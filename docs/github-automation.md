@@ -308,11 +308,13 @@ mode (full history, `fetch-depth: 0`) and `dir` mode (working tree), both
 failed scan still leaves the report retrievable; it never prints a matched
 secret to the job log. Unlike `sbom-vuln` below, this job fails on any
 detection (no `--exit-code` override, so gitleaks' non-zero default stands)
-and is already named in the *committed* `main-ruleset.json`'s
-`required_status_checks`. It is not yet a required check in the *active,
-applied* branch-protection ruleset described in "Publication and practical
-acceptance" above -- that only happens once the coordinator applies the
-committed file (see "Ruleset upgrade" below).
+and is named in `main-ruleset.json`'s `required_status_checks`. As of the
+"Ruleset upgrade, 2026-09-22" section below, this is also a required check in
+the *active, applied* branch-protection ruleset: `gh api
+repos/seathatflowsinourveins/native-agent-stack/rules/branches/main`
+(re-checked 2026-09-22 for `docs/decisions/2026-09-22-actions-hardening.md`)
+returns a `required_status_checks` rule listing `validate`, `token-report`
+and `secret-scan` under ruleset id 23739774.
 
 `supply-chain.yml`'s `sbom-vuln` job uses syft 1.52.0 (linux_amd64 tarball
 SHA-256 `caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d`,
@@ -509,4 +511,62 @@ which the `.gitleaks.toml` header records as a coordinator decision pending
 resolution before merge, not something this unit can fix. Local scans on this
 host go through the guarded `gitleaks` launcher (memory-capped, one scan per
 user); do not raise its limits to retry a failed scan.
+
+## Report-only Actions hardening, 2026-09-22
+
+Three GitHub Actions security lanes were adopted, each report-only (none is a
+required check) and recorded in
+[`docs/decisions/2026-09-22-actions-hardening.md`](decisions/2026-09-22-actions-hardening.md)
+with the exact evidence, alternatives and overturn condition.
+
+**`scorecard.yml` (OpenSSF Scorecard).** Runs `ossf/scorecard-action` pinned
+to the full commit SHA of `v2.4.4`
+(`2d1146689b8cda280b9bc96326124645441f03bc`, verified by dereferencing the
+annotated tag with `gh api repos/ossf/scorecard-action/git/tags/<sha>`) on a
+weekly schedule, `workflow_dispatch`, and push to `main`. `publish_results`
+is `false` -- results are never published to the public `api.scorecard.dev`
+dataset or badge -- and the job requests only `contents: read`; it does not
+use GitHub Advanced Security or `security-events: write`. The SARIF report is
+retained only as a workflow artifact (`scorecard-results-<run_id>`, 5-day
+retention), never uploaded to the Security tab.
+
+**`harden-runner` (step-security).** `step-security/harden-runner`, pinned to
+the full commit SHA of its latest release `v2.21.1`
+(`e14015d583714f6e62063499dc959a02595150a1`, from
+`gh api repos/step-security/harden-runner/releases/latest`), runs as the
+*first* step, before checkout, with `egress-policy: audit` (never `block`),
+on the following nine `ubuntu-24.04` jobs that download binaries or
+packages: `validate` and `secret-scan` (`validate.yml`), `sbom-vuln`
+(`supply-chain.yml`), `publish` (`publish-catalog.yml`), `freshness`
+(`catalog-freshness.yml`), `bootstrap-linux` (`adoption-bootstrap.yml`),
+`python` and `go` (`action-compatibility.yml`), and
+`nautilus-offline-replay` (`native-foundation-e2e.yml`). This is not every
+`ubuntu-24.04` job in the repository that downloads a binary or package:
+`bootstrap-macos` (`adoption-bootstrap.yml`) runs on `macos-15`, which
+`harden-runner` does not support; `synthetic-restore`
+(`native-offhost-restore.yml`) and `owned-guest-reboot`
+(`native-service-reboot.yml`) also run `apt-get install` and remain
+unhardened; and `source` and `destination`
+(`native-offhost-app-state.yml`) also download binaries but are pinned by
+exact byte hash in `blueprints/convergence-practice/offhost-app-state/plan.json`'s
+`frozen_sources` list (enforced by
+`tests/test_active_recovery_plans.py::test_default_application_plan_passes_actual_dispatch_source_guard`),
+so adding a step there needs a matching `plan.json` hash update in the same
+commit. All of these are recorded as a gap in
+[`docs/decisions/2026-09-22-actions-hardening-fix-round.md`](decisions/2026-09-22-actions-hardening-fix-round.md)
+for a future decision, not fixed by this record. Audit mode only logs
+observed egress; it cannot fail a job or block a network call, so it changes
+no existing pass/fail behavior.
+
+**`dependency-review.yml` (actions/dependency-review-action).** Pinned to
+the full commit SHA of its latest release `v5.0.0`
+(`a1d282b36b6f3519aa1f3fc636f609c47dddb294`, from
+`gh api repos/actions/dependency-review-action/releases/latest`), runs on
+`pull_request` only with `warn-only: true` and `contents: read`; it is not
+in `required_status_checks` and never blocks a PR. This repository is
+public (`gh api repos/seathatflowsinourveins/native-agent-stack --jq
+.visibility` returns `public`), so GitHub's dependency graph is on
+automatically and no GitHub Advanced Security requirement applies -- the
+private-repo conditional in the decision record's evidence section does not
+apply here and is recorded only as the check that was performed.
 

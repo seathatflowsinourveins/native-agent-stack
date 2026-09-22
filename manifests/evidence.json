@@ -2998,23 +2998,23 @@
     },
     {
       "path": ".github/workflows/action-compatibility.yml",
-      "sha256": "e20225fdb57a2651bbd9cf5320fcb81e56e2fb6568c88e595dbb51f8d15d6677",
-      "bytes": 4750
+      "sha256": "7314aed49a689300686c3d59fe702fc68c9a4092eed9bbc571c45f2e3796bafa",
+      "bytes": 5146
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "fad51d0ac95811d9749250aaf5e536127e4a219fa49610e73d40125a5e690e11",
-      "bytes": 9210
+      "sha256": "f658db4e87f0a2545b3e9da8f3e42c6c64c55e34957586edbe4b4b43a2130a2b",
+      "bytes": 9408
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "26de4c630de6841abb5c5a8f1f327a33f4fcc41275421bef631f082edc96c98a",
-      "bytes": 7637
+      "sha256": "4ee4b6f4976526219f2e15329a5ba1392dc471b4351e7d8f3f45120a78cc5c47",
+      "bytes": 7835
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
-      "sha256": "16b4ede4e4d14c93ed4eae315570b0872323c1ea05292f7ddcbee95028fa146f",
-      "bytes": 7770
+      "sha256": "9936d66500f267d208521064b969895d2d0d7f1f49247780d88ae3921db54616",
+      "bytes": 7968
     },
     {
       "path": ".github/workflows/native-offhost-app-state.yml",
@@ -3038,13 +3038,13 @@
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
-      "sha256": "6965c83b26f43a91764d2fd0d935aa06e9c2bd017f80c2f1e2404f768d1d5b84",
-      "bytes": 10820
+      "sha256": "5d04579839f4e76ab85d0c5a563f2f2b12049d07a1eedd1d2a741007b2781a5e",
+      "bytes": 11018
     },
     {
       "path": ".github/workflows/supply-chain.yml",
-      "sha256": "55abfe5a75a4d10ea4ad6da4209145823a06a0e28d445e42fed666f8a92323d8",
-      "bytes": 6688
+      "sha256": "d33f30444814f3b4a80b335083fd855b60f69a66d4ada425128ee11e1c2bfe43",
+      "bytes": 6886
     },
     {
       "path": ".github/workflows/token-report.yml",
@@ -3053,8 +3053,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "72798cb0398cbf5c67c6a14215fc9364f254735a0399b723430f9d8738f49eb0",
-      "bytes": 5594
+      "sha256": "423e8096b54a1df32f3e446c42649cfbbe95686fbbf7cd81bf4f110b92926f14",
+      "bytes": 5990
     },
     {
       "path": ".gitignore",
@@ -7624,7 +7624,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "c2510c95a2e7b52f7e490335bb7925d141c3d10b3c7496c433d2c1a37d080c75",
+      "sha256": "3993a81dac86a62bfdaf6f52339b10c6ba8ca577c0b1e0961395f8669d3d0fdd",
       "bytes": 12918514
     },
     {
@@ -7694,8 +7694,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "808586b230d9fa30c45a4e99e7cb52ef739a34dfa2e2a6e0c45e18eaca8d16a9",
-      "bytes": 32002
+      "sha256": "53901639629a081ed0be63538bae932c0e02dc4dbbee5feecebff0148b1ba4b1",
+      "bytes": 35715
     },
     {
       "path": "docs/grand-catalog-handbook.md",
