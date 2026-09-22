@@ -11,7 +11,7 @@ choice is retained, what happened to named alternatives, and what evidence would
 change the decision. Open [Choices & alternatives](../../docs/ecosystem/index.html#landscape)
 for the searchable offline view.
 
-The catalog references 61 selected components through 46 capability decisions. Its
+The catalog references 61 selected components through 47 capability decisions. Its
 registered evidence references are listed per capability. These are coverage counts, not a
 score of complete installation, execution or lifecycle acceptance.
 

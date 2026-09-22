@@ -6774,7 +6774,7 @@
     {
       "path": "docs/ecosystem/index.html",
       "bytes": 11106603,
-      "sha256": "f8be2d79bd95ea49f1621f085f234f0853b371a169da6687c2ada22827818f4f"
+      "sha256": "537221505040e55711996c88570c643e127f0cc625409d7a9758a61c7bd69ba1"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7773,7 +7773,7 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "8d29d9b5b84a04b5c9b5fc5d9a40153595fb947aab7f59084cd4372e6c6d30d7",
+      "sha256": "53a602e95ba4d3c80e6a4b0d0673554fea6a78417e816190e1c5d8cd25e7ea77",
       "bytes": 12942
     },
     {
