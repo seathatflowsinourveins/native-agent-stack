@@ -1,0 +1,30 @@
+{
+ "reconciliations": [
+  {
+   "layer": "backtesting-engine",
+   "kind": "selected_destination",
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "pin": "2.0.0rc5 (prerelease tag v2.0.0rc5, source 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+   "source": "catalogs/us-equities/runtime-target.json#/engine and docs/foundation-rd-readiness.md",
+   "note": "The engines-strategies card still records lean=default and nautilustrader=alternative at 1.231.0; the runtime target, the adaptive-paper practice and the equity replay run on 2.0.0rc5. GitHub's latest non-prerelease is still v1.231.0; 2.0.0 final has not shipped. LEAN remains the frozen historical comparator (SPY/LEAN parity still planned_not_executed)."
+  },
+  {
+   "layer": "execution-broker",
+   "kind": "selected_paths",
+   "paths": [
+    {"broker": "ibkr", "path": "NautilusTrader native IBKR adapter (crates/adapters/interactive_brokers)", "acceptance": "not_established"},
+    {"broker": "alpaca", "path": "custom deterministic Python adapter in blueprints/us-equities/adaptive-paper on alpaca-py 0.44.0", "acceptance": "bounded paper smoke and adaptive practice receipts; continuous operation and native fault cases unqualified"}
+   ],
+   "source": "catalogs/us-equities/runtime-target.json#/broker_boundaries",
+   "note": "trading-by-layer has no IBKR entry at default/conditional (ib-async is alternative); lean-alpaca is the LEAN-era default and is retained as reference only."
+  },
+  {
+   "layer": "code-navigation",
+   "kind": "in_use_not_pinned",
+   "repository": "https://github.com/BurntSushi/ripgrep",
+   "pin": "ripgrep 14.1.0 (/usr/bin/rg, Ubuntu package)",
+   "source": "agent-lab AGENTS.md mandates rg; docs/foundation-closure-20260921.md names it first",
+   "note": "Not a manifests/stack.json component; recorded here so the provenance gap the critic found is visible."
+  }
+ ]
+}

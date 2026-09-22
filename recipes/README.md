@@ -4,6 +4,12 @@ This guide contains the shared native recipes. The [adoption recipe map](../adop
 
 The examples target Linux/WSL x86_64. Use a current native Node.js 24, npm, Python 3.13, uv, Git and GitHub CLI as applicable. GPU serving additionally requires a compatible NVIDIA driver and enough free device memory. Desktop's Linux runtime and native Codex can have different configuration homes: run each client's own supported setup in its intended home, without copying authentication files between them.
 
+## Recipe index
+
+| Recipe | Scope |
+| --- | --- |
+| [SOTA convergence practice](sota-convergence-practice.md) | Reproducible dated repository-convergence recipe (`tools/sota-convergence/`): when to rerun, the six commands, evidence classes, the never-promote rule, and the cross-family review/PR/CI step. |
+
 ## Paths, pins and installation conventions
 
 Set these in the current shell, replacing the project path with this clone's absolute path:
