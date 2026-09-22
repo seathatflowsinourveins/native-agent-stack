@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "headroom-0.38.0-upgrade-recovery",
+  "date": "2026-09-22",
+  "layer_ids": ["token-efficiency"],
+  "gap_refs": [{"layer_id": "token-efficiency", "gap_index": 2}],
+  "purpose": "Install headroom-ai==0.38.0 (mcp extra) into a NEW isolated uv-tool prefix alongside the pinned 0.37.0, read its actual CLI/MCP docs, and run the same guarded MCP compress/retrieve recovery check the 0.37.0 receipt ran, to settle whether the pin_behind_upstream flag on token-efficiency gap 2 is safe to advance.",
+  "preregistered": "If headroom_compress+headroom_retrieve on 0.38.0 returns byte-for-byte original content (sha256 match) for the owned fixtures/rag-note.md artifact and the CLI help confirms the critic's correction (no `headroom compress` CLI subcommand, MCP-only path), the pin_behind_upstream flag can advance from 0.37.0 to 0.38.0 as a safe upgrade candidate; if recovery is inexact, or the MCP tool errors, or a compress CLI subcommand now exists contradicting the correction, the pin stays at 0.37.0 and the discrepancy is recorded honestly. This check does not exercise the proxy-intercept path (proxy target 127.0.0.1:1 is intentionally unreachable, matching the 0.37.0 receipt's own fixture) and does not touch the live 0.37.0 install or its ledger.",
+  "commands": [
+    {"cmd": "headroom --version (pinned 0.37.0, pre-check)", "exit": 0, "duration_s": 0.1, "output_excerpt": "headroom, version 0.37.0", "output_sha256": null},
+    {"cmd": "UV_TOOL_DIR=<new-prefix>/uv-tool-dir UV_TOOL_BIN_DIR=<new-prefix>/bin UV_PYTHON=.../python3.13 uv tool install --python 3.13 'headroom-ai[mcp]==0.38.0'", "exit": 0, "duration_s": 1.08, "output_excerpt": "Installed 2 executables: headroom, headroom-cache-ttl", "output_sha256": null},
+    {"cmd": "<new-prefix>/bin/headroom --version", "exit": 0, "duration_s": 0.2, "output_excerpt": "headroom, version 0.38.0", "output_sha256": null},
+    {"cmd": "<new-prefix>/bin/headroom --help | grep -iE 'compress|mcp'", "exit": 0, "duration_s": 0.2, "output_excerpt": "no `compress` top-level command listed; commands are audit-reads, evals, inspect, mcp, savings (each description mentions 'compression' but there is no bare `compress` verb)", "output_sha256": null},
+    {"cmd": "<new-prefix>/bin/headroom mcp --help", "exit": 0, "duration_s": 0.2, "output_excerpt": "MCP server for Claude Code integration... tools are named headroom_retrieve / headroom_compress / etc. ... Commands: install, reconcile, serve, status, uninstall", "output_sha256": null},
+    {"cmd": "mcporter call --stdio <new-prefix>/bin/headroom --stdio-arg mcp --stdio-arg serve --stdio-arg --proxy-url --stdio-arg http://127.0.0.1:1 --name headroom038check --tool headroom_compress --args '{\"content\": \"<fixtures/rag-note.md, 351 bytes>\"}' --output json --no-oauth", "exit": 0, "duration_s": 5, "output_excerpt": "{\"hash\": \"27680cf43a65121fc1affbde\", \"original_tokens\": 75, \"compressed_tokens\": 75, \"tokens_saved\": 0, \"transforms\": [\"router:noop\"], \"proxy\": {\"status\": \"unreachable\"}}", "output_sha256": "771cf5dbe29805d47973f16d617e60495eaf9e37f9e3e9f03b42094e63d22af9"},
+    {"cmd": "mcporter call --stdio <new-prefix>/bin/headroom --stdio-arg mcp --stdio-arg serve --stdio-arg --proxy-url --stdio-arg http://127.0.0.1:1 --name headroom038check --tool headroom_retrieve --args '{\"hash\":\"27680cf43a65121fc1affbde\"}' --output json --no-oauth", "exit": 0, "duration_s": 5, "output_excerpt": "{\"hash\": \"27680cf43a65121fc1affbde\", \"source\": \"local\", \"original_content\": \"# Automatic local code RAG...\", \"retrieval_count\": 1}", "output_sha256": "a8aef1e3c00b7fed3ab1fedf615d65760a6d16131944d7fab1b0c31d4e55596b"},
+    {"cmd": "mcporter call --stdio <new-prefix>/bin/headroom --stdio-arg mcp --stdio-arg serve --stdio-arg --proxy-url --stdio-arg http://127.0.0.1:1 --name headroom038check --tool headroom_stats --args '{}' --output json --no-oauth", "exit": 0, "duration_s": 5, "output_excerpt": "{\"sub_agents\": {\"compressions\": 1, \"retrievals\": 1, \"tokens_saved\": 0}, \"combined\": {\"total_compressions\": 1, \"total_tokens_saved\": 0}}", "output_sha256": "c917a972d253a6440ff03908d625d76b44c7f2e7c9f316b4f804425e28f850e2"},
+    {"cmd": "python3 -c \"orig==retrieved; sha256(orig)==sha256(retrieved)\" (independent recovery verification)", "exit": 0, "duration_s": 0.1, "output_excerpt": "exact_match: True; orig_sha256: 27680cf43a65121fc1affbde0dba8021ea21180bb8db0a9c0f80a09b831257cc; retrieved_sha256: (same)", "output_sha256": null},
+    {"cmd": "curl -fsSL https://pypi.org/pypi/headroom-ai/0.38.0/json (read-only checksum verification)", "exit": 0, "duration_s": 0.5, "output_excerpt": "headroom_ai-0.38.0-cp310-abi3-manylinux_2_28_x86_64.whl sha256=941d1f0c0aa0754bd4959bba0b212d1554a56c179c0643dd7852a4b9d95c7db7", "output_sha256": null}
+  ],
+  "tool_versions": {
+    "headroom_pinned": "0.37.0",
+    "headroom_new": "0.38.0",
+    "uv": "0.12.17",
+    "python": "3.13.15",
+    "mcporter": "0.13.13",
+    "mcp_python_sdk": "1.30.0"
+  },
+  "installs": [
+    {
+      "name": "headroom-ai[mcp]",
+      "version": "0.38.0",
+      "prefix": "/home/example/.local/share/codex-ecosystem/tools/headroom-ai-0.38.0",
+      "source_url": "https://pypi.org/pypi/headroom-ai/0.38.0/json",
+      "sha256": "941d1f0c0aa0754bd4959bba0b212d1554a56c179c0643dd7852a4b9d95c7db7"
+    }
+  ],
+  "result": "0.38.0 CLI help confirms the critic's correction: there is no `headroom compress` CLI subcommand (only audit-reads/evals/inspect/mcp/savings, each of which mentions compression in its description but none is a bare `compress` verb); the MCP path (`headroom mcp serve`, tools headroom_compress/headroom_retrieve/headroom_stats) is unchanged in shape from 0.37.0. A live MCP session on the new 0.38.0 binary compressed the owned fixtures/rag-note.md (351 bytes / 75 tokens) with transform 'router:noop' (no reduction for this small artifact) and headroom_retrieve returned content that matched the original byte-for-byte (sha256 27680cf43a65121fc1affbde0dba8021ea21180bb8db0a9c0f80a09b831257cc on both sides; headroom's own content hash 27680cf43a65121fc1affbde is confirmed to be the first 24 hex chars of that same sha256). The configured proxy at 127.0.0.1:1 was reported unreachable exactly as in the 0.37.0 receipt's fixture, so the proxy-intercept path itself was not exercised by either version's receipt. The pinned 0.37.0 install was not modified.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "supports_incumbent",
+    "explanation": "Exact MCP compress/retrieve recovery holds on 0.38.0 for this owned fixture and the CLI-surface shape (no compress subcommand) matches the critic's correction, so nothing here blocks advancing the pin_behind_upstream flag from 0.37.0 to 0.38.0. It only partially settles gap 2 because this run used one small, low-entropy fixture (351 bytes, noop transform triggered) rather than the larger MCP-tool-listing fixture that produced the 0.37.0 receipt's 36,625-vs-19,714-token compression numbers, so compression-ratio behavior on 0.38.0 (as opposed to exact-recovery correctness) is not yet independently confirmed at that scale."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Fixture is small (351 bytes / 75 tokens) and triggered a no-op transform, so this run demonstrates exact recovery but not a compression-ratio comparison against the 0.37.0 receipt's larger fixture.",
+    "The configured Headroom proxy (127.0.0.1:1) was unreachable by design in both the 0.37.0 and 0.38.0 fixtures, so automatic proxy-intercept compression was not exercised by either receipt.",
+    "Only one MCP round-trip (compress+retrieve+stats) was run once as preregistered; no retry or alternate-fixture rerun was performed.",
+    "Individual MCP call durations were not precisely instrumented (each completed well under its 60s command timeout); duration_s values for those three commands are approximate.",
+    "The installed wheel's sha256 was not independently recomputed from the local uv cache; it is recorded from PyPI's published JSON API digest for the matching platform tag, which the installer would have verified against at download time."
+  ],
+  "raw_artifacts": [
+    {"path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/token-observation/headroom-0.38.0-check/compress.json", "sha256": "771cf5dbe29805d47973f16d617e60495eaf9e37f9e3e9f03b42094e63d22af9"},
+    {"path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/token-observation/headroom-0.38.0-check/retrieve.json", "sha256": "a8aef1e3c00b7fed3ab1fedf615d65760a6d16131944d7fab1b0c31d4e55596b"},
+    {"path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/token-observation/headroom-0.38.0-check/stats.json", "sha256": "c917a972d253a6440ff03908d625d76b44c7f2e7c9f316b4f804425e28f850e2"},
+    {"path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/token-observation/headroom-0.38.0-check/prior-0.37.0-receipt.json", "sha256": "28e71ba00f3306aff103f52f2f82fb711e2e1ef95d35cf718b0afe72ed144b2a"}
+  ]
+}

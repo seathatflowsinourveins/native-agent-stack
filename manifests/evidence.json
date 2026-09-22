@@ -12086,6 +12086,46 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-agents-models-workers-20260922.json",
       "sha256": "cc48e0009abf6a5bee0ec3511e176b091ed1e23ac11ac2fe74c63c2eea919a09",
       "bytes": 26372
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/headroom-0.38.0-upgrade-recovery.json",
+      "sha256": "5a678203430da7904df64d66e72cbd1f82d22ab64742f0dc5104a3d495594704",
+      "bytes": 9110
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/rtk-second-artifact-pair.json",
+      "sha256": "07da607ac095491b13fabd136e88b284a51fa70277292cb6cd75638c15df120e",
+      "bytes": 6932
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/ccusage-real-log-coverage.json",
+      "sha256": "56cd603682515e30734458983d126cc65b8cb5d33d437d5dd909642d8e9138dd",
+      "bytes": 7951
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/observation-inference/observability-offline-regression.json",
+      "sha256": "e9ba66a759c0a54a290542afd20add68a887b0d7d56234d740227c3b9e06bba0",
+      "bytes": 3603
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/run.sh",
+      "sha256": "c635d9a13c1c9092f7a5bc3d7a55572cc9e615d5b12e8574b85281d5d8f99f1e",
+      "bytes": 2289
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/rtk-second-artifact-pair/run.sh",
+      "sha256": "7744487a401d2dadffc622c5f457571f9d3e1f12ac7cec26ec1a99477609681d",
+      "bytes": 1538
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/ccusage-real-log-coverage/run.sh",
+      "sha256": "edec3276cfe37609d828336723ee3991ef168d4bcd95818d3652bea04b81ed48",
+      "bytes": 1842
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/observability-offline-regression/run.sh",
+      "sha256": "853799b3b37231811b40f7824d4e640523fc128e8eca397c0141067ac05be6ad",
+      "bytes": 475
     }
   ],
   "convergence_records": [
