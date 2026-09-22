@@ -29,9 +29,16 @@ python3 tools/sota-convergence/extract_layers.py --repo-root . --out "$WORK_DIR"
 # 2. Authenticated GitHub metadata (network; gh must already be signed in)
 python3 tools/sota-convergence/github_freshness.py --work-dir "$WORK_DIR" --workers 6
 
-# 3. Review lanes -- the agent-lab saved workflow, not a manual step
-#    (reads/writes files under $WORK_DIR; see .claude/workflows/ for the graph name)
-run-saved-workflow sota-convergence --args '{"work_dir": "'"$WORK_DIR"'"}'
+# 3. Review lanes -- an agent-lab saved workflow, not a manual step and not a
+#    CLI command. In Claude Code, with ultracode on (see .claude/settings.json),
+#    run the saved workflow by name "sota-convergence" with args:
+#      {work_dir, repo, lanes?, refuters?, budgets?, max_proposals_per_lane?}
+#    The workflow itself writes nothing to disk: it reads the working files and
+#    the freshness snapshot from $WORK_DIR and returns one top-level object
+#    {lanes, critic, lost} (the same shape build_manifest.py --lanes consumes:
+#    lanes: [{lane, result: {layers: [...], calls, limits}, proposals: [...]}],
+#    critic, lost). The coordinator -- not the workflow -- must persist that
+#    returned object verbatim to "$WORK_DIR/lanes.json" before step 4 runs.
 
 # 4. Merge into the dated manifest (no network; refuses to write on a leak)
 python3 tools/sota-convergence/build_manifest.py \

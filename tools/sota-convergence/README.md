@@ -27,7 +27,14 @@ default reconciliation file. No step here calls a model.
    of the three working files above and writes `github-freshness.json` with
    stars, `pushed_at`, latest release/tag, head commit, license, archived and
    rename status per repository. Resumable: a repository already present in
-   `--out` is skipped unless `--refresh`; `--max-repos` bounds a trial run.
+   `--out` *without* an `"error"` field is skipped unless `--refresh`; a
+   repository whose record carries `"error"` (from a `gh` timeout or failure)
+   stays pending and is retried on the next run. One `gh` call raising (a
+   timeout, missing binary, etc.) never aborts the batch -- `gh_api` catches
+   it and records `{"error": "..."}` for that repository only -- and
+   progress is checkpointed to `--out` every 25 fetched repositories and
+   again in a `finally` block, so a long run interrupted partway still leaves
+   what it fetched on disk. `--max-repos` bounds a trial run.
 
    ```sh
    python3 tools/sota-convergence/github_freshness.py --work-dir /path/to/work-dir --workers 6
@@ -64,12 +71,18 @@ default reconciliation file. No step here calls a model.
 
 - **Pin-vs-upstream** (`classify_pin`): a component/entry only counts as
   `pin_behind_upstream` when its repository is a GitHub URL, its pin is not a
-  `.devN` commit-tracking pin (e.g. `2.0.0.dev0 @ <commit>`), and its parsed
-  leading version is lower than GitHub's latest release/tag. Non-GitHub
-  repositories (OS packages such as systemd) and `.devN` pins are excluded
-  from the comparison rather than counted either way. A version merely
-  *annotated* with a commit fingerprint (`0.25.0 (<commit>)`) is still
-  compared normally.
+  `.devN` commit-tracking pin (e.g. `2.0.0.dev0 @ <commit>`), its pin is not
+  an OS-distribution package pin, and its parsed leading version is lower
+  than GitHub's latest release/tag. Non-GitHub repositories and `.devN` pins
+  are excluded from the comparison rather than counted either way. An
+  OS-package pin is excluded even when the project's own `repository` field
+  is a real GitHub URL (e.g. `systemd/systemd`): a distro package string like
+  `255.4-1ubuntu8.17` is not comparable to an upstream tag. Detection is
+  twofold -- an `-NubuntuM` / `-Ndeb` / `+debN` suffix on the pin itself, or
+  the component/entry id being in `--os-package-ids` (default: `systemd`),
+  which also excludes a distro pin that happens not to match the suffix
+  pattern. A version merely *annotated* with a commit fingerprint
+  (`0.25.0 (<commit>)`) is still compared normally.
 - **Selected trading baseline**: only catalog `decision` values `default` and
   `conditional` are promoted into a manifest row; `alternative`/`watch`/
   `excluded` entries stay discoverable in `trading-by-layer.json` and can
@@ -80,6 +93,14 @@ default reconciliation file. No step here calls a model.
 - **Sanitize-then-refuse**: `sanitize()` strips `/home/...` fragments;
   `assert_no_leak()` then raises if `/home/` or `APCA` is still present, and
   `build_manifest.py` never writes on that path.
+- **Deterministic ordering**: per-layer `components`/`entries` and
+  `candidates` are sorted by `(decision-rank, id)` (`row_item_sort_key`) and
+  `(disposition-rank, repository)` (`candidate_sort_key`) respectively before
+  being written, not left in the source JSON's or the lane's insertion order.
+  Rebuilding the manifest from the same working files and `lanes.json`
+  content -- even if a lane lists its candidates or a catalog lists its
+  entries in a different order -- produces byte-identical row ordering, so
+  reruns diff cleanly.
 
 ## Evidence classes
 
@@ -103,16 +124,35 @@ acceptance, or superiority.
 `build_manifest.py` run against the real 2026-09-22 working files reproduces
 `catalogs/sota-convergence/manifest-20260922.json` exactly on the
 `(layer, repository, review_status)` identity set for both foundation and
-trading, on `candidates_total`/`candidates_by_disposition`, and on
-`components_confirmed`. The raw/unique `pins_behind_upstream` counts differ
-by a small, understood margin: two GitHub-metadata `.devN` pins
-(`serena`, `alphalens-reloaded`) that the *published* manifest's own prose
-already says are "ahead of GitHub's latest release" were nonetheless flagged
-`True` by the original, unrecovered baseline generator -- `classify_pin`'s
-`.devN` rule fixes exactly that inconsistency, per its own worked example.
-`modal`'s freshness in the original run came from a live PyPI read (noted in
-the trading lane's own limitations as one of "six PyPI JSON reads" outside
-the `gh api`/`web_fetch`/`web_search` budget); this tool's freshness step is
-GitHub-only, so `modal`'s pin-vs-upstream comparison is not reproducible
-without adding a PyPI fetch. Neither difference changes a selection,
-candidate disposition, or count that a decision was made from.
+trading, on `candidates_total`/`candidates_by_disposition`,
+`pins_behind_upstream_unique_components` and `components_confirmed`. Rerun
+2026-09-22 against `/home/seath/codex-ecosystem/state/sota-convergence-20260922/`
+(read-only inputs): `foundation_layers=16, trading_layers=12,
+components_confirmed=106, candidates_total=34,
+pins_behind_upstream_unique_components=15,
+candidates_by_disposition={not_adopted_confirmed:10,
+refuted_targeted_candidate:6, refuted_keep_but_compare:11,
+refuted_not_adopted:6, targeted_candidate:1}` -- all match the published
+manifest's `counts` exactly.
+
+The raw (non-deduplicated, sums every layer occurrence) `pins_behind_upstream`
+count differs by a small, understood margin -- 26 here vs. 33 published, a
+gap of exactly 7 occurrences across four ids that the published manifest's
+own prose already flags as false positives, not four newly-behind repos:
+`serena` and `alphalens-reloaded` (`.devN` GitHub-metadata pins the published
+prose says are "ahead of GitHub's latest release" but the original,
+unrecovered baseline generator nonetheless flagged `True` -- `classify_pin`'s
+`.devN` rule fixes exactly that inconsistency, per its own worked example);
+`systemd` (an Ubuntu-package pin on a real GitHub repository, flagged
+`pin_behind_upstream: true` three times across `workers`,
+`scheduling-supervision` and `recovery-portability` in the published data
+even though the published manifest's own review note already calls the
+behind-flag "a category error" -- this is the bug `classify_pin`'s
+OS-package-pin exclusion fixes); and `modal` (its freshness in the original
+run came from a live PyPI read, noted in the trading lane's own limitations
+as one of "six PyPI JSON reads" outside the `gh api`/`web_fetch`/`web_search`
+budget -- this tool's freshness step is GitHub-only, so `modal`'s
+pin-vs-upstream comparison is not reproducible without adding a PyPI fetch).
+None of these four changes a selection, candidate disposition, or count that
+a decision was made from -- and `pins_behind_upstream_unique_components`
+(15) already excludes all four in both the published and the rerun manifest.

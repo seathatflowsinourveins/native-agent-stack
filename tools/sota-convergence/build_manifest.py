@@ -20,14 +20,18 @@ candidate/alternative mechanism, never by catalog membership alone.
 Pin-vs-upstream rule: a component/entry counts as ``pin_behind_upstream``
 only when its repository is a GitHub URL, its pin is not a ``.devN``
 commit-tracking pin (e.g. ``2.0.0.dev0 @ c6fbd1c...`` or
-``2.0.0.dev0 (c6fbd1c)``), and its parsed leading version is lower than
-GitHub's latest release/tag. Non-GitHub repositories (including bare
-OS-package pins such as systemd) and ``.devN`` commit-pinned components are
-excluded from the comparison rather than silently counted as "behind" or
-"not behind" -- see ``classify_pin``. A version merely *annotated* with a
-commit fingerprint (e.g. ``0.25.0 (702f4814...)``) is still compared
-normally: the fingerprint documents provenance, it does not make the
-release incomparable.
+``2.0.0.dev0 (c6fbd1c)``), its pin is not an OS-distribution package pin
+(e.g. ``255.4-1ubuntu8.17`` for systemd -- a distro package string compared
+against an upstream tag is a category error even when the project's own
+repository happens to be on GitHub), and its parsed leading version is lower
+than GitHub's latest release/tag. Non-GitHub repositories, OS-package pins
+(matched by an ``-NubuntuM`` / ``-Ndeb`` / ``+debN`` pin suffix, or by
+component/entry id via ``--os-package-ids``, default ``["systemd"]``) and
+``.devN`` commit-pinned components are excluded from the comparison rather
+than silently counted as "behind" or "not behind" -- see ``classify_pin``. A
+version merely *annotated* with a commit fingerprint (e.g.
+``0.25.0 (702f4814...)``) is still compared normally: the fingerprint
+documents provenance, it does not make the release incomparable.
 
 Disposition rule: a lane proposes a label; two adversarial refuters try to
 break the proposal. A surviving ``not_adopted`` stays not adopted --
@@ -49,6 +53,12 @@ GITHUB_RE = re.compile(r"^https?://github\.com/")
 # GitHub's latest release/tag. A version number merely *annotated* with a commit
 # fingerprint (e.g. "0.25.0 (702f4814...)") is still a real, comparable release.
 DEV_PIN_RE = re.compile(r"\.dev\d*\b", re.IGNORECASE)
+# An OS-distribution package pin (Ubuntu/Debian style, e.g. "255.4-1ubuntu8.17"
+# or "1.2.3-1deb11u1" / "1.2.3+deb11u1") is a distro package string, not an
+# upstream release; it is never comparable to a GitHub tag even when the
+# project's own repository field is a real GitHub URL (e.g. systemd/systemd).
+OS_PIN_RE = re.compile(r"-\d+ubuntu\d*|-\d+deb\d*(?:u\d+)?|\+deb\d+u?\d*", re.IGNORECASE)
+DEFAULT_OS_PACKAGE_IDS = ("systemd",)
 VERSION_RE = re.compile(r"(\d+)\.(\d+)(?:\.(\d+))?")
 
 
@@ -73,10 +83,17 @@ def parse_version(text):
     return tuple(int(g) if g else 0 for g in match.groups())
 
 
-def classify_pin(pin, repository, upstream_latest):
-    """Return {"behind": bool, "excluded": bool, "reason": str|None}."""
+def classify_pin(pin, repository, upstream_latest, component_id=None, os_package_ids=DEFAULT_OS_PACKAGE_IDS):
+    """Return {"behind": bool, "excluded": bool, "reason": str|None}.
+
+    ``os_package_ids`` is an explicit allow-list of component/entry ids
+    (default ``("systemd",)``) that are always treated as OS-package pins,
+    regardless of pin format, in addition to the ``OS_PIN_RE`` regex match on
+    the pin string itself (Ubuntu/Debian suffix style)."""
     if not repository or not GITHUB_RE.match(repository):
         return {"behind": False, "excluded": True, "reason": "non_github_or_os_package"}
+    if (component_id in (os_package_ids or ())) or (pin and OS_PIN_RE.search(pin)):
+        return {"behind": False, "excluded": True, "reason": "os_package_pin"}
     if pin and DEV_PIN_RE.search(pin):
         return {"behind": False, "excluded": True, "reason": "commit_pinned"}
     pin_version = parse_version(pin)
@@ -105,7 +122,8 @@ def compute_upstream(repository, repositories: dict) -> dict:
 # Baseline: foundation-layers.json + trading-by-layer.json + freshness
 # ---------------------------------------------------------------------------
 
-def build_baseline_foundation(foundation_layers: dict, repositories: dict) -> list:
+def build_baseline_foundation(foundation_layers: dict, repositories: dict,
+                               os_package_ids=DEFAULT_OS_PACKAGE_IDS) -> list:
     rows = []
     for layer in foundation_layers.get("layers", []):
         components = []
@@ -113,7 +131,8 @@ def build_baseline_foundation(foundation_layers: dict, repositories: dict) -> li
             repository = component.get("repository")
             pin = component.get("version") or component.get("pin")
             upstream = compute_upstream(repository, repositories)
-            classification = classify_pin(pin, repository, upstream.get("latest"))
+            classification = classify_pin(pin, repository, upstream.get("latest"),
+                                           component_id=component["id"], os_package_ids=os_package_ids)
             components.append({
                 "id": component["id"], "repository": repository, "pin": pin,
                 "upstream": upstream, "behind": classification["behind"],
@@ -127,7 +146,8 @@ def build_baseline_foundation(foundation_layers: dict, repositories: dict) -> li
 SELECTED_TRADING_DECISIONS = ("default", "conditional")
 
 
-def build_baseline_trading(trading_by_layer: dict, repositories: dict) -> list:
+def build_baseline_trading(trading_by_layer: dict, repositories: dict,
+                            os_package_ids=DEFAULT_OS_PACKAGE_IDS) -> list:
     """Only 'default' and 'conditional' catalog decisions are the current
     selected baseline; 'alternative', 'watch' and 'excluded' entries stay
     discoverable in trading-by-layer.json but are not promoted into the
@@ -142,7 +162,8 @@ def build_baseline_trading(trading_by_layer: dict, repositories: dict) -> list:
             repository = entry.get("repository")
             pin = entry.get("version_or_commit") or entry.get("pin")
             upstream = compute_upstream(repository, repositories)
-            classification = classify_pin(pin, repository, upstream.get("latest"))
+            classification = classify_pin(pin, repository, upstream.get("latest"),
+                                           component_id=entry["id"], os_package_ids=os_package_ids)
             entries.append({
                 "id": entry["id"], "repository": repository, "decision": entry.get("decision"),
                 "pin": pin, "upstream": upstream, "behind": classification["behind"],
@@ -156,18 +177,28 @@ def build_baseline_trading(trading_by_layer: dict, repositories: dict) -> list:
 # Disposition and sanitization
 # ---------------------------------------------------------------------------
 
+PROPOSABLE_LABELS = frozenset({"not_adopted", "keep_but_compare", "targeted_candidate"})
+
+
 def disposition(label, survives):
     """The lane proposes a label; two refuters try to break the proposal. A
-    surviving not_adopted stays not adopted - survival never upgrades a label."""
+    surviving not_adopted stays not adopted - survival never upgrades a label.
+
+    ``label`` is validated against the fixed proposable set first: anything
+    else (``None``, a typo, or a label a lane invented) is normalized to
+    ``"unlabelled"`` before the survives logic runs, so an unrecognised label
+    can never pass through unchanged into a promotable-looking value."""
+    if label not in PROPOSABLE_LABELS:
+        label = "unlabelled"
     if survives is None:
         return f"{label}_unverified"
     if not survives:
-        return "refuted_" + (label or "unlabelled")
+        return "refuted_" + label
     return {
         "not_adopted": "not_adopted_confirmed",
         "keep_but_compare": "keep_but_compare",
         "targeted_candidate": "targeted_candidate",
-    }.get(label, label or "unlabelled")
+    }.get(label, "unlabelled")
 
 
 HOST_PATH_RE = re.compile(r"/home/[^\s\"']+")
@@ -242,14 +273,59 @@ def merge_lanes(lanes_doc: dict, repositories: dict):
 
 
 # ---------------------------------------------------------------------------
+# Deterministic ordering (so two runs against unchanged inputs, or the same
+# lanes.json content with proposals/candidates written in a different order,
+# diff cleanly)
+# ---------------------------------------------------------------------------
+
+# Rank used only as the primary sort key; ties (or rows without a "decision"
+# field, e.g. foundation components) fall back to "id" and are otherwise
+# untouched -- this does not change which rows are selected, only the order
+# they are written in.
+DECISION_RANK = {"default": 0, "conditional": 1}
+
+# Candidates are grouped by disposition maturity: promotable-looking labels
+# first, then their unverified form, then refuted, with an unknown/future
+# disposition placed last (rather than raising) so a rerun still diffs
+# cleanly instead of erroring.
+CANDIDATE_DISPOSITION_RANK = {
+    "targeted_candidate": 0,
+    "keep_but_compare": 1,
+    "not_adopted_confirmed": 2,
+    "targeted_candidate_unverified": 3,
+    "keep_but_compare_unverified": 4,
+    "not_adopted_unverified": 5,
+    "unlabelled_unverified": 6,
+    "refuted_targeted_candidate": 7,
+    "refuted_keep_but_compare": 8,
+    "refuted_not_adopted": 9,
+    "refuted_unlabelled": 10,
+    "unlabelled": 11,
+}
+
+
+def row_item_sort_key(item):
+    return (DECISION_RANK.get(item.get("decision"), 0), item["id"])
+
+
+def candidate_sort_key(candidate):
+    return (CANDIDATE_DISPOSITION_RANK.get(candidate["disposition"], 99), candidate.get("repository") or "")
+
+
+def sorted_candidates(cands, layer_id):
+    return sorted(cands.get(layer_id, []), key=candidate_sort_key)
+
+
+# ---------------------------------------------------------------------------
 # Manifest assembly
 # ---------------------------------------------------------------------------
 
 def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading_by_layer,
-                    freshness_doc, lanes_doc, reconciliations, taxonomy) -> dict:
+                    freshness_doc, lanes_doc, reconciliations, taxonomy,
+                    os_package_ids=DEFAULT_OS_PACKAGE_IDS) -> dict:
     repositories = freshness_doc.get("repositories", {})
-    baseline_foundation = build_baseline_foundation(foundation_layers, repositories)
-    baseline_trading = build_baseline_trading(trading_by_layer, repositories)
+    baseline_foundation = build_baseline_foundation(foundation_layers, repositories, os_package_ids=os_package_ids)
+    baseline_trading = build_baseline_trading(trading_by_layer, repositories, os_package_ids=os_package_ids)
     status, notes, alts, cands, gaps, calls, limits = merge_lanes(lanes_doc, repositories)
 
     manifest = {
@@ -283,10 +359,11 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
                 "review_note": lane_status.get("note"),
                 "evidence": lane_status.get("evidence", []) + notes.get((layer_id, component["repository"]), []),
             })
+        components.sort(key=row_item_sort_key)
         manifest["foundation"].append({
             "layer": layer_id, "title": row["title"], "components": components,
             "alternatives_keep_but_compare": alts.get(layer_id, []),
-            "candidates": cands.get(layer_id, []),
+            "candidates": sorted_candidates(cands, layer_id),
             "open_gaps": sorted(set(gaps.get(layer_id, []))),
         })
 
@@ -302,10 +379,11 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
                 "review_note": lane_status.get("note"),
                 "evidence": lane_status.get("evidence", []) + notes.get((layer_id, entry["repository"]), []),
             })
+        entries.sort(key=row_item_sort_key)
         manifest["trading"].append({
             "layer": layer_id, "entries": entries,
             "alternatives_keep_but_compare": alts.get(layer_id, []),
-            "candidates": cands.get(layer_id, []),
+            "candidates": sorted_candidates(cands, layer_id),
             "open_gaps": sorted(set(gaps.get(layer_id, []))),
         })
 
@@ -315,7 +393,7 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
             manifest["trading"].append({
                 "layer": layer_id, "entries": [],
                 "alternatives_keep_but_compare": alts.get(layer_id, []),
-                "candidates": cands.get(layer_id, []),
+                "candidates": sorted_candidates(cands, layer_id),
                 "open_gaps": sorted(set(gaps.get(layer_id, []))),
                 "note": "layer id named by a review lane outside the baseline taxonomy",
             })
@@ -348,9 +426,11 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
         ),
         "candidates_total": sum(len(row["candidates"]) for row in all_rows),
         "pins_behind_upstream_unique_components": len(pins_behind_unique),
-        "pins_behind_note": "components with a commit-pinned version (a parenthetical hash) or a "
-                             "non-GitHub repository (including OS packages) are excluded from the "
-                             "pin-vs-upstream comparison rather than counted either way",
+        "pins_behind_note": "components with a commit-pinned version (a parenthetical hash), a "
+                             "non-GitHub repository, or an OS-distribution package pin (matched by "
+                             "an -Nubuntu/-Ndeb/+debN pin suffix, or by id via --os-package-ids, "
+                             "e.g. systemd even though its own repository is on GitHub) are excluded "
+                             "from the pin-vs-upstream comparison rather than counted either way",
         "candidates_by_disposition": dict(Counter(
             candidate["disposition"] for row in all_rows for candidate in row["candidates"]
         )),
@@ -376,6 +456,9 @@ def parse_args(argv=None):
     parser.add_argument("--checked-at", required=True)
     parser.add_argument("--id", dest="manifest_id", required=True)
     parser.add_argument("--scope", default=None)
+    parser.add_argument("--os-package-ids", nargs="*", default=list(DEFAULT_OS_PACKAGE_IDS),
+                         help="Component/entry ids always excluded from pin-vs-upstream as OS-distribution "
+                              "packages, regardless of pin format (default: %(default)s).")
     return parser.parse_args(argv)
 
 
@@ -408,7 +491,7 @@ def main(argv=None) -> int:
         checked_at=args.checked_at, manifest_id=args.manifest_id, scope=scope,
         foundation_layers=foundation_layers, trading_by_layer=trading_by_layer,
         freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=reconciliations,
-        taxonomy=taxonomy,
+        taxonomy=taxonomy, os_package_ids=tuple(args.os_package_ids),
     )
 
     text = sanitize(json.dumps(manifest, indent=1))

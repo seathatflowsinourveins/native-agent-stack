@@ -85,7 +85,14 @@ def build_targets(urls) -> dict:
 
 
 def gh_api(path: str, timeout: int = 60):
-    proc = subprocess.run(["gh", "api", path], capture_output=True, text=True, timeout=timeout)
+    """Run one ``gh api <path>`` call. Never raises: a timeout, a missing
+    ``gh`` binary or any other subprocess failure is caught here and returned
+    as ``(None, str(exc))``, the same shape as a non-zero exit or unparsable
+    stdout, so one bad repository never aborts the whole fetch."""
+    try:
+        proc = subprocess.run(["gh", "api", path], capture_output=True, text=True, timeout=timeout)
+    except Exception as exc:  # noqa: BLE001 - surfaced as a bounded error string, never re-raised
+        return None, str(exc)
     if proc.returncode != 0:
         return None, proc.stderr.strip()[:160]
     try:
@@ -125,6 +132,30 @@ def fetch_repository(slug: str) -> dict:
     return out
 
 
+def build_document(results: dict) -> dict:
+    return {
+        "schema": "github-freshness/1",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "count": len(results),
+        "errors": sum(1 for rec in results.values() if isinstance(rec, dict) and rec.get("error")),
+        "repositories": results,
+    }
+
+
+def write_document(out_path: Path, results: dict) -> dict:
+    document = build_document(results)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(document, indent=1) + "\n", encoding="utf-8")
+    return document
+
+
+# Write a checkpoint to --out after this many freshly-fetched repositories,
+# so a long run that is interrupted (killed, out of budget, or an
+# unanticipated exception past gh_api's own try/except) still leaves the
+# repositories fetched so far on disk for the next resumed run to pick up.
+CHECKPOINT_INTERVAL = 25
+
+
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--work-dir", type=Path, required=True,
@@ -152,7 +183,11 @@ def main(argv=None) -> int:
         existing = load_json(out_path)
 
     results = dict(existing.get("repositories", {}))
-    already_covered_slugs = {rec.get("slug") for rec in results.values() if isinstance(rec, dict)}
+    # A record carrying "error" (a prior gh timeout/failure) is not covered:
+    # it stays pending so a resumed run retries exactly the repositories that
+    # previously failed, instead of only genuinely-fetched ones.
+    already_covered_slugs = {rec.get("slug") for rec in results.values()
+                              if isinstance(rec, dict) and not rec.get("error")}
     pending = {slug: url for slug, url in sorted(targets.items())
                if args.refresh or slug not in already_covered_slugs}
     if args.max_repos is not None:
@@ -161,22 +196,26 @@ def main(argv=None) -> int:
     print(f"github repositories {len(targets)} non-github {len(non_github)} "
           f"already-covered {len(targets) - len(pending)} to-fetch {len(pending)}", flush=True)
 
+    document = build_document(results)
     if pending:
-        with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
-            for i, record in enumerate(pool.map(fetch_repository, sorted(pending)), 1):
-                results[pending[record["slug"]]] = record
-                if i % 50 == 0:
-                    print(f"fetched {i}", flush=True)
+        try:
+            with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
+                for i, record in enumerate(pool.map(fetch_repository, sorted(pending)), 1):
+                    results[pending[record["slug"]]] = record
+                    if i % 50 == 0:
+                        print(f"fetched {i}", flush=True)
+                    if i % CHECKPOINT_INTERVAL == 0:
+                        write_document(out_path, results)
+                        print(f"checkpoint {i} written to {out_path}", flush=True)
+        finally:
+            # Always leave whatever was fetched so far on disk, even on an
+            # unanticipated exception (gh_api itself never raises, but this
+            # is the resumability backstop the checkpoint above is not
+            # guaranteed to have reached).
+            document = write_document(out_path, results)
+    else:
+        document = write_document(out_path, results)
 
-    document = {
-        "schema": "github-freshness/1",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
-        "count": len(results),
-        "errors": sum(1 for rec in results.values() if isinstance(rec, dict) and rec.get("error")),
-        "repositories": results,
-    }
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(document, indent=1) + "\n", encoding="utf-8")
     print(f"done {len(results)} errors {document['errors']}")
     return 0
 
