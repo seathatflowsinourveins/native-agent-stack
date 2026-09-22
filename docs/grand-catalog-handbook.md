@@ -59,8 +59,13 @@ packets (`lane_packets.py --trading-candidates manifest --withhold-labels`):
 - **Trading packets** hold the convergence manifest's own entries for the layer, with
   evidence from their domain cards and the layer's taxonomy scope terms.
 - **Foundation packets** drop the labels that revealed the incumbent (candidate review
-  status, decision selection and decision review status). The repository the lanes
-  read did not: see the label-exposure limit below.
+  status, decision selection and decision review status). Every packet keeps each
+  candidate's `adopted` flag, because only an adopted candidate may win; it marks the
+  prior selected-or-conditional set without saying which was the default. The
+  repository the lanes read kept the labels: see the label-exposure limit below.
+  The 32 packets (with `SHA256SUMS`, matching every sealed return's `packet_sha256`)
+  and the scrubbed adjudication inputs with their lane key are retained under
+  `evidence/artifacts/layer-verdicts-20260922/packets/` and `.../adjudication-inputs/`.
 - **Both lanes ran against a checkout** of catalog main with the September 22 v2
   verdicts removed (ledger verdict fields, sealed returns, this handbook and the
   explorer). Each saw neither the other lane's returns nor those verdicts. The
@@ -384,9 +389,10 @@ To rerun the verdicts against a later landscape, follow the
    manifest --withhold-labels`, so each trading packet carries that layer's own
    manifest entries and no packet carries a decision-bearing label (the defaults
    reproduce the first run's packets). Build a blind checkout with every recorded
-   verdict removed, including the v1 decision fields and the foundation decision
-   records' `selection` and `review_status` labels (the September 22 checkout kept
-   those), and point both lanes at it. Then run the Claude lane through the saved
+   verdict removed: the v2 fields, the sealed returns, packets and adjudication
+   inputs, this handbook and the explorer, and also every catalog JSON value of
+   `selection`, `decision`, `disposition`, `current_choice` and `review_status`
+   (the September 22 checkout kept those). Point both lanes at it. Then run the Claude lane through the saved
    `layer-verdict-lane` workflow, which lives in the agent-lab repository's
    `.claude/workflows/`, not in this catalog.
 4. Run the independent Codex lane (`codex_lane.py`) on the same packets without
@@ -416,25 +422,37 @@ their dates and superseding links.
   `evidence/artifacts/layer-verdicts-20260922/adjudication/` hold every judgment.
   The comparison that would decide them is an executed one, such as IBKR adapter
   acceptance or a retention and recovery test of the observability backends.
-- **The foundation lanes could read the incumbent's labels.** The packets withheld
-  them, but the checkout both lanes read kept `catalogs/foundation/decisions.json`
-  with each decision's `selection` (8 `default`, 37 `conditional`) and the landscape
-  ledger's v1 `current_choice`, `decision`, `rationale` and candidate `disposition`
-  fields. In each lane, 19 of the 20 foundation returns list `decisions.json` among
-  the sources they read, and some returns and adjudications cite a `selection`
-  label as evidence (the Claude `agent-sdks` return and the `workers` and
-  `code-navigation` adjudications, for example). No return lists a landscape ledger
-  among its sources, and no trading return read `decisions.json`. The foundation
-  verdicts are therefore not independent of the prior selection. A rerun on a
-  checkout that also removes those labels and fields would test how much they
-  steered the result.
+- **The lanes could read the incumbent's labels.** The packets withheld them, but
+  the checkout both lanes read kept every prior label outside the v2 verdict fields:
+  - `catalogs/foundation/decisions.json` keeps each of its 54 decisions' `selection`
+    (8 `default`, 37 `conditional`, 4 `optional`, 3 `candidate`, 2 `trial`);
+  - the landscape ledgers keep their v1 `current_choice`, `decision`, `rationale`
+    and candidate `disposition`;
+  - `candidate-quality-review.json`, `hosting-practice.json`, `native-practice.json`
+    and other catalog files carry `decision`, `selection` or `disposition` values;
+  - trading cards such as `runtime-target.json` (`selected_destination`) and
+    `data-research.json` (`default` entries) carry the trading choices.
+
+  Every foundation return in both lanes (20 of 20 each) lists at least one of these
+  label-bearing files among its sources; 19 of 20 list `decisions.json`, and the
+  Claude `durable-memory` return notes that `candidate-quality-review.json` exposes
+  the prior dispositions. Two Claude and three Codex trading returns list one. Some
+  returns and adjudications cite a label as evidence (the Claude `agent-sdks` return
+  and the `workers` and `code-navigation` adjudications, for example). The verdicts,
+  the foundation ones above all, are therefore not independent of the prior
+  selection. The evidence itself is interleaved with those decisions across the
+  catalog, so no checkout can hide the prior choice completely; a rerun on a
+  checkout with those fields removed would measure how much they steered the result.
 - **Adjudication is not independent of one lane's family.** The adjudicators are
   Opus 5.5, the same family as the Claude lane. Scrubbed returns and the order swap
   reduce that influence but do not remove it. Scrubbing removed host paths and model
-  names but not process wording: three Claude returns still say they were revised
-  after refuter findings, a cue only that lane's pipeline produces (those layers
-  went once to each lane and once to neither). A Codex-side adjudication of the 10
-  decided layers would test both.
+  names but not process wording. In the retained adjudication inputs, three Claude
+  returns still say they were corrected after an earlier round or after refuter
+  findings, a cue only that lane's pipeline produces (`code-navigation`,
+  `web-research` and `observability-hosting`: one went to each lane and one to
+  neither). The sealed Claude returns carry more such wording in their `limits`,
+  which the adjudication inputs left out. A Codex-side adjudication of the 10 decided
+  layers would test both.
 - **Trading candidates are layer-specific; trading requirements are not.** Each
   trading packet held that layer's own manifest entries and scope terms. The four rows
   the first run had flagged for naming other layers' tools now name their own:

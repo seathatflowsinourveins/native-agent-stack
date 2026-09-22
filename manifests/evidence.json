@@ -7624,8 +7624,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "81ef743fb0b0a5a9379d2b9fdc011797d14dc3758e0ab7cb5f9038a2ce5a5434",
-      "bytes": 12916666
+      "sha256": "9a9c8556570576de769cc92193eaf609f482d1af449e5c817c822cfac9419149",
+      "bytes": 12918127
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7699,8 +7699,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "3cb6da8b97b9565e9f398ec7eb181945d4ae2cc89a96ad579d971027447066b2",
-      "bytes": 416855
+      "sha256": "121c471b3a498507eba4a3ba85b05cf92c603abedc92b03c7640ec4481198e5a",
+      "bytes": 418298
     },
     {
       "path": "docs/harness-defaults.md",
@@ -11854,8 +11854,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "9f0000fa357dc82dc24fb7db9737a247e7eadb921a0573cd329519dc245bde06",
-      "bytes": 52460
+      "sha256": "f572b918f2f47935bd8e288a2167c12166229d0b53c596c05f58e9cd45efedfa",
+      "bytes": 52759
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
@@ -12331,6 +12331,236 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json",
       "sha256": "55abedca7d7eeae00a66c8958db98015f3cf3092c8a3992b09c390974295b694",
       "bytes": 11256
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/us-equities__identity-provenance.json",
+      "sha256": "dee4ebd8a2d71ca5c60616f65f57a8492cc340127d1955250a1ae63006b1c660",
+      "bytes": 29135
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/foundation__web-research.json",
+      "sha256": "bdbcb4a900865821a0277417a81d5b9d1e496046d9e2efbbdcf65fda37bf4ed5",
+      "bytes": 26724
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/foundation__document-retrieval.json",
+      "sha256": "23ac8ffdc0617e8d8af30d1518d214a2accb1050090a648212bb9ce34e682115",
+      "bytes": 22492
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/foundation__code-navigation.json",
+      "sha256": "6bc84c1ba0a9ff0bce50c0b440f98ad6544b29d4f53d7c66da0b45e7cb6a5f16",
+      "bytes": 18210
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/us-equities__evaluation-experiments.json",
+      "sha256": "a1d8bb53a814ba24ac836812eabd34c7ca03474e7c5d12d35514abb48e145dd9",
+      "bytes": 27896
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/foundation__workers.json",
+      "sha256": "d483310ba8d74acaf79fe99af8d9e684555e04524c15b1621d6571e1bbd05841",
+      "bytes": 53894
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/foundation__token-efficiency.json",
+      "sha256": "2a096644de12529bd0a9e8955764825b4d2cbf3a02ce519354e8bfa24dc58d05",
+      "bytes": 26870
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/us-equities__execution-broker.json",
+      "sha256": "5519ccc0d261d2a4471129978a6fd4f3c8c787d6fa0f1c4b664af3c423efde08",
+      "bytes": 24279
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",
+      "sha256": "ea63e60442960a996b29432e74465859bd25fe381b54ca66cbc2bf61856de178",
+      "bytes": 879
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/us-equities__observability-hosting.json",
+      "sha256": "80b9b50cfd37208ef7a8a3e0f4acc65d3f6d73ee9741c641d110343f6ef26859",
+      "bytes": 41097
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/foundation__instructions-skills.json",
+      "sha256": "86ea737d969d35a1a0168d37ce011b4690b4753648df697a202552ed10b7bb19",
+      "bytes": 31379
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/foundation__observation-inference.json",
+      "sha256": "6bda86d955f9ff865fe97141a92309ef5aee1ede842d7616801a9fb9b0fee119",
+      "bytes": 40063
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/us-equities__data-quality-orchestration.json",
+      "sha256": "89c19888e9cb1eb64f42e5fc4bb4d359e6843b597da2292ce45f36dd9efec008",
+      "bytes": 18323
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/SHA256SUMS",
+      "sha256": "55400fbdfae2fdce80549b6887875330df4cee9f4f0af5e77d35b5f02ef6827b",
+      "bytes": 3243
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__agent-sdks.json",
+      "sha256": "0535214c13287c263717eb2fc05e10a7628e267ccd7820c06f6cc276c2e3a762",
+      "bytes": 12123
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__scheduling-supervision.json",
+      "sha256": "1d7de5163e018054ba538bb4f190fbadbda7635e0a21612e0d4ea6dcccaa2d62",
+      "bytes": 14053
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__mcp-surfaces.json",
+      "sha256": "e3bd8deb88d369dfb96a2d04774cfc5cebf44697ac4e315b9a11e98d1a2e884f",
+      "bytes": 6906
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__recovery-portability.json",
+      "sha256": "c57cffa6f330fde6eff19143b4cc807ac0c9536a6f78f7aeefa5cf52ccf8d8c7",
+      "bytes": 12392
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__storage-compute.json",
+      "sha256": "b8b9f461da9a3538c0b9dc1b2c023f2e390b4c178781ef3f29a739520a4508b9",
+      "bytes": 16887
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__backtesting-engine.json",
+      "sha256": "65b272aa624920fb0d86c6edff7d29a20085cff423608f026ce1f5795b948159",
+      "bytes": 11671
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__identity-provenance.json",
+      "sha256": "1863ff602e323d46a26ba0fbdd409b09d30c6f05d13bdc254ef02573844b8bfc",
+      "bytes": 13632
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__ci-supply-chain.json",
+      "sha256": "0eb5019163f4e6eca4fa177575807adca6cd00c6c447c164f48550555537b284",
+      "bytes": 11645
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__market-data-reference.json",
+      "sha256": "d5e8c03062719382468b750607ec752bcc78efbbcec2199f61a433622f9cee0d",
+      "bytes": 20154
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__web-research.json",
+      "sha256": "9b40b995a5408221913a5aeded32ede86424d11a30d8fccf82def184985c470c",
+      "bytes": 10391
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__durable-memory.json",
+      "sha256": "22f71424e8377d2c83aeae5ed357f0d8935df32b190c7d9e9d4dc0aedabf62e2",
+      "bytes": 17060
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__secrets-credentials.json",
+      "sha256": "c0e4d7a87b7297ac56989889770ee689284372ea0244cd792984f754b0735a53",
+      "bytes": 5950
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__document-retrieval.json",
+      "sha256": "874fbf9f81a7bf8d1c26df284949b0f87a0958cd12617d36bf08e04925e5fb46",
+      "bytes": 10069
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__quality-evaluation.json",
+      "sha256": "bc5abad6fc2a1b5248c4d1069e274543a6a548ca7c10fd0bd7ff9cc378452a58",
+      "bytes": 15500
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__git-github-automation.json",
+      "sha256": "c459066115c3c4c19fe91aae102376e64a4a4ab9d007f6e41fd3527978164eec",
+      "bytes": 10592
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__code-navigation.json",
+      "sha256": "691a09c0f4d4a0dc1a14b2f5064079b6bf12960d202bf3db63d7043544de315f",
+      "bytes": 10719
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__research-factors-ml.json",
+      "sha256": "1a8113b9db33a65c1d227250e4715b3fa60adf4d54f7c9142ac8d340d0bce312",
+      "bytes": 32658
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__security-supply-chain.json",
+      "sha256": "293ea175742eb97699ea43ef89811fef52ae9962bc3a1d270ca130809fec39b8",
+      "bytes": 9655
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__agents-models-workers.json",
+      "sha256": "0594bcc49721f0e023de97be5e7e07e5ab06a7d1040709102720e8beb8009108",
+      "bytes": 27619
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__hosting-services.json",
+      "sha256": "b7bdd2da5305350a165a49f29d8a9cb354b7fc86ed03d9c0f08d32a0a946caa2",
+      "bytes": 13770
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__isolation.json",
+      "sha256": "e2816a751383f7b6680833ac587cf2263a14441687afcdd7fbc384f4602fab49",
+      "bytes": 9365
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__evaluation-experiments.json",
+      "sha256": "f3433de3aba1e6886ba512eb36e77d81ea130047633d485de492ada8ecbee8bd",
+      "bytes": 11660
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__workers.json",
+      "sha256": "340698d20de078aff95d362debc02c9cb9858540f4f90b5cb3e391afa58ed2dc",
+      "bytes": 31437
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__native-clients.json",
+      "sha256": "82809ae19f1a1ba4eaa4ff6605b2ed38d83b47656a86fc4274ecb37c3bc9091f",
+      "bytes": 26498
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__token-efficiency.json",
+      "sha256": "0e2850eebbe21f18b6e75f09a78d504720930e0e1f1c78359059c1196816c2d7",
+      "bytes": 15410
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__execution-broker.json",
+      "sha256": "a12fbdd9a124a2850009e3fb0dadc6aadd77c4b0284c8a69f0c65c81120f2b74",
+      "bytes": 13100
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__portfolio-risk.json",
+      "sha256": "824673a65fddc83cc26de5e8b6ae139effdaf62ec0feb2e11562cb97eda768f6",
+      "bytes": 9499
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__observability-hosting.json",
+      "sha256": "063948467311adc1dde76155a75a79b1d644ef882adc3656cdd6046597f94970",
+      "bytes": 19979
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__instructions-skills.json",
+      "sha256": "963239d242a4bebe641150f30ddc89be5542f550c797b49144ccd4ff33c70bdb",
+      "bytes": 14037
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__semantic-rag.json",
+      "sha256": "fd3ac89764fefc0e140c662e45e9d16150672af03d278912a7895f19bf1c80a7",
+      "bytes": 13035
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/foundation__observation-inference.json",
+      "sha256": "be95e26e136f99966d539f159045bac43c5f1dcad35914dc71d395db1ee487df",
+      "bytes": 20326
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__data-quality-orchestration.json",
+      "sha256": "cdbe255da0593b73f77e57bc8b887984a78e5233165f3a9fa27818d427708eeb",
+      "bytes": 8782
     }
   ],
   "convergence_records": [

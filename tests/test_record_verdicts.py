@@ -198,6 +198,7 @@ FOUNDATION_LAYERS = [
     "review-explorer-layer", "verify-noalt-layer", "verify-adjleak-layer", "verify-winalt-layer",
     "disagree-split-layer", "disagree-one-order-layer", "disagree-no-judgments-layer",
     "disagree-split-claimed-layer", "disagree-refuted-layer", "disagree-contradiction-layer",
+    "disagree-missing-winner-layer", "disagree-bool-votes-layer", "disagree-judgments-object-layer",
 ]
 US_EQUITIES_LAYERS = ["unindexed-alt-layer", "unindexed-pending-layer"]
 
@@ -491,6 +492,21 @@ class DisagreeTests(RecordVerdictsFixture):
         data = counterbalanced("claude")
         data["judgments"][1]["refuting_votes"] = 1
         self.assert_adjudication_rejected("disagree-refuted-layer", data, "must equal the lane")
+
+    def test_split_without_an_explicit_null_winner_lane_is_rejected(self):
+        data = counterbalanced(None, picks={"A": "claude", "B": "codex"})
+        del data["winner_lane"]
+        self.assert_adjudication_rejected("disagree-missing-winner-layer", data, "winner_lane claude|codex|null")
+
+    def test_boolean_refuting_votes_is_rejected(self):
+        data = counterbalanced("claude")
+        data["judgments"][0]["refuting_votes"] = False
+        self.assert_adjudication_rejected("disagree-bool-votes-layer", data, "nonnegative integer refuting_votes")
+
+    def test_judgments_that_are_not_a_list_are_rejected(self):
+        data = counterbalanced("claude")
+        data["judgments"] = {"A": data["judgments"][0]}
+        self.assert_adjudication_rejected("disagree-judgments-object-layer", data, "both presentation orders")
 
     def test_judgment_lane_contradicting_its_positions_is_rejected(self):
         data = counterbalanced("claude")

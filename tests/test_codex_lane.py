@@ -407,6 +407,13 @@ class StrictSchemaTests(CodexLaneFixture):
         self.assertEqual(strict["required"], ["title", "description"])
         self.assertEqual(strict["$defs"], {"$id": {"type": "string"}})
 
+    def test_property_dependencies_keep_their_names(self):
+        schema = {"type": "object", "dependentRequired": {"title": ["description"]},
+                  "dependencies": {"title": ["$id"], "description": {"required": ["title"], "title": "dropped"}}}
+        strict = codex_lane.strict_output_schema(schema)
+        self.assertEqual(strict["dependentRequired"], {"title": ["description"]})
+        self.assertEqual(strict["dependencies"], {"title": ["$id"], "description": {"required": ["title"]}})
+
     def test_instance_data_keywords_are_kept_verbatim(self):
         schema = {"type": "object", "const": {"title": "x"}, "default": {"description": "y"},
                   "enum": [{"$id": "z"}], "examples": [{"uniqueItems": True}]}

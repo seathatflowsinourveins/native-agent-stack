@@ -1,0 +1,227 @@
+{
+ "candidate_source": "sota_manifest_layer_entries",
+ "candidates": [
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c1",
+   "name": "whchien/ai-trader",
+   "newcomer": true,
+   "note": "Its four MCP tools reproducing the retained SPY one_zero parity case with the same cash accounting as LEAN, under a read-only tool permission set, would make it a bounded research interface worth adopting; it would still not replace the runtime.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "repository": "https://github.com/whchien/ai-trader",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Forward-aligned return convention differs from many reports; misalignment can leak future information.",
+    "When cash returns are absent, simulator may download risk-free data; explicit final cash column avoids that path.",
+    "Research simulator is not an order gateway, and optimizer feasibility is not execution feasibility.",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+   ],
+   "component_id": "cvxportfolio",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst"
+   ],
+   "key": "c2",
+   "name": "cvxportfolio",
+   "pin": "1.5.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/cvxgrp/cvxportfolio",
+   "review_status": null,
+   "role": "Multi-period portfolio policies with transaction/holding cost models",
+   "upstream": {
+    "archived": false,
+    "latest": "1.5.1",
+    "license": "GPL-3.0",
+    "prerelease": false,
+    "pushed_at": "2026-04-27",
+    "released_at": "2025-07-06",
+    "renamed_to": null,
+    "stars": 1291
+   }
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c3",
+   "name": "nkaz001/hftbacktest",
+   "newcomer": true,
+   "note": "no demonstrated gap for the current north star - it models limit-order queue position and latency, which the broad-universe protocol (decisions on daily bars, entry at the t+1 open) does not need; it would only matter if the project moved to intraday execution",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "repository": "https://github.com/nkaz001/hftbacktest",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Proof: Completed, 3,943 bundled data points, 3 simulated orders; no broker connection or strategy validation.",
+    "Native restore reported 7 advisory pairs across 5 runtime packages, including high/critical classifications; exploitability was not assessed and historical advisories were later resolved in the linked local patch.",
+    "GitHub latest release v2.4.0.1 is from 2017; this is a 2026 source pin, not that old release.",
+    "LEAN CLI is a separate paid-organization/Docker workflow; the accepted source build required neither.",
+    "Follow-up: pinned local dependency patches and source-integrated Alpaca compilation passed native runtime graph audits. This does not initialize the adapter; QuantConnect product347 entitlement and separately authorized paper access are still required."
+   ],
+   "component_id": "lean",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/engine/receipt.json",
+    "blueprints/us-equities/engine/README.md",
+    "blueprints/us-equities/engine/resolution-receipt.json"
+   ],
+   "key": "c4",
+   "name": "LEAN",
+   "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/engine/README.md",
+   "repository": "https://github.com/QuantConnect/Lean",
+   "review_status": null,
+   "role": "frozen historical comparator (oracle), not the runtime",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.4.0.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2017-08-08",
+    "renamed_to": null,
+    "stars": 21721
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Prerelease: 2.0.0 final has not shipped; GitHub's latest non-prerelease is still v1.231.0.",
+    "SPY/LEAN parity gate G-a (retained-equity-replay): runtime-target.json next_acceptance records reported_execution_blocked_review_incomplete; the retained comparison summary (evidence/artifacts/comparison-progress-20260922/summary.json) records a completed BLOCKED replay of the historical one_zero case with four failed checks, all attributed to the unsupported distributions_and_cash and market_on_open_proxy mappings. A completed blocked comparison is not parity acceptance; the per-check verdict is retained in blueprints/us-equities/engine-nautilus/spy-parity/verdict.json.",
+    "Closing the parity gate needs an engine-native market-on-open and dividend-cash mechanism or a newly preregistered mapping manifest (gate dividend-sim-module).",
+    "No local simulation, broker session or latency benchmark beyond the synthetic FX quickstart and the September21 AAPL diagnostic was performed.",
+    "Event semantics shared by backtest/live still require a calibrated data/fill model and recovery tests."
+   ],
+   "component_id": "nautilustrader",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-nautilus-v2-20260920.json",
+    "catalogs/us-equities/runtime-target.json"
+   ],
+   "key": "c5",
+   "name": "NautilusTrader",
+   "pin": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+   "pin_behind_upstream": false,
+   "recipe_ref": "evidence/receipts/native-nautilus-v2-20260920.json",
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "review_status": null,
+   "role": "selected destination runtime (runtime-target.json)",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.231.0",
+    "license": "LGPL-3.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-08-02",
+    "renamed_to": null,
+    "stars": 29265
+   }
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c6",
+   "name": "lumiwealth/lumibot",
+   "newcomer": true,
+   "note": "Lumibot completing the same SPY one_zero parity case against LEAN with reconciled cash, plus a paper roundtrip with completed-trial recovery matching blueprints/us-equities/paper-e2e-20260921/paper-receipt.json.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "repository": "https://github.com/Lumiwealth/lumibot",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  }
+ ],
+ "catalog": "us-equities",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+ "group": "engines-strategies",
+ "layer_id": "backtesting-engine",
+ "layer_scope_terms": [
+  "backtesting",
+  "execution-engine",
+  "legacy-engine",
+  "portfolio-backtesting",
+  "cost-aware-simulation",
+  "execution-experiment"
+ ],
+ "limitations": [
+  "Nautilus 2.0.0rc5 is a prerelease. The old September 19 Nautilus alternative and LEAN default cards remain historical; runtime-target.json governs the current destination.",
+  "The retained AAPL replay has 15 bars and five roundtrips per baseline/stress scenario with reconciled cash; it excludes known action dates and uses retrospective synthetic close fills with unlimited modeled depth.",
+  "SPY/LEAN dividend/cash parity is still planned. LEAN's known-crash fixtures are engineering stresses, not untouched holdout results or calibrated broker execution.",
+  "The Alpaca trial observed two actual writes, a -0.08 USD cash-matched gross result, flat/idle reconciliation and completed-trial recovery with zero additional writes. In-flight native failure cases, IBKR, live operation and continuous paper operation remain open.",
+  "No accepted point-in-time universe, extreme-mover/catalyst strategy, financing-inclusive performance or deployable profitability follows from these receipts.",
+  "Independent source review found two bare matches! expressions that do not assert denial-event variants in Nautilus risk tests, also present in v2.0.0rc5 source. Other tests assert denial and reasons. This narrow test defect is not an observed runtime failure; see docs/blind-catalog-source-adjudication-20260921.md."
+ ],
+ "requirement": "Use the selected NautilusTrader destination with broker-specific execution boundaries, deterministic numeric risk and reproducible equity accounting; preserve the prior LEAN oracle and qualify any strategy with causal data, costs and independent reconciliation.",
+ "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Backtesting engine",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].card_rationale",
+  "candidates[].card_decision",
+  "candidates[].review_status"
+ ]
+}

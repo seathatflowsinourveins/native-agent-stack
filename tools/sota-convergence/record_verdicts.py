@@ -525,7 +525,7 @@ def load_adjudication(adjudications_dir, catalog, layer_id, issues: list = None)
         return reject("adjudication must be a JSON object")
     winner_lane = raw.get("winner_lane")
     evidence_refs = raw.get("evidence_refs")
-    if winner_lane not in ("claude", "codex", None) or not nonempty_str(raw.get("why")):
+    if "winner_lane" not in raw or winner_lane not in ("claude", "codex", None) or not nonempty_str(raw.get("why")):
         return reject("adjudication needs winner_lane claude|codex|null and a nonempty why")
     if not isinstance(evidence_refs, list) or not all(isinstance(item, str) for item in evidence_refs):
         return reject("adjudication evidence_refs must be a list of text")

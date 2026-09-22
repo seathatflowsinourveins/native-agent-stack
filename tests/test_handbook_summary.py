@@ -28,8 +28,8 @@ DISPLAY = {
     "prometheus": "Prometheus", "loki": "Loki", "mcporter": "MCPorter", "mcp-inspector": "MCP Inspector",
     "gitleaks": "Gitleaks", "candidate:cli-cli": "gh CLI", "difftastic": "Difftastic",
 }
-# Names of recorded alternatives that must never appear in a winners cell.
-NON_WINNERS = ("jCodeMunch", "codebase-memory", "Grafana")
+# Table wording that names a component with a descriptive suffix.
+ALIASES = {"ECC selection": "ECC", "Codex SDK": "Codex"}
 
 
 def summary_rows():
@@ -40,8 +40,10 @@ def summary_rows():
 
 
 def names_in(cell):
-    return {name for name in list(DISPLAY.values()) + list(NON_WINNERS)
-            if re.search(rf"(?<![\w-]){re.escape(name)}(?![\w-])", cell)}
+    """Every comma- or 'and'-separated name before the decision, resolved through the aliases.
+    An unknown name is returned as written, so it can never match a winner set."""
+    names = re.split(r", | and ", cell.split(" (", 1)[0])
+    return {ALIASES.get(name, name) for name in names}
 
 
 class FoundationSummaryTableTests(unittest.TestCase):

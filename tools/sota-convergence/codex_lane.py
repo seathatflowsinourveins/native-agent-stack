@@ -55,9 +55,11 @@ DEFAULT_SCHEMA = HERE / "lane-return.schema.json"
 # 'uniqueItems' is not permitted", HTTP 400 invalid_json_schema). The strict copy drops
 # them; record_verdicts.py still enforces every dropped rule when it validates a return.
 STRICT_UNSUPPORTED_KEYWORDS = frozenset({"uniqueItems", "$schema", "$id", "title", "description"})
-# Keywords whose value maps names to subschemas: the names are data (a property may be
-# called "title"), so only the subschemas are filtered.
-SCHEMA_MAP_KEYWORDS = frozenset({"properties", "patternProperties", "$defs", "definitions", "dependentSchemas"})
+# Keywords whose value maps property names to subschemas or to name arrays: the names are
+# data (a property may be called "title"), so only the subschemas are filtered and name
+# arrays pass through unchanged.
+SCHEMA_MAP_KEYWORDS = frozenset({"properties", "patternProperties", "$defs", "definitions", "dependentSchemas",
+                                 "dependentRequired", "dependencies"})
 # Keywords whose value is instance data, never a schema, so it is kept verbatim.
 DATA_KEYWORDS = frozenset({"const", "enum", "default", "examples"})
 

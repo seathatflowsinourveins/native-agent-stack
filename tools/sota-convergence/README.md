@@ -529,14 +529,18 @@ occur far more often on default entries than on conditional ones. Foundation pac
 both modes, and the default `ledger` mode still reproduces the 2026-09-22 packets byte for byte.
 
 Known limit of the withholding (2026-09-22 independent review): each
-candidate keeps its `adopted` flag, which the never-promote rule needs, and
-foundation packets attach the matched decisions' `selection` value
+candidate keeps its `adopted` flag, which the never-promote rule needs, and by
+default foundation packets attach the matched decisions' `selection` value
 (`default`/`conditional`/`optional`); the layer's `limitations` and
-`existing_overturn_when` can also name the current choice. A lane therefore
-sees which adopted candidate is the incumbent default. The 2026-09-22 run used
-these packets unchanged so they stay reproducible from this tool; the
-comparison that would change this is a rerun with `selection` stripped from
-the attached decisions and the two runs' winner sets compared layer by layer.
+`existing_overturn_when` can also name the current choice. The default mode
+reproduces the first 2026-09-22 packets byte for byte. `--withhold-labels`
+drops candidate and SOTA-component `review_status` and the decisions'
+`selection` and `review_status` from ledger-built packets; the recorded
+cross-family run used it (`--trading-candidates manifest --withhold-labels`;
+the 32 packets and their `SHA256SUMS` are retained under
+`evidence/artifacts/layer-verdicts-20260922/packets/`). The repository a lane
+reads still carries those labels in the catalog files, so withholding them from
+the packets alone does not blind a lane; see the handbook's label-exposure limit.
 
 ```sh
 python3 tools/sota-convergence/lane_packets.py --root . --out /path/to/work-dir

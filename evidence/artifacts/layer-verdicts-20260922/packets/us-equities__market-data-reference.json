@@ -1,0 +1,491 @@
+{
+ "candidate_source": "sota_manifest_layer_entries",
+ "candidates": [
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Event-time point-in-time retrieval does not automatically exclude a late correction learned after the historical decision.",
+    "Materialization freshness, feature skew, access control and outage fallback require separate operational evidence."
+   ],
+   "component_id": "data-feast",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md"
+   ],
+   "key": "c1",
+   "name": "data-feast",
+   "pin": "v0.66.0; source 1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/feast-dev/feast",
+   "review_status": null,
+   "role": "Historical feature retrieval and online/offline feature definitions",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.66.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-08-21",
+    "renamed_to": null,
+    "stars": 7304
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Schema inference is not a financial data-quality contract. Validate precision, timezones and schema drift.",
+    "Watermark-only extraction can miss late revisions; use bounded overlap, deduplication and immutable capture. The hub extra is separate from the basic local pipeline."
+   ],
+   "component_id": "data-dlt",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md"
+   ],
+   "key": "c2",
+   "name": "data-dlt",
+   "pin": "1.30.0; source a2f4a21e22e5c266278271b6591c70dbc485aea8",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/dlt-hub/dlt",
+   "review_status": null,
+   "role": "Python extraction/loading pipelines with local DuckDB destination",
+   "upstream": {
+    "archived": false,
+    "latest": "1.30.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-08-11",
+    "renamed_to": null,
+    "stars": 5880
+   }
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c3",
+   "name": "atilaahmettaner/tradingview-mcp",
+   "newcomer": true,
+   "note": "Documented data rights plus a demonstrated as-of query returning what was published at a historical close, reconciled against retained Alpaca news timestamps for the same symbols and dates.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c4",
+   "name": "sec-api-io/sec-api-python",
+   "newcomer": true,
+   "note": "no demonstrated gap - dgunning/edgartools is already the layer default for SEC filing objects/XBRL and is at its current release",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "repository": "https://github.com/SEC-API-io/sec-api-python",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Community wrapper is not an official GDELT SDK. Its 2025 release is recorded honestly, not presented as newly released.",
+    "GDELT DOC search has bounded results/time windows; it is not exhaustive historical financial news.",
+    "Article URLs/text remain subject to publisher rights; GDELT first-seen time is not necessarily publication or tradable availability time."
+   ],
+   "component_id": "data-gdeltdoc",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/README.md"
+   ],
+   "key": "c5",
+   "name": "data-gdeltdoc",
+   "pin": "1.12.0; source f2e500144b0a6090d63723f94453b32717e5fd23",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/alex9smith/gdelt-doc-api",
+   "review_status": null,
+   "role": "Community client for GDELT article and coverage queries",
+   "upstream": {
+    "archived": false,
+    "latest": "1.12.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2025-04-22",
+    "released_at": "2025-04-03",
+    "renamed_to": null,
+    "stars": 232
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Company facts can contain later revisions; fiscal period end is not the date a fact became tradable information.",
+    "SEC public availability can lag acceptance. Historical downloads today do not prove what an agent actually observed in the past.",
+    "Automated filings parsing requires validation of units, dimensions, duplicate facts and issuer/security mappings.",
+    "Native5.58.0 accepted the selected SEC index request after contact correction:371CIK/accession entries represent360uniqueaccessions. Initial synthetic and real-fixture parser receipts remain dated. Bounded acquired samples do not establish a historical trading universe or strategy.",
+    "Dependencies are version-frozen in a separate42-package environment, not wheel-hash-locked; new hosts need native acceptance."
+   ],
+   "component_id": "data-edgartools",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
+    "blueprints/us-equities/catalyst-provenance/receipt.json",
+    "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+   ],
+   "key": "c6",
+   "name": "EdgarTools",
+   "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/catalyst-provenance/receipt.json",
+   "repository": "https://github.com/dgunning/edgartools",
+   "review_status": null,
+   "role": "SEC filing objects, XBRL, ownership and filing-text extraction",
+   "upstream": {
+    "archived": false,
+    "latest": "v5.58.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-11",
+    "renamed_to": null,
+    "stars": 2737
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Free SDK and limited free service do not grant commercial use, redistribution or every endpoint.",
+    "Ticker inactive/date filters help but do not alone prove a complete historical investable universe.",
+    "October 2025 rename makes massive the current Python package; old Polygon names remain in older integrations."
+   ],
+   "component_id": "data-massive",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md"
+   ],
+   "key": "c7",
+   "name": "Massive Python client",
+   "pin": "v2.8.0; source 3c247d78c603fc13d274fda1aa26749e7c8c3710",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/massive-com/client-python",
+   "review_status": null,
+   "role": "Official Massive SDK, formerly Polygon.io",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.8.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-07-09",
+    "released_at": "2026-05-26",
+    "renamed_to": null,
+    "stars": 1512
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "FRED default queries often return revised latest data; select vintage/as-of data explicitly.",
+    "A vintage date alone does not encode exact intraday announcement/receipt time. Some underlying series carry third-party restrictions.",
+    "Community wrapper latest checked release is 2024, not a recent foundation-model release; no data request was run.",
+    "As-of retrieval can return multiple eligible releases for a period; select the last eligible vintage explicitly while retaining the revision history."
+   ],
+   "component_id": "data-fredapi",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/README.md"
+   ],
+   "key": "c8",
+   "name": "data-fredapi",
+   "pin": "v0.5.2; source bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/mortada/fredapi",
+   "review_status": null,
+   "role": "Community FRED/ALFRED macro series and vintage access",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.5.2",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-01-28",
+    "released_at": "2024-05-05",
+    "renamed_to": null,
+    "stars": 1658
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "No account, entitlement, data request or order was exercised by this catalog. An installed SDK is not acquisition evidence.",
+    "Symbol asof selects symbol interpretation; it does not reconstruct every historical revision known at that date. A present-day asset list is not a survivorship-free universe.",
+    "Corporate-action completeness and corrections require explicit policy; IEX-derived strategies may differ on consolidated data."
+   ],
+   "component_id": "data-alpaca-py",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md"
+   ],
+   "key": "c9",
+   "name": "alpaca-py",
+   "pin": "v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/alpacahq/alpaca-py",
+   "review_status": null,
+   "role": "Official Alpaca historical/streaming data and paper-trading SDK",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.44.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-18",
+    "released_at": "2026-08-11",
+    "renamed_to": null,
+    "stars": 1528
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Single-node synthetic replay is a prospective smoke check, not high availability or exchange recovery evidence.",
+    "Ordering is partition-local; Kafka transactions do not make broker orders, files or all external sinks exactly-once.",
+    "GitHub has no current release entries; version/date come from Apache downloads."
+   ],
+   "component_id": "data-kafka",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md"
+   ],
+   "key": "c10",
+   "name": "data-kafka",
+   "pin": "4.3.1; source 26b251a451ce941d3d7a55e6487bcb7f16b5ad48",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/apache/kafka",
+   "review_status": null,
+   "role": "Durable partitioned event log for multiple independent consumers",
+   "upstream": {
+    "archived": false,
+    "latest": "show",
+    "license": "Apache-2.0",
+    "prerelease": null,
+    "pushed_at": "2026-09-22",
+    "released_at": null,
+    "renamed_to": null,
+    "stars": 33783
+   }
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c11",
+   "name": "rossod4/quantlab",
+   "newcomer": true,
+   "note": "names the right gap (point-in-time data layer, SEC EDGAR fundamentals, survivorship measurement) but demonstrates nothing: 0 stars, no license, no release, created 2026-08-07, self-described 'in progress'",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "repository": "https://github.com/Rossod4/quantlab",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Catalog did not install/start a server. Enterprise features and managed hosting have separate terms.",
+    "Dedup/upsert can overwrite corrections; retain a raw immutable ledger before serving latest state."
+   ],
+   "component_id": "data-questdb",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md"
+   ],
+   "key": "c12",
+   "name": "QuestDB",
+   "pin": "10.0.1; source 7a391566ac827e0d8c269b91f2415c16b0a32a84",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/questdb/questdb",
+   "review_status": null,
+   "role": "SQL time-series server with ingestion and temporal joins",
+   "upstream": {
+    "archived": false,
+    "latest": "10.0.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-08-24",
+    "renamed_to": null,
+    "stars": 17339
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Existing native receipt confirms one XNYS session only, not every holiday, future schedule or venue.",
+    "Regular-session calendars do not describe every extended-hours feed, security-specific halt or emergency closure. Calendar updates must be revalidated."
+   ],
+   "component_id": "data-exchange-calendars",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md",
+    "blueprints/us-equities/data/receipt.json",
+    "blueprints/us-equities/data/summarize_backtest.py",
+    "blueprints/us-equities/workers/requirements.txt",
+    "manifests/stack.json",
+    "blueprints/us-equities/historical-simulation/receipt.json"
+   ],
+   "key": "c13",
+   "name": "exchange_calendars",
+   "pin": "4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/data/receipt.json",
+   "repository": "https://github.com/gerrymanoim/exchange_calendars",
+   "review_status": null,
+   "role": "Trading sessions, holidays, breaks and UTC boundaries",
+   "upstream": {
+    "archived": false,
+    "latest": "4.13.2",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-15",
+    "released_at": "2026-03-10",
+    "renamed_to": null,
+    "stars": 667
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Exchange-specific feed is not automatically consolidated US coverage. SDK Apache license does not license the data.",
+    "Corporate-action ts_record is UTC while action dates use exchange-local dates; late adjustment factors must not leak into earlier decisions.",
+    "Corporate-action product documentation restricts external redistribution; contracts govern storage, derived data and sharing."
+   ],
+   "component_id": "data-databento",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md"
+   ],
+   "key": "c14",
+   "name": "Databento",
+   "pin": "v0.86.0; source e675ef30369f5ee9f68b04606080c519adf3be69",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/databento/databento-python",
+   "review_status": null,
+   "role": "Normalized historical/live market data and instrument definitions",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.86.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-17",
+    "released_at": "2026-09-01",
+    "renamed_to": null,
+    "stars": 302
+   }
+  }
+ ],
+ "catalog": "us-equities",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+ "group": "data-research",
+ "layer_id": "market-data-reference",
+ "layer_scope_terms": [
+  "market-data",
+  "reference",
+  "corporate-actions",
+  "market-calendars",
+  "timezones",
+  "news",
+  "macro-data",
+  "fundamentals",
+  "alternative-data",
+  "sec",
+  "vintage-data",
+  "point-in-time-joins",
+  "stream-ingestion",
+  "raw-ingestion",
+  "ingestion",
+  "event-stream",
+  "data-adapters"
+ ],
+ "limitations": [
+  "The authenticated Alpaca receipt covers 25 AAPL SIP/raw daily bars and two corporate actions over five successful pages, not a survivorship-free universe, complete history or real-time feed entitlement.",
+  "Numeric corporate-action values matched the frozen probe, but missing dividend currency prevented full cash-unit reconciliation. Original historical availability and complete action coverage remain open.",
+  "Three documentary lifecycle cases preserve observed cutoffs and source anchors; retrospective claims do not establish historical as-known eligibility or permanent security identity.",
+  "The prior SEC HTTP 403 remains a historical failure. Later corrected acquisition and parsing qualify their selected requests only; no general filing-completeness or strategy-validity claim follows.",
+  "SQL, schemas and content hashes cannot repair missing provenance, revised fundamentals, access rights or outcome-selected samples."
+ ],
+ "requirement": "Acquire licensed, source-identifiable US-equity observations; preserve feed, timestamps, identity and corporate actions; produce exact reproducible analytical snapshots and reject data whose historical availability or eligibility is unknown.",
+ "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Market data and reference",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].card_rationale",
+  "candidates[].card_decision",
+  "candidates[].review_status"
+ ]
+}

@@ -1,0 +1,223 @@
+{
+ "candidates": [
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c1",
+   "name": "OpenHands SDK",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "docs/foundation-closure-20260921.md",
+   "repository": "https://github.com/openhands/software-agent-sdk",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c2",
+   "name": "LangGraph",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "docs/foundation-closure-20260921.md",
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c3",
+   "name": "Claude Agent SDK",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "docs/foundation-closure-20260921.md",
+   "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "codex",
+   "decisions": [
+    {
+     "capability": "Select the native agent SDK/runtime used by programmatic workers",
+     "evidence_scope": "Reuses the existing native Codex CLI/SDK inventory and acceptance evidence; no new execution was run to freeze this taxonomy layer.",
+     "id": "agent-sdk-runtime-selection",
+     "limitations": [
+      "Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain unqualified candidates here; their version metadata is source review only, not fresh execution."
+     ],
+     "next_gap": "The SDK table in docs/foundation-closure-20260921.md lines 78-84 has not been revisited by any lane since 2026-09-21; qualify a concrete application need before promoting Claude Agent SDK, OpenHands SDK, Temporal or LangGraph."
+    },
+    {
+     "capability": "Use the scoped native companion backend when explicitly selected",
+     "evidence_scope": "One read-only native bridge backend task passed.",
+     "id": "companion-backend",
+     "limitations": [
+      "The backend result is narrower than complete plugin integration; native account allowance and interactive activation remain separate."
+     ],
+     "next_gap": "Qualify the intended outer plugin invocation before calling full integration accepted."
+    },
+    {
+     "capability": "Route native Claude Workflow stages to lean task-matched project agents with explicit model, effort and deferred named tool lanes, and size each workflow to its task",
+     "evidence_scope": "On one identical task the provider-returned first prompt fell from 42,396 tokens (default child) to 12,164 (named MCP grants behind ToolSearch) and 8,048 (source-scout); eight native review-changes runs, two readiness audits, one builder run and one Codex cross-family review are retained as sanitized receipts; the portable copies were adopted into a scratch project and run natively under the full host profile with the observational layer recorded; the project-only profile was not qualified (provider errors, then a permission-layer refusal of the Workflow tool).",
+     "id": "lean-workflow-child-routing",
+     "limitations": [
+      "First-prompt figures bound one tiny task on one host and model; they are not a savings rate.",
+      "Haiku is not routed on one packet and one Opus verifier (Sonnet 14/14 lane rows, Haiku 9/14 with a misattributed quote).",
+      "The review workflow's strict accepted status was never returned during the deployment; the gate was fix-and-commit after independent review.",
+      "Local suites are stubbed or synthetic; only the native runs and the Prometheus deltas are provider evidence. Per-session scoping of the exported metric is unavailable by design (the collector keeps no session id on metrics), so observational deltas are host-wide time windows with concurrent activity declared.",
+      "Codex agent examples inherit model and effort and have no end-to-end run of their own.",
+      "The project-only settings profile is not qualified: three provider errors and, with the coordinator model pinned, a permission-layer refusal of the Workflow tool; headless runs need a loaded settings source whose permission mode or allow rule covers the Workflow tool."
+     ],
+     "next_gap": "Overturn only on evidence: Haiku after a repeat trial with no unanchored citation on two distinct extraction packets; the unrestricted guideline if recorded runs exceed their independent units or pause on fan-out rate limits; a one-hour child cache class only for a child that idles more than five minutes between requests; the Codex agent examples after a task-level run of their own."
+    },
+    {
+     "capability": "Maintain useful scoped memory across native Codex and Claude",
+     "evidence_scope": "Nine current repository sources reviewed; native learning, scheduler admission, unchanged upstream tests and real client outcome capture are recorded separately. Existing code/document/context retrieval remain complementary layers.",
+     "id": "native-memory-learning-maintenance",
+     "limitations": [
+      "Scheduler covers all store scopes, with a per-project limit and once-per-session claims; current deployment has one adopted project.",
+      "Assistant excerpts are sanitized and capped, not complete transcripts. Claude prompt capture remains opted out.",
+      "Model review rejected insufficient evidence; scheduler admission did not establish learned-write quality. Exact memory lifetime token savings remain unknown.",
+      "Alternative systems are research candidates, not installed or locally benchmarked winners."
+     ],
+     "next_gap": "Evaluate real subsequent learned proposals and representative retrieval quality before changing the accepted memory of record."
+    },
+    {
+     "capability": "Resolve persistent native command and MCP environments",
+     "evidence_scope": "Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
+     "id": "native-process-defaults",
+     "limitations": [
+      "Configuration presence does not prove an already-running task hot-reloaded it.",
+      "The Linux/WSL and Desktop process/configuration boundaries remain distinct."
+     ],
+     "next_gap": "Collect the specific new-host or changed-session activation evidence; do not copy account stores."
+    },
+    {
+     "capability": "Resume the same native session after an owned interruption",
+     "evidence_scope": "Codex on Mac and Claude on WSL resumed the same session to finish an unchanged single checkpoint; later bounded source tasks also retained continuations.",
+     "id": "native-session-resume",
+     "limitations": [
+      "Individual session continuation does not establish arbitrary worker crash, provider cancellation or whole-host recovery.",
+      "Resumed cumulative usage must not be added again to earlier included totals."
+     ],
+     "next_gap": "The separate native-child-interruption-recovery decision covers one abrupt writing-worker failure with a single local effect; qualify changed effects or another host before extending acceptance."
+    },
+    {
+     "capability": "Use native client tools to retrieve exact project evidence",
+     "evidence_scope": "Both signed-in native clients completed the bounded source-retrieval tasks; the final receipt also retains scoped continuation and observation results.",
+     "id": "native-source-tasks",
+     "limitations": [
+      "Earlier refused MCP calls, Claude format failures and source-host account limits remain recorded.",
+      "Successful retrieval does not qualify every installed tool, all prompts, another PC or complete causal token savings."
+     ],
+     "next_gap": "Verify changed native process/tool activation on the intended host; retain failed attempts."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c4",
+   "name": "Codex SDK/CLI",
+   "pin": "0.155.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/openai/codex",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "rust-v0.155.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-18",
+    "renamed_to": null,
+    "stars": 125923
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c5",
+   "name": "Temporal",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "docs/foundation-closure-20260921.md",
+   "repository": "https://github.com/temporalio/temporal",
+   "review_status": null,
+   "upstream": null
+  }
+ ],
+ "catalog": "foundation",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "A concrete application needs durable multi-host state/replay (Temporal), explicit graph checkpoints (LangGraph), a remote/container worker (OpenHands SDK) or programmatic Claude session control (Claude Agent SDK), and a matched comparison passes.",
+ "group": null,
+ "layer_id": "agent-sdks",
+ "limitations": [
+  "Version metadata for the alternatives is source review only, not fresh execution or a head-to-head comparison.",
+  "This freeze adds the layer id; it does not rerun or update the 2026-09-21 SDK table."
+ ],
+ "requirement": "Give a worker structured events, custom tools or session control through a supported SDK when the native CLI's bounded review is not enough.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Agent SDKs and runtime workers",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].review_status",
+  "candidates[].decisions[].selection",
+  "candidates[].decisions[].review_status",
+  "sota_components_not_in_candidates[].review_status"
+ ]
+}
