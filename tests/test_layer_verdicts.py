@@ -147,6 +147,16 @@ class BuildVerdictsTests(LayerVerdictFixture):
             if line.startswith("| native-clients") or line.startswith("| market-data-reference"):
                 self.assertNotIn("pending_lanes", line)
 
+    def test_no_selection_row_renders_as_no_selection_in_the_narrative(self):
+        foundation = json.loads((self.root / "catalogs/landscape/foundation.json").read_text())
+        row = foundation["layers"][0]
+        row["verdict_status"] = "no_selection"
+        row["open_gaps"] = ["no qualified candidate on the retained evidence"]
+        self.write("catalogs/landscape/foundation.json", foundation)
+        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        text = self.handbook_text()
+        self.assertIn("(native-clients): no selection — no qualified candidate on the retained evidence", text)
+
     def test_leak_refusal_stops_the_write(self):
         # "rationale" is a v1 field the generator does not republish; the leak
         # must be injected into a field build_verdict_row() actually carries

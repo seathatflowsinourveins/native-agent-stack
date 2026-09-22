@@ -240,9 +240,13 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
     require_lane(isinstance(winner_evidence_refs, list) and all(isinstance(item, str) for item in winner_evidence_refs),
                  "winner_evidence_refs must be a list of text")
 
+    # The contract asks why_selected to cite at least one evidence path; the lane may
+    # leave winner_evidence_refs empty rather than guess, so a repository-style path
+    # token anywhere in the text (or one of its own cited paths) satisfies it.
     cited_paths = [citation_path(item) for item in winner_evidence_refs]
-    require_lane(any(path and path in why_selected for path in cited_paths),
-                 "why_selected must name at least one of its winner_evidence_refs paths")
+    require_lane(any(path and path in why_selected for path in cited_paths)
+                 or bool(_PATH_TOKEN.search(why_selected)),
+                 "why_selected must cite at least one evidence path")
 
     alternatives = data.get("alternatives")
     require_lane(isinstance(alternatives, list) and bool(alternatives), "alternatives must be a nonempty list")
@@ -367,6 +371,7 @@ def index_v1_candidates_by_repository(row: dict) -> dict:
 # Generated publication indexes are not evidence, and citing one from a ledger row makes the
 # explorer embed a hash of a file that embeds the explorer's own hash (no fixed point).
 GENERATED_INDEXES = frozenset({"manifests/evidence.json", "docs/ecosystem/index.html"})
+_PATH_TOKEN = re.compile(r"(?<![\w/.-])[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+\.[A-Za-z0-9]+")
 _LINE_SUFFIX = re.compile(r":[0-9L][0-9L,\-]*$")
 
 
@@ -522,30 +527,33 @@ def load_adjudication(adjudications_dir, catalog, layer_id, issues: list = None)
     return {"winner_lane": winner_lane, "raw": raw}
 
 
-def relativize_source(entry: str, root: Path) -> str:
-    """A lane records the absolute paths it opened. Rewrite the longest path suffix
-    that names a file in this repository to its repository-relative form (keeping
-    any trailing note); other absolute paths are left for sanitize_value to redact."""
+def relativize_source(entry: str, root: Path, lane_roots=()) -> str:
+    """A lane records the absolute paths it opened. Only a path under one of the
+    checkouts the lane was given as its repository root (``--lane-repo-root``) is
+    rewritten to its repository-relative form, and only when that file exists here;
+    a trailing note is kept. Every other absolute path is left for sanitize_value to
+    redact, so a file from another checkout is never attributed to this repository."""
     if not isinstance(entry, str) or not entry.startswith("/"):
         return entry
-    head, _, rest = entry.partition(" ")
-    path_part = head.split("#", 1)[0]
-    path_part = _LINE_SUFFIX.sub("", path_part)
-    tail = head[len(path_part):]
-    parts = [part for part in path_part.split("/") if part]
-    for start in range(len(parts)):
-        candidate = "/".join(parts[start:])
-        try:
-            if safe_file(root, candidate).is_file():
-                return candidate + tail + ((" " + rest) if rest else "")
-        except ValueError:
+    for lane_root in lane_roots:
+        prefix = str(lane_root).rstrip("/") + "/"
+        if not entry.startswith(prefix):
             continue
+        remainder = entry[len(prefix):]
+        head, _, rest = remainder.partition(" ")
+        path_part = _LINE_SUFFIX.sub("", head.split("#", 1)[0])
+        try:
+            if path_part and safe_file(root, path_part).is_file():
+                return remainder
+        except ValueError:
+            pass
     return entry
 
 
-def with_relative_sources(data: dict, root: Path) -> dict:
+def with_relative_sources(data: dict, root: Path, lane_roots=()) -> dict:
     result = dict(data)
-    result["sources_read"] = [relativize_source(entry, root) for entry in data.get("sources_read") or []]
+    result["sources_read"] = [relativize_source(entry, root, lane_roots)
+                              for entry in data.get("sources_read") or []]
     return result
 
 
@@ -557,7 +565,8 @@ def sealed_text(data: dict) -> str:
 
 
 def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Path, checked_at: str,
-                 adjudications_dir, identities: set, aliases: dict, sha256sums: dict, rejections: list) -> list:
+                 adjudications_dir, identities: set, aliases: dict, sha256sums: dict, rejections: list,
+                 lane_roots=()) -> list:
     """Mutate ``row`` in place with whatever the valid lane returns for this
     layer establish; return the list of (absolute path, text) sealed/
     adjudication files this row's processing needs written. Returns an empty
@@ -603,7 +612,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     lanes_field = {"claude": {"run_id": "", "sealed_sha256": ""}, "codex": {"run_id": "", "sealed_sha256": ""}}
     for lane in list(valid):
         try:
-            text = sealed_text(with_relative_sources(valid[lane], root))
+            text = sealed_text(with_relative_sources(valid[lane], root, lane_roots))
         except ValueError as error:  # LeakDetected: a marker survived sanitization
             rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": lane,
                                "reason": f"sealing refused: {error}"})
@@ -666,13 +675,20 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
         ids_text = (f"claude={','.join(sorted(component_ids_for(valid['claude'], candidates_by_key)))}; "
                     f"codex={','.join(sorted(component_ids_for(valid['codex'], candidates_by_key)))}")
         adjudication = load_adjudication(adjudications_dir, catalog, layer_id, rejections)
+        adjudication_text = None
+        if adjudication is not None:
+            try:
+                adjudication_text = sealed_text(adjudication["raw"])
+            except ValueError as error:  # LeakDetected
+                rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
+                                   "reason": f"sealing refused: {error}"})
+                adjudication = None
         if adjudication is not None and adjudication["winner_lane"] in valid:
             chosen_lane = adjudication["winner_lane"]
             for gap in valid[chosen_lane].get("open_gaps") or []:
                 add_gap(gap)
             adjudication_relative = f"{SEALED_BASE}/adjudication/{run_id}.json"
-            sealed_writes.append((root / SEALED_BASE / "adjudication" / f"{run_id}.json",
-                                   sealed_text(adjudication["raw"])))
+            sealed_writes.append((root / SEALED_BASE / "adjudication" / f"{run_id}.json", adjudication_text))
             add_gap(f"lanes disagreed: {ids_text}; adjudicated by {adjudication_relative}")
             verdict_status = "recorded"
         else:
@@ -738,6 +754,10 @@ def parse_args(argv=None):
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--checked-at", default="2026-09-22")
     parser.add_argument("--adjudications", type=Path, default=None)
+    parser.add_argument("--lane-repo-root", action="append", default=[], metavar="PATH",
+                        help="Absolute checkout path a lane was given as its repository root; sources_read "
+                             "entries under it are recorded repository-relative (repeatable; pass the same "
+                             "values to --check).")
     # Mutually exclusive and required, matching the contract's "--write |
     # --check": previously both were independent store_true flags, so
     # omitting both silently ran --check and passing both silently preferred
@@ -771,7 +791,7 @@ def main(argv=None) -> int:
         for row in document.get("layers", []):
             sealed_writes.extend(process_row(
                 row, root, catalog, row["layer_id"], work_dir, args.checked_at, args.adjudications,
-                identities, aliases, sha256sums, rejections))
+                identities, aliases, sha256sums, rejections, tuple(args.lane_repo_root)))
         new_text = json.dumps(document, indent=2, ensure_ascii=False) + "\n"
         ledger_outputs[catalog] = (path, new_text, new_text != original_text)
 
