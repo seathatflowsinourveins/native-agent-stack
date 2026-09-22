@@ -494,3 +494,255 @@ contents only (which lane's entry is *chosen* per row is unaffected, since
 G1's `select_row_review` precedence already operated correctly on whichever
 entries it was given -- the bug was `_build_card_row` handing it an
 incomplete list). No pin was changed by this round either.
+
+## Lane packets
+
+The layer-verdict lanes (Claude and Codex, run by the coordinator -- nothing
+here calls a model) each judge one packet per landscape ledger layer, not the
+raw ledger row: **`lane_packets.py`** withholds the incumbent's own verdict
+(`current_choice`, `decision`, the layer-level `rationale` and each
+candidate's `disposition`/`rationale`) so a lane argues from retained
+evidence rather than copying the existing selection, and writes one packet
+per `(catalog, layer_id)` to `<work_dir>/packets/<catalog>__<layer_id>.json`
+plus a `<work_dir>/packets/SHA256SUMS` (`sha256sum` format).
+
+```sh
+python3 tools/sota-convergence/lane_packets.py --root . --out /path/to/work-dir
+python3 tools/sota-convergence/lane_packets.py --root . --out /path/to/work-dir --catalog us-equities --seed 20260922
+```
+
+No network access; every input is already checked into `catalogs/` and
+`adoption/`. Each candidate is matched to a `catalogs/sota-convergence/
+manifest-20260922.json` component/entry by normalized GitHub slug
+(`build_manifest.github_repo_slug` -- lowercase `owner/repo`, `.git`/
+`/tree/...`/`/releases/tag/...` stripped); a candidate without a `repository`,
+or whose repository is not a GitHub URL, never matches, and a matched
+candidate carries the manifest's `pin`/`upstream`/`review_status`/
+`pin_behind_upstream` fields through unmodified. `recipe_ref` prefers
+`adoption/manifest.json`'s `recipe_map` keyed by the matched `component_id`,
+else the first of the candidate's own `evidence_refs` that resolves to a real
+path under `--root` (`scripts/catalog_decisions.safe_file` keeps that
+confined to the repository), else `null`. Foundation candidates additionally
+carry every `catalogs/foundation/decisions.json` decision whose
+`component_ids` include the matched component (`us-equities` candidates never
+carry decisions -- the decisions ledger only ever names foundation layers).
+Manifest components/entries for the layer that no candidate matched are
+listed separately under `sota_components_not_in_candidates`, so a lane can
+see what the current landscape row has not yet considered.
+
+Candidate order is shuffled per packet with `random.Random` seeded from
+`sha256(f"{seed}{catalog}{layer_id}")` (`--seed`, default `20260922`), so
+repeated runs at the same seed reproduce the same order for both lanes (no
+first-listed-wins signal), while a different seed can reorder them. The
+five numbered rules in `lane-prompt.md`'s "Rules" section are parsed at
+build time (never duplicated by hand) into each packet's `rules` field, so
+the packet and the shared prompt can never drift apart. Reuses (imports,
+does not reimplement) `build_manifest.py`'s `sanitize_value`/`assert_no_leak`
+and `github_repo_slug`, and `scripts/landscape.py`'s `DISPOSITIONS`/
+`WINNER_EVIDENCE_CLASSES` enums (also duplicated literally, since a static
+schema file cannot import them, into `lane-return.schema.json`'s own
+`enum` arrays -- `tests/test_lane_packets.py` asserts the two stay in sync).
+Every packet is sanitized and leak-checked before anything is written; like
+`build_verdicts.py`, a leak anywhere aborts the whole run before any packet
+file reaches disk.
+
+`lane-return.schema.json` is the JSON Schema (draft 2020-12, fully inlined --
+no `$ref`/`$defs` -- and `additionalProperties: false` everywhere) a lane's
+returned JSON must match; it is usable directly as a `codex --output-schema`
+file. `lane-prompt.md` is the shared prompt both lanes receive, with
+`{PACKET_PATH}`/`{REPO_ROOT}`/`{LANE}` placeholders filled in by whichever
+runner invokes the lane.
+
+## Record verdicts
+
+`record_verdicts.py` -- no network. Consumes the per-layer Claude/Codex lane
+returns a separate lane run produces against `lane_packets.py`'s packets
+(see the PR-5 lane contract's "Packet" and "Lane return" shapes) and records
+them onto the layer-verdict schema v2 rows in
+`catalogs/landscape/{foundation,us-equities}.json`. It never selects a
+winner itself -- a lane already returned `winner_keys`, `why_selected` and
+the rest of the lane-return contract; this tool only validates each lane
+file, seals the accepted ones as retained evidence and derives the row's
+`winners`/`alternatives`/`open_gaps`/`lanes` fields deterministically.
+
+```sh
+python3 tools/sota-convergence/record_verdicts.py \
+  --root . --work-dir /path/to/work-dir --checked-at YYYY-MM-DD \
+  [--adjudications /path/to/adjudications] --write
+python3 tools/sota-convergence/record_verdicts.py \
+  --root . --work-dir /path/to/work-dir --checked-at YYYY-MM-DD --check
+```
+
+`--write` and `--check` are a required, mutually exclusive pair (argparse
+rejects both together and rejects neither) -- there is no silent default
+mode.
+
+- **Per-lane validation, never aborts the run.** For every layer with at
+  least one `<work-dir>/{claude,codex}/<catalog>__<layer_id>.json` file, each
+  present lane file is checked against the full lane-return contract (schema
+  shape, `packet_sha256` matching `<work-dir>/packets/SHA256SUMS`, every
+  `winner_keys` entry an adopted packet candidate, every adopted non-winner
+  candidate present in `alternatives`, `why_selected` distinct from every
+  `why_not_default`, `overturn_when` naming a `fixtures/`, `blueprints/`,
+  `tests/` path or a runnable `python3`/`node` command). A file that fails
+  any rule is reported (catalog, layer id, lane, the failing rule) and
+  treated as absent for that layer -- this never aborts the run, but the
+  process exits 1 at the end if any lane file was rejected, in both
+  `--write` and `--check`.
+- **Sealing.** Every accepted lane return is reserialized deterministically
+  (`sort_keys=True, indent=1` + newline -- the same convention every
+  generator here uses, subject to the same `build_manifest.py`
+  leak defense) and written to
+  `evidence/artifacts/layer-verdicts-20260922/<lane>/<catalog>-<layer_id>-20260922.json`;
+  its sha256 becomes the row's `lanes.<lane>.sealed_sha256`.
+- **Derived winner `pin`** (never taken from the lane): the packet's own
+  manifest-joined `pin`, else the winning candidate's real v1 pin text if
+  any -- the ledger's actual `candidates[]` schema carries this as
+  `source_pin` (preferred) or, on a few rows, `revision`; there is no
+  `v1_pin` field anywhere in the repository -- else the literal string
+  `"unpinned"`.
+- **Agreement.** Both lanes valid and their winner component-id sets equal
+  -> `same_winner` (recorded from Claude's `why_selected`/`overturn_when`,
+  Codex's `open_gaps` appended); Claude only -> `codex_absent` (recorded,
+  `open_gaps` gets "codex lane absent for this layer"); both valid but
+  disagreeing -> `disagree`: recorded from the lane an optional
+  `--adjudications/<catalog>__<layer_id>.json`
+  (`{"winner_lane": "claude"|"codex", "why", "evidence_refs": [...]}`) names
+  (the file itself is retained at
+  `evidence/artifacts/layer-verdicts-20260922/adjudication/<run_id>.json`),
+  else the row stays `pending_lanes` with the open disagreement recorded
+  (`open_gaps` names the two lanes' winner *component_ids* -- the same
+  identity the agreement check itself compares -- never the packet-local
+  candidate keys, which are opaque outside the packet). Codex-only (no
+  dedicated agreement value exists for it) folds into the same "neither lane
+  ran" `pending` state -- Codex's file is still sealed for later reuse, but
+  no winner is recorded from a single non-Claude lane.
+- **Alternatives** are the union of both lanes' `alternatives` by normalized
+  repository slug (Claude's entry first; `source` is always `lane:claude` or
+  `lane:codex`, never a packet-derived value). An alternative whose
+  repository is not in the canonical index
+  (`catalogs/landscape/manifest.json#/sources/repository_index`) is moved
+  into `open_gaps` as `"unindexed alternative <name> <url>"` instead of
+  being rejected -- this check runs on every processed row, including one
+  that stays `pending_lanes` (e.g. a disagreement), not only a `recorded` one.
+- **Never modifies a v1 field** except the shared `overturn_when` text, and
+  only when a verdict is actually recorded (set to the winning lane's own
+  `overturn_when`, which the lane-return contract already requires to carry
+  one of `fixtures/`, `blueprints/`, `tests/`, `python3 ` or `node `).
+- `--check` recomputes every row in memory and exits 1 on any difference
+  from what is checked in, without writing; `--write` writes the two ledger
+  files (`json.dumps(doc, indent=2, ensure_ascii=False)` + newline -- the
+  exact serialization these hand-maintained files already use, so an
+  untouched row's bytes, including field order, do not move) and the sealed
+  evidence files. Re-running `--write` on an already-current work dir writes
+  byte-identical output.
+
+After recording, refresh the generated join and narrative and rerun the
+landscape and publication checks:
+
+```sh
+python3 tools/sota-convergence/build_verdicts.py --write --root .
+python3 scripts/landscape.py --root .
+python3 scripts/validate.py
+```
+
+## Codex lane
+
+`codex_lane.py` is the Codex half of the layer-verdict lane pair described in
+the PR-5 lane contract (Claude's own lane is run as an agent-lab saved
+workflow, not from this repository). It is a subprocess/text pipeline over
+`codex exec`, not a schema validator: full validation of the returned JSON
+against `lane-return.schema.json` is `record_verdicts.py`'s job.
+
+For every packet under `<work-dir>/packets/<catalog>__<layer_id>.json`
+(written by `lane_packets.py`) without an already-valid
+`<work-dir>/codex/<catalog>__<layer_id>.json` on disk -- valid meaning: the
+existing file parses as a JSON object with `lane == "codex"`, `catalog` and
+`layer_id` matching this packet, and, if it already has a `packet_sha256`,
+that hash still matching the packet file's current bytes -- it fills the
+shared lane prompt (`lane-prompt.md`, placeholders `{PACKET_PATH}`
+`{REPO_ROOT}` `{LANE}`) and runs:
+
+```sh
+codex exec --sandbox read-only --skip-git-repo-check --ephemeral \
+  -C <repo> --output-schema <schema> -o <out.tmp> --json \
+  -c model_reasoning_effort=<effort> <filled prompt>
+```
+
+capturing the full JSON event stream to
+`<work-dir>/codex/events/<catalog>__<layer_id>.jsonl` and appending one usage
+row per attempt (`catalog`, `layer`, `attempt`, `exit_code`, `timed_out`,
+`model`, `seconds`, plus whatever token fields were found) to
+`<work-dir>/codex/usage.jsonl`. The event stream's shape is never assumed
+beyond "JSON objects, one per line": model name and usage/token fields are
+extracted from the last events that carry them anywhere in the object,
+tolerant of unknown shapes, and a layer is never failed merely because usage
+was not found.
+
+`-o`'s output file (the agent's last message) is parsed as one JSON object.
+`lane` is always forced to `"codex"`; `packet_sha256` is filled from the
+packet file's own sha256 only when the model's response did not already set
+one; `model` is filled from the event stream (falling back to
+`{"name": "unknown", "effort": <--effort>}`) only when the response did not
+already carry a usable `model.name` -- an already-set field from the model's
+own response is never overwritten. A failing attempt (non-zero exit,
+timeout, or a missing/unparseable `-o` file) is retried exactly once; if the
+retry also fails, the layer is left unwritten (picked up again by the next
+run, via the resumable-skip check above) and the run's own exit code is 1.
+Any `<catalog>__<layer_id>.out.tmp` left over from a prior attempt (or an
+earlier run killed by SIGKILL/Ctrl-C/OOM before it could clean up) is removed
+immediately before each attempt is launched, not only after a failure is
+detected, so a stale file is never misread as the current attempt's own
+output.
+
+```sh
+python3 tools/sota-convergence/codex_lane.py \
+  --work-dir /path/to/work-dir --repo . --effort high
+python3 tools/sota-convergence/codex_lane.py \
+  --work-dir /path/to/work-dir --repo . --layers native-clients,market-data-reference
+python3 tools/sota-convergence/codex_lane.py \
+  --work-dir /path/to/work-dir --repo . --dry-run   # prints the command per pending layer, writes nothing
+```
+
+`--prompt` and `--schema` override the default `lane-prompt.md` /
+`lane-return.schema.json` paths (both otherwise resolved next to
+`codex_lane.py` itself); `--timeout` overrides the default 900-second
+per-attempt `codex exec` timeout; `--jobs` runs that many packets
+concurrently (default 1, sequential). `tests/test_codex_lane.py` never
+invokes a real `codex` binary -- `tests/fixtures/codex-lane/bin/codex` is an
+env-var-driven fake placed first on `PATH` that records its own argv,
+optionally sleeps (timeout coverage), replays a canned event stream, exits
+non-zero on chosen attempts (retry coverage), can exit 0 while skipping the
+`-o` write or writing unparseable/non-object JSON to it on chosen attempts
+(covers the "exit 0 but no usable output" retry path, distinct from a
+non-zero exit or a timeout), and otherwise copies a canned return to
+whatever `-o` path it was given; `tests/fixtures/codex-lane/` also
+carries a fixture copy of the contract's verbatim prompt text and a minimal
+fixture `lane-return.schema.json`, since the real ones (owned by the
+`lane_packets.py` unit) are siblings, not inputs this unit reads.
+A later fix made `trading[]` rows exactly the taxonomy layer ids (taxonomy
+order, not the previous alphabetical `layers` order) and moved any review-lane
+layer id outside the foundation/taxonomy baseline (e.g. a "beyond" lane's
+`awesome-list-convergence` grouping) out of `trading[]` into a new
+`lane_groupings` section, so `scripts/landscape.py`'s exact-coverage check no
+longer sees an id outside the 12-layer taxonomy. This touches two different
+datasets, kept separate here:
+
+- The 16-foundation-layer private input behind the reproduction above has no
+  non-taxonomy trading row, so its reproduced
+  `(layer, repository, review_status)` identity set, `candidates_total` and
+  the rest of `counts` are unaffected by the fix.
+- The newer 2026-09-22, 20-foundation-layer, "beyond"-lane work-dir the fix
+  actually targets (the private `layer-verdicts-20260922` work directory
+  outside the repository) *was* rerun (`build_manifest.py --work-dir
+  .../layer-verdicts-20260922 ...`, no `catalogs/` write): the pre-fix
+  working-tree manifest at `catalogs/sota-convergence/manifest-20260922.json`
+  (itself a pre-fix run against that same work-dir) has 15 trading rows
+  (three of them the non-taxonomy `awesome-list-convergence`/
+  `star-audit-targeted-candidates`/`unmaintained-reference-material` ids) and
+  `candidates_total=18`; the post-fix rerun instead reports 12 trading rows,
+  `candidates_total=16`, `lane_groupings=3` and `lane_grouping_candidates=2`
+  -- the two candidates that moved out of `candidates_total` are exactly the
+  ones the three non-taxonomy lane layers contributed. No selection, pin
+  comparison or disposition changed; only where the non-taxonomy rows live in
+  the manifest, and which count they are scoped to, changed.

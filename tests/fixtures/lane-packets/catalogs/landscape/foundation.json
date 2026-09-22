@@ -1,0 +1,48 @@
+{
+ "schema_version": 2,
+ "checked_at": "2026-09-22",
+ "scope": "Fixture: one foundation layer with a matched and an unmatched candidate.",
+ "layers": [
+  {
+   "catalog": "foundation",
+   "layer_id": "layer-a",
+   "title": "Layer A",
+   "requirement": "Do the thing reliably.",
+   "current_choice": "Widget One",
+   "decision": "retain",
+   "rationale": "Widget One has native execution evidence.",
+   "evidence_refs": ["docs/evidence.md"],
+   "limitations": ["Only one comparison was run."],
+   "overturn_when": "A matched python3 tests/fixtures/lane-packets/check.py run shows otherwise.",
+   "candidates": [
+    {
+     "name": "Widget One",
+     "repository": "https://github.com/acme/widget-one",
+     "disposition": "selected",
+     "rationale": "Fits the requirement on native execution evidence.",
+     "evidence_kind": "native_execution",
+     "evidence_refs": ["docs/evidence.md"]
+    },
+    {
+     "name": "Widget Local",
+     "repository": null,
+     "disposition": "conditional",
+     "rationale": "No public repository yet.",
+     "evidence_kind": "source_review",
+     "evidence_refs": []
+    }
+   ],
+   "verdict_status": "pending_lanes",
+   "winners": [],
+   "alternatives": [],
+   "overturn_protocol": {"fixture_paths": [], "metric": "", "arms": []},
+   "lanes": {
+    "claude": {"run_id": "", "sealed_sha256": ""},
+    "codex": {"run_id": "", "sealed_sha256": ""},
+    "agreement": "pending"
+   },
+   "open_gaps": [],
+   "checked_at": "2026-09-22"
+  }
+ ]
+}

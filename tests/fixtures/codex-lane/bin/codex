@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+"""Fake ``codex`` binary for tests/test_codex_lane.py. Placed first on PATH,
+it never talks to a model: it records its own argv, optionally sleeps (to
+exercise codex_lane.py's timeout handling), optionally replays a canned JSON
+event stream to stdout, optionally exits non-zero on chosen attempt numbers
+(to exercise the retry-once path), and otherwise writes a canned JSON return
+to whatever path followed ``-o``/``--output-last-message`` in argv -- exactly
+what codex_lane.py passes there.
+
+All behavior is env-var driven so a single script fixture serves every test:
+
+  CODEX_FAKE_ARGV_LOG        path; each invocation appends one JSON array
+                              (sys.argv) as a line. Optional.
+  CODEX_FAKE_COUNTER_FILE    path; holds an integer attempt counter for this
+                              test's invocations of this script, incremented
+                              on every call before the counter is read.
+                              Optional (defaults the local attempt to 1).
+  CODEX_FAKE_SLEEP_SECONDS   float seconds to sleep before doing anything
+                              else observable. Optional (default 0).
+  CODEX_FAKE_EVENTS_FILE     path to canned JSONL text printed verbatim to
+                              stdout (before the fail/exit-code check, so a
+                              failing attempt can still emit partial events).
+                              Optional.
+  CODEX_FAKE_FAIL_ATTEMPTS   comma-separated attempt numbers (1-based, per
+                              CODEX_FAKE_COUNTER_FILE) that should exit
+                              non-zero instead of writing the -o file.
+                              Optional (default: never fail).
+  CODEX_FAKE_EXIT_CODE       exit code used for a failing attempt. Optional
+                              (default 1).
+  CODEX_FAKE_RETURN_FILE     path to canned JSON text written verbatim to
+                              the ``-o``/``--output-last-message`` target
+                              found in argv, on a non-failing attempt.
+                              Optional (nothing is written if unset).
+  CODEX_FAKE_SKIP_OUTPUT_ATTEMPTS
+                              comma-separated attempt numbers (1-based) that
+                              exit 0 (a "successful" codex run) but do NOT
+                              write the -o file at all -- simulates the agent
+                              exiting cleanly without ever producing a final
+                              message (or the write being lost). Optional
+                              (default: never skip).
+  CODEX_FAKE_BAD_OUTPUT_ATTEMPTS
+                              comma-separated attempt numbers (1-based) that
+                              exit 0 but write CODEX_FAKE_BAD_OUTPUT_TEXT (or
+                              its default) to the -o file instead of
+                              CODEX_FAKE_RETURN_FILE's contents -- simulates
+                              a successful exit whose -o file is truncated,
+                              non-JSON, or JSON that is not an object.
+                              Optional (default: never).
+  CODEX_FAKE_BAD_OUTPUT_TEXT text written to -o for a CODEX_FAKE_BAD_OUTPUT_ATTEMPTS
+                              attempt. Optional (default: an unparseable
+                              string, "{not valid json").
+"""
+import json
+import os
+import sys
+import time
+from pathlib import Path
+
+
+def main() -> int:
+    argv_log = os.environ.get("CODEX_FAKE_ARGV_LOG")
+    if argv_log:
+        with open(argv_log, "a", encoding="utf-8") as handle:
+            handle.write(json.dumps(sys.argv) + "\n")
+
+    attempt = 1
+    counter_file = os.environ.get("CODEX_FAKE_COUNTER_FILE")
+    if counter_file:
+        path = Path(counter_file)
+        count = int(path.read_text(encoding="utf-8")) if path.exists() else 0
+        count += 1
+        path.write_text(str(count), encoding="utf-8")
+        attempt = count
+
+    sleep_seconds = float(os.environ.get("CODEX_FAKE_SLEEP_SECONDS", "0") or "0")
+    if sleep_seconds:
+        time.sleep(sleep_seconds)
+
+    events_file = os.environ.get("CODEX_FAKE_EVENTS_FILE")
+    if events_file:
+        sys.stdout.write(Path(events_file).read_text(encoding="utf-8"))
+        sys.stdout.flush()
+
+    fail_attempts = {
+        int(item) for item in os.environ.get("CODEX_FAKE_FAIL_ATTEMPTS", "").split(",") if item.strip()
+    }
+    if attempt in fail_attempts:
+        return int(os.environ.get("CODEX_FAKE_EXIT_CODE", "1") or "1")
+
+    out_path = None
+    args = sys.argv[1:]
+    for index, arg in enumerate(args):
+        if arg in ("-o", "--output-last-message") and index + 1 < len(args):
+            out_path = args[index + 1]
+            break
+
+    skip_output_attempts = {
+        int(item) for item in os.environ.get("CODEX_FAKE_SKIP_OUTPUT_ATTEMPTS", "").split(",") if item.strip()
+    }
+    if attempt in skip_output_attempts:
+        return 0
+
+    bad_output_attempts = {
+        int(item) for item in os.environ.get("CODEX_FAKE_BAD_OUTPUT_ATTEMPTS", "").split(",") if item.strip()
+    }
+    if attempt in bad_output_attempts:
+        if out_path:
+            bad_text = os.environ.get("CODEX_FAKE_BAD_OUTPUT_TEXT", "{not valid json")
+            Path(out_path).write_text(bad_text, encoding="utf-8")
+        return 0
+
+    return_file = os.environ.get("CODEX_FAKE_RETURN_FILE")
+    if out_path and return_file:
+        Path(out_path).write_text(Path(return_file).read_text(encoding="utf-8"), encoding="utf-8")
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
