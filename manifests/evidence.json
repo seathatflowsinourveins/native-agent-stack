@@ -12094,43 +12094,43 @@
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/document-retrieval/upstream-currency-sweep.json",
-      "sha256": "8f3342e31ec46c355b41bf869e2e3c06a4982f64b08189cced134edb4406df13",
-      "bytes": 12882
+      "sha256": "c5e09557e535502d12bed7defed756f87d5845f87cb2ca0a33abdd2e9013aeef",
+      "bytes": 18257
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/evaluation-experiments/upstream-currency-sweep.json",
-      "sha256": "0b26e8f663ee7f948120ad815c1ed0909838d424596dedc73ce71302d6096366",
-      "bytes": 12886
+      "sha256": "df8eec41e1d0e01b32c7cc29b71c2455d2376ef9d47111c9d7dcc2ab8752185f",
+      "bytes": 18261
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/git-github-automation/upstream-currency-sweep.json",
-      "sha256": "68314f9f141426883f0cb6722e2bc5e94006086d1e6d62a936c7aa501f1aa868",
-      "bytes": 12885
+      "sha256": "eb6206d442261fbd9dfeff02731cebebca3629c8698a6fabe521057d073abb1d",
+      "bytes": 18260
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/scheduling-supervision/upstream-currency-sweep.json",
-      "sha256": "159a7722f0353fe2e10f7fbaeb53571839888bf7225f0f3dda8aafa1c7e79457",
-      "bytes": 12886
+      "sha256": "c52a9f8596e281bd1a3d40ba7b8d9b03ef36bbd7d19fee39221920da9aab0eee",
+      "bytes": 18261
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/secrets-credentials/attestation-endpoint-recheck.json",
-      "sha256": "efa2a23c6ff3a02f0986d881d6a8ebf75c2eaeb548de0a24c8b0fae9d664e5dd",
-      "bytes": 5984
+      "sha256": "e9b955e87b5be3aa247238b35ad3eec2a65975e8a2b0aeea6fc995076a18a43c",
+      "bytes": 6451
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/secrets-credentials/gitleaks-repo-history-scan.json",
-      "sha256": "0c7180e8496158c717ed390e7e1affb2cbdad16d88fdcc1d0f6661b715e448f4",
-      "bytes": 6485
+      "sha256": "bb22b30efed95387aa939330272390c61387f75d240dad5b8e41ac5d914b261a",
+      "bytes": 9165
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/upstream-currency-sweep.json",
-      "sha256": "0a510e54fa8ac8e4cc7188f73196ac45f5e77d7bc4875610f1130f2b896fc1cd",
-      "bytes": 12880
+      "sha256": "5e2fbf11cac69016ddf70875e5010e7a42d73d997dcf60b45dac156b61ea2533",
+      "bytes": 18255
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/workers/upstream-currency-sweep.json",
-      "sha256": "68ccd8df3c8f62a6a25bb475fb8bf92acf2dec425d2892d2ace503c62c65d34b",
-      "bytes": 12871
+      "sha256": "5588aebc536561d71923261f9161204ea27341dfb40d596cd5bda23240e61f48",
+      "bytes": 18246
     }
   ],
   "convergence_records": [

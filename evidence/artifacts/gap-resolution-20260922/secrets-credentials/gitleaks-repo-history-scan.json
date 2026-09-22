@@ -38,12 +38,12 @@
     "git": "2.43.0"
   },
   "installs": [],
-  "result": "git-history mode: 615 commits scanned (~1.27GB), duration 45.60s, exit 1 (leaks found: 1). The one finding is a synthetic 'Key leaked: REDACTED' literal string inside tests/test_lane_packets.py (a unit test for the repo's own lane_packets.py redaction logic), not a real secret. dir mode (live worktree): 0 findings, exit 0, duration 1.98s, but 1 file (docs/ecosystem/index.html, 13MB) was skipped for exceeding the 2MB --max-target-megabytes cap. git rev-list --count HEAD is 491 and --all is 738; gitleaks reported 615 commits scanned, a discrepancy not independently reconciled here (gitleaks git's default ref/log-opts traversal was not audited against git rev-list's exact ref set).",
+  "result": "git-history mode: 615 commits scanned (~1.27GB), duration 45.60s, exit 1 (leaks found: 1). The one finding (RuleID=generic-api-key, tests/test_lane_packets.py:255, Commit=34fc51beaf24114fe266f73b2e36ae8176c8a521) is a synthetic 'Key leaked: REDACTED' literal string inside a unit test for the repo's own lane_packets.py redaction logic, not a real secret -- and, per a fix-round correction, `git merge-base --is-ancestor 34fc51beaf24114fe266f73b2e36ae8176c8a521 HEAD` fails (exit 1): commit 34fc51b is NOT an ancestor of this branch's HEAD. `git branch -a --contains 34fc51b...` lists only claude/gc-pr5-packets and claude/grand-catalog-pr5, so the finding originates from those concurrently active sibling branches, reached only because gitleaks git's default log-opts walks every ref in this shared repository, not from this branch's own commit history. dir mode (live worktree): 0 findings, exit 0, duration 1.98s, but 1 file (docs/ecosystem/index.html, 13MB) was skipped for exceeding the 2MB --max-target-megabytes cap. This same out-of-ancestry finding and its explanation were already recorded before this unit ran: .gitleaks.toml:51-66 documents that `gitleaks git . --config .gitleaks.toml --max-target-megabytes 2` restricted to `--log-opts=\"HEAD\"` (this branch's own ancestry) scanned 376 commits with 0 findings, while the same command under default log-opts scanned 542 commits and produced exactly this one residual finding on 34fc51b, confirmed not an ancestor. This run's own default-log-opts count (615) differs from that prior 542-commit count; .gitleaks.toml explicitly flags the default-log-opts commit count and the sibling-branch finding as 'NOT stable invariants' in this shared, concurrently used repository, so a different count/finding-status on a different day is expected variability, not a discrepancy this receipt re-ran to resolve. git rev-list --count HEAD is 491 and --all is 738; neither this run's 615 nor .gitleaks.toml's 542 exactly matches either rev-list count, consistent with default log-opts walking a ref set (including sibling branches created/removed over time) broader and more volatile than either rev-list invocation.",
   "settles_gap": "partially",
   "verdict_impact": {
     "could_change_verdict": false,
     "direction": "supports_incumbent",
-    "explanation": "Extending gitleaks coverage to this repository's actual commit history and live worktree found no genuine leaked secret, consistent with the existing secrets-credentials decision. It advances gap 1 (git-history scanning was previously entirely unmeasured) without closing it: other secret types, Mac acceptance, and a general false-positive rate remain untested, and gap 2 (scanning is not proof of no secret anywhere) is unaffected by design."
+    "explanation": "Extending gitleaks coverage to this repository's actual commit history and live worktree found no genuine leaked secret reachable from this branch's own ancestry, consistent with the existing secrets-credentials decision and with .gitleaks.toml's prior 0-findings HEAD-ancestry measurement (376 commits, recorded before this unit ran). This run's single default-log-opts finding is confirmed out-of-ancestry (sibling-branch fixture, not part of this branch's history) and was already known and explained in .gitleaks.toml before this check. It advances gap 1 (this unit is the first to independently re-derive and cross-check that prior git-history measurement, rather than the first to measure git-history at all) without closing it: other secret types, Mac acceptance, and a general false-positive rate remain untested, and gap 2 (scanning is not proof of no secret anywhere) is unaffected by design."
   },
   "evidence_class": "native_proven",
   "limitations": [
@@ -51,8 +51,9 @@
     "git mode printed no explicit per-blob skip messages, so whether any historical blob exceeded the 2MB cap and was silently skipped is not directly observable from this run's output.",
     "Only this WSL host was scanned; Mac acceptance remains excluded, matching the existing gap text.",
     "Only the generic-api-key and (from the prior fixture) github-pat rule classes have any positive-detection evidence; the broader gitleaks ruleset's false-positive/false-negative rate on this repository is unmeasured.",
-    "The one finding is judged benign by source inspection of the matched line and its file's purpose, not by an independent second reviewer.",
-    "615 commits scanned (gitleaks git) vs. 491 (git rev-list --count HEAD) vs. 738 (git rev-list --all --count) were not reconciled; the exact ref set gitleaks traversed is unconfirmed."
+    "The one finding is judged benign by source inspection of the matched line and its file's purpose, not by an independent second reviewer, though it is also independently confirmed out-of-ancestry (not part of this branch's history) by `git merge-base --is-ancestor` and `git branch -a --contains`.",
+    "615 commits scanned by this run's default-log-opts `gitleaks git` vs. 542 recorded by .gitleaks.toml's own prior default-log-opts measurement vs. 491 (git rev-list --count HEAD) vs. 738 (git rev-list --all --count) were not fully reconciled; .gitleaks.toml itself documents that the default-log-opts count is not a stable invariant in this shared, concurrently used repository, so this run was not repeated to chase a matching count.",
+    "This receipt did not itself run a fresh `--log-opts=\"HEAD\"` HEAD-ancestry-restricted scan; it cites .gitleaks.toml's already-recorded 376-commit/0-finding HEAD-ancestry measurement (predating this unit's branch point) rather than re-executing an equivalent check, per the no-re-run-to-fish-for-a-different-outcome rule."
   ],
   "raw_artifacts": [
     {
@@ -61,7 +62,7 @@
     },
     {
       "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/git-history.stderr.log",
-      "sha256": "f2523dd9b6d5a04fd3edd47e82d04c6f88458c32627aa7cc38f3120d24c5ac15"
+      "sha256": "b59316b2ce3ce0d38b536d8a2d2122d900eefb363b138a27f3b33b791a2e6e10"
     },
     {
       "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/dir-worktree.json",

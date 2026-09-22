@@ -40,7 +40,7 @@
     }
   ],
   "purpose": "One batched, read-only gh api snapshot (repo state + latest release + HEAD commit, plus targeted tag lookups where releases are absent) for every repository the triage flags as needing a currency check across this unit's 7 layers, per the critic's cross_layer_checks id 'gh-api-upstream-currency-sweep' (OpenHands software-agent-sdk incl. reconciling its two cataloged revisions, context-hub, dagu, headroom, arize phoenix, inspect_ai, qmd, poppler/freedesktop mirror, markitdown, worktrunk, beads, gitleaks, syft, grype). Batched into one dated pass instead of per-layer reruns, as the critic instructed.",
-  "preregistered": "Expected: for each of the 14 repositories, one `gh api repos/<owner>/<repo>` call (pushed_at/archived/disabled), one `gh api repos/<owner>/<repo>/releases/latest` call, and one `gh api repos/<owner>/<repo>/commits/HEAD` call; a 404 on releases/latest for a repo would trigger a follow-up `gh api repos/<owner>/<repo>/tags` call to characterize currency without a Releases API. A newer upstream tag/release than the installed manifests/stack.json pin, for any of dagu/headroom/context-hub/qmd/worktrunk/beads/gitleaks/markitdown/syft, would extend or newly surface a currency gap; an exact match would reconfirm the pin is current. For OpenHands specifically, comparing HEAD and the latest release's target commit against both cataloged revisions (9bc452eb.../856d99d4...) would either reconcile them (if one now matches) or reconfirm both are stale (if neither matches) -- this does not by itself resolve which revision the catalog should adopt, only whether either is current. Run once per repository; no re-run to seek a different outcome.",
+  "preregistered": "Expected: for each of the 14 repositories, one `gh api repos/<owner>/<repo>` call (pushed_at/archived/disabled), one `gh api repos/<owner>/<repo>/releases/latest` call, and one `gh api repos/<owner>/<repo>/commits/HEAD` call; a 404 on releases/latest for a repo would trigger a follow-up `gh api repos/<owner>/<repo>/tags` call to characterize currency without a Releases API. A newer upstream tag/release than the installed manifests/stack.json pin, for any of dagu/headroom/context-hub/qmd/worktrunk/beads/gitleaks/markitdown/syft, would extend or newly surface a currency gap; an exact match would reconfirm the pin is current. For OpenHands specifically, comparing HEAD and the latest release's target commit against both cataloged revisions (9bc452eb.../856d99d4...) would either reconcile them (if one now matches) or reconfirm both are stale (if neither matches) -- this does not by itself resolve which revision the catalog should adopt, only whether either is current. Run once per repository; no re-run to seek a different outcome. Fix-round addendum (preregistered before running, in response to a finding that the assigned OpenHands revision reconciliation subtask was omitted): expected outputs are (a) `gh api .../git/ref/tags/v1.49.2` to resolve the tag actually cataloged as '1.49.2' in docs/foundation-closure-20260921.md, to check whether it equals 856d99d4 (the SHA cataloged alongside that label) or a different commit, and (b) two-way `gh api .../compare/A...B` calls between 9bc452eb and 856d99d4 to establish whether they are the same commit, a direct ancestor/descendant pair, or divergent -- any of these three outcomes would be a genuinely new reconciliation fact not previously recorded, settling whether the two catalog citations are the same underlying pick under different labels. This is a new sub-check filling a scope gap, not a re-run of the original sweep seeking a different outcome; it was run once.",
   "commands": [
     {
       "cmd": "python3 blueprints/gap-resolution-20260922/upstream-currency-sweep/currency_sweep.py > ${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/currency-sweep/sweep-20260922.json 2> ${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/currency-sweep/sweep-20260922.stderr.log",
@@ -62,6 +62,27 @@
       "duration_s": 0.5,
       "output_excerpt": "(empty -- no tags returned)",
       "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "cmd": "gh api repos/OpenHands/software-agent-sdk/git/ref/tags/v1.49.2",
+      "exit": 0,
+      "duration_s": 0.4,
+      "output_excerpt": "refs/tags/v1.49.2 -> object sha d128a786ee2ee570eb23ff5862ec148b43cfad0b (commit) -- a third commit distinct from both cataloged revisions (9bc452eb..., 856d99d4...).",
+      "output_sha256": "847b44b54e0c3d50df86fe70cf10ec6d0020d8baa2ab3b8d366f9a81d4284e60"
+    },
+    {
+      "cmd": "gh api repos/OpenHands/software-agent-sdk/compare/9bc452ebf6b0093c531f25394c5ba5e9817ff910...856d99d48e4b11c70c5f1cab21e7830570dbc324 --jq '{status, ahead_by, behind_by, total_commits}'",
+      "exit": 0,
+      "duration_s": 0.5,
+      "output_excerpt": "{\"ahead_by\":0,\"behind_by\":7,\"status\":\"behind\",\"total_commits\":0} -- from 9bc452eb's perspective, 856d99d4 is 7 commits behind.",
+      "output_sha256": "9b092e3c89128bc06e4563020fbf5d0c87093ad5fa530f0fdb70675aa9e211d9"
+    },
+    {
+      "cmd": "gh api repos/OpenHands/software-agent-sdk/compare/856d99d48e4b11c70c5f1cab21e7830570dbc324...9bc452ebf6b0093c531f25394c5ba5e9817ff910 --jq '{status, ahead_by, behind_by, total_commits}'",
+      "exit": 0,
+      "duration_s": 0.5,
+      "output_excerpt": "{\"ahead_by\":7,\"behind_by\":0,\"status\":\"ahead\",\"total_commits\":7} -- from 856d99d4's perspective, 9bc452eb is 7 commits ahead: 856d99d4 (2026-09-20T19:00:59Z, cataloged in docs/foundation-closure-20260921.md:86 as '1.49.2') is a direct ancestor of 9bc452eb (2026-09-22T00:58:34Z, cataloged in docs/candidate-quality-review-20260921.md:45), i.e. the two cataloged revisions ARE reconciled with each other on a single lineage: 9bc452eb is simply 856d99d4 plus 7 later commits. Neither matches the v1.49.2 tag's target (d128a786...) or current HEAD/latest-release target from the prior command; both remain stale relative to 2026-09-22.",
+      "output_sha256": "1bacb19f82cad572e6f6b2f26dda30013e1cbde91747f40e0f7b22726f26e680"
     }
   ],
   "tool_versions": {
@@ -69,20 +90,21 @@
     "python3": "3.12.3"
   },
   "installs": [],
-  "result": "14-repository currency snapshot recorded (see output_excerpt/raw_artifacts). Key findings: OpenHands software-agent-sdk -- neither cataloged revision (9bc452eb, 856d99d4/1.49.2) matches current HEAD (52feb470) or latest release v1.49.4's target, reconfirming both catalog citations are stale and mutually unreconciled. Dagu 2.16.6 pin is one minor version behind upstream v2.17.0 (reconfirms gap 0 unchanged). Headroom 0.37.0 pin is one minor version behind upstream v0.38.0 (reconfirms gap 2 unchanged). inspect_ai's newest GitHub tag is still 'release/2025-11-28' against the PyPI pin 0.3.266 cited in gap 6 -- confirmed unchanged and accurate. Arize phoenix has no GitHub-Releases Python-package tag matching its PyPI version and no stack.json entry -- still source-review only. qmd, worktrunk, beads, gitleaks and syft pins all match their current latest GitHub release (no currency gap). markitdown's installed pin 0.1.7 is one patch behind upstream v0.1.8 (a new observation). context-hub's latest release predates 2026-09-22 by about 5 months with no more recent push, bearing on gap 5's 'is Context Hub current/maintained' question without settling the layer's separate 'value on documentation questions' half. poppler_mirror and grype have no manifests/stack.json currency baseline to compare against (poppler_mirror publishes neither GitHub releases nor tags; grype is unpinned).",
+  "result": "14-repository currency snapshot recorded (see output_excerpt/raw_artifacts). Key findings: OpenHands software-agent-sdk -- neither cataloged revision (9bc452eb, 856d99d4/1.49.2) matches current HEAD (52feb470) or latest release v1.49.4's target, reconfirming both catalog citations are stale and mutually unreconciled. Dagu 2.16.6 pin is one minor version behind upstream v2.17.0 (reconfirms gap 0 unchanged). Headroom 0.37.0 pin is one minor version behind upstream v0.38.0 (reconfirms gap 2 unchanged). inspect_ai's newest GitHub tag is still 'release/2025-11-28' against the PyPI pin 0.3.266 cited in gap 6 -- confirmed unchanged and accurate. Arize phoenix has no GitHub-Releases Python-package tag matching its PyPI version and no stack.json entry -- still source-review only. qmd, worktrunk, beads, gitleaks and syft pins all match their current latest GitHub release (no currency gap). markitdown's installed pin 0.1.7 is one patch behind upstream v0.1.8 (a new observation). context-hub's latest release predates 2026-09-22 by about 5 months with no more recent push, bearing on gap 5's 'is Context Hub current/maintained' question without settling the layer's separate 'value on documentation questions' half. poppler_mirror and grype have no manifests/stack.json currency baseline to compare against (poppler_mirror publishes neither GitHub releases nor tags; grype is unpinned). OpenHands revision reconciliation (fix-round addition, per finding that this subtask was assigned but not performed): `gh api .../git/ref/tags/v1.49.2` resolves to commit d128a786ee2ee570eb23ff5862ec148b43cfad0b, a third commit distinct from both cataloged revisions. `gh api .../compare/856d99d4...9bc452eb` shows status=ahead, ahead_by=7, total_commits=7: 856d99d48e4b11c70c5f1cab21e7830570dbc324 (cataloged as '1.49.2' in docs/foundation-closure-20260921.md:86, committed 2026-09-20T19:00:59Z) is a direct ancestor of 9bc452ebf6b0093c531f25394c5ba5e9817ff910 (cataloged in docs/candidate-quality-review-20260921.md:45, committed 2026-09-22T00:58:34Z), 7 commits apart on one lineage. The two cataloged revisions are therefore reconciled WITH EACH OTHER (one is the direct ancestor of the other, not divergent or unrelated commits) even though neither matches current HEAD, the latest release's target commit, or the v1.49.2 tag's target.",
   "settles_gap": "partially",
   "verdict_impact": {
     "could_change_verdict": false,
     "direction": "inconclusive",
-    "explanation": "This sweep only reconfirms and extends currency data already known to be stale (Dagu, Headroom, OpenHands) or already accurate (inspect_ai pin discrepancy text); it performs no install, upgrade or re-qualification, so it cannot by itself change any candidate's verdict. The one new observation (markitdown 0.1.7 behind 0.1.8) is a currency fact, not an execution result, and needs its own qualification run before it could bear on a verdict."
+    "explanation": "This sweep only reconfirms and extends currency data already known to be stale (Dagu, Headroom, OpenHands) or already accurate (inspect_ai pin discrepancy text); it performs no install, upgrade or re-qualification, so it cannot by itself change any candidate's verdict. The one new observation (markitdown 0.1.7 behind 0.1.8) is a currency fact, not an execution result, and needs its own qualification run before it could bear on a verdict. The added OpenHands reconciliation sub-check found the two cataloged revisions are on a single ancestor lineage (856d99d4 is 7 commits behind 9bc452eb), not independently divergent picks; this narrows but does not fully close the gap, since neither is current and the catalog still needs a coordinator decision on which (if either) to keep citing."
   },
-  "evidence_class": "native_proven",
+  "evidence_class": "source_review",
   "limitations": [
     "Read-only gh api only; no package was installed, upgraded or re-qualified against its newer upstream version. Currency (is a newer version available) and qualification (does the newer version work here) are different questions; this receipt only answers the former.",
     "Phoenix's GitHub tag ('@arizeai/phoenix-mcp@4.3.13') is from a different sub-package (the JS/MCP package in the phoenix monorepo) than the Python arize-phoenix PyPI distribution the catalog card cites; this sweep did not resolve a matching Python-package tag/release.",
     "poppler_mirror publishes neither GitHub Releases nor tags, so its GitHub mirror cannot be used to currency-check the installed 26.09.0 pin; canonical poppler versioning is on freedesktop.org's GitLab, outside this gh-api-only sweep.",
     "syft and grype belong primarily to ci-supply-chain, a layer outside this unit's assigned 7 layers (it is one of the 12 layers the triage never covered); their data is retained here for cross-layer reuse per the critic's grouping, not as a settled ci-supply-chain gap.",
-    "This is a single dated snapshot (2026-09-22); it was not repeated to check for flakiness or transient API state, per the no-re-run-to-fish-for-a-different-outcome rule."
+    "This is a single dated snapshot (2026-09-22); it was not repeated to check for flakiness or transient API state, per the no-re-run-to-fish-for-a-different-outcome rule.",
+    "Reclassified from native_proven to source_review in this fix round: per tools/sota-convergence/README.md's evidence_level definitions ('source_review means nothing was installed, built or run; native_proven ... means an actual reproducible execution exists'), read-only `gh api` metadata lookups about each cataloged tool do not install, build or run that tool, so they characterize currency without qualifying it -- distinct from the gitleaks-repo-history-scan receipt, where gitleaks itself was actually executed and is correctly native_proven."
   ],
   "raw_artifacts": [
     {
@@ -104,6 +126,18 @@
     {
       "path": "blueprints/gap-resolution-20260922/upstream-currency-sweep/currency_sweep.py",
       "sha256": "c8406015cfe72495e832af7fe024f056aad0e888506fa7030bb403af947a24c0"
+    },
+    {
+      "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/currency-sweep/openhands-tag-v1.49.2.json",
+      "sha256": "847b44b54e0c3d50df86fe70cf10ec6d0020d8baa2ab3b8d366f9a81d4284e60"
+    },
+    {
+      "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/currency-sweep/openhands-compare-9bc-vs-856.json",
+      "sha256": "9b092e3c89128bc06e4563020fbf5d0c87093ad5fa530f0fdb70675aa9e211d9"
+    },
+    {
+      "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/currency-sweep/openhands-compare-856-vs-9bc.json",
+      "sha256": "1bacb19f82cad572e6f6b2f26dda30013e1cbde91747f40e0f7b22726f26e680"
     }
   ],
   "id": "upstream-currency-sweep-20260922--workers"

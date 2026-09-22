@@ -61,11 +61,12 @@
     "direction": "supports_incumbent",
     "explanation": "A 200 response or a new attest step in release.yml would have been a material change worth surfacing to the coordinator; neither occurred, so this recheck reconfirms the existing gap-4 record rather than overturning anything."
   },
-  "evidence_class": "native_proven",
+  "evidence_class": "source_review",
   "limitations": [
     "Only two digests were checked (one platform binary, one checksums manifest) out of 10 release assets; the other 8 platform archives were not individually queried, though GitHub attestations are normally generated per-build-workflow-run rather than per-asset, so a 404 on these two is a reasonable proxy, not exhaustive per-asset proof.",
     "The release.yml read is source review of the current default branch, not the exact workflow revision that produced the v8.30.1 release (published 2026-03-21); the workflow file may have changed since that release ran.",
-    "This is a point-in-time recheck; it does not predict whether attestations will be added to a future release."
+    "This is a point-in-time recheck; it does not predict whether attestations will be added to a future release.",
+    "Reclassified from native_proven to source_review in this fix round: per tools/sota-convergence/README.md's evidence_level definitions ('source_review means nothing was installed, built or run; native_proven ... means an actual reproducible execution exists'), this receipt's read-only `gh api` attestation/release-asset/workflow-source lookups do not install, build or run gitleaks itself, so they are source review of upstream metadata, not native execution."
   ],
   "raw_artifacts": [
     {
