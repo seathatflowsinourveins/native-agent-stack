@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "worktrunk-0-79-0-requalify",
+  "date": "2026-09-22",
+  "layer_ids": ["git-github-automation", "workers"],
+  "gap_refs": [
+    { "layer_id": "git-github-automation", "gap_index": 2 }
+  ],
+  "purpose": "Re-run the frozen owned-worktree qualification (create/list/remove/dirty-refuse/cleanup) that was previously observed only on Worktrunk 0.78.0, against the currently pinned 0.79.0 binary at $HOME/.local/share/codex-ecosystem/tools/worktrunk-0.79.0/, mirroring blueprints/convergence-practice/wsl-native-tools/{install.py,plan.json,run.py} byte-for-byte and only updating pins.json's worktrunk component to the 0.79.0 release identity (version, release_url, release_published_at, source_commit, license_url/sha256, archive/checksum URLs and sha256), per gap-triage.json git-github-automation gap 2 ('worktrunk acceptance was observed on 0.78.0 ... current pin 0.79.0 has not been re-qualified') and the cross_layer_checks entry worktrunk-0.79.0-requalify-and-crash-cleanup. The new fixture is written under blueprints/gap-resolution-20260922/worktrunk-0-79-0-requalify/ rather than editing the original 0.78.0 receipt, which is left as the unchanged historical record.",
+  "preregistered": "If a fresh install into a new exclusive prefix reproduces the pinned worktrunk 0.79.0 archive_sha256 (b8c190b1d652370ef9f6b8f4694a2d6831b5b22f4b789f047612aad32764c6cf) and binary_sha256 (7f2ef254669878e14adf3be17846f0965fa67a04e7b80d27e2d047fe1ba2c465) from pins.json, and the unmodified run.py qualification (create two named worktrees at the frozen main commit, list them, remove the clean one without force, refuse removal of the dirty/untracked one while preserving its bytes and registration, restore and remove it, and confirm only main remains with project hooks suppressed) exits with receipt status 'passed' end to end, that settles git-github-automation gap 2 (0.79.0 is no longer unqualified) and jointly closes the cross_layer_checks pairing with the workers-layer crash-cleanup probe's happy-path prerequisite (the same binary must first pass ordinary create/remove before a crash-kill case is meaningful). Any exit-code mismatch, hash mismatch, or 'failed' receipt status would instead leave gap 2 open and is recorded as such, not retried.",
+  "commands": [
+    { "cmd": "python3 blueprints/gap-resolution-20260922/worktrunk-0-79-0-requalify/install.py --prefix $PREFIX (prefix-079)", "exit": 0, "duration_s": null, "output_excerpt": "installation.json: gitleaks 8.30.1 archive_sha256=551f6fc8..., worktrunk 0.79.0 archive_sha256=b8c190b1... (both publisher_checksum_verified=true, github_asset_digest_verified=true, license_matches_pinned_source=true)", "output_sha256": "712818a51c770d87e9d0eeac281aea4166b9c8f8a75747a71f6226b53f466dbc" },
+    { "cmd": "python3 blueprints/gap-resolution-20260922/worktrunk-0-79-0-requalify/run.py --prefix $PREFIX --work $PREFIX/attempt-1", "exit": 0, "duration_s": 1.706364, "output_excerpt": "receipt.json status=passed; versions: git 2.43.0, gitleaks 8.30.1, wt v0.79.0; worktrunk: created=2 removed_without_force=2 dirty_removal_refused=true project_hooks_suppressed=true; cleanup: remaining_worktrees=[repo] remaining_branches=[main] owned_clean_path_absent=true owned_dirty_path_absent=true services_or_models_started=false; 22 sub-commands recorded, only gitleaks-positive (expected 1) and wt-remove-dirty-refused (expected 1) have non-zero exit by design, all 22 exit codes match plan.json expectations", "output_sha256": "162f11c40b6c2465950aba28a082fc6b76816ba1a24548099be619a70ceaf3ee" }
+  ],
+  "tool_versions": {
+    "git": "git version 2.43.0",
+    "gitleaks": "8.30.1",
+    "worktrunk": "wt v0.79.0",
+    "python": "3.12.3"
+  },
+  "installs": [
+    {
+      "name": "worktrunk",
+      "version": "0.79.0",
+      "prefix": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/prefix-079/ (disposable qualification prefix, distinct from the existing pinned install at $HOME/.local/share/codex-ecosystem/tools/worktrunk-0.79.0/, which was not touched)",
+      "source_url": "https://github.com/max-sixty/worktrunk/releases/download/v0.79.0/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+      "sha256": "b8c190b1d652370ef9f6b8f4694a2d6831b5b22f4b789f047612aad32764c6cf"
+    },
+    {
+      "name": "gitleaks",
+      "version": "8.30.1",
+      "prefix": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/prefix-079/ (disposable qualification prefix)",
+      "source_url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz",
+      "sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+    }
+  ],
+  "result": {
+    "status": "passed",
+    "frozen_inputs_sha256": {
+      "install.py": "563254d0fc38dd6e98158a905792c121ffdaed6d2be3157a16a45ad9ba79a255",
+      "pins.json": "19eaca0b6e51e48f7d5cbdf86a11d190556b305c4a4c3963572174a5c1bd1c5d",
+      "plan.json": "10a7781aaee484954e047b4eac4bda545df7376d080a4ebeb66d00381957e4a8",
+      "run.py": "834ecb98cf1953cb9e1b282e6b1f104b4969abc2a8e008439b2c383328338aaa"
+    },
+    "install_py_and_run_py_bytes_identical_to_0_78_0_fixture": true,
+    "only_pins_json_changed": "worktrunk component version/release_url/release_published_at/source_commit/license_url/license_sha256/archive.url/archive.sha256/checksums.url/checksums.sha256 updated from 0.78.0 to 0.79.0; gitleaks component unchanged",
+    "started_at": "2026-09-22T22:36:01.501093+00:00",
+    "finished_at": "2026-09-22T22:36:03.207457+00:00"
+  },
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Confirms the worktrunk 0.79.0 pin behaves identically to the qualified 0.78.0 pin on the exact same synthetic create/list/remove/dirty-refuse/cleanup scenario; this removes the stale-pin concern (gap 2) without surfacing any new regression, so the layer's existing keep_but_compare selection of Worktrunk for owned-worktree isolation is unaffected."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Synthetic single-repo qualification only; does not exercise concurrent agents, remote branches, submodules, or the actual publication worktree set this host runs.",
+    "Does not itself update the tracked blueprints/convergence-practice/wsl-native-tools/pins.json (which still documents the original 0.78.0 receipt as history); the new 0.79.0 fixture lives under blueprints/gap-resolution-20260922/worktrunk-0-79-0-requalify/ per this task's owned-output scope, so a coordinator decision is still needed on whether to promote pins.json's tracked default.",
+    "Does not by itself close git-github-automation gap 7 (matched winner-vs-challenger comparison); no challenger worktree-isolation tool was run."
+  ],
+  "raw_artifacts": [
+    { "path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/prefix-079/installation.json", "sha256": "712818a51c770d87e9d0eeac281aea4166b9c8f8a75747a71f6226b53f466dbc" },
+    { "path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/prefix-079/attempt-1/receipt.json", "sha256": "162f11c40b6c2465950aba28a082fc6b76816ba1a24548099be619a70ceaf3ee" },
+    { "path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/prefix-079/attempt-1/logs/ (22 stdout+stderr pairs, individually sha256'd inside receipt.json commands[])" }
+  ]
+}

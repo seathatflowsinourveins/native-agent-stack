@@ -12086,6 +12086,51 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-agents-models-workers-20260922.json",
       "sha256": "cc48e0009abf6a5bee0ec3511e176b091ed1e23ac11ac2fe74c63c2eea919a09",
       "bytes": 26372
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/git-github-automation/worktrunk-0-79-0-requalify.json",
+      "sha256": "5f05440e130889203b8fcbb0d347189e5462a16b65d8de09e82d7040e35cbe05",
+      "bytes": 7385
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/workers/worktrunk-crash-cleanup-probe.json",
+      "sha256": "9532065c73e2987f88093f743997b4a36b6701050cc0a13ec16fe41cd7a3ca56",
+      "bytes": 9881
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/git-github-automation/difftastic-larger-fixture.json",
+      "sha256": "ee55eab1801140844e8fa367045aaa97fcbd19beedeec7e6ba47c36ddd1d70a2",
+      "bytes": 5529
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/worktrunk-0-79-0-requalify/install.py",
+      "sha256": "563254d0fc38dd6e98158a905792c121ffdaed6d2be3157a16a45ad9ba79a255",
+      "bytes": 4051
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/worktrunk-0-79-0-requalify/pins.json",
+      "sha256": "19eaca0b6e51e48f7d5cbdf86a11d190556b305c4a4c3963572174a5c1bd1c5d",
+      "bytes": 2459
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/worktrunk-0-79-0-requalify/plan.json",
+      "sha256": "10a7781aaee484954e047b4eac4bda545df7376d080a4ebeb66d00381957e4a8",
+      "bytes": 1317
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/worktrunk-0-79-0-requalify/run.py",
+      "sha256": "834ecb98cf1953cb9e1b282e6b1f104b4969abc2a8e008439b2c383328338aaa",
+      "bytes": 14574
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/worktrunk-crash-cleanup-probe/probe.py",
+      "sha256": "c7a1408f9f8d8ab812f8c30761bdaa030d7b89e1b6eeb63e0cfb48da74dbb66e",
+      "bytes": 3389
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/difftastic-larger-fixture/run_difft.sh",
+      "sha256": "033e64a6e657c7a20ffb2b4a0a34b766c3c2ed0b7fce3322af76c469879833e0",
+      "bytes": 1845
     }
   ],
   "convergence_records": [

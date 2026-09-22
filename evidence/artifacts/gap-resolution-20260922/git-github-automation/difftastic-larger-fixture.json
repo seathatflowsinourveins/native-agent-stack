@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "difftastic-larger-fixture",
+  "date": "2026-09-22",
+  "layer_ids": ["git-github-automation"],
+  "gap_refs": [
+    { "layer_id": "git-github-automation", "gap_index": 4 }
+  ],
+  "purpose": "Extend difftastic acceptance beyond the single before.py/after.py fixture pair by running the pinned difft 0.71.0 ($HOME/.local/share/codex-ecosystem/bin/difft, guarded launcher for tools/difftastic-0.71.0/difft) over every file changed in a real multi-file commit range of this repository, per gap-triage.json git-github-automation gap 4 ('difftastic acceptance is a single fixture pair ... not an LLM invocation or general quality benchmark'). Range: native-agent-stack-token-practice-review commit 231077d095511391e7dd8a5ab25c451331332c5e (parent) to bdd04ca50eb781f8366c955f481479b7a7f57cbd (this worktree's HEAD, 'Re-record the 12 trading layer verdicts from layer-specific packets (#74)'), 20 files changed spanning .json, .md, .py and .html. old/<path> and new/<path> were extracted with `git show <rev>:<path>` and verified byte-identical to `git show` output before running difft (spot-checked on docs/grand-catalog-handbook.md).",
+  "preregistered": "If difft --display=inline exits 0 and produces non-empty, non-fallback output (no 'failed to parse' / 'could not find a parser' / panic message) for all 20 changed-file pairs, that settles the gap's specific complaint (single-fixture-pair acceptance) by demonstrating difft parses and reports every changed file in a real, larger, heterogeneous (json/md/py/html) changed set, not just the synthetic before.py/after.py pair -- while still not being a matched comparison against a challenger structural-diff tool (no second tool is installed; that remains open per gap 7). If any file fails to parse, produces empty output despite a real byte-level diff, or crashes difft, that file is recorded as a failure and the gap stays open for that file type.",
+  "commands": [
+    { "cmd": "difft --version", "exit": 0, "duration_s": null, "output_excerpt": "Difftastic 0.71.0 / Revision: b7d119e 2026-09-18 / Toolchain: 1.85.0 / System: linux x86_64", "output_sha256": null },
+    { "cmd": "for path in changed-files.txt: difft --display=inline --color=never old/<path> new/<path> > reports/<path>.txt (20 invocations, one per changed file)", "exit": 0, "duration_s": null, "output_excerpt": "20/20 exit 0; 20/20 non-empty output; 0/20 contained a parse-failure or panic marker; largest report docs/ecosystem/index.html at 26015185 bytes (single-line minified HTML), smallest tools/sota-convergence/README.md at 2659 bytes", "output_sha256": "123636ede7069ca8869930cbcc34c5a891ce7966fe96a31c66a319239e5c49f0" }
+  ],
+  "tool_versions": {
+    "difft": "Difftastic 0.71.0"
+  },
+  "installs": [],
+  "result": {
+    "files_attempted": 20,
+    "files_exit_0": 20,
+    "files_parsed_ok": 20,
+    "files_reported_change": 20,
+    "files_failed": 0,
+    "per_file_results_jsonl": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/difft-out/results.jsonl",
+    "file_types_covered": [".json", ".md", ".py", ".html"],
+    "commit_range": { "repo": "native-agent-stack-token-practice-review", "old": "231077d095511391e7dd8a5ab25c451331332c5e", "new": "bdd04ca50eb781f8366c955f481479b7a7f57cbd" },
+    "old_new_extraction_verified": "diff <(git show 231077d:docs/grand-catalog-handbook.md) old/docs/grand-catalog-handbook.md and the equivalent for new/ both produced no diff before running difft"
+  },
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "difft parsed and reported every one of 20 real changed files across 4 file types with no parse failures, which directly answers the 'single fixture pair' complaint in gap 4 and supports difftastic as a working structural diff tool at scale on this repository's actual content. It does not settle gap 7 (matched winner-vs-challenger comparison), since no second structural-diff tool is installed on this host to compare against; the layer's decision stays keep_but_compare on that axis."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Not a matched comparison against any challenger structural-diff tool (gap 7 remains open); this is a single-tool scale extension, exactly as the gap's blocker text anticipated.",
+    "'Parsed_ok' is a mechanical check for known difftastic fallback/failure strings in stdout, not a manual review of diff quality or correctness for every file.",
+    "docs/ecosystem/index.html is a large single-line minified file; difft's inline report for it is 26,015,185 bytes and is kept only in the scratch dir (not copied into the repository) per the >1MB raw-output rule; its sha256 is recorded above.",
+    "This range was chosen because it was the worktree's own HEAD commit and already had a real 20-file multi-type diff on hand; it was not selected by any criterion related to diff difficulty or edge cases."
+  ],
+  "raw_artifacts": [
+    { "path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/difft-out/results.jsonl", "sha256": "123636ede7069ca8869930cbcc34c5a891ce7966fe96a31c66a319239e5c49f0" },
+    { "path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/difft-out/reports/ (20 per-file difft reports, largest docs/ecosystem/index.html at 26015185 bytes)" },
+    { "path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/difft-out/old/ and new/ (extracted pre/post file trees, git-show-verified)" }
+  ]
+}
