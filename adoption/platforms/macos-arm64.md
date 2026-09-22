@@ -45,6 +45,31 @@ The script keeps to what a stock Mac has: `shasum -a 256` instead of
 `sha256sum`, an atomic `mkdir` lock instead of `flock`, `cd` + `pwd -P` instead
 of `realpath`, and no bash-4-only syntax, because `/bin/bash` on macOS is 3.2.
 
+### Bootstrap usage and exit codes
+
+```sh
+bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation \
+  [--skip-system-packages] [--allow-unpinned <id,id,...>] [--plan]
+```
+
+`--plan` resolves and prints every pinned component (version, asset, SHA-256)
+with no network access and no installation. It is the only mode anything on
+this page has run in, and only under a `uname`/`sw_vers` shim on Linux.
+
+| Exit | Meaning |
+| --- | --- |
+| 0 | The profile installed, or `--plan` finished printing it. |
+| 1 | Guard or refusal: not Darwin/arm64, run as root, no Homebrew for a real run, an unusable `ECO_INSTALL_ROOT`, another bootstrap holding the lock, a checksum mismatch, or a pin whose `sha256` is null (fail closed, in `--plan` too). |
+| 2 | Usage error: missing `--profile`, an unknown argument, or a flag given without its value. |
+| 3 | A selected component has no pin at all in [`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json) and was not named in `--allow-unpinned`. Checked before anything is installed, and in `--plan` too; `--allow-unpinned <id,id,...>` skips the named ids instead and echoes them to the run log. |
+| 4 | A prerequisite (`curl`, `git`, `tar`, `shasum`, `unzip`, `jq`, `mktemp`) is still missing after the Homebrew step. With `--skip-system-packages` no `brew install` is attempted and the check lists what is missing. |
+
+`socraticode` is the one selected component this draft leaves unpinned (below);
+the script carries it as a documented skip, so the shipped profile needs no
+`--allow-unpinned`. Exit codes 3 and 4 and the `--allow-unpinned` flag mirror
+[`adoption/bootstrap-linux.sh`](../bootstrap-linux.sh), so the two platform
+scripts do not diverge; `--plan` is macOS-only.
+
 ### darwin-arm64 pinned release archives
 
 These components are installed from upstream `darwin-arm64` (or `darwin-arm64`-equivalent)

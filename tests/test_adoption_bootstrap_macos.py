@@ -61,6 +61,28 @@ def macos_shim(directory: Path) -> Path:
     return shim
 
 
+# Everything the script looks for with `command -v` before it reads the pins.
+PREREQUISITES = ("curl", "git", "tar", "shasum", "unzip", "jq", "mktemp")
+
+
+def prerequisite_shim(directory: Path, omit=()) -> Path:
+    """macos_shim plus real symlinks for the prerequisites, minus `omit`.
+
+    The exit-4 test restricts PATH to exactly this directory, so anything not
+    linked here is genuinely absent from the script's point of view without
+    touching the host's own PATH. `dirname` is linked too: the script resolves
+    its own directory with it before any check runs.
+    """
+    shim = macos_shim(directory)
+    for tool in (*PREREQUISITES, "dirname", "basename"):
+        if tool in omit:
+            continue
+        found = shutil.which(tool)
+        if found:
+            (shim / tool).symlink_to(found)
+    return shim
+
+
 class PinsSchemaTests(unittest.TestCase):
     def setUp(self):
         self.pins = load(PINS_PATH)
@@ -214,6 +236,39 @@ class ScriptStructureTests(unittest.TestCase):
                         "PATH must include bin_dir before node/uv/gh and any npm-kind pin")
         self.assertEqual(self.text.count('export PATH="$bin_dir:$PATH"'), 1)
 
+    def test_unpinned_fail_closed_check_precedes_every_install_and_plan_line(self):
+        # Mirrors the Linux script: the pin lookup for the whole selected set
+        # runs before install_pin is ever called, so neither an install nor a
+        # --plan line can happen ahead of the exit-3 refusal.
+        check_index = self.text.index("unpinned_ids=()")
+        core_loop_index = self.text.index("for core_id in node uv gh")
+        self.assertLess(check_index, core_loop_index)
+        self.assertIn("exit 3", self.text)
+        self.assertIn("--allow-unpinned", self.text)
+
+    def test_empty_array_expansions_stay_bash_32_safe(self):
+        # A stock Mac's /bin/bash is 3.2, where `set -u` rejects some
+        # expansions of an empty array. The script guards every element
+        # expansion with ${arr[@]+"${arr[@]}"} and counts with a plain
+        # integer instead of ${#arr[@]}, which this host's bash 5 cannot
+        # exercise; the rule is checked structurally instead.
+        self.assertNotIn("${#", self.text,
+                         "use an explicit counter, not ${#array[@]}, for bash 3.2")
+        for guarded in ("${component_ids[@]+", "${allow_unpinned_ids[@]+"):
+            self.assertIn(guarded, self.text)
+
+    def test_brew_prerequisite_install_precedes_the_presence_check(self):
+        # Item 4 mirror: on Linux the apt block moved ahead of the
+        # curl/git/tar/jq presence check; here the brew jq install does.
+        brew_index = self.text.index("brew install jq")
+        check_index = self.text.index(
+            "for required in curl git tar shasum unzip jq mktemp")
+        self.assertLess(
+            brew_index, check_index,
+            "the brew jq install must run before the prerequisite presence check")
+        self.assertIn("Missing prerequisites: %s", self.text)
+        self.assertIn("exit 4", self.text)
+
     def test_llama_server_is_installed_as_a_wrapper_not_a_bare_symlink(self):
         self.assertIn("DYLD_LIBRARY_PATH", self.text)
         # The wrapper lives in a heredoc, so its runtime expansions are escaped
@@ -249,6 +304,7 @@ class ScriptBehaviorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("--profile", result.stdout)
         self.assertIn("--plan", result.stdout)
+        self.assertIn("--allow-unpinned", result.stdout)
         self.assertIn("ECO_INSTALL_ROOT", result.stdout)
 
     def test_missing_profile_exits_two(self):
@@ -317,6 +373,170 @@ class ScriptBehaviorTests(unittest.TestCase):
                              "no tool files should have been installed before the refusal")
 
 
+class UnpinnedComponentFailClosedTests(unittest.TestCase):
+    """A selected component with no pin at all fails closed (exit 3) before
+    anything is installed, and in --plan mode too, unless it is named in
+    --allow-unpinned. Mirrors the Linux UnpinnedComponentFailClosedTests in
+    tests/test_adoption_bootstrap.py. The fixture is a copy of the shipped
+    pins file with a pin entry removed, so every run below stays offline.
+    No macOS host ran any of this: Linux plus the uname/sw_vers shim only.
+    """
+
+    def _fixture(self, tmp_path: Path, drop_pins=("qdrant",)):
+        adoption_dir = tmp_path / "adoption"
+        adoption_dir.mkdir()
+        script_copy = adoption_dir / "bootstrap-macos.sh"
+        script_copy.write_text(SCRIPT_PATH.read_text())
+        script_copy.chmod(0o755)
+        (adoption_dir / "manifest.json").write_text(MANIFEST_PATH.read_text())
+        pins = load(PINS_PATH)
+        kept = [tool for tool in pins["tools"] if tool["id"] not in drop_pins]
+        self.assertEqual(len(kept), len(pins["tools"]) - len(drop_pins),
+                         "the fixture must really remove a shipped pin entry")
+        pins["tools"] = kept
+        (adoption_dir / "pins-macos-arm64.json").write_text(json.dumps(pins))
+        return script_copy
+
+    def _run(self, script, shim, eco_root, extra_args=()):
+        return subprocess.run(
+            ["bash", str(script), "--plan", "--profile", PROFILE_ID,
+             "--skip-system-packages", *extra_args],
+            capture_output=True, text=True, timeout=60,
+            env={**os.environ,
+                 "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}",
+                 "ECO_INSTALL_ROOT": str(eco_root)},
+        )
+
+    def test_unpinned_selected_component_exits_3_in_plan_mode(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            script = self._fixture(tmp_path)
+            eco_root = tmp_path / "eco"
+            result = self._run(script, macos_shim(tmp_path), eco_root)
+            self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+            self.assertIn("No pin in", result.stderr)
+            self.assertIn("qdrant", result.stderr)
+            self.assertIn("--allow-unpinned", result.stderr)
+            # The refusal comes before install_pin runs at all, so --plan has
+            # not printed a single component line either.
+            self.assertNotIn("plan node", result.stdout)
+            self.assertFalse(
+                eco_root.exists() and any(eco_root.glob("tools/*/*")),
+                "no tool files should have been installed before the refusal")
+
+    def test_allow_unpinned_skips_it_and_the_plan_exits_zero(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            script = self._fixture(tmp_path)
+            eco_root = tmp_path / "eco"
+            result = self._run(script, macos_shim(tmp_path), eco_root,
+                               extra_args=["--allow-unpinned", "qdrant"])
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Allowed unpinned components", result.stdout)
+            self.assertIn("qdrant", result.stdout.split("\n")[0])
+            self.assertIn("No pin for component qdrant", result.stderr)
+            self.assertRegex(result.stdout, r"(?m)^plan node\s")
+            self.assertFalse(
+                eco_root.exists() and any(eco_root.glob("tools/*/*")),
+                "--plan must still install nothing")
+
+    def test_allow_unpinned_equals_form_is_accepted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            script = self._fixture(tmp_path)
+            eco_root = tmp_path / "eco"
+            result = self._run(script, macos_shim(tmp_path), eco_root,
+                               extra_args=["--allow-unpinned=qdrant"])
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Allowed unpinned components", result.stdout)
+
+    def test_partial_allow_unpinned_still_fails_closed_on_the_rest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            script = self._fixture(tmp_path, drop_pins=("qdrant", "mcporter"))
+            eco_root = tmp_path / "eco"
+            result = self._run(script, macos_shim(tmp_path), eco_root,
+                               extra_args=["--allow-unpinned", "qdrant"])
+            self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+            refusal = result.stderr.split("No pin in", 1)[-1].split("\n")[0]
+            self.assertIn("mcporter", refusal)
+            self.assertNotIn("qdrant", refusal)
+
+    def test_allow_unpinned_without_a_value_exits_two(self):
+        result = subprocess.run(
+            ["bash", str(SCRIPT_PATH), "--profile", PROFILE_ID,
+             "--allow-unpinned"],
+            capture_output=True, text=True, timeout=60, env={**os.environ},
+        )
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("--allow-unpinned requires", result.stderr)
+
+    def test_the_documented_socraticode_skip_needs_no_flag(self):
+        # The shipped profile selects socraticode, which this draft leaves
+        # unpinned on purpose; it is carried in the script's documented-skip
+        # list, so the shipped --plan stays exit 0 while still echoing it.
+        self.assertIn("documented_unpinned_ids=(socraticode)",
+                      SCRIPT_PATH.read_text())
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            result = subprocess.run(
+                ["bash", str(SCRIPT_PATH), "--plan", "--profile", PROFILE_ID,
+                 "--skip-system-packages"],
+                capture_output=True, text=True, timeout=60,
+                env={**os.environ,
+                     "PATH": f"{macos_shim(tmp_path)}{os.pathsep}{os.environ['PATH']}",
+                     "ECO_INSTALL_ROOT": str(eco_root)},
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Allowed unpinned components", result.stdout)
+            self.assertIn("socraticode", result.stdout.split("\n")[0])
+
+
+class PrerequisitesBeforeAndAfterBrewTests(unittest.TestCase):
+    """--skip-system-packages with a missing prerequisite lists it and exits 4
+    (not 1), the Linux script's item-4 behaviour. PATH is restricted to a shim
+    directory that omits jq, so the check itself reports it without brew,
+    network or a real macOS host."""
+
+    def test_skip_system_packages_with_a_hidden_prerequisite_exits_4(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            shim = prerequisite_shim(tmp_path, omit=("jq",))
+            eco_root = tmp_path / "eco"
+            result = subprocess.run(
+                [shutil.which("bash"), str(SCRIPT_PATH), "--profile", PROFILE_ID,
+                 "--skip-system-packages"],
+                capture_output=True, text=True, timeout=60,
+                env={"PATH": str(shim), "HOME": os.environ.get("HOME", str(tmp_path)),
+                     "ECO_INSTALL_ROOT": str(eco_root)},
+            )
+            self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
+            self.assertIn("Missing prerequisites", result.stderr)
+            self.assertIn("jq", result.stderr)
+            self.assertIn("--skip-system-packages", result.stderr)
+            self.assertFalse(eco_root.exists(),
+                             "the prerequisite check must run before any install root is made")
+
+    def test_every_prerequisite_present_gets_past_the_check(self):
+        # Control for the test above: the same shim with jq linked reaches the
+        # plan instead of exiting 4.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            shim = prerequisite_shim(tmp_path)
+            eco_root = tmp_path / "eco"
+            result = subprocess.run(
+                [shutil.which("bash"), str(SCRIPT_PATH), "--plan", "--profile",
+                 PROFILE_ID, "--skip-system-packages"],
+                capture_output=True, text=True, timeout=60,
+                env={**os.environ,
+                     "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}",
+                     "ECO_INSTALL_ROOT": str(eco_root)},
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotIn("Missing prerequisites", result.stderr)
+
+
 class PlatformPageTests(unittest.TestCase):
     def setUp(self):
         self.page = PAGE_PATH.read_text()
@@ -335,6 +555,13 @@ class PlatformPageTests(unittest.TestCase):
         self.assertIn("What a hosted run proves", self.page)
         self.assertIn("not a workstation acceptance", self.page)
         self.assertIn("launchd", self.page)
+
+    def test_page_documents_the_bootstrap_usage_and_exit_codes(self):
+        self.assertIn("--allow-unpinned <id,id,...>", self.page)
+        self.assertIn("--skip-system-packages", self.page)
+        for row in ("| 0 |", "| 1 |", "| 2 |", "| 3 |", "| 4 |"):
+            self.assertIn(row, self.page, f"exit code row {row} missing")
+        self.assertIn("bootstrap-linux.sh", self.page)
 
     def test_page_records_the_python_313_requirement(self):
         self.assertIn("brew install python@3.13", self.page)

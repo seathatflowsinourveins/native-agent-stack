@@ -10,19 +10,29 @@ set -Eeuo pipefail
 
 usage() {
   printf '%s\n' \
-    'Usage: bash bootstrap-macos.sh --profile <id> [--skip-system-packages] [--plan]' \
+    'Usage: bash bootstrap-macos.sh --profile <id> [--skip-system-packages]' \
+    '                               [--allow-unpinned <id,id,...>] [--plan]' \
     '' \
     'Installs the tools pinned in adoption/pins-macos-arm64.json for the' \
     "given profile's component_ids (from adoption/manifest.json) under" \
     'ECO_INSTALL_ROOT (default ~/.local/share/codex-ecosystem), each in an' \
     'isolated tools/<name>-<version> prefix with bin/ symlinks. Every archive' \
     'is SHA-256 verified with shasum -a 256 before extraction; a pin with a' \
-    'null sha256 refuses to install (fail closed). Uses Homebrew only for a' \
-    'missing jq prerequisite. Never edits a shell profile.' \
+    'null sha256 refuses to install (fail closed). A selected component with' \
+    'no pin at all also fails closed (exit 3) before installing anything, and' \
+    'in --plan mode too, unless it is named in --allow-unpinned, in which case' \
+    'it is skipped and echoed to the run log; socraticode, documented on' \
+    'adoption/platforms/macos-arm64.md as having no reviewed darwin-arm64' \
+    'archive in this draft, is skipped the same way without the flag.' \
+    'Uses Homebrew only for a missing jq prerequisite, installed before the' \
+    'curl/git/tar/jq presence check unless --skip-system-packages is given,' \
+    'in which case that check lists what is missing and exits 4.' \
+    'Never edits a shell profile.' \
     '' \
     '  --plan  resolve and print each pinned component (version, asset,' \
     '          sha256) without any network access or installation; still' \
-    '          exits 1 on a pin with no verified sha256.'
+    '          exits 1 on a pin with no verified sha256 and 3 on a selected' \
+    '          component with no pin at all.'
 }
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
@@ -31,6 +41,7 @@ repo_root="$(cd -- "$script_dir/.." >/dev/null 2>&1 && pwd -P)"
 profile_id=""
 skip_system=0
 plan_mode=0
+allow_unpinned_ids=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --profile)
@@ -44,6 +55,17 @@ while [[ $# -gt 0 ]]; do
       ;;
     --skip-system-packages)
       skip_system=1
+      shift
+      ;;
+    --allow-unpinned)
+      [[ $# -ge 2 ]] || { printf -- '--allow-unpinned requires a comma-separated id list.\n' >&2; exit 2; }
+      IFS=',' read -r -a _allow_unpinned_chunk <<<"$2"
+      allow_unpinned_ids+=(${_allow_unpinned_chunk[@]+"${_allow_unpinned_chunk[@]}"})
+      shift 2
+      ;;
+    --allow-unpinned=*)
+      IFS=',' read -r -a _allow_unpinned_chunk <<<"${1#--allow-unpinned=}"
+      allow_unpinned_ids+=(${_allow_unpinned_chunk[@]+"${_allow_unpinned_chunk[@]}"})
       shift
       ;;
     --plan)
@@ -72,23 +94,32 @@ command -v sw_vers >/dev/null || { printf 'Cannot identify the macOS release (sw
 macos_version="$(sw_vers -productVersion)"
 
 # jq is the only prerequisite Homebrew may supply here; everything else ships
-# with macOS or the Command Line Tools. shasum replaces Linux sha256sum.
+# with macOS or the Command Line Tools. Like the Linux apt block, this install
+# runs *before* the presence check below, so a Mac that has no jq yet satisfies
+# that check without a second run. shasum replaces Linux sha256sum.
+if [[ "$skip_system" == 0 && "$plan_mode" == 0 ]] && ! command -v jq >/dev/null; then
+  command -v brew >/dev/null || {
+    printf 'Homebrew is required to install the missing jq prerequisite; install it from https://brew.sh or rerun with --skip-system-packages.\n' >&2
+    exit 1
+  }
+  brew install jq
+fi
+
+missing_prerequisites=()
+missing_prerequisite_count=0
 for required in curl git tar shasum unzip jq mktemp; do
-  if command -v "$required" >/dev/null; then
-    continue
+  if ! command -v "$required" >/dev/null; then
+    missing_prerequisites+=("$required")
+    missing_prerequisite_count=$((missing_prerequisite_count + 1))
   fi
-  if [[ "$required" == jq && "$skip_system" == 0 && "$plan_mode" == 0 ]] && command -v brew >/dev/null; then
-    brew install jq
-    if command -v jq >/dev/null; then
-      continue
-    fi
-  fi
-  printf 'Missing prerequisite: %s\n' "$required" >&2
-  if [[ "$required" == jq ]]; then
-    printf 'Install it with: brew install jq\n' >&2
-  fi
-  exit 1
 done
+if [[ "$missing_prerequisite_count" -gt 0 ]]; then
+  printf 'Missing prerequisites: %s\n' "${missing_prerequisites[*]}" >&2
+  if [[ "$skip_system" == 1 ]]; then
+    printf 'Re-run without --skip-system-packages, or install them manually first (jq: brew install jq).\n' >&2
+  fi
+  exit 4
+fi
 
 manifest_path="$repo_root/adoption/manifest.json"
 pins_path="$repo_root/adoption/pins-macos-arm64.json"
@@ -106,6 +137,55 @@ while IFS= read -r component_id; do
   [[ -n "$component_id" ]] || continue
   component_ids+=("$component_id")
 done < <(printf '%s' "$component_ids_json" | jq -r '.[]')
+
+# Fail closed on any selected component with no pin, before installing
+# anything and before --plan prints a single line: install_pin's own
+# "no pin -> skip" path only ever reaches components allowed here.
+#
+# socraticode has no reviewed darwin-arm64 release archive in this draft and is
+# documented as skipped on adoption/platforms/macos-arm64.md (it is not a
+# required_command of this profile), so it is allowed by default exactly like
+# an explicit --allow-unpinned id: skipped, echoed, never installed. The Linux
+# script needs no such list because every component it selects is pinned.
+documented_unpinned_ids=(socraticode)
+allowed_unpinned_ids=("${documented_unpinned_ids[@]}" ${allow_unpinned_ids[@]+"${allow_unpinned_ids[@]}"})
+all_selected_ids=(node uv gh)
+for selected_id in ${component_ids[@]+"${component_ids[@]}"}; do
+  case "$selected_id" in
+    node|uv|gh) continue ;;
+  esac
+  all_selected_ids+=("$selected_id")
+done
+unpinned_ids=()
+unpinned_count=0
+for selected_id in "${all_selected_ids[@]}"; do
+  pin_entry="$(jq -c --arg id "$selected_id" '.tools[] | select(.id == $id)' "$pins_path")"
+  if [[ -z "$pin_entry" ]]; then
+    unpinned_ids+=("$selected_id")
+    unpinned_count=$((unpinned_count + 1))
+  fi
+done
+if [[ "$unpinned_count" -gt 0 ]]; then
+  unresolved_unpinned_ids=()
+  unresolved_count=0
+  for unpinned_id in "${unpinned_ids[@]}"; do
+    allowed=0
+    for allowed_id in "${allowed_unpinned_ids[@]}"; do
+      [[ "$unpinned_id" == "$allowed_id" ]] && { allowed=1; break; }
+    done
+    if [[ "$allowed" == 0 ]]; then
+      unresolved_unpinned_ids+=("$unpinned_id")
+      unresolved_count=$((unresolved_count + 1))
+    fi
+  done
+  if [[ "$unresolved_count" -gt 0 ]]; then
+    printf 'No pin in %s for selected component(s): %s\n' "$pins_path" "${unresolved_unpinned_ids[*]}" >&2
+    printf 'Pass --allow-unpinned %s to install the rest and skip these explicitly.\n' \
+      "$(IFS=,; printf '%s' "${unresolved_unpinned_ids[*]}")" >&2
+    exit 3
+  fi
+  printf 'Allowed unpinned components (documented skip or --allow-unpinned): %s\n' "${unpinned_ids[*]}"
+fi
 
 # Homebrew formulae float; the version record below is the retained evidence.
 if [[ "$skip_system" == 0 && "$plan_mode" == 0 ]]; then
