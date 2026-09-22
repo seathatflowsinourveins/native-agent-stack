@@ -89,6 +89,14 @@ class TradingGatesTests(unittest.TestCase):
         result = self.run_check(document(gate(receipt_path="decision.md", flip_condition={"type": "exists"})))
         self.assertEqual(result["status"], "passed")
 
+    def test_exists_condition_rejects_an_empty_file(self):
+        # Codex cross-family review of PR-4: presence-only conditions must not be
+        # satisfiable by an empty file.
+        (self.root / "empty.json").write_text("", encoding="utf-8")
+        result = self.run_check(document(gate(receipt_path="empty.json", flip_condition={"type": "exists"})))
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("empty", result["errors"][0])
+
     def test_rung_readiness_requires_every_earlier_rung(self):
         self.write("r.json", {"ok": True})
         sim = gate(id="sim-gate", rung="sim")

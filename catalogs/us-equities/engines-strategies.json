@@ -187,7 +187,7 @@
       ],
       "limitations": [
         "Prerelease: 2.0.0 final has not shipped; GitHub's latest non-prerelease is still v1.231.0.",
-        "SPY/LEAN parity gate G-a (retained-equity-replay) is planned_not_executed per runtime-target.json next_acceptance; no pass/fail counts are recorded by any retained receipt.",
+        "SPY/LEAN parity gate G-a (retained-equity-replay): runtime-target.json next_acceptance records reported_execution_blocked_review_incomplete; the retained comparison summary (evidence/artifacts/comparison-progress-20260922/summary.json) records a completed BLOCKED replay of the historical one_zero case with four failed checks, all attributed to the unsupported distributions_and_cash and market_on_open_proxy mappings. A completed blocked comparison is not parity acceptance; the per-check total is not retained in this repository.",
         "The dividend SimulationModule needed to close the parity gate is owned by the separate parity worktree, not this card.",
         "No local simulation, broker session or latency benchmark beyond the synthetic FX quickstart and the September21 AAPL diagnostic was performed.",
         "Event semantics shared by backtest/live still require a calibrated data/fill model and recovery tests."

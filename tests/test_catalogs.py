@@ -466,10 +466,17 @@ class Pr4CardsReconciliationTests(unittest.TestCase):
         self.assertIn("2.0.0rc5", nautilustrader["version_or_commit"])
         self.assertEqual(nautilustrader.get("source_commit"), "1b0a49d2792a9432a3aca3fcb617ce7a630d905e")
         joined_limitations = " ".join(nautilustrader["limitations"])
-        self.assertIn("planned_not_executed", joined_limitations)
-        self.assertIn("no pass/fail counts", joined_limitations.lower())
+        # Codex cross-family review of PR-4: the card must state the retained parity
+        # state (a completed BLOCKED replay with four failed checks recorded in the
+        # comparison summary), not "planned_not_executed", and never a per-check total
+        # that is not retained in this repository.
+        self.assertIn("reported_execution_blocked_review_incomplete", joined_limitations)
+        self.assertIn("completed BLOCKED replay", joined_limitations)
+        self.assertIn("four failed checks", joined_limitations)
         self.assertIn("parity worktree", joined_limitations)
+        self.assertNotIn("planned_not_executed", joined_limitations)
         self.assertNotIn("25 pass / 4 fail", joined_limitations)
+        self.assertNotIn("29 checks", joined_limitations)
 
         lean = self.entry(data, "lean")
         self.assertEqual(lean["decision"], "default")

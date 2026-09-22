@@ -6629,13 +6629,13 @@
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
-      "bytes": 104885,
-      "sha256": "e1ff4a6ead11ca6b14626d5c5cf8bac336644278e4db82df8457bed61b27ef55"
+      "bytes": 105245,
+      "sha256": "ee6b820d6f27f0c886d900ccf550363dad8f53ed3ef2f438e1ca62a22a3ced15"
     },
     {
       "path": "catalogs/us-equities/engines-strategies.md",
-      "bytes": 24698,
-      "sha256": "e1d6c94450ea0d8eb49f6cc1208c302148666ae6f34bfd7f1b326c6bc4faa53b"
+      "bytes": 25019,
+      "sha256": "f4c00b04ed3929b4223f76ca8d612830c23cdc97614bd0095041b3648a6f727d"
     },
     {
       "path": "catalogs/us-equities/foundation-memory.json",
@@ -6789,8 +6789,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 12120002,
-      "sha256": "1bdd083a336e544a10bb2d9fbedc661b9574efc0f5908ec66eabe81d559a3225"
+      "bytes": 12121802,
+      "sha256": "51c8a70503191661395f006feb1c5ebf33f5709b97b1e38f5cb3f8cc78458135"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7564,8 +7564,8 @@
     },
     {
       "path": "tests/test_catalogs.py",
-      "sha256": "65dafea150d16f6b4d7bbad8e941725c772d9da51fe1dcd8986f6edceb936bdc",
-      "bytes": 31163
+      "sha256": "0f3e47f75cb277f0bdf37c4d66eb7c9036d2a452d29e1f958164486420693c4c",
+      "bytes": 31682
     },
     {
       "path": "tests/test_catalyst_dataset.py",
@@ -10754,8 +10754,8 @@
     },
     {
       "path": "tools/sota-convergence/reconciliations-20260922.json",
-      "bytes": 6739,
-      "sha256": "aae498c62af1a83267d0f6a9159b34f9909202d8984b55c051fb0377d8061ecf"
+      "bytes": 7097,
+      "sha256": "a512097b7dc9b912e2e9efec0027f9d28cb9e836ee0c2d9ed93c97a81b9a1b5a"
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -11459,18 +11459,18 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "bytes": 15724,
-      "sha256": "f84b86a83ea2c859d7efe3a00143f68737e736435c3eccf5ff5f7cb9d011c4c2"
+      "bytes": 17810,
+      "sha256": "6a625b3a58c0a270171e59e563cb4d703335ad65bc4a5f3198430a467abf8c42"
     },
     {
       "path": "scripts/trading_gates.py",
-      "bytes": 9575,
-      "sha256": "73a06878617a3eac149b842fd5bda0bf8e8c9b83f7c94202059188d17dd81f12"
+      "bytes": 9701,
+      "sha256": "d8c00fff45b5094d0558c62b597bfe5e0f0f0cb3540f74e3e52cbd59b8113f94"
     },
     {
       "path": "tests/test_trading_gates.py",
-      "bytes": 6592,
-      "sha256": "c74a350422e212f4bc1841d66ab2a3118a38d256b49c27dca2192ecc02ba50a4"
+      "bytes": 7057,
+      "sha256": "ac11ef14d7576a9c5b52b750755d47f2fb2aa1b03fd6daaebef265b49a864825"
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",

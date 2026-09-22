@@ -71,7 +71,9 @@ def condition_holds(root: Path, gate: dict) -> tuple[bool, str]:
         return False, "receipt missing"
     condition = gate["flip_condition"]
     if condition is None or condition["type"] == "exists":
-        return True, "receipt present"
+        if receipt.stat().st_size == 0:
+            return False, "receipt present but empty"
+        return True, "receipt present (non-empty; content not judged)"
     try:
         document = load_json(receipt)
     except (OSError, ValueError) as error:
