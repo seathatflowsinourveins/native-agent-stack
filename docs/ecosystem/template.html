@@ -26,6 +26,12 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 </style>
 </head>
 <body>
+<section id="catalog-recovery" class="shell" aria-labelledby="catalog-recovery-title">
+<div class="page-heading"><div><div class="eyebrow">Offline catalog</div><h1 id="catalog-recovery-title">Open the complete catalog.</h1><p id="catalog-recovery-message">The interactive catalog is in index.html. If you opened the page template, use the button below. If index.html is already open, enable JavaScript or download a fresh copy of that file.</p></div></div>
+<div class="setup-guides"><a class="button" href="index.html">Open index.html ↗</a><a href="README.md">Opening and recovery guide</a><a href="../../catalogs/landscape/manifest.json">Landscape manifest</a></div>
+<!--@@BODY@@-->
+</section>
+<div id="catalog-app" hidden>
 <a class="skip" href="#main">Skip to content</a>
 <header><div class="shell">
 <div class="masthead"><a class="brand" href="#overview" aria-label="Native stack overview"><span class="mark" aria-hidden="true">n</span><span><strong>native stack</strong><span class="small">ECOSYSTEM MANIFEST</span></span></a><div class="edition"><span class="dot"></span><span>Public reference <span class="optional">/ </span><span id="edition-date"></span></span></div></div>
@@ -40,7 +46,6 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <button role="tab" id="tab-evidence" aria-controls="evidence" aria-selected="false" tabindex="-1" data-tab="evidence"><span class="tab-number">05</span>Evidence & sources</button>
 </nav></div></header>
 <main id="main" class="shell" tabindex="-1">
-@@BODY@@
 <section id="overview" role="tabpanel" aria-labelledby="tab-overview">
 <div class="hero"><div><div class="eyebrow">A connected system. A deliberate selection.</div><h1>Native by design.<br><em>Selective by default.</em></h1><p>Agents, skills, workers, retrieval and research—one navigable map of what exists, what was reviewed, and what actually ran.</p></div><aside class="hero-note"><div class="eyebrow">Built around the work</div><p>Keep native runtimes. Bring in the right context. Verify a useful result. Carry forward only the decisions that matter.</p><button class="button" data-open="explorer">Explore the repositories <span aria-hidden="true">↗</span></button></aside></div>
 <div id="catalog-entry-points" class="catalog-entries" aria-label="Two maintained catalogs" hidden></div>
@@ -113,10 +118,26 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <footer class="global-footer"><p>One offline file. No external scripts, fonts, analytics, account access or background requests. Links open the labeled public source or this PC only when you choose. Reference evidence is never authority to install, deploy or trade.</p><a id="repository-link" href="https://github.com/seathatflowsinourveins/native-agent-stack" target="_blank" rel="noopener noreferrer">Open the public repository ↗</a></footer>
 </main>
 <dialog id="record-dialog" aria-labelledby="record-title"><div class="dialog-head"><h2 id="record-title"></h2><button class="dialog-close" id="close-dialog" aria-label="Close record">×</button></div><div id="record-content" class="dialog-content"></div></dialog>
+</div>
 <script id="ecosystem-data" type="application/json">@@DATA@@</script>
 <script>
 "use strict";
-const data = JSON.parse(document.getElementById("ecosystem-data").textContent);
+(() => {
+const app = document.getElementById("catalog-app");
+const recovery = document.getElementById("catalog-recovery");
+function recoverCatalog(title, message) {
+  app.hidden = true;
+  recovery.hidden = false;
+  document.getElementById("catalog-recovery-title").textContent = title;
+  document.getElementById("catalog-recovery-message").textContent = message;
+}
+const source = document.getElementById("ecosystem-data")?.textContent.trim();
+if(!source || source.startsWith("@@")) {
+  recoverCatalog("Open the complete catalog.", "This file has no embedded catalog data. Open the sibling index.html file using the button below; the source template cannot display the catalog.");
+  return;
+}
+try {
+const data = JSON.parse(source);
 const $ = id => document.getElementById(id);
 const make = (tag, cls, content) => { const node = document.createElement(tag); if(cls) node.className = cls; if(content !== undefined) node.textContent = content; return node; };
 const add = (parent, ...children) => { children.forEach(child => parent.appendChild(child)); return parent; };
@@ -686,6 +707,13 @@ function inspectRecord(repo) {
 $("close-dialog").addEventListener("click", () => $("record-dialog").close());
 $("record-dialog").addEventListener("click", event => { if(event.target === $("record-dialog")) { const box = event.target.getBoundingClientRect(); if(event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) event.target.close(); } });
 renderRepositories(); showTab(location.hash.slice(1)); requestAnimationFrame(() => window.scrollTo(0, 0));
+app.hidden = false;
+recovery.hidden = true;
+} catch(error) {
+  recoverCatalog("The catalog could not load.", "The embedded data or page initialization failed. Reopen a fresh index.html from the same checkout, or use the opening guide and manifest below. No background service is required.");
+  console.error("Offline catalog initialization failed:", error);
+}
+})();
 </script>
 </body>
 </html>

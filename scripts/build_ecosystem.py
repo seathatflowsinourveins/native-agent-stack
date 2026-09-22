@@ -658,7 +658,7 @@ def render(root):
     body = '<noscript><h2>JavaScript is disabled</h2><p>Enable JavaScript for local search and filters. '
     body += 'No data leaves this page. Public source repository: <a href="'
     body += html.escape(data["repository_url"], quote=True) + '">native-agent-stack</a>.</p></noscript>'
-    result = template.replace("@@DATA@@", encoded).replace("@@BODY@@", body)
+    result = template.replace("@@DATA@@", encoded).replace("<!--@@BODY@@-->", body)
     scripts = re.findall(r"<script>(.*?)</script>", result, re.S)
     require(len(scripts) == 1, "template must have one inline application script")
     script_hash = base64.b64encode(hashlib.sha256(scripts[0].encode()).digest()).decode()

@@ -1,11 +1,23 @@
 # Offline ecosystem manifest
 
-Open [index.html](index.html) locally in a browser. It is one self-contained file:
+**Open [index.html](index.html), not template.html.** The template is the build
+source and contains no catalog data. Opening it now shows a link to the sibling
+index instead of inactive catalog controls. Keep the checkout's directory layout
+when using that link; a copied standalone template cannot find a missing index.
+
+The generated index is one self-contained file:
 the styles, application script and public search data are embedded. The page
 makes no background requests and needs no server, account, package install or
 external font. Source links navigate only when selected. GitHub shows HTML source;
 download the file to view it locally. The same file can be served by an existing
 static host, but this change does not configure GitHub Pages or paid hosting.
+
+If the catalog cannot initialize, its opening screen remains visible with links
+to this guide and the manifest. Enable JavaScript for the interactive views. For
+missing or damaged embedded data, download a fresh generated `index.html`, or run
+the rebuild command below from a complete checkout. The index does not redirect,
+fetch missing data, or depend on the template being beside it. A standalone copy
+still works offline; the guide and manifest links require the checkout layout.
 
 The views connect a layered ecosystem map, foundation and trading capabilities,
 current choices and alternatives, the repository explorer, selected-stack setup,
