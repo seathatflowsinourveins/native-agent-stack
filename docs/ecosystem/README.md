@@ -38,7 +38,7 @@ depend on those links.
 
 ## Use the setup and efficiency views
 
-**Choices & alternatives** covers all 16 foundation layers and four domain
+**Choices & alternatives** covers all 20 foundation layers and 12 trading
 research layers. Each card states the requirement, current choice, named candidate
 outcomes, linked evidence, limitations and the comparison that would reopen the
 decision. Search across layers/candidates or filter by catalog and outcome.
