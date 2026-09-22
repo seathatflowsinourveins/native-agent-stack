@@ -1453,9 +1453,10 @@
       "license": "Apache-2.0",
       "us_equities_fit": "Identify affected runtime dependencies before deploying unattended research services.",
       "alpaca_fit": "Triage actual adapter dependency exposure without using broker credentials.",
-      "evidence_level": "source_review",
+      "evidence_level": "native_proven",
       "evidence_refs": [
-        "https://github.com/anchore/grype/blob/v0.119.0/README.md"
+        "https://github.com/anchore/grype/blob/v0.119.0/README.md",
+        "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json"
       ],
       "native_workflow": [
         "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
