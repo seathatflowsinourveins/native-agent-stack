@@ -3003,13 +3003,13 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "fad51d0ac95811d9749250aaf5e536127e4a219fa49610e73d40125a5e690e11",
-      "bytes": 9210
+      "sha256": "f658db4e87f0a2545b3e9da8f3e42c6c64c55e34957586edbe4b4b43a2130a2b",
+      "bytes": 9408
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "1cc305b69e6b4c11db4f1bb1ff3fcf30b88b31c2123ea9e31dedc4ab2570cd00",
-      "bytes": 7591
+      "sha256": "8fd00bc20ea9720f4b21c8c7e01526258cfc381e7a9f95526a1e6c91e7dc5a32",
+      "bytes": 7789
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -3038,13 +3038,13 @@
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
-      "sha256": "6965c83b26f43a91764d2fd0d935aa06e9c2bd017f80c2f1e2404f768d1d5b84",
-      "bytes": 10820
+      "sha256": "5d04579839f4e76ab85d0c5a563f2f2b12049d07a1eedd1d2a741007b2781a5e",
+      "bytes": 11018
     },
     {
       "path": ".github/workflows/supply-chain.yml",
-      "sha256": "55abfe5a75a4d10ea4ad6da4209145823a06a0e28d445e42fed666f8a92323d8",
-      "bytes": 6688
+      "sha256": "d33f30444814f3b4a80b335083fd855b60f69a66d4ada425128ee11e1c2bfe43",
+      "bytes": 6886
     },
     {
       "path": ".github/workflows/token-report.yml",
@@ -3053,8 +3053,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "72798cb0398cbf5c67c6a14215fc9364f254735a0399b723430f9d8738f49eb0",
-      "bytes": 5594
+      "sha256": "5c1cfad82dd9ebc91216f199b5ee114da9d8d0d285bf7f2634ad5b4e6ad77e71",
+      "bytes": 5792
     },
     {
       "path": ".gitignore",
@@ -7624,7 +7624,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "90836a5f9dfef72d6f31ce36b07093662117d58f6c6a38f26902589c84cb6dee",
+      "sha256": "3e40915cb0a829ed9884092eff9bc145cb4e4c3e2b883aa1146c06f4b41dc9d4",
       "bytes": 13036732
     },
     {
@@ -7694,8 +7694,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "e5d5c19a9347a6198cfb926d1c6b6e59c1bd8781b38b2732240057285111cac7",
-      "bytes": 30881
+      "sha256": "26471ad92e2a85ed235bd4180d1d11fc3a9597ef109821da2302f8ccc5a8d7b0",
+      "bytes": 33650
     },
     {
       "path": "docs/grand-catalog-handbook.md",
