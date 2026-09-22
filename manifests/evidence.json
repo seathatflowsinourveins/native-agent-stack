@@ -7058,6 +7058,16 @@
       "bytes": 401431
     },
     {
+      "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
+      "sha256": "fdcd5141da25fa09b08a84db5d9d41b0f2cb252b8fdef49bc49d9fa4cb5c3026",
+      "bytes": 1208868
+    },
+    {
+      "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.md",
+      "sha256": "fbfe926388112d5299384157b3b04676437b53dbacf4657917f3d698c9cb5be0",
+      "bytes": 41835
+    },
+    {
       "path": "catalogs/us-equities/README.md",
       "sha256": "7dca26c6ed8b5e781f7b89308e2517a5d9da0551b6d2015dd4a35ae7c9b09d72",
       "bytes": 15143
@@ -7761,6 +7771,11 @@
       "path": "docs/tasks/2026-09-22-new-machine-install.md",
       "sha256": "64d7e5f1b7464ef502908d454104a45cc6ea36f9a9dcc31f621ffb89b26e214c",
       "bytes": 18721
+    },
+    {
+      "path": "docs/tasks/2026-09-22-sdk-runtime-coverage.md",
+      "sha256": "e5de3b54cf58e32332ea749a054cdf75763c0bf69131a487a46ecff1dda8a75d",
+      "bytes": 5545
     },
     {
       "path": "docs/token-efficiency-stack.json",
