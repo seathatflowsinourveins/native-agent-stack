@@ -3697,8 +3697,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "dfb64b11f5904053b538a1eb09f46c6ee8e304a76fd71549a42dddccd6be7fa8",
-      "bytes": 144
+      "sha256": "4167fa7e1c1544355b4623ace517eaafd2929997db3bf779abbac8b9a4fc4fd4",
+      "bytes": 195
     },
     {
       "path": ".gitleaks.toml",
@@ -3727,8 +3727,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "87b0acf6f1b2b3b4e2a2b0c278379bea5532a2a1c8ffde9cd6afbf568d14ea04",
-      "bytes": 12025
+      "sha256": "0e5b5bac62a5f67a42bb4bc6126829a21fd937f310b1f5784122238f6fb3f3ae",
+      "bytes": 12480
     },
     {
       "path": "adoption/host-state.example.json",
@@ -3742,8 +3742,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "bytes": 15925,
-      "sha256": "adc0c6a3c58dc0daf8c1c29061b349ca0ffd62b17950b4d6c31a7e9f63c34a76"
+      "bytes": 17023,
+      "sha256": "9a5df2ec69d4d092315584c02d506bdc7864ce1087df273234b9f8492cffa83b"
     },
     {
       "path": "adoption/paired/README.md",
@@ -7523,8 +7523,8 @@
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "38e9fbb77fa0262622c9e06c248c1dd9baaab4b1bf69760bcb301e8347aaed9f",
-      "bytes": 4374
+      "sha256": "e93aeaa36c15584f8137621a0c407fa85307d33fc31be22309a06f020af5c678",
+      "bytes": 5861
     },
     {
       "path": "tests/test_adoption_status.py",
@@ -7778,8 +7778,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "bytes": 121647,
-      "sha256": "9aef19449c37b392924f35c11f8bad4e58611ce715ae00dcbbeb285f7b8b5212"
+      "bytes": 130409,
+      "sha256": "755019133fb48c152698726685196be76dbc5afc6966e206aa2320dee0c98879"
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -11360,6 +11360,16 @@
       "path": "tests/test_blind_layer_decisions.py",
       "sha256": "0512e58b967baed9fdc95323cd6867dbb1981785bb3d20e51d6a1df1bcb4fbc1",
       "bytes": 2827
+    },
+    {
+      "path": "docs/tasks/2026-09-22-github-automation-newpc.md",
+      "sha256": "67e30da1fbbdb0bf094e90de227c955507e10152554666d51b8add2acd3f96a4",
+      "bytes": 4880
+    },
+    {
+      "path": "evidence/receipts/github-automation-newpc-20260922.json",
+      "sha256": "8e2a449d0ef11fdd2d6b73cf2dda1b49540f746beca8264791cbf112f08335b4",
+      "bytes": 3622
     }
   ],
   "convergence_records": [

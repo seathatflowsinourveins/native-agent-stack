@@ -1,0 +1,105 @@
+model = "gpt-6-astra"
+model_reasoning_effort = "ultra"
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+mcp_oauth_credentials_store = "file"
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 3
+
+[projects."${HOME}/codex-ecosystem/validation/native-codex"]
+trust_level = "trusted"
+
+[projects."${HOME}/codex-ecosystem/validation/native-codex-20260918T222103Z"]
+trust_level = "trusted"
+
+[projects."${PROJECT_ROOT}"]
+trust_level = "trusted"
+
+[projects."${HOME}/codex-ecosystem/validation/native-paired-20260918-v2/source"]
+trust_level = "trusted"
+
+[projects."${HOME}/codex-ecosystem/state/gap-resolution-20260919/deerflow/run-1/runtime/acp-workspace"]
+trust_level = "trusted"
+
+[projects."${HOME}/code/native-agent-stack-publication"]
+trust_level = "trusted"
+
+[tui.model_availability_nux]
+gpt-6-astra = 4
+
+[hooks.state]
+
+[hooks.state."${PROJECT_ROOT}/.codex/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:bd2e79e58ffc881238bd952b6e6fada7e9dbe9157bdefddf5b65facc16f36420"
+
+[hooks.state."context-mode@context-mode:.codex-plugin/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:56da0c4249dc7af048f42ae458fb83931926a8af41ec6fab5ae819ff3a8c83ae"
+
+[hooks.state."context-mode@context-mode:.codex-plugin/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:0d237345f8d46110d36cd0ef08e79b55fa151a07691dee36d492aa6f64bc0efd"
+
+[hooks.state."context-mode@context-mode:.codex-plugin/hooks.json:pre_compact:0:0"]
+trusted_hash = "sha256:ac1f9e5eb71ca262492150381d8f078b897056fc691f9973fc56d7b1b402e648"
+
+[hooks.state."context-mode@context-mode:.codex-plugin/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:a6cc6a322d0931bdd68a5969e523cd71e6eedccab4850e8996c8948311173618"
+
+[hooks.state."context-mode@context-mode:.codex-plugin/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:114549c484c131b94782d3424527dd1042d48bc3a8616a11299acdf60b112572"
+
+[hooks.state."context-mode@context-mode:.codex-plugin/hooks.json:stop:0:0"]
+trusted_hash = "sha256:9205c1763e40c0256ab334e2e96c037c1cdf5b8bfaddba31ed19d93d3388586a"
+
+[hooks.state."${HOME}/.codex/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:2a9b493e71f7e16d4a61d72d728df02fa6b6b8df7601a653c399b36f479d64a8"
+
+[hooks.state."${HOME}/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:18108baae805cb035c1a90b002291f4ab504364fcab807dd078f8933126e6f9b"
+
+[hooks.state."${HOME}/.codex/hooks.json:pre_compact:0:0"]
+trusted_hash = "sha256:00dc3791bfd4ae0b46c43cb8ee8a391b6da63e5b7690cebfe1bd59cf8793ad58"
+
+[hooks.state."${HOME}/.codex/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:6994cf4fb1fc4534ee5efb35367f0f85b3bcd5fb3e200b0b3fd73c9d337397cc"
+
+[hooks.state."${HOME}/.codex/hooks.json:session_end:0:0"]
+trusted_hash = "sha256:9a190d2120d2c9dd8dcb4adfb956379e2bfc9d74435eaea9262b22a31b5649fd"
+
+[hooks.state."${HOME}/.codex/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:9cd01164b2e560a27f94a0fedcddcd21306857980f4fee2dd248719244b4a061"
+
+[hooks.state."${HOME}/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:0cfffc0558b708e1d401a870834648362335c69221add66766052d5dd92c2f98"
+
+[marketplaces.context-mode]
+source_type = "git"
+source = "https://github.com/mksglu/context-mode.git"
+
+[plugins."context-mode@context-mode"]
+enabled = true
+
+[features]
+hooks = true
+plugin_hooks = true
+
+# Local ecosystem observation; content is removed before collector persistence.
+[otel]
+environment = "local"
+log_user_prompt = false
+exporter = { otlp-http = { endpoint = "http://${OTEL_ENDPOINT}/v1/logs", protocol = "binary" } }
+metrics_exporter = { otlp-http = { endpoint = "http://${OTEL_ENDPOINT}/v1/metrics", protocol = "binary" } }
+trace_exporter = "none"
+
+[otel.tool_result]
+max_bytes = 0
+
+# App Server metrics use the explicitly configured local OTLP exporter.
+[analytics]
+enabled = true
+
+# Native WSL defaults; regenerate PATH when adopting another host/runtime.
+[shell_environment_policy.set]
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+RTK_TELEMETRY_DISABLED = "1"
