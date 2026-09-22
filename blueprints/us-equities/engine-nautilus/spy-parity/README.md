@@ -176,15 +176,16 @@ rather than trusting the receipt: an attributed fill price must equal its
 session's first-bar close while the oracle equals that bar's open, and any cash
 residue those deltas do not explain exactly stays an unattributed `FAIL`.
 
-Implementing a dividend `SimulationModule` or an open-tick fill path is a
-separate follow-up, deliberately not attempted until the tolerance sheet is
-sealed.
+Closing either mapping needs a mechanism the pinned engine supports natively,
+or a newly preregistered mapping manifest. The current manifest refuses an
+injected balancing cash entry and synthetic open-priced data (both would
+fabricate the mapping), so neither is attempted here.
 
 ## Review findings carried (2026-09-22)
 
 An independent review of this harness confirmed 21 of 24 claims and recorded
 six non-blocking items. None changes the BLOCKED verdict; they are carried
-into the dividend-module follow-up round:
+into the next harness round:
 
 1. `fixture_strategy.py` substitutes a zero commission when a native fill
    event carries none, instead of refusing; the published run did not hit

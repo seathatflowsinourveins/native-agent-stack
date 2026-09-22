@@ -52,7 +52,7 @@
       "id": "dividend-sim-module",
       "rung": "sim",
       "layer": "backtesting-engine",
-      "title": "Dividend SimulationModule and synthetic open tick close the two unsupported parity mappings",
+      "title": "An engine-supported path for market-on-open fills and dividend cash closes the two unsupported parity mappings",
       "status": "not_established",
       "owner": "peer:sota-workflow-resolution",
       "evidence_class": "none",
@@ -61,7 +61,7 @@
       "flip_condition": {
         "type": "exists"
       },
-      "note": "Designed (G-a follow-up), implementation deferred until parity review completed; expected receipt path named here so the checker can surface it. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit. 2026-09-22 probe evidence (blueprints/us-equities/engine-nautilus/spy-parity/probes/): dividend-symbol-scan.json finds no dividend data type the rc5 backtest engine ingests; the fill-semantics probes show AT_THE_OPEN is rejected and market orders fill at the bar close. The bound mapping manifest states that injecting a synthetic open-priced data point or a look-ahead limit price would fabricate the mapping, so this gate's title (a synthetic open tick) is not an accepted route; a qualified mechanism for both mappings is not yet identified. Not implemented."
+      "note": "Designed (G-a follow-up), implementation deferred until parity review completed; expected receipt path named here so the checker can surface it. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit. 2026-09-22: the bound mapping manifest (blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json) concludes from its symbol scan (probes/dividend-symbol-scan.json records the raw matches) that no dividend data type the rc5 backtest engine ingests exists, and its fill-semantics probes show AT_THE_OPEN is rejected and market orders fill at the bar close. The same manifest refuses an injected balancing cash entry and synthetic open-priced data as fabricating the mapping, so neither a module that posts invented dividend cash nor a synthetic open tick is an accepted route. Closing this gate needs a mechanism the pinned engine supports natively or a newly preregistered mapping manifest; none is identified yet. Not implemented."
     },
     {
       "id": "snapshot-promotion-gate",

@@ -5442,7 +5442,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "7ca68ae9436d533cee8a19cf5dac4218f40c156011b237179c450ddd37d10629",
+      "sha256": "3c6d43a223fedef5bf093417571108a794e5d118961efd199124ac914ecea701",
       "bytes": 2281
     },
     {
@@ -5957,8 +5957,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
-      "sha256": "dd57dd53b55a89fad75e89b596ab5273533d741ca4aa0a2245ed79ddce3cb21f",
-      "bytes": 10043
+      "sha256": "bf55086246038750ff439bf705ccdc1c923f1ba48dff8ef42693b678c6ed52ff",
+      "bytes": 10152
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
@@ -7247,8 +7247,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "fbbd15765d6e87e80832f7ea00b6b9b13665c95826386cb2eb34a3791fc6ca96",
-      "bytes": 18855
+      "sha256": "62ce4da28e5641115ab0f09374b02fe087af705532d69c5c99661633eb2877f8",
+      "bytes": 19058
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
