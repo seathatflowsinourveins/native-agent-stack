@@ -10,6 +10,14 @@ Claude roles in [`examples/claude-native/agents/`](../claude-native/agents/):
 
 Copy the `.toml` files into the destination project's `.codex/agents/` and merge
 [`config.agents.toml.example`](config.agents.toml.example) into `.codex/config.toml`.
+The example also registers each role under `[agents."<name>"]` with `config_file`
+and `description`, the shape a research child quoted from the Codex config
+reference on 2026-09-22; that registration is unverified on an installed CLI (the
+installed 0.155.1 binary contains the strings `config_file`,
+`developer_instructions` and `max_concurrent_threads_per_session`, a string scan,
+not a parse test), and which `description` Codex shows when both the table entry
+and the `.toml` file carry one is untested, so confirm both against the installed
+version before relying on them.
 The definitions carry `name`, `description` and `developer_instructions`; they set
 no `model`, `model_reasoning_effort` or `sandbox_mode` and inherit the session's
 configuration, so the reviewer's no-edit rule is a prompt instruction, not an

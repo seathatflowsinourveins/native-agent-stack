@@ -1,0 +1,22 @@
+{
+  "recorded": "2026-09-22",
+  "evidence_class": "native Workflow runs on the deploying host (Claude Code 2.1.278, observed with `claude --version` on 2026-09-22) plus one attempted Codex companion tracked job; provider-returned child usage from the run journals, not a savings rate",
+  "host": "WSL2 laptop, Intel Core Ultra 9 275HX (24 threads), 31 GB RAM, RTX 5090 Laptop 24 GB; the planned Threadripper PRO 5975WX workstation was not touched",
+  "runs": [
+    {"id": "wf_e67951db-655", "name": "harness-rules-manifest", "shape": "two source-scout inventories then evidence-reviewer judgment", "agents": 3, "child_tokens": 147967, "tool_uses": 58, "duration_ms": 475029},
+    {"id": "wf_3025640f-b1e", "name": "sota-harness-rules-research", "shape": "three research sweeps, Opus synthesis, evidence-reviewer verification", "agents": 5, "child_tokens": 431005, "tool_uses": 99, "duration_ms": 1217492},
+    {"id": "wf_20a5e69a-84d", "name": "measure-skill-child-prompt", "shape": "one semantic-evidence-reviewer probe", "agents": 1, "child_tokens": 17436, "tool_uses": 1, "duration_ms": 9557, "first_request_prompt_tokens": 15059},
+    {"id": "wf_451ec95d-224", "name": "sota-runtime-convergence", "shape": "four sweeps, Opus synthesis, two evidence-reviewer verifiers", "agents": 7, "child_tokens": 755303, "tool_uses": 177, "duration_ms": 1678785}
+  ],
+  "codex_lane_c_attempt": {
+    "when": "2026-09-22",
+    "path": "examples/claude-native/workflows/codex-cross-review.mjs from a dedicated checkout of the PR branch, prompt over the two dated records and the Codex example config",
+    "outcome": "unsuccessful:failed:1",
+    "job_status": "failed",
+    "elapsed_ms": 4200,
+    "cause": "provider usage limit on the Codex account; the companion returned the limit message with a retry date of 2026-09-26 15:41 local",
+    "redactions": ["job, thread and turn identifiers removed"],
+    "disposition": "no retry until the limit resets; the prompt is retained and the review remains open"
+  },
+  "pinned_sources": ["affaan-m/everything-claude-code @dd6ee538", "shanraisshan/claude-code-best-practice @15969ed2", "davila7/claude-code-templates @c840d6f6", "hesreallyhim/awesome-claude-code @1abbc780", "VoltAgent/awesome-claude-code-subagents @ca7a50b7", "anthropics/skills main", "official Claude Code and Codex documentation fetched 2026-09-22"]
+}

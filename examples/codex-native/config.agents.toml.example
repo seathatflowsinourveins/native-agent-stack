@@ -1,7 +1,29 @@
 # Codex custom agents: merge into the project's .codex/config.toml. The agent
 # definitions live in .codex/agents/<name>.toml. Model and reasoning effort are
-# inherited from the session configuration; three concurrent threads mirror the
-# Claude setting CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS=3.
+# inherited from the session configuration unless a role's layer sets them; an
+# explicit spawn model takes precedence. The thread cap is the Codex-side worker
+# bound and carries its own dated row next to the Claude setting
+# CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS in the deploying project's cap table
+# (3 on 2026-09-22; raise only after a tracked multi-agent job completes at 3
+# without provider errors).
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 3
+
+# Role registration shape as quoted from the Codex config reference by a research
+# child on 2026-09-22 (the quote is retained in
+# evidence/artifacts/harness-rules-convergence-20260922/official-doc-excerpts.json):
+# agents.<name>.config_file is the TOML layer for that role and
+# agents.<name>.description is the guidance Codex reads when choosing and
+# spawning the type. UNVERIFIED on an installed CLI: no Codex session has run
+# with this registration yet (the installed 0.155.1 binary contains the strings
+# config_file, developer_instructions and max_concurrent_threads_per_session; a
+# string scan, not a parse test), so confirm both keys against the installed
+# version's config reference before relying on it.
+[agents."evidence-reviewer"]
+config_file = ".codex/agents/evidence-reviewer.toml"
+description = "Independently inspect an assigned patch and its verification evidence."
+
+[agents."isolated-builder"]
+config_file = ".codex/agents/isolated-builder.toml"
+description = "Implement a bounded task in its own worktree and return a verified handoff."
