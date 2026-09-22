@@ -8,25 +8,28 @@
 # on `bd init`, which always creates .beads/embeddeddolt/ under the scratch
 # dir's cwd; `bd create --json` prints a single object, not an array).
 #
-# IMPORTANT CONFOUND FOUND AND CORRECTED: an earlier pilot claimed with
-# `bd update <id> --claim --assignee <name>` (matching the triage's proposed
-# command). Per gastownhall/beads source (cmd/bd/update.go,
-# internal/storage/issueops/execution.go), --claim grants the lease to the
-# CLI actor (--actor / $BEADS_ACTOR / git user.name / $USER), not to whatever
-# --assignee is also passed; a combined --claim --assignee invocation then
-# overwrites the assignee via a second, ordinary field patch after the lease
-# is already granted to the actor identity, and its JSON response omits the
-# lease_expires_at/heartbeat_at fields a bare --claim reply includes. That
-# pilot's own reclaim call 59s past its lease's true 5-minute TTL (confirmed
-# via internal/storage/issueops/lease.go's `const DefaultLeaseTTL = 5 *
-# time.Minute` at the exact pinned commit f45b249ce6b40ba62aecc03949e6371e
-# 8f7c79d8 == bd 1.3.0) still returned count:0 - a real, reportable
-# discrepancy for that exact invocation, but not evidence against
-# `bd reclaim` itself, since --claim alone is bd's own documented "atomically
-# claim" path. The corrected run below uses bare `--claim` (no extra
-# --assignee), which does confirm lease_expires_at/heartbeat_at in its own
-# reply, and is the invocation actually exercised for the receipt's positive
-# result.
+# IMPORTANT CONFOUND FOUND, AND ITS CAUSE CORRECTED IN A LATER FIX ROUND: an
+# earlier pilot claimed with `bd update <id> --claim --assignee <name>`
+# (matching the triage's proposed command). The lease-grant mechanism itself
+# is NOT the cause: --claim does arm a lease for the CLI actor (--actor /
+# $BEADS_ACTOR / git user.name / $USER). The actual cause, per
+# gastownhall/beads source at the exact pinned commit
+# f45b249ce6b40ba62aecc03949e6371e8f7c79d8 (== bd 1.3.0), is that the same
+# call's --assignee value is then applied through the ordinary generic-update
+# path, and ManageLeaseOnUpdate (internal/storage/issueops/update.go) deletes
+# the issue's lease row (DeleteLeaseInTx) whenever a generic update changes
+# who holds an in_progress claim. With the lease row gone, `bd reclaim`'s own
+# query (ReclaimExpiredLeasesInTx, internal/storage/issueops/lease.go) is an
+# inner join `FROM leases l JOIN issues i ... WHERE i.status = 'in_progress'
+# AND l.lease_expires_at < ?`, which structurally cannot select an issue with
+# no lease row, at any elapsed time -- not a transient miss at 0s
+# grace/~59s past TTL, but a permanent exclusion from recovery for any issue
+# claimed or reassigned this way. This is a real, permanent limit on bd's
+# crash-recovery semantics, not merely a usage trap for this one invocation.
+# The corrected run below uses bare `--claim` (no extra --assignee), which
+# does confirm lease_expires_at/heartbeat_at in its own reply, keeps its
+# lease row, and is the invocation actually exercised for the receipt's
+# positive result.
 #
 # The probe deliberately does NOT fake an expired lease by writing to the
 # Dolt tables directly (`bd sql` also refuses raw SQL in embedded mode:
