@@ -155,4 +155,10 @@ A rerun of the practice tooling with GitHub-slug normalization (after the Codex 
 17 component pins behind upstream (repomix and markitdown join the 15 above). The published
 manifest is a dated record and is not regenerated; the tooling is the source for the next run.
 
+Handbook (2026-09-22): the per-layer verdicts recorded after this audit (20
+foundation and 12 trading layers, Claude lane only, Codex lane absent) are in
+[layer-verdicts-20260922.json](layer-verdicts-20260922.json) and explained in the
+[grand catalog handbook](../../docs/grand-catalog-handbook.md); this README stays
+the dated audit of the convergence run itself.
+
 Gate ladder (2026-09-22): the trading gates named by the critic are tracked in `catalogs/us-equities/gates-20260922.json` and checked by `scripts/trading_gates.py --check`; the reconciliations recorded there and in `tools/sota-convergence/reconciliations-20260922.json` supersede the engine-card note above.

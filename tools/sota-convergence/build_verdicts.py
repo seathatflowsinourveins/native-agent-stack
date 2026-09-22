@@ -140,9 +140,10 @@ def build_document(root: Path, checked_at: str) -> dict:
         "checked_at": checked_at,
         "generated_by": "tools/sota-convergence/build_verdicts.py",
         "scope": "Joins the landscape ledger's layer-verdict schema v2 rows with the dated SOTA-convergence "
-                 "manifest's per-layer components/entries and adoption/manifest.json's recipe_map. Every row "
-                 "currently pending_lanes was carried over unchanged; this generator does not itself run a "
-                 "lane, select a winner or claim an execution result.",
+                 "manifest's per-layer components/entries and adoption/manifest.json's recipe_map. Rows are "
+                 "rendered as the ledger records them (recorded rows from the record tool, pending_lanes rows "
+                 "unchanged); this generator does not itself run a lane, select a winner or claim an "
+                 "execution result.",
         "catalogs": catalogs,
         "counts": counts,
     }
