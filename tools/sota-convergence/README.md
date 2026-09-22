@@ -26,14 +26,25 @@ default reconciliation file. No step here calls a model.
    calls; `gh auth status` must already pass). Reads the repository URLs out
    of the three working files above and writes `github-freshness.json` with
    stars, `pushed_at`, latest release/tag, head commit, license, archived and
-   rename status per repository. Resumable: a repository already present in
-   `--out` *without* an `"error"` field is skipped unless `--refresh`; a
-   repository whose record carries `"error"` (from a `gh` timeout or failure)
-   stays pending and is retried on the next run. One `gh` call raising (a
-   timeout, missing binary, etc.) never aborts the batch -- `gh_api` catches
-   it and records `{"error": "..."}` for that repository only -- and
-   progress is checkpointed to `--out` every 25 fetched repositories and
-   again in a `finally` block, so a long run interrupted partway still leaves
+   rename status per repository, plus every alias URL seen for that
+   repository's normalized GitHub slug (`"aliases"` -- a `/releases/tag/vX`
+   or `/tree/...` catalog URL and the canonical form both resolve to the same
+   record; `build_manifest.py` looks records up by slug, not by exact URL).
+   Resumable: a repository already present in `--out` *without* an `"error"`
+   or `"partial_errors"` field is skipped unless `--refresh`. A repository
+   whose record carries `"error"` (the primary `repos/{slug}` call itself
+   timed out or failed) stays pending and is retried on the next run. A
+   repository whose primary call succeeded but a releases/tags/commit
+   sub-request failed with something other than an ordinary 404 "no
+   releases" (a timeout, 429, or 5xx) keeps that failure in
+   `"partial_errors"`, is counted in the document's top-level
+   `partial_errors`, and is also retried on the next run -- it is not
+   silently treated as done just because the primary call succeeded. One
+   `gh` call raising (a timeout, missing binary, etc.) never aborts the batch
+   -- `gh_api` catches it and records `{"error": "..."}` for that repository
+   only -- and progress is checkpointed to `--out` every 25 fetched
+   repositories and again in a `finally` block, so a long run interrupted
+   partway still leaves
    what it fetched on disk. `--max-repos` bounds a trial run.
 
    ```sh
@@ -83,16 +94,35 @@ default reconciliation file. No step here calls a model.
   which also excludes a distro pin that happens not to match the suffix
   pattern. A version merely *annotated* with a commit fingerprint
   (`0.25.0 (<commit>)`) is still compared normally.
+- **Slug-normalized freshness lookup** (`github_repo_slug`,
+  `compute_upstream`, `repository_known`): a component/entry's `repository`
+  field is looked up in the freshness snapshot first by exact URL, then by
+  normalized GitHub slug (owner/name, lower-cased, `.git`/release-tag/tree
+  suffixes and a trailing slash stripped) -- so a catalog URL that happens to
+  use a `/releases/tag/vX` or `/tree/...` form still resolves to the same
+  freshness record as the canonical URL, instead of silently losing upstream
+  metadata on an exact-string miss.
 - **Selected trading baseline**: only catalog `decision` values `default` and
   `conditional` are promoted into a manifest row; `alternative`/`watch`/
   `excluded` entries stay discoverable in `trading-by-layer.json` and can
   only reach the manifest through the lane candidate/alternative mechanism.
 - **Disposition never promotes** (`disposition`): a lane proposes a label,
   two refuters try to break it. A surviving `not_adopted` stays
-  `not_adopted_confirmed`; nothing is upgraded by surviving review.
-- **Sanitize-then-refuse**: `sanitize()` strips home-directory path fragments;
-  `assert_no_leak()` then raises if a home path or the broker key prefix is still present, and
-  `build_manifest.py` never writes on that path.
+  `not_adopted_confirmed`; nothing is upgraded by surviving review. The same
+  explicit-`False`-vs-`None` handling applies to a `selected` entry's own
+  status verdict (`merge_lanes`): a refuted (`survives: False`) proposal is
+  confirmed as unchanged, but an unknown verdict (`survives: None`, e.g. no
+  refuter voted) stays `<status>_unverified` and is never promoted to
+  `confirmed_*` -- `not verdict["survives"]` alone would treat `None` the
+  same as `False`, which is the review finding this fixed.
+- **Sanitize-then-refuse**: `sanitize_value()` walks the manifest's decoded
+  dict/list/str values and redacts Linux/macOS/Windows host-path fragments
+  *before* `json.dumps` (never the already-serialized text -- see its
+  docstring for why that can produce invalid JSON on a quoted embedded path);
+  the serialized result is then round-tripped through `json.loads` to prove
+  it is still valid JSON, and `assert_no_leak()` raises if a home path or the
+  broker key prefix survived. `build_manifest.py` never writes on either
+  failure.
 - **Deterministic ordering**: per-layer `components`/`entries` and
   `candidates` are sorted by `(decision-rank, id)` (`row_item_sort_key`) and
   `(disposition-rank, repository)` (`candidate_sort_key`) respectively before
@@ -104,17 +134,32 @@ default reconciliation file. No step here calls a model.
 
 ## Evidence classes
 
-Keep these separate when reading or citing the output:
+Keep these separate when reading or citing the output. `review_status` and
+`evidence_level` are two independent axes: `review_status` is whether a
+*selection or pin change* survived adversarial review; `evidence_level` is
+what was actually *executed*. **`review_status` never establishes native
+execution**, regardless of its prefix -- a component/entry can be
+`confirmed_default` and `source_review` at the same time (the published
+2026-09-22 manifest's `inspect-ai` and `quantstats` rows both are; see
+`catalogs/sota-convergence/README.md`'s "Method and limits").
 
 - **Metadata** (`github-freshness.json`, `upstream` fields in the manifest) --
   GitHub REST facts (stars, pushed_at, release tags). Not a behavioral test.
-- **Source review** (`lanes.json` selections/candidates, `review_status`
-  values not prefixed `confirmed`) -- a lane read documentation/READMEs and
-  reasoned about fit; nothing was installed or run.
-- **Native run** (`review_status` prefixed `confirmed_*` after surviving
-  adversarial verification, and anything cited to a receipt under
-  `evidence/` or `manifests/evidence.json`) -- an actual reproducible
-  execution exists, separate from this manifest.
+- **`review_status`** (selection/pin confirmation, not execution) --
+  `lanes.json` `selected`/`new_candidates` verdicts. A `confirmed_*` prefix
+  means the *proposed change* survived two adversarial refuters; any other
+  value (including `<status>_unverified`, for an unknown `survives: null`
+  verdict) means a lane read documentation/READMEs and reasoned about fit,
+  or that no verdict exists yet. Nothing about `review_status` says whether
+  the tool itself was installed, built or run.
+- **`evidence_level`** (execution classification, from the catalog card) --
+  `source_review` means nothing was installed, built or run; `native_proven`
+  (or anything cited to a receipt under `evidence/` or
+  `manifests/evidence.json`) means an actual reproducible execution exists,
+  separate from this manifest. `build_manifest.py` carries this field into a
+  manifest trading entry row whenever the source
+  `catalogs/us-equities/*.json` card sets it (`extract_layers.py` already
+  reads it verbatim); it is absent from foundation components today.
 
 Inclusion in any working file or the manifest is never installation, E2E
 acceptance, or superiority.

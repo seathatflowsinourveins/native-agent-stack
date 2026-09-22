@@ -14,11 +14,16 @@ Reads (repository-relative to --work-dir):
   star-candidates.json    (#/star_candidates[]/repository, #/beyond_stars[]/repository)
 
 Writes --out (default <work-dir>/github-freshness.json):
-  {schema, generated_at, count, errors, repositories: {repo_url: {...}}}
+  {schema, generated_at, count, errors, partial_errors, fetched_this_run,
+   retained_from_prior_runs, observation_window: {min, max},
+   repositories: {repo_url: {..., observed_at, slug, aliases, partial_errors?}}}
 
 Resumability: a repository already present in an existing --out file is
-skipped unless --refresh is given. --max-repos bounds a trial run to the
-first N (sorted) slugs that still need fetching.
+skipped unless --refresh is given, *unless* its record carries a
+"partial_errors" entry (a sub-request -- releases/tags/commit -- that failed
+with something other than an ordinary "not found"); such a record is left
+pending so the next run retries exactly the missing metadata. --max-repos
+bounds a trial run to the first N (sorted) slugs that still need fetching.
 """
 from __future__ import annotations
 
@@ -26,6 +31,7 @@ import argparse
 import json
 import re
 import subprocess
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
@@ -66,12 +72,16 @@ def collect_repository_urls(work_dir: Path) -> set:
 
 
 def github_slug(url: str):
-    """Return 'owner/repo' for a github.com URL (release/tag/tree suffixes stripped), or None."""
+    """Return normalized, lower-cased 'owner/repo' for a github.com URL
+    (release/tag/tree suffixes and a trailing slash are already excluded by
+    the capturing pattern, which stops at the next '/', '#' or '?'), or
+    None. Lower-casing means a canonical URL and a differently-cased alias
+    resolve to the same slug."""
     match = GITHUB_URL_RE.match(url or "")
     if not match:
         return None
     owner, repo = match.group(1), match.group(2).removesuffix(".git")
-    return f"{owner}/{repo}"
+    return f"{owner}/{repo}".lower()
 
 
 def build_targets(urls) -> dict:
@@ -82,6 +92,22 @@ def build_targets(urls) -> dict:
         if slug and slug not in targets:
             targets[slug] = url
     return targets
+
+
+def build_slug_aliases(urls) -> dict:
+    """slug -> sorted list of every distinct URL alias seen for that slug
+    (e.g. a canonical https://github.com/owner/repo URL and a
+    .../releases/tag/v1 or .../tree/main alias for the same repository).
+    Every alias this run saw is recorded on the freshness record so a
+    catalog card referencing any alias form still resolves
+    (build_manifest.py looks records up by normalized slug -- see its
+    ``github_repo_slug`` / ``compute_upstream``)."""
+    aliases = defaultdict(set)
+    for url in urls:
+        slug = github_slug(url)
+        if slug:
+            aliases[slug].add(url)
+    return {slug: sorted(urlset) for slug, urlset in aliases.items()}
 
 
 def gh_api(path: str, timeout: int = 60):
@@ -101,8 +127,27 @@ def gh_api(path: str, timeout: int = 60):
         return None, str(exc)
 
 
+def is_expected_missing(err) -> bool:
+    """True when a gh api sub-request failure (releases/tags/commit -- never
+    the primary ``repos/{slug}`` call, which is always a real fetch
+    failure) looks like an ordinary "not found" -- e.g. GitHub's REST API
+    returns 404 for ``releases/latest`` on a repository with no releases at
+    all, which is an expected outcome, not a fetch failure. A timeout, a 429
+    rate limit, or a 5xx server error is a real, transient, retryable
+    failure and must not be swallowed here."""
+    if not err:
+        return False
+    lowered = str(err).lower()
+    if "429" in lowered or "rate limit" in lowered:
+        return False
+    if re.search(r"\b5\d\d\b", lowered):
+        return False
+    return "404" in lowered or "not found" in lowered
+
+
 def fetch_repository(slug: str) -> dict:
     out = {"slug": slug, "observed_at": datetime.now(timezone.utc).isoformat()}
+    partial_errors = {}
     repo, err = gh_api(f"repos/{slug}")
     if not repo:
         out["error"] = err
@@ -113,7 +158,8 @@ def fetch_repository(slug: str) -> dict:
         out[key] = repo.get(key)
     out["license"] = (repo.get("license") or {}).get("spdx_id")
     out["renamed_to"] = repo["full_name"] if repo.get("full_name", "").lower() != slug.lower() else None
-    release, _ = gh_api(f"repos/{slug}/releases/latest")
+
+    release, release_err = gh_api(f"repos/{slug}/releases/latest")
     if release:
         out["latest_release"] = {
             "tag": release.get("tag_name"),
@@ -121,29 +167,66 @@ def fetch_repository(slug: str) -> dict:
             "prerelease": release.get("prerelease"),
         }
     else:
-        tags, _ = gh_api(f"repos/{slug}/tags?per_page=1")
-        out["latest_tag"] = tags[0]["name"] if tags else None
-    commit, _ = gh_api(f"repos/{slug}/commits/{repo.get('default_branch')}")
+        if release_err and not is_expected_missing(release_err):
+            partial_errors["releases"] = release_err
+        tags, tags_err = gh_api(f"repos/{slug}/tags?per_page=1")
+        if tags_err is None:
+            out["latest_tag"] = tags[0]["name"] if tags else None
+        elif not is_expected_missing(tags_err):
+            partial_errors["tags"] = tags_err
+
+    commit, commit_err = gh_api(f"repos/{slug}/commits/{repo.get('default_branch')}")
     if commit:
         out["head"] = {
             "sha": commit.get("sha"),
             "date": ((commit.get("commit") or {}).get("committer") or {}).get("date"),
         }
+    elif commit_err and not is_expected_missing(commit_err):
+        partial_errors["commit"] = commit_err
+
+    if partial_errors:
+        # Kept on the record (not discarded) and counted at the top level,
+        # and treated as retryable on resume (see main()'s
+        # already_covered_slugs) -- a record with fewer than all three
+        # sub-fields populated is not silently treated as "done".
+        out["partial_errors"] = partial_errors
     return out
 
 
-def build_document(results: dict) -> dict:
+def build_document(results: dict, slug_aliases: dict | None = None, fetched_this_run: int = 0) -> dict:
+    if slug_aliases:
+        for record in results.values():
+            if not isinstance(record, dict):
+                continue
+            aliases = slug_aliases.get(record.get("slug"))
+            if aliases:
+                record["aliases"] = sorted(aliases)
+    observed_dates = sorted(
+        rec.get("observed_at") for rec in results.values()
+        if isinstance(rec, dict) and rec.get("observed_at")
+    )
+    retained = max(len(results) - fetched_this_run, 0)
     return {
         "schema": "github-freshness/1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "count": len(results),
         "errors": sum(1 for rec in results.values() if isinstance(rec, dict) and rec.get("error")),
+        "partial_errors": sum(1 for rec in results.values() if isinstance(rec, dict) and rec.get("partial_errors")),
+        "fetched_this_run": fetched_this_run,
+        "retained_from_prior_runs": retained,
+        # Actual observation dates, not this write's checkpoint/generation
+        # time (see build_manifest.py's format_observation_window, which
+        # cites this window rather than generated_at in the published
+        # manifest's method.freshness text).
+        "observation_window": ({"min": observed_dates[0], "max": observed_dates[-1]}
+                                if observed_dates else None),
         "repositories": results,
     }
 
 
-def write_document(out_path: Path, results: dict) -> dict:
-    document = build_document(results)
+def write_document(out_path: Path, results: dict, slug_aliases: dict | None = None,
+                    fetched_this_run: int = 0) -> dict:
+    document = build_document(results, slug_aliases=slug_aliases, fetched_this_run=fetched_this_run)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(document, indent=1) + "\n", encoding="utf-8")
     return document
@@ -176,6 +259,7 @@ def main(argv=None) -> int:
 
     urls = collect_repository_urls(args.work_dir)
     targets = build_targets(urls)
+    slug_aliases = build_slug_aliases(urls)
     non_github = sorted(u for u in urls if u and not github_slug(u))
 
     existing = {"repositories": {}}
@@ -183,11 +267,15 @@ def main(argv=None) -> int:
         existing = load_json(out_path)
 
     results = dict(existing.get("repositories", {}))
-    # A record carrying "error" (a prior gh timeout/failure) is not covered:
-    # it stays pending so a resumed run retries exactly the repositories that
-    # previously failed, instead of only genuinely-fetched ones.
+    # A record carrying "error" (a prior gh timeout/failure on the primary
+    # repos/{slug} call) or "partial_errors" (a releases/tags/commit
+    # sub-request that failed with something other than an ordinary "not
+    # found") is not covered: it stays pending so a resumed run retries
+    # exactly the repositories that previously failed or are incomplete,
+    # instead of only genuinely-fetched ones.
     already_covered_slugs = {rec.get("slug") for rec in results.values()
-                              if isinstance(rec, dict) and not rec.get("error")}
+                              if isinstance(rec, dict) and not rec.get("error")
+                              and not rec.get("partial_errors")}
     pending = {slug: url for slug, url in sorted(targets.items())
                if args.refresh or slug not in already_covered_slugs}
     if args.max_repos is not None:
@@ -196,27 +284,28 @@ def main(argv=None) -> int:
     print(f"github repositories {len(targets)} non-github {len(non_github)} "
           f"already-covered {len(targets) - len(pending)} to-fetch {len(pending)}", flush=True)
 
-    document = build_document(results)
+    fetched_count = 0
     if pending:
         try:
             with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
                 for i, record in enumerate(pool.map(fetch_repository, sorted(pending)), 1):
                     results[pending[record["slug"]]] = record
+                    fetched_count = i
                     if i % 50 == 0:
                         print(f"fetched {i}", flush=True)
                     if i % CHECKPOINT_INTERVAL == 0:
-                        write_document(out_path, results)
+                        write_document(out_path, results, slug_aliases=slug_aliases, fetched_this_run=fetched_count)
                         print(f"checkpoint {i} written to {out_path}", flush=True)
         finally:
             # Always leave whatever was fetched so far on disk, even on an
             # unanticipated exception (gh_api itself never raises, but this
             # is the resumability backstop the checkpoint above is not
             # guaranteed to have reached).
-            document = write_document(out_path, results)
+            document = write_document(out_path, results, slug_aliases=slug_aliases, fetched_this_run=fetched_count)
     else:
-        document = write_document(out_path, results)
+        document = write_document(out_path, results, slug_aliases=slug_aliases, fetched_this_run=0)
 
-    print(f"done {len(results)} errors {document['errors']}")
+    print(f"done {len(results)} errors {document['errors']} partial_errors {document['partial_errors']}")
     return 0
 
 

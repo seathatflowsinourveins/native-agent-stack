@@ -63,18 +63,36 @@ generated manifest before publication.
 ## Evidence classes
 
 Keep these distinguished in the record and in review comments, per the
-[acceptance evidence policy](../docs/acceptance-evidence-policy.md):
+[acceptance evidence policy](../docs/acceptance-evidence-policy.md).
+`review_status` and `evidence_level` are two independent axes, not one:
+`review_status` records whether a *selection or pin change* survived
+adversarial review; `evidence_level` records what was actually *executed*. A
+component or entry can carry a `confirmed_*`/`_confirmed` `review_status` and
+still be `source_review` -- the published 2026-09-22 manifest's `inspect-ai`
+and `quantstats` rows are exactly that case (see
+`catalogs/sota-convergence/README.md`'s "Method and limits").
 
 - **Metadata** -- `github-freshness.json` and the manifest's `upstream`
   fields: GitHub REST facts only (stars, `pushed_at`, latest release/tag,
   license, archived, rename). Not a behavioral or compatibility claim.
-- **Source review** -- lane `selected`/`new_candidates` entries and any
-  `review_status` not prefixed `confirmed_`: a lane read documentation or a
-  README and reasoned about fit. Nothing was installed, built or run.
-- **Native run** -- `review_status` values prefixed `confirmed_` (survived
-  adversarial verification) and anything the manifest cites to a receipt
-  under `evidence/` or `manifests/evidence.json`: an actual reproducible
-  execution exists, separately dated and scoped from this manifest.
+- **`review_status`** (selection/pin confirmation, not execution) -- whether
+  a lane's proposed change to a `selected`/`new_candidates` status survived
+  two adversarial refuters. A `confirmed_*` prefix means the *proposal* was
+  checked, not that the underlying tool ran: **`review_status` never
+  establishes native execution**, regardless of prefix. A missing verdict
+  (`survives: null`) stays `<status>_unverified`, never `confirmed_*` (see
+  `disposition()`/the selected-status branch in `build_manifest.py`'s
+  `merge_lanes`).
+- **`evidence_level`** (execution classification, from the catalog card) --
+  the field that actually classifies execution evidence: `source_review`
+  means a lane read documentation/source and reasoned about fit, nothing was
+  installed, built or run; `native_proven` (or anything the manifest cites to
+  a receipt under `evidence/` or `manifests/evidence.json`) means an actual,
+  reproducible execution exists, separately dated and scoped from this
+  manifest. `build_manifest.py` carries `evidence_level` into each manifest
+  trading entry row whenever the source `catalogs/us-equities/*.json` card
+  sets it (`extract_layers.py` already reads it verbatim); foundation
+  components (`manifests/stack.json`) do not currently carry the field.
 
 ## The never-promote rule
 
