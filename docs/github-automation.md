@@ -238,3 +238,52 @@ manual off-host workflows (a repository settings decision for the automation
 maintainer), concurrency limits on stateful or manually dispatched workflows, and
 informational naming notes. Static checks execute no job; a pull request's own runs
 remain the execution evidence.
+
+## Publication on tags
+
+`publish-catalog.yml` now runs on `push: tags: ['v*']` in addition to its
+existing `workflow_dispatch`, and its job condition is
+`startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'` so a
+pushed release tag or the trusted-main dispatch path both qualify; any other
+ref still short-circuits. Creating and pushing a `v*` tag is a coordinator-only
+action: the ruleset above protects `main`, and only a maintainer with push
+access to tag refs can trigger this path — a fork or an unprivileged
+contributor cannot cause a publication run by opening a pull request. Treat a
+tag push the same as the manual dispatch it extends: it still requires
+`github.repository == 'seathatflowsinourveins/native-agent-stack'` and the
+job's `contents: read`, `id-token: write`, `attestations: write` permissions
+are unchanged.
+
+The job now produces two attested artifacts per run, not one. After the
+existing archive-and-hash step, a SHA-256-checked download of syft 1.52.0
+(`syft_1.52.0_linux_amd64.tar.gz`, verified against the upstream
+`syft_1.52.0_checksums.txt` and pinned in-workflow to
+`caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d`) scans the
+checked-out tree and writes
+`native-agent-stack-${GITHUB_SHA}.spdx.json`. A second `actions/attest` step
+(same pinned action SHA as the archive's) attests that SBOM with
+`predicate-type: https://spdx.dev/Document`, `push-to-registry: false`, and no
+storage record, mirroring the archive attestation's `subject-path`/predicate
+shape. Both attestations are verified in-run with `gh attestation verify`
+(archive and SBOM each get their own `GH_TOKEN`-scoped step) before the SBOM is
+uploaded next to the archive artifact and its digest is matched, the same
+upload-then-match pattern already used for the archive. A verify command an
+operator can reuse after download:
+
+```sh
+gh attestation verify native-agent-stack-<sha>.spdx.json \
+  --repo seathatflowsinourveins/native-agent-stack \
+  --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml \
+  --source-digest <sha>
+```
+
+`adoption-bootstrap.yml` is a separate, lower-stakes job
+(`bootstrap-linux`, 20-minute timeout, plain `ubuntu-24.04`, no elevated
+permissions) that runs `adoption/bootstrap-linux.sh --profile foundation-cpu`
+into `$RUNNER_TEMP/eco` on push to `main`, on pull requests touching
+`adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`,
+weekly (Monday 06:47 UTC), and on manual dispatch, then asserts every
+`foundation-cpu` required command is present via
+`scripts/adoption_status.py --profile foundation-cpu --json`. Its workflow
+header records this as synthetic/local-integration evidence on a disposable
+runner, not a second-machine developer-laptop acceptance.

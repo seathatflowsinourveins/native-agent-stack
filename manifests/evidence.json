@@ -9038,8 +9038,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "43284b9f3addbb94d56938649415f99b62618517ca8e7492b8d44b4be9fbb5a9",
-      "bytes": 15521
+      "sha256": "4342278895fa3f2bc81bf90049f6415aadad20b121704e2b3b24a0871f49853c",
+      "bytes": 18317
     },
     {
       "path": "docs/research-task-acceptance.md",
@@ -9058,8 +9058,8 @@
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
-      "sha256": "ef6c6324a74f14fa48fb8681cb0914914eeebf46ad713388a53f20ba7e15bb93",
-      "bytes": 6727
+      "sha256": "54a4c678f7826f31f0add9237dfb3b20b16f746bf65cc94d8d4fc6796efbe5d4",
+      "bytes": 10631
     },
     {
       "path": "docs/catalog-provenance.md",
@@ -9458,8 +9458,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "810120df9ec901fc0e8247fda6559ab46a352d469457524aa0798472cde9f8b4",
-      "bytes": 12635
+      "sha256": "363fbe72420d56801a8ece33f9cef20d71ff1d93aa9ce20dc07202ccdf9fa3f3",
+      "bytes": 15080
     },
     {
       "path": "docs/tasks/2026-09-20-automation-resolution.md",
@@ -11360,6 +11360,26 @@
       "path": "tests/test_blind_layer_decisions.py",
       "sha256": "0512e58b967baed9fdc95323cd6867dbb1981785bb3d20e51d6a1df1bcb4fbc1",
       "bytes": 2827
+    },
+    {
+      "path": "adoption/bootstrap-linux.sh",
+      "sha256": "1398f65d7b3a7c7635fbaa827de4ac7c7e1a124e46486bb3cf3533e0ae970693",
+      "bytes": 11145
+    },
+    {
+      "path": "adoption/pins-linux-x86_64.json",
+      "sha256": "3607fc8278cd32c89f706e8dfb452c1d369b14162184cfa41e03db70f3b07593",
+      "bytes": 6757
+    },
+    {
+      "path": "tests/test_adoption_bootstrap.py",
+      "sha256": "db92f3ededdc60a477c38d0712629dc09e0afc8cbb3230ac0406860ffab8b72a",
+      "bytes": 7556
+    },
+    {
+      "path": ".github/workflows/adoption-bootstrap.yml",
+      "sha256": "45e256e5a5cdc33d862b1e5835b05cda1b9f57dfc59d069c77d3ee1e37889151",
+      "bytes": 2545
     }
   ],
   "convergence_records": [
