@@ -12246,6 +12246,31 @@
       "path": "blueprints/gap-resolution-20260922/capture-alpaca-wire-serialization/probe_wire.py",
       "sha256": "e574bc58599b24c921b7787135fb30f191f955b050c29264d07c82859c50fa92",
       "bytes": 7864
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/research-factors-ml/repo-local-full-test-rerun.json",
+      "sha256": "5292c4d327cf0c1c47d2d3098ecf9cd26fbe79957a2af548c435519f1c4f2b6c",
+      "bytes": 9597
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/research-factors-ml/sklearn-timeseriessplit-matched-arm.json",
+      "sha256": "851aeab9791e52e8406e225287fb3d83b11643db28d48a104586e0ffa2a52c07",
+      "bytes": 9676
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/portfolio-risk/skf_walkforward_optimizer.json",
+      "sha256": "b8b751f9708156162c3f77e1b95b2a143c76b4c1fb062617d4c1d76cc9d98e4d",
+      "bytes": 7701
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/sklearn-timeseriessplit/run_c22.py",
+      "sha256": "2ae0fd45532538b315c1602e81cb260263a040154130787128486816d940a4e0",
+      "bytes": 6883
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/skf-walkforward-optimizer/run_optimizer.py",
+      "sha256": "5fe7f4027090c3a914a59f75e1244d2cc382f64d121c622be3a88c1c99bc9ef7",
+      "bytes": 6341
     }
   ],
   "convergence_records": [
