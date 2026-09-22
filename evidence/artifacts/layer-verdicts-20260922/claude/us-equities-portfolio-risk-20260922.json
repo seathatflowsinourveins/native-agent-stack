@@ -1,41 +1,37 @@
 {
  "alternatives": [
   {
-   "disposition": "conditional",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/engines-strategies.md",
-    "tests/test_sota_convergence.py",
-    "evidence/artifacts/claude-repository-evidence-20260921/results.json"
-   ],
-   "key": "c4",
-   "name": "quantstats",
-   "repository": "https://github.com/ranaroussi/quantstats",
-   "why_not_default": "It has no execution evidence. The packet's evidence_kind is source_review. The card limitation says the 'Prospective workflow is unexecuted'. A Grep of blueprints/, fixtures/ and tests/ matched only tests/test_sota_convergence.py, where lines 670-691 are manifest-schema assertions with evidence_level 'source_review'. The repository mentions quantstats elsewhere, but only in catalogs and records, not execution evidence. catalogs/us-equities/engines-strategies.md:82 and evidence/artifacts/claude-repository-evidence-20260921/results.json:7283 make it the Default report renderer. Its role, return/risk reports, falls under the layer's performance-evaluation scope term and complements the c3 splitter rather than competing with it. It stays conditional, not default, because per the packet's card limitation a tear sheet is descriptive and 'does not fix leakage, trial selection, poor fills or accounting errors', and because it has never run here. This verdict departs from the catalog's Default ranking on evidence-class grounds only."
-  },
-  {
    "disposition": "unqualified",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "catalogs/us-equities/engines-strategies.json",
-    "catalogs/us-equities/engines-strategies.md"
+    "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst"
    ],
    "key": "c1",
    "name": "cvxportfolio",
    "repository": "https://github.com/cvxgrp/cvxportfolio",
-   "why_not_default": "It has no execution evidence. catalogs/us-equities/engines-strategies.json:870 gives evidence_level 'source_review', and :875 labels the native workflow '# Prospective and unexecuted'. The workflow example deliberately uses no costs (:881). Grep found no blueprint or fixture that installs or runs it. The card warns that the forward-aligned return convention can leak future information and that 'optimizer feasibility is not execution feasibility'. Its license is GPL-3.0-or-later (:867). Its multi-period, cost-aware role is distinct from the splitter, but no measured comparison shows it closes a gap on the frozen inputs."
+   "why_not_default": "The only evidence is a source review of an upstream README URL (https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst), and this lane could not open it locally. No local receipt, test or fixture under the repository runs cvxportfolio. The packet card says its multi-period policy/cost-model workflow is unexecuted, that its simulator may download risk-free data when cash returns are absent, and that optimizer feasibility is not execution feasibility. It is also GPL-3.0, while skfolio is BSD-3-Clause. Its multi-period transaction/holding-cost modelling is scope that the skfolio splitter receipt does not cover, so it remains a comparison target rather than a rejected tool."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "tests/test_sota_convergence.py",
-    "catalogs/us-equities/engines-strategies.md"
+    "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/README.md"
    ],
    "key": "c2",
    "name": "empyrical-reloaded",
    "repository": "https://github.com/stefan-jansen/empyrical-reloaded",
-   "why_not_default": "It has no execution evidence. The packet's evidence_kind is source_review, and the card says the 'Prospective workflow is unexecuted'. In blueprints/, fixtures/ and tests/, the only match is a comment at tests/test_sota_convergence.py:1952. Other mentions are in catalogs and records, not execution evidence. Its metric-function role overlaps c4's reporting role. It shares the 'empyrical' import namespace with the legacy package. The packet's review_status is 'unmaintained_signal', and upstream was last pushed on 2025-12-12."
+   "why_not_default": "Supported only by a source review of an upstream README URL (https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/README.md), which this lane did not open. No local execution receipt exists. The packet card records an import-name collision with the older empyrical package and says the pandas-datareader integration is incompatible with Python >=3.12. That matters because the accepted research environment is Python 3.13.15, per receipt.json runtime.python. It computes return/risk metrics only; it does not do portfolio construction or chronological validation."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/ranaroussi/quantstats/blob/v0.0.81/README.md"
+   ],
+   "key": "c4",
+   "name": "quantstats",
+   "repository": "https://github.com/ranaroussi/quantstats",
+   "why_not_default": "Supported only by a source review of an upstream README URL (https://github.com/ranaroussi/quantstats/blob/v0.0.81/README.md), which this lane did not open. No local execution receipt exists. It produces descriptive return-period tear sheets and overlaps c2's metric role. The packet card says it does not fix leakage, trial selection, fills or accounting errors, and it assumes a 252-period convention. It is a reporting aid, not portfolio or risk construction."
   }
  ],
  "catalog": "us-equities",
@@ -43,62 +39,54 @@
  "lane": "claude",
  "layer_id": "portfolio-risk",
  "limits": [
-  "I could not open the external GitHub README evidence_refs for c1 (cvxportfolio 1.5.1), c2 (empyrical-reloaded 0.5.12), c3 (skfolio v1.2.8) or c4 (quantstats v0.0.81) because no web access was available. Their source_review status comes from the packet and catalog, not from my own reading.",
-  "I did not read receipt.json lines 1344-1559. The fold and selection totals come from the claim, independent_review and command entries.",
-  "I did not open plan.json, requirements.lock or tests/test_research_evaluation.py. The refuter confirmed they exist.",
-  "I could not run commands, so 12 passed and 214 passed, 0 skipped are recorded results, not results observed now.",
-  "The TypeSafe skill body was in context from <host-path>/SKILL.md. The coordinator supplied no TypeSafe inference results, and I used none. All judgments are this lane's own source review. The refuter findings were treated as data and checked against the cited sources.",
-  "The client reports the actual model as claude-opus-5-5[1m]. The requested lane setting opus/high was kept."
+  "Four packet evidence_refs are GitHub URLs: the cvxportfolio 1.5.1, empyrical-reloaded 0.5.12 and quantstats v0.0.81 READMEs, and the skfolio v1.2.8 README.rst. This lane is restricted to local files and has no web access, so none were opened. The source-review status of c1, c2 and c4, and skfolio's documented optimizer scope, remain unverified here.",
+  "receipt.json was read at lines 1-1343 and 1477-1794. Lines 1344-1476 (the reserved-segment candidate details) were not read in full; the reserved summary was taken from the README table.",
+  "tests/test_research_evaluation.py, evaluate.py and plan.json were confirmed to exist only by a glob listing, not opened. No commands were run and no receipt result was re-executed; all numbers are the recorded values.",
+  "The existing prior lane artifact evidence/artifacts/layer-verdicts-20260922/claude/us-equities-portfolio-risk-20260922.json was deliberately not read, to keep this verdict independent.",
+  "No TypeSafe inference results were supplied by the coordinator. All judgments are this lane's own source review, not retained provider judgments.",
+  "Skill path: <host-path>/SKILL.md. The client reports the actual model as claude-opus-5-5[1m]; the output model field keeps the fixed value 'opus'/'high' as instructed."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "No candidate has native evidence for the layer's portfolio-optimization, performance-evaluation or legacy-metrics scope terms. skfolio's native evidence covers only WalkForward on a raw-price label study: evaluate.py:181-183 and README 'This accepts the splitter used here, not every skfolio optimizer'.",
-  "No adopted candidate has observed evidence of deterministic numeric risk enforcement, reproducible equity accounting or broker reconciliation within NautilusTrader, which the layer requirement asks for.",
-  "The skfolio pin 1.2.9 is behind upstream v1.3.0 (released 2026-09-20), and 1.3.0 is unqualified.",
-  "The receipt's cost proxy does not model fills, commissions, funding, turnover netting or liquidity, and there is no dividend or cash reconciliation.",
-  "There are few reserved episodes per candidate, and the reserved segment has been inspected, so no statistical advantage is established.",
-  "cvxportfolio, empyrical-reloaded and quantstats have no installation or execution evidence in blueprints/, fixtures/ or tests/.",
-  "Native acceptance covers only the Linux/WSL Python 3.13.15 environment.",
-  "This verdict does not follow the catalog ranking, where quantstats is Default and skfolio is 'Conditional beyond accepted scope'. The difference has not been resolved by an executed comparison."
+  "The skfolio native evidence covers only the WalkForward splitter in a raw-price label study. No skfolio optimizer, risk measure or portfolio weight output has been executed (README.md, 'This accepts the splitter used here, not every skfolio optimizer').",
+  "No candidate provides deterministic pre-trade numeric risk enforcement or broker reconciliation. The receipt limitations state there is 'No cash/position/fee/dividend reconciliation or new LEAN engine execution'.",
+  "The receipt says its labels are not portfolio P&L, total return, annualized return or Sharpe; the cost proxy is a fixed 20bp round trip. Only 11 completed reserved episodes per candidate exist, with no alpha or superiority claim.",
+  "No integration of any candidate with the selected NautilusTrader 2.0.0rc5 destination is evidenced.",
+  "The packet shows the skfolio pin (1.2.9) behind upstream v1.3.0, and v1.3.0 has not been accepted natively.",
+  "cvxportfolio, empyrical-reloaded and quantstats have no local execution receipts, so their fitness is untested, which is not the same as failed.",
+  "No executed comparison exists between any pair of candidates on the same frozen inputs.",
+  "Native acceptance is limited to a Linux/WSL Python 3.13.15 environment (receipt limitations)."
  ],
  "overturn_protocol": {
   "arms": [
-   "c3 skfolio 1.2.9 (WalkForward plus an optimizer or risk estimator)",
-   "c1 cvxportfolio 1.5.1 multi-period policy with an explicit USDOLLAR cash column",
-   "c2 empyrical-reloaded 0.5.12 metrics on local arrays",
-   "c4 quantstats 0.0.81 report on the same return series"
+   "c3 skfolio optimizer + WalkForward (native, pinned)",
+   "c1 cvxportfolio 1.5.1 multi-period policy with explicit cash column (native, pinned)"
   ],
   "fixture_paths": [
    "blueprints/us-equities/research-evaluation/plan.json",
-   "blueprints/us-equities/research-evaluation/requirements.lock",
-   "blueprints/us-equities/research-evaluation/evaluate.py",
+   "blueprints/us-equities/research-evaluation/receipt.json",
    "tests/test_research_evaluation.py"
   ],
-  "metric": "Native exit status and passing focused tests on the frozen plan, plus reproducible portfolio or risk outputs (weights, cost-inclusive returns, drawdown and volatility) that match an independent recomputation, with cash and dividend accounting reconciled"
+  "metric": "On identical frozen inputs: native exit status, focused boundary-test pass count, number of training exits that precede their evaluation cutoff, cost-inclusive result reproducibility (hash-equal reruns), and whether the tool can express the transaction/holding-cost and constraint semantics the portfolio-risk layer requires"
  },
- "overturn_when": "The verdict changes if an executed comparison on the same frozen inputs, blueprints/us-equities/research-evaluation/plan.json with the hash-locked requirements.lock, shows either of these: (a) cvxportfolio's multi-period cost-aware policy, or empyrical-reloaded or quantstats metrics, produce reproducible, independently recomputed portfolio or risk outputs that the skfolio path lacks; or (b) a skfolio optimizer or risk estimator fails native acceptance. That comparison needs a recorded run of blueprints/us-equities/research-evaluation/evaluate.py extended with those arms, plus 'python3 -m unittest discover -s tests -p test_research_evaluation.py -q' passing. A regression of that focused test below 12 passed would also reopen the verdict.",
- "packet_sha256": "609c3c6750020c3e3db392fabe9415bba3f7e9f47cd2f7a7954beceaf51a98eb",
+ "overturn_when": "Reopen the verdict if either of two runs on the frozen inputs in blueprints/us-equities/research-evaluation/plan.json turns out differently. First: a native skfolio optimizer/risk-measure run on those inputs, with tests added alongside tests/test_research_evaluation.py and run as `python3 -m unittest discover -s tests -p test_research_evaluation.py -v`, fails or cannot express the required cost or constraint semantics. Second: an equivalently receipted native cvxportfolio (c1) run on the same plan produces cost-aware multi-period results with a reproducible cash ledger and passing boundary tests that skfolio cannot match. Either outcome would promote c1 or demote c3. A regression in the existing focused suite, or a WalkForward source hash that no longer matches the receipt, would also reopen c3.",
+ "packet_sha256": "824673a65fddc83cc26de5e8b6ae139effdaf62ec0feb2e11562cb97eda768f6",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/us-equities__portfolio-risk.json",
-  "blueprints/us-equities/research-evaluation/receipt.json (round 1: lines 1-1343 and 1560-1794; revision: lines 1560-1591)",
+  "blueprints/us-equities/research-evaluation/receipt.json",
   "blueprints/us-equities/research-evaluation/README.md",
-  "blueprints/us-equities/research-evaluation/evaluate.py (Grep skfolio: lines 181-183, 238)",
-  "catalogs/us-equities/engines-strategies.md (lines 75-99)",
-  "catalogs/us-equities/engines-strategies.json (lines 853-897, cvxportfolio entry)",
-  "evidence/artifacts/claude-repository-evidence-20260921/results.json (lines 7280-7285)",
-  "tests/test_sota_convergence.py (Grep matches: lines 670, 686, 691, 1952)",
-  "Grep quantstats|empyrical|cvxportfolio in {blueprints,fixtures,tests}/** (1 file: tests/test_sota_convergence.py) and repository-wide excluding evidence/ (21 files, all catalogs, docs, recipes, tools, observability or tests)"
+  "<host-path>/SKILL.md (preloaded skill body)"
  ],
- "why_selected": "skfolio (c3) is the only adopted candidate with retained native execution evidence, but that evidence covers one function: the WalkForward splitter. It does not cover the layer's portfolio-optimization, performance-evaluation or legacy-metrics scope terms, and no candidate has native evidence for those. blueprints/us-equities/research-evaluation/evaluate.py:181-183 is the only place skfolio is used. It imports skfolio.model_selection.WalkForward and requires installed version 1.2.9. The receipt (kind \"native_cli_e2e\", status \"accepted_for_causal_raw_price_label_control_only\", observed_utc 2026-09-19T22:59:04Z) records WalkForward 252/63/6 with reduce_test=True on Python 3.13.15. The run produced 20 development folds, 21 frozen selections and 6605 candidate records. Its recorded acceptance commands are \"focused-tests\" (python3 -m unittest discover -s tests -p test_research_evaluation.py -q; exit 0, \"12 passed\") and \"full-tests\" (exit 0, \"214 passed, 0 skipped\"), at receipt.json lines 1562-1589. The receipt's independent review reports 42 private artifact hashes verified with 0 mismatches. README.md says: \"This accepts the splitter used here, not every skfolio optimizer.\" The same file says the labels are not portfolio P&L. The packet's external c3 ref is the v1.2.8 README, while the pin and the executed wheel are 1.2.9. catalogs/us-equities/engines-strategies.md:85 reconciles the two as \"1.2.9 accepted splitter; 1.2.8 earlier review\". This verdict departs from the repository's catalog ranking. engines-strategies.md:82 makes quantstats the Default and :85 makes skfolio \"Conditional beyond accepted scope\". The packet withheld those decisions, and I rank c3 first only because it alone has observed execution. This is a narrow winner, not proof of fitness for the whole layer. quantstats (c4) is kept as a conditional complement for reporting.",
+ "why_selected": "c3 (skfolio) is the only adopted candidate with retained local execution evidence. What was actually observed comes from blueprints/us-equities/research-evaluation/receipt.json (kind \"native_cli_e2e\", observed_utc 2026-09-19T22:59:04Z, status \"accepted_for_causal_raw_price_label_control_only\"). In that run, the installed upstream skfolio 1.2.9 WalkForward was called with 252/63/6 and reduce_test=True on SPY/QQQ/IWM session rows. It produced 20 development folds, 21 frozen selections and 6605 candidate records. The run command exited 0 with empty stderr (0 bytes). The focused tests reported \"12 passed\" and the full suite \"214 passed, 0 skipped\". The dependency check reported \"All 19 installed packages compatible.\" An independent review verified 42 private artifact hashes with 0 mismatches and reported no blocking findings. The receipt records a walkforward_source_sha256 and reviewed revision c99fcf71349e2df4a7a1033ee85ca2e9ced9abee. The README \"Observed native results\" section also says \"This accepts the splitter used here, not every skfolio optimizer.\" The native evidence therefore covers skfolio's chronological validation splitter in a raw-price label study. It does not cover skfolio's portfolio optimizers, risk measures, portfolio P&L or pre-trade risk enforcement. skfolio is selected because it is the only portfolio-layer candidate whose own component has actually run here. It is not selected because it has been shown to satisfy the full portfolio-and-risk requirement. The other three candidates rely on GitHub README URLs, which this lane could not open.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
   "blueprints/us-equities/research-evaluation/receipt.json",
   "blueprints/us-equities/research-evaluation/README.md",
-  "blueprints/us-equities/research-evaluation/evaluate.py"
+  "https://github.com/skfolio/skfolio/blob/v1.2.8/README.rst"
  ],
  "winner_keys": [
   "c3"

@@ -1,22 +1,51 @@
 {
  "alternatives": [
   {
+   "disposition": "selected",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/hosting/receipt.json",
+    "blueprints/us-equities/research-runtime/receipt.json",
+    "blueprints/us-equities/hosting/README.md"
+   ],
+   "key": "c3",
+   "name": "Dagu",
+   "repository": "https://github.com/dagucloud/dagu",
+   "why_not_default": "Selected as the orchestration default. Limits:\n- The restart check proves only that completed history survives; resuming an in-flight step is not proven (hosting/receipt.json limitations).\n- The model telemetry match came from a standalone Claude report, not a Dagu-run model step (research-runtime/receipt.json lines 15, 54, 70).\n- The pin v2.16.6 is behind upstream v2.17.0, and the license is GPL-3.0.\n- The local WSL user service stops when Windows shuts down."
+  },
+  {
+   "disposition": "selected",
+   "evidence_class": "synthetic",
+   "evidence_refs": [
+    "blueprints/us-equities/data/README.md",
+    "blueprints/us-equities/data/fixtures/good-gate-result.json",
+    "blueprints/us-equities/data/fixtures/bad-gate-result.json",
+    "tests/test_promotion_gate.py"
+   ],
+   "key": "c4",
+   "name": "data-pandera",
+   "repository": "https://github.com/unionai-oss/pandera",
+   "why_not_default": "Selected as the data-quality default. Limits:\n- Evidence is synthetic CSV fixtures only: good, bad, null-price-cell, empty-snapshot and fractional-negative-volume.\n- There is no production bars/universe ingest (data/README.md).\n- The fixture tests are skipped when the gate venv is missing (tests/test_promotion_gate.py lines 90-92).\n- Schema validation does not establish provider completeness, correct corporate actions or absence of leakage.\n- I raised the packet's source_review class to synthetic based on local retained gate outputs that are not among the packet's refs."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "blueprints/us-equities/hosting.md"
+   ],
+   "key": "c2",
+   "name": "Temporal",
+   "repository": "https://github.com/temporalio/temporal",
+   "why_not_default": "The only evidence is an upstream README URL that I did not open (source_review). No local execution, failure, cancellation or restart receipt exists. blueprints/us-equities/hosting.md lines 41-42 say Temporal is not a prerequisite for the completed native proof and was not added. The candidate card notes that unlimited default activity retries are unsafe for quota errors or uncertain broker writes. It stays conditional on a demonstrated in-flight or durable-workflow requirement that Dagu fails. It is untested, not failed."
+  },
+  {
    "disposition": "unqualified",
    "evidence_class": "source_review",
    "evidence_refs": [],
    "key": "c1",
    "name": "modal",
    "repository": "https://github.com/modal-labs/modal-client",
-   "why_not_default": "The only evidence is an external PyPI page (https://pypi.org/project/modal/1.5.5/), which could not be opened from the repository. The candidate card says `modal run` was not run here and may incur cloud charges. No native execution, failure, cancellation, identity or telemetry receipt exists for this layer. Managed cloud compute also falls outside the local, no-paid-hosting scope the Dagu receipts establish. The packet metadata is inconsistent: the pin is 1.5.5 but upstream.latest is v1.3.1, so the release identity is not verified."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "source_review",
-   "evidence_refs": [],
-   "key": "c2",
-   "name": "Temporal",
-   "repository": "https://github.com/temporalio/temporal",
-   "why_not_default": "Temporal targets the gap Dagu leaves open: durable in-flight workflow recovery. The hosting receipt limitation says 'Restart acceptance preserves completed history; it does not prove in-flight resumption.' However, the only evidence is an upstream README URL (v1.32.0), which I did not open. No local server, CLI 1.9.1 or Python SDK 1.33.0 execution, failure, cancellation or recovery receipt exists in the repository. The candidate card also warns that activities retry by default, which is unsafe for uncertain broker writes. It stays conditional on a measured in-flight recovery requirement and an executed comparison."
+   "why_not_default": "The only evidence is a PyPI URL that I did not open (source_review). The card says `modal run` executes paid cloud code and was not run, and that native subscription credentials must not be assumed to belong in cloud containers. There is no local receipt for managed compute, identity, cancellation or usage accounting. It is untested, not failed."
   }
  ],
  "catalog": "us-equities",
@@ -24,58 +53,62 @@
  "lane": "claude",
  "layer_id": "data-quality-orchestration",
  "limits": [
-  "I could not open the external evidence_refs for c1 (https://pypi.org/project/modal/1.5.5/), c2 (temporalio/temporal v1.32.0 README) or c4 (unionai-oss/pandera README at 62f55e2). No web access was used, and reads were restricted to the repository root.",
-  "I could not run commands. No receipt, test or native CLI was re-executed, so every Dagu and pandera result above is documented-as-done in retained files, not observed-now.",
-  "tests/test_promotion_gate.py was inspected only through a grep of test names and skip conditions. blueprints/us-equities/data/promotion_gate.py, the other fixture gate-result files and blueprints/us-equities/research-runtime/prepare-evidence.yaml were not opened.",
-  "No TypeSafe inference results were supplied by the coordinator, and no TypeSafe service call was made. Every judgment here is my own source review of the retained files. The packet withholds prior decisions and rationales, so no provider judgment was retained or compared.",
-  "Skill path: <host-path>/SKILL.md (preloaded). Actual model: claude-opus-5-5[1m] per the client environment. The requested model field is copied as opus/high."
+  "I could not open the upstream URL evidence_refs for c1 (PyPI modal 1.5.5), c2 (Temporal v1.32.0 README) or c4 (pandera README at 62f55e2d) because I had no web access. They remain unverified.",
+  "I could not run commands. I did not rerun tests/test_promotion_gate.py or any Dagu command, and I did not check the artifact sha256 values in the receipts against current files. I read the retained receipts as documented-as-done, not observed now.",
+  "I did not verify that the gate's isolated venv interpreter exists on this host. It lies outside the permitted read root, and a Glob for its bin/python3* returned no files, which may reflect symlink handling rather than absence. Whether FixtureGateRuns would run or skip here is unknown.",
+  "I confirmed promotion_gate.py, runner.py, the fixture CSVs, research-evidence.yaml and prepare-evidence.yaml by glob or by reference only. I did not read their contents.",
+  "No TypeSafe inference results were supplied, and the packet withheld provider decisions. Every judgment here is my own source review, revised after the independent refuter findings. The model is Opus 5.5 (claude-opus-5-5[1m]) under the fixed lane label opus/high. The skill path is <host-path>/typesafe-ai."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "Dagu: the retained restart check proves only that completed history persists, not that in-flight work resumes (hosting/receipt.json limitations). No off-host durability, no continuous hosting and no recurring scheduler exist (service.recurring_schedule false).",
-  "Dagu: the paired Astra-to-Claude model workflow was not executed (research-runtime/receipt.json dagu.paired_model_workflow_executed false; Codex primary window usedPercent 100). The Claude report ran outside the Dagu graph as an independent_report. No model-worker queue is established.",
-  "Dagu: the pin v2.16.6 is behind upstream v2.17.0, and v2.17.0 has not been executed.",
-  "Dagu: the current auth configuration does not match the accepted receipt. hosting/receipt.json records basic auth with anonymous 401 / authenticated 200. hosting/README.md says the current dashboard uses auth.mode none, where anonymous reads return 200. No receipt accepts the current auth mode.",
-  "Dagu: native host shell execution is not a sandbox. The research-runtime receipt states that native account homes and hooks remain accessible, so broker-authority separation rests on configuration (no broker credentials in the service environment), not on an OS boundary.",
-  "pandera: the checks run only on synthetic CSV fixtures. No production bars/universe ingest exists (data/README.md). Schema validation does not establish provider completeness, correct corporate actions or absence of leakage. The duckdb:// input path is source-only.",
-  "pandera: the fixture tests are skipped when the isolated gate venv is absent (tests/test_promotion_gate.py line 90 skipUnless). No test execution was observed in this review.",
-  "Temporal and Modal: no local execution evidence exists in the repository for either candidate."
+  "Dagu: resuming an in-flight step after a restart or host loss is not established. The restart check proves only that completed history is preserved.",
+  "Dagu: no model step has run under Dagu with matching telemetry. paired_model_workflow_executed is false and the Codex allowance was at 100 percent. The Prometheus/Loki match belongs to a standalone Claude report (research-runtime/receipt.json lines 15, 54, 70, 112). There is also no model-worker queue and no continuous off-host hosting.",
+  "The auth state conflicts between sources. hosting/receipt.json records Basic auth, with anonymous requests getting 401. hosting.md line 3 still says 'authenticated local research run history', and research-runtime/receipt.json line 56 has private_auth_preserved true. The current hosting/README.md says auth.mode is none and anonymous API reads return 200. The receipts and hosting.md therefore predate the current auth configuration.",
+  "Pandera: validated only on synthetic CSV fixtures. There is no production bars/universe ingest, and the duckdb:// input path is source-only.",
+  "The fixture tests in tests/test_promotion_gate.py are skipped whenever the gate venv is absent, so a green run on another host does not establish that fixtures are classified correctly.",
+  "The claim that the paper runtime never imports pandera comes from the project README (data/README.md lines 94-96). I did not verify it in runner.py.",
+  "Neither Temporal nor Modal has any local execution evidence, so they are untested, not failed.",
+  "Local Dagu subprocess cancellation is not the same as cancelling a provider request (hosting.md lines 47-48)."
  ],
  "overturn_protocol": {
   "arms": [
-   "Dagu v2.16.6 (retained receipts)",
-   "Dagu v2.17.0 (upstream latest)",
-   "Temporal server v1.32.0 + CLI 1.9.1 + Python SDK 1.33.0 on the same research workflow",
-   "pandera 0.33.1 promotion gate via python3 -m unittest tests.test_promotion_gate with the gate venv present"
+   "c3 Dagu v2.16.6 (current)",
+   "c3 Dagu v2.17.0 (upstream latest)",
+   "c2 Temporal server v1.32.0 / Python SDK 1.33.0",
+   "c4 pandera 0.33.1 promotion_gate.py (current)"
   ],
   "fixture_paths": [
-   "blueprints/us-equities/hosting/receipt.json",
-   "blueprints/us-equities/research-runtime/receipt.json",
-   "blueprints/us-equities/data/fixtures/good-gate-result.json",
-   "blueprints/us-equities/data/fixtures/bad-gate-result.json",
+   "blueprints/us-equities/hosting/research-evidence.yaml",
+   "blueprints/us-equities/research-runtime/prepare-evidence.yaml",
+   "blueprints/us-equities/data/fixtures/good.csv",
+   "blueprints/us-equities/data/fixtures/bad.csv",
+   "blueprints/us-equities/data/fixtures/null-price-cell.csv",
+   "blueprints/us-equities/data/fixtures/empty-snapshot.csv",
+   "blueprints/us-equities/data/fixtures/fractional-negative-volume.csv",
    "tests/test_promotion_gate.py"
   ],
-  "metric": "The native status must be correct in every scenario: failure fixture (failed, dependent step aborted), cancellation (aborted), restart with history preserved, and in-flight resumption after a mid-step process kill. The comparison also checks for duplicate effect owners, zero broker calls, and telemetry usage matching Prometheus and Loki. For data quality, it checks that the fixture pass/fail pattern for each named check matches the retained gate-result JSON."
+  "metric": "Orchestration: pass or fail on each of five checks: (1) failure status with the dependent step aborted; (2) cancellation reported as aborted in native history; (3) completed history preserved after restart; (4) an in-flight step resumed after a service/host kill; (5) failed attempts retained with zero broker calls. Model telemetry counts only if the model step runs inside the orchestrated graph.\n\nData quality: agreement between fixture pass/fail results and the expected named-check outcomes, with zero skips in FixtureGateRuns, plus detection of seeded defects in a real-schema snapshot."
  },
- "overturn_when": "Change the verdict for c3 in either case:\n- A recorded same-workflow comparison, retained alongside blueprints/us-equities/hosting/receipt.json and blueprints/us-equities/research-runtime/receipt.json, shows that Temporal (or Dagu v2.17.0) passes the same failure, cancellation and restart checks, adds verified in-flight recovery after a mid-step process kill, and creates no duplicate effect owner.\n- The Dagu arm fails that same in-flight check where the challenger passes.\n\nChange the verdict for c4 if `python3 -m unittest tests.test_promotion_gate`, run with the gate venv present, fails any fixture expectation. Examples: good.csv not passing every named check, or bad.csv not failing its five expected checks. The same applies if a real bars/universe ingest shows pandera cannot express a required check in blueprints/us-equities/data/promotion_gate.py.",
- "packet_sha256": "6d2021654b47b509193efdfff10dbee6672e71ce6f107aaf11c81614c7d27c8e",
+ "overturn_when": "Two checks could change this verdict.\n\nOrchestration (Dagu): a Temporal or other orchestrator arm must repeat the checks in blueprints/us-equities/hosting/receipt.json against blueprints/us-equities/hosting/research-evidence.yaml. Those checks are the exit-23 failure fixture, native cancellation and history after a service restart. The arm must also resume an in-flight step after a host or service kill, which Dagu's receipt does not prove. It overturns the verdict only if the candidate passes all of these, with no duplicate effect owners and no broker authority, while Dagu fails the in-flight check.\n\nData quality (pandera): run `python3 -m unittest tests/test_promotion_gate.py` with the gate's isolated venv present or PROMOTION_GATE_PYTHON set. The FixtureGateRuns class must report zero skips; a skipped class counts as not run, not as a pass. It overturns the verdict if the gate misclassifies any fixture in blueprints/us-equities/data/fixtures/, or if a real-schema snapshot contains a seeded defect that the pandera gate passes and an alternative validator catches.",
+ "packet_sha256": "cdbe255da0593b73f77e57bc8b887984a78e5233165f3a9fa27818d427708eeb",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/us-equities__data-quality-orchestration.json",
   "blueprints/us-equities/hosting/receipt.json",
-  "blueprints/us-equities/research-runtime/receipt.json",
+  "blueprints/us-equities/research-runtime/receipt.json (lines 1-120)",
   "blueprints/us-equities/hosting/README.md",
-  "blueprints/us-equities/data/README.md",
+  "blueprints/us-equities/hosting.md (lines 1-10, 30-49)",
+  "blueprints/us-equities/data/README.md (including lines 70-119)",
   "blueprints/us-equities/data/fixtures/good-gate-result.json",
   "blueprints/us-equities/data/fixtures/bad-gate-result.json",
-  "tests/test_promotion_gate.py (grep of test names/skip lines only)",
-  "<host-path>/SKILL.md (preloaded skill body)"
+  "tests/test_promotion_gate.py (lines 1-100)",
+  "<host-path>/SKILL.md (skill body preloaded via command)"
  ],
- "why_selected": "Two winners cover the two halves of the layer title: orchestration (c3) and data quality (c4). They do not duplicate each other. The winner_evidence_class is set to the weaker of the two, local_integration.\n\nc3 Dagu v2.16.6 is the only candidate with native execution evidence. Both receipts record local runs of the upstream binary.\n- Setup (blueprints/us-equities/hosting/receipt.json, kind native_cli_e2e): the archive checksum matched the publisher (publisher_checksum_matched true).\n- Research workflow: a three-step workflow (summarize, baseline_evidence, catalog_evidence) succeeded with exit_code 0.\n- Failure: an exit-23 failure fixture recorded status failed, and its dependent step was aborted.\n- Cancellation: native `dagu stop` produced status aborted, although that CLI process exited 0.\n- Restart: after a service restart, prior history rows were preserved. The retained history shows succeeded, failed and aborted runs.\n- Failed attempts: initial failures were kept in initial_failures (schema exit 1, first_execution exit 1).\n- Broker and model calls: model_calls 0 and broker_calls 0.\n- Model run (blueprints/us-equities/research-runtime/receipt.json, kind native_model_e2e): Dagu packet and order_table steps succeeded, and a standalone native Claude report completed. That report ran with `--tools '' --disallowedTools '*'`, native_subtype success and exposed_tool_count 0.\n- Telemetry: native_usage_equals_prometheus_and_loki is true. The initial validation failure is kept in retained_failures.\n\nc4 pandera 0.33.1: the packet's own evidence_ref is an upstream URL that I could not open. However, the repository contains a local integration on synthetic fixtures.\n- blueprints/us-equities/data/README.md describes a fail-closed promotion gate (promotion_gate.py) built on pandera==0.33.1 in an isolated venv. The paper runtime reads only its gate-result.json.\n- The retained outputs are consistent with that: blueprints/us-equities/data/fixtures/good-gate-result.json shows status pass on 12 named checks over 4 rows. bad-gate-result.json shows status fail on valid_trading_session, volume_integral_non_negative, observed_at_not_future, high_ge_max_open_close and unique_symbol_session. Both record pandera 0.33.1.\n- tests/test_promotion_gate.py reruns every fixture, but only when the gate venv exists. I did not observe a test execution.",
- "winner_evidence_class": "local_integration",
+ "why_selected": "The layer covers both data quality and orchestration, so I picked one winner for each half. The two do not overlap.\n\nc3, Dagu v2.16.6 (orchestration), has retained native CLI evidence:\n- blueprints/us-equities/hosting/receipt.json (kind native_cli_e2e, checked_at 2026-09-19) records a publisher checksum match and a 3-step `dagu start` run that exited 0 and succeeded.\n- The same receipt records an exit-23 failure fixture (status failed, dependent step aborted), a native `dagu stop` cancellation (stop_exit 0, status aborted), and prior_history_rows_preserved true after a service restart.\n- It shows model_calls 0 and broker_calls 0, and it keeps the earlier schema and env-passthrough failures.\n- blueprints/us-equities/research-runtime/receipt.json (native_model_e2e, observed 2026-09-19T16:21:52Z) records the Dagu packet and order_table steps succeeding, with final_validation_exit_codes [0, 0] (lines 36-46).\n\nThe Dagu evidence therefore covers supervised processes, failure and cancellation status, retained failed attempts, restart history and no broker authority. It does not cover model telemetry. The Prometheus/Loki usage match in research-runtime/receipt.json (line 112) belongs to a standalone Claude report (line 15; workflow \"independent_report\" at line 70) that ran outside the Dagu graph. paired_model_workflow_executed is false (line 54), so that match is not Dagu evidence.\n\nc4, pandera 0.33.1 (data quality): the packet's only ref is an upstream README URL, which I could not open. My own source review found a local fail-closed gate described in blueprints/us-equities/data/README.md.\n- good-gate-result.json has status pass, row_count 4, all 12 named checks passing, and pins pandera 0.33.1.\n- bad-gate-result.json fails exactly valid_trading_session, volume_integral_non_negative, observed_at_not_future, high_ge_max_open_close and unique_symbol_session, matching data/README.md lines 76-78.\n- tests/test_promotion_gate.py runs these fixtures only through the gate's isolated venv (lines 1-4 and 90-92).\n- Per data/README.md lines 94-117, the paper runtime reads the gate JSON and also hashes the --snapshot file against input_sha256 (promotion_gate_mismatch). The README says the runtime does not import pandera. That is the project's claim; I did not open runner.py.\n\nThe pandera evidence is synthetic CSV fixtures only, so the winner-set class is synthetic.",
+ "winner_evidence_class": "synthetic",
  "winner_evidence_refs": [
   "blueprints/us-equities/hosting/receipt.json",
   "blueprints/us-equities/research-runtime/receipt.json",

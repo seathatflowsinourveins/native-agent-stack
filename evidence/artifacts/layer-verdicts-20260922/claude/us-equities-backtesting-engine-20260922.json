@@ -1,50 +1,15 @@
 {
  "alternatives": [
   {
-   "disposition": "selected",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "evidence/receipts/native-nautilus-v2-20260920.json",
-    "catalogs/us-equities/runtime-target.json",
-    "evidence/artifacts/comparison-progress-20260922/summary.json",
-    "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json"
-   ],
-   "key": "c5",
-   "name": "NautilusTrader",
-   "repository": "https://github.com/nautechsystems/nautilus_trader",
-   "why_not_default": "Selected as the destination runtime. Its native acceptance covers only the synthetic EUR/USD quickstart (runs run-3 and run-4). Equity evidence is a 15-session AAPL local-integration replay that performed no SPY/LEAN parity. The SPY/LEAN one_zero comparison completed as BLOCKED with returned_failed_checks 4. The summary attributes it to two separately listed unsupported mappings (distributions_and_cash, market_on_open_proxy), and the individual check names are not retained. The version is a prerelease (2.0.0rc5)."
-  },
-  {
-   "disposition": "selected",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/engine/receipt.json",
-    "blueprints/us-equities/engine/resolution-receipt.json",
-    "blueprints/us-equities/historical-simulation/receipt.json",
-    "blueprints/us-equities/engine/README.md"
-   ],
-   "key": "c4",
-   "name": "LEAN",
-   "repository": "https://github.com/QuantConnect/Lean",
-   "why_not_default": "Selected as the frozen historical oracle, not as the runtime. blueprints/us-equities/engine/README.md labels it a retained comparison reference. Its native evidence is (a) the upstream BasicTemplateFrameworkAlgorithm sample on the default brokerage model and (b) six frozen SPY cases from 2019-12-02 to 2020-04-30 with native dividend cash reconciliation. Both use bundled upstream sample data, not an entitled vendor dataset. The historical-simulation limitations (lines 1731-1746) say the window is a known crash interval, not a holdout, and uses hourly market-on-open proxies at 10:00 New York. Margin liquidation is uncalibrated, financing is not modeled, and there are no paper or live orders. The Alpaca adapter's product-347 subscription validation and brokerage initialization were never invoked, and the unmodified Alpaca build resolved 2 advisory pairs."
-  },
-  {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [],
+   "evidence_refs": [
+    "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst"
+   ],
    "key": "c2",
    "name": "cvxportfolio",
    "repository": "https://github.com/cvxgrp/cvxportfolio",
-   "why_not_default": "Its only evidence ref is an external upstream README URL, and there is no retained local receipt. The packet's card limitations say the prospective workflow is unexecuted and that this is a research simulator, not an order gateway. It fills a multi-period optimizer role, not the broker-boundary equity backtest and accounting role, and its review_status is unmaintained_signal. It is untested, not failed."
-  },
-  {
-   "disposition": "out_of_scope",
-   "evidence_class": "source_review",
-   "evidence_refs": [],
-   "key": "c3",
-   "name": "nkaz001/hftbacktest",
-   "repository": "https://github.com/nkaz001/hftbacktest",
-   "why_not_default": "No retained evidence: the packet has evidence_kind null and empty evidence_refs. The disposition rests only on the packet note that it models queue position and latency, which daily-bar decisions with next-session entry do not need. I did not review its source. evidence_class is set to source_review only because the enum has no 'no evidence' value; it is packet-metadata review, not source review."
+   "why_not_default": "Its only evidence is a source-review reference to an external README at pin 1.5.1. That file is outside the repository, and I could not open it. My reasons here come from the packet's card_limitations ('Research simulator is not an order gateway'; 'Prospective workflow is unexecuted'), not from the README. The repository retains no execution, cash reconciliation or LEAN parity case for it, so nothing shows it meets the requirement for broker-specific execution boundaries or reproducible equity accounting. At most it could be a portfolio-policy research layer on top of the engine."
   },
   {
    "disposition": "unqualified",
@@ -53,7 +18,7 @@
    "key": "c6",
    "name": "lumiwealth/lumibot",
    "repository": "https://github.com/Lumiwealth/lumibot",
-   "why_not_default": "No retained evidence: the packet has evidence_kind null and empty evidence_refs. The packet names its qualifying check (SPY one_zero parity against LEAN plus a paper roundtrip), and that check has not been run. It is untested, not failed. evidence_class is source_review only because the enum has no 'no evidence' value; this is packet-metadata review."
+   "why_not_default": "It is not adopted, and the packet gives it evidence_kind null and evidence_refs []. I reviewed no source for it, so the evidence_class value only reflects that the schema has no 'none' option; the real basis is an unreviewed packet note. That note describes the comparison that would qualify it: the SPY one_zero parity case against LEAN with reconciled cash, plus a paper roundtrip. Neither has been executed. Untested is not the same as failed."
   },
   {
    "disposition": "unqualified",
@@ -62,7 +27,16 @@
    "key": "c1",
    "name": "whchien/ai-trader",
    "repository": "https://github.com/whchien/ai-trader",
-   "why_not_default": "No retained evidence: the packet has evidence_kind null and empty evidence_refs. The packet note describes it at most as a research interface that would not replace the runtime. It is untested, not failed. evidence_class is source_review only because the enum has no 'no evidence' value; this is packet-metadata review."
+   "why_not_default": "It is not adopted, and the packet gives it evidence_kind null and evidence_refs []. I reviewed no source for it; the evidence_class value only reflects the schema's lack of a 'none' option. The packet note describes it at most as a bounded MCP research interface that would not replace the runtime. No execution is recorded."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c3",
+   "name": "nkaz001/hftbacktest",
+   "repository": "https://github.com/nkaz001/hftbacktest",
+   "why_not_default": "It is not adopted, and the packet gives it evidence_kind null and evidence_refs []. I reviewed no source for it; the evidence_class value only reflects the schema's lack of a 'none' option. The packet note says it models limit-order queue position and latency, which would matter only for intraday execution experiments and not for the current protocol of daily-bar decisions with a t+1 open entry. That scope argument is the packet's claim, not my own. Because the layer scope terms include backtesting and execution-experiment, I record it as unqualified rather than out of scope. No execution is recorded."
   }
  ],
  "catalog": "us-equities",
@@ -70,68 +44,76 @@
  "lane": "claude",
  "layer_id": "backtesting-engine",
  "limits": [
-  "I did not re-run any command. Everything reported is documented-as-done in retained receipts, not observed now. The private raw artifacts the receipts reference by hash (run outputs, spy-parity/verdict.json, the parity compare.py) are not in the repository and could not be checked.",
-  "tests/test_historical_simulation.py was confirmed to exist by Glob only; I did not read it. I did not read lines 1369-1724 of historical-simulation/receipt.json (private artifact hashes and isolation details).",
-  "acceptance-plan.md line 84 says the Nautilus converter and comparator 'do not exist yet', while summary.json records a completed BLOCKED comparison by a private harness. The committed plan text may predate that run. I cannot reconcile the two from repository files.",
-  "cvxportfolio's only evidence ref is an external URL (https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst) outside the repository root, so I did not read it.",
-  "The dispositions for non-adopted c1, c3 and c6 rest only on packet notes. The source_review evidence_class for them reflects the lack of any 'no evidence' enum value, not an actual source review.",
-  "Revision round: I accepted both refuters' major findings. The earlier overturn command did not decide parity, and c4 omitted the six-case historical-simulation receipt. I also applied the minor findings: the vulnerability-audit scope, failed checks versus unsupported mappings, and the evidence-class labeling. The challenger refuter's finding that challenger_preferred=null is correct was retained after my own re-read.",
-  "Skill: the typesafe-ai skill body was preloaded from <host-path>/SKILL.md. No TypeSafe inference results were supplied and no service calls were made. Every judgment here is my own review of the files above; the refuter findings were verified against the source, not adopted on agreement. Actual model: claude-opus-5-5[1m]. The reported model field is the fixed value opus/high."
+  "I did not open c2's only evidence, an external GitHub URL, because file reads were limited to the repository and no fetch tool was available. Its README content is unverified.",
+  "I confirmed only that tolerances.json exists (by Glob) and did not read it. For run.py, compare.py, convert.py, fixture_strategy.py and tests/test_spy_parity.py I confirmed existence only, not their contents or command-line arguments.",
+  "I ran no commands. Every result here comes from a receipt I read, not from a re-execution I observed. I could not recompute the oracle receipt's sha256 (06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9 in mapping-manifest.json). Private artifacts referenced only by hash, such as run CSVs, build logs and the private review, were not available.",
+  "I read only lines 1-1368 of the 1749-line historical-simulation/receipt.json and only the first 80 lines of equity-replay/receipt.json.",
+  "No TypeSafe inference results were supplied, and I made no service calls. The typesafe-ai skill body was preloaded from <host-path>/SKILL.md. The actual client model is claude-opus-5-5[1m]; the packet's fixed model value opus/high is reported as instructed.",
+  "The non-adopted candidates c1, c3 and c6 have no retained evidence. Their dispositions rest on packet notes only."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "SPY/LEAN parity is not accepted. The one_zero comparison completed as BLOCKED with returned_failed_checks 4, attributed to unsupported mappings distributions_and_cash and market_on_open_proxy. The individual failed-check names and the comparator source are not retained in this repository.",
-  "Nautilus native acceptance uses synthetic FX. Its equity evidence is a 15-session AAPL local-integration replay that excludes known dividend/split dates, fills at a retrospective 16:00 close with unlimited synthetic depth, and performs no SPY/LEAN parity.",
-  "The LEAN oracle runs on bundled upstream sample data (a 2013 sample and a 2019-12-02 to 2020-04-30 SPY crash window). The data is not an entitled vendor dataset. Fills use hourly market-on-open proxies, margin liquidation is uncalibrated, financing is not modeled, and there is no holdout.",
-  "Neither engine has IBKR adapter acceptance. Native in-flight broker faults, cancel and reconnect reconciliation are not qualified. The LEAN Alpaca adapter's subscription validation and initialization were never invoked.",
-  "Nautilus 2.0.0rc5 is a prerelease. The packet records v1.231.0 as the latest stable release.",
-  "No causal point-in-time universe, cost-calibrated fill model or strategy profitability is established.",
-  "cvxportfolio, hftbacktest, Lumibot and ai-trader are untested, not failed."
+  "SPY/LEAN parity is not accepted. blueprints/us-equities/engine-nautilus/spy-parity/verdict.json is BLOCKED with 4 failed checks: entry fill price delta 0.2900, exit fill price delta -0.4550, reconciled end cash delta -226.4800, and native end cash delta -655.120, which includes -428.64 of unposted distributions. catalogs/us-equities/runtime-target.json reports the next_acceptance status as reported_execution_blocked_review_incomplete.",
+  "The pinned Nautilus wheel has no market-on-open fill mechanism and no dividend-cash posting mechanism. spy-parity/mapping-manifest.json records both mappings as unsupported: AT_THE_OPEN orders are rejected in the probes, and the symbol scan found no dividend crediting. Closing this gap needs either an engine-side mechanism or a newly preregistered mapping.",
+  "The parity verdict covers only the one_zero case on the source host. The stressed and margin cases (one_stress, two_zero, two_stress, adaptive_stress, over_limit) remain blocked by the costs_and_rounding_stress and margin_and_adaptive_state mappings in mapping-manifest.json. evidence/artifacts/comparison-progress-20260922/summary.json line 186 says there is no destination-machine qualification.",
+  "The LEAN oracle's inputs are the bundled upstream LEAN SPY sample, not an acquired vendor dataset (historical-simulation/receipt.json line 27). The receipt's status limits acceptance to known stress exposure and margin mechanics.",
+  "The native Nautilus receipt covers synthetic FX only. It does not cover US-equity corporate actions, a point-in-time universe or historical movers. The AAPL replay (equity-replay/receipt.json) is a local integration with 15 bars and synthetic scheduled close fills, and it avoids corporate-action dates.",
+  "The IBKR adapter has no local broker acceptance: runtime-target.json records local_broker_acceptance not_established. Native broker fault behaviour during a live connection is also unqualified.",
+  "blueprints/us-equities/engine/resolution-receipt.json records that the Alpaca adapter path needs a product-347 entitlement that was not exercised, and that the unmodified adapter build still resolved 2 advisory pairs.",
+  "Nautilus 2.0.0rc5 is a prerelease. The packet's c5 upstream metadata gives v1.231.0 as the latest non-prerelease; I did not verify that against a repository file.",
+  "No strategy has been qualified with causal data, costs and independent reconciliation. Profitability is not established.",
+  "Correction to the packet's group-level limitation that 'SPY/LEAN dividend/cash parity is still planned': the comparison has since been executed and returned BLOCKED (evidence/artifacts/comparison-progress-20260922/summary.json rows[6], lines 171-189). The gap is now an unaccepted result, not an unrun comparison.",
+  "Correction to my earlier proposal: it said no retained LEAN receipt contained the run that produced the one_zero expected values. That was wrong. blueprints/us-equities/historical-simulation/receipt.json is that run, and it is now cited."
  ],
  "overturn_protocol": {
   "arms": [
-   "c5 NautilusTrader 2.0.0rc5 with reviewed distributions_and_cash and market_on_open_proxy mappings",
-   "c4 LEAN 985ef30 frozen oracle (retained one_zero outputs, no engine rerun)",
-   "c6 Lumibot on the same frozen inputs (optional challenger)"
+   "NautilusTrader 2.0.0rc5 (commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+   "LEAN 985ef30ad3ac774218c5ac516b4cb0aa2655730f oracle (historical-simulation receipt native-historical-leverage-stress-20260919)",
+   "Candidate alternative engine (for example Lumibot) on the same frozen inputs and failure contract"
   ],
   "fixture_paths": [
-   "blueprints/us-equities/engine-nautilus/acceptance-plan.md",
-   "blueprints/us-equities/historical-simulation/plan.json",
+   "blueprints/us-equities/engine-nautilus/spy-parity/verdict.json",
+   "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
+   "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json",
+   "blueprints/us-equities/engine-nautilus/spy-parity/run.py",
+   "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
    "blueprints/us-equities/historical-simulation/receipt.json",
-   "tests/test_historical_simulation.py"
+   "blueprints/us-equities/historical-simulation/plan.json",
+   "tests/test_spy_parity.py",
+   "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json"
   ],
-  "metric": "SPY one_zero parity against the frozen LEAN oracle: number of failed checks. The exact events are 4 (intent/fill times, signed shares, fill prices 323.58 and 291.69). Distributions must equal 428.64 and final cash 90734.08, each within $0.01 on exported balances. Economic records must be equal across two fresh runs."
+  "metric": "The result of each of the 29 SPY one_zero parity checks, using the semantics of verdict.json: PASS or FAIL within tolerance, the number of unattributed failures, and whether the verdict is complete. The observed Nautilus baseline is 25 PASS and 4 FAIL, all attributed to unsupported mappings, with 0 unattributed failures and verdict BLOCKED. native_end_cash_usd is 90078.96 against the LEAN oracle's end_cash_usd of 90734.080 in historical-simulation/receipt.json."
  },
- "overturn_when": "Run the Nautilus SPY one_zero parity comparison defined in blueprints/us-equities/engine-nautilus/acceptance-plan.md sections 2-3 against the frozen LEAN oracle.\n\nThe oracle is the one_zero case in blueprints/us-equities/historical-simulation/plan.json and receipt.json. Its baseline outputs are verified without launching an engine by `python3 blueprints/us-equities/historical-simulation/analysis.py --run \"$PRIVATE_RUN\"` and `python3 -m unittest tests.test_historical_simulation -q`.\n\nPass criteria from acceptance-plan.md lines 122-150:\n- Exactly 4 events, matching exactly: entry intent at 1577826000 for 304 shares, entry fill at 1577977200 for 304 shares at 323.58, exit intent at 1588190400 for -304 shares, and exit fill at 1588255200 for -304 shares at 291.69.\n- Distributions of $428.64 and final cash of $90,734.08, with at most $0.01 absolute tolerance on exported balances.\n- Equal economic records across two fresh runs.\n\nNautilus loses the destination role if the rerun, with the distributions_and_cash and market_on_open_proxy mappings resolved, still returns failed checks. It also loses the role if either mapping must be declared unsupported.\n\nThe verdict also changes if a non-adopted engine (for example c6 Lumibot) passes this same one_zero oracle with reconciled cash while Nautilus does not.\n\nThe comparator that produced the current BLOCKED result (summary.json: 'historical parity harness compare.py', source spy-parity/verdict.json) is private and not in this repository. acceptance-plan.md line 84 says the converter, fixture strategy and comparator 'do not exist yet'. The committed equity-replay launcher and tests/test_nautilus_equity_replay.py cover the AAPL replay only and cannot decide this condition.",
- "packet_sha256": "832735eaffd0ed13a13a80f0ee7ce065214a33528ed0c1c5668ef0dabe195c19",
+ "overturn_when": "Re-run the SPY one_zero parity case with the retained harness scripts blueprints/us-equities/engine-nautilus/spy-parity/run.py and compare.py. Keep the preregistered spy-parity/tolerances.json and mapping-manifest.json, and use the LEAN oracle blueprints/us-equities/historical-simulation/receipt.json (case one_zero, end_cash_usd 90734.080). Also re-run the harness tests in tests/test_spy_parity.py.\n\nReopen the runtime choice (c5) in either of two cases:\n1. A Nautilus-native market-on-open fill and dividend-cash posting mechanism is added, and fill_price_usd, end_cash or native_end_cash still fail with an unattributed residue.\n2. A non-adopted engine (for example Lumibot) passes all 29 checks on the same frozen case while Nautilus stays BLOCKED.\n\nReopen LEAN's oracle role (c4) if a fresh run of the pinned 985ef30 build on the frozen plan.json and input hashes does not reproduce the one_zero values in historical-simulation/receipt.json (fills 323.58 and 291.69, dividends 428.64, end cash 90734.080).",
+ "packet_sha256": "65b272aa624920fb0d86c6edff7d29a20085cff423608f026ce1f5795b948159",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/us-equities__backtesting-engine.json",
+  "catalogs/us-equities/runtime-target.json",
+  "evidence/receipts/native-nautilus-v2-20260920.json",
   "blueprints/us-equities/engine/receipt.json",
   "blueprints/us-equities/engine/README.md",
-  "blueprints/us-equities/engine/resolution-receipt.json (full in the first round; lines 76-130 re-read)",
-  "evidence/receipts/native-nautilus-v2-20260920.json",
-  "catalogs/us-equities/runtime-target.json (full in the first round; grep for accepted_reference_paths this round)",
-  "evidence/artifacts/comparison-progress-20260922/summary.json (lines 160-195)",
-  "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json (lines 1-106)",
-  "blueprints/us-equities/historical-simulation/receipt.json (lines 1-1368 and 1725-1748)",
-  "blueprints/us-equities/historical-simulation/plan.json",
-  "blueprints/us-equities/engine-nautilus/acceptance-plan.md (lines 60-169, plus grep)",
-  "tests/test_historical_comparison.py (grep only: it tests authenticated-data/compare.py, not the parity harness)"
+  "blueprints/us-equities/engine/resolution-receipt.json",
+  "evidence/artifacts/comparison-progress-20260922/summary.json",
+  "blueprints/us-equities/engine-nautilus/spy-parity/verdict.json",
+  "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json",
+  "blueprints/us-equities/historical-simulation/receipt.json (lines 1-1368)",
+  "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json (lines 1-80)"
  ],
- "why_selected": "The winners are c5 NautilusTrader 2.0.0rc5 as the selected destination runtime and c4 LEAN as the frozen historical oracle. The requirement asks for both roles.\n\nc5, native execution observed (FX only): evidence/receipts/native-nautilus-v2-20260920.json records the pinned commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e running the unchanged upstream synthetic EUR/USD quickstart.\n- Runs run-3 and run-4 are the accepted runs. They were isolated with bwrap, both exited 0 and wrote 0 stderr bytes.\n- They produced 902 orders, 902 fills and 451 positions. Cash went from 1000000.00 to 1000431.00000, and every position ended flat.\n- account.csv was byte-identical between the two runs. positions.csv and fills.csv were equal only after UUIDv4 normalization.\n- Earlier runs run-1 and run-2 exited 0 but produced empty reports. They are kept as failures.\n- The data is synthetic FX, not equities. catalogs/us-equities/runtime-target.json (line 30) marks Nautilus as selected_destination. Its next_acceptance (lines 113-116) records the SPY/LEAN parity gate as reported_execution_blocked_review_incomplete.\n- evidence/artifacts/comparison-progress-20260922/summary.json (lines 171-188) records a completed BLOCKED one_zero comparison with returned_failed_checks 4. It lists unsupported_mappings distributions_and_cash and market_on_open_proxy in a separate field. The individual check names are not retained.\n- Nautilus equity coverage is local integration only. blueprints/us-equities/engine-nautilus/equity-replay/receipt.json is a 15-session AAPL replay, and its line 103 states that no SPY/LEAN parity was performed.\n\nc4, native execution observed on two retained receipts at pin 985ef30ad3ac774218c5ac516b4cb0aa2655730f:\n(a) blueprints/us-equities/engine/receipt.json records the unmodified BasicTemplateFrameworkAlgorithm run.\n- Status Completed, exit code 0 and 3943 data points, matching the expected count.\n- 3 orders submitted and 3 filled. order_list_hash f209ed42701b0419858e0100595b40c0 matches upstream.\n- blueprints/us-equities/engine/resolution-receipt.json replays the same sample after 3 package-reference replacements and gets the same hash. Its launcher and source_integrated_adapter audits report 0 vulnerable packages (lines 106-128). The unmodified Alpaca adapter build still resolved 2 advisory pairs: DotNetZip 1.16.0 (NU1903) and System.Drawing.Common 4.7.0 (NU1904), at lines 79-97.\n(b) blueprints/us-equities/historical-simulation/receipt.json (kind native_cli_e2e) records six frozen local SPY simulations from 2019-12-02 to 2020-04-30.\n- Status: accepted_for_known_stress_exposure_and_margin_mechanics_only.\n- Five invested cases finished flat with native fill, fee and dividend cash reconciliation. In one_zero, 2 fills and $428.64 in dividends take end cash to 90734.080.\n- The over_limit case received one native buying-power rejection and zero fills.\n- This receipt is listed under accepted_reference_paths in runtime-target.json (line 102).\n\nAll of this is documented-as-done in the project's retained receipts. I read them; I did not re-run anything.",
+ "why_selected": "This is my own review of the retained source files. No TypeSafe inference results were supplied, so none were used. The packet's cards and the refuters' findings are treated as claims, and I checked them against the files.\n\nc5, NautilusTrader 2.0.0rc5\n- catalogs/us-equities/runtime-target.json names it as the destination the requirement asks for: engine.decision \"selected_destination\", tag v2.0.0rc5, source_commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e.\n- evidence/receipts/native-nautilus-v2-20260920.json records a native execution of the unchanged upstream synthetic EUR/USD quickstart (source_unchanged true). Accepted runs run-3 and run-4 both exited 0 with 10000 iterations, 902 orders, 902 fills and 451 positions. Ending cash was 1000431.00000 against starting cash of 1000000.00, and all positions were flat. account.csv was byte-identical across the two runs. Runs run-1 and run-2 produced empty reports and are retained as failures. This is native execution, but of synthetic FX, not US equities.\n- US-equity scope comes from local integrations, not upstream tests. blueprints/us-equities/engine-nautilus/equity-replay/receipt.json covers 15 AAPL bars with 10 filled orders and reconciled cash: baseline ending cash 99866.60, stress 99855.60.\n- blueprints/us-equities/engine-nautilus/spy-parity/verdict.json records the SPY one_zero comparison against the LEAN oracle. It is complete but BLOCKED. Of its 29 checks, 4 FAIL (ordinals 12, 16, 21 and 22). All four are attributed to the unsupported mappings market_on_open_proxy and distributions_and_cash in spy-parity/mapping-manifest.json, and unexplained_residue is 0.0000.\n- c5 is the default because of the destination decision and the native engine receipt. It is not the default because of accepted equity parity.\n\nc4, LEAN at 985ef30ad3ac774218c5ac516b4cb0aa2655730f\n- The requirement says to keep LEAN as the prior oracle. The receipt that directly supports that role is blueprints/us-equities/historical-simulation/receipt.json. spy-parity/mapping-manifest.json lines 47-54 bind it as oracle.receipt, and runtime-target.json line 102 lists it in accepted_reference_paths.\n- It records kind native_cli_e2e, source_pin 985ef30 and status accepted_for_known_stress_exposure_and_margin_mechanics_only.\n- Its one_zero command exited 0. That case bought and sold 304 SPY with fills at 323.58 and 291.69, dividends 428.64 and end_cash_usd 90734.080. That end cash is the expected value used in verdict.json checks 21 and 22.\n- blueprints/us-equities/engine/receipt.json records a native source build (exit 0, 7855 warnings, 0 errors). It also records the unmodified bundled backtest, which reached Completed with 3943 data points, 3 orders submitted and filled, and an order_list_hash that matches upstream.\n- blueprints/us-equities/engine/resolution-receipt.json records the patched rebuild. Its order_list_hash also matched, its launcher advisory audit reported 0 vulnerable packages, and the Alpaca adapter compiled. No broker orders were submitted (broker_orders_submitted 0).\n\nBoth winners have native-execution receipts. None of these receipts establishes acceptance of a US-equity strategy, a broker connection or engine parity.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
   "evidence/receipts/native-nautilus-v2-20260920.json",
   "catalogs/us-equities/runtime-target.json",
-  "blueprints/us-equities/engine/receipt.json",
-  "blueprints/us-equities/engine/resolution-receipt.json",
   "blueprints/us-equities/historical-simulation/receipt.json",
+  "blueprints/us-equities/engine/receipt.json",
   "blueprints/us-equities/engine/README.md",
-  "evidence/artifacts/comparison-progress-20260922/summary.json",
+  "blueprints/us-equities/engine/resolution-receipt.json",
+  "blueprints/us-equities/engine-nautilus/spy-parity/verdict.json",
+  "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json",
   "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json"
  ],
  "winner_keys": [

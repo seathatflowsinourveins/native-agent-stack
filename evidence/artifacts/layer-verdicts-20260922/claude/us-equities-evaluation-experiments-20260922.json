@@ -1,62 +1,97 @@
 {
  "alternatives": [
   {
-   "disposition": "overlap",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/mlflow/mlflow/blob/v3.16.1/README.md"
-   ],
-   "key": "c3",
-   "name": "mlflow",
-   "repository": "https://github.com/mlflow/mlflow",
-   "why_not_default": "Same repository and release (v3.16.1) as c1, so selecting both would create two owners of one tracking store. The only differences are in the packet text. c3's role adds 'model lineage and optional traces' (packet line 87), which is a role string and not observed capability; the traces part overlaps the observability layer. Its pin is the tag 'v3.16.1' with no commit (line 82), weaker source identity than c1's commit pin. Its card says 'No tracking server or experiment recorded by this task' (line 70). Neither mlflow entry has retained execution."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md"
-   ],
-   "key": "c4",
-   "name": "data-river",
-   "repository": "https://github.com/online-ml/river",
-   "why_not_default": "Covers the progressive-evaluation term, but on source review only; a case-insensitive rg found no river execution under tests/, fixtures/ or blueprints/. Its card says 'Immediate synthetic labels are not a valid financial online-evaluation assumption'. It also says progressive validation must model delayed fills and returns, late corrections and restart behavior (packet lines 102-103), and none of that has been modelled. It is a model and validation library, not a store for experiment or evaluation records."
-  },
-  {
-   "disposition": "out_of_scope",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md",
-    "https://github.com/embeddings-benchmark/mteb/releases/tag/2.21.0"
-   ],
-   "key": "c5",
-   "name": "foundation-mteb",
-   "repository": "https://github.com/embeddings-benchmark/mteb",
-   "why_not_default": "Evaluates embeddings and retrieval, not trading experiments or agent tasks. Its pin 2.21.0 is behind upstream 2.21.6 (pin_behind_upstream true, packet lines 144-152). The card says the 'Public leaderboard is not independent proof for code retrieval, point-in-time filings or net trading performance' (line 133). No local execution was found."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/Arize-ai/phoenix/blob/arize-phoenix-v20.14.0/README.md"
-   ],
-   "key": "c6",
-   "name": "phoenix",
-   "repository": "https://github.com/Arize-ai/phoenix",
-   "why_not_default": "Trace inspection overlaps the observability layer. The card cites ELv2 restrictions (packet line 164), and upstream license metadata is NOASSERTION (line 186). The card also records that server launch is prospective, with no app instrumented and no judge-model calls run (line 165). Auto-instrumentation can capture prompt and tool contents (line 166). PHOENIX_ALLOWED_PROVIDERS=NONE is not a backend inference authorization boundary (line 167). Upstream 'latest' resolves to @arizeai/phoenix-mcp@4.3.13 (line 185), not the pinned arize-phoenix-v20.14.0."
-  },
-  {
-   "disposition": "conditional",
+   "disposition": "selected",
    "evidence_class": "native_proven",
    "evidence_refs": [
+    "blueprints/convergence-practice/arb-trace2code/README.md",
     "blueprints/convergence-practice/arb-trace2code/receipt.json",
-    "blueprints/convergence-practice/local-fixture/evaluation-receipt.json",
-    "catalogs/convergence-practice/architecture-wave/eyuansu62__agent-retrieval-bench.json"
+    "blueprints/convergence-practice/local-fixture/evaluation-receipt.json"
    ],
    "key": "c7",
    "name": "foundation-agent-retrieval-bench",
    "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
-   "why_not_default": "c7 is the only packet candidate with retained execution, but it covers file-level code retrieval only, not experiment tracking or agent-task evaluation. The two receipts are different evidence classes.\n\nThe ARB replay counts as native_proven. blueprints/convergence-practice/arb-trace2code/receipt.json records an actual upstream offline evaluation at v0.2.1 (commit b487f3866cc13dd971819cb902517a6a50282404). The lexical and bm25 rankers each evaluated 101 samples with exit_code 0, and the pinned upstream tests reported '15 passed in 0.15s'. The run was on a Darwin arm64 host (lines 71-73), not this PC. It covers 7 repositories with gin 56 and click 26 of the 101 samples. The receipt's limits record no abstention/no-gold test and state that file-level relevance does not prove task completion.\n\nThe local fixture counts only as local_integration. blueprints/convergence-practice/local-fixture/evaluation-receipt.json is source_authored_not_external_holdout true (line 64), over 24 queries and 15 documents. bm25 scored MRR 0.9666666666666666 and Recall@1 0.95, and lexical scored MRR 0.9 and Recall@1 0.8. These are macro means over 20 positive queries, with 4 negative queries excluded (lines 44, 95-96).\n\nThe packet card's 'No benchmark download/evaluation performed' (packet line 198) is contradicted by these retained receipts. The 'not a financial-document benchmark' limitation comes from the packet card (line 197), not from the receipts."
+   "why_not_default": "Selected, but its scope is narrow. The upstream replay is one positive-only code-file retrieval task: 101 cases, 82 of them from Gin and Click. It was run on a recorded macOS arm64 host (README.md line 36), not this WSL host, and has no abstention metric and no agent-repair outcome (README.md lines 3-24). The local fixture is public-document retrieval: 15 docs and 24 source-authored queries, not an external holdout. It records no host and has no abstention or accuracy metric (evaluation-receipt.json lines 43, 64, 67-70). Neither run covers financial documents. The packet card's statement that no benchmark was run is superseded by these retained receipts."
+  },
+  {
+   "disposition": "selected",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json",
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c2",
+   "name": "inspect-ai",
+   "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+   "why_not_default": "Selected because it fits agent-task evaluation, but the evidence is source review only. Nothing has been installed or run: installation_performed false and model_calls 0 (architecture-wave record, lines 124-125). The record's own next acceptance has no retained receipt. That acceptance (line 123) is one mock-model task with deterministic scoring, bounded concurrency/retries, a retained failure log, and interruption and resume, with no provider request."
+  },
+  {
+   "disposition": "selected",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c1",
+   "name": "data-mlflow",
+   "repository": "https://github.com/mlflow/mlflow",
+   "why_not_default": "Selected for experiment tracking, but the evidence is source review only. The catalog card marks the sqlite synthetic-run workflow as prospective and unexecuted. No tracking run, artifact store or access control has been observed (catalogs/us-equities/data-research.json lines 779-817)."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c3",
+   "name": "mlflow",
+   "repository": "https://github.com/mlflow/mlflow",
+   "why_not_default": "Same repository and version (v3.16.1) as c1, but pinned only by tag, while c1 carries an exact source commit. Its role (artifacts, lineage, optional traces) duplicates c1, and the traces also overlap the observability layer. There is no tracking-server execution evidence (catalogs/us-equities/agents-operations.json lines 1688-1726)."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c4",
+   "name": "data-river",
+   "repository": "https://github.com/online-ml/river",
+   "why_not_default": "Covers progressive evaluation, but only for online or streaming learning. Its own card says immediate synthetic labels are invalid for financial online evaluation and require modelling of delayed labels, corrections and restarts. Nothing was executed (catalogs/us-equities/data-research.json lines 1304-1340)."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c5",
+   "name": "foundation-mteb",
+   "repository": "https://github.com/embeddings-benchmark/mteb",
+   "why_not_default": "An embedding and retrieval evaluator that has never been run here; its commands are prospective. The 2.21.0 pin is behind upstream 2.21.6, and the reviewed commit is a default-branch snapshot that can differ from the tag. Unlike c7, it has no retained run on the frozen local fixture (catalogs/us-equities/foundation-memory.json lines 1210-1245)."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c6",
+   "name": "phoenix",
+   "repository": "https://github.com/Arize-ai/phoenix",
+   "why_not_default": "Tagged for both the observability and agent-evaluation layers, as a trace UI plus evaluation workspace, so it overlaps the observability layer. Server launch is prospective, no app has been instrumented and no judge calls were made. The catalog card gives the license as Elastic-2.0 with restrictions, while the packet's upstream metadata says NOASSERTION. Auto-instrumentation can capture prompt and tool contents (catalogs/us-equities/agents-operations.json lines 1239-1280)."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json",
+    "catalogs/us-equities/agents-operations.json",
+    "manifests/stack.json"
+   ],
+   "key": null,
+   "name": "promptfoo",
+   "repository": "https://github.com/promptfoo/promptfoo",
+   "why_not_default": "Not a candidate in this packet; it appears in the foundation quality-evaluation packet. Its us-equities card (agents-operations.json lines 1321-1361) tags it agent-evaluation and security, with evidence_level source_review and prospective commands. A retained execution does exist. evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json records a promptfoo 0.123.1 eval with exit_code 0: 1 case passed, 0 failed, 0 errors, with retained recovery and failure notes. That run was NVIDIA's four-query embedding-retrieval example against a local vLLM endpoint with a locally authored assertion. Its own limitations say it is not held-out qualification, and it evaluates no agent task. It is recorded in challenger_preferred and is not promoted."
   }
  ],
  "catalog": "us-equities",
@@ -64,85 +99,82 @@
   "key": null,
   "name": "promptfoo",
   "repository": "https://github.com/promptfoo/promptfoo",
-  "required_comparison": "Run the same frozen graded fixture under both tools and compare per-case pass/fail agreement with the frozen labels across two repeated runs, retained failed-case records, and log recovery after an interrupted run. The fixture is blueprints/native-skill-practice/catalog-cases.json: 8 cases with frozen-label SHA-256 7cc28c50afb9842de3d8dc923e80159bf99d0f0e9acd643684a99b61b3ad3a40.\n\nThe promptfoo arm uses the existing blueprints/native-skill-practice/promptfooconfig.yaml. Its adapter contract is `node --test blueprints/native-skill-practice/test-contract.cjs`, run from the repository root. The inspect-ai arm (c2) needs a task file for the same cases and scorer; no such file exists yet. Use a deterministic mock or echo provider in both arms first, so neither arm makes a provider request.\n\nThis is the settling comparison named at results.json line 5735.",
-  "why": "promptfoo is not a packet candidate. catalogs/us-equities/agents-operations.json lines 1322-1326 tags it with the 'agent-evaluation' layer, which is one of this layer's scope terms. On retained evidence it goes beyond the winning agent-evaluation candidate c2, which has installation_performed false and model_calls 0. Two native promptfoo 0.123.1 runs are retained, and one of them used a real graded provider.\n\nFirst, evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json records `promptfoo eval -c promptfooconfig.yaml --no-cache -j 1 -o results.json report.html` with exit_code 0 and max_concurrency 1. It passed 1 case with 0 failed and 0 errors. The rendered report has a failure filter, and the file retains browser-harness failures and a recovery record. That run was only a four-query example.\n\nSecond, blueprints/native-skill-practice/typesafe-result.json records promptfoo_exit_code 100 and service_errors 0 over 8 requests. The README says this exit preserves one TypeSafe assertion failure and five comparator assertion failures and is 'not a clean evaluation pass'.\n\nThese are prompt and assertion evaluations, not agent task/solver evaluations. evidence/artifacts/claude-repository-evidence-20260921/results.json lines 5730-5735 states that no promptfoo versus inspect-ai comparison exists. So promptfoo is not promoted."
+  "required_comparison": "A matched run over the frozen fixture blueprints/convergence-practice/local-fixture/fixture.json (fixture_sha256 aea5e9616fb19eb1d2fd58ecfadf88ff087d7d2e79b4a70bc9f88207af9d0402, with corpus-manifest.json) using a mock model and 0 provider calls, with two arms: c2 inspect-ai 0.3.266 and promptfoo 0.123.1. Each arm must score deterministically under bounded concurrency/retries, retain a failure log and survive interruption and resume. Record the exit code, per-case scores recomputable from rankings.json, and resume success. The comparison is decided on those observed results; lane agreement does not count.",
+  "why": "It is tagged for this layer's agent-evaluation scope and has a retained native eval run: exit_code 0 and 1 of 1 case passed (evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json). c2 (inspect-ai), by contrast, has no installation or run (installation_performed false). promptfoo is also listed as an optional component in manifests/stack.json line 689. Its executed scope is a four-query retrieval example, not an agent task, so on current evidence it does not outrank c2 for agent-task evaluation. It is not in this packet and is not selected."
  },
  "lane": "claude",
  "layer_id": "evaluation-experiments",
  "limits": [
-  "Every packet evidence_ref is an external URL (GitHub or PyPI). This lane has no web access and opened none of them. Claims about those READMEs come only from the packet's card_limitations and roles.",
-  "No commands were run. The proposed commands (`node --test blueprints/native-skill-practice/test-contract.cjs`, `python3 -m unittest discover -s tests -p test_research_evaluation.py -v`) were only confirmed to reference existing files; their results were not observed. Installation, versions and receipt hashes were not verified.",
-  "The promptfoo numbers (exit 100 over 8 requests, 7/8 versus 3/8 labels) come from the retained typesafe-result.json and README, not from observation. That run used an authorized TypeSafe provider; no TypeSafe inference was supplied to or run by this lane.",
-  "The catalog decision labels I saw were not used as evidence: the architecture-wave records' catalog_card values and agents-operations.json's 'decision' fields ('alternative' for promptfoo, openlit and langfuse). The packet withholds decision-bearing labels.",
-  "results.json's 'keep-but-compare' verdict for promptfoo is a retained provider/audit judgment, including 'GPT-6 agreed'. I report it as documented and did not adopt it. My own source review found the same missing comparison.",
-  "The prior claude-lane artifact under evidence/artifacts/layer-verdicts-20260922/claude/ was not opened, to avoid anchoring.",
-  "TypeSafe skill path: <host-path>/typesafe-ai. No TypeSafe service calls were made and no coordinator-supplied inference results were present. Actual client model: claude-opus-5-5[1m]; the fixed output model field is opus/high."
+  "Every packet evidence_ref is a remote URL (GitHub README, PyPI or release pages). I have no network tool and did not open them, so their contents are unverified. I removed them from winner_evidence_refs and relied on locally retained catalog cards and receipts.",
+  "My grep of the handbook for evidence-class definitions also matched lines 431 and 1725-1727. These appear to be earlier layer-verdict text, including a quality-evaluation row for promptfoo and a local-fixture classification for this layer. Their content did not determine this verdict, but I cannot claim independence from them. For the same reason I did not read the prior claude-lane artifact for this layer.",
+  "I also saw fields the packet withholds, namely the catalog-card decision/rationale values and the architecture-wave decision block. The selection rests on evidence class and scope fit, but I cannot guarantee it is independent of those fields.",
+  "I read arb-trace2code/receipt.json only through a grep, and did not read fixture.json, rankings.json or corpus-manifest.json beyond confirming that they exist.",
+  "I could not run commands. The metrics and hashes are copied from the receipts, not recomputed.",
+  "The client did not expose the actual model or effort beyond the fixed packet values. The environment reports Opus 5.5 (claude-opus-5-5[1m]). The skill path is <host-path>/SKILL.md.",
+  "No TypeSafe inference results were supplied or used. The refuters' findings are provider judgments that I re-checked against the cited sources; everything else is this lane's own source review.",
+  "Revision corrections from the refuters' findings: (1) the local-fixture run is public-document retrieval with no host recorded, not code retrieval on macOS; (2) c2 is not the only agent-evaluation candidate, since c6 carries that layer tag; (3) the c2 acceptance includes bounded concurrency as well as retries; (4) the macOS host citation is README.md line 36; (5) overturn_protocol now names the frozen input fixture.json and gives separate metric sets for the two receipts; (6) promptfoo was added as challenger_preferred, without promotion."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "No retained execution of mlflow (c1/c3), inspect-ai (c2), river (c4), mteb (c5) or phoenix (c6). A case-insensitive rg over tests/, fixtures/ and blueprints/ found mlflow only in public-stars-refresh.json metadata and in prose. There is no mlflow adapter or inspect-ai task file to run.",
-  "No executed promptfoo versus inspect-ai comparison exists (evidence/artifacts/claude-repository-evidence-20260921/results.json line 5730). The retained promptfoo runs are a four-query retrieval example and an 8-case semantic-judgment diagnostic, not agent task/solver evaluations.",
-  "The candidate set is incomplete. Packet line 262 counts 6 agents-operations entries for this layer, but only 3 are present (phoenix, inspect-ai, mlflow). agents-operations.json also tags openlit (line 1147), langfuse (line 1197) and promptfoo (line 1322) with agent-evaluation, yet sota_components_not_in_candidates is [] (packet line 274).",
-  "The inspect-ai pin is inconsistent. The packet cites PyPI 0.3.266, the source review is at ec4dfc6953784dc45b79de3147530c89868c6e26, releases/latest returned HTTP 404, and upstream latest is 'release/2025-11-28'.",
-  "No candidate meets the shared group requirement: native identity, supervised owned processes, retained failed attempts, recoverable state, and no broker authority for research workers.",
-  "No evidence links an evaluation score to trading profitability or paper execution correctness. The c2 and c3 cards say so explicitly.",
-  "Progressive evaluation with delayed labels (c4) has not been modelled or tested.",
-  "c7's native run covers file-level code retrieval over 7 repositories on a Darwin arm64 host. It does not establish financial-document retrieval, agent task completion or behavior on this PC.",
-  "c7's packet card, 'No benchmark download/evaluation performed', is out of date against its retained receipts."
+  "inspect-ai, mlflow (both cards), river, mteb and phoenix have no retained execution; their evidence is source review only.",
+  "c7's upstream replay is code-file retrieval on a recorded macOS arm64 host. Its local-fixture run is public-document retrieval with no host recorded. Neither covers financial documents, agent task outcomes, abstention, or a recorded run on this WSL host.",
+  "promptfoo's retained run is a four-query embedding-retrieval example with a locally authored assertion. The record does not name the host OS; it shows only a local 127.0.0.1 vLLM endpoint. It does not establish agent-task evaluation.",
+  "The packet requirement text is shared by the group: native identity, supervising owned processes, and keeping research workers away from broker execution. No candidate has evidence of process supervision or of withholding broker authority.",
+  "No candidate has retained evidence for validation-reporting, or for progressive evaluation with delayed labels on financial data.",
+  "Pin discrepancies remain unresolved. c7's packet evidence_ref is snapshot 07014c9, while the executed release commit is b487f38 (the receipt records an identical source tree). For c2, the packet's upstream.latest 'release/2025-11-28' does not match the PyPI pin 0.3.266. For c6, upstream.latest refers to a different package (@arizeai/phoenix-mcp@4.3.13).",
+  "c6's license conflicts between sources: the packet says NOASSERTION and the catalog card says Elastic-2.0."
  ],
  "overturn_protocol": {
   "arms": [
-   "promptfoo 0.123.1 (challenger): catalog-cases.json via the existing promptfooconfig.yaml with a deterministic provider, --max-concurrency 1",
-   "c2 inspect-ai (pin to be resolved: PyPI 0.3.266 vs source ec4dfc69): same 8 cases, deterministic scorer, mock model, bounded retries, interruption then resume",
-   "c1 mlflow v3.16.1 @32792afe: local file-store logging of the research-evaluation run plus one deliberately failed run",
-   "c7 agent-retrieval-bench v0.2.1: existing trace2code replay as the retrieval-evaluation control"
+   "c7 agent-retrieval-bench v0.2.1 lexical and bm25 (existing receipts)",
+   "c5 mteb 2.21.x retrieval evaluation on the same frozen local fixture",
+   "c2 inspect-ai 0.3.266 mock-model task with deterministic scorer over the same fixture",
+   "promptfoo 0.123.1 (non-packet challenger) mock-provider eval with deterministic assertions over the same fixture",
+   "c1 mlflow 3.16.1 local sqlite run recording the receipt's parameters, metrics and artifact hashes"
   ],
   "fixture_paths": [
-   "blueprints/native-skill-practice/catalog-cases.json",
-   "blueprints/native-skill-practice/promptfooconfig.yaml",
-   "blueprints/native-skill-practice/test-contract.cjs",
-   "blueprints/us-equities/research-evaluation/plan.json",
-   "blueprints/us-equities/research-evaluation/evaluate.py",
-   "tests/test_research_evaluation.py",
+   "blueprints/convergence-practice/local-fixture/fixture.json",
+   "blueprints/convergence-practice/local-fixture/corpus-manifest.json",
+   "blueprints/convergence-practice/local-fixture/rankings.json",
+   "blueprints/convergence-practice/local-fixture/evaluation-receipt.json",
    "blueprints/convergence-practice/arb-trace2code/receipt.json"
   ],
-  "metric": "Record these fields per arm:\n1. Completed run receipt with exit code.\n2. Per-case pass/fail against frozen labels, reproduced across 2 identical runs.\n3. Retained failed-case or failed-run record.\n4. Successful resume after an interruption.\n5. Returned results counted against the expected cases or records: 8 for catalog-cases.json and 6,605 candidate records for research-evaluation.\n6. No provider request in mock arms.\n7. No broker credentials in the worker environment.\n\nStop at the first failure. Do not merge or sum counters across arms."
+  "metric": "Local-fixture arms: exit code, Recall@1/Recall@3/Recall@5 and full-ranking MRR as a macro mean over the 20 positive queries, with the 4 no-gold rankings retained, all recomputable from ranked paths. ARB replay arms: Recall@5/Recall@10/Recall@20 and full-ranking MRR over 101 cases. Agent-evaluation arms: deterministic score, bounded concurrency/retries, a retained failure log, interruption/resume success, and provider_calls == 0."
  },
- "overturn_when": "Two executed comparisons could change this verdict.\n\n1. Agent evaluation (c2 versus the promptfoo challenger). Run the matched comparison on blueprints/native-skill-practice/catalog-cases.json. Promptfoo uses blueprints/native-skill-practice/promptfooconfig.yaml, with the adapter contract `node --test blueprints/native-skill-practice/test-contract.cjs` run from the repository root. inspect-ai runs a task over the same 8 frozen cases with a deterministic mock provider, bounded retries, and an interruption followed by resume. Demote c2 if inspect-ai cannot install at a pinned version, loses failed samples, or cannot recover an interrupted log while promptfoo retains its failures. If promptfoo meets all checks and inspect-ai does not, only that executed comparison can promote promptfoo.\n\n2. Experiment tracking (c1). Record the existing chronological experiment in a local MLflow v3.16.1 file store: blueprints/us-equities/research-evaluation/evaluate.py with plan.json. Its README records 20 development folds, 21 frozen selections and 6,605 candidate records. Also log one deliberately failed run. Run `python3 -m unittest discover -s tests -p test_research_evaluation.py -v` unchanged as the boundary control. Demote c1 if the store cannot retain the parameters, the complete candidate records, the artifacts and the failed-run status. Neither the mlflow adapter nor the inspect-ai task exists yet; both must be written before these checks can run.\n\n3. Retrieval evaluation (c7). Reconsider c7 only if retrieval evaluation becomes this layer's primary acceptance and a financial-document fixture is replayed using the pattern in blueprints/convergence-practice/local-fixture/evaluation-receipt.json.",
- "packet_sha256": "6402a1d40bdbe5b9c3466406e34f7b5f0f735378a074ced0bf3502bb607d29f1",
+ "overturn_when": "The verdict changes if a new retained receipt shows a better result for another arm:\n\n- **Retrieval evaluation:** c5 (mteb) runs on the frozen input blueprints/convergence-practice/local-fixture/fixture.json with the same corpus-manifest.json hashes and cutoffs 1/3/5. The run must exit 0 with Recall@1/3/5 and full-ranking MRR that can be recomputed from the ranked paths. It must either beat c7's ARB BM25 result (MRR 0.9666666666666666) or add abstention coverage for the 4 no-gold queries.\n- **Agent evaluation:** the matched comparison of c2 inspect-ai and promptfoo on that fixture, as described in challenger_preferred, has one of two outcomes. Either c2 fails its recorded next acceptance (mock model, deterministic scoring, bounded concurrency/retries, retained failure log, interruption and resume, 0 provider calls), or promptfoo meets the same acceptance while c2 does not. In either case c2 is replaced.\n- **Experiment tracking:** a c1 local sqlite run fails to record the fixture receipt's parameters, metrics and artifact hashes. c1 is then demoted in favour of a measured alternative.",
+ "packet_sha256": "f3433de3aba1e6886ba512eb36e77d81ea130047633d485de492ada8ecbee8bd",
  "schema_version": 1,
  "sources_read": [
-  "<host-path>/us-equities__evaluation-experiments.json (full, re-read this round)",
+  "<host-path>/us-equities__evaluation-experiments.json (round 1 in full; round 2 grep of key/adopted/role/name)",
+  "catalogs/us-equities/agents-operations.json (lines 1230-1367, 1680-1729)",
+  "catalogs/us-equities/data-research.json (lines 770-819, 1296-1345)",
+  "catalogs/us-equities/foundation-memory.json (lines 1200-1329)",
+  "blueprints/convergence-practice/local-fixture/evaluation-receipt.json (full)",
+  "<host-path>/local-fixture (glob: fixture.json, corpus-manifest.json, rankings.json, freeze-receipt.json, evaluation.md, evaluation-receipt.json)",
+  "blueprints/convergence-practice/arb-trace2code/README.md",
+  "blueprints/convergence-practice/arb-trace2code/receipt.json (grep of exit_code/upstream_tests/kind fields only)",
+  "catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json (round 1 full; round 2 grep lines 123-125)",
   "evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json (full)",
-  "evidence/artifacts/claude-repository-evidence-20260921/results.json (lines 5705-5754)",
-  "catalogs/us-equities/agents-operations.json (rg for openlit/langfuse/promptfoo ids, lines 1147-1163, 1197-1213, 1322-1338)",
-  "blueprints/native-skill-practice/README.md (full)",
-  "blueprints/native-skill-practice/typesafe-result.json (rg: promptfoo_exit_code, service_errors, passed, requests)",
-  "Glob <host-path>/* (existence of catalog-cases.json, promptfooconfig.yaml, test-contract.cjs)",
-  "blueprints/us-equities/research-evaluation/README.md (full)",
-  "tests/test_research_evaluation.py (lines 1-60)",
-  "Glob <host-path>/* and <host-path>/*",
-  "rg -i 'promptfoo|inspect_ai|inspect-ai|mlflow' over <host-path>/{tests,fixtures,blueprints,tools,scripts} (11 files; no mlflow/inspect-ai execution recipe)",
-  "blueprints/us-equities/adaptive-paper/README-research.md (rg lines 116-120)",
-  "rg over <host-path>/convergence-practice for positive_aggregation/source_authored/os/architecture (confirms evaluation-receipt.json lines 44, 64, 95-96 and arb receipt lines 71-73)",
-  "blueprints/convergence-practice/arb-trace2code/receipt.json (read in the prior round)",
-  "blueprints/convergence-practice/local-fixture/evaluation-receipt.json (read in the prior round)",
-  "catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json (read in the prior round)",
-  "catalogs/convergence-practice/architecture-wave/eyuansu62__agent-retrieval-bench.json (read in the prior round)",
+  "manifests/stack.json (grep promptfoo, lines 686-711)",
+  "docs/grand-catalog-handbook.md (grep native_proven|local_integration; used only for the class definitions on lines 108-109)",
   "<host-path>/SKILL.md (skill body preloaded in context)"
  ],
- "why_selected": "This verdict rests on source review only. Neither winner has a retained execution record. I chose the two candidates whose packet roles fit the layer's experiment-tracking and agent-evaluation terms.\n\nc1 (data-mlflow) covers experiment tracking. Its packet role is \"Local experiment runs, parameters, metrics and artifacts\" (packet line 23). Its pin is v3.16.1 with source commit 32792afe5b0183fce10532d3a023f5cfa8612d09 (line 18). This revision picks c1 instead of c3. Both are the same repository and release, and both are not_individually_reviewed. c3's extra \"model lineage and optional traces\" (line 87) comes from a role string, not observed capability, and its pin is a tag only (line 82). So the difference is source identity, not function. c1's card also says \"No experiments or models were run by this review\" (line 7).\n\nc2 (inspect-ai) covers agent evaluation and validation reporting. Its role is \"Programmable task/solver/scorer evaluations\" (packet line 55). catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json retains a README and license review at commit ec4dfc6953784dc45b79de3147530c89868c6e26. In the same file, the GitHub releases/latest call returned HTTP 404 (exit 1), installation_performed is false and model_calls is 0. Its recorded next_acceptance (mock-model task, deterministic scoring, bounded retries, failure log, interruption and resume) has not been executed.\n\nA non-packet candidate, promptfoo, has retained native execution in the evaluation scope. It is recorded as challenger_preferred and is not selected. The packet's only candidate with execution evidence, c7, is limited to file-level code retrieval and is kept as a conditional alternative.",
+ "why_selected": "I judged the candidates against the layer title and its layer_scope_terms: evaluation, agent-evaluation, experiment-tracking, progressive-evaluation and validation-reporting. Together the three winners cover retrieval evaluation, agent-task evaluation and experiment tracking. Only c7 has executed evidence.\n\nc7 (agent-retrieval-bench v0.2.1) has two retained runs of different kinds.\n\n- **Upstream replay (native, recorded host macOS arm64).** blueprints/convergence-practice/arb-trace2code/README.md (lines 3-11, 28 and 36) and receipt.json record an offline replay of the complete 101-case v2_trace2code release. The replay is code-file retrieval from failure traces. It used the unmodified lexical and BM25 evaluators at commit b487f3866cc13dd971819cb902517a6a50282404. Results were lexical Recall@5 0.343234 / MRR 0.207453 and BM25 Recall@5 0.222772 / MRR 0.163848. 15 upstream tests passed.\n- **Local integration (no host recorded).** blueprints/convergence-practice/local-fixture/evaluation-receipt.json has kind executed_frozen_public_document_retrieval_fixture (line 67). It ranked 15 public documents from the native-agent-stack repository at base commit bf99d340 against 24 source-authored queries: 20 positive and 4 no-gold. BM25 MRR was 0.9666666666666666 and Recall@1 0.95; lexical MRR was 0.9 and Recall@1 0.8. The run had provider_calls 0 and execution_exit_code 0. This receipt records no host or OS, and it has no abstention metric (lines 43, 70).\n\nNeither run evaluates financial documents.\n\nc2 (inspect-ai 0.3.266) is the candidate whose role, \"Programmable task/solver/scorer evaluations\", best fits evaluating an agent's task outcome. c6 (phoenix) is also tagged agent-evaluation, but as a trace-inspection workspace. c7 evaluates retrieval only. c2's evidence is source review only: catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json records installation_performed false and model_calls 0 (lines 124-125).\n\nc1 (data-mlflow v3.16.1, commit 32792afe5b0183fce10532d3a023f5cfa8612d09) covers experiment tracking with an exact source pin. It is source review only; catalogs/us-equities/data-research.json lines 779-817 mark its sqlite workflow as prospective.\n\nThe weakest class in the winner set is therefore source_review.",
  "winner_evidence_class": "source_review",
  "winner_evidence_refs": [
-  "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md",
-  "https://pypi.org/project/inspect-ai/0.3.266/",
-  "catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json"
+  "blueprints/convergence-practice/arb-trace2code/README.md",
+  "blueprints/convergence-practice/arb-trace2code/receipt.json",
+  "blueprints/convergence-practice/local-fixture/evaluation-receipt.json",
+  "catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json",
+  "catalogs/us-equities/agents-operations.json",
+  "catalogs/us-equities/data-research.json"
  ],
  "winner_keys": [
-  "c1",
-  "c2"
+  "c7",
+  "c2",
+  "c1"
  ]
 }
