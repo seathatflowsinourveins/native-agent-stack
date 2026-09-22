@@ -1178,6 +1178,52 @@ class OvernightHoldPreflightScope(unittest.TestCase):
         self.assertIsNone(raised)
         self.assertEqual(code, 2)
 
+    def test_non_object_state_file_keeps_the_flat_gate(self):
+        trial = self.root / "state" / "fixture-account" / "adaptive" / "trial.json"
+        trial.parent.mkdir(parents=True)
+        trial.write_text("[]")
+        sentinel, code, raised = self._paper()
+        self.assertIsNone(raised)
+        self.assertEqual(code, 2)
+        self.assertEqual(json.loads(self.output.read_text())["reason"], "clean_native_start_requires_flat_account")
+
+    def _paper_with_lock_hook(self, on_lock):
+        """Runs main() with a real (no-op) account lock whose entry calls
+        ``on_lock`` -- another process changing trial.json between the
+        pre-lock phase read and the locked re-read."""
+        from contextlib import contextmanager
+
+        @contextmanager
+        def lock(_fingerprint):
+            on_lock()
+            yield
+
+        extra = ["--gate-result", str(self.gate_path), "--snapshot", str(self.snapshot)]
+        with patch.object(sys, "argv", self._argv("paper", extra)), \
+             patch.object(runner_module, "load_config", return_value=(self.config, None, None)), \
+             patch.object(runner_module, "credentials", return_value=("fixture-key", "fixture-secret")), \
+             patch.object(runner_module, "preflight", return_value=self.observation), \
+             patch.object(runner_module, "account_lock_fingerprint", lock):
+            return runner_module.main()
+
+    def test_hold_appearing_between_preflight_and_lock_is_refused(self):
+        self.observation["positions"] = []
+        trial = self.root / "state" / "fixture-account" / "adaptive" / "trial.json"
+
+        def write_hold():
+            trial.parent.mkdir(parents=True, exist_ok=True)
+            trial.write_text(json.dumps({"phase": "held_overnight"}))
+
+        with self.assertRaisesRegex(SafetyErrorAlways, "trial_state_changed_during_preflight"):
+            self._paper_with_lock_hook(write_hold)
+
+    def test_hold_disappearing_between_preflight_and_lock_is_refused(self):
+        trial = self.root / "state" / "fixture-account" / "adaptive" / "trial.json"
+        trial.parent.mkdir(parents=True)
+        trial.write_text(json.dumps({"phase": "held_overnight"}))
+        with self.assertRaisesRegex(SafetyErrorAlways, "trial_state_changed_during_preflight"):
+            self._paper_with_lock_hook(lambda: trial.write_text(json.dumps({"phase": "finished"})))
+
     def test_main_reuses_run_native_hold_decision(self):
         self.assertFalse(runner_module._final_boundary_from_run_status({"status": "held_overnight"}))
         for status in ("needs_attention", "failed", "passed", "completed_no_signals"):

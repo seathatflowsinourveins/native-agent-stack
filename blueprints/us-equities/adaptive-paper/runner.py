@@ -433,9 +433,10 @@ def validate_preflight(observation, config, *, require_open, allow_existing=Fals
     relaxes the cash/equity floor, the full-universe/benchmark-quote checks
     and the fixed trial-length window requirement. ``allow_existing_positions``
     is the narrower, separate gate for deliverable D4: it only relaxes the
-    flat-account/no-open-orders requirement (set when overnight_holds is
-    enabled), leaving the other four guards enforced exactly as for a normal
-    fresh start. Defaults to ``allow_existing`` when not given, so recovery's
+    flat-account/no-open-orders requirement (main() sets it for ``--command
+    recover`` or to resume a trial whose persisted phase is
+    ``held_overnight`` while overnight_holds is enabled), leaving the other
+    four guards enforced exactly as for a normal fresh start. Defaults to ``allow_existing`` when not given, so recovery's
     existing behaviour is unchanged."""
     if mode == "paper":
         _check_promotion_gate(gate_result_path, snapshot_path)
@@ -831,8 +832,9 @@ def _run_native_status(reconciliation, session_errors, native_fills, outcome, se
     reconciled, flat end is "passed"/"completed_no_signals" regardless of
     overnight_holds. Any other non-flat end is "held_overnight" only when
     _honest_overnight_hold agrees it is a genuine, reconciled,
-    error/halt-free session-boundary hold -- the identical decision main()'s
-    wrapper makes for is_final_boundary, so a mid-RTH non-flat end (or an
+    error/halt-free session-boundary hold -- main() reuses this status for
+    is_final_boundary (``_final_boundary_from_run_status``) instead of
+    deciding again, so a mid-RTH non-flat end (or an
     unreconciled/errored/halted one) is never recorded as held_overnight
     (exit 0, resumable phase) by this function.
 
@@ -1074,9 +1076,12 @@ def main():
     # phase is re-read under the account lock below and must still agree.
     prior_path = args.state_root / observation["account_identity_sha256"] / "adaptive" / "trial.json"
     try:
-        prior_phase = json.loads(prior_path.read_text()).get("phase") if prior_path.exists() else None
+        prior_metadata = json.loads(prior_path.read_text()) if prior_path.exists() else None
     except (OSError, ValueError):
-        prior_phase = None
+        prior_metadata = None
+    # A non-object state file (e.g. [] or null) is treated as no resumable phase,
+    # so the strict flat-account gate applies.
+    prior_phase = prior_metadata.get("phase") if isinstance(prior_metadata, dict) else None
     prior_hold = bool(session_policy["overnight_holds"] and prior_phase == "held_overnight")
     try:
         # allow_existing (recovery mode) stays scoped to --command recover

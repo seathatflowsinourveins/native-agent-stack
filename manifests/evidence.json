@@ -5459,8 +5459,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/receipt.json",
-      "sha256": "bcd255b09da181e389181dc32c06782e8c071bb43b7e173d00069fd24a2d7e96",
-      "bytes": 50703
+      "sha256": "4eea72ff95a9c6cbe0d5788a392a53c585aa8538559cc7e704fb9d3971ab7c12",
+      "bytes": 51150
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/recovery.py",
@@ -5474,8 +5474,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "583698ecdc5d7b8b4f1f0480b049f50554e5870be6feb90215cc11677b96b457",
-      "bytes": 71989
+      "sha256": "e171fc4302cb93b41ec32cfeddb04df900af23f8e75df47aba2718145dfa2662",
+      "bytes": 72358
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/selector.py",
@@ -5534,7 +5534,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "43a80c0cd2f564ab4272e91fb0312e96f0b3f2016678fb64a797f0f9b4a5bce5",
+      "sha256": "da75f14bb915c443a39c65b365108cc4cac8fabd2d2ba41a033bb1c02c1c7c44",
       "bytes": 4003
     },
     {
@@ -11354,8 +11354,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "7b5cdbfbcbddfec021c76c4812ff3f7702c91828b2ed1fcdd295ed068af046eb",
-      "bytes": 68536
+      "sha256": "a40f5fa4780f32dd28ae82ba3c50257e44fbd9dded4b06ac0f6ad4ffa40a6f92",
+      "bytes": 70916
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
