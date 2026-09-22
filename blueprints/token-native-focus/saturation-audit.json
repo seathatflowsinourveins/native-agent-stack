@@ -32,12 +32,12 @@
   },
   "counts": {
     "selected_components": 68,
-    "catalog_identities": 843,
-    "nonselected_catalog_identities": 775,
+    "catalog_identities": 844,
+    "nonselected_catalog_identities": 776,
     "exclusive_identity_groups": {
       "star_review": 275,
       "component_record": 68,
-      "catalog_card": 114,
+      "catalog_card": 115,
       "research_supplement": 384,
       "legacy_candidate": 2
     },

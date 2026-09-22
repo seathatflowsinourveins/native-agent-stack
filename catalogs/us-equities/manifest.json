@@ -10,12 +10,12 @@
   "model_file": "catalogs/us-equities/models.json",
   "coverage_file": "catalogs/us-equities/coverage.json",
   "counts": {
-    "repository_entries": 152,
-    "unique_catalog_repositories": 147,
+    "repository_entries": 154,
+    "unique_catalog_repositories": 148,
     "models": 20,
     "public_stars": 342,
     "starred_catalog_repositories": 42,
-    "beyond_star_catalog_repositories": 105
+    "beyond_star_catalog_repositories": 106
   },
   "scope": "Decisions and source review are not installation or E2E. native_proven is bounded by referenced receipts; defaults can still require implementation.",
   "evidence_files": [
@@ -56,7 +56,7 @@
   "harness_contract": "blueprints/us-equities/harness-contract.json",
   "broader_reference_union": 171,
   "star_audit_file": "catalogs/us-equities/star-audit.json",
-  "grand_index_repositories": 843,
-  "grand_index_beyond_stars": 501,
+  "grand_index_repositories": 844,
+  "grand_index_beyond_stars": 502,
   "decision_index_file": "catalogs/us-equities/decision-index.json"
 }

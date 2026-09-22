@@ -329,12 +329,12 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 843,
+    "repositories": 844,
     "public_star_repositories": 342,
-    "beyond_public_stars": 501,
-    "references": 1815,
+    "beyond_public_stars": 502,
+    "references": 1817,
     "repositories_by_record_type": {
-      "catalog_card": 147,
+      "catalog_card": 148,
       "component_record": 68,
       "legacy_candidate": 20,
       "public_star": 342,
@@ -12721,7 +12721,15 @@
           "path": "catalogs/us-equities/engines-strategies.json",
           "pointer": "/entries/3",
           "id": "nautilustrader",
-          "decision": "alternative",
+          "decision": "default",
+          "evidence_level": "native_proven"
+        },
+        {
+          "kind": "catalog_card",
+          "path": "catalogs/us-equities/engines-strategies.json",
+          "pointer": "/entries/38",
+          "id": "nautilus-ibkr-adapter",
+          "decision": "default",
           "evidence_level": "source_review"
         },
         {
@@ -17100,6 +17108,24 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "catalog_card"
+      ],
+      "references": [
+        {
+          "kind": "catalog_card",
+          "path": "catalogs/us-equities/engines-strategies.json",
+          "pointer": "/entries/39",
+          "id": "adaptive-paper-alpaca-adapter",
+          "decision": "default",
+          "evidence_level": "source_review"
         }
       ]
     },

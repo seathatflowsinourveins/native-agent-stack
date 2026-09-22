@@ -1468,7 +1468,8 @@
       ],
       "limitations": [
         "Database download/network access may occur; not executed here.",
-        "Known-CVE matches do not prove exploitability, and0matches do not prove safety."
+        "Known-CVE matches do not prove exploitability, and0matches do not prove safety.",
+        "rc5 dependency tree and local Alpaca adapter unscanned until the 2026-09-22 scan receipt lands (a sibling worker produces this receipt; not claimed here)."
       ],
       "sources": [
         "https://github.com/anchore/grype",
@@ -1588,7 +1589,8 @@
       "limitations": [
         "Server config is not supplied and no service starts in this task.",
         "Development mode is unsuitable for persistent secrets; no dev-mode recipe offered.",
-        "Secret management does not reduce a token’s authority by itself."
+        "Secret management does not reduce a token’s authority by itself.",
+        "IBKR is this catalog's selected live-primary broker path; runtime-target.json broker_boundaries records only selected_path and local_broker_acceptance: not_established, not a 'live-primary' designation. Its credential handling here remains selected live-primary, unaccepted."
       ],
       "sources": [
         "https://github.com/openbao/openbao",
