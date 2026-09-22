@@ -1224,6 +1224,57 @@ class OvernightHoldPreflightScope(unittest.TestCase):
         with self.assertRaisesRegex(SafetyErrorAlways, "trial_state_changed_during_preflight"):
             self._paper_with_lock_hook(lambda: trial.write_text(json.dumps({"phase": "finished"})))
 
+    def _held_ledger(self, positions=(), orders=()):
+        from safety import Ledger as LedgerAlways, RiskLimits as RiskLimitsAlways
+        ledger = LedgerAlways(self.root / "held-ledger.sqlite3", RiskLimitsAlways())
+        self.addCleanup(ledger.close)
+        ledger.adopt_broker_snapshot({"positions": list(positions), "orders": list(orders)}, time.time())
+        return ledger
+
+    def test_held_resume_accepts_exactly_the_ledger_holdings(self):
+        ledger = self._held_ledger([{"symbol": "SPY", "qty": "1", "avg_entry_price": "500"}])
+        runner_module.held_resume_matches_ledger(ledger, {"positions": [{"symbol": "SPY", "qty": "1"}], "orders": []})
+
+    def test_held_resume_refuses_a_foreign_or_changed_position(self):
+        ledger = self._held_ledger([{"symbol": "SPY", "qty": "1", "avg_entry_price": "500"}])
+        for positions in ([{"symbol": "SPY", "qty": "1"}, {"symbol": "AMD", "qty": "3"}],
+                          [{"symbol": "SPY", "qty": "2"}],
+                          [{"symbol": "SPY", "qty": "1"}, {"symbol": "META", "qty": "-1"}],
+                          []):
+            with self.subTest(positions=positions):
+                with self.assertRaisesRegex(SafetyErrorAlways, "held_resume_position_mismatch"):
+                    runner_module.held_resume_matches_ledger(ledger, {"positions": positions, "orders": []})
+
+    def test_held_resume_refuses_an_order_the_ledger_does_not_own(self):
+        ledger = self._held_ledger([{"symbol": "SPY", "qty": "1", "avg_entry_price": "500"}])
+        foreign = {"client_order_id": "manual-1", "id": "b-1", "symbol": "SPY", "side": "sell", "qty": "1"}
+        with self.assertRaisesRegex(SafetyErrorAlways, "held_resume_external_order"):
+            runner_module.held_resume_matches_ledger(
+                ledger, {"positions": [{"symbol": "SPY", "qty": "1"}], "orders": [foreign]})
+
+    def test_main_refuses_held_resume_when_broker_holds_what_the_ledger_does_not(self):
+        """Wiring: the persisted held trial's ledger is empty while the broker
+        shows SPY, so main() refuses before resuming, keeps the held phase for
+        explicit recovery, and never builds a broker transport."""
+        from safety import RiskLimits as RiskLimitsAlways
+        trial = self.root / "state" / "fixture-account" / "adaptive" / "trial.json"
+        trial.parent.mkdir(parents=True)
+        held = {"phase": "held_overnight", "config_sha256": hashlib.sha256(self.config_file.read_bytes()).hexdigest(),
+                "started_at": 0, "baseline_cash": "100000"}
+        trial.write_text(json.dumps(held))
+        transport_sentinel = RuntimeError("broker_transport_constructed")
+        extra = ["--gate-result", str(self.gate_path), "--snapshot", str(self.snapshot)]
+        from contextlib import nullcontext
+        with patch.object(sys, "argv", self._argv("paper", extra)), \
+             patch.object(runner_module, "load_config", return_value=(self.config, RiskLimitsAlways(), None)), \
+             patch.object(runner_module, "credentials", return_value=("fixture-key", "fixture-secret")), \
+             patch.object(runner_module, "preflight", return_value=self.observation), \
+             patch.object(runner_module, "account_lock_fingerprint", lambda _f: nullcontext()), \
+             patch.object(runner_module, "AlpacaPaperTransport", side_effect=transport_sentinel):
+            with self.assertRaisesRegex(SafetyErrorAlways, "held_resume_position_mismatch"):
+                runner_module.main()
+        self.assertEqual(json.loads(trial.read_text()), held)
+
     def test_main_reuses_run_native_hold_decision(self):
         self.assertFalse(runner_module._final_boundary_from_run_status({"status": "held_overnight"}))
         for status in ("needs_attention", "failed", "passed", "completed_no_signals"):
