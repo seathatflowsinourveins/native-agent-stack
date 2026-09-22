@@ -7548,8 +7548,8 @@
     },
     {
       "path": "tests/test_catalogs.py",
-      "sha256": "ff4615d93eda8b720816fa798fb6774362246ca5cca751e67f2e277dd8217a54",
-      "bytes": 27735
+      "sha256": "632507448b06b51a88c18f25f5e9255da740841e00f91a1e31d759c085a30116",
+      "bytes": 30863
     },
     {
       "path": "tests/test_catalyst_dataset.py",
