@@ -6335,7 +6335,7 @@
     {
       "path": "docs/ecosystem/index.html",
       "bytes": 8096789,
-      "sha256": "3d45139ffe63294341f51ca0332d094636d64c53fda18a82026ca7a398515f71"
+      "sha256": "329392d470ac3b7cc9ebb21531980db793dad896b83016376dd3ed4e2e521e0c"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -9170,7 +9170,7 @@
     {
       "path": "docs/full-stack-convergence.md",
       "bytes": 10817,
-      "sha256": "0cfb65f54fdcc308e6b97fa3ad9dcfad9d45ae0f20c3388b15970b1df8bc180c"
+      "sha256": "81a979ba9a1630ff2ded54af19a2a3203c179d602aed1d2aa50a0b314e2f07c4"
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/agentsview-aggregate-safe.png",
