@@ -6661,8 +6661,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "1d9d4a8298a9d62e4254556869d6daedbbdc5ed7ab4d6ce6eccaeddce2fbbd87",
-      "bytes": 10968908
+      "sha256": "a0b8b7b28d5edd4335c234745d4711c38947adb26a2019dccdc26f150ba4bfa5",
+      "bytes": 10969955
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -10961,13 +10961,13 @@
     },
     {
       "path": "docs/comparison-progress-20260922.md",
-      "sha256": "d8b00ac0dfc49623866f63bacf0855ac24e6f455901fb698680f890a084ce5b8",
-      "bytes": 5444
+      "sha256": "fed4d51273a2c6b3b65c183ee5b5257fcf48db84d87c87206df81f98b4f51e3a",
+      "bytes": 6476
     },
     {
       "path": "evidence/artifacts/comparison-progress-20260922/summary.json",
-      "sha256": "a8ee6e80e6fc2d8b3c18971346367e7256fbb7f9f1c0b42c27e9dee680d76cb5",
-      "bytes": 9575
+      "sha256": "189af76ecafc54263484887b10903a01e6e04d23ff92b6dbb652e6585fddb2e3",
+      "bytes": 9849
     },
     {
       "path": "evidence/artifacts/comparison-progress-20260922/tests/compare/closure-script.test.mjs",
@@ -10983,6 +10983,11 @@
       "path": "evidence/artifacts/comparison-progress-20260922/tools/compare/closure.pre-review.mjs",
       "sha256": "53fc880ab286c07ca4f158ec6bb7c6aafe422f78b4f3d9658a71715e2ccf4d1a",
       "bytes": 3750
+    },
+    {
+      "path": "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json",
+      "sha256": "6db8fc715835ec90f8384adfcc766e4bcf2d8162e7f27f42d417e97256d77c7f",
+      "bytes": 10955
     }
   ],
   "convergence_records": [

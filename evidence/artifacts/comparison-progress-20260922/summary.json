@@ -19,7 +19,7 @@
     "missing_refs": 0,
     "status_ledger_sha256": "201b784c421115cfcbde01a25ec61fdfb94b64316a833cb8a0156fae4114521d",
     "proposals_sha256": "532d89bf14335513a0f867967e047c4c1a8977f442ed65bb70ec66a768269dfb",
-    "availability": "The original supplied source seal stays on the originating host. Paths in rows are relative to that private phase; hashes identify original source bytes. Per-submission rescored worker receipts are absent from the reviewed private seal and this public export. This file is a derived, sanitized summary, not a full runnable comparison export."
+    "availability": "The original supplied return3 source seal stays on the originating host. Paths in rows identify that private phase; hashes identify original source bytes. Return3 lacked per-submission rescored worker receipts; the later workers-receipts-r3 phase supplies all nine original/rescored pairs, reconciled in worker-receipts-followup.json. This public export remains a derived, sanitized summary rather than a complete runnable comparison."
   },
   "source_files_exported": [
     {
@@ -145,10 +145,11 @@
       "limits": [
         "Recovery not run; artifact acceptance has no pinned judge.",
         "Initial classifier mislabelled the cancelled Codex submission; pre-fix judgments retained.",
-        "Sealed run-summary still labels that submission provider_usage_limit while rescored judgments differ. Per-submission rescored receipts are absent from the reviewed private seal and this public export.",
+        "The return3 run-summary preserves the original provider_usage_limit misclassification. Return4 supplies a corrected summary and all nine original/rescored measurement receipt pairs; independent reconciliation is recorded in worker-receipts-followup.json. Codex cancellation still has no native returned receipt.",
         "Two judging rounds refuted claims; no arm accepted as a winner and no SDK adoption follows.",
         "Cancellation usage can be zero or unavailable in returned receipts; this does not prove zero provider consumption."
-      ]
+      ],
+      "receipt_provenance_followup": "worker-receipts-followup.json"
     },
     {
       "layer": "data-research",

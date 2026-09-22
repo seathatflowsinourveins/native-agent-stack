@@ -22,17 +22,32 @@ without raw conversations, host paths or unrelated trading collectors.
 | Document retrieval | Unresolved | Shared retrieval measurements; latency and difficult-layout ingestion remain unqualified |
 | Semantic retrieval | Unresolved | Retrieval numbers do not close restore acceptance; receipt assembly precedes the restore result |
 | Durable memory | Overall unresolved | Two script closures say retain and pass their recorded reviewer gate, but the separate overall rule detects a failed incumbent floor |
-| Runtime workers | Nine returned submission rows; unresolved | Recovery unrun, artifact acceptance unjudged, and old cancellation classification remains in the sealed run summary |
+| Runtime workers | Nine measurement receipt pairs reconciled; comparison unresolved | Recovery unrun, artifact acceptance unjudged, and incomplete native output on cancellation |
 | Market data / filings | Unresolved | Identity, dated-universe, corporate-action and as-known gaps; paid challenger unrun |
 | Engine parity | Reported historical run completed BLOCKED | Four failed checks attributed to dividend cash posting and market-on-open mapping; parity remains unaccepted |
 
 The worker arms are native Claude CLI, the Codex SDK lane and Claude Agent SDK.
 The scorer initially mistook a cancelled Codex submission for a usage limit;
 rescored judgments preserve the earlier failed interpretation. The sealed run
-summary still carries that old label. Per-submission rescored receipts are absent
-from the reviewed private seal as well as this public export, so neither can
-independently reconcile every rescored submission. The two judging rounds retained
-refutations. No worker or SDK becomes a new accepted default from these results.
+summary preserves that old label. Claude's 07:49 UTC return now supplies all nine
+original/rescored measurement receipt pairs and a corrected summary in a separate
+seal. An independent review reconciled all 18 hashes and nine summary rows;
+[the follow-up index](../evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json)
+records the changed classification fields and the provenance fields added to
+every receipt. The earlier absence and failed classification remain historical
+evidence.
+
+This resolves the packaging mismatch, not the comparison. Six replay records
+have full measured structural completeness; cancellation records preserve
+incomplete task output. The cancelled Codex run has no native returned receipt
+and no requested usage; other interruption receipts also retain unavailable or
+zero reported usage without claiming zero provider consumption. Twelve selected
+local classifier tests pass in the original source layout; direct invocation
+from the flat seal fails to resolve imports. Recovery, artifact acceptance and
+refuted judgments remain open. A further synthetic check found that the
+classifier suppresses an explicit model/provider-mismatch block during
+cancellation; this does not affect the observed cancelled submission, but
+remains an open classifier defect. No worker or SDK becomes a new accepted default.
 
 ai-memory remains the operational memory of record. Basic Memory's returned
 lexical-retrieval results do not establish a replacement: both executed stores
