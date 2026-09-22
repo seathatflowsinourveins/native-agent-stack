@@ -45,9 +45,40 @@ def save(path, data):
         os.close(fd)
 
 
+def _inside_git_worktree(path):
+    """Walk parents for a `.git` entry (directory in a normal clone, file in
+    a linked worktree). Resolved so a symlink cannot hide the real location."""
+    current = path.parent
+    while True:
+        if (current / ".git").exists() or (current / ".git").is_symlink():
+            return True
+        parent = current.parent
+        if parent == current:
+            return False
+        current = parent
+
+
 def credentials(path):
+    """Fail closed on a paper-credential env file with unsafe permissions,
+    ownership, or location before any content is read. File contents are
+    never included in a raised error or log."""
+    resolved = Path(path).resolve()
+    try:
+        info = resolved.stat()
+    except OSError:
+        raise SafetyError("credential_file_permissions: cannot stat the env file; "
+                           "create it at a private path outside this repository with `chmod 600`")
+    if info.st_uid != os.getuid():
+        raise SafetyError("credential_file_permissions: env file is not owned by the current user; "
+                           "chown it to your own account (never share a paper credential file)")
+    if info.st_mode & 0o777 != 0o600:
+        raise SafetyError("credential_file_permissions: env file mode must be exactly 0600; "
+                           f"run `chmod 600 {resolved.name}`")
+    if _inside_git_worktree(resolved):
+        raise SafetyError("credential_file_permissions: env file must live outside any Git worktree; "
+                           "move it to a private, non-repository path (e.g. under your home config directory)")
     result = {}
-    for line in Path(path).read_text().splitlines():
+    for line in resolved.read_text().splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
@@ -100,7 +131,40 @@ def public_preflight(observation):
             "quote_errors": observation.get("quote_errors", {})}
 
 
-def validate_preflight(observation, config, *, require_open, allow_existing=False):
+def _check_promotion_gate(gate_result_path, snapshot_path):
+    """Fail closed unless a promotion-gate result file (written by the
+    separately venv'd `blueprints/us-equities/data/promotion_gate.py`)
+    reports `status: "pass"` for the exact snapshot bytes this run consumes.
+
+    This runtime has no live market-data snapshot concept of its own, so the
+    gated "snapshot" is the configured universe/bars input file (ordinarily
+    the frozen `--config` for this trial); see the promotion-gate scope note
+    in `blueprints/us-equities/data/README.md` for why that substitution is
+    documented as sufficient here.
+    """
+    if gate_result_path is None or snapshot_path is None:
+        raise SafetyError("promotion_gate_missing")
+    try:
+        gate = json.loads(Path(gate_result_path).read_text())
+    except (OSError, ValueError):
+        raise SafetyError("promotion_gate_missing")
+    if not isinstance(gate, dict) or gate.get("status") != "pass":
+        raise SafetyError("promotion_gate_failed")
+    try:
+        observed_hash = hashlib.sha256(Path(snapshot_path).read_bytes()).hexdigest()
+    except OSError:
+        raise SafetyError("promotion_gate_missing")
+    if gate.get("input_sha256") != observed_hash:
+        raise SafetyError("promotion_gate_mismatch")
+
+
+def validate_preflight(observation, config, *, require_open, allow_existing=False,
+                        mode=None, gate_result_path=None, snapshot_path=None):
+    """`mode="paper"` additionally requires a passing, hash-matched promotion
+    gate (see `_check_promotion_gate`); `mode=None` (the default) preserves
+    prior behavior exactly for existing preflight/recover call sites."""
+    if mode == "paper":
+        _check_promotion_gate(gate_result_path, snapshot_path)
     account, clock = observation["account"], observation["clock"]
     if (account.get("status") != "ACTIVE" or account.get("currency") != "USD" or any(account.get(k) is not False for k in
             ("trading_blocked", "account_blocked", "trade_suspended_by_user"))

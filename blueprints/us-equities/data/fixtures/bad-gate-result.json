@@ -1,0 +1,70 @@
+{
+  "checked_at": "2026-09-22T07:52:22.428411+00:00",
+  "checks": [
+    {
+      "detail": "ok",
+      "name": "symbol_nonempty",
+      "status": "pass"
+    },
+    {
+      "detail": "1 of 4 rows failed; example row indices [2]",
+      "name": "valid_trading_session",
+      "status": "fail"
+    },
+    {
+      "detail": "ok",
+      "name": "open_positive",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "high_positive",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "low_positive",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "close_positive",
+      "status": "pass"
+    },
+    {
+      "detail": "1 of 4 rows failed; example row indices [2]",
+      "name": "volume_non_negative",
+      "status": "fail"
+    },
+    {
+      "detail": "1 of 4 rows failed; example row indices [3]",
+      "name": "observed_at_not_future",
+      "status": "fail"
+    },
+    {
+      "detail": "1 of 4 rows failed; example row indices [3]",
+      "name": "high_ge_max_open_close",
+      "status": "fail"
+    },
+    {
+      "detail": "ok",
+      "name": "low_le_min_open_close",
+      "status": "pass"
+    },
+    {
+      "detail": "2 of 4 rows failed; example row indices [0, 1]",
+      "name": "unique_symbol_session",
+      "status": "fail"
+    }
+  ],
+  "input_sha256": "06b5e9c1b068d603c5a82bee582f5e34ccbe29458aa9c3c1d12f999439293f37",
+  "row_count": 4,
+  "status": "fail",
+  "versions": {
+    "exchange_calendars": "4.13.2",
+    "pandas": "3.0.6",
+    "pandera": "0.33.1",
+    "pyarrow": "25.0.1",
+    "python": "3.13.15"
+  }
+}
