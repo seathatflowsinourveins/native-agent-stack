@@ -1,0 +1,85 @@
+{
+  "date_utc": "2026-09-22",
+  "local_date": "2026-09-21",
+  "base_commit": "648cb71c0df5956e1d48c8a7f5651b52f6cf3505",
+  "scratch_root": "/tmp/memory-lifecycle-probe-20260921-scratch",
+  "ai_memory": {
+    "binary": "<AI_MEMORY_INSTALLED_BINARY>",
+    "binary_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0",
+    "reported_version": "2.3.2",
+    "inspected_source_tag": "v2.3.2",
+    "inspected_source_commit": "353841d91618d20b110b208de284a74d0b960379",
+    "source_build_equivalence": "not independently rebuilt; installed binary identity is hash and version"
+  },
+  "basic_memory": {
+    "source_commit": "3bf2d523c0a941f71cb144a5502e7557dd025d69",
+    "reported_version": "0.23.2",
+    "python": "Python 3.12.3",
+    "source_tree_clean": true,
+    "dependency_resolution": "uv pip install from pinned local source; exact resolved packages retained, not upstream uv.lock installation"
+  },
+  "provision_commands": [
+    [
+      "git",
+      "clone",
+      "--quiet",
+      "--filter=blob:none",
+      "https://github.com/basicmachines-co/basic-memory.git",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/basic-memory"
+    ],
+    [
+      "git",
+      "-C",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/basic-memory",
+      "checkout",
+      "--quiet",
+      "3bf2d523c0a941f71cb144a5502e7557dd025d69"
+    ],
+    [
+      "uv",
+      "venv",
+      "--python",
+      "3.12",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv"
+    ],
+    [
+      "uv",
+      "pip",
+      "install",
+      "--python",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/python",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/basic-memory"
+    ],
+    [
+      "git",
+      "clone",
+      "--quiet",
+      "--depth",
+      "1",
+      "--branch",
+      "v2.3.2",
+      "https://github.com/akitaonrails/ai-memory.git",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-memory"
+    ]
+  ],
+  "failed_help_attempts": [
+    {
+      "argv": [
+        "bm",
+        "db",
+        "--help"
+      ],
+      "exit_code": 2,
+      "meaning": "Source module name is not exposed command; corrected after root --help showed reindex"
+    },
+    {
+      "argv": [
+        "bm",
+        "sync",
+        "--help"
+      ],
+      "exit_code": 2,
+      "meaning": "No sync command at pinned version; used documented reindex instead"
+    }
+  ]
+}

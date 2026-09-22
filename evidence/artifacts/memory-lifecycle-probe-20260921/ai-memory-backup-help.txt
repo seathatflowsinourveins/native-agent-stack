@@ -1,0 +1,18 @@
+Snapshot wiki/, db/, and config.toml into a gzipped tarball
+
+Usage: ai-memory backup [OPTIONS] --to <TO>
+
+Options:
+      --data-dir <DATA_DIR>
+          Override the data directory.
+
+          Defaults to a platform path under `dirs::data_local_dir()`. The config loader also honours `AI_MEMORY_DATA_DIR`.
+
+  -o, --to <TO>
+          Destination tarball (`.tar.gz`)
+
+      --config <CONFIG>
+          Path to an explicit config file (defaults to `<data_dir>/config.toml`)
+
+  -h, --help
+          Print help (see a summary with '-h')

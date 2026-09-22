@@ -1,0 +1,18 @@
+Initialise the data directory layout
+
+Usage: ai-memory init [OPTIONS]
+
+Options:
+      --data-dir <DATA_DIR>
+          Override the data directory.
+
+          Defaults to a platform path under `dirs::data_local_dir()`. The config loader also honours `AI_MEMORY_DATA_DIR`.
+
+      --force
+          Overwrite an existing `config.toml` if present
+
+      --config <CONFIG>
+          Path to an explicit config file (defaults to `<data_dir>/config.toml`)
+
+  -h, --help
+          Print help (see a summary with '-h')

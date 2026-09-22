@@ -1,0 +1,57 @@
+
+ Usage: bm tool search-notes [OPTIONS] [query]
+
+ Search across all content in the knowledge base.
+
+ Three output modes: a formatted Rich table (default in a terminal), plain
+ numbered text results (--plain), and raw JSON (--json, or automatically when
+ piped). The interactive default is set by the cli_output_style config option
+ (rich/plain). --json and --plain are mutually exclusive.
+
+ Examples:
+
+ bm tool search-notes "my query"
+ bm tool search-notes --permalink "specs/*"
+ bm tool search-notes --tag python --tag async
+ bm tool search-notes --meta status=draft
+ bm tool search-notes "auth" --entity-type observation --category requirement
+ bm tool search-notes "my query" --plain
+ bm tool search-notes "my query" --json
+
+╭─ Arguments ──────────────────────────────────────────────────────────────────╮
+│   query      <str>  Search query string (optional when using metadata        │
+│                     filters)                                                 │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --compact                   Omit note bodies and matched excerpts for        │
+│                             discovery                                        │
+│ --permalink                 Search permalink values                          │
+│ --title                     Search title values                              │
+│ --vector                    Use vector retrieval                             │
+│ --hybrid                    Use hybrid retrieval                             │
+│ --after_date         <str>  Search results after date, eg. '2d', '1 week'    │
+│ --tag                <str>  Filter by frontmatter tag (repeatable)           │
+│ --status             <str>  Filter by frontmatter status                     │
+│ --type               <str>  Filter by frontmatter type (repeatable)          │
+│ --entity-type        <str>  Filter by search item type: entity, observation, │
+│                             relation (repeatable)                            │
+│ --category           <str>  Filter observation results to exact categories   │
+│                             (repeatable); pair with --entity-type            │
+│                             observation                                      │
+│ --meta               <str>  Filter by frontmatter key=value (repeatable)     │
+│ --filter             <str>  JSON metadata filter (advanced)                  │
+│ --page               <int>  Page number for pagination [default: 1]          │
+│ --page-size          <int>  Number of results per page [default: 10]         │
+│ --json                      Output raw JSON instead of formatted display     │
+│ --plain                     Output undecorated plain text (no                │
+│                             colors/markup), even when piped                  │
+│ --project            <str>  The project to use. If not provided, the default │
+│                             project will be used.                            │
+│ --project-id         <str>  Project external_id (UUID). Takes precedence     │
+│                             over --project; use to disambiguate same-named   │
+│                             projects across cloud workspaces.                │
+│ --local                     Force local API routing (ignore cloud mode)      │
+│ --cloud                     Force cloud API routing                          │
+│ --help                      Show this message and exit.                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+

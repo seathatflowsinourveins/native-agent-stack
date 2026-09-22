@@ -1,0 +1,31 @@
+Fetch and display the full body of a wiki page. Accepts either `--path` (exact path) or a positional query that searches FTS5 and fetches the top matching page
+
+Usage: ai-memory read-page [OPTIONS] [QUERY]
+
+Arguments:
+  [QUERY]
+          FTS5 query to find the page (searches and fetches the top hit). Ignored when `--path` is provided
+
+Options:
+      --data-dir <DATA_DIR>
+          Override the data directory.
+
+          Defaults to a platform path under `dirs::data_local_dir()`. The config loader also honours `AI_MEMORY_DATA_DIR`.
+
+      --path <PATH>
+          Exact wiki path (e.g. `notes/foo.md`). Takes precedence over `query`
+
+      --config <CONFIG>
+          Path to an explicit config file (defaults to `<data_dir>/config.toml`)
+
+      --workspace <WORKSPACE>
+          Workspace name. Defaults to the nearest `.ai-memory.toml` marker's `workspace`, else `default`
+
+      --project <PROJECT>
+          Project name. When omitted, auto-derived from the current project
+
+      --json
+          Emit the page as JSON (includes frontmatter)
+
+  -h, --help
+          Print help (see a summary with '-h')

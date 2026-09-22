@@ -1,0 +1,21 @@
+Restore a backup tarball into the data directory
+
+Usage: ai-memory restore [OPTIONS] --from <FROM>
+
+Options:
+      --data-dir <DATA_DIR>
+          Override the data directory.
+
+          Defaults to a platform path under `dirs::data_local_dir()`. The config loader also honours `AI_MEMORY_DATA_DIR`.
+
+  -i, --from <FROM>
+          Source tarball
+
+      --config <CONFIG>
+          Path to an explicit config file (defaults to `<data_dir>/config.toml`)
+
+      --force
+          Overwrite an existing non-empty data dir
+
+  -h, --help
+          Print help (see a summary with '-h')

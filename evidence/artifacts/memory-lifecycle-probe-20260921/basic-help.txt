@@ -1,0 +1,49 @@
+
+ Usage: bm [OPTIONS] COMMAND [ARGS]...
+
+ Basic Memory - Local-first personal knowledge management.
+
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --version             -v        Show version and exit.                       │
+│ --install-completion            Install completion for the current shell.    │
+│ --show-completion               Show completion for the current shell, to    │
+│                                 copy it or customize the installation.       │
+│ --help                          Show this message and exit.                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ───────────────────────────────────────────────────────────────────╮
+│ status     Show current project-index observation status and readiness.      │
+│ reset      Reset database (drop all tables and recreate).                    │
+│ reindex    Rebuild search indexes and/or vector embeddings without dropping  │
+│            the database.                                                     │
+│ doctor     Run local consistency checks to verify file/database indexing.    │
+│ mcp        Run the MCP server with configurable transport options.           │
+│ orphans    Show entities that have no relations in the knowledge graph.      │
+│ cat        Print a note's content, optionally sliced by lines, section, or   │
+│            token budget.                                                     │
+│ head       Print the first lines of a note (head(1) over `bm cat`).          │
+│ grep       Search note content, semantically by default (-F for literal      │
+│            matching).                                                        │
+│ ls         List the immediate contents of one directory.                     │
+│ find       Recursively list files by name glob, or query notes by            │
+│            frontmatter metadata.                                             │
+│ tail       Show the most recently changed notes, newest first.               │
+│ tree       Show a directory hierarchy (tree(1) over `bm find`).              │
+│ prune      Remove index entries for files your ignore patterns now exclude.  │
+│ format     Format files using configured formatters.                         │
+│ update     Check for updates and install when supported.                     │
+│ workspace  Point users to the real workspace verbs under `bm cloud           │
+│            workspace`.                                                       │
+│ import     Import data from various sources                                  │
+│ cloud      Access Basic Memory Cloud                                         │
+│ ci         Capture GitHub delivery moments into Basic Memory                 │
+│ tool       Access to MCP tools via CLI                                       │
+│ man        Read the Basic Memory manual, or install the man pages.           │
+│ inspect    Inspect retrieval projections                                     │
+│ project    Manage multiple Basic Memory projects                             │
+│ config     Manage Basic Memory's config.json settings                        │
+│ schema     Schema management commands                                        │
+│ wiki       Build and inspect deterministic Wiki navigation                   │
+│ hook       Harness lifecycle hook front door                                 │
+│ install    Install Basic Memory resources into an agent host.                │
+╰──────────────────────────────────────────────────────────────────────────────╯
+

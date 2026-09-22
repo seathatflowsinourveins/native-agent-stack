@@ -1,0 +1,134 @@
+{
+  "evidence_class": "tiny synthetic native CLI lifecycle comparison",
+  "accepted_evidence_sources": {
+    "ai_memory": "Corrected second run, explicit embedding_provider=none",
+    "basic_memory": "Original run, explicit semantic_search_enabled=false; reused unchanged"
+  },
+  "passed": 28,
+  "total": 28,
+  "completed_command_count": 41,
+  "checks": [
+    {
+      "name": "frozen corpus hash unchanged",
+      "passed": true
+    },
+    {
+      "name": "ai: amber returns one matching note and expected fact",
+      "passed": true
+    },
+    {
+      "name": "ai: full read preserves orchard-pump fact",
+      "passed": true
+    },
+    {
+      "name": "ai: Juniper returns one matching note and expected fact",
+      "passed": true
+    },
+    {
+      "name": "ai: full read preserves harbor-lantern fact",
+      "passed": true
+    },
+    {
+      "name": "ai: cobalt returns one matching note and expected fact",
+      "passed": true
+    },
+    {
+      "name": "ai: full read preserves alpine-kite fact",
+      "passed": true
+    },
+    {
+      "name": "ai: updated search returns violet and 19 days",
+      "passed": true
+    },
+    {
+      "name": "ai: old amber query returns no results",
+      "passed": true
+    },
+    {
+      "name": "ai: updated full read contains new fact, excludes old fact",
+      "passed": true
+    },
+    {
+      "name": "ai: deleted Juniper query returns no results",
+      "passed": true
+    },
+    {
+      "name": "ai: after restart, full read retains new fact",
+      "passed": true
+    },
+    {
+      "name": "ai: after restart, remaining cobalt fact is searchable",
+      "passed": true
+    },
+    {
+      "name": "ai: after restart, deleted Juniper query stays empty",
+      "passed": true
+    },
+    {
+      "name": "basic: amber returns one matching note and expected fact",
+      "passed": true
+    },
+    {
+      "name": "basic: full read preserves orchard-pump fact",
+      "passed": true
+    },
+    {
+      "name": "basic: Juniper returns one matching note and expected fact",
+      "passed": true
+    },
+    {
+      "name": "basic: full read preserves harbor-lantern fact",
+      "passed": true
+    },
+    {
+      "name": "basic: cobalt returns one matching note and expected fact",
+      "passed": true
+    },
+    {
+      "name": "basic: full read preserves alpine-kite fact",
+      "passed": true
+    },
+    {
+      "name": "basic: updated search returns violet and 19 days",
+      "passed": true
+    },
+    {
+      "name": "basic: old amber query returns no results",
+      "passed": true
+    },
+    {
+      "name": "basic: updated full read contains new fact, excludes old fact",
+      "passed": true
+    },
+    {
+      "name": "basic: deleted Juniper query returns no results",
+      "passed": true
+    },
+    {
+      "name": "basic: after reindex, full read retains new fact",
+      "passed": true
+    },
+    {
+      "name": "basic: after reindex, remaining cobalt fact is searchable",
+      "passed": true
+    },
+    {
+      "name": "basic: after reindex, deleted Juniper query stays empty",
+      "passed": true
+    },
+    {
+      "name": "all recorded lifecycle commands exited successfully",
+      "passed": true
+    }
+  ],
+  "ai_memory_recovery": "Not run: inspected upstream restore/reindex guard scans all same-name processes, beyond the authorized isolated state. No guard bypass.",
+  "basic_memory_recovery": "Full search index rebuild exercised; this is not loss-of-database restore.",
+  "limits": [
+    "Lexical fixture only, no semantic quality claim",
+    "No concurrency/crash/schema migration test",
+    "No agent hooks or real memory",
+    "Single host/run; startup costs and different architectures confound timing comparisons",
+    "Accepted runs explicitly disable embeddings and configure no LLM provider; network egress was not instrumented",
+    "Initial ai-memory attempt failed no-model-download constraint and is retained separately"
+  ]
+}

@@ -1,0 +1,46 @@
+
+ Usage: bm project add [OPTIONS] {name} [path]
+
+ Add a new project, indexing its existing files.
+
+ A local project is indexed before this command returns, so its notes are
+ searchable immediately. Pass --no-wait to skip that for a large directory
+ you would rather index later.
+
+ Use --local to force local routing when cloud mode is enabled.
+ Use --cloud to force cloud routing when cloud mode is disabled.
+
+ Cloud mode examples:
+
+     bm project add research                           # No local sync
+
+     bm project add research --local-path ~/docs       # With local sync
+
+     bm project add research --cloud --visibility shared
+
+     bm project add research --cloud --workspace Personal --visibility shared
+
+
+ Local mode example:
+
+     bm project add research ~/Documents/research
+
+╭─ Arguments ──────────────────────────────────────────────────────────────────╮
+│ *    name      <str>  Name of the project [required]                         │
+│      path      <str>  Path to the project directory (required for local      │
+│                       mode)                                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --local-path        <str>  Local sync path for cloud mode (optional)         │
+│ --workspace         <str>  Cloud workspace name, slug, type, or tenant_id    │
+│                            (cloud mode only)                                 │
+│ --visibility        <str>  Cloud project visibility: workspace (everyone in  │
+│                            the workspace) or shared (invite-only)            │
+│ --default                  Set as default project                            │
+│ --no-wait                  Register the project without indexing it; reads   │
+│                            stay empty until you index                        │
+│ --local                    Force local API routing (ignore cloud mode)       │
+│ --cloud                    Force cloud API routing                           │
+│ --help                     Show this message and exit.                       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+

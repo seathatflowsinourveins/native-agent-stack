@@ -1,0 +1,21 @@
+{
+  "first_attempt_acceptance": "failed: background model fetch attempted despite no-model-download constraint",
+  "first_attempt_model_files_after_stop": [],
+  "first_attempt_network_bytes": "not measured; no completed files observed is not proof of zero transfer",
+  "corrected_attempt": "one rerun of ai-memory only in new empty store, explicit documented AI_MEMORY_EMBEDDING_PROVIDER=none",
+  "corrected_server_checks": [
+    {
+      "server": 1,
+      "vector_disabled_logged": true,
+      "fetch_logged": false
+    },
+    {
+      "server": 2,
+      "vector_disabled_logged": true,
+      "fetch_logged": false
+    }
+  ],
+  "corrected_model_files_after_stop": [],
+  "basic_memory_lane": "Original explicit semantic_search_enabled=false run reused unchanged; not rerun",
+  "no_network_egress_instrumentation": true
+}

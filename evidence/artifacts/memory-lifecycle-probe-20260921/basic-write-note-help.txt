@@ -1,0 +1,37 @@
+
+ Usage: bm tool write-note [OPTIONS]
+
+ Create or update a markdown note. Content can be provided via --content or
+ stdin.
+
+ Examples:
+
+ bm tool write-note --title "My Note" --folder "notes" --content "Note content"
+ bm tool write-note --title "My Guide" --folder "notes" --content "..." --type
+ guide
+ echo "content" | bm tool write-note --title "My Note" --folder "notes"
+ bm tool write-note --title "My Note" --folder "notes" --overwrite
+ bm tool write-note --title "My Note" --folder "notes" --local
+
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ *  --title             <str>  The title of the note [required]               │
+│ *  --folder            <str>  The folder to create the note in [required]    │
+│    --content           <str>  The content of the note. If not provided,      │
+│                               content will be read from stdin.               │
+│    --tags              <str>  A list of tags to apply to the note            │
+│    --type              <str>  Note type stored in frontmatter (e.g. 'guide', │
+│                               'report'). A 'type:' in the note's own content │
+│                               frontmatter takes precedence.                  │
+│                               [default: note]                                │
+│    --project           <str>  The project to write to. If not provided, the  │
+│                               default project will be used.                  │
+│    --project-id        <str>  Project external_id (UUID). Takes precedence   │
+│                               over --project; use to disambiguate same-named │
+│                               projects across cloud workspaces.              │
+│    --overwrite                Replace an existing note on conflict (matches  │
+│                               MCP write_note overwrite=True)                 │
+│    --local                    Force local API routing (ignore cloud mode)    │
+│    --cloud                    Force cloud API routing                        │
+│    --help                     Show this message and exit.                    │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
