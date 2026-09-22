@@ -1,0 +1,133 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "adoption/research.json",
+    "docs/portable-userspace-install-20260921.md"
+   ],
+   "key": "c1",
+   "name": "uv",
+   "repository": "https://github.com/astral-sh/uv",
+   "why_not_default": "adoption/research.json line 221 records the decision required_reuse_existing_native_python_layer. Line 222 limits its scope to syncing the accepted SDK package versions from a hash-bearing requirements lock into a new environment. It is the retained Python SDK lock lane, not a proven tool-reproduction or recovery path. All 8 native commands at lines 235-267, including `uv --version` and `uv pip sync --require-hashes`, are marked \"source-confirmed recipe; not executed by this research pass\". binary_downloaded_or_verified and signature_verified are both false (lines 277-278). Line 280 reports \"Installed uv --version returned 0.12.17\" as a read-only observation, which conflicts with the not-executed status of the same command at lines 237-238, and no receipt is retained for it. Line 281 assigns fresh-environment installation and acceptance evidence to the coordinator. docs/portable-userspace-install-20260921.md contains no uv match (grep \\buv\\b returned nothing), and its clean-install tools were not installed with uv. uv is kept as the conditional SDK lock lane pending a fresh-environment hash-locked sync acceptance."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c3",
+   "name": "mise",
+   "repository": "https://github.com/jdx/mise",
+   "why_not_default": "adoption/research.json lines 76-104 record the decision optional_native_tool_layer_not_required_for_current_uv_only_adoption. Line 87 says the current SDK can be reproduced with uv. Line 94 says a tool-manager lock does not replace the SDK hash lock. mise's lock/install commands are unexecuted source-confirmed recipes. Its checksum metadata matched, but no binary was downloaded or signature-verified. No native install or restore evidence was retained."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c2",
+   "name": "chezmoi",
+   "repository": "https://github.com/twpayne/chezmoi",
+   "why_not_default": "adoption/research.json lines 414-473 record the decision defer_optional_selected_dotfile_management, limited to explicitly selected non-secret files. Broad home-directory or authentication-store capture is excluded, and the requirement forbids copying auth stores anyway. The checksum metadata matched, but the signature was not verified and no chezmoi command was executed."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c5",
+   "name": "Litestream",
+   "repository": "https://github.com/benbjohnson/litestream",
+   "why_not_default": "catalogs/us-equities/hosting-source-review.json lines 186-202 record the decision defer_until_continuous_replication_requirement and the status research_only. Litestream adds a standing writer that creates _litestream_lock in the source database. The review states that native ai-memory backup plus restic already covers the bounded need. The v0.5 restore lacks the older Age encryption. No execution was retained."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c7",
+   "name": "Devbox",
+   "repository": "https://github.com/jetify-com/devbox",
+   "why_not_default": "Not adopted. adoption/research.json lines 522-569 record the decision defer_nix_environment_platform. Devbox changes the host environment model and overlaps the uv SDK lane. Only checksum-list metadata was checked; nothing was downloaded, executed or signature-verified."
+  },
+  {
+   "disposition": "out_of_scope",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c6",
+   "name": "Determinate Nix installer",
+   "repository": "https://github.com/DeterminateSystems/nix-installer",
+   "why_not_default": "Not adopted. adoption/research.json lines 624-667 record the decision defer_privileged_platform_installation. It is a privileged system installer, not an SDK lock or state-recovery tool, and the current native/WSL setup does not need it. Only the GitHub asset digest was recorded; nothing was downloaded or verified."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "recovery-portability",
+ "limits": [
+  "The skill was preloaded from <host-path>/typesafe-ai. The environment reports the actual model as claude-opus-5-5[1m]; the fixed model field is copied as instructed. I made no TypeSafe inference calls and received no provider judgments. The packet withholds the current choice, decision and rationale, so every disposition is my own source review, revised after the two refuter reports. I accepted the major finding (the evidence class overstated uv) and both minor findings (same-host vs fresh-hosted attribution; the unacknowledged conflict in uv's version observation and its scope).",
+  "I could not run commands. I checked that the blueprint paths exist in round 1 only and did not execute them.",
+  "I did not open the Restic recipe_ref blueprints/us-equities/hosting/backup/README.md (existence confirmed only), evidence/receipts/native-offhost-app-state-20260920.json, the wsl-restore receipt, or the platform artifact JSONs. The application-restore claims rely on the decisions.json evidence_scope summaries.",
+  "I did not independently check GitHub run 35537533416 or the artifact contents. I relied on the receipt's retained independent-review fields.",
+  "I read only the relevant sections of research.json and decisions.json."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "No candidate's retained evidence shows that the selected tools reproduce on a new host. The clean-install proof in docs/portable-userspace-install-20260921.md uses npm, upstream archives and native installers, and no candidate in this packet covers it.",
+  "uv has no fresh-environment sync acceptance. All 8 of its commands are marked not executed (adoption/research.json lines 235-267). The 0.12.17 version observation at line 280 conflicts with that status and has no receipt. The '36-package' lock (line 230) has no acceptance receipt among the evidence_refs.",
+  "Restic recovery is proven only on synthetic state and hosted runners inside one GitHub administrative domain. The ai-memory/Qdrant proof at decisions.json line 1915 is same-host only; the fresh-hosted proof is line 2501. Independent physical host, lost-account/password recovery, production data, whole-stack recovery, reboot and power loss remain unestablished.",
+  "UID/GID, timestamps, ACL/xattrs, sparse files, links, Windows filesystems and long-term retention are not qualified for Restic.",
+  "Snapshots are sequential, not atomic across applications, and native-client rebinding after a restore is not established.",
+  "Restic recovery on macOS or on a new WSL PC is not established by these receipts.",
+  "uv, mise, chezmoi, Litestream, Devbox and the Nix installer have no native execution evidence. They are untested, not failed."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "restic 0.19.1 snapshot restore (current winner)",
+   "uv 0.12.17 hash-locked pip sync into a new prefix (c1, conditional)",
+   "mise locked install (c3) for multi-language tool bootstrap",
+   "Litestream replicate/restore (c5) for SQLite application state",
+   "Devbox/Nix profile (c7/c6) for system-dependency closure"
+  ],
+  "fixture_paths": [
+   "blueprints/convergence-practice/offhost-restore/README.md",
+   "blueprints/convergence-practice/offhost-app-state/README.md",
+   "blueprints/convergence-practice/wsl-restore/README.md",
+   "blueprints/us-equities/hosting/backup/README.md"
+  ],
+  "metric": "Pass or fail for each step: a locked install into an empty target; a restore into an empty target checked with the complete path/type/sha256/mode oracle and actual application queries; then resume and cleanup on the target host. All arms use the same synthetic state on the same host."
+ },
+ "overturn_when": "Three checks could change this verdict. (1) Re-run the blueprints/convergence-practice/offhost-restore/README.md or blueprints/convergence-practice/offhost-app-state/README.md recipe with matching inputs. If it shows Restic data loss or an oracle mismatch that Litestream's (c5) `restore -integrity-check full` avoids in an executed side-by-side run on the same state and host, Restic would be demoted for SQLite application state. (2) A fresh-environment hash-locked sync following the adoption/research.json uv recipe (`uv venv` then `uv pip sync --require-hashes --no-build` into a new prefix, then `uv pip check`) that passes on the target host would add uv (c1) as a native_proven co-winner for SDK reproduction. (3) An executed multi-language or system-dependency case where mise (c3) or a Devbox/Nix profile (c7/c6) passes locked install, restore, resume and cleanup while uv cannot cover it would promote that alternative for tool reproduction.",
+ "packet_sha256": "f4248857a5026dfe59fc1279a5f8894faabf392c46a1af83b2bdfeaa1a68186b",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__recovery-portability.json",
+  "adoption/research.json (lines 1-104, 208-287, plus grep of decision fields at 76-667)",
+  "docs/portable-userspace-install-20260921.md (full in round 1; grep \\buv\\b in revision: no matches)",
+  "catalogs/foundation/decisions.json (lines 60-129, 1890-1959, 2480-2515; re-read 1910-1919 and 2498-2503 in revision)",
+  "adoption/lifecycle.md (lines 228-296)",
+  "catalogs/us-equities/hosting-source-review.json (lines 183-214, via grep context)",
+  "evidence/receipts/native-offhost-restic-20260920.json (full)"
+ ],
+ "why_selected": "Change in this revision: uv (c1) is no longer a co-winner. The winner set is Restic (c4) alone, so winner_evidence_class native_proven applies only to evidence that was actually executed. Restic is the only adopted candidate with retained native execution evidence. evidence/receipts/native-offhost-restic-20260920.json (kind native_cli_e2e) records a fresh GitHub-hosted runner, run 35537533416, conclusion success, using restic 0.19.1 with sha256 20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639. The runner ran 7 unchanged upstream tests at source 6aa3a516 with 0 failures. It rejected a wrong password with exit 12 and 0 restored files. `check --read-data` exited 0 and reported \"no errors were found\". It then restored two exact snapshot IDs with exits 0 and 0. The complete path/type/length/sha256/mode oracle passed over 6 files and 1048747 bytes. An independent review matched 24 downloaded reports and confirmed the ciphertext was unchanged. catalogs/foundation/decisions.json supports two further restore scopes, with Restic as a component in both. First, same-host restore (lines 1890-1948, evidence_scope at line 1915): selected public bytes, ai-memory/FTS state and Qdrant snapshot/query results survived a same-host backup and restore; an independent physical host is unestablished (line 1917). Second, fresh hosted destination (lines 2480-2515, line 2501): two fresh hosted jobs passed ai-memory and Qdrant backup, encrypted transfer and empty-target restore, checked with actual scoped memory queries and Qdrant state/query equality. adoption/lifecycle.md lines 257-279 give the native `restic snapshots/check/restore` recipe and keep keys out of the catalog, which fits the requirement not to copy authentication stores. The oracles are local integration checks, the state is synthetic, and review_status is confirmed_conditional. The requirement's other half, \"reproduce selected tools\", has no candidate with retained execution evidence. uv (c1) is the retained SDK lock lane, but all its evidence is source review. adoption/research.json lines 235-267 mark all 8 uv commands \"not executed by this research pass\". The clean-install proof in docs/portable-userspace-install-20260921.md uses npm, upstream archives and native installers, and contains no uv invocation. So that half is recorded as an open gap and is not credited to any winner.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "evidence/receipts/native-offhost-restic-20260920.json",
+  "catalogs/foundation/decisions.json",
+  "adoption/lifecycle.md"
+ ],
+ "winner_keys": [
+  "c4"
+ ]
+}

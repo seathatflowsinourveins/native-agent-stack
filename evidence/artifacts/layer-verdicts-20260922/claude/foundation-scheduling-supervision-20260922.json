@@ -1,0 +1,111 @@
+{
+ "alternatives": [
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c2",
+   "name": "Prefect",
+   "repository": "https://github.com/PrefectHQ/prefect",
+   "why_not_default": "The only evidence is source review. catalogs/us-equities/agents-operations.json lines 361-401 give decision 'alternative' and evidence_level source_review; the commands are marked 'Prospective commands; not executed'; its limitations say 'No flow is supplied or scheduled here.' The same record says to 'Choose instead of Dagu for the first scheduler, not an extra coordinator above it', so it would replace Dagu rather than add to it. It also needs a persistent server/database. Nothing records a cancellation, process-tree, checkpoint or reboot result for Prefect."
+  },
+  {
+   "disposition": "out_of_scope",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c4",
+   "name": "Dagster",
+   "repository": "https://github.com/dagster-io/dagster",
+   "why_not_default": "catalogs/us-equities/agents-operations.json lines 403-440 give it the 'data-orchestration' layer only (not durable-jobs). Its role is 'Partitioned data assets, lineage and backfills' and its rationale says 'not needed just to start three agents'. It is source review only and its commands were not executed. It needs an asset-definitions project and a metadata database. Nothing records process-tree supervision or recovery."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c5",
+   "name": "Restate",
+   "repository": "https://github.com/restatedev/restate",
+   "why_not_default": "catalogs/us-equities/hosting-source-review.json lines 28-47 give decision 'defer_new_service' with execution_status research_only. The record says it 'duplicates manual Dagu research coordination and adds persistence/auth/SDK operation', and that durable replay does not prove external exactly-once effects. Its license is BUSL-1.1 with a use-grant limit. The same file (line 60) says to pick Temporal or Restate, not both. Nothing records native execution."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json",
+    "catalogs/us-equities/hosting-source-review.json",
+    "docs/foundation-rd-readiness.md"
+   ],
+   "key": "c6",
+   "name": "Temporal",
+   "repository": "https://github.com/temporalio/temporal",
+   "why_not_default": "It is the recorded escalation path, but it has not been exercised. catalogs/us-equities/agents-operations.json lines 318-359 call it 'Preferred escalation when jobs must survive host loss, await approvals or span days; heavier than the present bounded worker', with source_review evidence and unexecuted commands. catalogs/us-equities/hosting-source-review.json line 60 records the production burden (persistence and visibility databases, schema upgrades, payload encryption, auth) and says start-dev is developer evidence only. docs/foundation-rd-readiness.md line 26 keeps it keep-but-compare until a durable cross-host requirement exceeds the accepted native path. The current evidence does not show that requirement."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "scheduling-supervision",
+ "limits": [
+  "I did not open the receipts under the decision records: evidence/receipts/native-service-reboot-20260920.json, blueprints/us-equities/worker-supervision/receipt.json, blueprints/convergence-practice/job-recovery/receipt-wsl.json and receipt-macos.json, and blueprints/us-equities/hosting/receipt.json. I checked by Glob that they exist, apart from the evidence/receipts file. The native execution claims are therefore verified only at the level of the decision records, not against the raw receipts.",
+  "No commands were run. The upstream metadata (stars, latest tags, pushed_at) is copied from the packet and was not re-fetched.",
+  "The model is reported as the fixed packet value claude-opus-5/high. The client reports the running model as claude-opus-5-5[1m]. No TypeSafe inference results were supplied or called; the skill body was preloaded from <host-path>/SKILL.md.",
+  "The packet withholds the current_choice, decision and rationale, so this verdict does not rely on them."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "Dagu is pinned at 2.16.6 but upstream latest is v2.17.0 (packet pin_behind_upstream=true). No result for 2.17.0 is recorded.",
+  "All accepted runs used synthetic local workloads: one WSL host, Mac/WSL cancellation, and one orderly reboot of a disposable guest. Physical-PC reboot, power loss, host or user-manager crash, off-host recovery and production workloads are not established (decisions.json lines 2347-2352 and 2405-2412).",
+  "Remote provider cancellation, billing cessation and distributed or external exactly-once effects (for example broker orders) are not established by any candidate's evidence.",
+  "catalogs/us-equities/agents-operations.json line 281 says 'Scheduling remains inactive', and hosting-source-review.json line 21 says the service 'runs server, not scheduler' (dated 2026-09-19). The later guest reboot used a bounded systemd timer, but no recurring production schedule of real jobs is recorded.",
+  "Neither docs/foundation-convergence-20260921.md (lines 97-99) nor this review supplies an observed daily maintenance trigger or restart persistence on the real host.",
+  "Prefect, Dagster, Restate and Temporal have no native execution evidence. Their suitability relative to Dagu is unmeasured, not failed.",
+  "claude-code and beads also carry scheduling-supervision decisions (native-child-interruption-recovery, native-workflow-graceful-recovery, dependency-task-queue), but they are outside this packet's candidate list and I did not judge them."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "dagu-2.16.6+systemd-user-manager (current)",
+   "dagu-2.17.0+systemd-user-manager (upstream latest)",
+   "temporal server+CLI+Python SDK (challenger)"
+  ],
+  "fixture_paths": [
+   "blueprints/convergence-practice/job-recovery/fixture.py",
+   "blueprints/convergence-practice/service-reboot/plan.json",
+   "blueprints/us-equities/worker-supervision/fixture.py"
+  ],
+  "metric": "Pass/fail on each declared case, retained with failures: bounded process-tree termination at the deadline; checkpoint preserved across cancellation/retry; same-run resume after an orderly reboot with exactly one local effect; history visible after restart. Operational burden (added services, databases, auth) is recorded separately."
+ },
+ "overturn_when": "The verdict changes if a real workload needs host-loss survival, days-long waits or durable cross-host effects. The comparison is a challenger arm (Temporal preferred over Restate, per hosting-source-review.json line 60) run through the same declared effect/retry/recovery cases as the accepted fixtures: blueprints/convergence-practice/job-recovery/fixture.py (checkpointed cancel/retry), blueprints/convergence-practice/service-reboot/plan.json with run.py (orderly reboot resume), and blueprints/us-equities/worker-supervision/fixture.py (process-tree deadline). The challenger must pass all cases with acceptable operational burden, or the Dagu+systemd arm must fail a case the challenger passes. A retained failure of Dagu 2.17.0 (the upstream latest) on the same checkpoint/reboot cases would also reopen the Dagu pin.",
+ "packet_sha256": "767ffaa018d5eaf5e134ef31992ea8ac28527574d74f802a4d8ea9a2af97aa43",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__scheduling-supervision.json",
+  "catalogs/foundation/decisions.json (lines 420-449, 1530-1639, 2322-2481, 2595-2674)",
+  "docs/foundation-convergence-20260921.md (lines 70-99)",
+  "catalogs/us-equities/agents-operations.json (lines 270-444)",
+  "catalogs/us-equities/hosting-source-review.json (lines 1-70)",
+  "docs/foundation-rd-readiness.md (lines 20-31)",
+  "<host-path>/SKILL.md (preloaded skill body in context)"
+ ],
+ "why_selected": "I picked systemd (c1) and Dagu (c3) together because each covers part of the requirement and neither covers all of it. They are the only adopted candidates with native execution records, and each record's review_status is accepted_within_scope.\n\n- **systemd (c1):** In catalogs/foundation/decisions.json, decision owned-process-deadlines (lines 1533-1574) records that the Linux user manager terminated a TERM-ignoring parent and its descendants. It kept the timeout failure, and a separate fresh run was accepted. Decision native-child-interruption-recovery (lines 2324-2383) records automatic systemd cleanup of descendants after an abrupt parent-runtime failure. The checkpoint was unchanged and there was one local effect. Together these cover the 'bounded process trees, cancellation' part of the requirement.\n- **Dagu (c3):** Decision checkpointed-workflow-resume (lines 1576-1634) records three things. Native cancel/retry kept one checkpoint on both Mac and WSL. The job ran to completion after the SSH client was terminated. A selected subset of unchanged official Dagu retry tests passed on fresh hosted runners.\n- **Both together:** Decision owned-guest-scheduled-reboot (lines 2385-2478) lists both components. A systemd user-manager timer automatically resumed the same Dagu run after an orderly reboot of a disposable guest. The checkpoint was preserved and there was one local effect. That covers 'visible history' and 'recoverable effects'.\n\nThe observed class is native execution of the pinned upstream tools on synthetic local workloads plus local integration. The decision records themselves label the planner and the guest experiment as local synthetic integration coverage, not production workloads. docs/foundation-rd-readiness.md line 26 independently records the same retained selection ('Dagu/user-service supervision within their recorded scopes'). This is my own review of the decision records. I did not open the receipts underneath them.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "catalogs/foundation/decisions.json",
+  "docs/foundation-rd-readiness.md",
+  "docs/foundation-convergence-20260921.md",
+  "catalogs/us-equities/agents-operations.json",
+  "catalogs/us-equities/hosting-source-review.json"
+ ],
+ "winner_keys": [
+  "c1",
+  "c3"
+ ]
+}

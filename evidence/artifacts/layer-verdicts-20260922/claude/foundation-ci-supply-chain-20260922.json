@@ -1,0 +1,151 @@
+{
+ "alternatives": [
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "docs/github-automation.md",
+    "catalogs/foundation/automation.json",
+    "docs/catalog-provenance.md"
+   ],
+   "key": "c1",
+   "name": "actionlint",
+   "repository": "https://github.com/rhysd/actionlint",
+   "why_not_default": "Version 1.7.12 checks workflow syntax, expressions and action usage. It executes no job (docs/github-automation.md lines 93-95). The validate job downloads the pinned release, verifies its archive SHA-256 and runs it across all workflows (lines 116-118). validate is a required check (catalogs/foundation/automation.json lines 18-21). There is retained evidence of rejections: its embedded shellcheck found two sudo/redirection warnings, which were fixed (github-automation.md lines 119-122), and a first run exited 1 on a runner-context misuse (docs/catalog-provenance.md line 170). None of the retained evidence shows it covering permission scoping, pin enforcement, inventory or attribution. It is a complementary correctness gate next to zizmor, not a winner for this requirement's parts."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c2",
+   "name": "Trivy",
+   "repository": "https://github.com/aquasecurity/trivy",
+   "why_not_default": "The packet marks Trivy adopted, but its only evidence ref records decision 'defer_until_sbom_and_db_freshness_policy' with execution_status research_only (catalogs/us-equities/hosting-source-review.json lines 144-160). No native execution was retained, so Trivy is untested, not failed."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/automation.json",
+    "docs/github-automation.md"
+   ],
+   "key": "c5",
+   "name": "Dependabot",
+   "repository": "https://github.com/dependabot/dependabot-core",
+   "why_not_default": "Hosted initial scans 35541330440 and 35541327481 succeeded and opened major proposals #29 and #30. Their hash failures correctly blocked integration (catalogs/foundation/automation.json lines 32-36; docs/github-automation.md lines 56-62). It keeps GitHub Actions SHA pins current but does not detect or enforce unpinned uses. It owns only GitHub Actions references: pip is not activated, and the curl-downloaded binaries are outside its scope (docs/github-automation.md lines 375-404). Weekly timing and a nonempty minor/patch group are unobserved (automation.json lines 264-266)."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "docs/foundation-closure-20260921.md",
+    "docs/github-automation.md",
+    "catalogs/foundation/automation.json"
+   ],
+   "key": "c6",
+   "name": "gitleaks",
+   "repository": "https://github.com/gitleaks/gitleaks",
+   "why_not_default": "Native gitleaks accepted clean controls and rejected inert fixtures (catalogs/foundation/decisions.json, offline-security-inventory). Its capability is secret detection, which is the secrets-credentials layer's concern (decisions.json secrets-credentials-policy, review_status source_review with no new execution). The hosted secret-scan evidence is incomplete: the first hosted run was cancelled by its own timeout during the history scan (docs/github-automation.md lines 465-469). secret-scan is named only in the committed ruleset, not the applied one (lines 296-302). The sources conflict on its failure policy: automation.json says no fail threshold has been decided, while github-automation.md lines 296-298 says the job fails on any detection."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    ".github/workflows/supply-chain.yml",
+    "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+    "catalogs/us-equities/agents-operations.json",
+    "docs/github-automation.md"
+   ],
+   "key": "c8",
+   "name": "Grype",
+   "repository": "https://github.com/anchore/grype",
+   "why_not_default": "The packet marks Grype not adopted. Its binary is version- and SHA-256-pinned. CI checks GRYPE_VERSION 0.119.0 against GRYPE_SHA256 3fa2dc4b... with sha256sum before extraction (.github/workflows/supply-chain.yml lines 79-91). The native receipt records publisher_checksum_matched and github_asset_digest_matched true (scan-nautilus-rc5-20260922/receipt.json lines 46-51). The earlier claim that it is unpinned was wrong. The 'tracks latest' wording in docs/github-automation.md lines 310-314 is a policy for choosing the next pin, and it keeps Grype out of the freshness job's drift table. What is not pinned is the vulnerability database: `grype db update` fetches the latest DB and only its build time is recorded (receipt lines 56-70). The native scan returned 0 matches (status passed_scoped_scan_zero_findings). The requirement does not ask for vulnerability verdicts. In CI, sbom-vuln is report-only, never passes --fail-on, and the threshold is explicitly pending (github-automation.md lines 278-285 and 319-324). Its packet ref docs/acceptance-evidence-policy.md has no Grype mention."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "ci-supply-chain",
+ "limits": [
+  "I could not run commands. Every native, hosted and exit-code result above comes from repository records; I observed none of it myself. Hosted runs 35541322881, 35541330440, 35541327481 and 35541389048 were not fetched independently.",
+  "No TypeSafe inference results were supplied. All dispositions are my own review of the sources, not retained provider judgments. Refuter findings were treated as claims and checked against the original files. They were accepted where the files supported them: the zizmor permission gap, Grype binary pinning, the Syft runtime receipt, actionlint scope, attest scope and line citations. Skill path: <host-path>/SKILL.md. Actual client model: claude-opus-5-5[1m]. The fixed packet model value was copied as instructed.",
+  "Some line citations for decisions.json, hosting-source-review.json, agents-operations.json and foundation-closure are carried over from the earlier round and were not re-read in this revision.",
+  "Not opened: .github/workflows/validate.yml, publish-catalog.yml, .github/main-ruleset.json, .gitleaks.toml, blueprints/convergence-practice/ci-security/experiment.json, and the full docs/acceptance-evidence-policy.md."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "No retained negative control shows zizmor, or any candidate, rejecting an over-broad workflow permission. The only unsafe fixture declares contents: read (tests/fixtures/workflow-security/unsafe.yml.txt lines 4-5), and its findings are only artipacked, template-injection and unpinned-uses. The scoped-permission part rests on configuration review (supply-chain.yml lines 19-20; docs/catalog-provenance.md lines 20-24) and a clean zizmor pass.",
+  "No candidate enforces pins beyond Action `uses:` references. Binary pins rely on inline sha256sum steps (supply-chain.yml lines 66-91). The native-foundation-e2e package set has no lock file; its pins are inline (docs/github-automation.md lines 326-329).",
+  "Hosted-check attribution rests on the ruleset's check_source_app_id 15368 (automation.json lines 17-22), which no candidate owns. The attestation evidence covers the published catalog archive at d0fe136 only, and newer catalogs are not claimed to have been published (automation.json line 221).",
+  "No retained hosted run IDs show supply-chain.yml sbom-vuln or a tag-triggered SBOM attestation succeeding.",
+  "The committed .github/main-ruleset.json is recorded as reviewed but not applied. The applied ruleset still requires only validate and token-report (docs/github-automation.md lines 296-302).",
+  "Weekly Dependabot timing, a nonempty minor/patch group and superseded-PR cancellation are unverified (automation.json lines 264-270).",
+  "Syft coverage is installed Python metadata only. The 36/36 SDK receipt covers one prefix (receipt.json line 429), no vulnerability scanner (line 432), and no vendored native libraries (line 434). The 21-package runtime scan has no dist-info cross-check (scan receipt lines 172-177).",
+  "The Grype vulnerability DB is not pinned. `grype db update` fetches the latest, and only its build time is recorded (scan receipt lines 56-70).",
+  "Correction to the packet: Trivy (c2) is marked adopted, but its only evidence records a deferred, research-only decision. Grype (c8) is marked not adopted, but it is pinned and runs in supply-chain.yml.",
+  "The sources conflict on gitleaks' failure policy: automation.json ('no fail threshold decided yet') vs docs/github-automation.md lines 296-298 ('fails on any detection')."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "zizmor 1.30.1 vs actionlint 1.7.12 on the same clean/unsafe workflow fixture pair plus a new permission-defect fixture",
+   "Syft 1.52.0 vs Trivy SBOM on the same SDK prefix and runtime site-packages",
+   "actions/attest hosted publication vs archive digest match only",
+   "Grype 0.119.0 (binary pinned) with a decided --fail-on threshold and recorded DB snapshot vs the current report-only lane"
+  ],
+  "fixture_paths": [
+   "tests/test_workflow_security.py",
+   "tests/fixtures/workflow-security/unsafe.yml.txt",
+   "blueprints/convergence-practice/ci-security/experiment.json",
+   "blueprints/us-equities/supply-chain/receipt.json",
+   "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json"
+  ],
+  "metric": "Each part of the requirement has its own metric. Workflow analysis: accept/reject exit codes on the clean directory vs the inert fixture (expected 0 vs 14 with the named identifiers, and unittest passed 2 / skipped 0); detection of a permission-scoping defect once such a fixture exists. Inventory: agreement count between installed distributions and name/version/PURL (expected 36/36). Attribution: hosted original/altered/original verification exit codes (expected 0/1/0) for the named commit."
+ },
+ "overturn_when": "Any of the following would change the verdict. (a) Workflow-analysis slot: run python3 -m unittest discover -s tests -p test_workflow_security.py -v. It must report passed 2 and skipped 0; a skip means the check did not run, because the class is skipUnless(zizmor) (tests/test_workflow_security.py line 16). Also run the directory-wide scan recorded in evidence/receipts/native-linux-zizmor-20260920.json line 31, because the unit test scans only validate.yml (lines 41-42). If the clean directory is no longer exit 0 with 0 findings, or tests/fixtures/workflow-security/unsafe.yml.txt no longer yields exit 14 with unpinned-uses and template-injection, c7 is overturned. A permission-defect fixture (e.g. permissions: write-all) does not exist yet. If one is added under tests/fixtures/workflow-security/ and zizmor fails to reject it while another analyzer does, the scoped-permission part moves to that analyzer. (b) Inventory slot: re-run Syft and an alternative (e.g. Trivy SBOM) on the prefixes in blueprints/us-equities/supply-chain/receipt.json and blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json. The slot changes if Syft's 36/36 dist-info agreement fails, or if the alternative matches it and also covers non-Python or native-library content. (c) Attribution slot: c4 is overturned if a new hosted publication run fails original/altered/original verification (expected 0/1/0) under the procedure in docs/catalog-provenance.md. (d) If the requirement adds vulnerability gating with a decided threshold and a pinned or recorded DB snapshot, compare Grype (c8) using blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json.",
+ "packet_sha256": "01a76a4df7a5c86d95d4183efe557e09719d29ab16f2734f9def1a5670a44210",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__ci-supply-chain.json (lines 1-252)",
+  "evidence/receipts/native-linux-zizmor-20260920.json (full)",
+  "tests/fixtures/workflow-security/unsafe.yml.txt (full)",
+  "tests/test_workflow_security.py (full)",
+  ".github/workflows/supply-chain.yml (full)",
+  "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json (full)",
+  "blueprints/us-equities/supply-chain/receipt.json (lines 1-95, 424-439)",
+  "catalogs/foundation/automation.json (lines 10-29, 200-224; earlier round: full)",
+  "docs/catalog-provenance.md (lines 1-30; earlier round: 1-223)",
+  "docs/github-automation.md (lines 88-127, 230-329; earlier round: 50-469)",
+  "catalogs/foundation/decisions.json (earlier round: lines 1405-1474, 2905-2954)",
+  "catalogs/us-equities/hosting-source-review.json (earlier round: lines 86-102, 144-160, 228)",
+  "catalogs/us-equities/agents-operations.json (earlier round: lines 1442-1496)",
+  "docs/foundation-closure-20260921.md (earlier round: line 63)",
+  "docs/acceptance-evidence-policy.md (earlier round: grep only)",
+  "blueprints/convergence-practice/ci-security/README.md (earlier round)",
+  "<host-path>/SKILL.md (skill body loaded in context via skill invocation)"
+ ],
+ "why_selected": "The requirement (packet line 252) has four parts. Each winner has retained native evidence for a different part. I opened these repository records myself; I did not re-run or observe any command or hosted run.\n\n(1) Pinned Action references and workflow-injection defects: zizmor 1.30.1 (c7). evidence/receipts/native-linux-zizmor-20260920.json lines 31-54 records a native directory-wide scan of .github/workflows that returned exit 0 with 0 findings. The same receipt records exit 14 with 3 findings (artipacked, template-injection, unpinned-uses) on the unchanged inert fixture, plus a unittest run with passed 2 and skipped 0. The fixture is tests/fixtures/workflow-security/unsafe.yml.txt (actions/checkout@main on line 10; injection on line 11). catalogs/foundation/decisions.json (offline-security-inventory) records it as accepted_within_scope. zizmor's pin evidence covers only `uses:` Action references. The curl-downloaded binaries are pinned by sha256sum steps in the workflows (e.g. .github/workflows/supply-chain.yml lines 66-91), not by any candidate. Scoped permissions are credited to zizmor only through its clean pass. The fixture itself declares `permissions: contents: read` (lines 4-5), and no retained negative control shows zizmor rejecting an over-broad permission. The scoped-permission evidence is configuration review: supply-chain.yml lines 19-20 and docs/catalog-provenance.md lines 20-24.\n\n(2) Actual runtime inventory: Syft 1.52.0 (c3). blueprints/us-equities/supply-chain/receipt.json lines 9-10 and 55-85 record status passed_scoped_inventory_acceptance. Syft found 36 packages, the CycloneDX PURLs matched Syft, and all 36 installed dist-info entries matched. blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json lines 13-16, 77-82 and 102-104 separately record a native Syft scan (exit 0) of the pinned NautilusTrader 2.0.0rc5 paper runtime's site-packages, which returned 21 packages. That scan has no dist-info cross-check.\n\n(3) Attributable hosted output: actions/attest (c4). catalogs/foundation/automation.json lines 208-221 and docs/catalog-provenance.md lines 8-16 record hosted publication run 35541322881 at d0fe136. An independent download matched the catalog digest. Original/altered/original verification returned 0/1/0, and a non-main dispatch was skipped with zero steps. This attributes the published catalog archive to its origin. It does not attribute CI check results. Check attribution comes from the ruleset's pinned check source (automation.json lines 17-22: required checks validate and token-report, check_source_app_id 15368), which no candidate owns.\n\nThese results are documented native evidence for one host and one commit. They are not a measured comparison against the alternatives.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "evidence/receipts/native-linux-zizmor-20260920.json",
+  "tests/fixtures/workflow-security/unsafe.yml.txt",
+  "tests/test_workflow_security.py",
+  "catalogs/foundation/decisions.json",
+  "blueprints/us-equities/supply-chain/receipt.json",
+  "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+  "catalogs/us-equities/hosting-source-review.json",
+  "catalogs/foundation/automation.json",
+  "docs/catalog-provenance.md",
+  ".github/workflows/supply-chain.yml"
+ ],
+ "winner_keys": [
+  "c7",
+  "c3",
+  "c4"
+ ]
+}

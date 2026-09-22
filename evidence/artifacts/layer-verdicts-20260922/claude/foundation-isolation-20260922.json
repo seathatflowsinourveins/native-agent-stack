@@ -1,0 +1,136 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "docs/token-native-saturation.md"
+   ],
+   "key": "c4",
+   "name": "Apple Container",
+   "repository": "https://github.com/apple/container",
+   "why_not_default": "Its native evidence is a persistence fixture on a Mac: one PostgreSQL row survived a stop/start in a named volume (catalogs/foundation/decisions.json 'mac-container-volume', lines 1779-1839; docs/token-native-saturation.md line 63). It does not test an enforced filesystem or network restriction, and it runs only on macOS. The record also keeps a failure (a Mac Documents bind mount stalled) and has recovery 'not_established'. Selection is 'optional'. It does not qualify isolation on Linux/WSL."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md"
+   ],
+   "key": "c1",
+   "name": "Podman / Quadlet",
+   "repository": "https://github.com/podman-container-tools/podman",
+   "why_not_default": "The evidence is source review only. catalogs/landscape/hosting-practice.json (lines 32-42) records decision 'conditional' and native_acceptance 'not_established', with image, networking, volume, GPU and Docker-API compatibility unmeasured. docs/hosting-container-practice.md line 6 says 'No container trial in this review establishes that either wins or fails on our workload.' No container was installed or run. This is untested, not a failure."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md"
+   ],
+   "key": "c3",
+   "name": "Docker Engine / Moby",
+   "repository": "https://github.com/moby/moby",
+   "why_not_default": "The evidence is source review only. catalogs/landscape/hosting-practice.json (lines 9-19) records docker-v29.8.1 as 'conditional' with native_acceptance 'not_established', and says no matched result shows better reproduction or recovery than the accepted native services. docs/hosting-container-practice.md lines 24-29 warns of Desktop/engine conflicts in WSL. No isolation trial was run. This is untested, not a failure."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c7",
+   "name": "E2B",
+   "repository": "https://github.com/e2b-dev/E2B",
+   "why_not_default": "The evidence is source review only. catalogs/us-equities/agents-operations.json (lines 647-686) records e2b@2.51.0 as 'conditional' for untrusted generated code that needs a VM boundary. Its commands are marked 'Prospective commands; not executed', its limitations say 'Import is not sandbox E2E', and it needs an account/API credential, a cloud budget and managed hosting. No run of an enforced boundary is retained."
+  },
+  {
+   "disposition": "out_of_scope",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c2",
+   "name": "gVisor",
+   "repository": "https://github.com/google/gvisor",
+   "why_not_default": "Not adopted. catalogs/us-equities/hosting-source-review.json (lines 104-122) records release-20260914.0 with decision 'defer_oci_platform' and execution_status research-only. The entry says the stronger application-kernel boundary needs an OCI bundle/runtime plus workload and platform acceptance, and that no containerized hosting platform currently requires runsc. No runsc execution is retained."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "isolation",
+ "limits": [
+  "External URL evidence refs were not fetched. Upstream metadata is copied from the packet.",
+  "evidence/receipts/worktrunk-list.json, the velanext-native-quality-tools-20260920 receipt and blueprints/convergence-practice/wsl-native-tools/receipt.json were not opened. The 0.78.0 dirty-refusal claim is taken from the manifests/evidence.json line 1886 summary only.",
+  "The Apple Container receipt and blueprints/token-native-focus/saturation-audit.json were not read in this revision.",
+  "No commands were run. All evidence is retained receipts and catalog text, dated 2026-09-19 to 2026-09-22.",
+  "The fixed model field is copied from the task. The session reports the actual model as claude-opus-5-5[1m]. The TypeSafe skill was preloaded from <host-path>/typesafe-ai. No TypeSafe inference results were supplied, so every disposition is my own source review. Refuter findings were treated as data and re-checked against the original files."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "Worktrunk version attribution: the 2026-09-20 worktrunk-owned-lifecycle check records no version and ran before 0.79.0 was released (2026-09-21). The 0.79.0 create/list/remove qualification is only in orx-worktrunk-upgrades.json, whose status is 'awaiting-independent-coordinator-review'. Dirty-removal refusal is evidenced only for 0.78.0 on VelaNext (manifests/evidence.json line 1886).",
+  "The catalogs disagree on Worktrunk's role. decisions.json line 487 says 'default' with stage_refs 'use' only. docs/token-native-saturation.md line 121 says 'optional' with stages 'use, cleanup'. This is unresolved.",
+  "sandbox-runtime filesystem quirk: when a path overlaps allow-write and deny-read, the first write exited 0 into an ephemeral hidden sandbox mount, leaving the host unchanged, rather than being refused (runtime-tools.json line 30). Direct write denial is established only by the separate fixture.",
+  "sandbox-runtime has no retained evidence for TLS, SOCKS, DNS rebinding, IPv6, remote-host traffic or general sandbox escape. The first immediate network request failed with exit 7 because of a proxy startup race, and the tested command needed bounded curl retries.",
+  "The sandbox-runtime version label is inconsistent: hosting-source-review.json line 79 says the installed CLI --version prints 1.0.0 while package.json says 0.0.77. The same entry's execution_status reads research-only except existing-tool results, but the native_cli_e2e receipts are those existing-tool results.",
+  "No candidate has hostile-workload, resource-limit or macOS isolation evidence.",
+  "Worktrunk isolates edits only, not permissions, accounts, global settings or shared services. Crash cleanup is not established.",
+  "Ordinary native, Dagu, Claude and Codex processes are not sandboxed automatically.",
+  "Podman, Docker, E2B and gVisor are untested, not failed.",
+  "Bubblewrap is missing from the candidates. hosting-source-review.json lines 123-141 record an isolated ai-memory restore on distro bubblewrap 0.9.0 with all namespaces unshared and a read-only host root. It is not a packet candidate (sota_components_not_in_candidates is empty), no receipt was opened, and it has no network allow/deny assertion. This is a coverage gap in the layer's candidate set."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "sandbox-runtime 0.0.77 (current conditional boundary)",
+   "gVisor runsc release-20260914.0",
+   "Podman/Quadlet v6.1.2 rootless",
+   "Docker Engine docker-v29.8.1 rootless",
+   "E2B e2b@2.51.0 managed sandbox"
+  ],
+  "fixture_paths": [
+   "blueprints/token-native-focus/saturation-audit.json",
+   "blueprints/convergence-practice/container-storage/README.md"
+  ],
+  "metric": "Pass/fail per boundary assertion: the allowed request is delivered; explicit-deny and default-deny requests are blocked before reaching the server; the protected read is refused; a separate protected write is refused with no host file created. Count an overlapping read/write path that exits 0 into an ephemeral mount as not-refused. Also score whether owned cleanup completed and whether the stated host is compatible. Score resource-limit enforcement as a separate pass/fail when the task needs it."
+ },
+ "overturn_when": "Change the boundary verdict if two things happen: a task requires hostile or untrusted code isolation, resource limits or a VM/OCI boundary; and a challenger passes an executed comparison against sandbox-runtime. The challengers are gVisor runsc, rootless Podman/Quadlet, rootless Docker and E2B.\n\nThe comparison must repeat these assertions:\n- the network assertions in evidence/receipts/native-sandbox-network-20260920.json;\n- the filesystem assertions in evidence/receipts/runtime-tools.json: allowed write, denied read, a separate denied write, and no host file created;\n- workload startup, resources, cleanup and host compatibility.\nRecord the result as lifecycle stages in blueprints/token-native-focus/saturation-audit.json.\n\nFor the Mac lane, apply the same checks to Apple Container using blueprints/convergence-practice/container-storage/README.md.\n\nChange the Worktrunk verdict only if a recorded 0.79.0 dirty-state or crash-cleanup check shows loss of unrelated work, or if the catalog resolves its role as 'optional' rather than 'default'.",
+ "packet_sha256": "52c7131a80d956c24bb33b07c1cea73d13146e697e618897f468c266a4111eb0",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__isolation.json",
+  "catalogs/landscape/hosting-practice.json",
+  "docs/hosting-container-practice.md",
+  "catalogs/foundation/decisions.json",
+  "docs/token-native-saturation.md",
+  "catalogs/us-equities/hosting-source-review.json",
+  "catalogs/us-equities/agents-operations.json",
+  "evidence/receipts/native-sandbox-network-20260920.json",
+  "evidence/receipts/token-native-retained-functional-20260920.json",
+  "evidence/receipts/runtime-tools.json",
+  "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
+  "recipes/native-upgrades-20260921.md",
+  "manifests/evidence.json"
+ ],
+ "why_selected": "The requirement has two parts: keep edits separate, and enforce a real filesystem/network boundary only when a task needs it. Worktrunk (c5) and sandbox-runtime (c6) are the only adopted candidates with native-execution evidence for those parts on this Linux/WSL host.\n\nc5, Worktrunk, for edit separation. There are two separate native runs:\n(a) Pinned 0.79.0 (observed 2026-09-21). evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json, lines 70-101: an upgrade from previous_version 0.78.0 to installed_version 0.79.0. The native wt switch --create, list and remove commands ran on an owned disposable fixture and each exited 0. listed_worktrees_before_cleanup was 2, after_cleanup_worktrees was 1, git_status_porcelain was empty and removed_worktree_directory_absent was true. Lines 103-114 record a local regression comparison against the upstream test oracle: baseline_behavior_passed false for 0.78.0 and candidate_behavior_passed true for 0.79.0. The upstream Rust test was read but not executed. The artifact's status is 'qualified-and-promoted-awaiting-independent-coordinator-review' (line 5).\n(b) Pre-0.79.0 build, version not recorded (2026-09-20). evidence/receipts/token-native-retained-functional-20260920.json, check worktrunk-owned-lifecycle: created_worktrees 2, remaining_worktrees 1, hooks_disabled true, disposable_repository_only true.\nDirty-removal refusal is recorded only for Worktrunk 0.78.0 on VelaNext (manifests/evidence.json line 1886). It has not been re-shown on 0.79.0.\n\nThe catalogs disagree on Worktrunk's role. catalogs/foundation/decisions.json 'owned-worktrees' (line 487) says selection 'default', with stage_refs listing only 'use' (lines 512-518). docs/token-native-saturation.md line 121 says 'optional' with stages 'use, cleanup'. I treat it as the default for edit separation only, following the decision record. That record limits Worktrunk to edits: 'Worktrees isolate edits, not permissions, accounts, global settings or shared services.'\n\nc6, sandbox-runtime 0.0.77, as the conditional enforced boundary.\nFilesystem: evidence/receipts/runtime-tools.json (native_cli_e2e, 2026-09-19), lines 25-31. allowed_write_exit was 0, denied_read_exit 1, separate_denied_write_exit 1 and host_file_created false. The clean child environment had HOME and PATH only.\nNetwork: evidence/receipts/native-sandbox-network-20260920.json (native_cli_e2e, passed). The allowed loopback request exited 0 and reached the server (server requests went from 0 to 1). The explicit-deny and default-deny requests each exited 22 with a proxy 403 and did not reach the server (server_total_requests 1).\ndecisions.json 'scoped-os-isolation' (lines 523-563) cites both receipts and records selection 'conditional'. That matches the requirement's 'only where the selected task requires enforced restrictions'.\n\nAll of this is dated native local execution within a stated scope. It is not a security certification.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
+  "evidence/receipts/token-native-retained-functional-20260920.json",
+  "evidence/receipts/runtime-tools.json",
+  "evidence/receipts/native-sandbox-network-20260920.json",
+  "catalogs/foundation/decisions.json",
+  "docs/token-native-saturation.md",
+  "manifests/evidence.json"
+ ],
+ "winner_keys": [
+  "c5",
+  "c6"
+ ]
+}
