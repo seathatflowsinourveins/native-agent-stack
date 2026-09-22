@@ -3710,8 +3710,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "371ced8f918559d71aa77594c07f9a5c85e4a9117d1da11e7d47c023c06539a2",
-      "bytes": 5227
+      "sha256": "72798cb0398cbf5c67c6a14215fc9364f254735a0399b723430f9d8738f49eb0",
+      "bytes": 5594
     },
     {
       "path": ".gitignore",
@@ -3720,8 +3720,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "80d8630d3fd4db6302d6da0077587d60eb7cf7da9df4d462b2fe1d89d3ebabf1",
-      "bytes": 846
+      "sha256": "c9956e586a7652080bc625896a9f0877695431ac0a4fe0de8c90b15939c76c03",
+      "bytes": 1878
     },
     {
       "path": "AGENTS.md",
@@ -9061,8 +9061,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "00968b4a8743510b0878cc788b068d5e8dab642de6dc418fa847546749bf4069",
-      "bytes": 28339
+      "sha256": "bb23d095af8233b4bef10f2a272285c910025c097c3ebb3f9bee71d89d8ca3aa",
+      "bytes": 29456
     },
     {
       "path": "docs/research-task-acceptance.md",

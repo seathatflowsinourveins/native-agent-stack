@@ -95,12 +95,15 @@ jobs:
       - name: Scan git history for secrets
         if: always()
         run: |
-          "$RUNNER_TEMP/gitleaks/gitleaks" git . --redact --no-banner \
-            --report-format json --report-path "$RUNNER_TEMP/gitleaks/gitleaks.json"
+          # --config: reviewed allowlists (.gitleaks.toml); --max-target-megabytes 2: the
+          # generated explorer HTML is skipped (recorded as incomplete coverage in
+          # docs/github-automation.md); measured 2026-09-22: 522 commits, 777 MB, 34 s locally.
+          "$RUNNER_TEMP/gitleaks/gitleaks" git . --config .gitleaks.toml --max-target-megabytes 2 \
+            --redact --no-banner --report-format json --report-path "$RUNNER_TEMP/gitleaks/gitleaks.json"
       - name: Scan working tree for secrets
         if: always()
         run: |
-          "$RUNNER_TEMP/gitleaks/gitleaks" dir . --redact --no-banner
+          "$RUNNER_TEMP/gitleaks/gitleaks" dir . --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner
       - name: Upload redacted secret-scan report
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
