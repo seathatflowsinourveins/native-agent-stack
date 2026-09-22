@@ -29,6 +29,13 @@
       "architecture": "arm64",
       "status": "drafted_not_accepted",
       "doc": "adoption/platforms/macos-arm64.md",
+      "bootstrap_script": "adoption/bootstrap-macos.sh",
+      "pins": "adoption/pins-macos-arm64.json",
+      "hosted_smoke": {
+        "workflow": ".github/workflows/adoption-bootstrap.yml",
+        "job": "bootstrap-macos",
+        "status": "pending_first_green_run"
+      },
       "evidence_ref": null
     }
   ],

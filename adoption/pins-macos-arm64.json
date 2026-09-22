@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-09-22",
+  "platform": "macos-arm64",
+  "source": "Drafted for the macos-arm64-foundation profile on 2026-09-22 from a Linux workstation: no macOS host executed anything here. Every sha256 below was obtained from the publisher, never guessed. Node, uv, gh and ai-memory come from the publisher's own checksum file or .sha256 sidecar; llama.cpp and Qdrant publish no checksum file for these assets, so each asset's GitHub release `digest` field was read via `gh api repos/<owner>/<repo>/releases/tags/<tag>` and the asset was additionally downloaded to a scratch directory under $TMPDIR and re-hashed with sha256sum (both agreed). The four npm registry tarballs are byte-identical to the ones pinned in adoption/pins-linux-x86_64.json (same registry tarball, re-downloaded and re-hashed here, and cross-checked against `npm view <pkg>@<ver> dist.integrity`); npm still resolves each client's darwin-arm64 optional dependency package unpinned at install time, which is recorded per entry. Versions match pins-linux-x86_64.json wherever the component is the same.",
+  "tools": [
+    {
+      "id": "node",
+      "version": "24.21.0",
+      "kind": "tarball",
+      "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-darwin-arm64.tar.xz",
+      "sha256": "6239d4cf92d864487ec8cd3615038f7b67e7f58b77b21cd2f09ea9fbd68065fe",
+      "checksum_source": "publisher_checksum_file",
+      "checksum_ref": "https://nodejs.org/dist/v24.21.0/SHASUMS256.txt line 'node-v24.21.0-darwin-arm64.tar.xz', fetched 2026-09-22",
+      "install_note": "Same Node version as the linux-x86_64 pin (24.21.0), different asset. Extract with --strip-components=1 into tools/node-24.21.0; symlink bin/{node,npm,npx,corepack}. Apple Silicon build; no Rosetta."
+    },
+    {
+      "id": "uv",
+      "version": "0.12.17",
+      "kind": "tarball",
+      "url": "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-apple-darwin.tar.gz",
+      "sha256": "85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b",
+      "checksum_source": "publisher_checksum_sidecar",
+      "checksum_ref": "astral-sh/uv release 0.12.17 asset uv-aarch64-apple-darwin.tar.gz.sha256, read 2026-09-22",
+      "install_note": "Same uv version as the linux-x86_64 pin. Archive also contains uvx; install both into tools/uv-0.12.17 and symlink each."
+    },
+    {
+      "id": "gh",
+      "version": "2.101.0",
+      "kind": "zip",
+      "url": "https://github.com/cli/cli/releases/download/v2.101.0/gh_2.101.0_macOS_arm64.zip",
+      "sha256": "e4303e39d8f07141c4bad4b99b01079f05029c59b27076e8fbc825c985ecdd8b",
+      "checksum_source": "publisher_checksum_file",
+      "checksum_ref": "cli/cli release v2.101.0 asset gh_2.101.0_checksums.txt line 'gh_2.101.0_macOS_arm64.zip', read 2026-09-22",
+      "install_note": "Same gh version as the linux-x86_64 pin. macOS ships a zip, not a tarball: unzip and take the executable at gh_2.101.0_macOS_arm64/bin/gh. Requires unzip (present in the macOS base system)."
+    },
+    {
+      "id": "codex",
+      "version": "0.155.1",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.155.1.tgz",
+      "sha256": "fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66",
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "npm view @openai/codex@0.155.1 dist.integrity = sha512-02fAAGyBtlA1zPjEo3kTj/bOSYbPz5DvjLwRZJdV7weFFEDzNFOMjQGmZ/+5CuirYV0hE+AZTrnjzwXYU4AdAQ== (2026-09-22); the tarball was re-downloaded and sha256sum matched adoption/pins-linux-x86_64.json exactly",
+      "install_note": "Platform-independent wrapper package, identical bytes to the linux-x86_64 pin. UNPINNED SUB-DEPENDENCY: on Apple Silicon npm resolves the optional dependency '@openai/codex-darwin-arm64' (npm alias to @openai/codex@0.155.1-darwin-arm64), which carries the real binary and is NOT covered by this sha256. Record its resolved version and integrity from the host's npm ls/package-lock at first install."
+    },
+    {
+      "id": "claude-code",
+      "version": "2.1.278",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.1.278.tgz",
+      "sha256": "08c6dfcf3dafcfd30e09b2926c596e274f0fa20844a5801ada7f1c8e6227157e",
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "npm view @anthropic-ai/claude-code@2.1.278 dist.integrity = sha512-mfNRqC0GaEXqmP97NiwJBeYBmRuqe2VzgLUreUUaEhyJxJWx2Z6ClW1tBOncGNNXdhj6EY4LPvUIWP+oq311CA== (2026-09-22); the tarball was re-downloaded and sha256sum matched adoption/pins-linux-x86_64.json exactly",
+      "install_note": "Identical bytes to the linux-x86_64 pin. UNPINNED SUB-DEPENDENCY: npm resolves '@anthropic-ai/claude-code-darwin-arm64@2.1.278' on Apple Silicon for the native binary; this sha256 does not cover it. Set DISABLE_AUTOUPDATER=1 so the pinned version stays pinned."
+    },
+    {
+      "id": "mcporter",
+      "version": "0.13.13",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.13.13.tgz",
+      "sha256": "ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d",
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "npm view mcporter@0.13.13 dist.integrity = sha512-rgltHjpmdsBzErnWfAlNsW6Sn5B3y3Qli8phNtKkgn7s/Lk3Uf1YWLpqJXrIXjhxzBR67Oi5Z3+wxptn/vxFkA== (2026-09-22); re-downloaded tarball sha256 matched the linux-x86_64 pin exactly",
+      "install_note": "Pure JavaScript package with no optionalDependencies on the registry (checked 2026-09-22), so the pinned tarball is the whole install. Requires Node >=24, satisfied by the node pin above."
+    },
+    {
+      "id": "context-mode",
+      "version": "1.0.169",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/context-mode/-/context-mode-1.0.169.tgz",
+      "sha256": "09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "npm view context-mode@1.0.169 dist.integrity = sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ== (2026-09-22); re-downloaded tarball sha256 matched the linux-x86_64 pin exactly",
+      "install_note": "No optionalDependencies on the registry (checked 2026-09-22). As in the linux-x86_64 pin, the npm package is a DIFFERENT source revision from the client-native Context Mode plugin and installing it does not establish plugin-level acceptance."
+    },
+    {
+      "id": "ai-memory",
+      "version": "2.3.2",
+      "kind": "tarball",
+      "url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.3.2/ai-memory-macos-aarch64.tar.gz",
+      "sha256": "e0f07ad28938f3ed98a5feb21d11917245d77501764e0005049e7d9c1c16f28a",
+      "checksum_source": "publisher_checksum_sidecar",
+      "checksum_ref": "akitaonrails/ai-memory release v2.3.2 asset ai-memory-macos-aarch64.tar.gz.sha256, read 2026-09-22",
+      "install_note": "Same ai-memory version as the linux-x86_64 pin; macos-aarch64 sidecar binary archive. Installs the single ai-memory executable. The MCP server registration, hooks install and any managed run remain separate macOS steps with no receipt yet."
+    },
+    {
+      "id": "llama-cpp",
+      "version": "b11057",
+      "kind": "tarball",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11057/llama-b11057-bin-macos-arm64.tar.gz",
+      "sha256": "443eadead90d44c3925b7163012430b2df4934df881cf72a4d94fc71d1380da1",
+      "checksum_source": "github_release_asset_digest_plus_local_rehash",
+      "checksum_ref": "gh api repos/ggml-org/llama.cpp/releases/tags/b11057 asset digest sha256:443eadead90d44c3925b7163012430b2df4934df881cf72a4d94fc71d1380da1 (size 11178107), and an independent sha256sum of the downloaded asset in a $TMPDIR scratch directory returned the same value on 2026-09-22",
+      "install_note": "Build b11057 matches the 'b11057 (0.4.1-dev)' llama-cpp row in manifests/stack.json; llama-server is a required_command of the macos-arm64-foundation profile, so it is pinned rather than left to a floating `brew install llama.cpp`. OBSERVED ARCHIVE LAYOUT (tar -tzf on the downloaded asset, 61 entries): one flat top-level directory llama-b11057/ holding every executable (llama-server, llama-cli, ...) NEXT TO its dylibs (libllama*.dylib, libggml*.dylib, libmtmd*.dylib) -- there is no build/bin subdirectory in this macOS asset. The whole directory is therefore installed into tools/llama-cpp-b11057 and bin/llama-server is a wrapper script that exports DYLD_LIBRARY_PATH to that prefix and execs the real binary, not a bare symlink. Metal embedding acceptance (port 8232, 768-dim) is unrun."
+    },
+    {
+      "id": "qdrant",
+      "version": "1.19.1",
+      "kind": "tarball",
+      "url": "https://github.com/qdrant/qdrant/releases/download/v1.19.1/qdrant-aarch64-apple-darwin.tar.gz",
+      "sha256": "e060209dfefc9d977ddcec48521349f505f8fd1ce21f2a3db444140870522fe4",
+      "checksum_source": "github_release_asset_digest_plus_local_rehash",
+      "checksum_ref": "gh api repos/qdrant/qdrant/releases/tags/v1.19.1 asset digest sha256:e060209dfefc9d977ddcec48521349f505f8fd1ce21f2a3db444140870522fe4 (size 27974838), and an independent sha256sum of the downloaded asset in a $TMPDIR scratch directory returned the same value on 2026-09-22",
+      "install_note": "Version 1.19.1 matches the qdrant row in manifests/stack.json. The archive is a single top-level file named qdrant (tar -tzf shows exactly one entry), so the generic single-binary tarball installer applies. Collections are re-indexed on the new host, never copied."
+    }
+  ]
+}
