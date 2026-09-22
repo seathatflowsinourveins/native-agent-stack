@@ -36,6 +36,10 @@
   ],
   "handbook_guides": [
     {
+      "path": "docs/catalog-reconciliation-20260922.md",
+      "label": "Live Claude reconciliation and canonical decisions"
+    },
+    {
       "path": "docs/claude-blind-adjudication-20260921.md",
       "label": "Claude independent findings and corrections"
     },

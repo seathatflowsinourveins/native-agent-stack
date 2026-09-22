@@ -5,6 +5,11 @@ result retains the qualified native foundation and all 68 selected components.
 New candidates expand discovery and decision-changing comparisons; they do not
 inherit installation, runtime quality or new-PC acceptance.
 
+The subsequent live-owner [September 22 reconciliation](catalog-reconciliation-20260922.md)
+corrected nine ambiguous coordinator labels and added a canonical-decision
+consistency check. It is explicitly post-seal review, not another blinded pass.
+Selected pins and candidate dispositions remain unchanged.
+
 The [Claude report](../evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json)
 retains its discovery, screening, judge and refuter outputs. Its claims and scores
 are attributed reviewer output, not automatically accepted catalog conclusions.

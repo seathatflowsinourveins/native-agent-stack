@@ -23,6 +23,49 @@ def norm(value):
     return value.lower().rstrip('/').removesuffix('.git')
 
 
+def check_layer_decisions(root=ROOT):
+    """Keep operative synthesis labels and the handbook tied to canonical decisions.
+
+    Historical peer labels are evidence, never an alternate source of adoption
+    authority. This check deliberately leaves the frozen screening ledger alone.
+    """
+    canonical = {}
+    for name in ('foundation', 'us-equities'):
+        path = f'catalogs/landscape/{name}.json'
+        catalog = json.loads((root / path).read_text())
+        for index, layer in enumerate(catalog['layers']):
+            key = layer['layer_id']
+            assert key not in canonical, f'duplicate canonical layer: {key}'
+            canonical[key] = (layer['decision'], path, f'/layers/{index}/decision')
+    assert len(canonical) == 20, 'expected the 20 canonical layers'
+    synthesis = json.loads((root / 'catalogs/landscape/blind-convergence.json').read_text())
+    assert synthesis['decision_authority'] == {
+        'catalogs': ['catalogs/landscape/foundation.json', 'catalogs/landscape/us-equities.json'],
+        'field': 'layers[].decision',
+        'rule': 'coordinator_disposition mirrors the canonical decision; peer judgments are historical evidence; candidate dispositions and per-host receipts govern adoption',
+    }, 'canonical decision authority is missing or changed'
+    seen = set()
+    for layer in synthesis['layers']:
+        key = layer['layer_id']
+        assert key not in seen, f'duplicate synthesis layer: {key}'
+        seen.add(key)
+        assert key in canonical, f'unknown synthesis layer: {key}'
+        decision, path, pointer = canonical[key]
+        assert layer['coordinator_disposition'] == decision, f'{key}: coordinator decision differs from canonical {decision}'
+        assert layer['canonical_decision_ref'] == {'path': path, 'pointer': pointer}, f'{key}: wrong canonical decision pointer'
+    assert seen == set(canonical), 'synthesis layer coverage differs from canonical'
+    markdown = (root / 'docs/blind-catalog-layer-findings-20260921.md').read_text()
+    table = {}
+    for line in markdown.splitlines():
+        if line.startswith('| ') and line.split('|')[1].strip() in canonical:
+            cells = [cell.strip() for cell in line.split('|')]
+            key, status = cells[1:3]
+            assert key not in table, f'duplicate handbook layer: {key}'
+            table[key] = status
+    assert table == {key: value[0].replace('_', ' ') for key, value in canonical.items()}, 'handbook decisions differ from canonical'
+    return len(canonical)
+
+
 def derive():
     compact = read('claude-source-review.json')
     coverage = read('claude-coverage-review.json')
@@ -109,7 +152,8 @@ if __name__ == '__main__':
     result = derive()
     if sys.argv[1:] == ['--check']:
         assert result == read('screening-ledger.json'), 'retained screening ledger is stale'
-        print('PASS: 514 original rows, 159 later repairs, 125 action joins; no adoption inferred')
+        check_layer_decisions()
+        print('PASS: 514 original rows, 159 later repairs, 125 action joins, 20 canonical layer labels; no adoption inferred')
     else:
         assert not sys.argv[1:], 'only --check is supported'
         print(json.dumps(result, indent=2))

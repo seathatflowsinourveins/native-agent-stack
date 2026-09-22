@@ -58,11 +58,15 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "retain",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/0/decision"
+      }
     },
     {
       "layer_id": "instructions-skills",
-      "coordinator_disposition": "retain_targeted_practice",
+      "coordinator_disposition": "adjust",
       "rationale": "The review favors the Agent Skills format and Anthropic examples; these complement the selected small skill set. Superpowers remains a workflow candidate, not a reason to load another full instruction suite.",
       "claude_independent_finding": "Retain targeted shared skills. Broad agent-framework discovery did not run a controlled skill-use comparison; omitted smaller skill repositories were not tested failures.",
       "evidence_refs": [
@@ -76,11 +80,15 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "adjust",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/1/decision"
+      }
     },
     {
       "layer_id": "workers",
-      "coordinator_disposition": "retain",
+      "coordinator_disposition": "keep_but_compare",
       "rationale": "Both views favor native Codex/Claude for bounded work. Keep application SDKs and LangGraph conditional on a real application/durable-state requirement. Claude's portable roles/workflow evidence is now integrated.",
       "claude_independent_finding": "Retain native owned workers. DeerFlow, Deep Agents and OpenHands SDK were omitted from F-agents, while application SDKs lost the stars cutoff. Preserve these conditional comparisons and distinguish Agent Canvas hosting from its SDK and historical benchmark harness.",
       "evidence_refs": [
@@ -94,7 +102,11 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "keep_but_compare",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/2/decision"
+      }
     },
     {
       "layer_id": "isolation",
@@ -112,11 +124,15 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "retain",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/3/decision"
+      }
     },
     {
       "layer_id": "code-navigation",
-      "coordinator_disposition": "retain_expand_discovery",
+      "coordinator_disposition": "retain",
       "rationale": "The independent exact/structural/symbol stack agrees with the current responsibility split. ripgrep and SCIP are newly indexed; SCIP needs language/index maintenance evidence before adding another lane.",
       "claude_independent_finding": "Retain exact/symbol/structural lanes. Serena was discovered but excluded from the star-capped shortlist; the reviewer explicitly identified inadequate coverage of small code-navigation tools.",
       "evidence_refs": [
@@ -130,7 +146,11 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "retain",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/4/decision"
+      }
     },
     {
       "layer_id": "document-retrieval",
@@ -148,7 +168,11 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "keep_but_compare",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/5/decision"
+      }
     },
     {
       "layer_id": "semantic-rag",
@@ -166,7 +190,11 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "keep_but_compare",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/6/decision"
+      }
     },
     {
       "layer_id": "durable-memory",
@@ -184,11 +212,15 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "keep_but_compare",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/7/decision"
+      }
     },
     {
       "layer_id": "web-research",
-      "coordinator_disposition": "retain_complementary_tools",
+      "coordinator_disposition": "retain",
       "rationale": "Playwright and Tavily's SDK complement the accepted CLI/browser tools; API libraries do not inherit native tool or account qualification. Crawl4AI stays conditional on a crawling workload. This report did not adjudicate DeerFlow or full research runtimes.",
       "claude_independent_finding": "Retain native browser/search tools. Browsertrix adds an archival-evidence comparison; Playwright traces support debugging rather than deterministic retrieval replay. Browser-agent scores use different models and protocols.",
       "evidence_refs": [
@@ -202,11 +234,15 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "retain",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/8/decision"
+      }
     },
     {
       "layer_id": "token-efficiency",
-      "coordinator_disposition": "retain",
+      "coordinator_disposition": "keep_but_compare",
       "rationale": "Both approaches favor scoped exact retrieval and explicit-file packaging. Context Mode, QMD and other accepted helpers remain selected by task. No report measured causal provider savings.",
       "claude_independent_finding": "Retain scoped retrieval and guarded transformations. LLMLingua is a source-pinned challenger; no measured preservation of our exact facts or complete provider cost supports substitution.",
       "evidence_refs": [
@@ -220,11 +256,15 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "keep_but_compare",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/9/decision"
+      }
     },
     {
       "layer_id": "quality-evaluation",
-      "coordinator_disposition": "retain_expand_discovery",
+      "coordinator_disposition": "retain",
       "rationale": "Add Hypothesis and DeepEval to discovery alongside pytest/Playwright/Promptfoo. They address generated edge cases and model evaluations, not proof that an untested repository wins; project/upstream acceptance remains the gate.",
       "claude_independent_finding": "Retain project/upstream checks and selected evaluation tools. Inspect AI remains a scoped challenger. A repository's test count, badges or reviewer score is not demonstrated result quality.",
       "evidence_refs": [
@@ -238,7 +278,11 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "retain",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/10/decision"
+      }
     },
     {
       "layer_id": "ci-supply-chain",
@@ -256,7 +300,11 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "retain",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/11/decision"
+      }
     },
     {
       "layer_id": "scheduling-supervision",
@@ -274,11 +322,15 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "keep_but_compare",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/12/decision"
+      }
     },
     {
       "layer_id": "hosting-services",
-      "coordinator_disposition": "retain_complementary_tools",
+      "coordinator_disposition": "retain",
       "rationale": "FastAPI agrees for Python interfaces; Pydantic supplies typed contracts. Caddy and Hono are newly indexed optional service/application choices. They do not replace a qualified UI/database stack or justify public hosting.",
       "claude_independent_finding": "Retain the qualified application/service choices. The broad F-ops group gives limited direct application-stack comparison; container/gateway popularity does not justify replacing Next.js/React/FastAPI/PostgreSQL.",
       "evidence_refs": [
@@ -292,7 +344,11 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "retain",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/13/decision"
+      }
     },
     {
       "layer_id": "recovery-portability",
@@ -310,11 +366,15 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "keep_but_compare",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/14/decision"
+      }
     },
     {
       "layer_id": "observation-inference",
-      "coordinator_disposition": "retain_complementary_tools",
+      "coordinator_disposition": "keep_but_compare",
       "rationale": "OTel and otel-tui align; Collector core and Contrib have different scope. llama.cpp and CPU-capable vLLM are workload alternatives, not mandatory infrastructure. Retain the accepted inference pin until target-hardware/model acceptance.",
       "claude_independent_finding": "Retain telemetry and the compatible inference pin. Prometheus is operations telemetry, not authoritative order/accounting state. New vLLM determinism controls have hardware and performance limits requiring separate qualification.",
       "evidence_refs": [
@@ -328,7 +388,11 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "keep_but_compare",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/15/decision"
+      }
     },
     {
       "layer_id": "foundation-memory",
@@ -346,11 +410,15 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "keep_but_compare",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/us-equities.json",
+        "pointer": "/layers/0/decision"
+      }
     },
     {
       "layer_id": "agents-operations",
-      "coordinator_disposition": "retain_keep_comparisons",
+      "coordinator_disposition": "retain",
       "rationale": "Native clients and systemd agree. Prefect and LangGraph are conditional research-application choices; the accepted Dagu/telemetry/recovery path has execution evidence the independent source report did not inspect.",
       "claude_independent_finding": "Retain native research/review, local effect ownership and shared telemetry. No comparative runtime trial in WF2 establishes migration to a framework, gateway or hosted stack.",
       "evidence_refs": [
@@ -364,7 +432,11 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "retain",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/us-equities.json",
+        "pointer": "/layers/1/decision"
+      }
     },
     {
       "layer_id": "data-research",
@@ -382,7 +454,11 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "keep_but_compare",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/us-equities.json",
+        "pointer": "/layers/2/decision"
+      }
     },
     {
       "layer_id": "engines-strategies",
@@ -400,7 +476,26 @@
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
       "claude_final_disposition": "keep_but_compare",
-      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/us-equities.json",
+        "pointer": "/layers/3/decision"
+      }
     }
-  ]
+  ],
+  "decision_authority": {
+    "catalogs": [
+      "catalogs/landscape/foundation.json",
+      "catalogs/landscape/us-equities.json"
+    ],
+    "field": "layers[].decision",
+    "rule": "coordinator_disposition mirrors the canonical decision; peer judgments are historical evidence; candidate dispositions and per-host receipts govern adoption"
+  },
+  "post_seal_reconciliation": {
+    "status": "peer_return_received_nine_label_ambiguities_corrected",
+    "scope": "Post-seal review of published 9a88388; not a new blind discovery or runtime comparison",
+    "peer_report": "evidence/artifacts/catalog-reconciliation-20260922/claude-return.json",
+    "adjudication": "evidence/artifacts/catalog-reconciliation-20260922/adjudication.json",
+    "guide": "docs/catalog-reconciliation-20260922.md"
+  }
 }

@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-22",
+  "kind": "post_seal_reconciliation_not_blinded",
+  "reviewed_revision": "9a88388d0db74aeb59d731dbbd699781d7d6a926",
+  "peer_verdict": "unsupported_promotion_found",
+  "coordinator_verdict": "nine_ambiguous_summary_labels_corrected_no_candidate_or_pin_promotion",
+  "acceptance_effect": "No install, pin, candidate disposition, runtime acceptance or destination-host acceptance changes.",
+  "peer_report": "evidence/artifacts/catalog-reconciliation-20260922/claude-return.json",
+  "provenance": {
+    "private_source_sha256": "a47191a9a1773d491f4ffaed6e8f4d3d00ee7c70a44f087e17e329b686397997",
+    "private_source_bytes": 32629,
+    "transforms": [
+      "Replace the private projects-root prefix with <PROJECTS_ROOT>",
+      "Replace the remaining private operator-home prefix with <OPERATOR_HOME>",
+      "Replace full UUID-shaped native session identifiers with <PRIVATE_SESSION>",
+      "Normalize trailing whitespace to one LF"
+    ],
+    "public_file_integrity": "manifests/evidence.json"
+  },
+  "decision_authority": {
+    "catalogs": [
+      "catalogs/landscape/foundation.json",
+      "catalogs/landscape/us-equities.json"
+    ],
+    "field": "layers[].decision",
+    "rule": "coordinator_disposition mirrors the canonical decision; peer judgments are historical evidence; candidate dispositions and per-host receipts govern adoption"
+  },
+  "corrected_labels": [
+    {
+      "layer_id": "instructions-skills",
+      "previous_coordinator_disposition": "retain_targeted_practice",
+      "canonical_decision": "adjust"
+    },
+    {
+      "layer_id": "workers",
+      "previous_coordinator_disposition": "retain",
+      "canonical_decision": "keep_but_compare"
+    },
+    {
+      "layer_id": "code-navigation",
+      "previous_coordinator_disposition": "retain_expand_discovery",
+      "canonical_decision": "retain"
+    },
+    {
+      "layer_id": "web-research",
+      "previous_coordinator_disposition": "retain_complementary_tools",
+      "canonical_decision": "retain"
+    },
+    {
+      "layer_id": "token-efficiency",
+      "previous_coordinator_disposition": "retain",
+      "canonical_decision": "keep_but_compare"
+    },
+    {
+      "layer_id": "quality-evaluation",
+      "previous_coordinator_disposition": "retain_expand_discovery",
+      "canonical_decision": "retain"
+    },
+    {
+      "layer_id": "hosting-services",
+      "previous_coordinator_disposition": "retain_complementary_tools",
+      "canonical_decision": "retain"
+    },
+    {
+      "layer_id": "observation-inference",
+      "previous_coordinator_disposition": "retain_complementary_tools",
+      "canonical_decision": "keep_but_compare"
+    },
+    {
+      "layer_id": "agents-operations",
+      "previous_coordinator_disposition": "retain_keep_comparisons",
+      "canonical_decision": "retain"
+    }
+  ],
+  "findings": [
+    {
+      "finding": "Nine summary dispositions differ from canonical decisions.",
+      "disposition": "accepted_and_corrected",
+      "reason": "All 20 coordinator_disposition values now exactly mirror canonical layers[].decision, with explicit path and JSON pointer. The Markdown status column uses those same values."
+    },
+    {
+      "finding": "Source-only candidates were actually promoted to accepted components.",
+      "disposition": "unsupported_stronger_inference",
+      "reason": "Existing scope guards already defer to canonical candidate dispositions and per-host receipts. Selected component pins and candidate dispositions are unchanged; ambiguous labels warranted correction."
+    },
+    {
+      "finding": "No executed comparison or trial exists anywhere for all 20 layers.",
+      "disposition": "scope_narrowed",
+      "reason": "This post-seal workflow executed no candidate runtime tests. Earlier native tasks, lifecycle probes and scoped fixture comparisons remain valid in their stated scopes; they do not establish universal matched quality superiority."
+    },
+    {
+      "finding": "WF3 differences have no machine-readable counts.",
+      "disposition": "superseded_by_existing_public_artifacts",
+      "reason": "The public coverage report, frozen screening ledger and audit_reports.py --check already reproduce 75 absence claims, 62 selected-unsurfaced rows, 75 disagreements and 125 recommendations."
+    },
+    {
+      "finding": "Extractor's unresolved star-pool discrepancy.",
+      "disposition": "critic_reconciled_within_same_return",
+      "reason": "Extractor and critic limitations are stage-specific. The critic recognizes different original and repaired pools and supersedes the earlier unresolved claim. Independent earlier arithmetic verified all 10 top-12 star sets; audit_reports.py checks partitions and joins, not that stars sort."
+    },
+    {
+      "finding": "No git command or ledger read occurred.",
+      "disposition": "stage_scope_only",
+      "reason": "The extractor used shell/git and queried ledger fields; the read-only critic inherited extraction and did not independently rerun git or read the full ledger. Concatenated limits must not be treated as one uniform execution boundary."
+    },
+    {
+      "finding": "Newer versions or upstream otel-tui default binding disqualify accepted configuration.",
+      "disposition": "not_established",
+      "reason": "A release delta is not a quality failure. Upstream default binding is a caveat; the accepted local profile explicitly uses loopback. No pin or deployment change is justified by this review alone."
+    }
+  ],
+  "independent_review": {
+    "reviewer": "separate Codex evidence reviewer",
+    "scope": "Read-only canonical join and source/scope adjudication; no fresh runtime trials",
+    "result": "Confirmed all nine mismatches and the narrower interpretation; no additional supported selection defect."
+  },
+  "validation_contract": {
+    "command": "python3 blueprints/blind-catalog-convergence/audit_reports.py --check",
+    "checks": [
+      "Derived 514-row screening ledger is semantically equal to the frozen JSON artifact; unchanged file bytes are separately verified against Git",
+      "20 canonical layer labels and pointers",
+      "20 Markdown current dispositions"
+    ],
+    "limits": "Local consistency checks do not qualify repository quality, comparative superiority or target-PC setup."
+  },
+  "remaining_gates": [
+    "Frozen worker cancellation/replay/ownership comparison",
+    "Representative memory retrieval quality and full lifecycle comparison",
+    "Semantic retrieval quality and total cost",
+    "Hardware/model inference acceptance",
+    "Independent paper-broker qualification",
+    "Destination-PC installation and recovery acceptance"
+  ],
+  "residual_bias": "Earlier independent discovery sealed reports before comparison but retained ambient/incumbent-name exposure. This follow-up reads published synthesis and is explicitly not blinded.",
+  "source_research": "No new broad discovery or upstream execution requested or used for this label correction."
+}

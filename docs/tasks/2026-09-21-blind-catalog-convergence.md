@@ -262,9 +262,10 @@ published revision 9a88388d0db74aeb59d731dbbd699781d7d6a926. The bounded packet
 asks for concrete remaining disagreements in the final 20-layer synthesis and
 confirmation that the final source corrections reached the peer's handoff. It
 explicitly identifies this as post-seal review, not a new blinded discovery pass.
-At this checkpoint the native message is queued and a one-shot idle notice is
-subscribed; an actual return remains pending. No duplicate task or acknowledgment
-loop was sent, and the user's owner session remains untouched.
+The actual return arrived at 2026-09-22T04:52:43.811Z from the same live owner,
+using a two-stage native extraction/review workflow. One bounded message and one
+pure idle subscription were used; no duplicate task or acknowledgment loop was
+sent, and the user's owner session remains untouched.
 
 The independent Codex follow-up found no additional substantive selection
 finding. All 20 layers retain evidence, limitations and overturn conditions;
@@ -275,5 +276,51 @@ A concrete practice correction is prepared: the Codex example's three-thread
 limit is independent of Claude's current eight-worker workflow setting. Both
 values remain unchanged, as confirmed by parsing the before/after TOML. Only
 comments and the cooperation recipe changed; historical three-worker Claude
-receipts retain their original scope. Incorporate the actual peer return before
-calling this additional exchange complete.
+receipts retain their original scope.
+
+Claude identified nine coordinator labels that differed from the canonical
+layer decisions. All 20 labels and the handbook table now use the exact
+canonical decisions, with per-layer pointers and an explicit authority rule.
+The existing report audit checks that join; focused negative fixtures reject
+misleading retain labels, wrong pointers, missing layers and handbook drift.
+The original 514-row screening ledger, selected 68 component pins and candidate
+dispositions are unchanged.
+
+The separate Codex reviewer confirmed the label ambiguity and narrowed the
+peer's stronger promotion claim: existing candidate statuses and scope guards
+already governed adoption. The preserved return and coordinator qualifications
+are in [the reconciliation record](../catalog-reconciliation-20260922.md).
+The returned claims about absent execution and missing machine-readable WF3
+counts are scoped or superseded explicitly; earlier measured evidence remains
+valid within its limits. This was post-seal review, not a fresh blinded pass.
+
+Follow-up verification completed:
+
+- Full Python suite: 786 tests, 784 passed and two environment-dependent skips.
+  This includes six new canonical-decision regression checks.
+- Identity index, catalog structure, foundation, landscape and all recorded
+  convergence checks passed. The report audit reproduces its original accounting
+  and now checks the 20 decision joins and handbook labels.
+- Publication integrity passed with 68 components, 1,630 hashed files, four
+  profiles and 134 receipts. The first privacy check caught literal private
+  prefixes in the transformation description; those were replaced with portable
+  descriptions and the check passed without changing the validator.
+- Exact HTML rebuild passed. Native browser checks confirmed offline loading,
+  no external resources or reported page errors, no horizontal overflow at
+  390-pixel width, and a working reconciliation guide dialog containing the
+  nine-label correction and the explicit non-blinded-review boundary. A stale
+  browser session returned a blank page; a fresh scoped session verified the
+  actual file. The final dialog check invoked its existing click handler.
+- Independent review replayed the audit and six regression tests, verified
+  source-report transformations, and confirmed unchanged canonical catalogs,
+  selected pins and frozen ledger bytes against Git. Its one wording finding
+  was resolved: the report audit verifies semantic JSON equality; byte equality
+  is separately verified against Git.
+- Both native Claude children are complete, with requested/resolved models,
+  effort and per-type provider-returned counters retained separately from the
+  workflow summary. No new runtime qualification is inferred.
+
+Publish this follow-up through the existing PR55 branch without force; use that
+PR's exact head checks for hosted status. No main-branch merge or new installation
+is part of this follow-up. The next-PC gates and layer-specific comparisons remain
+open in the canonical handbook.

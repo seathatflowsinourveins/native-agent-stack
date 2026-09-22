@@ -2800,8 +2800,8 @@
     },
     {
       "path": "catalogs/landscape/blind-convergence.json",
-      "sha256": "2f916fdb1f871aca0fabe5f08f503877c62424601d3fa61444e960be0e591a28",
-      "bytes": 35483
+      "sha256": "fc93749bfe12bb946bf12ad092f527adb0266b08453fb2b848dc151ee0c3bb2c",
+      "bytes": 38933
     },
     {
       "path": "catalogs/landscape/independent-discovery.json",
@@ -2810,8 +2810,8 @@
     },
     {
       "path": "docs/blind-catalog-layer-findings-20260921.md",
-      "sha256": "771731f48751e7576a1b5f143ff5fbc82055c3cc360ed4416f0ee45bacd6afb6",
-      "bytes": 10821
+      "sha256": "a58e5af94b7bd5dd903d793f84714552878bf8e68259325654bbaacb1e3dbc8c",
+      "bytes": 11137
     },
     {
       "path": "docs/blind-catalog-source-adjudication-20260921.md",
@@ -2820,8 +2820,8 @@
     },
     {
       "path": "docs/tasks/2026-09-21-blind-catalog-convergence.md",
-      "sha256": "624bbd80816a319aed4a9c6d804833e5d32b64d42a42262080581155dd0ddd32",
-      "bytes": 17608
+      "sha256": "addf0c0b72907408928bf57ce7a74de7c9c60278c35d7ac62ef48d4b625c753b",
+      "bytes": 20616
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-provenance.json",
@@ -2875,8 +2875,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "11905494ae7496c94cd0b00985cfe88988fea7d427fbb6a4c8a8babb33fc65df",
-      "bytes": 16807
+      "sha256": "5b26e2694aab769f0b303288b9a393dd4b71f76cf0a7661b2804e50a6f770513",
+      "bytes": 17170
     },
     {
       "path": "docs/tasks/2026-09-21-runtime-reviewed-catalog-handbook.md",
@@ -6661,8 +6661,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "c55f6e6b984eea47bea04aaa3b98c79d6e4e4c007507f5ad73629386d0fda65a",
-      "bytes": 10955344
+      "sha256": "53b3cddda1ea0a9c3f37d3399629628ff1d43e4d1adc77894271ba3b06071e65",
+      "bytes": 10962244
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -10141,8 +10141,8 @@
     },
     {
       "path": "catalogs/landscape/manifest.json",
-      "sha256": "4c4eb1807183b9c1f12834cf6be2048005b83f345710540106d28c7486ae5d4c",
-      "bytes": 4086
+      "sha256": "67e9092f30332780853b693147e8406dc3c3eccd57a526fced57d45b23022566",
+      "bytes": 4224
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -10866,8 +10866,8 @@
     },
     {
       "path": "docs/claude-blind-adjudication-20260921.md",
-      "sha256": "fc0f85376e9cde4017b1b708cddba522713a22ab7a27f778242fb0d4786639d1",
-      "bytes": 15932
+      "sha256": "1a5e94e2e9215f66c3f0601625724426955a1788848a7d3eec55e1613f78f47d",
+      "bytes": 16239
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-provenance.json",
@@ -10886,8 +10886,8 @@
     },
     {
       "path": "blueprints/blind-catalog-convergence/audit_reports.py",
-      "sha256": "720cb819376652c06e5ad85685af8559d19f4ea8454b50d6368dfac877d32d37",
-      "bytes": 6774
+      "sha256": "f710d236c40bdbb49dc0942df31c0f502209eee03553d07be3c5fdfa931b1b3a",
+      "bytes": 9348
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
@@ -10933,6 +10933,31 @@
       "path": "blueprints/blind-catalog-convergence/README.md",
       "sha256": "eb0725143ef73697b220605d0adbbd3c5961f1c805b98587c2a28d883a44bd95",
       "bytes": 2223
+    },
+    {
+      "path": "docs/catalog-reconciliation-20260922.md",
+      "sha256": "2fd994f2948941e3ccd5b7618cac9ac60860b757ba3397cc0d67370610244503",
+      "bytes": 5316
+    },
+    {
+      "path": "evidence/artifacts/catalog-reconciliation-20260922/adjudication.json",
+      "sha256": "00ddef811a4d544e67c10c430385a917655b2916be5e17a220c61b3539ce855e",
+      "bytes": 6985
+    },
+    {
+      "path": "evidence/artifacts/catalog-reconciliation-20260922/claude-return.json",
+      "sha256": "3f39e161b2015094e109fa969fb1dd876b488bab5b1c21277e8e863e905f5307",
+      "bytes": 32589
+    },
+    {
+      "path": "evidence/artifacts/catalog-reconciliation-20260922/claude-usage.json",
+      "sha256": "abc78942697214f56ab9d455bfed05ebc6c945268ddd463078e1606b24e97732",
+      "bytes": 2460
+    },
+    {
+      "path": "tests/test_blind_layer_decisions.py",
+      "sha256": "0512e58b967baed9fdc95323cd6867dbb1981785bb3d20e51d6a1df1bcb4fbc1",
+      "bytes": 2827
     }
   ],
   "convergence_records": [

@@ -25,6 +25,12 @@ source reports. The final Claude coverage critique and 159-row repair are now
 This closes the dated catalog review; matched quality and destination-host gates
 remain explicit. Source-only candidates remain separate from qualified defaults.
 
+The live Claude owner's [September 22 reconciliation](catalog-reconciliation-20260922.md)
+identified nine ambiguous summary labels. All 20 displayed dispositions now
+mirror the canonical layer decisions, with an automated consistency check.
+No candidate disposition or selected version changed; historical reviewer
+claims and their qualifications remain linked.
+
 ## What qualifies a selection
 
 Evaluate repository quality against the task before investing in installation:
