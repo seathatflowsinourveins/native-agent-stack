@@ -197,10 +197,72 @@ def render_table(catalog: str, rows: list) -> str:
     return "\n".join(lines)
 
 
+def render_winner_line(winner: dict) -> str:
+    return f"- {winner.get('component_id') or '?'} @ {winner.get('pin') or '?'} — {winner.get('why_selected') or '-'}"
+
+
+def render_alternative_line(alternative: dict) -> str:
+    return (f"- {alternative.get('name') or '?'} ({alternative.get('disposition') or '?'}) — "
+            f"{alternative.get('why_not_default') or '-'}")
+
+
+def render_lanes_line(row: dict) -> str:
+    lanes = row.get("lanes") or {}
+    agreement = lanes.get("agreement") or "-"
+    claude_run = (lanes.get("claude") or {}).get("run_id") or "-"
+    codex_run = (lanes.get("codex") or {}).get("run_id") or "-"
+    return f"Lanes: {agreement} (claude: {claude_run}; codex: {codex_run})"
+
+
+def render_row_narrative(row: dict) -> str:
+    """A ``recorded`` row gets a full ``#### <title> (<layer_id>)`` block
+    (winner(s), alternatives, the full untruncated ``overturn_when``, open
+    gaps, lane agreement + both run ids); every other row (``pending_lanes``
+    or ``no_selection``) renders as a single "pending -- ..." bullet line,
+    since there is nothing yet to narrate beyond why it is still open."""
+    if row["verdict_status"] != "recorded":
+        gaps = "; ".join(row.get("open_gaps") or []) or "no lane has run"
+        return f"- **{row.get('title') or row['layer_id']}** ({row['layer_id']}): pending — {gaps}"
+    lines = [f"#### {row.get('title') or row['layer_id']} ({row['layer_id']})", ""]
+    lines.extend(render_winner_line(winner) for winner in row["winners"])
+    lines.append("")
+    lines.append("Alternatives:")
+    if row["alternatives"]:
+        lines.extend(render_alternative_line(alt) for alt in row["alternatives"])
+    else:
+        lines.append("- none")
+    lines.append("")
+    lines.append(f"Overturn when: {row.get('overturn_when') or '-'}")
+    lines.append("")
+    lines.append("Open gaps:")
+    gaps = row.get("open_gaps") or []
+    if gaps:
+        lines.extend(f"- {gap}" for gap in gaps)
+    else:
+        lines.append("- none")
+    lines.append("")
+    lines.append(render_lanes_line(row))
+    return "\n".join(lines)
+
+
+def render_narrative(catalog: str, rows: list) -> str:
+    # "###" (one level above each row's own "#### <title> (<layer_id>)"
+    # block, and distinct from render_table's own "### {catalog}" table
+    # heading) so this section heading actually nests above its rows in the
+    # rendered Markdown outline instead of sitting at the same level as them.
+    parts = [f"### {catalog} (per-layer narrative)", ""]
+    for row in rows:
+        parts.append(render_row_narrative(row))
+        parts.append("")
+    return "\n".join(parts).rstrip("\n") + "\n"
+
+
 def render_handbook_section(document: dict) -> str:
     parts = [HANDBOOK_HEADING, "", document["scope"], ""]
     for catalog in ("foundation", "us-equities"):
         parts.append(render_table(catalog, document["catalogs"][catalog]))
+        parts.append("")
+        parts.append(render_narrative(catalog, document["catalogs"][catalog]))
         parts.append("")
     return "\n".join(parts).rstrip("\n") + "\n"
 

@@ -1,0 +1,50 @@
+{
+ "schema_version": 2,
+ "checked_at": "2026-09-22",
+ "scope": "Fixture: one us-equities layer with a matched and an unmatched candidate.",
+ "layers": [
+  {
+   "catalog": "us-equities",
+   "layer_id": "layer-b",
+   "title": "Layer B",
+   "group": "data-research",
+   "requirement": "Fetch reference data reliably.",
+   "current_choice": "Data One",
+   "decision": "retain",
+   "rationale": "Data One has native execution evidence.",
+   "evidence_refs": ["docs/evidence.md"],
+   "limitations": ["Only one comparison was run."],
+   "overturn_when": "A matched python3 tests/fixtures/lane-packets/check.py run shows otherwise.",
+   "candidates": [
+    {
+     "name": "Data One",
+     "repository": "https://github.com/acme/data-one",
+     "disposition": "selected",
+     "rationale": "Fits the requirement on native execution evidence.",
+     "evidence_kind": "native_execution",
+     "evidence_refs": ["docs/evidence.md"]
+    },
+    {
+     "name": "Data Unmatched",
+     "repository": "https://github.com/acme/data-unmatched",
+     "disposition": "observed_failure",
+     "rationale": "Regressed on load in a measured comparison.",
+     "evidence_kind": "measured_comparison",
+     "evidence_refs": []
+    }
+   ],
+   "verdict_status": "pending_lanes",
+   "winners": [],
+   "alternatives": [],
+   "overturn_protocol": {"fixture_paths": [], "metric": "", "arms": []},
+   "lanes": {
+    "claude": {"run_id": "", "sealed_sha256": ""},
+    "codex": {"run_id": "", "sealed_sha256": ""},
+    "agreement": "pending"
+   },
+   "open_gaps": [],
+   "checked_at": "2026-09-22"
+  }
+ ],
+ "domain_rows": []
+}

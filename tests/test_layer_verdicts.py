@@ -184,6 +184,70 @@ class BuildVerdictsTests(LayerVerdictFixture):
         self.assertEqual(trading_row["sota_components"][0]["pin"], "3.0")
         self.assertEqual(trading_row["recipe_refs"], ["alpaca-py"])
 
+    def test_narrative_renders_recorded_and_pending_rows(self):
+        foundation = json.loads((self.root / "catalogs/landscape/foundation.json").read_text())
+        row = foundation["layers"][0]
+        row["verdict_status"] = "recorded"
+        row["winners"] = [{
+            "component_id": "codex-native-sdk", "repository": "https://github.com/openai/codex",
+            "pin": "1.0", "evidence_class": "native_proven", "why_selected": "Native execution evidence",
+            "evidence_refs": [], "recipe_ref": "recipes/README.md",
+            "platform_status": {"linux-wsl2-x86_64": "accepted", "macos-arm64": "untested"},
+        }]
+        row["alternatives"] = [{
+            "name": "Other tool", "repository": "https://github.com/example/other",
+            "disposition": "conditional", "why_not_default": "Not selected on the retained evidence",
+            "evidence_class": "source_review", "source": "lane:codex",
+        }]
+        row["overturn_when"] = "See tests/test_layer_verdicts.py for the fixture that would overturn this."
+        row["open_gaps"] = ["codex lane absent for this layer"]
+        row["lanes"] = {"claude": {"run_id": "foundation-native-clients-20260922", "sealed_sha256": "a" * 64},
+                        "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "codex_absent"}
+        self.write("catalogs/landscape/foundation.json", foundation)
+
+        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        text = self.handbook_text()
+        self.assertIn("#### Native clients (native-clients)", text)
+        self.assertIn("- codex-native-sdk @ 1.0 — Native execution evidence", text)
+        self.assertIn("- Other tool (conditional) — Not selected on the retained evidence", text)
+        self.assertIn("Overturn when: See tests/test_layer_verdicts.py for the fixture that would overturn this.",
+                      text)
+        self.assertIn("- codex lane absent for this layer", text)
+        self.assertIn("Lanes: codex_absent (claude: foundation-native-clients-20260922; codex: -)", text)
+        # The still-pending trading row renders as a single "pending -- ..." line.
+        self.assertIn("- **Market data** (market-data-reference): pending — no lane has run", text)
+        # --check recomputes and covers the narrative, not just the table.
+        self.assertEqual(build_verdicts.main(["--check", "--root", str(self.root)]), 0)
+        foundation["layers"][0]["overturn_when"] = "A different, untracked overturn text"
+        self.write("catalogs/landscape/foundation.json", foundation)
+        self.assertEqual(build_verdicts.main(["--check", "--root", str(self.root)]), 1)
+
+    def test_narrative_catalog_heading_nests_above_its_row_blocks(self):
+        # render_narrative's own "<catalog> (per-layer narrative)" heading
+        # must sit at a shallower Markdown level ("###") than every row's
+        # "#### <title> (<layer_id>)" block, and distinct from render_table's
+        # own "### {catalog}" table heading text, so the outline actually
+        # nests instead of placing the section heading beside its rows.
+        foundation = json.loads((self.root / "catalogs/landscape/foundation.json").read_text())
+        row = foundation["layers"][0]
+        row["verdict_status"] = "recorded"
+        row["winners"] = [{
+            "component_id": "codex-native-sdk", "repository": "https://github.com/openai/codex",
+            "pin": "1.0", "evidence_class": "native_proven", "why_selected": "Native execution evidence",
+            "evidence_refs": [], "recipe_ref": "recipes/README.md",
+            "platform_status": {"linux-wsl2-x86_64": "accepted", "macos-arm64": "untested"},
+        }]
+        row["alternatives"] = []
+        self.write("catalogs/landscape/foundation.json", foundation)
+
+        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        text = self.handbook_text()
+        self.assertIn("### foundation (per-layer narrative)", text)
+        self.assertNotIn("#### foundation (per-layer narrative)", text)
+        narrative_heading = text.index("### foundation (per-layer narrative)")
+        row_heading = text.index("#### Native clients (native-clients)")
+        self.assertLess(narrative_heading, row_heading)
+
 
 if __name__ == "__main__":
     unittest.main()

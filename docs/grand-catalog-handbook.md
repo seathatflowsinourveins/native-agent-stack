@@ -277,6 +277,49 @@ Joins the landscape ledger's layer-verdict schema v2 rows with the dated SOTA-co
 | web-research | - | pending | - | - | 0 | A defined source-coverage or ingestion task exceeds the current commands and a candidate improves attributable retrieva… | - | - |
 | workers | - | pending | - | - | 0 | A real task needs durable multi-host state, approval waits or effect recovery beyond native workers, and one challenger… | - | - |
 
+### foundation (per-layer narrative)
+
+- **Agent SDKs and runtime workers** (agent-sdks): pending — no lane has run
+
+- **CI and supply chain** (ci-supply-chain): pending — no lane has run
+
+- **Code navigation** (code-navigation): pending — no lane has run
+
+- **Documents and ingestion** (document-retrieval): pending — no lane has run
+
+- **Durable memory** (durable-memory): pending — no lane has run
+
+- **Git practice and GitHub automation** (git-github-automation): pending — no lane has run
+
+- **Application and service hosting** (hosting-services): pending — no lane has run
+
+- **Instructions and skills** (instructions-skills): pending — no lane has run
+
+- **Isolation** (isolation): pending — no lane has run
+
+- **MCP servers and client surfaces** (mcp-surfaces): pending — no lane has run
+
+- **Native clients** (native-clients): pending — no lane has run
+
+- **Observation and optional inference** (observation-inference): pending — no lane has run
+
+- **Quality and evaluation** (quality-evaluation): pending — no lane has run
+
+- **Recovery and portability** (recovery-portability): pending — no lane has run
+
+- **Scheduling and supervision** (scheduling-supervision): pending — no lane has run
+
+- **Secrets and credentials** (secrets-credentials): pending — no lane has run
+
+- **Semantic code retrieval** (semantic-rag): pending — no lane has run
+
+- **Context and usage efficiency** (token-efficiency): pending — no lane has run
+
+- **Web research** (web-research): pending — no lane has run
+
+- **Workers and task ownership** (workers): pending — no lane has run
+
+
 ### us-equities
 
 | Layer | Group | Verdict status | Winner(s) + pin | Evidence class | Alternatives | Overturn when | Recipe anchor | Platform status |
@@ -293,4 +336,30 @@ Joins the landscape ledger's layer-verdict schema v2 rows with the dated SOTA-co
 | research-factors-ml | engines-strategies | pending | - | - | 0 | Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/… | - | - |
 | security-supply-chain | agents-operations | pending | - | - | 0 | Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/bac… | - | - |
 | storage-compute | data-research | pending | - | - | 0 | Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on … | - | - |
+
+### us-equities (per-layer narrative)
+
+- **Agents, models and workers** (agents-models-workers): pending — no lane has run
+
+- **Backtesting engine** (backtesting-engine): pending — no lane has run
+
+- **Data quality and orchestration** (data-quality-orchestration): pending — no lane has run
+
+- **Evaluation and experiments** (evaluation-experiments): pending — no lane has run
+
+- **Execution and broker adapters** (execution-broker): pending — no lane has run
+
+- **Identity, provenance and lineage** (identity-provenance): pending — no lane has run
+
+- **Market data and reference** (market-data-reference): pending — no lane has run
+
+- **Observability and hosting** (observability-hosting): pending — no lane has run
+
+- **Portfolio and risk** (portfolio-risk): pending — no lane has run
+
+- **Research, factors and ML** (research-factors-ml): pending — no lane has run
+
+- **Security and supply chain** (security-supply-chain): pending — no lane has run
+
+- **Storage and compute** (storage-compute): pending — no lane has run
 <!-- verdicts:end -->

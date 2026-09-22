@@ -7499,8 +7499,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "3d6b0b96f65dd4aa3005ead50445d15fcb29e86dc0632bb7ef682a353fab8a88",
-      "bytes": 12139744
+      "sha256": "a3daa6e96a1cc2596c2e8ad42858faae305368eb7532d8957d9e153546ae90af",
+      "bytes": 12142472
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7574,8 +7574,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "71bc8dc3214d89dfd491e2c7da2dfb8cb785c23f9a19b469fc8a4df4bb5c5315",
-      "bytes": 24357
+      "sha256": "ccc757b6382768a284e83e2328fd65bbf8bf32af7e3bbf3128a4bbbb226bb5f4",
+      "bytes": 27016
     },
     {
       "path": "docs/harness-defaults.md",
@@ -11249,8 +11249,8 @@
     },
     {
       "path": "recipes/sota-convergence-practice.md",
-      "sha256": "2541d24667ab59a180b4f8c60bc12a41bb0e08aeb6dd0ff748d9b89aabddebe3",
-      "bytes": 7246
+      "sha256": "492ea9a8563bc6e653d7fdb63879d7dad35bcb85e756f5357dbb4eb3cc6c0595",
+      "bytes": 10250
     },
     {
       "path": "recipes/tavily.md",
@@ -11539,8 +11539,8 @@
     },
     {
       "path": "tests/test_layer_verdicts.py",
-      "sha256": "c7743e5cb6add04001330960dd2f4a919692ec4bf4d77be69a4fcd2907fa429e",
-      "bytes": 10454
+      "sha256": "c782e9be6798d6635a87b58fd334bf7cb5430a95588d3a43eba3bc6e5fa3c2f0",
+      "bytes": 14742
     },
     {
       "path": "tests/test_lifecycle_capture.py",
@@ -11724,8 +11724,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "d8415ac76312c55f898cb30eb4562aae59899a0e31be8a6f3d3f82bdd1167b16",
-      "bytes": 32362
+      "sha256": "7d308a9c3ce2e85c20ba6d53ad3260eeb69d6719640d5912537e5230adf18be2",
+      "bytes": 47290
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
@@ -11734,8 +11734,8 @@
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "03861ee58426eedf5cc5f659bb2415dd7b4ecc5ac0ea08c2ca39b9c210d9c7c9",
-      "bytes": 12248
+      "sha256": "d53c7d0fe353eae588d4325952d6e7e2393da13d87d04f2ebefd4ba1235bcae7",
+      "bytes": 14997
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",
