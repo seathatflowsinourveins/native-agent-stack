@@ -29,7 +29,8 @@
   "evidence_class": "native_proven",
   "limitations": [
     "Offline/mocked-HTTP suite only; does not exercise a live SEC acquisition and cannot close the historical_point_in_time_reconstruction=false limitation.",
-    "Live SEC EDGAR acquisition (the other half of gap 2's two options) is out of scope for this check and recorded separately as needs_user_input."
+    "Live SEC EDGAR acquisition (the other half of gap 2's two options) is out of scope for this check and recorded separately as needs_user_input.",
+    "The `preregistered` field above was written after this command had already been run and its result (16/16 passed) was known, so it is a post-hoc restatement of the expected outcome rather than a true blind prediction recorded before execution."
   ],
   "raw_artifacts": [
     {"path": "/tmp/claude-1000/-home-seath-code-agent-lab/redacted-session-scratchpad/scratchpad/financial-data-regression.log", "sha256": "ccce5b1adb755e3885f2faba1e285a7895c905913b75904b909c32363b6f3048"}

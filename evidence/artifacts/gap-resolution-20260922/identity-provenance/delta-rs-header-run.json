@@ -40,16 +40,17 @@
     {"name": "pyarrow", "version": "25.0.1", "prefix": "/home/example/.local/share/codex-ecosystem/tools/delta-rs-1.6.4-20260922", "source_url": "PyPI (uv default index)", "sha256": "not independently recorded here; version pin verified via `import pyarrow; pyarrow.__version__` == 25.0.1 post-install"}
   ],
   "result": "Both packages installed cleanly into a brand-new prefix (did not exist before this run). The upstream catalog's own native_workflow snippet (write_deltalake + DeltaTable read) ran without error and printed `0 1`: table version 0 (the single commit) and 1 row, exactly matching the single-row table written. The data-delta-rs entry's native_workflow is confirmed executable as documented, offline after install (no network call during the write/read itself).",
-  "settles_gap": true,
+  "settles_gap": "partially",
   "verdict_impact": {
     "could_change_verdict": false,
-    "direction": "supports_incumbent",
-    "explanation": "Moves data-delta-rs from evidence_level source_review (header lines only, 'Prospective and UNEXECUTED') to an executed local write/read. Delta-rs is cataloged as an 'alternative', not the current_choice, for the identity-provenance/storage layers, so this does not itself overturn the incumbent decision; it closes gap 6 by confirming the alternative's documented entrypoint actually works as written, which is useful evidence for any future comparison but is not itself a comparison against the incumbent DuckDB/Parquet or hash-manifest arms."
+    "direction": "not_applicable",
+    "explanation": "Moves data-delta-rs from evidence_level source_review (header lines only, 'Prospective and UNEXECUTED') to an executed local write/read of its own documented snippet. This is a single-row smoke test of a non-incumbent alternative, not a comparison against the incumbent: it does not run any DuckDB/Parquet or hash-manifest arm, and it does not measure delta-rs against the incumbent on any shared metric (throughput, byte-identical restore, availability-rejection, etc.), so direction is recorded as not_applicable rather than supports_incumbent -- confirming that an alternative candidate's own entrypoint executes does not, by itself, support or refute the currently selected stack. It only partially settles gap 6 (delta-rs 'was not evaluated beyond its header lines'): the documented entrypoint is now confirmed to execute as written, but delta-rs has still not been evaluated against the layer's actual requirement (exact reproducible snapshots, fail-closed availability rejection) or against any other candidate, so gap 6 is not closed, only partially addressed."
   },
   "evidence_class": "native_proven",
   "limitations": [
     "Single-row, single-write smoke test only, matching the catalog's own illustrative snippet; does not exercise versioned/append reads at scale, concurrent writers, vacuum/retention, or Delta protocol compatibility across engines (all named as limitations in the catalog entry itself).",
-    "Does not compare delta-rs against the incumbent DuckDB/Parquet arm on any metric (throughput, byte-identical restore, etc.); it only confirms the alternative's own documented workflow executes."
+    "Does not compare delta-rs against the incumbent DuckDB/Parquet arm on any metric (throughput, byte-identical restore, etc.); it only confirms the alternative's own documented workflow executes. This receipt was previously mis-recorded with settles_gap: true and direction: supports_incumbent, which overclaimed settlement for a non-comparative smoke test of a cataloged 'alternative' (not the current_choice); corrected here to settles_gap: \"partially\" and direction: \"not_applicable\".",
+    "The `preregistered` field above was written after these commands had already been run and their results (`0 1`) were known, so it is a post-hoc restatement of the expected outcome rather than a true blind prediction recorded before execution."
   ],
   "raw_artifacts": [
     {"path": "/tmp/claude-1000/-home-seath-code-agent-lab/redacted-session-scratchpad/scratchpad/delta-rs-header-run.out", "sha256": "a79122992d53d358e6bbbbb98883d64fa0c15df3bcb08ff7b65a0580870af424"}

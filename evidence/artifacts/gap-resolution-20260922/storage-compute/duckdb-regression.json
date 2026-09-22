@@ -31,7 +31,8 @@
   "evidence_class": "native_proven",
   "limitations": [
     "Confirms regression stability and fail-closed behavior, not licensed feed entitlement, survivorship-free coverage, or comparative store throughput.",
-    "Does not touch storage-compute gap 0 (SEC EDGAR 403 retry) or gap 3 (comparative throughput harness), which are out of scope for this check."
+    "Does not touch storage-compute gap 0 (SEC EDGAR 403 retry) or gap 3 (comparative throughput harness), which are out of scope for this check.",
+    "The `preregistered` field above was written after this command had already been run and its result (14/14 passed) was known, so it is a post-hoc restatement of the expected outcome rather than a true blind prediction recorded before execution."
   ],
   "raw_artifacts": [
     {"path": "/tmp/claude-1000/-home-seath-code-agent-lab/redacted-session-scratchpad/scratchpad/duckdb-regression.log", "sha256": "978b535c6f36d53cd32ea50397e0c899c6ce4c7bf87f9c17356f788553c338ce"}

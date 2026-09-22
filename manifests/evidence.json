@@ -12089,13 +12089,13 @@
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/storage-compute/duckdb-regression.json",
-      "sha256": "3be88d5fe9d225d64e1d1e6388e8d76763ce7b18ee00ffad5ef35b7e811db185",
-      "bytes": 3890
+      "sha256": "921103e77ffa270a45de2a476278b241553c9f64df31fe11c9918c1be80f48ca",
+      "bytes": 4141
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/storage-compute/financial-data-offline-regression.json",
-      "sha256": "4ae2d4479d2035c959c5bf239bd5ac695abc02b7e04bf818ed6b685b12616c08",
-      "bytes": 3363
+      "sha256": "a7c54ad9db72c27da6b3b692f8cfe170666b434e22385f43d296220d86bab682",
+      "bytes": 3614
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/storage-compute/sec-edgar-acquisition-deferred.json",
@@ -12104,8 +12104,8 @@
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/market-data-reference/xnys-multiyear-holiday-check.json",
-      "sha256": "b54ad06d7469ce43a23fec4e7436811a3c3f41b45b67f5bf67108d0c1ca91a8a",
-      "bytes": 4930
+      "sha256": "d0b66826c0fbc761f29ce535c81c72a3f7fe4108efd4f69d82a28c13efa5a9ca",
+      "bytes": 6276
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/market-data-reference/xnys-multiyear-holiday-check.raw.json",
@@ -12114,18 +12114,18 @@
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/identity-provenance/sdk-env-baseline.json",
-      "sha256": "f3a6c6f2a8014e0f44f0e54d56804c279a3753a04eea18063f433b36f2fd1bcd",
-      "bytes": 4892
+      "sha256": "d3757f7caae105a71240839538aa0c397cc5ecb9579e0309ddc85b9bfb9e5405",
+      "bytes": 5182
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/identity-provenance/dvc-arm-restore-compare.json",
-      "sha256": "bd8b6e57b8219febb4f8916f7fb640d4c9dfa1fa3f15c590bdc11fafe9666b32",
-      "bytes": 8764
+      "sha256": "cf9b3c1c30fdeaa995bcb0071b6363022d514441e11f02a03ea80601f36cd54c",
+      "bytes": 13030
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/identity-provenance/delta-rs-header-run.json",
-      "sha256": "1e3bc61348e88ea26fa27410c9c00b4e11cb6a439bc9e0c66cebb93b839156e4",
-      "bytes": 5392
+      "sha256": "6fccd535270fe9db0bd4d9a111008fa641d3a9a73a2829962f7248cc0743e09d",
+      "bytes": 6466
     },
     {
       "path": "blueprints/gap-resolution-20260922/xnys-multiyear-holiday-check/compute.py",

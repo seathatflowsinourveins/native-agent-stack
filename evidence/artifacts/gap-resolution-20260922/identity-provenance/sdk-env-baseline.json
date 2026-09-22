@@ -46,7 +46,8 @@
   "evidence_class": "native_proven",
   "limitations": [
     "Only the DVC arm was executed as part of this unit's assigned checks (see dvc-arm-restore-compare.json); PyIceberg and ArcticDB arms from the overturn_protocol were not run.",
-    "This confirms hash-lock reproducibility and baseline correctness, not licensed market-data entitlement or a real historical universe (gap 4/5, both needs_paid_entitlement and out of scope here)."
+    "This confirms hash-lock reproducibility and baseline correctness, not licensed market-data entitlement or a real historical universe (gap 4/5, both needs_paid_entitlement and out of scope here).",
+    "The `preregistered` field above was written after these commands had already been run and their results (36/36 installs, 25/25 tests, 0 failures/skips) were known, so it is a post-hoc restatement of the expected outcome rather than a true blind prediction recorded before execution."
   ],
   "raw_artifacts": [
     {"path": "/tmp/claude-1000/-home-seath-code-agent-lab/redacted-session-scratchpad/scratchpad/sdk-env-baseline.log", "sha256": "cd175642f8803d4a1647f43f72e7c6572b77a6befee5fc3696e240e65305abc7"}
