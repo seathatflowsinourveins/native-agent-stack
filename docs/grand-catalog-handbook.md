@@ -44,8 +44,8 @@ Each layer was given a stripped evidence packet. An Opus proposer selected the
 winner set from retained evidence, and two Opus refuters attacked it from the
 evidence and challenger angles, with one revision round after any refutation.
 The record tool then applied the rules in code: every recorded winner must name
-its evidence class, the reason it beats the alternatives, an install anchor and
-a platform status. The dated
+its evidence class and the reason it beats the alternatives, and the tool derives
+its platform status from that evidence class and supplies its install anchor. The dated
 [convergence manifest](../catalogs/sota-convergence/manifest-20260922.json) was
 refreshed from the same day's lane run. Sealed lane returns are under
 `evidence/artifacts/layer-verdicts-20260922/claude/`.
@@ -150,13 +150,13 @@ This handbook does not start services, create schedules or select paid hosting.
 
 ## Runtime workers, SDKs and research applications
 
-The exercised programmatic research worker uses the **Codex Python SDK**
-(`openai-codex`), explicitly selecting the native Codex binary. It is the
-recorded winner of the agent-SDK layer. **OpenAI Agents SDK** and **Claude Agent
+The agent-SDK layer's recorded winner is the `codex` component (Codex CLI and
+SDK, 0.155.1). The exercised programmatic research worker uses its **Python SDK**
+(`openai-codex`), explicitly selecting the native Codex binary. **OpenAI Agents SDK** and **Claude Agent
 SDK** remain application-runtime candidates; the overturn condition is a matched
 three-arm worker comparison. The locked environment includes `openai-codex`,
-`openai`, `alpaca-py`, `duckdb` and `exchange-calendars` with 36 transitive
-distributions. Use the [SDK lock and native uv recipe](../adoption/sdk/README.md).
+`openai`, `alpaca-py`, `duckdb` and `exchange-calendars`; the lock pins 36
+distributions in total. Use the [SDK lock and native uv recipe](../adoption/sdk/README.md).
 
 The [SDK, harness and runtime coverage sweep](../catalogs/sota-convergence/sdk-runtime-coverage-20260922.md)
 examined agent SDKs, coding harnesses, durable runtimes, sandbox and worker
@@ -241,9 +241,10 @@ than repeating commands.
 
 The macOS profile targets Apple Silicon with 24 GB of unified memory. Its
 embedding backend is llama.cpp Metal serving embeddinggemma-300M. Moving to
-Nemotron-3-Embed-1B on a 48 GB machine is the recorded upgrade, taken only if a
-retrieval comparison on the project corpus favours it and the host has the
-memory headroom.
+Nemotron-3-Embed-1B on a 48 GB machine is the recorded upgrade. It is an open
+gate, not a scheduled step: it needs a GGUF build upstream, a retrieval
+comparison on the project corpus that favours it, and memory headroom on the
+host.
 
 Configuration comes from templates, not copied files. `tools/adoption/render_config.py`
 renders `~/.claude/settings.json`, `~/.codex/config.toml` and the project Codex
@@ -292,7 +293,7 @@ flip candidate. On September 22:
 
 | Rung | Established | Open |
 | --- | --- | --- |
-| Simulation | Offline equity replay, rc5 supply-chain scan, fail-closed snapshot gate, exchange_calendars in the stack | SPY/LEAN parity (blocked on two unsupported mappings), dividend module, pre-2020 delisting, dated security identity, point-in-time news and filings, paid data arm |
+| Simulation | Offline equity replay, rc5 supply-chain scan, fail-closed snapshot gate (synthetic), exchange_calendars in the stack | SPY/LEAN parity (blocked on two unsupported mappings), dividend module, pre-2020 delisting, dated security identity, point-in-time news and filings, paid data arm |
 | Paper | Alpaca paper smoke, broker-path alert rules (synthetic), credential handling | Adaptive-paper broker trial |
 | Live | None | Leverage ladder 1x/2x/4x, native fault behaviour, IBKR local acceptance, explicit live go |
 
@@ -307,17 +308,20 @@ maintenance design. In brief:
 - **Required on `main`:** `validate` (validators, the zizmor and actionlint
   workflow audit, the verdict check, the examples byte-identity check and the
   unit tests, which include the gate-ladder check), `token-report` and
-  `secret-scan`. The main ruleset also blocks deletion and
-  force-push and requires linear history and a pull request; tags cannot be
-  deleted or moved.
+  `secret-scan`. The main ruleset also blocks deletion and force-push and
+  requires linear history and a pull request. Tags cannot be deleted or
+  force-moved. These rulesets were applied on September 22 and observed live
+  through the GitHub API; the generated rows for the CI and git-automation
+  layers cite the records from before that application.
 - **Report-only lanes:** the Monday `catalog-freshness` lane rebuilds the
   convergence manifest from current GitHub metadata and publishes pin drift as an
   artifact, without writing back. `supply-chain` inventories and scans the pinned
   rc5 install with Syft and Grype. `adoption-bootstrap` exercises the pinned
   bootstrap scripts on hosted runners.
-- **Secret scanning coverage:** `secret-scan` uses reviewed, path- and key-scoped
-  allowlists and skips files over 2 MB. The generated explorer HTML is therefore
-  not scanned; its sources are.
+- **Secret scanning coverage:** `secret-scan` fails on any finding. It uses
+  reviewed, path- and key-scoped allowlists and skips files over 2 MB, so the
+  generated explorer HTML is not scanned; its sources are. Its first hosted run
+  timed out on full history before the size skip was added.
 - **Releases:** pushing a `v*` tag runs `publish-catalog`, which archives the
   validated commit and attests both the archive and an SPDX SBOM. Verify a
   release with `gh attestation verify`.
@@ -336,14 +340,18 @@ To rerun the verdicts against a later landscape, follow the
 
 1. Extract the layers and collect current GitHub metadata (`extract_layers.py`,
    `github_freshness.py`); the weekly freshness lane shows when this is due.
-2. Build stripped packets per layer (`lane_packets.py`) and run the Claude lane
-   through the saved `layer-verdict-lane` workflow.
-3. Run the independent Codex lane (`codex_lane.py`) on the same packets without
+2. Refresh the dated convergence manifest: run the saved `sota-convergence`
+   workflow, then `build_manifest.py` (see the tooling README).
+3. Build stripped packets per layer with `lane_packets.py`, each carrying that
+   layer's own candidates. Then run the Claude lane through the saved
+   `layer-verdict-lane` workflow, which lives in the agent-lab repository's
+   `.claude/workflows/`, not in this catalog.
+4. Run the independent Codex lane (`codex_lane.py`) on the same packets without
    exposing the Claude returns.
-4. Record both lanes with `record_verdicts.py`. A row is `same_winner` only when
-   both lanes name the same repository and an overturning comparison of the same
-   class. Otherwise it stays `keep_but_compare` until the named comparison runs.
-5. Regenerate this page's tables with `build_verdicts.py --write` and check with
+5. Record both lanes with `record_verdicts.py`. A row is `same_winner` when both
+   lanes name the same set of winner components. When they disagree, the row
+   stays `pending_lanes` until an adjudication file is supplied.
+6. Regenerate this page's tables with `build_verdicts.py --write` and check with
    `--check`.
 
 Reopen a layer on a demonstrated gap, a changed requirement, relevant upstream
@@ -355,16 +363,17 @@ their dates and superseding links.
 
 - **No cross-family lane.** Every row is `codex_absent`. Run the Codex lane once
   the usage limit lifts and record the agreement per row.
-- **Four trading rows were judged against the wrong candidate set.** Their
-  packets carried their group's candidates rather than the layer's own tools,
-  and each row's `open_gaps` says so:
+- **Trading packets carried group-level candidates.** Every trading packet was
+  built from its group's shared candidate list, not the layer's own tools. Four
+  rows record the resulting mismatch in their `open_gaps`:
   - `security-supply-chain` recorded Codex SDK, Dagu and OpenTelemetry instead of
     Syft, Grype and Gitleaks.
   - `data-quality-orchestration` has no Pandera candidate.
   - `evaluation-experiments` omits Inspect AI, promptfoo and MLflow.
   - `agents-models-workers` carries the research-memory candidates.
 
-  Treat these four winners as unreliable until the packets are rebuilt with
+  Treat these four winners as unreliable, and the other eight trading rows as
+  drawn from a group-wide set, until the packets are rebuilt with
   layer-specific candidates and the lane is rerun. Until then, the trading cards
   and the gate ladder are the reference for those layers.
 - **Recorded pins can lag.** The trading `agents-models-workers` row cites older

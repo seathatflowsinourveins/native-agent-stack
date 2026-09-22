@@ -7499,8 +7499,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "be931933eec81255129685bab47d0a982f9f2431b11dc839fad172d989ae072d",
-      "bytes": 13179628
+      "sha256": "a8fb9fa34f9b47264f08aeb4b7b68855a827aa52b4fd6c3c76f720de4354d6b0",
+      "bytes": 13180468
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7564,18 +7564,18 @@
     },
     {
       "path": "docs/github-automation-evidence.json",
-      "sha256": "7bb47481be9904ca1fcbc633ccc4438fcbc53fa9aae2c8f0369ade8c422de5fa",
-      "bytes": 12863
+      "sha256": "bd3ad41bfd8b220b543175c6609e1aa44341f6a41c77c0d14578e17bc3215c57",
+      "bytes": 14047
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "3390a88c71bf9baedeb33a2b75778a1c89a824f2df80bf29c060adf11408fbf7",
-      "bytes": 30445
+      "sha256": "e5d5c19a9347a6198cfb926d1c6b6e59c1bd8781b38b2732240057285111cac7",
+      "bytes": 30881
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "8a5387c9c6009d3b42146f15565cc697f446eadd5d45a0058cd6c1e2bbfb288d",
-      "bytes": 476014
+      "sha256": "66af604a1dcf43a7b8c865402d6748ac729e2f8f05372f1348eeddfbaf172675",
+      "bytes": 476845
     },
     {
       "path": "docs/harness-defaults.md",
