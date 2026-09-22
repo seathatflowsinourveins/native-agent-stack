@@ -1,274 +1,85 @@
 {
  "alternatives": [
   {
-   "disposition": "conditional",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/state-recovery/memory/receipt.json",
-    "blueprints/us-equities/state-recovery/qdrant/receipt.json",
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c9",
-   "name": "Restic",
-   "repository": "https://github.com/restic/restic",
-   "why_not_default": "Native same-host restores passed. blueprints/us-equities/state-recovery/memory/receipt.json has status passed_same_host_restore (line 8) with 324 byte-equal restored files (line 33). blueprints/us-equities/state-recovery/qdrant/receipt.json has status passed_same_host_native_restore (line 8) and keeps an initial restore failure with exit_code 101 (line 41). Neither receipt involves a broker action (memory line 134, qdrant line 58). It was left out only because of the three-winner cap: Dagu already preserves completed run history across restart, and nothing else covers telemetry. That is coverage-based, not a measured ranking. Correction to the earlier proposal: the isolated restore namespace (memory line 37) came from bubblewrap, which is listed separately at line 14, not from Restic. The restores are same-host only, and no broker/order journal is backed up (agents-operations.json line 1767). It becomes the choice when state recovery beyond completed-history restart is required."
-  },
-  {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "docs/candidate-quality-review-20260921.md"
-   ],
+   "evidence_refs": [],
    "key": "c1",
-   "name": "Microsoft Agent Framework",
-   "repository": "https://github.com/microsoft/agent-framework",
-   "why_not_default": "Source review only. docs/candidate-quality-review-20260921.md line 47 says it fills a discovery gap but needs a required application workflow qualified before another runtime is added. There is no local run, broker-boundary or recovery evidence."
+   "name": "openbao",
+   "repository": "https://github.com/openbao/openbao",
+   "why_not_default": "Its only evidence is an upstream README reference (https://github.com/openbao/openbao/blob/v2.6.2/README.md), which I could not open under this lane's local-read boundary. The packet marks it source_review and not_individually_reviewed. The card itself says no server config is supplied, no service starts and credential handling is unaccepted. There is no local receipt of scoped secret issuance or of denying broker credentials to research workers. That is the clause of the requirement it would most directly serve, but it is untested, not failed."
   },
   {
-   "disposition": "conditional",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/deerflow/research-receipt.json",
-    "blueprints/us-equities/deerflow/native-receipt.json",
-    "docs/candidate-quality-review-20260921.md"
-   ],
-   "key": "c2",
-   "name": "DeerFlow",
-   "repository": "https://github.com/bytedance/deer-flow",
-   "why_not_default": "One native ACP research task completed (blueprints/us-equities/deerflow/research-receipt.json line 58). Its recorded sandbox had networkAccess false (lines 66-72) and 0 MCP tool calls (line 94), which does not show weaker isolation than the Codex worker; that earlier comparison is withdrawn. The actual gaps are these. DeerFlow returns text and discards ACP completion and usage, which were recovered from private adapter logs (line 14), so the 'complete returned results' clause is not met natively. Strict read-only enforcement is not established, because mode read-only maps to workspaceWrite (line 13). It was an embedded tool invocation, not the full planner or scheduler (line 12). Durable recovery was not exercised (line 17)."
-  },
-  {
-   "disposition": "overlap",
+   "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json",
-    "catalogs/us-equities/agents-operations.md"
-   ],
-   "key": "c3",
-   "name": "OpenAI Agents SDK",
-   "repository": "https://github.com/openai/openai-agents-python",
-   "why_not_default": "Source review only. The catalog lists it as an alternative (catalogs/us-equities/agents-operations.md line 125). It is an API-backed loop with its own authentication and tracing, not the native subscription identity. Upstream tracing is on by default and needs an opt-out (agents-operations.md line 77). No local run exists."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json",
-    "catalogs/us-equities/agents-operations.md"
-   ],
-   "key": "c4",
-   "name": "Prefect",
-   "repository": "https://github.com/prefecthq/prefect",
-   "why_not_default": "Source review only. The catalog treats it as an alternative to Dagu when Python flows dominate (agents-operations.md lines 38 and 95). There is no supervision, cancellation or restart receipt."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json",
-    "catalogs/us-equities/agents-operations.md"
-   ],
+   "evidence_refs": [],
    "key": "c5",
-   "name": "Temporal",
-   "repository": "https://github.com/temporalio/temporal",
-   "why_not_default": "Source review only. It applies when jobs span days or must survive host failure (agents-operations.md line 40). Activities retry by default, possibly without limit, which is unsafe for uncertain broker writes (agents-operations.json line 348). No local acceptance exists."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "evidence/receipts/foundation-native-20260920.json",
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c10",
-   "name": "Loki",
-   "repository": "https://github.com/grafana/loki",
-   "why_not_default": "Native execution was observed: Loki matched native usage for Codex and for both Claude runs (evidence/receipts/foundation-native-20260920.json lines 35-36). It is a storage and query backend that receives data through the c14 collector, which owns the privacy transform and allowlist (agents-operations.json lines 861 and 878). By itself it adds no scoping or redaction control. It observes research status only, with no broker connection (agents-operations.json line 990)."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "docs/candidate-quality-review-20260921.md"
-   ],
-   "key": "c11",
-   "name": "Deep Agents",
-   "repository": "https://github.com/langchain-ai/deepagents",
-   "why_not_default": "Source review only. docs/candidate-quality-review-20260921.md line 44 calls it a serious challenger that still needs the same source-research task, permission boundaries, recovery and complete cost comparison. None of these has run."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "docs/candidate-quality-review-20260921.md"
-   ],
-   "key": "c12",
-   "name": "OpenHands SDK",
-   "repository": "https://github.com/OpenHands/software-agent-sdk",
-   "why_not_default": "Source review only. docs/candidate-quality-review-20260921.md line 45 says installation and native-account and recovery acceptance remain open."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "docs/candidate-quality-review-20260921.md"
-   ],
-   "key": "c13",
-   "name": "OpenHands Agent Canvas",
-   "repository": "https://github.com/OpenHands/OpenHands",
-   "why_not_default": "Source review only. docs/candidate-quality-review-20260921.md line 46 says hosting existing workers 'is not yet qualified here'."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "local_integration",
-   "evidence_refs": [
-    "docs/dashboard-rendered-acceptance.md",
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c16",
-   "name": "Grafana",
-   "repository": "https://github.com/grafana/grafana",
-   "why_not_default": "Visualization layer. docs/dashboard-rendered-acceptance.md line 29 shows exact panel queries matching native results, on 'our integration panels'. Lines 8-10 describe these as 'selected native operations and local integration checks'. The packet labels its evidence native_execution; this lane classes it as local_integration because the panels are project integrations. Lines 14-15 on keeping private session content off GitHub are an evidence-publishing rule, not a runtime boundary control. It reads telemetry that c14 already scopes and adds no worker, supervision or broker-boundary control."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json",
-    "catalogs/us-equities/agents-operations.md"
-   ],
-   "key": "c18",
-   "name": "Dagster",
-   "repository": "https://github.com/dagster-io/dagster",
-   "why_not_default": "Source review only. It is the alternative for asset/partition lineage (agents-operations.md lines 39 and 96). There is no supervision, cancellation or restart receipt."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "adoption/paired/receipt.json",
-    "blueprints/us-equities/research-efficiency/native-receipt.json",
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c19",
-   "name": "Claude Code",
-   "repository": "https://github.com/anthropics/claude-code",
-   "why_not_default": "A native paired run completed with live_or_paper_broker_connected false (adoption/paired/receipt.json lines 17 and 22). The research-efficiency receipt records 'bounded_comparison_completed_with_two_word_protocol_failures' (blueprints/us-equities/research-efficiency/native-receipt.json line 1152). It overlaps the Codex worker, which the catalog keeps as the default research worker (catalogs/us-equities/agents-operations.json lines 15-16)."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "evidence/receipts/foundation-native-20260920.json",
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c20",
-   "name": "Prometheus",
-   "repository": "https://github.com/prometheus/prometheus",
-   "why_not_default": "Native execution was observed, but on the initial Claude run Prometheus missed the first two requests (evidence/receipts/foundation-native-20260920.json line 35). A full match came only on a fresh run after waiting for telemetry initialization (line 36). It is a metrics backend fed by the c14 collector and adds no scoping or redaction control of its own."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c21",
-   "name": "LangGraph",
-   "repository": "https://github.com/langchain-ai/langgraph",
-   "why_not_default": "Source review only. Its pin is behind upstream (packet: 1.2.11 vs 1.2.12). InMemorySaver loses state on restart, and checkpoints are not a durable broker ledger (agents-operations.json line 262)."
+   "name": "cosign",
+   "repository": "https://github.com/sigstore/cosign",
+   "why_not_default": "Its only evidence is an upstream README reference (https://github.com/sigstore/cosign/blob/v3.1.3/README.md), which I could not open under this lane's local-read boundary. The packet marks it source_review and not_individually_reviewed, and its card says no signing or identity flow was started. The retained syft and grype receipts both record signature_verified: false with checksum-only verification. Cosign would close that gap, but no verification run is retained."
   }
  ],
  "catalog": "us-equities",
- "challenger_preferred": {
-  "key": null,
-  "name": "Syft (with Grype on its SBOMs)",
-  "repository": "https://github.com/anchore/syft",
-  "required_comparison": "Rebuild the packet so the supply-chain components (syft, grype, gitleaks, cosign, openbao) are candidates. Then judge them against blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json and blueprints/us-equities/supply-chain/receipt.json, together with the worker and hosting receipts (blueprints/us-equities/workers/receipt.json, blueprints/us-equities/hosting/receipt.json), under a requirement text specific to this layer.",
-  "why": "For a security and supply-chain layer, native execution shows syft 1.52.0 and grype 0.119.0 scanning the pinned NautilusTrader 2.0.0rc5 runtime (21 packages) and the Alpaca adapter pins (2 packages), with zero matches against a database built 2026-09-22T06:30:41Z. The status is passed_scoped_scan_zero_findings (blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json lines 12-16). catalogs/us-equities/gates-20260922.json lines 84-98 record this as the security-supply-chain gate 'rc5-supply-chain-scan' with status established. Syft is catalog 'default' (agents-operations.json line 1408). It appears only in the packet's sota_components_not_in_candidates, so this lane cannot select it."
- },
+ "challenger_preferred": null,
  "lane": "claude",
  "layer_id": "security-supply-chain",
  "limits": [
-  "Revision round. The files re-read in full or in bounded sections this round were: packet lines 290-539 and the c7/c9 entries; hosting/receipt.json in full; workers/receipt.json lines 1-115; deerflow/research-receipt.json lines 1-100; state-recovery/memory/receipt.json lines 1-60; foundation-native-20260920.json lines 1-45; observability/receipt.json lines 300-394; agents-operations.json lines 825-894; dashboard-rendered-acceptance.md in full. The state-recovery READMEs were seen only as grep matches. The other citations carried over from the first round, and the evidence refuter reported those line citations as checked.",
-  "Only the relevant sections of observability/receipt.json (the c14 catalog evidence ref) were read; its earlier sections were not.",
-  "The raw.githubusercontent.com README URLs for c1, c2, c11, c12 and c13 were not fetched, because reads were restricted to the repository root.",
-  "Not opened: evidence/receipts/runtime-tools.json (gitleaks), blueprints/us-equities/supply-chain/receipt.json (syft SDK inventory), blueprints/us-equities/hosting/backup/receipt.json (restic signing checks) and docs/decisions/2026-09-22-broker-credential-handling.md. The README claim that Restic's release signature was verified (state-recovery/memory/README.md line 100) is documented as done, not observed in a receipt read here.",
-  "Non-adopted candidates c6 (vLLM), c8 (OmniRoute) and c15 (FreeLLMAPI) were not assessed and their evidence was not opened. None of them is a security or supply-chain control.",
-  "No commands were run and no receipt was re-executed. Every judgment is source review of retained receipts, not a fresh observation.",
-  "No provider or TypeSafe inference results were supplied, so every disposition is this lane's own source review. The two refuter lenses' findings were treated as data and checked against the original files: the c2 isolation comparison, the c14 line citation, the c19 ref mismatch and the Restic/bubblewrap attribution were corrected, and the major telemetry-coverage finding was resolved by moving c14 into the winner set. The TypeSafe skill came from <host-path>/SKILL.md via skill invocation. The actual model is Opus 5.5 (id claude-opus-5-5[1m]); the fixed model value was recorded as instructed."
+  "I did not open the GitHub-hosted evidence_refs: the openbao v2.6.2, grype v0.119.0, syft v1.52.0 and cosign v3.1.3 READMEs. This lane may read only local files under <host-path>/nas-wt-trading-layers. Their content is unverified here, and the source_review claims for c1 and c5 are unverified.",
+  "I could not run commands, so I did not execute tests/test_catalogs.py or any re-scan. The raw Syft/Grype/gitleaks artifacts are private and referenced only by sha256, so the recorded counts could not be re-derived. All figures are copied from the retained receipts.",
+  "Prior layer-verdict artifacts exist under evidence/artifacts/layer-verdicts-20260922/claude/ and I deliberately did not read them, to keep this verdict independent. No TypeSafe inference results were supplied or used; all judgments here are my own source review.",
+  "Skill path: <host-path>/typesafe-ai (in context). The actual model exposed by the client is claude-opus-5-5[1m]. The model field is the fixed value the packet requires."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "Candidate-set mismatch. The packet's layer_id is security-supply-chain, but its requirement text (line 531), existing_overturn_when (line 522) and candidates are group-level agents-operations items. The actual security components are listed only under sota_components_not_in_candidates: syft, gitleaks https://github.com/gitleaks/gitleaks, grype https://github.com/anchore/grype, cosign https://github.com/sigstore/cosign and openbao https://github.com/openbao/openbao.",
-  "No measured comparison ranks c14 against c9 for the third winner slot. With three winners, the 'recoverable state' clause rests on Dagu's completed-history restart (hosting receipt line 38 and limitations line 100: no in-flight resumption). Restic's same-host restore receipts stay outside the winner set.",
-  "The c14 privacy canary is labelled 'Independent synthetic review; not an inference task' (observability/receipt.json line 314). Traces are disabled, no trace database was deployed, and broker monitoring was not accepted (agents-operations.json lines 839 and 882). A privileged audit sink for order/account identifiers is still only a requirement (line 866).",
-  "Gitleaks (https://github.com/gitleaks/gitleaks) is catalog default and marked native_proven through evidence/receipts/runtime-tools.json, which was not opened here. foundation-closure-20260921.md lines 201-203 record 197 unchanged baseline matches and say no clean whole-repository security claim follows. observability/receipt.json line 392 records gitleaks_current_tree_findings 0 for that local validation scope only.",
-  "Grype (https://github.com/anchore/grype) covers installed Python package metadata only, not bundled native extensions, host OS packages or transitive shared libraries (scan receipt line 16). Signature verification was false for the grype binary (line 52).",
-  "Cosign (https://github.com/sigstore/cosign) and OpenBao (https://github.com/openbao/openbao) are source review only. No signature verification or service secret lifecycle was executed (agents-operations.json lines 1538-1553 and 1577-1595).",
-  "catalogs/us-equities/gates-20260922.json lines 229-241 establish broker credential handling only as local_integration, checked by file presence alone. market_research.py keeps an unguarded credentials() function.",
-  "The worker's broker boundary depends on the environment, not on enforcement. Read-only mode does not restrict external MCP mutations (workers/receipt.json line 110). There is no per-request provider attestation (line 109), no VM or network isolation boundary, and no off-host recovery. Dagu host shell execution 'is not a sandbox' (hosting receipt line 102).",
-  "The Dagu pin v2.16.6 is behind upstream v2.17.0 (packet). Recovery in the hosting receipt is completed-history restart, not in-flight recovery."
+  "The packet's requirement text (bounded research, native identity, process supervision, telemetry, no broker execution authority for research workers) and its existing_overturn_when (scheduler/graph escalation) match the agents-operations group, not a security/supply-chain requirement. I judged the candidates against it as supplied; the coordinator should confirm the requirement mapping.",
+  "None of the evidence establishes separation of broker credentials from research workers. OpenBao has no execution receipt, and its card says IBKR credential handling is 'selected live-primary, unaccepted'.",
+  "No release signature or build provenance is verified for syft or grype. Both receipts record signature_verified: false with checksum-only matching.",
+  "The Grype scan covers Python package metadata only. It does not cover bundled Rust/Cython extensions, host OS packages, transitive shared libraries or IBKR-side software. Its zero matches are tied to the 2026-09-22T06:30:41Z database snapshot.",
+  "The Syft inventory covers one SDK prefix (36 packages). Three outbound symlinks were not followed, and whole-host and external-interpreter coverage is absent.",
+  "The gitleaks receipt does not name which repository its 22 commits came from. It is a 2026-09-19 point-in-time result with no recurring scan evidence, and its sandbox network denial was 'configured but not separately exercised'.",
+  "There is no measured comparison between these tools and alternatives (e.g. other SBOM, vulnerability or secret scanners). Selection rests on native receipts, not on a head-to-head comparison."
  ],
  "overturn_protocol": {
   "arms": [
-   "current winners: c17 Codex + c7 Dagu + c14 OpenTelemetry Collector contrib (worker, supervision and scoped telemetry)",
-   "alternative set: c17 Codex + c7 Dagu + c9 Restic (worker, supervision and same-host state recovery)",
-   "challenger: syft + grype scan receipt (with gitleaks secret scan) as the layer's supply-chain controls"
+   "current winners syft+grype+gitleaks (native_proven, scoped)",
+   "openbao native scoped-credential issuance/denial run",
+   "cosign native signature verification of pinned syft/grype releases"
   ],
   "fixture_paths": [
-   "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
    "blueprints/us-equities/supply-chain/receipt.json",
-   "blueprints/us-equities/workers/receipt.json",
-   "blueprints/us-equities/hosting/receipt.json",
-   "blueprints/us-equities/state-recovery/memory/receipt.json",
-   "blueprints/us-equities/state-recovery/qdrant/receipt.json"
+   "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+   "evidence/receipts/runtime-tools.json",
+   "tests/test_catalogs.py"
   ],
-  "metric": "Per candidate, a native-execution receipt with status passed for a security or supply-chain control scoped to the pinned runtime/adapter: SBOM coverage count, vulnerability matches against a dated DB, secret-scan findings, telemetry privacy canary result. It must also show zero broker credentials or order tools in the research worker environment. Count the requirement clauses covered by native receipts for each candidate set."
+  "metric": "A native receipt with exit code 0 and an explicit pass or fail for the layer requirement. For OpenBao: a scoped credential is issued to the paper runtime and denied to a research-worker identity. For cosign: release signature and identity are verified for the pinned syft/grype artifacts. This is compared against the current checksum-only, no-secret-lifecycle evidence of the winners."
  },
- "overturn_when": "This verdict holds only for the packet's current candidate set, and the choice between c14 and c9 for the third slot rests on clause coverage, not on measurement.\n\nIt changes if the layer's candidates include the security components already in its gate records: syft/grype (blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json), the syft SDK inventory (blueprints/us-equities/supply-chain/receipt.json) and gitleaks.\n\nIt also changes if a re-executed worker or hosting receipt shows broker credentials or order tools reachable from the research environment, contradicting blueprints/us-equities/workers/receipt.json line 110 or broker_calls 0 in blueprints/us-equities/hosting/receipt.json line 97.\n\nFinally, it changes if a layer requirement makes durable state recovery a hard requirement that Dagu's completed-history restart does not meet. In that case c9 Restic, with its same-host restore receipts (blueprints/us-equities/state-recovery/memory/receipt.json, blueprints/us-equities/state-recovery/qdrant/receipt.json), should replace c14.",
- "packet_sha256": "74f43b463f62450377635747662694fc985738c4920166c95d18d150fc3a2529",
+ "overturn_when": "Change the verdict if either of these is retained. (a) A native OpenBao receipt under blueprints/us-equities/ showing the paper runtime received scoped, revocable broker credentials while a research-worker identity was denied them. That would directly satisfy the requirement's 'without granting research workers broker execution authority' clause and would warrant adding c1 as a winner. (b) A native cosign verification of the pinned syft/grype release artifacts that turns their signature_verified: false into a verified identity. A re-run of the scan recorded in blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json against a later database changes the findings, not the tool selection. After any receipt change, run python3 -m pytest tests/test_catalogs.py; it asserts local evidence refs exist and grype is native_proven.",
+ "packet_sha256": "36aa3f94798ed32da75140ec011287b67b8c848724f806044adf45bf2ca7d9a9",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/us-equities__security-supply-chain.json",
-  "catalogs/us-equities/agents-operations.md",
-  "catalogs/us-equities/agents-operations.json",
-  "blueprints/us-equities/workers/receipt.json",
-  "blueprints/us-equities/research-runtime/receipt.json",
-  "blueprints/us-equities/hosting/receipt.json",
-  "blueprints/us-equities/state-recovery/memory/receipt.json",
-  "blueprints/us-equities/state-recovery/qdrant/receipt.json",
-  "blueprints/us-equities/state-recovery/memory/README.md",
-  "blueprints/us-equities/state-recovery/qdrant/README.md",
-  "evidence/receipts/foundation-native-20260920.json",
-  "observability/receipt.json",
-  "blueprints/us-equities/deerflow/native-receipt.json",
-  "blueprints/us-equities/deerflow/research-receipt.json",
-  "adoption/paired/receipt.json",
-  "blueprints/us-equities/research-efficiency/native-receipt.json",
-  "docs/foundation-closure-20260921.md",
-  "docs/dashboard-rendered-acceptance.md",
-  "docs/candidate-quality-review-20260921.md",
-  "catalogs/landscape/candidate-quality-review.json",
-  "evidence/artifacts/catalog-quality-review-20260921/sources.json",
-  "catalogs/us-equities/gates-20260922.json",
-  "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json"
+  "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+  "blueprints/us-equities/supply-chain/receipt.json",
+  "blueprints/us-equities/supply-chain/README.md",
+  "evidence/receipts/runtime-tools.json",
+  "recipes/README.md (gitleaks rows, lines 64-93)",
+  "tests/test_catalogs.py (lines 505-534)"
  ],
- "why_selected": "None of the packet's candidates is a security or supply-chain tool, so the adopted candidates were judged against the packet's requirement text as written (packet line 531): \"Run bounded research with native identity and complete returned results; supervise owned processes; retain scoped telemetry, failed attempts and recoverable state without granting research workers broker execution authority.\" Each winner has a native-execution receipt and covers a different clause. No measured comparison exists between the candidates; the set was chosen by clause coverage from source review of retained receipts.\n\n(1) Codex (c17), native execution. blueprints/us-equities/workers/receipt.json records run.status \"completed\" with the full usage totals returned (lines 24-48), after a native interactive login with \"no credential store copied or inspected\" (line 13). The failed ctx_execute_file attempt is kept (lines 75-79, 111). Line 110 records the boundary in full: \"Read-only filesystem mode does not restrict external MCP mutations; the recorded environment supplied no broker keys or broker tools.\" Broker authority is therefore absent because of the environment, not blocked by enforcement.\n\n(2) Dagu (c7), native execution. blueprints/us-equities/hosting/receipt.json has scope \"no broker or model calls\" (line 4). The failure fixture ended \"failed\" with its dependent step \"aborted\" (lines 25-30). The cancellation fixture ended \"aborted\" (lines 31-35). service_restart_exit is 0 and prior_history_rows_preserved is true (lines 37-38), and failed or aborted runs are kept in history after restart (lines 46-82). The service runs under systemd with restart_policy on-failure (lines 93-94) and has broker_calls 0 (line 97).\n\n(3) OpenTelemetry Collector contrib (c14) is the only adopted candidate that covers the \"retain scoped telemetry\" clause with a boundary control. evidence/receipts/foundation-native-20260920.json lines 35-36 record native execution: native Codex usage matched Loki and Prometheus, and a fresh Claude run matched native/Loki/Prometheus consumption 35537 in all four categories. The initial Claude run is kept as a partial miss. The catalog entry (catalogs/us-equities/agents-operations.json lines 861, 865 and 878) says it supplies the privacy transform, carries usage metadata \"without prompt bodies\" and requires a reviewed privacy allowlist. The catalog's own evidence ref, observability/receipt.json, adds a privacy canary at lines 313-330, which that receipt labels \"Independent synthetic review\" (a synthetic canary through native POST and export), with forbidden_marker_absent true. It also keeps an initial privacy-review failure among its retained failed attempts (line 371) and reports status passed_with_explicit_limits (line 386).\n\nIn the earlier proposal Restic (c9) was the third winner. It was replaced because Dagu already keeps completed run history across restart (hosting line 38), while no other adopted candidate retains scoped telemetry. This is a coverage judgment, not a measured ranking. None of the three winners is a supply-chain control. The retained supply-chain receipts belong to syft/grype, which are not packet candidates (see challenger_preferred).",
+ "why_selected": "Only syft (c4), grype (c2) and gitleaks (c3) have retained native execution evidence. The other adopted candidates have only upstream README references. (1) Syft: blueprints/us-equities/supply-chain/receipt.json (id syft-sdk-inventory-20260919, status passed_scoped_inventory_acceptance) records a native Syft 1.52.0 scan. It ran in a read-only, network-isolated bubblewrap namespace, exited 0 and found 36 Python packages. The package name/version/PURL entries matched 36/36 between the Syft and CycloneDX outputs and 36/36 against installed dist-info metadata. The source fingerprint was unchanged before and after the scan. The release archive matched the publisher checksum list and the GitHub asset digest; signature_verified is false. (2) Grype: blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json (status passed_scoped_scan_zero_findings) records native Grype 0.119.0 with database schema v6.1.9, built 2026-09-22T06:30:41Z. It scanned the Syft SBOMs of the NautilusTrader 2.0.0rc5 runtime site-packages (21 packages) and the adaptive-paper requirements.txt pins (2 packages). Every syft/grype command exited 0, with 0 runtime matches and 0 adapter matches. The archive checksum matched and signature_verified is false. (3) Gitleaks: evidence/receipts/runtime-tools.json (kind native_cli_e2e, recorded 2026-09-19T04:55:03Z) records a native gitleaks history scan that exited 0 over 22 commits (1174704 bytes, approximate) with 0 findings and 100 percent redaction. The pinned command is in recipes/README.md line 93. Together these three cover dependency inventory, known-vulnerability matching and secret scanning. All are scoped, dated native_proven results, not security certifications.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
-  "blueprints/us-equities/workers/receipt.json",
-  "blueprints/us-equities/hosting/receipt.json",
-  "evidence/receipts/foundation-native-20260920.json",
-  "observability/receipt.json",
-  "catalogs/us-equities/agents-operations.json"
+  "blueprints/us-equities/supply-chain/receipt.json",
+  "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+  "blueprints/us-equities/supply-chain/README.md",
+  "evidence/receipts/runtime-tools.json",
+  "recipes/README.md"
  ],
  "winner_keys": [
-  "c17",
-  "c7",
-  "c14"
+  "c4",
+  "c2",
+  "c3"
  ]
 }

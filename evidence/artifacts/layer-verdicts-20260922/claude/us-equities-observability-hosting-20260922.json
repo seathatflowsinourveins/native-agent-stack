@@ -1,206 +1,120 @@
 {
  "alternatives": [
   {
-   "disposition": "measured_tradeoff",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/research-runtime/receipt.json",
-    "adoption/paired/receipt.json",
-    "adoption/paired/observation.json",
-    "evidence/receipts/foundation-native-20260920.json",
-    "docs/foundation-closure-20260921.md",
-    "blueprints/us-equities/research-efficiency/native-receipt.json"
-   ],
-   "key": "c19",
-   "name": "Claude Code",
-   "repository": "https://github.com/anthropics/claude-code",
-   "why_not_default": "Claude Code is a co-equal native research worker. The earlier reason for placing it below Codex (a \"first Claude run Prometheus gap\") was wrong for the research workload. Two Claude research runs on 2026-09-19 matched telemetry on their first request. research-runtime/receipt.json line 112 records native_usage_equals_prometheus_and_loki true with exposed_tool_count 0. adoption/paired/observation.json lines 72-79 record all_four_prometheus_categories_match_native true, loki_instance_matches_prometheus true and all_four_api_request_usage_categories_match_native true, for a run under Dagu research-pair with exit 0. Its broker boundary is stronger than c7's: zero exposed tools (`--tools '' --disallowedTools '*'`, research-runtime/receipt.json line 169; adoption/paired/receipt.json line 29). The trade-off comes from same-task observations of both clients. (a) On the 2026-09-20 seven-MCP-call task, Codex matched Prometheus, but Claude's prometheus_matches_direct was false with prometheus_missing total_tokens 77317 (foundation-native-20260920.json lines 353-359); Loki matched for both. (b) No failed Claude turn with its usage is retained, while c7's worker receipt keeps two. Claude therefore trails on the requirement's tool-bearing telemetry and failed-attempt clauses and leads on the no-broker-authority clause. The packet gives no pin (pin null). docs/foundation-closure-20260921.md line 52 records installed 2.1.278."
-  },
-  {
    "disposition": "overlap",
    "evidence_class": "native_proven",
    "evidence_refs": [
-    "evidence/receipts/foundation-native-20260920.json",
-    "adoption/paired/observation.json",
-    "catalogs/us-equities/agents-operations.json",
-    "docs/dashboard-rendered-acceptance.md"
+    "observability/receipt.json",
+    "observability/backends/receipt.json"
    ],
-   "key": "c6",
-   "name": "Prometheus",
-   "repository": "https://github.com/prometheus/prometheus",
-   "why_not_default": "Prometheus is the metric store behind the selected Collector, so it complements c1 rather than offering another way to meet the requirement. It is outside the winner set only because of the 3-winner cap, and the retention clause depends on it. Observed gap: on the 2026-09-20 seven-MCP-call task, Claude's Prometheus series missed 77317 total tokens (foundation-native-20260920.json lines 353-359). Codex matched on that task, and both clients matched on the 2026-09-19 tool-free research runs (adoption/paired/observation.json lines 27 and 72). docs/dashboard-rendered-acceptance.md records seven scrape targets up and states that scraping is not provider-level or whole-ecosystem end-to-end evidence."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "evidence/receipts/foundation-native-20260920.json",
-    "adoption/paired/observation.json",
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c12",
-   "name": "Loki",
-   "repository": "https://github.com/grafana/loki",
-   "why_not_default": "Loki is the sanitized log store behind the same Collector and complements c1. Its records matched native usage on every retained run: Codex loki_matched_requests 9 and Claude 6 on 2026-09-20; paired Astra 18 records and Claude 51 records, with instances matching Prometheus. It stores only labels and redacted bodies, and the catalog records no trace database and no high availability. It is outside the winner set only because of the cap, and the retention clause depends on it."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json",
-    "docs/dashboard-rendered-acceptance.md"
-   ],
-   "key": "c10",
+   "key": "c2",
    "name": "Grafana",
    "repository": "https://github.com/grafana/grafana",
-   "why_not_default": "Grafana visualizes Prometheus and Loki and adds no ingestion, supervision or state recovery. Its evidence class is corrected to native_proven, matching the packet's evidence_kind and catalog evidence_level (agents-operations.json line 950). The catalog limits that proof to local health, provisioned data-source and dashboard queries, and UI checks, with no external publication and no high availability (line 965). docs/dashboard-rendered-acceptance.md records exact panel-query agreement for memory, Qdrant and QMD, and also that Claude had no current telemetry series."
+   "why_not_default": "Observed natively. Readiness returned HTTP 200, and the provisioned dashboard and datasources survived a backend restart (observability/backends/receipt.json persistence checks; check_persistence.py lines 75-76). The dashboard render predates the SDK receipt panel. Grafana only visualizes data that Prometheus and Loki already retain, so it adds no retention or identity capability. The packaged build commit differs from the tag commit (grafana_tag_build_commit_equal false). It is supporting, not a core winner."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "observability/receipt.json",
+    "observability/backends/receipt.json"
+   ],
+   "key": "c12",
+   "name": "alertmanager",
+   "repository": "https://github.com/prometheus/alertmanager",
+   "why_not_default": "`amtool check-config` exited 0. A firing and a resolved notification went through the local webhook route to ntfy, and a silence persisted across a backend restart (observability/backends/receipt.json). external_delivery_tested is false (observability/receipt.json). It adds local alerting but does not retain research telemetry or state itself."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "observability/receipt.json",
+    "observability/backends/receipt.json"
+   ],
+   "key": "c10",
+   "name": "ntfy",
+   "repository": "https://github.com/binwiederhier/ntfy",
+   "why_not_default": "Its local inbox received the firing and resolved notifications, and a synthetic message persisted after restart (check_persistence.py ntfy_message check, recorded true in observability/backends/receipt.json). There was no external delivery (external_delivery_tested false). It is a notification sink, not telemetry retention for research runs."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "observability/receipt.json"
+   ],
+   "key": "c13",
+   "name": "opentelemetry-collector",
+   "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+   "why_not_default": "Its only evidence is the contrib distribution asset otelcol-contrib 0.161.0 (observability/receipt.json components). The standalone core binary was not exercised separately, so it is subsumed by c14."
   },
   {
    "disposition": "conditional",
    "evidence_class": "native_proven",
    "evidence_refs": [
-    "blueprints/us-equities/state-recovery/memory/receipt.json",
-    "blueprints/us-equities/state-recovery/qdrant/receipt.json",
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c17",
-   "name": "Restic",
-   "repository": "https://github.com/restic/restic",
-   "why_not_default": "Restic is the only adopted candidate with native restore evidence for recoverable state beyond Dagu history, and the winner set depends on it for that clause. Its scope is same-host only. It restored ai-memory (324 files byte-equal) and Qdrant (201 points, exact query match). The repository and password are on one host, with off_host false, no key escrow, no schedule and no retention deletion. Telemetry stores and process supervision are not covered."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/deerflow/research-receipt.json",
-    "blueprints/us-equities/deerflow/native-receipt.json",
-    "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md",
-    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
-   ],
-   "key": "c4",
-   "name": "DeerFlow",
-   "repository": "https://github.com/bytedance/deer-flow",
-   "why_not_default": "One embedded ACP research prompt completed (totalTokens 42345). DeerFlow discards ACP completion and usage, so those figures came from private adapter logs. The read-only mode label mapped to workspaceWrite/on-request. No standing service, planner/UI or recovery was accepted. The 2026-09-21 review is source-only, at a newer revision."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c20",
-   "name": "Temporal",
-   "repository": "https://github.com/temporalio/temporal",
-   "why_not_default": "Source review only. Temporal is the named escalation for work that must survive host loss, but no local execution, failure/cancellation or restart receipt exists. The catalog notes that activities retry by default."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c21",
-   "name": "LangGraph",
-   "repository": "https://github.com/langchain-ai/langgraph",
-   "why_not_default": "Source review only, with an import smoke test as the proposed command. InMemorySaver loses state on restart. LangGraph is an agent-state graph, not a process supervisor or telemetry path. The pin is behind upstream (1.2.11 vs 1.2.12)."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
+    "blueprints/us-equities/hosting/backup/receipt.json",
+    "blueprints/us-equities/hosting/backup/selected-files.txt",
+    "blueprints/us-equities/hosting/backup/source.sha256"
    ],
    "key": "c8",
-   "name": "Prefect",
-   "repository": "https://github.com/prefecthq/prefect",
-   "why_not_default": "Source review only. No flow is supplied or scheduled. Prefect would replace Dagu as the first scheduler rather than run on top of it. There is no failure/cancellation/restart receipt."
+   "name": "Restic",
+   "repository": "https://github.com/restic/restic",
+   "why_not_default": "Native backup, `check --read-data` and a verified restore passed (22 files, 160642 bytes; hashes matched independently). The scope was static public reference files only: live_databases 0, and no Loki, Prometheus, SQLite or broker-journal backup. off_host_destination is false and the timer is not enabled. It covers only a narrow part of the recoverable-state clause and retains no telemetry."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/runtime-tools.json"
+   ],
+   "key": "c3",
+   "name": "sandbox-runtime",
+   "repository": "https://github.com/anthropics/sandbox-runtime",
+   "why_not_default": "Relevant to restricting research workers. Native filesystem checks returned allowed_write_exit 0, denied_read_exit 1 and separate_denied_write_exit 1 (evidence/receipts/runtime-tools.json). Network denial was configured but not exercised, and an overlapping read/write path returned exit 0 inside an ephemeral hidden mount. It is not an observability or retention component and does not show that workers lack broker authority."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c9",
+   "name": "mlflow",
+   "repository": "https://github.com/mlflow/mlflow",
+   "why_not_default": "The only evidence is an external README URL, which could not be opened under the local-read constraint. The packet card records no tracking server or experiment run, so there is no local execution evidence of lineage or trace retention. Untested, not failed."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c11",
+   "name": "phoenix",
+   "repository": "https://github.com/Arize-ai/phoenix",
+   "why_not_default": "The only evidence is an external README, not opened. The card says the server launch is prospective with no app instrumented. The license is ELv2; upstream metadata reports NOASSERTION. There is no native trace-retention evidence. Untested, not failed."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c1",
+   "name": "opensandbox",
+   "repository": "https://github.com/opensandbox-group/OpenSandbox",
+   "why_not_default": "The only evidence is an external README, not opened. The card says help/import is not proof of isolation, and the pin server/v0.2.3 is behind upstream release-1.1.0. There is no local execution evidence."
   },
   {
    "disposition": "out_of_scope",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c16",
-   "name": "Dagster",
-   "repository": "https://github.com/dagster-io/dagster",
-   "why_not_default": "Dagster is catalogued for data orchestration (asset lineage and backfills), not for supervising research workers or carrying telemetry. Source review only, and no definitions file is included."
+   "evidence_refs": [],
+   "key": "c4",
+   "name": "modal",
+   "repository": "https://github.com/modal-labs/modal-client",
+   "why_not_default": "Managed cloud compute. The card says `modal run` may incur charges and was not run, and catalog inclusion does not authorize paid hosting. The only evidence is an external PyPI page, not opened."
   },
   {
-   "disposition": "unqualified",
+   "disposition": "out_of_scope",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c15",
-   "name": "OpenAI Agents SDK",
-   "repository": "https://github.com/openai/openai-agents-python",
-   "why_not_default": "Source review only, with no provider call. It is API-backed and does not inherit native Codex account identity. Tracing is on by default, so a destination and a sensitive-data policy are required."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md",
-    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
-   ],
-   "key": "c3",
-   "name": "OpenHands Agent Canvas",
-   "repository": "https://github.com/OpenHands/OpenHands",
-   "why_not_default": "Source review of a README only. Hosting, account boundaries, persistence and migration are explicitly unqualified."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md",
-    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
-   ],
-   "key": "c9",
-   "name": "OpenHands SDK",
-   "repository": "https://github.com/OpenHands/software-agent-sdk",
-   "why_not_default": "Source review only. It is a challenger for remote or isolated workers. Installation, native-account and recovery acceptance are all open."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md",
-    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
-   ],
-   "key": "c5",
-   "name": "Deep Agents",
-   "repository": "https://github.com/langchain-ai/deepagents",
-   "why_not_default": "Source review only. The review names it a serious challenger but requires the same source-research task, permission boundaries, recovery and full cost comparison, none of which has run."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md",
-    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
-   ],
-   "key": "c18",
-   "name": "Microsoft Agent Framework",
-   "repository": "https://github.com/microsoft/agent-framework",
-   "why_not_default": "Source review only. It was listed to fill a discovery gap and needs a qualified application workflow before any runtime is added."
-  },
-  {
-   "disposition": "observed_failure",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "evidence/receipts/foundation-native-20260920.json",
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c13",
-   "name": "OmniRoute",
-   "repository": "https://github.com/diegosouzapw/omniroute",
-   "why_not_default": "Not adopted. OmniRoute is a routing gateway, not an observability or hosting component, and gateway inference failed acceptance. The Codex client attempt returned HTTP 400 (prefixed raw model not supported); the receipt keeps it separate from a direct HTTP 429 quota probe on the OpenAI-compatible route (foundation-native-20260920.json lines 185-204). The Claude client returned HTTP 429 after a launcher parser failure. Native encrypted restore ignored .enc files."
+   "evidence_refs": [],
+   "key": "c7",
+   "name": "e2b",
+   "repository": "https://github.com/e2b-dev/E2B",
+   "why_not_default": "A managed sandbox, or self-hosted on AWS/GCP. The card says importing it is not a sandbox E2E. The only evidence is an external README, not opened, and it has no role in local telemetry retention."
   }
  ],
  "catalog": "us-equities",
@@ -208,87 +122,75 @@
  "lane": "claude",
  "layer_id": "observability-hosting",
  "limits": [
-  "Skill: the typesafe-ai body was preloaded from <host-path>/SKILL.md. No TypeSafe inference results were supplied and no service was called. Every disposition is my own source review; no provider judgment was retained. Refuter findings were treated as data and each was checked against the original receipts before acceptance.",
-  "Model: the client reports claude-opus-5-5[1m] as the executing model. The model field copies the required fixed value claude-opus-5/high.",
-  "Round-1 sources not re-read this round (hosting, deerflow, state-recovery, dashboard and candidate-review files) are relied on from the round-1 bounded reads.",
-  "External raw.githubusercontent.com README evidence_refs for c3, c4, c5, c9 and c18 were not fetched. Those candidates were judged from local review artifacts only.",
-  "observability/receipt.json and observability/backends/receipt.json (the catalog's own refs for c1/c6/c10/c12) are not in the packet evidence_refs and were not read.",
-  "Non-adopted c11 FreeLLMAPI and c14 vLLM receipts were not opened, so neither appears in alternatives.",
-  "No commands were run. The pass status of tests/test_observability.py is not established here, and research-pair.yaml was confirmed to exist by glob only; its contents were not read.",
-  "c19's disposition of measured_tradeoff rests on same-task native observations of both clients (the 2026-09-19 paired research run and the 2026-09-20 seven-MCP-call run). It was not a comparison designed to pick a winner."
+  "External evidence URLs for c1, c4, c7, c9 and c11 could not be opened under the local-read constraint. Those candidates are unverified, not failed.",
+  "No commands were run. check_persistence.py and the pytest guards are named as overturn checks but were not executed in this review. Receipts are retained 2026-09-19 records, not current observations.",
+  "check_persistence.py needs a private Grafana env file and a running local stack, so it cannot be run offline.",
+  "The coordinator supplied no TypeSafe inference results. All dispositions are this lane's own source review. Packet card_limitations and the refuter findings are treated as data; I verified the refuter findings against the cited lines of test_observability.py, check_persistence.py and observability/receipt.json.",
+  "This round did not re-read the packet or the other receipts. It relies on the earlier-round reads, which the evidence refuter confirmed line by line.",
+  "Recipe and README files and observability/followup-receipt.json were not opened.",
+  "Model: opus/high per the fixed packet value. The client identifies the running model as claude-opus-5-5[1m]. Skill path: <host-path>/SKILL.md."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "No research-workload receipt shows c7 running with a tool boundary equal to Claude's zero exposed tools. Read-only filesystem mode does not restrict external MCP mutations, and broker authority is withheld only because no broker keys or tools were supplied (workers/receipt.json line 110). The tool-heavy Codex telemetry match ran with danger-full-access and approval never.",
-  "No failed Claude turn with its usage is retained, so c19 cannot yet be compared with c7 on the failed-attempt clause.",
-  "The winners c7/c2/c1 alone do not meet the retention or recoverable-state clauses. Storage depends on c6/c12, and restore depends on c17, which is same-host only with no off-host disaster recovery or key escrow. Loki and Prometheus stores were not backed up.",
-  "Dagu's restart kept completed history only. In-flight resumption and host-loss recovery are not shown (hosting/receipt.json line 100).",
-  "The Dagu pin v2.16.6 is behind upstream v2.17.0, and the newer release has not been exercised.",
-  "The Codex configured model and provider are verified, but there is no independent per-request provider attestation.",
-  "Claude's tool-heavy Prometheus gap (77317) is not resolved for tool-bearing runs. Tool-free research runs matched.",
-  "Collector traces are disabled and no trace database is deployed. There is no high availability and no external alert destination.",
-  "No measured comparison exists against Temporal, Prefect, OpenHands, Deep Agents or Microsoft Agent Framework, which have source review only.",
-  "The user service stops when Windows shuts down. There is no continuous off-host hosting, paid hosting or unattended broker operation.",
-  "All evidence comes from one WSL host dated 2026-09-19/20. It does not carry over to a new WSL or macOS machine."
+  "No runnable script in the repository re-runs the native usage-match or per-receipt_id deduplication queries. Both rest on the retained observability/receipt.json record only.",
+  "The 80770 deduplicated total comes from republished summaries of two earlier SDK receipts, not new model calls (observability/receipt.json sdk_receipt_lane.source).",
+  "Failed research-worker attempts were never ingested and queried natively in Loki or Prometheus. retained_failed_attempts is prose about harness failures, and preservation of failed status is shown only offline (tests/test_observability.py lines 32-54).",
+  "check_persistence.py restarts only the five backend units, not the collector, and uses a synthetic fixture. Collector-restart equality exists only as a retained record.",
+  "There is no high availability, off-host backup or disaster recovery for the telemetry backends. Single-host persistence is not replication.",
+  "Retention periods were configured but never aged out, so expiry behaviour is unverified.",
+  "The SDK native turn histogram was not observed (native_turn_histogram_observed false).",
+  "Traces are disabled and no trace database is deployed, so per-step research lineage is not retained.",
+  "Nothing shows research workers lack broker execution authority. sandbox-runtime network denial was not exercised.",
+  "Live Loki and Prometheus data was not included in the restic backup (live_databases 0).",
+  "The alert-rule count differs across records: six in observability/receipt.json, final_rule_count 8 in the backends receipt, and fourteen asserted in tests/test_observability_backends_alerts.py. The current rendered set was not re-verified.",
+  "No measured comparison exists against any alternative telemetry or trace store."
  ],
  "overturn_protocol": {
   "arms": [
-   "Dagu v2.16.6 + native Codex SDK worker (gpt-6-astra) + otelcol-contrib v0.161.0 (current)",
-   "Dagu v2.16.6 + native Claude Code worker (claude-opus-5) on research-pair.yaml with a tool-bearing no-broker allowlist and one induced failed turn",
-   "Dagu v2.17.0 (upstream latest) on hosting/research-evidence.yaml",
-   "Temporal server v1.32.0 / Python SDK 1.33.0 local start-dev on the same workload"
+   "otelcol-contrib v0.161.0 -> Prometheus v3.14.0 + Loki v3.7.8 (current winners)",
+   "otelcol-contrib -> Phoenix arize-phoenix-v20.14.0 trace store",
+   "MLflow v3.16.1 tracking server with the same fixture run"
   ],
   "fixture_paths": [
-   "blueprints/us-equities/research-runtime/research-pair.yaml",
-   "blueprints/us-equities/research-runtime/prepare-evidence.yaml",
-   "blueprints/us-equities/hosting/research-evidence.yaml",
+   "fixtures/observability-check.json",
+   "observability/backends/check_persistence.py",
    "tests/test_observability.py"
   ],
-  "metric": "Pass/fail on each of:\n- retained failed-turn usage reconciled to Prometheus and Loki\n- tool-bearing research run with native, Prometheus and Loki equal in every token category\n- exposed-tool/broker boundary (zero broker tools; MCP mutation restricted)\n- failure-fixture status\n- cancellation status\n- completed-history preservation after restart\n- in-flight resumption without duplicate effect\n- anonymous/authenticated HTTP status\n- zero broker calls"
+  "metric": "Pass/fail per arm on the same fixture: (a) check_persistence.py checks prometheus_historical_sample and loki_log true after the backend restart (the script exits 0); (b) the tests/test_observability.py offline guards pass; (c) the native fixture answer is correct (sum 42, service_count 4) and collected usage equals native usage per client; (d) the per-receipt_id deduplicated total is unchanged after a collector restart; (e) unknown usage stays absent, not zero; (f) a failed research-worker observation can be retrieved by query from the store."
  },
- "overturn_when": "Two checks could change the verdict.\n\nWorker choice (c7 vs c19): run the Claude worker in blueprints/us-equities/research-runtime/research-pair.yaml under Dagu. Claude already has tool-free, first-request telemetry parity, so that is not the deciding check. The verdict flips to c19 if both of the following hold:\n(a) Claude retains a failed turn with full usage that reconciles to Prometheus and Loki.\n(b) On a tool-bearing research run under a no-broker tool allowlist, Claude matches Prometheus in all four categories. Its 2026-09-20 seven-MCP-call run missed 77317 tokens.\nThe Codex choice also weakens if a Codex research run cannot keep its all-category Prometheus/Loki match once exposed tools are restricted to zero or to an allowlist that blocks MCP mutations.\n\nSupervision choice: another scheduler (Temporal c20, Prefect c8, or Dagu v2.17.0) running blueprints/us-equities/hosting/research-evidence.yaml would have to:\n- reproduce the hosting/receipt.json failure, cancellation and restart checks\n- show in-flight resumption after a kill, without a duplicate effect owner\n\nRegression check: `python3 -m unittest tests/test_observability.py` must keep passing. It checks only the process-identity and observation helpers of the current Codex blueprints/us-equities/workers/native_worker.py. It is not a check that transfers to other workers.",
- "packet_sha256": "def57b8c52b4e2f3a1ddde409c8fb5d231fda6f86ee7b8acf834120d329e942b",
+ "overturn_when": "1. Backend retention: run `python3 observability/backends/check_persistence.py --grafana-env <private Grafana env file> --evidence-dir <fresh directory>` against the running local stack. It restarts the five backend units, compares before and after snapshots, and exits 1 if any check is false. If prometheus_historical_sample or loki_log comes back false, retention by the c5 and c6 winners is contradicted. 2. Retention contract: run `python3 -m pytest tests/test_observability.py`. These are offline guards only, not native retention checks. A failure in test_sdk_observation_is_bounded_atomic_and_preserves_unknown_usage (failed status and usage None preserved) or test_dashboard_keeps_receipt_identity_separate_from_shared_resource (max by receipt_id) would break the retained-identity and unknown-usage basis. 3. Alternatives: if c11 phoenix or c9 mlflow is run natively on fixtures/observability-check.json and measurably retains per-task identity, failed research attempts or unknown usage that the collector-to-Prometheus/Loki path loses, the verdict changes. The native usage match and the 80770 deduplication after a collector restart have no retained runnable script in the repository. Re-establishing them is listed under open_gaps.",
+ "packet_sha256": "5f2d97b888f0ef3632a56da5ce9fca9261cbc1d2bd4258dfcc70bbdb46e4dc2f",
  "schema_version": 1,
  "sources_read": [
-  "<host-path>/us-equities__observability-hosting.json (lines 1-60, 130-189, 380-539 re-read this round; full in round 1)",
-  "adoption/paired/observation.json (full, newly read this round)",
-  "adoption/paired/receipt.json (lines 1-200)",
-  "blueprints/us-equities/research-runtime/receipt.json (full, re-read)",
-  "blueprints/us-equities/workers/receipt.json (full, re-read)",
-  "evidence/receipts/foundation-native-20260920.json (full in round 1; lines 170-429 re-read)",
-  "catalogs/us-equities/agents-operations.json (lines 1-530, 800-1029, 1603-1642, 1725-1774; lines 940-969 re-read)",
-  "tests/test_observability.py (lines 1-70)",
-  "blueprints/us-equities/research-runtime/ (glob: prepare-evidence.yaml, research-pair.yaml exist)",
-  "blueprints/us-equities/hosting/receipt.json (full, round 1)",
-  "blueprints/us-equities/hosting/research-evidence.yaml (full, round 1)",
-  "blueprints/us-equities/deerflow/research-receipt.json (lines 1-100, round 1)",
-  "blueprints/us-equities/deerflow/native-receipt.json (lines 1-80, round 1)",
-  "blueprints/us-equities/state-recovery/memory/receipt.json (lines 1-70, round 1)",
-  "blueprints/us-equities/state-recovery/qdrant/receipt.json (lines 1-60, round 1)",
-  "blueprints/us-equities/research-efficiency/native-receipt.json (lines 1-60, round 1)",
-  "docs/dashboard-rendered-acceptance.md (full, round 1)",
-  "docs/candidate-quality-review-20260921.md (lines 1-122, round 1)",
-  "catalogs/landscape/candidate-quality-review.json (lines 80-149 plus grep, round 1)",
-  "evidence/artifacts/catalog-quality-review-20260921/sources.json (lines 1-25, round 1)",
-  "docs/foundation-closure-20260921.md (grep lines 3, 23, 52, 65, 67, round 1)"
+  "<host-path>/us-equities__observability-hosting.json (earlier round)",
+  "<host-path>/SKILL.md (preloaded in context)",
+  "observability/receipt.json (earlier round in full; this round lines 100-259 and 365-379)",
+  "observability/backends/receipt.json (earlier round)",
+  "observability/backends/check_persistence.py (full, this round)",
+  "tests/test_observability.py (lines 28-89, this round)",
+  "tests/test_observability_backends_alerts.py (test names, earlier round)",
+  "evidence/receipts/runtime-tools.json (earlier round)",
+  "blueprints/us-equities/hosting/backup/receipt.json (earlier round)",
+  "blueprints/us-equities/hosting/backup/selected-files.txt (earlier round)",
+  "blueprints/us-equities/hosting/backup/source.sha256 (first 5 lines, earlier round)",
+  "fixtures/observability-check.json (earlier round)",
+  "Glob observability/**/*.{py,mjs,js,cjs,sh} under <host-path>/nas-wt-trading-layers (no usage/dedup re-run script found)"
  ],
- "why_selected": "This is my own review of the retained receipts. No provider judgment was carried over, and no TypeSafe inference was run. The same three candidates are selected in this revision, with corrected reasons. Each winner covers one part of the requirement on native-execution evidence.\n\n(1) c7 Codex: bounded research under native identity, with failed attempts retained. blueprints/us-equities/workers/receipt.json records a native SDK research run: status \"completed\", configured_model gpt-6-astra, duration_ms 58410, total totalTokens 135311. It keeps two failed follow-up extraction turns with their full usage (all_three_native_turns totalTokens 204091; successful_research_tasks 1, blocked_file_extraction_tasks 2). This receipt is the only direct evidence here that failed-attempt usage is retained. Its boundary is limited, though: read-only filesystem mode does not restrict external MCP mutations, and broker authority is withheld only because no broker keys or broker tools were supplied (line 110). For the research workload, telemetry reconciles in adoption/paired/observation.json, checked 2026-09-19: astra all_six_prometheus_categories_match_native true, native_loki_instance_matches_prometheus true, total_tokens 20776. Correction to the earlier proposal: the foundation-native-20260920.json codex result (loki_matches_direct true, prometheus_matches_direct true, every prometheus_missing category 0) came from a different task, seven MCP calls, run with --ask-for-approval never and --sandbox danger-full-access (lines 301-318). It shows telemetry fidelity on a tool-heavy run, not the read-only research boundary.\n\n(2) c2 Dagu: supervision of owned processes. blueprints/us-equities/hosting/receipt.json records:\n- a native failure fixture (step exit 23 -> failed, dependent step aborted)\n- a `dagu stop` cancellation (aborted)\n- completed history kept after a service restart\n- 401 for anonymous and 200 for authenticated HTTP requests\n- model_calls 0 and broker_calls 0\n\nadoption/paired/receipt.json lines 47-51 record Dagu 2.16.6 research_pair succeeded with exit_code 0 (Astra then Claude).\n\n(3) c1 OpenTelemetry Collector contrib: scoped telemetry. It is a component in research-runtime/receipt.json and adoption/paired/receipt.json, and both reconcile native usage against Prometheus and Loki with bodies redacted or omitted.\n\nTrade-off explicitly accepted under the 3-winner cap: c1 does not store telemetry itself. Storage is done by c6 Prometheus and c12 Loki. Recoverable state beyond Dagu's completed history is covered only by c17 Restic, on the same host. c7/c2/c1 alone therefore do not meet the retention and recoverable-state parts of the requirement; those parts depend on c6, c12 and c17 as companions. Codex was chosen over the co-equal c19 Claude Code on two points. First, it retains failed-turn usage. Second, it matched Prometheus on the same seven-MCP-call task where Claude missed 77317 tokens. Claude has the stronger tool boundary (zero exposed tools); see c19. Evidence class: native execution plus local integration on one WSL host. No designed winner comparison was run.",
+ "why_selected": "The requirement is retained, scoped telemetry for bounded native research runs, including failed attempts and recoverable state. c14 (otelcol-contrib), c5 (Prometheus) and c6 (Loki) have the most direct retained native-execution evidence for it. All of that evidence is retained records dated 2026-09-19; none was observed now. In observability/receipt.json (kind native_cli_e2e), `otelcol-contrib validate` exited 0 and upstream_checksum_matches is true. Native Codex 0.155.1 and Claude 2.1.278 each completed the fixtures/observability-check.json task (sum 42, service_count 4). The receipt records collected_turn_histogram_matches_native_usage true for Codex and collected_request_logs_and_metrics_match true for Claude (lines 163-202). For Prometheus, the `up` query returned \"1\" for seven targets (lines 109-119), and the privacy canary's retained values were [\"7\",\"7\"] (lines 130-138). For Loki, a LogQL query taking the max per receipt_id returned total_tokens 80770 (lines 121-127). sdk_receipt_lane (lines 246-254) records after_collector_restart_total_tokens 80770 and unknown usage kept as None/absent rather than coerced to zero. Qualifier: the 80770 figure comes from metadata summaries of two earlier SDK receipts (40187 + 40583, lines 206-224), republished through write_observation. They were not new model calls. Separately, observability/backends/receipt.json records a synthetic-fixture run of observability/backends/check_persistence.py. It restarted only the five backend units (restart_exit_code 0), and afterwards the Prometheus historical sample and the Loki fixture log were still present. It also records every listener bound to 127.0.0.1 and archive_sha256_verified true. Qualifier on failed attempts: the four retained_failed_attempts (lines 370-375) are prose notes about acceptance-harness failures. They are not failed research-worker runs retained in Loki or Prometheus. Keeping a status 'failed' observation with usage None is shown only by an offline temp-directory test (tests/test_observability.py lines 32-54). This is native execution on one WSL host plus a synthetic persistence fixture, not a measured comparison against the alternatives.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
-  "blueprints/us-equities/workers/receipt.json",
-  "adoption/paired/receipt.json",
-  "adoption/paired/observation.json",
-  "blueprints/us-equities/hosting/receipt.json",
-  "blueprints/us-equities/research-runtime/receipt.json",
-  "evidence/receipts/foundation-native-20260920.json",
-  "catalogs/us-equities/agents-operations.json"
+  "observability/receipt.json",
+  "observability/backends/receipt.json",
+  "observability/backends/check_persistence.py",
+  "fixtures/observability-check.json",
+  "tests/test_observability.py"
  ],
  "winner_keys": [
-  "c7",
-  "c2",
-  "c1"
+  "c14",
+  "c5",
+  "c6"
  ]
 }
