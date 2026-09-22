@@ -370,6 +370,33 @@ class CodexLaneTests(CodexLaneFixture):
             self.assertEqual(row["exit_code"], 0)
 
 
+
+class StrictSchemaTests(CodexLaneFixture):
+    def test_strict_copy_drops_keywords_codex_rejects_and_keeps_the_rest(self):
+        schema = {"$schema": "x", "type": "object", "additionalProperties": False,
+                  "properties": {"keys": {"type": "array", "uniqueItems": True, "minItems": 1,
+                                          "items": {"type": "string", "pattern": "^c"}}},
+                  "required": ["keys"]}
+        strict = codex_lane.strict_output_schema(schema)
+        self.assertNotIn("$schema", strict)
+        self.assertNotIn("uniqueItems", strict["properties"]["keys"])
+        self.assertEqual(strict["properties"]["keys"]["minItems"], 1)
+        self.assertEqual(strict["properties"]["keys"]["items"]["pattern"], "^c")
+        self.assertFalse(strict["additionalProperties"])
+
+    def test_the_real_lane_schema_has_no_rejected_keyword_after_stripping(self):
+        text = json.dumps(codex_lane.strict_output_schema(json.loads(codex_lane.DEFAULT_SCHEMA.read_text())))
+        for keyword in codex_lane.STRICT_UNSUPPORTED_KEYWORDS:
+            self.assertNotIn('"' + keyword + '"', text)
+
+    def test_codex_exec_receives_the_strict_schema(self):
+        self.write_packet("foundation", "native-clients")
+        self.assertEqual(self.run_lane(), 0)
+        argv = self.argv_calls()[0]
+        schema_arg = argv[argv.index("--output-schema") + 1]
+        self.assertTrue(schema_arg.endswith("lane-return.codex-strict.schema.json"))
+        self.assertTrue(Path(schema_arg).exists())
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -50,6 +50,29 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 DEFAULT_PROMPT = HERE / "lane-prompt.md"
 DEFAULT_SCHEMA = HERE / "lane-return.schema.json"
+# Codex structured output runs in strict mode, which rejects some JSON Schema keywords
+# (observed 2026-09-22 with codex-cli 0.155.1: "In context=('properties', 'winner_keys'),
+# 'uniqueItems' is not permitted", HTTP 400 invalid_json_schema). The strict copy drops
+# them; record_verdicts.py still enforces every dropped rule when it validates a return.
+STRICT_UNSUPPORTED_KEYWORDS = frozenset({"uniqueItems", "$schema", "$id", "title", "description"})
+
+
+def strict_output_schema(schema):
+    """Return a copy of ``schema`` without keywords Codex strict output rejects."""
+    if isinstance(schema, dict):
+        return {key: strict_output_schema(value) for key, value in schema.items()
+                if key not in STRICT_UNSUPPORTED_KEYWORDS}
+    if isinstance(schema, list):
+        return [strict_output_schema(value) for value in schema]
+    return schema
+
+
+def write_strict_schema(schema_path: Path, codex_dir: Path) -> Path:
+    codex_dir.mkdir(parents=True, exist_ok=True)
+    strict_path = codex_dir / "lane-return.codex-strict.schema.json"
+    strict = strict_output_schema(json.loads(schema_path.read_text(encoding="utf-8")))
+    strict_path.write_text(json.dumps(strict, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    return strict_path
 DEFAULT_TIMEOUT = 900.0
 DEFAULT_EFFORT = "high"
 LANE = "codex"
@@ -310,14 +333,16 @@ def main(argv=None) -> int:
         pending.append((catalog, layer_id, packet_path, packet_sha256, out_path))
 
     if args.dry_run:
+        strict_display = codex_dir / "lane-return.codex-strict.schema.json"
         for catalog, layer_id, packet_path, packet_sha256, out_path in pending:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
-            cmd = build_command(repo, schema_path.resolve(), tmp_out, args.effort, prompt_text)
+            cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text)
             print(shlex.join(cmd))
         return 0
 
     events_dir.mkdir(parents=True, exist_ok=True)
+    strict_schema_path = write_strict_schema(schema_path, codex_dir)
     usage_lock = threading.Lock()
     failures: list = []
 
@@ -325,7 +350,7 @@ def main(argv=None) -> int:
         catalog, layer_id, packet_path, packet_sha256, out_path = item
         prompt_text = fill_prompt(template, packet_path.resolve(), repo)
         tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
-        cmd = build_command(repo, schema_path.resolve(), tmp_out, args.effort, prompt_text)
+        cmd = build_command(repo, strict_schema_path.resolve(), tmp_out, args.effort, prompt_text)
         events_path = events_dir / f"{catalog}__{layer_id}.jsonl"
         events_path.write_text("", encoding="utf-8")
 

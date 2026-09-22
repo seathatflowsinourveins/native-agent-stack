@@ -547,6 +547,42 @@ class ManifestTradingCandidatesTests(LanePacketsFixture):
     def test_manifest_mode_is_deterministic(self):
         self.assertEqual(self.build(trading_candidates="manifest"), self.build(trading_candidates="manifest"))
 
+
+class WithholdLabelsTests(LanePacketsFixture):
+    def test_withheld_packets_carry_no_decision_bearing_label(self):
+        packets = self.build(withhold=True)
+        for name, text in packets.items():
+            packet = json.loads(text)
+            for candidate in packet["candidates"]:
+                self.assertIsNone(candidate["review_status"], name)
+                for decision in candidate["decisions"]:
+                    self.assertNotIn("selection", decision)
+                    self.assertNotIn("review_status", decision)
+            self.assertIn("candidates[].decisions[].selection", packet["withheld"])
+        text = "".join(packets.values())
+        self.assertNotIn("confirmed_default", text)
+
+    def test_evidence_prose_of_decisions_is_kept(self):
+        plain = json.loads(self.build()["foundation__layer-a.json"])
+        withheld = json.loads(self.build(withhold=True)["foundation__layer-a.json"])
+        for before, after in zip(plain["candidates"], withheld["candidates"]):
+            for d_before, d_after in zip(before["decisions"], after["decisions"]):
+                for key in ("id", "capability", "evidence_scope", "limitations", "next_gap"):
+                    self.assertEqual(d_before.get(key), d_after.get(key))
+
+    def test_default_mode_is_unchanged(self):
+        self.assertEqual(self.build(), self.build(withhold=False))
+        self.assertTrue(any(d.get("selection") for c in json.loads(self.build()["foundation__layer-a.json"])["candidates"]
+                            for d in c["decisions"]), "the fixture must exercise a decision with a selection")
+
+
+class WithholdWithManifestModeTests(ManifestTradingCandidatesTests):
+    def test_manifest_mode_trading_packets_are_unchanged_by_withholding(self):
+        plain = self.build(trading_candidates="manifest")
+        withheld = self.build(trading_candidates="manifest", withhold=True)
+        self.assertEqual(plain["us-equities__layer-b.json"], withheld["us-equities__layer-b.json"])
+        self.assertNotEqual(plain["foundation__layer-a.json"], withheld["foundation__layer-a.json"])
+
 if __name__ == "__main__":
     unittest.main()
 
