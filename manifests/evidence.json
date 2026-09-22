@@ -3076,8 +3076,8 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "12d5700a59ea1a76910a0823a628d0f7864c56d8826582b9e371b25d2b6c2b4e",
-      "bytes": 11686
+      "sha256": "384858498777de6ab634164eb69d7b23146383eaf4182676e4e00bf31eaf9a67",
+      "bytes": 14458
     },
     {
       "path": "adoption/bootstrap.md",
@@ -5372,8 +5372,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "55eb09d9173d74a6acfc7549135654b05e7c7f6ec10e7c4c1e6a90c7e7b69872",
-      "bytes": 10610
+      "sha256": "62015fe2be4b6e2c3b0e6ae3b123e29a2090bad803b50cde556fc5356979b383",
+      "bytes": 13909
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/benchmark.py",
@@ -5397,8 +5397,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/metrics.py",
-      "sha256": "bcaa6023a34707555963b6916023dd94280ab1cd5854b995e35fd62b6bb34c20",
-      "bytes": 15907
+      "sha256": "7d6ef2dbdaaed3de1a0c1f65257d834c92b9b1027a4f8a206c5ed148c4cf0e6f",
+      "bytes": 19657
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
@@ -5427,8 +5427,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "7679fc819af21794a1e82fe5e5d0218f5c9fd67c96baa0e7f604a2bb50a6bc51",
-      "bytes": 31117
+      "sha256": "fd82248b59082679a154e4bec573d36cd2bbeeac350da4976f76c6a4a283f59f",
+      "bytes": 33012
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -5857,8 +5857,8 @@
     },
     {
       "path": "blueprints/us-equities/data/fixtures/bad-gate-result.json",
-      "sha256": "9d97c66150e354be376e7b9aabbe0c6c03ab541433dec885b0a46bf90bf461ad",
-      "bytes": 1588
+      "sha256": "47c71e94a33c1c09c044ccd635af2a2bace6204a51d31e7804a0f67c3606e17f",
+      "bytes": 1685
     },
     {
       "path": "blueprints/us-equities/data/fixtures/bad.csv",
@@ -5867,8 +5867,8 @@
     },
     {
       "path": "blueprints/us-equities/data/fixtures/good-gate-result.json",
-      "sha256": "80818156b0ecb502a71dd36e83479a09b2fd72e13af41b945ca691085209570f",
-      "bytes": 1380
+      "sha256": "8088ef27d7477daa4e6b4471960951cc74efde674168574d0edd1e78a1764c18",
+      "bytes": 1477
     },
     {
       "path": "blueprints/us-equities/data/fixtures/good.csv",
@@ -5877,8 +5877,8 @@
     },
     {
       "path": "blueprints/us-equities/data/fixtures/null-price-cell-gate-result.json",
-      "sha256": "f11f55c42ceed4af50f3d679005829521bf4b44136751e37c9e5dc4f0080fecf",
-      "bytes": 1571
+      "sha256": "ab9ac9ff3b734a899d1b70dff5abfaf7f91eaa1558116c0e2908e6788f55dbcb",
+      "bytes": 1668
     },
     {
       "path": "blueprints/us-equities/data/fixtures/null-price-cell.csv",
@@ -5887,8 +5887,8 @@
     },
     {
       "path": "blueprints/us-equities/data/promotion_gate.py",
-      "sha256": "0f9fcf22119ae19491f32ecb23d59ca7c67135edd1fc5778974d757419c93913",
-      "bytes": 11464
+      "sha256": "d5ac87da9fcfc0f76ccef1dd9cfceec59943e8c54012a2ce90e867599302b5fb",
+      "bytes": 14896
     },
     {
       "path": "blueprints/us-equities/data/receipt.json",
@@ -6892,8 +6892,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "b191557ed9b762e6abd6a9f9bb51efd29b0937a2272b285c4d4034444c956edc",
-      "bytes": 19528
+      "sha256": "a15605acd5bece752167aca985aab6e0900bd455cc7a1872891b984be5a0b9dd",
+      "bytes": 19809
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -7422,8 +7422,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "56db7366e7ab882fe4fbf565eec48cc16b0c017bab59deddbd13d4f221836d65",
-      "bytes": 12134675
+      "sha256": "9d6446fe2002cf03c56d46bf7b59d156c9655bbfb0f60d21f46c1b786f7fb0fb",
+      "bytes": 12139743
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7492,8 +7492,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "bb23d095af8233b4bef10f2a272285c910025c097c3ebb3f9bee71d89d8ca3aa",
-      "bytes": 29456
+      "sha256": "3390a88c71bf9baedeb33a2b75778a1c89a824f2df80bf29c060adf11408fbf7",
+      "bytes": 30445
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -11232,8 +11232,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "548925d2b9eac34962f478cf1d5c9c159d9aff4c2c35966434a29d8034e629e2",
-      "bytes": 22196
+      "sha256": "926488970190eedec231dbbc2ade4de38d42f8d7a8899f4da99bf835a87e6628",
+      "bytes": 27312
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -11492,13 +11492,13 @@
     },
     {
       "path": "tests/test_promotion_gate.py",
-      "sha256": "5b1e6701ee4ee1b491e189390a015326ac6482ec3a9d1717cfd74c856352e3b8",
-      "bytes": 8793
+      "sha256": "783348c2dda3f8a78cd730505d81e59337037ac9dc9812c2dfa8dba0f00c4106",
+      "bytes": 13552
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "38501a1ea9b85263b879bc561436118811ae466b04c79faf0fa96b790088d7db",
-      "bytes": 8513
+      "sha256": "b033320e968e63abb7cf6c4c7c8850c1c14ada3d841f63ccdfb7464106ddfe69",
+      "bytes": 10573
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -11582,8 +11582,8 @@
     },
     {
       "path": "tools/adoption/render_config.py",
-      "sha256": "4432c5f49f926f4337a6fdab20db29cd2f2db61e2ee10e47a873c798f57f5005",
-      "bytes": 9480
+      "sha256": "ca30b4f62c3df35e96c1da766ac8cd76e21af23a4a5d913317b4a4d77f28c819",
+      "bytes": 10586
     },
     {
       "path": "tools/sota-convergence/README.md",
