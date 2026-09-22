@@ -1,5 +1,10 @@
 # Independent catalog convergence and portable Claude practice
 
+Current status: dated documentary convergence is complete and published through
+PR55. The final closure below supersedes the earlier pending checkpoints.
+Use the grand handbook and adoption manifest for the next PC; destination-host
+acceptance and matched quality comparisons remain explicit future gates.
+
 ## Outcome and scope
 
 Requested: cooperate with the live Claude Ultracode owner, discover strong
@@ -206,3 +211,46 @@ The 177 catalog-focused tests passed. Publication integrity passed with 1,615
 hashed files and 134 receipts; all 17 convergence records validated after
 assigning a distinct attempt number to the second source-coverage observation.
 WF3's final critique and its sealed return remain pending at this checkpoint.
+
+## Final closure and publication, September 22
+
+WF3 returned with 11 completed children and an original false readiness verdict:
+159 candidate-group rows lacked screening decisions. WF4 returned with seven
+completed children and exactly 159 later decisions. The preserved before/after
+ledger does not rewrite the original report. Independent audits corrected the
+critic's star-cap arithmetic, WF4's incorrect OctoBot backtesting rationale and
+source/pin scope errors. The peer explicitly confirmed the earlier five material
+Codex corrections. The final additional corrections were sent once through the
+owned relay; that last delivery was queued, without assuming another read.
+
+The published index has 843 identities, 68 unchanged versioned component pins,
+20 layers and 134 receipts. Every one of the 125 peer recommendations resolves
+to a current identity and an explicit follow-up disposition. Grype's source-only
+domain card is conditional. Existing quality gates govern all replacements.
+See the complete adjudication, closure provenance, screening ledger and blueprint
+README; raw native conversations and sign-in state remain private.
+
+Independent final review verified all 28 sealed hashes, seven public hashes,
+exact report transformations and WF3/WF4 usage fields. Its only remaining finding
+was corrected: 18 repository-group pairs, rather than 18 distinct repositories,
+had all their sampled claims refuted. No supported review finding remains open.
+
+Final Python verification: 780 tests, 778 passed and two environment-dependent
+skips. Catalog/foundation/landscape checks, all 17 convergence records, report
+accounting, exact HTML rebuild, actionlint 1.7.12 and strict offline zizmor pass.
+The evidence inventory has 1,625 files. Mobile offline search and the repository
+detail dialog work without horizontal overflow, external resources or browser
+errors. These are artifact and current-host checks, not destination acceptance.
+
+Integration commit 6568523 fast-forwarded the original PR55 branch; it was pushed
+without force. The PR description now reflects the combined final scope and
+validation. Hosted checks are attached to its published head. The final handoff
+record is a documentation follow-up to that integration. PR56/57 contents are
+integrated; neither they nor PR55 were merged into main by this task.
+
+Only owned relays were stopped, including an accidental copy created because
+the original relay was still running. The user's live Claude owner and its
+settings were not restarted or stopped. No further research or workflow was
+requested in the last correction message. Resume with the connected destination
+PC and the adoption recipe, or reopen a specific layer when its stated evidence
+gate is triggered; do not restart the whole discovery wave.

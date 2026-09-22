@@ -2820,8 +2820,8 @@
     },
     {
       "path": "docs/tasks/2026-09-21-blind-catalog-convergence.md",
-      "sha256": "394f90fa5dfc4dd46c479cd851d8066dc99ea4d069cde086217662865cf9ae2a",
-      "bytes": 13111
+      "sha256": "1b846625a1c6b51b85ed7486ae4fd18ebf259fd9c6bea9d4d68339dfe1dfa0aa",
+      "bytes": 16198
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-provenance.json",
