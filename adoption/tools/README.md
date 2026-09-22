@@ -128,23 +128,48 @@ and prints which containment branch it took.
 
 - **Structural validation** — ShellCheck (`-S style`, gated on `shutil.which`)
   finds no finding in either script; neither file contains a personal home path
-  literal; both enable strict mode; `ecosystem-bounded-run` with no arguments
-  exits 64. This proves artifact consistency, not that containment works.
+  literal; `ecosystem-bounded-run` with no arguments exits 64. On strict mode,
+  note the divergence: **the shipped scripts do not carry `set -Eeuo pipefail`.
+  Both open with the literal line `set -euo pipefail`, and that literal is what
+  the suite asserts**, because the files are copied byte-for-byte from their
+  source and adding `-E` here would break the byte-fidelity guarantee recorded
+  under Provenance. Neither script installs an `ERR` trap, which is the only
+  reason the missing `-E` changes no behaviour, so the suite asserts the
+  absence of an `ERR` trap as well and that exemption cannot go stale silently.
+  An upstream sync that adopts `-E` must update the script and that assertion
+  together. This class proves artifact consistency, not that containment works.
 - **Local integration check** — on a host that has cgroup v2 and a working
-  `systemd --user` bus, the test asserts that `ecosystem-bounded-run sh -c 'exit
-  3'` propagates exit 3, that `ecosystem-bounded-run true` exits 0, and that no
-  *process* survives the job. `--collect` cleanup is asynchronous and its
-  latency is not bounded: on the developing WSL2 host the same
-  `ecosystem-bounded-run true` settled in 0.03s-0.06s on most runs, but one
+  `systemd --user` bus, the suite asserts that `ecosystem-bounded-run sh -c
+  'exit 3'` propagates exit 3 and that `ecosystem-bounded-run true` exits 0, and
+  then proves containment *from inside the job*. A single job writes three
+  oracle files: its own `/proc/self/cgroup`, the systemd properties of the unit
+  that cgroup path names, and the limit files the kernel applied to that cgroup.
+  The test then requires all of: the job's cgroup v2 leaf is an
+  `ecosystem-job-<uid>-<pid>-<random>.scope`, the launcher's own unit name;
+  `systemctl --user show` reports that unit as `running` with `TasksCurrent` at
+  least 1 and `MemoryMax=6442450944` *while the job is still inside it*, which
+  is only true if `systemd-run` really created the unit; and the cgroup's own
+  `memory.max` is `6442450944` with `pids.max` `256`, i.e. the kernel, not only
+  systemd, applied the documented defaults. Any ambient `ECOSYSTEM_JOB_*`
+  override is stripped from the job's environment first, so the defaults are
+  what is measured. Checked by mutation on 2026-09-22: a stand-in runner that
+  `exec`s the command directly fails with `the job did not run inside an
+  ecosystem-job-*.scope; its own cgroup was '0::/init.scope'`, and a runner
+  patched to `MemoryMax=8G` fails with `'8589934592' != '6442450944'` — so a
+  silently uncontained or unbounded run cannot pass this test.
+  Afterwards the test polls for the release of **only that one unit name**, so a
+  concurrent guarded scan by the same user elsewhere can neither fail nor mask
+  it. `--collect` cleanup is asynchronous and its latency is not bounded: on the
+  developing WSL2 host the unit usually left the listing in 0.02s-0.06s, but one
   scope unit was still listed more than 30s after the runner returned. That
   lingering unit reported `TasksCurrent=0` and an already-removed control
   group, i.e. an empty unit waiting for systemd's garbage collector, not an
-  escaped job. So the test polls a 15s deadline, prints the observed settle
-  time, and if units are still listed it fails only when one of them still
+  escaped job. So the test polls to a 45s deadline, prints the observed release
+  time, and if its unit is still listed it fails only when that unit still
   holds tasks. A listing taken right after the runner exits can legitimately
   still show the scope, so `systemctl --user list-units 'ecosystem-job-*'`
   returning a line is not by itself a containment failure — check
-  `TasksCurrent`. It also
+  `TasksCurrent`. The suite also
   drives `gitleaks-guarded version` at a stub binary via `GITLEAKS_NATIVE`,
   through an instrumented copy of the runner, and asserts the stub's oracle file
   exists while the runner's oracle file does not — i.e. the fast `version` path
@@ -155,7 +180,10 @@ and prints which containment branch it took.
   scan path. This measures the documented rule rather than restating it.
 - On a host **without** the user bus, the same test asserts the refusal property
   instead: exit 78 and the oracle file the wrapped command would have created
-  does not exist — the "never runs a command uncontained" guarantee.
+  does not exist — the "never runs a command uncontained" guarantee. The
+  branch probe (`systemd-run --user --scope true`) is itself run under a
+  timeout inside `try`/`except`, so a host where the probe cannot even execute
+  takes the refusal branch rather than erroring at import time.
 
 The integration branch is evidence for the host that ran it. It is not upstream
 Gitleaks evidence, and it says nothing about a host with a different systemd or

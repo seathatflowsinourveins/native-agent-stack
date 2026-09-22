@@ -2,12 +2,16 @@
 
 Two evidence classes live here and are labelled at each assertion:
 
-* structural validation - ShellCheck, absence of personal home paths, strict
-  mode, and the usage exit code. These prove artifact consistency only.
+* structural validation - ShellCheck, absence of personal home paths, the exact
+  strict-mode line the scripts ship, and the usage exit code. These prove
+  artifact consistency only.
 * local integration check - the containment behaviour actually exercised on the
   host running the suite. The suite never skips it; it takes one of two
   branches and prints which one, because a host without a native
-  ``systemd --user`` bus can only demonstrate the refusal property.
+  ``systemd --user`` bus can only demonstrate the refusal property. The
+  containment branch reads its evidence from inside the job (cgroup, systemd
+  unit properties, kernel limit files), so a runner that executed the command
+  uncontained fails instead of passing unnoticed.
 """
 
 import os
@@ -30,18 +34,39 @@ SHELLCHECK = shutil.which("shellcheck")
 
 # Built from fragments so this file can never match its own acceptance grep.
 PERSONAL_HOME = re.compile("/(?:" + "home" + "|" + "Users" + ")/[A-Za-z0-9_.-]+")
-# The sources ship ``set -euo pipefail`` and are copied byte-for-byte, so this
-# asserts the bytes actually shipped. Neither script installs an ERR trap, so the
-# absent ``-E`` is behaviourally inert here; adding it would break the
-# byte-fidelity guarantee the provenance section records. A future upstream sync
-# that does add ``-E`` must update this line deliberately.
+# The shipped scripts do NOT carry ``set -Eeuo pipefail``. Both open with the
+# literal line ``set -euo pipefail``, and they are copied byte-for-byte from
+# their source, so this asserts the bytes actually shipped rather than the
+# stricter line. Neither script installs an ERR trap, which is what makes the
+# absent ``-E`` behaviourally inert, and that inertness is asserted below rather
+# than assumed; adding ``-E`` here would break the byte-fidelity guarantee the
+# provenance section records. The README evidence paragraph states the same
+# divergence. A future upstream sync that does adopt ``-E`` must update this
+# line deliberately.
+STRICT_MODE_LINE = "set -euo pipefail"
 STRICT_MODE = re.compile(r"^set -euo pipefail$", re.M)
+ERR_TRAP = re.compile(r"^[ \t]*trap\b.*\bERR\b", re.M)
+
+# The launcher names its transient unit ecosystem-job-<uid>-<pid>-<random>.scope
+# (see ``job_unit=`` in ecosystem-bounded-run); that name is also the leaf of the
+# cgroup v2 path a contained job reads from /proc/self/cgroup.
+SCOPE_UNIT = re.compile(r"ecosystem-job-[0-9]+-[0-9]+-[0-9]+\.scope")
+
+# ecosystem-bounded-run's own defaults, as the kernel and systemd report them.
+EXPECTED_MEMORY_MAX = str(6 * 1024 ** 3)
+EXPECTED_TASKS_MAX = "256"
 
 RUNTIME_BUS = Path(f"/run/user/{os.getuid()}/bus")
 
 
 def _user_scope_available():
-    """True when this host can actually place a job in a systemd user scope."""
+    """True when this host can actually place a job in a systemd user scope.
+
+    Any failure of the probe itself - no ``systemd-run`` on PATH, a denied exec,
+    a probe that hangs until its timeout - means this host cannot be shown to
+    contain a job, so the suite takes the refusal branch instead of raising at
+    import time and taking every other test down with it.
+    """
     if not Path("/sys/fs/cgroup/cgroup.controllers").is_file():
         return False
     try:
@@ -49,11 +74,16 @@ def _user_scope_available():
             return False
     except OSError:
         return False
-    probe = subprocess.run(
-        ["systemd-run", "--user", "--scope", "true"],
-        stdin=subprocess.DEVNULL, capture_output=True, text=True,
-        timeout=60, check=False,
-    )
+    try:
+        probe = subprocess.run(
+            ["systemd-run", "--user", "--scope", "true"],
+            stdin=subprocess.DEVNULL, capture_output=True, text=True,
+            timeout=60, check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        # SubprocessError covers TimeoutExpired; OSError covers a missing or
+        # non-executable systemd-run.
+        return False
     return probe.returncode == 0
 
 
@@ -90,11 +120,21 @@ class GuardedRunnerStructureTests(unittest.TestCase):
                 found = PERSONAL_HOME.findall(path.read_text(encoding="utf-8"))
                 self.assertEqual(found, [], f"{path.name} contains personal home paths: {found}")
 
-    def test_strict_mode_is_enabled(self):
+    def test_strict_mode_is_the_line_actually_shipped(self):
         for script in SCRIPTS:
             with self.subTest(script=script.name):
                 text = script.read_text(encoding="utf-8")
-                self.assertRegex(text, STRICT_MODE)
+                self.assertRegex(
+                    text, STRICT_MODE,
+                    f"{script.name} does not ship the literal line "
+                    f"{STRICT_MODE_LINE!r}",
+                )
+                self.assertIsNone(
+                    ERR_TRAP.search(text),
+                    f"{script.name} installs an ERR trap, so the shipped "
+                    f"{STRICT_MODE_LINE!r} (no -E) is no longer inert and the "
+                    "strict-mode line must be revisited",
+                )
 
     def test_guarded_gitleaks_resolves_runner_beside_itself(self):
         text = GITLEAKS_GUARDED.read_text(encoding="utf-8")
@@ -248,7 +288,16 @@ class GuardedGitleaksSymlinkInstallTests(unittest.TestCase):
 
 
 class BoundedRunContainmentTests(unittest.TestCase):
-    """Branch-aware local integration check; never skipped, always reported."""
+    """Branch-aware local integration check; never skipped, always reported.
+
+    The containment branch proves containment *from inside the job*: the job
+    reports its own cgroup, the systemd properties of the unit it is running in,
+    and the limit values the kernel actually applied to it. A silently
+    uncontained run therefore fails instead of passing unnoticed. Everything the
+    branch inspects afterwards is scoped to the one unit name this run used, so
+    a concurrent guarded scan by the same user elsewhere can neither fail nor
+    mask it.
+    """
 
     def _list_units(self):
         result = _run(["systemctl", "--user", "list-units",
@@ -256,32 +305,114 @@ class BoundedRunContainmentTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         return result.stdout
 
-    def _wait_for_collection(self, deadline=15.0):
-        """Return (seconds, listing); seconds is None when scopes survived."""
+    @staticmethod
+    def _is_listed(unit, listing):
+        """True when `unit` appears as a unit name in a list-units listing."""
+        return any(unit in line.split() for line in listing.splitlines())
+
+    def _wait_for_release(self, unit, deadline=45.0):
+        """Poll until `unit` leaves the listing.
+
+        Returns (seconds, listing) once it is gone, or (None, listing) if it is
+        still listed at the deadline. `--collect` teardown is asynchronous and
+        its latency is unbounded (over 30s observed on this host), so a unit
+        still listed immediately after the job exits is not by itself a failure.
+        """
         started = time.monotonic()
         while True:
             listing = self._list_units()
             elapsed = time.monotonic() - started
-            if not listing.strip():
+            if not self._is_listed(unit, listing):
                 return elapsed, listing
             if elapsed > deadline:
                 return None, listing
-            time.sleep(0.02)
+            time.sleep(0.05)
 
-    def _live_tasks(self, listing):
-        """Units from ``listing`` that still hold at least one process."""
-        busy = []
-        for line in listing.splitlines():
-            unit = line.split()[0] if line.split() else ""
-            if not unit.endswith(".scope"):
-                continue
-            shown = _run(["systemctl", "--user", "show", unit,
-                          "-p", "TasksCurrent", "-p", "SubState", "--value"]).stdout
-            fields = shown.split()
-            tasks = next((f for f in fields if f.isdigit()), None)
-            if tasks is not None and int(tasks) > 0:
-                busy.append(f"{unit} TasksCurrent={tasks}")
-        return busy
+    def _live_tasks(self, unit):
+        """TasksCurrent for one unit; None when systemd no longer reports it."""
+        shown = _run(["systemctl", "--user", "show", unit,
+                      "-p", "TasksCurrent", "--value"]).stdout
+        tasks = next((f for f in shown.split() if f.isdigit()), None)
+        return None if tasks is None else int(tasks)
+
+    def _run_self_reporting_job(self, tmp):
+        """Run one job that records, from inside itself, where it is contained.
+
+        Returns the transient scope unit name the job actually ran in.
+        """
+        cgroup_oracle = tmp / "job-cgroup"
+        unit_oracle = tmp / "job-unit-properties"
+        limit_oracle = tmp / "job-kernel-limits"
+
+        # The $ORACLE_* names are expanded by the job's own shell: systemd-run is
+        # invoked with --expand-environment=no, and a transient scope inherits
+        # the caller's environment.
+        script = (
+            'set -eu\n'
+            'cat /proc/self/cgroup > "$ORACLE_CGROUP"\n'
+            'job_path=$(cut -d: -f3 /proc/self/cgroup)\n'
+            '/usr/bin/systemctl --user show "${job_path##*/}"'
+            ' -p TasksCurrent -p MemoryMax -p SubState --value > "$ORACLE_UNIT"\n'
+            'cat "/sys/fs/cgroup$job_path/memory.max"'
+            ' "/sys/fs/cgroup$job_path/pids.max" > "$ORACLE_LIMITS"\n'
+        )
+        # The documented defaults are what is asserted below, so any ambient
+        # ECOSYSTEM_JOB_* override is dropped rather than silently measured.
+        environment = {k: v for k, v in os.environ.items()
+                       if not k.startswith("ECOSYSTEM_JOB_")}
+        environment.update(ORACLE_CGROUP=str(cgroup_oracle),
+                           ORACLE_UNIT=str(unit_oracle),
+                           ORACLE_LIMITS=str(limit_oracle))
+        result = _run([str(BOUNDED_RUN), "sh", "-c", script], env=environment)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue(
+            cgroup_oracle.is_file(),
+            "the job wrote no cgroup record, so it cannot be shown to have run",
+        )
+
+        # 1. The job's own cgroup leaf must be the launcher's transient scope.
+        cgroup = cgroup_oracle.read_text(encoding="utf-8").strip()
+        self.assertTrue(cgroup.startswith("0::"),
+                        f"not a cgroup v2 record: {cgroup!r}")
+        job_path = cgroup.split(":", 2)[2]
+        unit = job_path.rsplit("/", 1)[-1]
+        self.assertIsNotNone(
+            SCOPE_UNIT.fullmatch(unit),
+            "the job did not run inside an ecosystem-job-*.scope; its own "
+            f"cgroup was {cgroup!r}",
+        )
+
+        # 2. systemd-run really created that unit: systemd reports it as a live
+        #    scope holding this job while the job is still inside it.
+        self.assertTrue(unit_oracle.is_file(),
+                        "the job could not query its own systemd unit")
+        properties = unit_oracle.read_text(encoding="utf-8").split()
+        self.assertEqual(
+            len(properties), 3,
+            f"systemd did not report {unit} as a unit: {properties!r}",
+        )
+        tasks_inside, memory_max, sub_state = properties
+        self.assertTrue(
+            tasks_inside.isdigit() and int(tasks_inside) >= 1,
+            f"{unit} reported TasksCurrent={tasks_inside!r} while the job ran",
+        )
+        self.assertEqual(sub_state, "running",
+                         f"{unit} was {sub_state!r} while the job ran")
+        self.assertEqual(
+            memory_max, EXPECTED_MEMORY_MAX,
+            f"{unit} carries MemoryMax={memory_max!r}, not the 6G default",
+        )
+
+        # 3. The kernel applied the limits to that cgroup, not just systemd.
+        self.assertTrue(limit_oracle.is_file(),
+                        "the job could not read its own cgroup limit files")
+        limits = limit_oracle.read_text(encoding="utf-8").split()
+        self.assertEqual(
+            limits, [EXPECTED_MEMORY_MAX, EXPECTED_TASKS_MAX],
+            f"{unit} kernel limits were {limits!r}, not the documented "
+            f"MemoryMax=6G / TasksMax=256",
+        )
+        return unit
 
     def test_containment_or_refusal(self):
         if CONTAINMENT_AVAILABLE:
@@ -293,22 +424,25 @@ class BoundedRunContainmentTests(unittest.TestCase):
             succeeding = _run([str(BOUNDED_RUN), "true"])
             self.assertEqual(succeeding.returncode, 0, succeeding.stdout + succeeding.stderr)
 
-            # `--collect` removes the scope asynchronously and the unit object
-            # can outlive its cgroup by a long, unbounded interval (measured on
-            # this host from 0.03s to over 30s for the same command). The
-            # property that matters is that no *process* survives the runner, so
-            # a surviving unit only fails when it still holds tasks.
-            settled, listing = self._wait_for_collection()
+            with tempfile.TemporaryDirectory() as tmp:
+                unit = self._run_self_reporting_job(Path(tmp))
+            print(f"[branch] job ran inside {unit} with MemoryMax="
+                  f"{EXPECTED_MEMORY_MAX} and pids.max={EXPECTED_TASKS_MAX}")
+
+            # Only this run's unit is inspected, so a concurrent guarded scan by
+            # the same user cannot fail or mask the assertion. The property that
+            # matters after the job returns is that no *process* survives it.
+            settled, listing = self._wait_for_release(unit)
             if settled is None:
-                busy = self._live_tasks(listing)
-                self.assertEqual(
-                    busy, [],
-                    "a transient scope still holds live processes after the job "
-                    f"returned:\n{listing}")
-                print("[branch] scope units awaiting systemd GC hold no tasks "
-                      f"(not collected within 15s):\n{listing.rstrip()}")
+                tasks_left = self._live_tasks(unit)
+                self.assertFalse(
+                    tasks_left,
+                    f"{unit} still holds {tasks_left} live task(s) after the "
+                    f"job returned:\n{listing}")
+                print(f"[branch] {unit} still awaiting systemd GC after 45s "
+                      f"and holds no tasks (TasksCurrent={tasks_left})")
             else:
-                print(f"[branch] transient scopes collected after {settled:.3f}s")
+                print(f"[branch] {unit} released after {settled:.3f}s")
         else:
             print("\n[branch] refusal: no usable systemd --user scope; asserting the uncontained guard")
 
