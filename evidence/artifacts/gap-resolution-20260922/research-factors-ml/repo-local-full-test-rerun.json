@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "repo-local-full-test-rerun",
+  "date": "2026-09-22",
+  "layer_ids": ["research-factors-ml"],
+  "gap_refs": [
+    {"layer_id": "research-factors-ml", "gap_index": 3}
+  ],
+  "purpose": "Rebuild the repo's local test environment exactly as blueprints/us-equities/research-evaluation/receipt.json records (its own working-SDK Python 3.13.15, its full-suite argv `discover -s tests -q` with no pattern, and the 12 focused boundary tests) and compare counts to the receipt's claimed 214 passed / 0 skipped, honoring the critic's correction that the previously proposed check used the wrong argv (`-p test_research_evaluation.py` only runs 12 tests, not the full suite).",
+  "preregistered": "Expect the focused test_research_evaluation.py suite to still show 12 passed (unchanged since 2026-09-19). For the full-suite rerun, this is a fast-growing agent-workflow-starter repo three days past the receipt's observed_utc, so the exact 214-count is not expected to still hold; the result that would settle this gap is whether the full suite is currently green (no errors) under the repository's declared CI command (`python3 -m unittest`, per .github/workflows/validate.yml) and whether the pinned bare interpreter named by receipt.json's $SDK_PYTHON token reproduces the same outcome. A materially different total test count is expected and does not by itself refute the receipt (the receipt only ever claimed a point-in-time local-suite result); an unexplained error in the pinned SDK_PYTHON run that does not occur under the repo's actual CI interpreter would indicate the receipt's '$SDK_PYTHON' token is environment-ambiguous.",
+  "commands": [
+    {
+      "id": "focused-tests-sdkpython",
+      "cmd": "/home/example/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/bin/python3.13 -m unittest discover -s tests -p test_research_evaluation.py -q",
+      "exit": 0,
+      "duration_s": 0.065,
+      "output_excerpt": "Ran 12 tests in 0.013s\n\nOK",
+      "output_sha256": "8b40ca19cbd00c3fd3c99312b5bcf0abf2251136b5b2ebba43217960920f8939"
+    },
+    {
+      "id": "full-tests-sdkpython",
+      "cmd": "/home/example/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/bin/python3.13 -m unittest discover -s tests -q",
+      "exit": 1,
+      "duration_s": 82.698,
+      "output_excerpt": "Ran 1999 tests in 81.742s\nFAILED (errors=6, skipped=343)\nAll 6 errors: ModuleNotFoundError: No module named 'requests' in tests/test_broad_universe_scan.py (Session.__init__ imports requests lazily)",
+      "output_sha256": "b1d4023f3bea610035fefe6ffd130892a19afa8a847de0bee3606c512ae4fc20",
+      "note": "Reproduced identically on a second invocation (full-tests-run1.log, sha256 9cb1a1360d99621d99a966e702edec526bed56ce0b4df8a788d1e00d10b22312): same 6 errors, same skip count, so this is deterministic, not flaky."
+    },
+    {
+      "id": "full-tests-repo-ci-python",
+      "cmd": "python3 -m unittest discover -s tests -q  # system python3 3.12.3, the interpreter with 'requests' installed; closest local match to .github/workflows/validate.yml's `python3 -m unittest` CI step",
+      "exit": 0,
+      "duration_s": 84.489,
+      "output_excerpt": "Ran 1999 tests in 83.686s\nOK (skipped=324)",
+      "output_sha256": "39d54465ba48bda89dd737ace3276be6c5a0c127a40cd2e5baa45cb27e013221",
+      "note": "Reproduced identically on a second invocation (full-tests-sysPy-run1.log, sha256 6368c67f85388b4e30fad9598adc4102f1b56210a09fb6a606783fb7a83fadf0)."
+    }
+  ],
+  "tool_versions": {
+    "sdk_python": "3.13.15 (/home/example/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/bin/python3.13)",
+    "system_python3": "3.12.3"
+  },
+  "installs": [],
+  "result": "The 12 focused boundary tests reproduce exactly (12 passed, matching the receipt). The full-suite claim of '214 passed, 0 skipped' does not reproduce as stated: the repository's tests directory now has 1999 tests (up from 214 on 2026-09-19, three days of unrelated repo growth), so the receipt's exact count is stale, not falsified -- the receipt never claimed to bind future repo state. Under the bare pinned SDK_PYTHON interpreter the receipt's own $SDK_PYTHON token names, the current full suite FAILS with 6 errors, all ModuleNotFoundError: No module named 'requests' in tests/test_broad_universe_scan.py (a layer unrelated to research-factors-ml/portfolio-risk); under system python3 (which has requests installed and is the closer match to the repo's declared CI command `python3 -m unittest` in .github/workflows/validate.yml), the full suite passes: 1999 tests, OK, skipped=324. Both outcomes reproduced identically on a second run each, so this is a genuine, deterministic environment-dependency gap in the bare SDK_PYTHON interpreter, not test flakiness, and it is unrelated to skfolio/WalkForward/research-evaluation code, which is unaffected either way (the 12 focused tests pass under both interpreters).",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "Confirms the research-evaluation-specific claim (12 focused tests) still holds and that the '214-test local suite, not skfolio's own upstream suite' framing in the layer verdict remains accurate in kind (still local-integration evidence, now at a different count). It also surfaces a distinct, out-of-scope finding (missing 'requests' in the bare SDK_PYTHON interpreter breaks 6 unrelated broad-universe-scan tests) that does not affect the research-factors-ml/portfolio-risk verdict but should be flagged separately; it does not touch the not_actionable gaps (0, 2, 4, 5) or the skfolio-vs-alternative comparison question (gap 6), which are addressed by the other two checks in this unit."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Command wall-clock durations were measured on a second, separately-timed rerun of the same deterministic commands (identical results both times) rather than the very first invocation, since the first invocation's timing was not captured; this is recorded as a limitation, not a re-run to seek a different outcome.",
+    "Does not run skfolio's own upstream pytest suite (would require cloning skfolio's source repo, a network fetch this task disallows); this remains local-integration evidence only, as the original triage already notes.",
+    "The 'requests' module gap is a finding about the bare pinned SDK_PYTHON interpreter's completeness for the full repo suite, not a research-factors-ml/portfolio-risk defect; it is reported for completeness but not scored against this layer's gaps."
+  ],
+  "raw_artifacts": [
+    {"path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/research-portfolio/logs/focused-tests-final.log", "sha256": "8b40ca19cbd00c3fd3c99312b5bcf0abf2251136b5b2ebba43217960920f8939"},
+    {"path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/research-portfolio/logs/full-tests-sdkpy-final.log", "sha256": "b1d4023f3bea610035fefe6ffd130892a19afa8a847de0bee3606c512ae4fc20"},
+    {"path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/research-portfolio/logs/full-tests-run1.log", "sha256": "9cb1a1360d99621d99a966e702edec526bed56ce0b4df8a788d1e00d10b22312"},
+    {"path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/research-portfolio/logs/full-tests-syspy-final.log", "sha256": "39d54465ba48bda89dd737ace3276be6c5a0c127a40cd2e5baa45cb27e013221"},
+    {"path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/research-portfolio/logs/full-tests-sysPy-run1.log", "sha256": "6368c67f85388b4e30fad9598adc4102f1b56210a09fb6a606783fb7a83fadf0"}
+  ]
+}

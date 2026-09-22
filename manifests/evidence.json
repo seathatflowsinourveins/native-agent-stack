@@ -12086,6 +12086,31 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-agents-models-workers-20260922.json",
       "sha256": "cc48e0009abf6a5bee0ec3511e176b091ed1e23ac11ac2fe74c63c2eea919a09",
       "bytes": 26372
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/research-factors-ml/repo-local-full-test-rerun.json",
+      "sha256": "6cd89e845b3836a1a011cfc77b9dec3a50ede8e74979ff5e3fc5e57bf44af95b",
+      "bytes": 7700
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/research-factors-ml/sklearn-timeseriessplit-matched-arm.json",
+      "sha256": "8156011c0ecbd8f127b008b5f0d8b52d85f113863dfc2ae89d464cdc47359a45",
+      "bytes": 7373
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/portfolio-risk/skf_walkforward_optimizer.json",
+      "sha256": "e5e597d7962cf044dc62bd6fe797e2b7f8758293d96351f6d64b91d14041e750",
+      "bytes": 7233
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/sklearn-timeseriessplit/run_c22.py",
+      "sha256": "2ae0fd45532538b315c1602e81cb260263a040154130787128486816d940a4e0",
+      "bytes": 6883
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/skf-walkforward-optimizer/run_optimizer.py",
+      "sha256": "5fe7f4027090c3a914a59f75e1244d2cc382f64d121c622be3a88c1c99bc9ef7",
+      "bytes": 6341
     }
   ],
   "convergence_records": [

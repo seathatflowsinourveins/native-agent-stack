@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "skf_walkforward_optimizer",
+  "date": "2026-09-22",
+  "layer_ids": ["portfolio-risk"],
+  "gap_refs": [
+    {"layer_id": "portfolio-risk", "gap_index": 0}
+  ],
+  "purpose": "Run a real skfolio optimizer (MeanRisk, default MINIMIZE_RISK/Variance objective, and HierarchicalRiskParity/HRP) over the same 252/63/6 WalkForward split on the frozen SPY/QQQ/IWM inputs (plan.json sha256 b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7), using the receipt's own Python 3.13.15 offline environment (the requirements.lock-pinned skfolio 1.2.9 venv, not a different Python version), per the critic's correction that the prior proposed check used `uv venv --python 3.12`, which does not match the accepted 3.13.15 environment.",
+  "preregistered": "Fixed before running: for each optimizer, report (a) a development cross_val_predict over the WalkForward(train_size=252, test_size=63, purged_size=6, reduce_test=True) split on daily close-to-close returns (n_test_folds, annualized return/vol/Sharpe approximations), and (b) a reserved-segment out-of-sample result: fit on the last 252+6 development sessions (matching the receipt's reserved_train window), predict weights, and apply them to realized 2021Q1 daily returns, reporting the resulting annualized return/vol/Sharpe. This is a distinct metric from evaluate.py's 5-session raw-price label (skfolio's own daily-return risk/return machinery, not the custom episodic label), so no claim is made that these numbers are comparable to the accepted receipt's reserved mean_net_cost_proxy_label; this check only establishes whether a real skfolio optimizer (not only the WalkForward splitter) executes end-to-end on this layer's frozen inputs and produces a portfolio weight/return output, which is what gap 0 asks for.",
+  "commands": [
+    {
+      "id": "uv-venv-offline-sync",
+      "cmd": "uv venv --python /home/example/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/bin/python3.13 $WAVE_DIR/venv && uv pip sync --python $WAVE_DIR/venv/bin/python --offline --require-hashes blueprints/us-equities/research-evaluation/requirements.lock",
+      "exit": 0,
+      "duration_s": 0.5,
+      "output_excerpt": "Resolved 19 packages in 5ms\nInstalled 19 packages in 68ms\n + skfolio==1.2.9\n + scipy==1.18.1\n + clarabel==0.11.1 ...",
+      "output_sha256": "not_separately_captured_see_installs_field"
+    },
+    {
+      "id": "run-skfolio-optimizers",
+      "cmd": "$WAVE_DIR/venv/bin/python blueprints/gap-resolution-20260922/skf-walkforward-optimizer/run_optimizer.py --lean-source /home/example/.local/share/codex-ecosystem/tools/lean-985ef30 --out $WAVE_DIR/optimizer-run-1",
+      "exit": 0,
+      "duration_s": 3.5,
+      "output_excerpt": "development.mean_risk_min_variance: {n_test_folds: 20, annualized_sharpe_approx: 0.778}; development.hrp_variance: {n_test_folds: 20, annualized_sharpe_approx: 0.846}; reserved.mean_risk_min_variance: {weights SPY=0.954 QQQ=0.046 IWM~0, annualized_sharpe_approx: 1.940}; reserved.hrp_variance: {weights SPY=0.311 QQQ=0.275 IWM=0.414, annualized_sharpe_approx: 1.871}; inputs_unchanged: true",
+      "output_sha256": "87f08434778931a577631ab00ba96ac74a00dbcd6efee2df7aa5ea6ec816f975"
+    }
+  ],
+  "tool_versions": {
+    "python": "3.13.15 (matches receipt.json line 25 exactly, not a different minor version)",
+    "skfolio": "1.2.9",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "clarabel": "0.11.1",
+    "uv": "0.12.17"
+  },
+  "installs": [
+    {"name": "skfolio", "version": "1.2.9", "prefix": "/home/example/codex-ecosystem/state/gap-resolution-20260922/research-portfolio/wave1/venv (disposable uv venv, not a pinned tools/ install)", "source_url": "https://pypi.org/simple (offline, served from local uv cache)", "sha256": "a3faab8f2d77d6663e2b541f04da7a0ee855fcb909966a3bd297b13b21c2c053 (matches requirements.lock and the gap-triage's recorded pin)"}
+  ],
+  "result": "Both optimizers executed successfully end-to-end on the frozen SPY/QQQ/IWM inputs using the receipt's own 3.13.15 environment. Development cross_val_predict over the identical 252/63/6/reduce_test=True WalkForward split produced 20 test folds for both MeanRisk (min-variance) and HierarchicalRiskParity, with mean_risk_min_variance giving annualized_sharpe_approx 0.778 (return 16.1%, vol 19.2%) and hrp_variance giving 0.846 (return 19.0%, vol 20.5%) over the full 2015-2020 development span (1252 daily observations). A separate reserved-segment fit (train on the last 252+6 development sessions ending 2020-12-22, predict on 2021Q1) produced: mean_risk_min_variance concentrated almost entirely in SPY (95.4%) and QQQ (4.6%), IWM ~0, with 2021Q1 annualized_sharpe_approx 1.940; hrp_variance diversified across all three (SPY 31.1%, QQQ 27.5%, IWM 41.4%) with annualized_sharpe_approx 1.871. Both reserved-segment Sharpe approximations are well above 1, but n_observations is only 60 trading days, so this is not a statistically meaningful out-of-sample claim -- it establishes that the pipeline runs and produces weights/returns, not that either optimizer outperforms.",
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "refutes_incumbent",
+    "explanation": "The prior verdict stated 'no skfolio optimizer, risk measure or portfolio weight output has been executed' for this layer (gap 0); this receipt directly refutes that specific claim with a native, reproducible execution of two real skfolio optimizers (MeanRisk and HierarchicalRiskParity) producing actual portfolio weights and cross-validated out-of-sample returns on the layer's own frozen inputs. It does not establish that either optimizer is superior to a competing library (cvxportfolio, empyrical-reloaded, quantstats remain uncached and uninstallable offline, per gap 5/6), nor does it perform cash/fee/dividend reconciliation or feed into the NautilusTrader execution layer (gaps 1 and 3 remain open)."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Uses skfolio's native daily close-to-close returns and risk/return objective, not evaluate.py's custom 5-session raw-price cost-adjusted label; the two are not numerically comparable metrics, only the same frozen input data and the same 252/63/6 WalkForward shape are shared.",
+    "60 daily observations in the 2021Q1 reserved segment is a small sample; the reported Sharpe approximations are descriptive, not a statistical claim of skill or persistence.",
+    "Does not integrate with the pinned NautilusTrader 2.0.0rc5 destination (gap 3) or perform cash/position/fee/dividend reconciliation (open_gaps[0]/[1] in portfolio-risk); those remain open and were out of this check's preregistered scope.",
+    "Does not compare skfolio against cvxportfolio, empyrical-reloaded or quantstats (gap 5/6): none of the three packages is present in the local uv cache, and installing them needs a PyPI/GitHub network fetch this read-only-network lane does not perform."
+  ],
+  "raw_artifacts": [
+    {"path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/research-portfolio/wave1/optimizer-run-1/results.json", "sha256": "87f08434778931a577631ab00ba96ac74a00dbcd6efee2df7aa5ea6ec816f975"}
+  ]
+}
