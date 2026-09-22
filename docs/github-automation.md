@@ -384,8 +384,12 @@ lock actually used here is `.github/requirements-ci.lock`, a name Dependabot
 does not recognize as a Python dependency file, and four of the five pinned
 CI binaries (actionlint, gitleaks, syft, grype) are curl-downloaded release
 tarballs with no manifest Dependabot understands at all. The new
-`catalog-freshness.yml` drift table already covers all five pins (including
-`nautilus_trader`) against each tool's latest upstream release, so the gap is
+`catalog-freshness.yml` drift table covers four of those five (actionlint,
+gitleaks, syft, zizmor) plus `nautilus_trader` against each tool's latest
+upstream release; grype is intentionally excluded from that table (see
+"Secret and supply-chain scanning" above -- it tracks upstream's latest
+release rather than a fixed pin and belongs to the report-only `sbom-vuln`
+lane instead), so the actionlint/gitleaks/syft/zizmor/nautilus_trader gap is
 covered by a different, already-built lane rather than by Dependabot.
 Precondition to revisit: rename `.github/requirements-ci.lock` to a
 Dependabot-discoverable name (e.g. `requirements-ci.txt` with a

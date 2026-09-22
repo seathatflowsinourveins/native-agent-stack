@@ -7694,8 +7694,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "e5d5c19a9347a6198cfb926d1c6b6e59c1bd8781b38b2732240057285111cac7",
-      "bytes": 30881
+      "sha256": "e1917e3c25d907a80a95238b06f1a153fb8f739a85898588a5110f400199902b",
+      "bytes": 31171
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -11559,8 +11559,8 @@
     },
     {
       "path": "tests/test_broad_universe_scan.py",
-      "sha256": "41072d6ddadc47e964f503978069220eb8482b29609c56795012a0f8ae90b2e5",
-      "bytes": 50630
+      "sha256": "d7d8ae308787970746ce7fa3a1ce46600542eea58d86ef19caab355a1a432641",
+      "bytes": 50802
     },
     {
       "path": "tests/test_catalog_decisions.py",
