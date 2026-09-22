@@ -1,0 +1,148 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "docs/hf-memory-model-qualification.md",
+    "evidence/receipts/hf-memory-models-20260921.json",
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c3",
+   "name": "Hugging Face Hub native CLI",
+   "repository": "https://github.com/huggingface/huggingface_hub",
+   "why_not_default": "This candidate supports pinning and verifying model files. It is neither the serving path nor the index. hf 1.32.0 checked 15 Nemotron files at revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 (docs/hf-memory-model-qualification.md lines 43-48; evidence/receipts/hf-memory-models-20260921.json line 24). It kept the native warning about 33 extra local metadata files (same receipt, line 18). It shares the local-embedding-runtime decision with vLLM (catalogs/foundation/decisions.json lines 927-975). It is needed for reproducible model inputs, but it does not answer queries."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c2",
+   "name": "Haystack",
+   "repository": "https://github.com/deepset-ai/haystack",
+   "why_not_default": "The only evidence is a pinned source review, and the commands were never run (catalogs/us-equities/foundation-memory.json lines 946-981). It belongs to the rag-pipeline layer for financial documents, not to conceptual code search. The catalog marks it 'conditional' and notes 'No financial corpus pipeline or performance proof yet'. It has no code-index, embedding-compatibility or recovery evidence, and it was not an arm of the 2026-09-22 sealed semantic-rag comparison."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c4",
+   "name": "pgvector",
+   "repository": "https://github.com/pgvector/pgvector",
+   "why_not_default": "The only evidence is a source review. The catalog's own limitation says: 'Adds no benefit to current Qdrant code index unless a specific SQL integration need is established.' Its use depends on a future PostgreSQL service (catalogs/us-equities/foundation-memory.json lines 1057-1092). It was not an arm of any executed comparison."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/blind-catalog-source-adjudication-20260921.md",
+    "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json"
+   ],
+   "key": "c5",
+   "name": "code-memory",
+   "repository": "https://github.com/kapillamba4/code-memory",
+   "why_not_default": "The only evidence is a source review; it was never installed or trialled. At commit 5a8db166 the review found 'No measured resource, retrieval or maintenance advantage'. It also noted:\n- The default Jina weights are licensed CC-BY-NC-4.0.\n- The loader enables remote model code without pinning a revision.\n- Two freshness concerns are source-level only and were not reproduced (docs/blind-catalog-source-adjudication-20260921.md lines 5-45).\nThe sealed Codex review lists it as 'provisional_source_based_selection_not_adopted' (codex-source-review.json line 253). It was not an arm of the executed 2026-09-22 comparison."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c6",
+   "name": "LanceDB",
+   "repository": "https://github.com/lancedb/lancedb",
+   "why_not_default": "Not adopted. The only evidence is a source review. The catalog decision is 'alternative', for local research corpora, and its commands were not run. The x86 wheel requires AVX2/FMA/F16C. There is no code-index, embedding or recovery evidence (catalogs/us-equities/foundation-memory.json lines 1094-1132). Nothing in the evidence shows it meets the requirement better than Qdrant."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "semantic-rag",
+ "limits": [
+  "Skill path: <host-path>/typesafe-ai (preloaded). No TypeSafe inference results were supplied and no service calls were made. Every judgment here comes from my own source review. The refuter findings were checked against the original files, not accepted because the refuters agreed. Actual client model: claude-opus-5-5[1m]. The fixed packet value claude-opus-5/high was recorded as instructed.",
+  "Read-scope deviation: to resolve the blocking and major refuter findings, I read four files under <host-path>/agent-lab, which is outside the stated packet root <host-path>/nas-wt-pr5-series. They are verdict.json, restore-A.json, executed-comparisons.md and run-arms.mjs. They are cited by absolute path, so evidence_refs (relative to the packet root) do not include them. The comparison lives in a different repository, and its corpus is a copy of adaptive-paper/ plus broad-universe/, not the nas-wt-pr5-series checkout.",
+  "I could not run commands. The '93 pass' result for `node --test tests/compare` is documented as done in the task record (line 373). I did not observe it. The runner commands in overturn_when come from its usage header and were not executed by me.",
+  "I did not open the packet's Qdrant same-host and synthetic off-host restore receipts, evidence/receipts/vllm-compatibility.json, desktop-direct-rag.json, docs/foundation-stack.md, protocol.sealed.json or questions.merged.json. I checked only that the last two exist.",
+  "Corrections to my earlier proposal:\n(1) The earlier text said no executed comparison existed. That is corrected: a sealed, measured semantic-rag comparison ran on 2026-09-22 against a lexical baseline, with final_status unresolved.\n(2) Recovery evidence is corrected from Qdrant 'accepted_within_scope' alone to also include the measured incumbent restore_pass null (0, 1, 0).\n(3) The c3 citation for 33 metadata files is corrected to line 18 of the HF receipt.\n(4) 'vLLM 0.30.0 untested' is corrected to 'no source records an attempt; status unknown'.\n(5) overturn_when and overturn_protocol now name runnable node commands and tests/ paths.",
+  "Corrections to the packet, carried over:\n- c2 and c4 are catalog 'conditional' (source_review).\n- c5 is 'provisional_source_based_selection_not_adopted' (codex-source-review.json line 253). All three were treated as conditional or unqualified alternatives, not qualified adoptions.\n- The embedding norms and collection sizes in native-rag.json and full-stack-convergence.md come from separate dated observations; they are not contradictions.",
+  "The upstream metadata in the packet (stars, latest releases) was not re-queried."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "Quality: the only measured comparison is against a lexical baseline, with n=20 and no power calculation. Its final_status is 'unresolved'. None of the packet candidates c2 to c6 has been an executed arm.",
+  "Recoverable state: the incumbent returned restore_pass null, from attempts 0, 1, 0. Two of three Qdrant-snapshot/restic cycles changed the replay span lists; the task record (line 376) describes the change as ranks 9 and 10 swapped for one question. The snapshot checksum matched in both cycles. SocratiCode recovery is not_established (decisions.json lines 902-906). Byte-identical restored retrieval is therefore not established.",
+  "Weakness in the sealed protocol: the incumbent floor tests `=== 0`, so a null incumbent restore escapes the floor. The task record (executed-comparisons.md lines 380-381) says fixing this needs a new protocol_id.",
+  "The native two-client evidence from 2026-09-19 is one question per client, not a recall benchmark.",
+  "No opened source records whether vLLM v0.30.0 (upstream latest per the packet metadata) was tried. Its status is unknown. Version 0.29.0 had an actual host initialization failure (docs/native-memory-rag-lifecycle.md line 15).",
+  "Nemotron-3-Embed-8B-BF16 and EmbeddingGemma have not been qualified for this route. The live service uses a 4,096-token context, not the model card's 32,768.",
+  "The code-memory freshness concerns are source-level implications, not reproduced failures.",
+  "Watcher freshness was outside the scope of the sealed comparison. Arm A's index_build_s was a warm re-index.",
+  "Another project, a full-service restart and new-PC/macOS activation each need their own scope. SocratiCode's AGPL-3.0 licence obligations were not assessed.",
+  "No token-saving or provider-usage comparison is established."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "A: SocratiCode 1.14.0 + Qdrant 1.19.1 + vLLM 0.25.0 serving nvidia/Nemotron-3-Embed-1B-BF16 rev c0c9fea93ea424587517f2c59e20db9f1d6bf615 (incumbent; measured 2026-09-22: hit@5 0.85, MRR@10 0.7417, restore_pass null)",
+   "B (executed baseline): jCodeMunch lexical/symbol (measured 2026-09-22: hit@5 0.25, MRR@10 0.1475, restore_pass 1)",
+   "Challenger to add: code-memory @5a8db166 with a separately pinned, licence-appropriate embedding model",
+   "Optional challenger: a LanceDB- or pgvector-backed index behind the same embedding service",
+   "Optional: the same SocratiCode route with Nemotron-3-Embed-8B-BF16"
+  ],
+  "fixture_paths": [
+   "<host-path>/protocol.sealed.json",
+   "<host-path>/questions.merged.json",
+   "<host-path>/sealed-protocol.test.mjs",
+   "<host-path>/span-matching.test.mjs",
+   "<host-path>/closure-and-isolation.test.mjs",
+   "<host-path>/latency-stats.test.mjs",
+   "<host-path>/closure-script.test.mjs"
+  ],
+  "metric": "The sealed semantic-rag closure computed by run-arms.mjs computeClosure() and tools/compare/closure.mjs. Metrics: span_hit_at_5 and mrr_at_10 on the 20 sealed questions (the challenger must beat the incumbent by at least 2/20 on both), p95_query_latency_ms and peak_rss_mb (no worse), and restore_pass (a restic backup/check/restore/replay cycle, 3 attempts; null on disagreement). Closure outcomes are retain, overturn or unresolved. The incumbent floor fires if armA.restore_pass === 0 or target_model_starts === 0."
+ },
+ "overturn_when": "An executed comparison already exists outside the packet root: the agent-lab semantic-rag runner, <host-path>/run-arms.mjs. Its usage lines 17-21 cover the seal, run, restore and assemble subcommands, with the sealed protocol in tools/compare/semantic/protocol.sealed.json. It is checked by <host-path>/{sealed-protocol,span-matching,closure-and-isolation,latency-stats,closure-script}.test.mjs, run with `node --test tests/compare` (cwd agent-lab, 93 pass per docs/tasks/2026-09-22-executed-comparisons.md line 373). Its 2026-09-22 result is final_status \"unresolved\". Any of these would change the verdict:\n1. A challenger arm meets the sealed overturn conjunction under a new protocol_id and closure returns overturn. The conjunction is at least 2/20 better on both span_hit_at_5 and mrr_at_10, no worse on p95 latency and peak RSS, and restore_pass 1 (run-arms.mjs lines 794 and 877-902). The challenger could be code-memory @5a8db166, or a LanceDB- or pgvector-backed index run through the same runner: `node tools/compare/semantic/run-arms.mjs run --protocol <p> --arm B --repeats 3 --out-dir <dir>`, then `restore` and `assemble`.\n2. The incumbent's own restore repeats. Running `node tools/compare/semantic/run-arms.mjs restore --protocol <p> --arm A --out-dir <dir>` could return 0 on every attempt. The incumbent floor would then fire (armA.restore_pass === 0), and the Qdrant recoverable-state claim would count as failed rather than unresolved. It returned 0, 1, 0 in restore-A.json.\n3. A native vLLM upgrade attempt at the latest upstream v0.30.0 initializes and reproduces the four first-ranked results in docs/hf-memory-model-qualification.md lines 50-68. That would change the c8 pin, not the winner set.",
+ "packet_sha256": "6dc6f72805a8c62f4a7e3281c0989625b0788427f33611191a845f72ed998938",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__semantic-rag.json",
+  "docs/native-memory-rag-lifecycle.md (lines 1-110)",
+  "catalogs/foundation/decisions.json (lines 850-999)",
+  "catalogs/us-equities/foundation-memory.json (lines 170-214, 940-1133)",
+  "evidence/receipts/native-rag.json (lines 1-140)",
+  "docs/hf-memory-model-qualification.md (full)",
+  "evidence/receipts/hf-memory-models-20260921.json (lines 1-30; re-read lines 16-25)",
+  "docs/full-stack-convergence.md (lines 45-124)",
+  "docs/token-native-saturation.md (lines 20-34, 95-122)",
+  "docs/blind-catalog-source-adjudication-20260921.md (lines 1-45)",
+  "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json (lines 227-255, 723-734)",
+  "fixtures/rag-note.md",
+  "glob <host-path>/*{semantic,rag,compare}* (only fixtures/rag-note.md was relevant); grep 'semantic-rag-executed|run-arms|span_hit_at_5' under nas-wt-pr5-series (no matches)",
+  "<host-path>/verdict.json (full)",
+  "<host-path>/restore-A.json (lines 1-40)",
+  "<host-path>/2026-09-22-executed-comparisons.md (lines 350-419)",
+  "<host-path>/run-arms.mjs (lines 1-30; grep for restore/closure_rule, lines 20, 536, 589-618, 794, 850, 877-902, 1201-1269)",
+  "glob <host-path>/closure.mjs} (all cited files exist)",
+  "<host-path>/SKILL.md (skill body preloaded in context)"
+ ],
+ "why_selected": "Source review, my own. The requirement asks for a scoped local index, a compatible embedding service and recoverable state. The only path that covers it is SocratiCode (c7), using vLLM-served Nemotron embeddings (c8) and storing them in Qdrant (c1). The evidence is:\n- a retained native execution,\n- one sealed measured comparison against a lexical baseline, whose closure is unresolved,\n- local integration checks.\nNo measured comparison exists against the packet's alternative candidates (c2 to c6).\n\nWhat was observed:\n(a) evidence/receipts/native-rag.json, kind native_model_e2e, recorded 2026-09-19T04:55:03Z.\n- Codex (gpt-6-astra) and Claude (claude-opus-5[1m]) each ran one successful codebase_search with limit 1. Both returned tools/ecosystem/linux-usage-report.cjs lines 2-39 with score 0.6429.\n- The index held 35 files and 139 chunks in collection codebase_72cfa87c5abf, status green.\n- Nemotron-3-Embed-1B-BF16 returned 2048 finite dimensions with norm 1.0000000207936353.\n- Automatic watching picked up an add, an update and a delete, each in about 3.0 s.\n\n(b) Sealed comparison, 2026-09-22. It lives outside the packet root, in <host-path>/agent-lab.\n- File: runner-temp/semantic-rag/out/verdict.json, protocol_id semantic-rag-executed-20260922-v2r, computed_by tools/compare/semantic/run-arms.mjs.\n- Arm A (SocratiCode+Qdrant+vLLM): span_hit_at_5 0.85, mrr_at_10 0.7416666666666666, p95 141 ms, peak RSS 120 MB, restore_pass null.\n- Arm B (jCodeMunch lexical): span_hit_at_5 0.25, mrr_at_10 0.14750000000000002, p95 88 ms, peak RSS 68 MB, restore_pass 1.\n- final_status is \"unresolved\". docs/tasks/2026-09-22-executed-comparisons.md lines 368-385 record n=20 sealed questions, 3 repeats with byte-identical quality, and no power calculation.\n- In quality, the embedding route clearly beats the lexical baseline. That lexical baseline is not one of this packet's candidates.\n\n(c) Recovery is only partly established.\n- In catalogs/foundation/decisions.json lines 857-925, Qdrant recovery is accepted_within_scope and SocratiCode recovery is not_established.\n- <host-path>/restore-A.json lines 4-11 shows three Qdrant-snapshot/restic restore cycles with values 0, 1, 0. Attempt 1 failed with \"replay span lists differed after restore\" even though the snapshot checksum matched (lines 18-33). The task record, line 376, says ranks 9 and 10 swapped for one question.\n\n(d) docs/hf-memory-model-qualification.md lines 50-68: NVIDIA's upstream retrieval example ran against local vLLM and put all four intended documents at rank 1. docs/native-memory-rag-lifecycle.md lines 13-15 give the pins SocratiCode 1.14.0, Qdrant 1.19.1 and vLLM 0.25.0.\n\nKept from provider judgments without opening their receipts: the Qdrant same-host and synthetic off-host restore decisions in the packet (c1.decisions).",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "evidence/receipts/native-rag.json",
+  "catalogs/foundation/decisions.json",
+  "docs/native-memory-rag-lifecycle.md",
+  "docs/hf-memory-model-qualification.md",
+  "docs/full-stack-convergence.md"
+ ],
+ "winner_keys": [
+  "c7",
+  "c1",
+  "c8"
+ ]
+}

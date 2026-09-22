@@ -1,0 +1,170 @@
+{
+ "alternatives": [
+  {
+   "disposition": "overlap",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "blueprints/convergence-practice/application-delivery/README.md"
+   ],
+   "key": "c11",
+   "name": "React",
+   "repository": "https://github.com/react/react",
+   "why_not_default": "React 19.3.0 was exercised in the same receipts as the UI layer under Next.js (application-delivery README lines 4 and 13). It is covered as a Next.js dependency, not a separately chosen hosting component. The packet marks review_status 'not_individually_reviewed', and the three-winner limit applies. It remains required inside the selected stack."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md"
+   ],
+   "key": "c4",
+   "name": "Docker Compose",
+   "repository": "https://github.com/docker/compose",
+   "why_not_default": "Source review only (v5.5.1, pin 5f94fb0a), with native_acceptance 'not_established'. The rationale says its lifecycle value 'has not been compared with current service coordination' (catalogs/landscape/hosting-practice.json lines 20-30). The trigger in docs/hosting-container-practice.md line 11 is a selected multi-service OCI package; no such package is selected."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md",
+    "blueprints/convergence-practice/application-delivery/README.md"
+   ],
+   "key": "c7",
+   "name": "Docker Engine / Moby",
+   "repository": "https://github.com/moby/moby",
+   "why_not_default": "Source review only (docker-v29.8.1, pin 464cd50c). The catalog says 'No matched result shows better reproduction or recovery than the accepted native services for this workload' (hosting-practice.json lines 9-19). The application README (lines 120-125) records that an official PostgreSQL container's bind mount stalled before guest boot; the full-stack receipt uses native PostgreSQL instead."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md"
+   ],
+   "key": "c8",
+   "name": "Podman / Quadlet",
+   "repository": "https://github.com/podman-container-tools/podman",
+   "why_not_default": "Source review only (v6.1.2, pin 04f3aa43), with native_acceptance 'not_established'. Image, networking, volume, GPU and Docker-API compatibility are 'workload-specific and unmeasured here' (hosting-practice.json lines 31-42). The trigger is a rootless or systemd-managed container requirement (docs/hosting-container-practice.md line 13), and none is defined."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md"
+   ],
+   "key": "c10",
+   "name": "Dockerized IB Gateway",
+   "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+   "why_not_default": "This is a broker gateway rather than hosting for the typed application. Source review only; 'Image digest, sign-in, restart, API connectivity and broker reconciliation are not qualified' (hosting-practice.json lines 43-53). The Nautilus source uses a mutable 'stable' image tag, and dockerized_gateway in client configs raises ValueError (docs/hosting-container-practice.md lines 31-36). It belongs to the separately qualified IBKR paper path."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c3",
+   "name": "Modal",
+   "repository": "https://github.com/modal-labs/modal-client",
+   "why_not_default": "Managed cloud compute that needs a separate account, native login and compute budget. The catalog says 'modal run executes cloud code and may incur charges; not run here' and 'avoid permanent hosting until cost/egress policies are set' (catalogs/us-equities/agents-operations.json lines 606-645). Source review only (modal 1.5.5). It does not fit the local-application requirement, and no GPU or remote workload is defined."
+  },
+  {
+   "disposition": "out_of_scope",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c5",
+   "name": "BentoML",
+   "repository": "https://github.com/bentoml/BentoML",
+   "why_not_default": "A model-serving and packaging alternative (layers 'model-serving' and 'packaging', decision 'alternative'). Its commands are 'Prospective commands; not executed', and the catalog advises 'Prefer direct vLLM for a single supported model endpoint until packaging adds value' (catalogs/us-equities/agents-operations.json lines 564-604). It does not address hosting the typed application or its database."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c9",
+   "name": "Dev Containers CLI",
+   "repository": "https://github.com/devcontainers/cli",
+   "why_not_default": "Researched as a dev-environment container boundary (wave 1, v0.89.0, commit 5dc75333). Every native command is marked 'source-confirmed recipe; not executed by this research pass'. The lock omits the base image, Dockerfile steps and application dependencies. The record states 'No container was built or executed' (adoption/research.json lines 324-411). There is no execution evidence for running the application or its services."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "hosting-services",
+ "limits": [
+  "I opened no external URL evidence_refs: the Compose, Moby, Podman, ib-gateway-docker and Nautilus READMEs, the Docker rootless docs, the Podman systemd unit docs, and the Modal PyPI and BentoML README pages. Their claims come only from the in-repo catalog summaries.",
+  "I read the receipts by grep on status and pass/fail fields, not in full. I did not open acceptance-plan.json, freeze.json, migration-rollback.json or container-storage/README.md; I only confirmed that they exist via Glob.",
+  "I ran no commands, so I re-executed no tests or receipts. All results are recorded evidence, not observed now.",
+  "No TypeSafe inference results were supplied and none were made. The TypeSafe skill was preloaded from <host-path>/SKILL.md, and this verdict is my own source review. I made no TypeSafe service or credential access.",
+  "The model field is copied from the fixed packet value 'claude-opus-5'/high. The client reports the actual model as Claude Opus 5.5 (claude-opus-5-5[1m]).",
+  "The packet withholds current_choice, decision and rationale, so I could not compare this verdict against the recorded catalog disposition.",
+  "Correction to the packet: the winners' evidence_kind is 'native_execution', but I classify it as local_integration. The checks are the project's own suite on a synthetic fixture on named Mac and WSL hosts, not upstream E2E or production."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "The evidence does not accept production authentication or authorization, hosted or cloud deployment, production load, or independent-host database backup/restore (decisions.json lines 1660-1668; application-delivery README lines 135-139).",
+  "Lifecycle stage 'recovery' is 'not_established' for Next.js (decisions.json line 1697). Recovery was not confirmed for the other components in the portion read.",
+  "Migration reversal proves schema reversal, not recovery of user data or a production-safe rollback (application-delivery README lines 150-152).",
+  "No container lane (Docker, Compose, Podman or Dev Containers) has any execution evidence against the application workload. The earlier PostgreSQL container bind-mount stall is recorded, but a named-volume container route was qualified separately and was not substituted.",
+  "Native systemd/Dagu service supervision is the retained 'supporting services' lane in hosting-practice.json but is not a candidate in this packet, so this verdict does not cover it.",
+  "Modal, BentoML and Dockerized IB Gateway have no executed commands. Cloud cost, account, broker sign-in, restart and reconciliation are unqualified.",
+  "The SOTA components listed outside the candidate set (apple-container, mcp-inspector, mcporter, omniroute) were not evaluated here. hosting-practice.json limits say Apple Container evidence is platform-specific and does not qualify Linux engines.",
+  "Evidence covers only the named Mac and WSL fixtures; another PC must produce its own receipts."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "native services: FastAPI + Next.js/React + native PostgreSQL 18.6 source build (current)",
+   "container lane: Docker Engine + Compose running the same locked application and PostgreSQL with a named volume",
+   "container lane: Podman/Quadlet running the same locked application and PostgreSQL"
+  ],
+  "fixture_paths": [
+   "blueprints/convergence-practice/application-delivery/acceptance-plan.json",
+   "blueprints/convergence-practice/application-delivery/freeze.json",
+   "blueprints/convergence-practice/application-delivery/receipt.json",
+   "blueprints/convergence-practice/wsl-application/receipt.json",
+   "blueprints/convergence-practice/container-storage/README.md"
+  ],
+  "metric": "Pass/fail on frozen acceptance: 12 API/database tests, browser create/update, byte-identical row and history after restart, migration reversal. Also measured install, startup and rebuild time, resource use, isolated backup/restore success, interruption recovery and cleanup completeness, on the same host."
+ },
+ "overturn_when": "Rerun the frozen acceptance for the same locked application and database under one chosen container lane (Docker Engine plus Compose, or Podman/Quadlet), per the comparison_required text in catalogs/landscape/hosting-practice.json. The frozen acceptance is blueprints/convergence-practice/application-delivery/acceptance-plan.json and freeze.json: make verify with 12 API/database tests, the browser create/update workflow, and restart persistence. Measure installation, startup and rebuild time, resources, backup/restore of persistent state, interruption recovery and cleanup. Change the verdict only if that run passes every check the native lane passes and also closes a concrete gap such as isolated backup/restore or packaging. A new failure in the native receipts would also change the verdict. For the portability part, rerun python3 -m unittest discover -s blueprints/convergence-practice/application-delivery -p 'test_portability.py' -v. Separately, a defined production, remote-team or GPU requirement would open a targeted trial for Modal or a hosted provider.",
+ "packet_sha256": "02722aa7de4fb7c5f686a9ee2b054a866b1a5dc23334815528fa337c7eff48b9",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__hosting-services.json",
+  "catalogs/foundation/decisions.json (lines 1625-1714)",
+  "blueprints/convergence-practice/application-delivery/README.md",
+  "blueprints/convergence-practice/application-delivery/receipt.json (grep of status/passed/failed fields)",
+  "blueprints/convergence-practice/wsl-application/README.md (lines 1-30 plus grep)",
+  "blueprints/convergence-practice/wsl-application/receipt.json (grep of status/passed/failed fields)",
+  "catalogs/landscape/hosting-practice.json",
+  "docs/hosting-container-practice.md",
+  "catalogs/us-equities/agents-operations.json (lines 564-645)",
+  "adoption/research.json (devcontainers/cli entry, lines 15-45 and 324-411, 712-718)",
+  "<host-path>/SKILL.md (preloaded skill body)"
+ ],
+ "why_selected": "FastAPI 0.141.1 (c1), PostgreSQL 18.6 (c6) and Next.js 16.3.5 (c2) are the only adopted candidates with retained execution receipts for the requirement \"run the selected local typed application and supporting services reproducibly\". The capability decision is at catalogs/foundation/decisions.json:1636-1668 (id local-typed-application, layer_ids include hosting-services, selection \"conditional\", review_status \"accepted_within_scope\", evidence_ids native-application-delivery-20260920, mac-native-application-migration-20260920 and wsl-application-20260920). What was actually observed is local execution of the project's own acceptance suite on named fixtures. On the Mac, blueprints/convergence-practice/application-delivery/receipt.json records status \"passed\" (line 13), API tests passed 12 and failed 0 (lines 35-36), a passing production_build (line 57) and one browser workflow that passed with 0 failures (lines 59-60). On WSL, blueprints/convergence-practice/wsl-application/receipt.json records status \"passed_with_explicit_platform_adaptations\" (line 4) and passed 12, failed 0 (lines 108-109). In blueprints/convergence-practice/application-delivery/README.md lines 111-118, the browser-created record survived a native PostgreSQL stop/start and an API/Next restart byte-for-byte. Lines 145-152 record a separate empty-database migration reversal. Reproducibility comes from locked setup with make targets and pins (README lines 13-18 and 45-59). Account, state and deployment scope stay explicit: loopback only, local trust authentication for a synthetic fixture, and state kept in an ignored .runtime directory (README lines 41-43 and 127-133). I classify this as local integration: the project's own tests on a synthetic fixture. The packet labels it native_execution. It is neither upstream E2E nor production hosting. React (c11) was also exercised, but it is carried as a Next.js dependency rather than chosen as a separate component, so it is recorded as overlap to stay within the three-winner limit. Every container, managed-compute and gateway candidate has only source review, with native_acceptance \"not_established\" (catalogs/landscape/hosting-practice.json lines 18, 29, 40 and 52).",
+ "winner_evidence_class": "local_integration",
+ "winner_evidence_refs": [
+  "catalogs/foundation/decisions.json",
+  "blueprints/convergence-practice/application-delivery/README.md",
+  "blueprints/convergence-practice/application-delivery/receipt.json",
+  "blueprints/convergence-practice/wsl-application/README.md",
+  "blueprints/convergence-practice/wsl-application/receipt.json"
+ ],
+ "winner_keys": [
+  "c1",
+  "c6",
+  "c2"
+ ]
+}

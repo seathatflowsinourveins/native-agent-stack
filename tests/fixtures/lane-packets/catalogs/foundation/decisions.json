@@ -1,0 +1,23 @@
+{
+ "schema_version": 1,
+ "checked_at": "2026-09-22",
+ "scope": "Fixture decisions touching layer-a's matched component.",
+ "decisions": [
+  {
+   "id": "decision-1",
+   "capability": "Do the thing with Widget One",
+   "capability_key": "do-the-thing",
+   "checked_at": "2026-09-22",
+   "layer_ids": ["layer-a"],
+   "selection": "default",
+   "review_status": "accepted_within_scope",
+   "activation": "Use Widget One's supported CLI.",
+   "component_ids": ["widget-one"],
+   "candidate": null,
+   "evidence_ids": ["ev-1"],
+   "evidence_scope": "One source reviewed.",
+   "limitations": ["Single source."],
+   "next_gap": "Need a second independent comparison."
+  }
+ ]
+}

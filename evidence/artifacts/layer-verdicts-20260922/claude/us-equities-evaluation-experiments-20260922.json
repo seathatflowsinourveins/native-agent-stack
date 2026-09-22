@@ -1,0 +1,285 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c2",
+   "name": "LangGraph",
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "why_not_default": "The only evidence is a source review of an upstream README (catalogs/us-equities/agents-operations.json lines 247-263). The recorded command is an import smoke test, not a working agent, and InMemorySaver loses state on restart. There is no native research run, supervision test or telemetry match. The pin, 1.2.11, is behind upstream 1.2.12."
+  },
+  {
+   "disposition": "out_of_scope",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c3",
+   "name": "Dagster",
+   "repository": "https://github.com/dagster-io/dagster",
+   "why_not_default": "Dagster is catalogued as an alternative for partitioned data assets and backfill lineage, from a README review only (agents-operations.json lines 403-439). No definitions or run exist. It addresses data lineage rather than supervising bounded research workers."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/candidate-quality-review-20260921.md",
+    "catalogs/landscape/candidate-quality-review.json"
+   ],
+   "key": "c5",
+   "name": "OpenHands Agent Canvas",
+   "repository": "https://github.com/OpenHands/OpenHands",
+   "why_not_default": "docs/candidate-quality-review-20260921.md line 46 says hosting the existing native workers 'is not yet qualified here'. The evidence is a README review only, with no installation, native-identity or recovery run."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/deerflow/research-receipt.json",
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "docs/candidate-quality-review-20260921.md"
+   ],
+   "key": "c6",
+   "name": "DeerFlow",
+   "repository": "https://github.com/bytedance/deer-flow",
+   "why_not_default": "The native evidence is one embedded ACP prompt (blueprints/us-equities/deerflow/research-receipt.json). In that run DeerFlow discards ACP completion and usage data, so usage had to be recovered from private adapter logs. The 'read-only' mode actually maps to workspaceWrite/on-request, so strict read-only is not established. There is no planner/UI or persistent service. The discovery receipt covers a development commit (2.1.0-rc0), not stable v2.0.0. The 2026-09-21 review keeps it optional (candidate-quality-review-20260921.md line 43)."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/foundation-native-20260920.json",
+    "blueprints/us-equities/research-runtime/receipt.json"
+   ],
+   "key": "c7",
+   "name": "Prometheus",
+   "repository": "https://github.com/prometheus/prometheus",
+   "why_not_default": "Prometheus supplies the telemetry-retention part of the requirement, and it was observed matching native Claude usage in all four categories (evidence/receipts/foundation-native-20260920.json lines 466-493; research-runtime/receipt.json telemetry). It is a supporting observability component, not a research-worker or supervision runtime, and it is already the default in the observability layer."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c8",
+   "name": "Prefect",
+   "repository": "https://github.com/prefecthq/prefect",
+   "why_not_default": "The evidence is a README review only, and the catalog says 'No flow is supplied or scheduled here' (agents-operations.json lines 389-392). It would be chosen instead of Dagu, not in addition. It has no failure, cancellation or restart evidence comparable to Dagu's hosting receipt."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/candidate-quality-review-20260921.md",
+    "catalogs/landscape/candidate-quality-review.json"
+   ],
+   "key": "c10",
+   "name": "Deep Agents",
+   "repository": "https://github.com/langchain-ai/deepagents",
+   "why_not_default": "The 2026-09-21 review names it a 'serious challenger' but requires the same source-research task, permission boundaries, recovery and full cost comparison, none of which has run (candidate-quality-review-20260921.md line 44). The evidence is a README review only, and its installed version is undetermined (candidate-quality-review.json line 170)."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/candidate-quality-review-20260921.md",
+    "catalogs/landscape/candidate-quality-review.json"
+   ],
+   "key": "c11",
+   "name": "Microsoft Agent Framework",
+   "repository": "https://github.com/microsoft/agent-framework",
+   "why_not_default": "It fills a gap in discovery only. The review says to 'qualify a required application workflow before adding another runtime' (candidate-quality-review-20260921.md line 47). There is no native run."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/candidate-quality-review-20260921.md",
+    "catalogs/landscape/candidate-quality-review.json"
+   ],
+   "key": "c12",
+   "name": "OpenHands SDK",
+   "repository": "https://github.com/OpenHands/software-agent-sdk",
+   "why_not_default": "It is a challenger for remote or isolated workers, but 'installation and native-account/recovery acceptance remain open' (candidate-quality-review-20260921.md line 45). The evidence is a README review only."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/foundation-native-20260920.json",
+    "blueprints/us-equities/research-runtime/receipt.json"
+   ],
+   "key": "c13",
+   "name": "Loki",
+   "repository": "https://github.com/grafana/loki",
+   "why_not_default": "Loki is the supporting log store. Its records matched native Claude usage (foundation-native-20260920.json lines 478-484; research-runtime receipt: 51 Loki records for the instance). It is observability, not a worker or supervision runtime, and it is already the default in its own layer. It stores sanitized labels, not full transcripts (agents-operations.json line 1007)."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "docs/dashboard-rendered-acceptance.md"
+   ],
+   "key": "c15",
+   "name": "Grafana",
+   "repository": "https://github.com/grafana/grafana",
+   "why_not_default": "Grafana only visualizes data; it does not retain it. docs/dashboard-rendered-acceptance.md line 29 says 'Claude has no current telemetry series; absence is not zero usage or savings'. It supports the layer rather than satisfying the research-worker requirement."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/foundation-native-20260920.json"
+   ],
+   "key": "c16",
+   "name": "OpenTelemetry Collector contrib",
+   "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+   "why_not_default": "The Collector is the privacy-filtered telemetry path that feeds Prometheus and Loki, observed in foundation-native-20260920.json. It is a necessary supporting component but not a research-worker or supervision runtime. Traces are disabled (agents-operations.json line 882)."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/state-recovery/memory/receipt.json",
+    "blueprints/us-equities/state-recovery/qdrant/receipt.json"
+   ],
+   "key": "c18",
+   "name": "Restic",
+   "repository": "https://github.com/restic/restic",
+   "why_not_default": "Restic covers recoverable state. The ai-memory and Qdrant restores passed on the same host (state-recovery/memory and qdrant receipts: 'passed_same_host_restore' and 'passed_same_host_native_restore'). Research-run state, off-host recovery and worker in-flight recovery are not covered. It is a backup layer, not a worker runtime."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c19",
+   "name": "Temporal",
+   "repository": "https://github.com/temporalio/temporal",
+   "why_not_default": "The catalog names it the preferred escalation for host-loss survival or multi-day approval workflows (agents-operations.json line 326). The evidence is a README review only, start-dev is not production, and activities retry by default. None of Dagu's failure, cancellation or restart tests has been run for it."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c20",
+   "name": "OpenAI Agents SDK",
+   "repository": "https://github.com/openai/openai-agents-python",
+   "why_not_default": "The catalog says 'No provider API call or model comparison performed', tracing is on by default, and the SDK does not inherit the native Codex identity (agents-operations.json lines 1632-1636). That fails the requirement's native-identity criterion as evidenced."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": null,
+   "name": "Inspect AI (not a packet candidate; listed in sota_components_not_in_candidates)",
+   "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+   "why_not_default": "The us-equities catalog makes Inspect AI the default for 'agent-evaluation', as the first choice for a frozen extraction/tool-use acceptance suite (agents-operations.json lines 1282-1320). The evidence is source review of the PyPI page only, and the catalog says 'Eval command would perform model calls; not run here'. It cannot be selected because it is not a packet candidate. The project's own frozen-rubric blind review in research-efficiency/native-receipt.json currently fills the evaluation role."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": null,
+   "name": "MLflow (not a packet candidate)",
+   "repository": "https://github.com/mlflow/mlflow",
+   "why_not_default": "The catalog decision is conditional: use it 'when strategy/feature experiments require a durable registry'. The catalog also says 'No tracking server or experiment recorded by this task' (agents-operations.json lines 1695-1719). The evidence is a README review only."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "evaluation-experiments",
+ "limits": [
+  "I could not run commands, so no receipt, test or validator was re-executed. Every result above is retained historical evidence, not something I observed now.",
+  "I did not fetch the external raw.githubusercontent.com README pins for c5, c6, c10, c11 and c12. My judgments on those candidates rely on the local review docs.",
+  "evidence/artifacts/catalog-quality-review-20260921/sources.json, the state-recovery receipts, dashboard-rendered-acceptance.md and candidate-quality-review.json were read by grep only, not in full.",
+  "The files under tests/ and blueprints/ named in the overturn protocol were confirmed to exist by Glob only. I did not open them.",
+  "The observability/receipt.json and observability/backends/receipt.json files cited in the catalog for c7, c13, c15 and c16 are not in the packet's evidence_refs and were not opened.",
+  "Skill path: the typesafe-ai skill body was preloaded in context from <host-path>/typesafe-ai. No TypeSafe inference results were supplied, and I made no service calls; all dispositions come from my own source review.",
+  "Actual client model is claude-opus-5-5[1m]. The fixed schema value claude-opus-5/high was copied as instructed."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "No executed comparison between candidates exists. The research-efficiency receipt compares focused and full context within each provider only; with two tasks per provider it gives no confidence intervals and no provider ranking.",
+  "The layer's actual evaluation tools (Inspect AI as the agent-evaluation default, promptfoo, MLflow) are not packet candidates. Each has source review only, with no executed eval run or experiment registry.",
+  "Dagu restart keeps completed history but does not prove in-flight resumption (hosting/receipt.json limitations). The pin v2.16.6 is behind upstream v2.17.0, and no scheduling or standing model worker is active.",
+  "Native configured-model checks are not independent per-request provider attestation (workers/receipt.json, paired receipt limitations).",
+  "Codex zero-tools enforcement is requested and audited, not hard MCP prevention. Read-only filesystem mode does not restrict external MCP mutations.",
+  "Provider-side cancellation is not proven, and no run timed out (research-efficiency limitations).",
+  "Restic recovery covers the ai-memory and Qdrant state on the same host only. Research-run state and off-host disaster recovery are unproven.",
+  "Grafana has no current Claude telemetry series (dashboard-rendered-acceptance.md line 29).",
+  "Deep Agents, OpenHands SDK/Canvas and Microsoft Agent Framework have no installation or native-identity run.",
+  "The packet leaves the Claude Code pin as null. docs/foundation-closure-20260921.md line 52 records installed version 2.1.278, and the research-efficiency runtime says the underlying Claude executable was not separately frozen."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "current: native Codex SDK (c1) + native Claude Code CLI (c4) supervised by Dagu (c9)",
+   "Deep Agents (c10) worker on the same frozen tasks",
+   "OpenHands SDK (c12) worker on the same frozen tasks",
+   "DeerFlow (c6) full planner/service lane with enforced read-only",
+   "Temporal (c19) supervising the same research-pair graph (supervision arm only)"
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/research-efficiency/plan.json",
+   "blueprints/us-equities/research-efficiency/experiment.py",
+   "blueprints/us-equities/research-runtime/research-pair.yaml",
+   "blueprints/us-equities/hosting/receipt.json",
+   "tests/test_research_efficiency.py",
+   "tests/test_research_evaluation.py",
+   "tests/test_worker_recovery.py"
+  ],
+  "metric": "Two kinds of metric apply, one per candidate type. Worker candidates: pass rates on the frozen 10-point blind rubric (>=8 overall and >=3/4 required facts), a separate word/citation protocol pass, and complete native usage including failed attempts, with native identity and zero exposed broker tools. Supervisor candidates: outcomes of the failure fixture, cancellation fixture, restart-history preservation and in-flight recovery. Comparisons are matched within a provider; no general token-savings claim."
+ },
+ "overturn_when": "The verdict changes if a challenger passes an executed comparison under the same conditions. The challenger would be Deep Agents (c10), the OpenHands SDK (c12), DeerFlow (c6) as a full planner/service, or Temporal (c19) as supervisor. The comparison would reuse the frozen task and rubric in blueprints/us-equities/research-efficiency/plan.json and the checks in tests/test_research_efficiency.py, tests/test_research_evaluation.py and tests/test_worker_recovery.py. To overturn, the challenger must reach semantic and protocol pass rates at least equal to the retained 8/8 and 6/8, with complete usage including failed attempts, native account identity and zero broker tools. For a supervisor challenger, it must also match or exceed Dagu's failure, cancellation and restart-history results in blueprints/us-equities/hosting/receipt.json, and it must add in-flight recovery. Separately, a native Inspect AI run of the frozen suite that finds errors the project rubric missed would change how this layer is evaluated.",
+ "packet_sha256": "90913e4315906b77b3374eb76d51765be15e3aaab933f05d3e33d407939feb75",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/us-equities__evaluation-experiments.json",
+  "catalogs/us-equities/agents-operations.json (lines 1-445, 854-1023, 1282-1320, 1605-1780)",
+  "blueprints/us-equities/workers/receipt.json",
+  "adoption/paired/receipt.json",
+  "blueprints/us-equities/research-efficiency/native-receipt.json",
+  "blueprints/us-equities/deerflow/research-receipt.json",
+  "blueprints/us-equities/deerflow/native-receipt.json",
+  "blueprints/us-equities/research-runtime/receipt.json",
+  "blueprints/us-equities/hosting/receipt.json",
+  "evidence/receipts/foundation-native-20260920.json (grep of id/claim/status; lines 455-514)",
+  "docs/foundation-closure-20260921.md (lines 1-70)",
+  "docs/candidate-quality-review-20260921.md (lines 30-122)",
+  "catalogs/landscape/candidate-quality-review.json (grep for OpenHands/deepagents/agent-framework)",
+  "evidence/artifacts/catalog-quality-review-20260921/sources.json (grep count only: 28 matches)",
+  "docs/dashboard-rendered-acceptance.md (grep: lines 4, 29, 80, 84)",
+  "blueprints/us-equities/state-recovery/memory/receipt.json (grep: kind/claim/status)",
+  "blueprints/us-equities/state-recovery/qdrant/receipt.json (grep: kind/claim/status)"
+ ],
+ "why_selected": "This verdict comes from my own review of the retained receipts. The packet withholds the provider decision and rationale fields, so none were carried over. What the receipts show, by candidate:\n\n(1) Codex (c1), native execution. In blueprints/us-equities/workers/receipt.json, one native Codex SDK research task completed with configured model gpt-6-astra. It used 135311 total tokens and ran for 58410 ms, with no broker keys. The receipt keeps its failures: the ctx_execute_file tool failed (lines 76-78), and two follow-up scope attempts also failed and keep their usage (lines 132-206). All three turns total 204091 tokens (line 215).\n\n(2) Claude Code (c4), native execution. In adoption/paired/receipt.json, a Dagu-run LEAN->DuckDB->Astra->Claude pair completed. Both reports passed the citation, value, unit and scope checks. Claude ran with 0 exposed tools, and the Astra report was bound into Claude's prompt by hash. Combined native-worker usage was 37069 tokens, and trading_authorized was false.\n\n(3) Codex and Claude together, measured within each provider. blueprints/us-equities/research-efficiency/native-receipt.json has 8 native invocations graded blind against a frozen rubric. All 8 passed the semantic check; 6 passed the word protocol. The two Claude full-context answers failed the word limit (327 and 260 words), and both failures are retained. This compares focused against full context for each provider. It does not compare the candidates with each other.\n\n(4) Dagu (c9), native execution of supervision. blueprints/us-equities/hosting/receipt.json records a failure fixture (step exit 23, then failed, with the dependent step aborted) and a cancellation fixture (aborted). After a service restart, completed history was kept, and anonymous access returned 401 while authenticated access returned 200. The receipt records model_calls 0 and broker_calls 0. blueprints/us-equities/research-runtime/receipt.json shows the Dagu packet and order_table steps succeeded. Claude's native usage matched Prometheus and Loki exactly (native_usage_equals_prometheus_and_loki true), and the receipt retains its failures.\n\nTogether these three cover native identity, complete returned results, process supervision, retained failed attempts and the no-broker boundary.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "blueprints/us-equities/workers/receipt.json",
+  "adoption/paired/receipt.json",
+  "blueprints/us-equities/research-efficiency/native-receipt.json",
+  "blueprints/us-equities/hosting/receipt.json",
+  "blueprints/us-equities/research-runtime/receipt.json",
+  "catalogs/us-equities/agents-operations.json"
+ ],
+ "winner_keys": [
+  "c1",
+  "c4",
+  "c9"
+ ]
+}

@@ -24,8 +24,10 @@ remains prerelease: 2.0.0 final has not shipped, and the SPY/LEAN parity gate
 records a completed **BLOCKED** replay of the historical one_zero case with four
 failed checks on the unsupported `distributions_and_cash` and
 `market_on_open_proxy` mappings; a completed blocked comparison is not parity
-acceptance and the per-check total is not retained here. The dividend
-`SimulationModule` needed to close it is owned by the separate parity worktree.
+acceptance. The verdict and its 29 checks are on main under
+`blueprints/us-equities/engine-nautilus/spy-parity/`; closing the gate needs an
+engine-native market-on-open and dividend-cash mechanism or a newly
+preregistered mapping manifest (gate `dividend-sim-module`).
 The current target also records bounded AAPL replay and Alpaca paper evidence;
 neither establishes SPY parity, a strategy edge or complete broker recovery.
 
@@ -55,7 +57,7 @@ current runtime target above for the selected engine.
 | `lean` | `985ef30` | Default | Frozen historical comparator (oracle), not the runtime; SPY/LEAN parity gate G-a is planned/blocked. |
 | `lean-alpaca` | `1973f61` | Default | Official broker adapter; source/build recipe, no accepted paper session. |
 | `alpaca-py` | 0.44.0 | Default | Official SDK for read-only broker-state observation and market-data interfaces. |
-| `nautilustrader` | `2.0.0rc5` (tag `v2.0.0rc5`; source `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`) | Default | Selected destination runtime (runtime-target.json). Prerelease; SPY/LEAN parity gate G-a completed BLOCKED (four failed checks on the two unsupported mappings; not parity acceptance; per-check total not retained here). Historical `1.231.0` source review below is superseded. |
+| `nautilustrader` | `2.0.0rc5` (tag `v2.0.0rc5`; source `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`) | Default | Selected destination runtime (runtime-target.json). Prerelease; SPY/LEAN parity gate G-a completed BLOCKED (four failed checks on the two unsupported mappings; not parity acceptance; per-check verdict retained under `blueprints/us-equities/engine-nautilus/spy-parity/`). Historical `1.231.0` source review below is superseded. |
 | `nautilus-ibkr-adapter` | same pin as `nautilustrader` | Default | Native IBKR socket adapter; `local_broker_acceptance` `not_established` (runtime-target.json). |
 | `adaptive-paper-alpaca-adapter` | `7e7eefe28315f3de3aa4dc75cc8b6524f70829cb` (`blueprints/us-equities/adaptive-paper`) | Default | Custom deterministic Alpaca adapter for the adaptive-paper lane; source_review with the synthetic capacity fixture cited (180 fills / 90 round trips in 60.4282s, zero broker connections); no live broker fills claimed. |
 | `lumibot` | 4.5.91 | Alternative | Direct Python strategy lifecycle and Alpaca broker; unresolved GPL/MIT license metadata conflict. |

@@ -1,0 +1,235 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c1",
+   "name": "Massive Python client",
+   "repository": "https://github.com/massive-com/client-python",
+   "why_not_default": "The evidence is source review only. The data-research.json data-massive entry has decision 'conditional' and a native_workflow marked 'Prospective and UNEXECUTED'. There is no acquisition, entitlement or comparison receipt, and the repository has no Massive collector. The catalog notes that aggregate adjustment covers splits but not dividends. The packet's second evidence_ref, catalogs/us-equities/simulation-data-review.json, contains no Massive entry."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c2",
+   "name": "Databento",
+   "repository": "https://github.com/databento/databento-python",
+   "why_not_default": "The evidence is source review only. The data-databento entry has decision 'conditional' and an UNEXECUTED workflow that may be billable. It is potentially stronger for licensed exchange-level history, point-in-time reference data and ts_event/ts_recv. However, there is no acquisition receipt, cost measurement, coverage comparison or collector in the repository. The exchange-specific feed is not consolidated US coverage, and corporate-action redistribution is restricted. simulation-data-review.json contains no Databento entry."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/data/receipt.json",
+    "blueprints/us-equities/data/summarize_backtest.py",
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c3",
+   "name": "exchange_calendars",
+   "repository": "https://github.com/gerrymanoim/exchange_calendars",
+   "why_not_default": "It has native evidence but is a complementary session-boundary dependency, not an acquisition or snapshot component. blueprints/us-equities/data/receipt.json records one XNYS session (2013-10-07, 13:30-20:00 UTC) via summarize_backtest.py. The catalog limitation says this does not cover every holiday, future schedule, venue, extended-hours session or halt. Retain it as the calendar companion."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c7",
+   "name": "QuestDB",
+   "repository": "https://github.com/questdb/questdb",
+   "why_not_default": "The evidence is source review only. No server was installed or started. The catalog adopts it conditionally, for sustained tick ingestion after embedded files fail measured needs, but no throughput or concurrency measurement exists. Dedup/upsert can overwrite corrections unless a raw immutable ledger is kept."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "synthetic",
+   "evidence_refs": [
+    "blueprints/us-equities/nanosecond-replay/receipt.json",
+    "blueprints/us-equities/nanosecond-replay/replay.py"
+   ],
+   "key": "c8",
+   "name": "pandas exact timestamp support",
+   "repository": "https://github.com/pandas-dev/pandas",
+   "why_not_default": "pandas 3.0.6 ran natively only as the timestamp parser (replay.py utc_ns, lines 30-41) in front of DuckDB, on synthetic clocks and symbols. The receipt states market_data_adapter_accepted false. It adds no independent acquisition or snapshot capability."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c10",
+   "name": "Polars",
+   "repository": "https://github.com/pola-rs/polars",
+   "why_not_default": "The evidence is source review only. The catalog lists Polars as an alternative to the SQL path and warns against duplicating a full SQL pipeline. There is no native receipt, and Polars supplies no data, corporate actions or point-in-time contract."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c13",
+   "name": "ClickHouse",
+   "repository": "https://github.com/clickhouse/clickhouse",
+   "why_not_default": "The evidence is source review only. The command is prospective, and there is no server, throughput or reliability evidence. Background merges and deduplication are not an immutable revision ledger. The pin v26.8.7.19-lts is behind upstream v26.9.2.8-stable (packet pin_behind_upstream true)."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c15",
+   "name": "lakeFS",
+   "repository": "https://github.com/treeverse/lakefs",
+   "why_not_default": "The evidence is source review only. The catalog decision is 'alternative', aimed at concurrent teams that need atomic lake branches, and the quickstart is unexecuted. Commits do not make external databases part of an atomic snapshot, and garbage collection can remove historical artifacts."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c16",
+   "name": "OpenBB",
+   "repository": "https://github.com/openbb-finance/openbb",
+   "why_not_default": "The evidence is source review only; the workflow imports the router but makes no data request. Provider-normalized output does not normalize adjustment, time-of-availability or survivorship semantics. OpenBB is AGPL-3.0, and each provider's terms are separate."
+  },
+  {
+   "disposition": "out_of_scope",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c4",
+   "name": "yfinance",
+   "repository": "https://github.com/ranaroussi/yfinance",
+   "why_not_default": "Not adopted. The catalog decision is 'excluded' because the data is for personal use and consists of present-day adjusted history and current tickers, so it cannot support point-in-time research."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json",
+    "catalogs/us-equities/simulation-data-review.json"
+   ],
+   "key": "c5",
+   "name": "sec-edgar-downloader",
+   "repository": "https://github.com/jadchaar/sec-edgar-downloader",
+   "why_not_default": "Not adopted. The catalog decision is 'alternative', a raw-only collector, and simulation-data-review.json records 'defer_redundant_downloader'. EdgarTools has a native get_filings receipt for the same SEC scope."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c11",
+   "name": "Pandera",
+   "repository": "https://github.com/unionai-oss/pandera",
+   "why_not_default": "Not adopted in this layer; it is the default in the data-quality layer. It is a schema-contract complement whose workflow is unexecuted and uses synthetic keys. Schema validation does not establish completeness, corporate actions or absence of leakage."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c12",
+   "name": "DVC",
+   "repository": "https://github.com/treeverse/dvc",
+   "why_not_default": "Not adopted in this layer; it is the default for data versioning. Its workflow is unexecuted. Content hashes prove identity, not validity or point-in-time correctness, and the winners' receipts already pin their artifacts by sha256."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "market-data-reference",
+ "limits": [
+  "All dispositions come from my own review of the retained receipts and code. The coordinator supplied no TypeSafe inference results, and no service calls were made. Skill path: <host-path>/typesafe-ai (loaded as the invoked skill body). Actual client model: claude-opus-5-5[1m]; the fixed schema value claude-opus-5 was copied as instructed.",
+  "Refuter findings were treated as data and checked against the original sources. Both blocking findings (c6 attribution; compare.py being Alpaca/AAPL-only) and the major finding (DuckDB vs replay.py rejections) were confirmed in the files and corrected. The minor findings were also confirmed and addressed.",
+  "No commands could be run. compare.py, replay.py, collect.py, catalyst.py and native_edgar.py were read (or, for native_edgar.py, referenced from the receipt) but not executed. native_edgar.py was not opened; its existence is inferred only from the command recorded in access-resolution.json line 35.",
+  "catalogs/us-equities/simulation-data-review.json is listed as evidence for c1 and c2 but contains no Massive or Databento entry.",
+  "Private run artifacts (raw payloads and private receipts) are referenced only by hash and were not inspected.",
+  "replay.py lines after 150 and temporal_snapshot.py were not read. The lifecycle-sample receipt was read only for lines 1-40 plus grep matches."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "The Alpaca acquisition covers one retrospective AAPL sample: 25 daily bars and 2 actions. There is no survivorship-free universe, delisting completeness, intraday data or real-time entitlement.",
+  "Corporate-action reconciliation is incomplete. 1 of 2 actions has an unknown dividend currency, and original historical availability is not_established.",
+  "No executed cross-provider comparison exists. The existing compare.py and collect.py are hard-wired to Alpaca/AAPL, and there is no Massive or Databento collector, so the challenger arms are not runnable yet.",
+  "The catalog entry for data-alpaca-py (catalogs/us-equities/data-research.json lines 22 and 38) still says evidence_level source_review and 'No account, entitlement, data request or order was exercised'. The later native receipt (2026-09-20) supersedes it, but the catalog has not been reconciled.",
+  "The nanosecond replay is synthetic (market_data_adapter_accepted false). The fail-closed rejections are repository contract code (replay.py and temporal_snapshot.py), not DuckDB capabilities. DuckDB has no acceptance for ingesting a real feed.",
+  "The EdgarTools-native evidence is limited to the get_filings index acquisition (371 rows, 360 unique accessions, 5 context rows) and the offline lifecycle parsing. The header acquisition and the unknown-availability rejection were produced by the stdlib-only catalyst.py. Historical as-known availability remains unestablished.",
+  "The lifecycle sample has three hand-selected cases. There is no permanent identity crosswalk, and the timezone of the SEC acceptance timestamps is unknown.",
+  "exchange_calendars is confirmed for one XNYS session only.",
+  "No measured throughput or concurrency evidence exists to decide between embedded DuckDB and a server (QuestDB or ClickHouse)."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "c9 alpaca-py 0.44.0 via compare.py (current native baseline; the only arm runnable today)",
+   "c1 Massive client v2.8.0 (requires a new collector and a generalized comparator; neither exists)",
+   "c2 Databento v0.86.0 (requires a new collector and a generalized comparator; neither exists)",
+   "c14 DuckDB 1.5.5 embedded snapshot via replay.py vs c7 QuestDB 10.0.1 / c13 ClickHouse server, only after a measured throughput need"
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/authenticated-data/plan.json",
+   "blueprints/us-equities/authenticated-data/compare.py",
+   "blueprints/us-equities/alpaca-historical/collect.py",
+   "blueprints/us-equities/nanosecond-replay/fixture.json",
+   "blueprints/us-equities/nanosecond-replay/replay.py",
+   "blueprints/us-equities/point-in-time/temporal_snapshot.py",
+   "blueprints/us-equities/catalyst-provenance/catalyst.py",
+   "blueprints/us-equities/lifecycle-sample/plan.json"
+  ],
+  "metric": "Bars: equal, different, missing and extra closes per session. Corporate actions: equal, numeric_values_equal and unknown_currency counts. Whether original historical availability is established. Rejection of unknown-availability rows at the historical cutoff. Delisting and ticker-reuse identity coverage. Measured request cost. Snapshot replay identity (sha256) and rejection exit codes. SEC index row and accession counts."
+ },
+ "overturn_when": "Acquisition (c9): the repository currently has no runnable challenger arm. blueprints/us-equities/authenticated-data/compare.py reproduces only the c9 baseline. It loads alpaca-historical/collect.py (lines 15-20), verifies an Alpaca receipt (line 111) and rejects any symbol other than AAPL or any reference that is not exactly 25 sessions (lines 39-40 and 47-48). collect.py validate_plan also requires AAPL/sip/raw, alpaca_py_version 0.44.0 and data.alpaca.markets URLs (lines 125-143). The verdict should change only after an executed comparison meets all of the following:\n- It uses a new provider-specific collector for Massive (c1) or Databento (c2). No such file exists yet.\n- It uses a comparator generalized beyond Alpaca/AAPL.\n- It runs against the same frozen blueprints/us-equities/authenticated-data/plan.json AAPL 2020-08-03..2020-09-04 contract plus representative delisted, ticker-reused (META) and dividend or split names.\n- It shows the challenger reaching full corporate-action reconciliation (currency included) and auditable original historical availability where alpaca-py leaves them not_established, at acceptable measured request cost.\nUntil then, python3 blueprints/us-equities/authenticated-data/compare.py --run <run> --receipt-sha256 <sha> --lean <lean results> --lean-sha256 <sha> is the baseline check. The verdict should also be reopened if that baseline no longer reproduces 25/25 equal bars.\n\nSnapshot store (c14): overturn if python3 blueprints/us-equities/nanosecond-replay/replay.py run on blueprints/us-equities/nanosecond-replay/fixture.json fails to reproduce the recorded selections and rejections. Also overturn if a measured throughput or concurrency test justifies a server (QuestDB c7 or ClickHouse c13).\n\nSEC reference (c6): overturn if a native get_filings rerun through blueprints/us-equities/catalyst-provenance/native_edgar.py fails to reproduce the 371 rows and 360 unique accessions for the same day.",
+ "packet_sha256": "da5224ff1a0c692d41942281d1cdd2a0a50abff30337d6ac034ac4df9a58b2fe",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/us-equities__market-data-reference.json (lines 1-60 plus grep for requirement, evidence_refs and keys)",
+  "catalogs/us-equities/data-research.json (lines 1-560, 690-779 and 988-1147 in round 1; lines 14-41 re-read in revision)",
+  "catalogs/us-equities/simulation-data-review.json (grep for massive/databento: no matches)",
+  "blueprints/us-equities/data/receipt.json",
+  "blueprints/us-equities/data/summarize_backtest.py (lines 1-22)",
+  "blueprints/us-equities/authenticated-data/native-receipt.json",
+  "blueprints/us-equities/authenticated-data/compare.py (full)",
+  "blueprints/us-equities/alpaca-historical/collect.py (lines 120-144)",
+  "blueprints/us-equities/nanosecond-replay/receipt.json",
+  "blueprints/us-equities/nanosecond-replay/replay.py (lines 1-150)",
+  "blueprints/us-equities/catalyst-provenance/access-resolution.json (full)",
+  "blueprints/us-equities/catalyst-provenance/catalyst.py (lines 1-15)",
+  "blueprints/us-equities/lifecycle-sample/native-receipt.json (lines 1-40 plus grep)",
+  "catalogs/us-equities/runtime-target.json (lines 66-105 plus grep)",
+  "Glob listings of blueprints/us-equities/{authenticated-data,nanosecond-replay,point-in-time,alpaca-historical,lifecycle-sample}/"
+ ],
+ "why_selected": "Among the adopted candidates, these three have retained receipts showing native execution of the acquisition, snapshot-storage and SEC reference steps that the requirement asks for. Adopted c3 exchange_calendars and c8 pandas also have native receipts, but they cover a session-calendar step and a parse step only (see alternatives). In each case the requirement's rejection and fail-closed behaviour comes from repository code running on top of these packages, not from the packages themselves.\n\n(1) c9 alpaca-py 0.44.0 acquired licensed, source-identifiable observations and corporate actions. blueprints/us-equities/authenticated-data/native-receipt.json records native_cli_e2e 'native-alpaca-historical-20260920': 25 AAPL SIP/raw daily bars (3 pages) and 2 corporate actions (2 pages), with 5 HTTP 200 pages, observed terminal pagination and hash-anchored private artifacts. The bars matched the frozen LEAN probe 25/25 (maximum_absolute_close_difference \"0.00\"). The actions show numeric_values_equal 2 and unknown_currency 1, with status reconciliation_incomplete and original_historical_availability not_established. The comparison ran through the repository's compare.py, which is hard-wired to Alpaca and AAPL. catalogs/us-equities/runtime-target.json selects alpaca-py 0.44.0 for ingestion.\n\n(2) c14 DuckDB 1.5.5 supplied the BIGINT/Parquet storage and reads for exact analytical snapshots. blueprints/us-equities/nanosecond-replay/receipt.json covers a SYNTHETIC fixture run natively through pandas 3.0.6 and DuckDB. It shows exact nanosecond cutoff selection and an identical early replay. The precision, overflow, overwrite and hash-mismatch rejections (exit_code 2) are enforced by the custom replay.py and point-in-time/temporal_snapshot.py contract (PIT.require and manifest checks), not by DuckDB (replay.py lines 30-41 and 115-137; DuckDB is used at lines 84-112 and 140-150). blueprints/us-equities/data/receipt.json records the Parquet sha256 of 6 LEAN simulation events on XNYS 2013-10-07. That receipt does not name DuckDB; the DuckDB use is visible only in blueprints/us-equities/data/summarize_backtest.py (lines 2, 8 and 19). blueprints/us-equities/lifecycle-sample/native-receipt.json lists duckdb 1.5.5 in its runtime, preserving source anchors and exact observation cutoffs over 6 HTTP 200 public documents through custom adapters.\n\n(3) c6 EdgarTools 5.58.0 is the only adopted candidate with native SEC reference acquisition. blueprints/us-equities/catalyst-provenance/access-resolution.json native_upstream (lines 31-56) records get_filings with exit_code 0, http_status 200, cohort_rows 371, unique_accessions 360 and selected_context_rows 5. It names the original source URL and the complete compressed source sha256. The lifecycle-sample receipt records EdgarTools 5.58.0 in the offline processing that supports the ordered META ticker-reuse documentary evidence. EdgarTools did not produce the header acquisition or the unknown-availability rejection. The 5 headers came from the stdlib-only catalyst.py adapter (lines 57-65; its imports at lines 3-13 contain no edgar import). The historical packet (eligible_count 0, 5 before_first_availability at 2020-03-03) and the observed packet (5 qualified) also came from catalyst.py. The receipt itself says the provenance bridge is custom repository code (line 15). That rejection is therefore repository behaviour running over SEC data.\n\nNo candidate has an executed, measured comparison against another candidate. The selection rests on native receipts versus source review only.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "blueprints/us-equities/authenticated-data/native-receipt.json",
+  "blueprints/us-equities/authenticated-data/compare.py",
+  "catalogs/us-equities/runtime-target.json",
+  "blueprints/us-equities/nanosecond-replay/receipt.json",
+  "blueprints/us-equities/nanosecond-replay/replay.py",
+  "blueprints/us-equities/data/receipt.json",
+  "blueprints/us-equities/data/summarize_backtest.py",
+  "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+  "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+ ],
+ "winner_keys": [
+  "c9",
+  "c14",
+  "c6"
+ ]
+}

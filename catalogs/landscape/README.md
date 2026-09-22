@@ -73,9 +73,13 @@ unchanged):
 - `verdict_status` -- one of `pending_lanes` (no lane has run; `winners` and
   `alternatives` may be empty), `recorded` (a lane selected a winner: needs
   at least one winner and one alternative, a `why_selected` distinct from
-  every alternative's `why_not_default`, and an `overturn_when` naming a
-  fixture/blueprint/test path or a runnable command) or `no_selection` (no
+  every alternative's `why_not_default`, and a `verdict_overturn_when` naming
+  a fixture/blueprint/test path or a runnable command) or `no_selection` (no
   qualified candidate yet: needs a nonempty `open_gaps`).
+- `verdict_overturn_when` -- the recorded verdict's own overturn condition
+  (text; empty or absent unless recorded). The v1 `overturn_when` stays the
+  dated review's condition, which the quality comparison mirrors, and is never
+  rewritten by a lane.
 - `winners[]` -- `{component_id, repository (https URL or null), pin,
   evidence_class, why_selected, evidence_refs[], recipe_ref, platform_status}`.
   `pin` must equal the [sota manifest](../sota-convergence/manifest-20260922.json)
@@ -96,10 +100,13 @@ unchanged):
   `evidence/artifacts/layer-verdicts-20260922/<lane>/<run_id>.json`.
 - `open_gaps[]`, `checked_at` (per-row date).
 
-Every row currently migrated from the September 2026 v1 review is
-`verdict_status: "pending_lanes"` with empty `winners`/`alternatives`/
-`open_gaps` -- this migration selects no winner and runs no lane; it only adds
-the v2 fields so a future lane run has somewhere to record its result.
+The v2 migration from the September 2026 v1 review set every row to
+`verdict_status: "pending_lanes"` with empty `winners`/`alternatives`/`open_gaps`;
+it selected no winner and ran no lane. On 2026-09-22 the Claude lane recorded all
+32 rows (PR-5). Every row carries `lanes.agreement: "codex_absent"` because the
+Codex lane could not run (account usage limit until 2026-09-28); four trading rows
+record in `open_gaps` that their packet carried the group's candidates instead of
+the layer's own tools (see the handbook's "Limits of the September 22 verdicts").
 [`tools/sota-convergence/build_verdicts.py`](../../tools/sota-convergence/README.md)
 joins these rows with the sota manifest and `adoption/manifest.json` into
 [`catalogs/sota-convergence/layer-verdicts-20260922.json`](../sota-convergence/layer-verdicts-20260922.json)

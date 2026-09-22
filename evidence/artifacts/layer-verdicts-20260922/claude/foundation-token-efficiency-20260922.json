@@ -1,0 +1,134 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "docs/token-native-saturation.md",
+    "docs/token-practice.md",
+    "docs/full-stack-convergence.md",
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c3",
+   "name": "Context Mode",
+   "repository": "https://github.com/mksglu/context-mode",
+   "why_not_default": "Context Mode overlaps RTK in the in-layer decision selected-context-processing, where it is only 'conditional' (catalogs/foundation/decisions.json lines 1140-1153). The evidence on this requirement is weak. Its lifecycle row accepts use and restart only, with no recovery stage and 0 retained artifact pairs (docs/token-native-saturation.md line 73). The only paired native trials have opposite signs: Codex went from 135,217 to 119,998 tokens (11.26% fewer), while Claude went from 292,561 to 368,121 (25.83% more), with uncontrolled cache and plugin availability (docs/token-practice.md lines 83-92). The six-attempt selective-policy pilot made zero Context Mode calls (decisions.json line 1163). Its counter text mixes retained-history and conversation scopes (docs/full-stack-convergence.md lines 140-141), so it does not meet the measurement part. On the positive side, both native clients passed a Context Mode/jCodeMunch task with six successful MCP calls (token-native-saturation.md line 18). Its 'default' status belongs to native-process-defaults, which is scoped to the native-clients and instructions-skills layers (decisions.json lines 163-171), not to this layer."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "scripts/native_token_ci.py",
+    "docs/token-practice.md",
+    "catalogs/us-equities/foundation-memory.json",
+    "docs/token-native-saturation.md",
+    "docs/full-stack-convergence.md"
+   ],
+   "key": "c7",
+   "name": "Repomix",
+   "repository": "https://github.com/yamadashy/repomix",
+   "why_not_default": "Repomix handles selected-file handoff. The clean-CI fixture packs exact selected originals and checks their fidelity ('repomix-source-fidelity-and-selection'). The separate --compress output is structural only (scripts/native_token_ci.py lines 271-294). Its one artifact pair is 3,697 -> 663 tokens, recorded as a 'Lossy outline versus complete pack' (docs/token-practice.md line 112). Its limitation reads 'Compression omits implementation detail and is not adequate evidence for correctness' (catalogs/us-equities/foundation-memory.json line 323). Its lifecycle row accepts the use stage only (docs/token-native-saturation.md line 107). The reviewed snapshot is v1.18.0 at commit 6c5ead0d (foundation-memory.json lines 302-303), while the pin is 1.18.1, whose selected upstream subset passed 148 cases (docs/full-stack-convergence.md lines 124-130). The packet gives its review_status as not_individually_reviewed. It is narrower than RTK or Headroom for general task context."
+  },
+  {
+   "disposition": "measured_tradeoff",
+   "evidence_class": "measured_comparison",
+   "evidence_refs": [
+    "docs/token-practice.md",
+    "docs/full-stack-convergence.md",
+    "scripts/native_token_ci.py"
+   ],
+   "key": "c6",
+   "name": "TOON",
+   "repository": "https://github.com/toon-format/toon",
+   "why_not_default": "The packet marks TOON as not adopted, although docs/full-stack-convergence.md line 56 lists 'measured TOON' as layer practice. That conflict is for upstream resolution; I follow the packet. The measured counterexample covers the full catalog of 502 identities. Exact o200k_base counts rose from 59,792 compact-JSON tokens to 66,815 TOON tokens (7,023 more), so the guard kept compact JSON. The native tokenx heuristic had instead reported 13,137 fewer tokens (docs/token-practice.md lines 129-142). One smaller artifact did shrink, from 1,664 to 1,307 (line 108). The CI strict decode round trip passes (scripts/native_token_ci.py lines 297-310). TOON is only useful case by case, per artifact."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c2",
+   "name": "Claude Token Efficient",
+   "repository": "https://github.com/drona23/claude-token-efficient",
+   "why_not_default": "Not adopted. The only review read the README and license (review_depth readme_license_overview) at commit 0d30a6db. It classified the repository as overlaps_established: a short instruction file for reduced verbosity, whose recurring instruction tokens and upstream-only benchmarks prevent a savings claim. There was no installation, inference or native acceptance (catalogs/us-equities/star-audit.json lines 4506-4526). It does not address recoverable originals or separated measurement."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "token-efficiency",
+ "limits": [
+  "Skill: typesafe-ai, preloaded from <host-path>/SKILL.md. No TypeSafe inference results were supplied, so every disposition here is my own source review, not a retained provider judgment.",
+  "The client reports the actual model as claude-opus-5-5[1m]. The required model field is copied as claude-opus-5/high.",
+  "I could not run commands. The CI result (41 commands, 14 checks), the upstream subset counts (34/148/7) and the pinned versions are documented as done, not observed now. I reviewed the RTK fixture logic in source; I did not execute it.",
+  "I did not open the underlying receipts (evidence/receipts/*.json, including native-headroom-mcp-20260920.json, native-token-clean-prefix-20260920.json, token-practice-gap-followup-20260920.json and token-practice-native-pairs-20260920.json). The numbers come from the docs that summarize them.",
+  "I did not read the contents of blueprints/token-native-focus/saturation-audit.json, recipes/README.md or recipes/native-upgrades-20260921.md.",
+  "Corrections from the refuters, now applied. (1) The test_native_token_ci.py unit test stubs rtk_fixture, so the RTK overturn check is now the script run. (2) The winner evidence class is lowered from native_proven to local_integration. (3) The ccusage 34-case mapping is stated. (4) The native-process-defaults layer scope is noted. (5) The unsupported claim that Repomix has no recovery is dropped: its CI packs exact originals. (6) The saturation-audit lifecycle matrix is removed from the fixture paths.",
+  "The docs/full-stack-convergence.md line 56 layer row ('RTK, Context Mode, guarded Headroom, measured TOON') was visible, so this verdict is not fully blind to the project's choice. It departs from that row by replacing Context Mode with ccusage, based on in-layer evidence."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "No matched baseline exists for the current native tasks. The only paired trials are one fixed-order pair per client, with opposite signs (Codex -11.26%, Claude +25.83%) (docs/token-practice.md lines 83-92).",
+  "Exact whole-PC lifetime provider savings are unmeasured for every candidate (docs/full-stack-convergence.md lines 147-150).",
+  "Headroom recovery is established on owned synthetic MCP fixtures only. Automatic interception of agent traffic is not configured (catalogs/foundation/decisions.json lines 1214-1217). The pin is 0.37.0 while upstream is v0.38.0 (packet candidate c5, pin_behind_upstream true). I found no retained record that qualifies 0.38.0.",
+  "The repository has no runnable regression fixture for Headroom or Context Mode. The clean CI covers only rtk, qmd, repomix and toon (scripts/native_token_ci.py lines 328-329).",
+  "ccusage child/attempt coverage is unresolved (decisions.json line 1336). Its evidence covers offline parsing and one scoped session, with the use stage only and 0 retained pairs (docs/token-native-saturation.md line 66).",
+  "The foundation gateway RTK/lite previews failed required semantic checks. General CLI acceptance does not repair those failures (decisions.json line 1166).",
+  "RTK's only native artifact pair is one fixed six-commit Git log. Its lifecycle row accepts the use stage only (token-native-saturation.md line 109).",
+  "jCodeMunch and QMD are SOTA components outside this candidate set and were not ranked here.",
+  "Activation on a new host (another WSL or macOS PC) is not established for any winner."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "cheapest adequate native baseline (focused direct read / raw command output)",
+   "RTK (c4)",
+   "Headroom guarded (c5)",
+   "Context Mode (c3)",
+   "Repomix (c7)",
+   "TOON (c6)"
+  ],
+  "fixture_paths": [
+   "fixtures/records.json",
+   "fixtures/before.py",
+   "fixtures/after.py",
+   "fixtures/rag-note.md"
+  ],
+  "metric": "Pass/fail on required-fact preservation and exact raw-original recovery, plus complete provider usage including all attempts and child workers, read through native accounting or ccusage without summing overlapping scopes. Report these separately from artifact o200k_base token counts. The existing runnable part is `python3 scripts/native_token_ci.py --install --output <new directory>`, which covers RTK, QMD, Repomix and TOON only. Headroom and Context Mode arms still need a new fixture and runner."
+ },
+ "overturn_when": "Three checks would change this verdict.\n\n(1) For RTK: `python3 scripts/native_token_ci.py --install --output <new directory>` reports status failed for the rtk component on pin 0.49.0. For example, 'rtk-proxy-exact-stdout' or 'rtk-preserves-both-commit-subjects' fails. The script is at scripts/native_token_ci.py lines 211-235 and 313-361. tests/test_native_token_ci.py stubs rtk_fixture, so it cannot detect this.\n\n(2) For Headroom and ccusage: a new fixture under fixtures/ plus a python3 runner, which does not exist yet. It would need to show a Headroom 0.37.0 or 0.38.0 exact-original recovery failure, or ccusage 20.0.24 mixing counter scopes, or ccusage failing to parse child or attempt usage.\n\n(3) For the whole set: a frozen matched-task comparison, repeated with controlled cache warmth and plugin availability. It would need to show that Context Mode, Repomix or TOON preserves the required facts and raw-original recovery while using less complete provider usage, all attempts and child workers included, than the winning arm on the same task. No repository fixture holds that comparison. It must be built and executed before it can overturn anything.",
+ "packet_sha256": "5125413f0b1b13c2e5957ba874f2c441d503dd9aeb5507042d1396a93fa05a92",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__token-efficiency.json (full)",
+  "catalogs/foundation/decisions.json (lines 160-229 prior round; 1140-1354 this round; 1471-1539 prior round)",
+  "docs/token-native-saturation.md (full)",
+  "docs/token-practice.md (lines 80-239; ccusage grep at lines 291-295)",
+  "docs/full-stack-convergence.md (lines 28-152)",
+  "catalogs/us-equities/star-audit.json (lines 4504-4527)",
+  "catalogs/us-equities/foundation-memory.json (lines 298-327)",
+  "scripts/native_token_ci.py (lines 205-366; argparse/main grep)",
+  "tests/test_native_token_ci.py (lines 1-40 prior round)",
+  "tests/test_sota_convergence.py (lines 1600-1639)",
+  "tests/test_ecosystem_manifest.py (lines 90-114)",
+  "<host-path>/fixtures (existence of records.json, before.py, after.py, rag-note.md via glob)",
+  "evidence/receipts/native-headroom-mcp-20260920.json (existence via glob only)"
+ ],
+ "why_selected": "This verdict comes from my own review of the retained sources. No TypeSafe inference results were supplied. The requirement has three parts: supply useful task context, keep originals recoverable, and measure artifact reductions separately from provider usage. In this revision, ccusage replaces Context Mode because it is the only adopted candidate that covers the measurement part. I no longer use the 'default' selection in native-process-defaults as support. That decision is scoped to the native-clients and instructions-skills layers (catalogs/foundation/decisions.json lines 163-171). Inside token-efficiency, every decision is 'conditional' (lines 1144-1147, 1199-1202, 1313-1317).\n\nRTK (c4) supplies context and recovers originals. I reviewed the clean-CI fixture source (scripts/native_token_ci.py lines 211-235). It checks that both commit subjects survive compaction, and that `rtk proxy git log -2` stdout is identical to the raw `git log -2` output (check 'rtk-proxy-exact-stdout'). A retained record says the hosted clean install ran 41 native commands and 14 checks on local fixtures (docs/full-stack-convergence.md lines 132-137). There is one exact artifact pair, a Git log going from 537 to 178 o200k_base tokens (docs/token-practice.md line 107). Its lifecycle row accepts the use stage only, with 1 retained pair (docs/token-native-saturation.md line 109).\n\nHeadroom (c5) covers recoverable originals directly. Owned synthetic MCP compression and retrieval passed, and so did isolated install, restart and uninstall (decisions.json line 1214). After restart it restored identical original content (token-native-saturation.md lines 3-10). Its lifecycle row accepts install, use, persistence, restart, cleanup and recovery, with 11 retained pairs (line 82). Measured pairs: the direct summary used 19,714 tokens against 36,625, with exact recovery available, and a guarded log fixture used 191 against 26,529 (token-practice.md lines 231-234). The retained counterexample is 2,732 tokens against a 5,105-token original, rising to 18,777 when the full original was also fetched (lines 215-217).\n\nccusage (c1) covers the measurement part. Its decision capability is 'Read native provider usage without mixing counter scopes', based on offline native usage parsing and scoped current-session observations (decisions.json lines 1309-1328). The gap follow-up confirms the offline parsing (token-practice.md lines 291-294). The pinned 20.0.24 upgrade passed its selected upstream subset of 34 cases (full-stack-convergence.md lines 124-130, listed 'respectively'). Artifact counts are kept separate from provider usage, because RTK, Context Mode and Headroom counters are estimates and not provider accounting (token-practice.md lines 150-156).\n\nWhat was observed: local integration and synthetic fixtures, one native RTK artifact pair, Headroom's owned-fixture recovery, and ccusage offline parsing. None of this establishes a causal or lifetime provider saving.",
+ "winner_evidence_class": "local_integration",
+ "winner_evidence_refs": [
+  "scripts/native_token_ci.py",
+  "docs/full-stack-convergence.md",
+  "docs/token-practice.md",
+  "docs/token-native-saturation.md",
+  "catalogs/foundation/decisions.json"
+ ],
+ "winner_keys": [
+  "c4",
+  "c5",
+  "c1"
+ ]
+}

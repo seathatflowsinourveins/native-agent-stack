@@ -8,6 +8,12 @@ The examples target Linux/WSL x86_64. Use a current native Node.js 24, npm, Pyth
 
 | Recipe | Scope |
 | --- | --- |
+| [Native Claude profile](claude-native-profile.md) | Terminal entry, small persistent instructions, selected skills and new-PC checks for native Claude Code |
+| [Native Claude Ultracode](claude-native-ultracode.md) | Workflow profile, task-matched worker models and effort, concurrency cap, sessions, messaging and dashboards |
+| [Claude/Codex cooperation lanes](claude-codex-cooperation-lanes.md) | Explicit cross-family review, live-session messaging and the Codex agent-role registration |
+| [Claude/Codex foreground review](claude-codex-foreground-review.md) | The accepted foreground `/codex:review` path from a dedicated checkout |
+| [Native upgrades (2026-09-21)](native-upgrades-20260921.md) | Dated upgrade commands, including Worktrunk worktree creation and removal |
+| [Tavily](tavily.md) | Tavily CLI installation, sign-in and returned results |
 | [SOTA convergence practice](sota-convergence-practice.md) | Reproducible dated repository-convergence recipe (`tools/sota-convergence/`): when to rerun, the six commands, evidence classes, the never-promote rule, and the cross-family review/PR/CI step. |
 
 ## Paths, pins and installation conventions

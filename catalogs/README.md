@@ -1,10 +1,15 @@
 # Two maintained catalogs
 
-For the dated reason behind each selection and the named alternatives, use the
-[current landscape ledger](landscape/README.md) or its
-[offline comparison view](../docs/ecosystem/index.html#landscape). It covers every
-foundation layer and all four domain research layers, with evidence limits and
-the comparison that would change each decision.
+Start with the [grand catalog handbook](../docs/grand-catalog-handbook.md). It
+explains the September 22, 2026 layer verdicts: 20 foundation and 12 trading
+layers, each with its winners, named alternatives, evidence class and the
+comparison that would overturn it, plus how to rerun them.
+
+For the full rows, use the [landscape ledger](landscape/README.md), its frozen
+snapshot [layer-verdicts-20260922.json](sota-convergence/layer-verdicts-20260922.json)
+or the [offline comparison view](../docs/ecosystem/index.html#landscape). The
+[trading gate ladder](us-equities/gates-20260922.json) tracks the sim → paper →
+live gates.
 
 | Catalog | Purpose | Start here |
 | --- | --- | --- |
