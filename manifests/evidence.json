@@ -7298,8 +7298,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "37e5d9c4d5e07deec8687567f14aade0eeb65ac0dbd909fb1efdcd588bb5d881",
-      "bytes": 14253
+      "sha256": "8f72fc88a1e80645a509f8671832cc748e6091000a22b8fca5b0fd5b9e2390f0",
+      "bytes": 15802
     },
     {
       "path": "observability/backends/check_persistence.py",
@@ -7363,8 +7363,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
-      "sha256": "2db2a867cae2de4ea79997ddc8551543bb20dd8776d4afd4ecc7f03cdbb32d6e",
-      "bytes": 7279
+      "sha256": "45c5ca5fcfd2575e398494f353289634056c0064e0b216045e5092f320d5a931",
+      "bytes": 9373
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus.yml.example",
@@ -10268,8 +10268,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "bytes": 9991,
-      "sha256": "be43167d9a13134078d5d45fab7ce1d1079a7fc65da235949682efa2ef428743"
+      "bytes": 10610,
+      "sha256": "55eb09d9173d74a6acfc7549135654b05e7c7f6ec10e7c4c1e6a90c7e7b69872"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/benchmark.py",
@@ -11363,23 +11363,23 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/metrics.py",
-      "sha256": "63cc3d7c2ec0141f08acc3e4d784774912573e8d4c21eb2a32c59e4eafe01de9",
-      "bytes": 14455
+      "sha256": "bcaa6023a34707555963b6916023dd94280ab1cd5854b995e35fd62b6bb34c20",
+      "bytes": 15907
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
-      "sha256": "1901e0e9de8af18d9f34d9e8a30ffcc1f79d9d11434154d37765c10186961f80",
-      "bytes": 4789
+      "sha256": "3c729b21531bb4088472bed73442897597da27dee2e376a9dbef3d859e04313d",
+      "bytes": 7219
     },
     {
       "path": "tests/test_adaptive_paper_metrics.py",
-      "sha256": "a4416eaa51d28a6dee3af34e6fbcb3a602dff9fe1e2ebbb3c06e935f107c6a96",
-      "bytes": 10104
+      "sha256": "97d0541bf8916b395703ab7000f4b92ab4f85b475700f1bbbcb1c95b32dc7ef5",
+      "bytes": 12828
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
-      "sha256": "6ec1062ad34c117ab4cd9e54f426480982279d9af7c7f9e881b3622feee09cb6",
-      "bytes": 7018
+      "sha256": "c015775d7072829877361f358f79d560075e0d84c06c9155146aa0c58875ba90",
+      "bytes": 8168
     }
   ],
   "convergence_records": [

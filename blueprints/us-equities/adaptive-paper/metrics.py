@@ -62,6 +62,14 @@ recorded by ``safety.py``/``runner.py``:
   ``meta['limits']['max_rest_per_minute']`` /
   ``['max_submits_per_minute']``. Exported only when the ledger file is
   present and openable.
+* ``paper_ledger_readable`` -- 1 iff this scrape's read-only open of
+  ``--ledger`` succeeded, 0 if the file is missing or the open/read failed.
+  This is the exporter's own operational status, not a value read from the
+  ledger's schema, and is the only signal for the four metrics above being
+  silently absent (they are conditionally emitted, unlike
+  ``paper_trial_active``/``paper_needs_attention``, so no ``absent()`` rule
+  can target them directly). Always exported. Guarded by the
+  ``EquitiesLedgerUnreadable`` alert.
 
 Two requested metrics are **not derivable from the current ledger/trial.json
 schema and are intentionally not exported** (see the trailing comment lines
@@ -185,6 +193,18 @@ def render_metrics(ledger_path: Path, trial_path: Path, *, now: float | None = N
         lines.append("# adaptive-paper-metrics gap: ledger file not found; ledger-derived metrics omitted "
                       "for this scrape.")
         conn = None
+
+    # Always exported (not gated on the ledger being present/openable), independent of any
+    # ledger-derived series above: this is the exporter's own read attempt outcome, not a value
+    # read from the ledger's schema. A wrong --ledger path, a permissions problem, or a failed
+    # read-only sqlite open would otherwise leave paper_order_state_divergence_total,
+    # paper_ledger_frozen and the paper_request_budget_* series silently absent with no series
+    # any absent()-based alert could target (they are conditionally emitted, unlike
+    # paper_trial_active/paper_needs_attention above). EquitiesLedgerUnreadable guards this case.
+    _gauge(lines, "paper_ledger_readable",
+           "1 if this scrape's read-only open of --ledger succeeded; 0 if the ledger file is "
+           "missing or the open/read failed. Always exported regardless of ledger state.",
+           [("", 1 if conn is not None else 0)])
 
     if conn is not None:
         try:

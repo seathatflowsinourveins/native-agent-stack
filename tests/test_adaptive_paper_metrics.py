@@ -61,10 +61,31 @@ class MetricsRenderingTests(unittest.TestCase):
         samples = parse(text)
         self.assertEqual(samples[("paper_trial_active", ())], "0")
         self.assertEqual(samples[("paper_needs_attention", ())], "0")
+        self.assertEqual(samples[("paper_ledger_readable", ())], "0")
         self.assertNotIn(("paper_order_state_divergence_total", ()), samples)
         self.assertIn("ledger file not found", text)
         self.assertIn("paper_reconciliation_last_success_timestamp_seconds is not exported", text)
         self.assertIn("paper_request_budget_wait_exceeded_total is not exported", text)
+
+    def test_unreadable_ledger_file_reports_readable_zero_but_keeps_the_always_on_gauges(self):
+        # Simulates the review finding: a wrong --ledger path or a permissions problem must not
+        # silently drop paper_order_state_divergence_total/paper_ledger_frozen/paper_request_budget_*
+        # with nothing to alert on. paper_ledger_readable is the guard EquitiesLedgerUnreadable uses.
+        if os.geteuid() == 0:
+            self.skipTest("root ignores permission bits; this scenario requires a non-root user")
+        self.write_trial(trial_id="fixture", phase="starting", started_at=self.now)
+        self.ledger_path.write_bytes(b"not a real sqlite file")
+        os.chmod(self.ledger_path, 0o000)
+        try:
+            text = m.render_metrics(self.ledger_path, self.trial_path, now=self.now)
+        finally:
+            os.chmod(self.ledger_path, 0o600)  # allow tearDown's TemporaryDirectory cleanup
+        samples = parse(text)
+        self.assertEqual(samples[("paper_trial_active", ())], "1")  # exporter itself is fine
+        self.assertEqual(samples[("paper_ledger_readable", ())], "0")
+        self.assertNotIn(("paper_order_state_divergence_total", ()), samples)
+        self.assertNotIn(("paper_ledger_frozen", (("reason", "external_order_detected"),)), samples)
+        self.assertIn("ledger open failed", text)
 
     def test_healthy_active_trial(self):
         ledger = Ledger(self.ledger_path, RiskLimits())
@@ -78,6 +99,7 @@ class MetricsRenderingTests(unittest.TestCase):
         samples = parse(text)
         self.assertEqual(samples[("paper_trial_active", ())], "1")
         self.assertEqual(samples[("paper_needs_attention", ())], "0")
+        self.assertEqual(samples[("paper_ledger_readable", ())], "1")
         self.assertNotIn(("paper_reconciliation_status", (("result", "passed"),)), samples)  # no status yet
         self.assertNotIn(("paper_ledger_frozen", (("reason", "external_order_detected"),)), samples)
         self.assertEqual(samples[("paper_order_state_divergence_total", ())], "0")
@@ -117,6 +139,24 @@ class MetricsRenderingTests(unittest.TestCase):
         self.assertNotIn(("paper_ledger_frozen", (("reason", "external_order_detected"),)), samples)
         self.assertEqual(samples[("paper_order_state_divergence_total", ())], "0")
         self.assertEqual(samples[("paper_needs_attention", ())], "1")
+
+    def test_recovered_flat_run_reports_finished_phase_but_needs_attention_status(self):
+        # Mirrors runner.py:463-465: an exception/failure path sets status="needs_attention", then
+        # a successful post-failure recovery overwrites outcome["flat"] = True, so metadata["phase"]
+        # ends up "finished" while metadata["status"] stays "needs_attention". paper_needs_attention
+        # alone (phase-derived) misses this; paper_reconciliation_status{result="needs_attention"}
+        # is what EquitiesReconciliationFailed's added clause keys off.
+        ledger = Ledger(self.ledger_path, RiskLimits())
+        ledger.start_trial(self.now)
+        ledger.close()
+        self.write_trial(trial_id="fixture", phase="finished", status="needs_attention",
+                         started_at=self.now)
+
+        text = m.render_metrics(self.ledger_path, self.trial_path, now=self.now)
+        samples = parse(text)
+        self.assertEqual(samples[("paper_trial_active", ())], "0")
+        self.assertEqual(samples[("paper_needs_attention", ())], "0")
+        self.assertEqual(samples[("paper_reconciliation_status", (("result", "needs_attention"),))], "1")
 
     def test_a_second_freeze_call_is_idempotent_in_the_ledger_and_the_counter(self):
         ledger = Ledger(self.ledger_path, RiskLimits())
@@ -162,6 +202,7 @@ class MetricsHttpServerTests(unittest.TestCase):
         self.assertEqual(status, 200)
         samples = parse(body)
         self.assertEqual(samples[("paper_trial_active", ())], "1")
+        self.assertEqual(samples[("paper_ledger_readable", ())], "1")
         self.assertTrue(headers.get("Content-Type", "").startswith("text/plain"))
 
     def test_unknown_path_is_404(self):

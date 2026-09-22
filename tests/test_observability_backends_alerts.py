@@ -35,6 +35,7 @@ EXPECTED_ALERTS = {
     "EquitiesRequestBudgetExhausted",
     "EquitiesLedgerFrozen",
     "EquitiesPaperMetricsMissing",
+    "EquitiesLedgerUnreadable",
 }
 
 try:
@@ -77,12 +78,29 @@ class RulesTemplateTests(unittest.TestCase):
     def test_metrics_missing_alert_uses_absent(self):
         self.assertIn('absent(paper_trial_active)', self.text)
 
+    def test_ledger_unreadable_alert_uses_readable_gauge(self):
+        self.assertIn('paper_ledger_readable == 0', self.text)
+
+    def test_reconciliation_failed_alert_covers_recovered_flat_needs_attention_status(self):
+        # runner.py can end a trial at phase=finished with status=needs_attention (failed then
+        # recovered flat); paper_needs_attention alone misses this, so the rule must also key
+        # off paper_reconciliation_status{result="needs_attention"}.
+        self.assertIn('paper_reconciliation_status{result="needs_attention"} == 1', self.text)
+
+    def test_ecosystem_service_unavailable_excludes_the_optional_adaptive_paper_job(self):
+        # adaptive-paper is a separate process not started by install.py/configure.py; without
+        # this exclusion the generic up==0 rule fires permanently outside an active paper trial.
+        match = re.search(r"- alert: EcosystemServiceUnavailable\n(.*?)(?=\n      - alert:|\Z)",
+                           self.text, re.S)
+        self.assertIsNotNone(match)
+        self.assertIn('job!~"acceptance-fixture|adaptive-paper"', match.group(1))
+
     @unittest.skipUnless(HAVE_YAML, "optional PyYAML structural check")
-    def test_rendered_yaml_is_well_formed_and_has_thirteen_rules(self):
+    def test_rendered_yaml_is_well_formed_and_has_fourteen_rules(self):
         placeholder = self.text.replace("@CONFIG_ROOT@", "/tmp/x").replace("@DATA_ROOT@", "/tmp/y")
         doc = yaml.safe_load(placeholder)
         rule_count = sum(len(group["rules"]) for group in doc["groups"])
-        self.assertEqual(rule_count, 13)
+        self.assertEqual(rule_count, 14)
         names = {rule["alert"] for group in doc["groups"] for rule in group["rules"] if "alert" in rule}
         self.assertTrue(EXPECTED_ALERTS.issubset(names))
 
@@ -143,7 +161,7 @@ class RenderedNativeValidationTests(unittest.TestCase):
             capture_output=True, text=True,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("13 rules found", result.stdout)
+        self.assertIn("14 rules found", result.stdout)
 
     def test_promtool_check_config(self):
         result = subprocess.run(

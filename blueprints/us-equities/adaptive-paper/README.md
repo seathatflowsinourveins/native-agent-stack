@@ -143,10 +143,15 @@ metric and the two gaps documented below.
 
 Exported: `paper_trial_active`, `paper_needs_attention`,
 `paper_reconciliation_status{result}`, `paper_order_state_divergence_total`,
-`paper_ledger_frozen{reason}`, `paper_request_budget_remaining{kind}`, and
-`paper_request_budget_limit{kind}`. **Not exported** (not durably recorded by
-the current ledger/`trial.json` schema; see `metrics.py`'s module docstring
-for why, rather than inventing new `safety.py` fields to support them):
+`paper_ledger_frozen{reason}`, `paper_request_budget_remaining{kind}`,
+`paper_request_budget_limit{kind}`, and `paper_ledger_readable` (1/0, always
+exported: this scrape's read-only ledger open succeeded or not -- it is the
+exporter's own operational status, not a value read from the ledger, and is
+the only signal for the conditionally-emitted metrics above going silently
+absent on a bad `--ledger` path or a permissions problem). **Not exported**
+(not durably recorded by the current ledger/`trial.json` schema; see
+`metrics.py`'s module docstring for why, rather than inventing new
+`safety.py` fields to support them):
 `paper_reconciliation_last_success_timestamp_seconds` and
 `paper_request_budget_wait_exceeded_total`.
 
@@ -154,8 +159,12 @@ The observability backend profile's Prometheus scrapes `127.0.0.1:18890` as
 job `adaptive-paper`, and its rules add the `equities-broker-path` alert
 group (`EquitiesOrderStateDivergence`, `EquitiesReconciliationFailed`,
 `EquitiesRequestBudgetExhausted`, `EquitiesLedgerFrozen`,
-`EquitiesPaperMetricsMissing`), routed to the existing local ntfy receiver by
-`scope: equities-broker`. See
+`EquitiesPaperMetricsMissing`, `EquitiesLedgerUnreadable`), routed to the
+existing local ntfy receiver by `scope: equities-broker`. It also excludes
+this job from the pre-existing `EcosystemServiceUnavailable` rule, since this
+exporter is a separate process not started by `install.py`/`configure.py`
+and would otherwise leave that generic rule firing permanently whenever no
+paper trial is running. See
 [`observability/backends/README.md`](../../../observability/backends/README.md#adaptive-paper-broker-path-alerts)
 and the templates under `observability/backends/templates/`. Run `metrics.py`
 as its own process alongside a trial; it is not started by `runner.py` and
