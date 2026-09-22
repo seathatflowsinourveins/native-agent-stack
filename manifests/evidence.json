@@ -5533,8 +5533,8 @@
     },
     {
       "path": "blueprints/us-equities/data/README.md",
-      "sha256": "5c55a783e8ca98c6bfbf9ad8178bdb49661d6391c039aef0fb769b241686a009",
-      "bytes": 5111
+      "sha256": "1b5d5e629a51335f7e701d0647613588aa90c649e85a5dca305b7ff3b31ee9dd",
+      "bytes": 5602
     },
     {
       "path": "blueprints/us-equities/data/receipt.json",
@@ -10318,8 +10318,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "bytes": 30063,
-      "sha256": "5fd61bc606f89f660ecd4bf44d263638c6707cc8e89183744c2067dcd534ac3e"
+      "bytes": 31117,
+      "sha256": "7679fc819af21794a1e82fe5e5d0218f5c9fd67c96baa0e7f604a2bb50a6bc51"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -10368,8 +10368,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "bytes": 16232,
-      "sha256": "0da2dbbb38e11643cf5213b0da023a896e078e25ef6ebc1b12128b39f558a2d6"
+      "bytes": 22196,
+      "sha256": "548925d2b9eac34962f478cf1d5c9c159d9aff4c2c35966434a29d8034e629e2"
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -11363,8 +11363,8 @@
     },
     {
       "path": "blueprints/us-equities/data/promotion_gate.py",
-      "sha256": "e4f7edf69bf3742de4abae9e3cee2da25353dcf013f011ef62d507ea40f5f64a",
-      "bytes": 10606
+      "sha256": "0f9fcf22119ae19491f32ecb23d59ca7c67135edd1fc5778974d757419c93913",
+      "bytes": 11464
     },
     {
       "path": "blueprints/us-equities/data/fixtures/good.csv",
@@ -11388,13 +11388,23 @@
     },
     {
       "path": "tests/test_promotion_gate.py",
-      "sha256": "34b2e1ae9bbf8ec3da50a88ac1011131d465dbef8676d292e61e6ef050488576",
-      "bytes": 7556
+      "sha256": "5b1e6701ee4ee1b491e189390a015326ac6482ec3a9d1717cfd74c856352e3b8",
+      "bytes": 8793
     },
     {
       "path": "docs/decisions/2026-09-22-broker-credential-handling.md",
-      "sha256": "8a975fa70bee2c14215b645d3d09e1165966d21d4d61cc50de30d2bf6c88aeb4",
-      "bytes": 3627
+      "sha256": "4e32f464b3466e03be4122471fec9cc46886238f602a7ec3d128bfe2eac4e9e7",
+      "bytes": 4241
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/null-price-cell.csv",
+      "sha256": "1718d0cdc84850734cc17692407d5b2a145a84ee7476bc5ac19b03491988f730",
+      "bytes": 188
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/null-price-cell-gate-result.json",
+      "sha256": "f11f55c42ceed4af50f3d679005829521bf4b44136751e37c9e5dc4f0080fecf",
+      "bytes": 1571
     }
   ],
   "convergence_records": [

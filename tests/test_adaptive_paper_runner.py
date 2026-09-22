@@ -249,6 +249,112 @@ class PromotionGatePreflight(unittest.TestCase):
             self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
 
 
+class MainCommandGateWiring(unittest.TestCase):
+    """Regression: review found `python3 runner.py paper ...` bypassed the
+    promotion gate entirely -- `main()` registered no `--gate-result`/
+    `--snapshot` arguments and its `paper`/`recover` call site omitted the
+    new `mode`/`gate_result_path`/`snapshot_path` kwargs, so `validate_preflight`
+    always ran with `mode=None`. These tests drive `runner.main()` itself
+    (mocking only the network-touching `preflight` call and the
+    native-runtime entry past the gate check) to prove the CLI wiring, not
+    just the already-covered `validate_preflight` unit behavior."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.env_file = self.root / "paper.env"
+        self.env_file.write_text("APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
+        os.chmod(self.env_file, 0o600)
+        self.config_file = self.root / "config.json"
+        self.config_file.write_text("{}")
+        self.output = self.root / "output.json"
+        self.snapshot = self.root / "universe.csv"
+        self.snapshot.write_text("symbol\nSPY\n")
+        self.snapshot_hash = hashlib.sha256(self.snapshot.read_bytes()).hexdigest()
+        self.now_ns = time.time_ns()
+        self.observation = _paper_ready_observation(self.now_ns)
+        self.observation["account_identity_sha256"] = "fixture-account"
+        self.config = _paper_ready_config()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _argv(self, command, extra):
+        return ["runner.py", command, "--env-file", str(self.env_file), "--config", str(self.config_file),
+                "--output", str(self.output), "--state-root", str(self.root / "state"), *extra]
+
+    def _run_main(self, command, extra=()):
+        """Patches every dependency `main()` reaches before/at the gate check
+        (config loading, credential parsing, the network preflight call) and
+        makes `account_lock_fingerprint` -- the first thing `main()` touches
+        immediately *after* a passing gate check -- raise a sentinel so the
+        test can tell "gate check passed and execution continued" apart from
+        "gate check raised/returned" without needing the pinned native
+        runtime or an SQLite ledger. Returns `(sentinel, code, raised)`:
+        `code` is `main()`'s return value (`None` if it raised instead), and
+        `raised` is the exception instance if one propagated out of `main()`."""
+        sentinel = RuntimeError("reached_post_gate_execution")
+        with patch.object(sys, "argv", self._argv(command, extra)), \
+             patch.object(runner_module, "load_config", return_value=(self.config, None, None)), \
+             patch.object(runner_module, "credentials", return_value=("fixture-key", "fixture-secret")), \
+             patch.object(runner_module, "preflight", return_value=self.observation), \
+             patch.object(runner_module, "account_lock_fingerprint", side_effect=sentinel):
+            try:
+                code = runner_module.main()
+                return sentinel, code, None
+            except Exception as exc:  # noqa: BLE001 -- deliberately catches the sentinel too
+                return sentinel, None, exc
+
+    def test_paper_without_gate_arguments_is_blocked_before_execution_continues(self):
+        sentinel, code, raised = self._run_main("paper")
+        self.assertIsNone(raised)
+        self.assertEqual(code, 2)
+        result = json.loads(self.output.read_text())
+        self.assertEqual(result["status"], "not_started")
+        self.assertEqual(result["reason"], "promotion_gate_missing")
+
+    def test_paper_with_failing_gate_result_is_blocked_before_execution_continues(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps({"status": "fail", "input_sha256": self.snapshot_hash}))
+        sentinel, code, raised = self._run_main("paper", ["--gate-result", str(gate_path), "--snapshot", str(self.snapshot)])
+        self.assertIsNone(raised)
+        self.assertEqual(code, 2)
+        result = json.loads(self.output.read_text())
+        self.assertEqual(result["status"], "not_started")
+        self.assertEqual(result["reason"], "promotion_gate_failed")
+
+    def test_paper_with_mismatched_snapshot_hash_is_blocked(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": "0" * 64}))
+        sentinel, code, raised = self._run_main("paper", ["--gate-result", str(gate_path), "--snapshot", str(self.snapshot)])
+        self.assertIsNone(raised)
+        self.assertEqual(code, 2)
+        result = json.loads(self.output.read_text())
+        self.assertEqual(result["reason"], "promotion_gate_mismatch")
+
+    def test_paper_with_passing_matched_gate_reaches_post_gate_execution(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": self.snapshot_hash}))
+        sentinel, code, raised = self._run_main("paper", ["--gate-result", str(gate_path), "--snapshot", str(self.snapshot)])
+        self.assertIsNone(code)
+        self.assertIs(raised, sentinel)
+
+    def test_recover_command_is_unaffected_by_missing_gate_arguments(self):
+        """`recover` resumes a trial already admitted by an earlier `paper`
+        run; it must not additionally require --gate-result/--snapshot."""
+        self.observation["positions"] = [{"symbol": "SPY", "qty": "1"}]
+        sentinel, code, raised = self._run_main("recover")
+        self.assertIsNone(code)
+        self.assertIs(raised, sentinel)
+
+    def test_preflight_command_is_unaffected_by_missing_gate_arguments(self):
+        sentinel, code, raised = self._run_main("preflight")
+        self.assertIsNone(raised)
+        self.assertEqual(code, 0)
+        result = json.loads(self.output.read_text())
+        self.assertEqual(result["status"], "ready")
+
+
 class CredentialFilePermissions(unittest.TestCase):
     """runner.credentials() fails closed on env-file mode, ownership, and
     Git-worktree location before any line of the file is parsed."""

@@ -139,6 +139,25 @@ class FixtureGateRuns(unittest.TestCase):
             self.assertEqual(result["status"], "fail")
             self.assertEqual(result.get("exception_class"), "ValueError")
 
+    def test_null_price_cell_fails_closed_via_unmapped_failures(self):
+        """Regression: pandera's own `not_nullable` failure identifier is not
+        one of the 11 hardcoded CHECK_NAMES. Before the fix, `_summarize`
+        silently dropped it and marked every named check "pass", so the gate
+        emitted status "pass" (exit 0) for a snapshot with a null open cell.
+        It must now fail closed via a synthetic `unmapped_failures` check."""
+        code, result = self._run("null-price-cell.csv")
+        self.assertEqual(code, 1)
+        self.assertEqual(result["status"], "fail")
+        unmapped = next((c for c in result["checks"] if c["name"] == "unmapped_failures"), None)
+        self.assertIsNotNone(result["checks"])
+        self.assertIsNotNone(unmapped, result["checks"])
+        self.assertEqual(unmapped["status"], "fail")
+        self.assertIn("not_nullable", unmapped["detail"])
+        # Every hardcoded CHECK_NAMES entry still reports "pass": the
+        # unmapped identifier must not be silently absorbed into one of them.
+        named = {c["name"]: c["status"] for c in result["checks"] if c["name"] in g.CHECK_NAMES}
+        self.assertTrue(all(status == "pass" for status in named.values()), named)
+
     def test_invalid_calendar_fails_closed(self):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "gate-result.json"

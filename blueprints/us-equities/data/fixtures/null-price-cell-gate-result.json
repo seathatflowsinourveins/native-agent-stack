@@ -1,0 +1,75 @@
+{
+  "checked_at": "2026-09-22T08:02:35.526729+00:00",
+  "checks": [
+    {
+      "detail": "ok",
+      "name": "symbol_nonempty",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "valid_trading_session",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "open_positive",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "high_positive",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "low_positive",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "close_positive",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "volume_non_negative",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "observed_at_not_future",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "high_ge_max_open_close",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "low_le_min_open_close",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "unique_symbol_session",
+      "status": "pass"
+    },
+    {
+      "detail": "unrecognized pandera check identifiers ['not_nullable']; 1 of 2 rows failed; example row indices [0]",
+      "name": "unmapped_failures",
+      "status": "fail"
+    }
+  ],
+  "input_sha256": "1718d0cdc84850734cc17692407d5b2a145a84ee7476bc5ac19b03491988f730",
+  "row_count": 2,
+  "status": "fail",
+  "versions": {
+    "exchange_calendars": "4.13.2",
+    "pandas": "3.0.6",
+    "pandera": "0.33.1",
+    "pyarrow": "25.0.1",
+    "python": "3.13.15"
+  }
+}

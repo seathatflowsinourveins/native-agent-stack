@@ -136,11 +136,15 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
     separately venv'd `blueprints/us-equities/data/promotion_gate.py`)
     reports `status: "pass"` for the exact snapshot bytes this run consumes.
 
-    This runtime has no live market-data snapshot concept of its own, so the
-    gated "snapshot" is the configured universe/bars input file (ordinarily
-    the frozen `--config` for this trial); see the promotion-gate scope note
-    in `blueprints/us-equities/data/README.md` for why that substitution is
-    documented as sufficient here.
+    This runtime has no live market-data snapshot concept of its own (Alpaca
+    quotes are fetched fresh at preflight time, never read from a stored
+    file), and `config.json` itself cannot be the gated snapshot: the gate
+    only accepts `.parquet`/`.csv`/`duckdb://` input, so a JSON config always
+    fails closed with `unsupported_input_format`. The gated "snapshot" is
+    therefore an explicit, separately supplied bars/universe input file (the
+    `--snapshot` CLI argument) that was actually run through
+    `promotion_gate.py`; see `blueprints/us-equities/data/README.md` for the
+    current state of that ingest.
     """
     if gate_result_path is None or snapshot_path is None:
         raise SafetyError("promotion_gate_missing")
@@ -418,6 +422,14 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--trial", default="adaptive-20260921")
     parser.add_argument("--state-root", type=Path, default=DEFAULT_STOP.parent)
+    parser.add_argument("--gate-result", type=Path, default=None,
+                         help="promotion-gate result JSON from "
+                              "blueprints/us-equities/data/promotion_gate.py; "
+                              "required (status pass, hash-matched) for `paper`")
+    parser.add_argument("--snapshot", type=Path, default=None,
+                         help="the exact bars/universe input file the promotion "
+                              "gate validated (its hash must match --gate-result's "
+                              "input_sha256); required for `paper`")
     args = parser.parse_args()
     LAST_OUTPUT = args.output
     if not re.fullmatch(r"[a-z0-9-]{1,24}", args.trial):
@@ -450,8 +462,10 @@ def main():
         save(args.output, summary)
         print(json.dumps({k: summary[k] for k in ("status", "orders_submitted")}, default=str))
         return 0 if summary["status"] == "ready" else 2
+    gate_mode = "paper" if args.command == "paper" else None
     try:
-        close = validate_preflight(observation, config, require_open=True, allow_existing=args.command == "recover")
+        close = validate_preflight(observation, config, require_open=True, allow_existing=args.command == "recover",
+                                    mode=gate_mode, gate_result_path=args.gate_result, snapshot_path=args.snapshot)
     except SafetyError as exc:
         summary.update(status="not_started", reason=str(exc))
         save(args.output, summary)

@@ -75,16 +75,23 @@ The gate runs in its own environment so the paper runtime
 (`../adaptive-paper/runner.py`) never imports pandera/pandas/
 exchange_calendars; it only reads the resulting `gate-result.json`. That
 runtime has no live market-data snapshot concept of its own (Alpaca quotes
-are fetched fresh at preflight time, not read from a stored file), so
-`runner.validate_preflight(..., mode="paper", gate_result_path=..., snapshot_path=...)`
-substitutes the configured universe/bars input file -- ordinarily the frozen
-`--config` used for the trial -- as the gated "snapshot": the gate must
-report `status: "pass"` and an `input_sha256` matching that file's current
-sha256, or the runtime raises `SafetyError` with kind `promotion_gate_missing`
-(no result file, no snapshot path, unreadable/invalid JSON), `promotion_gate_failed`
+are fetched fresh at preflight time, not read from a stored file), and
+`config.json` itself cannot be the gated "snapshot": `promotion_gate.py`
+only accepts `.parquet`/`.csv`/`duckdb://` input, so pointing it at a JSON
+config always fails closed with `unsupported_input_format`. Instead,
+`runner.py`'s `main()` registers `--gate-result <path>` and `--snapshot
+<path>` CLI arguments; for the `paper` command (not `preflight`, not
+`recover`, which resumes a trial admitted by an earlier `paper` invocation)
+it calls `validate_preflight(..., mode="paper", gate_result_path=args.gate_result,
+snapshot_path=args.snapshot)`. The gate must report `status: "pass"` and an
+`input_sha256` matching `--snapshot`'s current sha256, or the runtime raises
+`SafetyError` with kind `promotion_gate_missing` (no result file, no
+snapshot path, unreadable/invalid JSON), `promotion_gate_failed`
 (`status != "pass"`), or `promotion_gate_mismatch` (hash does not match the
-current file). Wiring the `--gate-result` CLI flag and the `mode`/
-`gate_result_path`/`snapshot_path` call-site arguments into `runner.py`'s
-`main()` is a follow-up integration step outside this change's owned
-`validate_preflight`/`credentials` scope; `mode=None` (every existing call
-site) is unaffected.
+current file). `mode=None` (the `preflight` and `recover` call sites) is
+unaffected. `--snapshot` must name an actual bars/universe input file that
+was run through `promotion_gate.py` -- this repository does not yet ship a
+production bars/universe ingest that produces one; until that ingest exists,
+an operator must supply the real file it will produce (or, for the bounded
+CSV fixtures used in tests here, `fixtures/good.csv` with
+`fixtures/good-gate-result.json`).

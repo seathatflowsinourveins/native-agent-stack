@@ -144,6 +144,11 @@ def _schema(calendar, now):
 
 
 def _summarize(failure_cases, row_count: int) -> list:
+    """Fail closed: any pandera failure identifier not in the fixed
+    CHECK_NAMES set (e.g. pandera's own `not_nullable` for a null cell) is
+    never silently dropped. It is reported under a synthetic
+    `unmapped_failures` check with status "fail", so `evaluate()`'s
+    any-check-failed status computation still yields "fail" for it."""
     if failure_cases is None or len(failure_cases) == 0:
         return [{"name": name, "status": "pass", "detail": "ok"} for name in CHECK_NAMES]
     renamed = failure_cases.copy()
@@ -158,6 +163,14 @@ def _summarize(failure_cases, row_count: int) -> list:
         indices = sorted({int(index) for index in subset["index"].dropna()})
         checks.append({"name": name, "status": "fail",
                         "detail": f"{len(indices)} of {row_count} rows failed; example row indices {indices[:5]}"})
+    unmapped = sorted(failing - set(CHECK_NAMES))
+    if unmapped:
+        subset = renamed[renamed["check"].isin(unmapped)]
+        indices = sorted({int(index) for index in subset["index"].dropna()})
+        checks.append({"name": "unmapped_failures", "status": "fail",
+                        "detail": f"unrecognized pandera check identifiers {unmapped}; "
+                                  f"{len(indices)} of {row_count} rows failed; "
+                                  f"example row indices {indices[:5]}"})
     return checks
 
 

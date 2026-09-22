@@ -2,10 +2,17 @@
 
 **Decided by:** unit `pr4-gate-credentials`, catalog integration branch `claude/grand-catalog-20260922`; the coordinator mirrors a pointer into agent-lab.
 
-**Scope:** `blueprints/us-equities/adaptive-paper/runner.py`'s `credentials(path)` and `market_research.py`'s
-identically-shaped `credentials(path)`. Neither function's callers change; this decision only tightens the
-precondition on the env file that `--env-file` names before it is opened. No broker call, no live credentials
-file, and no new secret store are introduced.
+**Scope:** `blueprints/us-equities/adaptive-paper/runner.py`'s `credentials(path)` only. `runner.py`'s caller
+does not change; this decision only tightens the precondition on the env file that `--env-file` names before
+it is opened. No broker call, no live credentials file, and no new secret store are introduced.
+
+`market_research.py` (same directory) has its own, differently implemented `credentials(path)` that also
+reads an Alpaca env file named by its own `--env-file` flag, but it is **not** touched by this decision: it
+still opens the file with `O_NOFOLLOW` and a size cap only, and enforces no `0600` mode, no current-uid
+ownership, and no outside-any-Git-worktree check. A reader must not assume the research CLI fails closed the
+same way the paper runner now does. Extending the same three preconditions to `market_research.py`'s
+`credentials(path)` (it is not part of this unit's owned paths or test scope) is an open follow-up, tracked
+here so it is not silently dropped.
 
 ## Decision
 
