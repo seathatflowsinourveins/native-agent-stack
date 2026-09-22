@@ -43,13 +43,36 @@ nothing on that page has been executed on a Mac; see
    `OTEL_ENDPOINT`, `AI_MEMORY_URL`, `QDRANT_URL`, `EMBED_URL`):
    ```sh
    python3 tools/adoption/render_config.py --host <host> --out "$RUN_DIR/rendered"
-   python3 tools/adoption/render_config.py --host <host> --check   # compare against live configs before overwriting them
+   python3 tools/adoption/render_config.py --host <host> --check \
+     --live-codex-project "$PROJECT_ROOT/.codex/config.toml"   # compare against live configs before overwriting them
    ```
    Templates are in [`adoption/templates/`](templates/): `claude.settings.template.json`,
    `codex.config.template.toml` (user-level `~/.codex/config.toml`), and
    `project.codex.config.template.toml` (project-level `.codex/config.toml`).
-   `--check` prints a unified diff and exits 1 on any byte difference; a pure
-   JSON-formatting difference is called out explicitly in its output.
+   `--check`'s `project.codex.config.toml` comparison targets the project
+   being onboarded (`$PROJECT_ROOT`, e.g. `agent-lab`), never this catalog
+   checkout, which has no `.codex/config.toml` of its own and will always
+   report "live file not found" if `--live-codex-project` is omitted; pass it
+   explicitly, or export `ADOPTION_PROJECT_ROOT` before running (see
+   `tools/adoption/render_config.py --help`). `--check` prints a unified diff
+   and exits 1 on any byte difference; a pure JSON-formatting difference is
+   called out explicitly in its output.
+
+   **Trust-state warning.** The rendered `codex.config.toml` (user-level)
+   carries this source host's accumulated Codex `[projects."..."]
+   trust_level = "trusted"` grants and `[hooks.state...] trusted_hash` MCP/hook
+   approvals byte-for-byte (only the nine `${...}` placeholders above are
+   substituted; see the template's own top-of-file docstring in
+   `tools/adoption/render_config.py`). None of those grants or hashes have
+   been reviewed on the target machine. This does not itself transfer
+   authentication (`adoption/manifest.json` `policy.authentication_transfer:
+   native_login_on_target_only`, step 3 above), but it does pre-approve
+   project trust and hook execution state that a fresh Codex install would
+   otherwise ask about. Review the rendered file's `[projects.*]` and
+   `[hooks.state.*]` sections before use on a new host and drop entries that
+   do not apply; `adoption/manifest.json` `policy.historical_acceptance_transfers:
+   false` means none of that state should be read as re-qualifying the new
+   host's own acceptance evidence.
 
 5. **Services.** Start only the selected profile's services using the native
    process-lifecycle guide in [`adoption/lifecycle.md`](lifecycle.md#native-client-integration-and-process-lifecycle):

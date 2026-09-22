@@ -23,14 +23,18 @@ three has a native acceptance receipt, so none can claim
    (deferred, needs its own scoped workflow and a dated CI receipt).
    Overturn only on an actual linked hosted run, not a workflow file's mere
    existence.
-2. **`macos-embedding-backend`** — llama.cpp Metal `llama-server --embedding`
-   serving embeddinggemma-300M-Q8_0 (768 dims, matching the existing Linux
-   QMD model) as the 24 GB default; Nemotron-3-Embed-1B (2048 dims) gated
-   behind an open "does a GGUF exist upstream" question and a 48 GB machine.
-   Alternatives considered: MLX and LM Studio, both without a measured
-   comparison on this project's retrieval workload. Overturn the 24 GB
-   default only on a measured recall/MRR comparison favoring Nemotron **and**
-   available memory headroom.
+2. **`macos-embedding-backend`** — llama.cpp Metal `llama-server --embedding
+   --port 8232` (a distinct port from the Linux profile's 2048-dim Nemotron
+   RAG endpoint at 8231, so the two are never conflated as one embedding
+   space) serving embeddinggemma-300M-Q8_0 (768 dims, matching QMD's own
+   internal AST-chunk index model on the existing Linux host, not the
+   port-8231 Nemotron RAG endpoint) as the 24 GB default; Nemotron-3-Embed-1B
+   (2048 dims, matching the Linux 8231 endpoint) gated behind an open "does a
+   GGUF exist upstream" question and a 48 GB machine. Alternatives
+   considered: MLX and LM Studio, both without a measured comparison on this
+   project's retrieval workload. Overturn the 24 GB default only on a
+   measured recall/MRR comparison favoring Nemotron **and** available memory
+   headroom.
 3. **`agent-lab-hosting`** — keep agent-lab's existing private GitHub remote
    (`origin https://github.com/seathatflowsinourveins/agent-lab.git`,
    confirmed with `git remote -v` on this host) plus minimal CI, rather than
@@ -66,6 +70,18 @@ and in this unit's structured handoff. Summary:
   `native_proven`: no GitHub Actions workflow exists yet and no hosted run has
   occurred. `macos-embedding-backend` is explicitly `source_review`: no Mac
   executed `llama-server`.
+- `python3 scripts/adoption_status.py --json` (`native_proven`, exit 2 on this
+  host, `status: prerequisites_missing`): the `foundation-cpu` profile itself
+  reports `prerequisites_present` (all its commands and recipe paths are
+  present); the overall report is `prerequisites_missing` because
+  `adoption/manifest.json` `supported_platforms` pins Python `3.13` and this
+  host runs `3.12.3` -- a pre-existing mismatch unrelated to this unit's
+  changes (confirmed by running the same command at base commit `5cfed34`
+  before any of this unit's edits, same result). `--profile
+  macos-arm64-foundation --json` also exits 2, correctly reporting `brew`,
+  `llama-server` and `launchctl` all absent on this Linux host -- the expected
+  outcome for a macOS-only profile checked from Linux, not a bug in the new
+  profile.
 
 ## Limits
 
@@ -79,7 +95,18 @@ and in this unit's structured handoff. Summary:
   `adoption/hosts/<host>.json` and its own `--check`).
 - `docs/ecosystem/*` and `catalogs/sota-convergence/manifest-20260922.json`
   are unchanged by this unit; a full-catalog explorer rebuild is the
-  coordinator's step, not this unit's.
+  coordinator's step, not this unit's. **This is an unresolved merge gate,
+  not only a documentation limitation**: `.github/workflows/validate.yml` and
+  `publish-catalog.yml` both run `python3 scripts/build_ecosystem.py --check`,
+  and on this branch that check currently fails -- three new decision ids
+  (`new-pc-bootstrap-ci`, `macos-embedding-backend`, `agent-lab-hosting`) and
+  the new `macos-arm64-foundation` adoption profile are absent from the
+  committed `docs/ecosystem/index.html` until the coordinator regenerates it
+  after merging every unit. `scripts/build_ecosystem.py --check` was
+  deliberately not run by this unit (its owned paths exclude
+  `docs/ecosystem/*` and `--write`), but the coordinator must regenerate the
+  explorer before or as part of merging this branch, or CI's validate job
+  will fail on the integration branch.
 - `new-pc-bootstrap-ci` hosted execution and the macOS embedding acceptance
   test both remain pending; see the two decisions' `next_gap` fields for their
   exact overturn conditions.

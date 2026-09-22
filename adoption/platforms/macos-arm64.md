@@ -49,14 +49,35 @@ receipt — not invented in this catalog:
 
 ## Embedding backend decision
 
-**Default (24 GB): llama.cpp Metal**, `llama-server --embedding --port 8231`
-serving **embeddinggemma-300M-Q8_0** (768 dimensions) — the same model
-[QMD already uses locally](../../recipes/README.md#local-semantic-code-search)
-on the existing host, kept identical across platforms rather than introducing
-a second embedding space to reconcile.
+**These are two separate embedding spaces by design, not two ports serving
+the same model.** [The Linux/WSL2 profile](../../recipes/README.md#local-semantic-code-search)
+runs `llama-server`/vLLM on **port 8231** serving **NVIDIA
+Nemotron-3-Embed-1B-BF16** (2048 dimensions) as QMD's Qdrant-backed RAG
+endpoint (`manifests/stack.json` records `"dimensions": 2048` for that
+component; a real 2048-dim response from that host is recorded in
+`evidence/artifacts/full-stack-convergence-20260921/embedding-result.json`).
+Separately, QMD's own internal AST-chunk index model on that same Linux host
+is `ggml-org/embeddinggemma-300M-GGUF` — a different model, not exposed on
+8231, per that host's own `qmd status` output (`Embedding:
+https://huggingface.co/ggml-org/embeddinggemma-300M-GGUF`, in
+`evidence/receipts/native-token-ci-local-20260920.json`). Neither Linux model
+is "the same 768-dim model QMD already uses" as a single fact; QMD's internal
+index model is 768-ish-class embeddinggemma, the RAG endpoint at 8231 is the
+2048-dim Nemotron.
 
-**Upgrade gate (48 GB): Nemotron-3-Embed-1B** (2048 dimensions), **only if a
-GGUF build exists upstream** — this is an open gate, not a scheduled step.
+**Default (24 GB): llama.cpp Metal**, `llama-server --embedding --port 8232`
+(a distinct port from the canonical Linux RAG endpoint 8231, so a macOS host
+never presents a 768-dim response where 2048-dim is expected) serving
+**embeddinggemma-300M-Q8_0** (768 dimensions) — matching QMD's own internal
+index model, not the Linux RAG endpoint's Nemotron model. This keeps QMD's
+own index model identical across platforms; it does not claim parity with the
+2048-dim Nemotron RAG endpoint, which macOS does not run in this default.
+
+**Upgrade gate (48 GB): Nemotron-3-Embed-1B** (2048 dimensions, matching the
+Linux RAG endpoint), **only if a GGUF build exists upstream** — this is an
+open gate, not a scheduled step. If activated, it would run on its own port
+(not 8231, which is a Linux-host loopback binding, not something a macOS host
+shares) with its own qualification run.
 
 **Overturn condition for the upgrade:** a measured retrieval comparison run on
 this project's own corpus showing Nemotron beats embeddinggemma on
@@ -64,15 +85,22 @@ recall/MRR **and** the host has the memory headroom for it. Until that
 comparison exists and passes both conditions, the 24 GB default stands even on
 a 48 GB machine.
 
-**Acceptance test for either model:**
+**Acceptance test for the 24 GB default (embeddinggemma-300M-Q8_0, 768
+dimensions):**
 
 ```sh
-curl 127.0.0.1:8231/v1/embeddings -d '{"model": "embeddinggemma-300M-Q8_0", "input": "<fixed test string>"}'
+curl 127.0.0.1:8232/v1/embeddings -d '{"model": "embeddinggemma-300M-Q8_0", "input": "<fixed test string>"}'
 ```
 
-must return a vector of the expected dimension, and its cosine similarity
-against a Linux-produced reference vector for the same fixed string must be
-**≥ 0.99**. No such run has occurred; this is the test to run, not a result.
+must return a 768-dimension vector, and its cosine similarity must be **≥
+0.99** against a reference vector produced by running the same
+embeddinggemma-300M-Q8_0 model through llama.cpp **on a Linux host** for the
+same fixed string (not against the Linux profile's 2048-dim Nemotron
+response, which is a different model and dimension and cannot be compared by
+cosine similarity at all). No such Linux reference vector has been captured
+and no such run has occurred on macOS; this is the test to run, not a result.
+The 48 GB Nemotron upgrade, if ever activated, would instead compare against
+the existing 2048-dim Linux Nemotron reference at 8231.
 
 ### Considered and not activated
 

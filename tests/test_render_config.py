@@ -126,6 +126,30 @@ class RenderConfigTests(unittest.TestCase):
         self.assertIn("differs from", result.stdout)
         self.assertIn("---", result.stdout)  # unified diff header present
 
+    def test_default_project_live_path_never_hardcodes_catalog_checkout(self):
+        # Regression for the finding that the old module-level DEFAULT_LIVE_PATHS
+        # unconditionally pointed project.codex.config.toml at this catalog
+        # checkout's own .codex/config.toml (which does not exist), so --check
+        # without --live-codex-project could never exit 0 on any host. The
+        # default now tracks the current working directory (or
+        # $ADOPTION_PROJECT_ROOT) instead of a hardcoded catalog path, proven
+        # here by running from a directory other than the catalog checkout.
+        result = subprocess.run(
+            [sys.executable, str(SCRIPT), "--host", "test-fixture-host", "--check"],
+            capture_output=True, text=True, check=False, cwd=str(self.tmp_path),
+        )
+        self.assertNotIn(str(ROOT / ".codex" / "config.toml"), result.stdout + result.stderr)
+        self.assertIn(str(self.tmp_path / ".codex" / "config.toml"), result.stdout + result.stderr)
+
+    def test_default_project_live_path_honors_adoption_project_root_env(self):
+        import os
+        full_env = {**os.environ, "ADOPTION_PROJECT_ROOT": str(self.tmp_path)}
+        result = subprocess.run(
+            [sys.executable, str(SCRIPT), "--host", "test-fixture-host", "--check"],
+            capture_output=True, text=True, check=False, env=full_env,
+        )
+        self.assertIn(str(self.tmp_path / ".codex" / "config.toml"), result.stdout + result.stderr)
+
     def test_check_reports_missing_live_file(self):
         result = run("--host", "test-fixture-host", "--check",
                      "--live-settings", str(self.tmp_path / "nowhere.json"),

@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import difflib
 import json
+import os
 import string
 import subprocess
 import sys
@@ -37,11 +38,30 @@ TEMPLATE_FILES = {
     "project.codex.config.toml": TEMPLATES / "project.codex.config.template.toml",
 }
 
-DEFAULT_LIVE_PATHS = {
-    "settings.json": Path.home() / ".claude" / "settings.json",
-    "codex.config.toml": Path.home() / ".codex" / "config.toml",
-    "project.codex.config.toml": ROOT / ".codex" / "config.toml",
-}
+
+def default_project_root() -> Path:
+    """Resolve the project whose `.codex/config.toml` --check compares against.
+
+    The template's `project.codex.config.toml` targets the project being
+    onboarded (e.g. agent-lab), never this catalog checkout, which has no
+    `.codex/config.toml` of its own. Callers running --check for a real
+    project must pass ``--live-codex-project`` or set
+    ``ADOPTION_PROJECT_ROOT``; without either, this falls back to the current
+    working directory so the default at least reflects "the project you ran
+    this from" rather than silently pointing at the catalog repository.
+    """
+    env_root = os.environ.get("ADOPTION_PROJECT_ROOT")
+    if env_root:
+        return Path(env_root)
+    return Path.cwd()
+
+
+def default_live_paths() -> dict[str, Path]:
+    return {
+        "settings.json": Path.home() / ".claude" / "settings.json",
+        "codex.config.toml": Path.home() / ".codex" / "config.toml",
+        "project.codex.config.toml": default_project_root() / ".codex" / "config.toml",
+    }
 
 REQUIRED_KEYS = (
     "HOME", "ECO_ROOT", "PROJECT_ROOT", "HOST_PATH", "CODE_INDEX_PATH",
@@ -117,7 +137,7 @@ def cmd_check(args: argparse.Namespace) -> int:
     except RenderError as error:
         print(f"render failed: {error}", file=sys.stderr)
         return 1
-    live_paths = dict(DEFAULT_LIVE_PATHS)
+    live_paths = default_live_paths()
     if args.live_settings:
         live_paths["settings.json"] = Path(args.live_settings)
     if args.live_codex_user:
@@ -188,7 +208,12 @@ def build_parser() -> argparse.ArgumentParser:
                          help="Diff rendered configs against live files instead of writing --out")
     parser.add_argument("--live-settings", help="Override the live Claude settings.json path for --check")
     parser.add_argument("--live-codex-user", help="Override the live user-level codex config.toml path for --check")
-    parser.add_argument("--live-codex-project", help="Override the live project codex config.toml path for --check")
+    parser.add_argument("--live-codex-project",
+                         help="Live project-level .codex/config.toml path for --check. "
+                              "Defaults to $ADOPTION_PROJECT_ROOT/.codex/config.toml, or the "
+                              "current working directory's .codex/config.toml if that is unset -- "
+                              "never this catalog checkout. Pass the project being onboarded, e.g. "
+                              "/home/<host-user>/code/agent-lab/.codex/config.toml.")
     parser.add_argument("--verify", action="store_true",
                          help="Run codex --version, claude --version, codex mcp list and report exit codes")
     return parser

@@ -2749,7 +2749,7 @@
       ],
       "selection": "candidate",
       "review_status": "source_review",
-      "activation": "Drafted, not accepted: llama.cpp Metal `llama-server --embedding --port 8231` serving embeddinggemma-300M-Q8_0 (768 dims, the same model QMD already uses locally) as the 24 GB default; Nemotron-3-Embed-1B (2048 dims) as an open-gated 48 GB upgrade only if a GGUF build exists upstream. See adoption/platforms/macos-arm64.md for the full comparison, acceptance test and considered-not-activated alternatives (MLX, LM Studio).",
+      "activation": "Drafted, not accepted: llama.cpp Metal `llama-server --embedding --port 8232` (a distinct port from the Linux profile's 2048-dim Nemotron RAG endpoint at 8231) serving embeddinggemma-300M-Q8_0 (768 dims, matching QMD's own internal AST-chunk index model, not the port-8231 Nemotron endpoint) as the 24 GB default; Nemotron-3-Embed-1B (2048 dims, matching the Linux 8231 endpoint) as an open-gated 48 GB upgrade only if a GGUF build exists upstream. See adoption/platforms/macos-arm64.md for the full comparison, acceptance test and considered-not-activated alternatives (MLX, LM Studio).",
       "component_ids": [],
       "candidate": {
         "id": "llama-cpp-metal-macos-embedding",
@@ -2760,7 +2760,7 @@
       "limitations": [
         "Alternatives considered: MLX (no measured retrieval comparison yet on this project's corpus); LM Studio (the existing Linux EMBEDDING_PROVIDER=lmstudio setting points at local vLLM, not the desktop app, so it does not transfer as-is); Nemotron-3-Embed-1B now instead of gated (rejected until a GGUF exists upstream and a recall/MRR comparison favors it).",
         "Zero native macOS execution; this row cannot use accepted_within_scope or partial_acceptance.",
-        "The stated acceptance test (curl 127.0.0.1:8231/v1/embeddings, dimension check, cosine similarity >= 0.99 against a Linux-produced reference vector) has not been run."
+        "The stated acceptance test (curl 127.0.0.1:8232/v1/embeddings, 768-dimension check, cosine similarity >= 0.99 against a Linux llama.cpp embeddinggemma-300M-Q8_0 reference vector -- not the Linux 2048-dim Nemotron endpoint at 8231) has not been run."
       ],
       "source_paths": [
         "adoption/platforms/macos-arm64.md",
