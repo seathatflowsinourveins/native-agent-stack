@@ -3223,8 +3223,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "9676de014fe41e5b2b7cca1b6497153a79e073a39d6aacb2ff636085faf6f420",
-      "bytes": 4483
+      "sha256": "53e1ddd5b917928547ccadb2793e36ebec3f4b3ea8164d8555d873eb72510e97",
+      "bytes": 4513
     },
     {
       "path": "recipes/claude-native-profile.md",
@@ -6334,8 +6334,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 8186881,
-      "sha256": "0301e9ac0b4810aa9fb6ee02529da57a27270a62d06c03e066bc37ff2241b98f"
+      "bytes": 8189522,
+      "sha256": "de0295857bfd2375994a07172e6a07878c43551e812eddb8444ed96e8d404de7"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -9084,8 +9084,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "8ce7cce234280dbfd2a0d258827bbd3c708353dc64978fbc7a701e61b7c6d227",
-      "bytes": 12689
+      "sha256": "8b84b88a4d71d96bd1a59f03652eded68faff27d7dd8e29e2f6484c7202ae2c4",
+      "bytes": 12766
     },
     {
       "path": "docs/native-ultracode-20260921.md",
@@ -10009,8 +10009,8 @@
     },
     {
       "path": "examples/codex-native/README.md",
-      "sha256": "904c40dad92899f3e15903d4c419382305566996003eb9533405061553d87747",
-      "bytes": 2014
+      "sha256": "7eb22acd4cb3d00fcecd917c341d1f0154deb3396290aa1b646dcee24141c890",
+      "bytes": 2260
     },
     {
       "path": "examples/codex-native/agents/evidence-reviewer.toml",
@@ -10024,13 +10024,13 @@
     },
     {
       "path": "examples/codex-native/config.agents.toml.example",
-      "sha256": "11c8955b1a5e6a0ce61e3c5020201a140720151a42afa9c99cef3516768f2043",
-      "bytes": 1847
+      "sha256": "c3247195b40f2c1b042b70c90b6273412f5019c5cc0b3d814241d25910b769fd",
+      "bytes": 2139
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
-      "sha256": "7e13cb55bb5e6ebc88c14f2a98840832c701777bcac4a3cee19f035536edf56a",
-      "bytes": 5622
+      "sha256": "a3d22b8fddebc9c648bd17b411831e4ba37b34bb46387d331a8350699e34d94e",
+      "bytes": 6284
     },
     {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/codex-pr-review.json",
@@ -10044,18 +10044,18 @@
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
-      "sha256": "96ebad2ecceb15618795f9bcaf032391cbd81c553fbbd8e4b6b4f6099680b86e",
-      "bytes": 68550
+      "sha256": "047e11b6b123236211159f8dfd287641b76808ccf0507c02bafba89e6f4ce694",
+      "bytes": 68991
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
-      "sha256": "6e8769972378cdc7722f25c7eef91c715298516a97d6ef753fd9033ec39f11d9",
-      "bytes": 14838
+      "sha256": "da5dd61a96155dd73c9c1e2166ff9977e68231dfc0b0200aea5f0f845fb33499",
+      "bytes": 15978
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/runs.json",
-      "sha256": "6ec83dc8348af7c80fddbdd03eb74f05635de487053a0c5f85a52b61c6c483f3",
-      "bytes": 2800
+      "sha256": "0a18c5095cadc4a9cfad049659ca86d253410372856c205891c10abeb925f7ce",
+      "bytes": 3826
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/official-doc-excerpts.json",

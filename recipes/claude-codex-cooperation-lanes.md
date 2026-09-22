@@ -80,7 +80,12 @@ turn ids are UUIDs and must be redacted from published receipts.
 The accepted foreground path for reviewing git state is
 `claude -p '/codex:review --wait --scope branch --base <sha> --json'` in a
 dedicated sole-Claude checkout: the broker is workspace-keyed and any
-`SessionEnd` in that checkout ends it.
+`SessionEnd` in that checkout ends it. The broker also caches the Codex sign-in
+per workspace: after any `codex login`, stop that workspace's broker (its
+`SessionEnd`, or terminate the `app-server-broker.mjs serve --cwd <workspace>`
+process) before the next job, or the job fails in seconds with "access token
+could not be refreshed" (observed 2026-09-22; the fourth attempt on a fresh
+broker then completed with four findings, none high).
 
 On 2026-09-21 the bridge reviewed the lean-agent routing change and returned nine
 findings with counterexamples, all resolved before commit; the stored review is
@@ -100,6 +105,9 @@ The Codex agent examples mirror the Claude roles (`evidence-reviewer`,
 they carry no `model`, `model_reasoning_effort` or `sandbox_mode` and inherit the
 session's configuration, so the reviewer's no-edit instruction is a prompt rule,
 not an enforced sandbox.
-`[agents] max_concurrent_threads_per_session = 3` mirrors the Claude concurrency
-setting. These examples have no end-to-end run of their own in the dated guide;
-qualify them per task before relying on them.
+`[agents] max_concurrent_threads_per_session = 3` is the Codex-side worker bound
+(spawned threads, excluding the primary) and a separate client limit from the
+Claude concurrency setting, which is eight in the portable profile; each carries
+its own dated row. These examples have no end-to-end run of their own in the
+dated guide; qualify them per task before relying on them. Role registration and
+its `config_file` path rule are in `examples/codex-native/README.md`.

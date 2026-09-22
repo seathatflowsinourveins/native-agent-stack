@@ -17,7 +17,10 @@ lines retained in `evidence/artifacts/harness-rules-convergence-20260922/codex-a
 every `.toml` under the agents directory is discovered even without a table
 entry, a declared `config_file` is not loaded twice, the file's `description`
 wins over the table's, duplicate names in one layer warn, and a description is
-required. Not yet exercised in a Codex session on this profile.
+required. `config_file` resolves against the folder that holds `config.toml`, so
+the value is `agents/<name>.toml`, not `.codex/agents/<name>.toml` (a Codex
+Lane C review confirmed the schema on `codex-cli 0.155.1` and caught that path).
+Not yet exercised as a spawned role in a Codex session on this profile.
 The definitions carry `name`, `description` and `developer_instructions`; they set
 no `model`, `model_reasoning_effort` or `sandbox_mode` and inherit the session's
 configuration, so the reviewer's no-edit rule is a prompt instruction, not an
