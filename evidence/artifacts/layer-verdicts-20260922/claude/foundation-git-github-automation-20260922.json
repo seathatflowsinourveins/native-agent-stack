@@ -1,0 +1,96 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "manifests/evidence.json"
+   ],
+   "key": "c3",
+   "name": "Codex for Claude review bridge",
+   "repository": "https://github.com/openai/codex-plugin-cc",
+   "why_not_default": "Its only use stage is partial_acceptance. In catalogs/foundation/decisions.json, lines 386-387 give selection \"optional\" and review_status partial_acceptance, and lines 397 and 405 give the scope \"One read-only native bridge backend task passed\" and the next gap. manifests/evidence.json line 1464 says the bridge trial \"used one backend task without an outer Claude interaction or matched baseline\". The packet's own evidence_kind for c3 is \"mixed\". It is the only candidate with a review-oriented run, but that run is narrower than plugin integration and has no PR, ruleset or GitHub-operation evidence. Line 2960 limits it to \"a concrete cross-client review task\". Keep it conditional until an outer plugin invocation is qualified against a baseline."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/github-automation.md"
+   ],
+   "key": null,
+   "name": "GitHub Agentic Workflows (gh-aw)",
+   "repository": "https://github.com/github/gh-aw",
+   "why_not_default": "It is not a packet candidate. docs/github-automation.md lines 148-157 say that, as checked on 2026-09-20, it is public preview and no agentic workflow is activated. The daily Codex maintenance task keeps the reasoning-over-changes responsibility. There is no execution or comparison evidence."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "git-github-automation",
+ "limits": [
+  "Source review only; I ran no commands. Every native-execution result is an earlier documented receipt, not something observed now.",
+  "I read only parts of the receipts. I did not open evidence/receipts/worktrunk-list.json or the token-practice-gap-followup-20260920 receipt. I did not open fixtures/after.py; I confirmed it exists from the Glob and the receipt reference.",
+  "I did not open recipes/README.md, adoption/lifecycle.md, docs/convergence-architecture.md or blueprints/token-native-focus/saturation-audit.json.",
+  "The packet withheld current_choice, decision, rationale and the per-candidate disposition, so I could not check this verdict against them.",
+  "No TypeSafe inference results were supplied. All judgments are my own source review. The only retained provider or catalog judgments are the review_status/selection values, which I report as they appear. The refuter findings (evidence and challenger lenses) were checked against the cited lines and accepted where they held: c3 evidence class downgraded, the 'default' wording corrected, the review/PR gap added, the version gap added, overturn fixtures replaced with deciding paths, and the evidence.json line citation corrected to 640-641.",
+  "Skill path: <host-path>/typesafe-ai (body preloaded). The client reports the executing model as claude-opus-5-5[1m]. The model field copies the fixed packet value claude-opus-5/high as instructed."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "No winner has retained execution evidence for GitHub review/PR automation (PR creation, review or merge gating). gh's recorded runs are release download/attestation verify (docs/github-automation.md lines 100-106, 128-135) and a settings GET (lines 180-183). Only c3, a non-winner, has a review-oriented run, and it is partial.",
+  "gh CLI has no decision record, lifecycle stage, pin or manifests/stack.json entry (packet lines 54-68; decisions.json lines 2971-2982).",
+  "The worktrunk acceptance was observed on 0.78.0 in disposable synthetic repositories with hooks disabled (evidence.json lines 1886, 1888). The current pin 0.79.0 has not been re-qualified here.",
+  "worktrunk crash cleanup without deleting unrelated or dirty state is not established (owned-worktrees next_gap).",
+  "difftastic is selection conditional. Its acceptance is a single fixture pair (fixtures/before.py and after.py) and is recorded as 'not an LLM invocation or general quality benchmark' (evidence.json line 652).",
+  "The layer decision git-github-automation-practice is selection conditional and source_review, and records no new execution for this freeze.",
+  "The committed main-ruleset.json is documented as not yet applied (docs/github-automation.md lines 173-178, 357-360). The ruleset check verified settings, not an attempted blocked merge.",
+  "There is no matched comparison between any winner and any challenger, and no review/PR comparison fixture exists. Stars and release recency are not quality evidence."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "worktrunk 0.79.0 (packet pin; earlier acceptance was 0.78.0) vs native git worktree vs any challenger manager",
+   "difftastic 0.71.0 vs challenger structural diff",
+   "gh CLI direct vs codex-for-claude 1.0.6 outer plugin invocation vs gh-aw manual read-only pilot"
+  ],
+  "fixture_paths": [
+   "blueprints/convergence-practice/wsl-native-tools/run.py",
+   "tests/test_wsl_native_tools.py",
+   "fixtures/before.py",
+   "fixtures/after.py"
+  ],
+  "metric": "Worktree part: pass/fail on the run.py assertions (2 created, 2 removed without force, dirty removal refused with the modified and untracked bytes preserved, no hook ran, only the primary worktree and main branch remain), plus crash cleanup. Structural-diff part: correctness of the reported changes and exit codes on the before/after pair and a larger changed-code set. Review/PR part: useful findings, false positives, elapsed time and provider usage on one matched change set. No fixture exists for this part yet."
+ },
+ "overturn_when": "Owned worktrees: rerun blueprints/convergence-practice/wsl-native-tools/run.py, with tests/test_wsl_native_tools.py as its offline guard. If the current worktrunk pin 0.79.0 fails its create/list/dirty-refusal/cleanup assertions, the verdict changes. It also changes if another worktree manager or plain `git worktree` passes the same assertions and adds crash cleanup without losing unrelated state. Structural diffs: a challenger diff tool beating difftastic on fixtures/before.py and fixtures/after.py (plus a larger changed-code set) overturns c1. Review/PR automation: no fixture exists. The verdict for that part stays open until someone creates and runs a matched PR-review comparison: gh direct, a qualified outer codex-for-claude invocation and a gh-aw read-only pilot, on the same change set. The workflow-security tests and `python3 scripts/validate.py` are regression gates only. They do not decide any overturn.",
+ "packet_sha256": "0b01208243eefc619695a3ff3ff0db902e112406ce76c2a51488d3f43a0246ad",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__git-github-automation.json",
+  "catalogs/foundation/decisions.json (lines 360-539, 1340-1429, 2940-3004)",
+  "docs/github-automation.md (full; grep for gh/review/pull_request)",
+  "manifests/evidence.json (lines 582-590, 638-656, 1341-1349, 1444-1468, 1880-1893)",
+  "blueprints/convergence-practice/wsl-native-tools/run.py (lines 195-234, grep hits)",
+  "blueprints/convergence-practice/wsl-native-tools/pins.json (grep hits lines 29-45)",
+  "tests/test_wsl_native_tools.py (grep hits lines 151-207)",
+  "fixtures/before.py",
+  "evidence/receipts/portable-cli-artifacts.json (grep hits lines 36-37, 133-134)",
+  "<host-path>/SKILL.md (skill body preloaded in context)"
+ ],
+ "why_selected": "The requirement has three parts: owned worktrees, GitHub review/PR automation and structural diffs for changed code. Each winner covers a different part, but the evidence strength is uneven. I only reviewed sources; nothing here was executed now.\n\nc4 (worktrunk) is the only winner with a \"default\" selection. catalogs/foundation/decisions.json lines 477-521 (owned-worktrees, selection \"default\" at line 487) record it as accepted_within_scope. manifests/evidence.json lines 582-590 (worktrunk-list, kind native_cli_e2e) and lines 1880-1893 (velanext-native-quality-tools-20260920, native_cli_e2e) record the earlier result: \"Worktrunk0.78.0 created/listed/removed owned worktrees while refusing dirty removal without loss\". That run used isolated synthetic Linux/WSL fixtures. The runner, blueprints/convergence-practice/wsl-native-tools/run.py lines 195-231, creates two worktrees with --no-hooks, removes the clean one, requires the dirty removal to fail (expected=1) with bytes preserved, and then checks that git keeps only the primary worktree.\n\nc1 (difftastic) is selection \"conditional\" (decisions.json line 1360, deterministic-quality-tools lines 1351-1411), with a use stage accepted within the scope \"native shell/structural comparison\". Its backing evidence is portable-cli-artifacts (manifests/evidence.json lines 640-641, kind native_cli_e2e). That run was fixture-specific on fixtures/before.py and fixtures/after.py, which the receipt names at lines 36-37. It records normal difft exit 0 and --exit-code exit 1.\n\nc2 (gh CLI) has no decision record and no pin (packet lines 54-68). Its evidence is dated local observations in docs/github-automation.md: native `gh attestation verify` exit 0 on 2026-09-20 (lines 128-135), a `gh api` GET of branch rules that verified settings only (lines 180-183), and documented ruleset maintenance commands (lines 187-200). The layer routing at decisions.json line 2960 assigns worktree lifecycle to worktrunk, GitHub operations to gh and structural diffs to difftastic. That layer record is selection \"conditional\" (line 2958) and source_review only, and it says no new execution was run.\n\nCorrection to my earlier proposal: no winner has retained execution evidence for PR creation, review or merge automation. gh's recorded runs cover supply-chain integrity and reading settings.",
+ "winner_evidence_class": "source_review",
+ "winner_evidence_refs": [
+  "catalogs/foundation/decisions.json",
+  "manifests/evidence.json",
+  "docs/github-automation.md",
+  "blueprints/convergence-practice/wsl-native-tools/run.py",
+  "evidence/receipts/portable-cli-artifacts.json"
+ ],
+ "winner_keys": [
+  "c4",
+  "c1",
+  "c2"
+ ]
+}

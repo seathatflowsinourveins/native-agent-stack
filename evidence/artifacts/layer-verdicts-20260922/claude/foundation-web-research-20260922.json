@@ -1,0 +1,144 @@
+{
+ "alternatives": [
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "evidence/receipts/token-practice-gap-followup-20260920.json"
+   ],
+   "key": "c4",
+   "name": "Playwright CLI",
+   "repository": "https://github.com/microsoft/playwright-cli",
+   "why_not_default": "Native execution was observed, but the retained evidence is weaker than agent-browser's. In evidence/receipts/token-practice-gap-followup-20260920.json, the first `open <file-url>` failed with initial_file_navigation_exit_code 1 and 'Access to file protocol is blocked' (lines 148-149). browser-open is listed in failed_attempts_retained (lines 106-107). The run recovered only by serving the same fixture bytes over loopback HTTP (line 150), after which 7 HTTP steps succeeded and returned \"Hello, Playwright!\" (lines 136-137). The fill and click steps targeted fixed CSS selectors (`fill #name`, `click #greet`, `eval document.querySelector('#status')`, lines 142-144), not snapshot refs. Snapshots were only written to files (lines 141 and 145). The run used an existing Chrome and alpha Playwright dependencies 1.64.0-alpha-1789764292000 (lines 19 and 123-125), with no browser download or arbitrary-site test. It has no model-driven run and no second observation. Both tools sit under the same bounded-browser-operations decision in catalogs/foundation/decisions.json (lines 1048-1096). No head-to-head comparison was measured, so it stays an overlapping conditional lane rather than a loser."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/upstream-snapshot.json"
+   ],
+   "key": "c3",
+   "name": "Cua Driver",
+   "repository": "https://github.com/trycua/cua",
+   "why_not_default": "The packet marks this candidate adopted: true, but its only evidence is a source review. catalogs/landscape/upstream-snapshot.json (added_reviews, around lines 5832-5977) records adoption_status conditional_source_review_only and says it was not installed or adopted. There is no installed or executed Cua task, recovery test, latency/cost comparison, permission-lifecycle check or new-host reproduction. Its role is cross-application desktop computer use, which is wider than the bounded page interaction this layer requires. The record states it did not fail a fair comparison; it is untested, not failed. The external Cua README ref was not opened."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c5",
+   "name": "Crawl4AI",
+   "repository": "https://github.com/unclecode/crawl4ai",
+   "why_not_default": "The packet marks this candidate adopted: true, but its only evidence, catalogs/us-equities/star-audit.json (around lines 5960-5981), records decision \"alternative\" at review_depth readme_license_overview. That entry says no installation, model inference or native acceptance was performed. It frames Crawl4AI as a possible licensed-document ingestion lane that would need to preserve provenance and source restrictions. No retained retrieval result exists."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c2",
+   "name": "Firecrawl MCP",
+   "repository": "https://github.com/firecrawl/firecrawl-mcp-server",
+   "why_not_default": "Not adopted. catalogs/us-equities/star-audit.json (around lines 3958-3979) holds only a README/license review, with no installation or native acceptance. It would need an explicit choice to accept hosted/API costs and fetched-content rights. No evidence shows it retrieves attributable sources better than Tavily on the same queries."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c6",
+   "name": "Browser Use",
+   "repository": "https://github.com/browser-use/browser-use",
+   "why_not_default": "Not adopted. catalogs/us-equities/star-audit.json (around lines 2608-2629) holds only a README/license review, with no installation or native acceptance. It is a browser agent that uses hosted browser/model services, which conflicts with the requirement for no standing research-agent stack. Its credentials and proxies would be separate choices."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "web-research",
+ "limits": [
+  "I could not run commands. No candidate was re-executed; every result above is retained evidence, not a new observation.",
+  "The external Cua evidence ref (https://github.com/trycua/cua/blob/9bbfa7dd3e27ca7f1861ede70aaca390174493f9/libs/cua-driver/README.md) was not opened, because reads were limited to files under the repository root.",
+  "These files were not opened: recipes/README.md, recipes/tavily.md, docs/convergence-architecture.md, adoption/lifecycle.md, blueprints/token-native-focus/saturation-audit.json and evidence/receipts/artifact-reductions.json.",
+  "The large JSON files (star-audit, upstream-snapshot) were read through grep context and bounded sections in the first round, not in full, and were not re-read in this revision.",
+  "The OpenResearch version used for the 2026-09-20 retrieval of 2608.02583 is not recorded. I infer from the 2026-09-21 upgrade receipt (previous_version 0.2.4) that it predates 0.2.7; the exact version is unverified.",
+  "The OpenResearch private paper bodies and discovery returns (the private_exclusions in orx-worktrunk-upgrades.json) and the local transcripts were not available. Only the public projection was read.",
+  "No TypeSafe inference results were supplied by the coordinator. All dispositions are my own source review. Where I quote retained judgments from the packet or catalogs (selection 'conditional', review_status accepted_within_scope), they are marked as such. Refuter findings were verified against the original files, not accepted by agreement. Skill path: <host-path>/SKILL.md.",
+  "The model field copies the packet's fixed value, claude-opus-5/high. The client reports the actual runtime model as claude-opus-5-5[1m]; the actual effort setting is not exposed."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "No measured comparison exists between any two candidates in this layer. Each winner is qualified only for its own native operation.",
+  "Tavily Map, Crawl and Research are unqualified. The 4-result search that found official sources was domain-filtered (native-tavily-cli-20260920.json lines 190-191). The unfiltered IBKR search missed the intended Nautilus adapter guide (native-tavily-session-20260920.json, intended_adapter_guide_found false). Open-web search completeness is therefore not established.",
+  "The two Tavily records differ. docs/ecosystem/tavily-receipt.json records a 3-result search and says extraction was not exercised. The later evidence/receipts/native-tavily-cli-20260920.json records 4 search results and 1 extraction with 0 failures. Only the latter supports the decision's 'four sources/one extraction' wording.",
+  "Browser-session recovery and compatibility with arbitrary websites are not established for agent-browser or Playwright CLI.",
+  "OpenResearch 0.2.7 has one three-paper discovery, one full-paper retrieval (2609.05760, 69752 bytes) and 7 unchanged Markdown UI tests. The earlier retrieval of 2608.02583 has no recorded version and predates the 0.2.7 promotion. The Rust CLI suite was not run because cargo/rustc were absent. Handling of missing or ambiguous sources and research quality are not assessed. The pin is behind upstream v0.2.8, which is unqualified.",
+  "No frozen primary-source retrieval fixture exists under fixtures/, blueprints/ or tests/ for this layer. The retrieval half of the overturn comparison has no runnable path yet.",
+  "The packet marks c3 (Cua Driver) and c5 (Crawl4AI) as adopted: true. Their own evidence records c3 as conditional_source_review_only ('not installed or adopted') and c5 as decision 'alternative' with no native acceptance. This packet/catalog inconsistency is unresolved.",
+  "docs/full-stack-convergence.md line 55 lists the Web research components as 'Tavily, Context Hub, HF, OpenResearch'. Context Hub and HF are not packet candidates, yet the packet reports sota_components_not_in_candidates as []. Their standing in this layer is unjudged.",
+  "No token savings are claimed or measured."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "c1 agent-browser",
+   "c4 Playwright CLI",
+   "c6 Browser Use (challenger)",
+   "c3 Cua Driver (challenger)",
+   "c8 Tavily CLI search/extract",
+   "c7 OpenResearch discover/paper",
+   "c2 Firecrawl MCP (challenger)",
+   "c5 Crawl4AI (challenger)"
+  ],
+  "fixture_paths": [
+   "fixtures/greeting.html"
+  ],
+  "metric": "Browser: correctness of the snapshot/ref interaction (fill, click, verify returned text), session recovery, and wall time per completed operation. Retrieval: on the same frozen primary-source set (fixture still to be built), the share of expected primary sources returned with attributable URLs, extraction failures, and total runtime/cost."
+ },
+ "overturn_when": "Two checks could change this verdict.\n\n1. Browser lane: run agent-browser, Playwright CLI and a challenger (Browser Use or Cua Driver) on fixtures/greeting.html, then on a representative selected external page. A challenger would win if it completes the snapshot/ref fill-click-verify sequence with equal correctness and better session recovery or runtime/cost.\n\n2. Retrieval lane: build a frozen primary-source fixture under fixtures/ with known expected sources, including the retained IBKR miss from evidence/receipts/native-tavily-session-20260920.json (intended_adapter_guide_found false) and an unfiltered open-web query. Then compare Tavily search/extract, OpenResearch discover/paper and a challenger (Firecrawl MCP or Crawl4AI) on attributable-source completeness, extraction failures and total runtime/cost. That fixture does not exist yet, so this check cannot run until it is built.\n\nA regression in a changed release of Tavily, agent-browser or OpenResearch (upstream v0.2.8 against the 0.2.7 pin), measured on the same commands, would also overturn the verdict.",
+ "packet_sha256": "12bec6964a04cd2e37906fc14d14a18e5b89fc4caff24bbfab4cbdb243a98f56",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__web-research.json",
+  "<host-path>/SKILL.md (skill body preloaded in context)",
+  "catalogs/foundation/decisions.json (lines 1040-1159, 2270-2339; first round)",
+  "docs/ecosystem/tavily-receipt.json (first round)",
+  "evidence/receipts/native-tavily-session-20260920.json (first round)",
+  "evidence/receipts/native-tavily-cli-20260920.json (lines 180-274 first round; lines 185-196 re-read)",
+  "docs/dashboard-rendered-acceptance.md (lines 1-40; first round)",
+  "docs/full-stack-convergence.md (lines 45-134 first round; lines 50-59 re-read)",
+  "catalogs/us-equities/star-audit.json (grep context for browser-use, firecrawl-mcp-server, crawl4ai; first round)",
+  "catalogs/landscape/upstream-snapshot.json (grep context for trycua/cua added_reviews; first round)",
+  "evidence/receipts/token-practice-gap-followup-20260920.json (lines 1-210 re-read)",
+  "evidence/receipts/desktop-cli-workflows.json (lines 1-65 re-read)",
+  "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json (full)",
+  "recipes/native-upgrades-20260921.md (lines 1-87)",
+  "fixtures/greeting.html (existence verified via Glob in first round; fixture_sha256 recorded in token-practice-gap-followup line 134)"
+ ],
+ "why_selected": "Each of the three winners has retained native-execution evidence for a different part of the requirement. The scope is bounded, and no candidate was measured against another.\n\nc8, Tavily CLI 0.1.8, covers attributable web search and extraction. evidence/receipts/native-tavily-cli-20260920.json (lines 180-267) records `tvly search` with exit 0 and result_count 4. The search was domain-filtered (`--include-domains developers.openai.com,code.claude.com`, `--max-results 4`, lines 185-192), so its official-source results hold by construction and do not show open-web completeness. The same receipt records `tvly extract` with exit 0, result_count 1 and failed_count 0. A later task in evidence/receipts/native-tavily-session-20260920.json ran an unfiltered IBKR search that returned 3 sources, but intended_adapter_guide_found was false. Direct extraction of the known Nautilus IBKR URL returned 1 result with no failures. Only Search and Extract were exercised.\n\nc1, agent-browser, covers bounded page interaction. evidence/receipts/desktop-cli-workflows.json (lines 4 and 42-61) records a native_model_e2e run in an active Codex Desktop task on fixtures/greeting.html. Snapshot refs @e2/@e3 were used for fill and click, all_exit_codes was 0, the status \"Hello, Publication Codex Desktop!\" was observed, the screenshot was visually inspected and the owned session was closed. docs/dashboard-rendered-acceptance.md line 28 adds a second observation of a real Dagu browser stream.\n\nc7, OpenResearch at the packet pin 0.2.7, covers discovery and retrieval of public papers. evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json (lines 3-59) records the 2026-09-21 upgrade from 0.2.4 to 0.2.7. After it, `orx --no-telemetry discover keyword 'retrieval augmented generation memory' --limit 3` ran with exit 0 and result_count 3. `orx --no-telemetry paper 2609.05760 --full` ran with exit 0 and returned 69752 UTF-8 bytes. The unchanged upstream ui/tests/markdownTarget.test.mjs passed 7, failed 0 and skipped 0. recipes/native-upgrades-20260921.md line 13 records the same acceptance. An earlier full retrieval (`orx --no-telemetry paper 2608.02583 --full`, 63560 bytes, in evidence/receipts/token-practice-gap-followup-20260920.json lines 195-200) is dated 2026-09-20, before the 0.2.7 promotion, and records no version. It supports the capability but not the 0.2.7 pin.\n\nAll three are bounded CLIs with no standing research-agent stack. catalogs/foundation/decisions.json (lines 1048-1138 and 2278-2322) retains each as selection conditional with review_status accepted_within_scope. That is a retained provider or catalog judgment, not my own finding.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "catalogs/foundation/decisions.json",
+  "evidence/receipts/native-tavily-cli-20260920.json",
+  "evidence/receipts/native-tavily-session-20260920.json",
+  "docs/ecosystem/tavily-receipt.json",
+  "evidence/receipts/desktop-cli-workflows.json",
+  "docs/dashboard-rendered-acceptance.md",
+  "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
+  "recipes/native-upgrades-20260921.md",
+  "evidence/receipts/token-practice-gap-followup-20260920.json",
+  "docs/full-stack-convergence.md"
+ ],
+ "winner_keys": [
+  "c8",
+  "c1",
+  "c7"
+ ]
+}

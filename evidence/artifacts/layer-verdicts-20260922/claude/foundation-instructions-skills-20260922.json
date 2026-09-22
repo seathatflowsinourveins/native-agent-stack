@@ -1,0 +1,165 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "catalogs/landscape/native-practice.json",
+    "docs/native-skill-practice-20260921.md",
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c9",
+   "name": "Agent Skills reference tools",
+   "repository": "https://github.com/agentskills/agentskills",
+   "why_not_default": "Native execution was observed, but only as a format validator. catalogs/foundation/decisions.json lines 296-335 record that it 'accepted and rendered one selected skill', with selection 'conditional'. docs/native-skill-practice-20260921.md lines 43-44 record three selected directories passing skills-ref. It supplies no procedure. native-practice.json lines 216-227 say the tree has no SKILL.md to install, and that reference validation does not establish Claude/Codex discovery. foundation-closure line 53 lists it for this layer, which fits its role as the portable-format check, not a skill source."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/foundation/community-practice-20260920.json",
+    "docs/foundation-closure-20260921.md",
+    "docs/harness-rules-convergence-20260922.md"
+   ],
+   "key": "c5",
+   "name": "Shan Claude best practice",
+   "repository": "https://github.com/shanraisshan/claude-code-best-practice",
+   "why_not_default": "Source review only: 'No example workflow, model task, hook or service was executed' (community-practice-20260920.json lines 120-181). It is the closest candidate to the 'concise instructions' part of the requirement, but only as a reference (docs/foundation-closure-20260921.md line 22). Its cross-model example is dated March 6 and names older models (lines 37-39). It installs no selected skill file. The formal review was at bde3f031. A later research sweep did read it at the packet pin 15969ed2 (docs/harness-rules-convergence-20260922.md line 10), but no hash or install record exists at that pin."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/native-practice.json",
+    "docs/native-skill-practice-20260921.md"
+   ],
+   "key": "c6",
+   "name": "Trail of Bits security skills",
+   "repository": "https://github.com/trailofbits/skills",
+   "why_not_default": "native-practice.json lines 199-214 record decision 'conditional' on source review only (pin 32e34f81). The procedure has mandatory comprehensive reporting and history phases plus an optional namespaced plugin agent, which is heavier than the existing bounded review. It suits only selected security-sensitive diffs. No trial is retained."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/native-practice.json",
+    "docs/native-skill-practice-20260921.md"
+   ],
+   "key": "c10",
+   "name": "Vercel frontend skills",
+   "repository": "https://github.com/vercel-labs/agent-skills",
+   "why_not_default": "native-practice.json lines 166-182 record decision 'conditional' on source review only (pin 063bee94). The UI review skill fetches mutable external rules, and the React guide has 70 rules. There is no demonstrated need in the current static catalog, and no trial is retained."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+    "recipes/README.md",
+    "catalogs/foundation/decisions.json",
+    "catalogs/foundation/community-practice-20260920.json"
+   ],
+   "key": "c7",
+   "name": "Claude Code Templates",
+   "repository": "https://github.com/davila7/claude-code-templates",
+   "why_not_default": "It has a readiness hash check only, with no native discovery and no task trial. evidence/artifacts/claude-repository-evidence-20260921/results.json lines 8928-8972 record pin c840d6f6, status 'guidance-only' and 'the `concise-planning` skill text is installed'. In that record, sha256sum of $HOME/code/agent-lab/.claude/skills/concise-planning/SKILL.md exited 0 and contained the recorded hash ecd35e54..., with evidence_class 'readiness'. The record does not say the recorded hash was compared with the upstream file. recipes/README.md line 85 treats the repository as an optional reference for a matching task, with 'No all-agent pack installation or runtime E2E'. catalogs/foundation/decisions.json lines 238-293 give its use status as 'not_applicable', and community-practice-20260920.json has no entry for it. No native-client discovery is recorded, unlike the three winners."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/foundation/community-practice-20260920.json",
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c1",
+   "name": "VoltAgent subagent collection",
+   "repository": "https://github.com/voltagent/awesome-claude-code-subagents",
+   "why_not_default": "Not adopted. It is a role-contract reference, not a skill source, and has source review only. community-practice-20260920.json lines 223-270 note that the reviewed code-reviewer role exposes Write/Edit/Bash, so the title does not make it read-only (docs/foundation-closure-20260921.md line 24). It was not executed."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/native-practice.json",
+    "docs/native-skill-practice-20260921.md",
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c2",
+   "name": "Anthropic webapp-testing skill",
+   "repository": "https://github.com/anthropics/skills",
+   "why_not_default": "Not adopted. native-practice.json lines 183-198 record that it overlaps the accepted agent-browser/Playwright lanes, and its blanket networkidle wait has shown no advantage (source review at pin 34040c9c). foundation-closure line 26 calls the repository an on-demand reference, and line 53 lists 'Anthropic skills' for this layer. Neither line is backed by a retained hash or discovery observation for a specific Anthropic skill, so it does not beat c8 or c3."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "instructions-skills",
+ "limits": [
+  "I could not run commands. test-contract.cjs, skills-ref, hash checks and native discovery were not re-executed. All execution results are documented, retained evidence, not observed in this session.",
+  "I did not open native-receipt.json, catalog-cases.json, promptfooconfig.yaml, summary.json or provenance.json. Claims about the blueprints rely on native-practice.json and docs/native-skill-practice-20260921.md.",
+  "I did not read the upstream SKILL.md files or the c7 concise-planning file.",
+  "Skill path: <host-path>/SKILL.md (preloaded). No TypeSafe API call was made or supplied. All dispositions are my own source review; the only retained provider judgments are the jev-1.13.0 rows in typesafe-result.json.",
+  "Actual client model: claude-opus-5-5[1m]. The fixed schema value claude-opus-5/high was copied as instructed. Effort level is not exposed."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "No winner supplies the 'concise canonical rules' half of the requirement. That half is covered by the project's own instruction files, not by any candidate repository, and no candidate was compared on it.",
+  "This winner set differs from docs/foundation-closure-20260921.md line 53 (ECC; Anthropic skills; Agent Skills). The difference is not resolved by an executed comparison.",
+  "No selected skill has a measured task-quality or cost improvement over a matched baseline.",
+  "TypeSafe's 7/8 result comes from 8 selected cases and is not representative accuracy. On C4, jev-1.13.0 said contradicted with confidence 0.76, against a frozen label of insufficient. The comparator is literal containment (3/8), not a native coding-agent baseline.",
+  "gh-fix-ci was exercised only on a clean-check path. security-best-practices has installation and discovery evidence only; its references name FastAPI 0.128.x and Next.js 16.1.x, while the foundation pins 0.141.1 and 16.3.5.",
+  "ECC skills have no task-performance trial. Codex discovery for them is not recorded in the files read.",
+  "For ECC dd6ee538 and Shan 15969ed2, the packet pins were read in a research sweep (harness-rules-convergence-20260922.md line 10). Hash identity and installation are established only at 2b6e8397 for ECC. Shan has no install record.",
+  "c7's readiness check confirms that the installed file matches a recorded hash. The record does not show comparison with the upstream file or native discovery.",
+  "The packet gives pin null for c3, c6, c8 and c10, although native-practice.json records source pins for them.",
+  "Native discovery on another PC (a new WSL or macOS host) is not established."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "current selected set: TypeSafe (c8) + ECC search-first/iterative-retrieval (c4) + OpenAI gh-fix-ci/security-best-practices (c3)",
+   "candidate procedure (c6 Trail of Bits differential-review, c10 Vercel web-design-guidelines, c7 concise-planning, c5 Shan reference, or a newly pinned skill) loaded on demand for the same task"
+  ],
+  "fixture_paths": [
+   "blueprints/native-skill-practice/catalog-cases.json",
+   "blueprints/native-skill-practice/promptfooconfig.yaml",
+   "blueprints/native-skill-practice/native-receipt.json",
+   "blueprints/native-skill-practice/test-contract.cjs"
+  ],
+  "metric": "On a matched representative task: supported findings and task completion, conflicts with canonical project rules, and loaded skill bytes. Native discovery and hash identity against the retained pins must also hold."
+ },
+ "overturn_when": "The verdict changes in two cases. First, if a concrete task exposes a missing procedure and a matched trial shows a pinned conditional candidate (c6, c10, c5, c7 or c1) or a new skill does better than the current procedure: more supported findings, fewer conflicts or less loaded context. The trial must follow blueprints/native-skill-practice/catalog-cases.json and promptfooconfig.yaml, and the candidate must work in native discovery and task execution. Second, if a winner's installed bytes stop matching the retained pins or it fails native discovery. To check that, rerun `node --test test-contract.cjs` from blueprints/native-skill-practice and the native receipt check in blueprints/native-skill-practice/native-receipt.json.",
+ "packet_sha256": "c2ac65c776c07d3f5bbeecaa84cca78377fc76caf12ffbf379bd87df2129f1e4",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__instructions-skills.json",
+  "docs/native-skill-practice-20260921.md",
+  "blueprints/native-skill-practice/typesafe-result.json",
+  "catalogs/landscape/native-practice.json (lines 28-253)",
+  "docs/foundation-closure-20260921.md (lines 1-60, incl. 18-57 re-read)",
+  "catalogs/foundation/community-practice-20260920.json (lines 1-40, 110-379)",
+  "catalogs/foundation/decisions.json (lines 236-350)",
+  "blueprints/native-skill-practice/README.md (grep)",
+  "evidence/artifacts/claude-repository-evidence-20260921/results.json (lines 8925-8974)",
+  "docs/harness-rules-convergence-20260922.md (lines 1-30)",
+  "recipes/README.md (lines 80-89)",
+  "<host-path>/SKILL.md (skill body preloaded)"
+ ],
+ "why_selected": "The requirement (packet line 298) has two parts: concise canonical rules, and useful upstream procedures, without activating whole catalogs. No candidate supplies the canonical rules. On the evidence, those come from the project's own AGENTS/CLAUDE files; the community-practice-20260920.json layer map (lines 360-374) keeps the current project rules and copies. So the winners are chosen for the procedures part. c8, c4 and c3 are the only adopted candidates with retained evidence that named upstream skill files were installed with matching bytes and observed in a native client, and each is loaded per operation, not as a catalog. All three findings below are my own source review.\n\n(1) c8 TypeSafe has the strongest evidence. catalogs/landscape/native-practice.json lines 32-69 record it pinned at 65a39f39, with its SKILL.md sha256 matching the upstream file. Fresh native source-review invocations completed in Claude Code 2.1.278 and Codex 0.155.1 (docs/native-skill-practice-20260921.md lines 116-126). blueprints/native-skill-practice/typesafe-result.json holds a provider diagnostic in which jev-1.13.0 got 7 of 8 cases right against 3 of 8 for exact-text-baseline-v1 (service_errors 0, promptfoo_exit_code 100).\n\n(2) c4 ECC selects only two skills at 2b6e8397: search-first and iterative-retrieval. Installation with a matching source hash and single native Claude discovery were observed. The full hooks/rules bundle is explicitly not adopted (docs/foundation-closure-20260921.md line 21; catalogs/foundation/community-practice-20260920.json lines 112-113 and 313-341).\n\n(3) c3 OpenAI covers two skills pinned at 49f948fa: gh-fix-ci and security-best-practices. Their SKILL.md hashes matched upstream and Claude init listed them. The unchanged gh-fix-ci inspect_pr_checks.py ran once, exited 0 and printed 'PR #55: no failing checks detected.' (native-practice.json lines 71-162).\n\nThis set differs from the project's own layer entry. docs/foundation-closure-20260921.md line 53 lists 'ECC; Anthropic skills; Agent Skills'. I did not select Anthropic skills (c2) because it is not adopted in the packet, and its only retained support is the line 26 claim that 'Existing Claude sync already exposes selected official skills', with no hash or discovery record. I did not select Agent Skills (c9) because it is a format validator that supplies no procedure. TypeSafe and OpenAI both have hash-plus-discovery records.\n\nEvidence level: local integration and native discovery, plus one bounded provider diagnostic. Nothing here measures a task-quality improvement.",
+ "winner_evidence_class": "local_integration",
+ "winner_evidence_refs": [
+  "catalogs/landscape/native-practice.json",
+  "docs/native-skill-practice-20260921.md",
+  "blueprints/native-skill-practice/typesafe-result.json",
+  "catalogs/foundation/community-practice-20260920.json",
+  "docs/foundation-closure-20260921.md"
+ ],
+ "winner_keys": [
+  "c8",
+  "c4",
+  "c3"
+ ]
+}
