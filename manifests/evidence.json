@@ -12094,18 +12094,18 @@
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/document-retrieval/qmd-repeated-bench-isolated.json",
-      "sha256": "5393a2fd790657ee56b01a74ad5d17343a44cde76dad29e377e639b19fecb610",
-      "bytes": 8715
+      "sha256": "1b82191354de946d8aa1618add7b627449522dcfec5d143f2abb6eda329fa5f7",
+      "bytes": 11556
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/durable-memory/deletion-erasure-probe.json",
-      "sha256": "8326ebb7dc4e6c3a7028d16ea7a10f122b82f126f8809d31605b79eb15cca294",
-      "bytes": 13256
+      "sha256": "fd7b0e669adae64580cc8dbebff76eb3bc2f28418df2f246ee2200ce3e2089a7",
+      "bytes": 18965
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/agents-models-workers/ai-memory-local-scope-reread.json",
-      "sha256": "b0307934e84f69d62dcefa7aeebd7e9cb765372389260b905609af05dd17e37f",
-      "bytes": 10894
+      "sha256": "4e846bac96536d6da45ffff943060aa8b02576b01646ca6c526623db098130bb",
+      "bytes": 13022
     }
   ],
   "convergence_records": [
