@@ -34,7 +34,9 @@
       "hosted_smoke": {
         "workflow": ".github/workflows/adoption-bootstrap.yml",
         "job": "bootstrap-macos",
-        "status": "pending_first_green_run"
+        "status": "green_on_hosted_runner",
+        "run_id": "35753801691",
+        "receipt": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json"
       },
       "evidence_ref": null
     }

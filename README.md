@@ -234,12 +234,20 @@ codex login   # and/or: claude
 
 `adoption/manifest.json` `platform_profiles` records this profile's actual
 current state: `{"id": "macos-arm64", "status": "drafted_not_accepted",
-"evidence_ref": null}` — there is no separate hosted-runner-smoke field to
-cite here. Explicit claim boundary: a hosted GitHub macOS arm64 runner run
-(if and when one is added) is native operation on that hosted runner, not
-acceptance on a user's own Mac; a green hosted-runner smoke run there would
-not substitute for it. `launchd` integration and local embedding-backend
-steps on macOS remain unrun outside any such hosted runner — see
+"evidence_ref": null}`, with the hosted smoke job carried in its own
+`hosted_smoke` field: `{"workflow": ".github/workflows/adoption-bootstrap.yml",
+"job": "bootstrap-macos", "status": "green_on_hosted_runner"}`. That job ran
+green: run `35753801691` at head `9d9ce2b` on a GitHub-hosted `macos-15` arm64
+runner (macOS 15.7.9 build 24G830, Python 3.13.15) installed the pinned
+darwin-arm64 components and reported the `macos-arm64-foundation` profile
+`prerequisites_present` with no missing command
+([`evidence/receipts/adoption-macos-hosted-smoke-20260922.json`](evidence/receipts/adoption-macos-hosted-smoke-20260922.json)).
+Explicit claim boundary: that run is native operation on a GitHub-hosted macOS
+arm64 runner, not acceptance on a user's own Mac; the green hosted-runner smoke
+run does not substitute for it, which is why the profile stays
+`drafted_not_accepted` with `evidence_ref: null`. `launchd` integration and
+local embedding-backend steps on macOS remain unrun outside that hosted runner
+— see
 [`adoption/platforms/macos-arm64.md`](adoption/platforms/macos-arm64.md).
 
 To reproduce the public text measurement with the same upstream tokenizer:

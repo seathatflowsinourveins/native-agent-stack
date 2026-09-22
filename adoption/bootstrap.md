@@ -31,13 +31,18 @@ nothing on that page has been executed on a Mac; see
    [the macOS page](platforms/macos-arm64.md#prerequisites); that page is
    drafted, not accepted.
 
-2. **Run the platform bootstrap script.** `adoption/bootstrap-linux.sh --profile <id>`
-   on Linux/WSL2, or `adoption/bootstrap-macos.sh --profile <id>
-   [--skip-system-packages] [--plan]` on macOS (`ECO_INSTALL_ROOT` env,
+2. **Run the platform bootstrap script.** `adoption/bootstrap-linux.sh --profile <id>
+   [--skip-system-packages] [--allow-unpinned <id,id,...>]` on Linux/WSL2, or
+   `adoption/bootstrap-macos.sh --profile <id> [--skip-system-packages]
+   [--allow-unpinned <id,id,...>] [--plan]` on macOS (`ECO_INSTALL_ROOT` env,
    default `$HOME/.local/share/codex-ecosystem`; writes
-   `$ECO_INSTALL_ROOT/installed-versions.txt`; exit 2 usage, 1 guard/refusal,
-   0 success; `--plan` resolves the profile's pins with no network and still
-   exits 1 on a null `sha256`) — installs the selected profile's components
+   `$ECO_INSTALL_ROOT/installed-versions.txt`; both scripts exit 2 usage,
+   1 guard/refusal, 0 success, 3 when a selected component has no pin and was
+   not named in `--allow-unpinned`, and 4 when a prerequisite is still missing
+   after the system-package step — with `--skip-system-packages` no
+   `apt-get`/`brew install` is attempted and the check lists what is missing;
+   `--plan` resolves the profile's pins with no network and still exits 1 on a
+   null `sha256`) — installs the selected profile's components
    using each entry's `recipe_map` path. Inspect the script before running it
    on a new host; it installs only what the chosen `--profile` selects.
 

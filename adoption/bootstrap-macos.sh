@@ -210,14 +210,10 @@ mkdir -p "$bin_dir" "$cache_dir" "$ecosystem_root/tools"
 export PATH="$bin_dir:$PATH"
 # macOS has no flock(1); an atomic mkdir is the portable mutual exclusion.
 lock_dir="$ecosystem_root/bootstrap.lock.d"
+# lock_held flips to 1 only after this process created the lock directory, so
+# cleanup can never remove a lock another bootstrap is holding.
 lock_held=0
-if mkdir "$lock_dir" 2>/dev/null; then
-  lock_held=1
-else
-  printf 'Another ecosystem bootstrap is running (%s exists).\n' "$lock_dir" >&2
-  exit 1
-fi
-stage_dir="$(mktemp -d "$ecosystem_root/staging.XXXXXXXX")"
+stage_dir=""
 cleanup() {
   if [[ -n "${stage_dir:-}" && "$stage_dir" == "$ecosystem_root"/staging.* && -d "$stage_dir" ]]; then
     rm -rf -- "$stage_dir"
@@ -226,7 +222,16 @@ cleanup() {
     rmdir "$lock_dir" 2>/dev/null || true
   fi
 }
+# Installed before the lock is taken: a failure between mkdir and the first
+# command after it (mktemp, for one) must still release this run's lock.
 trap cleanup EXIT
+if mkdir "$lock_dir" 2>/dev/null; then
+  lock_held=1
+else
+  printf 'Another ecosystem bootstrap is running (%s exists).\n' "$lock_dir" >&2
+  exit 1
+fi
+stage_dir="$(mktemp -d "$ecosystem_root/staging.XXXXXXXX")"
 
 fetch() {
   local url="$1" checksum="$2" destination="$3"

@@ -126,8 +126,9 @@ installing an unbounded shim.
 `tests/test_adoption_guarded_runners.py` covers two different evidence classes,
 and prints which containment branch it took.
 
-- **Structural validation** — ShellCheck (`-S style`, gated on `shutil.which`)
-  finds no finding in either script; neither file contains a personal home path
+- **Structural validation** — ShellCheck (`-S style`, gated on `shutil.which`,
+  with `SC2317` excluded — see the note at the end of this page)
+  finds no other finding in either script; neither file contains a personal home path
   literal; `ecosystem-bounded-run` with no arguments exits 64. On strict mode,
   note the divergence: **the shipped scripts do not carry `set -Eeuo pipefail`.
   Both open with the literal line `set -euo pipefail`, and that literal is what
@@ -199,4 +200,4 @@ opened at line 21 survives the final `exec` on this bash (verified separately vi
 `/proc/self/fd`), which is what makes that guarantee hold. This is a one-host
 observation, not a suite assertion.
 
-The shellcheck structural test excludes `SC2317` (info: "command appears to be unreachable"): the bounded runner's cleanup function is only reached through `trap`, which shellcheck 0.9.x on GitHub-hosted runners reports as unreachable while 0.11.0 is clean; the scripts are kept byte-faithful to their recorded provenance rather than annotated.
+The shellcheck structural test excludes `SC2317` (info: "command appears to be unreachable"): the bounded runner's cleanup function is only reached through `trap`, which the shellcheck release on the current GitHub-hosted image (its version is not captured in the run log) reports as unreachable while 0.11.0 is clean; the scripts are kept byte-faithful to their recorded provenance rather than annotated.

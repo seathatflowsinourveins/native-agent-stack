@@ -144,10 +144,12 @@ normally live in `docs/github-automation.md` is therefore kept here.
     dropped from `adoption/manifest.json`. The profile does exist today (ids:
     `foundation-cpu`, `research-runtime`, `observability`, `semantic-rag`,
     `recovery`, `macos-arm64-foundation`, `trading-nautilus`), and the new
-    positive `jq` step in Decision 2 catches the rename at run time. The
-    coordinator or U-D should still add `assertIn("macos-arm64-foundation",
-    profile_ids)` and a `WorkflowReferenceTests` assertion for
-    `adoption/bootstrap-macos.sh` at integration.
+    positive `jq` step in Decision 2 catches the rename at run time.
+    **Done in the 2026-09-22 integration fix round:**
+    `ProfileMappingTests.test_profile_ids_referenced_by_workflow_exist_in_manifest`
+    now also asserts `macos-arm64-foundation`, and
+    `WorkflowReferenceTests.test_workflow_references_the_macos_bootstrap_script_path`
+    asserts the workflow references `adoption/bootstrap-macos.sh`.
 
 ## Verification
 
@@ -163,50 +165,73 @@ base commit `445bc83`. Commands were run raw (`rtk proxy`).
 | `grep -rn -E '/(home\|Users)/[a-z]' .github/workflows/adoption-bootstrap.yml docs/tasks/2026-09-22-new-machine-install.md` | 1 | no matches — no literal personal home path in either owned file, as `scripts/validate.py` PRIVATE_CONTENT requires |
 | `python3 scripts/validate.py` | 1 | exactly two lines, both for the one file this unit changed: `.github/workflows/adoption-bootstrap.yml: SHA-256 mismatch` and `.github/workflows/adoption-bootstrap.yml: byte count mismatch` (the same cause — `manifests/evidence.json` still records the pre-edit digest and length; the coordinator rehashes at integration, and this unit is forbidden from editing that manifest) |
 
-Evidence class for this unit: **structural validation** (syntax, static
-security analysis, local contract tests). No macOS runner has executed this
-job, so there is no native-operation evidence for it yet, and
-`adoption/bootstrap-macos.sh` is written by a sibling unit — until both land on
-the integration branch, the job cannot pass.
+Evidence class for this unit at the time it was written: **structural
+validation** (syntax, static security analysis, local contract tests), with no
+macOS runner having executed the job. That changed at integration: the job has
+since run green on GitHub-hosted macOS arm64 runners, which adds
+**native operation on a hosted runner** for `adoption/bootstrap-macos.sh` only
+— see "Hosted run and receipt" below. Nothing here is workstation
+acceptance.
 
-### Integration gates — to be filled at integration
+### Integration gates
 
-The coordinator runs these on the integrated branch and records exact exit
-codes here:
+Run raw (`rtk proxy`) on the integrated tree in the integration worktree,
+branch `claude/new-machine-install-20260922`, after the 2026-09-22 review fix
+round (this round's own working tree; base commit `9d9ce2b`):
 
 | Gate command | Exit | Observed |
 | --- | --- | --- |
-| `python3 scripts/build_ecosystem.py --check` | | |
-| `python3 scripts/validate.py` | | |
-| `python3 scripts/validate_catalogs.py` | | |
-| `python3 scripts/validate_foundation.py --root . --json` | | |
-| `python3 scripts/validate_convergence.py` | | |
-| `python3 -m unittest` | | |
-| `gitleaks` through the guarded ecosystem launcher | | |
+| `python3 scripts/build_ecosystem.py --check` | 0 | `"status": "passed"` after `--write` regenerated `docs/ecosystem/index.html` for the new receipt and the edited embedded pages (the generated file's own digest is recorded in `manifests/evidence.json` `files[]`, not quoted here, because this record is itself embedded in the explorer) |
+| `python3 scripts/validate.py` | 0 | `{"components": 69, "hashed_files": 1754, "profiles": 4, "receipts": 140, "status": "passed"}` (1,753 files / 139 receipts before this round's receipt was registered) |
+| `python3 scripts/validate_catalogs.py` | 0 | `{"beyond_star_catalog_repositories": 106, "models": 20, "public_stars": 342, "repository_entries": 154, "starred_catalog_repositories": 42, "unique_catalog_repositories": 148}` |
+| `python3 scripts/validate_foundation.py --root . --json` | 0 | `"ok": true`, `"errors": []`; 20 layers, 54 decisions, 61 foundation components, 84 evidence receipts |
+| `python3 scripts/validate_convergence.py --all-recorded --root . --json` | 0 | `"valid": true` overall, every recorded experiment valid with `"errors": []` |
+| `python3 -m unittest` | 0 | `Ran 1428 tests` / `OK (skipped=204)` (1,427 before the two assertions added in this round; the skips are optional-runtime gates — duckdb, alpaca-py, Nautilus, QEMU, promtool/amtool — and their count moves with what is installed on the host) |
+| `shellcheck -S style adoption/bootstrap-macos.sh` | 0 | no findings; ShellCheck 0.11.0 on this host, run after the `trap cleanup EXIT`/lock reordering |
+| `gitleaks git . --config .gitleaks.toml --log-opts d093a4c..HEAD --max-target-megabytes 2 --max-decode-depth 0` through the guarded ecosystem launcher | 0 | `11 commits scanned` / `no leaks found`, through `9d9ce2b`. Coverage exclusions: targets over 2 MB and nested decoding. The fix-round commit itself is scanned by the same command once it lands, not by this run. |
 
-### Receipt protocol
+Deltas against the pre-fix-round integration gate run are the two new unit
+tests, the new receipt file and its `files[]`/`receipts[]` registration, and
+the regenerated explorer; no gate changed its exit code.
 
-After the first green `bootstrap-macos` run on the integration branch, the
-coordinator writes
-`evidence/receipts/adoption-macos-hosted-smoke-20260922.json` with
-`kind: native_cli_e2e`, `component_ids` set to the components the
-`macos-arm64-foundation` profile pins, and `data` carrying `run_id`,
-`run_url`, `run_attempt`, `head_sha`, `runner_label`, `image_version` (from
-the uploaded `sw_vers.txt`), `status_artifact_sha256` and
-`installed_versions_sha256`; `limitations` repeats the Limits below verbatim.
-The coordinator then registers the receipt in `manifests/evidence.json`. No
-receipt is written from a workflow file's mere existence, and a failed or
-cancelled run is recorded as such rather than retried into a green receipt.
+### Hosted run and receipt (integration, 2026-09-22)
+
+The `bootstrap-macos` job ran on GitHub-hosted runners from the integration
+branch and passed twice:
+
+| Fact | Value |
+| --- | --- |
+| First green run | `35753384567` at head `585032a` — the macOS job passed; that run's `validate` job failed for an unrelated ShellCheck code (`SC2317`), fixed in `9d9ce2b` |
+| Recorded run | `35753801691` at head `9d9ce2b`, job `106834376649`, attempt 1 |
+| Runner | label `macos-15`, GitHub-hosted, image provisioner `20260828.587`, macOS 15.7.9 build 24G830, Python 3.13.15 |
+| `adoption_status.py` | overall `prerequisites_missing` (`platform.supported` false by design on darwin), profile `macos-arm64-foundation` `prerequisites_present`, `missing_commands: []` |
+| Installed versions read off the runner | ai-memory 2.3.2, codex-cli 0.155.1, gh 2.101.0, qdrant 1.19.1, uv 0.12.17 (aarch64-apple-darwin) |
+| Artifact `adoption-bootstrap-macos-status-35753801691-1` | `status.json` sha256 `e59c1881a99e81dbef996ee685219cf4496032d77bcf425afa052780a05cdd7c` (1,834 bytes), `installed-versions.txt` sha256 `bcef0ebbba22b5b1edfb3e64c72228ba67e0b70ca24446e68e0488cd5af1f406` (2,715 bytes), `sw_vers.txt` sha256 `31fd674ddb951680692d7b68cafdeab5baa6b3e82aae843269dad73b53f25fc5` (66 bytes) |
+
+Receipt: [`evidence/receipts/adoption-macos-hosted-smoke-20260922.json`](../../evidence/receipts/adoption-macos-hosted-smoke-20260922.json)
+(`kind: native_cli_e2e`, `component_ids` = the components the
+`macos-arm64-foundation` profile pins, `data` carrying the run/job ids, run URL,
+attempt, head sha, runner label and image, the `adoption_status` block and the
+three artifact digests; `limitations` repeats the Limits below). It is
+registered in `manifests/evidence.json` (`receipts[]` and `files[]`), and
+`adoption/manifest.json` `platform_profiles[macos-arm64].hosted_smoke` now reads
+`status: green_on_hosted_runner` with `run_id` and `receipt`, while the profile
+row itself stays `drafted_not_accepted` with `evidence_ref: null`: a hosted
+runner is not a Mac workstation. No receipt was written from a workflow file's
+mere existence, and a failed or cancelled run is recorded as such rather than
+retried into a green receipt.
 
 ## Limits
 
 - macOS stays `drafted_not_accepted`. A hosted runner is not a Mac
   workstation: no user account, no Homebrew-managed system state carried
   across runs, no Metal GPU work, no client sign-in.
-- The job has never run. Everything above is structural; `zizmor` and the unit
-  tests analyze the file, they do not execute the workflow. The run will fail
-  until the sibling unit's `adoption/bootstrap-macos.sh` and
-  `adoption/pins-macos-arm64.json` are merged.
+- The job has now run green twice on the integration branch (runs
+  `35753384567` at head `585032a` and `35753801691` at head `9d9ce2b`), so the
+  hosted-runner install path is no longer structural-only. Everything the
+  hosted run does **not** cover is still structural: `zizmor` and the unit tests
+  analyze the workflow file, they do not execute it, and nothing below the
+  hosted-runner boundary in this list has been executed anywhere.
 - launchd service registration and the `llama-server` Metal embedding backend
   are unrun on any Mac. The job only prints `llama-server --version`; it does
   not start the server, load a model or measure an embedding.
@@ -225,4 +250,13 @@ cancelled run is recorded as such rather than retried into a green receipt.
   GitHub's own parser is the first to see it on the integration PR.
 - `jq` and `gh` are assumed present on the `macos-15` image (both are
   documented preinstalled tools). If a future image drops either, the
-  assertion and version steps fail loudly rather than silently skipping.
+  assertion and version steps fail loudly rather than silently skipping. The
+  recorded run read `gh` 2.101.0 off the image, which is the image's copy, not
+  a pinned install.
+- `socraticode` is the `macos-arm64-foundation` profile's documented unpinned
+  skip (`documented_unpinned_ids=(socraticode)` in the script): the hosted run
+  did not install it, and no darwin-arm64 pin for it has been reviewed.
+- The hosted run used `--skip-system-packages`, so no `brew install` step ran:
+  the runner image already carried `curl`, `git`, `tar`, `shasum`, `unzip`,
+  `jq` and `mktemp`. The Homebrew prerequisite path on this page is still
+  unrun anywhere.

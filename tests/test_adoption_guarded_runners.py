@@ -109,7 +109,11 @@ class GuardedRunnerStructureTests(unittest.TestCase):
     # SC2317 (info, "command appears to be unreachable") is excluded: the bounded runner's
     # cleanup function is reached only through `trap`, which the shellcheck release on
     # GitHub-hosted runners reports as unreachable while shellcheck 0.11.0 is clean.
-    @unittest.skipUnless(SHELLCHECK, "native shellcheck unavailable; CI installs the pinned analyzer")
+    @unittest.skipUnless(
+        SHELLCHECK,
+        "native shellcheck unavailable; the hosted runner uses its image's shellcheck "
+        "(not pinned by any workflow)",
+    )
     def test_shellcheck_is_clean_at_style_severity(self):
         result = _run([SHELLCHECK, "-S", "style", "-e", "SC2317", str(BOUNDED_RUN), str(GITLEAKS_GUARDED)])
         self.assertEqual(

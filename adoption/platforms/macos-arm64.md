@@ -1,9 +1,12 @@
-# **Drafted, not accepted — nothing on this page was executed on a Mac**
+# **Drafted, not accepted — nothing on this page was executed on a Mac workstation**
 
 Per [the acceptance evidence policy](../../docs/acceptance-evidence-policy.md),
-this page is `source_review` evidence only: upstream documentation and release
-metadata were read, but no command below has a native execution receipt on
-macOS. `platform_profiles` entry `macos-arm64` in
+this page is `source_review` evidence plus one hosted-runner execution: upstream
+documentation and release metadata were read, and the bootstrap script has a
+native execution receipt from a GitHub-hosted macOS arm64 runner
+([`evidence/receipts/adoption-macos-hosted-smoke-20260922.json`](../../evidence/receipts/adoption-macos-hosted-smoke-20260922.json),
+"What a hosted run proves" below), but no command below has an execution receipt
+from a Mac workstation. `platform_profiles` entry `macos-arm64` in
 [`adoption/manifest.json`](../manifest.json) has `status: drafted_not_accepted`
 and `evidence_ref: null`. `adoption/manifest.json` `supported_platforms` stays
 Linux/x86_64/Python 3.13 only; this profile does not change that. The `macos-arm64-foundation`
@@ -45,6 +48,18 @@ The script keeps to what a stock Mac has: `shasum -a 256` instead of
 `sha256sum`, an atomic `mkdir` lock instead of `flock`, `cd` + `pwd -P` instead
 of `realpath`, and no bash-4-only syntax, because `/bin/bash` on macOS is 3.2.
 
+The lock is `$ECO_INSTALL_ROOT/bootstrap.lock.d` (default
+`$HOME/.local/share/codex-ecosystem/bootstrap.lock.d`). A run removes it on
+exit, including on a failure, and only when that run created it — but a
+`SIGKILL`ed or power-cut run leaves it behind, and every later run then exits 1
+with `Another ecosystem bootstrap is running`. Recovery: confirm no bootstrap is
+running (`pgrep -fl bootstrap-macos.sh` prints nothing), then remove the stale
+lock directory before retrying:
+
+```sh
+pgrep -fl bootstrap-macos.sh || rmdir "${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bootstrap.lock.d"
+```
+
 ### Bootstrap usage and exit codes
 
 ```sh
@@ -53,8 +68,12 @@ bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation \
 ```
 
 `--plan` resolves and prints every pinned component (version, asset, SHA-256)
-with no network access and no installation. It is the only mode anything on
-this page has run in, and only under a `uname`/`sw_vers` shim on Linux.
+with no network access and no installation. On this repository's Linux host it
+runs only under a `uname`/`sw_vers` shim. The full install path (no `--plan`,
+with `--skip-system-packages`) has run on real Darwin arm64 once, on the hosted
+runner described in "What a hosted run proves" below; every workstation step on
+this page — Homebrew prerequisites, sign-in, launchd, the embedding
+acceptance — remains unrun.
 
 | Exit | Meaning |
 | --- | --- |
@@ -67,8 +86,11 @@ this page has run in, and only under a `uname`/`sw_vers` shim on Linux.
 `socraticode` is the one selected component this draft leaves unpinned (below);
 the script carries it as a documented skip, so the shipped profile needs no
 `--allow-unpinned`. Exit codes 3 and 4 and the `--allow-unpinned` flag mirror
-[`adoption/bootstrap-linux.sh`](../bootstrap-linux.sh), so the two platform
-scripts do not diverge; `--plan` is macOS-only.
+[`adoption/bootstrap-linux.sh`](../bootstrap-linux.sh). Two differences are
+disclosed rather than hidden: this script carries
+`documented_unpinned_ids=(socraticode)`, a built-in skip list the Linux script
+does not have, so an unpinned `socraticode` never trips the exit-3 refusal here;
+and `--plan` is macOS-only.
 
 ### darwin-arm64 pinned release archives
 
@@ -120,11 +142,17 @@ binary, instead of a bare symlink.
 
 The `platform_profiles` row for `macos-arm64` names a hosted smoke job
 (`.github/workflows/adoption-bootstrap.yml`, job `bootstrap-macos`) whose status
-is `pending_first_green_run`: **no such run exists yet**, and the job itself is
-not part of this draft. When it does run green, its bounded claim is native
-operation of this script on a **GitHub-hosted macOS arm64 runner** — that the
-pinned assets download, verify against these SHA-256 values, extract and report
-versions on Apple Silicon. That is not a workstation acceptance:
+is `green_on_hosted_runner`. It has run green twice: run `35753384567` at head
+`585032a` (the macOS job passed; that run's `validate` job failed for an
+unrelated ShellCheck code), and run `35753801691` at head `9d9ce2b` (job
+`106834376649`, runner label `macos-15`, GitHub-hosted image provisioner
+`20260828.587`, macOS 15.7.9 build 24G830, Python 3.13.15), which is the run
+recorded in
+[`evidence/receipts/adoption-macos-hosted-smoke-20260922.json`](../../evidence/receipts/adoption-macos-hosted-smoke-20260922.json).
+Its bounded claim is native operation of this script on a **GitHub-hosted macOS
+arm64 runner** — that the pinned assets download, verify against these
+SHA-256 values, extract and report versions on Apple Silicon.
+That is not a workstation acceptance:
 
 - A hosted runner is not this profile's target Mac; hardware, memory (24/48 GB),
   installed Homebrew state and the user's own account are all different.

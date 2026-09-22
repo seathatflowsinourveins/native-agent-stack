@@ -190,11 +190,16 @@ class ProfileCoverageTests(unittest.TestCase):
                    if item["id"] == "macos-arm64")
         self.assertEqual(row["bootstrap_script"], "adoption/bootstrap-macos.sh")
         self.assertEqual(row["pins"], "adoption/pins-macos-arm64.json")
-        self.assertEqual(row["hosted_smoke"], {
-            "workflow": ".github/workflows/adoption-bootstrap.yml",
-            "job": "bootstrap-macos",
-            "status": "pending_first_green_run",
-        })
+        smoke = row["hosted_smoke"]
+        self.assertEqual(smoke["workflow"], ".github/workflows/adoption-bootstrap.yml")
+        self.assertEqual(smoke["job"], "bootstrap-macos")
+        # A hosted run is native operation on a GitHub runner, never an
+        # acceptance: the status may advance from pending to green, and no
+        # value of it may claim acceptance.
+        self.assertIn(smoke["status"], {"pending_first_green_run", "green_on_hosted_runner"})
+        self.assertNotEqual(smoke["status"], "accepted")
+        if "receipt" in smoke:
+            self.assertTrue((ROOT / smoke["receipt"]).is_file(), smoke["receipt"])
         # The row stays drafted: nothing here is an acceptance.
         self.assertEqual(row["status"], "drafted_not_accepted")
         self.assertIsNone(row["evidence_ref"])

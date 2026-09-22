@@ -2936,6 +2936,28 @@
         "This receipt does not extend, retro-label or otherwise change the scope of native-historical-leverage-stress-20260919 (lean), which remains scoped to its own six LEAN simulations only."
       ],
       "path": "evidence/receipts/exchange-calendars-native-check-20260922.json"
+    },
+    {
+      "id": "adoption-macos-hosted-smoke-20260922",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "context-mode",
+        "ai-memory",
+        "mcporter",
+        "llama-cpp",
+        "qdrant"
+      ],
+      "claim": "adoption/bootstrap-macos.sh --profile macos-arm64-foundation --skip-system-packages ran to completion on a GitHub-hosted macOS arm64 runner (label macos-15, macOS 15.7.9 build 24G830, Python 3.13.15) into a disposable ECO_INSTALL_ROOT, installing the pinned darwin-arm64 archives and npm packages listed in adoption/pins-macos-arm64.json; scripts/adoption_status.py --profile macos-arm64-foundation --json then reported the profile prerequisites_present with no missing command and platform.supported false, and the job uploaded status.json, installed-versions.txt and sw_vers.txt as its artifact.",
+      "limitations": [
+        "Native operation on a GitHub-hosted macOS arm64 runner only; not acceptance on a user's Mac workstation, which must record its own receipt.",
+        "platform_profiles[macos-arm64] stays drafted_not_accepted and adoption/manifest.json supported_platforms stays Linux/x86_64; the overall adoption_status is prerequisites_missing by design on an unsupported platform.",
+        "No native client sign-in, no launchd service bootstrap, no llama-server embedding acceptance and no Homebrew system-package step ran (--skip-system-packages; the runner image already carried the prerequisites).",
+        "npm packages resolve their darwin-arm64 optional binaries from the registry unpinned; the registry tarball sha256 is what the pins verify.",
+        "socraticode is the profile's documented unpinned skip and was not installed."
+      ],
+      "path": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json"
     }
   ],
   "files": [
@@ -3061,8 +3083,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "4603ee6f75ca380ab07d4abdbaf80742c546a8eceb2abfdb0adf40e44245fd8c",
-      "bytes": 20792
+      "sha256": "493ee6c0f962a863b0428c0744aaf9fc9ce3563df29bf4f3e2e2e292e689827f",
+      "bytes": 21362
     },
     {
       "path": "SECURITY.md",
@@ -3081,13 +3103,13 @@
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "0e34c36d9d8f0794e46457208620f4c8e8b226dab413043ce75a0a88c1dc85b9",
-      "bytes": 19039
+      "sha256": "7b588ea862d1035ba13b645c777f625bf09caa463b81955b6decf6db91aad96b",
+      "bytes": 19343
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "1728a5ea7c6855237e6b4d359d5d2e9562f3ce4e22b3ec7547a00dc371e26747",
-      "bytes": 7080
+      "sha256": "64d25035e3ae24e08fb8f0f46d965f3e55ea02e55307bb7aa7bcd48cb7a12dac",
+      "bytes": 7460
     },
     {
       "path": "adoption/host-state.example.json",
@@ -3106,8 +3128,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "72f07174ecce4136f70796e85b23b973e03be3ce9acf75f84e097f6be6640e02",
-      "bytes": 17449
+      "sha256": "06ffa9db66016b2ad52b4d9ffbf15632a298ff2f20fb2c7581aaea6ec1effd4e",
+      "bytes": 17563
     },
     {
       "path": "adoption/paired/README.md",
@@ -3156,8 +3178,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "228b90fc19522b1d53ada8af1e7e30449996a973cc57dce3222245736e0579d0",
-      "bytes": 15691
+      "sha256": "8f55582741fbd1e0230ef4ea9d37bf5c7dc2f5c9569705cbc99dbe2f5cb14756",
+      "bytes": 17458
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3211,8 +3233,8 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "52c3fdbaf31a454682b001998ec8914f23c6f9aec618a0856a65fec020b16249",
-      "bytes": 12706
+      "sha256": "0187674fd9ee0241a34bc445c02ba3ebad21df3aa2bdd0ac2635c55310589ae9",
+      "bytes": 12840
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
@@ -7467,7 +7489,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "4d5179bf08d47dbee3038cc7ca9b2b01f1e7e99858ebeddc3770b8a34fd2d82f",
+      "sha256": "6074e42b0daf3595e615587eb9d0b961a424442627f6bb7cec1faf6605035e42",
       "bytes": 12139744
     },
     {
@@ -7737,8 +7759,8 @@
     },
     {
       "path": "docs/tasks/2026-09-22-new-machine-install.md",
-      "sha256": "ff17e1b30d7d07f829c8b875e4244863db67a355c0e46f1e59e82bc745d2c02b",
-      "bytes": 14253
+      "sha256": "c4ee784d59cae482a004aa24e2cf69b14d98de052e0e1b6b545ab26c68c7d87b",
+      "bytes": 18599
     },
     {
       "path": "docs/token-efficiency-stack.json",
@@ -10181,6 +10203,11 @@
       "bytes": 1125
     },
     {
+      "path": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json",
+      "sha256": "0b5dd6eddd43f2f0fbce6ae67fbfe4194acf2fd21d5605a1b26c0dcc83d9753c",
+      "bytes": 4263
+    },
+    {
       "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
       "sha256": "dc77da98626554db016f1b519eba1db891a76af9b5f49849aad8aad2c126d461",
       "bytes": 866
@@ -11302,13 +11329,13 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "09563ae5270fc2de8659b5c87760b6e0118898a674e6340abf3396762298aef3",
-      "bytes": 19963
+      "sha256": "e42089d0ea4d0f48e92a3e9386869f6afcb1c8987817af1eb7187cf658d16a25",
+      "bytes": 20197
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "2a46a7cf9801579115a3176281e4b3be5cbe5136fa8a8b6475ddf4e6d76c5d42",
-      "bytes": 28529
+      "sha256": "fc882bffe36d2d3116e49bcdfca79274eed2c3f1c3eb96e2b9612731d1ff78a5",
+      "bytes": 28953
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -11317,8 +11344,8 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "505bafa7484ba21c1803431564fa478dd2cfbf69df055c18e849fe5ff6daa25d",
-      "bytes": 21121
+      "sha256": "9fe7155745db79cfa2ae673465c28907042aa0776b35834ddf17968ecd226a91",
+      "bytes": 21198
     },
     {
       "path": "tests/test_adoption_status.py",
