@@ -184,10 +184,14 @@ attempted here.
 
 ## Review findings carried (2026-09-22)
 
-An independent review of this harness (recorded in the agent-lab task record
-`docs/tasks/2026-09-22-executed-comparisons.md`, "Parity final review")
-confirmed 21 of 24 claims and recorded six non-blocking items. None changes the BLOCKED verdict; they are carried
-into the next harness round:
+An independent review of this harness confirmed 21 of 24 claims and recorded
+six non-blocking items. The review record is external evidence kept in the
+agent-lab working repository (task record
+`docs/tasks/2026-09-22-executed-comparisons.md`, "Parity final review"); it is
+not retained or hash-pinned in this repository, so the count is reported, not
+reproducible from this tree. The six items are restated below and can be
+checked against the files they name. None changes the BLOCKED verdict; they
+are carried into the next harness round:
 
 1. `fixture_strategy.py` substitutes a zero commission when a native fill
    event carries none, instead of refusing; the published run did not hit

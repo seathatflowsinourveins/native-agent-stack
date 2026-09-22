@@ -6024,8 +6024,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
-      "sha256": "b1d3885083e15b67b2c2e4711a32e6259fae72c1df0e683b347fcf16d1b20978",
-      "bytes": 10297
+      "sha256": "a2968f01d9132fec8c6536ab44ade9c2e517e997eca8650f9ad3b80fcd8ae042",
+      "bytes": 10546
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
