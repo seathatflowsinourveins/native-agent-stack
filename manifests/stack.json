@@ -218,7 +218,8 @@
         "alpaca-paper-e2e-20260921",
         "foundation-rd-20260921",
         "claude-upstream-checks-20260921",
-        "adaptive-paper-practice-20260921"
+        "adaptive-paper-practice-20260921",
+        "broad-universe-research-20260921"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -315,7 +316,8 @@
         "full-stack-convergence-20260921",
         "foundation-rd-20260921",
         "claude-upstream-checks-20260921",
-        "adaptive-paper-practice-20260921"
+        "adaptive-paper-practice-20260921",
+        "broad-universe-research-20260921"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -1228,7 +1230,8 @@
         "native-security-identity-20260920",
         "token-practice-coverage-20260920",
         "native-lifecycle-sample-20260920",
-        "synthetic-catalyst-contract-20260920"
+        "synthetic-catalyst-contract-20260920",
+        "broad-universe-research-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1362,7 +1365,8 @@
         "native-security-identity-20260920",
         "token-practice-coverage-20260920",
         "alpaca-paper-e2e-20260921",
-        "adaptive-paper-practice-20260921"
+        "adaptive-paper-practice-20260921",
+        "broad-universe-research-20260921"
       ],
       "upstream_sources": [
         "https://github.com/alpacahq/alpaca-py/tree/v0.44.0",

@@ -2651,6 +2651,25 @@
         "News is capped and advisory; native broker fault induction, signal parity and continuous operation remain open."
       ],
       "path": "evidence/receipts/adaptive-paper-practice-20260921.json"
+    },
+    {
+      "id": "broad-universe-research-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "alpaca-py",
+        "duckdb",
+        "claude-code",
+        "codex"
+      ],
+      "claim": "Widest entitled SIP daily coverage measured for 17,997 US-listed symbols over 2,693 sessions (2016-01-04 to 2026-09-18) with page-hash and pagination proofs; a frozen broad-universe mover protocol evaluated chronologically once, establishing no predictive signal; and a dated full-universe scan in which META and AMD ranked 14th and 19th of 1,795 eligible names.",
+      "limitations": [
+        "Survivorship exposure before 2020: only 25/47/167 symbols end in 2016/2017/2018 because the provider asset list under-enumerates delisted names and corporate-action records are thin before 2020.",
+        "Daily-bar event study with modelled costs; no opening-auction price, halts, quotes or portfolio simulation; not attainable P&L and not a paper or broker result.",
+        "Identity is provider-symbol based: 155 duplicated ticker series were removed, 80 partial overlaps (0.12% of rows) and 235 undated ticker collisions remain.",
+        "No paper order was placed: no signal met promotion, the session was closed, and multi-session horizons do not fit the frozen 300-second adaptive trial.",
+        "Scan flags are research flags, not predictions; provider mover screens are bounded top-N lists; tests are local synthetic-fixture checks."
+      ],
+      "path": "evidence/receipts/broad-universe-research-20260921.json"
     }
   ],
   "files": [
@@ -4717,8 +4736,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "bytes": 458931,
-      "sha256": "1a655ddf6deca8016b749e0d23cf56d41be663db0c102c0fb3009e3f397620db"
+      "bytes": 459711,
+      "sha256": "09b7245e8f104856b46623c2ab6160e274328e8a611c28be5cd1181f78811c10"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -6832,8 +6851,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 82637,
-      "sha256": "db31fb6354aa21b44491774e85bc86e8552eae76f2b12a133a61716551c504dc"
+      "bytes": 82813,
+      "sha256": "4999f2b0d9b3c0262d23e944eb49b35b170cab70512cbcd3d98d9ad112a92e4b"
     },
     {
       "path": "observability/README.md",
@@ -6992,8 +7011,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "bytes": 8340,
-      "sha256": "0644df4c919cb15b87898786821d3ba951ff78e46d12fe650b50d2b31786693b"
+      "bytes": 10097,
+      "sha256": "abc4d2b8188213ea8dc48f4e7cac97bc0fe50bf49d89447a7dbfe93c2e8fbca4"
     },
     {
       "path": "observability/receipt.json",
@@ -9929,6 +9948,76 @@
       "path": "tests/test_adaptive_paper_transport.py",
       "bytes": 25827,
       "sha256": "d657ffc6a426293b96e145b26f6df604c39f321d51717f48a821e5eb3078aa43"
+    },
+    {
+      "path": "evidence/receipts/broad-universe-research-20260921.json",
+      "bytes": 1568,
+      "sha256": "72810baa78bb0768410b6dfd234dcb3ae4911ad4f549c5b1b9d6bb314d1e67f0"
+    },
+    {
+      "path": "blueprints/us-equities/broad-universe/README.md",
+      "bytes": 13999,
+      "sha256": "b0aaac2a7d6124eb769fab5d2964bd554a9ebd132df59c0570517771878fc674"
+    },
+    {
+      "path": "blueprints/us-equities/broad-universe/collect_daily.py",
+      "bytes": 16457,
+      "sha256": "4557cd9b0fc6aa6781a31748bfc97d53b6c9234648480177daa2f78bca2bbfaf"
+    },
+    {
+      "path": "blueprints/us-equities/broad-universe/corporate_actions.py",
+      "bytes": 15001,
+      "sha256": "0e39b3eeb84db83c64aa777ed46756ae495b1581dbc6a41193604bbf132ce81e"
+    },
+    {
+      "path": "blueprints/us-equities/broad-universe/coverage.py",
+      "bytes": 59922,
+      "sha256": "ea88f5d7a9fd4d5f957b559ee4afc035134c7d267e4a1afa52c45afe3f48ebbd"
+    },
+    {
+      "path": "blueprints/us-equities/broad-universe/evaluate.py",
+      "bytes": 61632,
+      "sha256": "1570ecc7bc782e7583564f2f588577bd6680ed50f7d5ca4dab66e8e117bb45b8"
+    },
+    {
+      "path": "blueprints/us-equities/broad-universe/evaluation-results.json",
+      "bytes": 857369,
+      "sha256": "868837c770fa12347ca9ba8add06d37fd95e86db915866f103725f1364c8cac6"
+    },
+    {
+      "path": "blueprints/us-equities/broad-universe/protocol.json",
+      "bytes": 13851,
+      "sha256": "f3428ad980b25f69020d07f193ff9f916ed3d7990ebc7eaec4aa2c3299352139"
+    },
+    {
+      "path": "blueprints/us-equities/broad-universe/receipt.json",
+      "bytes": 286428,
+      "sha256": "fa5cb3acd60d03322cb9dbc98353fed9861f9d233a52795a3401c742f4ac46ee"
+    },
+    {
+      "path": "blueprints/us-equities/broad-universe/scan.py",
+      "bytes": 45354,
+      "sha256": "466c7a0baf977998c9d067fa479a2f93392fe389116bdd8fce99a3fed72d5888"
+    },
+    {
+      "path": "blueprints/us-equities/broad-universe/watchlist-20260921.json",
+      "bytes": 134880,
+      "sha256": "a5929b47122b1a1e8f506d8b5e19e83eb5dd3b802f22927c6c0dff5b11531394"
+    },
+    {
+      "path": "tests/test_broad_universe_coverage.py",
+      "bytes": 58079,
+      "sha256": "e7b5d945ef430987509f24db0feb9d0ee2b9af2f85208272c004e02c00effe52"
+    },
+    {
+      "path": "tests/test_broad_universe_evaluate.py",
+      "bytes": 52224,
+      "sha256": "03b107ae7e325d43e077e023a684493828221f8082b7637c5fcb083b78af4085"
+    },
+    {
+      "path": "tests/test_broad_universe_scan.py",
+      "bytes": 50630,
+      "sha256": "41072d6ddadc47e964f503978069220eb8482b29609c56795012a0f8ae90b2e5"
     }
   ],
   "convergence_records": [

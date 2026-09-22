@@ -813,6 +813,11 @@
             "id": "adaptive-paper-practice-20260921",
             "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "broad-universe-research-20260921",
+            "path": "evidence/receipts/broad-universe-research-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1486,6 +1491,11 @@
             "id": "adaptive-paper-practice-20260921",
             "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "broad-universe-research-20260921",
+            "path": "evidence/receipts/broad-universe-research-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1970,6 +1980,11 @@
           {
             "id": "adaptive-paper-practice-20260921",
             "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "broad-universe-research-20260921",
+            "path": "evidence/receipts/broad-universe-research-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -2930,6 +2945,11 @@
           {
             "id": "synthetic-catalyst-contract-20260920",
             "path": "blueprints/us-equities/catalyst-experiment/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "broad-universe-research-20260921",
+            "path": "evidence/receipts/broad-universe-research-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
