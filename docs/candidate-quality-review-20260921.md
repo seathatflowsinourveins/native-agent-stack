@@ -86,9 +86,9 @@ case-insensitive repository identities**. The revised comparison layers contain
 **207 rows and 157 identities**. Repeated repositories serve different layers;
 they are not additional independent evaluations.
 
-The broader 525-identity discovery inventory, public stars and historical cards
-have different scopes. Their count can change when the coordinator registers
-the added source reviews. This document does not claim all discovered repositories
+The broader discovery inventory now contains 527 identities after registration
+of these reviews. Public stars and historical cards have different scopes.
+This document does not claim all discovered repositories
 or every awesome-list link received a current source or runtime evaluation.
 
 All 20 layer requirements, present choices, evidence gaps, named challengers and

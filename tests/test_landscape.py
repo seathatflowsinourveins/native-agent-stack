@@ -79,15 +79,89 @@ class LandscapeTests(unittest.TestCase):
         return build_landscape(self.root, **kwargs)
 
     def test_current_and_historical_choices_stay_separate_and_counts_are_derived(self):
+        self.domain["layers"][0]["candidates"][0]["repository"] = "https://github.com/Example/SELECTED"
         data = self.build()
         self.assertEqual(data["counts"]["layers"], 2)
         self.assertEqual(data["counts"]["comparison_candidates"], 4)
+        self.assertEqual(data["counts"]["comparison_repositories"], 2)
         self.assertEqual(data["counts"]["historical_candidate_cards"], 1)
         domain = data["layers"][1]
         self.assertEqual(domain["current_choice"], "Native selected tool")
         self.assertEqual(domain["catalog_candidates"][0]["decision"], "default")
         self.assertEqual(domain["catalog_candidates"][0]["checked_at"], "2026-09-19")
         self.assertEqual(domain["candidates"][1]["disposition"], "unqualified")
+
+    def quality_fixture(self):
+        self.manifest["sources"]["quality_review"] = "quality.json"
+        self.manifest["handbook_guides"] = [{"path": "guide.md", "label": "Handbook"}]
+        self.quality_url = "https://raw.githubusercontent.com/example/selected/" + "a" * 40 + "/README.md"
+        self.write("quality-sources.json", {"scope": "Synthetic source record", "repositories": [{
+            "repository": self.candidate["repository"], "revision": "a" * 40,
+            "source_files": [{"url": self.quality_url, "bytes": 1, "sha256": "b" * 64}]}]})
+        return {"schema_version": 1, "checked_at": "2026-09-21",
+                "scope": "Source review, no execution claim", "no_universal_ranking": True,
+                "claim_limits": ["Not a benchmark"], "source_snapshot": "quality-sources.json",
+                "criteria": [{"id": "capability", "question": "Does it fit?"}],
+                "candidates": [{"name": "Selected source", "repository": self.candidate["repository"],
+                                "revision": "a" * 40, "disposition": "selected",
+                                "evidence_kind": "source_review", "requirement_fit": "Source fits",
+                                "source_findings": ["Documented capability"],
+                                "qualification_gap": "No matched comparison",
+                                "overturn_when": "An independently measured improvement",
+                                "evidence_refs": ["receipt.json", self.quality_url],
+                                "criteria": {"capability": {"finding": "Unknown on the new host",
+                                                            "evidence_refs": []}}}],
+                "layer_coverage": [{"catalog": c, "layer_id": l, "decision_ref": f + "#/layers/0",
+                                    "decision": "keep_but_compare", "requirement": self.layer["requirement"],
+                                    "current_choice": self.layer["current_choice"], "evidence_gap": "New host",
+                                    "challenger_repositories": ["https://github.com/example/alternative"],
+                                    "overturn_when": self.layer["overturn_when"]}
+                                   for c, l, f in [("foundation", "retrieval", "foundation.json"),
+                                                  ("us-equities", "data", "domain.json")]]}
+
+    def test_quality_review_joins_sources_without_promoting_unknowns(self):
+        quality = self.quality_fixture()
+        self.write("quality.json", quality)
+        tracked = []
+        data = self.build(track=tracked.append)
+        self.assertEqual(data["counts"]["quality_review_repositories"], 1)
+        attached = data["layers"][0]["candidates"][0]["quality_review"]
+        self.assertEqual(attached["criteria"]["capability"]["sources"], [])
+        self.assertEqual(attached["evidence_kind"], "source_review")
+        self.assertIn("quality-sources.json", tracked)
+        self.assertIn("guide.md", tracked)
+
+    def test_quality_review_rejects_false_execution_incomplete_coverage_and_unsafe_sources(self):
+        quality = self.quality_fixture()
+        cases = [
+            (lambda q: q.update(no_universal_ranking=False), "unestablished universal"),
+            (lambda q: q["candidates"][0].update(evidence_kind="native_execution"), "cannot certify execution"),
+            (lambda q: q["candidates"][0].update(disposition="observed_failure"), "observed failure"),
+            (lambda q: q["candidates"][0].update(revision="latest"), "full revision"),
+            (lambda q: q["candidates"][0].update(revision="f" * 40), "revision differs from source snapshot"),
+            (lambda q: q["candidates"][0].update(evidence_refs=[self.quality_url.replace("a" * 40, "f" * 40)]), "pinned sources differ"),
+            (lambda q: q["candidates"][0].update(evidence_refs=[self.quality_url, self.quality_url]), "contains duplicates"),
+            (lambda q: q["candidates"][0]["criteria"].clear(), "each declared criterion"),
+            (lambda q: q["layer_coverage"].pop(), "every layer"),
+            (lambda q: q["layer_coverage"][0].update(decision="retain"), "decision differs"),
+            (lambda q: q["layer_coverage"][0].update(current_choice="Unrelated engine"), "current_choice differs"),
+            (lambda q: q["layer_coverage"][0].update(requirement="Unrelated requirement"), "requirement differs"),
+            (lambda q: q["layer_coverage"][0].update(overturn_when="Unrelated trigger"), "overturn_when differs"),
+            (lambda q: q["layer_coverage"][0].update(challenger_repositories=["https://github.com/missing/repo"]), "absent from its layer"),
+            (lambda q: q["candidates"][0].update(evidence_refs=["https://user:password@example.com/source"]), "unsafe source"),
+        ]
+        for change, message in cases:
+            with self.subTest(message=message):
+                mutated = copy.deepcopy(quality)
+                change(mutated)
+                self.write("quality.json", mutated)
+                with self.assertRaisesRegex(ValueError, message):
+                    self.build()
+
+    def test_handbook_cannot_reference_files_outside_checkout(self):
+        self.manifest["handbook_guides"] = [{"label": "Unsafe", "path": "../outside.md"}]
+        with self.assertRaisesRegex(ValueError, "confined"):
+            self.build()
 
     def test_missing_and_duplicate_layers_fail(self):
         self.domain["layers"] = []

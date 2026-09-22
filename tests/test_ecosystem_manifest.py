@@ -320,6 +320,19 @@ process.stdout.write(JSON.stringify({nodes, errors, renderAttempts, navigations}
         self.assertIn("bounded web search", integration["search"])
         self.assertIn("/blob/main/docs/ecosystem/search-receipt.json", integration["receipt_url"])
         self.assertEqual(integration["receipt"]["limits"], ["Fresh agent discovery pending"])
+        self.config["publication_ref"] = "codex/review-catalog"
+        self.save()
+        page, _ = self.build()
+        self.assertIn("/blob/codex/review-catalog/docs/ecosystem/search-receipt.json",
+                      json.loads(page.data)["integrations"][0]["receipt_url"])
+
+    def test_publication_ref_rejects_path_escape(self):
+        self.config["publication_ref"] = "../outside"
+        self.save()
+        result = subprocess.run([sys.executable, str(GENERATOR), "--root", str(self.root)],
+                                capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unsafe publication ref", result.stdout)
 
     def test_linked_curated_document_is_hashed_and_changes_invalidate_the_page(self):
         self.config["guides"] = [{"title": "Adoption", "body": "Read selected scope",

@@ -5,6 +5,14 @@ the requirement, current choice, named competitors, evidence and reopening
 condition in **all 16 foundation layers and all four domain research layers**.
 Download its combined JSON from the page, or start with [manifest.json](manifest.json).
 
+For the complete installation and decision sequence, use the
+[grand catalog handbook](../../docs/grand-catalog-handbook.md). It connects
+[repository quality review](../../docs/candidate-quality-review-20260921.md),
+[actual native-runtime review](../../blueprints/catalog-runtime-review/README.md)
+and [clean-install evidence](../../blueprints/catalog-clean-install/README.md).
+The HTML embeds these guides and the source-backed quality criteria for the
+focused challenger set. Unknown quality/cost remains explicit.
+
 Each selected component has an explicit current role explanation. Every layer
 also has a [research continuation record](research-state.json): its next useful
 comparison, evidence and requirement trigger. Use the

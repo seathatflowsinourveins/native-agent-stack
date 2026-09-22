@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "catalog-clean-install-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "codex"
+  ],
+  "claim": "Native uv recreated the 36-distribution research SDK lock in a fresh prefix on the existing WSL host; package consistency, exact inventory, imports, SQL and 55 existing data fixtures passed.",
+  "limitations": [
+    "Same-host isolated-prefix evidence, not a new WSL distribution or complete foundation profile installation.",
+    "Initial broad suite: 766 tests, 763 passed, one missing-HOME environment error, two skips. Targeted HOME-preserving rerun passed; original failure retained.",
+    "Prerequisite audit found selected commands missing from its PATH; native sign-ins, GPU/services/memory/client integration and brokers were not qualified."
+  ],
+  "checked_at": "2026-09-21",
+  "timezone": "America/New_York",
+  "source_base": "dac2d1a3f880c04f6afadebe8bf3a251a64ab605",
+  "status": "sdk_prefix_passed_profile_acceptance_incomplete",
+  "lock_sha256": "f5bb7b8cf4406c5d408cce4083995cd29d4a34066f9d2aedb585837cc8536c5f",
+  "commands": "evidence/artifacts/catalog-clean-install-20260921/commands.json",
+  "source_hashes": "evidence/artifacts/catalog-clean-install-20260921/source-manifest.json",
+  "audit": "evidence/artifacts/catalog-clean-install-20260921/AUDIT.md",
+  "handbook": "blueprints/catalog-clean-install/README.md"
+}

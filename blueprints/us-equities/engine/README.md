@@ -1,6 +1,6 @@
 # Native LEAN backtest foundation
 
-This blueprint selects [QuantConnect LEAN](https://github.com/QuantConnect/Lean) for the user's research-first, Alpaca-paper-first US-equities workflow. It has an official [Alpaca brokerage integration](https://github.com/QuantConnect/Lean.Brokerages.Alpaca), allowing a strategy to use the engine's backtest and brokerage execution paths. That integration is a deployment option, not a paper-account connection demonstrated by this receipt.
+This historical blueprint qualified [QuantConnect LEAN](https://github.com/QuantConnect/Lean), now retained as a comparison reference. The current destination is NautilusTrader 2.0.0rc5 with separately qualified broker paths; [runtime-target.json](../../../catalogs/us-equities/runtime-target.json) governs that selection. LEAN has an official [Alpaca brokerage integration](https://github.com/QuantConnect/Lean.Brokerages.Alpaca), allowing a strategy to use the engine's backtest and brokerage execution paths. That integration is a deployment option, not a paper-account connection demonstrated by this receipt.
 
 The native check uses the upstream C# `BasicTemplateFrameworkAlgorithm`, its unchanged default backtesting configuration, and bundled SPY minute data for October 7–11, 2013. The sample is an engine acceptance fixture, not a selected investment strategy or evidence of profitable trading. See [the sanitized execution receipt](receipt.json) for the actual result and limitations.
 

@@ -135,7 +135,6 @@
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
         "https://raw.githubusercontent.com/bytedance/deer-flow/656db1223dda8883a09e7fde23f89da3a1a7a7dc/README.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json",
         "catalogs/us-equities/agents-operations.json",
         "blueprints/us-equities/deerflow/native-receipt.json",
         "blueprints/us-equities/deerflow/research-receipt.json"
@@ -194,8 +193,7 @@
       },
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
-        "https://raw.githubusercontent.com/langchain-ai/deepagents/c9926b1a96d204309d0b211701b288ce3bb4244b/README.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "https://raw.githubusercontent.com/langchain-ai/deepagents/c9926b1a96d204309d0b211701b288ce3bb4244b/README.md"
       ]
     },
     {
@@ -253,8 +251,7 @@
       },
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
-        "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/9bc452ebf6b0093c531f25394c5ba5e9817ff910/README.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/9bc452ebf6b0093c531f25394c5ba5e9817ff910/README.md"
       ]
     },
     {
@@ -312,8 +309,7 @@
       },
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
-        "https://raw.githubusercontent.com/OpenHands/OpenHands/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/README.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "https://raw.githubusercontent.com/OpenHands/OpenHands/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/README.md"
       ]
     },
     {
@@ -369,8 +365,7 @@
       },
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
-        "https://raw.githubusercontent.com/microsoft/agent-framework/98a982a147212424d766ed993e6ecda13abe5faf/README.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "https://raw.githubusercontent.com/microsoft/agent-framework/98a982a147212424d766ed993e6ecda13abe5faf/README.md"
       ]
     },
     {
@@ -430,8 +425,7 @@
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
         "https://raw.githubusercontent.com/akitaonrails/ai-memory/5157c6be10b5830d7adc7e29b0a4358c3ecbe6a2/README.md",
         "docs/memory-landscape-maintenance.md",
-        "docs/native-memory-rag-lifecycle.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "docs/native-memory-rag-lifecycle.md"
       ]
     },
     {
@@ -491,8 +485,7 @@
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
         "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/README.md",
-        "docs/memory-landscape-maintenance.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "docs/memory-landscape-maintenance.md"
       ]
     },
     {
@@ -554,8 +547,7 @@
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
         "https://raw.githubusercontent.com/vectorize-io/hindsight/680406b3dd9cca2108c7f0e204820a09b4e30906/README.md",
         "docs/memory-landscape-maintenance.md",
-        "evidence/artifacts/memory-landscape-20260921/sources.json",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "evidence/artifacts/memory-landscape-20260921/sources.json"
       ]
     },
     {
@@ -615,8 +607,7 @@
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
         "https://raw.githubusercontent.com/mem0ai/mem0/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/README.md",
-        "docs/memory-landscape-maintenance.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "docs/memory-landscape-maintenance.md"
       ]
     },
     {
@@ -676,8 +667,7 @@
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
         "https://raw.githubusercontent.com/getzep/graphiti/16cdf7045378c8d53ae01f94e2fa60d238cb0f68/README.md",
-        "docs/memory-landscape-maintenance.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "docs/memory-landscape-maintenance.md"
       ]
     },
     {
@@ -737,8 +727,7 @@
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
         "https://raw.githubusercontent.com/thedotmack/claude-mem/4520de9e0f8d6cdc20597520e383d8b51d93137f/README.md",
-        "docs/memory-landscape-maintenance.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "docs/memory-landscape-maintenance.md"
       ]
     },
     {
@@ -798,8 +787,7 @@
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
         "https://raw.githubusercontent.com/letta-ai/letta-code/dfb5639a4db2d97828e7ca07b808e93be85e05e7/README.md",
-        "docs/memory-landscape-maintenance.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "docs/memory-landscape-maintenance.md"
       ]
     },
     {
@@ -909,8 +897,7 @@
       },
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
-        "https://raw.githubusercontent.com/topoteretes/cognee/663a2dc15d04bc0d7ec2733a2dd604b7ed1b8c8e/README.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "https://raw.githubusercontent.com/topoteretes/cognee/663a2dc15d04bc0d7ec2733a2dd604b7ed1b8c8e/README.md"
       ]
     },
     {
@@ -968,8 +955,7 @@
       },
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
-        "https://raw.githubusercontent.com/volcengine/OpenViking/172c1050716f63339f4001292d58c830e6b7a315/README.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "https://raw.githubusercontent.com/volcengine/OpenViking/172c1050716f63339f4001292d58c830e6b7a315/README.md"
       ]
     },
     {
@@ -1027,8 +1013,7 @@
       },
       "evidence_refs": [
         "evidence/artifacts/catalog-quality-review-20260921/sources.json",
-        "https://raw.githubusercontent.com/supermemoryai/supermemory/57b430b5b6a19106a989651f4cde853c05147682/README.md",
-        "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+        "https://raw.githubusercontent.com/supermemoryai/supermemory/57b430b5b6a19106a989651f4cde853c05147682/README.md"
       ]
     }
   ],

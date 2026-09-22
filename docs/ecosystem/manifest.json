@@ -4,6 +4,7 @@
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
   "source_revision": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
+  "publication_ref": "codex/landscape-evidence-finalization-20260921",
   "layers": [
     {
       "id": "agents",

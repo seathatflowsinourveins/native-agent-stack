@@ -323,6 +323,9 @@ def build_data(root):
     require(config.get("schema_version") == 1, "unsupported explorer manifest version")
     repository_key(config["repository_url"])
     require(bool(re.fullmatch(r"[a-f0-9]{40}", config["source_revision"])), "source revision must be a full commit")
+    publication_ref = config.get("publication_ref", "main")
+    require(isinstance(publication_ref, str) and bool(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_./-]*", publication_ref))
+            and ".." not in publication_ref, "unsafe publication ref")
     layers = config["layers"]
     layer_ids = [layer["id"] for layer in layers]
     require(len(set(layer_ids)) == len(layer_ids) and "beyond" in layer_ids,
@@ -335,7 +338,7 @@ def build_data(root):
         # at the public branch after publication, with exact input hashes retained.
         new_catalog = path.startswith(("catalogs/foundation/", "catalogs/landscape/", "docs/landscape-")) or path in config.get("grand_catalogs", {}).values()
         new_practice = path.startswith(("blueprints/native-skill-practice/", "examples/codex-native/agents/semantic-", "examples/claude-native/agents/semantic-"))
-        revision = "main" if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or new_practice or path in current_public_paths else config["source_revision"]
+        revision = publication_ref if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or new_practice or path in current_public_paths else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 
     index, stack, evidence, stars, review = (read(path) for path in (INDEX, STACK, EVIDENCE, STARS, REVIEW))
@@ -344,6 +347,10 @@ def build_data(root):
     stars_observed_at = stars["retrieved_at"]
     if config.get("landscape_manifest"):
         landscape_manifest = read(config["landscape_manifest"])
+        current_public_paths.update(guide["path"] for guide in landscape_manifest.get("handbook_guides", []))
+        if landscape_manifest["sources"].get("quality_review"):
+            quality_source = read(landscape_manifest["sources"]["quality_review"])
+            current_public_paths.add(quality_source["source_snapshot"])
         current_stars = read(landscape_manifest["sources"]["freshness_snapshot"])["stars"]
         require(current_stars.get("status") == "checked", "current public-star snapshot must be checked")
         latest_map = {}
@@ -495,6 +502,7 @@ def build_data(root):
         if (root / path).exists():
             guide_paths.append(path)
     if config.get("landscape_manifest"):
+        guide_paths.extend(guide["path"] for guide in landscape_manifest.get("handbook_guides", []))
         guide_paths.extend(["catalogs/landscape/README.md", "docs/landscape-foundation-notes.md",
                             "docs/landscape-domain-notes.md", "docs/landscape-freshness-notes.md"])
         if landscape_manifest["sources"].get("native_practice"):

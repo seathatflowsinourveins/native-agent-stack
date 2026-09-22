@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "checked_at": "2026-09-21",
-  "source_base": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
+  "source_base": "dac2d1a3f880c04f6afadebe8bf3a251a64ab605",
   "status": "reviewed_baseline",
   "scope": "Current evidence-led selection across every foundation layer and all four domain research layers. Named alternatives have explicit dispositions; the wider repository inventory remains discovery and historical research.",
   "universal_superiority": "not_established",
@@ -18,7 +18,8 @@
     "selected_manifest": "manifests/stack.json",
     "freshness_snapshot": "catalogs/landscape/upstream-snapshot.json",
     "native_practice": "catalogs/landscape/native-practice.json",
-    "research_state": "catalogs/landscape/research-state.json"
+    "research_state": "catalogs/landscape/research-state.json",
+    "quality_review": "catalogs/landscape/candidate-quality-review.json"
   },
   "rules": [
     "Selected means the supported choice for the stated task and scope; it does not mean universal benchmark winner.",
@@ -29,5 +30,23 @@
     "Counts are derived from canonical records. Metadata coverage, receipt integrity and reviewer agreement do not prove performance superiority.",
     "The canonical index public_star flag describes the historical baseline ledger; current membership and the HTML star filter use the dated freshness snapshot.",
     "Reopen a selection when its stated overturning comparison meets the requirement; retain competitive alternatives until then."
+  ],
+  "handbook_guides": [
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "label": "Grand handbook"
+    },
+    {
+      "path": "docs/candidate-quality-review-20260921.md",
+      "label": "Repository quality"
+    },
+    {
+      "path": "blueprints/catalog-runtime-review/README.md",
+      "label": "Native review results"
+    },
+    {
+      "path": "blueprints/catalog-clean-install/README.md",
+      "label": "Clean install checks"
+    }
   ]
 }

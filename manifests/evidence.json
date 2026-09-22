@@ -2,6 +2,36 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "catalog-runtime-review-20260921",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "dagu"
+      ],
+      "claim": "One native Claude Opus 5 catalog review completed for the frozen 20-layer baseline; original Dagu branches failed and Codex returned capacity failure. This is bounded advisory review, not comparative repository qualification.",
+      "limitations": [
+        "No completed Codex verdict or cross-family agreement; all failed attempts and separate usage categories retained.",
+        "Final Claude pass used native CLI separately after the Dagu attempt; no successful full DAG run is claimed.",
+        "Frozen base precedes the subsequent candidate-quality and HTML patch; review does not establish universal superiority or new-PC acceptance."
+      ],
+      "path": "evidence/receipts/catalog-runtime-review-20260921.json"
+    },
+    {
+      "id": "catalog-clean-install-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Native uv recreated the 36-distribution research SDK lock in a fresh prefix on the existing WSL host; package consistency, exact inventory, imports, SQL and 55 existing data fixtures passed.",
+      "limitations": [
+        "Same-host isolated-prefix evidence, not a new WSL distribution or complete foundation profile installation.",
+        "Initial broad suite: 766 tests, 763 passed, one missing-HOME environment error, two skips. Targeted HOME-preserving rerun passed; original failure retained.",
+        "Prerequisite audit found selected commands missing from its PATH; native sign-ins, GPU/services/memory/client integration and brokers were not qualified."
+      ],
+      "path": "evidence/receipts/catalog-clean-install-20260921.json"
+    },
+    {
       "id": "dashboard-gap-resolution-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2637,6 +2667,156 @@
   ],
   "files": [
     {
+      "path": "blueprints/catalog-runtime-review/experiment.json",
+      "sha256": "54e0ea15669f73cdd5fd8c68ac3b5947463750c727fcf0a8460dcd07fa114301",
+      "bytes": 10682
+    },
+    {
+      "path": "blueprints/catalog-clean-install/README.md",
+      "sha256": "f908e53fb4363fe619d0d2f1b209a3025979d7f4d58fa8a6848caa4db25acc10",
+      "bytes": 3017
+    },
+    {
+      "path": "blueprints/catalog-runtime-review/README.md",
+      "sha256": "03154188e1ca5f53a5cb627543a7ec5741441896ef2dfcfac93792c5a2f5c9f9",
+      "bytes": 3673
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "sha256": "828467deb7a9d92fe3b064a543c69dd4cd1004cd694ed13fd06142e8ddb0b653",
+      "bytes": 120712
+    },
+    {
+      "path": "docs/candidate-quality-review-20260921.md",
+      "sha256": "f38e43c404dd39a421267941ce6a162968334b4db0996f2af81db972a3297bd8",
+      "bytes": 11603
+    },
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "sha256": "68efe92d6e9a75f94c047ec7483bd07adf2fd03d22c116d22d7e17beaf40387b",
+      "bytes": 14055
+    },
+    {
+      "path": "docs/tasks/2026-09-21-runtime-reviewed-catalog-handbook.md",
+      "sha256": "f9b85c5ed08b7e841673a4f574c7f674753363bc81e77041a75b3f8320b2e4f6",
+      "bytes": 7127
+    },
+    {
+      "path": "evidence/artifacts/catalog-clean-install-20260921/04-locked-sdk-sync.log",
+      "sha256": "a3b74348f7f9027071a1c50e071202fa2d5138c1d4f278699ecf6a8983f2e42e",
+      "bytes": 2212
+    },
+    {
+      "path": "evidence/artifacts/catalog-clean-install-20260921/05-package-consistency.log",
+      "sha256": "d0900a966d7c3f804cd32924678b1d61b7b4a05e502f3134ab8f7405b79af221",
+      "bytes": 655
+    },
+    {
+      "path": "evidence/artifacts/catalog-clean-install-20260921/06-sdk-imports-inventory.log",
+      "sha256": "406bb206b4e6c82450414e2754502a5908bd460431b9caf9402f43f455c270e2",
+      "bytes": 6867
+    },
+    {
+      "path": "evidence/artifacts/catalog-clean-install-20260921/07-portable-integrity.log",
+      "sha256": "38360bd8f5c17ac3d244395bcf9e6a5b80e49a08f04fa02608c6d35406dab8af",
+      "bytes": 499
+    },
+    {
+      "path": "evidence/artifacts/catalog-clean-install-20260921/08-catalog-integrity.log",
+      "sha256": "63befdacdc5ca70295eb60699cab5892fb92ca12406fc0d5b245d36fb92d3608",
+      "bytes": 633
+    },
+    {
+      "path": "evidence/artifacts/catalog-clean-install-20260921/09-existing-test-suite.log",
+      "sha256": "4d9fedf069ba7648675156da1723d10a435e641b5a124338fc4e2323c4d383d9",
+      "bytes": 122693
+    },
+    {
+      "path": "evidence/artifacts/catalog-clean-install-20260921/10-profile-prerequisites.log",
+      "sha256": "db0a56a053acf4208600872d43c70ca8233afa5e27b98adeada39373378a172a",
+      "bytes": 9624
+    },
+    {
+      "path": "evidence/artifacts/catalog-clean-install-20260921/12-home-preserved-failed-test-only.log",
+      "sha256": "1cdae485e5ad0ecdca52d2c403b55f4045352966f15d563352d42900e2358461",
+      "bytes": 1063
+    },
+    {
+      "path": "evidence/artifacts/catalog-clean-install-20260921/AUDIT.md",
+      "sha256": "ce02f72ee14f3ce4367c5e760674928a6e573df3e0d2529003c64abcb881fcdc",
+      "bytes": 7088
+    },
+    {
+      "path": "evidence/artifacts/catalog-clean-install-20260921/commands.json",
+      "sha256": "a194c37aa2cbf7b4ef84a0daab3649a564a3e6b831b7a2b72354020efdd102d8",
+      "bytes": 12539
+    },
+    {
+      "path": "evidence/artifacts/catalog-clean-install-20260921/fixture-source-hashes.json",
+      "sha256": "5438b27d948f0e775e1832cbb6536d4514fad04c56fd9bd7a0e8b1c3a5ce199b",
+      "bytes": 1996
+    },
+    {
+      "path": "evidence/artifacts/catalog-clean-install-20260921/source-manifest.json",
+      "sha256": "4e420368c440c01ad4d53c1a081e64fa2d90f486bba6f08ba7f57083eb12d261",
+      "bytes": 10228
+    },
+    {
+      "path": "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+      "sha256": "f7fa389d28f22fdc19bec886ba3fdae94d4230727a1b15853c45731e7a372167",
+      "bytes": 29022
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/completion-source-packet.json",
+      "sha256": "c7ce3217126960c56ec5b9444a9ff3fa3d62d3cf7889c4a455ca02b504e3b9c6",
+      "bytes": 76262
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/frozen-20-layer-packet.json",
+      "sha256": "569505abd5d8b4f02a8f5bfb63e8e980e27e80e272d9d49d65c633203d349cc7",
+      "bytes": 37682
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/input-provenance.json",
+      "sha256": "7ba99e5c53cfc8ecebad6b79c1c6973f651530dddd0d61d3bf44e5918f324932",
+      "bytes": 4954
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/native-review.json",
+      "sha256": "88c5269063973dd20b97eb4d5b990ec7b6f69d2d37661dcb69f69f9163050c1f",
+      "bytes": 35448
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/original-input-hashes.json",
+      "sha256": "740c23e7263d43df71b2ac0d6dbe6e3a7b5a5ae44aef4896aa063edf5fb5de2a",
+      "bytes": 2782
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/source-excerpts.json",
+      "sha256": "de215ab62eed5e16872ee429f94713b463663a77f39b347458807ea0037c6cf7",
+      "bytes": 43918
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/successful-claude-prompt.txt",
+      "sha256": "5adfec8f0d547c563a9bfa96f6e5906a7be5058e59ab6bcd32dc8a4320546755",
+      "bytes": 78331
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/typesafe-context.md",
+      "sha256": "4433f1b2954c4fefda5adfcb60cc2057aa0c2b074fe2dc871a58cb34f6125afe",
+      "bytes": 2158
+    },
+    {
+      "path": "evidence/receipts/catalog-clean-install-20260921.json",
+      "sha256": "9ef05c095fa7b15d59709de71c135e80981ba62a1a8ef910cda1f9da5d60f7b8",
+      "bytes": 1382
+    },
+    {
+      "path": "evidence/receipts/catalog-runtime-review-20260921.json",
+      "sha256": "795e4b00f8c52c376e11b474181795f6f8cf632ca8d453bb61f75929a88dff9f",
+      "bytes": 1231
+    },
+    {
       "path": "docs/hf-memory-model-qualification.md",
       "sha256": "beb6b7b165fce95ce5f501b39ab226089bb3aa5d73a46d2f21d8083ae47756e5",
       "bytes": 7017
@@ -3248,13 +3428,13 @@
     },
     {
       "path": "README.md",
-      "sha256": "be0bcebb6bdf59321582f3edc493dd3539c184e77a33c25501da70177aa7a605",
-      "bytes": 17466
+      "sha256": "7196f351d27dfe432966158f96dcc37eb67017a0bddc78c92f7c1a4a4839e044",
+      "bytes": 17917
     },
     {
       "path": "adoption/README.md",
-      "bytes": 11795,
-      "sha256": "470b430732ac8813b7c6c119db683401398d10f98914bb41441d713427290277"
+      "sha256": "87b0acf6f1b2b3b4e2a2b0c278379bea5532a2a1c8ffde9cd6afbf568d14ea04",
+      "bytes": 12025
     },
     {
       "path": "adoption/host-state.example.json",
@@ -4699,8 +4879,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "bytes": 459848,
-      "sha256": "3ef23c01d96a03dcd2b23a3b2e48302af76a29c8ce556a7781ec1ca4d4bf0558"
+      "bytes": 459865,
+      "sha256": "caa5267371d2b640a4772204c1e65c4316a8b356539d215dbcb79c5dd39265e3"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -5119,8 +5299,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/README.md",
-      "sha256": "b23a63340fb54ef709620052e0a7b8760963be035446a340b5b51b4dafea990f",
-      "bytes": 7898
+      "sha256": "88a864d60160423a99722b0e300c71f9d7585549513b09aabc020e9c8b0e54cb",
+      "bytes": 8070
     },
     {
       "path": "blueprints/us-equities/engine/patches/alpaca-source-references.patch",
@@ -6134,8 +6314,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "20d3d0e8a6e124d712c3450f40eec6a34f4c2f7e1d939eac33052c8933f7430d",
-      "bytes": 440331
+      "sha256": "fb45334c03aa9d93ac7ca414756c9910f8292f6f7def09383bb102a02124b86e",
+      "bytes": 448333
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -6179,7 +6359,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "b84057b9d84f88497566cf6fe8b7c0acb300d661c649d1b48d6b1a48b3a2227e",
+      "sha256": "bf5d09875420f2e307436af4c11863c2a9c74f9e8337620a57effbfa9ff66907",
       "bytes": 3112
     },
     {
@@ -6299,8 +6479,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 9013830,
-      "sha256": "abf9e09a00fd8fe2a8cb7de4581a71e2bbb9ba9b6c32f4ec2077ddd369370870"
+      "sha256": "35c129d699b1f04ac4a52fddd4e892793c5e977fe2c89c0b1e2e5d7318a913cd",
+      "bytes": 9601074
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6309,8 +6489,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "bytes": 38992,
-      "sha256": "8bb0baeed5a6b0fe0ea0a080d90127b5b716e306f3f33a3aa0c96864cf93eddc"
+      "bytes": 39063,
+      "sha256": "1892f9bde80ef66328048b535baab0968a7935c53e2038c0cf4046ceed420b00"
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6329,8 +6509,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "bytes": 100870,
-      "sha256": "62f13ccfec4ba4415713919d896d224041f94428e792a1124116cff524adeb59"
+      "sha256": "66a1a2c3eeadde1e165f96724736f145e94699cd41f5b65fef0932fcfd71028d",
+      "bytes": 102180
     },
     {
       "path": "docs/evidence.md",
@@ -7004,8 +7184,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "bytes": 42685,
-      "sha256": "51a3fe6c50d27607df1f7e2c412e11a0748e0d865caed258e8addb6b86da32dc"
+      "sha256": "8ee1a5eeef8d87aff2930bb3579820be145fb1019670df0864546af99fd24c22",
+      "bytes": 43372
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -7114,8 +7294,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "619246bc4bf37f4fc87b31cf462265e67756de1613d11c875cbd92ea93b97a5c",
-      "bytes": 50272
+      "sha256": "bb47ee46e89b213294a23ea23c8386226b08ea9098066a5233f09f814aa01738",
+      "bytes": 50953
     },
     {
       "path": "tests/test_execution_realism.py",
@@ -7284,8 +7464,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/README.md",
-      "sha256": "7009cf85f1166d58e21f65ad93d6929b65eecd9d5cb46b5d70854b04672ad64a",
-      "bytes": 4309
+      "sha256": "79c09b4aa2e39c1fd491f24b7be0d778d6e9930a67d9796f247df1a9d5d5e961",
+      "bytes": 4461
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/observe_quickstart.py",
@@ -9769,18 +9949,18 @@
     },
     {
       "path": "catalogs/landscape/README.md",
-      "sha256": "3a90a6c04a039fa6dd48c8a3116c31074e8386f0212443d927f64b81e1034c36",
-      "bytes": 4933
+      "sha256": "7e1c0ec30ae9592ad2fedfdeeb472e6e977649ffba07b3be0ee87ec69c98601c",
+      "bytes": 5450
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "196c8dcbc77272b1fcb91cb459e1124c4bc0ab0d15dee0e9c307c8a9712f5010",
-      "bytes": 74930
+      "sha256": "ed8a04b87a64e969a8dccf4bbf654682dfe0d61824458a3a436c15b87063429d",
+      "bytes": 88436
     },
     {
       "path": "catalogs/landscape/manifest.json",
-      "sha256": "35212896482dbbff457b7bdb271fa3056912cb44ffbe9768581bc4d6019226c8",
-      "bytes": 2538
+      "sha256": "ecbe19528f6cec3795b0b79913d83039c049a775e0c18d4f739fe2494a7c7878",
+      "bytes": 3064
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -9789,8 +9969,8 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "bf212503dc1975935dbb12a82a92c8298a669c9de7b1c529e839402dfacf8a6e",
-      "bytes": 47116
+      "sha256": "b6271dd91cb2c91d68d494c361a8d254f1fb212cb06be490c28511f024c951c4",
+      "bytes": 58920
     },
     {
       "path": "docs/landscape-domain-notes.md",
@@ -9814,13 +9994,13 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "b087b4227c22d71d08aae33cb0297693fdbb492664835b9a618e7024666443e9",
-      "bytes": 17984
+      "sha256": "be100170cf13bf46c67a333ce8d352a0acbe1ad764f3db2153ae5579a79386e3",
+      "bytes": 26889
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "3bd1ee2c9e1c9784aa39bc9623a618565633fe4e103922a4c4f9b9d7758a75cd",
-      "bytes": 15143
+      "sha256": "a4418f3b3b8c8e90cd4fc2dc8c05f336cabb249b4b3c30fc9ae92051b6b950df",
+      "bytes": 20699
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
@@ -9924,6 +10104,7 @@
     }
   ],
   "convergence_records": [
+    "blueprints/catalog-runtime-review/experiment.json",
     "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
     "blueprints/convergence-practice/application-delivery/experiment.json",
     "blueprints/convergence-practice/ci-security/experiment.json",

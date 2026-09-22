@@ -99,18 +99,19 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
 
     documents = manifest["catalogs"]
     require(set(documents) == {"foundation", "us-equities"}, "landscape must cover both catalogs")
-    layers, seen = [], set()
+    layers, seen, decision_pointers = [], set(), {}
     for catalog, path in documents.items():
         document = read(path)
         require(document.get("schema_version") == 1, "unsupported layer comparison schema")
         require(document.get("checked_at") == manifest["checked_at"], "layer review date differs from manifest")
         nonempty(document.get("scope"), path + ".scope")
         require(isinstance(document.get("layers"), list), path + " needs layers")
-        for row in document["layers"]:
+        for position, row in enumerate(document["layers"]):
             key = (row["catalog"], row["layer_id"])
             require(key[0] == catalog and key in expected, "unknown comparison layer: " + str(key))
             require(key not in seen, "duplicate comparison layer: " + str(key))
             seen.add(key)
+            decision_pointers[key] = path + "#/layers/" + str(position)
             for field in ("title", "requirement", "current_choice", "rationale", "overturn_when"):
                 nonempty(row.get(field), str(key) + "." + field)
             require(row.get("decision") in DECISIONS, "unknown layer decision")
@@ -249,6 +250,8 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
               "explained_components": len(component_coverage),
               "foundation_statuses": dict(sorted(review_status.items())),
               "comparison_candidates": sum(len(row["candidates"]) for row in layers),
+              "comparison_repositories": len({candidate["repository_id"] for row in layers
+                                               for candidate in row["candidates"]}),
               "historical_candidate_cards": sum(len(row["catalog_candidates"]) for row in layers),
               "dispositions": dict(sorted(Counter(candidate["disposition"] for row in layers
                                                     for candidate in row["candidates"]).items()))}
@@ -276,8 +279,129 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
         counts["applied_skills"] = len(names)
     if research:
         counts["research_queue_layers"] = len(research["layers"])
+    quality = None
+    if sources.get("quality_review"):
+        quality = read(sources["quality_review"])
+        require(quality.get("schema_version") == 1 and quality.get("checked_at") == manifest["checked_at"],
+                "quality review schema or date differs from landscape")
+        require(quality.get("no_universal_ranking") is True,
+                "quality review must preserve the unestablished universal ranking")
+        nonempty(quality.get("scope"), "quality review scope")
+        strings(quality.get("claim_limits"), "quality review limits")
+        quality["snapshot_sources"] = evidence([quality.get("source_snapshot")], "quality source snapshot")
+        snapshot = read(quality["source_snapshot"])
+        snapshot_rows = snapshot.get("repositories")
+        require(isinstance(snapshot_rows, list) and snapshot_rows, "quality snapshot needs repositories")
+        pinned_sources = {}
+        for row in snapshot_rows:
+            require(isinstance(row, dict), "quality snapshot repository must be an object")
+            repo_id = canonical(identity(row.get("repository")), aliases)
+            require(repo_id not in pinned_sources, "duplicate quality snapshot repository")
+            revision = row.get("revision")
+            require(isinstance(revision, str) and bool(re.fullmatch(r"[a-f0-9]{40}", revision)),
+                    "quality snapshot needs a full revision")
+            files = row.get("source_files")
+            require(isinstance(files, list) and bool(files), "quality snapshot needs source files")
+            urls = set()
+            for source in files:
+                require(isinstance(source, dict), "quality source file must be an object")
+                url = source.get("url")
+                require(https_url(url), "unsafe quality snapshot source")
+                parts = urlsplit(url)
+                path_parts = parts.path.strip("/").split("/")
+                require(parts.hostname == "raw.githubusercontent.com" and len(path_parts) >= 4
+                        and canonical(identity("https://github.com/" + "/".join(path_parts[:2])), aliases) == repo_id
+                        and path_parts[2] == revision,
+                        "quality snapshot source differs from pinned repository")
+                require(isinstance(source.get("sha256"), str)
+                        and bool(re.fullmatch(r"[a-f0-9]{64}", source["sha256"]))
+                        and isinstance(source.get("bytes"), int) and source["bytes"] > 0,
+                        "quality snapshot source needs content hash and byte count")
+                require(url not in urls, "duplicate quality snapshot source")
+                urls.add(url)
+            pinned_sources[repo_id] = (revision, urls)
+        criteria = quality.get("criteria")
+        require(isinstance(criteria, list) and bool(criteria), "quality review needs criteria")
+        criterion_ids = set()
+        for criterion in criteria:
+            require(isinstance(criterion, dict), "quality criterion must be an object")
+            key = nonempty(criterion.get("id"), "quality criterion id")
+            require(key not in criterion_ids, "duplicate quality criterion")
+            criterion_ids.add(key)
+            nonempty(criterion.get("question"), "quality criterion question")
+        candidates = quality.get("candidates")
+        require(isinstance(candidates, list) and bool(candidates), "quality review needs candidates")
+        quality_by_repo = {}
+        compared_ids = {candidate["repository_id"] for layer in layers for candidate in layer["candidates"]}
+        for candidate in candidates:
+            require(isinstance(candidate, dict), "quality candidate must be an object")
+            repo_id = canonical(identity(candidate.get("repository")), aliases)
+            require(repo_id in compared_ids, "quality candidate lacks a current layer comparison")
+            require(repo_id not in quality_by_repo, "duplicate quality repository identity")
+            quality_by_repo[repo_id] = candidate
+            require(bool(re.fullmatch(r"[a-f0-9]{40}", candidate.get("revision", ""))),
+                    "quality source needs a full revision")
+            require(repo_id in pinned_sources and candidate["revision"] == pinned_sources[repo_id][0],
+                    "quality candidate revision differs from source snapshot")
+            require(candidate.get("evidence_kind") == "source_review",
+                    "repository quality source review cannot certify execution")
+            require(candidate.get("disposition") in DISPOSITIONS - {"observed_failure"},
+                    "quality source review cannot declare an observed failure")
+            for field in ("name", "requirement_fit", "qualification_gap", "overturn_when"):
+                nonempty(candidate.get(field), "quality candidate " + field)
+            strings(candidate.get("source_findings"), "quality source findings")
+            candidate["sources"] = evidence(candidate.get("evidence_refs"), "quality candidate")
+            assessments = candidate.get("criteria")
+            require(isinstance(assessments, dict) and set(assessments) == criterion_ids,
+                    "quality candidate must address each declared criterion")
+            for key, assessment in assessments.items():
+                require(isinstance(assessment, dict), "quality assessment must be an object")
+                nonempty(assessment.get("finding"), "quality finding " + key)
+                refs = assessment.get("evidence_refs")
+                require(isinstance(refs, list), "quality finding needs explicit evidence references")
+                assessment["sources"] = evidence(refs, "quality criterion") if refs else []
+            all_refs = candidate["evidence_refs"] + [ref for a in assessments.values() for ref in a["evidence_refs"]]
+            raw_refs = {ref for ref in all_refs if urlsplit(ref).hostname == "raw.githubusercontent.com"}
+            require(bool(raw_refs) and raw_refs.issubset(pinned_sources[repo_id][1]),
+                    "quality candidate pinned sources differ from source snapshot")
+        coverage = quality.get("layer_coverage")
+        require(isinstance(coverage, list), "quality review needs layer coverage")
+        quality_layers = set()
+        for item in coverage:
+            require(isinstance(item, dict), "quality layer must be an object")
+            key = (item.get("catalog"), item.get("layer_id"))
+            require(key in expected and key not in quality_layers, "unknown or duplicate quality layer")
+            quality_layers.add(key)
+            layer = by_key[key]
+            require(item.get("decision_ref") == decision_pointers[key] and item.get("decision") == layer["decision"],
+                    "quality layer decision differs from current comparison")
+            for field in ("requirement", "current_choice", "evidence_gap", "overturn_when"):
+                nonempty(item.get(field), "quality layer " + field)
+            for field in ("requirement", "current_choice", "overturn_when"):
+                require(item[field] == layer[field], "quality layer " + field + " differs from current comparison")
+            challengers = strings(item.get("challenger_repositories"), "quality challengers")
+            layer_ids = {candidate["repository_id"] for candidate in layer["candidates"]}
+            require(all(canonical(identity(repo), aliases) in layer_ids for repo in challengers),
+                    "quality challenger absent from its layer")
+            if "evidence_refs" in item:
+                item["sources"] = evidence(item["evidence_refs"], "quality layer")
+        require(quality_layers == expected, "quality review must cover every layer exactly once")
+        for layer in layers:
+            for candidate in layer["candidates"]:
+                if candidate["repository_id"] in quality_by_repo:
+                    candidate["quality_review"] = quality_by_repo[candidate["repository_id"]]
+        quality["url"] = file_url(sources["quality_review"])
+        counts["quality_review_repositories"] = len(quality_by_repo)
+    guides = manifest.get("handbook_guides", [])
+    require(isinstance(guides, list), "handbook guides must be a list")
+    for guide in guides:
+        require(isinstance(guide, dict), "handbook guide must be an object")
+        nonempty(guide.get("label"), "handbook guide label")
+        require(isinstance(guide.get("path"), str) and guide["path"].endswith(".md"),
+                "handbook guide must be Markdown")
+        evidence([guide["path"]], "handbook guide")
     return {**manifest, "layers": layers, "counts": counts, "freshness": freshness, "native_practice": practice,
-            "research_state": research, "component_coverage": component_coverage,
+            "research_state": research, "component_coverage": component_coverage, "quality_review": quality,
             "url": file_url(manifest_path), "freshness_url": file_url(sources["freshness_snapshot"])}
 
 

@@ -1,0 +1,26 @@
+{
+  "label": "04-locked-sdk-sync",
+  "args": [
+    "<USER_HOME>/.local/share/codex-ecosystem/tools/uv-0.12.17/uv",
+    "--no-config",
+    "--no-cache",
+    "pip",
+    "sync",
+    "--python",
+    "<PRIVATE_EVIDENCE>/sdk/bin/python",
+    "--require-hashes",
+    "--no-build",
+    "--strict",
+    "--default-index",
+    "https://pypi.org/simple",
+    "--no-sources",
+    "--reinstall",
+    "<CLEAN_CHECKOUT>/adoption/sdk/requirements-linux-x86_64-py313.lock"
+  ],
+  "command": "<USER_HOME>/.local/share/codex-ecosystem/tools/uv-0.12.17/uv --no-config --no-cache pip sync --python <PRIVATE_EVIDENCE>/sdk/bin/python --require-hashes --no-build --strict --default-index https://pypi.org/simple --no-sources --reinstall <CLEAN_CHECKOUT>/adoption/sdk/requirements-linux-x86_64-py313.lock",
+  "started_at": "2026-09-22T01:33:54.529372+00:00",
+  "duration_seconds": 6.618,
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "Using Python 3.13.15 environment at: <PRIVATE_EVIDENCE>/sdk\nResolved 36 packages in 187ms\nDownloading duckdb (20.5MiB)\nDownloading openai (2.0MiB)\nDownloading pandas (10.3MiB)\nDownloading numpy (15.9MiB)\nDownloading openai-codex-cli-bin (121.5MiB)\nDownloading pydantic-core (2.0MiB)\n Downloaded openai\n Downloaded pydantic-core\n Downloaded pandas\n Downloaded numpy\n Downloaded duckdb\n Downloaded openai-codex-cli-bin\nPrepared 36 packages in 6.32s\nInstalled 36 packages in 32ms\n + alpaca-py==0.44.0\n + annotated-types==0.8.0\n + anyio==4.15.1\n + certifi==2026.7.22\n + charset-normalizer==3.5.1\n + duckdb==1.5.5\n + exchange-calendars==4.13.2\n + h11==0.16.0\n + httpcore2==2.13.0\n + httpx2==2.13.0\n + idna==3.20\n + jiter==0.17.0\n + korean-lunar-calendar==0.4.0\n + msgpack==1.2.2\n + numpy==2.5.3\n + openai==3.16.2\n + openai-codex==0.154.0\n + openai-codex-cli-bin==0.154.0\n + packaging==26.3\n + pandas==3.0.6\n + pydantic==2.13.5\n + pydantic-core==2.46.5\n + pyluach==2.3.0\n + python-dateutil==2.9.0.post0\n + pytz==2026.3.post1\n + requests==2.34.2\n + six==1.17.0\n + sniffio==1.3.1\n + sseclient-py==1.9.0\n + toolz==1.1.0\n + truststore==0.10.4\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + tzdata==2026.4\n + urllib3==2.8.0\n + websockets==17.1\n"
+}

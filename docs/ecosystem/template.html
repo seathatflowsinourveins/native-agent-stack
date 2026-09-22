@@ -370,6 +370,17 @@ function comparisonCandidate(row, historical = false) {
   const proof = add(make("details"), make("summary", "", "Evidence and scope"));
   if(historical) { listLimits(proof, row.limitations); add(proof, link("Original candidate card " + row.pointer + " ↗", row.url)); }
   catalogSources(proof, row.sources); add(card, proof);
+  if(row.quality_review) {
+    const quality = row.quality_review;
+    const detail = add(make("details"), make("summary", "", "Repository quality review"), make("p", "small muted", "Source revision: " + quality.revision + ". Source review; execution and comparative quality remain separate."));
+    add(detail, make("p", "", quality.requirement_fit));
+    Object.entries(quality.criteria).forEach(([key, assessment]) => {
+      add(detail, make("h5", "", readable(key)), make("p", "", assessment.finding));
+      if(assessment.sources.length) catalogSources(detail, assessment.sources);
+    });
+    add(detail, make("p", "", "Qualification gap: " + quality.qualification_gap), make("p", "", "Reconsider when: " + quality.overturn_when));
+    catalogSources(detail, quality.sources); add(card, detail);
+  }
   return card;
 }
 function renderLandscape() {
@@ -435,6 +446,11 @@ function initializeLandscape() {
     add($("landscape-summary"), make("p", "", counts.explained_components + " component roles explained · " + counts.research_queue_layers + " layer continuation records. " + researchStatusText(landscape.research_state, landscape.checked_at)));
     add($("landscape-actions"), recipeButton("docs/landscape-continuation.md", "New PC & continue research"), recipeButton("docs/hosting-container-practice.md", "Hosting & containers"), link("Research queue ↗", landscape.research_state.url));
   }
+  if(landscape.quality_review) {
+    add($("landscape-summary"), make("p", "", counts.comparison_repositories + " distinct compared repositories · " + counts.quality_review_repositories + " focused repository quality reviews. Unknown quality and cost remain explicit."));
+    add($("landscape-actions"), link("Repository quality evidence ↗", landscape.quality_review.url));
+  }
+  (landscape.handbook_guides || []).forEach(guide => add($("landscape-actions"), recipeButton(guide.path, guide.label)));
   add($("foundation-guides"), landscapeAction("foundation")); add($("trading-guides"), landscapeAction("us-equities"));
   add($("catalog-entry-points"), add(make("article", "catalog-entry"), make("div", "eyebrow", "Evidence for the selection"), make("h2", "", "Choices & alternatives"), make("p", "", "Why each layer is selected, why alternatives remain conditional, and the evidence needed to change the choice."), catalogAction("landscape","Compare the choices →")));
   ["landscape-search","landscape-catalog","landscape-outcome"].forEach(id=>$(id).addEventListener(id.endsWith("search")?"input":"change",renderLandscape));

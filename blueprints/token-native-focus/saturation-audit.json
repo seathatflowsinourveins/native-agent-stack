@@ -32,16 +32,16 @@
   },
   "counts": {
     "selected_components": 68,
-    "catalog_identities": 525,
-    "nonselected_catalog_identities": 457,
+    "catalog_identities": 527,
+    "nonselected_catalog_identities": 459,
     "exclusive_identity_groups": {
       "star_review": 275,
       "component_record": 68,
       "catalog_card": 114,
-      "research_supplement": 66,
+      "research_supplement": 68,
       "legacy_candidate": 2
     },
-    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups; the twelve newly indexed identities enter through landscape, selected-skill and deployment research supplements. Current public-star membership is reported separately by the upstream snapshot."
+    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups; fourteen newly indexed identities enter through landscape, selected-skill, deployment and candidate-quality research supplements. Current public-star membership is reported separately by the upstream snapshot."
   },
   "counter_policy": {
     "rtk": "retained upstream command-output estimate; global/project overlap",
