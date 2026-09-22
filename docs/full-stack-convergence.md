@@ -55,7 +55,7 @@ and [independent review](../evidence/artifacts/full-stack-convergence-20260921/i
 | Recovery/portability | Versioned prefixes, rollback, Restic native restore | Scoped disposable/hosted-job evidence; qualify new PCs |
 | Observation/inference | Grafana/Prometheus/Loki/OTel and native outputs | Source time differs from scrape time; usage differs from savings |
 
-The [foundation catalog](../catalogs/foundation/manifest.json) retains 44 capability
+The [foundation catalog](../catalogs/foundation/manifest.json) retains 47 capability
 decisions. The [lifecycle guide](../adoption/lifecycle.md) covers installation,
 restart, recovery and cleanup. Reuse accepted evidence while its inputs and scope
 match; additional testing should resolve a concrete uncertainty.

@@ -24,7 +24,8 @@ The portable [settings file](../examples/claude-native/ultracode.settings.json):
   "ultracode": true,
   "workflowSizeGuideline": "unrestricted",
   "env": {
-    "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "3"
+    "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
   }
 }
 ```
@@ -32,11 +33,24 @@ The portable [settings file](../examples/claude-native/ultracode.settings.json):
 The example persists `enableWorkflows`, `ultracode`, the `unrestricted` advisory size
 (each workflow sized to its task; it replaced `small` on 2026-09-21, see the
 [routing guide](../docs/ultracode-token-routing-20260921.md)) and the per-workflow
-concurrency setting of three, which makes a large run queue rather than burst. It does not select a model,
+concurrency setting of eight, which makes a large run queue rather than burst (the
+bundled `/workflow-authoring` reference states the default cap as min(16, available
+CPUs − 2) per workflow, and the official workflows doc says the setting overrides it
+and accepts 1–256 from 2.1.269, so the formula is the default, not a limit. Eight
+replaced three on 2026-09-21 on a 24-thread host after a 13-agent run, `wf_72e7aefc-8ad`
+in agent-lab's `docs/native-token-workflow.md` cap table, completed at three without
+provider or search-quota errors; no run has saturated eight. A new host starts at 8 and
+raises only after `child-usage.mjs --latest` shows a full run with no rate-limit errors
+or empty results), and `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1`
+so workflow and Agent children cannot fan out a second layer (the client default is
+three layers; official sub-agents doc, fetched 2026-09-22). It does not select a model,
 account or permission mode. To adopt it as a project default, merge only those
 keys into the existing `.claude/settings.json`; preserve all unrelated settings.
 Project environment settings require workspace trust, and organizational policy
-or feature availability can still restrict the profile.
+or feature availability can still restrict the profile. The dated rules set behind
+these values and the planned-workstation profile are in
+[the convergence record](../docs/harness-rules-convergence-20260922.md) and
+[the workstation profile](../docs/new-workstation-runtime-profile-20260922.md).
 
 `ultracode: true` requests effective `xhigh` effort, subject to applicable caps,
 and takes precedence over the stored `effortLevel` setting. Preserving that

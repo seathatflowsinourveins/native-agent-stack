@@ -70,6 +70,10 @@ NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-c
                     "docs/ultracode-token-routing-20260921.md", "recipes/claude-codex-cooperation-lanes.md", "examples/codex-native/README.md",
                     "blueprints/us-equities/broad-universe/README.md", "blueprints/us-equities/adaptive-paper/README.md",
                     "evidence/receipts/broad-universe-research-20260921.json", "evidence/receipts/adaptive-paper-practice-20260921.json",
+                    "docs/harness-rules-convergence-20260922.md", "docs/new-workstation-runtime-profile-20260922.md",
+                    "evidence/artifacts/harness-rules-convergence-20260922/runs.json",
+                    "evidence/artifacts/harness-rules-convergence-20260922/official-doc-excerpts.json",
+                    "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
                     "evidence/receipts/ultracode-token-routing-20260921.json", "evidence/receipts/portable-claude-native-qualification-20260921.json",
                     "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
                     "docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md", "docs/foundation-convergence-20260921.md",
@@ -483,7 +487,8 @@ def build_data(root):
                  "docs/community-native-practice.md", "examples/claude-native/CLAUDE.md",
                  "recipes/claude-native-ultracode.md", "docs/foundation-rd-readiness.md",
                  "recipes/claude-codex-foreground-review.md", "docs/claude-upstream-checks.md",
-                 "docs/ultracode-token-routing-20260921.md", "recipes/claude-codex-cooperation-lanes.md", "examples/codex-native/README.md"):
+                 "docs/ultracode-token-routing-20260921.md", "recipes/claude-codex-cooperation-lanes.md", "examples/codex-native/README.md",
+                 "docs/harness-rules-convergence-20260922.md", "docs/new-workstation-runtime-profile-20260922.md"):
         if (root / path).exists():
             guide_paths.append(path)
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))

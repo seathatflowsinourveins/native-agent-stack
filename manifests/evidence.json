@@ -3335,8 +3335,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "0e255c6072d88303e774a25f90e12d377be5eb79263d7a0b6e37f7881bd983d7",
-      "bytes": 3903
+      "sha256": "53e1ddd5b917928547ccadb2793e36ebec3f4b3ea8164d8555d873eb72510e97",
+      "bytes": 4513
     },
     {
       "path": "recipes/claude-native-profile.md",
@@ -6446,8 +6446,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 8148023,
-      "sha256": "a10f63aac046e8f462ed538a17324e5abd461b4e1e40e1c4b2ab39bf5672e2bb"
+      "bytes": 8240756,
+      "sha256": "1d094b98aca81b48069042fc226bb6766643bb8f45c9fd8322ed73d87d21f5b0"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7151,8 +7151,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "bytes": 41446,
-      "sha256": "bca7d15ec5c437e1a85b59a655029af5b35e9714e6d04d2db8a0aa6e750c7df7"
+      "bytes": 41977,
+      "sha256": "5693968a206ea00d33fbf824438d8798764e3d0630b5843c888e17decaa56dd2"
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -9196,8 +9196,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "043195efd6686ada4be63138f6af8862a150a83794b6d2a11c8a18a5e42a45b6",
-      "bytes": 11661
+      "sha256": "8b84b88a4d71d96bd1a59f03652eded68faff27d7dd8e29e2f6484c7202ae2c4",
+      "bytes": 12766
     },
     {
       "path": "docs/native-ultracode-20260921.md",
@@ -9206,8 +9206,8 @@
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
-      "sha256": "6332b0cea25cd469a301b99b5a5d84a8dda709b89348c471625dc7290905d155",
-      "bytes": 235
+      "sha256": "42e3087a50fc464be293f3ec7695b4780fa45ede696037819ea335cfa196d2a3",
+      "bytes": 284
     },
     {
       "path": "evidence/receipts/native-ultracode-20260921.json",
@@ -9282,7 +9282,7 @@
     {
       "path": "docs/full-stack-convergence.md",
       "bytes": 10817,
-      "sha256": "0cfb65f54fdcc308e6b97fa3ad9dcfad9d45ae0f20c3388b15970b1df8bc180c"
+      "sha256": "81a979ba9a1630ff2ded54af19a2a3203c179d602aed1d2aa50a0b314e2f07c4"
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/agentsview-aggregate-safe.png",
@@ -9891,8 +9891,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "25abde916c404a51edd634828c452c7948690e6813b8d3d691e42d417532d55f",
-      "bytes": 12803
+      "sha256": "564c427a29a3e9edb89b8431ce9af00723fd778cf4d74b5be4a0f0ca42cac628",
+      "bytes": 15861
     },
     {
       "path": "examples/claude-native/workflows/check-syntax.mjs",
@@ -9906,8 +9906,8 @@
     },
     {
       "path": "examples/claude-native/workflows/review-changes.js",
-      "sha256": "12c078107d45ca5690b6d4a5e3e7c6522453a0f7d3846355337b17e1901b3ad6",
-      "bytes": 17859
+      "sha256": "581300deaa95c6a2e097ec824cc01aca21ff17f87cb497327e4ddbc1cc37d65f",
+      "bytes": 18073
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
@@ -10131,8 +10131,8 @@
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
-      "sha256": "bfe12bdb582ea15ab4ce704edab70b7c2bc2ce2cb872938469900871dae3e430",
-      "bytes": 31688
+      "sha256": "78853b6113e5837874ec960e72ed00fceaf6a869a29aa6a89007fc9cf0df75c6",
+      "bytes": 31780
     },
     {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
@@ -10296,8 +10296,8 @@
     },
     {
       "path": "examples/claude-native/agents/source-scout.md",
-      "sha256": "55062f9e65e91a29b0b2c800f1e83c84b8d9596ab86f75fd76ab288a29852647",
-      "bytes": 1681
+      "sha256": "2d5f5d9465a535d376a0c570a5d24105a939ad6771e504c8dde358469acbbad4",
+      "bytes": 1829
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
@@ -10336,8 +10336,8 @@
     },
     {
       "path": "examples/codex-native/README.md",
-      "sha256": "d53c58e9d8e2c86ffd0ec901ffbc5bc03e125a2c622951c4c42fba78b822aae6",
-      "bytes": 1374
+      "sha256": "7eb22acd4cb3d00fcecd917c341d1f0154deb3396290aa1b646dcee24141c890",
+      "bytes": 2260
     },
     {
       "path": "examples/codex-native/agents/evidence-reviewer.toml",
@@ -10351,13 +10351,13 @@
     },
     {
       "path": "examples/codex-native/config.agents.toml.example",
-      "sha256": "b0e34249e6bdc06da0a94fce043bda1eefbe633433a3fd6e5fba49b3e5bb475c",
-      "bytes": 364
+      "sha256": "c3247195b40f2c1b042b70c90b6273412f5019c5cc0b3d814241d25910b769fd",
+      "bytes": 2139
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
-      "sha256": "7e13cb55bb5e6ebc88c14f2a98840832c701777bcac4a3cee19f035536edf56a",
-      "bytes": 5622
+      "sha256": "a3d22b8fddebc9c648bd17b411831e4ba37b34bb46387d331a8350699e34d94e",
+      "bytes": 6284
     },
     {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/codex-pr-review.json",
@@ -10418,6 +10418,31 @@
       "path": "tests/test_sota_convergence.py",
       "bytes": 54265,
       "sha256": "797fd5d1a90a3d82b1d2f43004e9debc33b53588f4052413aaf1b9b2efd1447a"
+    },
+    {
+      "path": "docs/harness-rules-convergence-20260922.md",
+      "sha256": "047e11b6b123236211159f8dfd287641b76808ccf0507c02bafba89e6f4ce694",
+      "bytes": 68991
+    },
+    {
+      "path": "docs/new-workstation-runtime-profile-20260922.md",
+      "sha256": "da5dd61a96155dd73c9c1e2166ff9977e68231dfc0b0200aea5f0f845fb33499",
+      "bytes": 15978
+    },
+    {
+      "path": "evidence/artifacts/harness-rules-convergence-20260922/runs.json",
+      "sha256": "0a18c5095cadc4a9cfad049659ca86d253410372856c205891c10abeb925f7ce",
+      "bytes": 3826
+    },
+    {
+      "path": "evidence/artifacts/harness-rules-convergence-20260922/official-doc-excerpts.json",
+      "sha256": "d21438d4c23a1643d662a284a9df1797ade4e30dfea3f4b91699f97f3104954b",
+      "bytes": 11033
+    },
+    {
+      "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
+      "sha256": "79e8f86b6c36d0afff4e5174f491937c7c257cebc4fc2cbb3f88adf6efb90e94",
+      "bytes": 3576
     }
   ],
   "convergence_records": [

@@ -1,0 +1,111 @@
+{
+ "recorded": "2026-09-22",
+ "note": "Verbatim excerpts returned by the research children from documentation pages fetched on 2026-09-22; retained so that rules quoting a fetch have a source in this repository. Quotes are as returned by the child (bounded to about 200 characters), not full-page captures.",
+ "excerpts": [
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/workflows",
+   "claim": "Size guideline is advisory, not a cap: prompt intent overrides it; unrestricted/small/medium/large map to specific agent-count bands.",
+   "quote": "A size guideline tells Claude how many agents to aim for when it writes a dynamic workflow. Claude Code sends the guideline to Claude as advice, not a cap, so a prompt that calls for a different scale still overrides it. ... | `unrestricted` | No guideline: Claude sizes the workflow to the task | | `small` | Fewer than 5 agents | | `medium` | Fewer than 10 agents |",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/workflows",
+   "claim": "Workflow scripts hold the plan/loop/branching in code so only the final answer enters Claude's context, and can run adversarial independent review of findings before reporting.",
+   "quote": "A workflow script holds the loop, the branching, and the intermediate results itself, so Claude's context holds only the final answer. Moving the plan into code also lets a workflow apply a repeatable quality pattern, not just run more agents: it can have independent agents adversarially review each other's findings before they're reported, or draft a plan from several angles and weigh them against each other, so you get a more trustworthy result than a single pass.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/workflows",
+   "claim": "Workflow agent model resolution follows the subagent model order; a script-named model per stage is a first-class override, else it falls back to session model, then org allowlist substitution.",
+   "quote": "Claude Code picks each workflow agent's model in the same order it uses for subagents. A model the script names for a stage counts as the per-invocation model in that order. When nothing else assigns one, the agent runs on your session's model.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/workflows",
+   "claim": "Workflow launch confirmation depends on permission mode: Auto prompts once then remembers consent; bypassPermissions and claude -p/Agent SDK never prompt and instead route through ordinary permission evaluation (allow/deny/ask rules, Workflow(<name>) rule).",
+   "quote": "In `claude -p` and the Agent SDK, Claude Code never shows this prompt. It runs the Workflow tool call through the same permission evaluation as the rest of the session, so deny rules, ask rules, and `dontAsk` mode apply to the launch as they apply to every tool call. ... `Workflow` in your allow rules approves every workflow, and `Workflow(<name>)` approves one saved workflow by name.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/sub-agents",
+   "claim": "Nested subagent depth defaults to 3 layers below main conversation and is configurable via CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH; at the limit only forks retain the Agent tool.",
+   "quote": "By default, a subagent can spawn subagents of its own, up to three layers below the main conversation. At the depth limit, Claude Code withholds the `Agent` tool from every subagent except a fork... To change the limit, set `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` to the number of subagent layers you want below your main conversation.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/sub-agents",
+   "claim": "Subagents receive only their own system prompt plus basic environment details, not the full Claude Code system prompt — isolating verbose tool output is a named common pattern.",
+   "quote": "Subagents receive only this system prompt plus basic environment details like the working directory, not the Claude Code system prompt.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/sub-agents",
+   "claim": "tools/disallowedTools resolve by applying disallowedTools first then filtering tools against the remainder; a disallowedTools entry with a Bash specifier still removes the whole tool, not just the matching command — use permissions.deny for command-level blocking.",
+   "quote": "If both are set, `disallowedTools` is applied first, then `tools` is resolved against the remaining pool. A tool listed in both is removed. ... A `disallowedTools` entry with a specifier, such as `Bash(git push *)`, still removes the whole tool from the subagent, not only the matching commands. To keep Bash and block specific commands, add a Bash deny rule such as `Bash(git push *)` to `permissions.deny` in your settings.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/sub-agents",
+   "claim": "Subagent output scanning does not judge maliciousness and does not change what an instruction in a report can do — a tool call it leads to still goes through the session's permission checks and sandboxing; it is not a substitute for restricting what a subagent can reach.",
+   "quote": "The scan doesn't judge whether content is malicious, and it doesn't change what an instruction in a report can do: a tool call the report leads Claude to make still goes through the session's permission checks and sandboxing. It isn't a substitute for restricting what a subagent can reach.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/agent-teams",
+   "claim": "Agent teams are experimental, opt-in via CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1; teammates run as fully independent Claude instances with own context, coordinate via direct messages plus a shared task list (for agents with Task tools), and cost more per-teammate than subagents since results aren't summarized back.",
+   "quote": "Teammates work independently, each in its own context window, and communicate directly with each other. ... | **Token cost** | Lower: results summarized back to main context | Higher: each teammate is a separate Claude instance | ... Use subagents when you need quick, focused workers that report back. Use agent teams when teammates need to share findings, challenge each other, and coordinate on their own.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/agent-teams",
+   "claim": "Team task claiming uses file locking to prevent race conditions when multiple teammates try to claim the same task simultaneously; tasks support dependency gating (pending/in-progress/completed, blocked until dependencies complete).",
+   "quote": "Task claiming uses file locking to prevent race conditions when multiple teammates try to claim the same task simultaneously. ... Tasks can also depend on other tasks: a pending task with unresolved dependencies cannot be claimed until those dependencies are completed.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/cross-session-messaging",
+   "claim": "Cross-session message delivery is gated by permission-mode class: plan mode counts as bypassing in interactive terminal sessions with bypass available; auto/acceptEdits/dontAsk count as prompting — messages from a bypassing sender to a prompting receiver are held for approval.",
+   "quote": "It groups sessions that bypass permission prompts into one class, and every other session into the other. Plan mode counts as bypassing in interactive terminal sessions with bypass permissions available, and auto, acceptEdits, and dontAsk count as prompting: **The receiving session prompts for permissions**: Claude Code delivers each message. It holds one for your approval only when the sending session identifies itself as bypassing permission prompts.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/hooks",
+   "claim": "Stop hooks receive background_tasks and session_crons fields specifically so a hook can distinguish 'session is done' from 'session is paused waiting for background work,' and Claude Code force-ends a turn after 8 consecutive Stop-hook blocks.",
+   "quote": "The `background_tasks` and `session_crons` arrays let hooks distinguish \"session is done\" from \"session is paused waiting for background work to wake it back up\". ... Claude Code overrides the hook and ends the turn after 8 consecutive blocks.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://code.claude.com/docs/en/costs",
+   "claim": "Enterprise cost baseline: ~$13/developer/active day average, $150-250/developer/month, with 90% of users below $30/active day — track via /usage Session block before drawing conclusions from a pilot.",
+   "quote": "Across enterprise deployments, the average cost is around $13 per developer per active day and $150-250 per developer per month, with costs remaining below $30 per active day for 90% of users. To estimate spend for your own team, start with a small pilot group and use the tracking tools below to establish a baseline before wider rollout.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://developers.openai.com/codex/config-reference",
+   "claim": "Codex config.toml supports a first-class agents table for multi-agent settings and custom role declarations, each role with its own config_file (TOML layer) and description shown to Codex when choosing/spawning that agent type.",
+   "quote": "`agents` | `table` | Multi-agent settings and custom role declarations. Scalar setting names are reserved and can't be used as custom role names. | `agents.<name>.config_file` | `string (path)` | Path to a TOML config layer for that role; relative paths resolve from the config file that declares the role. | `agents.<name>.description` | `string` | Role guidance shown to Codex when choosing and spawning that agent type.",
+   "retrieved": "2026-09-22"
+  },
+  {
+   "run": "wf_3025640f-b1e",
+   "source": "https://developers.openai.com/codex/config-reference",
+   "claim": "Codex config has agents.default_subagent_model and agents.default_subagent_reasoning_effort as fleet-wide defaults, overridden by an explicit spawn-time model.",
+   "quote": "`agents.default_subagent_model` | `string` | Default model for spawned agents. An explicit spawn model takes precedence. `agents.default_subagent_reasoning_effort` | `string` | Default reasoning effort for spawn...",
+   "retrieved": "2026-09-22"
+  }
+ ]
+}

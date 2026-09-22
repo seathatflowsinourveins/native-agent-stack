@@ -1,7 +1,35 @@
 # Codex custom agents: merge into the project's .codex/config.toml. The agent
 # definitions live in .codex/agents/<name>.toml. Model and reasoning effort are
-# inherited from the session configuration; three concurrent threads mirror the
-# Claude setting CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS=3.
+# inherited from the session configuration unless a role's layer sets them; an
+# explicit spawn model takes precedence. The thread cap is the Codex-side worker
+# bound and carries its own dated row next to the Claude setting
+# CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS in the deploying project's cap table
+# (3 on 2026-09-22; raise only after a tracked multi-agent job completes at 3
+# without provider errors).
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 3
+
+# Role registration shape verified against the Codex source at tag rust-v0.155.1
+# (codex-rs/agent-roles/src/agent_role_config.rs, loader.rs, discovery.rs; the
+# cited lines are retained in
+# evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json):
+# an [agents.<name>] entry carries description, config_file (the role's TOML
+# layer, resolved against the config folder) and nickname_candidates; a role file
+# holds name, description, nickname_candidates and any config keys such as
+# developer_instructions (unknown keys are rejected). Every .toml under the
+# agents directory is also discovered without a table entry, a declared
+# config_file is not loaded twice, the file's description wins over the table's,
+# duplicate role names in one layer warn, and a description is required. Not yet
+# exercised in a Codex session on this profile.
+# config_file resolves against the config folder that holds config.toml, so a
+# role file under .codex/agents/ is declared as agents/<name>.toml (a Codex
+# Lane C review on 2026-09-22 caught the earlier .codex/agents/... value, which
+# would resolve to .codex/.codex/agents/... while discovery masked it).
+[agents."evidence-reviewer"]
+config_file = "agents/evidence-reviewer.toml"
+description = "Independently inspect an assigned patch and its verification evidence."
+
+[agents."isolated-builder"]
+config_file = "agents/isolated-builder.toml"
+description = "Implement a bounded task in its own worktree and return a verified handoff."

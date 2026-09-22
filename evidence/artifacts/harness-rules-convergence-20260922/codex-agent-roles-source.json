@@ -1,0 +1,51 @@
+{
+  "recorded": "2026-09-22",
+  "evidence_class": "upstream source read at a pinned tag through the GitHub contents API; no Codex session exercised the registration",
+  "repository": "openai/codex",
+  "ref": "rust-v0.155.1",
+  "installed_cli": "codex-cli 0.155.1",
+  "files": [
+    {
+      "path": "codex-rs/agent-roles/src/agent_role_config.rs",
+      "lines": "10-18",
+      "quote": "pub struct AgentRoleConfig { /// Human-facing role documentation used in spawn tool guidance. /// Required for loaded user-defined roles after deprecated/new metadata precedence resolves. pub description: Option<String>, /// Path to a role-specific config layer. pub config_file: Option<PathBuf>, /// Candidate nicknames for agents spawned with this role. pub nickname_candidates: Option<Vec<String>>, }",
+      "meaning": "an [agents.<name>] entry carries description, config_file and nickname_candidates"
+    },
+    {
+      "path": "codex-rs/agent-roles/src/agent_role_config.rs",
+      "lines": "20-28",
+      "quote": "#[serde(deny_unknown_fields)] struct RawAgentRoleFileToml { name: Option<String>, description: Option<String>, nickname_candidates: Option<Vec<String>>, #[serde(flatten)] config: ConfigToml, }",
+      "meaning": "a role file holds name, description, nickname_candidates and any ConfigToml key (developer_instructions, model, ...); unknown keys are rejected"
+    },
+    {
+      "path": "codex-rs/agent-roles/src/discovery.rs",
+      "lines": "6-38",
+      "quote": "pub(crate) async fn collect_agent_role_files(...) ... if entry.is_file && path.as_path().extension().is_some_and(|extension| extension == \"toml\") { files.push(path); }",
+      "meaning": "every .toml under the agents directory (recursively) is discovered as a role file without a table entry"
+    },
+    {
+      "path": "codex-rs/agent-roles/src/loader.rs",
+      "lines": "47-57",
+      "quote": "for (declared_role_name, role_toml) in &agents_toml.roles { ... if let Some(config_file) = role.config_file.clone() { declared_role_files.insert(config_file); }",
+      "meaning": "declared roles are read from the agents table; a declared config_file is recorded so discovery does not load it twice"
+    },
+    {
+      "path": "codex-rs/agent-roles/src/loader.rs",
+      "lines": "100-112",
+      "quote": "if let Some(existing_role) = roles.get(&role_name) { merge_missing_role_fields(&mut merged_role, existing_role); } if let Err(err) = validate_required_agent_role_description(&role_name, merged_role.description.as_deref()) { push_agent_role_warning(startup_warnings, err); continue; }",
+      "meaning": "higher layers fill missing fields from lower layers; a role without a description is dropped with a startup warning"
+    },
+    {
+      "path": "codex-rs/agent-roles/src/loader.rs",
+      "lines": "147-164",
+      "quote": "role_name = parsed_file.role_name; role.description = parsed_file.description.or(role.description); role.nickname_candidates = parsed_file.nickname_candidates.or(role.nickname_candidates);",
+      "meaning": "when a table entry names a config_file, the file's name becomes the role name and the file's description wins over the table's"
+    },
+    {
+      "path": "codex-rs/core/src/config/mod.rs",
+      "lines": "1284-1300",
+      "quote": "pub struct MultiAgentV2Config { pub max_concurrent_threads_per_session: usize, pub min_wait_timeout_ms: i64, pub max_wait_timeout_ms: i64, pub default_wait_timeout_ms: i64, ... }",
+      "meaning": "max_concurrent_threads_per_session is the multi-agent thread bound; no CPU dependence is expressed in the type"
+    }
+  ]
+}

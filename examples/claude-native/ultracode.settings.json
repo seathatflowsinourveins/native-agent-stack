@@ -4,6 +4,7 @@
   "ultracode": true,
   "workflowSizeGuideline": "unrestricted",
   "env": {
-    "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "3"
+    "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
   }
 }
