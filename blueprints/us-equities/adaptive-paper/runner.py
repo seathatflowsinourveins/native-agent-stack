@@ -956,6 +956,16 @@ def _apply_forced_recovery_outcome(outcome, recovery):
     return outcome
 
 
+def _final_boundary_from_run_status(outcome):
+    """True unless run_native itself ended the run as a legitimate hold.
+
+    main() must not re-evaluate the session clock after run_native returns: a
+    needs_attention end that crosses into POST before main() reaches this
+    decision would otherwise be relabelled held_overnight (rebase review D2).
+    """
+    return outcome.get("status") != "held_overnight"
+
+
 def trial_phase_and_exit_code(result):
     """D1: the single authority for deriving the durable trial-state
     ``phase`` and the CLI exit code from a run's own ``result`` (run_native's
@@ -1056,15 +1066,26 @@ def main():
         print(json.dumps({k: summary[k] for k in ("status", "orders_submitted")}, default=str))
         return 0 if summary["status"] == "ready" else 2
     gate_mode = "paper" if args.command == "paper" else None
+    # Rebase review D1: overnight_holds relaxes the flat-account/no-open-orders
+    # gate only to resume a trial this engine itself left "held_overnight".
+    # A first trial (or any other prior phase) still requires a flat account,
+    # so positions or orders created outside a trial are never adopted. The
+    # phase is re-read under the account lock below and must still agree.
+    prior_path = args.state_root / observation["account_identity_sha256"] / "adaptive" / "trial.json"
+    try:
+        prior_phase = json.loads(prior_path.read_text()).get("phase") if prior_path.exists() else None
+    except (OSError, ValueError):
+        prior_phase = None
+    prior_hold = bool(session_policy["overnight_holds"] and prior_phase == "held_overnight")
     try:
         # allow_existing (recovery mode) stays scoped to --command recover
         # only; overnight_holds must not relax the cash/equity floor, window
         # sizing or universe/benchmark checks (D4) -- it only relaxes the
-        # separate flat-account/no-open-orders gate below.
+        # separate flat-account/no-open-orders gate below, and only for a
+        # resumable held trial (see prior_hold above).
         close = validate_preflight(observation, config, require_open=True,
                                    allow_existing=args.command == "recover",
-                                   allow_existing_positions=(args.command == "recover"
-                                                             or session_policy["overnight_holds"]),
+                                   allow_existing_positions=(args.command == "recover" or prior_hold),
                                    session_policy=session_policy,
                                    mode=gate_mode, gate_result_path=args.gate_result, snapshot_path=args.snapshot)
     except SafetyError as exc:
@@ -1082,8 +1103,10 @@ def main():
         # overnight_holds invocation -- the D1 ledger-adoption path handles
         # picking the held position back up -- while every other non-finished
         # phase still requires explicit --command recover, unchanged.
-        resumable_hold = (previous_metadata and previous_metadata.get("phase") == "held_overnight"
-                          and session_policy["overnight_holds"])
+        resumable_hold = bool(previous_metadata and previous_metadata.get("phase") == "held_overnight"
+                              and session_policy["overnight_holds"])
+        if resumable_hold != prior_hold:
+            raise SafetyError("trial_state_changed_during_preflight")
         if (previous_metadata and args.command != "recover"
                 and previous_metadata.get("phase") != "finished" and not resumable_hold):
             raise SafetyError("existing_trial_requires_explicit_recovery")
@@ -1180,7 +1203,12 @@ def main():
                     # overnight_holds. The default policy is unaffected:
                     # must_end_flat always requires flat regardless of
                     # is_final_boundary when overnight_holds is False (D5).
-                    is_final_boundary = not _honest_overnight_hold(outcome, session_policy, time.time())
+                    # Rebase review D2: run_native already decided the hold at
+                    # the moment its run ended (_run_native_status). Reuse
+                    # that decision instead of re-reading the clock here, so
+                    # a needs_attention end that crosses into POST before this
+                    # line runs can never be relabelled held_overnight.
+                    is_final_boundary = _final_boundary_from_run_status(outcome)
                     if must_end_flat(session_policy, is_final_boundary=is_final_boundary):
                         controller.port = fresh_port(True)
                         recovery = await recover(controller, metadata, config)

@@ -376,12 +376,16 @@
       "tests/test_adaptive_paper_transport.py": "b0a5e05bb7a6122e28267ae72a3be6e0e710881cf1b97e0758229021460bbab5"
     },
     "acceptance": {
-      "engine_and_pr4_suites": "Ran 523 tests / OK (skipped=1)",
+      "engine_and_pr4_suites": "Ran 527 tests / OK (skipped=1)",
       "unittest_discover": "Ran 1729 tests / OK (skipped=5)"
     },
     "limitations": [
       "earlier changes_since blocks record pre-rebase hashes for runner.py and its tests; this block supersedes them",
       "paper command now also requires a passing promotion-gate result (--gate-result/--snapshot) from PR-4"
+    ],
+    "review_fixes": [
+      "rebase review D1: overnight_holds relaxes the flat-account/no-open-orders preflight gate only when the prior trial phase is held_overnight (read before preflight, re-checked under the account lock: trial_state_changed_during_preflight); a first trial with foreign positions is refused (clean_native_start_requires_flat_account)",
+      "rebase review D2: main() reuses run_native's hold decision (_final_boundary_from_run_status) instead of re-reading the clock"
     ]
   }
 }

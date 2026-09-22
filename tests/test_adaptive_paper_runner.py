@@ -1127,6 +1127,63 @@ class MainCommandGateWiring(unittest.TestCase):
         self.assertEqual(result["status"], "ready")
 
 
+class OvernightHoldPreflightScope(unittest.TestCase):
+    """Rebase review D1/D2 (PR #69): overnight_holds may relax the flat-account
+    gate only to resume a trial this engine left held_overnight, and main()
+    reuses run_native's own hold decision instead of re-reading the clock."""
+
+    # 2026-09-22 15:00 UTC = 11:00 ET, a regular session inside the frozen calendar.
+    RTH_NS = 1790089200 * 1_000_000_000
+
+    def setUp(self):
+        MainCommandGateWiring.setUp(self)
+        self.observation["clock"].update(timestamp_ns=self.RTH_NS, received_at_ns=self.RTH_NS,
+                                         next_close_ns=self.RTH_NS + 3600 * 1_000_000_000)
+        # Benchmark-quote freshness is checked against real time, so quotes keep a current stamp.
+        self.observation["quotes"] = [{"symbol": s, "ts_ns": time.time_ns()} for s in self.config["symbols"]]
+        self.observation["positions"] = [{"symbol": "SPY", "qty": "1"}]
+        self.config.update(regular_session_only=False, extended_hours_enabled=True,
+                           sessions={"extended_hours": True, "overnight_holds": True,
+                                     "overnight_gross_multiple": "1.0"})
+        self.gate_path = self.root / "gate-result.json"
+        self.gate_path.write_text(json.dumps(_full_gate_result(input_sha256=self.snapshot_hash)))
+
+    def tearDown(self):
+        MainCommandGateWiring.tearDown(self)
+
+    _argv = MainCommandGateWiring._argv
+    _run_main = MainCommandGateWiring._run_main
+
+    def _paper(self):
+        return self._run_main("paper", ["--gate-result", str(self.gate_path), "--snapshot", str(self.snapshot)])
+
+    def test_first_trial_with_foreign_position_is_refused_even_under_overnight_holds(self):
+        sentinel, code, raised = self._paper()
+        self.assertIsNone(raised)
+        self.assertEqual(code, 2)
+        self.assertEqual(json.loads(self.output.read_text())["reason"], "clean_native_start_requires_flat_account")
+
+    def test_prior_held_overnight_phase_allows_the_non_flat_resume(self):
+        trial = self.root / "state" / "fixture-account" / "adaptive" / "trial.json"
+        trial.parent.mkdir(parents=True)
+        trial.write_text(json.dumps({"phase": "held_overnight"}))
+        sentinel, code, raised = self._paper()
+        self.assertIs(raised, sentinel)
+
+    def test_other_prior_phase_does_not_relax_the_flat_gate(self):
+        trial = self.root / "state" / "fixture-account" / "adaptive" / "trial.json"
+        trial.parent.mkdir(parents=True)
+        trial.write_text(json.dumps({"phase": "needs_attention"}))
+        sentinel, code, raised = self._paper()
+        self.assertIsNone(raised)
+        self.assertEqual(code, 2)
+
+    def test_main_reuses_run_native_hold_decision(self):
+        self.assertFalse(runner_module._final_boundary_from_run_status({"status": "held_overnight"}))
+        for status in ("needs_attention", "failed", "passed", "completed_no_signals"):
+            self.assertTrue(runner_module._final_boundary_from_run_status({"status": status}))
+
+
 class CredentialFilePermissions(unittest.TestCase):
     """runner.credentials() fails closed on env-file mode, ownership, and
     Git-worktree location before any line of the file is parsed."""
