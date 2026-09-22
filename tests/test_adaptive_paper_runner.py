@@ -1,6 +1,7 @@
 """Local cross-module tests: native engine, controller, ledger, synthetic port."""
 import asyncio
 from dataclasses import replace
+from datetime import datetime, timezone
 from decimal import Decimal
 import hashlib
 import json
@@ -1232,8 +1233,16 @@ class OvernightHoldPreflightScope(unittest.TestCase):
         return ledger
 
     def test_held_resume_accepts_exactly_the_ledger_holdings(self):
-        ledger = self._held_ledger([{"symbol": "SPY", "qty": "1", "avg_entry_price": "500"}])
-        runner_module.held_resume_matches_ledger(ledger, {"positions": [{"symbol": "SPY", "qty": "1"}], "orders": []})
+        own_order = {"client_order_id": "trial-exit-1", "id": "b-7", "symbol": "SPY", "side": "sell",
+                     "qty": "1", "limit_price": "501", "filled_qty": "0", "status": "new"}
+        ledger = self._held_ledger([{"symbol": "SPY", "qty": "1", "avg_entry_price": "500"},
+                                    {"symbol": "AAPL", "qty": "0.5", "avg_entry_price": "200"}], [own_order])
+        # Decimal value equality ("1" == "1.0", "0.5" == "0.50"), zero-quantity rows ignored,
+        # and an open order the ledger itself owns is accepted.
+        runner_module.held_resume_matches_ledger(ledger, {
+            "positions": [{"symbol": "SPY", "qty": "1.0"}, {"symbol": "AAPL", "qty": "0.50"},
+                          {"symbol": "MSFT", "qty": "0"}],
+            "orders": [own_order]})
 
     def test_held_resume_refuses_a_foreign_or_changed_position(self):
         ledger = self._held_ledger([{"symbol": "SPY", "qty": "1", "avg_entry_price": "500"}])
@@ -1263,6 +1272,8 @@ class OvernightHoldPreflightScope(unittest.TestCase):
                 "started_at": 0, "baseline_cash": "100000"}
         trial.write_text(json.dumps(held))
         transport_sentinel = RuntimeError("broker_transport_constructed")
+        frozen = datetime.fromtimestamp(self.RTH_NS / 1e9, timezone.utc)
+        real_session_at, real_extended_close = runner_module.session_at, runner_module.extended_session_close
         extra = ["--gate-result", str(self.gate_path), "--snapshot", str(self.snapshot)]
         from contextlib import nullcontext
         with patch.object(sys, "argv", self._argv("paper", extra)), \
@@ -1270,7 +1281,11 @@ class OvernightHoldPreflightScope(unittest.TestCase):
              patch.object(runner_module, "credentials", return_value=("fixture-key", "fixture-secret")), \
              patch.object(runner_module, "preflight", return_value=self.observation), \
              patch.object(runner_module, "account_lock_fingerprint", lambda _f: nullcontext()), \
-             patch.object(runner_module, "AlpacaPaperTransport", side_effect=transport_sentinel):
+             patch.object(runner_module, "AlpacaPaperTransport", side_effect=transport_sentinel), \
+             patch.object(runner_module, "session_at", lambda _ts: real_session_at(frozen)), \
+             patch.object(runner_module, "extended_session_close", lambda _ts: real_extended_close(frozen)):
+            # The session clock is pinned to the frozen RTH instant, so the controller's
+            # wall-clock session lookup does not depend on the built-in 2026 calendar.
             with self.assertRaisesRegex(SafetyErrorAlways, "held_resume_position_mismatch"):
                 runner_module.main()
         self.assertEqual(json.loads(trial.read_text()), held)
