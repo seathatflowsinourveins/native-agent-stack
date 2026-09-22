@@ -106,9 +106,12 @@ class GuardedRunnerStructureTests(unittest.TestCase):
                 self.assertTrue(script.is_file(), f"{script} is missing")
                 self.assertTrue(os.access(script, os.X_OK), f"{script} is not executable")
 
+    # SC2317 (info, "command appears to be unreachable") is excluded: the bounded runner's
+    # cleanup function is reached only through `trap`, which the shellcheck release on
+    # GitHub-hosted runners reports as unreachable while shellcheck 0.11.0 is clean.
     @unittest.skipUnless(SHELLCHECK, "native shellcheck unavailable; CI installs the pinned analyzer")
     def test_shellcheck_is_clean_at_style_severity(self):
-        result = _run([SHELLCHECK, "-S", "style", str(BOUNDED_RUN), str(GITLEAKS_GUARDED)])
+        result = _run([SHELLCHECK, "-S", "style", "-e", "SC2317", str(BOUNDED_RUN), str(GITLEAKS_GUARDED)])
         self.assertEqual(
             result.returncode, 0,
             f"shellcheck -S style reported findings:\n{result.stdout}{result.stderr}",

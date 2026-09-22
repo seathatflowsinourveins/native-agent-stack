@@ -3211,8 +3211,8 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "b84b21c2fb10995d07adcd346ef5271dc34d5a980a9298d6b01ccf49f7b3b574",
-      "bytes": 12360
+      "sha256": "52c3fdbaf31a454682b001998ec8914f23c6f9aec618a0856a65fec020b16249",
+      "bytes": 12706
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
@@ -11317,8 +11317,8 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "92d43e0d4168a813257ed9ea3a407ce0b8ee9cf75ff4edc2d98cecbca182aa2d",
-      "bytes": 20842
+      "sha256": "505bafa7484ba21c1803431564fa478dd2cfbf69df055c18e849fe5ff6daa25d",
+      "bytes": 21121
     },
     {
       "path": "tests/test_adoption_status.py",

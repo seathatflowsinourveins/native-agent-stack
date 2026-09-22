@@ -198,3 +198,5 @@ holds the per-user lock`, and the first then exited 0. The lock file descriptor
 opened at line 21 survives the final `exec` on this bash (verified separately via
 `/proc/self/fd`), which is what makes that guarantee hold. This is a one-host
 observation, not a suite assertion.
+
+The shellcheck structural test excludes `SC2317` (info: "command appears to be unreachable"): the bounded runner's cleanup function is only reached through `trap`, which shellcheck 0.9.x on GitHub-hosted runners reports as unreachable while 0.11.0 is clean; the scripts are kept byte-faithful to their recorded provenance rather than annotated.
