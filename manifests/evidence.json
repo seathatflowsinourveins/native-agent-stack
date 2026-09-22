@@ -12271,6 +12271,26 @@
       "path": "blueprints/gap-resolution-20260922/skf-walkforward-optimizer/run_optimizer.py",
       "sha256": "5fe7f4027090c3a914a59f75e1244d2cc382f64d121c622be3a88c1c99bc9ef7",
       "bytes": 6341
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/document-retrieval/cite-executed-retrieval.json",
+      "sha256": "4fa0c046d13944c53d191f2c7cdefc2720a6e59ee00f3507b5159b42857556f0",
+      "bytes": 11102
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/document-retrieval/qmd-repeated-bench-isolated.json",
+      "sha256": "1b82191354de946d8aa1618add7b627449522dcfec5d143f2abb6eda329fa5f7",
+      "bytes": 11556
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/durable-memory/deletion-erasure-probe.json",
+      "sha256": "fd7b0e669adae64580cc8dbebff76eb3bc2f28418df2f246ee2200ce3e2089a7",
+      "bytes": 18965
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/agents-models-workers/ai-memory-local-scope-reread.json",
+      "sha256": "4e846bac96536d6da45ffff943060aa8b02576b01646ca6c526623db098130bb",
+      "bytes": 13022
     }
   ],
   "convergence_records": [
