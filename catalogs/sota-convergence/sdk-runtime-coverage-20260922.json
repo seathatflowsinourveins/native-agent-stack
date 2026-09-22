@@ -7736,5 +7736,36 @@
   "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
   "evidence/artifacts/sdk-runtime-coverage-20260922/protocol-sdks.json",
   "evidence/artifacts/sdk-runtime-coverage-20260922/sandbox-worker-runtimes.json"
- ]
+ ],
+ "viability_probes": {
+  "artifact": "evidence/artifacts/sdk-runtime-coverage-20260922/probes-20260922.json",
+  "date": "2026-09-22",
+  "evidence_class": "native_execution on one WSL2 x86_64 host, each receipt independently verified (partially_confirmed x3); viability probes, not comparisons; nothing promoted",
+  "rows": [
+   {
+    "slug": "anthropics/claude-agent-sdk-typescript",
+    "category": "agent-sdks",
+    "version": "0.3.280",
+    "supported": "query() drove the native claude binary with apiKeySource none: fixture write plus a resumed session with the same session_id; structured SDK messages with usage and cost",
+    "open_defects": "allowedTools only auto-approves; the session exposed every host tool and ran host SessionStart hooks (no settingSources, tools or canUseTool); session files written under the user home",
+    "effect": "The C1 native_login_support label api_key_required does not hold on this host; disposition stays keep_but_compare pending an isolated run (settingSources [], explicit tools) compared with the native Agent/Workflow tools"
+   },
+   {
+    "slug": "awslabs/cli-agent-orchestrator",
+    "category": "coding-harnesses",
+    "version": "v2.5.1 (d98243e)",
+    "supported": "isolated uv install; CAO_HOME_DIR relocated CAO state; loopback server; launched a plan-mode claude worker on the native login that planned and stopped at the approval menu",
+    "open_defects": "status reported idle while the worker waited for approval; cao shutdown hung and needed a manual kill; the worker CLI wrote plan, transcript and project state under the user home",
+    "effect": "stays targeted_candidate; end-to-end completion and the codex provider unobserved"
+   },
+   {
+    "slug": "untrivial-ai/agent-orchestrator",
+    "category": "dispatch-frameworks",
+    "version": "v0.13.0 AppImage (sha256 and sha512 matched; bundled daemon reports dev)",
+    "supported": "ao daemon ran with no Electron process, bound loopback, answered status, agent ls, doctor and readyz, stopped cleanly via POST /shutdown",
+    "open_defects": "unprompted use of the host native Codex login for an account-capacity read, with the Codex auth and models cache files rewritten in the same second (probably a token refresh; concurrent probes prevent certain attribution); DISPLAY was set, so display independence is unproven; the parent-death auto-stop failed to start",
+    "effect": "stays targeted_candidate with a recorded credential-touch finding: any further run needs a separate HOME/CODEX_HOME"
+   }
+  ]
+ }
 }

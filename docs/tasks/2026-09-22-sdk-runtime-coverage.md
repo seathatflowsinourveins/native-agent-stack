@@ -88,3 +88,13 @@ behaviour.
   scopes) were redacted before publication; loopback service ports remain, as on `main`.
 - Usage: discovery about 1.3 M, selection about 12.0 M, re-collection about 1.2 M subagent tokens
   (workflow-reported, not lifetime provider totals).
+
+## Viability probes (follow-up, 2026-09-22)
+
+Workflow `wf_1f3da910-f1c` (three Sonnet/high executors, three Opus/high verifiers) probed the TypeScript
+Agent SDK, `awslabs/cli-agent-orchestrator` and the `untrivial-ai/agent-orchestrator` daemon on the WSL2
+host; results are summarised in the ledger's `viability_probes` block and Markdown section, with the
+sanitised receipts and verifications in `evidence/artifacts/sdk-runtime-coverage-20260922/probes-20260922.json`.
+Executed evidence overturns the TypeScript SDK's `api_key_required` C1 label on this host; no
+disposition changes. Probe-created files outside the scratch prefix were removed after verification.
+The agent-orchestrator daemon's unprompted read of the host's Codex account is recorded as a finding.

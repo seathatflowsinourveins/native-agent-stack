@@ -154,3 +154,13 @@ Recommended integration order (each gated as stated):
 - `dagu` 2.16.6 is installed under the ecosystem tools directory but not symlinked on the ecosystem PATH; scheduling and durability comparisons wait on that repair (an ecosystem-configuration item).
 - The three placeholder packets from the first pass were re-collected; rows carry `recollected: true`.
 - Rejected candidates carry the three judges' reasons in the JSON; a rejection on metadata alone is not a quality judgement of the project.
+
+## Viability probes (2026-09-22)
+
+Three targeted candidates that needed no account, consent or paid key were probed on one WSL2 x86_64 host with pinned versions inside a scratch prefix, the ecosystem bounded runner and the native Claude Code login with the API-key variables unset; each receipt was verified against the raw logs by an independent reviewer (all three partially confirmed; the corrected findings are the reviewer's). Sanitised receipts and verifications: `evidence/artifacts/sdk-runtime-coverage-20260922/probes-20260922.json`. Viability only; nothing is promoted.
+
+| Repository | Supported by the evidence | Open defects | Effect |
+| --- | --- | --- | --- |
+| `anthropics/claude-agent-sdk-typescript` 0.3.280 | `query()` drove the native `claude` binary with `apiKeySource: "none"`; fixture write and a resumed session with the same `session_id`; structured messages with usage and cost | `allowedTools` only auto-approves; host tools and SessionStart hooks were active (no `settingSources`, `tools` or `canUseTool`) | The `api_key_required` C1 label does not hold on this host; stays keep_but_compare pending an isolated run compared with the native Agent/Workflow tools |
+| `awslabs/cli-agent-orchestrator` v2.5.1 | Isolated install and state; loopback server; a plan-mode Claude worker on the native login planned and stopped at the approval menu | Waiting worker reported as `idle`; `cao shutdown` hung; worker CLI state written under the user home | Stays targeted_candidate; completion and the Codex provider unobserved |
+| `untrivial-ai/agent-orchestrator` v0.13.0 | The bundled `ao daemon` ran headless on loopback, answered status, agent listing, doctor and readiness, and stopped cleanly | Unprompted native Codex account read with the Codex credential files rewritten in the same second; `DISPLAY` was set; parent-death auto-stop failed | Stays targeted_candidate with a credential-touch finding: isolate `HOME`/`CODEX_HOME` for any further run |
