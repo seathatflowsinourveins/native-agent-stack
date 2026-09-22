@@ -2776,7 +2776,7 @@
       "limitations": [
         "Historical inventory of metadata and source review only; not installation, execution, benchmark or license-file inspection, and not a superiority claim.",
         "Freshness is GitHub REST metadata observed on 2026-09-22; a newer release is information, not a reason to upgrade, and release notes were not read.",
-        "Review lanes and refuters are native model judgments over cited evidence; agreement is not acceptance. Codex cross-family review was attempted three times and is blocked by the account's exhausted usage limit until 2026-09-26; it is not established for this record.",
+        "Review lanes and refuters are native model judgments over cited evidence; agreement is not acceptance. Codex cross-family review ran after the usage limit was lifted: four passes on the canonical branch (7/2/1/0 findings) and three on the agent-lab saved workflow (3/1/0); all supported findings were fixed with regression tests and the final passes found no actionable regressions.",
         "Critic-named gaps remain open: dated security identity, pre-2020 delisting coverage, point-in-time news/filing availability, IBKR acceptance, LEAN/SPY parity, source-review-only evaluation and portfolio layers."
       ],
       "path": "evidence/receipts/sota-convergence-20260922.json"
@@ -6447,7 +6447,7 @@
     {
       "path": "docs/ecosystem/index.html",
       "bytes": 8148023,
-      "sha256": "b549dd4e6edb87e4564be4ce33760403a120c3a297748c37417e01e389c18a07"
+      "sha256": "a10f63aac046e8f462ed538a17324e5abd461b4e1e40e1c4b2ab39bf5672e2bb"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7121,8 +7121,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "bytes": 10470,
-      "sha256": "c22ad8f898a5de5c779bd12d8668c7f067dc04f4634957cf2b84add44766128f"
+      "bytes": 10468,
+      "sha256": "cddaec827e3a55124b5474e24b2bbc3c8ddff5e58d86dd3318b3f9f49c2c290e"
     },
     {
       "path": "observability/receipt.json",
@@ -10371,18 +10371,18 @@
     },
     {
       "path": "evidence/receipts/sota-convergence-20260922.json",
-      "bytes": 2680,
-      "sha256": "4414d33d32cc2f7c7d1fd28eb601fb87c64abbc41bfc4cc506e8bb06edc8b86f"
+      "bytes": 4906,
+      "sha256": "24be77b12057c9cc7d29d0edbd0ba8af5005ceff82c2f1b1ffe34e5c424d1ab2"
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260922.json",
-      "bytes": 401345,
-      "sha256": "dffd00f9d9b9d2ae8f749c0c850d415d5c986221906c40df0523ee114992dae7"
+      "bytes": 401431,
+      "sha256": "01869fe708b9fb71f78200a06ce4b7cf6eb86532feb7edf96ffa616b3af3b18f"
     },
     {
       "path": "catalogs/sota-convergence/README.md",
-      "bytes": 15494,
-      "sha256": "4fdf366ff5572013be350879aa087018a2e79f029f5bad27ca705fedd84c9600"
+      "bytes": 15883,
+      "sha256": "b9486a04dd906d855be8369aaed7fca87780490b16ca368eae5e1a630a7b1f8c"
     },
     {
       "path": "recipes/sota-convergence-practice.md",

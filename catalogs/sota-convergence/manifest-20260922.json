@@ -7,7 +7,7 @@
   "baseline": "catalogs/foundation/decisions.json + manifests/stack.json + the four catalogs/us-equities layer files consolidated into 12 layers (taxonomy below)",
   "freshness": "authenticated GitHub REST metadata for 396 repositories fetched 2026-09-22T04:08:18Z: stars, pushed_at, latest release/tag, head, license, archived, rename",
   "review": "three native Opus/high review lanes (foundation, trading, beyond stars/awesome) with bounded gh api / WebFetch / WebSearch budgets; every proposed change adversarially verified by two Opus/high refuters (evidence lens, gap-fit lens); one completeness critic",
-  "cross_family": "Codex foreground review lane attempted three times on 2026-09-22 (branch diff, retry, prose-only commit); the native codex review run reported the account's usage limit exhausted until 2026-09-26; cross-family review is not established",
+  "cross_family": "Codex foreground review lane: three attempts blocked by the account's usage limit on 2026-09-22, then four passes on the canonical branch (7/2/1/0 findings) and three on the agent-lab saved workflow (3/1/0) once lifted; all supported findings fixed with regression tests; established at f9a652f (see receipt codex_review)",
   "rule": "evidence, not agreement or recency; a newer release is information, not a reason to upgrade"
  },
  "taxonomy": {

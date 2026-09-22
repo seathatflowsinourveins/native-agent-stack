@@ -69,9 +69,79 @@
   "limitations": [
     "Historical inventory of metadata and source review only; not installation, execution, benchmark or license-file inspection, and not a superiority claim.",
     "Freshness is GitHub REST metadata observed on 2026-09-22; a newer release is information, not a reason to upgrade, and release notes were not read.",
-    "Review lanes and refuters are native model judgments over cited evidence; agreement is not acceptance. Codex cross-family review was attempted three times and is blocked by the account's exhausted usage limit until 2026-09-26; it is not established for this record.",
+    "Review lanes and refuters are native model judgments over cited evidence; agreement is not acceptance. Codex cross-family review ran after the usage limit was lifted: four passes on the canonical branch (7/2/1/0 findings) and three on the agent-lab saved workflow (3/1/0); all supported findings were fixed with regression tests and the final passes found no actionable regressions.",
     "Critic-named gaps remain open: dated security identity, pre-2020 delisting coverage, point-in-time news/filing availability, IBKR acceptance, LEAN/SPY parity, source-review-only evaluation and portfolio layers."
   ],
   "native_evidence": "catalogs/sota-convergence/manifest-20260922.json",
-  "source_review": "catalogs/sota-convergence/README.md"
+  "source_review": "catalogs/sota-convergence/README.md",
+  "codex_review": {
+    "lane": "recipes/claude-codex-foreground-review.md",
+    "passes": [
+      {
+        "pass": "5",
+        "base": "c2019e6",
+        "head": "0dfea1d",
+        "scope": "convergence record + practice tooling",
+        "findings": 7,
+        "codex_status": 0,
+        "result_sha256": "cd179b8b19d52099fa4f3f5fcfa38d4423272ee3ca7def4009b284637a5c919f"
+      },
+      {
+        "pass": "6",
+        "base": "0dfea1d",
+        "head": "3f68d17",
+        "scope": "first fix diff",
+        "findings": 2,
+        "codex_status": 0,
+        "result_sha256": "999c91b3291baea84ff631dfad8c00e6e4734f6d4840dc16efe4a85804f94eb7"
+      },
+      {
+        "pass": "7",
+        "base": "3f68d17",
+        "head": "79fe1a3",
+        "scope": "second fix diff",
+        "findings": 1,
+        "codex_status": 0,
+        "result_sha256": "99eab1f14fad45d2230d63027ba4d9089e44c68476391a1c7e77694ba1543fa7"
+      },
+      {
+        "pass": "8",
+        "base": "79fe1a3",
+        "head": "f9a652f",
+        "scope": "third fix diff",
+        "findings": 0,
+        "codex_status": 0,
+        "result_sha256": "2f60793a357aeb165c7fa16901a4460296ed0fcc283ab4a826ecfeded609340d"
+      },
+      {
+        "pass": "lab-1",
+        "base": "4551f6d",
+        "head": "3e7650d",
+        "scope": "saved workflow",
+        "findings": 3,
+        "codex_status": 0,
+        "result_sha256": "322f5806d61f1b820292d4ef33e6951012dad4185ec882a0604b73bedb5f3ec8"
+      },
+      {
+        "pass": "lab-2",
+        "base": "3e7650d",
+        "head": "863ac52",
+        "scope": "first fix diff",
+        "findings": 1,
+        "codex_status": 0,
+        "result_sha256": "945e0a537906f4ba8335731f8559e8afda9f959f9c1d0209c4a61dbd312dcede"
+      },
+      {
+        "pass": "lab-3",
+        "base": "863ac52",
+        "head": "3b0dc2c",
+        "scope": "second fix diff",
+        "findings": 0,
+        "codex_status": 0,
+        "result_sha256": "699d55626d87e6d4f791457d112a4327dd3520f298679986cfb504ff0bc2c486"
+      }
+    ],
+    "established_at_head": "f9a652f",
+    "first_attempts_blocked_by_usage_limit": 3
+  }
 }

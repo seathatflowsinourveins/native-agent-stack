@@ -125,10 +125,14 @@ Baseline from `catalogs/foundation/decisions.json`, `manifests/stack.json` and t
 `gh api` / WebFetch / WebSearch budgets (103 gh calls, 2 fetches, 18 searches); every
 proposal verified by two Opus/high refuters; one completeness critic; then an independent
 native evidence review of this record against the manifest. 150 workflow children in
-total. The Codex foreground review lane was attempted three times (branch diff, retry,
-prose-only commit) and the native `codex review` run exposed the cause: the ChatGPT
-account's usage limit is exhausted until 2026-09-26 15:41 ET, so cross-family review of
-this record is **not established** and no credits were purchased.
+total. The Codex foreground review lane (`/codex:review --wait --scope branch --base <ref> --json` from a
+dedicated review worktree) was blocked by the account's usage limit on the first three attempts on
+2026-09-22; once the limit was lifted it ran **four passes on the canonical branch** (7, 2, 1, 0
+findings; bases c2019e6 → 0dfea1d → 3f68d17 → 79fe1a3) and **three on the agent-lab saved workflow**
+(3, 1, 0 findings). Every supported finding was fixed with a regression test that fails on the
+pre-fix code; the final passes returned no actionable regressions. Cross-family review of this
+record and its practice is therefore established as of `f9a652f`; the result files are
+hash-listed in the receipt.
 The freshness snapshot, lane outputs, 150-child usage record and Codex streams are private
 working files, so the 396/0/8 repository figures and the child count are not reproducible
 from the public files alone. Not done: release-note reading for the 15 behind pins, any install, run, benchmark or

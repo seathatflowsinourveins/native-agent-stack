@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-22T06:30:00Z",
+  "recorded_at_utc": "2026-09-22T08:05:00Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -198,7 +198,7 @@
       "kind": "gate",
       "id": "sota-convergence-20260922",
       "title": "SOTA repository convergence and practice",
-      "state": "28 layers confirmed against 396 upstream repositories / 33 newcomers and 1 targeted candidate / practice tooling recorded / Codex review deferred to 2026-09-26",
+      "state": "28 layers vs 396 upstream repositories / 33 newcomers and 1 targeted candidate / practice tooling and workflow recorded / Codex review established (7 passes)",
       "evidence_ref": "catalogs/sota-convergence/README.md"
     }
   ],
