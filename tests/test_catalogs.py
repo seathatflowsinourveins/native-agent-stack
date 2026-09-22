@@ -503,7 +503,11 @@ class Pr4CardsReconciliationTests(unittest.TestCase):
     def test_agents_operations_grype_and_openbao_notes(self):
         data = self.load(f"{BASE}/agents-operations.json")
         grype = self.entry(data, "grype")
-        self.assertTrue(any("2026-09-22 scan receipt" in item for item in grype["limitations"]))
+        # After the pr4-scan unit landed, the grype card records the executed scan
+        # (evidence_level native_proven, limitations naming the 2026-09-22 database
+        # snapshot) instead of the pending "scan receipt lands" note.
+        self.assertEqual(grype["evidence_level"], "native_proven")
+        self.assertTrue(any("2026-09-22 database" in item for item in grype["limitations"]))
         openbao = self.entry(data, "openbao")
         self.assertTrue(any("selected live-primary, unaccepted" in item for item in openbao["limitations"]))
         # Regression (fix round pr4-cards): "live-primary" is this catalog's own

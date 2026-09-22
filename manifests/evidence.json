@@ -6479,8 +6479,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "bytes": 14873,
-      "sha256": "c494a8e7e6d7048665c31d12543d56b815018c6655e5c946a88f696067a619af"
+      "bytes": 15143,
+      "sha256": "7dca26c6ed8b5e781f7b89308e2517a5d9da0551b6d2015dd4a35ae7c9b09d72"
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -6669,8 +6669,8 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "7013a99dee5f6f2916eef03cc60c2fd96ad268885f073d5394e126b833083cc4",
-      "bytes": 3112
+      "sha256": "ff36afff7587efbae3f7c14d1c410d4ef9a868d4961c361dcdc972254619e058",
+      "bytes": 3160
     },
     {
       "path": "catalogs/us-equities/model-followup.json",
@@ -6789,8 +6789,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 11106658,
-      "sha256": "7ada6da0c2a68212755554060590cf4efe97edf458ed09bc146be29acddd8446"
+      "bytes": 11144929,
+      "sha256": "4663e28660ec60df518870ebab9e2028d982fab15ab8df2db2db3115ac81b9ed"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7564,8 +7564,8 @@
     },
     {
       "path": "tests/test_catalogs.py",
-      "sha256": "632507448b06b51a88c18f25f5e9255da740841e00f91a1e31d759c085a30116",
-      "bytes": 30863
+      "sha256": "65dafea150d16f6b4d7bbad8e941725c772d9da51fe1dcd8986f6edceb936bdc",
+      "bytes": 31163
     },
     {
       "path": "tests/test_catalyst_dataset.py",
@@ -10724,8 +10724,8 @@
     },
     {
       "path": "catalogs/sota-convergence/README.md",
-      "bytes": 15883,
-      "sha256": "b9486a04dd906d855be8369aaed7fca87780490b16ca368eae5e1a630a7b1f8c"
+      "bytes": 16192,
+      "sha256": "ee820a57742c5807e45a0076b13251b6c13caf9484a0696c76522d50b02e25ac"
     },
     {
       "path": "recipes/sota-convergence-practice.md",
@@ -11456,6 +11456,21 @@
       "path": "evidence/receipts/exchange-calendars-native-check-20260922.json",
       "sha256": "ee5ec2a85edf415b1c440c2704b3252c348fe3da9ff01d83a9266b711c2b9efe",
       "bytes": 3320
+    },
+    {
+      "path": "catalogs/us-equities/gates-20260922.json",
+      "bytes": 15724,
+      "sha256": "f84b86a83ea2c859d7efe3a00143f68737e736435c3eccf5ff5f7cb9d011c4c2"
+    },
+    {
+      "path": "scripts/trading_gates.py",
+      "bytes": 9575,
+      "sha256": "73a06878617a3eac149b842fd5bda0bf8e8c9b83f7c94202059188d17dd81f12"
+    },
+    {
+      "path": "tests/test_trading_gates.py",
+      "bytes": 6592,
+      "sha256": "c74a350422e212f4bc1841d66ab2a3118a38d256b49c27dca2192ecc02ba50a4"
     }
   ],
   "convergence_records": [

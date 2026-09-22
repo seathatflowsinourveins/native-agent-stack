@@ -50,7 +50,8 @@
     "blueprints/convergence-practice/job-recovery/receipt-wsl.json",
     "blueprints/convergence-practice/native-recovery/receipt.json",
     "blueprints/convergence-practice/gpu-inference/receipt.json",
-    "blueprints/convergence-practice/native-recovery/claude/receipt.json"
+    "blueprints/convergence-practice/native-recovery/claude/receipt.json",
+    "catalogs/us-equities/gates-20260922.json"
   ],
   "north_star": "blueprints/us-equities/north-star.md",
   "harness_contract": "blueprints/us-equities/harness-contract.json",
