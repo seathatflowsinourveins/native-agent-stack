@@ -10,8 +10,11 @@ covers 20 layers, 66 candidate identities and 94 evidence URLs. Its
 [provenance](../evidence/artifacts/blind-catalog-convergence-20260921/codex-provenance.json)
 preserves the original hashes and the one private-path substitution in the public
 JSON. The [layer adjudication](../catalogs/landscape/blind-convergence.json) records
-differences from the baseline and the live Claude response status. Thirteen new
-repository identities are registered as discovery only; the current union is 540.
+differences from the baseline and the live Claude response status. Codex discovery
+added 13 identities. The sealed Claude discovery/refutation report adds 303 more,
+giving a current union of 843; additions remain discovery only. Read the
+[Claude source adjudication](claude-blind-adjudication-20260921.md) for corrected
+counts, screening omissions, source findings and native-attempt accounting.
 Read the [findings by layer](blind-catalog-layer-findings-20260921.md) for the
 coordinator's reasons and the strongest remaining comparisons.
 The [original-source adjudication](blind-catalog-source-adjudication-20260921.md)
@@ -38,9 +41,10 @@ receives ambient skill/tool names and project instructions naming the domain's
 NautilusTrader destination. Its report therefore declares partial selection
 blinding. It may research primary upstream sources and writes a separate report.
 The requested boundary is not filesystem enforcement or a measured accuracy
-improvement. The ongoing Claude discovery likewise uses its native workflow with
+improvement. The returned Claude discovery likewise used its native workflow with
 project instructions that can name current domain selections. Both reports must
-preserve this residual exposure. Do not relabel either report fully blind or
+preserve this residual exposure. Its top-12-by-stars screen introduces additional
+selection bias and is explicitly challenged in the report. Do not relabel either report fully blind or
 restart useful live work merely to make the reviews look symmetrical.
 
 ## Exchange results through the native clients

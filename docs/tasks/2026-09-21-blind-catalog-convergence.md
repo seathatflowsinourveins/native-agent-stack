@@ -166,3 +166,43 @@ corrected count partition against `648cb71`. Native browser inspection of the
 rebuilt local HTML at 390 pixels confirmed the 540-identity display, no horizontal
 overflow and zero external resource requests. These checks do not certify every
 remote source URL or replace the final publication check.
+
+## Sealed Claude discovery received and adjudicated
+
+The peer returned sealed WF1/WF2 artifacts. WF2 compact SHA-256 is
+`353a911625dd083c207c45686b4f25a5d683c09b7b98ecc03a4f4ec3bf84ef3a`;
+the published version replaces two private path prefixes and appends one LF,
+with public hash `e422f576df3f94b1d4f7202316f28d7a83cd1d6aafab8a0891ee1cf76495cf75`.
+The report's 514 entries represent 426 repositories, plus 15 additional refuter
+identities (441 total); 303 are new to the prior 540-identity union. The current
+index contains 843 identities and still 68 selected components, with unchanged
+pins. Broader discovery does not promote any candidate into acceptance.
+
+Original-source adjudication corrected Claude Code's mechanical licensing
+exclusion, separated OpenHands Canvas/SDK/old benchmark roles, retained actual
+AutoGen maintenance wording, distinguished the Rust-specific Nautilus IB issue
+from the Python adapter and qualified Mem0 benchmark applicability. Eight useful
+new runtime/browser/compression/optimization sources received pinned source checks.
+The 20-layer findings retain both reports, omissions, comparison conditions and
+existing runtime boundaries. The top-12-by-stars screen is recorded as bias.
+
+The workflow's 63 completed children are distinct from all 65 started attempts;
+two earlier judge attempts lack terminal journal results. The sealed --latest
+usage output belonged to WF3, so WF2 usage was independently derived using its
+exact directory and published with stable child ordinals. No provider savings
+or complete usage for missing terminal results is claimed. A native relay sent
+one corrective return to the peer for its already-running WF3; delivery was
+queued, not yet confirmed read. A mistaken idle relay copy was stopped before
+the original owned relay was resumed with its saved options; the user session
+was untouched.
+
+An independent publication reviewer verified all public/original transformations,
+all 14 sealed inventory hashes, all 65 usage records, counts, the 303 research-only
+additions, zero removed identities and unchanged selections. The sole finding was
+that the final LF was appended rather than retained; provenance and experiment
+references were corrected. No unresolved finding remained in that scope.
+
+The 177 catalog-focused tests passed. Publication integrity passed with 1,615
+hashed files and 134 receipts; all 17 convergence records validated after
+assigning a distinct attempt number to the second source-coverage observation.
+WF3's final critique and its sealed return remain pending at this checkpoint.

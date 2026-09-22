@@ -3,7 +3,7 @@
   "kind": "convergence_experiment",
   "status": "observed",
   "lane": "native-agent-engineering",
-  "task_and_failure": "Resolve selection anchoring and catalog omissions through separate source discovery, then adjudicate findings against original implementations and existing scoped evidence. The live Claude result remains separately pending until its actual return.",
+  "task_and_failure": "Resolve selection anchoring and omissions through separate sealed source discovery, then adjudicate against original implementations and scoped evidence. Both source reports returned; the peer coverage-synthesis return remains separately pending.",
   "primary_sources_and_pins": [
     {
       "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
@@ -20,7 +20,7 @@
   ],
   "discovery_provenance": [
     "One Codex subagent, fork_turns=none, received only neutral-requirements.json as assigned local input. It reports residual ambient project/tool exposure and no catalog, memory or other-review artifact access.",
-    "A supported native Claude relay delivered one request to preserve the existing independent-sota-research workflow. The peer confirmed reading; final discovery results remain pending.",
+    "Supported native Claude messaging preserved the existing independent-sota-research workflow. The sealed WF2 report was received and hashed before adjudication; a corrective return is queued to the peer for its already-running coverage synthesis.",
     "Reports are frozen before conclusions are shared across reviewers. Original/public hash mapping preserves the one private-path substitution."
   ],
   "license_and_compatibility": "Source review only. Existing native accounts and installed pins unchanged; candidate repository/model/service licenses and destination Linux/WSL compatibility remain separately qualified.",
@@ -40,6 +40,18 @@
       {
         "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "sha256": "24001f4bed3298909d4493a82501590dd5725d1df0445a666ffd81cbc318f84b"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+        "sha256": "e422f576df3f94b1d4f7202316f28d7a83cd1d6aafab8a0891ee1cf76495cf75"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-provenance.json",
+        "sha256": "8927c441a9c97d1f9a1ac017b155d0480f01541f81f33ebd00f4ef95be52a996"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf2-usage.json",
+        "sha256": "0cf1c372f8d5c9c9d3888a78131690716b789216803dc0bfd2ef84e309e5342a"
       }
     ],
     "inputs": [
@@ -112,6 +124,45 @@
         "total": null,
         "native_retries": null
       }
+    },
+    {
+      "id": "claude-source-publication-coverage",
+      "task": "catalog-source-convergence",
+      "role": "coordinator-artifact-check",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 1,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Exact sealed-report publication transform and discovery union; documentary findings only, no runtime-quality win. Explicit WF2 usage includes 65 started attempts, 63 completed children and two incomplete attempts.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+          "sha256": "e422f576df3f94b1d4f7202316f28d7a83cd1d6aafab8a0891ee1cf76495cf75"
+        },
+        {
+          "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-provenance.json",
+          "sha256": "8927c441a9c97d1f9a1ac017b155d0480f01541f81f33ebd00f4ef95be52a996"
+        },
+        {
+          "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf2-usage.json",
+          "sha256": "0cf1c372f8d5c9c9d3888a78131690716b789216803dc0bfd2ef84e309e5342a"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [],
@@ -120,7 +171,8 @@
     "Partial selection blinding: ambient instructions/tool identities were visible to both families.",
     "Most evidence is documentation/interface inspection; only selected source assertions were inspected, with no upstream tests rerun.",
     "A successful inventory check does not certify original-source truth, reviewer independence beyond disclosed boundaries or repository quality.",
-    "The original Codex report retains failed source fetches. Live Claude workflow failures and outcomes remain pending until returned."
+    "The original Codex report retains failed source fetches. Live Claude workflow failures and outcomes remain pending until returned.",
+    "Claude top-12-by-stars screening omitted relevant smaller tools and its broad role groups do not independently qualify every layer. Its source scores and refuter outcomes are attributed, not accepted performance measurements."
   ],
   "decision_and_scope": {
     "decision": "retain",
@@ -128,7 +180,7 @@
     "qualification_run_ids": []
   },
   "rollback": "Installed defaults and services unchanged. Revert owned catalog changes if source findings are disproved; retain dated discovery and failure history.",
-  "next_decision_changing_test": "Complete the live Claude return and reconcile both reports. Qualify code-memory freshness/model fit, matched ai-memory/Basic Memory/Hindsight recall and lifecycle, or shared Nautilus/LEAN accounting and broker recovery only within their frozen scopes. Establish actual installation/use on the destination PC.",
+  "next_decision_changing_test": "Incorporate the final Claude coverage return and resolve concrete supported differences. Qualify code-memory freshness/model fit, matched ai-memory/Basic Memory/Hindsight recall and lifecycle, or shared Nautilus/LEAN accounting and broker recovery only within frozen scopes. Establish useful operation on the destination PC.",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",

@@ -21,7 +21,8 @@
     "research_state": "catalogs/landscape/research-state.json",
     "quality_review": "catalogs/landscape/candidate-quality-review.json",
     "independent_discovery": "catalogs/landscape/independent-discovery.json",
-    "blind_convergence": "catalogs/landscape/blind-convergence.json"
+    "blind_convergence": "catalogs/landscape/blind-convergence.json",
+    "claude_independent_discovery": "catalogs/landscape/claude-independent-discovery.json"
   },
   "rules": [
     "Selected means the supported choice for the stated task and scope; it does not mean universal benchmark winner.",
@@ -34,6 +35,10 @@
     "Reopen a selection when its stated overturning comparison meets the requirement; retain competitive alternatives until then."
   ],
   "handbook_guides": [
+    {
+      "path": "docs/claude-blind-adjudication-20260921.md",
+      "label": "Claude independent findings and corrections"
+    },
     {
       "path": "blueprints/memory-lifecycle-probe/README.md",
       "label": "Memory lifecycle comparison"

@@ -2795,13 +2795,13 @@
   "files": [
     {
       "path": "blueprints/blind-catalog-convergence/experiment.json",
-      "sha256": "ce3c82aa73cd8e74d1caaff1e913386cb227e838dc42f280d53ea9e29c51e725",
-      "bytes": 6993
+      "sha256": "8af7006f27d7e42629807fcdafd8c56b0e4bf49e5264d3dceb03da15f650ba54",
+      "bytes": 9419
     },
     {
       "path": "catalogs/landscape/blind-convergence.json",
-      "sha256": "1fe36a18b7d3095784df14027f9d5dd62524099a72562de37137564fe89fd779",
-      "bytes": 17117
+      "sha256": "46b7bbcb458798da6f907be6a8027838ac5b1f80131e9f448be241192043db21",
+      "bytes": 24639
     },
     {
       "path": "catalogs/landscape/independent-discovery.json",
@@ -2810,8 +2810,8 @@
     },
     {
       "path": "docs/blind-catalog-layer-findings-20260921.md",
-      "sha256": "edaed3b78830cab5769bc1bc1b80fa4442ef6377e9b2d9ff1d1e06e74ba49a5d",
-      "bytes": 5801
+      "sha256": "5d3fc68a623d18daa653dbd23ecfa7d1651cd796480e2c93fabf00471a703639",
+      "bytes": 10694
     },
     {
       "path": "docs/blind-catalog-source-adjudication-20260921.md",
@@ -2820,8 +2820,8 @@
     },
     {
       "path": "docs/tasks/2026-09-21-blind-catalog-convergence.md",
-      "sha256": "31b1f9026812a0537282fce068951a26fc5c1a3a74e249023875afd130d3ff9e",
-      "bytes": 10540
+      "sha256": "394f90fa5dfc4dd46c479cd851d8066dc99ea4d069cde086217662865cf9ae2a",
+      "bytes": 13111
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-provenance.json",
@@ -2845,8 +2845,8 @@
     },
     {
       "path": "docs/blind-catalog-convergence-20260921.md",
-      "sha256": "a3bebf63a16b6af9910e488ecc0704465a58fff6fbc5076517db84a17682e396",
-      "bytes": 7542
+      "sha256": "afeef2e48a444584ee990c38c8e0641b1928ce468c00f2ec3b5d17b221574a7b",
+      "bytes": 7885
     },
     {
       "path": "blueprints/catalog-runtime-review/experiment.json",
@@ -2875,8 +2875,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "532e2d7c7c0f7b9887097dc02fe9e3dc5cfb5291ee8aafd502f84b014a8155d1",
-      "bytes": 15092
+      "sha256": "7d03fbc84b056290d96a6a23f2f3f8ceca3cb91517b055a949afd2f27e2349f7",
+      "bytes": 16454
     },
     {
       "path": "docs/tasks/2026-09-21-runtime-reviewed-catalog-handbook.md",
@@ -5061,8 +5061,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "bytes": 472835,
-      "sha256": "85fc102738a466d66c617803d51aed55558775be380c4fb022916563ddae511b"
+      "bytes": 472839,
+      "sha256": "f897f1d7edf68ad839cc2b6ac3a5044adc2ef554e9bf28c9f0bc318ab3e8b734"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -6496,8 +6496,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "4ac8c2e043d144d5bcc261340015ba0224e616fec92511e840d0ee0eab0ebe2b",
-      "bytes": 471775
+      "sha256": "d598dd769155894a2789ba096dd45e06b17d36ac86c90a74de4158a40a14c19c",
+      "bytes": 688154
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -6541,7 +6541,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "44fa294e4d71d474871d13b5780f0750893c74f05e87ffdc102a52d48e4f26c7",
+      "sha256": "c803a802637edb7edf13a94c3f03458244782d0b976d5d75172c548542409c85",
       "bytes": 3112
     },
     {
@@ -6661,8 +6661,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "c85105c9c06cdfeae490ba931cfd4248699a5904b20465990a9dfb04dc1ce045",
-      "bytes": 10544579
+      "sha256": "83aacf4cf9b69a30e990b3cff1cac85f41af78c254c64c8ab6d8e92804286906",
+      "bytes": 10946030
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -10141,8 +10141,8 @@
     },
     {
       "path": "catalogs/landscape/manifest.json",
-      "sha256": "accb8548ba998b2f2dd8c1c1af74687c6e69f2b767c08eeaf41570030ca6115b",
-      "bytes": 3860
+      "sha256": "4c4eb1807183b9c1f12834cf6be2048005b83f345710540106d28c7486ae5d4c",
+      "bytes": 4086
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -10858,6 +10858,31 @@
       "path": "evidence/receipts/memory-lifecycle-probe-20260921.json",
       "sha256": "fa38a4da448b427fac146affb7199ac6fff610eaa1fd156ce64172a5fefa52be",
       "bytes": 2496
+    },
+    {
+      "path": "catalogs/landscape/claude-independent-discovery.json",
+      "sha256": "e10efe5310224068500bf9aa653a23ed4fc775b24b0344cb00820b2523a389b0",
+      "bytes": 482381
+    },
+    {
+      "path": "docs/claude-blind-adjudication-20260921.md",
+      "sha256": "62760dcc6b152b3408929485f9637c0f599606362d682692b977e78dbc1cbe7f",
+      "bytes": 8081
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-provenance.json",
+      "sha256": "8927c441a9c97d1f9a1ac017b155d0480f01541f81f33ebd00f4ef95be52a996",
+      "bytes": 2485
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+      "sha256": "e422f576df3f94b1d4f7202316f28d7a83cd1d6aafab8a0891ee1cf76495cf75",
+      "bytes": 1397738
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf2-usage.json",
+      "sha256": "0cf1c372f8d5c9c9d3888a78131690716b789216803dc0bfd2ef84e309e5342a",
+      "bytes": 56355
     }
   ],
   "convergence_records": [

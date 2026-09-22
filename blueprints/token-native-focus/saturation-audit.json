@@ -32,16 +32,16 @@
   },
   "counts": {
     "selected_components": 68,
-    "catalog_identities": 540,
-    "nonselected_catalog_identities": 472,
+    "catalog_identities": 843,
+    "nonselected_catalog_identities": 775,
     "exclusive_identity_groups": {
       "star_review": 275,
       "component_record": 68,
       "catalog_card": 114,
-      "research_supplement": 81,
+      "research_supplement": 384,
       "legacy_candidate": 2
     },
-    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups; fourteen landscape, selected-skill, deployment and candidate-quality additions plus thirteen independently discovered identities enter through research supplements. Discovery is not installation. Current public-star membership is reported separately by the upstream snapshot."
+    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups. Thirteen Codex independent-discovery additions and 303 Claude discovery/refuter additions enter as research supplements after the prior 527-identity catalog. Source discovery is not installation or qualification. Current public-star membership remains a separate dated snapshot."
   },
   "counter_policy": {
     "rtk": "retained upstream command-output estimate; global/project overlap",

@@ -14,6 +14,13 @@ Public stars and awesome lists contribute discovery, not installation commands
 or proof of quality. The complete list of every child link in every awesome list
 has not been independently evaluated.
 
+The current combined discovery index contains **843 repository identities**.
+The selected manifest remains **68 components**. The
+[independent Claude adjudication](claude-blind-adjudication-20260921.md) retains
+the wider search, corrections and screening limits; the
+[20-layer findings](blind-catalog-layer-findings-20260921.md) compare both sealed
+source reports. Source-only candidates remain separate from qualified defaults.
+
 ## What qualifies a selection
 
 Evaluate repository quality against the task before investing in installation:
@@ -189,6 +196,13 @@ native Linux Codex and native Linux Claude account/configuration scopes separate
 The four domain layers reuse this foundation: memory/retrieval, research workers
 and operations, market data/filings, then simulation/execution. Current choices
 are in the [domain comparisons](../catalogs/landscape/us-equities.json).
+
+| Domain layer | Selected direction | Remaining decision or acceptance |
+| --- | --- | --- |
+| Research memory and retrieval | ai-memory; QMD; Serena; SocratiCode/Qdrant; task-selected Context Mode/RTK | Representative financial/source recall comparison and project isolation |
+| Research workers and operations | Native Codex/Claude; Dagu/systemd; OTel with Prometheus/Loki/Grafana; scoped sandboxing and Restic | Destination worker ownership, event delivery, cancellation and recovery |
+| Market data and filings | Official alpaca-py; EdgarTools; DuckDB/Parquet; exchange_calendars | Required universe, rights, corporate actions and information-availability evidence; Databento remains conditional |
+| Simulation and broker execution | NautilusTrader destination; LEAN historical comparison; native IBKR and separate alpaca-py paper path | Engine parity and independent broker-specific reconciliation/risk/reconnect acceptance |
 
 NautilusTrader 2.0.0rc5 remains the selected destination; LEAN retains useful
 comparison evidence. The historical SDK/LEAN adoption profile does not override
