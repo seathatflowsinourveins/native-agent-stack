@@ -31,6 +31,10 @@ jobs:
       run:
         shell: bash
     steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
       - name: Prepare owned evidence directory
         run: mkdir -p "$RUNNER_TEMP/action-compatibility"
       - name: Set up the selected Python line
@@ -74,6 +78,10 @@ jobs:
       run:
         shell: bash
     steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
       - name: Prepare owned evidence directory
         run: mkdir -p "$RUNNER_TEMP/action-compatibility"
       - name: Set up the exact selected Go toolchain

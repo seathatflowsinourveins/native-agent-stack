@@ -175,6 +175,27 @@ this unit.
   and adding the check to `required_status_checks` as a separate, explicit
   decision.
 
+## Correction, fix round 2026-09-22 (later same day)
+
+A review of this branch (commit `90ce605`) found the "Excluded jobs" note
+above stale in the same way section 3's correction found
+`docs/github-automation.md` stale: it read the task's job list as exhaustive
+rather than as the jobs actually covered so far. `secret-scan`
+(`validate.yml`) downloads and runs an unauthenticated binary (the gitleaks
+release tarball) and is also a required check, so it is a stronger case for
+`egress-policy: audit` than several jobs already covered, not a weaker one.
+This branch's fix round (see
+[`docs/decisions/2026-09-22-actions-hardening-fix-round.md`](2026-09-22-actions-hardening-fix-round.md))
+adds `harden-runner` to `secret-scan` plus three more downloading jobs found
+during that review (`python` and `go` in `action-compatibility.yml` and
+`nautilus-offline-replay` in `native-foundation-e2e.yml`) that were never
+covered by this original decision, not because they were newly added by it.
+`bootstrap-macos` remains excluded for the unchanged platform-support
+reason. That fix round also tried and reverted the same step on `source`
+(`native-offhost-app-state.yml`) after it broke a frozen-source-hash test,
+and records `source`, `destination`, `synthetic-restore`, and
+`owned-guest-reboot` as an out-of-bounded-scope gap for a later decision.
+
 ## Evidence class
 
 `local_static_analysis` for the workflow syntax/security checks

@@ -2998,8 +2998,8 @@
     },
     {
       "path": ".github/workflows/action-compatibility.yml",
-      "sha256": "e20225fdb57a2651bbd9cf5320fcb81e56e2fb6568c88e595dbb51f8d15d6677",
-      "bytes": 4750
+      "sha256": "7314aed49a689300686c3d59fe702fc68c9a4092eed9bbc571c45f2e3796bafa",
+      "bytes": 5146
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
@@ -3013,8 +3013,8 @@
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
-      "sha256": "16b4ede4e4d14c93ed4eae315570b0872323c1ea05292f7ddcbee95028fa146f",
-      "bytes": 7770
+      "sha256": "9936d66500f267d208521064b969895d2d0d7f1f49247780d88ae3921db54616",
+      "bytes": 7968
     },
     {
       "path": ".github/workflows/native-offhost-app-state.yml",
@@ -3053,8 +3053,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "5c1cfad82dd9ebc91216f199b5ee114da9d8d0d285bf7f2634ad5b4e6ad77e71",
-      "bytes": 5792
+      "sha256": "423e8096b54a1df32f3e446c42649cfbbe95686fbbf7cd81bf4f110b92926f14",
+      "bytes": 5990
     },
     {
       "path": ".gitignore",
@@ -7624,7 +7624,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "3e40915cb0a829ed9884092eff9bc145cb4e4c3e2b883aa1146c06f4b41dc9d4",
+      "sha256": "7c622a2ec708bbce2d7ffde9e132929be6a5de952de64e4637e760216ce5af6d",
       "bytes": 13036732
     },
     {
@@ -7694,8 +7694,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "26471ad92e2a85ed235bd4180d1d11fc3a9597ef109821da2302f8ccc5a8d7b0",
-      "bytes": 33650
+      "sha256": "d28f117655334ba6a63a9c87b85f48da3242e834dd6eebb09697c338cfcf52a9",
+      "bytes": 34594
     },
     {
       "path": "docs/grand-catalog-handbook.md",

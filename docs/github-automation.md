@@ -517,14 +517,28 @@ the full commit SHA of its latest release `v2.21.1`
 (`e14015d583714f6e62063499dc959a02595150a1`, from
 `gh api repos/step-security/harden-runner/releases/latest`), runs as the
 *first* step, before checkout, with `egress-policy: audit` (never `block`),
-on every `ubuntu-24.04` job that downloads binaries or packages: `validate`
-(`validate.yml`), `sbom-vuln` (`supply-chain.yml`), `publish`
-(`publish-catalog.yml`), `freshness` (`catalog-freshness.yml`), and
-`bootstrap-linux` (`adoption-bootstrap.yml`). `secret-scan` (also in
-`validate.yml`) and `bootstrap-macos` (`adoption-bootstrap.yml`, no Linux
-egress-monitoring support) are outside this decision's scope. Audit mode
-only logs observed egress; it cannot fail a job or block a network call, so
-it changes no existing pass/fail behavior.
+on the following nine `ubuntu-24.04` jobs that download binaries or
+packages: `validate` and `secret-scan` (`validate.yml`), `sbom-vuln`
+(`supply-chain.yml`), `publish` (`publish-catalog.yml`), `freshness`
+(`catalog-freshness.yml`), `bootstrap-linux` (`adoption-bootstrap.yml`),
+`python` and `go` (`action-compatibility.yml`), and
+`nautilus-offline-replay` (`native-foundation-e2e.yml`). This is not every
+`ubuntu-24.04` job in the repository that downloads a binary or package:
+`bootstrap-macos` (`adoption-bootstrap.yml`) runs on `macos-15`, which
+`harden-runner` does not support; `synthetic-restore`
+(`native-offhost-restore.yml`) and `owned-guest-reboot`
+(`native-service-reboot.yml`) also run `apt-get install` and remain
+unhardened; and `source` and `destination`
+(`native-offhost-app-state.yml`) also download binaries but are pinned by
+exact byte hash in `blueprints/convergence-practice/offhost-app-state/plan.json`'s
+`frozen_sources` list (enforced by
+`tests/test_active_recovery_plans.py::test_default_application_plan_passes_actual_dispatch_source_guard`),
+so adding a step there needs a matching `plan.json` hash update in the same
+commit. All of these are recorded as a gap in
+[`docs/decisions/2026-09-22-actions-hardening-fix-round.md`](decisions/2026-09-22-actions-hardening-fix-round.md)
+for a future decision, not fixed by this record. Audit mode only logs
+observed egress; it cannot fail a job or block a network call, so it changes
+no existing pass/fail behavior.
 
 **`dependency-review.yml` (actions/dependency-review-action).** Pinned to
 the full commit SHA of its latest release `v5.0.0`
