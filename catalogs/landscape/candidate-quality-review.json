@@ -1519,6 +1519,74 @@
         "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
         "blueprints/us-equities/research-evaluation/receipt.json"
       ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "agent-sdks",
+      "decision_ref": "catalogs/landscape/foundation.json#/layers/16",
+      "requirement": "Give a worker structured events, custom tools or session control through a supported SDK when the native CLI's bounded review is not enough.",
+      "current_choice": "Codex SDK/CLI (component codex) for supported start/run/resume; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain source-reviewed, unselected alternatives.",
+      "decision": "retain",
+      "evidence_gap": "Alternative SDKs (Claude Agent SDK, OpenHands SDK, Temporal, LangGraph) are source review only; no fresh execution or head-to-head comparison exists since the 2026-09-21 SDK table, and this taxonomy freeze does not rerun it.",
+      "challenger_repositories": [
+        "https://github.com/anthropics/claude-agent-sdk-python"
+      ],
+      "overturn_when": "A concrete application needs durable multi-host state/replay (Temporal), explicit graph checkpoints (LangGraph), a remote/container worker (OpenHands SDK) or programmatic Claude session control (Claude Agent SDK), and a matched comparison passes.",
+      "evidence_refs": [
+        "docs/foundation-closure-20260921.md",
+        "catalogs/foundation/decisions.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "mcp-surfaces",
+      "decision_ref": "catalogs/landscape/foundation.json#/layers/17",
+      "requirement": "Bridge, inspect and configure Model Context Protocol servers and client surfaces without adopting an unexamined registry entry.",
+      "current_choice": "mcporter for CLI bridging, mcp-inspector for stdio inspection, and the recipes/README.md native project MCP policy for configuration; broad registries remain discovery only.",
+      "decision": "retain",
+      "evidence_gap": "Registries such as punkpeye/awesome-mcp-servers remain an unexamined source per the sota critic; no entry from that registry has an actual bridge or inspection acceptance result.",
+      "challenger_repositories": [
+        "https://github.com/punkpeye/awesome-mcp-servers"
+      ],
+      "overturn_when": "A concrete MCP surface gap needs a new server, and a reviewed registry entry passes the same bridge/inspection acceptance as mcporter/mcp-inspector.",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "recipes/README.md"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "secrets-credentials",
+      "decision_ref": "catalogs/landscape/foundation.json#/layers/18",
+      "requirement": "Keep sign-ins and credentials off the checkout and detect accidental secret exposure before publication.",
+      "current_choice": "Native per-client logins on the target host plus gitleaks detection; openbao remains an unused, unqualified candidate.",
+      "decision": "keep_but_compare",
+      "evidence_gap": "openbao is source review only; it has never been installed or queried in this project, so no actual multi-host/multi-operator secret-sharing comparison exists against the native-login-only policy.",
+      "challenger_repositories": [
+        "https://github.com/openbao/openbao"
+      ],
+      "overturn_when": "A concrete multi-host or multi-operator secret-sharing need appears, and openbao (or a comparable secret manager) passes an actual installed/queried comparison against the native-login-only policy.",
+      "evidence_refs": [
+        "adoption/manifest.json",
+        "catalogs/foundation/decisions.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "git-github-automation",
+      "decision_ref": "catalogs/landscape/foundation.json#/layers/19",
+      "requirement": "Own Git worktrees, GitHub review/PR automation and structural diffs for changed code.",
+      "current_choice": "worktrunk for worktree lifecycle, gh CLI for GitHub operations, difftastic for structural diffs, and the codex-for-claude review bridge for a concrete cross-client review task; see docs/github-automation.md.",
+      "decision": "retain",
+      "evidence_gap": "gh CLI has no dedicated fresh local acceptance test in this catalog; the codex-for-claude review bridge keeps a partial-acceptance use stage, not full integration.",
+      "challenger_repositories": [
+        "https://github.com/openai/codex-plugin-cc"
+      ],
+      "overturn_when": "A concrete cross-repository or multi-host Git/GitHub workflow needs capabilities beyond gh/worktrunk/difftastic, and a challenger passes a matched comparison.",
+      "evidence_refs": [
+        "docs/github-automation.md",
+        "catalogs/foundation/decisions.json"
+      ]
     }
   ]
 }

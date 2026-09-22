@@ -2912,8 +2912,8 @@
     },
     {
       "path": "catalogs/landscape/blind-convergence.json",
-      "sha256": "fc93749bfe12bb946bf12ad092f527adb0266b08453fb2b848dc151ee0c3bb2c",
-      "bytes": 38933
+      "sha256": "ba1178eb357066e2df7a666d4c781bdfe40cb3f5ac3f58e304b93a8231a54643",
+      "bytes": 44657
     },
     {
       "path": "catalogs/landscape/independent-discovery.json",
@@ -2922,8 +2922,8 @@
     },
     {
       "path": "docs/blind-catalog-layer-findings-20260921.md",
-      "sha256": "a58e5af94b7bd5dd903d793f84714552878bf8e68259325654bbaacb1e3dbc8c",
-      "bytes": 11137
+      "sha256": "0dc0baca289c60fb69866c2fc2f277b21c05ce5fe02f788931563793bd08a76a",
+      "bytes": 12773
     },
     {
       "path": "docs/blind-catalog-source-adjudication-20260921.md",
@@ -2977,8 +2977,8 @@
     },
     {
       "path": "catalogs/landscape/candidate-quality-review.json",
-      "sha256": "b1bc757545b4680080942503ccfb63fcae0856c2a6201a4939aa1fa44b48b049",
-      "bytes": 120980
+      "sha256": "abb6d4539589cb0b668aafd98dbecf6cc56bd4fddc41cba82d17fc64f9a04b7b",
+      "bytes": 125622
     },
     {
       "path": "docs/candidate-quality-review-20260921.md",
@@ -3722,7 +3722,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "c235dba2bebf7e089a3994671835976cb372fa8597a47498aad8618ab0239afe",
+      "sha256": "b708fd46cba04a41cb5746c75cc5584cb77b417cc71858f582059cf0e7d48767",
       "bytes": 17917
     },
     {
@@ -7783,8 +7783,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "bytes": 22452,
-      "sha256": "4060706737555aea23ce4bbd6261f3cebc2277397147b6912a34120a2fcd1cf8"
+      "bytes": 23034,
+      "sha256": "36ab5311baacd3b69e397610d9bdb726b49061c491a4211e173cdf5dcc3af71b"
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -10773,7 +10773,7 @@
     },
     {
       "path": "catalogs/landscape/README.md",
-      "sha256": "7e1c0ec30ae9592ad2fedfdeeb472e6e977649ffba07b3be0ee87ec69c98601c",
+      "sha256": "f174f6bff493ea058335d2912fde42fc6b9addf80438c992f3089a19fed8dd68",
       "bytes": 5450
     },
     {
@@ -10908,8 +10908,8 @@
     },
     {
       "path": "catalogs/landscape/research-state.json",
-      "sha256": "d77c74140690de0c54dc36abf8caa2f2b9d3ce1416d5547235d3e900a490cfa9",
-      "bytes": 14185
+      "sha256": "bce7b2eac8d6f7a911155670498b7b82181da6277dd1dff6fb102d741674bb7e",
+      "bytes": 16476
     },
     {
       "path": "docs/hosting-container-practice.md",
@@ -11288,7 +11288,7 @@
     },
     {
       "path": "blueprints/blind-catalog-convergence/audit_reports.py",
-      "sha256": "f710d236c40bdbb49dc0942df31c0f502209eee03553d07be3c5fdfa931b1b3a",
+      "sha256": "88ebc5e0fd89f53a83402ae2f44f0cc59cb1ab5ca154700b0ee45c095b794bda",
       "bytes": 9348
     },
     {
@@ -11358,7 +11358,7 @@
     },
     {
       "path": "tests/test_blind_layer_decisions.py",
-      "sha256": "0512e58b967baed9fdc95323cd6867dbb1981785bb3d20e51d6a1df1bcb4fbc1",
+      "sha256": "5b111b1b21c9ab4fda55d18b01390bf6355d18ffffea72b1aec2ccfe62b5e743",
       "bytes": 2827
     }
   ],

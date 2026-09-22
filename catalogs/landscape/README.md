@@ -2,7 +2,7 @@
 
 Open the [offline comparison view](../../docs/ecosystem/index.html#landscape) for
 the requirement, current choice, named competitors, evidence and reopening
-condition in **all 16 foundation layers and all four domain research layers**.
+condition in **all 20 foundation layers and all four domain research layers**.
 Download its combined JSON from the page, or start with [manifest.json](manifest.json).
 
 For the complete installation and decision sequence, use the

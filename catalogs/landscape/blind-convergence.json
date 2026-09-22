@@ -481,6 +481,78 @@
         "path": "catalogs/landscape/us-equities.json",
         "pointer": "/layers/3/decision"
       }
+    },
+    {
+      "layer_id": "agent-sdks",
+      "coordinator_disposition": "retain",
+      "rationale": "This layer was split out of the original blind-review workers finding after 2026-09-21 to freeze the taxonomy at 20 foundation layers; it was not itself an independent blind-review subject. Retain reuses the workers-layer coordinator disposition for the Codex SDK/CLI component and the same source-reviewed alternatives (Claude Agent SDK, OpenHands SDK, Temporal, LangGraph).",
+      "claude_independent_finding": "Not part of the original sealed blind review (2026-09-21); this row is a taxonomy split, not a fresh independent finding. See the prior workers-layer finding for the source Claude Agent SDK/OpenHands SDK/Temporal/LangGraph discovery.",
+      "evidence_refs": [
+        "docs/foundation-closure-20260921.md",
+        "catalogs/landscape/foundation.json",
+        "catalogs/foundation/decisions.json"
+      ],
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/16/decision"
+      }
+    },
+    {
+      "layer_id": "mcp-surfaces",
+      "coordinator_disposition": "retain",
+      "rationale": "This layer was split out of the original blind-review code-navigation and hosting-services findings after 2026-09-21 to freeze the taxonomy at 20 foundation layers; it was not itself an independent blind-review subject. Retain reuses the accepted mcporter/mcp-inspector dispositions from those prior layers.",
+      "claude_independent_finding": "Not part of the original sealed blind review (2026-09-21); this row is a taxonomy split, not a fresh independent finding. See the prior code-navigation and hosting-services layer findings for the source mcporter/mcp-inspector discovery.",
+      "evidence_refs": [
+        "recipes/README.md",
+        "catalogs/landscape/foundation.json",
+        "catalogs/foundation/decisions.json"
+      ],
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/17/decision"
+      }
+    },
+    {
+      "layer_id": "secrets-credentials",
+      "coordinator_disposition": "keep_but_compare",
+      "rationale": "This layer is newly named after 2026-09-21 to freeze the taxonomy at 20 foundation layers; it was not itself an independent blind-review subject. gitleaks stays the ci-supply-chain component referenced here; openbao remains an unused, unqualified candidate pending a concrete multi-host secret-sharing need.",
+      "claude_independent_finding": "Not part of the original sealed blind review (2026-09-21); this row is a new taxonomy entry, not a fresh independent finding. No independent report examined openbao or native credential policy directly.",
+      "evidence_refs": [
+        "adoption/manifest.json",
+        "catalogs/landscape/foundation.json",
+        "catalogs/foundation/decisions.json"
+      ],
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/18/decision"
+      }
+    },
+    {
+      "layer_id": "git-github-automation",
+      "coordinator_disposition": "retain",
+      "rationale": "This layer was split out of the original blind-review workers/isolation and quality-evaluation findings after 2026-09-21 to freeze the taxonomy at 20 foundation layers; it was not itself an independent blind-review subject. Retain reuses the accepted worktrunk, gh CLI and difftastic dispositions from those prior layers.",
+      "claude_independent_finding": "Not part of the original sealed blind review (2026-09-21); this row is a taxonomy split, not a fresh independent finding. See the prior workers/isolation and quality-evaluation layer findings for the source worktrunk/difftastic discovery.",
+      "evidence_refs": [
+        "docs/github-automation.md",
+        "catalogs/landscape/foundation.json",
+        "catalogs/foundation/decisions.json"
+      ],
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/foundation.json",
+        "pointer": "/layers/19/decision"
+      }
     }
   ],
   "decision_authority": {

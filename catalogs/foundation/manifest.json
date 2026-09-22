@@ -20,7 +20,7 @@
       "id": "native-clients",
       "title": "Native clients",
       "purpose": "Run ordinary coding, research and review through locally signed-in native clients.",
-      "selection": "Codex and Claude keep native accounts, model selection, caching and compaction.",
+      "selection": "Codex and Claude keep native accounts, model selection, caching and compaction. Model routing and providers are not a separate layer here: an omniroute trial and the catalogs/us-equities/models.json ledger remain notes on this native-clients selection, not an adopted routing layer.",
       "activation": "Use the intended native client and inspect its loaded project tools; new process defaults require a fresh session.",
       "lifecycle_scope": "Dated native source retrieval, process environment and scoped session continuation passed; host-wide restart recovery is separate.",
       "next_gap": "Bind fresh-session activation and resumed effects to the next target host without repeating accepted model trials."
@@ -140,7 +140,7 @@
       "selection": "Locked Next/React/FastAPI/PostgreSQL fixture; platform-specific container and MCP tools only as needed.",
       "activation": "Select the target host recipe, explicit service owner and isolated prefix; external hosting is a separate action.",
       "lifecycle_scope": "Typed API/browser flows, migration reversal and rows after restart passed on named hosts; production auth and cloud deployment are unqualified.",
-      "next_gap": "Qualify independent database restore and production-specific access requirements before broader hosting claims."
+      "next_gap": "Qualify independent database restore and production-specific access requirements before broader hosting claims. Docs and dashboard publication are not a separate layer here: .github/workflows/publish-catalog.yml and the generated docs/ecosystem explorer remain this hosting-services layer's publication treatment."
     },
     {
       "id": "recovery-portability",
@@ -149,7 +149,7 @@
       "selection": "Owned lifecycle recipes, Restic, native application backups and native session resume.",
       "activation": "Use exact snapshots and empty restore targets; keep keys/account sign-ins private and separate from the checkout.",
       "lifecycle_scope": "Selected same-host and synthetic independent-host application restores, native session/job continuations and one orderly guest scheduled-service reboot passed. Source pins, native outputs and independent observations retain separate scopes. Native Workflow graceful recovery has its own accepted local fixture and unresolved usage reconciliation; see docs/native-workflow-writing-recovery-20260921.md.",
-      "next_gap": "Reuse matching accepted recipes; qualify actual production data, client rebinding, atomicity or a physical recovery target when required by a project."
+      "next_gap": "Reuse matching accepted recipes; qualify actual production data, client rebinding, atomicity or a physical recovery target when required by a project. Packaging and distribution are not a separate layer here: adoption/lifecycle.md's install/update/roll-back stages remain the recovery-and-portability treatment of that concern."
     },
     {
       "id": "observation-inference",

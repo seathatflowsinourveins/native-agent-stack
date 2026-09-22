@@ -286,6 +286,54 @@
         "catalogs/us-equities/runtime-target.json"
       ],
       "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "agent-sdks",
+      "status": "on_requirement_change",
+      "next_action": "Qualify a concrete application need (durable multi-host state, explicit graph checkpoints, a remote/container worker or programmatic Claude session control) before promoting a deferred SDK alternative; the SDK table in docs/foundation-closure-20260921.md (lines 78-84) has not been revisited by any lane since 2026-09-21.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/foundation-closure-20260921.md",
+        "catalogs/foundation/decisions.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "mcp-surfaces",
+      "status": "on_requirement_change",
+      "next_action": "Review a specific MCP registry entry, such as punkpeye/awesome-mcp-servers, only against a concrete surface gap; do not adopt a new server from a registry listing alone.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "recipes/README.md",
+        "catalogs/foundation/decisions.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "secrets-credentials",
+      "status": "on_requirement_change",
+      "next_action": "Qualify openbao, or a comparable secret manager, only against a concrete multi-host or multi-operator secret-sharing need; broker credential handling stays a trading gate, not a foundation selection.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "adoption/manifest.json",
+        "catalogs/foundation/decisions.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "git-github-automation",
+      "status": "on_requirement_change",
+      "next_action": "Qualify gh CLI's own lifecycle evidence and a changed codex-for-claude review-bridge version before extending acceptance beyond worktrunk, gh and difftastic.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/github-automation.md",
+        "catalogs/foundation/decisions.json"
+      ],
+      "saturation": "not_established"
     }
   ]
 }
