@@ -172,7 +172,8 @@
   },
   "factor_regime_design": "blueprints/us-equities/acceptance-wave/factors-regimes.md",
   "regime_selector": {
-    "status": "offline_design_not_implemented_or_accepted",
+    "status": "implemented_synthetic_not_accepted",
+    "status_note": "2026-09-22 (task G-d, strategy rotation framework): blueprints/us-equities/adaptive-paper/selector.py implements the WARMING/NO_NEW_RISK/HOLD/ACTIVE state machine and blueprints/us-equities/adaptive-paper/registry.json ships exactly one pool member (the pre-existing inline policy, moved verbatim to strategies_v1.py), evidence_class SYN. No broker connection is made and no historical replay was run to produce this status. Accepting a pool member as a live rotation candidate additionally requires an independently qualified HIST receipt per strategy (frozen historical replay against fixed-strategy/no-switch controls, per the 'Portfolio transitions and acceptance' section of factors-regimes.md), then a separately qualified paper receipt for that same strategy -- never automatic promotion from a synthetic/local-integration result.",
     "strategy_pool": [],
     "automatic_new_strategy_adoption": false,
     "automatic_broker_orders": false,

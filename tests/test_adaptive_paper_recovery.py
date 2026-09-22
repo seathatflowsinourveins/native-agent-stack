@@ -140,7 +140,10 @@ class RecoveryTests(unittest.TestCase):
         self.ledger = Ledger(Path(self.temp.name) / "ledger.sqlite", RiskLimits(cleanup_seconds=1))
         self.controller = Controller(self.ledger)
         self.port = self.controller.port = FakePort(self.controller)
-        self.config = {"cleanup_seconds": 1, "quote_max_age_seconds": .05, "order_timeout_seconds": .05}
+        self.config = {"cleanup_seconds": 1, "quote_max_age_seconds": .05, "order_timeout_seconds": .05,
+                      "regular_session_only": True, "extended_hours_enabled": False,
+                      "sessions": {"extended_hours": False, "overnight_holds": False,
+                                  "overnight_gross_multiple": "1.0"}}
         self.meta = {"trial_id": "fault-test", "baseline_cash": "10000"}
         self.start = time.time() - 1000
         self.ledger.start_trial(self.start)

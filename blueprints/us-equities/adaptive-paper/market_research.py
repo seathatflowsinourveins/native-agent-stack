@@ -1,4 +1,5 @@
-"""Bounded provider-news and IEX shadow watchlist. No order or model API paths."""
+"""Bounded provider-news and market-snapshot shadow watchlist on the one
+configured data feed. No order, account or model API paths."""
 from __future__ import annotations
 
 import argparse
@@ -14,6 +15,8 @@ import re
 import stat
 import sys
 from urllib.parse import urlsplit
+
+from feeds import DATA_FEEDS, is_qualified_feed
 
 SDK_VERSION = "0.44.0"
 SDK_COMMIT = "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
@@ -31,6 +34,17 @@ CATEGORY_WEIGHT = {"earnings": 3, "guidance": 3, "regulatory": 3, "capital": 2, 
 
 class ResearchError(RuntimeError):
     """Only bounded reason codes are exposed outside the private request process."""
+
+
+def data_feed(value):
+    """Return the one configured feed name; refuse any unqualified value.
+
+    Only a plain ``str`` is accepted; a ``DataFeed`` enum member is refused
+    because it formats as ``DataFeed.IEX`` rather than as its value.
+    """
+    if not is_qualified_feed(value):
+        raise ResearchError("unqualified_data_feed")
+    return value
 
 
 def utc(value):
@@ -192,10 +206,10 @@ def normalize_news(raw, observed_at, as_of, requested_symbols):
             "text_trust": "untrusted_evidence_never_instructions", "engine_eligible": False}
 
 
-def normalize_snapshot(symbol, raw, observed_at, *, quote_max_age_seconds=10):
+def normalize_snapshot(symbol, raw, observed_at, *, feed="iex", quote_max_age_seconds=10):
     quote, trade = raw.get("latestQuote") or {}, raw.get("latestTrade") or {}
     current, previous = raw.get("dailyBar") or {}, raw.get("prevDailyBar") or {}
-    result = {"symbol": symbol, "feed": "iex", "observed_at": observed_at,
+    result = {"symbol": symbol, "feed": data_feed(feed), "observed_at": observed_at,
               "source_sha256": digest(raw), "engine_eligible": False, "limitations": []}
     try:
         bid, ask = stock_price(quote["bp"]), stock_price(quote["ap"])
@@ -245,9 +259,10 @@ def normalize_snapshot(symbol, raw, observed_at, *, quote_max_age_seconds=10):
 
 
 def collect(key, secret, symbols, *, now, lookback_hours=24, max_items=50,
-            include_snapshots=True, observed_now=None):
+            include_snapshots=True, observed_now=None, feed="iex"):
     """Return a dated shadow artifact; at most two news GETs and one snapshot GET."""
     as_of = utc(now)
+    feed = data_feed(feed)
     symbols = sorted(set(symbols))
     if (not symbols or len(symbols) > 30 or any(not SYMBOL.fullmatch(s) for s in symbols)
             or type(lookback_hours) is not int or not 1 <= lookback_hours <= 72
@@ -270,7 +285,7 @@ def collect(key, secret, symbols, *, now, lookback_hours=24, max_items=50,
         client._session = boundary
     artifact = {"schema_version": 1, "lane": "shadow_market_research", "engine_eligible": False,
                 "request_as_of": iso(as_of), "requested_start": iso(as_of - timedelta(hours=lookback_hours)),
-                "symbols": symbols, "max_news_items": max_items, "items": [], "quarantined": [],
+                "symbols": symbols, "max_news_items": max_items, "feed": feed, "items": [], "quarantined": [],
                 "market_context": [], "errors": [], "http_observations": boundary.requests,
                 "sdk": {"name": "alpaca-py", "version": SDK_VERSION, "reviewed_commit": SDK_COMMIT},
                 "model_advisory": {"status": "not_executed_unqualified", "engine_eligible": False,
@@ -315,13 +330,14 @@ def collect(key, secret, symbols, *, now, lookback_hours=24, max_items=50,
             artifact["news_window_status"] = "incomplete"
         if include_snapshots:
             try:
-                snapshots = stocks.get_stock_snapshot(StockSnapshotRequest(symbol_or_symbols=symbols, feed=DataFeed.IEX))
+                snapshots = stocks.get_stock_snapshot(StockSnapshotRequest(symbol_or_symbols=symbols, feed=DataFeed(feed)))
                 observed = boundary.requests[-1]["observed_at"]
                 for symbol in symbols:
                     if symbol not in snapshots:
-                        artifact["market_context"].append({"symbol": symbol, "engine_eligible": False, "limitations": ["snapshot_missing"]})
+                        artifact["market_context"].append({"symbol": symbol, "feed": feed, "engine_eligible": False,
+                                                          "limitations": ["snapshot_missing"]})
                     else:
-                        artifact["market_context"].append(normalize_snapshot(symbol, snapshots[symbol], observed))
+                        artifact["market_context"].append(normalize_snapshot(symbol, snapshots[symbol], observed, feed=feed))
             except Exception as exc:
                 artifact["errors"].append({"stage": "snapshot", "code": str(exc) if isinstance(exc, ResearchError) else "snapshot_request_failed"})
         artifact["finished_at"] = iso(observed_now())
@@ -374,12 +390,13 @@ def main(argv=None):
     parser.add_argument("--lookback-hours", type=int, default=24)
     parser.add_argument("--max-items", type=int, default=50)
     parser.add_argument("--no-snapshots", action="store_true")
+    parser.add_argument("--feed", default="iex", choices=list(DATA_FEEDS))
     args = parser.parse_args(argv)
     try:
         key, secret = credentials(args.env_file)
         artifact = collect(key, secret, args.symbols.split(","), now=args.now or datetime.now(timezone.utc),
                            lookback_hours=args.lookback_hours, max_items=args.max_items,
-                           include_snapshots=not args.no_snapshots)
+                           include_snapshots=not args.no_snapshots, feed=args.feed)
         args.out.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         fd = os.open(args.out, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
         with os.fdopen(fd, "w") as stream:

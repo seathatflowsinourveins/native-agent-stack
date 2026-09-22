@@ -12,7 +12,7 @@ This module does not load environment files or discover credentials.
 
 Construct `AlpacaPaperTransport(api_key, secret_key, symbols, *, before_request,
 before_submit, sink_observation, request_observer=None, history_start=None,
-required_quote_symbols=None)` on
+required_quote_symbols=None, feed="iex")` on
 the owning asyncio loop. The three required callbacks may be synchronous or
 asynchronous and run on that same loop. `before_request(kind, client_id=None)`
 must reserve the actual attempt. For POST it must reserve atomically and return
@@ -53,9 +53,14 @@ from each socket, fresh quotes for the required benchmark basket, and no frozen
 health condition. The required basket defaults to all subscribed symbols; set
 `required_quote_symbols` explicitly when candidates may be quiet. Every submitted
 symbol still needs a fresh quote at the wire boundary and the caller's stricter
-per-symbol risk check. `_running` alone is insufficient. One shared IEX connection fans out
-quotes; one paper account connection receives order events. Native callbacks
-only enqueue into a bounded queue; the owning loop runs consumer callbacks.
+per-symbol risk check. `_running` alone is insufficient. One shared quote
+connection fans out quotes; one paper account connection receives order events.
+The single configured `feed` value (`iex` or `sip`) selects both the REST quote
+feed and the `wss://stream.data.alpaca.markets/v2/<feed>` stream endpoint the
+connect guard pins; any other value is refused before a client, socket or
+endpoint is built. Feed selection is a configuration choice, not evidence of
+market-data entitlement. Native callbacks only enqueue into a bounded queue; the
+owning loop runs consumer callbacks.
 Reconnect, stale quotes, missing initial order updates, malformed callbacks and
 overflow stop new exposure. After inspecting and reconciling a fresh complete
 snapshot, the caller may explicitly call `mark_reconciled()`. Queue loss or
@@ -72,8 +77,8 @@ the SDK's native `get`; a repeated page or the bounded page ceiling fails
 completeness instead of returning success. A snapshot does not atomically freeze
 broker state; the caller reconciles concurrent stream observations. Synchronous
 `preflight()` uses only guarded GETs for account, clock, positions, open orders,
-assets and IEX quotes. Its SHA-256 account identity supports a private account
-lock without returning the raw account ID. `open_orders_complete=False` on a
+assets and quotes on the configured feed. Its SHA-256 account identity supports
+a private account lock without returning the raw account ID. `open_orders_complete=False` on a
 full 500-order page prevents claiming an empty account from a truncated list.
 Missing or invalid per-symbol quotes are returned as sanitized `quote_errors`
 alongside the valid quotes, preserving clock/account/asset readiness evidence

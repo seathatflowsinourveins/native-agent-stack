@@ -2,18 +2,20 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import datetime, timezone
 from decimal import Decimal, ROUND_DOWN
 import re
 import time
 
 from safety import SafetyError
+from sessions import order_extended_hours_flag, validate_session_policy
 
 
-def _payload(intent):
+def _payload(intent, extended_hours=False):
     return {"client_order_id": intent.client_id, "symbol": intent.symbol,
             "side": intent.side, "qty": format(intent.qty, "f"),
             "limit_price": format(intent.limit_price, "f"), "type": "limit",
-            "time_in_force": "day", "extended_hours": False}
+            "time_in_force": "day", "extended_hours": extended_hours}
 
 
 def _code(exc):
@@ -32,6 +34,7 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
     if reconcile_fn is None:
         from runner import reconcile as reconcile_fn
     ledger, port = controller.ledger, controller.port
+    session_policy = validate_session_policy(config)
     controller.stop = True
     changed = asyncio.Event()
     cleanup = min(float(config["cleanup_seconds"]), float(ledger.limits.cleanup_seconds), 120.0)
@@ -123,7 +126,9 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                 # The durable HTTP budget marks attempted *before* any POST. No
                 # attempted request is ever retired based on a missing lookup.
                 ledger.mark_not_sent(intent.client_id, "recovery_proven_never_attempted")
-        port.adopt_intents([_payload(i) for i in ledger.intents()
+        adoption_extended_hours = order_extended_hours_flag(
+            datetime.fromtimestamp(controller.clock(), timezone.utc), session_policy)
+        port.adopt_intents([_payload(i, adoption_extended_hours) for i in ledger.intents()
                             if i.status not in {"not_sent", "broker_refused"}])
         await bounded(port.start(quote, order))
         await observe_snapshot()  # Unknown exposure/absent attempted IDs stop here.
@@ -158,9 +163,11 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                 raise SafetyError("recovery_quantity_not_representable")
             sequence += 1
             client_id = prefix + f"{sequence:07d}"
+            exit_extended_hours = order_extended_hours_flag(
+                datetime.fromtimestamp(controller.clock(), timezone.utc), session_policy)
             payload = {"client_order_id": client_id, "symbol": symbol, "side": "sell",
                        "qty": format(quantity, "f"), "limit_price": format(price, "f"),
-                       "type": "limit", "time_in_force": "day", "extended_hours": False,
+                       "type": "limit", "time_in_force": "day", "extended_hours": exit_extended_hours,
                        "strategy": "recovery", "reason": "owned_residual_exit"}
             submitted.append(client_id)
             try:

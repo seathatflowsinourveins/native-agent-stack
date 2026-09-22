@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "adaptive_policy_v1",
+  "evidence_class": "SYN",
+  "kind": "golden_decision_fixture",
+  "golden_fixture": "blueprints/us-equities/adaptive-paper/receipts/adaptive_policy_v1.golden.json",
+  "golden_fixture_sha256": "5cb4b21c7d2159e496093c67b3b358810db4e225d9c5ee1c633258050973556e",
+  "case_count": 16,
+  "note": "Golden decision fixture captured from the pre-selector strategies.py (2026-09-22, task G-d, strategy rotation framework) before strategies_v1.py's split into decide()/_regime_and_signals()/_decide_core(). tests/test_adaptive_paper_strategies.py's GoldenEquivalenceTests asserts BOTH strategies.AdaptivePolicy (the wrapper, constructed with the default empty strategy_pool and selector=None -- the path every existing call site takes) AND strategies_v1.AdaptivePolicy (the moved-verbatim engine, constructed directly) produce decide() output byte-identical against this fixture for the same 16 cases. This is not a HIST or paper receipt: no historical replay and no broker connection were run to produce it. Accepting adaptive_policy_v1 (or any future pool member) as a live rotation candidate additionally requires an independently qualified HIST receipt per strategy, then a separately qualified paper receipt -- see blueprints/us-equities/acceptance-wave/research-protocol.json's regime_selector field. This receipt intentionally lives under blueprints/us-equities/adaptive-paper/ (not tests/), so the shipped engine (runner.load_registry) never depends on the tests tree being present."
+}

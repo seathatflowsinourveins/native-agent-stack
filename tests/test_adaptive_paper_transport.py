@@ -3,14 +3,16 @@ import asyncio
 import importlib.util
 import json
 from pathlib import Path
+import sys
 import threading
 import time
 import unittest
 from unittest.mock import patch, Mock, AsyncMock
 
 ROOT = Path(__file__).resolve().parents[1]
-SPEC = importlib.util.spec_from_file_location(
-    "adaptive_paper_transport", ROOT / "blueprints/us-equities/adaptive-paper/transport.py")
+SOURCE = ROOT / "blueprints/us-equities/adaptive-paper"
+sys.path.insert(0, str(SOURCE))
+SPEC = importlib.util.spec_from_file_location("adaptive_paper_transport", SOURCE / "transport.py")
 t = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(t)
 try:
@@ -177,6 +179,43 @@ class HTTPBoundary(unittest.TestCase):
         self.assertEqual(result["orders"], [])
         self.assertEqual(result["clock"]["received_at_ns"], received_at_ns)
         self.assertEqual([c.args[0] for c in self.budget.call_args_list], ["read"] * 5 + ["data_read"])
+
+    def _preflight_clients(self):
+        trading, data = Mock(), Mock()
+        trading.get_account.return_value = {"id": "fixture-account", "cash": "1000",
+                                            "equity": "1000", "buying_power": "1000"}
+        trading.get_clock.return_value = {"is_open": True, "timestamp": "2026-09-21T15:00:00Z",
+                                          "next_close": "2026-09-21T20:00:00Z",
+                                          "next_open": "2026-09-22T13:30:00Z"}
+        trading.get_all_positions.return_value = []
+        trading.get.return_value = []
+        trading.get_asset.side_effect = lambda symbol: {"symbol": symbol, "tradable": True}
+        data.get_stock_latest_quote.return_value = {}
+        return trading, data
+
+    def test_preflight_sends_the_configured_feed_on_the_quote_request(self):
+        from alpaca.data.enums import DataFeed
+        for keywords, expected in (({"feed": "sip"}, DataFeed.SIP), ({"feed": "iex"}, DataFeed.IEX),
+                                   ({}, DataFeed.IEX)):
+            with self.subTest(**keywords):
+                trading, data = self._preflight_clients()
+                with patch.object(t, "_sdk_client", side_effect=[trading, data]):
+                    t.preflight("fixture-key", "fixture-secret", ["SPY"],
+                                before_request=self.budget, **keywords)
+                request = data.get_stock_latest_quote.call_args.args[0]
+                self.assertEqual(request.feed, expected)
+                self.assertEqual(request.feed.value, keywords.get("feed", "iex"))
+
+    def test_preflight_refuses_an_unqualified_feed_before_any_request(self):
+        for value in ("otc", "delayed_sip", "IEX", "", None):
+            with self.subTest(feed=value):
+                with patch.object(t, "_sdk_client") as client:
+                    with self.assertRaises(t.UnsupportedDataFeed) as caught:
+                        t.preflight("fixture-key", "fixture-secret", ["SPY"], feed=value,
+                                    before_request=self.budget)
+                self.assertEqual(str(caught.exception), "unqualified_data_feed")
+                client.assert_not_called()
+                self.budget.assert_not_called()
 
     def test_closed_preflight_preserves_clock_with_invalid_and_missing_quotes(self):
         trading, data = Mock(), Mock()
@@ -479,6 +518,108 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
             with self.assertRaisesRegex(t.TransportError, "endpoint rejected"):
                 await protocol.handshake(parse_uri("wss://example.org/stream"))
             upstream.assert_not_awaited()
+
+
+class DataFeedSelection(unittest.TestCase):
+    """One configured feed derives the quote stream endpoint; nothing else does."""
+
+    def test_configured_feed_selects_the_matching_quote_stream(self):
+        self.assertEqual(t.DATA_FEEDS, ("iex", "sip"))
+        self.assertEqual(t.data_stream_url("iex"), "wss://stream.data.alpaca.markets/v2/iex")
+        self.assertEqual(t.data_stream_url("sip"), "wss://stream.data.alpaca.markets/v2/sip")
+
+    def test_a_str_subclass_naming_a_feed_is_still_refused(self):
+        class FeedLike(str):
+            def __str__(self):
+                return "DataFeed.IEX"
+        with self.assertRaises(t.UnsupportedDataFeed):
+            t.data_stream_url(FeedLike("iex"))
+
+    def test_unqualified_feed_is_refused_before_any_endpoint_is_derived(self):
+        for value in ("otc", "delayed_sip", "boats", "overnight", "IEX", "iex ", "", None, 1, ["iex"]):
+            with self.subTest(feed=value):
+                with self.assertRaises(t.UnsupportedDataFeed) as caught:
+                    t.data_stream_url(value)
+                self.assertEqual(str(caught.exception), "unqualified_data_feed")
+                self.assertIsInstance(caught.exception, t.TransportError)
+
+    @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
+    def test_sdk_enum_members_are_refused_rather_than_formatted_into_the_url(self):
+        from alpaca.data.enums import DataFeed
+        for member in (DataFeed.IEX, DataFeed.SIP):
+            with self.subTest(feed=member):
+                self.assertIsInstance(member, str)
+                self.assertIn(member, t.DATA_FEEDS)
+                self.assertEqual("%s" % member, "DataFeed." + member.name)
+                with self.assertRaises(t.UnsupportedDataFeed) as caught:
+                    t.data_stream_url(member)
+                self.assertEqual(str(caught.exception), "unqualified_data_feed")
+
+    @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
+    def test_quote_stream_connect_guard_follows_the_configured_feed(self):
+        _, Quotes = t._stream_classes("wss://stream.data.alpaca.markets/v2/sip")
+        stream = Quotes.__new__(Quotes)
+        stream.owner = Mock()
+        stream._endpoint = "wss://stream.data.alpaca.markets/v2/iex"
+        with self.assertRaisesRegex(t.TransportError, "quote websocket endpoint rejected"):
+            asyncio.run(stream._connect())
+
+
+@unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
+class ConfiguredQuoteFeed(unittest.TestCase):
+    """No broker request is made; only the constructed stream arguments are read."""
+
+    def build(self, **kwargs):
+        captured = []
+
+        class Capturing(FakeStream):
+            def __init__(self, *args, **stream_kwargs):
+                captured.append(stream_kwargs)
+                super().__init__(*args, **stream_kwargs)
+
+        with patch.object(t, "_stream_classes", return_value=(Capturing, Capturing)) as classes:
+            port = t.AlpacaPaperTransport("fixture-key", "fixture-secret", ["SPY"],
+                                          before_request=lambda *a, **k: None,
+                                          before_submit=lambda intent: None,
+                                          sink_observation=lambda observation: None, **kwargs)
+        quotes = [row for row in captured if "feed" in row]
+        self.assertEqual(len(quotes), 1)
+        return port, classes, quotes[0]
+
+    def test_iex_feed_keeps_the_frozen_quote_stream(self):
+        port, classes, quotes = self.build(feed="iex")
+        self.assertEqual(port.feed, "iex")
+        self.assertEqual(port.data_ws, "wss://stream.data.alpaca.markets/v2/iex")
+        self.assertEqual(classes.call_args.args, (port.data_ws,))
+        self.assertEqual(quotes["feed"], "iex")
+        self.assertEqual(quotes["url_override"], port.data_ws)
+
+    def test_sip_feed_selects_the_sip_quote_stream(self):
+        port, classes, quotes = self.build(feed="sip")
+        self.assertEqual(port.feed, "sip")
+        self.assertEqual(port.data_ws, "wss://stream.data.alpaca.markets/v2/sip")
+        self.assertEqual(classes.call_args.args, (port.data_ws,))
+        self.assertEqual(quotes["feed"], "sip")
+        self.assertEqual(quotes["url_override"], port.data_ws)
+
+    def test_default_transport_feed_remains_the_frozen_iex_lane(self):
+        port, _, quotes = self.build()
+        self.assertEqual(port.feed, "iex")
+        self.assertEqual(quotes["url_override"], "wss://stream.data.alpaca.markets/v2/iex")
+
+    def test_unqualified_feed_refused_before_any_stream_is_constructed(self):
+        with self.assertRaises(t.UnsupportedDataFeed):
+            self.build(feed="otc")
+
+    def test_sdk_enum_member_is_refused_by_the_transport_and_by_preflight(self):
+        from alpaca.data.enums import DataFeed
+        with self.assertRaises(t.UnsupportedDataFeed):
+            self.build(feed=DataFeed.SIP)
+        with patch.object(t, "_sdk_client") as client:
+            with self.assertRaises(t.UnsupportedDataFeed):
+                t.preflight("fixture-key", "fixture-secret", ["SPY"], feed=DataFeed.SIP,
+                            before_request=lambda *a, **k: None)
+        client.assert_not_called()
 
 
 if __name__ == "__main__":

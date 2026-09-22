@@ -1,8 +1,8 @@
 # Dated shadow catalyst watchlist
 
 `market_research.py` produces a usable local research artifact from bounded Alpaca
-news and optional IEX snapshots. It has no order, account, position, execution,
-SEC acquisition or model-inference endpoints. Every article, market-context row
+news and optional snapshots on the single configured feed. It has no order,
+account, position, execution, SEC acquisition or model-inference endpoints. Every article, market-context row
 and review-queue item carries `engine_eligible: false`. Its scores prioritize
 reading; they do not predict returns or establish a profitable strategy.
 
@@ -12,8 +12,15 @@ The module uses **alpaca-py 0.44.0**, reviewed at
 [`cc4cb3b7ba50ae250e621983c2779047fb16bb28`](https://github.com/alpacahq/alpaca-py/tree/cc4cb3b7ba50ae250e621983c2779047fb16bb28).
 It calls the existing `NewsClient.get_news(NewsRequest(...))` and
 `StockHistoricalDataClient.get_stock_snapshot(StockSnapshotRequest(...,
-feed=DataFeed.IEX))`. These native clients serialize requests and parse their
-responses; the local adapter adds request bounds and explicit provenance.
+feed=DataFeed(feed)))`, where `feed` is the one configured value: `iex` by
+default, `sip` with `--feed sip`, and any other value refused as
+`unqualified_data_feed` before a client or request is built. The collected
+artifact and every market-context row record the feed actually used, including a
+row whose snapshot was missing; selecting `sip` is not evidence of entitlement.
+The qualified set lives once in `feeds.py`, shared with the trading transport,
+and only a plain string is accepted: an SDK `DataFeed` enum member is refused. These native clients serialize requests and
+parse their responses; the local adapter adds request bounds and explicit
+provenance.
 The unchanged official
 [`tests/live/test_data_rest.py::test_get_news`](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/tests/live/test_data_rest.py#L54)
 is the selected native read-only acceptance example, using an explicit three-item
@@ -78,7 +85,7 @@ publication-age score. Such matches are leads for evidence review, not confirmed
 event classifications. HTML becomes plain bounded text; embedded instructions
 remain untrusted evidence and cannot change control flow.
 
-IEX context reports last-trade change from the prior daily close, quote spread
+Market context reports last-trade change from the prior daily close, quote spread
 and a partial-day/prior-full-day volume ratio when the source fields are valid.
 Every component retains its own time. Stale or zero closed-session quotes are
 flagged and do not erase usable news. The volume ratio is explicitly **not**

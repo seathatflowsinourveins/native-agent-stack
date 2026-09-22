@@ -16,12 +16,14 @@ import threading
 import time
 from urllib.parse import urlsplit
 
+from feeds import DATA_FEEDS, is_qualified_feed
+
 SDK_VERSION = "0.44.0"
 SDK_COMMIT = "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
 PAPER_URL = "https://paper-api.alpaca.markets"
 DATA_URL = "https://data.alpaca.markets"
 PAPER_WS = "wss://paper-api.alpaca.markets/stream"
-DATA_WS = "wss://stream.data.alpaca.markets/v2/iex"
+DATA_WS_BASE = "wss://stream.data.alpaca.markets/v2"
 TERMINAL = {"filled", "canceled", "expired", "rejected", "replaced"}
 SYMBOL = re.compile(r"[A-Z][A-Z0-9.\-]{0,14}\Z")
 CLIENT_ID = re.compile(r"[A-Za-z0-9_\-]{1,48}\Z")
@@ -46,6 +48,26 @@ class RejectedSubmission(TransportError):
 class SubmissionNotSent(TransportError):
     definitive_rejection = True
     not_sent = True
+
+
+class UnsupportedDataFeed(TransportError):
+    """Refusal for any market data feed outside the qualified set."""
+
+
+def data_feed(value):
+    """Return the one configured feed name. Entitlement is not checked here.
+
+    Only a plain ``str`` is accepted; a ``DataFeed`` enum member is refused
+    because it formats as ``DataFeed.IEX`` and would build a malformed endpoint.
+    """
+    if not is_qualified_feed(value):
+        raise UnsupportedDataFeed("unqualified_data_feed")
+    return value
+
+
+def data_stream_url(feed):
+    """Derive the quote stream endpoint from the single configured feed."""
+    return "%s/%s" % (DATA_WS_BASE, data_feed(feed))
 
 
 def decimal_string(value, *, positive=False):
@@ -95,17 +117,48 @@ def normalize_order(raw):
     return result
 
 
+# Best-effort CTA/UTP quote-condition code that can mark an individual NBBO
+# quote update as halted ("H"). This environment has no network access to
+# verify Alpaca's current live schema, so this is a documented, tested,
+# defensive fallback; Alpaca's primary halt signal is the separate
+# "trading_status" stream message parsed by normalize_trading_status below,
+# not a field on ordinary quote updates (see D3 in the review round).
+QUOTE_HALT_CONDITION_CODES = frozenset({"H"})
+
+
 def normalize_quote(raw, symbol=None):
+    conditions = raw.get("c") or raw.get("cond") or raw.get("conditions") or []
     result = {"symbol": symbol or raw.get("S") or raw.get("symbol"),
               "bid": decimal_string(raw.get("bp", raw.get("bid")), positive=True),
               "ask": decimal_string(raw.get("ap", raw.get("ask")), positive=True),
               "bid_size": decimal_string(raw.get("bs", raw.get("bid_size", 0))),
               "ask_size": decimal_string(raw.get("as", raw.get("ask_size", 0))),
-              "ts_ns": timestamp_ns(raw.get("t", raw.get("timestamp")))}
+              "ts_ns": timestamp_ns(raw.get("t", raw.get("timestamp"))),
+              "halted": bool(raw.get("halted")) or bool(QUOTE_HALT_CONDITION_CODES & set(conditions))}
     if (Decimal(result["bid"]) > Decimal(result["ask"]) or result["ts_ns"] <= 0
             or min(Decimal(result["bid_size"]), Decimal(result["ask_size"])) < 0):
         raise TransportError("invalid quote")
     return result
+
+
+def normalize_trading_status(raw):
+    """Parse an Alpaca "trading_status" market-data stream message
+    (``T: "trading_status"``) into ``{"symbol", "halted", "ts_ns"}``.
+
+    Fields used: ``S`` (symbol), ``sc`` (status code; ``"H"`` == halted,
+    anything else == not halted), ``t`` (timestamp). This mapping documents
+    the exact fields checked but is NOT verified against a live Alpaca
+    payload in this environment (no network access here); it is a SYN-evidence
+    best-effort mapping pending a real trading_status sample, exercised only
+    by a fake-payload test. The websocket subscription that would deliver
+    these messages is not wired into AlpacaPaperTransport in this change (see
+    the task handoff); this function only defines the parsing contract a
+    future subscription can call.
+    """
+    symbol = raw.get("S") or raw.get("symbol")
+    status_code = raw.get("sc") or raw.get("status") or raw.get("status_code")
+    return {"symbol": symbol, "halted": status_code in ("H", "halted", "Halted"),
+            "ts_ns": timestamp_ns(raw.get("t", raw.get("timestamp")))}
 
 
 def normalize_account(raw):
@@ -117,7 +170,7 @@ def normalize_account(raw):
     return result
 
 
-def normalize_intent(order, symbols):
+def normalize_intent(order, symbols, *, allow_extended_hours=False):
     allowed = {"client_order_id", "symbol", "side", "qty", "limit_price", "type", "time_in_force",
                "extended_hours", "tags", "strategy", "reason"}
     if set(order) - allowed:
@@ -127,14 +180,17 @@ def normalize_intent(order, symbols):
     qty = Decimal(decimal_string(result["qty"], positive=True))
     result["qty"] = format(qty, "f")
     result["limit_price"] = decimal_string(result["limit_price"], positive=True)
+    extended_hours = order.get("extended_hours", False)
+    if type(extended_hours) is not bool or (extended_hours and not allow_extended_hours):
+        raise TransportError("only owned DAY limits with whole-share entries are supported")
     if ((result["side"] == "buy" and qty != qty.to_integral_value())
             or qty.as_tuple().exponent < -9 or result["symbol"] not in symbols
             or result["side"] not in {"buy", "sell"}
             or not CLIENT_ID.fullmatch(result["client_order_id"])
             or order.get("type", "limit") != "limit"
-            or order.get("time_in_force", "day") != "day"
-            or order.get("extended_hours", False) is not False):
+            or order.get("time_in_force", "day") != "day"):
         raise TransportError("only owned DAY limits with whole-share entries are supported")
+    result["extended_hours"] = extended_hours
     for key in ("strategy", "reason"):
         if key in order:
             if not isinstance(order[key], str) or len(order[key]) > 256:
@@ -237,11 +293,12 @@ def _sdk_client(api_key, secret_key, before_request, observer=None, *, data=Fals
     return client
 
 
-def preflight(api_key, secret_key, symbols, *, before_request, request_observer=None):
+def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, request_observer=None):
     """Read-only native SDK preflight; callback is synchronous in this helper."""
     from alpaca.data.enums import DataFeed
     from alpaca.data.requests import StockLatestQuoteRequest
     symbols = _symbols(symbols)
+    feed = data_feed(feed)
     lock = threading.Lock()
     trading = _sdk_client(api_key, secret_key, before_request, request_observer, read_only=True, lock=lock)
     data = _sdk_client(api_key, secret_key, before_request, request_observer, data=True, read_only=True, lock=lock)
@@ -264,7 +321,7 @@ def preflight(api_key, secret_key, symbols, *, before_request, request_observer=
             asset = trading.get_asset(symbol)
             assets.append({key: asset.get(key) for key in
                            ("symbol", "status", "tradable", "fractionable", "marginable", "shortable")})
-        quotes = data.get_stock_latest_quote(StockLatestQuoteRequest(symbol_or_symbols=list(symbols), feed=DataFeed.IEX))
+        quotes = data.get_stock_latest_quote(StockLatestQuoteRequest(symbol_or_symbols=list(symbols), feed=DataFeed(feed)))
         normalized_quotes, quote_errors = [], {}
         for symbol in symbols:
             if symbol not in quotes:
@@ -289,7 +346,7 @@ def preflight(api_key, secret_key, symbols, *, before_request, request_observer=
 def _symbols(symbols):
     result = tuple(sorted(set(symbols)))
     if not result or len(result) > 30 or any(not isinstance(s, str) or not SYMBOL.fullmatch(s) for s in result):
-        raise TransportError("one to thirty explicit IEX symbols required")
+        raise TransportError("one to thirty explicit symbols required")
     return result
 
 
@@ -312,7 +369,7 @@ def _protocol_factory(endpoint):
     return FixedEndpointProtocol
 
 
-def _stream_classes():
+def _stream_classes(data_ws):
     from alpaca.trading.stream import TradingStream
     from alpaca.data.live.stock import StockDataStream
 
@@ -341,8 +398,8 @@ def _stream_classes():
     class Quotes(StockDataStream):
         async def _connect(self):
             self.owner._connection("quotes", False)
-            if str(self._endpoint) != DATA_WS:
-                raise TransportError("IEX websocket endpoint rejected")
+            if str(self._endpoint) != data_ws:
+                raise TransportError("quote websocket endpoint rejected")
             await super()._connect()
 
         async def _auth(self):
@@ -367,7 +424,11 @@ class AlpacaPaperTransport:
     def __init__(self, api_key, secret_key, symbols, *, before_request, before_submit,
                  sink_observation, queue_size=1024, quote_timeout=5.0, start_timeout=15.0,
                  order_update_timeout=10.0, request_observer=None, history_start=None,
-                 max_snapshot_pages=20, required_quote_symbols=None):
+                 max_snapshot_pages=20, required_quote_symbols=None, feed="iex",
+                 extended_hours_allowed=False):
+        self.extended_hours_allowed = bool(extended_hours_allowed)
+        self.feed = data_feed(feed)
+        self.data_ws = data_stream_url(self.feed)
         self.symbols = _symbols(symbols)
         self.required_quote_symbols = (self.symbols if required_quote_symbols is None
                                        else _symbols(required_quote_symbols))
@@ -411,16 +472,16 @@ class AlpacaPaperTransport:
         self._client = _sdk_client(api_key, secret_key, self._budget_sync,
                                    self._response_sync, lock=self._http_lock)
         self._client._session.before_send = self._wire_guard
-        Orders, Quotes = _stream_classes()
+        Orders, Quotes = _stream_classes(self.data_ws)
         from alpaca.data.enums import DataFeed
         parameters = {"ping_interval": 10, "ping_timeout": 10, "max_queue": queue_size,
                       "open_timeout": 5, "close_timeout": 2}
         self._orders_stream = Orders(api_key, secret_key, paper=True, raw_data=True,
                                      url_override=PAPER_WS, websocket_params=dict(parameters,
                                      create_protocol=_protocol_factory(PAPER_WS)))
-        self._quotes_stream = Quotes(api_key, secret_key, feed=DataFeed.IEX, raw_data=True,
-                                     url_override=DATA_WS, websocket_params=dict(parameters,
-                                     create_protocol=_protocol_factory(DATA_WS)),
+        self._quotes_stream = Quotes(api_key, secret_key, feed=DataFeed(self.feed), raw_data=True,
+                                     url_override=self.data_ws, websocket_params=dict(parameters,
+                                     create_protocol=_protocol_factory(self.data_ws)),
                                      data_timeout=quote_timeout)
         self._orders_stream.owner = self
         self._quotes_stream.owner = self
@@ -629,7 +690,7 @@ class AlpacaPaperTransport:
 
     def adopt_intents(self, intents):
         for order in intents:
-            normalized = normalize_intent(order, self.symbols)
+            normalized = normalize_intent(order, self.symbols, allow_extended_hours=self.extended_hours_allowed)
             key = normalized["client_order_id"]
             if key in self._intents and self._intents[key] != normalized:
                 raise TransportError("durable intent changed")
@@ -656,11 +717,11 @@ class AlpacaPaperTransport:
 
     async def submit(self, order):
         from alpaca.trading.requests import LimitOrderRequest
-        intent = normalize_intent(order, self.symbols)
+        intent = normalize_intent(order, self.symbols, allow_extended_hours=self.extended_hours_allowed)
         key = intent["client_order_id"]
         request = LimitOrderRequest(**{k: v for k, v in intent.items()
-                                       if k not in {"tags", "strategy", "reason"}},
-                                    time_in_force="day", extended_hours=False)
+                                       if k not in {"tags", "strategy", "reason", "extended_hours"}},
+                                    time_in_force="day", extended_hours=intent["extended_hours"])
         async with self._operation_lock:
             if key in self._intents:
                 if self._intents[key] != intent:

@@ -7,10 +7,22 @@ limit/DAY orders only; unknown submission outcomes freeze and stop the node.
 from __future__ import annotations
 
 import asyncio
+from datetime import datetime, timezone
 from decimal import Decimal
 import importlib.metadata
+from pathlib import Path
 import re
+import sys
 from typing import Protocol, Callable
+
+# This module is sometimes loaded directly via importlib file-spec (see
+# tests/test_adaptive_paper_native.py) without its own directory on
+# sys.path; self-heal so the local sessions.py sibling import below resolves
+# regardless of how the caller imported this module.
+_HERE = str(Path(__file__).resolve().parent)
+if _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
+from sessions import DEFAULT_SESSION_POLICY, order_extended_hours_flag, reconciliation_receipt
 
 from nautilus_trader.common import Environment, LogLevel
 from nautilus_trader.config import DataClientConfig, ExecutionClientConfig, LiveNodeConfig
@@ -77,7 +89,7 @@ def instrument(metadata):
 
 class NativeSession:
     """Shared owner-loop state, deduplication and externally observable failures."""
-    def __init__(self, port, symbols):
+    def __init__(self, port, symbols, session_policy=None):
         self.port = port
         self.instruments = {m["symbol"]: instrument(m) for m in symbols}
         if len(self.instruments) != len(symbols) or not symbols:
@@ -90,6 +102,8 @@ class NativeSession:
         self.observations = []
         self.unresolved_orders = {}
         self.snapshot_state = None
+        self.session_policy = dict(session_policy) if session_policy else dict(DEFAULT_SESSION_POLICY)
+        self.reconciliation = None
         self.fee_assumption = "Port has no fees; native booking uses zero commission pending external fee reconciliation."
 
     def fail(self, code):
@@ -200,13 +214,34 @@ class AlpacaExecutionClient(ExecutionClient):
         await self.session.start()
         snapshot = await self.session.port.snapshot()
         self._validate_snapshot(snapshot)
-        if any(dec(row["qty"], signed=True) != 0 for row in snapshot["positions"]):
-            raise ValueError("startup_requires_flat_account_use_external_recovery")
-        if any(row["status"] not in TERMINAL for row in snapshot["orders"]):
-            raise ValueError("startup_requires_no_open_orders_use_external_recovery")
-        # Closed historical broker rows are not current native positions or fills.
-        # This new session deliberately does not adopt an old strategy's ledger.
-        self.session.snapshot_state = {**snapshot, "orders": [], "positions": []}
+        if self.session.session_policy.get("overnight_holds"):
+            # Startup reconciliation (deliverable 3): accept existing positions
+            # and open orders and record a reconciliation receipt instead of
+            # requiring a flat account. The local ledger side of this delta is
+            # populated by the caller (runner.py), which has ledger access;
+            # this adapter only records the broker-side snapshot it observed.
+            self.session.reconciliation = reconciliation_receipt(snapshot, boundary=False)
+            # S6: transport.snapshot() merges open + recent-history pages, so
+            # the raw snapshot can include historical terminal orders (e.g.
+            # already filled/canceled/expired/rejected). snapshot_state is
+            # later read by order_status_reports/generate_order_status_report
+            # to replay open-order state into native on startup; a stale
+            # terminal order there would be replayed as if still live.
+            # reconciliation_receipt above already recorded the full
+            # snapshot (open + terminal) for the reconciliation audit trail;
+            # snapshot_state itself must keep only genuinely open orders.
+            self.session.snapshot_state = {**snapshot,
+                                           "orders": [row for row in snapshot["orders"]
+                                                     if row["status"] not in TERMINAL]}
+        else:
+            if any(dec(row["qty"], signed=True) != 0 for row in snapshot["positions"]):
+                raise ValueError("startup_requires_flat_account_use_external_recovery")
+            if any(row["status"] not in TERMINAL for row in snapshot["orders"]):
+                raise ValueError("startup_requires_no_open_orders_use_external_recovery")
+            # Closed historical broker rows are not current native positions or
+            # fills. This new session deliberately does not adopt an old
+            # strategy's ledger.
+            self.session.snapshot_state = {**snapshot, "orders": [], "positions": []}
         self._account(snapshot["account"])
 
     async def _disconnect(self):
@@ -319,9 +354,11 @@ class AlpacaExecutionClient(ExecutionClient):
             return
         self.orders[cid] = order
         tags = list(order.tags or [])
+        now = datetime.fromtimestamp(self.clock.timestamp_ns() / 1e9, tz=timezone.utc)
+        extended_hours = order_extended_hours_flag(now, self.session.session_policy)
         payload = {"client_order_id": cid, "symbol": str(order.instrument_id.symbol),
             "side": str(order.side).lower(), "qty": str(order.quantity), "limit_price": str(order.price),
-            "type": "limit", "time_in_force": "day", "extended_hours": False,
+            "type": "limit", "time_in_force": "day", "extended_hours": extended_hours,
             "tags": tags, "strategy": str(order.strategy_id)}
         for tag in tags:
             if tag.startswith("reason="):
@@ -404,12 +441,12 @@ class AlpacaExecutionClient(ExecutionClient):
 
 
 def build_node(port, symbols, strategies, *, account_id="ALPACA-PAPER", trader_id="ADAPTIVE-001",
-               max_order_submit_rate="180/00:01:00", account_type=AccountType.CASH):
+               max_order_submit_rate="180/00:01:00", account_type=AccountType.CASH, session_policy=None):
     if importlib.metadata.version("nautilus_trader") != "2.0.0rc5":
         raise ValueError("unqualified_native_version")
     if not account_id.startswith("ALPACA-"):
         raise ValueError("account_identity_must_be_ALPACA_scoped")
-    session = NativeSession(port, symbols)
+    session = NativeSession(port, symbols, session_policy=session_policy)
 
     class DataFactory(DataClientFactory):
         @staticmethod
