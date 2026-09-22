@@ -17,35 +17,101 @@ first real qualification run; neither has one yet.
 
 ## Prerequisites
 
-Homebrew, with the pins this profile assumes:
+Homebrew, for the formulae this profile still leaves floating:
 
 ```sh
-brew install git gh uv node@24 python@3.13 ripgrep jq coreutils restic shellcheck llama.cpp
+brew install jq python@3.13 ripgrep coreutils restic shellcheck
 ```
 
-Homebrew formulae float to whatever is current at install time. Record
-`brew list --versions` in the host receipt (`evidence/receipts/adoption-<host>-<date>.json`,
-schema in [`adoption/receipt.json`](../receipt.json)) immediately after this
-step so the exact installed versions are retained, not just the formula names
-above.
+`brew install python@3.13` is not optional: a fresh Mac's `python3` is **3.9**
+from the Command Line Tools, below the Python 3.13 the `acceptance_target` in
+[`adoption/manifest.json`](../manifest.json) requires, and macOS ships no
+system Python that can satisfy it.
+
+`node`, `uv`, `gh`, `llama.cpp` and Qdrant are **no longer Homebrew formulae**
+in this draft: they are SHA-256 pinned upstream release archives installed by
+[`adoption/bootstrap-macos.sh`](../bootstrap-macos.sh) from
+[`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json), so their versions
+match the Linux profile instead of floating with the tap.
+
+Homebrew formulae that remain float to whatever is current at install time. The
+bootstrap records `brew list --versions` into
+`$ECO_INSTALL_ROOT/installed-versions.txt`; copy it into the host receipt
+(`evidence/receipts/adoption-<host>-<date>.json`, schema in
+[`adoption/receipt.json`](../receipt.json)) so the exact installed versions are
+retained, not just the formula names above.
+
+The script keeps to what a stock Mac has: `shasum -a 256` instead of
+`sha256sum`, an atomic `mkdir` lock instead of `flock`, `cd` + `pwd -P` instead
+of `realpath`, and no bash-4-only syntax, because `/bin/bash` on macOS is 3.2.
 
 ### darwin-arm64 pinned release archives
 
 These components are installed from upstream `darwin-arm64` (or `darwin-arm64`-equivalent)
 release archives rather than Homebrew, matching the archive convention in
 [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions).
-List only the upstream release asset name here; the publisher checksum/signature
-and the resulting SHA-256 are recorded on the Mac at first install, in the host
-receipt — not invented in this catalog:
+Every SHA-256 below was read from the publisher on 2026-09-22 — a checksum file,
+a `.sha256` sidecar, or (where the publisher ships neither) the GitHub release
+asset `digest` plus an independent re-hash of the downloaded asset. None was
+guessed, and none was produced on a Mac: reading a publisher checksum is
+`source_review`/independent observation, not an installation receipt. The
+machine-readable copy with each `checksum_source` and `checksum_ref` is
+[`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json).
 
-| Component | Expected darwin-arm64 asset name pattern |
-| --- | --- |
-| `gh` | `gh_<version>_macOS_arm64.zip` |
-| `uv` | `uv-aarch64-apple-darwin.tar.gz` |
-| `gitleaks` | `gitleaks_<version>_darwin_arm64.tar.gz` |
-| `syft` | `syft_<version>_darwin_arm64.tar.gz` |
-| `dagu` | `dagu_<version>_darwin_arm64.tar.gz` |
-| `qdrant` | `qdrant-aarch64-apple-darwin.tar.gz` |
+| Component | Version | Asset | SHA-256 | checksum_source |
+| --- | --- | --- | --- | --- |
+| `node` | 24.21.0 | `node-v24.21.0-darwin-arm64.tar.xz` | `6239d4cf92d864487ec8cd3615038f7b67e7f58b77b21cd2f09ea9fbd68065fe` | `publisher_checksum_file` |
+| `uv` | 0.12.17 | `uv-aarch64-apple-darwin.tar.gz` | `85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b` | `publisher_checksum_sidecar` |
+| `gh` | 2.101.0 | `gh_2.101.0_macOS_arm64.zip` | `e4303e39d8f07141c4bad4b99b01079f05029c59b27076e8fbc825c985ecdd8b` | `publisher_checksum_file` |
+| `codex` | 0.155.1 | `codex-0.155.1.tgz` | `fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66` | `npm_registry_integrity_crosscheck` |
+| `claude-code` | 2.1.278 | `claude-code-2.1.278.tgz` | `08c6dfcf3dafcfd30e09b2926c596e274f0fa20844a5801ada7f1c8e6227157e` | `npm_registry_integrity_crosscheck` |
+| `mcporter` | 0.13.13 | `mcporter-0.13.13.tgz` | `ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d` | `npm_registry_integrity_crosscheck` |
+| `context-mode` | 1.0.169 | `context-mode-1.0.169.tgz` | `09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c` | `npm_registry_integrity_crosscheck` |
+| `ai-memory` | 2.3.2 | `ai-memory-macos-aarch64.tar.gz` | `e0f07ad28938f3ed98a5feb21d11917245d77501764e0005049e7d9c1c16f28a` | `publisher_checksum_sidecar` |
+| `llama-cpp` | b11057 | `llama-b11057-bin-macos-arm64.tar.gz` | `443eadead90d44c3925b7163012430b2df4934df881cf72a4d94fc71d1380da1` | `github_release_asset_digest_plus_local_rehash` |
+| `qdrant` | 1.19.1 | `qdrant-aarch64-apple-darwin.tar.gz` | `e060209dfefc9d977ddcec48521349f505f8fd1ce21f2a3db444140870522fe4` | `github_release_asset_digest_plus_local_rehash` |
+
+Not pinned here: `socraticode` (no darwin-arm64 release archive reviewed for
+this draft — it is skipped by the bootstrap with a printed note and is not a
+`required_command` of the profile), and `gitleaks`, `syft` and `dagu`, which
+are not in the `macos-arm64-foundation` component list.
+
+Two pins are only partly covered by their hash. The `@openai/codex` and
+`@anthropic-ai/claude-code` npm tarballs are byte-identical to the Linux pins,
+but on Apple Silicon npm additionally resolves `@openai/codex-darwin-arm64` and
+`@anthropic-ai/claude-code-darwin-arm64` — the packages carrying the real
+binaries — **unpinned** at install time. Record their resolved versions and
+integrity from the host's `npm ls` output at first install.
+
+`llama-server` is a profile `required_command`, so llama.cpp is pinned rather
+than left to `brew install llama.cpp`. The macOS asset holds every executable
+in one flat directory **beside its dylibs** (observed with `tar -tzf`; there is
+no `build/bin` path in this asset), so the bootstrap installs the whole
+directory into `tools/llama-cpp-b11057` and places a wrapper script at
+`bin/llama-server` that exports `DYLD_LIBRARY_PATH` before exec'ing the real
+binary, instead of a bare symlink.
+
+## What a hosted run proves
+
+The `platform_profiles` row for `macos-arm64` names a hosted smoke job
+(`.github/workflows/adoption-bootstrap.yml`, job `bootstrap-macos`) whose status
+is `pending_first_green_run`: **no such run exists yet**, and the job itself is
+not part of this draft. When it does run green, its bounded claim is native
+operation of this script on a **GitHub-hosted macOS arm64 runner** — that the
+pinned assets download, verify against these SHA-256 values, extract and report
+versions on Apple Silicon. That is not a workstation acceptance:
+
+- A hosted runner is not this profile's target Mac; hardware, memory (24/48 GB),
+  installed Homebrew state and the user's own account are all different.
+- launchd remains unrun. No agent in the table below has been bootstrapped,
+  kickstarted or booted out on any Mac, hosted or otherwise.
+- The embedding acceptance below (port 8232, 768-dimension response, ≥ 0.99
+  cosine against a Linux reference vector) remains unrun, and a sandboxed
+  runner is exactly the context where Metal may be unavailable.
+- Native sign-in for Codex, Claude and GitHub cannot happen on a hosted runner.
+
+Until a real Mac produces a receipt, this profile stays
+`status: drafted_not_accepted` with `evidence_ref: null`.
 
 ## Embedding backend decision
 
