@@ -123,6 +123,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/landscape/hosting-practice.json",
+      "collection": "/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/landscape/native-practice.json",
       "collection": "/alternatives",
       "repository_field": "repository",
@@ -305,16 +311,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 521,
+    "repositories": 525,
     "public_star_repositories": 342,
-    "beyond_public_stars": 179,
-    "references": 1255,
+    "beyond_public_stars": 183,
+    "references": 1272,
     "repositories_by_record_type": {
       "catalog_card": 147,
       "component_record": 68,
       "legacy_candidate": 20,
       "public_star": 342,
-      "research_supplement": 199,
+      "research_supplement": 207,
       "star_review": 342
     }
   },
@@ -4193,6 +4199,29 @@
       ]
     },
     {
+      "repository": "https://github.com/docker/compose",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/13/candidates/8",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/hosting-practice.json",
+          "pointer": "/candidates/1",
+          "decision": "conditional",
+          "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/docling-project/docling",
       "aliases": [],
       "public_star": false,
@@ -5223,6 +5252,12 @@
           "evidence_level": "pinned_source_review"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/12",
+          "disposition": "conditional"
+        },
+        {
           "kind": "component_record",
           "path": "manifests/stack.json",
           "pointer": "/components/56",
@@ -5378,6 +5413,35 @@
           "pointer": "/discovery_only_leads/0",
           "decision": "discovery_only",
           "evidence_level": "list_reference_only"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/13/candidates/10",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/hosting-practice.json",
+          "pointer": "/candidates/3",
+          "decision": "conditional",
+          "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/15",
+          "disposition": "conditional"
         }
       ]
     },
@@ -6024,9 +6088,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/6/candidates/6",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -8131,6 +8202,35 @@
       ]
     },
     {
+      "repository": "https://github.com/moby/moby",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/13/candidates/7",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/3/candidates/5",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/hosting-practice.json",
+          "pointer": "/candidates/0",
+          "decision": "conditional",
+          "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/modal-labs/modal-client",
       "aliases": [],
       "public_star": false,
@@ -8160,9 +8260,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/10/candidates/8",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -9266,9 +9373,16 @@
       "record_types": [
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/2/candidates/6",
+          "disposition": "conditional"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -9468,9 +9582,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/0/candidates/5",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -9822,6 +9943,12 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/15",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/convergence-program/trading.json",
           "pointer": "/entries/4",
           "decision": "add_existing_dependency_to_catalog_and_accept_exact_parser",
@@ -10067,6 +10194,35 @@
           "pointer": "/entries/18",
           "id": "ffn",
           "decision": "alternative",
+          "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/podman-container-tools/podman",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/13/candidates/9",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/3/candidates/6",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/hosting-practice.json",
+          "pointer": "/candidates/2",
+          "decision": "conditional",
           "evidence_level": "source_review"
         }
       ]

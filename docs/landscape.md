@@ -1,4 +1,11 @@
-# Current landscape and practice decisions
+# Historical landscape and practice decisions — September 19, 2026
+
+This dated snapshot retains earlier star counts, configuration and CI boundaries.
+Use the [current grand catalog](../catalogs/landscape/README.md),
+[native skill practice](native-skill-practice-20260921.md) and
+[continuation guide](landscape-continuation.md) for current choices and next work.
+Later memory maintenance and consolidation evidence supersedes the earlier
+configuration described below; the original observations are preserved.
 
 Checked September 19, 2026 against primary upstream releases, documentation and official model publishers. The machine-readable [landscape](../manifests/landscape.json) records release dates/pins and recent model research; [candidate decisions](../manifests/candidates.json) preserve the broader alternatives.
 

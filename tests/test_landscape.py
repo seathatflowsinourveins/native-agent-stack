@@ -97,6 +97,47 @@ class LandscapeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate comparison"):
             self.build()
 
+    def test_each_selected_component_needs_a_current_role_explanation(self):
+        stack = json.loads((self.root / "stack.json").read_text())
+        stack["components"][0]["repository"] = "https://github.com/example/unexplained"
+        self.write("stack.json", stack)
+        with self.assertRaisesRegex(ValueError, "lacks a current role explanation"):
+            self.build()
+
+    def test_research_queue_requires_complete_layers_safe_evidence_and_supported_closure(self):
+        self.manifest["sources"]["research_state"] = "research.json"
+        queue = {"schema_version": 1, "checked_at": "2026-09-21", "scope": "Bounded research",
+                 "resume_order": ["Read one layer"], "guide": "guide.md",
+                 "source_inventory_refs": ["receipt.json"],
+                 "saturation": {"status": "not_established", "close_only_when": ["Frozen comparison"],
+                                "reopen_on": ["Changed requirement"]},
+                 "layers": [{"catalog": c, "layer_id": l, "status": "comparison_required",
+                             "saturation": "not_established", "next_action": "Run matched comparison",
+                             "decision_ref": path, "evidence_refs": ["receipt.json"]}
+                            for c, l, path in [("foundation", "retrieval", "foundation.json"),
+                                               ("us-equities", "data", "domain.json")]]}
+        self.write("research.json", queue)
+        data = self.build()
+        self.assertEqual(data["counts"]["research_queue_layers"], 2)
+        self.assertEqual(data["layers"][0]["research"]["next_action"], "Run matched comparison")
+        for mutation in (lambda q: q["layers"].pop(),
+                         lambda q: q["layers"].append(copy.deepcopy(q["layers"][0])),
+                         lambda q: q["layers"][0].update(decision_ref="other.json"),
+                         lambda q: q["layers"][0].update(evidence_refs=["../outside.json"]),
+                         lambda q: q["layers"][0].update(status="bounded_review_complete", saturation="bounded_review_complete"),
+                         lambda q: q["saturation"].update(status="bounded_review_complete", closure_refs=["receipt.json"])):
+            broken = copy.deepcopy(queue)
+            mutation(broken)
+            self.write("research.json", broken)
+            with self.assertRaises(ValueError):
+                self.build()
+        for item in queue["layers"]:
+            item.update(status="bounded_review_complete", saturation="bounded_review_complete",
+                        closure_refs=["receipt.json"], next_action="Monitor declared reopening trigger")
+        queue["saturation"].update(status="bounded_review_complete", closure_refs=["receipt.json"])
+        self.write("research.json", queue)
+        self.assertEqual(self.build()["research_state"]["saturation"]["status"], "bounded_review_complete")
+
     def test_unknown_repository_and_duplicate_candidate_fail(self):
         self.candidate["repository"] = "https://github.com/example/missing"
         with self.assertRaisesRegex(ValueError, "absent from canonical index"):

@@ -13,7 +13,8 @@ These adoption profiles select from the existing component catalog; they do not 
 | Adoption profile | Selects | Next native acceptance |
 | --- | --- | --- |
 | `foundation-cpu` | Codex, Claude Code, Context Mode, RTK, QMD BM25, explicitly scoped ai-memory, MCPorter | Native client setup; one useful context/document call and scoped memory retrieval |
-| `research-runtime` | Hash-locked SDK/DuckDB, native Dagu and LEAN | Accepted input → backtest → Parquet → bounded evidence packet; model task after account readiness |
+| `research-runtime` | Historical hash-locked SDK/DuckDB, Dagu and LEAN comparison lane | Reproduce the retained comparison; this profile does not override the Nautilus destination |
+| `trading-nautilus` | Selected pinned Nautilus engine and separate Alpaca boundary | Reproduce the bounded engine check; qualify SPY/LEAN parity and each broker independently |
 | `observability` | Collector, Prometheus, Loki, Grafana, Alertmanager, ntfy | Native config validation, actual task/event delivery, matching usage categories |
 | `semantic-rag` | HF, vLLM, Qdrant, SocratiCode | Hardware-compatible model serving, explicit project index and real retrieval/watcher behavior |
 | `recovery` | Restic plus selected ai-memory/Qdrant application state | Isolated restore, logical comparison, independent key/destination, then explicit consumer cutover |
@@ -92,6 +93,12 @@ Transfer public configuration templates and explicitly selected private **applic
 [Dagu hosting](../blueprints/us-equities/hosting/README.md) is the accepted manual local research lane. A user service starts only the selected local runtime; it cannot keep a stopped WSL VM running. Paid hosting, unattended schedules and broker orders remain separate operational choices. DeerFlow/ACP and OmniRoute have their own [blueprint evidence](../blueprints/us-equities/README.md); a routed text response does not prove native tools, hooks or model-session parity.
 
 ## Continue in a future session
+
+Start with the [current 20-layer research queue](../catalogs/landscape/research-state.json)
+and [continuation guide](../docs/landscape-continuation.md). They connect each
+current selection to its evidence, next useful comparison and bounded stopping
+rule. The [deployment comparison](../docs/hosting-container-practice.md) keeps
+Docker/Compose and Podman conditional on a demonstrated requirement.
 
 After the native observability services are accepted on the new host, install the
 [grand dashboard and progress emitter](../observability/grand-dashboard/README.md)

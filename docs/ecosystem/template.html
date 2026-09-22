@@ -392,6 +392,11 @@ function renderLandscape() {
     candidates.forEach(row => add(alternatives, comparisonCandidate(row))); add(card, alternatives);
     const evidence = add(make("details"), make("summary", "", "Limits, evidence and when to reconsider"));
     listLimits(evidence, layer.limitations); add(evidence, make("p", "", "Reopen when: " + layer.overturn_when)); catalogSources(evidence, layer.sources); add(card, evidence);
+    if(layer.research) {
+      const research = add(make("details"), make("summary", "", "Continue this layer"));
+      add(research, make("p", "", "Status: " + layer.research.status.replaceAll("_", " ")), make("p", "", layer.research.next_action));
+      catalogSources(research, layer.research.sources); add(card, research);
+    }
     if(layer.catalog_candidates.length) {
       const archive = add(make("details"), make("summary", "", "All recorded candidate cards · " + layer.catalog_candidates.length), make("p", "small muted", "Original dated research. Current choices are stated above; source screening and historical defaults do not establish a present-day win."));
       // Build this larger archive only when requested; the full data stays offline.
@@ -405,6 +410,11 @@ function renderLandscape() {
   const layerCount = grid.childElementCount;
   $("landscape-count").textContent = layerCount + (layerCount === 1 ? " layer · " : " layers · ") + candidateCount + " current candidate decisions shown";
   if(!layerCount) add(grid, make("p", "catalog-empty", "No comparisons match. Clear the search or choose another outcome."));
+}
+function researchStatusText(research, checkedAt) {
+  return research.saturation.status === "bounded_review_complete"
+    ? "Bounded review complete for the declared set as of " + checkedAt + "; reopening conditions still apply."
+    : "Comparative saturation remains open; each layer names its next useful action.";
 }
 function initializeLandscape() {
   if(!data.landscape) return;
@@ -420,6 +430,10 @@ function initializeLandscape() {
   if(landscape.native_practice) {
     add($("landscape-summary"), make("p", "", "Applied skills: " + landscape.native_practice.skills.map(skill=>skill.name).join(", ") + ". Native workers verify source evidence; semantic judgments remain advisory."));
     add($("landscape-actions"), recipeButton("docs/native-skill-practice-20260921.md", "Skills & native workers"), link("Skill pins and qualification ↗", landscape.native_practice.url));
+  }
+  if(landscape.research_state) {
+    add($("landscape-summary"), make("p", "", counts.explained_components + " component roles explained · " + counts.research_queue_layers + " layer continuation records. " + researchStatusText(landscape.research_state, landscape.checked_at)));
+    add($("landscape-actions"), recipeButton("docs/landscape-continuation.md", "New PC & continue research"), recipeButton("docs/hosting-container-practice.md", "Hosting & containers"), link("Research queue ↗", landscape.research_state.url));
   }
   add($("foundation-guides"), landscapeAction("foundation")); add($("trading-guides"), landscapeAction("us-equities"));
   add($("catalog-entry-points"), add(make("article", "catalog-entry"), make("div", "eyebrow", "Evidence for the selection"), make("h2", "", "Choices & alternatives"), make("p", "", "Why each layer is selected, why alternatives remain conditional, and the evidence needed to change the choice."), catalogAction("landscape","Compare the choices →")));

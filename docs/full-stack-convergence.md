@@ -1,7 +1,7 @@
 # Full-stack native practice and returned evidence
 
 The subsequent [landscape reconciliation](../catalogs/landscape/README.md) covers
-all 20 foundation/domain layers, expands the joined research index to 521
+all 20 foundation/domain layers, expands the joined research index to 525
 identities, and records the current 343-public-star snapshot. The original wave
 counts and measurements below retain their dated scope; the current HTML derives
 its totals from the canonical records.

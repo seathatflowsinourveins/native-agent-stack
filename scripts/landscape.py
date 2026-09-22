@@ -145,6 +145,58 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                            "sources": source_links, "url": file_url(path), "catalog_candidates": []})
     require(seen == expected, "comparison coverage must exactly match all foundation and domain layers")
 
+    component_coverage = []
+    for component in stack["components"]:
+        repo_id = canonical(identity(component["repository"]), aliases)
+        matched = [layer["id"] for layer in layers
+                   if any(candidate["repository_id"] == repo_id for candidate in layer["candidates"])]
+        require(bool(matched), "selected component lacks a current role explanation: " + component["id"])
+        component_coverage.append({"component_id": component["id"], "repository_id": repo_id,
+                                   "profile": component.get("profile"), "layer_ids": matched})
+
+    research = None
+    if sources.get("research_state"):
+        research = read(sources["research_state"])
+        require(research.get("schema_version") == 1 and research.get("checked_at") == manifest["checked_at"],
+                "research state schema or date differs from landscape")
+        for field in ("scope",):
+            nonempty(research.get(field), "research." + field)
+        strings(research.get("resume_order"), "research.resume_order")
+        saturation = research.get("saturation", {})
+        require(saturation.get("status") in {"not_established", "bounded_review_complete"},
+                "unknown research saturation status")
+        strings(saturation.get("close_only_when"), "research closure criteria")
+        strings(saturation.get("reopen_on"), "research reopening criteria")
+        research["sources"] = evidence(research.get("source_inventory_refs"), "research inventories")
+        research["guide_url"] = evidence([research.get("guide")], "research guide")[0]["url"]
+        queue_keys = set()
+        require(isinstance(research.get("layers"), list), "research queue needs layers")
+        for item in research["layers"]:
+            key = (item.get("catalog"), item.get("layer_id"))
+            require(key in expected and key not in queue_keys, "unknown or duplicate research layer")
+            queue_keys.add(key)
+            require(item.get("status") in {"on_requirement_change", "comparison_required", "new_host_required", "bounded_review_complete"},
+                    "unknown research queue status")
+            if item["status"] == "bounded_review_complete":
+                require(item.get("saturation") == "bounded_review_complete", "inconsistent layer closure")
+                item["closure_sources"] = evidence(item.get("closure_refs"), "layer closure")
+                require(any(not row["path"].startswith("https://") for row in item["closure_sources"]),
+                        "layer closure requires a retained local record")
+            else:
+                require(item.get("saturation") == "not_established", "open layer cannot claim closure")
+            nonempty(item.get("next_action"), "research next action")
+            require(item.get("decision_ref") == documents[key[0]], "research decision reference differs from catalog")
+            item["sources"] = evidence(item.get("evidence_refs"), "research layer")
+            next(layer for layer in layers if layer["id"] == ":".join(key))["research"] = item
+        require(queue_keys == expected, "research queue must cover every layer exactly once")
+        if saturation["status"] == "bounded_review_complete":
+            require(all(item["status"] == "bounded_review_complete" for item in research["layers"]),
+                    "overall closure requires every layer's bounded closure")
+            saturation["sources"] = evidence(saturation.get("closure_refs"), "overall closure")
+            require(any(not row["path"].startswith("https://") for row in saturation["sources"]),
+                    "overall closure requires a retained local record")
+        research["url"] = file_url(sources["research_state"])
+
     # All historical candidate cards remain visible with their original date and
     # role. They do not override the explicitly dated current comparison above.
     by_key = {(row["catalog"], row["layer_id"]): row for row in layers}
@@ -194,6 +246,7 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
               "domain_layers": len(domain_documents), "selected_components": len(stack["components"]),
               "research_repositories": len(identities), "foundation_decisions": sum(review_status.values()),
               "current_public_stars": len(star_urls),
+              "explained_components": len(component_coverage),
               "foundation_statuses": dict(sorted(review_status.items())),
               "comparison_candidates": sum(len(row["candidates"]) for row in layers),
               "historical_candidate_cards": sum(len(row["catalog_candidates"]) for row in layers),
@@ -221,7 +274,10 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
             skill["sources"] = evidence(skill.get("evidence_refs"), name)
         practice = {**practice, "url": file_url(sources["native_practice"])}
         counts["applied_skills"] = len(names)
+    if research:
+        counts["research_queue_layers"] = len(research["layers"])
     return {**manifest, "layers": layers, "counts": counts, "freshness": freshness, "native_practice": practice,
+            "research_state": research, "component_coverage": component_coverage,
             "url": file_url(manifest_path), "freshness_url": file_url(sources["freshness_snapshot"])}
 
 

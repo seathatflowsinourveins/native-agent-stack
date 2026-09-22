@@ -3248,13 +3248,13 @@
     },
     {
       "path": "README.md",
-      "sha256": "b4c8f2aa15172a9efcbba74a0d2080bbfd2563c470b9c331b710c10c3f15f193",
-      "bytes": 17007
+      "sha256": "be0bcebb6bdf59321582f3edc493dd3539c184e77a33c25501da70177aa7a605",
+      "bytes": 17466
     },
     {
       "path": "adoption/README.md",
-      "bytes": 11211,
-      "sha256": "b41db891b63e31169d73735e1dae1e9c00fd70b45b2f457a1743d3ce614a68e5"
+      "bytes": 11795,
+      "sha256": "470b430732ac8813b7c6c119db683401398d10f98914bb41441d713427290277"
     },
     {
       "path": "adoption/host-state.example.json",
@@ -3268,8 +3268,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "bytes": 15169,
-      "sha256": "f0376f625debc71b74f436c5f7d2f312b80bb3ab9adb3e212ddc787ec79557cd"
+      "bytes": 15925,
+      "sha256": "adc0c6a3c58dc0daf8c1c29061b349ca0ffd62b17950b4d6c31a7e9f63c34a76"
     },
     {
       "path": "adoption/paired/README.md",
@@ -3338,8 +3338,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "3ae1a89cc8c3fa5034216d69ce100c1efed4a63e9e13f97ce18b0fa6e3dcac20",
-      "bytes": 8547
+      "sha256": "9116102ebb4df576139194178d8e901d2088d7fa0629af4f1b9bf455bf65dccd",
+      "bytes": 9104
     },
     {
       "path": "blueprints/convergence-practice/README.md",
@@ -4699,8 +4699,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "bytes": 459835,
-      "sha256": "fb63fa45b7a5d647f67f6b48d193d21a374dbe161f31ff5c4ad65987e1f3d59e"
+      "bytes": 459848,
+      "sha256": "3ef23c01d96a03dcd2b23a3b2e48302af76a29c8ce556a7781ec1ca4d4bf0558"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -6134,8 +6134,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "6bc96f96bc853b3c2a76c4ad4c9c0bcf60ba32dfdede6521660684bea18b298f",
-      "bytes": 435537
+      "sha256": "20d3d0e8a6e124d712c3450f40eec6a34f4c2f7e1d939eac33052c8933f7430d",
+      "bytes": 440331
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -6179,7 +6179,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "0c30644d5ac1009157d27d0c1ba0832c3466055b88f331e789adc79d40c95b26",
+      "sha256": "b84057b9d84f88497566cf6fe8b7c0acb300d661c649d1b48d6b1a48b3a2227e",
       "bytes": 3112
     },
     {
@@ -6294,13 +6294,13 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "e343543564d022c5d060851a2c279c46c7e38f8331e5677c5c2dfc801d2a4d71",
-      "bytes": 11307
+      "sha256": "6a22963b1c59875437bd91619aea8c96b900081c809ebac9a1ba6c22f3de90d1",
+      "bytes": 12079
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 8919170,
-      "sha256": "5802a09184778a65230b74136f99bdadc4773fc1877cb39dc25bdcd1fe573a5b"
+      "bytes": 9013830,
+      "sha256": "abf9e09a00fd8fe2a8cb7de4581a71e2bbb9ba9b6c32f4ec2077ddd369370870"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6329,8 +6329,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "bytes": 97949,
-      "sha256": "36fcf2be68fe6426c93cd3557c6e32ef7f740908cb095bc12322cd33b1b76eab"
+      "bytes": 100870,
+      "sha256": "62f13ccfec4ba4415713919d896d224041f94428e792a1124116cff524adeb59"
     },
     {
       "path": "docs/evidence.md",
@@ -6344,8 +6344,8 @@
     },
     {
       "path": "docs/landscape.md",
-      "sha256": "b089e3876b24ef32ee806ddf057c6712a8ceb9cbc069add3b6b9976e9db6a312",
-      "bytes": 9038
+      "sha256": "3d6595b91ec6a935b0d7222399248ae1165b4e196e5a1ad3d6a778d0ce162d41",
+      "bytes": 9506
     },
     {
       "path": "docs/native-token-ci.md",
@@ -7004,8 +7004,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "bytes": 42417,
-      "sha256": "9c7dc3826b68c3121ad7ebb3ee61e4c0ddbcb38f0cbeab86a7de16179be9e9fc"
+      "bytes": 42685,
+      "sha256": "51a3fe6c50d27607df1f7e2c412e11a0748e0d865caed258e8addb6b86da32dc"
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -7049,8 +7049,8 @@
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "0b12322b7faa4bed1aa78c5d06e79e0068cb7f4f79db7326f5b17c2aa118160b",
-      "bytes": 4143
+      "sha256": "38e9fbb77fa0262622c9e06c248c1dd9baaab4b1bf69760bcb301e8347aaed9f",
+      "bytes": 4374
     },
     {
       "path": "tests/test_adoption_status.py",
@@ -7114,8 +7114,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "386cb42e21a39607ca68b3cbc66b2396ab4255e845e1e5b75a796cd86aba4793",
-      "bytes": 45979
+      "sha256": "619246bc4bf37f4fc87b31cf462265e67756de1613d11c875cbd92ea93b97a5c",
+      "bytes": 50272
     },
     {
       "path": "tests/test_execution_realism.py",
@@ -9135,7 +9135,7 @@
     {
       "path": "docs/full-stack-convergence.md",
       "bytes": 11390,
-      "sha256": "89544e1cf00451e1d4e76f405dad7274953b49f34512f5e74b726c3de46c2be9"
+      "sha256": "66ea0e9da015a420c4a189feaacfbd49e359852b7bed191f4b69729c53a87944"
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/agentsview-aggregate-safe.png",
@@ -9769,18 +9769,18 @@
     },
     {
       "path": "catalogs/landscape/README.md",
-      "sha256": "3451ba6af356238ba9266b6c012b530e6683b4a768768a2e55ff72a7ebddd828",
-      "bytes": 4495
+      "sha256": "3a90a6c04a039fa6dd48c8a3116c31074e8386f0212443d927f64b81e1034c36",
+      "bytes": 4933
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "68338f406976cfabe95146be78c4e201e40ca0466d686a192c37d38804721e01",
-      "bytes": 69596
+      "sha256": "196c8dcbc77272b1fcb91cb459e1124c4bc0ab0d15dee0e9c307c8a9712f5010",
+      "bytes": 74930
     },
     {
       "path": "catalogs/landscape/manifest.json",
-      "sha256": "569f5c2e6ee7428f41c8add52420aaa4a6a2b858a1ffad6409951db9c54d8806",
-      "bytes": 2310
+      "sha256": "35212896482dbbff457b7bdb271fa3056912cb44ffbe9768581bc4d6019226c8",
+      "bytes": 2538
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -9789,8 +9789,8 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "7dda998cbee95bb9067e52f511f7650c1c32c1ea5cce2ed7ff14e7082b6773bc",
-      "bytes": 49539
+      "sha256": "bf212503dc1975935dbb12a82a92c8298a669c9de7b1c529e839402dfacf8a6e",
+      "bytes": 47116
     },
     {
       "path": "docs/landscape-domain-notes.md",
@@ -9814,13 +9814,13 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "10fc87922898eef7dd5458a8a3c95c7903127d090e87d1cdd20178cfe472a78d",
-      "bytes": 14018
+      "sha256": "b087b4227c22d71d08aae33cb0297693fdbb492664835b9a618e7024666443e9",
+      "bytes": 17984
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "a4ec190d1c6762be69a1f33ea74d637ddee067d775852a2f88c67cc758ff51e8",
-      "bytes": 12232
+      "sha256": "3bd1ee2c9e1c9784aa39bc9623a618565633fe4e103922a4c4f9b9d7758a75cd",
+      "bytes": 15143
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
@@ -9896,6 +9896,31 @@
       "path": "examples/codex-native/agents/semantic-evidence-reviewer.toml",
       "sha256": "e9112b0f4cf0cce038245a8cc9d138e0d11d0f2650d6964383bd46c8ace9e9db",
       "bytes": 1557
+    },
+    {
+      "path": "catalogs/landscape/hosting-practice.json",
+      "sha256": "00d51484a4984fe8fdbde06fc262d318b600137494e46f532c8a4b410f300e43",
+      "bytes": 5456
+    },
+    {
+      "path": "catalogs/landscape/research-state.json",
+      "sha256": "d77c74140690de0c54dc36abf8caa2f2b9d3ce1416d5547235d3e900a490cfa9",
+      "bytes": 14185
+    },
+    {
+      "path": "docs/hosting-container-practice.md",
+      "sha256": "9f51559140b9f43c55204103d3ab2f0788fa7d294ef89e1255d848f9dfedafbc",
+      "bytes": 3607
+    },
+    {
+      "path": "docs/landscape-continuation.md",
+      "sha256": "535f1275cdee442758fac58173f78ce144ecb60d25709cd2826d02db4d740862",
+      "bytes": 6067
+    },
+    {
+      "path": "docs/tasks/2026-09-21-catalog-continuity-and-entrypoint.md",
+      "sha256": "403280495ca0099d105892c99cf203ee601d0263f63f791792bc6172508ef1f3",
+      "bytes": 6221
     }
   ],
   "convergence_records": [

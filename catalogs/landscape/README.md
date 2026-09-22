@@ -5,6 +5,13 @@ the requirement, current choice, named competitors, evidence and reopening
 condition in **all 16 foundation layers and all four domain research layers**.
 Download its combined JSON from the page, or start with [manifest.json](manifest.json).
 
+Each selected component has an explicit current role explanation. Every layer
+also has a [research continuation record](research-state.json): its next useful
+comparison, evidence and requirement trigger. Use the
+[new-PC/session guide](../../docs/landscape-continuation.md) and
+[hosting/container comparison](../../docs/hosting-container-practice.md) when
+those boundaries apply. A complete index is distinct from comparative saturation.
+
 The current comparison joins [foundation.json](foundation.json) and
 [us-equities.json](us-equities.json). The existing 152 domain candidate cards
 remain available in each corresponding layer with their original dates, pins,

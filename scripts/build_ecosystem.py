@@ -57,6 +57,7 @@ PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
 NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
                     "docs/native-skill-practice-20260921.md",
+                    "docs/hosting-container-practice.md", "docs/landscape-continuation.md",
                     "docs/token-native-saturation.md", "catalogs/us-equities/README.md",
                     "catalogs/us-equities/decision-index.json", "catalogs/us-equities/manifest.json",
                     "docs/claude-upstream-checks.md", "docs/ecosystem/claude-upstream-checks.html",
@@ -498,6 +499,8 @@ def build_data(root):
                             "docs/landscape-domain-notes.md", "docs/landscape-freshness-notes.md"])
         if landscape_manifest["sources"].get("native_practice"):
             guide_paths.extend(["docs/native-skill-practice-20260921.md", "blueprints/native-skill-practice/README.md"])
+        if landscape_manifest["sources"].get("research_state"):
+            guide_paths.extend(["docs/landscape-continuation.md", "docs/hosting-container-practice.md"])
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
     recipes = []
     for path in documents_to_embed:

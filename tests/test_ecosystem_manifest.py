@@ -160,6 +160,20 @@ class EcosystemManifestTests(unittest.TestCase):
         self.assertEqual(data["counts"]["stars"], 1)
 
     @unittest.skipUnless(shutil.which("node"), "JavaScript startup regression needs Node")
+    def test_research_summary_distinguishes_open_and_bounded_closed_review(self):
+        template = (ROOT / "docs/ecosystem/template.html").read_text()
+        script = re.search(r"function researchStatusText\(.*?^}", template, re.S | re.M).group(0)
+        script += '\nconsole.log(JSON.stringify(["not_established", "bounded_review_complete"].map(status => researchStatusText({saturation: {status}}, "2026-09-21"))));'
+        result = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        opened, closed = json.loads(result.stdout)
+        self.assertIn("remains open", opened)
+        self.assertIn("Bounded review complete", closed)
+        self.assertIn("2026-09-21", closed)
+        self.assertIn("reopening conditions", closed)
+        self.assertNotIn("remains open", closed)
+
+    @unittest.skipUnless(shutil.which("node"), "JavaScript startup regression needs Node")
     def test_template_and_failed_generated_startup_offer_recovery_without_navigation(self):
         """Execute the real startup script; native-browser checks cover complete rendering."""
         template = (ROOT / "docs/ecosystem/template.html").read_text()

@@ -17,7 +17,8 @@
     "repository_index": "catalogs/us-equities/decision-index.json",
     "selected_manifest": "manifests/stack.json",
     "freshness_snapshot": "catalogs/landscape/upstream-snapshot.json",
-    "native_practice": "catalogs/landscape/native-practice.json"
+    "native_practice": "catalogs/landscape/native-practice.json",
+    "research_state": "catalogs/landscape/research-state.json"
   },
   "rules": [
     "Selected means the supported choice for the stated task and scope; it does not mean universal benchmark winner.",
@@ -26,6 +27,7 @@
     "A current release or repository activity check does not supersede an accepted pin without a relevant compatibility or improvement result.",
     "The current layer decision takes precedence over historical candidate-card recommendations. Historical dates, failures and original source pins remain visible.",
     "Counts are derived from canonical records. Metadata coverage, receipt integrity and reviewer agreement do not prove performance superiority.",
+    "The canonical index public_star flag describes the historical baseline ledger; current membership and the HTML star filter use the dated freshness snapshot.",
     "Reopen a selection when its stated overturning comparison meets the requirement; retain competitive alternatives until then."
   ]
 }
