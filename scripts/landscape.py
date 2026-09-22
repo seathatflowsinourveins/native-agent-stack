@@ -171,6 +171,8 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         evidence_maybe_empty(alternative.get("evidence_refs"), str(key) + ".alternative.evidence_refs")
         require(alternative.get("source") in ALTERNATIVE_SOURCES, str(key) + ".alternative.source is unknown")
 
+    verdict_overturn_when = row.get("verdict_overturn_when", "")
+    require(isinstance(verdict_overturn_when, str), str(key) + ".verdict_overturn_when must be text")
     status = row["verdict_status"]
     if status == "recorded":
         require(bool(winners), str(key) + " recorded verdict needs at least one winner")
@@ -178,8 +180,10 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         for winner in winners:
             require(winner.get("why_selected") not in why_not_defaults,
                     str(key) + ".winner.why_selected must differ from every alternative's why_not_default")
-        require(any(marker in row.get("overturn_when", "") for marker in OVERTURN_MARKERS),
-                str(key) + ".overturn_when must name a fixture/blueprint/test path or a runnable command "
+        # The v1 ``overturn_when`` belongs to the dated review that the quality
+        # comparison mirrors; a recorded verdict carries its own condition.
+        require(any(marker in verdict_overturn_when for marker in OVERTURN_MARKERS),
+                str(key) + ".verdict_overturn_when must name a fixture/blueprint/test path or a runnable command "
                            "for a recorded verdict")
     elif status == "no_selection":
         require(bool(open_gaps), str(key) + " no_selection verdict needs open_gaps")
