@@ -1,0 +1,164 @@
+name: Catalog freshness (report-only)
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      max_repos:
+        description: 'Bound the GitHub freshness fetch to the first N pending repositories (0 = no bound).'
+        type: number
+        default: 0
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  freshness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Extract deterministic working files (no network)
+        run: |
+          mkdir -p "$RUNNER_TEMP/freshness"
+          python3 tools/sota-convergence/extract_layers.py --repo-root . --out "$RUNNER_TEMP/freshness"
+      - name: Fetch authenticated GitHub freshness metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MAX_REPOS: ${{ inputs.max_repos || 0 }}
+        run: |
+          max_repos_args=()
+          if [[ "$MAX_REPOS" =~ ^[0-9]+$ ]] && [ "$MAX_REPOS" -gt 0 ]; then
+            max_repos_args=(--max-repos "$MAX_REPOS")
+          fi
+          python3 tools/sota-convergence/github_freshness.py \
+            --work-dir "$RUNNER_TEMP/freshness" --workers 6 "${max_repos_args[@]}"
+      - name: Rebuild the dated manifest for a bounded freshness check
+        run: |
+          # A scheduled freshness run reuses the catalogs' existing selections and
+          # skips the interactive lane review (recipes/sota-convergence-practice.md,
+          # "Monthly ... skip a full lane re-review if no selection changed"). The
+          # pin-vs-upstream baseline build_manifest.py computes comes directly from
+          # foundation-layers.json/trading-by-layer.json/github-freshness.json, not
+          # from lanes.json, so an empty lanes record adds zero lane-proposed
+          # candidates while still recomputing the real baseline drift.
+          printf '{"lanes": [], "critic": null, "lost": []}\n' > "$RUNNER_TEMP/freshness/lanes.json"
+          python3 tools/sota-convergence/build_manifest.py \
+            --work-dir "$RUNNER_TEMP/freshness" --lanes "$RUNNER_TEMP/freshness/lanes.json" \
+            --out "$RUNNER_TEMP/freshness/manifest-$(date -u +%Y%m%d).json" \
+            --checked-at "$(date -u +%Y-%m-%d)" --id "catalog-freshness-$(date -u +%Y%m%d)"
+      - name: Diff the rebuilt manifest against the published pins/upstream
+        run: |
+          python3 - "$RUNNER_TEMP/freshness" <<'PYEOF'
+          import glob, json, sys
+          from pathlib import Path
+
+          work_dir = Path(sys.argv[1])
+          rebuilt_path = sorted(work_dir.glob("manifest-*.json"))[-1]
+          rebuilt = json.loads(rebuilt_path.read_text())
+          published_path = Path("catalogs/sota-convergence/manifest-20260922.json")
+          published = json.loads(published_path.read_text())
+
+          def rows(manifest):
+              out = {}
+              for group in manifest.get("foundation", []):
+                  for c in group.get("components", []):
+                      out[c["id"]] = c
+              for group in manifest.get("trading", []):
+                  for c in group.get("entries", []):
+                      out[c["id"]] = c
+              return out
+
+          old_rows, new_rows = rows(published), rows(rebuilt)
+          drifted = []
+          for component_id, new in sorted(new_rows.items()):
+              old = old_rows.get(component_id)
+              if old is None:
+                  continue
+              old_latest = (old.get("upstream") or {}).get("latest")
+              new_latest = (new.get("upstream") or {}).get("latest")
+              if old.get("pin") != new.get("pin") or old_latest != new_latest \
+                      or old.get("pin_behind_upstream") != new.get("pin_behind_upstream"):
+                  drifted.append((component_id, old.get("pin"), new.get("pin"),
+                                   old_latest, new_latest,
+                                   old.get("pin_behind_upstream"), new.get("pin_behind_upstream")))
+
+          lines = ["# Catalog freshness drift",
+                   "",
+                   f"Published manifest: `{published_path}` (counts: {published.get('counts')})",
+                   f"Rebuilt manifest: `{rebuilt_path.name}` (counts: {rebuilt.get('counts')})",
+                   "",
+                   "This is a report-only diff; it never writes to the repository or opens an issue.",
+                   ""]
+          if drifted:
+              lines += ["| id | pin (published) | pin (fresh) | upstream latest (published) | upstream latest (fresh) | behind (published) | behind (fresh) |",
+                        "| --- | --- | --- | --- | --- | --- | --- |"]
+              for row in drifted:
+                  lines.append("| " + " | ".join(str(v) for v in row) + " |")
+          else:
+              lines.append("No pin/upstream drift detected for components present in both manifests.")
+          drift_md = work_dir / "drift.md"
+          drift_md.write_text("\n".join(lines) + "\n")
+          print(drift_md.read_text())
+          PYEOF
+      - name: Append the fixed CI-tool pin-drift table
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "## Fixed CI-tool pin drift"
+            echo ""
+            echo "| tool | pinned version | latest upstream release |"
+            echo "| --- | --- | --- |"
+            for spec in \
+              "actionlint|rhysd/actionlint|1.7.12" \
+              "gitleaks|gitleaks/gitleaks|8.30.1" \
+              "syft|anchore/syft|1.52.0" \
+              "zizmor|zizmorcore/zizmor|1.30.1" \
+              "nautilus_trader|nautechsystems/nautilus_trader|2.0.0rc5"; do
+              IFS='|' read -r name repo pinned <<<"$spec"
+              latest=$(gh api "repos/$repo/releases/latest" --jq '.tag_name' 2>/dev/null || echo "unavailable")
+              echo "| $name | $pinned | $latest |"
+            done
+            echo ""
+            cat "$RUNNER_TEMP/freshness/drift.md"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Validate manifests and evidence integrity
+        run: python3 scripts/validate.py
+      - name: Validate catalog evidence and coverage joins
+        run: python3 scripts/validate_catalogs.py
+      - name: Validate general foundation capability claims
+        run: python3 scripts/validate_foundation.py --root . --json
+      - name: Validate landscape choices and alternative evidence
+        run: python3 scripts/landscape.py --root .
+      - name: Validate declared convergence evidence and scope
+        run: >-
+          python3 scripts/validate_convergence.py
+          --all-recorded --root . --json
+      - name: Run project test suite
+        run: python3 -m unittest
+      - name: Retain the rebuilt manifest and drift report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: catalog-freshness-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/freshness/manifest-*.json
+            ${{ runner.temp }}/freshness/github-freshness.json
+            ${{ runner.temp }}/freshness/drift.md
+          if-no-files-found: error
+          include-hidden-files: false
+          retention-days: 30
