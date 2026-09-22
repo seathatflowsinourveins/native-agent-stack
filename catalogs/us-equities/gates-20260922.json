@@ -157,7 +157,7 @@
       "flip_condition": {
         "type": "exists"
       },
-      "note": "Bars downloaded on 2026-09-21 do not prove what was published at each historical close; the one 2026 dataset found is survivorship-selected by construction. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit."
+      "note": "Partial evidence, qualified 2026-09-22 by independent review (status unchanged): evidence/receipts/pit-availability.json (plan not preregistered; plan.json history). EDGAR acceptanceDateTime present on all 3,488 counted filings of 20 currently listed symbols (UTC reading checked on three 2026 filings); 16:00-17:30 ET share 63.9% of 8-Ks and 60.9% of 10-Ks. XOM and DKNG are ticker-to-CIK identity breaks, excluded and probed separately. Alpaca news filtered on created_at; provider updated_at later than created_at on most recent items. Raw bars are today's download, not vintages. Remaining: date-correct ticker-to-CIK mapping, delisted names, and a dated or archived as-published price source. Bars downloaded on 2026-09-21 do not prove what was published at each historical close; the one 2026 dataset found is survivorship-selected by construction. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit."
     },
     {
       "id": "databento-arm-b",
