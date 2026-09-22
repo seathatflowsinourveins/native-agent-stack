@@ -414,20 +414,26 @@
   "promotion_gate_completeness": {
     "recorded_at_utc": "2026-09-22T23:05:00Z",
     "evidence_class": "SYN",
-    "summary": "The paper preflight's promotion-gate check now requires the result's checks to name every promotion_gate.CHECK_NAMES entry exactly once (no missing, extra, unnamed or duplicate checks), a non-empty versions object and an ISO-8601 checked_at; otherwise promotion_gate_incomplete. Closes a blind Codex review finding on #64 (reported by peer finalize-llm-harness-catalogs): a result with checks=[{status:'pass'}], row_count=1, versions=null, checked_at=null and a matching header-only CSV hash previously passed.",
+    "summary": "The paper preflight's promotion-gate check now requires: checks naming every promotion_gate.CHECK_NAMES entry exactly once with string names (no missing, extra, unnamed, non-string or duplicate checks); a non-empty versions object of non-empty strings; a timezone-aware ISO-8601 date-time checked_at; and, for a .csv snapshot, row_count equal to the file's data rows. A gate 'unmapped_failures' entry raises promotion_gate_unmapped_failures. Closes a blind Codex review finding on #64 (relayed by peer finalize-llm-harness-catalogs): a result with checks=[{status:'pass'}], row_count=1, versions=null, checked_at=null and a matching header-only CSV hash previously passed.",
     "tests": [
       "test_complete_gate_result_is_accepted",
       "test_gate_result_without_the_named_checks_is_incomplete",
       "test_gate_result_missing_one_named_check_is_incomplete",
       "test_gate_result_with_duplicate_or_unknown_check_is_incomplete",
+      "test_non_string_check_name_is_refused_cleanly",
       "test_null_or_empty_versions_and_checked_at_are_incomplete",
+      "test_naive_or_date_only_checked_at_and_empty_versions_are_incomplete",
+      "test_csv_row_count_must_match_the_snapshot_rows",
+      "test_unmapped_failures_entry_is_reported_as_such",
       "test_runner_check_names_match_the_gate_module"
     ],
-    "mutation_check": "with the name-set guard removed, 3 of the new tests fail (missing, duplicate and unknown check cases); the reproduction case is additionally caught by the null-versions guard",
-    "real_input_check": "the 2026-09-22 real SIP snapshot gate result (480 rows, 12/12 checks) and the good fixture are still accepted",
+    "mutation_check": "name-set guard removed: 3 test methods fail (4 cases: missing check; duplicate and unknown check subtests; non-string name); CSV row binding removed: test_csv_row_count_must_match_the_snapshot_rows fails; the blind reproduction is additionally caught by the null-versions guard",
+    "real_input_check": "the 2026-09-22 real SIP snapshot gate result (480 rows, 12/12 checks) and fixtures/good-gate-result.json are accepted; fixtures/null-price-cell-gate-result.json raises promotion_gate_unmapped_failures",
     "files": {
-      "blueprints/us-equities/adaptive-paper/runner.py": "2147f700348ad9aa60e6149e84ade308ee90c11031321137f60e856560badb46",
-      "tests/test_adaptive_paper_runner.py": "570e88c28ff7ad5b8ba2d96c79641cb605a56f1540047afeaa2644c0c2110ce0"
-    }
+      "blueprints/us-equities/adaptive-paper/runner.py": "eef060cb5454a426a8e33805f9c5dc4505983cb78020bdbc6b281eb2d771fe8d",
+      "tests/test_adaptive_paper_runner.py": "fd0832673b12777442c4eabdd5098ff242ab5d662418a3fad63fc06082729fb7"
+    },
+    "limits": "parquet snapshots are hash-bound but their row_count is not re-counted (no parquet reader in this runtime); checked_at age is not bounded",
+    "review": "independent review of eb2e9c8: no fail-open; follow-ups applied (non-string name TypeError, naive/date-only checked_at, version value types, CSV row_count binding, unmapped_failures diagnostic)"
   }
 }

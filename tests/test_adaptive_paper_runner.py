@@ -860,7 +860,7 @@ def _paper_ready_config(symbols=("SPY",)):
             "sessions": {"extended_hours": False, "overnight_holds": False, "overnight_gross_multiple": "1.0"}}
 
 
-def _full_gate_result(*, status="pass", row_count=4, checks_status="pass", input_sha256=None):
+def _full_gate_result(*, status="pass", row_count=1, checks_status="pass", input_sha256=None):
     """A gate-result.json body with the full contract `_check_promotion_gate`
     now requires (status, input_sha256, row_count, checks, versions,
     checked_at) -- shaped like a real `promotion_gate.py` output, not the
@@ -934,6 +934,34 @@ class PromotionGatePreflight(unittest.TestCase):
             with self.subTest(extra=extra["name"]):
                 with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_incomplete"):
                     self._call(gate_result_path=self._write_raw_gate(body), snapshot_path=self.snapshot)
+
+    def test_non_string_check_name_is_refused_cleanly(self):
+        body = _full_gate_result(input_sha256=self.snapshot_hash)
+        body["checks"][0] = {"name": ["rows_present"], "status": "pass"}
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_incomplete"):
+            self._call(gate_result_path=self._write_raw_gate(body), snapshot_path=self.snapshot)
+
+    def test_naive_or_date_only_checked_at_and_empty_versions_are_incomplete(self):
+        for field, value in (("checked_at", "2026-09-22"), ("checked_at", "20260922"),
+                             ("checked_at", "2026-09-22T10:00:00"), ("versions", {"pandera": None}),
+                             ("versions", {"pandera": ""})):
+            body = _full_gate_result(input_sha256=self.snapshot_hash)
+            body[field] = value
+            with self.subTest(field=field, value=value):
+                with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_incomplete"):
+                    self._call(gate_result_path=self._write_raw_gate(body), snapshot_path=self.snapshot)
+
+    def test_csv_row_count_must_match_the_snapshot_rows(self):
+        gate_path = self._write_gate(input_sha256=self.snapshot_hash, row_count=4)
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_mismatch"):
+            self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+
+    def test_unmapped_failures_entry_is_reported_as_such(self):
+        body = _full_gate_result(input_sha256=self.snapshot_hash, status="fail")
+        body["checks"].append({"name": "unmapped_failures", "status": "fail",
+                               "detail": "unrecognized pandera check identifiers ['not_nullable']"})
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_unmapped_failures"):
+            self._call(gate_result_path=self._write_raw_gate(body), snapshot_path=self.snapshot)
 
     def test_null_or_empty_versions_and_checked_at_are_incomplete(self):
         for field, value in (("versions", None), ("versions", {}), ("checked_at", None),
