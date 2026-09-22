@@ -6446,8 +6446,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 8147709,
-      "sha256": "f0fdac5b9de94f6dc7232c8c5768826f312df0a92ac406d326cace0ed186fc24"
+      "bytes": 8148023,
+      "sha256": "b549dd4e6edb87e4564be4ce33760403a120c3a297748c37417e01e389c18a07"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7121,8 +7121,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "bytes": 10097,
-      "sha256": "670dcb911499a570229f1ba4193d9d2d6c25f5c430828cb810aa224e51368c10"
+      "bytes": 10537,
+      "sha256": "79d93fb0a2cf83e638099fb90f950a0e087b22e697d903830862b5bf972ef42b"
     },
     {
       "path": "observability/receipt.json",
@@ -7141,8 +7141,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "e2ff79e118781eb3cda801d6f66f7fe69a4e46c90677bba1e7043f1df8a38cfc",
-      "bytes": 56483
+      "bytes": 56791,
+      "sha256": "f9311acde90fac0e71aafff9f564421d2201b28814d3d3fab552a4e9136425de"
     },
     {
       "path": "scripts/adoption_status.py",
@@ -10383,6 +10383,41 @@
       "path": "catalogs/sota-convergence/README.md",
       "bytes": 14331,
       "sha256": "bca0848070ec5498bd520d763b435e66b9ec3be24bf355b1fa7cc272d437a503"
+    },
+    {
+      "path": "recipes/sota-convergence-practice.md",
+      "bytes": 5989,
+      "sha256": "dde3071479f1cd1bc911ccbf2727e020c867408b2dfd283edff6a526c10e5cb9"
+    },
+    {
+      "path": "tools/sota-convergence/README.md",
+      "bytes": 9204,
+      "sha256": "1bf13e0e43108670f16d1a901785d443709b3afdb8e5807a72d27f3b92b6bd33"
+    },
+    {
+      "path": "tools/sota-convergence/extract_layers.py",
+      "bytes": 11159,
+      "sha256": "fdf467de78339e320cb124371ebeda135de16c6253f04fd1214cac6c7715e08d"
+    },
+    {
+      "path": "tools/sota-convergence/github_freshness.py",
+      "bytes": 9176,
+      "sha256": "6a58434fa29c7230cda19f78e27097fbd0ca06f336074b923b0e4488affbefd6"
+    },
+    {
+      "path": "tools/sota-convergence/build_manifest.py",
+      "bytes": 25710,
+      "sha256": "aa76596b9ff19aa02b03d4c77639d6239c6291f07acb0ec1178747744afdce51"
+    },
+    {
+      "path": "tools/sota-convergence/reconciliations-20260922.json",
+      "bytes": 1882,
+      "sha256": "c076e3fedf658b195af08b75c2887b80bb9ee8cdf80b12b35dadfeadf72ae3ea"
+    },
+    {
+      "path": "tests/test_sota_convergence.py",
+      "bytes": 27351,
+      "sha256": "524cda6158a9378c673d50817ffb84943f37881a4bd3cc99f68c68e7553d6e39"
     }
   ],
   "convergence_records": [
