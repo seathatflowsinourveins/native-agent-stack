@@ -413,6 +413,69 @@ class SchemaAndPromptConsistencyTests(unittest.TestCase):
         self.assertIn("claude lane", formatted)
 
 
+
+class ManifestTradingCandidatesTests(LanePacketsFixture):
+    """--trading-candidates manifest builds us-equities candidates from the sota manifest's
+    own layer entries, with evidence from their domain catalog cards."""
+
+    def setUp(self):
+        super().setUp()
+        manifest = self.read("catalogs/sota-convergence/manifest-20260922.json")
+        layer = manifest["trading"][0]
+        layer["entries"].append({"id": "data-two", "repository": "https://github.com/acme/data-one",
+                                 "pin": "3.1.0", "upstream": None, "pin_behind_upstream": False,
+                                 "review_status": "not_individually_reviewed"})
+        layer["candidates"] = [{"repository": "https://github.com/acme/newcomer",
+                                "demonstrated_gap": "names the gap but demonstrates nothing"}]
+        layer["alternatives_keep_but_compare"] = []
+        self.write("catalogs/sota-convergence/manifest-20260922.json", manifest)
+        self.write("docs/card-evidence.md", "card evidence")
+        cards = {"entries": [
+            {"id": "data-one", "repository": "https://github.com/acme/data-one", "decision": "default",
+             "evidence_level": "native_proven", "evidence_refs": ["docs/card-evidence.md"],
+             "role": "Reads the market data", "limitations": ["Same host only"],
+             "rationale": "INCUMBENT RATIONALE MUST NOT APPEAR"},
+            {"id": "data-two", "repository": "https://github.com/acme/data-one", "decision": "rejected",
+             "evidence_level": "source_review", "evidence_refs": [], "role": "Second card, same repository",
+             "limitations": [], "rationale": "INCUMBENT RATIONALE MUST NOT APPEAR"},
+        ]}
+        for relative in lane_packets.TRADING_CARD_FILES:
+            self.write(relative, {"entries": []})
+        self.write(lane_packets.TRADING_CARD_FILES[0], cards)
+
+    def manifest_packet(self):
+        return self.packet("us-equities", "layer-b", self.build(trading_candidates="manifest"))
+
+    def test_candidates_are_the_manifest_layer_entries_plus_newcomers(self):
+        packet = self.manifest_packet()
+        by_component = {c["component_id"]: c for c in packet["candidates"]}
+        self.assertEqual(set(by_component), {"data-one", "data-two", None})
+        self.assertTrue(by_component["data-one"]["adopted"])
+        self.assertFalse(by_component["data-two"]["adopted"], "a card decision outside default/conditional is not adopted")
+        self.assertEqual(by_component["data-one"]["evidence_refs"], ["docs/card-evidence.md"])
+        self.assertEqual(by_component["data-one"]["pin"], "3.0.0")
+        self.assertEqual(by_component["data-two"]["pin"], "3.1.0", "two entries sharing a repository keep their own ids and pins")
+        newcomer = by_component[None]
+        self.assertFalse(newcomer["adopted"])
+        self.assertEqual(newcomer["note"], "names the gap but demonstrates nothing")
+        self.assertEqual(packet["candidate_source"], lane_packets.MANIFEST_CANDIDATE_SOURCE)
+
+    def test_card_rationale_and_decision_are_withheld(self):
+        packet = self.manifest_packet()
+        text = json.dumps(packet)
+        self.assertNotIn("INCUMBENT RATIONALE MUST NOT APPEAR", text)
+        self.assertNotIn('"decision"', json.dumps(packet["candidates"]))
+        self.assertIn("candidates[].card_rationale", packet["withheld"])
+
+    def test_foundation_packets_and_ledger_mode_are_unchanged(self):
+        ledger = self.build()
+        manifest = self.build(trading_candidates="manifest")
+        self.assertEqual(ledger["foundation__layer-a.json"], manifest["foundation__layer-a.json"])
+        self.assertNotIn("candidate_source", json.loads(ledger["us-equities__layer-b.json"]))
+
+    def test_manifest_mode_is_deterministic(self):
+        self.assertEqual(self.build(trading_candidates="manifest"), self.build(trading_candidates="manifest"))
+
 if __name__ == "__main__":
     unittest.main()
 

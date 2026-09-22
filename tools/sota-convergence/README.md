@@ -506,6 +506,17 @@ evidence rather than copying the existing selection, and writes one packet
 per `(catalog, layer_id)` to `<work_dir>/packets/<catalog>__<layer_id>.json`
 plus a `<work_dir>/packets/SHA256SUMS` (`sha256sum` format).
 
+**Layer-specific trading candidates** (`--trading-candidates manifest`). The trading
+ledger rows carry four group-wide candidate lists (one per domain card), so sibling layers
+chose from identical candidates and several 2026-09-22 verdicts named tools that are not the
+layer's own. In manifest mode each us-equities packet instead holds the sota manifest's own
+entries for that layer (adopted when their domain card decision is `default` or
+`conditional`), then the layer's newcomer and keep-but-compare repositories (never adopted).
+Evidence paths, role and limitations come from the entry's card in
+`catalogs/us-equities/{agents-operations,data-research,engines-strategies,foundation-memory}.json`;
+the card rationale and decision are withheld. Foundation packets are identical in both modes,
+and the default `ledger` mode still reproduces the 2026-09-22 packets byte for byte.
+
 Known limit of the withholding (2026-09-22 independent review): each
 candidate keeps its `adopted` flag, which the never-promote rule needs, and
 foundation packets attach the matched decisions' `selection` value
