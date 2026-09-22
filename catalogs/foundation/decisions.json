@@ -2632,6 +2632,62 @@
         ]
       },
       "supersedes": []
+    },
+    {
+      "id": "lean-workflow-child-routing",
+      "capability": "Route native Claude Workflow stages to lean task-matched project agents with explicit model, effort and deferred named tool lanes, and size each workflow to its task",
+      "capability_key": "lean-workflow-child-routing",
+      "checked_at": "2026-09-21",
+      "layer_ids": [
+        "workers",
+        "scheduling-supervision"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Name `agentType` where the role fits: `source-scout` (Sonnet/medium) for extraction, inventories and acceptance commands, `evidence-reviewer` (Opus/high, read-only) for independent review, `isolated-builder` (Sonnet/medium, own worktree) for bounded implementation; keep the default child for a stage that must re-run commands and judge them; never omit a stage's model or effort; run `workflowSizeGuideline: unrestricted` with three concurrent agents and size by task; record every run with `child-usage.mjs --latest`.",
+      "component_ids": [
+        "claude-code",
+        "codex"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "ultracode-token-routing-20260921",
+        "portable-claude-native-qualification-20260921"
+      ],
+      "evidence_scope": "On one identical task the provider-returned first prompt fell from 42,396 tokens (default child) to 12,164 (named MCP grants behind ToolSearch) and 8,048 (source-scout); eight native review-changes runs, two readiness audits, one builder run and one Codex cross-family review are retained as sanitized receipts; the portable copies were adopted into a scratch project and run natively under the full host profile with the observational layer recorded; the project-only profile was not qualified (provider errors, then a permission-layer refusal of the Workflow tool).",
+      "limitations": [
+        "First-prompt figures bound one tiny task on one host and model; they are not a savings rate.",
+        "Haiku is not routed on one packet and one Opus verifier (Sonnet 14/14 lane rows, Haiku 9/14 with a misattributed quote).",
+        "The review workflow's strict accepted status was never returned during the deployment; the gate was fix-and-commit after independent review.",
+        "Local suites are stubbed or synthetic; only the native runs and the Prometheus deltas are provider evidence. Per-session scoping of the exported metric is unavailable by design (the collector keeps no session id on metrics), so observational deltas are host-wide time windows with concurrent activity declared.",
+        "Codex agent examples inherit model and effort and have no end-to-end run of their own.",
+        "The project-only settings profile is not qualified: three provider errors and, with the coordinator model pinned, a permission-layer refusal of the Workflow tool; headless runs need a loaded settings source whose permission mode or allow rule covers the Workflow tool."
+      ],
+      "source_paths": [
+        "docs/ultracode-token-routing-20260921.md",
+        "recipes/claude-native-ultracode.md",
+        "recipes/claude-codex-cooperation-lanes.md",
+        "examples/claude-native/workflows/README.md"
+      ],
+      "next_gap": "Overturn only on evidence: Haiku after a repeat trial with no unanchored citation on two distinct extraction packets; the unrestricted guideline if recorded runs exceed their independent units or pause on fan-out rate limits; a one-hour child cache class only for a child that idles more than five minutes between requests; the Codex agent examples after a task-level run of their own.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Native Workflow child routing, packet identity, acceptance reproduction and usage accounting with owned local integration and one scratch adoption under the full host profile.",
+        "unknown": "Long-idle child cache behavior, Codex agent runs, the project-only settings profile (no headless run completed), and behavior on a machine without the MCP lanes.",
+        "stage_refs": [
+          {
+            "component_id": "claude-code",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "codex",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
     }
   ]
 }

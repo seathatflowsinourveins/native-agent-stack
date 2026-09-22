@@ -1,0 +1,2444 @@
+{
+ "evidence_class": "native integration (upstream Claude Code runtime executing the portable saved workflows in a scratch adoption) plus local integration checks (stubbed suites)",
+ "failed_native_attempts": [
+  {
+   "attempt": "attempt-2",
+   "cause": "valid envelope, rejected: the inventory scout read the acceptance command as an example in a sentence about empty output; fixed by listing commands one per line; Prometheus per-session scoping found unavailable by design; this coordinator had another native workflow running (contaminated window)",
+   "elapsed_s": 77.182,
+   "exit": 0,
+   "profile": "default",
+   "workflow": "review-changes"
+  },
+  {
+   "attempt": "attempt-3",
+   "cause": "API 500 after 2.6 s, no workflow ran; retried in attempt-4",
+   "elapsed_s": 2.609,
+   "exit": 1,
+   "profile": "project-only",
+   "workflow": "review-changes"
+  },
+  {
+   "attempt": "attempt-4",
+   "cause": "API 529 Overloaded after 201 s, no workflow ran; retried in attempt-5",
+   "elapsed_s": 201.305,
+   "exit": 1,
+   "profile": "project-only",
+   "workflow": "review-changes"
+  },
+  {
+   "attempt": "attempt-5",
+   "cause": "API 529 Overloaded after 202 s, no workflow ran; retries exhausted, profile recorded as unqualified",
+   "elapsed_s": 201.898,
+   "exit": 1,
+   "profile": "project-only",
+   "workflow": "review-changes"
+  }
+ ],
+ "local_checks": {
+  "attempt-1": {
+   "steps": [
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/check-syntax.mjs",
+      ".claude/workflows/review-changes.js",
+      ".claude/workflows/readiness-audit.js"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.023,
+     "ended_utc": "2026-09-22T00:40:16+00:00",
+     "exit": 0,
+     "profile": "default",
+     "started_utc": "2026-09-22T00:40:16+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 93,
+     "stdout_sha256": "3d28f3891a9aa67b71449a434e837d303f30ddb90682397de36917a8c4ee2606",
+     "step": "default:check-syntax",
+     "summary_lines": [
+      "SYNTAX_OK .claude/workflows/review-changes.js",
+      "SYNTAX_OK .claude/workflows/readiness-audit.js"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.039,
+     "ended_utc": "2026-09-22T00:40:16+00:00",
+     "exit": 0,
+     "profile": "default",
+     "started_utc": "2026-09-22T00:40:16+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 11361,
+     "stdout_sha256": "c9e5902d0ee3f029fdf66c913dbff2a33ebb5e5712e954bf11a216ce60ab9610",
+     "step": "default:test-envelope",
+     "summary_lines": [
+      "SUMMARY passed=159 failed=0 total=159"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-contract-mutations.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.666,
+     "ended_utc": "2026-09-22T00:40:17+00:00",
+     "exit": 0,
+     "profile": "default",
+     "started_utc": "2026-09-22T00:40:16+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 982,
+     "stdout_sha256": "72581211987c985d22759f58a3df4023b5c91007b3722089b8df4d55c3f4b3f7",
+     "step": "default:test-contract-mutations",
+     "summary_lines": [
+      "SUMMARY passed=15 failed=0 total=15"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-child-usage.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.024,
+     "ended_utc": "2026-09-22T00:40:17+00:00",
+     "exit": 0,
+     "profile": "default",
+     "started_utc": "2026-09-22T00:40:17+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1005,
+     "stdout_sha256": "53b840f14a629e7d3ded40085cf7a126740062f8bf2ca2c8e749ea911f6717fb",
+     "step": "default:test-child-usage",
+     "summary_lines": [
+      "SUMMARY passed=16 failed=0 total=16"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-usage-receipts.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.031,
+     "ended_utc": "2026-09-22T00:40:17+00:00",
+     "exit": 0,
+     "profile": "default",
+     "started_utc": "2026-09-22T00:40:17+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1610,
+     "stdout_sha256": "ebb54c87dabef2f4d550c3dee5cb6dc0be814f70bd2105d6e7a2116cf1eb311c",
+     "step": "default:test-usage-receipts",
+     "summary_lines": [
+      "SUMMARY passed=18 failed=0 total=18"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-codex-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.02,
+     "ended_utc": "2026-09-22T00:40:17+00:00",
+     "exit": 0,
+     "profile": "default",
+     "started_utc": "2026-09-22T00:40:17+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 330,
+     "stdout_sha256": "b565dd44b52c6ff54c79286e71dec7f2d20106545a3fc77816859c50b439ca84",
+     "step": "default:test-codex-envelope",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "claude",
+      "plugin",
+      "validate",
+      ".claude/agents",
+      "--json",
+      "--strict"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.445,
+     "ended_utc": "2026-09-22T00:40:17+00:00",
+     "exit": 0,
+     "profile": "default",
+     "started_utc": "2026-09-22T00:40:17+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 219,
+     "stdout_sha256": "e0c119e998b49cca06fa38cf87784fa73cff3c4603e8e1af82304f421ec1c02d",
+     "step": "default:plugin-validate",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/check-syntax.mjs",
+      ".claude/workflows/review-changes.js",
+      ".claude/workflows/readiness-audit.js"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.021,
+     "ended_utc": "2026-09-22T00:40:17+00:00",
+     "exit": 0,
+     "profile": "project-only",
+     "started_utc": "2026-09-22T00:40:17+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 93,
+     "stdout_sha256": "3d28f3891a9aa67b71449a434e837d303f30ddb90682397de36917a8c4ee2606",
+     "step": "project-only:check-syntax",
+     "summary_lines": [
+      "SYNTAX_OK .claude/workflows/review-changes.js",
+      "SYNTAX_OK .claude/workflows/readiness-audit.js"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.039,
+     "ended_utc": "2026-09-22T00:40:17+00:00",
+     "exit": 0,
+     "profile": "project-only",
+     "started_utc": "2026-09-22T00:40:17+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 11361,
+     "stdout_sha256": "c9e5902d0ee3f029fdf66c913dbff2a33ebb5e5712e954bf11a216ce60ab9610",
+     "step": "project-only:test-envelope",
+     "summary_lines": [
+      "SUMMARY passed=159 failed=0 total=159"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-contract-mutations.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.641,
+     "ended_utc": "2026-09-22T00:40:18+00:00",
+     "exit": 0,
+     "profile": "project-only",
+     "started_utc": "2026-09-22T00:40:17+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 982,
+     "stdout_sha256": "72581211987c985d22759f58a3df4023b5c91007b3722089b8df4d55c3f4b3f7",
+     "step": "project-only:test-contract-mutations",
+     "summary_lines": [
+      "SUMMARY passed=15 failed=0 total=15"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-child-usage.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.024,
+     "ended_utc": "2026-09-22T00:40:18+00:00",
+     "exit": 0,
+     "profile": "project-only",
+     "started_utc": "2026-09-22T00:40:18+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1005,
+     "stdout_sha256": "53b840f14a629e7d3ded40085cf7a126740062f8bf2ca2c8e749ea911f6717fb",
+     "step": "project-only:test-child-usage",
+     "summary_lines": [
+      "SUMMARY passed=16 failed=0 total=16"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-usage-receipts.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.032,
+     "ended_utc": "2026-09-22T00:40:18+00:00",
+     "exit": 0,
+     "profile": "project-only",
+     "started_utc": "2026-09-22T00:40:18+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1610,
+     "stdout_sha256": "ebb54c87dabef2f4d550c3dee5cb6dc0be814f70bd2105d6e7a2116cf1eb311c",
+     "step": "project-only:test-usage-receipts",
+     "summary_lines": [
+      "SUMMARY passed=18 failed=0 total=18"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-codex-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.021,
+     "ended_utc": "2026-09-22T00:40:18+00:00",
+     "exit": 0,
+     "profile": "project-only",
+     "started_utc": "2026-09-22T00:40:18+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 330,
+     "stdout_sha256": "b565dd44b52c6ff54c79286e71dec7f2d20106545a3fc77816859c50b439ca84",
+     "step": "project-only:test-codex-envelope",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "claude",
+      "plugin",
+      "validate",
+      ".claude/agents",
+      "--json",
+      "--strict",
+      "--setting-sources",
+      "project"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.106,
+     "ended_utc": "2026-09-22T00:40:18+00:00",
+     "exit": 1,
+     "profile": "project-only",
+     "started_utc": "2026-09-22T00:40:18+00:00",
+     "stderr_bytes": 42,
+     "stderr_sha256": "b010d9df6543fbba68de1b7b112be03461dabd4442a27696eac33ec31b4bcf27",
+     "stdout_bytes": 0,
+     "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "step": "project-only:plugin-validate",
+     "summary_lines": [],
+     "timed_out": false
+    }
+   ]
+  },
+  "attempt-2": {
+   "gates": {
+    "check-syntax": true,
+    "plugin-validate": true,
+    "test-child-usage": true,
+    "test-codex-envelope": true,
+    "test-contract-mutations": true,
+    "test-envelope": true,
+    "test-usage-receipts": true
+   },
+   "note": "node checks read no Claude settings; run once. Both profiles of attempt-1 produced identical node results (159/15/16/18/7).",
+   "steps": [
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/check-syntax.mjs",
+      ".claude/workflows/review-changes.js",
+      ".claude/workflows/readiness-audit.js"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.025,
+     "ended_utc": "2026-09-22T00:41:39+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 0,
+     "started_utc": "2026-09-22T00:41:39+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 93,
+     "stdout_sha256": "3d28f3891a9aa67b71449a434e837d303f30ddb90682397de36917a8c4ee2606",
+     "step": "check-syntax",
+     "summary_lines": [
+      "SYNTAX_OK .claude/workflows/review-changes.js",
+      "SYNTAX_OK .claude/workflows/readiness-audit.js"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.04,
+     "ended_utc": "2026-09-22T00:41:39+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 159,
+     "started_utc": "2026-09-22T00:41:39+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 11361,
+     "stdout_sha256": "c9e5902d0ee3f029fdf66c913dbff2a33ebb5e5712e954bf11a216ce60ab9610",
+     "step": "test-envelope",
+     "summary_lines": [
+      "SUMMARY passed=159 failed=0 total=159"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-contract-mutations.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.682,
+     "ended_utc": "2026-09-22T00:41:39+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 15,
+     "started_utc": "2026-09-22T00:41:39+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 982,
+     "stdout_sha256": "72581211987c985d22759f58a3df4023b5c91007b3722089b8df4d55c3f4b3f7",
+     "step": "test-contract-mutations",
+     "summary_lines": [
+      "SUMMARY passed=15 failed=0 total=15"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-child-usage.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.025,
+     "ended_utc": "2026-09-22T00:41:40+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 16,
+     "started_utc": "2026-09-22T00:41:39+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1005,
+     "stdout_sha256": "53b840f14a629e7d3ded40085cf7a126740062f8bf2ca2c8e749ea911f6717fb",
+     "step": "test-child-usage",
+     "summary_lines": [
+      "SUMMARY passed=16 failed=0 total=16"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-usage-receipts.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.032,
+     "ended_utc": "2026-09-22T00:41:40+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 18,
+     "started_utc": "2026-09-22T00:41:40+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1610,
+     "stdout_sha256": "ebb54c87dabef2f4d550c3dee5cb6dc0be814f70bd2105d6e7a2116cf1eb311c",
+     "step": "test-usage-receipts",
+     "summary_lines": [
+      "SUMMARY passed=18 failed=0 total=18"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-codex-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.022,
+     "ended_utc": "2026-09-22T00:41:40+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 7,
+     "started_utc": "2026-09-22T00:41:40+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 330,
+     "stdout_sha256": "b565dd44b52c6ff54c79286e71dec7f2d20106545a3fc77816859c50b439ca84",
+     "step": "test-codex-envelope",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "claude",
+      "plugin",
+      "validate",
+      ".claude/agents",
+      "--json",
+      "--strict"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.499,
+     "ended_utc": "2026-09-22T00:41:40+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "json_success": true,
+     "pass_lines": 0,
+     "started_utc": "2026-09-22T00:41:40+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 219,
+     "stdout_sha256": "e0c119e998b49cca06fa38cf87784fa73cff3c4603e8e1af82304f421ec1c02d",
+     "step": "plugin-validate",
+     "summary_lines": [],
+     "timed_out": false
+    }
+   ]
+  },
+  "attempt-3": {
+   "gates": {
+    "check-syntax": true,
+    "cwd-tmp:test-child-usage": true,
+    "cwd-tmp:test-envelope": true,
+    "cwd-tmp:test-usage-receipts": true,
+    "plugin-validate": true,
+    "test-child-usage": true,
+    "test-codex-envelope": true,
+    "test-contract-mutations": true,
+    "test-envelope": true,
+    "test-usage-receipts": true
+   },
+   "steps": [
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/check-syntax.mjs",
+      ".claude/workflows/review-changes.js",
+      ".claude/workflows/readiness-audit.js"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.024,
+     "ended_utc": "2026-09-22T00:47:21+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 0,
+     "started_utc": "2026-09-22T00:47:20+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 93,
+     "stdout_sha256": "3d28f3891a9aa67b71449a434e837d303f30ddb90682397de36917a8c4ee2606",
+     "step": "check-syntax",
+     "summary_lines": [
+      "SYNTAX_OK .claude/workflows/review-changes.js",
+      "SYNTAX_OK .claude/workflows/readiness-audit.js"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.04,
+     "ended_utc": "2026-09-22T00:47:21+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 159,
+     "started_utc": "2026-09-22T00:47:21+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 11361,
+     "stdout_sha256": "c9e5902d0ee3f029fdf66c913dbff2a33ebb5e5712e954bf11a216ce60ab9610",
+     "step": "test-envelope",
+     "summary_lines": [
+      "SUMMARY passed=159 failed=0 total=159"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-contract-mutations.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.717,
+     "ended_utc": "2026-09-22T00:47:21+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 18,
+     "started_utc": "2026-09-22T00:47:21+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1226,
+     "stdout_sha256": "014957899f4ce0384afb49bb2fca3719f7bf5d8f5899e6ed1e3be7768272364e",
+     "step": "test-contract-mutations",
+     "summary_lines": [
+      "SUMMARY passed=18 failed=0 total=18"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-child-usage.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.024,
+     "ended_utc": "2026-09-22T00:47:21+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 16,
+     "started_utc": "2026-09-22T00:47:21+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1005,
+     "stdout_sha256": "53b840f14a629e7d3ded40085cf7a126740062f8bf2ca2c8e749ea911f6717fb",
+     "step": "test-child-usage",
+     "summary_lines": [
+      "SUMMARY passed=16 failed=0 total=16"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-usage-receipts.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.03,
+     "ended_utc": "2026-09-22T00:47:21+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 18,
+     "started_utc": "2026-09-22T00:47:21+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1610,
+     "stdout_sha256": "ebb54c87dabef2f4d550c3dee5cb6dc0be814f70bd2105d6e7a2116cf1eb311c",
+     "step": "test-usage-receipts",
+     "summary_lines": [
+      "SUMMARY passed=18 failed=0 total=18"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-codex-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.024,
+     "ended_utc": "2026-09-22T00:47:21+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 7,
+     "started_utc": "2026-09-22T00:47:21+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 330,
+     "stdout_sha256": "b565dd44b52c6ff54c79286e71dec7f2d20106545a3fc77816859c50b439ca84",
+     "step": "test-codex-envelope",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "claude",
+      "plugin",
+      "validate",
+      ".claude/agents",
+      "--json",
+      "--strict"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.468,
+     "ended_utc": "2026-09-22T00:47:22+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "json_success": true,
+     "pass_lines": 0,
+     "started_utc": "2026-09-22T00:47:21+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 219,
+     "stdout_sha256": "e0c119e998b49cca06fa38cf87784fa73cff3c4603e8e1af82304f421ec1c02d",
+     "step": "plugin-validate",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-envelope.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.036,
+     "ended_utc": "2026-09-22T00:47:22+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T00:47:22+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 11361,
+     "stdout_sha256": "c9e5902d0ee3f029fdf66c913dbff2a33ebb5e5712e954bf11a216ce60ab9610",
+     "step": "cwd-tmp:test-envelope",
+     "summary_lines": [
+      "SUMMARY passed=159 failed=0 total=159"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-child-usage.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.027,
+     "ended_utc": "2026-09-22T00:47:22+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T00:47:22+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1005,
+     "stdout_sha256": "53b840f14a629e7d3ded40085cf7a126740062f8bf2ca2c8e749ea911f6717fb",
+     "step": "cwd-tmp:test-child-usage",
+     "summary_lines": [
+      "SUMMARY passed=16 failed=0 total=16"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-usage-receipts.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.029,
+     "ended_utc": "2026-09-22T00:47:22+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T00:47:22+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1610,
+     "stdout_sha256": "ebb54c87dabef2f4d550c3dee5cb6dc0be814f70bd2105d6e7a2116cf1eb311c",
+     "step": "cwd-tmp:test-usage-receipts",
+     "summary_lines": [
+      "SUMMARY passed=18 failed=0 total=18"
+     ],
+     "timed_out": false
+    }
+   ]
+  },
+  "attempt-4": {
+   "gates": {
+    "check-syntax": true,
+    "cwd-tmp:test-child-usage": true,
+    "cwd-tmp:test-contract-mutations": true,
+    "cwd-tmp:test-envelope": true,
+    "cwd-tmp:test-usage-receipts": true,
+    "plugin-validate": true,
+    "test-child-usage": true,
+    "test-codex-envelope": true,
+    "test-contract-mutations": true,
+    "test-envelope": true,
+    "test-usage-receipts": true
+   },
+   "steps": [
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/check-syntax.mjs",
+      ".claude/workflows/review-changes.js",
+      ".claude/workflows/readiness-audit.js"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.021,
+     "ended_utc": "2026-09-22T01:10:29+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 0,
+     "started_utc": "2026-09-22T01:10:29+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 93,
+     "stdout_sha256": "3d28f3891a9aa67b71449a434e837d303f30ddb90682397de36917a8c4ee2606",
+     "step": "check-syntax",
+     "summary_lines": [
+      "SYNTAX_OK .claude/workflows/review-changes.js",
+      "SYNTAX_OK .claude/workflows/readiness-audit.js"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.038,
+     "ended_utc": "2026-09-22T01:10:29+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 162,
+     "started_utc": "2026-09-22T01:10:29+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 11530,
+     "stdout_sha256": "ae39cd48d3884c0bbbe3aa6ba6bbb534e0772c85b358e456b8cc6c1af8111621",
+     "step": "test-envelope",
+     "summary_lines": [
+      "SUMMARY passed=162 failed=0 total=162"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-contract-mutations.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.866,
+     "ended_utc": "2026-09-22T01:10:30+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 19,
+     "started_utc": "2026-09-22T01:10:29+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1613,
+     "stdout_sha256": "89513b09038143b0a6bb71aa8dfd401a3a13b887d8e9d24a87070b6bdc6bf569",
+     "step": "test-contract-mutations",
+     "summary_lines": [
+      "SUMMARY passed=19 failed=0 total=19"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-child-usage.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.026,
+     "ended_utc": "2026-09-22T01:10:30+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 16,
+     "started_utc": "2026-09-22T01:10:30+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1005,
+     "stdout_sha256": "53b840f14a629e7d3ded40085cf7a126740062f8bf2ca2c8e749ea911f6717fb",
+     "step": "test-child-usage",
+     "summary_lines": [
+      "SUMMARY passed=16 failed=0 total=16"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-usage-receipts.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.034,
+     "ended_utc": "2026-09-22T01:10:30+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 18,
+     "started_utc": "2026-09-22T01:10:30+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1610,
+     "stdout_sha256": "ebb54c87dabef2f4d550c3dee5cb6dc0be814f70bd2105d6e7a2116cf1eb311c",
+     "step": "test-usage-receipts",
+     "summary_lines": [
+      "SUMMARY passed=18 failed=0 total=18"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-codex-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.023,
+     "ended_utc": "2026-09-22T01:10:30+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 7,
+     "started_utc": "2026-09-22T01:10:30+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 330,
+     "stdout_sha256": "b565dd44b52c6ff54c79286e71dec7f2d20106545a3fc77816859c50b439ca84",
+     "step": "test-codex-envelope",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "claude",
+      "plugin",
+      "validate",
+      ".claude/agents",
+      "--json",
+      "--strict"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.518,
+     "ended_utc": "2026-09-22T01:10:31+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "json_success": true,
+     "pass_lines": 0,
+     "started_utc": "2026-09-22T01:10:30+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 219,
+     "stdout_sha256": "e0c119e998b49cca06fa38cf87784fa73cff3c4603e8e1af82304f421ec1c02d",
+     "step": "plugin-validate",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-envelope.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.038,
+     "ended_utc": "2026-09-22T01:10:31+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:10:31+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 11530,
+     "stdout_sha256": "ae39cd48d3884c0bbbe3aa6ba6bbb534e0772c85b358e456b8cc6c1af8111621",
+     "step": "cwd-tmp:test-envelope",
+     "summary_lines": [
+      "SUMMARY passed=162 failed=0 total=162"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-contract-mutations.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.809,
+     "ended_utc": "2026-09-22T01:10:31+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:10:31+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1613,
+     "stdout_sha256": "89513b09038143b0a6bb71aa8dfd401a3a13b887d8e9d24a87070b6bdc6bf569",
+     "step": "cwd-tmp:test-contract-mutations",
+     "summary_lines": [
+      "SUMMARY passed=19 failed=0 total=19"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-child-usage.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.027,
+     "ended_utc": "2026-09-22T01:10:31+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:10:31+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1005,
+     "stdout_sha256": "53b840f14a629e7d3ded40085cf7a126740062f8bf2ca2c8e749ea911f6717fb",
+     "step": "cwd-tmp:test-child-usage",
+     "summary_lines": [
+      "SUMMARY passed=16 failed=0 total=16"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-usage-receipts.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.029,
+     "ended_utc": "2026-09-22T01:10:31+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:10:31+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1610,
+     "stdout_sha256": "ebb54c87dabef2f4d550c3dee5cb6dc0be814f70bd2105d6e7a2116cf1eb311c",
+     "step": "cwd-tmp:test-usage-receipts",
+     "summary_lines": [
+      "SUMMARY passed=18 failed=0 total=18"
+     ],
+     "timed_out": false
+    }
+   ]
+  },
+  "attempt-6": {
+   "gates": {
+    "check-syntax": true,
+    "cwd-tmp:test-child-usage": true,
+    "cwd-tmp:test-contract-mutations": true,
+    "cwd-tmp:test-envelope": true,
+    "cwd-tmp:test-usage-receipts": true,
+    "plugin-validate": true,
+    "test-child-usage": true,
+    "test-codex-envelope": true,
+    "test-contract-mutations": true,
+    "test-envelope": true,
+    "test-usage-receipts": true
+   },
+   "steps": [
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/check-syntax.mjs",
+      ".claude/workflows/review-changes.js",
+      ".claude/workflows/readiness-audit.js"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.023,
+     "ended_utc": "2026-09-22T01:36:18+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 0,
+     "started_utc": "2026-09-22T01:36:18+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 93,
+     "stdout_sha256": "3d28f3891a9aa67b71449a434e837d303f30ddb90682397de36917a8c4ee2606",
+     "step": "check-syntax",
+     "summary_lines": [
+      "SYNTAX_OK .claude/workflows/review-changes.js",
+      "SYNTAX_OK .claude/workflows/readiness-audit.js"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.035,
+     "ended_utc": "2026-09-22T01:36:18+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 167,
+     "started_utc": "2026-09-22T01:36:18+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 11929,
+     "stdout_sha256": "1a84766ce67778bf89c0aaf9ec6e03f1a13d0395b2046370284056c535e2a20c",
+     "step": "test-envelope",
+     "summary_lines": [
+      "SUMMARY passed=167 failed=0 total=167"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-contract-mutations.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.857,
+     "ended_utc": "2026-09-22T01:36:19+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 21,
+     "started_utc": "2026-09-22T01:36:18+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1857,
+     "stdout_sha256": "a8f0b00812e2566e2a730112d972f4ab2fad917960ac04cdbff397e81caa5da3",
+     "step": "test-contract-mutations",
+     "summary_lines": [
+      "SUMMARY passed=21 failed=0 total=21"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-child-usage.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.027,
+     "ended_utc": "2026-09-22T01:36:19+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 16,
+     "started_utc": "2026-09-22T01:36:19+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1005,
+     "stdout_sha256": "53b840f14a629e7d3ded40085cf7a126740062f8bf2ca2c8e749ea911f6717fb",
+     "step": "test-child-usage",
+     "summary_lines": [
+      "SUMMARY passed=16 failed=0 total=16"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-usage-receipts.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.03,
+     "ended_utc": "2026-09-22T01:36:19+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 18,
+     "started_utc": "2026-09-22T01:36:19+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1615,
+     "stdout_sha256": "5638b48fa39e02f734b76deb02b6cdc5fe48bb765188689c1d3338c9f5c71b5d",
+     "step": "test-usage-receipts",
+     "summary_lines": [
+      "SUMMARY passed=18 failed=0 total=18"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-codex-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.021,
+     "ended_utc": "2026-09-22T01:36:19+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 7,
+     "started_utc": "2026-09-22T01:36:19+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 330,
+     "stdout_sha256": "b565dd44b52c6ff54c79286e71dec7f2d20106545a3fc77816859c50b439ca84",
+     "step": "test-codex-envelope",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "claude",
+      "plugin",
+      "validate",
+      ".claude/agents",
+      "--json",
+      "--strict"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.423,
+     "ended_utc": "2026-09-22T01:36:19+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "json_success": true,
+     "pass_lines": 0,
+     "started_utc": "2026-09-22T01:36:19+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 219,
+     "stdout_sha256": "e0c119e998b49cca06fa38cf87784fa73cff3c4603e8e1af82304f421ec1c02d",
+     "step": "plugin-validate",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-envelope.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.037,
+     "ended_utc": "2026-09-22T01:36:19+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:36:19+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 11929,
+     "stdout_sha256": "1a84766ce67778bf89c0aaf9ec6e03f1a13d0395b2046370284056c535e2a20c",
+     "step": "cwd-tmp:test-envelope",
+     "summary_lines": [
+      "SUMMARY passed=167 failed=0 total=167"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-contract-mutations.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.873,
+     "ended_utc": "2026-09-22T01:36:20+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:36:19+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1857,
+     "stdout_sha256": "a8f0b00812e2566e2a730112d972f4ab2fad917960ac04cdbff397e81caa5da3",
+     "step": "cwd-tmp:test-contract-mutations",
+     "summary_lines": [
+      "SUMMARY passed=21 failed=0 total=21"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-child-usage.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.023,
+     "ended_utc": "2026-09-22T01:36:20+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:36:20+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1005,
+     "stdout_sha256": "53b840f14a629e7d3ded40085cf7a126740062f8bf2ca2c8e749ea911f6717fb",
+     "step": "cwd-tmp:test-child-usage",
+     "summary_lines": [
+      "SUMMARY passed=16 failed=0 total=16"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-usage-receipts.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.031,
+     "ended_utc": "2026-09-22T01:36:20+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:36:20+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1615,
+     "stdout_sha256": "5638b48fa39e02f734b76deb02b6cdc5fe48bb765188689c1d3338c9f5c71b5d",
+     "step": "cwd-tmp:test-usage-receipts",
+     "summary_lines": [
+      "SUMMARY passed=18 failed=0 total=18"
+     ],
+     "timed_out": false
+    }
+   ]
+  },
+  "attempt-7": {
+   "gates": {
+    "check-syntax": true,
+    "cwd-tmp:test-child-usage": true,
+    "cwd-tmp:test-contract-mutations": true,
+    "cwd-tmp:test-envelope": true,
+    "cwd-tmp:test-usage-receipts": true,
+    "plugin-validate": true,
+    "test-child-usage": true,
+    "test-codex-envelope": true,
+    "test-contract-mutations": true,
+    "test-envelope": true,
+    "test-usage-receipts": true
+   },
+   "steps": [
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/check-syntax.mjs",
+      ".claude/workflows/review-changes.js",
+      ".claude/workflows/readiness-audit.js"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.023,
+     "ended_utc": "2026-09-22T01:52:24+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 0,
+     "started_utc": "2026-09-22T01:52:24+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 93,
+     "stdout_sha256": "3d28f3891a9aa67b71449a434e837d303f30ddb90682397de36917a8c4ee2606",
+     "step": "check-syntax",
+     "summary_lines": [
+      "SYNTAX_OK .claude/workflows/review-changes.js",
+      "SYNTAX_OK .claude/workflows/readiness-audit.js"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.039,
+     "ended_utc": "2026-09-22T01:52:24+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 169,
+     "started_utc": "2026-09-22T01:52:24+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 12099,
+     "stdout_sha256": "0b7b793aef58270af1e2e07185b56a4eb1f1baed496850aac8ce8d2449d8d85e",
+     "step": "test-envelope",
+     "summary_lines": [
+      "SUMMARY passed=169 failed=0 total=169"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-contract-mutations.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.908,
+     "ended_utc": "2026-09-22T01:52:25+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 23,
+     "started_utc": "2026-09-22T01:52:24+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 2004,
+     "stdout_sha256": "b513a37a045ebf1f75dfef8f4d5a1b9654b604bec3c1de48c42cb0c13f609527",
+     "step": "test-contract-mutations",
+     "summary_lines": [
+      "SUMMARY passed=23 failed=0 total=23"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-child-usage.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.025,
+     "ended_utc": "2026-09-22T01:52:25+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 16,
+     "started_utc": "2026-09-22T01:52:25+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1005,
+     "stdout_sha256": "53b840f14a629e7d3ded40085cf7a126740062f8bf2ca2c8e749ea911f6717fb",
+     "step": "test-child-usage",
+     "summary_lines": [
+      "SUMMARY passed=16 failed=0 total=16"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-usage-receipts.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.031,
+     "ended_utc": "2026-09-22T01:52:25+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 18,
+     "started_utc": "2026-09-22T01:52:25+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1615,
+     "stdout_sha256": "5638b48fa39e02f734b76deb02b6cdc5fe48bb765188689c1d3338c9f5c71b5d",
+     "step": "test-usage-receipts",
+     "summary_lines": [
+      "SUMMARY passed=18 failed=0 total=18"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      ".claude/workflows/test-codex-envelope.mjs"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.02,
+     "ended_utc": "2026-09-22T01:52:25+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "pass_lines": 7,
+     "started_utc": "2026-09-22T01:52:25+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 330,
+     "stdout_sha256": "b565dd44b52c6ff54c79286e71dec7f2d20106545a3fc77816859c50b439ca84",
+     "step": "test-codex-envelope",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "claude",
+      "plugin",
+      "validate",
+      ".claude/agents",
+      "--json",
+      "--strict"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.459,
+     "ended_utc": "2026-09-22T01:52:25+00:00",
+     "exit": 0,
+     "fail_lines": 0,
+     "json_success": true,
+     "pass_lines": 0,
+     "started_utc": "2026-09-22T01:52:25+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 219,
+     "stdout_sha256": "e0c119e998b49cca06fa38cf87784fa73cff3c4603e8e1af82304f421ec1c02d",
+     "step": "plugin-validate",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-envelope.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.037,
+     "ended_utc": "2026-09-22T01:52:25+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:52:25+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 12099,
+     "stdout_sha256": "0b7b793aef58270af1e2e07185b56a4eb1f1baed496850aac8ce8d2449d8d85e",
+     "step": "cwd-tmp:test-envelope",
+     "summary_lines": [
+      "SUMMARY passed=169 failed=0 total=169"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-contract-mutations.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.875,
+     "ended_utc": "2026-09-22T01:52:26+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:52:25+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 2004,
+     "stdout_sha256": "b513a37a045ebf1f75dfef8f4d5a1b9654b604bec3c1de48c42cb0c13f609527",
+     "step": "cwd-tmp:test-contract-mutations",
+     "summary_lines": [
+      "SUMMARY passed=23 failed=0 total=23"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-child-usage.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.025,
+     "ended_utc": "2026-09-22T01:52:26+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:52:26+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1005,
+     "stdout_sha256": "53b840f14a629e7d3ded40085cf7a126740062f8bf2ca2c8e749ea911f6717fb",
+     "step": "cwd-tmp:test-child-usage",
+     "summary_lines": [
+      "SUMMARY passed=16 failed=0 total=16"
+     ],
+     "timed_out": false
+    },
+    {
+     "argv": [
+      "node",
+      "<scratch>/repo/.claude/workflows/test-usage-receipts.mjs"
+     ],
+     "cwd": "/tmp",
+     "elapsed_s": 0.03,
+     "ended_utc": "2026-09-22T01:52:26+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:52:26+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 1615,
+     "stdout_sha256": "5638b48fa39e02f734b76deb02b6cdc5fe48bb765188689c1d3338c9f5c71b5d",
+     "step": "cwd-tmp:test-usage-receipts",
+     "summary_lines": [
+      "SUMMARY passed=18 failed=0 total=18"
+     ],
+     "timed_out": false
+    }
+   ]
+  }
+ },
+ "native_runs": {
+  "child_usage": {
+   "F": {
+    "by_resolved_model": {
+     "claude-opus-5": {
+      "cache_creation_input_tokens": 81252,
+      "cache_read_input_tokens": 337137,
+      "children": 1,
+      "input_tokens": 16,
+      "output_tokens": 32405
+     },
+     "claude-sonnet-5": {
+      "cache_creation_input_tokens": 38076,
+      "cache_read_input_tokens": 76105,
+      "children": 2,
+      "input_tokens": 14,
+      "output_tokens": 9261
+     }
+    },
+    "children": [
+     {
+      "agent_id": "a0603f8ec7eb1ff43",
+      "agent_type": "source-scout",
+      "complete": true,
+      "efforts": [
+       "medium"
+      ],
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 8092,
+      "issues": [],
+      "label": "inventory",
+      "phase": "Inventory",
+      "requested_model": "sonnet",
+      "requests": 5,
+      "resolved_models": [
+       "claude-sonnet-5"
+      ],
+      "usage": {
+       "cache_creation_input_tokens": 29306,
+       "cache_read_input_tokens": 68358,
+       "input_tokens": 10,
+       "output_tokens": 8830
+      },
+      "usage_by_model": {
+       "claude-sonnet-5": {
+        "cache_creation_input_tokens": 29306,
+        "cache_read_input_tokens": 68358,
+        "input_tokens": 10,
+        "output_tokens": 8830
+       }
+      }
+     },
+     {
+      "agent_id": "ac723d4ba2e52025b",
+      "agent_type": "evidence-reviewer",
+      "complete": true,
+      "efforts": [
+       "high"
+      ],
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 11686,
+      "issues": [],
+      "label": "review",
+      "phase": "Review",
+      "requested_model": "opus",
+      "requests": 8,
+      "resolved_models": [
+       "claude-opus-5"
+      ],
+      "usage": {
+       "cache_creation_input_tokens": 81252,
+       "cache_read_input_tokens": 337137,
+       "input_tokens": 16,
+       "output_tokens": 32405
+      },
+      "usage_by_model": {
+       "claude-opus-5": {
+        "cache_creation_input_tokens": 81252,
+        "cache_read_input_tokens": 337137,
+        "input_tokens": 16,
+        "output_tokens": 32405
+       }
+      }
+     },
+     {
+      "agent_id": "a3a70d521597464ad",
+      "agent_type": "source-scout",
+      "complete": true,
+      "efforts": [
+       "medium"
+      ],
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 7749,
+      "issues": [],
+      "label": "recheck",
+      "phase": "Recheck",
+      "requested_model": "sonnet",
+      "requests": 2,
+      "resolved_models": [
+       "claude-sonnet-5"
+      ],
+      "usage": {
+       "cache_creation_input_tokens": 8770,
+       "cache_read_input_tokens": 7747,
+       "input_tokens": 4,
+       "output_tokens": 431
+      },
+      "usage_by_model": {
+       "claude-sonnet-5": {
+        "cache_creation_input_tokens": 8770,
+        "cache_read_input_tokens": 7747,
+        "input_tokens": 4,
+        "output_tokens": 431
+       }
+      }
+     }
+    ],
+    "multi_model_children": [],
+    "reason": "every child has an explicit requested model, a matching resolved model, returned usage and a non-null result",
+    "status": "complete"
+   },
+   "F-attempt-3": {
+    "by_resolved_model": {
+     "claude-opus-5": {
+      "cache_creation_input_tokens": 55953,
+      "cache_read_input_tokens": 243983,
+      "children": 1,
+      "input_tokens": 16,
+      "output_tokens": 20497
+     },
+     "claude-sonnet-5": {
+      "cache_creation_input_tokens": 18515,
+      "cache_read_input_tokens": 65416,
+      "children": 2,
+      "input_tokens": 16,
+      "output_tokens": 6572
+     }
+    },
+    "children": [
+     {
+      "agent_id": "a9687485b84ef4deb",
+      "agent_type": "source-scout",
+      "complete": true,
+      "efforts": [
+       "medium"
+      ],
+      "first_request_cache_read": 6387,
+      "first_request_prompt_tokens": 8028,
+      "issues": [],
+      "label": "inventory",
+      "phase": "Inventory",
+      "requested_model": "sonnet",
+      "requests": 4,
+      "resolved_models": [
+       "claude-sonnet-5"
+      ],
+      "usage": {
+       "cache_creation_input_tokens": 9190,
+       "cache_read_input_tokens": 39860,
+       "input_tokens": 8,
+       "output_tokens": 5581
+      },
+      "usage_by_model": {
+       "claude-sonnet-5": {
+        "cache_creation_input_tokens": 9190,
+        "cache_read_input_tokens": 39860,
+        "input_tokens": 8,
+        "output_tokens": 5581
+       }
+      }
+     },
+     {
+      "agent_id": "aafafa57048b443f4",
+      "agent_type": "evidence-reviewer",
+      "complete": true,
+      "efforts": [
+       "high"
+      ],
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 10204,
+      "issues": [],
+      "label": "review",
+      "phase": "Review",
+      "requested_model": "opus",
+      "requests": 8,
+      "resolved_models": [
+       "claude-opus-5"
+      ],
+      "usage": {
+       "cache_creation_input_tokens": 55953,
+       "cache_read_input_tokens": 243983,
+       "input_tokens": 16,
+       "output_tokens": 20497
+      },
+      "usage_by_model": {
+       "claude-opus-5": {
+        "cache_creation_input_tokens": 55953,
+        "cache_read_input_tokens": 243983,
+        "input_tokens": 16,
+        "output_tokens": 20497
+       }
+      }
+     },
+     {
+      "agent_id": "a439d9959a4341103",
+      "agent_type": "source-scout",
+      "complete": true,
+      "efforts": [
+       "medium"
+      ],
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 7702,
+      "issues": [],
+      "label": "recheck",
+      "phase": "Recheck",
+      "requested_model": "sonnet",
+      "requests": 4,
+      "resolved_models": [
+       "claude-sonnet-5"
+      ],
+      "usage": {
+       "cache_creation_input_tokens": 9325,
+       "cache_read_input_tokens": 25556,
+       "input_tokens": 8,
+       "output_tokens": 991
+      },
+      "usage_by_model": {
+       "claude-sonnet-5": {
+        "cache_creation_input_tokens": 9325,
+        "cache_read_input_tokens": 25556,
+        "input_tokens": 8,
+        "output_tokens": 991
+       }
+      }
+     }
+    ],
+    "multi_model_children": [],
+    "reason": "every child has an explicit requested model, a matching resolved model, returned usage and a non-null result",
+    "status": "complete"
+   },
+   "F-attempt-5": {
+    "by_resolved_model": {
+     "claude-opus-5": {
+      "cache_creation_input_tokens": 46012,
+      "cache_read_input_tokens": 127001,
+      "children": 1,
+      "input_tokens": 10,
+      "output_tokens": 10928
+     },
+     "claude-sonnet-5": {
+      "cache_creation_input_tokens": 26077,
+      "cache_read_input_tokens": 66722,
+      "children": 2,
+      "input_tokens": 16,
+      "output_tokens": 6067
+     }
+    },
+    "children": [
+     {
+      "agent_id": "a8ba3fd01d6652748",
+      "agent_type": "source-scout",
+      "complete": true,
+      "efforts": [
+       "medium"
+      ],
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 8050,
+      "issues": [],
+      "label": "inventory",
+      "phase": "Inventory",
+      "requested_model": "sonnet",
+      "requests": 5,
+      "resolved_models": [
+       "claude-sonnet-5"
+      ],
+      "usage": {
+       "cache_creation_input_tokens": 17112,
+       "cache_read_input_tokens": 50265,
+       "input_tokens": 10,
+       "output_tokens": 5658
+      },
+      "usage_by_model": {
+       "claude-sonnet-5": {
+        "cache_creation_input_tokens": 17112,
+        "cache_read_input_tokens": 50265,
+        "input_tokens": 10,
+        "output_tokens": 5658
+       }
+      }
+     },
+     {
+      "agent_id": "a43c33c05500c1358",
+      "agent_type": "evidence-reviewer",
+      "complete": true,
+      "efforts": [
+       "high"
+      ],
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 10231,
+      "issues": [],
+      "label": "review",
+      "phase": "Review",
+      "requested_model": "opus",
+      "requests": 5,
+      "resolved_models": [
+       "claude-opus-5"
+      ],
+      "usage": {
+       "cache_creation_input_tokens": 46012,
+       "cache_read_input_tokens": 127001,
+       "input_tokens": 10,
+       "output_tokens": 10928
+      },
+      "usage_by_model": {
+       "claude-opus-5": {
+        "cache_creation_input_tokens": 46012,
+        "cache_read_input_tokens": 127001,
+        "input_tokens": 10,
+        "output_tokens": 10928
+       }
+      }
+     },
+     {
+      "agent_id": "af6acf0a2fa5bb6af",
+      "agent_type": "source-scout",
+      "complete": true,
+      "efforts": [
+       "medium"
+      ],
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 7724,
+      "issues": [],
+      "label": "recheck",
+      "phase": "Recheck",
+      "requested_model": "sonnet",
+      "requests": 3,
+      "resolved_models": [
+       "claude-sonnet-5"
+      ],
+      "usage": {
+       "cache_creation_input_tokens": 8965,
+       "cache_read_input_tokens": 16457,
+       "input_tokens": 6,
+       "output_tokens": 409
+      },
+      "usage_by_model": {
+       "claude-sonnet-5": {
+        "cache_creation_input_tokens": 8965,
+        "cache_read_input_tokens": 16457,
+        "input_tokens": 6,
+        "output_tokens": 409
+       }
+      }
+     }
+    ],
+    "multi_model_children": [],
+    "reason": "every child has an explicit requested model, a matching resolved model, returned usage and a non-null result",
+    "status": "complete"
+   },
+   "P-pinned": null,
+   "readiness": {
+    "by_resolved_model": {
+     "claude-opus-5": {
+      "cache_creation_input_tokens": 41469,
+      "cache_read_input_tokens": 379439,
+      "children": 1,
+      "input_tokens": 26,
+      "output_tokens": 10099
+     },
+     "claude-sonnet-5": {
+      "cache_creation_input_tokens": 19945,
+      "cache_read_input_tokens": 44426,
+      "children": 2,
+      "input_tokens": 14,
+      "output_tokens": 2018
+     }
+    },
+    "children": [
+     {
+      "agent_id": "a36087a433bfa952f",
+      "agent_type": "source-scout",
+      "complete": true,
+      "efforts": [
+       "medium"
+      ],
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 8073,
+      "issues": [],
+      "label": "read:docs-1",
+      "phase": "Read",
+      "requested_model": "sonnet",
+      "requests": 4,
+      "resolved_models": [
+       "claude-sonnet-5"
+      ],
+      "usage": {
+       "cache_creation_input_tokens": 10560,
+       "cache_read_input_tokens": 27349,
+       "input_tokens": 8,
+       "output_tokens": 1456
+      },
+      "usage_by_model": {
+       "claude-sonnet-5": {
+        "cache_creation_input_tokens": 10560,
+        "cache_read_input_tokens": 27349,
+        "input_tokens": 8,
+        "output_tokens": 1456
+       }
+      }
+     },
+     {
+      "agent_id": "a433c02900c7d37e3",
+      "agent_type": "source-scout",
+      "complete": true,
+      "efforts": [
+       "medium"
+      ],
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 8074,
+      "issues": [],
+      "label": "read:commands-2",
+      "phase": "Read",
+      "requested_model": "sonnet",
+      "requests": 3,
+      "resolved_models": [
+       "claude-sonnet-5"
+      ],
+      "usage": {
+       "cache_creation_input_tokens": 9385,
+       "cache_read_input_tokens": 17077,
+       "input_tokens": 6,
+       "output_tokens": 562
+      },
+      "usage_by_model": {
+       "claude-sonnet-5": {
+        "cache_creation_input_tokens": 9385,
+        "cache_read_input_tokens": 17077,
+        "input_tokens": 6,
+        "output_tokens": 562
+       }
+      }
+     },
+     {
+      "agent_id": "af2c681e6d23d60c0",
+      "agent_type": "workflow-subagent",
+      "complete": true,
+      "efforts": [
+       "high"
+      ],
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 20612,
+      "issues": [],
+      "label": "verify",
+      "phase": "Verify",
+      "requested_model": "opus",
+      "requests": 13,
+      "resolved_models": [
+       "claude-opus-5"
+      ],
+      "usage": {
+       "cache_creation_input_tokens": 41469,
+       "cache_read_input_tokens": 379439,
+       "input_tokens": 26,
+       "output_tokens": 10099
+      },
+      "usage_by_model": {
+       "claude-opus-5": {
+        "cache_creation_input_tokens": 41469,
+        "cache_read_input_tokens": 379439,
+        "input_tokens": 26,
+        "output_tokens": 10099
+       }
+      }
+     }
+    ],
+    "multi_model_children": [],
+    "reason": "every child has an explicit requested model, a matching resolved model, returned usage and a non-null result",
+    "status": "complete"
+   }
+  },
+  "envelopes": {
+   "F": {
+    "accepted": false,
+    "attempt": "attempt-6",
+    "defects": [
+     "The new cross-reference `recipes/claude-codex-cooperation-lanes.md` does not exist in this repository, so the commit replaced one dangling link with another dangling link.",
+     "The new sandbox-escape guard is unreachable, and the commit deleted the only mutation that could have exercised it, so both the guard and the new `+ 2` spare levels have no negative evidence.",
+     "The new kind-aware assertion can report a missing or wrong-kind configured path, but the immediately following consumers are unguarded, so the file aborts with an uncaught exception before its SUMMARY line and the other 14 assertions never run.",
+     "The tightened coverage check still has a wildcard hole that defeats its stated purpose: a requested path of '/' normalizes to the empty string and is then treated as covered by any repository-relative inventory entry.",
+     "The stricter `stringList` validation makes the 'requested check command is blank' diagnostic dead code and silently hollows out the test named for it.",
+     "Requiring exact set equality of all matched totals can reject a correctly reproduced check purely because the second worker quoted more output than the first."
+    ],
+    "gaps": [
+     "The only recorded acceptance command exercises none of the changed behavior. /repo/app.js is a single line (`module.exports = { value: 2 }`) and is not one of the seven changed files, so `node --check app.js` only parses unrelated syntax. The recorded evidence itself is internally consistent (that f",
+     "The repository contains three suites that directly assert the changed behavior - /repo/.claude/workflows/test-envelope.mjs, /repo/.claude/workflows/test-contract-mutations.mjs and /repo/.claude/workflows/test-usage-receipts.mjs - and none was requested or run. I hand-traced the six new/edited test-e",
+     "test-contract-mutations.mjs:76 now requires the spawned baseline copy to satisfy `run.status === 0 && fails.length === 0 && /SUMMARY passed=\\d+ failed=0 /`, which is strictly stronger than the previous 'reaches a SUMMARY line'. Whether the current tree satisfies it cannot be settled by reading: it d",
+     "test-usage-receipts.mjs hard-codes receipt figures (line 32: 42396, 42220, 21565, 12164, 8048; line 41: 17535 and 17864; lines 36, 47, 56) and cross-checks them against docs/workflow-contract.md, which this commit edited. I confirmed the two edited lines (12 and 36) are not among the table rows thos",
+     "Whether `recipes/claude-codex-cooperation-lanes.md` is meant as a deliberate cross-repository pointer to the upstream native-agent-stack tree (which does have a recipes/ directory) rather than an in-repo path is undetermined; I found no in-repo convention or note for out-of-tree links, so defect 1 n",
+     "Two behavior claims need coordinator resolution before acceptance: claim 3 is corrected (its enumeration of what still counts as coverage is wrong), and claim 6 is confirmed only as 'the guard was added' - the guard is unreachable (defect 2), so the safety property the claim implies is not delivered"
+    ],
+    "inventory_checks_run": [
+     {
+      "command": "node --check app.js",
+      "exit": "0"
+     }
+    ],
+    "parse_error": null,
+    "profile": "default",
+    "readiness_verdict": null,
+    "reason": "unresolved corrected claim: review-changes.js path coverage no longer accepts an absolute inventory path or a path with a matching tail as covering a requested path; only exact or dot-relative repository-relative matches count. ; 6 defect(s) reported ; 6 verification gap(s) reported",
+    "recheck_checks_run": [
+     {
+      "command": "node --check app.js",
+      "exit": "0"
+     }
+    ],
+    "requested_checks": [
+     "node --check app.js"
+    ],
+    "status": "rejected",
+    "unread_sources": null,
+    "workflow": "review-changes"
+   },
+   "F-attempt-3": {
+    "accepted": false,
+    "attempt": "attempt-3",
+    "defects": [
+     "The rewritten DEPTH regex undercounts chained '..' segments, so the temp tree is created shallower than the config's deepest climb; a binding climbing 4+ levels would resolve its copy target above the mkdtemp root, i.e. write outside the temp tree that rmSync(root) cleans, defeating the stated self-containment intent.",
+     "Recorded evidence quoting `SUMMARY passed=15 failed=0 total=15` for `node .claude/workflows/test-contract-mutations.mjs` is stale after this diff: the suite now emits strictly more assertion lines, so that documented total can no longer match the test file it came from.",
+     "The new 'settings resolves to an existing file' mutation drives test-envelope.mjs into an unguarded read of the configured settings file, which throws instead of failing closed with a SUMMARY line; the mutation's pass condition (`run.status === 1 && added.some(...)`) does not notice the abort, so the new case does not actually verify fail-closed behavior.",
+     "Latent: the copy loop no longer requires a './' or '../' prefix, so a future workflows-relative binding such as 'docs/x.md' or a bare filename is now fed to `cpSync(resolve(HERE, rel), target)`; if that sibling path does not exist, cpSync throws and aborts the whole mutation harness (no SUMMARY, no per-case FAIL) instead of being skipped as before."
+    ],
+    "gaps": [
+     "No acceptance command exercises either changed file. The only requested/recorded check is `node --check app.js`; app.js is not in `git diff HEAD~1 -- .`, the tree is clean, and its content is `module.exports = { value: 2 }` (30 bytes, consistent with the recorded 'no output, exit 0' and the quoted `",
+     "Current SUMMARY totals for `node .claude/workflows/test-contract-mutations.mjs` and `node .claude/workflows/test-envelope.mjs` are unavailable to me (read-only role, no execution). They are needed to size and close defect 2 (stale documented `total=15`) and to confirm that the two new mutation cases",
+     "The two prompt-format claims (1 and 2) are prompt text only and have no behavioral evidence. Concrete risk with no covering check: review-changes.js requires the returned `checks_run[].command` to match the requested command exactly (test-envelope.mjs:83 'near-match returned command cannot satisfy c",
+     "The new assertion at test-contract-mutations.mjs:41 lives in the mutation harness itself, so no mutation case covers it; there is no evidence that it fails when a binding is made absolute or non-string.",
+     "docs/ultracode-token-routing-20260921.md:35 describes the mutation suite as 'seven defects must fail the suite on the named assertion, one harmless edit must ...', which does not match the 16 MUTATIONS entries now present (15 with a named assertion, 1 harmless). The mismatch predates this diff but i"
+    ],
+    "inventory_checks_run": [
+     {
+      "command": "node --check app.js",
+      "exit": "0"
+     }
+    ],
+    "parse_error": null,
+    "profile": "default",
+    "readiness_verdict": null,
+    "reason": "4 defect(s) reported ; 5 verification gap(s) reported",
+    "recheck_checks_run": [
+     {
+      "command": "node --check app.js",
+      "exit": "0"
+     }
+    ],
+    "requested_checks": [
+     "node --check app.js"
+    ],
+    "status": "rejected",
+    "unread_sources": null,
+    "workflow": "review-changes"
+   },
+   "F-attempt-5": {
+    "accepted": false,
+    "attempt": "attempt-5",
+    "defects": [
+     "The new mutation's injected binding resolves outside the temp copy, so its result depends on the shared system temp directory rather than on the copied tree, and it does not exercise the DEPTH logic its name implies. DEPTH is computed at line 18 from the unmutated config (value 1 for the current contract.config.json) and the copy loop at lines 51-55 runs before the mutation is written at line 59, ",
+     "The readOr/try-catch hardening does not make the suite 'always' reach SUMMARY: `configured(key)` itself throws before readOr's try block when a binding key is absent or non-string, because path.resolve rejects a non-string argument. The new generic loop at line 31 guards with `typeof CONFIG[key] === 'string'`, but the four remaining call sites pass `configured('contract_doc')` / `configured('setti",
+     "The generalized assertion is named 'resolves to an existing file' but tests existsSync, which is also true for a directory. This is now load-bearing because the generic loop pulls in usage_receipts_dir, which is a directory, so the check cannot distinguish a binding that must name a file (settings, instructions, contract_doc, routing_doc, task_record) from one that resolves to a directory; a setti"
+    ],
+    "gaps": [
+     "Neither changed file was executed as evidence. The only recorded acceptance command is `node --check app.js`, and the inventory's own checks_run note states it 'does not exercise the actual diff'. There is no recorded run of `node .claude/workflows/test-envelope.mjs` or `node .claude/workflows/test-",
+     "The recorded `node --check app.js` evidence (exit 0, no output) could not be independently confirmed from this read-only role; I verified only that app.js exists at the repository root (Glob pattern `app.js` returned `app.js`). app.js does not appear in `git diff HEAD~1 --stat -- .`, which lists exa",
+     "No negative-evidence coverage exists for two of the changes. The existsSync skip at test-contract-mutations.mjs:53 is unreachable with the current contract.config.json (all six binding sources exist) and no MUTATIONS entry removes a real source before the copy, and the DEPTH change at line 18 is not",
+     "Whether the new mutation at test-contract-mutations.mjs:37 produces its expected new FAIL line depends on runtime os.tmpdir() contents (defect D1); this cannot be settled without a recorded run of the mutation suite.",
+     "`git status --short --untracked-files=all -- .` returned no output in my own run, so the inventory's statement that there are no untracked in-scope files is consistent; no gap remains on untracked-file coverage."
+    ],
+    "inventory_checks_run": [
+     {
+      "command": "node --check app.js",
+      "exit": "0"
+     }
+    ],
+    "parse_error": null,
+    "profile": "default",
+    "readiness_verdict": null,
+    "reason": "3 defect(s) reported ; 5 verification gap(s) reported",
+    "recheck_checks_run": [
+     {
+      "command": "node --check app.js",
+      "exit": "0"
+     }
+    ],
+    "requested_checks": [
+     "node --check app.js"
+    ],
+    "status": "rejected",
+    "unread_sources": null,
+    "workflow": "review-changes"
+   },
+   "P-pinned": {
+    "accepted": null,
+    "attempt": "attempt-6",
+    "defects": null,
+    "gaps": null,
+    "inventory_checks_run": null,
+    "parse_error": "unparseable: Expecting value: line 1 column 1 (char 0) | The Workflow tool refused to run and returned no envelope, so I have no JSON to reply with.\n\nEvery invocation was rejected by the permission layer with the same",
+    "profile": "project-only-pinned",
+    "readiness_verdict": null,
+    "reason": null,
+    "recheck_checks_run": null,
+    "refusal": "the Workflow tool was invoked but refused by the permission layer: \"Review dynamic workflow before running\" (project-only settings carry no permission rule for the Workflow tool; the full profile runs under the user settings permission mode)",
+    "requested_checks": null,
+    "status": null,
+    "unread_sources": null,
+    "workflow": "review-changes"
+   },
+   "readiness": {
+    "accepted": null,
+    "attempt": "attempt-3",
+    "defects": [],
+    "gaps": [],
+    "inventory_checks_run": [],
+    "parse_error": null,
+    "profile": "default",
+    "readiness_verdict": "BLOCKING GATE: the audit's own evidence base, not the repository. The two reader packets covered README.md (3 lines, no setup/gate content) and `node --version` only; neither touched a single artifact that determines whether the portable workflows can run (.claude/settings.json, .claude/workflows/*, .claude/agents/*, docs/workflow-contract.md). On the packets as delivered, \"ready to run the portable workflows\" is undeterminable \u2014 both readers said so themselves in open_gates, and that must not be restated as a pass.\n\nIndependently established facts the readers missed (all observed now, by me, in the working tree at <scratch>/repo):\n\n1. Workflow enablement is present. /.claude/settings.json l",
+    "reason": "",
+    "recheck_checks_run": [],
+    "requested_checks": null,
+    "status": "complete",
+    "unread_sources": [],
+    "workflow": "readiness-audit"
+   }
+  },
+  "steps": {
+   "F": {
+    "child_usage": {
+     "argv": [
+      "node",
+      ".claude/workflows/child-usage.mjs",
+      "--latest"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.026,
+     "ended_utc": "2026-09-22T01:46:20+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:46:20+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 3322,
+     "stdout_sha256": "417282113bf7abe0684d1142276f3be54a384d3f8f04a9f15e507facca9fed8c",
+     "step": "default:review-changes:child-usage",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    "run": {
+     "argv": [
+      "claude",
+      "-p",
+      "--session-id",
+      "[redacted-uuid]",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--max-budget-usd",
+      "5",
+      "Use the Workflow tool to run the saved workflow \"review-changes\" with args {\"base\": \"HEAD~1\", \"checks\": [\"node --check app.js\"]}. Reply with the returned envelope JSON only."
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 594.758,
+     "ended_utc": "2026-09-22T01:46:20+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:36:26+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 279521,
+     "stdout_sha256": "8ba1498687092efb00b96c65c9c252952e69b4ebd3845aaaf8bd7a7b26bd62e7",
+     "step": "default:review-changes:native",
+     "summary_lines": [],
+     "timed_out": false
+    }
+   },
+   "F-attempt-3": {
+    "child_usage": {
+     "argv": [
+      "node",
+      ".claude/workflows/child-usage.mjs",
+      "--latest"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.025,
+     "ended_utc": "2026-09-22T00:58:47+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T00:58:47+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 3323,
+     "stdout_sha256": "1777aaf99e5be68bef1754048064926b6abe6125c1832ab35583b0a9dcdf4f34",
+     "step": "default:review-changes:child-usage",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    "run": {
+     "argv": [
+      "claude",
+      "-p",
+      "--session-id",
+      "[redacted-uuid]",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--max-budget-usd",
+      "5",
+      "Use the Workflow tool to run the saved workflow \"review-changes\" with args {\"base\": \"HEAD~1\", \"checks\": [\"node --check app.js\"]}. Reply with the returned envelope JSON only."
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 679.306,
+     "ended_utc": "2026-09-22T00:58:47+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T00:47:27+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 221116,
+     "stdout_sha256": "07e496f196f73b29b3b67459bc109a816b6d7ca05e6728bae3cce7e8ebcf8df4",
+     "step": "default:review-changes:native",
+     "summary_lines": [],
+     "timed_out": false
+    }
+   },
+   "F-attempt-5": {
+    "child_usage": {
+     "argv": [
+      "node",
+      ".claude/workflows/child-usage.mjs",
+      "--latest"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.025,
+     "ended_utc": "2026-09-22T01:32:06+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:32:06+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 3324,
+     "stdout_sha256": "ba88432bfd78436a2545cfecc2b68faa4c26f0891dc1ba07575bf59bc3103344",
+     "step": "default:review-changes:child-usage",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    "run": {
+     "argv": [
+      "claude",
+      "-p",
+      "--session-id",
+      "[redacted-uuid]",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--max-budget-usd",
+      "5",
+      "Use the Workflow tool to run the saved workflow \"review-changes\" with args {\"base\": \"HEAD~1\", \"checks\": [\"node --check app.js\"]}. Reply with the returned envelope JSON only."
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 316.17,
+     "ended_utc": "2026-09-22T01:32:06+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:26:50+00:00",
+     "stderr_bytes": 157,
+     "stderr_sha256": "e705bbf8982385da2b1a03725921d0a6c6730bbaadd22c8f9168522573d067e0",
+     "stdout_bytes": 199723,
+     "stdout_sha256": "dfe91f7c1b0e96ea5102cbf763ecf3bef5ea7ed411e10be59dcc7b7b01b6c3b0",
+     "step": "default:review-changes:native",
+     "summary_lines": [],
+     "timed_out": false
+    }
+   },
+   "P-pinned": {
+    "child_usage": {
+     "argv": [
+      "node",
+      ".claude/workflows/child-usage.mjs",
+      "--latest"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.026,
+     "ended_utc": "2026-09-22T01:49:15+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:49:15+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 3322,
+     "stdout_sha256": "417282113bf7abe0684d1142276f3be54a384d3f8f04a9f15e507facca9fed8c",
+     "step": "project-only-pinned:review-changes:child-usage",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    "run": {
+     "argv": [
+      "claude",
+      "-p",
+      "--session-id",
+      "[redacted-uuid]",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--max-budget-usd",
+      "5",
+      "--setting-sources",
+      "project",
+      "--settings",
+      ".claude/settings.json",
+      "--model",
+      "claude-fable-5-1[1m]",
+      "Use the Workflow tool to run the saved workflow \"review-changes\" with args {\"base\": \"HEAD~1\", \"checks\": [\"node --check app.js\"]}. Reply with the returned envelope JSON only."
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 129.313,
+     "ended_utc": "2026-09-22T01:49:15+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:47:05+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 168718,
+     "stdout_sha256": "d5f545def111a2d229020ce140f93c04897d19289ce1d1b537dbe92feef13a1d",
+     "step": "project-only-pinned:review-changes:native",
+     "summary_lines": [],
+     "timed_out": false
+    }
+   },
+   "readiness": {
+    "child_usage": {
+     "argv": [
+      "node",
+      ".claude/workflows/child-usage.mjs",
+      "--latest"
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 0.024,
+     "ended_utc": "2026-09-22T01:07:33+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:07:33+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 3325,
+     "stdout_sha256": "1fc838d106d1fbf85ed67dc67ca2ea89baae328a95ef5350604b67c42dfb240a",
+     "step": "default:readiness-audit:child-usage",
+     "summary_lines": [],
+     "timed_out": false
+    },
+    "run": {
+     "argv": [
+      "claude",
+      "-p",
+      "--session-id",
+      "[redacted-uuid]",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--max-budget-usd",
+      "5",
+      "Use the Workflow tool to run the saved workflow \"readiness-audit\" with args {\"docs\": [\"README.md\"], \"commands\": [\"node --version\"], \"question\": \"Is this scratch adoption ready to run the portable workflows, and what is the single blocking gate?\"}. Reply with the returned envelope JSON only."
+     ],
+     "cwd": "<scratch>/repo",
+     "elapsed_s": 433.184,
+     "ended_utc": "2026-09-22T01:07:33+00:00",
+     "exit": 0,
+     "started_utc": "2026-09-22T01:00:19+00:00",
+     "stderr_bytes": 0,
+     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "stdout_bytes": 182381,
+     "stdout_sha256": "553342125f48301f8d1e0f1c67083d004819a9d971df4446af2f1152be11c3e2",
+     "step": "default:readiness-audit:native",
+     "summary_lines": [],
+     "timed_out": false
+    }
+   }
+  },
+  "workflow_tool_use_observed": {
+   "F": {
+    "args": {
+     "base": "HEAD~1",
+     "checks": [
+      "node --check app.js"
+     ]
+    },
+    "name": "review-changes"
+   },
+   "F-attempt-3": {
+    "args": {
+     "base": "HEAD~1",
+     "checks": [
+      "node --check app.js"
+     ]
+    },
+    "name": "review-changes"
+   },
+   "F-attempt-5": {
+    "args": {
+     "base": "HEAD~1",
+     "checks": [
+      "node --check app.js"
+     ]
+    },
+    "name": "review-changes"
+   },
+   "P-pinned": {
+    "args": {
+     "base": "HEAD~1",
+     "checks": [
+      "node --check app.js"
+     ]
+    },
+    "name": "review-changes"
+   },
+   "readiness": {
+    "args": {
+     "commands": [
+      "node --version"
+     ],
+     "docs": [
+      "README.md"
+     ],
+     "question": "Is this scratch adoption ready to run the portable workflows, and what is the single blocking gate?"
+    },
+    "name": "readiness-audit"
+   }
+  }
+ }
+}

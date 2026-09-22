@@ -33,6 +33,8 @@
       "scope": "Native Claude terminal view of stages, workers, tokens and returned results. Open inside the selected Claude session; not a standalone web server.",
       "source_paths": [
         "recipes/claude-native-ultracode.md",
+        "recipes/claude-codex-cooperation-lanes.md",
+        "docs/ultracode-token-routing-20260921.md",
         "docs/native-ultracode-20260921.md"
       ]
     },

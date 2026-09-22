@@ -585,9 +585,31 @@
       "body": "Selected review/readiness scripts, exact source coverage, task-matched native agent definitions and local fixture boundaries.",
       "path": "examples/claude-native/workflows/README.md",
       "category": "setup"
+    },
+    {
+      "title": "Broad US-equities history and META/AMD research",
+      "offline": true,
+      "body": "September 21 research across 17,997 symbols and 24.2 million symbol-sessions. All 15 signal/horizon checks remain unestablished; the dated scan, identity gaps and paper boundary are explicit.",
+      "path": "blueprints/us-equities/broad-universe/README.md",
+      "category": "research"
+    },
+    {
+      "title": "Adaptive paper runtime and qualification boundaries",
+      "offline": true,
+      "body": "Native execution adapter, deterministic safety controls and recovery evidence. Local integration and prior broker observations remain separate from qualification of the revised runtime.",
+      "path": "blueprints/us-equities/adaptive-paper/README.md",
+      "category": "research"
     }
   ],
   "highlights": [
+    {
+      "id": "broad-universe-research-20260921",
+      "offline": true,
+      "title": "Broad historical research and a dated META/AMD scan",
+      "status": "Research complete; no strategy qualified",
+      "body": "17,997 symbols across 2,693 sessions; 24,195,741 symbol-sessions after identity deduplication. None of 15 signal/horizon checks establishes a predictive edge. The scan is from September 21 at 23:48 UTC; historical membership, revisions and early delisted coverage remain open.",
+      "path": "blueprints/us-equities/broad-universe/README.md"
+    },
     {
       "id": "external-eval",
       "title": "101 published retrieval cases",

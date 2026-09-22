@@ -1,0 +1,138 @@
+{
+ "attempts": [
+  {
+   "cause": "frozen test-envelope total was the agent-lab count (165) instead of the three-agent portable count (159); an unsupported --setting-sources flag was passed to claude plugin validate",
+   "n": 1,
+   "outcome": "harness error"
+  },
+  {
+   "cause": "the inventory scout read the acceptance command as an example in a sentence about empty output and ran nothing (recheck ran it); fixed by listing commands one per line with a count. Per-session Prometheus scoping found unavailable by design. Window contaminated by another native workflow of this coordinator",
+   "n": 2,
+   "outcome": "native envelope valid, rejected"
+  },
+  {
+   "cause": "four mutation-harness defects reported by the Opus reviewer, fixed",
+   "n": 3,
+   "outcome": "native full-profile envelope valid, rejected; readiness complete; project-only API 500"
+  },
+  {
+   "cause": "eight Codex findings (six code defects, one doc link, one inherent property), all resolved",
+   "n": 4,
+   "outcome": "local checks pass; project-only API 529; Codex lane C completed"
+  },
+  {
+   "cause": "three reviewer defects in the harness, fixed; client_scope introduced",
+   "n": 5,
+   "outcome": "native full-profile envelope valid, rejected; project-only API 529; scoped observation reconciles sonnet exactly"
+  },
+  {
+   "cause": "six reviewer defects (four in review-changes.js acceptance logic, two in the harness), fixed with local tests only",
+   "n": 6,
+   "outcome": "closing native run on the final workflow/agent set, envelope valid, rejected; pinned bare profile refused by the permission layer"
+  },
+  {
+   "cause": "no further native run; post-closing fixes are covered by the suites and envelope tests",
+   "n": 7,
+   "outcome": "local checks pass on the final file set"
+  }
+ ],
+ "evidence_classes": {
+  "codex": "independent cross-family review",
+  "local checks": "local integration (stubbed suites, synthetic rows, structural validation)",
+  "native runs": "native integration on the upstream Claude Code runtime, not an unchanged upstream test",
+  "observation": "independent observation (Prometheus, Grafana provisioning)"
+ },
+ "final_file_hashes": {
+  "agents/evidence-reviewer.md": {
+   "bytes": 2069,
+   "sha256": "75067deabb854902f680e2edbd24d975d055ef64552aa2a9dd514c20cd7f58b1"
+  },
+  "agents/isolated-builder.md": {
+   "bytes": 2016,
+   "sha256": "48938a39d10f33a2eef490d885da379cd63a03b7e42e53e4cb3ee3b8c80e1599"
+  },
+  "agents/source-scout.md": {
+   "bytes": 1681,
+   "sha256": "55062f9e65e91a29b0b2c800f1e83c84b8d9596ab86f75fd76ab288a29852647"
+  },
+  "settings.json": {
+   "bytes": 235,
+   "sha256": "6332b0cea25cd469a301b99b5a5d84a8dda709b89348c471625dc7290905d155"
+  },
+  "workflows/check-syntax.mjs": {
+   "bytes": 978,
+   "sha256": "ca62177687420fe22e03d0510a18e4f32b5d150e0156f6651c48367c3da506e1"
+  },
+  "workflows/child-usage.mjs": {
+   "bytes": 7780,
+   "sha256": "75a6d74b07b62d8bb1be0ed37bcffece18781c9c1bdff4a94c23cd5ce9dbe60b"
+  },
+  "workflows/codex-cross-review.mjs": {
+   "bytes": 8498,
+   "sha256": "cd303779df6521c804070a319aa04c86ed2d6fe1c099c537836f037dec5f4e8b"
+  },
+  "workflows/contract.config.json": {
+   "bytes": 350,
+   "sha256": "2e73ed523e115e6a1f55a4cc992bf052e157d9cdd85aeb09cf4ef93d3f996771"
+  },
+  "workflows/readiness-audit.js": {
+   "bytes": 13143,
+   "sha256": "d0d5afb3f4f8d635d0a75e48b4c4cda4a074e842130d9c80eb6633a5bfe1701a"
+  },
+  "workflows/review-changes.js": {
+   "bytes": 17859,
+   "sha256": "12c078107d45ca5690b6d4a5e3e7c6522453a0f7d3846355337b17e1901b3ad6"
+  },
+  "workflows/test-child-usage.mjs": {
+   "bytes": 5612,
+   "sha256": "fd23f5c7d1118e4b67bd00fc6212f0db4b0f2cbac1f2aaa0c76ee5f07e780c56"
+  },
+  "workflows/test-codex-envelope.mjs": {
+   "bytes": 2342,
+   "sha256": "2617c081f606268ed20a6e00f6472495fad950db433ca3afbb44ea970aaac446"
+  },
+  "workflows/test-contract-mutations.mjs": {
+   "bytes": 9440,
+   "sha256": "f418a9da354cb766cbab4f779be754359797b110ac4f3c28cdcda5e319d3c0a1"
+  },
+  "workflows/test-envelope.mjs": {
+   "bytes": 44353,
+   "sha256": "42e31e482482f437495bb492327ff1ccc39bef2743886a9a8c37814b41949c0f"
+  },
+  "workflows/test-usage-receipts.mjs": {
+   "bytes": 8495,
+   "sha256": "2ed3323db76d0104327a0c0bb35f00cf6a05018bdd9f49982b0c279cf2540871"
+  }
+ },
+ "first_prompt_tokens_final_run": {
+  "inventory": 8092,
+  "recheck": 7749,
+  "review": 11686
+ },
+ "gates": {
+  "codex lane C review completed (attempt-4)": true,
+  "local checks, both cwds, final file set (attempt-7)": true,
+  "native readiness-audit, full profile, complete envelope (attempt-3)": true,
+  "native review-changes, bare project-only profile": false,
+  "native review-changes, full profile, valid envelope with three children on the requested models and the acceptance command reproduced in both stages (attempt-6)": true,
+  "observation: scoped client_scope query empty at launch, sonnet and opus present under query_source=subagent after the run (attempts 5 and 6)": true,
+  "observation: sonnet children reconcile exactly with child-usage.mjs on all four counters (attempts 5 and 6)": true
+ },
+ "not_qualified": {
+  "project-only profile": "three provider failures (API 500, 529, 529) across attempts 3-5 with no workflow launched; the pinned sub-profile (attempt-6) reached the Workflow tool, which the permission layer refused (\"Review dynamic workflow before running\") because project-only settings carry no permission rule for it. Headless runs of a saved workflow therefore need a loaded settings source whose permission mode or allow rule covers the Workflow tool; interactive sessions get the prompt instead. Not tested further."
+ },
+ "observability_findings": [
+  "per-session scoping of exported Claude Code metrics is unavailable by design (collector keeps no session.id; instance is not the session id); OTEL_RESOURCE_ATTRIBUTES=ecosystem.client.scope=<run> is kept as the client_scope label and scopes a run exactly",
+  "host-wide sums of the cumulative counter drift within minutes of a session ending (stream staleness), so only same-window snapshots are comparable",
+  "the Opus child's exported subagent counters cover 10% of its provider-returned output in attempt 6 and 43% in attempt 5 (cache read 6% and 27%) while both Sonnet children reconcile exactly; unexplained, left for the observability layer",
+  "the provisioned Grafana dashboards sum Claude tokens by type only; the per-model query is documented as a follow-up"
+ ],
+ "pr_gate": "pass",
+ "question": "Can the portable Claude Code practice (examples/claude-native as published) be adopted into a fresh project and run natively, and does the observational layer see it?",
+ "sanitizations": [
+  "scratch root replaced by <scratch>",
+  "home directories replaced by ~",
+  "every UUID-shaped identifier (session, job, thread, turn) replaced by [redacted-uuid] or [redacted]",
+  "session ids kept only as sha256"
+ ]
+}

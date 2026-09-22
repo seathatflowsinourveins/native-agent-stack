@@ -15,6 +15,14 @@ silently enlarging the canonical index or accepted component manifest. Stars and
 awesome lists remain discovery signals. Layer tags are navigation heuristics,
 not adoption decisions or quality scores.
 
+The broad-universe research and adaptive-paper cards open complete embedded
+reports without network access. Their recorded receipts are also available in
+the selected components' returned-results viewer. These are dated research and
+runtime records: the September 21 scan is not a live quote feed, and none of the
+15 broad-universe signal/horizon checks established a strategy for promotion.
+Optional public-source links resolve after publication; local reading does not
+depend on those links.
+
 ## Use the setup and efficiency views
 
 **Selected stack & setup** includes every component in `manifests/stack.json`,

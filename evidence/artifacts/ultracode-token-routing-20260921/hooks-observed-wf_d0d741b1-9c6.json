@@ -1,0 +1,50 @@
+{
+ "run_id": "wf_d0d741b1-9c6",
+ "hook_success_counts_by_child": {
+  "verify": {
+   "SubagentStart:workflow-subagent :: ai-memory": 1,
+   "PreToolUse:Bash :: ai-memory": 16,
+   "PostToolUse:Bash :: ai-memory": 16,
+   "PreToolUse:Read :: ai-memory": 2,
+   "PostToolUse:Read :: ai-memory": 2,
+   "PreToolUse:Bash :: rtk hook claude": 11,
+   "PreToolUse:StructuredOutput :: ai-memory": 2,
+   "PostToolUse:StructuredOutput :: ai-memory": 1,
+   "SubagentStop :: ai-memory": 1
+  },
+  "inventory:haiku": {
+   "SubagentStart:workflow-subagent :: ai-memory": 1,
+   "PreToolUse:Read :: ai-memory": 17,
+   "PreToolUse:Bash :: ai-memory": 45,
+   "PreToolUse:Bash :: rtk hook claude": 41,
+   "PostToolUse:Bash :: ai-memory": 40,
+   "PostToolUse:Read :: ai-memory": 15,
+   "PreToolUse:StructuredOutput :: ai-memory": 1,
+   "PostToolUse:StructuredOutput :: ai-memory": 1,
+   "SubagentStop :: ai-memory": 1
+  },
+  "inventory:sonnet": {
+   "SubagentStart:workflow-subagent :: ai-memory": 1,
+   "PreToolUse:Bash :: ai-memory": 20,
+   "PreToolUse:Bash :: rtk hook claude": 14,
+   "PostToolUse:Bash :: ai-memory": 19,
+   "PreToolUse:Read :: ai-memory": 4,
+   "PostToolUse:Read :: ai-memory": 4,
+   "PreToolUse:StructuredOutput :: ai-memory": 1,
+   "PostToolUse:StructuredOutput :: ai-memory": 1,
+   "SubagentStop :: ai-memory": 1
+  },
+  "official-docs": {
+   "SubagentStart:workflow-subagent :: ai-memory": 1,
+   "PreToolUse:ToolSearch :: ai-memory": 1,
+   "PostToolUse:ToolSearch :: ai-memory": 1,
+   "PreToolUse:mcp__plugin_context-mode_context-mode__ctx_fetch_and_index :: ai-memory": 1,
+   "PostToolUse:mcp__plugin_context-mode_context-mode__ctx_fetch_and_index :: ai-memory": 1,
+   "PreToolUse:mcp__plugin_context-mode_context-mode__ctx_search :: ai-memory": 5,
+   "PostToolUse:mcp__plugin_context-mode_context-mode__ctx_search :: ai-memory": 5,
+   "PreToolUse:StructuredOutput :: ai-memory": 1,
+   "PostToolUse:StructuredOutput :: ai-memory": 1,
+   "SubagentStop :: ai-memory": 1
+  }
+ }
+}

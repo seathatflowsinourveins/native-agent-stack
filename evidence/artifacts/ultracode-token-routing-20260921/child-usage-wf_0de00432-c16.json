@@ -1,0 +1,49 @@
+{
+ "status": "complete",
+ "reason": "every child has an explicit requested model, a matching resolved model, returned usage and a non-null result",
+ "multi_model_children": [],
+ "children": [
+  {
+   "agent_id": "a56b39fe75a548ce8",
+   "label": "build:prometheus-token-probe",
+   "phase": "Build",
+   "agent_type": "isolated-builder",
+   "requested_model": "sonnet",
+   "resolved_models": [
+    "claude-sonnet-5"
+   ],
+   "efforts": [
+    "medium"
+   ],
+   "requests": 31,
+   "usage": {
+    "input_tokens": 62,
+    "output_tokens": 9876,
+    "cache_read_input_tokens": 967045,
+    "cache_creation_input_tokens": 46118
+   },
+   "usage_by_model": {
+    "claude-sonnet-5": {
+     "input_tokens": 62,
+     "output_tokens": 9876,
+     "cache_read_input_tokens": 967045,
+     "cache_creation_input_tokens": 46118
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 17864,
+   "complete": true,
+   "issues": []
+  }
+ ],
+ "by_resolved_model": {
+  "claude-sonnet-5": {
+   "children": 1,
+   "input_tokens": 62,
+   "output_tokens": 9876,
+   "cache_read_input_tokens": 967045,
+   "cache_creation_input_tokens": 46118
+  }
+ },
+ "run_id": "wf_0de00432-c16"
+}

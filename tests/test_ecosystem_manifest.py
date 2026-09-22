@@ -260,6 +260,30 @@ class EcosystemManifestTests(unittest.TestCase):
         self.write("docs/adoption.md", "A corrected adoption boundary.")
         self.assertNotEqual(self.run_generator("--check").returncode, 0)
 
+    def test_unpublished_curated_source_is_available_as_one_complete_offline_recipe(self):
+        source = {"title": "Research", "body": "Dated and unqualified",
+                  "path": "docs/unpublished.md", "offline": True}
+        self.config["guides"] = [source]
+        self.config["highlights"] = [{**source, "id": "research", "status": "Recorded"}]
+        content = "# Research\nNo strategy qualified.\n\n## Limits\nKeep the failed results.\n"
+        self.write(source["path"], content)
+        self.save()
+        page, _ = self.build()
+        data = json.loads(page.data)
+        recipes = [row for row in data["setup"]["recipes"] if row["path"] == source["path"]]
+        self.assertEqual(len(recipes), 1)
+        self.assertEqual(recipes[0]["text"], content)
+        for key in ("guides", "highlights"):
+            self.assertEqual(data[key][0]["recipe_path"], source["path"])
+        self.assertEqual(page.external_assets, [])
+
+    def test_offline_curated_source_rejects_non_markdown(self):
+        self.config["guides"] = [{"title": "Receipt", "body": "Read receipt",
+                                  "path": "docs/receipt.json", "offline": True}]
+        self.write("docs/receipt.json", {"status": "not_established"})
+        self.save()
+        self.assertIn("offline curated source must be Markdown", self.run_generator("--write").stdout)
+
     def test_selected_stack_contains_every_component_even_without_old_audit_coverage(self):
         page, _ = self.build()
         setup = json.loads(page.data)["setup"]

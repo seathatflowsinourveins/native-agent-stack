@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "id": "portable-claude-native-qualification-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "prometheus"
+  ],
+  "claim": "The portable Claude Code practice in examples/claude-native (three agents, ten workflow and check scripts, a sibling contract config, the unrestricted settings example) was adopted byte-for-byte into a scratch project and run on the upstream Claude Code 2.1.278 runtime: every local check passed from two working directories on the final file set; a headless review-changes run produced a valid envelope with source-scout, evidence-reviewer and source-scout children on Sonnet, Opus and Sonnet and reproduced the acceptance command in both the inventory and the independent recheck; a readiness-audit run completed; the run's metrics, tagged with an OpenTelemetry client scope the collector keeps as a label, showed both models under query_source=subagent and reconciled the Sonnet children exactly with child-usage.mjs; a Codex lane C review of the copied files completed with eight findings, all resolved.",
+  "recorded_date_utc": "2026-09-21",
+  "base_commit": "549515ac6c7856284e3d0f75337ab48bfd073b06",
+  "status": "bounded-native-operation-with-corrections",
+  "guide": "docs/ultracode-token-routing-20260921.md",
+  "artifacts": [
+    "evidence/artifacts/portable-claude-native-qualification-20260921/freeze.json",
+    "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
+    "evidence/artifacts/portable-claude-native-qualification-20260921/angle2-observation.json",
+    "evidence/artifacts/portable-claude-native-qualification-20260921/codex-lane-c.json",
+    "evidence/artifacts/portable-claude-native-qualification-20260921/summary.json",
+    "examples/claude-native/workflows/README.md",
+    "examples/claude-native/workflows/contract.config.json"
+  ],
+  "observations": {
+    "native_version": "2.1.278 (Claude Code)",
+    "node": "v24.21.0",
+    "codex": "codex-cli 0.155.1",
+    "attempts": 7,
+    "native_workflow_runs": {
+      "review_changes_full_profile": 3,
+      "readiness_audit_full_profile": 1,
+      "project_only_profile_launches": 0
+    },
+    "closing_run": {
+      "envelope_status": "rejected",
+      "accepted": false,
+      "inventory_checks": [
+        {
+          "command": "node --check app.js",
+          "exit": "0"
+        }
+      ],
+      "recheck_checks": [
+        {
+          "command": "node --check app.js",
+          "exit": "0"
+        }
+      ],
+      "children": [
+        {
+          "label": "inventory",
+          "agent_type": "source-scout",
+          "resolved_model": "claude-sonnet-5",
+          "requests": 5,
+          "first_request_prompt_tokens": 8092
+        },
+        {
+          "label": "review",
+          "agent_type": "evidence-reviewer",
+          "resolved_model": "claude-opus-5",
+          "requests": 8,
+          "first_request_prompt_tokens": 11686
+        },
+        {
+          "label": "recheck",
+          "agent_type": "source-scout",
+          "resolved_model": "claude-sonnet-5",
+          "requests": 2,
+          "first_request_prompt_tokens": 7749
+        }
+      ],
+      "run_seconds": 594.8
+    },
+    "observation": {
+      "scoped_before_rows": 0,
+      "sonnet_exact_on_all_counters": true,
+      "sonnet_output": {
+        "child_usage": 9261,
+        "exact": true,
+        "exporter": 9261.0,
+        "ratio": 1.0
+      },
+      "opus_output": {
+        "child_usage": 32405,
+        "exact": false,
+        "exporter": 3128.0,
+        "ratio": 0.097
+      },
+      "opus_cache_read": {
+        "child_usage": 337137,
+        "exact": false,
+        "exporter": 21588.0,
+        "ratio": 0.064
+      }
+    },
+    "codex_lane_c": {
+      "outcome": "completed:success",
+      "result_status": 0,
+      "elapsed_ms": 371027,
+      "findings": 8
+    },
+    "local_checks_final": {
+      "test-envelope": 169,
+      "test-contract-mutations": 23,
+      "test-child-usage": 16,
+      "test-usage-receipts": 18,
+      "test-codex-envelope": "7 PASS"
+    }
+  },
+  "limitations": [
+    "Local integration on one host with a synthetic one-line change; not an unchanged upstream test and not a benchmark.",
+    "The workflow's strict accepted status was not returned: every native reviewer found defects in the files under qualification, which were fixed and re-run; the fixes after the closing native run are covered by the local suites and envelope tests only.",
+    "The project-only settings profile was not qualified: three provider failures (500, 529, 529) and, with the coordinator model pinned, a permission-layer refusal of the Workflow tool because that profile carries no permission rule for it; headless runs need a loaded settings source whose permission mode or allow rule covers the Workflow tool.",
+    "Per-session scoping of the exported metrics is unavailable by design; the client scope comes from OTEL_RESOURCE_ATTRIBUTES and other sessions on the host were active during the windows. The Opus child's exported counters covered 10 percent (closing run) and 43 percent (previous run) of its provider-returned output while the Sonnet children reconciled exactly; unexplained.",
+    "Session, job, thread and turn identifiers are redacted; raw streams stay outside Git."
+  ]
+}

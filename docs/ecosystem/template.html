@@ -144,9 +144,9 @@ data.layers.forEach((layer, index) => {
   action.addEventListener("click", () => { resetFilters(); $("layer-filter").value = layer.id; renderRepositories(); showTab("explorer", true); window.scrollTo(0, 0); });
   add(card, add(make("footer"), make("span", "", layer.examples), action)); $("layer-grid").appendChild(card);
 });
-data.guides.forEach(guide => add($("guide-grid"), add(make("article", "guide"), link(guide.title + " ↗", guide.url), make("p", "", guide.body))));
+data.guides.forEach(guide => add($("guide-grid"), add(make("article", "guide"), guide.recipe_path ? recipeButton(guide.recipe_path, guide.title) : link(guide.title + " ↗", guide.url), make("p", "", guide.body))));
 data.policies.forEach(policy => add($("policy-grid"), add(make("article", "policy"), make("span", "number", policy.number), add(make("div"), make("h3", "", policy.title), make("p", "", policy.body), link("Read the source ↗", policy.url)))));
-data.highlights.forEach(proof => add($("evidence-grid"), add(make("article", "proof"), make("div", "eyebrow", proof.status), make("h3", "", proof.title), make("p", "", proof.body), link("Inspect evidence ↗", proof.url))));
+data.highlights.forEach(proof => add($("evidence-grid"), add(make("article", "proof"), make("div", "eyebrow", proof.status), make("h3", "", proof.title), make("p", "", proof.body), proof.recipe_path ? recipeButton(proof.recipe_path, "Read embedded research") : link("Inspect evidence ↗", proof.url))));
 data.awesome.forEach(item => add($("awesome-list"), add(make("article", "awesome"), link(item.name + " ↗", item.url), make("code", "", item.pin), make("p", "small muted", "Observed " + item.date.slice(0,10) + " · " + item.license))));
 $("provenance-summary").textContent = "Snapshot provenance · " + data.inputs.length + " public input hashes";
 $("provenance-note").textContent = "Public star snapshot: " + data.stars_observed_at + ". Component snapshot: " + data.component_snapshot_at + ". Existing source-link base: " + data.source_revision + ". This new explorer packet links its own documents at public main after publication; their exact snapshot hashes are below. Hashes bind bytes and scope, not truth or independent execution attestation. The evidence manifest hashes only its receipts section to avoid a generated-file hash cycle.";
@@ -312,6 +312,7 @@ function renderGrandCatalogs() {
   });
   trading.next_acceptance.forEach(step => add($("trading-next"), add(make("article", "catalog-card"), make("h3", "", readable(step.id)), make("p", "", step.scope))));
   listLimits($("trading-evidence"), trading.limitations); catalogSources($("trading-evidence"), trading.accepted_references); catalogSources($("trading-evidence"), [{path: "Trading target record", url: trading.url}]);
+  [["blueprints/us-equities/broad-universe/README.md", "Broad history and dated META/AMD research"], ["blueprints/us-equities/adaptive-paper/README.md", "Paper runtime and qualification boundaries"]].forEach(([path, label]) => { if(recipeMap.has(path)) add($("trading-evidence"), recipeButton(path, label)); });
   renderFoundation();
 }
 renderGrandCatalogs();

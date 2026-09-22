@@ -50,6 +50,7 @@ RETURNED_RECEIPT_FAMILIES = {
     "dashboard-render-e2e", "dashboard-gap-resolution", "memory-landscape", "memory-landscape-lifecycle", "foundation-convergence",
     "foundation-rd",
     "claude-upstream-checks",
+    "broad-universe-research", "adaptive-paper-practice",
 }
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
@@ -66,6 +67,10 @@ NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-c
                     "evidence/artifacts/foundation-rd-20260921/qmd-bench-output.txt",
                     "evidence/artifacts/foundation-rd-20260921/native-review.json",
                     "recipes/claude-native-ultracode.md", "examples/claude-native/ultracode.settings.json",
+                    "docs/ultracode-token-routing-20260921.md", "recipes/claude-codex-cooperation-lanes.md", "examples/codex-native/README.md",
+                    "blueprints/us-equities/broad-universe/README.md", "blueprints/us-equities/adaptive-paper/README.md",
+                    "evidence/receipts/broad-universe-research-20260921.json", "evidence/receipts/adaptive-paper-practice-20260921.json",
+                    "evidence/receipts/ultracode-token-routing-20260921.json", "evidence/receipts/portable-claude-native-qualification-20260921.json",
                     "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
                     "docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md", "docs/foundation-convergence-20260921.md",
                     "docs/harness-defaults.md", "catalogs/README.md", STACK, ADOPTION,
@@ -328,6 +333,8 @@ def build_data(root):
         # This packet is newer than the immutable base; its own new pages resolve
         # at the public branch after publication, with exact input hashes retained.
         new_catalog = path.startswith("catalogs/foundation/") or path in config.get("grand_catalogs", {}).values()
+        # Artifact bundles that arrived with this packet do not exist at the immutable base.
+        new_catalog = new_catalog or path.startswith(("evidence/artifacts/ultracode-token-routing-20260921/", "evidence/artifacts/portable-claude-native-qualification-20260921/"))
         revision = "main" if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or path in current_public_paths else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 
@@ -422,6 +429,7 @@ def build_data(root):
                        "search": " ".join([haystack, *decisions, *record.get("aliases", [])])})
     require(set(star_map).issubset(seen), "public-star inventory has repositories missing from the canonical index")
     curated = {}
+    offline_guide_paths = set()
     for name in ("policies", "guides", "highlights"):
         curated[name] = []
         for value in config[name]:
@@ -431,6 +439,10 @@ def build_data(root):
                 require(safe_file(root, path).is_file(), "curated source file missing")
                 track(path)
                 item["url"] = file_url(path)
+                if item.pop("offline", False):
+                    require(path.endswith(".md"), "offline curated source must be Markdown")
+                    item["recipe_path"] = path
+                    offline_guide_paths.add(path)
             elif "url" in item:
                 item["url"] = public_url(item["url"])
             curated[name].append(item)
@@ -465,12 +477,13 @@ def build_data(root):
     for profile in profiles:
         require(set(profile["component_ids"]).issubset(component_ids),
                 "adoption profile references an unknown component")
-    guide_paths = list(SETUP_GUIDES)
+    guide_paths = list(SETUP_GUIDES) + sorted(offline_guide_paths)
     for path in ("docs/claude-foundation-finalization-20260921.md", "examples/claude-native/workflows/README.md", "docs/foundation-convergence-20260921.md", "docs/native-memory-rag-lifecycle.md", "docs/memory-landscape-maintenance.md", "adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md", "docs/token-session-handbook.md",
                  "docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md",
                  "docs/community-native-practice.md", "examples/claude-native/CLAUDE.md",
                  "recipes/claude-native-ultracode.md", "docs/foundation-rd-readiness.md",
-                 "recipes/claude-codex-foreground-review.md", "docs/claude-upstream-checks.md"):
+                 "recipes/claude-codex-foreground-review.md", "docs/claude-upstream-checks.md",
+                 "docs/ultracode-token-routing-20260921.md", "recipes/claude-codex-cooperation-lanes.md", "examples/codex-native/README.md"):
         if (root / path).exists():
             guide_paths.append(path)
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
