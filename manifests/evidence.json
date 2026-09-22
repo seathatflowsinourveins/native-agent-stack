@@ -12206,6 +12206,46 @@
       "path": "blueprints/gap-resolution-20260922/beads-lease-recovery-probe/pilot-create-out.json",
       "sha256": "4869e57320a8d53c39debad6d368ee57b1a743d30d8a5292a5b9085c30ace14e",
       "bytes": 366
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/data-quality-orchestration/promotion-gate-fixture-suite.json",
+      "sha256": "479d2422b8e221a35a94d61f112d07cfc3b0fc6dfaaca058f620e3fe4a151acd",
+      "bytes": 10847
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/data-quality-orchestration/promotion-gate-fixture-suite.raw.log",
+      "sha256": "c5af2d188e72b081267e619465bb647f90bc455ca3bf98a6c81c0614d6dbbf7c",
+      "bytes": 3225
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/execution-broker/rerun-frozen-fixture-suite.json",
+      "sha256": "af52bf4094ada50167e98bdcf8b2b8eae7c86707e3abec319b46f8d00afd514d",
+      "bytes": 16753
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/execution-broker/rerun-frozen-fixture-suite.raw.log",
+      "sha256": "00c3b5504f60a58920a40a8c37f04728794fc2cf0ce9c33d225612f83b44eb9f",
+      "bytes": 27757
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/execution-broker/rerun-frozen-fixture-suite.pinned-runtime.raw.log",
+      "sha256": "fb36319ff27d076030f2faa22e9d9e59cef742da960c1e61361674ebd719225e",
+      "bytes": 26586
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/execution-broker/capture-alpaca-wire-serialization.json",
+      "sha256": "20a145eb6080745f2bd486a236dbe2e8d13c81fb0e59d61ea25096aaa51c4660",
+      "bytes": 15135
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/execution-broker/capture-alpaca-wire-serialization.raw.json",
+      "sha256": "6d262b603c381a1f30ad2ef2586ebe2671a2ff0b7fa7b774a2d00ef9e556b35f",
+      "bytes": 8462
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/capture-alpaca-wire-serialization/probe_wire.py",
+      "sha256": "e574bc58599b24c921b7787135fb30f191f955b050c29264d07c82859c50fa92",
+      "bytes": 7864
     }
   ],
   "convergence_records": [
