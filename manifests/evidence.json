@@ -3103,8 +3103,8 @@
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "7b588ea862d1035ba13b645c777f625bf09caa463b81955b6decf6db91aad96b",
-      "bytes": 19343
+      "sha256": "a730416954690978c51682898c01e498be0722b2a85b4c2bf3d37f2103525c01",
+      "bytes": 20192
     },
     {
       "path": "adoption/bootstrap.md",
@@ -3168,8 +3168,8 @@
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "b994497271c4a188429069e4678b94b8effb9e722a8b039c9cf7e48de754c006",
-      "bytes": 9694
+      "sha256": "cf645139500175634c9fda870935f3441a808a9b57e7939453a028b17c7ef5cd",
+      "bytes": 10170
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -3233,13 +3233,13 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "0187674fd9ee0241a34bc445c02ba3ebad21df3aa2bdd0ac2635c55310589ae9",
-      "bytes": 12840
+      "sha256": "baa7298f7520e5e47cc3816dd3d30b7fc65c74ec7e5e10c1c36dc2bc59fb86f5",
+      "bytes": 16285
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
-      "sha256": "7680fe1173b35a8472023772c8973c4a9b65c4e444414ac44efa199cbabe17db",
-      "bytes": 2744
+      "sha256": "f6c0cfa42b377b2f383f763c2342fe25b585131c9ba3e287788f5f617b044004",
+      "bytes": 5235
     },
     {
       "path": "adoption/tools/gitleaks-guarded",
@@ -11509,8 +11509,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "fc882bffe36d2d3116e49bcdfca79274eed2c3f1c3eb96e2b9612731d1ff78a5",
-      "bytes": 28953
+      "sha256": "d99bf558684c7c666884b1ef6e5c29d88999c6412b0643d53270934c7c1cccd8",
+      "bytes": 37057
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -11519,8 +11519,8 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "9fe7155745db79cfa2ae673465c28907042aa0776b35834ddf17968ecd226a91",
-      "bytes": 21198
+      "sha256": "147b889e4bdedf071490e6ea5ecd36056ddc17c843d91ea9fbfda6bee0291926",
+      "bytes": 30053
     },
     {
       "path": "tests/test_adoption_status.py",
