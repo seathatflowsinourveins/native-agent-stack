@@ -3041,8 +3041,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "c9956e586a7652080bc625896a9f0877695431ac0a4fe0de8c90b15939c76c03",
-      "bytes": 1878
+      "sha256": "c550b0a93fb1944568244f56f52726e99dcca9cfd1d5aab7b7ef16d5d9147b0f",
+      "bytes": 17409
     },
     {
       "path": "AGENTS.md",
@@ -11252,8 +11252,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "4b4f7d7fd0624fcb1abce1a19334025bc4d5fc918927e58ec454e61c82d8c0c8",
-      "bytes": 12726
+      "sha256": "09563ae5270fc2de8659b5c87760b6e0118898a674e6340abf3396762298aef3",
+      "bytes": 19963
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -11674,6 +11674,11 @@
       "path": "blueprints/us-equities/data/fixtures/fractional-negative-volume-gate-result.json",
       "sha256": "985249539ef5f507a3953c36724e3d5507e79eb90b0fd72656977d6d42d70191",
       "bytes": 1518
+    },
+    {
+      "path": "tests/test_gitleaks_config.py",
+      "sha256": "56c2cc58fa10ad1dce4833f47f5d07e474d86058c8b86292ee7cc6d515a28d03",
+      "bytes": 8006
     }
   ],
   "convergence_records": [

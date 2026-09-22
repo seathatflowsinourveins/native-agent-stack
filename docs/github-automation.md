@@ -250,9 +250,11 @@ remain the execution evidence.
 Three lanes run on a schedule and never gate a merge: `catalog-freshness.yml`
 (Mondays 06:17 UTC, plus manual dispatch with a `max_repos` bound), the
 `sbom-vuln` job in `supply-chain.yml` (weekly, plus push/PR when its own paths
-change) and a later `adoption-bootstrap` lane (not yet built). None of these
-three appear in `main-ruleset.json`'s required status checks; a required check
-must run on every PR, and a report-only scheduled lane does not.
+change) and `adoption-bootstrap.yml` (weekly Monday 06:47 UTC, plus push/PR
+when `adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`
+change; described in full further below). None of these three appear in
+`main-ruleset.json`'s required status checks; a required check must run on
+every PR, and a report-only scheduled lane does not.
 
 `catalog-freshness.yml` reuses `tools/sota-convergence/extract_layers.py` and
 `github_freshness.py` unchanged, then rebuilds a manifest with
@@ -291,10 +293,13 @@ against `blueprints/convergence-practice/wsl-native-tools/pins.json`,
 mode (full history, `fetch-depth: 0`) and `dir` mode (working tree), both
 `--redact`. The redacted JSON report is uploaded with `if: always()` so a
 failed scan still leaves the report retrievable; it never prints a matched
-secret to the job log. This job is not yet in `main-ruleset.json`'s required
-checks by default merge policy -- it *is* listed in the required-status-checks
-parameters below, pending the coordinator applying the updated ruleset (see
-"Ruleset upgrade" below).
+secret to the job log. Unlike `sbom-vuln` below, this job fails on any
+detection (no `--exit-code` override, so gitleaks' non-zero default stands)
+and is already named in the *committed* `main-ruleset.json`'s
+`required_status_checks`. It is not yet a required check in the *active,
+applied* branch-protection ruleset described in "Publication and practical
+acceptance" above -- that only happens once the coordinator applies the
+committed file (see "Ruleset upgrade" below).
 
 `supply-chain.yml`'s `sbom-vuln` job uses syft 1.52.0 (linux_amd64 tarball
 SHA-256 `caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d`,
@@ -310,10 +315,13 @@ should be re-checked whenever `sbom-vuln`'s own workflow path changes.
 
 Receipts land as workflow artifacts only: `secret-scan-<run_id>` (30-day
 retention) and `supply-chain-<run_id>` (90-day retention, matching the SBOM's
-longer useful life). Neither report is committed to the repository. The
-threshold decision -- whether a grype finding of a given severity should ever
-fail a build -- is explicitly **pending**; today both scans are report-only
-and a human reads the artifact.
+longer useful life). Neither report is committed to the repository.
+`sbom-vuln` is report-only by design -- it never passes `--fail-on`, so a
+grype finding of any severity never fails that job, and the threshold
+decision (whether one ever should) is explicitly **pending**; a human reads
+the artifact. `secret-scan` already fails its own job on any detection (see
+above); "report-only" describes `sbom-vuln`'s vulnerability findings, not
+`secret-scan`'s.
 
 `native-foundation-e2e.yml`'s package set has no dedicated lock file (its
 pins live inline in the workflow's `packages=(...)` array); the task that
@@ -323,8 +331,8 @@ so the filter instead watches the workflow file itself.
 ## Repository policy files
 
 [`.github/CODEOWNERS`](../.github/CODEOWNERS) names the automation maintainer
-as the default owner and again for `.github/` and a not-yet-created
-`adoption/` directory (reserved for a future adoption-bootstrap lane).
+as the default owner and again for `.github/` and `adoption/` (the built
+adoption-bootstrap lane's own directory).
 [`SECURITY.md`](../SECURITY.md) documents scope (a catalog, not a deployed
 service), the private-vulnerability-reporting path (falling back to a public
 issue without secret detail while private reporting is not yet enabled),
