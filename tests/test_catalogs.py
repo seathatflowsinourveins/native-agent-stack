@@ -437,5 +437,112 @@ class CatalogValidationTests(unittest.TestCase):
             self.assertEqual(main(["--root", str(self.root)]), 1)
 
 
+class Pr4CardsReconciliationTests(unittest.TestCase):
+    """Content checks for the 2026-09-22 engine/broker card reconciliation (pr4-cards).
+
+    These assert the actual repository files under catalogs/us-equities, not a
+    synthetic fixture; they check card content only, not full-catalog schema
+    validation (that path also needs coverage.json/star-audit.json, which this
+    unit does not own -- see the task handoff for the exact blocking finding).
+    """
+
+    ROOT = Path(__file__).resolve().parents[1]
+
+    def load(self, relative):
+        return json.loads((self.ROOT / relative).read_text(encoding="utf-8"))
+
+    def entry(self, data, entry_id):
+        for item in data["entries"]:
+            if item["id"] == entry_id:
+                return item
+        self.fail(f"entry {entry_id} not found")
+
+    def test_nautilustrader_card_is_the_selected_destination_default(self):
+        data = self.load(f"{BASE}/engines-strategies.json")
+        nautilustrader = self.entry(data, "nautilustrader")
+        self.assertEqual(nautilustrader["decision"], "default")
+        self.assertEqual(nautilustrader["evidence_level"], "native_proven")
+        self.assertIn("selected destination runtime", nautilustrader["role"])
+        self.assertIn("2.0.0rc5", nautilustrader["version_or_commit"])
+        self.assertEqual(nautilustrader.get("source_commit"), "1b0a49d2792a9432a3aca3fcb617ce7a630d905e")
+        joined_limitations = " ".join(nautilustrader["limitations"])
+        self.assertIn("25 pass / 4 fail", joined_limitations)
+        self.assertIn("market_on_open_proxy", joined_limitations)
+        self.assertIn("distributions_and_cash", joined_limitations)
+        self.assertIn("parity worktree", joined_limitations)
+
+        lean = self.entry(data, "lean")
+        self.assertEqual(lean["decision"], "default")
+        self.assertIn("frozen historical comparator", lean["role"])
+        self.assertNotIn("shared strategy host", lean["role"])
+
+    def test_new_broker_adapter_cards_exist_with_required_notes(self):
+        data = self.load(f"{BASE}/engines-strategies.json")
+        ibkr = self.entry(data, "nautilus-ibkr-adapter")
+        self.assertEqual(ibkr["repository"], "https://github.com/nautechsystems/nautilus_trader")
+        self.assertEqual(ibkr["decision"], "default")
+        self.assertEqual(ibkr["evidence_level"], "source_review")
+        self.assertIn("broker-adapter", ibkr["layers"])
+        self.assertTrue(any("not_established" in item for item in ibkr["limitations"]))
+
+        alpaca = self.entry(data, "adaptive-paper-alpaca-adapter")
+        self.assertEqual(alpaca["repository"], "https://github.com/seathatflowsinourveins/native-agent-stack")
+        self.assertEqual(alpaca["decision"], "default")
+        self.assertEqual(alpaca["evidence_level"], "source_review")
+        self.assertTrue(any("no live broker fills claimed" in item.lower() for item in alpaca["limitations"]))
+        self.assertIn("blueprints/us-equities/adaptive-paper/receipt.json", alpaca["evidence_refs"])
+
+    def test_engines_strategies_card_files_referenced_by_new_entries_exist(self):
+        data = self.load(f"{BASE}/engines-strategies.json")
+        for entry_id in ("nautilustrader", "nautilus-ibkr-adapter", "adaptive-paper-alpaca-adapter"):
+            item = self.entry(data, entry_id)
+            for ref in item.get("evidence_refs", []):
+                if not ref.startswith("https://"):
+                    self.assertTrue((self.ROOT / ref).is_file(), f"{entry_id}: missing local evidence {ref}")
+
+    def test_agents_operations_grype_and_openbao_notes(self):
+        data = self.load(f"{BASE}/agents-operations.json")
+        grype = self.entry(data, "grype")
+        self.assertTrue(any("2026-09-22 scan receipt" in item for item in grype["limitations"]))
+        openbao = self.entry(data, "openbao")
+        self.assertTrue(any("selected live-primary, unaccepted" in item for item in openbao["limitations"]))
+
+    def test_manifest_repository_entry_counts_match_recomputation(self):
+        manifest = self.load(f"{BASE}/manifest.json")
+        repos = set()
+        total = 0
+        for name in ("foundation-memory", "agents-operations", "data-research", "engines-strategies"):
+            data = self.load(f"{BASE}/{name}.json")
+            for entry in data["entries"]:
+                total += 1
+                repos.add(entry["repository"].lower())
+        self.assertEqual(manifest["counts"]["repository_entries"], total)
+        self.assertEqual(manifest["counts"]["unique_catalog_repositories"], len(repos))
+
+    def test_reconciliations_file_has_the_nine_new_entries(self):
+        data = self.load("tools/sota-convergence/reconciliations-20260922.json")
+        entries = data["reconciliations"]
+        pairs = [(item["layer"], item["kind"]) for item in entries]
+        for expected in (
+            ("backtesting-engine", "card_reconciled"),
+            ("execution-broker", "card_added"),
+            ("market-data-reference", "stack_component_added"),
+            ("security-supply-chain", "scan_recorded"),
+            ("observability-hosting", "alert_rules_added"),
+            ("security-supply-chain", "decision_recorded"),
+            ("data-quality-orchestration", "gate_wired"),
+            ("execution-broker", "gate_ladder_recorded"),
+        ):
+            self.assertIn(expected, pairs)
+        self.assertEqual(pairs.count(("execution-broker", "card_added")), 2)
+        new_kinds = {
+            "card_reconciled", "card_added", "stack_component_added", "scan_recorded",
+            "alert_rules_added", "decision_recorded", "gate_wired", "gate_ladder_recorded",
+        }
+        for item in entries:
+            if item["kind"] in new_kinds:
+                self.assertEqual(set(item), {"layer", "kind", "repository", "pin", "source", "note"})
+
+
 if __name__ == "__main__":
     unittest.main()

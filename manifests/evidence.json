@@ -6468,13 +6468,13 @@
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
-      "sha256": "b94046c240a1e0b93875e3f3eabc44c821b3deeeae4977ebefc54e9268202e08",
-      "bytes": 97644
+      "sha256": "9c5bc46b3d058147c39d5d1a3ddfc44c4f9eb8a497c8e6d80bfeeff5eb0e77b5",
+      "bytes": 97980
     },
     {
       "path": "catalogs/us-equities/agents-operations.md",
-      "sha256": "c7e35db1bf0216eb49410250d8fb1261c97893a4527e41fcc9c32ecf20ef528f",
-      "bytes": 26507
+      "sha256": "0ee118e8db1c211141655af45ae832491b91dd374300f240cb0d1e459e43f841",
+      "bytes": 26837
     },
     {
       "path": "catalogs/us-equities/architecture/README.md",
@@ -6608,18 +6608,18 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "273191fbc46d24a337e52d7eba6ddc8a763d0ce37878f868710029b176b7ec5f",
-      "bytes": 688158
+      "sha256": "a3a4847130e20d8ba559b9fea808701f87d0dd817a6fd53477b1b24534ca1515",
+      "bytes": 688943
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
-      "bytes": 99208,
-      "sha256": "97189a2959a2a3b815b0a801cc6a329592d8a035e31c80e6e1c3f822774c26eb"
+      "bytes": 104711,
+      "sha256": "0d05d1fb99e62dbc95c54a331e504392b9448d7c6c529f44f41b97479f75a1aa"
     },
     {
       "path": "catalogs/us-equities/engines-strategies.md",
-      "bytes": 22816,
-      "sha256": "6502e766b469181ca7c31fdcb734abe9fae1f018e628e9c0a92b88cc0d2e77d4"
+      "bytes": 24636,
+      "sha256": "a04a3299fc91e46203c9c3fb9c06ad235253340a8f1945c0b0f95bee7c56c3f0"
     },
     {
       "path": "catalogs/us-equities/foundation-memory.json",
@@ -6653,7 +6653,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "c803a802637edb7edf13a94c3f03458244782d0b976d5d75172c548542409c85",
+      "sha256": "43086c77397f4bab96adff5f06c3394ce210c415fb44399188ee3708902b9051",
       "bytes": 3112
     },
     {
@@ -7548,8 +7548,8 @@
     },
     {
       "path": "tests/test_catalogs.py",
-      "sha256": "0272997b1c93f2e218a20885e7390570ed4fd780ad9ce0e40ca060b23fc1b470",
-      "bytes": 21921
+      "sha256": "ff4615d93eda8b720816fa798fb6774362246ca5cca751e67f2e277dd8217a54",
+      "bytes": 27735
     },
     {
       "path": "tests/test_catalyst_dataset.py",
@@ -10738,8 +10738,8 @@
     },
     {
       "path": "tools/sota-convergence/reconciliations-20260922.json",
-      "bytes": 1882,
-      "sha256": "c076e3fedf658b195af08b75c2887b80bb9ee8cdf80b12b35dadfeadf72ae3ea"
+      "bytes": 6720,
+      "sha256": "89f2a84d07fa8be6f3cd9a20c21bf0a4b5267d127aded473c69e0c10ae137083"
     },
     {
       "path": "tests/test_sota_convergence.py",

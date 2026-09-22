@@ -14,7 +14,7 @@
         "backtesting",
         "execution-engine"
       ],
-      "role": "Event-driven research engine and eventual shared strategy host",
+      "role": "frozen historical comparator (oracle), not the runtime",
       "decision": "default",
       "rationale": "Retain the already proven native C# source build and bundled backtest; a separate official Alpaca adapter avoids inventing a broker bridge.",
       "version_or_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
@@ -163,48 +163,42 @@
         "backtesting",
         "execution-engine"
       ],
-      "role": "Typed event-driven multi-venue engine",
-      "decision": "alternative",
-      "rationale": "Strong alternative if the broker/data requirements change, especially IBKR; avoid writing a new Alpaca adapter merely to switch engines.",
-      "version_or_commit": "1.231.0",
-      "release_date": "2026-08-02T18:47:40.645057Z",
+      "role": "selected destination runtime (runtime-target.json)",
+      "decision": "default",
+      "rationale": "Runtime-target reconciliation (2026-09-22): NautilusTrader 2.0.0rc5 is the selected destination runtime for native IBKR execution plus a separately qualified Alpaca boundary. The unchanged upstream synthetic EUR/USD quickstart passed two isolated offline runs with exact cash reconciliation; this supersedes the earlier 1.231.0 alternative review below.",
+      "version_or_commit": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+      "release_date": "2026-09-15T06:17:23Z",
       "license": "LGPL-3.0-or-later",
-      "us_equities_fit": "Stable source includes equities examples and Interactive Brokers/Databento adapters.",
-      "alpaca_fit": "No Alpaca directory in the inspected v1.231.0 adapter tree.",
-      "evidence_level": "source_review",
+      "us_equities_fit": "Selected destination for the September21 AAPL diagnostic and the adaptive-paper engine integration; SPY/LEAN parity, realistic liquidity and native broker adapters remain open per runtime-target.json.",
+      "alpaca_fit": "No upstream Nautilus Alpaca adapter; the accepted path is a custom deterministic Python adapter on alpaca-py0.44.0 (see the adaptive-paper-alpaca-adapter card), not an in-tree integration.",
+      "evidence_level": "native_proven",
       "evidence_refs": [
-        "https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/README.md"
+        "evidence/receipts/native-nautilus-v2-20260920.json",
+        "catalogs/us-equities/runtime-target.json"
       ],
       "native_workflow": [
-        "# Prospective and unexecuted. upstream AAPL backtest requires the documented local Databento sample files.",
-        "python -m pip install nautilus_trader==1.231.0",
-        "git clone https://github.com/nautechsystems/nautilus_trader.git nautilus_trader",
-        "git -C nautilus_trader checkout --detach v1.231.0",
-        "cd nautilus_trader",
-        "python examples/backtest/databento_ema_cross_long_only_aapl_bars.py"
+        "# Native receipt commands (evidence/receipts/native-nautilus-v2-20260920.json); replay only in an isolated environment.",
+        "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --pre \"nautilus_trader==2.0.0rc5\"",
+        "python \"$NAUTILUS_ENV_QUICKSTART\"  # unchanged upstream docs/getting_started/quickstart.py at commit 1b0a49d"
       ],
       "requirements": [
-        "Python <3.15,>=3.12; use a separate environment for this package.",
-        "Release-compatible wheels or a Rust/Cython build environment.",
-        "Example expects aapl-xnas-ohlcv-1s-2023.dbn.zst and aapl-xnas-ohlcv-1m-2023.dbn.zst under tests/test_data/databento/temp.",
-        "IBKR route additionally requires TWS/Gateway, account permissions and data subscriptions."
+        "Python >=3.12,<3.15 vanilla CPython; Ubuntu22.04+/glibc>=2.35 per the official installation guide.",
+        "IBKR route additionally requires signed-in TWS/IB Gateway, a paper account, market-data permissions and a unique client ID."
       ],
       "limitations": [
-        "v2 Rust/PyO3 development and release-candidate documentation is not interchangeable with stable 1.231.0 APIs.",
-        "No local simulation, broker session or latency benchmark performed.",
-        "Event semantics shared by backtest/live still require a calibrated data/fill model and recovery tests.",
-        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+        "Prerelease: 2.0.0 final has not shipped; GitHub's latest non-prerelease is still v1.231.0.",
+        "SPY/LEAN parity gate G-a is BLOCKED: 25 pass / 4 fail, confined to the unsupported market_on_open_proxy and distributions_and_cash mappings.",
+        "The dividend SimulationModule needed to close the parity gate is owned by the separate parity worktree, not this card.",
+        "No local simulation, broker session or latency benchmark beyond the synthetic FX quickstart and the September21 AAPL diagnostic was performed.",
+        "Event semantics shared by backtest/live still require a calibrated data/fill model and recovery tests."
       ],
       "sources": [
-        "https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/README.md",
-        "https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/LICENSE",
-        "https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/pyproject.toml",
-        "https://pypi.org/project/nautilus_trader/1.231.0/",
-        "https://github.com/nautechsystems/nautilus_trader/releases/tag/v1.231.0",
-        "https://github.com/nautechsystems/nautilus_trader/tree/v1.231.0/nautilus_trader/adapters",
-        "https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/examples/backtest/databento_ema_cross_long_only_aapl_bars.py",
-        "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/"
-      ]
+        "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5",
+        "https://pypi.org/pypi/nautilus_trader/2.0.0rc5/json",
+        "https://nautilustrader.io/docs/latest/getting_started/installation/",
+        "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/quickstart.py"
+      ],
+      "source_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
     },
     {
       "id": "lumibot",
@@ -1668,6 +1662,84 @@
         "https://github.com/virattt/dexter/blob/v1.0.5/README.md",
         "https://github.com/virattt/dexter/blob/v1.0.5/package.json",
         "https://github.com/virattt/dexter/releases/tag/v1.0.5"
+      ]
+    },
+    {
+      "id": "nautilus-ibkr-adapter",
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "layers": [
+        "broker-adapter",
+        "execution"
+      ],
+      "role": "Native Interactive Brokers socket adapter for the selected destination runtime",
+      "decision": "default",
+      "rationale": "Reuse the in-tree IBKR adapter shipped at the same selected engine pin rather than a community client; IBKR is the selected live-primary broker path in runtime-target.json.",
+      "version_or_commit": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+      "release_date": "2026-09-15T06:17:23Z",
+      "source_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "license": "LGPL-3.0-or-later",
+      "us_equities_fit": "Native socket adapter to TWS/IB Gateway; supports the paper socket defaults (TWS7497, Gateway4002) recorded in runtime-target.json.",
+      "alpaca_fit": "Not applicable; this card is the IBKR-only broker boundary, separate from the Alpaca path.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted; source/doc review only. Do not start a live/paper socket session from this recipe.",
+        "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --pre \"nautilus_trader==2.0.0rc5\"",
+        "rg -n 'class InteractiveBrokers' \"$NAUTILUS_SOURCE/nautilus_trader/adapters/interactive_brokers\""
+      ],
+      "requirements": [
+        "Native TWS or IB Gateway sign-in, a paper account, market-data permissions and a unique client ID.",
+        "Risk/universe/session contract defined before any socket connection is attempted."
+      ],
+      "limitations": [
+        "local_broker_acceptance not_established (runtime-target.json).",
+        "Adapter installation does not establish socket access, paper order behavior, cancellation races or reconnect reconciliation.",
+        "IBKR is selected live-primary, unaccepted: no local paper or live session has been run against this adapter."
+      ],
+      "sources": [
+        "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/",
+        "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5"
+      ]
+    },
+    {
+      "id": "adaptive-paper-alpaca-adapter",
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "layers": [
+        "broker-adapter",
+        "execution"
+      ],
+      "role": "Custom deterministic Python Alpaca adapter for the adaptive-paper lane",
+      "decision": "default",
+      "rationale": "Official alpaca-py SDK has no Nautilus in-tree adapter, so the adaptive-paper lane wires a custom deterministic Python adapter directly to the selected2.0.0rc5 LiveNode; this is the accepted Alpaca broker path in runtime-target.json.",
+      "version_or_commit": "7e7eefe28315f3de3aa4dc75cc8b6524f70829cb (blueprints/us-equities/adaptive-paper)",
+      "release_date": null,
+      "license": null,
+      "us_equities_fit": "Inverse-volatility sizing within deterministic exposure limits over a 24-symbol universe; shared account lock/STOP and SQLite durable intent/fill/request journal per receipt.json.",
+      "alpaca_fit": "Wraps alpaca-py0.44.0 against https://paper-api.alpaca.markets; local native capacity trial recorded180 fills /90 round trips in60.4282s at178.7246 submissions/minute with zero broker connections (blueprints/us-equities/adaptive-paper/receipt.json native_capacity block).",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "blueprints/us-equities/adaptive-paper/receipt.json",
+        "blueprints/us-equities/adaptive-paper/README.md"
+      ],
+      "native_workflow": [
+        "# Historical local commands already executed for the linked receipt; do not replay against a live/paper account without new operator authorization.",
+        "python blueprints/us-equities/adaptive-paper/benchmark.py",
+        "python blueprints/us-equities/adaptive-paper/runner.py"
+      ],
+      "requirements": [
+        "Isolated Python3.12.3 runtime; alpaca-py0.44.0 (upstream pin cc4cb3b7ba50ae250e621983c2779047fb16bb28).",
+        "Operator-provided paper credentials for any future broker-connected trial; none were used for the recorded synthetic capacity run."
+      ],
+      "limitations": [
+        "no live broker fills claimed.",
+        "The synthetic capacity fixture used a synthetic broker and zero broker connections; it is not a paper or live execution acceptance run.",
+        "broker_readiness in the same receipt records status not_started (regular_session_window_unavailable); continuous operation and native broker fault behavior remain unqualified."
+      ],
+      "sources": [
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/7e7eefe28315f3de3aa4dc75cc8b6524f70829cb/blueprints/us-equities/adaptive-paper/README.md",
+        "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/alpaca/trading/client.py"
       ]
     }
   ]
