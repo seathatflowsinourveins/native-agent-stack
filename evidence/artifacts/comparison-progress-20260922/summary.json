@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-09-22",
+  "status": "reviewed_progress_not_adoption",
+  "purpose": "Track observed failures, corrections and remaining comparisons without promoting blocked judgments into catalog selections.",
+  "selected_versions_changed": false,
+  "canonical_layer_decisions_changed": false,
+  "candidate_dispositions_changed": false,
+  "source": {
+    "kind": "Claude native owner corrected return; Codex cross-family artifact review",
+    "return": "claude-return-3.md",
+    "return_sha256": "df22e1902910c09c3aa45e391442fa63a362535078808f4dab7fc899ddcb801a",
+    "phase": "executed-comparisons-r2",
+    "sealed_at_utc": "2026-09-22T07:10:55Z",
+    "seal_sha256": "00f2a2d4898359630ddef1b4db14f2bfa6ef388a2d474b66382730d782dc5043",
+    "seal_entries_verified": 163,
+    "seal_failures": 0,
+    "proposal_refs_checked": 38,
+    "missing_refs": 0,
+    "status_ledger_sha256": "201b784c421115cfcbde01a25ec61fdfb94b64316a833cb8a0156fae4114521d",
+    "proposals_sha256": "532d89bf14335513a0f867967e047c4c1a8977f442ed65bb70ec66a768269dfb",
+    "availability": "The original supplied return3 source seal stays on the originating host. Paths in rows identify that private phase; hashes identify original source bytes. Return3 lacked per-submission rescored worker receipts; the later workers-receipts-r3 phase supplies all nine original/rescored pairs, reconciled in worker-receipts-followup.json. This public export remains a derived, sanitized summary rather than a complete runnable comparison."
+  },
+  "source_files_exported": [
+    {
+      "path": "tools/compare/closure.pre-review.mjs",
+      "sha256": "53fc880ab286c07ca4f158ec6bb7c6aafe422f78b4f3d9658a71715e2ccf4d1a",
+      "purpose": "Historical defective local script; evidence only."
+    },
+    {
+      "path": "tools/compare/closure.mjs",
+      "sha256": "590ef5f76bb2dd72888b9c2c6cf2a27f79fbac623ca3998597cd0cc6491b2b74",
+      "purpose": "Corrected local script; no installation or default-harness adoption."
+    },
+    {
+      "path": "tests/compare/closure-script.test.mjs",
+      "sha256": "adfbce650c82c8b8d59c1dc116c99d7a9fcb4f019b007225e6e2956ec94caf03",
+      "purpose": "Unchanged locally authored synthetic contract tests, in their expected source layout."
+    }
+  ],
+  "verification": {
+    "independent_review": "Codex reader independently verified38paths, seven exact closure recomputations, and10synthetic tests in original layout; original source and recorded refuter authority inspected.",
+    "source_layout_note": "Direct invocation in the flat sealed layout fails MODULE_NOT_FOUND; reconstructing the original tools/compare and tests/compare layout permits the unchanged tests to run.",
+    "synthetic_gate_tests": {
+      "command": "node --test evidence/artifacts/comparison-progress-20260922/tests/compare/closure-script.test.mjs",
+      "expected_tests": 10,
+      "result": "passed",
+      "tests": 10,
+      "passed": 10,
+      "failed": 0,
+      "repository_copy_exit_code": 0
+    },
+    "historical_failures": [
+      "Old gate permitted a leak-reporting refuter and three empty verdicts in independently reproduced synthetic checks.",
+      "Return2's 27 evidence references did not resolve from its declared root.",
+      "Durable composed unresolved was incorrectly attributed to a script closure that says retain."
+    ],
+    "qualification": "Source hashes and synthetic checks establish the reviewed artifact properties; they do not establish comparison fairness, repository leadership, complete lifecycle acceptance or upstream E2E.",
+    "gated_closure_recomputation": {
+      "scope": "Independent reader executed the corrected script on seven supplied protocol/judgment pairs; no provider replay.",
+      "compared": 7,
+      "exact_matches": 7
+    }
+  },
+  "rows": [
+    {
+      "layer": "foundation-memory",
+      "result": "unresolved",
+      "publication_eligible": false,
+      "source": "foundation-memory/closure.gated.json",
+      "source_sha256": "a3da74982212195ca446d5aff8ce15e7cba60d5fffdb419350e5f579980d95b0",
+      "authority": "closure.mjs",
+      "limits": [
+        "Bounded 12-query diagnostic, not an independent holdout.",
+        "Shared retrieval measurements with document-retrieval; no independent replication.",
+        "Selected measured run-record observed at 06:07:35.196Z. A later degraded re-record under the same protocol remains a separate retained attempt.",
+        "Missing abstention and failed equal-byte budget prevent a change."
+      ]
+    },
+    {
+      "layer": "document-retrieval",
+      "result": "unresolved",
+      "publication_eligible": false,
+      "source": "document-retrieval/closure.gated.json",
+      "source_sha256": "49060292dcb22bb1df1f856f205f35ad2e9d5efacf45778c41a0a3400eeea4ea",
+      "authority": "closure.mjs",
+      "limits": [
+        "Uses shared retrieval measurements, not a second independent trial.",
+        "Latency not measured; difficult-layout/parser lane unqualified."
+      ]
+    },
+    {
+      "layer": "semantic-rag",
+      "result": "unresolved",
+      "publication_eligible": false,
+      "source": "semantic-rag/closure.gated.json",
+      "source_sha256": "b24547e00208051a235adf1bb311c261f5a57362bf10120c0a94d2fc11481ebf",
+      "authority": "closure.mjs",
+      "limits": [
+        "Returned retrieval scores do not close restore acceptance.",
+        "Receipt was assembled before restore completion; repeat restore and receipt provenance remain open."
+      ]
+    },
+    {
+      "layer": "durable-memory",
+      "result": "unresolved",
+      "publication_eligible": true,
+      "publication_eligibility_scope": "The two script closure files pass the recorded refuter gate; the overall comparison is unresolved.",
+      "authority": "runner composition in durable-memory/result.json",
+      "source": "durable-memory/result.json",
+      "source_sha256": "94d068816dbd43c191890c5c23ace978f58dbde7ff5d76ad900bf3dff1c4640d",
+      "mechanical_closures": [
+        {
+          "source": "durable-memory/closure-C.gated.json",
+          "sha256": "11933839384f5e5930df300bea8af98d451e679ae7a6148669fcf6c9327f87a4",
+          "status": "retain"
+        },
+        {
+          "source": "durable-memory/closure-incumbent-floor.gated.json",
+          "sha256": "2f7e84318203b085e762c81a6ba3bb93d9130243a7dc7771379a2c97683d9326",
+          "status": "retain",
+          "meaning": "Failed conjunction; this is not an accepted incumbent floor."
+        }
+      ],
+      "limits": [
+        "Lexical query transform and exact-span proxy limit generalization.",
+        "Neither executed store clears the abstention floor; Basic Memory also fails ownership condition.",
+        "Hindsight arm not executed under the available offline prerequisites.",
+        "ai-memory remains the operational memory of record, not a demonstrated recall-quality winner."
+      ]
+    },
+    {
+      "layer": "workers",
+      "result": "unresolved",
+      "publication_eligible": false,
+      "source": "workers/closure.gated.json",
+      "source_sha256": "a7f822f932af723841258396dbbce0110888c5aa4f432a2315fa53e77a829c9f",
+      "authority": "closure.mjs over rescored judgments",
+      "reported_submissions": 9,
+      "reported_arms": [
+        "native Claude CLI",
+        "Codex SDK via native_worker.py",
+        "Claude Agent SDK"
+      ],
+      "limits": [
+        "Recovery not run; artifact acceptance has no pinned judge.",
+        "Initial classifier mislabelled the cancelled Codex submission; pre-fix judgments retained.",
+        "The return3 run-summary preserves the original provider_usage_limit misclassification. Return4 supplies a corrected summary and all nine original/rescored measurement receipt pairs; independent reconciliation is recorded in worker-receipts-followup.json. Codex cancellation still has no native returned receipt.",
+        "Two judging rounds refuted claims; no arm accepted as a winner and no SDK adoption follows.",
+        "Cancellation usage can be zero or unavailable in returned receipts; this does not prove zero provider consumption."
+      ],
+      "receipt_provenance_followup": "worker-receipts-followup.json"
+    },
+    {
+      "layer": "data-research",
+      "result": "unresolved",
+      "publication_eligible": false,
+      "source": "data-research/closure.gated.json",
+      "source_sha256": "d608c948c99c2b75ce48031e592e977424576ed9d8abf04d9fa2c8d2784afacf",
+      "authority": "closure.mjs",
+      "limits": [
+        "Bounded gap cases leave identity, dated-universe, corporate-action and as-known coverage open.",
+        "Paid challenger was not run; this is not a failed-candidate result or a purchase recommendation.",
+        "Provider limits and entitlements are not independently requalified by this review."
+      ]
+    },
+    {
+      "layer": "engines-strategies",
+      "result": "BLOCKED",
+      "publication_eligible": false,
+      "source": "spy-parity/verdict.json",
+      "source_sha256": "b7b898a861492348ae864de25551c127a0367e4638ef5dfa65152f233a6b0d10",
+      "authority": "historical parity harness compare.py",
+      "returned_complete": true,
+      "returned_failed_checks": 4,
+      "unsupported_mappings": [
+        "distributions_and_cash",
+        "market_on_open_proxy"
+      ],
+      "limits": [
+        "Completed blocked comparison is not parity acceptance.",
+        "Source-host historical one_zero case only; no paper/live or destination-machine qualification.",
+        "Reported hardening findings remain in the private review; trading implementation has a separate owner."
+      ]
+    }
+  ],
+  "next_host": {
+    "wsl": "Await explicit scoped convergence handoff and connection; perform destination-specific install, useful operation, cancellation and recovery acceptance.",
+    "macos": "Separately qualified later; Linux results are not macOS receipts."
+  }
+}

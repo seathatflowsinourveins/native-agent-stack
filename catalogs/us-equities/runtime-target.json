@@ -111,8 +111,9 @@
   "next_acceptance": [
     {
       "id": "retained-equity-replay",
-      "status": "planned_not_executed",
-      "scope": "SPY/LEAN parity remains planned: freeze retained SPY inputs/mappings, reproduce one_zero orders/fills/dividends/cash against the dated oracle. The separately completed AAPL diagnostic deliberately avoids corporate-action dates and does not close this requirement."
+      "status": "reported_execution_blocked_review_incomplete",
+      "scope": "The September 22 source-host SPY/LEAN one_zero harness returned a completed BLOCKED comparison with four failed checks attributed to dividend cash posting and market-on-open mappings. This is recorded progress, not accepted parity; hardening and qualified rerun remain open. The separately completed AAPL diagnostic deliberately avoids corporate-action dates and does not close this requirement.",
+      "executed_evidence_ref": "evidence/artifacts/comparison-progress-20260922/summary.json#/rows/6"
     },
     {
       "id": "broker-state-failures",
