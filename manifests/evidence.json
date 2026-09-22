@@ -2987,8 +2987,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "32c0e5ecc804ebbdf69c31e2150faeb7925565f7b800883556b25811236ff716",
-      "bytes": 23966
+      "sha256": "71bc8dc3214d89dfd491e2c7da2dfb8cb785c23f9a19b469fc8a4df4bb5c5315",
+      "bytes": 24357
     },
     {
       "path": "docs/tasks/2026-09-21-runtime-reviewed-catalog-handbook.md",
@@ -6773,8 +6773,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 12056769,
-      "sha256": "64034f40ce5464eeae051c3292aa88a0f8f2161abb89463040d94b6602200268"
+      "bytes": 12065410,
+      "sha256": "b2bd7fc5ecbdebfd30ba89fc3b8fac5960b1280aedba0ab02429b68ff31098c5"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7788,8 +7788,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "bytes": 8225,
-      "sha256": "ccb4647c37c77bcbc179a6ced010d2b20b5d744ec6edbc194ce1baa7d989d168"
+      "bytes": 8484,
+      "sha256": "c69a0e4dfc18cf5a0c9c34005b12400c2a4a413baa19f1957a20ab946fba8500"
     },
     {
       "path": "docs/harness-defaults.md",
@@ -10783,8 +10783,8 @@
     },
     {
       "path": "catalogs/landscape/manifest.json",
-      "sha256": "a861b8db59ba3300ec5aee9d9041e194e7b865392c22cfc3bba0aedb11c1b557",
-      "bytes": 4300
+      "sha256": "7ca1f4e0d572746d4aabebfa288133162654d31926cee4a7072e6a2652a1ad2e",
+      "bytes": 4439
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -11375,6 +11375,41 @@
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
       "sha256": "c91b282a354c44b3066e40908d94815c810ec705320827183438f9a0d59b846a",
       "bytes": 124069
+    },
+    {
+      "path": "docs/comparison-progress-20260922.md",
+      "sha256": "fb71b39497ff91540e555c3b25c4fa9c4ef760a3c767366c8d27c6524e2eecaf",
+      "bytes": 7392
+    },
+    {
+      "path": "evidence/artifacts/comparison-progress-20260922/summary.json",
+      "sha256": "0a19fd133aca4bffdc692f8dd851a333dab80b4f2ecd5959cb000a75165adc92",
+      "bytes": 10021
+    },
+    {
+      "path": "evidence/artifacts/comparison-progress-20260922/tests/compare/closure-script.test.mjs",
+      "sha256": "adfbce650c82c8b8d59c1dc116c99d7a9fcb4f019b007225e6e2956ec94caf03",
+      "bytes": 4869
+    },
+    {
+      "path": "evidence/artifacts/comparison-progress-20260922/tools/compare/closure.mjs",
+      "sha256": "590ef5f76bb2dd72888b9c2c6cf2a27f79fbac623ca3998597cd0cc6491b2b74",
+      "bytes": 4986
+    },
+    {
+      "path": "evidence/artifacts/comparison-progress-20260922/tools/compare/closure.pre-review.mjs",
+      "sha256": "53fc880ab286c07ca4f158ec6bb7c6aafe422f78b4f3d9658a71715e2ccf4d1a",
+      "bytes": 3750
+    },
+    {
+      "path": "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json",
+      "sha256": "5b43a56c1bb8be4df24431ab5f947925c328a36f01c9b7bf308143809e5f1ddd",
+      "bytes": 11131
+    },
+    {
+      "path": "evidence/artifacts/comparison-progress-20260922/worker-classifier-correction.json",
+      "sha256": "7205bf2ec7bb10cace37cb09f3949c194cebc7bc1edc4023f854c9e34ea191fa",
+      "bytes": 2475
     }
   ],
   "convergence_records": [

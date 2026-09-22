@@ -31,6 +31,12 @@ mirror the canonical layer decisions, with an automated consistency check.
 No candidate disposition or selected version changed; historical reviewer
 claims and their qualifications remain linked.
 
+The [September 22 comparison progress](comparison-progress-20260922.md) records
+the subsequent worker, retrieval, memory and parity results, including failed
+judgments and the repaired publication check. The comparisons remain unresolved
+or blocked; no selection changed. Joint setup readiness is still pending, and
+the destination WSL host must supply its own acceptance after connection.
+
 ## What qualifies a selection
 
 Evaluate repository quality against the task before investing in installation:
