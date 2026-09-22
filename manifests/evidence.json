@@ -871,7 +871,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1853,7 +1853,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -2705,6 +2705,81 @@
         "Session, job, thread and turn identifiers are redacted; raw streams stay outside Git."
       ],
       "path": "evidence/receipts/portable-claude-native-qualification-20260921.json"
+    },
+    {
+      "id": "sota-convergence-20260922",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "affaan-m/ECC",
+        "agent-browser",
+        "agentsview",
+        "ai-memory",
+        "alertmanager",
+        "apple-container",
+        "ast-grep",
+        "beads",
+        "ccusage",
+        "claude-code",
+        "claude-hud",
+        "codebase-memory-mcp",
+        "codex",
+        "codex-for-claude",
+        "context-hub",
+        "context-mode",
+        "dagu",
+        "davila7/claude-code-templates",
+        "difftastic",
+        "fastapi",
+        "gitleaks",
+        "grafana",
+        "headroom",
+        "huggingface-hub-native",
+        "jcodemunch-mcp",
+        "llama-cpp",
+        "loki",
+        "markitdown",
+        "mcp-inspector",
+        "mcporter",
+        "nextjs",
+        "ntfy",
+        "omniroute",
+        "openresearch",
+        "opentelemetry-collector-contrib",
+        "otel-tui",
+        "playwright-cli",
+        "playwright-test",
+        "poppler",
+        "postgresql",
+        "prometheus",
+        "promptfoo",
+        "qdrant",
+        "qmd",
+        "react",
+        "repomix",
+        "restic",
+        "rtk",
+        "sandbox-runtime",
+        "serena",
+        "shanraisshan/claude-code-best-practice",
+        "shellcheck",
+        "skills-ref",
+        "socraticode",
+        "syft",
+        "systemd",
+        "tavily-cli",
+        "toon",
+        "vllm",
+        "worktrunk",
+        "zizmor"
+      ],
+      "claim": "Dated per-layer SOTA repository convergence: 16 foundation layers and 12 consolidated trading layers confirmed against authenticated GitHub metadata for 396 repositories (0 archived, 1 rename, 15 component pins with a newer release); 34 newcomers from 342 stars, 26 in-scope awesome lists and a bounded web sweep were adversarially verified and one (snyk/agent-scan) is a targeted candidate; the engine card was reconciled with the NautilusTrader 2.0.0rc5 destination.",
+      "limitations": [
+        "Historical inventory of metadata and source review only; not installation, execution, benchmark or license-file inspection, and not a superiority claim.",
+        "Freshness is GitHub REST metadata observed on 2026-09-22; a newer release is information, not a reason to upgrade, and release notes were not read.",
+        "Review lanes and refuters are native model judgments over cited evidence; agreement is not acceptance. Codex cross-family review was attempted three times and is blocked by the account's exhausted usage limit until 2026-09-26; it is not established for this record.",
+        "Critic-named gaps remain open: dated security identity, pre-2020 delisting coverage, point-in-time news/filing availability, IBKR acceptance, LEAN/SPY parity, source-review-only evaluation and portfolio layers."
+      ],
+      "path": "evidence/receipts/sota-convergence-20260922.json"
     }
   ],
   "files": [
@@ -10293,6 +10368,21 @@
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/claude-pr-review.json",
       "sha256": "e412e3abc2d63867c8ba16f304bc4c7578c3ea0a196d7fc08590defbccd2592c",
       "bytes": 9539
+    },
+    {
+      "path": "evidence/receipts/sota-convergence-20260922.json",
+      "bytes": 2680,
+      "sha256": "4414d33d32cc2f7c7d1fd28eb601fb87c64abbc41bfc4cc506e8bb06edc8b86f"
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260922.json",
+      "bytes": 401345,
+      "sha256": "dffd00f9d9b9d2ae8f749c0c850d415d5c986221906c40df0523ee114992dae7"
+    },
+    {
+      "path": "catalogs/sota-convergence/README.md",
+      "bytes": 14331,
+      "sha256": "bca0848070ec5498bd520d763b435e66b9ec3be24bf355b1fa7cc272d437a503"
     }
   ],
   "convergence_records": [
