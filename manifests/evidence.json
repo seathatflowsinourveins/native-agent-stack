@@ -12634,8 +12634,8 @@
     },
     {
       "path": "catalogs/landscape/gap-resolution-20260922.json",
-      "bytes": 337793,
-      "sha256": "efcca76540b19017504c8142046d7887cda3f24ce05babad960556f834d70bdb"
+      "bytes": 337205,
+      "sha256": "c4ea9fe5d377b2c7b200c5ab22923ea4635253d2d619836aa07a61566d5669e5"
     },
     {
       "path": "docs/gap-resolution-20260922.md",
