@@ -16,7 +16,9 @@
     "elapsed_ms": 4200,
     "cause": "provider usage limit on the Codex account; the companion returned the limit message with a retry date of 2026-09-26 15:41 local",
     "redactions": ["job, thread and turn identifiers removed"],
-    "disposition": "no retry until the limit resets; the prompt is retained and the review remains open"
+    "disposition": "no retry until the limit resets; the prompt is retained and the review remains open",
+    "second_attempt": {"when": "2026-09-22, after a Claude account re-login", "outcome": "unsuccessful:failed:1", "elapsed_ms": 4197, "cause": "same Codex usage limit; the Codex account is separate from the Claude login", "disposition": "no further retries before 2026-09-26 15:41 local"}
   },
+  "codex_registration_shape": "verified against the openai/codex source at tag rust-v0.155.1 (codex-agent-roles-source.json); not exercised in a session",
   "pinned_sources": ["affaan-m/everything-claude-code @dd6ee538", "shanraisshan/claude-code-best-practice @15969ed2", "davila7/claude-code-templates @c840d6f6", "hesreallyhim/awesome-claude-code @1abbc780", "VoltAgent/awesome-claude-code-subagents @ca7a50b7", "anthropics/skills main", "official Claude Code and Codex documentation fetched 2026-09-22"]
 }

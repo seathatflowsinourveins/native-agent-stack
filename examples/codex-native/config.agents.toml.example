@@ -10,16 +10,18 @@
 enabled = true
 max_concurrent_threads_per_session = 3
 
-# Role registration shape as quoted from the Codex config reference by a research
-# child on 2026-09-22 (the quote is retained in
-# evidence/artifacts/harness-rules-convergence-20260922/official-doc-excerpts.json):
-# agents.<name>.config_file is the TOML layer for that role and
-# agents.<name>.description is the guidance Codex reads when choosing and
-# spawning the type. UNVERIFIED on an installed CLI: no Codex session has run
-# with this registration yet (the installed 0.155.1 binary contains the strings
-# config_file, developer_instructions and max_concurrent_threads_per_session; a
-# string scan, not a parse test), so confirm both keys against the installed
-# version's config reference before relying on it.
+# Role registration shape verified against the Codex source at tag rust-v0.155.1
+# (codex-rs/agent-roles/src/agent_role_config.rs, loader.rs, discovery.rs; the
+# cited lines are retained in
+# evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json):
+# an [agents.<name>] entry carries description, config_file (the role's TOML
+# layer, resolved against the config folder) and nickname_candidates; a role file
+# holds name, description, nickname_candidates and any config keys such as
+# developer_instructions (unknown keys are rejected). Every .toml under the
+# agents directory is also discovered without a table entry, a declared
+# config_file is not loaded twice, the file's description wins over the table's,
+# duplicate role names in one layer warn, and a description is required. Not yet
+# exercised in a Codex session on this profile.
 [agents."evidence-reviewer"]
 config_file = ".codex/agents/evidence-reviewer.toml"
 description = "Independently inspect an assigned patch and its verification evidence."

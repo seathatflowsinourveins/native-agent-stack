@@ -6334,8 +6334,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 8186679,
-      "sha256": "bf300bfdabdbf77b67796547e8be90428fc4a9b605c4a0a6e8896b70b7af611b"
+      "bytes": 8186881,
+      "sha256": "0301e9ac0b4810aa9fb6ee02529da57a27270a62d06c03e066bc37ff2241b98f"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7039,8 +7039,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "bytes": 41149,
-      "sha256": "5374ba01c339f183fb09aa40bf1688fa9bee1327418b214a66ed2a89a136aebc"
+      "bytes": 41360,
+      "sha256": "ad5aa745f9ec8862a51a3fe2165bc3667b7d63bda064d761142599c7b5fdab15"
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -10009,8 +10009,8 @@
     },
     {
       "path": "examples/codex-native/README.md",
-      "sha256": "913f30e94d72cfdebe7bdd52d4c422b050bd8b027baf69584c798882cb9f890b",
-      "bytes": 1951
+      "sha256": "904c40dad92899f3e15903d4c419382305566996003eb9533405061553d87747",
+      "bytes": 2014
     },
     {
       "path": "examples/codex-native/agents/evidence-reviewer.toml",
@@ -10024,8 +10024,8 @@
     },
     {
       "path": "examples/codex-native/config.agents.toml.example",
-      "sha256": "596066b7d6c114181a6d39db7fa7e4c2e70c6b29230d7c5ed59a09928ea24896",
-      "bytes": 1696
+      "sha256": "11c8955b1a5e6a0ce61e3c5020201a140720151a42afa9c99cef3516768f2043",
+      "bytes": 1847
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -10049,18 +10049,23 @@
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
-      "sha256": "953605a6330a305664e33ebbbf0697a2f6ecca9264c1a600c10e8acd8cbfff77",
-      "bytes": 14699
+      "sha256": "6e8769972378cdc7722f25c7eef91c715298516a97d6ef753fd9033ec39f11d9",
+      "bytes": 14838
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/runs.json",
-      "sha256": "5ae56bcdd970b2a0fa5ca07be1def9dd845a8b26968de36a4a75e219332e1ed7",
-      "bytes": 2355
+      "sha256": "6ec83dc8348af7c80fddbdd03eb74f05635de487053a0c5f85a52b61c6c483f3",
+      "bytes": 2800
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/official-doc-excerpts.json",
       "sha256": "d21438d4c23a1643d662a284a9df1797ade4e30dfea3f4b91699f97f3104954b",
       "bytes": 11033
+    },
+    {
+      "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
+      "sha256": "79e8f86b6c36d0afff4e5174f491937c7c257cebc4fc2cbb3f88adf6efb90e94",
+      "bytes": 3576
     }
   ],
   "convergence_records": [
