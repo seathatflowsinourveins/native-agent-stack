@@ -169,3 +169,53 @@ paper trial is running. See
 and the templates under `observability/backends/templates/`. Run `metrics.py`
 as its own process alongside a trial; it is not started by `runner.py` and
 does not affect the trial's risk decisions or request budget.
+
+## Codex cross-family review fixes (PR-4 follow-up)
+
+Five findings from a Codex cross-family review of PR-4 are resolved, each with
+a regression test in `tests/` that fails against the pre-fix source and passes
+after (see `tests/test_promotion_gate.py`, `tests/test_adaptive_paper_runner.py`,
+`tests/test_adaptive_paper_metrics.py`):
+
+* **`promotion_gate.py`: empty snapshot silently passed.** An all-required-
+  columns, zero-row snapshot used to report `status: "pass"`, `row_count: 0`.
+  A named `rows_present` check now fails closed whenever `row_count == 0`,
+  independent of every other check. See `blueprints/us-equities/data/README.md`.
+* **`promotion_gate.py`: `volume=-0.5` passed via lossy coercion.** `.astype
+  ('int64')` truncated a raw fractional/negative volume (e.g. `-0.5` -> `0`)
+  BEFORE the old `volume_non_negative` check ran on the coerced column. Volume
+  is now validated on the RAW column, before any coercion, via a named
+  `volume_integral_non_negative` check (rejects non-finite, non-integral, or
+  negative raw values); `_prepare()`'s coercion is now purely a safe
+  downstream-typing substitution that can never itself raise. See
+  `blueprints/us-equities/data/README.md`.
+* **`runner.py` `validate_preflight(mode="paper")`: accepted an incomplete/
+  empty/partially-failing gate result.** A gate result whose top-level
+  `status` was `"pass"` and whose `input_sha256` matched used to be accepted
+  even when it declared `row_count: 0` or carried a failed check.
+  `_check_promotion_gate` now validates the full contract: every key in
+  `status, input_sha256, row_count, checks, versions, checked_at` is present;
+  every `checks[].status == "pass"`; `row_count > 0`; the referenced
+  `--snapshot` is a regular file with a gate-accepted extension (`.csv`/
+  `.parquet`) whose sha256 matches `input_sha256`. New `SafetyError` kinds:
+  `promotion_gate_incomplete` (missing/malformed required keys or an empty
+  `checks` list), `promotion_gate_failed_check` (a named check failed despite
+  a "pass" top-level status), `promotion_gate_empty` (`row_count <= 0`
+  despite a "pass" top-level status) -- alongside the pre-existing
+  `promotion_gate_missing`/`promotion_gate_failed`/`promotion_gate_mismatch`.
+* **`metrics.py`: `--trial-json` (and any other path argument) accepted
+  arbitrary paths.** `_read_trial_json` read whatever path it was given, with
+  no restriction. Every readable path (`--ledger`, `--trial-json`) is now
+  confined to the resolved ledger directory (the resolved parent of
+  `--ledger`) via `Path.resolve(strict=True)` plus a containment check; a
+  path outside that directory, or a symlink escaping it, is refused before
+  any attempt to read its contents (refused paths are treated exactly like a
+  missing file -- the relevant gauge reads `0`/absent, never the escaped
+  file's content).
+* **`metrics.py`: the read-only SQLite URI was built by string
+  concatenation.** `"file:" + str(path) + "?mode=ro"` let a filename
+  containing `?`/`#` override `mode=ro` (a probe path of
+  `/synthetic/probe?mode=memory&ignored=` yielded a writable connection). The
+  URI is now built from `urllib.parse.quote` of the resolved path plus
+  `?mode=ro&immutable=1`, and any ledger path containing `?`/`#` is refused
+  outright as a second, independent guard.

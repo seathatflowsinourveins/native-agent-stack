@@ -150,6 +150,38 @@ class RenderConfigTests(unittest.TestCase):
         )
         self.assertIn(str(self.tmp_path / ".codex" / "config.toml"), result.stdout + result.stderr)
 
+    def test_check_reports_newline_difference_not_byte_identical(self):
+        # Regression: --check previously compared Path.read_text() output,
+        # which silently translates \r\n/\r to \n (universal newlines), so a
+        # live file saved with CRLF line endings was wrongly reported
+        # "byte-identical" to an LF-rendered template even though the actual
+        # on-disk bytes differ. It must now exit 1 and say so explicitly.
+        live_dir = self.tmp_path / "live-crlf"
+        live_dir.mkdir()
+        rendered_now = {
+            name: string.Template((TEMPLATES / name).read_text()).substitute(FIXTURE_VALUES)
+            for name in TEMPLATE_NAMES
+        }
+        settings_crlf = rendered_now["claude.settings.template.json"].replace("\n", "\r\n")
+        self.assertNotEqual(
+            settings_crlf, rendered_now["claude.settings.template.json"],
+            "fixture template must actually contain a newline for this test to be meaningful",
+        )
+        (live_dir / "settings.json").write_bytes(settings_crlf.encode("utf-8"))
+        (live_dir / "codex_user.toml").write_text(rendered_now["codex.config.template.toml"])
+        (live_dir / "codex_project.toml").write_text(rendered_now["project.codex.config.template.toml"])
+        result = run("--host", "test-fixture-host", "--check",
+                     "--live-settings", str(live_dir / "settings.json"),
+                     "--live-codex-user", str(live_dir / "codex_user.toml"),
+                     "--live-codex-project", str(live_dir / "codex_project.toml"))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertNotIn("settings.json: byte-identical", result.stdout)
+        self.assertIn("settings.json: differs from", result.stdout)
+        self.assertIn("newline", result.stdout)
+        # The other two files, unchanged, are still reported byte-identical.
+        self.assertIn("codex.config.toml: byte-identical", result.stdout)
+        self.assertIn("project.codex.config.toml: byte-identical", result.stdout)
+
     def test_check_reports_missing_live_file(self):
         result = run("--host", "test-fixture-host", "--check",
                      "--live-settings", str(self.tmp_path / "nowhere.json"),

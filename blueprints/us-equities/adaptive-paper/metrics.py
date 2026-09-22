@@ -98,6 +98,7 @@ import json
 import sqlite3
 import sys
 import time
+import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -126,6 +127,40 @@ def _escape_label(value: str) -> str:
     return str(value).replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
 
 
+def _ledger_dir(ledger_path: Path) -> Path | None:
+    """The resolved directory every readable path (`--ledger`, `--trial-json`,
+    and any other path argument this exporter accepts) must live inside.
+    Returns None if the ledger's parent directory does not exist/cannot be
+    resolved -- callers must then treat every path as unreadable."""
+    try:
+        return Path(ledger_path).parent.resolve(strict=True)
+    except OSError:
+        return None
+
+
+def _resolve_confined(path: Path, boundary: Path | None) -> Path | None:
+    """Resolve `path` strictly (following symlinks) and require the result to
+    live inside `boundary`. Returns the resolved path, or None if `boundary`
+    is None, `path` does not exist/cannot be resolved, or the resolved path
+    is outside `boundary` (including a symlink whose target escapes it).
+    Callers must treat None as "refuse; never read" -- `resolve(strict=True)`
+    only stats/reads the symlink chain, it never opens file contents, so a
+    refusal here happens before any read is attempted."""
+    if boundary is None:
+        return None
+    try:
+        resolved = Path(path).resolve(strict=True)
+    except OSError:
+        return None
+    try:
+        resolved.relative_to(boundary)
+    except ValueError:
+        return None
+    if resolved == boundary:
+        return None
+    return resolved
+
+
 def _read_trial_json(path: Path):
     try:
         return json.loads(path.read_text())
@@ -133,9 +168,39 @@ def _read_trial_json(path: Path):
         return None
 
 
+def _sqlite_ro_uri(path: Path) -> str:
+    """Build a `file:` URI that SQLite opens strictly read-only. Built from
+    `urllib.parse.quote` of the path, never by naive string concatenation: a
+    raw `?`/`#` in the path would otherwise be interpreted as the start of
+    the URI's query string, letting a filename like
+    `.../probe?mode=memory&ignored=` silently override `mode=ro` (or escape
+    the target file entirely) and yield a writable connection. As a second,
+    independent guard, a resolved path containing `?` or `#` is refused
+    outright rather than relying solely on percent-encoding.
+
+    Deliberately does **not** add `immutable=1`: the ledger this exporter
+    reads is a live WAL database that `safety.Ledger` holds open and keeps
+    writing to for the whole duration of a trial (see the module docstring).
+    SQLite's `immutable` hint asserts the file's content and schema never
+    change for the life of the connection; against an actively-written WAL
+    file that assertion is false, and the observed failure mode is not mere
+    staleness but an outright `sqlite3.OperationalError: no such table: meta`
+    on every scrape taken while a trial is running (the immutable connection
+    does not read the WAL, and this database has no non-WAL schema image to
+    fall back to). A plain `mode=ro` connection ignores `PRAGMA
+    journal_mode`/state changes it doesn't need to and correctly reads
+    committed WAL frames on each scrape, still strictly read-only: any write
+    attempt raises `sqlite3.OperationalError` (see
+    `test_open_ledger_readonly_connection_rejects_a_write_attempt`)."""
+    text = str(path)
+    if "?" in text or "#" in text:
+        raise ValueError(f"ledger_path_rejected: reserved URI character in {text!r}")
+    return "file:" + urllib.parse.quote(text) + "?mode=ro"
+
+
 def _open_ledger_readonly(path: Path) -> sqlite3.Connection:
     """Open strictly read-only; raises rather than silently allowing a write."""
-    uri = "file:" + str(path.resolve()) + "?mode=ro"
+    uri = _sqlite_ro_uri(path)
     conn = sqlite3.connect(uri, uri=True, timeout=2)
     conn.row_factory = sqlite3.Row
     return conn
@@ -163,7 +228,13 @@ def render_metrics(ledger_path: Path, trial_path: Path, *, now: float | None = N
     """
     now = time.time() if now is None else now
     lines: list[str] = []
-    metadata = _read_trial_json(trial_path)
+    # Every path this function reads is confined to the ledger's own
+    # directory (see _ledger_dir/_resolve_confined): a `--trial-json` (or
+    # `--ledger`) argument pointing outside it -- directly, or via a symlink
+    # that escapes it -- is refused before any attempt to read its contents.
+    boundary = _ledger_dir(ledger_path)
+    trial_resolved = _resolve_confined(trial_path, boundary)
+    metadata = _read_trial_json(trial_resolved) if trial_resolved is not None else None
 
     phase = metadata.get("phase") if isinstance(metadata, dict) else None
     active = 1 if phase == "starting" else 0
@@ -182,16 +253,17 @@ def render_metrics(ledger_path: Path, trial_path: Path, *, now: float | None = N
         _gauge(lines, "paper_reconciliation_status",
                "1 for the current trial.json status result label, 0 for other known labels.", samples)
 
-    if ledger_path.exists():
+    ledger_resolved = _resolve_confined(ledger_path, boundary)
+    if ledger_resolved is not None:
         try:
-            conn = _open_ledger_readonly(ledger_path)
-        except sqlite3.OperationalError as exc:
+            conn = _open_ledger_readonly(ledger_resolved)
+        except (sqlite3.OperationalError, ValueError) as exc:
             lines.append(f"# adaptive-paper-metrics gap: ledger open failed ({_escape_label(str(exc))}); "
                          "ledger-derived metrics omitted for this scrape.")
             conn = None
     else:
-        lines.append("# adaptive-paper-metrics gap: ledger file not found; ledger-derived metrics omitted "
-                      "for this scrape.")
+        lines.append("# adaptive-paper-metrics gap: ledger file not found or outside the configured "
+                      "ledger directory; ledger-derived metrics omitted for this scrape.")
         conn = None
 
     # Always exported (not gated on the ledger being present/openable), independent of any

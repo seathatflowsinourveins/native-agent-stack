@@ -52,24 +52,44 @@ were pinned by the caller).
 It validates `--input` (a `.parquet` file, a `.csv` file, or a
 `duckdb://<db-path>#<table>` spec -- the `duckdb` package is optional and not
 part of the pinned install above, so that path is source-only until a caller
-adds the dependency) against a pandera schema: rows unique on
-`(symbol, session)`; `session` a valid trading session on the selected
-`exchange_calendars` calendar; `open`/`high`/`low`/`close` all `> 0`;
-`high >= max(open, close)`; `low <= min(open, close)`; `volume >= 0`;
-`observed_at <= now`. It writes `gate-result.json`:
+adds the dependency) against a pandera schema plus two checks computed
+outside pandera: the snapshot has at least one row (`rows_present`; a
+0-row snapshot with every required column present fails closed instead of
+reporting `status: "pass", row_count: 0`), rows unique on `(symbol, session)`;
+`session` a valid trading session on the selected `exchange_calendars`
+calendar; `open`/`high`/`low`/`close` all `> 0`; `high >= max(open, close)`;
+`low <= min(open, close)`; `observed_at <= now`; and `volume` is finite,
+integral and `>= 0` (`volume_integral_non_negative`), validated on the RAW
+column BEFORE any lossy numeric coercion -- a raw value like `-0.5` would
+otherwise be silently truncated to `0` by a later `astype('int64')` and pass
+a post-coercion `>= 0` check. It writes `gate-result.json`:
 `{status: "pass"|"fail", input_sha256, row_count, checks: [{name, status,
 detail}], versions, checked_at}`. Any exception -- schema failure or an
 unreadable/malformed input, a missing dependency, an unknown calendar code --
 produces `status: "fail"` with the raised exception's class name; the gate
-never raises past its own `main()`. Two synthetic fixtures live under
+never raises past its own `main()`. Synthetic fixtures live under
 `fixtures/` as CSV (`.csv`, not `.parquet`: `scripts/validate.py`'s
 publication scan requires every non-PNG/PDF file to decode as UTF-8 text, and
-Parquet is binary) -- `good.csv` passes every named check; `bad.csv` fails
-`valid_trading_session`, `volume_non_negative`, `observed_at_not_future`,
-`high_ge_max_open_close` and `unique_symbol_session` by construction) with
-their retained gate outputs (`fixtures/good-gate-result.json`,
-`fixtures/bad-gate-result.json`). `tests/test_promotion_gate.py` reruns both
-through the isolated venv.
+Parquet is binary):
+
+* `good.csv` passes every named check.
+* `bad.csv` fails `valid_trading_session`, `volume_integral_non_negative`,
+  `observed_at_not_future`, `high_ge_max_open_close` and
+  `unique_symbol_session` by construction.
+* `null-price-cell.csv` has a null `open` cell, which pandera reports under
+  its own `not_nullable` identifier -- not one of the fixed `CHECK_NAMES` --
+  so it surfaces as a synthetic `unmapped_failures` check rather than being
+  silently absorbed into any named check passing.
+* `empty-snapshot.csv` (header row only, 0 data rows) fails only
+  `rows_present`; every other check reports "pass" over the empty frame
+  (Codex cross-family review finding, PR-4 follow-up).
+* `fractional-negative-volume.csv` has one row with raw `volume=-0.5`; it
+  fails only `volume_integral_non_negative` (Codex cross-family review
+  finding, PR-4 follow-up).
+
+Each fixture's retained gate output lives alongside it
+(`fixtures/<name>-gate-result.json`). `tests/test_promotion_gate.py` reruns
+every fixture through the isolated venv.
 
 The gate runs in its own environment so the paper runtime
 (`../adaptive-paper/runner.py`) never imports pandera/pandas/
@@ -83,13 +103,20 @@ config always fails closed with `unsupported_input_format`. Instead,
 <path>` CLI arguments; for the `paper` command (not `preflight`, not
 `recover`, which resumes a trial admitted by an earlier `paper` invocation)
 it calls `validate_preflight(..., mode="paper", gate_result_path=args.gate_result,
-snapshot_path=args.snapshot)`. The gate must report `status: "pass"` and an
-`input_sha256` matching `--snapshot`'s current sha256, or the runtime raises
-`SafetyError` with kind `promotion_gate_missing` (no result file, no
-snapshot path, unreadable/invalid JSON), `promotion_gate_failed`
-(`status != "pass"`), or `promotion_gate_mismatch` (hash does not match the
-current file). `mode=None` (the `preflight` and `recover` call sites) is
-unaffected. `--snapshot` must name an actual bars/universe input file that
+snapshot_path=args.snapshot)`. The gate result must satisfy the full
+contract -- every required key present, every named check passing,
+`row_count > 0`, a top-level `status: "pass"`, and an `input_sha256` matching
+a `--snapshot` file the gate itself could accept (`.csv`/`.parquet`) -- or the
+runtime raises `SafetyError` with kind `promotion_gate_missing` (no result
+file, no snapshot path, unreadable/invalid JSON, or an unusable/wrong-
+extension snapshot path), `promotion_gate_incomplete` (a required key is
+missing, or `checks` is missing/empty), `promotion_gate_failed_check` (a
+named check reports `status: "fail"` despite a "pass" top-level status),
+`promotion_gate_empty` (`row_count <= 0` despite a "pass" top-level status),
+`promotion_gate_failed` (top-level `status != "pass"`), or
+`promotion_gate_mismatch` (hash does not match the current file). `mode=None`
+(the `preflight` and `recover` call sites) is unaffected. `--snapshot` must
+name an actual bars/universe input file that
 was run through `promotion_gate.py` -- this repository does not yet ship a
 production bars/universe ingest that produces one; until that ingest exists,
 an operator must supply the real file it will produce (or, for the bounded

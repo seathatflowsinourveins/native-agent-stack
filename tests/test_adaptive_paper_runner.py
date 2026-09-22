@@ -177,16 +177,32 @@ def _paper_ready_config(symbols=("SPY",)):
             "symbols": list(symbols), "benchmarks": list(symbols), "quote_max_age_seconds": 5}
 
 
+def _full_gate_result(*, status="pass", row_count=4, checks_status="pass", input_sha256=None):
+    """A gate-result.json body with the full contract `_check_promotion_gate`
+    now requires (status, input_sha256, row_count, checks, versions,
+    checked_at) -- shaped like a real `promotion_gate.py` output, not the
+    bare {status, input_sha256} pairs the pre-fix runtime accepted."""
+    return {
+        "status": status,
+        "input_sha256": input_sha256,
+        "row_count": row_count,
+        "checks": [{"name": "rows_present", "status": checks_status, "detail": "ok"}],
+        "versions": {"pandera": "0.33.1"},
+        "checked_at": "2026-09-22T00:00:00+00:00",
+    }
+
+
 class PromotionGatePreflight(unittest.TestCase):
-    """`mode="paper"` requires a passing, hash-matched promotion-gate result;
-    `mode=None` (every pre-existing call) is unaffected. Does not require the
-    pinned nautilus_trader/alpaca runtime: runner.py imports those lazily."""
+    """`mode="paper"` requires a complete, fully-passing, hash-matched
+    promotion-gate result; `mode=None` (every pre-existing call) is
+    unaffected. Does not require the pinned nautilus_trader/alpaca runtime:
+    runner.py imports those lazily."""
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
-        self.snapshot = self.root / "config.json"
-        self.snapshot.write_text('{"symbols": ["SPY"]}')
+        self.snapshot = self.root / "snapshot.csv"
+        self.snapshot.write_text("symbol\nSPY\n")
         self.snapshot_hash = hashlib.sha256(self.snapshot.read_bytes()).hexdigest()
         self.now_ns = time.time_ns()
         self.observation = _paper_ready_observation(self.now_ns)
@@ -199,6 +215,11 @@ class PromotionGatePreflight(unittest.TestCase):
         return validate_preflight_always(self.observation, self.config, require_open=True,
                                           mode="paper", **gate_kwargs)
 
+    def _write_gate(self, **fields):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps(_full_gate_result(**fields)))
+        return gate_path
+
     def test_mode_none_is_unaffected_by_missing_gate_arguments(self):
         # Every pre-existing preflight/recover call site omits mode/gate args.
         validate_preflight_always(self.observation, self.config, require_open=True)
@@ -208,8 +229,7 @@ class PromotionGatePreflight(unittest.TestCase):
             self._call(snapshot_path=self.snapshot)
 
     def test_missing_snapshot_path_raises_promotion_gate_missing(self):
-        gate_path = self.root / "gate-result.json"
-        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": self.snapshot_hash}))
+        gate_path = self._write_gate(input_sha256=self.snapshot_hash)
         with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_missing"):
             self._call(gate_result_path=gate_path)
 
@@ -224,29 +244,76 @@ class PromotionGatePreflight(unittest.TestCase):
             self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
 
     def test_failing_gate_status_raises_promotion_gate_failed(self):
-        gate_path = self.root / "gate-result.json"
-        gate_path.write_text(json.dumps({"status": "fail", "input_sha256": self.snapshot_hash}))
-        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_failed"):
+        gate_path = self._write_gate(status="fail", input_sha256=self.snapshot_hash)
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_failed$"):
             self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
 
     def test_mismatched_hash_raises_promotion_gate_mismatch(self):
-        gate_path = self.root / "gate-result.json"
-        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": "0" * 64}))
+        gate_path = self._write_gate(input_sha256="0" * 64)
         with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_mismatch"):
             self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
 
     def test_passing_matched_gate_allows_preflight_to_proceed(self):
-        gate_path = self.root / "gate-result.json"
-        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": self.snapshot_hash}))
+        gate_path = self._write_gate(input_sha256=self.snapshot_hash)
         close = self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
         self.assertEqual(close, (self.now_ns + 3600_000_000_000) / 1e9)
 
     def test_passing_gate_still_enforces_ordinary_account_checks(self):
-        gate_path = self.root / "gate-result.json"
-        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": self.snapshot_hash}))
+        gate_path = self._write_gate(input_sha256=self.snapshot_hash)
         self.observation["account"]["trading_blocked"] = True
         with self.assertRaisesRegex(SafetyErrorAlways, "account_not_ready"):
             self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+
+    # --- Regression (finding 3): the pre-fix _check_promotion_gate only ever
+    # read gate["status"] and gate["input_sha256"], so a gate result declaring
+    # row_count=0 or carrying a failed check but a "pass" top-level status
+    # (and a matching hash) was wrongly accepted. ---
+
+    def test_gate_result_missing_required_keys_raises_promotion_gate_incomplete(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": self.snapshot_hash}))
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_incomplete"):
+            self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+
+    def test_gate_result_with_empty_checks_list_raises_promotion_gate_incomplete(self):
+        gate_path = self.root / "gate-result.json"
+        body = _full_gate_result(input_sha256=self.snapshot_hash)
+        body["checks"] = []
+        gate_path.write_text(json.dumps(body))
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_incomplete"):
+            self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+
+    def test_gate_result_with_zero_row_count_raises_promotion_gate_empty(self):
+        """The exact review-finding scenario: top-level status "pass", hash
+        matches, but row_count is 0."""
+        gate_path = self._write_gate(row_count=0, input_sha256=self.snapshot_hash)
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_empty"):
+            self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+
+    def test_gate_result_with_a_failed_check_raises_promotion_gate_failed_check(self):
+        """The other review-finding scenario: top-level status "pass", hash
+        matches, but one of the named checks reports status "fail"."""
+        gate_path = self._write_gate(checks_status="fail", input_sha256=self.snapshot_hash)
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_failed_check"):
+            self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+
+    def test_snapshot_with_unaccepted_extension_raises_promotion_gate_missing(self):
+        """`--snapshot` must reference a file the gate itself could accept
+        (`.csv`/`.parquet`); a `.json` config file (or any other extension)
+        can never legitimately be the gated snapshot."""
+        bogus_snapshot = self.root / "config.json"
+        bogus_snapshot.write_text('{"symbols": ["SPY"]}')
+        bogus_hash = hashlib.sha256(bogus_snapshot.read_bytes()).hexdigest()
+        gate_path = self._write_gate(input_sha256=bogus_hash)
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_missing"):
+            self._call(gate_result_path=gate_path, snapshot_path=bogus_snapshot)
+
+    def test_snapshot_path_that_is_a_directory_raises_promotion_gate_missing(self):
+        directory_snapshot = self.root / "snapshot-dir.csv"
+        directory_snapshot.mkdir()
+        gate_path = self._write_gate(input_sha256="0" * 64)
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_missing"):
+            self._call(gate_result_path=gate_path, snapshot_path=directory_snapshot)
 
 
 class MainCommandGateWiring(unittest.TestCase):
@@ -315,7 +382,7 @@ class MainCommandGateWiring(unittest.TestCase):
 
     def test_paper_with_failing_gate_result_is_blocked_before_execution_continues(self):
         gate_path = self.root / "gate-result.json"
-        gate_path.write_text(json.dumps({"status": "fail", "input_sha256": self.snapshot_hash}))
+        gate_path.write_text(json.dumps(_full_gate_result(status="fail", input_sha256=self.snapshot_hash)))
         sentinel, code, raised = self._run_main("paper", ["--gate-result", str(gate_path), "--snapshot", str(self.snapshot)])
         self.assertIsNone(raised)
         self.assertEqual(code, 2)
@@ -325,16 +392,39 @@ class MainCommandGateWiring(unittest.TestCase):
 
     def test_paper_with_mismatched_snapshot_hash_is_blocked(self):
         gate_path = self.root / "gate-result.json"
-        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": "0" * 64}))
+        gate_path.write_text(json.dumps(_full_gate_result(input_sha256="0" * 64)))
         sentinel, code, raised = self._run_main("paper", ["--gate-result", str(gate_path), "--snapshot", str(self.snapshot)])
         self.assertIsNone(raised)
         self.assertEqual(code, 2)
         result = json.loads(self.output.read_text())
         self.assertEqual(result["reason"], "promotion_gate_mismatch")
 
+    def test_paper_with_zero_row_count_gate_result_is_blocked(self):
+        """Regression (finding 3): a gate result with top-level status "pass"
+        and a matching hash, but row_count=0, must not reach execution."""
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps(_full_gate_result(row_count=0, input_sha256=self.snapshot_hash)))
+        sentinel, code, raised = self._run_main("paper", ["--gate-result", str(gate_path), "--snapshot", str(self.snapshot)])
+        self.assertIsNone(raised)
+        self.assertEqual(code, 2)
+        result = json.loads(self.output.read_text())
+        self.assertEqual(result["reason"], "promotion_gate_empty")
+
+    def test_paper_with_a_failed_check_in_gate_result_is_blocked(self):
+        """Regression (finding 3): a gate result with top-level status
+        "pass" and a matching hash, but a failed named check, must not
+        reach execution."""
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps(_full_gate_result(checks_status="fail", input_sha256=self.snapshot_hash)))
+        sentinel, code, raised = self._run_main("paper", ["--gate-result", str(gate_path), "--snapshot", str(self.snapshot)])
+        self.assertIsNone(raised)
+        self.assertEqual(code, 2)
+        result = json.loads(self.output.read_text())
+        self.assertEqual(result["reason"], "promotion_gate_failed_check")
+
     def test_paper_with_passing_matched_gate_reaches_post_gate_execution(self):
         gate_path = self.root / "gate-result.json"
-        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": self.snapshot_hash}))
+        gate_path.write_text(json.dumps(_full_gate_result(input_sha256=self.snapshot_hash)))
         sentinel, code, raised = self._run_main("paper", ["--gate-result", str(gate_path), "--snapshot", str(self.snapshot)])
         self.assertIsNone(code)
         self.assertIs(raised, sentinel)

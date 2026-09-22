@@ -1,13 +1,85 @@
 # Upstream configuration: https://github.com/gitleaks/gitleaks#configuration
-# Keep all default detection. Allowlists cover reviewed non-credential matches only:
-# (1) three recorded QuantConnect.Api build-artifact hashes (2026-09-20);
-# (2) content digests (64-hex SHA-256, 40-hex SHA-1/git ids) in evidence artifacts and
-#     receipts, and opaque Alpaca pagination cursors ("next_page_token") in a retained
-#     historical-bars receipt (2026-09-22: the only matches a full-history scan produced,
-#     251 findings over 522 commits, all classified by shape before allowlisting).
+# Keep all default detection. Every allowlist below is scoped under a specific
+# `[[rules]] id = "..."` block (NOT a top-level `[[allowlists]]`) and is BOTH
+# path-restricted (an exact file path, not a whole directory) AND context-restricted
+# (a specific field-name/value shape, not a bare hex-secret pattern).
+#
+# This replaces an earlier revision that used two problems at once:
+#   1. A top-level `regexTarget = "secret"` allowlist for bare 64-hex/40-hex values,
+#      with no `paths` restriction, so it suppressed ANY matching hex-shaped secret
+#      anywhere in the repo (e.g. a synthetic `api_key = "<64-hex>"` line).
+#   2. A top-level `[[allowlists]]` with BOTH `paths` and `regexes` set. Measured
+#      against the installed gitleaks 8.30.1 binary (not just its upstream source),
+#      a top-level allowlist with `paths` set skips the ENTIRE FILE once the path
+#      matches, regardless of whether any `regexes` also given ever match (verified
+#      with a `paths`-matching, deliberately non-matching-`regexes` allowlist: the
+#      file was still skipped with 0 bytes scanned). Only a `[[rules.allowlists]]`
+#      block nested under a specific `[[rules]] id = "..."` was measured to apply
+#      `paths` and `regexes` as a true per-line AND: the same non-matching-regex
+#      allowlist, moved under a rule, left the file's real secret detected, and a
+#      matching key-name regex suppressed only that exact key/value shape while a
+#      `ghp_`-shaped token on the very same line, or an `api_key`/`token` field in a
+#      non-allowlisted path, was still caught. Every allowlist below is therefore
+#      rule-scoped for this reason, duplicated under both rules that produced
+#      matches (generic-api-key, sourcegraph-access-token) where relevant.
+#      Regression coverage for both failure modes is in tests/test_gitleaks_config.py.
+#
+# 2026-09-22 baseline: a full-history scan with default rules (`.gitleaks.toml`
+# moved aside) over 525 commits (~801 MB scanned) produced 257 findings across 27
+# files (234 generic-api-key + 23 sourcegraph-access-token; the sourcegraph rule
+# matched a subset of the same 40-hex values already caught by generic-api-key).
+# All 257 were classified by shape and location before allowlisting:
+#   - 3 recorded QuantConnect.Api build-artifact hashes (2026-09-20, unchanged below).
+#   - Content digests (40/64-hex SHA-1/SHA-256) that are JSON values under a closed
+#     set of ~70 named fields (archive_sha256, source_head_pin, commit, disk-token,
+#     etc. - the exact list is in the semantic-fields allowlist below), restricted to
+#     the 25 exact evidence/blueprint/catalog files that produced them.
+#   - Content digests under filename-shaped JSON keys (a source-tree or build-output
+#     path such as "engine.go" or "scripts/native_token_ci.py") in whole-file or
+#     whole-subtree checksum manifests, restricted to the same 25 exact files and to
+#     keys that look like a relative path (contain "." or "/", or are one of a small
+#     set of known extension-less filenames) so a credential-shaped key such as
+#     "api_key" or "token" is never matched by this allowlist even inside those files.
+#   - Git commit/tree ids referenced in two dated review narratives (pin/commit/tree/
+#     source_pin/@ context words only), restricted to those two exact files.
+#   - Opaque Alpaca pagination cursors ("next_page_token") in one retained
+#     historical-bars receipt, restricted to that exact file and to the cursor's own
+#     base64-with-padding value shape (regexTarget = "secret"), not the whole line,
+#     so any other credential on the same line is still detected.
+#   - sha256sum-style "<64-hex>  <filename>" lines inside a JSON string array in two
+#     sealed comparison-protocol files, restricted to those two exact files.
+# After this config, `gitleaks git . --config .gitleaks.toml --max-target-megabytes 2`
+# restricted to this branch's own ancestry (--log-opts="HEAD") scanned 376 commits
+# (~756 MB) and produced 0 findings (re-measured 2026-09-22, this fix round;
+# `git merge-base --is-ancestor` confirms every commit scanned this way is an
+# ancestor of this branch's HEAD). The same command with default log-opts (which
+# walks all refs reachable in this shared, concurrently used repository, not just
+# this branch) scanned 542 commits and produced exactly 1 residual finding:
+# tests/test_lane_packets.py on commit 34fc51b, confirmed NOT an ancestor of this
+# branch (`git merge-base --is-ancestor 34fc51b HEAD` fails) and not a path this
+# unit owns or created - a synthetic fixture on a different, concurrently active
+# sibling branch (PR-5, "packets unit"). `gitleaks dir .` (working tree only)
+# produced 0 findings. The default-log-opts commit count and the sibling-branch
+# finding are NOT stable invariants: this is a shared repository with other
+# active branches, so a rerun on a different day can see a different count or a
+# different (or zero) number of out-of-ancestry findings; only the HEAD-scoped
+# 0-findings result is this unit's own acceptance evidence. This means the
+# published acceptance command (default log-opts, no --log-opts restriction)
+# does not currently reach 0 findings by itself; reaching 0 requires either
+# `--log-opts="HEAD"` or the sibling branch merging/rebasing its own fix. This
+# is flagged for a coordinator decision, not resolved by this unit.
+#
+# `--exit-code 0` tells gitleaks to always return process exit code 0, findings
+# or not (it does NOT mean "0 findings required"); pass/fail must be read from
+# the "leaks found: N" / "no leaks found" log line or the JSON report, never
+# from the process exit code, when this flag is used. tests/test_gitleaks_config.py
+# test_exit_code_zero_flag_always_returns_zero_even_with_findings pins this
+# behavior against the installed binary so a wrongly-recorded exit code (as
+# happened once during this unit's review) cannot recur unnoticed.
+#
 # validate.yml's secret-scan job passes --config .gitleaks.toml and
-# --max-target-megabytes 2; the generated explorer HTML is therefore NOT scanned and that
-# is recorded as incomplete coverage (its sources are scanned).
+# --max-target-megabytes 2; the generated explorer HTML is therefore NOT scanned and
+# that is recorded as incomplete coverage (its sources are scanned).
 [extend]
 useDefault = true
 
@@ -25,17 +97,166 @@ regexes = [
   '''^\s*"Launcher/bin/Debug/QuantConnect\.Api\.xml": "828ef6359e33844b81ca839238ffac8f2dcd10995c5629cb40956bf5d4853e5c",?\s*$'''
 ]
 
-[[allowlists]]
-description = "Content digests: 64-hex SHA-256 and 40-hex SHA-1/git object ids are not secrets"
-regexTarget = "secret"
-regexes = [
-  '''^[0-9a-f]{64}$''',
-  '''^[0-9a-f]{40}$''',
+# Content digests held under a closed set of named JSON fields (sha256/commit/pin
+# style keys), restricted to the exact files that were reviewed and produced them.
+[[rules.allowlists]]
+description = "Content digests (40/64-hex) under named sha256/commit/pin fields in reviewed evidence files"
+condition = "AND"
+paths = [
+  '''^blueprints/convergence-practice/offhost-restore/source-receipt\.json$''',
+  '''^blueprints/convergence-practice/service-reboot/attempt-1/freeze\.json$''',
+  '''^blueprints/convergence-practice/service-reboot/attempt-2/freeze\.json$''',
+  '''^blueprints/convergence-practice/service-reboot/attempt-2/guest-after\.json$''',
+  '''^blueprints/convergence-practice/service-reboot/attempt-2/guest-before\.json$''',
+  '''^blueprints/us-equities/broad-universe/receipt\.json$''',
+  '''^blueprints/us-equities/execution-realism/inputs\.json$''',
+  '''^catalogs/landscape/claude-independent-discovery\.json$''',
+  '''^evidence/artifacts/catalog-clean-install-20260921/source-manifest\.json$''',
+  '''^evidence/artifacts/executed-comparisons-20260922/executed-comparisons/executed-comparisons/durable-memory/protocol-C\.json$''',
+  '''^evidence/artifacts/executed-comparisons-20260922/executed-comparisons/executed-comparisons/durable-memory/protocol\.sealed\.json$''',
+  '''^evidence/artifacts/full-stack-convergence-20260921/native-token-workflow\.json$''',
+  '''^evidence/artifacts/native-dagu-retry-20260920/source-after\.json$''',
+  '''^evidence/artifacts/native-dagu-retry-20260920/source-before\.json$''',
+  '''^evidence/artifacts/native-service-reboot-20260920/freeze\.json$''',
+  '''^evidence/artifacts/native-service-reboot-20260920/guest-after\.json$''',
+  '''^evidence/artifacts/native-service-reboot-20260920/guest-before\.json$''',
+  '''^evidence/artifacts/native-service-reboot-20260920/guest-freeze\.json$''',
+  '''^evidence/artifacts/portable-userspace-install-20260921/token-clean-install-unprivileged/receipt\.json$''',
+  '''^evidence/artifacts/portable-userspace-install-20260921/token-clean-install/receipt\.json$''',
+  '''^evidence/receipts/native-dashboard-access-20260921\.json$''',
+  '''^evidence/receipts/native-token-ci-github-20260920\.json$''',
+  '''^evidence/receipts/native-token-ci-local-20260920\.json$''',
+  '''^evidence/receipts/native-token-clean-prefix-20260920\.json$''',
+  '''^evidence/receipts/portable-userspace-install-20260921\.json$''',
 ]
-
-[[allowlists]]
-description = "Opaque market-data pagination cursors retained in historical receipts"
 regexTarget = "line"
 regexes = [
-  '''"next_page_token":\s*"[A-Za-z0-9+/=_-]{20,}"''',
+  '''"(?:after_neutral_key_manifest_sha256|archive_sha256|arms_json_sha256|artifact_archive_sha256|artifact_sha256|base_commit|before_neutral_key_manifest_sha256|binary_sha256_before|binary_sha256|cases_sealed_sha256|checkpoint_sha256|claim_sha256|commit|completed_sha256|config_sha256|content_sha256|corporate_actions_ledger|corpus_sha256sums|coverage_manifest|coverage_probes|dagu_archive_sha256|dagu|daily_parquet|dataset_ledger|derived_sha256|disk-token|disk_token|downloaded_receipt_sha256|entitlement_probe|evaluate_sha256|evaluated_at_commit|evaluation_events|expected_symbol_sha256|frozen_commit|head_sha|image_sha256|input_sha256|installed_binary_sha256|interpreter_sha256|ledger_sha256|machine_id_sha256|manifest_sha256|openapi_sha256|payload_iso_sha256|plan_sha256|preparation_receipt_sha256|private_original_sha256|python_sha256|qemu_binary_sha256|raw_sha256|recovered_sha256|refetch_check|response_sha256|result_sha256|retained_sha256|rtk_archive_sha256|runner_sha256|scan_private|seal_sha256|seed_sha256|sha256|source_head_pin|source_revision|source_sha256|stderr_raw_sha256|stderr_sha256|stdout_raw_sha256|stdout_sha256|symbols_sha256|ubuntu_keyring_sha256|uv_executable_sha256|workflow_sha256)":\s*"(?:[0-9a-f]{40}|[0-9a-f]{64})"''',
+]
+
+# Content digests under filename-shaped JSON keys (whole-file or whole-subtree
+# checksum manifests: a source-tree inventory or a small build/script hash map).
+# The key alternative requires a path separator, a file extension, a leading dot,
+# or one of a few known extension-less filenames, so a credential-shaped key name
+# (api_key, token, secret, password, ...) is never matched by this allowlist even
+# inside these exact files.
+[[rules.allowlists]]
+description = "Content digests (40/64-hex) under filename-shaped keys in reviewed checksum-manifest files"
+condition = "AND"
+paths = [
+  '''^blueprints/convergence-practice/service-reboot/attempt-1/freeze\.json$''',
+  '''^blueprints/convergence-practice/service-reboot/attempt-2/freeze\.json$''',
+  '''^blueprints/us-equities/execution-realism/inputs\.json$''',
+  '''^evidence/artifacts/catalog-clean-install-20260921/source-manifest\.json$''',
+  '''^evidence/artifacts/full-stack-convergence-20260921/native-token-workflow\.json$''',
+  '''^evidence/artifacts/native-dagu-retry-20260920/source-after\.json$''',
+  '''^evidence/artifacts/native-dagu-retry-20260920/source-before\.json$''',
+  '''^evidence/artifacts/native-service-reboot-20260920/freeze\.json$''',
+  '''^evidence/artifacts/native-service-reboot-20260920/guest-freeze\.json$''',
+  '''^evidence/artifacts/portable-userspace-install-20260921/token-clean-install-unprivileged/receipt\.json$''',
+  '''^evidence/artifacts/portable-userspace-install-20260921/token-clean-install/receipt\.json$''',
+  '''^evidence/receipts/native-token-ci-github-20260920\.json$''',
+  '''^evidence/receipts/native-token-ci-local-20260920\.json$''',
+  '''^evidence/receipts/native-token-clean-prefix-20260920\.json$''',
+  '''^evidence/receipts/portable-userspace-install-20260921\.json$''',
+]
+regexTarget = "line"
+regexes = [
+  '''"(?:[A-Za-z0-9_$][A-Za-z0-9_\-./$]*[./][A-Za-z0-9_\-.$]*|\.[A-Za-z0-9_\-./$]+|Dockerfile|LICENSE|Makefile|SHA256SUMS)":\s*"(?:[0-9a-f]{40}|[0-9a-f]{64})"''',
+]
+
+# 40-hex git commit/tree ids referenced in dated review-narrative prose (not JSON
+# key:value pairs), restricted to the two review files that hold them and to lines
+# where a pin/commit/tree/source context word or an "@version" separator sits
+# immediately before the hex id.
+[[rules.allowlists]]
+description = "Git commit/tree ids referenced in blind-catalog-convergence review narrative"
+condition = "AND"
+paths = [
+  '''^evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review\.json$''',
+  '''^evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger\.json$''',
+]
+regexTarget = "line"
+regexes = [
+  '''(?i)(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b''',
+]
+
+# Opaque Alpaca pagination cursor retained in one historical-bars receipt. Scoped to
+# the cursor's own base64-with-padding value shape (regexTarget = "secret"), not the
+# whole line, so any other credential-shaped value on the same line is still
+# detected (e.g. a ghp_-prefixed token, which this shape never matches).
+[[rules.allowlists]]
+description = "Opaque market-data pagination cursor retained in one historical receipt"
+condition = "AND"
+paths = ['''^blueprints/us-equities/broad-universe/receipt\.json$''']
+regexTarget = "secret"
+regexes = [
+  '''^[A-Za-z0-9+/]{16,}={1,2}$''',
+]
+
+# sha256sum-style "<64-hex>  <filename>" lines inside a JSON string array, restricted
+# to the two sealed-protocol files that record them.
+[[rules.allowlists]]
+description = "sha256sum-style corpus_files entries in sealed comparison protocols"
+condition = "AND"
+paths = [
+  '''^evidence/artifacts/executed-comparisons-20260922/executed-comparisons/executed-comparisons/durable-memory/protocol-C\.json$''',
+  '''^evidence/artifacts/executed-comparisons-20260922/executed-comparisons/executed-comparisons/durable-memory/protocol\.sealed\.json$''',
+]
+regexTarget = "line"
+regexes = [
+  '''"[0-9a-f]{64}\s{2}[^"]+"''',
+]
+
+[[rules]]
+id = "sourcegraph-access-token"
+
+# Same named-field allowlist as generic-api-key above (source_head_pin and friends
+# also match the sourcegraph-access-token rule's 40-hex pattern in these files).
+[[rules.allowlists]]
+description = "Content digests (40/64-hex) under named sha256/commit/pin fields in reviewed evidence files"
+condition = "AND"
+paths = [
+  '''^blueprints/convergence-practice/offhost-restore/source-receipt\.json$''',
+  '''^blueprints/convergence-practice/service-reboot/attempt-1/freeze\.json$''',
+  '''^blueprints/convergence-practice/service-reboot/attempt-2/freeze\.json$''',
+  '''^blueprints/convergence-practice/service-reboot/attempt-2/guest-after\.json$''',
+  '''^blueprints/convergence-practice/service-reboot/attempt-2/guest-before\.json$''',
+  '''^blueprints/us-equities/broad-universe/receipt\.json$''',
+  '''^blueprints/us-equities/execution-realism/inputs\.json$''',
+  '''^catalogs/landscape/claude-independent-discovery\.json$''',
+  '''^evidence/artifacts/catalog-clean-install-20260921/source-manifest\.json$''',
+  '''^evidence/artifacts/executed-comparisons-20260922/executed-comparisons/executed-comparisons/durable-memory/protocol-C\.json$''',
+  '''^evidence/artifacts/executed-comparisons-20260922/executed-comparisons/executed-comparisons/durable-memory/protocol\.sealed\.json$''',
+  '''^evidence/artifacts/full-stack-convergence-20260921/native-token-workflow\.json$''',
+  '''^evidence/artifacts/native-dagu-retry-20260920/source-after\.json$''',
+  '''^evidence/artifacts/native-dagu-retry-20260920/source-before\.json$''',
+  '''^evidence/artifacts/native-service-reboot-20260920/freeze\.json$''',
+  '''^evidence/artifacts/native-service-reboot-20260920/guest-after\.json$''',
+  '''^evidence/artifacts/native-service-reboot-20260920/guest-before\.json$''',
+  '''^evidence/artifacts/native-service-reboot-20260920/guest-freeze\.json$''',
+  '''^evidence/artifacts/portable-userspace-install-20260921/token-clean-install-unprivileged/receipt\.json$''',
+  '''^evidence/artifacts/portable-userspace-install-20260921/token-clean-install/receipt\.json$''',
+  '''^evidence/receipts/native-dashboard-access-20260921\.json$''',
+  '''^evidence/receipts/native-token-ci-github-20260920\.json$''',
+  '''^evidence/receipts/native-token-ci-local-20260920\.json$''',
+  '''^evidence/receipts/native-token-clean-prefix-20260920\.json$''',
+  '''^evidence/receipts/portable-userspace-install-20260921\.json$''',
+]
+regexTarget = "line"
+regexes = [
+  '''"(?:after_neutral_key_manifest_sha256|archive_sha256|arms_json_sha256|artifact_archive_sha256|artifact_sha256|base_commit|before_neutral_key_manifest_sha256|binary_sha256_before|binary_sha256|cases_sealed_sha256|checkpoint_sha256|claim_sha256|commit|completed_sha256|config_sha256|content_sha256|corporate_actions_ledger|corpus_sha256sums|coverage_manifest|coverage_probes|dagu_archive_sha256|dagu|daily_parquet|dataset_ledger|derived_sha256|disk-token|disk_token|downloaded_receipt_sha256|entitlement_probe|evaluate_sha256|evaluated_at_commit|evaluation_events|expected_symbol_sha256|frozen_commit|head_sha|image_sha256|input_sha256|installed_binary_sha256|interpreter_sha256|ledger_sha256|machine_id_sha256|manifest_sha256|openapi_sha256|payload_iso_sha256|plan_sha256|preparation_receipt_sha256|private_original_sha256|python_sha256|qemu_binary_sha256|raw_sha256|recovered_sha256|refetch_check|response_sha256|result_sha256|retained_sha256|rtk_archive_sha256|runner_sha256|scan_private|seal_sha256|seed_sha256|sha256|source_head_pin|source_revision|source_sha256|stderr_raw_sha256|stderr_sha256|stdout_raw_sha256|stdout_sha256|symbols_sha256|ubuntu_keyring_sha256|uv_executable_sha256|workflow_sha256)":\s*"(?:[0-9a-f]{40}|[0-9a-f]{64})"''',
+]
+
+# Same prose-narrative allowlist as generic-api-key above.
+[[rules.allowlists]]
+description = "Git commit/tree ids referenced in blind-catalog-convergence review narrative"
+condition = "AND"
+paths = [
+  '''^evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review\.json$''',
+  '''^evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger\.json$''',
+]
+regexTarget = "line"
+regexes = [
+  '''(?i)(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b''',
 ]
