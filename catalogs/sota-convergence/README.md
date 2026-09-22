@@ -134,3 +134,14 @@ working files, so the 396/0/8 repository figures and the child count are not rep
 from the public files alone. Not done: release-note reading for the 15 behind pins, any install, run, benchmark or
 license-file inspection (GitHub reports NOASSERTION for serena, ccusage, borg). The
 private working files stay under the host's state directory.
+
+A `review_status` in this manifest (e.g. `confirmed_default`) records only that a lane's
+*proposed change* to a selection or pin survived two adversarial refuters; it never by
+itself establishes that the underlying tool was installed, built or run. Execution
+evidence is the separate `evidence_level` field carried from each entry's
+`catalogs/us-equities/*.json` catalog card (`source_review` or `native_proven`): the
+`portfolio-risk` layer's `quantstats 0.0.81` and the `evaluation-experiments` layer's
+`inspect-ai 0.3.266` both carry `review_status: confirmed_default` here while their own
+catalog cards set `evidence_level: source_review` and their manifest notes say the same
+in prose -- confirmed selections with no reproducible execution receipt yet, not a
+contradiction in the manifest.

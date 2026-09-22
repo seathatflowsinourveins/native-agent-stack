@@ -3,9 +3,12 @@
 dated SOTA-convergence manifest with the exact key layout of
 ``catalogs/sota-convergence/manifest-20260922.json``.
 
-No network access. All host-path fragments are removed from the serialized
-output before it is written; the writer refuses to write if a leak survives
-sanitization (see ``sanitize`` / ``assert_no_leak``).
+No network access. All host-path fragments are removed from the manifest's
+decoded string values (``sanitize_value``, walking dict/list/str, applied
+*before* JSON serialization -- see its docstring for why sanitizing already-
+serialized JSON text is unsafe) before the object is dumped, re-parsed with
+``json.loads`` to prove the result is valid JSON, and leak-checked
+(``assert_no_leak``); the writer refuses to write if a leak survives.
 
 Baseline (pins vs. upstream) is computed here, directly from
 ``foundation-layers.json``, ``trading-by-layer.json`` and the freshness
@@ -48,6 +51,11 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 
 GITHUB_RE = re.compile(r"^https?://github\.com/")
+# Capturing form used to derive a normalized owner/repo slug (see
+# github_repo_slug below); stops at the next '/', '#' or '?' so a
+# release/tree/tag suffix or a trailing slash never becomes part of the repo
+# name.
+GITHUB_URL_RE = re.compile(r"^https?://github\.com/([^/\s]+)/([^/\s#?]+)")
 # A ".devN" pin (optionally annotated with "@ <commit>" or "(<commit>)") tracks a
 # working commit, not a tagged release; its numeric prefix is not comparable to
 # GitHub's latest release/tag. A version number merely *annotated* with a commit
@@ -103,8 +111,61 @@ def classify_pin(pin, repository, upstream_latest, component_id=None, os_package
     return {"behind": pin_version < upstream_version, "excluded": False, "reason": None}
 
 
+def github_repo_slug(url: str):
+    """Normalized 'owner/repo' slug for a GitHub URL.
+
+    The capturing pattern stops at the next '/', '#' or '?', so a
+    '/releases/tag/vX', '/tree/...' or trailing-slash alias for the same
+    repository already resolves to the same owner/repo pair; '.git' is
+    stripped and the result is lower-cased so a canonical URL and any of
+    those alias forms normalize identically. Mirrors
+    ``github_freshness.github_slug`` (kept independent here so this module
+    has no import-time dependency on that sibling script -- both files are
+    also loaded standalone, by file path, in tests/test_sota_convergence.py).
+    """
+    match = GITHUB_URL_RE.match(url or "")
+    if not match:
+        return None
+    owner, repo = match.group(1), match.group(2)
+    if repo.lower().endswith(".git"):
+        repo = repo[: -len(".git")]
+    return f"{owner}/{repo}".lower()
+
+
+def _repositories_by_slug(repositories: dict) -> dict:
+    """slug -> freshness record, built from each record's own ``slug`` field
+    when present (set by github_freshness.py) and otherwise derived from the
+    dict key URL itself. First-seen wins, so this is deterministic for a
+    fixed input dict."""
+    index = {}
+    for url, record in (repositories or {}).items():
+        slug = None
+        if isinstance(record, dict):
+            slug = record.get("slug")
+        slug = (slug or github_repo_slug(url) or "").lower() or None
+        if slug and slug not in index:
+            index[slug] = record
+    return index
+
+
+def repository_known(repository, repositories: dict) -> bool:
+    """True when ``repository`` (by exact URL or by normalized GitHub slug)
+    has a freshness record in ``repositories``."""
+    repositories = repositories or {}
+    if repository in repositories:
+        return True
+    slug = github_repo_slug(repository)
+    return bool(slug and slug in _repositories_by_slug(repositories))
+
+
 def compute_upstream(repository, repositories: dict) -> dict:
-    record = (repositories or {}).get(repository) or {}
+    repositories = repositories or {}
+    record = repositories.get(repository)
+    if record is None:
+        slug = github_repo_slug(repository)
+        if slug:
+            record = _repositories_by_slug(repositories).get(slug)
+    record = record or {}
     release = record.get("latest_release") or {}
     return {
         "latest": release.get("tag") or record.get("latest_tag"),
@@ -164,11 +225,21 @@ def build_baseline_trading(trading_by_layer: dict, repositories: dict,
             upstream = compute_upstream(repository, repositories)
             classification = classify_pin(pin, repository, upstream.get("latest"),
                                            component_id=entry["id"], os_package_ids=os_package_ids)
-            entries.append({
+            row = {
                 "id": entry["id"], "repository": repository, "decision": entry.get("decision"),
                 "pin": pin, "upstream": upstream, "behind": classification["behind"],
                 "excluded": classification["excluded"], "exclusion_reason": classification["reason"],
-            })
+            }
+            # evidence_level (source_review / native_proven / ...) is the
+            # execution classification; it is distinct from review_status
+            # (a selection/pin confirmation) -- see recipes/sota-convergence-
+            # practice.md's "Evidence classes". Carried through only when the
+            # source catalogs/us-equities/*.json card sets it
+            # (extract_layers.py already copies it verbatim into
+            # trading-catalog.json / trading-by-layer.json).
+            if entry.get("evidence_level") is not None:
+                row["evidence_level"] = entry["evidence_level"]
+            entries.append(row)
         rows.append({"layer": layer_id, "entries": entries})
     return rows
 
@@ -201,12 +272,46 @@ def disposition(label, survives):
     }.get(label, "unlabelled")
 
 
-HOST_PATH_RE = re.compile(r"/home/[^\s\"']+")
+# Host-path forms to redact. Patterns and coverage (Linux, macOS, Windows
+# drive-letter and bare "\Users\" forms) mirror the "personal home path" /
+# "Windows user path" checks in scripts/validate.py's PRIVATE_CONTENT list
+# (adapted here, without validate.py's "/home/example" placeholder
+# exemption, since this sanitizer's own contract -- see
+# test_sanitize_removes_host_paths below -- redacts every /home/ occurrence,
+# including any that happen to say "example").
+HOST_PATH_PATTERNS = (
+    re.compile(r"/home/[^\s\"']+"),
+    re.compile(r"/Users/[^\s\"']+", re.IGNORECASE),
+    re.compile(r"(?:[A-Za-z]:)?\\+Users\\+[^\s\"']+", re.IGNORECASE),
+)
 LEAK_MARKERS = ("/home/", "APCA")
 
 
 def sanitize(text: str) -> str:
-    return HOST_PATH_RE.sub("<host-path>", text)
+    for pattern in HOST_PATH_PATTERNS:
+        text = pattern.sub("<host-path>", text)
+    return text
+
+
+def sanitize_value(value):
+    """Recursively redact host paths from decoded values -- dict/list/str --
+    walking the Python object *before* it is JSON-serialized. Applying
+    ``sanitize`` to the already-serialized JSON text instead (the previous
+    approach) can corrupt the output: a value like
+    ``read "/home/example/file.json" before publishing`` is escaped by
+    json.dumps as ``read \\"/home/example/file.json\\" before publishing``,
+    and the host-path regex's character class does not exclude a backslash,
+    so it consumes the backslash that escapes the closing quote and leaves
+    an unescaped ``"`` behind -- invalid JSON that ``assert_no_leak`` alone
+    would not catch. Sanitizing the raw Python string first means there are
+    no JSON escape sequences to misread."""
+    if isinstance(value, str):
+        return sanitize(value)
+    if isinstance(value, dict):
+        return {key: sanitize_value(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [sanitize_value(item) for item in value]
+    return value
 
 
 def assert_no_leak(text: str) -> None:
@@ -240,12 +345,33 @@ def merge_lanes(lanes_doc: dict, repositories: dict):
                 key = (layer_id, selected["repository"])
                 verdict = verdicts.get((layer_id, selected["repository"], selected["status"]))
                 status_value = selected["status"]
-                if verdict is not None and not verdict["survives"]:
-                    status_value = ("confirmed_default" if status_value in ("demotion_proposed", "unmaintained_signal")
-                                     else "confirmed_pin")
-                    notes[key].append(f"{selected['status']} proposed by {lane['lane']} lane, "
-                                       "refuted by adversarial verification")
-                status[key] = {"status": status_value, "evidence": selected.get("evidence", []),
+                evidence = list(selected.get("evidence", []))
+                if verdict is not None:
+                    survives = verdict.get("survives")
+                    vote_count = len(verdict.get("votes") or [])
+                    if survives is False:
+                        # The lane's proposed status change was refuted: the
+                        # original selection/pin is confirmed as-is.
+                        status_value = ("confirmed_default" if status_value in ("demotion_proposed", "unmaintained_signal")
+                                         else "confirmed_pin")
+                        notes[key].append(f"{selected['status']} proposed by {lane['lane']} lane, "
+                                           "refuted by adversarial verification")
+                    elif survives is None:
+                        # Unknown verdict (no refuter vote, or a null in the
+                        # lanes.json record): never treat this as a
+                        # completed refutation -- that would silently upgrade
+                        # an unreviewed status (e.g. "unmaintained_signal")
+                        # to "confirmed_default". Keep it unverified instead.
+                        status_value = f"{status_value}_unverified"
+                        evidence.append(
+                            f"{vote_count} adversarial vote(s) returned for {lane['lane']} lane's "
+                            f"{selected['status']} proposal; verification outcome unknown (survives=null)"
+                        )
+                    # survives is True: the lane's proposed status change
+                    # itself survived verification -- keep status_value as
+                    # the lane proposed it (no note; this never upgrades
+                    # beyond what the lane itself proposed).
+                status[key] = {"status": status_value, "evidence": evidence,
                                 "note": selected.get("note"), "lane": lane["lane"]}
             for alt in layer.get("alternatives_keep_but_compare", []):
                 alts[layer_id].append({**alt, "lane": lane["lane"]})
@@ -253,7 +379,8 @@ def merge_lanes(lanes_doc: dict, repositories: dict):
                 verdict = verdicts.get((layer_id, candidate["repository"], "new_candidate"))
                 survives = verdict["survives"] if verdict else None
                 upstream_now = (compute_upstream(candidate["repository"], repositories)
-                                 if candidate["repository"] in repositories else candidate.get("upstream_now"))
+                                 if repository_known(candidate["repository"], repositories)
+                                 else candidate.get("upstream_now"))
                 votes = [{"lens": i, "refuted": v["refuted"], "confidence": v.get("confidence"),
                           "reasoning": v.get("reasoning", "")[:400]}
                          for i, v in enumerate(verdict["votes"])] if verdict else []
@@ -320,6 +447,35 @@ def sorted_candidates(cands, layer_id):
 # Manifest assembly
 # ---------------------------------------------------------------------------
 
+def format_observation_window(freshness_doc: dict) -> str:
+    """Describe *when the freshness data was actually observed*, from the
+    per-record ``observed_at`` timestamps github_freshness.py retains --
+    never from ``generated_at`` (checkpoint/write time), which a resumed run
+    rewrites on every invocation even when zero repositories were re-fetched
+    (see github_freshness.build_document's ``fetched_this_run`` /
+    ``retained_from_prior_runs`` counts and ``observation_window``).
+
+    Prefers the top-level ``observation_window`` (present on any freshness
+    file written by the current github_freshness.py); falls back to scanning
+    ``repositories[*].observed_at`` directly for an older-format freshness
+    file that predates that top-level field but still carries per-record
+    dates."""
+    window = freshness_doc.get("observation_window") or {}
+    min_at, max_at = window.get("min"), window.get("max")
+    if not (min_at and max_at):
+        observed_dates = sorted(
+            rec.get("observed_at") for rec in (freshness_doc.get("repositories") or {}).values()
+            if isinstance(rec, dict) and rec.get("observed_at")
+        )
+        if observed_dates:
+            min_at, max_at = observed_dates[0], observed_dates[-1]
+    if not (min_at and max_at):
+        return "observed at an unrecorded time (no per-record observed_at in the freshness snapshot)"
+    if min_at[:19] == max_at[:19]:
+        return f"observed {min_at[:19]}Z"
+    return f"observed {min_at[:19]}Z to {max_at[:19]}Z"
+
+
 def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading_by_layer,
                     freshness_doc, lanes_doc, reconciliations, taxonomy,
                     os_package_ids=DEFAULT_OS_PACKAGE_IDS) -> dict:
@@ -328,6 +484,16 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
     baseline_trading = build_baseline_trading(trading_by_layer, repositories, os_package_ids=os_package_ids)
     status, notes, alts, cands, gaps, calls, limits = merge_lanes(lanes_doc, repositories)
 
+    # Fall back to deriving retained_from_prior_runs from count - fetched_this_run
+    # for an older-format freshness file that predates these top-level fields
+    # (mirrors format_observation_window's fallback), rather than reporting a
+    # misleading 0 retained alongside a nonzero repository count.
+    fetched_this_run = freshness_doc.get("fetched_this_run", 0)
+    if "retained_from_prior_runs" in freshness_doc:
+        retained_from_prior_runs = freshness_doc["retained_from_prior_runs"]
+    else:
+        retained_from_prior_runs = max(freshness_doc.get("count", 0) - fetched_this_run, 0)
+
     manifest = {
         "schema_version": 1, "id": manifest_id, "checked_at": checked_at, "scope": scope,
         "method": {
@@ -335,7 +501,9 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
                         "manifests/stack.json and the catalogs/us-equities layer files, "
                         "consolidated into 12 trading layers (taxonomy below)",
             "freshness": f"authenticated GitHub REST metadata for {freshness_doc.get('count', 0)} "
-                         f"repositories fetched {(freshness_doc.get('generated_at') or '')[:19]}Z: "
+                         f"repositories, {format_observation_window(freshness_doc)} "
+                         f"(fetched_this_run={fetched_this_run}, "
+                         f"retained_from_prior_runs={retained_from_prior_runs}): "
                          "stars, pushed_at, latest release/tag, head, license, archived, rename",
             "review": "review lanes from a lanes.json record (schema: lanes[].result.layers[], "
                        "lanes[].proposals[]); every proposed change adversarially verified "
@@ -372,13 +540,16 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
         entries = []
         for entry in row["entries"]:
             lane_status = status.get((layer_id, entry["repository"]), {})
-            entries.append({
+            row_entry = {
                 "id": entry["id"], "repository": entry["repository"], "decision": entry["decision"],
                 "pin": entry["pin"], "upstream": entry["upstream"], "pin_behind_upstream": entry["behind"],
                 "review_status": lane_status.get("status", "not_individually_reviewed"),
                 "review_note": lane_status.get("note"),
                 "evidence": lane_status.get("evidence", []) + notes.get((layer_id, entry["repository"]), []),
-            })
+            }
+            if "evidence_level" in entry:
+                row_entry["evidence_level"] = entry["evidence_level"]
+            entries.append(row_entry)
         entries.sort(key=row_item_sort_key)
         manifest["trading"].append({
             "layer": layer_id, "entries": entries,
@@ -494,7 +665,12 @@ def main(argv=None) -> int:
         taxonomy=taxonomy, os_package_ids=tuple(args.os_package_ids),
     )
 
-    text = sanitize(json.dumps(manifest, indent=1))
+    # Sanitize the decoded object *before* serialization (see sanitize_value's
+    # docstring for why sanitizing the serialized text instead can produce
+    # invalid JSON), then prove the serialized result is valid JSON before
+    # the leak check and the write.
+    text = json.dumps(sanitize_value(manifest), indent=1)
+    json.loads(text)
     assert_no_leak(text)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(text + "\n", encoding="utf-8")

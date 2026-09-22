@@ -99,6 +99,46 @@ class FreshnessParsingTests(unittest.TestCase):
         self.assertIsNone(upstream["latest"])
         self.assertIsNone(upstream["renamed_to"])
 
+    def test_release_url_alias_resolves_to_same_freshness_record_as_canonical_url(self):
+        # 2026-09-22 review finding 1: catalogs use release/tree URLs for
+        # some components (agentsview, QMD, RTK); github_freshness.py only
+        # keeps one representative URL per slug, so an exact-string lookup
+        # against a release/tag alias missed the freshness record entirely.
+        # compute_upstream must fall back to a normalized-slug lookup.
+        repositories = {
+            "https://github.com/example/aliased": {
+                "slug": "example/aliased",
+                "latest_release": {"tag": "v2.0.0", "published_at": "2026-01-01T00:00:00Z"},
+                "pushed_at": "2026-01-01T00:00:00Z", "stargazers_count": 3, "license": "MIT",
+            },
+        }
+        canonical = build_manifest_mod.compute_upstream(
+            "https://github.com/example/aliased", repositories)
+        aliased = build_manifest_mod.compute_upstream(
+            "https://github.com/example/aliased/releases/tag/v1", repositories)
+        self.assertEqual(canonical["latest"], "v2.0.0")
+        self.assertEqual(aliased, canonical)
+
+    def test_slug_lookup_also_works_without_a_slug_field_on_the_record(self):
+        # A record loaded from an older-format freshness file (or one keyed
+        # by a differently-cased URL) may not carry its own "slug" field;
+        # the slug must still be derivable from the dict key URL itself.
+        repositories = {
+            "https://github.com/example/tree-form/tree/main": {
+                "latest_release": {"tag": "v9.0.0"},
+            },
+        }
+        upstream = build_manifest_mod.compute_upstream(
+            "https://github.com/example/tree-form", repositories)
+        self.assertEqual(upstream["latest"], "v9.0.0")
+
+    def test_repository_known_matches_by_slug_too(self):
+        repositories = {"https://github.com/example/known": {"slug": "example/known"}}
+        self.assertTrue(build_manifest_mod.repository_known(
+            "https://github.com/example/known/releases/tag/v1", repositories))
+        self.assertFalse(build_manifest_mod.repository_known(
+            "https://github.com/example/unknown", repositories))
+
 
 class PinVsUpstreamRuleTests(unittest.TestCase):
     def test_older_pin_counts_as_behind(self):
@@ -211,6 +251,56 @@ class SanitizerTests(unittest.TestCase):
     def test_writer_accepts_clean_text(self):
         clean = build_manifest_mod.sanitize('{"note": "no secrets or host paths here"}')
         build_manifest_mod.assert_no_leak(clean)  # must not raise
+
+    def test_sanitize_covers_macos_and_windows_user_paths_too(self):
+        # 2026-09-22 review finding 6/2: the publication guard originally
+        # covered only Linux /home/ paths; scripts/validate.py's
+        # PRIVATE_CONTENT already recognizes macOS and Windows forms too.
+        for text in (
+            'note: "/Users/example/code/x.json" was read',
+            r'note: "C:\Users\example\code\x.json" was read',
+            r'note: "\Users\example\code\x.json" was read',
+        ):
+            with self.subTest(text=text):
+                cleaned = build_manifest_mod.sanitize(text)
+                self.assertNotIn("Users", cleaned)
+                self.assertIn("<host-path>", cleaned)
+
+
+class QuotedPathSanitizationTests(unittest.TestCase):
+    """2026-09-22 review finding 2: sanitizing the *serialized* JSON text
+    (the previous approach) can consume the backslash that escapes a quote
+    inside a quoted path, producing invalid JSON that assert_no_leak alone
+    does not catch. Sanitizing decoded string values before serialization
+    fixes this; the fix is proven by round-tripping through json.loads."""
+
+    QUOTED_PATH_NOTE = 'read "/home/example/file.json" before publishing'
+
+    def test_naive_post_serialization_sanitize_corrupts_this_exact_case(self):
+        # Documents the bug this finding fixed: applying sanitize() to
+        # already-serialized JSON text breaks on a quoted embedded path.
+        text = json.dumps({"note": self.QUOTED_PATH_NOTE})
+        naive = build_manifest_mod.sanitize(text)
+        with self.assertRaises(json.JSONDecodeError):
+            json.loads(naive)
+
+    def test_sanitizing_the_decoded_object_before_dumps_stays_valid_json(self):
+        obj = {"note": self.QUOTED_PATH_NOTE}
+        cleaned = build_manifest_mod.sanitize_value(obj)
+        text = json.dumps(cleaned, indent=1)
+        # Must round-trip through json.loads to prove the written text is
+        # valid JSON (the fix's second half, per the finding).
+        reparsed = json.loads(text)
+        self.assertNotIn("/home/", text)
+        self.assertEqual(reparsed["note"], 'read "<host-path>" before publishing')
+
+    def test_sanitize_value_walks_nested_lists_and_dicts(self):
+        obj = {"evidence": ["/home/example/a.json", {"nested": "/Users/example/b.json"}], "count": 3, "ok": None}
+        cleaned = build_manifest_mod.sanitize_value(obj)
+        self.assertEqual(cleaned["evidence"][0], "<host-path>")
+        self.assertEqual(cleaned["evidence"][1]["nested"], "<host-path>")
+        self.assertEqual(cleaned["count"], 3)
+        self.assertIsNone(cleaned["ok"])
 
 
 class CountsReconcileTests(unittest.TestCase):
@@ -377,6 +467,171 @@ class CountsReconcileTests(unittest.TestCase):
         self.assertEqual(candidate["disposition"], "targeted_candidate_unverified")
 
 
+class SelectedVerdictNullSurvivesTests(unittest.TestCase):
+    """2026-09-22 review finding 5: merge_lanes' selected-status handling
+    used ``if verdict is not None and not verdict["survives"]:`` -- a
+    ``survives: null`` (unknown outcome) verdict is truthy under ``not
+    None``... no: ``not None`` is True, so a *null* verdict was treated
+    exactly like a *refuted* (``survives: False``) one. An
+    ``unmaintained_signal`` proposal with no votes therefore became
+    ``confirmed_default`` and gained a false "refuted by adversarial
+    verification" note. ``survives: False`` must be handled explicitly;
+    ``None`` must stay unverified."""
+
+    def _lanes_doc(self, survives, votes):
+        return {
+            "critic": None,
+            "lanes": [{
+                "lane": "trading",
+                "result": {"calls": {}, "limits": [], "layers": [{
+                    "layer_id": "layer-a",
+                    "selected": [{
+                        "repository": "https://github.com/example/fredapi",
+                        "status": "unmaintained_signal", "evidence": ["stale-push"],
+                        "note": "no commits in a year",
+                    }],
+                    "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                }]},
+                "proposals": [{
+                    "layer": "layer-a", "repository": "https://github.com/example/fredapi",
+                    "kind": "unmaintained_signal", "survives": survives, "votes": votes,
+                }],
+            }],
+        }
+
+    def test_unmaintained_signal_with_null_survives_stays_unverified_not_confirmed(self):
+        status, notes, alts, cands, gaps, calls, limits = build_manifest_mod.merge_lanes(
+            self._lanes_doc(None, []), {})
+        key = ("layer-a", "https://github.com/example/fredapi")
+        self.assertEqual(status[key]["status"], "unmaintained_signal_unverified")
+        # No refutation note, and no promotion to a "confirmed_*" status.
+        self.assertEqual(notes.get(key, []), [])
+        self.assertFalse(any("refuted" in item for item in status[key]["evidence"]))
+        # The returned (here: zero) vote count is recorded in the evidence.
+        self.assertTrue(any("0 adversarial vote" in item for item in status[key]["evidence"]))
+
+    def test_unmaintained_signal_with_survives_false_is_confirmed_default_with_a_refuted_note(self):
+        status, notes, alts, cands, gaps, calls, limits = build_manifest_mod.merge_lanes(
+            self._lanes_doc(False, [{"refuted": True, "confidence": 0.9, "reasoning": "still maintained"}]), {})
+        key = ("layer-a", "https://github.com/example/fredapi")
+        self.assertEqual(status[key]["status"], "confirmed_default")
+        self.assertTrue(any("refuted" in item for item in notes.get(key, [])))
+
+    def test_unmaintained_signal_with_survives_true_keeps_the_proposed_status(self):
+        status, notes, alts, cands, gaps, calls, limits = build_manifest_mod.merge_lanes(
+            self._lanes_doc(True, [{"refuted": False, "confidence": 0.7, "reasoning": "confirmed stale"}]), {})
+        key = ("layer-a", "https://github.com/example/fredapi")
+        self.assertEqual(status[key]["status"], "unmaintained_signal")
+        self.assertEqual(notes.get(key, []), [])
+
+    def test_end_to_end_manifest_does_not_inflate_components_confirmed_on_a_null_verdict(self):
+        foundation_layers = {"checked_at": "2026-01-01", "layers": []}
+        trading_by_layer = {
+            "taxonomy": {"layer-a": ["tag-a"]},
+            "layers": {"layer-a": [{
+                "id": "fredapi", "repository": "https://github.com/example/fredapi",
+                "decision": "conditional", "version_or_commit": "1.0.0", "layers": ["tag-a"],
+            }]},
+        }
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        manifest = build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="test scope",
+            foundation_layers=foundation_layers, trading_by_layer=trading_by_layer,
+            freshness_doc=freshness_doc, lanes_doc=self._lanes_doc(None, []), reconciliations=[],
+            taxonomy=trading_by_layer["taxonomy"],
+        )
+        entry = manifest["trading"][0]["entries"][0]
+        self.assertEqual(entry["review_status"], "unmaintained_signal_unverified")
+        self.assertEqual(manifest["counts"]["components_confirmed"], 0)
+
+
+class EvidenceLevelCarryThroughTests(unittest.TestCase):
+    """2026-09-22 review finding 7: review_status (a selection/pin
+    confirmation) and evidence_level (source_review / native_proven --
+    actual execution evidence, from the catalog card) are independent axes.
+    evidence_level must be carried into each manifest trading entry row when
+    the source catalogs/us-equities/*.json card has it."""
+
+    def test_evidence_level_from_the_catalog_card_is_carried_into_the_manifest_entry(self):
+        trading_by_layer = {
+            "taxonomy": {"layer-b": ["tag-a"]},
+            "layers": {"layer-b": [
+                {"id": "quantstats", "repository": "https://github.com/ranaroussi/quantstats",
+                 "decision": "default", "version_or_commit": "0.0.81", "layers": ["tag-a"],
+                 "evidence_level": "source_review"},
+                {"id": "no-level-tool", "repository": "https://github.com/example/no-level-tool",
+                 "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-a"]},
+            ]},
+        }
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        lanes_doc = {"critic": None, "lanes": []}
+        manifest = build_manifest_mod.build_manifest(
+            checked_at="2026-09-22", manifest_id="test-id", scope="s",
+            foundation_layers={"layers": []}, trading_by_layer=trading_by_layer,
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[],
+            taxonomy=trading_by_layer["taxonomy"],
+        )
+        entries = {e["id"]: e for e in manifest["trading"][0]["entries"]}
+        self.assertEqual(entries["quantstats"]["evidence_level"], "source_review")
+        self.assertNotIn("evidence_level", entries["no-level-tool"])
+        # review_status (survival of a lane's proposed change) must remain
+        # independent of evidence_level (execution classification): neither
+        # entry has a lane verdict here, so both stay "not_individually_reviewed".
+        self.assertEqual(entries["quantstats"]["review_status"], "not_individually_reviewed")
+
+
+class ObservationWindowTests(unittest.TestCase):
+    """2026-09-22 review finding 4: on a resumed run, ``generated_at`` is
+    rewritten even when zero repositories were re-fetched, so citing it in
+    method.freshness misrepresents old metadata as newly fetched. The
+    manifest must cite the freshness snapshot's per-record observation
+    window instead."""
+
+    def test_resumed_run_with_zero_fetches_reports_the_retained_window(self):
+        freshness_doc = {
+            "count": 2, "generated_at": "2026-09-22T00:00:00+00:00",
+            "fetched_this_run": 0, "retained_from_prior_runs": 2,
+            "observation_window": {"min": "2026-08-01T00:00:00+00:00", "max": "2026-08-15T00:00:00+00:00"},
+            "repositories": {},
+        }
+        manifest = build_manifest_mod.build_manifest(
+            checked_at="2026-09-22", manifest_id="test-id", scope="s",
+            foundation_layers={"layers": []}, trading_by_layer={"taxonomy": {}, "layers": {}},
+            freshness_doc=freshness_doc, lanes_doc={"critic": None, "lanes": []}, reconciliations=[],
+            taxonomy={},
+        )
+        freshness_text = manifest["method"]["freshness"]
+        self.assertIn("2026-08-01T00:00:00", freshness_text)
+        self.assertIn("2026-08-15T00:00:00", freshness_text)
+        # generated_at (the checkpoint/write time of this resumed run) must
+        # not be cited as if it were the observation/fetch time.
+        self.assertNotIn("2026-09-22T00:00:00", freshness_text)
+        self.assertIn("fetched_this_run=0", freshness_text)
+        self.assertIn("retained_from_prior_runs=2", freshness_text)
+
+    def test_missing_observation_window_does_not_crash_and_says_so(self):
+        freshness_doc = {"count": 0, "generated_at": "2026-09-22T00:00:00+00:00", "repositories": {}}
+        text = build_manifest_mod.format_observation_window(freshness_doc)
+        self.assertIn("unrecorded", text)
+
+    def test_falls_back_to_scanning_per_record_observed_at_for_an_older_format_freshness_file(self):
+        # An older-format github-freshness.json (from before this fix) has no
+        # top-level "observation_window", but its records already carry
+        # "observed_at" -- the window must still be derivable, not just
+        # reported as unrecorded.
+        freshness_doc = {
+            "count": 2, "generated_at": "2026-09-22T04:08:18+00:00",
+            "repositories": {
+                "https://github.com/example/a": {"observed_at": "2026-09-22T04:07:01+00:00"},
+                "https://github.com/example/b": {"observed_at": "2026-09-22T04:07:55+00:00"},
+            },
+        }
+        text = build_manifest_mod.format_observation_window(freshness_doc)
+        self.assertIn("2026-09-22T04:07:01", text)
+        self.assertIn("2026-09-22T04:07:55", text)
+        self.assertNotIn("unrecorded", text)
+
+
 class DeterministicOrderingTests(unittest.TestCase):
     """Rebuilding the manifest must not reorder rows: per-layer components,
     entries and candidates are sorted by (decision-rank, id/repository), not
@@ -500,6 +755,194 @@ class GithubFreshnessResilienceTests(unittest.TestCase):
 
             document = json.loads(out_path.read_text(encoding="utf-8"))
             self.assertNotIn("error", document["repositories"]["https://github.com/example/b-repo"])
+
+
+class _FakeProc:
+    def __init__(self, returncode, stdout="", stderr=""):
+        self.returncode = returncode
+        self.stdout = stdout
+        self.stderr = stderr
+
+
+class GithubFreshnessPartialErrorTests(unittest.TestCase):
+    """2026-09-22 review finding 3: a release/tag/commit sub-request that
+    times out or is rate-limited (as opposed to an ordinary 404 for "no
+    releases") must be kept as a retryable partial_errors entry, not
+    silently discarded."""
+
+    REPO = "example/solo-repo"
+
+    def _write_foundation_layers(self, work_dir):
+        (work_dir / "foundation-layers.json").write_text(json.dumps({
+            "layers": [{"components": [{"repository": f"https://github.com/{self.REPO}"}]}],
+        }), encoding="utf-8")
+
+    def test_expected_404_for_no_releases_is_not_a_partial_error(self):
+        def fake_run(cmd, capture_output=True, text=True, timeout=60):
+            path = cmd[2]
+            if path == f"repos/{self.REPO}":
+                return _FakeProc(0, stdout=json.dumps(
+                    {"full_name": self.REPO, "default_branch": "main", "stargazers_count": 1}))
+            if path == f"repos/{self.REPO}/releases/latest":
+                return _FakeProc(1, stdout="", stderr="HTTP 404: Not Found")
+            if path == f"repos/{self.REPO}/tags?per_page=1":
+                return _FakeProc(0, stdout="[]")
+            if path == f"repos/{self.REPO}/commits/main":
+                return _FakeProc(0, stdout=json.dumps(
+                    {"sha": "abc", "commit": {"committer": {"date": "2026-01-01"}}}))
+            return _FakeProc(1, stdout="", stderr="unexpected")
+
+        with mock.patch("subprocess.run", side_effect=fake_run):
+            record = github_freshness.fetch_repository(self.REPO)
+        self.assertNotIn("error", record)
+        self.assertNotIn("partial_errors", record)
+        self.assertIsNone(record.get("latest_tag"))
+
+    def test_release_timeout_is_kept_as_a_retryable_partial_error(self):
+        def fake_run(cmd, capture_output=True, text=True, timeout=60):
+            path = cmd[2]
+            if path == f"repos/{self.REPO}":
+                return _FakeProc(0, stdout=json.dumps(
+                    {"full_name": self.REPO, "default_branch": "main", "stargazers_count": 1}))
+            if path == f"repos/{self.REPO}/releases/latest":
+                raise subprocess.TimeoutExpired(cmd=cmd, timeout=timeout)
+            if path == f"repos/{self.REPO}/tags?per_page=1":
+                return _FakeProc(0, stdout="[]")
+            if path == f"repos/{self.REPO}/commits/main":
+                return _FakeProc(0, stdout=json.dumps(
+                    {"sha": "abc", "commit": {"committer": {"date": "2026-01-01"}}}))
+            return _FakeProc(1, stdout="", stderr="unexpected")
+
+        with mock.patch("subprocess.run", side_effect=fake_run):
+            record = github_freshness.fetch_repository(self.REPO)
+        self.assertNotIn("error", record)
+        self.assertIn("releases", record.get("partial_errors", {}))
+
+    def test_a_record_with_partial_errors_is_retried_on_resume(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            work_dir = Path(tmp)
+            self._write_foundation_layers(work_dir)
+            out_path = work_dir / "github-freshness.json"
+
+            def failing_release_run(cmd, capture_output=True, text=True, timeout=60):
+                path = cmd[2]
+                if path == f"repos/{self.REPO}":
+                    return _FakeProc(0, stdout=json.dumps(
+                        {"full_name": self.REPO, "default_branch": "main", "stargazers_count": 1}))
+                if path == f"repos/{self.REPO}/releases/latest":
+                    raise subprocess.TimeoutExpired(cmd=cmd, timeout=timeout)
+                if path == f"repos/{self.REPO}/tags?per_page=1":
+                    return _FakeProc(0, stdout="[]")
+                if path == f"repos/{self.REPO}/commits/main":
+                    return _FakeProc(0, stdout=json.dumps(
+                        {"sha": "abc", "commit": {"committer": {"date": "2026-01-01"}}}))
+                return _FakeProc(1, stdout="", stderr="unexpected")
+
+            with mock.patch("subprocess.run", side_effect=failing_release_run):
+                rc = github_freshness.main(["--work-dir", str(work_dir), "--workers", "1"])
+            self.assertEqual(rc, 0)
+            document = json.loads(out_path.read_text(encoding="utf-8"))
+            self.assertEqual(document.get("partial_errors"), 1)
+            self.assertIn("partial_errors", document["repositories"][f"https://github.com/{self.REPO}"])
+
+            calls = []
+
+            def recovered_run(cmd, capture_output=True, text=True, timeout=60):
+                calls.append(cmd[2])
+                path = cmd[2]
+                if path == f"repos/{self.REPO}":
+                    return _FakeProc(0, stdout=json.dumps(
+                        {"full_name": self.REPO, "default_branch": "main", "stargazers_count": 1}))
+                if path == f"repos/{self.REPO}/releases/latest":
+                    return _FakeProc(0, stdout=json.dumps(
+                        {"tag_name": "v1.0.0", "published_at": "2026-01-01T00:00:00Z", "prerelease": False}))
+                if path == f"repos/{self.REPO}/commits/main":
+                    return _FakeProc(0, stdout=json.dumps(
+                        {"sha": "abc", "commit": {"committer": {"date": "2026-01-01"}}}))
+                return _FakeProc(1, stdout="", stderr="unexpected")
+
+            with mock.patch("subprocess.run", side_effect=recovered_run):
+                rc = github_freshness.main(["--work-dir", str(work_dir), "--workers", "1"])
+            self.assertEqual(rc, 0)
+            self.assertTrue(any(p.startswith(f"repos/{self.REPO}") for p in calls),
+                             "a record with partial_errors must be retried on resume")
+            document = json.loads(out_path.read_text(encoding="utf-8"))
+            record = document["repositories"][f"https://github.com/{self.REPO}"]
+            self.assertNotIn("partial_errors", record)
+            self.assertEqual(record["latest_release"]["tag"], "v1.0.0")
+            self.assertEqual(document.get("partial_errors"), 0)
+
+
+class GithubFreshnessAliasAndObservationTests(unittest.TestCase):
+    """2026-09-22 review findings 1 and 4: every alias URL seen for a slug
+    is recorded on the freshness record, and the document carries
+    fetched_this_run / retained_from_prior_runs / observation_window."""
+
+    def test_records_every_alias_url_seen_for_a_slug(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            work_dir = Path(tmp)
+            (work_dir / "foundation-layers.json").write_text(json.dumps({
+                "layers": [{"components": [
+                    {"repository": "https://github.com/example/aliased"},
+                    {"repository": "https://github.com/example/aliased/releases/tag/v1"},
+                ]}],
+            }), encoding="utf-8")
+
+            def fake_run(cmd, capture_output=True, text=True, timeout=60):
+                path = cmd[2]
+                if path == "repos/example/aliased":
+                    return _FakeProc(0, stdout=json.dumps(
+                        {"full_name": "example/aliased", "default_branch": "main", "stargazers_count": 1}))
+                return _FakeProc(1, stdout="", stderr="not found")
+
+            with mock.patch("subprocess.run", side_effect=fake_run):
+                rc = github_freshness.main(["--work-dir", str(work_dir), "--workers", "1"])
+            self.assertEqual(rc, 0)
+            document = json.loads((work_dir / "github-freshness.json").read_text(encoding="utf-8"))
+            record = document["repositories"]["https://github.com/example/aliased"]
+            self.assertEqual(
+                record.get("aliases"),
+                ["https://github.com/example/aliased", "https://github.com/example/aliased/releases/tag/v1"],
+            )
+
+    def test_document_reports_fetched_and_retained_counts_and_observation_window(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            work_dir = Path(tmp)
+            (work_dir / "foundation-layers.json").write_text(json.dumps({
+                "layers": [{"components": [{"repository": "https://github.com/example/solo"}]}],
+            }), encoding="utf-8")
+
+            def fake_run(cmd, capture_output=True, text=True, timeout=60):
+                path = cmd[2]
+                if path == "repos/example/solo":
+                    return _FakeProc(0, stdout=json.dumps(
+                        {"full_name": "example/solo", "default_branch": "main", "stargazers_count": 1}))
+                return _FakeProc(1, stdout="", stderr="not found")
+
+            out_path = work_dir / "github-freshness.json"
+            with mock.patch("subprocess.run", side_effect=fake_run):
+                rc = github_freshness.main(["--work-dir", str(work_dir), "--workers", "1"])
+            self.assertEqual(rc, 0)
+            document = json.loads(out_path.read_text(encoding="utf-8"))
+            self.assertEqual(document["fetched_this_run"], 1)
+            self.assertEqual(document["retained_from_prior_runs"], 0)
+            window = document["observation_window"]
+            self.assertIsNotNone(window)
+            self.assertEqual(window["min"], window["max"])
+
+            # Resume with nothing new to fetch: fetched_this_run must be 0
+            # and the window must be retained from the prior run, not moved
+            # to this run's generated_at.
+            with mock.patch("subprocess.run", side_effect=fake_run):
+                rc = github_freshness.main(["--work-dir", str(work_dir), "--workers", "1"])
+            self.assertEqual(rc, 0)
+            resumed = json.loads(out_path.read_text(encoding="utf-8"))
+            self.assertEqual(resumed["fetched_this_run"], 0)
+            self.assertEqual(resumed["retained_from_prior_runs"], 1)
+            self.assertEqual(resumed["observation_window"], document["observation_window"])
 
 
 if __name__ == "__main__":
