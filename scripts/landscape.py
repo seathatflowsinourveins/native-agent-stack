@@ -112,8 +112,11 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
             require(bool(re.fullmatch(r"[a-f0-9]{64}", sealed)),
                     str(key) + f".lanes.{lane_name}.sealed_sha256 must be a lowercase 64-digit hash")
             sealed_path = f"evidence/artifacts/layer-verdicts-20260922/{lane_name}/{lane['run_id']}.json"
-            require(safe_file(root, sealed_path).is_file(),
+            sealed_file = safe_file(root, sealed_path)
+            require(sealed_file.is_file(),
                     str(key) + f".lanes.{lane_name}.sealed_sha256 needs a sealed file: {sealed_path}")
+            require(hashlib.sha256(sealed_file.read_bytes()).hexdigest() == sealed,
+                    str(key) + f".lanes.{lane_name}.sealed_sha256 does not match {sealed_path}")
     require(lanes_field.get("agreement") in LANE_AGREEMENTS, str(key) + ".lanes.agreement is unknown")
 
     open_gaps = row.get("open_gaps")
@@ -171,6 +174,8 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         evidence_maybe_empty(alternative.get("evidence_refs"), str(key) + ".alternative.evidence_refs")
         require(alternative.get("source") in ALTERNATIVE_SOURCES, str(key) + ".alternative.source is unknown")
 
+    verdict_overturn_when = row.get("verdict_overturn_when", "")
+    require(isinstance(verdict_overturn_when, str), str(key) + ".verdict_overturn_when must be text")
     status = row["verdict_status"]
     if status == "recorded":
         require(bool(winners), str(key) + " recorded verdict needs at least one winner")
@@ -178,8 +183,13 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         for winner in winners:
             require(winner.get("why_selected") not in why_not_defaults,
                     str(key) + ".winner.why_selected must differ from every alternative's why_not_default")
-        require(any(marker in row.get("overturn_when", "") for marker in OVERTURN_MARKERS),
-                str(key) + ".overturn_when must name a fixture/blueprint/test path or a runnable command "
+        # The v1 ``overturn_when`` belongs to the dated review that the quality
+        # comparison mirrors; a recorded verdict carries its own condition.
+        winner_ids = {canonical(identity(w["repository"]), aliases) for w in winners if w.get("repository")}
+        require(not any(canonical(identity(a["repository"]), aliases) in winner_ids for a in alternatives),
+                str(key) + " lists a winner repository among its alternatives")
+        require(any(marker in verdict_overturn_when for marker in OVERTURN_MARKERS),
+                str(key) + ".verdict_overturn_when must name a fixture/blueprint/test path or a runnable command "
                            "for a recorded verdict")
     elif status == "no_selection":
         require(bool(open_gaps), str(key) + " no_selection verdict needs open_gaps")

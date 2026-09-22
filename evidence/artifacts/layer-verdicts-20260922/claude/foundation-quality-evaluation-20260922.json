@@ -1,0 +1,160 @@
+{
+ "alternatives": [
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json",
+    "docs/acceptance-evidence-policy.md"
+   ],
+   "key": "c1",
+   "name": "Inspect AI",
+   "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+   "why_not_default": "The evidence is source review only. catalogs/us-equities/agents-operations.json (lines 1282-1319) records evidence_level source_review. Its native_workflow says 'Prospective commands; not executed for this catalog', and its limit says 'Eval command would perform model calls; not run here.' There is no returned eval, frozen oracle or failure record. That catalog marks it 'default' for the us-equities agent-evaluation layer, but that is a selection claim, not an observed execution. docs/acceptance-evidence-policy.md is general policy with nothing specific to Inspect AI. Untested does not mean failed: it stays the named challenger for tool-use and extraction suites."
+  },
+  {
+   "disposition": "out_of_scope",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "evidence/receipts/token-native-retained-functional-20260920.json"
+   ],
+   "key": "c3",
+   "name": "MCP Inspector",
+   "repository": "https://github.com/modelcontextprotocol/inspector",
+   "why_not_default": "evidence/receipts/token-native-retained-functional-20260920.json (lines 18 and 84-106) records one Inspector stdio call to Context Mode: exit 0, and the check '42 computed' passed. The receipt itself says this 'does not certify the complete client plugin, hooks, project-file scope or current desktop connection.' That qualifies an MCP inspection/adapter operation, not general changed-behaviour verification. The packet's review_status is not_individually_reviewed. The receipt is retrospective ('not rerun by this documentation update')."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "evidence/receipts/portable-cli-artifacts.json"
+   ],
+   "key": "c4",
+   "name": "ShellCheck",
+   "repository": "https://github.com/koalaman/shellcheck",
+   "why_not_default": "The trade-off is scope, not missing execution. catalogs/foundation/decisions.json (deterministic-quality-tools, lines 1363-1407) lists ShellCheck use as accepted_within_scope and cites evidence_id portable-cli-artifacts (lines 1370-1374). That receipt, evidence/receipts/portable-cli-artifacts.json (lines 20-28), records `shellcheck fixtures/example.sh` with exit_code 0, expected_exit 0 and matched true. That is one clean run on one fixture, with no finding reported and no negative case exercised. The receipt limits itself to 'Fixture-specific native behavior, not an LLM invocation or general quality benchmark' (line 15). ShellCheck is a narrow static shell checker that complements the winners; it is not a changed-behaviour verification or evaluation lane."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "measured_comparison",
+   "evidence_refs": [
+    "blueprints/native-skill-practice/typesafe-result.json",
+    "docs/native-skill-practice-20260921.md",
+    "catalogs/landscape/native-practice.json"
+   ],
+   "key": "c5",
+   "name": "TypeSafe semantic skill",
+   "repository": "https://github.com/typesafe-ai/skills",
+   "why_not_default": "blueprints/native-skill-practice/typesafe-result.json records a measured diagnostic. jev-1.13.0 matched 7/8 frozen labels against 3/8 for the exact-text baseline, with 0 service errors and a median latency of 171.5 ms. Case C4 disagrees: the model answered contradicted where the frozen label is insufficient, at confidence 0.76. The failure is kept (passed false; the limitations say to 'preserve as a failure requiring source review'). The file's own limitations name 'Eight selected diagnostic cases, not representative' and a weak comparator, and say there is 'no calibrated threshold... or automatic selection authority'. docs/native-skill-practice-20260921.md (lines 98-114) and catalogs/landscape/native-practice.json (lines 50-69) confirm the judgments are advisory. TypeSafe supplies semantic judgments inside a verification flow; it is not the harness itself, and this diagnostic ran through Promptfoo."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "evidence/receipts/portable-cli-artifacts.json"
+   ],
+   "key": "c7",
+   "name": "Difftastic",
+   "repository": "https://github.com/Wilfred/difftastic",
+   "why_not_default": "The trade-off is scope, not missing execution. catalogs/foundation/decisions.json (deterministic-quality-tools, lines 1363-1407) lists Difftastic use as accepted_within_scope and cites evidence_id portable-cli-artifacts. That receipt, evidence/receipts/portable-cli-artifacts.json, keeps a failed expectation. The initial `difft --color never fixtures/before.py fixtures/after.py` returned exit_code 0 against expected_exit 1, matched false (lines 30-41). The corrected `difft --exit-code ...` returned exit_code 1 against expected 1 (lines 127-139). Line 16 notes that 'Difft default exit 0 was normal', which is a matter of exit semantics rather than a defect. The run shows only that a structural diff was detected on a before/after fixture. Difftastic is a review aid, not a behaviour check or evaluation harness."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "catalogs/landscape/native-practice.json",
+    "docs/native-skill-practice-20260921.md"
+   ],
+   "key": "c8",
+   "name": "Official OpenAI CI and security skills",
+   "repository": "https://github.com/openai/skills",
+   "why_not_default": "catalogs/landscape/native-practice.json (lines 95-124) records one run of the unchanged gh-fix-ci helper inspect_pr_checks.py against PR 55. It exited 0 with stdout 'PR #55: no failing checks detected.' An independent gh query returned five SUCCESS checks. Failure-log extraction, repair quality and native-agent activation remain explicitly unqualified. For security-best-practices, finding quality and false-positive control are unmeasured (docs/native-skill-practice-20260921.md lines 12-13 and 151-153). These are procedure skills layered on CI, not the verification lane, and their failure path is untested."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c9",
+   "name": "MLflow",
+   "repository": "https://github.com/mlflow/mlflow",
+   "why_not_default": "The evidence is source review only. catalogs/us-equities/agents-operations.json (lines 1688-1725) records evidence_level source_review, prospective commands marked not executed, and the limit 'No tracking server or experiment recorded by this task.' Its role there is experiment tracking and lineage, not changed-behaviour verification. That entry is marked conditional: 'Add when strategy/feature experiments require a durable registry'."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "quality-evaluation",
+ "limits": [
+  "I could not execute commands. Every result above is documented-as-done in retained files, not observed now. I did not check private raw captures or artifact hashes, including the private browser-automation failures mentioned in docs/promptfoo-upstream-retrieval.md.",
+  "I did not open: evidence_id wsl-application-20260920 beyond receipt.json; evidence/artifacts/promptfoo-nemotron-upstream-20260921/*; blueprints/native-skill-practice/native-receipt.json; the contents of catalog-cases.json; blueprints/token-native-focus/saturation-audit.json; or the fixtures that portable-cli-artifacts ran against (fixtures/example.sh, before.py, after.py).",
+  "No live TypeSafe inference was supplied or made. The jev-1.13.0 verdicts in typesafe-result.json are retained provider judgments, kept separate from my own source review. The refuter findings were treated as data and checked against the original receipt before I applied them.",
+  "Upstream metadata (stars, release dates) comes from the packet and was not verified independently.",
+  "Skill path: <host-path>/typesafe-ai (body present in context). The client exposes the actual model as claude-opus-5-5[1m] (Opus 5.5); effort is not exposed. The model field copies the task's fixed value, claude-opus-5/high."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "No unchanged upstream Promptfoo or Playwright test suite was run. The evidence is an upstream example with a local assertion, plus a local application lane that uses an unchanged Playwright spec.",
+  "The Promptfoo evidence is 4/4 on NVIDIA's four-pair example plus an 8-case diagnostic. Neither is a held-out model-quality evaluation, and no universal ranking follows from them.",
+  "Inspect AI and MLflow have no executed result. Untested does not mean failed.",
+  "ShellCheck has one clean fixture run with no finding and no negative case. Difftastic has a structural-diff exit-code check only. Neither has evidence as a behaviour-verification lane.",
+  "The gh-fix-ci failing-log path, repair quality and security-skill finding quality are unqualified.",
+  "TypeSafe case C4 disagrees with its frozen label and is unresolved as a model error. Its threshold is uncalibrated.",
+  "The two catalogs conflict. agents-operations.json marks Inspect AI 'default' and Promptfoo 'alternative' for the us-equities agent-evaluation layer, while the foundation evidence favours Promptfoo. No executed comparison between them exists.",
+  "Correction from round 1: returned native output for ShellCheck and Difftastic does exist, in evidence/receipts/portable-cli-artifacts.json. I had wrongly treated it as absent, and c4 and c7 are now reclassified as local_integration. The winner basis is restated as changed-behaviour verification with failure retention, not 'only native execution with failures'.",
+  "Correction from round 1: docs/promptfoo-upstream-retrieval.md only mentions the stale-ref and row-count failures (lines 70-73), which it says are in private evidence. They came from browser automation of the report, not from the Promptfoo evaluation, and I did not check them.",
+  "Correction carried from round 1: c6's ref docs/dashboard-rendered-acceptance.md never mentions Playwright. Its Promptfoo row (line 33) describes an older two-case echo evaluation, which docs/promptfoo-upstream-retrieval.md supersedes. The Playwright support comes from the decision's source_path, the wsl-application README and receipt.json.",
+  "Correction carried from round 1: the Promptfoo operation in the 20260920 receipt (fresh-promptfoo-local) is a two-assertion echo run with zero model calls. It is not model-quality evidence."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "promptfoo 0.123.1 with blueprints/native-skill-practice/promptfooconfig.yaml (current)",
+   "inspect-ai 0.3.266 eval over the same frozen cases (challenger, not yet executed)"
+  ],
+  "fixture_paths": [
+   "blueprints/native-skill-practice/catalog-cases.json",
+   "blueprints/native-skill-practice/promptfooconfig.yaml",
+   "blueprints/convergence-practice/wsl-application/receipt.json"
+  ],
+  "metric": "Three measures on the same case pack: frozen-label match count, retention of every failing row and its exit code (Promptfoo's exit 100 is currently kept), and usable per-case failure inspection. No label or prompt tuning after inference."
+ },
+ "overturn_when": "First overturn: a defined tool-use or extraction requirement that cannot be expressed in the Promptfoo or Playwright lanes. Inspect AI (c1) would then run as a prospective `inspect eval`, at inspect-ai==0.3.266 per catalogs/us-equities/agents-operations.json. It must use the same frozen oracle, blueprints/native-skill-practice/catalog-cases.json, and be compared with the existing arm, blueprints/native-skill-practice/promptfooconfig.yaml. It overturns this verdict only if it matches at least as many frozen labels, keeps every failing row and its exit status, and gives failure inspection that is at least as usable.\n\nSecond overturn: a rerun of the unchanged Playwright test in blueprints/convergence-practice/wsl-application/ (per its README and receipt.json) fails, or its assertions change.",
+ "packet_sha256": "d867724d4a5e995141cbc90aa3d5c120529660c132c4bca4ca5e2b67281dda30",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__quality-evaluation.json (full in round 1; grep for key/adopted/evidence_kind/review_status in revision)",
+  "catalogs/us-equities/agents-operations.json (lines 1275-1334, 1682-1736; grep inspect/mlflow)",
+  "docs/acceptance-evidence-policy.md",
+  "docs/promptfoo-upstream-retrieval.md (full in round 1; lines 66-75 re-read)",
+  "evidence/receipts/token-native-retained-functional-20260920.json (lines 1-135; grep)",
+  "evidence/receipts/portable-cli-artifacts.json (full, revision round)",
+  "catalogs/foundation/decisions.json (lines 1345-1424; grep)",
+  "catalogs/landscape/native-practice.json (lines 50-129; grep)",
+  "docs/native-skill-practice-20260921.md",
+  "blueprints/native-skill-practice/typesafe-result.json",
+  "docs/dashboard-rendered-acceptance.md",
+  "blueprints/convergence-practice/wsl-application/README.md (lines 1-22; grep)",
+  "blueprints/convergence-practice/wsl-application/receipt.json (lines 110-134; grep)",
+  "blueprints/native-skill-practice/ (glob listing only, to confirm the fixture paths exist)",
+  "<host-path>/SKILL.md (skill body preloaded in context)"
+ ],
+ "why_selected": "Promptfoo (c2) and Playwright (c6) are the only candidates whose retained records verify changed behaviour through a returned native run: an evaluation for Promptfoo and a browser flow for Playwright. Both records also keep failures.\n\nOther candidates also have failure-preserving native records, but they do not verify changed behaviour. ShellCheck and Difftastic have them in evidence/receipts/portable-cli-artifacts.json, but that receipt covers only a static shell check and a structural-diff exit code on fixtures. TypeSafe keeps its failed case C4, but that diagnostic ran inside Promptfoo.\n\nPromptfoo evidence:\n- docs/promptfoo-upstream-retrieval.md (lines 8-22) records a run of Promptfoo 0.123.1 through its native exec: provider on NVIDIA's unchanged upstream retrieval example. It returned all four paired documents first, one passing case, 0 failures and 0 errors.\n- The same document limits the claim to compatibility with that upstream example; it is not a benchmark. Lines 70-73 only mention two earlier browser-automation failures in the report review (a stale ref and a wrong row-count expectation). It says they are kept in private evidence, which I did not check. They were not Promptfoo evaluation failures.\n- blueprints/native-skill-practice/typesafe-result.json shows Promptfoo used as the evaluation harness. It kept promptfoo_exit_code 100 and every failing row: the exact-text baseline matched 3/8 labels and jev-1.13.0 matched 7/8, with the C4 disagreement retained. This directly meets the requirement's failure-preservation clause.\n\nPlaywright evidence:\n- catalogs/foundation/decisions.json (deterministic-quality-tools, around lines 1352-1410) lists playwright-test use as accepted_within_scope. Its source path is blueprints/convergence-practice/wsl-application/README.md.\n- That lane's receipt.json (lines 114-126) records `taskset -c 0-3 pnpm exec playwright test --config ../wsl-application/playwright.config.ts` with exit 0, passed 1, failed 0, retries 0, browser_assertions_changed false and page_errors 0. It also records full_failed_attempts_retained true (line 258).\n\nEvidence class: both are local integrations of upstream tools and examples on this host, recorded as done. I reviewed the retained documents and receipts and reran nothing. This is not an unchanged upstream test suite and not a universal quality ranking.",
+ "winner_evidence_class": "local_integration",
+ "winner_evidence_refs": [
+  "docs/promptfoo-upstream-retrieval.md",
+  "blueprints/native-skill-practice/typesafe-result.json",
+  "catalogs/foundation/decisions.json",
+  "blueprints/convergence-practice/wsl-application/README.md",
+  "blueprints/convergence-practice/wsl-application/receipt.json"
+ ],
+ "winner_keys": [
+  "c2",
+  "c6"
+ ]
+}

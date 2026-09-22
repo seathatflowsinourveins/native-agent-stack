@@ -60,6 +60,63 @@ claude -p '/codex:review --wait --scope branch --base BASE_COMMIT --json' \
 holds the working files, `github-freshness.json`, `lanes.json` and the
 generated manifest before publication.
 
+## Layer-verdict lanes
+
+A separate, independent pipeline from the six commands above -- it records a
+per-layer winner onto the landscape ledger's schema v2 rows
+(`catalogs/landscape/{foundation,us-equities}.json`), not the dated sota
+manifest. Full contract in `tools/sota-convergence/README.md`'s "Record
+verdicts" section; the same evidence-class distinctions above apply to every
+lane's `winner_evidence_class`.
+
+```sh
+# 1. Packets -- one per (catalog, layer_id), with the retained evidence a
+#    lane may read and the withheld fields (current_choice/decision/
+#    rationale) it must argue past.
+python3 tools/sota-convergence/lane_packets.py --root . --out "$WORK_DIR"
+
+# 2. Claude lane -- the agent-lab saved workflow, run per packet; each
+#    return is written to "$WORK_DIR/claude/<catalog>__<layer_id>.json".
+# 3. Codex lane -- a separate account/quota, resumable.
+python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo .
+
+# 4. Record: validate every lane file (a rejected file is reported and
+#    treated as absent, never aborts the run), seal the accepted ones, and
+#    write the ledger rows.
+python3 tools/sota-convergence/record_verdicts.py \
+  --root . --work-dir "$WORK_DIR" --checked-at "$(date +%Y-%m-%d)" --write
+python3 tools/sota-convergence/record_verdicts.py \
+  --root . --work-dir "$WORK_DIR" --checked-at "$(date +%Y-%m-%d)" --check
+
+# 5. Refresh the generated join/narrative and rerun the standing checks.
+python3 tools/sota-convergence/build_verdicts.py --write --root .
+python3 scripts/landscape.py --root .
+python3 scripts/validate.py
+python3 -m unittest
+```
+
+A lane disagreement (different winner component-id sets) stays
+`pending_lanes` with the open gap recorded unless an adjudication file is
+placed at `<adjudications-dir>/<catalog>__<layer_id>.json` and passed via
+`--adjudications`; agreement between lanes alone never promotes a candidate
+that neither lane actually selected as its winner (the same never-promote
+rule as the six-command pipeline above, applied per layer instead of per
+candidate). The disagreement's open gap names the two lanes' winner
+*component_ids*, not the packet-local candidate keys, since only component
+identity is meaningful once the packet itself is not part of the retained
+record. A recorded winner's `pin` is the packet's manifest-joined pin, else
+the winning candidate's own v1 pin text if any (`source_pin`, else
+`revision` -- see `catalogs/landscape/{foundation,us-equities}.json`'s real
+`candidates[]` fields), else `"unpinned"`.
+
+Step 5's `build_verdicts.py --write` is the only step that regenerates
+`docs/grand-catalog-handbook.md`'s generated block (tables and per-layer
+narrative). `build_verdicts.py --check` fails whenever that block differs from
+the checked-in handbook: after rows were recorded, and also after any change to
+the generator itself, even while every row is still `pending_lanes`. Run
+`--write` and commit the regenerated handbook in the same change as the rows
+or the generator edit.
+
 ## Evidence classes
 
 Keep these distinguished in the record and in review comments, per the

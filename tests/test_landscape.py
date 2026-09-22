@@ -10,6 +10,9 @@ import unittest
 from scripts.landscape import MANIFEST, build_landscape
 
 
+# Bytes the fixture writes for the sealed Claude run (self.write serializes with json.dumps).
+SEALED_RUN_1_SHA256 = hashlib.sha256(json.dumps({"run_id": "run-1", "lane": "claude"}).encode("utf-8")).hexdigest()
+
 class LandscapeTests(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
@@ -367,8 +370,8 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                 "disposition": "unqualified", "why_not_default": "Not tested on this host",
                 "evidence_class": "source_review", "evidence_refs": [], "source": "discovery_index",
             }],
-            "overturn_when": "python3 tests/test_landscape.py replays the comparison",
-            "lanes": {"claude": {"run_id": "run-1", "sealed_sha256": "a" * 64},
+            "verdict_overturn_when": "python3 tests/test_landscape.py replays the comparison",
+            "lanes": {"claude": {"run_id": "run-1", "sealed_sha256": SEALED_RUN_1_SHA256},
                       "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "codex_absent"},
         }
         fields.update(overrides)
@@ -409,7 +412,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
 
     def test_recorded_overturn_when_needs_a_fixture_or_command_marker(self):
         self.seal_claude_run()
-        self.layer.update(self.recorded_fields(overturn_when="A vague future improvement"))
+        self.layer.update(self.recorded_fields(verdict_overturn_when="A vague future improvement"))
         with self.assertRaisesRegex(ValueError, "must name a fixture"):
             self.build()
 

@@ -1,0 +1,47 @@
+{
+ "foundation": [
+  {
+   "layer": "layer-a",
+   "title": "Layer A",
+   "components": [
+    {
+     "id": "widget-one",
+     "repository": "https://github.com/acme/widget-one",
+     "pin": "1.0.0",
+     "upstream": {"latest": "1.1.0", "released_at": "2026-09-01", "prerelease": false,
+                  "pushed_at": "2026-09-10", "stars": 42, "license": "MIT",
+                  "archived": false, "renamed_to": null},
+     "pin_behind_upstream": true,
+     "review_status": "confirmed_default"
+    },
+    {
+     "id": "widget-two-unclaimed",
+     "repository": "https://github.com/acme/widget-two",
+     "pin": "2.0.0",
+     "upstream": {"latest": "2.0.0", "released_at": "2026-08-01", "prerelease": false,
+                  "pushed_at": "2026-08-15", "stars": 7, "license": "MIT",
+                  "archived": false, "renamed_to": null},
+     "pin_behind_upstream": false,
+     "review_status": "confirmed_default"
+    }
+   ]
+  }
+ ],
+ "trading": [
+  {
+   "layer": "layer-b",
+   "entries": [
+    {
+     "id": "data-one",
+     "repository": "https://github.com/acme/data-one",
+     "pin": "3.0.0",
+     "upstream": {"latest": "3.0.0", "released_at": "2026-09-05", "prerelease": false,
+                  "pushed_at": "2026-09-06", "stars": 100, "license": "Apache-2.0",
+                  "archived": false, "renamed_to": null},
+     "pin_behind_upstream": false,
+     "review_status": "confirmed_default"
+    }
+   ]
+  }
+ ]
+}

@@ -73,3 +73,134 @@ jobs:
           path: status.json
           if-no-files-found: error
           retention-days: 7
+
+  # Evidence class: native operation on a GitHub-hosted macOS arm64 runner
+  # (macos-15, Apple Silicon, free minutes on this public repository). It is a
+  # hosted smoke of adoption/bootstrap-macos.sh's pinned, checksum-verified
+  # installation into a disposable $RUNNER_TEMP prefix plus the read-only
+  # status report; it is NOT a Mac workstation acceptance and it signs into no
+  # native client. A green run here never flips adoption/manifest.json's
+  # macos-arm64 platform profile out of drafted_not_accepted, and never flips
+  # scripts/adoption_status.py's platform.supported, which stays false because
+  # supported_platforms pins linux/x86_64 only.
+  bootstrap-macos:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Check out the event commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up the manifest-supported Python line
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Assert the runner is Apple Silicon and record the image
+        shell: bash
+        run: |
+          set -euo pipefail
+          architecture="$(uname -m)"
+          if [ "$architecture" != "arm64" ]; then
+            echo "expected an Apple Silicon runner; uname -m reported $architecture" >&2
+            exit 1
+          fi
+          sw_vers | tee sw_vers.txt
+      - name: Run the macOS bootstrap into a disposable prefix
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ECO_INSTALL_ROOT="$RUNNER_TEMP/eco"
+          bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation --skip-system-packages
+      - name: Read the read-only adoption status report
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$RUNNER_TEMP/eco/bin:$PATH"
+          # scripts/adoption_status.py exits 2 whenever the overall status is
+          # prerequisites_missing, which is the expected outcome on darwin even
+          # when every profile command is present: supported_platforms lists
+          # linux/x86_64 only. Accept 0 or 2, fail on anything else.
+          code=0
+          python3 scripts/adoption_status.py --profile macos-arm64-foundation --json > status.json || code=$?
+          cat status.json
+          if [ "$code" -ne 0 ] && [ "$code" -ne 2 ]; then
+            echo "adoption_status.py exited $code; only 0 or 2 is expected on darwin" >&2
+            exit 1
+          fi
+          echo "adoption_status.py exit code: $code"
+      - name: Assert the report is a real macos-arm64-foundation profile report
+        shell: bash
+        run: |
+          set -euo pipefail
+          # scripts/adoption_status.py returns an early error report -- manifest
+          # status "invalid", "profiles": [] and a non-empty "errors" list -- and
+          # still exits 2 when the manifest or the requested profile is broken.
+          # Without these positive checks the emptiness assertions below would
+          # pass vacuously on exactly the wiring failure this smoke must catch.
+          jq -e '.manifest.status == "valid"' status.json
+          jq -e '.errors | length == 0' status.json
+          jq -e '[.profiles[] | select(.id == "macos-arm64-foundation")] | length == 1' status.json
+          jq -e '[.profiles[] | select(.id == "macos-arm64-foundation")][0].commands | length >= 1' status.json
+          jq -e '[.profiles[] | select(.id == "macos-arm64-foundation")][0].recipes | length >= 1' status.json
+          jq -e '[.profiles[] | select(.id == "macos-arm64-foundation")][0].status == "prerequisites_present"' status.json
+      - name: Assert every required command for the macOS profile is present
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '[.profiles[].commands[] | select(.present == false)] | length == 0' status.json
+          jq -e '[.profiles[].recipes[] | select(.present == false)] | length == 0' status.json
+      - name: Assert the platform report stays unsupported on darwin
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.platform.os == "darwin"' status.json
+          jq -e '.platform.architecture == "arm64"' status.json
+          jq -e '.platform.supported == false' status.json
+      - name: Render the published example host's configs read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          # adoption/hosts/example.json is the committed placeholder host file;
+          # render_config.py --out only writes into the chosen directory and
+          # never reads or edits a live client config (--check does that).
+          python3 tools/adoption/render_config.py --host example --out "$RUNNER_TEMP/rendered"
+          ls -l "$RUNNER_TEMP/rendered"
+      - name: Verify the installed native client versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$RUNNER_TEMP/eco/bin:$PATH"
+          codex --version
+          claude --version
+          llama-server --version
+          uv --version
+          node --version
+          # gh is NOT in the macos-arm64-foundation profile's required_commands
+          # gh is installed by the bootstrap into $ECO_INSTALL_ROOT/bin, which is first on PATH here,
+          # installed-versions.txt stays the authoritative pinned-version record.
+          gh --version
+      - name: Collect the artifact payload
+        if: always()
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p macos-status
+          for file in status.json sw_vers.txt "$RUNNER_TEMP/eco/installed-versions.txt"; do
+            if [ -f "$file" ]; then
+              cp "$file" macos-status/
+            else
+              echo "absent, not uploaded: $file"
+            fi
+          done
+          ls -l macos-status
+      - name: Upload the macOS adoption status report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: adoption-bootstrap-macos-status-${{ github.run_id }}-${{ github.run_attempt }}
+          path: macos-status
+          # warn, not error: a failed bootstrap must stay visible as that
+          # step's failure instead of being masked by a missing-artifact error.
+          if-no-files-found: warn
+          retention-days: 30

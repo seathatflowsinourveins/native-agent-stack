@@ -4,7 +4,19 @@ One page, one order. Each step names the [manifest](manifest.json) `recipe_map`
 entry or component it uses instead of repeating its command. Read
 [the adoption reference](README.md) first for profile selection and the four
 native verification tiers; this page only sequences the steps for a machine
-that has never run this stack. Read the platform page for the chosen
+that has never run this stack.
+
+**Step 0, before anything below: get the catalog at its pinned commit.**
+```sh
+git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
+cd native-agent-stack
+git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['baseline_commit'])")"
+```
+This checks out `adoption/manifest.json` `source.baseline_commit`, the same
+field `scripts/adoption_status.py` compares the working tree's revision
+against (`baseline_matches` / `baseline_differs` in its `git` result block).
+
+Read the platform page for the chosen
 [`platform_profiles`](manifest.json) entry before starting:
 [Linux/WSL2 x86_64](platforms/linux-wsl2.md) (`status: accepted`) or
 [macOS arm64](platforms/macos-arm64.md) (`status: drafted_not_accepted` —
@@ -19,11 +31,20 @@ nothing on that page has been executed on a Mac; see
    [the macOS page](platforms/macos-arm64.md#prerequisites); that page is
    drafted, not accepted.
 
-2. **Run the platform bootstrap script.** `adoption/bootstrap-linux.sh --profile <id>`
-   (added by a sibling worker in this same integration branch; not present in
-   this unit's owned paths) installs the selected profile's components using
-   each entry's `recipe_map` path. Inspect the script before running it on a
-   new host; it installs only what the chosen `--profile` selects.
+2. **Run the platform bootstrap script.** `adoption/bootstrap-linux.sh --profile <id>
+   [--skip-system-packages] [--allow-unpinned <id,id,...>]` on Linux/WSL2, or
+   `adoption/bootstrap-macos.sh --profile <id> [--skip-system-packages]
+   [--allow-unpinned <id,id,...>] [--plan]` on macOS (`ECO_INSTALL_ROOT` env,
+   default `$HOME/.local/share/codex-ecosystem`; writes
+   `$ECO_INSTALL_ROOT/installed-versions.txt`; both scripts exit 2 usage,
+   1 guard/refusal, 0 success, 3 when a selected component has no pin and was
+   not named in `--allow-unpinned`, and 4 when a prerequisite is still missing
+   after the system-package step — with `--skip-system-packages` no
+   `apt-get`/`brew install` is attempted and the check lists what is missing;
+   `--plan` resolves the profile's pins with no network and still exits 1 on a
+   null `sha256`) — installs the selected profile's components
+   using each entry's `recipe_map` path. Inspect the script before running it
+   on a new host; it installs only what the chosen `--profile` selects.
 
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
@@ -79,7 +100,8 @@ nothing on that page has been executed on a Mac; see
    `systemctl --user` on Linux/WSL2 (owned units only; never stop the shared
    MCPorter daemon to "clean up" another component), `launchctl` on macOS
    (table in [the macOS page](platforms/macos-arm64.md#launchd-services); not
-   yet exercised on a Mac).
+   yet exercised on a Mac). For the portable guarded runner wrappers used by
+   these services, see `adoption/tools/README.md`.
 
 6. **Prerequisite report.** `python3 scripts/adoption_status.py --profile <id> --json`
    reports command presence and recipe-path presence only; it never logs in,

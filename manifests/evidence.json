@@ -2936,6 +2936,28 @@
         "This receipt does not extend, retro-label or otherwise change the scope of native-historical-leverage-stress-20260919 (lean), which remains scoped to its own six LEAN simulations only."
       ],
       "path": "evidence/receipts/exchange-calendars-native-check-20260922.json"
+    },
+    {
+      "id": "adoption-macos-hosted-smoke-20260922",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "context-mode",
+        "ai-memory",
+        "mcporter",
+        "llama-cpp",
+        "qdrant"
+      ],
+      "claim": "adoption/bootstrap-macos.sh --profile macos-arm64-foundation --skip-system-packages ran to completion on a GitHub-hosted macOS arm64 runner (label macos-15, macOS 15.7.9 build 24G830, Python 3.13.15) into a disposable ECO_INSTALL_ROOT, installing the pinned darwin-arm64 archives and npm packages listed in adoption/pins-macos-arm64.json; scripts/adoption_status.py --profile macos-arm64-foundation --json then reported the profile prerequisites_present with no missing command and platform.supported false, and the job uploaded status.json, installed-versions.txt and sw_vers.txt as its artifact.",
+      "limitations": [
+        "Native operation on a GitHub-hosted macOS arm64 runner only; not acceptance on a user's Mac workstation, which must record its own receipt.",
+        "platform_profiles[macos-arm64] stays drafted_not_accepted and adoption/manifest.json supported_platforms stays Linux/x86_64; the overall adoption_status is prerequisites_missing by design on an unsupported platform.",
+        "No native client sign-in, no launchd service bootstrap, no llama-server embedding acceptance and no Homebrew system-package step ran (--skip-system-packages; the runner image already carried the prerequisites).",
+        "npm packages resolve their darwin-arm64 optional binaries from the registry unpinned; the registry tarball sha256 is what the pins verify.",
+        "socraticode is the profile's documented unpinned skip and was not installed."
+      ],
+      "path": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json"
     }
   ],
   "files": [
@@ -2981,8 +3003,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "4543cf637dacc0a7fe84a0618667d87494b975b81d50b801de998c8abeaae4f8",
-      "bytes": 2763
+      "sha256": "fad51d0ac95811d9749250aaf5e536127e4a219fa49610e73d40125a5e690e11",
+      "bytes": 9210
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -3061,8 +3083,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "b336d899290b9972f6551c3445cf452c8fb7aeed23d76b15040fda43eea4b3c7",
-      "bytes": 17916
+      "sha256": "493ee6c0f962a863b0428c0744aaf9fc9ce3563df29bf4f3e2e2e292e689827f",
+      "bytes": 21362
     },
     {
       "path": "SECURITY.md",
@@ -3080,9 +3102,14 @@
       "bytes": 14458
     },
     {
+      "path": "adoption/bootstrap-macos.sh",
+      "sha256": "7b588ea862d1035ba13b645c777f625bf09caa463b81955b6decf6db91aad96b",
+      "bytes": 19343
+    },
+    {
       "path": "adoption/bootstrap.md",
-      "sha256": "2521b470971f8de308e1417a5197e06f90222fd610616fd99f20b45b7c73d23d",
-      "bytes": 6175
+      "sha256": "64d25035e3ae24e08fb8f0f46d965f3e55ea02e55307bb7aa7bcd48cb7a12dac",
+      "bytes": 7460
     },
     {
       "path": "adoption/host-state.example.json",
@@ -3101,8 +3128,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "835cfc510e98b7a07c0d3883e4300339b73b3a08ace334385c9109222946a5c8",
-      "bytes": 17169
+      "sha256": "06ffa9db66016b2ad52b4d9ffbf15632a298ff2f20fb2c7581aaea6ec1effd4e",
+      "bytes": 17563
     },
     {
       "path": "adoption/paired/README.md",
@@ -3140,14 +3167,19 @@
       "bytes": 6757
     },
     {
+      "path": "adoption/pins-macos-arm64.json",
+      "sha256": "b994497271c4a188429069e4678b94b8effb9e722a8b039c9cf7e48de754c006",
+      "bytes": 9694
+    },
+    {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "080351629a2053545ca8e5ec229dfd7c50a20c34c0ed3ac664feffccf2d5d6ae",
-      "bytes": 3691
+      "sha256": "facbb9a5111a047cde34881e5e1aeca4963d6b780446fade7a3af85d9aaf081e",
+      "bytes": 4224
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "7125ffc432bc1ac4c565d3ec8ec04e69b6b21fd7daf094229e7d18f26e921620",
-      "bytes": 8914
+      "sha256": "8f55582741fbd1e0230ef4ea9d37bf5c7dc2f5c9569705cbc99dbe2f5cb14756",
+      "bytes": 17458
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3198,6 +3230,21 @@
       "path": "adoption/templates/project.codex.config.template.toml",
       "sha256": "f0bc6d67bb58604925a8e332c30b8fdea9a1da080d06550ba11222b6c9a58675",
       "bytes": 2432
+    },
+    {
+      "path": "adoption/tools/README.md",
+      "sha256": "0187674fd9ee0241a34bc445c02ba3ebad21df3aa2bdd0ac2635c55310589ae9",
+      "bytes": 12840
+    },
+    {
+      "path": "adoption/tools/ecosystem-bounded-run",
+      "sha256": "7680fe1173b35a8472023772c8973c4a9b65c4e444414ac44efa199cbabe17db",
+      "bytes": 2744
+    },
+    {
+      "path": "adoption/tools/gitleaks-guarded",
+      "sha256": "61e87881841a346fc0c4d2ec514b283696311ce033fd7b27397973fc2429a655",
+      "bytes": 1938
     },
     {
       "path": "adoption/update.md",
@@ -5866,6 +5913,26 @@
       "bytes": 324
     },
     {
+      "path": "blueprints/us-equities/data/fixtures/empty-snapshot-gate-result.json",
+      "sha256": "5e2a2af2d73a3254e0b27d280b5fdf2f4cfd2c70b72a441b3d04c0b7f256d7cf",
+      "bytes": 1499
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/empty-snapshot.csv",
+      "sha256": "058ad8f0954ce1ce1e1397c9db29548a169ceabac6e3c81a63c6f462b24f1e73",
+      "bytes": 54
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/fractional-negative-volume-gate-result.json",
+      "sha256": "985249539ef5f507a3953c36724e3d5507e79eb90b0fd72656977d6d42d70191",
+      "bytes": 1518
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/fractional-negative-volume.csv",
+      "sha256": "971a078a9c23b1229443e07495411124c35aa9f5f1bc0a3d4679261bf95998ba",
+      "bytes": 189
+    },
+    {
       "path": "blueprints/us-equities/data/fixtures/good-gate-result.json",
       "sha256": "8088ef27d7477daa4e6b4471960951cc74efde674168574d0edd1e78a1764c18",
       "bytes": 1477
@@ -6872,8 +6939,8 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "a8fc08f6ed50ac3e5490e2db13e91b8c9d68ebe1d6d998f3930e2bc7b4e1f25d",
-      "bytes": 2350
+      "sha256": "7e4c9903951886c308c1e4a0432fd26264bcd186fbc43a66096bf48ff3705ab2",
+      "bytes": 2636
     },
     {
       "path": "catalogs/convergence-practice/architecture-wave/README.md",
@@ -6997,8 +7064,8 @@
     },
     {
       "path": "catalogs/landscape/README.md",
-      "sha256": "592625d91924cf25f186955a090473ec6e06c7fafe9f9b0fa560df813db16554",
-      "bytes": 9549
+      "sha256": "cc6ff10c80aa1ff9fcf2fb290dcd10c4c511e379f425a71e6fee4b7020105daa",
+      "bytes": 10082
     },
     {
       "path": "catalogs/landscape/blind-convergence.json",
@@ -7017,8 +7084,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "01e755befca7f279f9450b7b4499170f574d90e3916b8bfafaddcc8afde6af4a",
-      "bytes": 125902
+      "sha256": "889d91f6fb14054758c56d4815a6f4716bed015da6a03fac58623bdf8e80e092",
+      "bytes": 449724
     },
     {
       "path": "catalogs/landscape/hosting-practice.json",
@@ -7052,23 +7119,33 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "15f2c59dee5c7e7b7c96d07d242ce89c104ac46cdc85745f93923ca05690361f",
-      "bytes": 250953
+      "sha256": "51247e8b30c2a5d617210e016831e0fc54778a7c46a6b7a79220c6266a39ecd3",
+      "bytes": 569887
     },
     {
       "path": "catalogs/sota-convergence/README.md",
-      "sha256": "ee820a57742c5807e45a0076b13251b6c13caf9484a0696c76522d50b02e25ac",
-      "bytes": 16192
+      "sha256": "76ee44ca2cdb48b6ce62379b6b1b7fd71276b868c5724138751b333331b1106c",
+      "bytes": 16558
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
-      "sha256": "c91b282a354c44b3066e40908d94815c810ec705320827183438f9a0d59b846a",
-      "bytes": 124069
+      "sha256": "0e3c0a2a5b2085f7fa39f93a2a5c663373a643c785a2b3384baaabd942851859",
+      "bytes": 694569
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260922.json",
-      "sha256": "01869fe708b9fb71f78200a06ce4b7cf6eb86532feb7edf96ffa616b3af3b18f",
-      "bytes": 401431
+      "sha256": "6c9fddc0c664521782f7cad64f6a3d16e4db5ce968834ee5e5940a9bfb56ca77",
+      "bytes": 504565
+    },
+    {
+      "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
+      "sha256": "aedaa9e631098e56112228c9e38b889f69d997368ffc68942386e41df7515409",
+      "bytes": 1092045
+    },
+    {
+      "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.md",
+      "sha256": "ab4139ac109eb2afeb31a2d53e676667fcabd7474737ee33434ba044379b84ef",
+      "bytes": 44536
     },
     {
       "path": "catalogs/us-equities/README.md",
@@ -7502,8 +7579,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "e1ffe1ee87b6d004b762d2bc08acbd650812815390007cef1670a1f286832fd4",
-      "bytes": 12140173
+      "sha256": "1e83cfa3c6184199aa6de50d1918b17a17e1998db7b0ebdcf1bbd32e3363d55e",
+      "bytes": 13180898
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7567,18 +7644,18 @@
     },
     {
       "path": "docs/github-automation-evidence.json",
-      "sha256": "7bb47481be9904ca1fcbc633ccc4438fcbc53fa9aae2c8f0369ade8c422de5fa",
-      "bytes": 12863
+      "sha256": "bd3ad41bfd8b220b543175c6609e1aa44341f6a41c77c0d14578e17bc3215c57",
+      "bytes": 14047
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "3390a88c71bf9baedeb33a2b75778a1c89a824f2df80bf29c060adf11408fbf7",
-      "bytes": 30445
+      "sha256": "e5d5c19a9347a6198cfb926d1c6b6e59c1bd8781b38b2732240057285111cac7",
+      "bytes": 30881
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "71bc8dc3214d89dfd491e2c7da2dfb8cb785c23f9a19b469fc8a4df4bb5c5315",
-      "bytes": 24357
+      "sha256": "66af604a1dcf43a7b8c865402d6748ac729e2f8f05372f1348eeddfbaf172675",
+      "bytes": 476845
     },
     {
       "path": "docs/harness-defaults.md",
@@ -7769,6 +7846,16 @@
       "path": "docs/tasks/2026-09-22-github-automation-newpc.md",
       "sha256": "24ca1c63044562444803bc7a9b56bf433f2c5815f62cc8bb10a1535684b1911f",
       "bytes": 6790
+    },
+    {
+      "path": "docs/tasks/2026-09-22-new-machine-install.md",
+      "sha256": "64d7e5f1b7464ef502908d454104a45cc6ea36f9a9dcc31f621ffb89b26e214c",
+      "bytes": 18721
+    },
+    {
+      "path": "docs/tasks/2026-09-22-sdk-runtime-coverage.md",
+      "sha256": "8d3dd361883f12352c83a130392bf15d110248dabd227100c910fd52f8a629af",
+      "bytes": 6632
     },
     {
       "path": "docs/token-efficiency-stack.json",
@@ -10066,6 +10153,36 @@
       "bytes": 2166
     },
     {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",
+      "sha256": "e494120421102202312b567d699025c96e85c0e925a88a143c4ea11af2a791a2",
+      "bytes": 169217
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/coding-harnesses.json",
+      "sha256": "c7adcb8f7cf03996aa74481505d73af6f9bb491e8d6f326d15f732feb91e1c7f",
+      "bytes": 306151
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/dispatch-frameworks.json",
+      "sha256": "cbed6e57f19da8eba3c9ea7c82267935e5e608d2dd3cc4d8048333855a9295c3",
+      "bytes": 369840
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/durable-runtimes.json",
+      "sha256": "64923a5c3325754aaa389705dd830ca7c06f2187881c9121d87eece9ec813108",
+      "bytes": 237686
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/protocol-sdks.json",
+      "sha256": "6b539232a2d6e8758b844db46c0d032b0183310212d47c342e2e196d4a0e30e8",
+      "bytes": 279038
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/sandbox-worker-runtimes.json",
+      "sha256": "3706f2888e0b28bd4bec5327267715ba78e910ce2854daf81aaa1017760839ca",
+      "bytes": 248046
+    },
+    {
       "path": "evidence/artifacts/ultracode-token-routing-20260921/audit-verifier-wf_d0d741b1-9c6.json",
       "sha256": "5e86863b7f6b6c94ec21c712de3f505f95b8a7b02a54ab693b5281e85dbe4fe5",
       "bytes": 25523
@@ -10209,6 +10326,11 @@
       "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
       "sha256": "f8d965b15517bfc7de9bc5f80b7dd328b1f19dff48b4508ac53531819a1c02a8",
       "bytes": 1125
+    },
+    {
+      "path": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json",
+      "sha256": "2548ce67040bf68b0cead4fccc7f8fd22aa7eb06d975e13475dad605c0c17a57",
+      "bytes": 4713
     },
     {
       "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
@@ -11177,8 +11299,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "841e850398ff6059c62df204061a3a1952b2b84fc38224edf96ad3af7f620349",
-      "bytes": 57270
+      "sha256": "a6c19b8f948f3dccf5ddd61b8e18c0c8e990ae1e4add0f022738ddbd5cb1af1c",
+      "bytes": 58129
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -11207,8 +11329,8 @@
     },
     {
       "path": "recipes/sota-convergence-practice.md",
-      "sha256": "2541d24667ab59a180b4f8c60bc12a41bb0e08aeb6dd0ff748d9b89aabddebe3",
-      "bytes": 7246
+      "sha256": "492ea9a8563bc6e653d7fdb63879d7dad35bcb85e756f5357dbb4eb3cc6c0595",
+      "bytes": 10250
     },
     {
       "path": "recipes/tavily.md",
@@ -11232,8 +11354,8 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "d1894bbde159ca88cf13a063ee706055b178c1c24522e075211be5edf17c37d5",
-      "bytes": 37951
+      "sha256": "44b99a901e76c28a6fa9166396ff8429a531e22cc0a639b7a708e5e69e0b1c90",
+      "bytes": 38791
     },
     {
       "path": "scripts/native_token_ci.py",
@@ -11332,13 +11454,23 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "09563ae5270fc2de8659b5c87760b6e0118898a674e6340abf3396762298aef3",
-      "bytes": 19963
+      "sha256": "e42089d0ea4d0f48e92a3e9386869f6afcb1c8987817af1eb7187cf658d16a25",
+      "bytes": 20197
+    },
+    {
+      "path": "tests/test_adoption_bootstrap_macos.py",
+      "sha256": "fc882bffe36d2d3116e49bcdfca79274eed2c3f1c3eb96e2b9612731d1ff78a5",
+      "bytes": 28953
     },
     {
       "path": "tests/test_adoption_contract.py",
       "sha256": "e93aeaa36c15584f8137621a0c407fa85307d33fc31be22309a06f020af5c678",
       "bytes": 5861
+    },
+    {
+      "path": "tests/test_adoption_guarded_runners.py",
+      "sha256": "9fe7155745db79cfa2ae673465c28907042aa0776b35834ddf17968ecd226a91",
+      "bytes": 21198
     },
     {
       "path": "tests/test_adoption_status.py",
@@ -11451,6 +11583,11 @@
       "bytes": 11791
     },
     {
+      "path": "tests/test_gitleaks_config.py",
+      "sha256": "ed9710e611064809690f66744026b18ae5f9554ba19881a8c6ca8d2a0e91a123",
+      "bytes": 14407
+    },
+    {
       "path": "tests/test_gpu_inference.py",
       "sha256": "1e15d3750823bc9aad9a160f303d49be69fc04fd282f5673ef65bd8665127ee1",
       "bytes": 4753
@@ -11477,13 +11614,13 @@
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "0b9b46e4838a5d3e0eb36d68c5a21e2b24f20c003ba3d2a91b061101c4e1f9e4",
-      "bytes": 33052
+      "sha256": "c58424011bd31121d8198a8043360f5f37c7cbddfdc78f56ab6ac1daffbd054a",
+      "bytes": 33290
     },
     {
       "path": "tests/test_layer_verdicts.py",
-      "sha256": "c7743e5cb6add04001330960dd2f4a919692ec4bf4d77be69a4fcd2907fa429e",
-      "bytes": 10454
+      "sha256": "45e3e3ce53951a85352b129d309c134b9b50e0b2bf35493864c26be9603f05ca",
+      "bytes": 15404
     },
     {
       "path": "tests/test_lifecycle_capture.py",
@@ -11607,8 +11744,8 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "sha256": "c342724f2c4ab9292db3f604a765eaff32470c930a2125d2a59e4d92d068f9a9",
-      "bytes": 59286
+      "sha256": "557605ad4b390785ca9b9927be43fede3c66cc4a74b8f42976cb605ce87b69f2",
+      "bytes": 133084
     },
     {
       "path": "tests/test_stack_lifecycle.py",
@@ -11667,18 +11804,18 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "f81cadadad8ee47a4ce75bdac37c5b95867019445d29b21b82a2032ae0b28f09",
-      "bytes": 14890
+      "sha256": "9102c342bbb09db70835b43bf4fd4bfbc9d7d6865d2b23425ccac96fe1239db0",
+      "bytes": 49949
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "7f9797504ad1b7020e62c4e746f2ef2608266f408f90d5a72b531dc3e85c7943",
-      "bytes": 36285
+      "sha256": "f3b3dfc83c53e2972ffed67ca7ce7635d828e2179a00e829a7645bf8abcd15aa",
+      "bytes": 74139
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "03861ee58426eedf5cc5f659bb2415dd7b4ecc5ac0ea08c2ca39b9c210d9c7c9",
-      "bytes": 12248
+      "sha256": "4dd8e7c49529e7852f6fb5587d21ad3c550d4bf407c5198184923c9892403a15",
+      "bytes": 15314
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",
@@ -11736,29 +11873,169 @@
       "bytes": 50793
     },
     {
-      "path": "blueprints/us-equities/data/fixtures/empty-snapshot.csv",
-      "sha256": "058ad8f0954ce1ce1e1397c9db29548a169ceabac6e3c81a63c6f462b24f1e73",
-      "bytes": 54
+      "path": "evidence/artifacts/sota-convergence-review-20260922/manifest-citation-review.json",
+      "sha256": "97ffac75c1208a58d9700ad5e30d1c0aa0f3decfc3199f10ce4d88135b7d10e4",
+      "bytes": 90508
     },
     {
-      "path": "blueprints/us-equities/data/fixtures/empty-snapshot-gate-result.json",
-      "sha256": "5e2a2af2d73a3254e0b27d280b5fdf2f4cfd2c70b72a441b3d04c0b7f256d7cf",
-      "bytes": 1499
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-quality-evaluation-20260922.json",
+      "sha256": "fcd8558ae2f5a237bee336f030eb95ef21e86607fd61405d8f430514442761cb",
+      "bytes": 16459
     },
     {
-      "path": "blueprints/us-equities/data/fixtures/fractional-negative-volume.csv",
-      "sha256": "971a078a9c23b1229443e07495411124c35aa9f5f1bc0a3d4679261bf95998ba",
-      "bytes": 189
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-semantic-rag-20260922.json",
+      "sha256": "eac70e3a42be5503f2a07de9da7e53c8307503beefb1ed9f0feaf35cabcc0b42",
+      "bytes": 16551
     },
     {
-      "path": "blueprints/us-equities/data/fixtures/fractional-negative-volume-gate-result.json",
-      "sha256": "985249539ef5f507a3953c36724e3d5507e79eb90b0fd72656977d6d42d70191",
-      "bytes": 1518
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-hosting-services-20260922.json",
+      "sha256": "87ea0c00c82a7a8c981ebff6b05ff310094f903648494c6e06e3d2d805dfd4eb",
+      "bytes": 14557
     },
     {
-      "path": "tests/test_gitleaks_config.py",
-      "sha256": "ed9710e611064809690f66744026b18ae5f9554ba19881a8c6ca8d2a0e91a123",
-      "bytes": 14407
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-identity-provenance-20260922.json",
+      "sha256": "c49116cde90e4417e527ec992fd355bb20e9d61f475f1e90401eabfde07eca19",
+      "bytes": 19124
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-evaluation-experiments-20260922.json",
+      "sha256": "d5451dc85acdb10fbfcc054f51d8ac34dbb9cef605caa04e8c1369ef642a3694",
+      "bytes": 20347
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-market-data-reference-20260922.json",
+      "sha256": "651da3669001ca9f289f6a5305e7ad4921eeda131b9b54286ac6fc8cc353e1ba",
+      "bytes": 20206
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-execution-broker-20260922.json",
+      "sha256": "b58e666b158c82a3acb73730c272bc6831bdc0afd5b0c7b3d872473c6ff36da0",
+      "bytes": 20317
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-research-factors-ml-20260922.json",
+      "sha256": "21b7372c86b4f615f3734235f3b46cbc54f726d3123456e41936854f225284a1",
+      "bytes": 18953
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-observability-hosting-20260922.json",
+      "sha256": "0f5e3c53b8e0b3baa902a33afec38fb7b2b0a0d4e305fcb7cc42429ab0f28bd9",
+      "bytes": 23572
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-durable-memory-20260922.json",
+      "sha256": "7dc1888d6bfe7c570d84a9fbf9a1c91e4a728c801d12da6c6e21542cfccc61b0",
+      "bytes": 14705
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-git-github-automation-20260922.json",
+      "sha256": "a0100b118306ef4ee612acc2d391986beaadc8412f2a1c0c08ab2801f331f434",
+      "bytes": 10338
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-agent-sdks-20260922.json",
+      "sha256": "f32405554ad582f6a460d08f8142513ab8f3d6d357ae217362471556618ae284",
+      "bytes": 14302
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-mcp-surfaces-20260922.json",
+      "sha256": "9d6f77c1413aa9bb9554fa632a3c3dc285547cee95fd4f7ba87559ec69653062",
+      "bytes": 11064
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-code-navigation-20260922.json",
+      "sha256": "15640234ffd5dc0cb95976fb93ccee6456fe3247658991257e2d0f58bab9acd6",
+      "bytes": 10670
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-portfolio-risk-20260922.json",
+      "sha256": "5409587587c0c1cc5934ed8b854463cd5351a4da166244738f35de89e10bc21c",
+      "bytes": 15576
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-web-research-20260922.json",
+      "sha256": "368432408bc7985a1a9c3dee9605ea409c2353c4909f179f6648c416e2da12bc",
+      "bytes": 15128
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-data-quality-orchestration-20260922.json",
+      "sha256": "f493b77f0b3bf68dd8b2e2786cc5e006cafddbc0e937c4f640bb1a519a6907e8",
+      "bytes": 25965
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-security-supply-chain-20260922.json",
+      "sha256": "86d0af49633456369f928a8cae62273796acefeccace03b8c519b24e107d2d55",
+      "bytes": 24381
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-isolation-20260922.json",
+      "sha256": "55029b47663f44f2bdf0e3c9714a3f1baf32bbc4c1a5cab0d2fb7b3d1a9b75e8",
+      "bytes": 13380
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-secrets-credentials-20260922.json",
+      "sha256": "21f13156382c312e76b48288cfb9c471b135c96e89c0bf1f593572121922e0c5",
+      "bytes": 9143
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-observation-inference-20260922.json",
+      "sha256": "271a5cb5497c7112499ee97235ea89c882df7cae28663b580804af58b13b2765",
+      "bytes": 13373
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-ci-supply-chain-20260922.json",
+      "sha256": "2b7aa88ea18e1bed54301479ab9ec3c503ed4e5df8201c83eb640866cf7c67ad",
+      "bytes": 16673
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-token-efficiency-20260922.json",
+      "sha256": "9e6cd907952a5f86c4e9adbc03721a93d8fbc6583c90d5fcd346aad3c4382637",
+      "bytes": 14760
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-native-clients-20260922.json",
+      "sha256": "b312a7d1e85fe217f37bdf54a8c9d02c8e6dcc62c18572c9c7af58029b67e8f1",
+      "bytes": 10323
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-workers-20260922.json",
+      "sha256": "1b0a6274cc7f29c956f759df3db9a4ef3c4da80e249f9a4150d663133d27e745",
+      "bytes": 18647
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-storage-compute-20260922.json",
+      "sha256": "675c76d57d4afbf8266edf31a5969a39f3c79ac874a9c8798998e515b00fbebf",
+      "bytes": 20191
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-backtesting-engine-20260922.json",
+      "sha256": "c91853167ddcc21b70f5285e54e04fa2a93b7673f1ad283491dfccb06e70878f",
+      "bytes": 21613
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-instructions-skills-20260922.json",
+      "sha256": "e82f0257ccf81250bd702169f39676076362a14c8a5d181ecb1fefff87c92c3e",
+      "bytes": 14456
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-recovery-portability-20260922.json",
+      "sha256": "3aad8796332337ec94e3264024885de103c9eb5fa1ff5774da6d48195393aff6",
+      "bytes": 12736
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-document-retrieval-20260922.json",
+      "sha256": "d83ef7b6515ea06549466507e1cfbdd95a1e031d7ca1b00031c4ec52b8f36a37",
+      "bytes": 10612
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-scheduling-supervision-20260922.json",
+      "sha256": "7ec34b8d08410b70210df53810983c3b03b71013e417f2e09dd5c196ffd60570",
+      "bytes": 10606
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-agents-models-workers-20260922.json",
+      "sha256": "4e288a358b7c5af40f34e2502ebaf95d739a00d479fed883a9f6969052cab342",
+      "bytes": 22371
     }
   ],
   "convergence_records": [

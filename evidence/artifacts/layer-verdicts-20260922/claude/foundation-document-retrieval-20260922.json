@@ -1,0 +1,119 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "evidence/receipts/portable-cli-artifacts.json",
+    "catalogs/foundation/decisions.json",
+    "blueprints/convergence-practice/document-ingestion/README.md"
+   ],
+   "key": "c1",
+   "name": "MarkItDown",
+   "repository": "https://github.com/microsoft/markitdown",
+   "why_not_default": "The only native evidence is one HTML fixture conversion. evidence/receipts/portable-cli-artifacts.json has argv 'markitdown fixtures/greeting.html' and 'markitdown_contains_heading': true. catalogs/foundation/decisions.json (lines 788-790) says base HTML acceptance does not imply the optional PDF/Office extras. blueprints/convergence-practice/document-ingestion/README.md (lines 15-17) keeps MarkItDown 0.1.7 only as a candidate for specific unmet needs. No retrieval, provenance or page-boundary check was run. Upstream metadata in the packet says the 0.1.7 pin is behind v0.1.8; I did not verify that. Keep it as a conditional HTML converter only."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "docs/token-native-saturation.md"
+   ],
+   "key": "c4",
+   "name": "Context Hub",
+   "repository": "https://github.com/andrewyng/context-hub",
+   "why_not_default": "This candidate covers a different scope: curated external developer documentation (catalogs/foundation/decisions.json lines 817-856, curated-developer-docs, conditional). It is not controlled ingestion of local source documents. docs/token-native-saturation.md (line 16) records that its retained comparison grew by 85 tokens. The packet marks it unmaintained_signal: last push 2026-05-31, latest release v0.1.4. Use it only for a named documentation gap, and inspect the primary source it returns."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json",
+    "blueprints/convergence-practice/document-ingestion/README.md"
+   ],
+   "key": "c6",
+   "name": "Docling",
+   "repository": "https://github.com/docling-project/docling",
+   "why_not_default": "The only evidence is pinned upstream source review. catalogs/us-equities/foundation-memory.json (foundation-docling, lines 1134-1170) says 'commands are prospective and were not executed' and that table/unit extraction quality is unmeasured. Model weights carry separate licenses. The document-ingestion README (lines 118-123) says to adopt it only if it passes a frozen layout/OCR corpus with provenance and answer checks. That test has not been run, so it has not failed either."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c3",
+   "name": "LlamaIndex",
+   "repository": "https://github.com/run-llama/llama_index",
+   "why_not_default": "The only evidence is source review for the separate rag-pipeline layer. catalogs/us-equities/foundation-memory.json (foundation-llama_index, lines 983-1018) says commands are prospective and not executed. It notes the README now prioritizes LlamaParse, and that managed parsing may add cost or send data externally. No ingestion or retrieval fixture was run."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "claude",
+ "layer_id": "document-retrieval",
+ "limits": [
+  "I ran no commands. Audit scripts, unit tests and QMD benchmarks were not re-executed, and receipt hashes were not recomputed. Every pass/fail figure above is as recorded in the retained files.",
+  "I did not open the raw benchmark table (qmd-bench-output.txt), the Poppler receipt.json, source-review.json contents, or the evidence receipt for token-native-retained-functional-20260920.",
+  "Upstream metadata in the packet (stars, latest releases, push dates) is copied from the packet; I did not verify it.",
+  "The 'desktop-cli-workflows' and 'native-catalog-retrieval-20260920' evidence behind the QMD '8 of 12 top-three' figure were not opened; that figure is taken from the decisions.json summary.",
+  "TypeSafe: the skill was preloaded at <host-path>/SKILL.md. The coordinator supplied no TypeSafe inference results and I made no service calls. All judgments here are my own source review, not provider judgments.",
+  "Actual model: the client reports claude-opus-5-5[1m]. The fixed model field was copied as instructed (claude-opus-5, effort high)."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "claude-opus-5-5"
+ },
+ "open_gaps": [
+  "The evidence covers a small designed, born-digital Latin-text PDF only. It does not cover OCR, scanned pages, multi-column filings, difficult tables or Office documents (document-ingestion README lines 13-14, 112-123).",
+  "The QMD comparison is one ordered run on an index without a full-corpus seal (full_corpus_seal false), with a 12-query gold set. It establishes no general retrieval ranking and no token saving (qmd-comparison.json limits).",
+  "Correction: two BM25 measurements should not be conflated. The decision's '8 of 12 in top three' comes from the earlier September 19 benchmark. The September 21 expanded-index diagnostic reports bm25 recall_at_3 0.5, which is 6 of 12. The index changed between them (qmd-comparison.json limits: 'expanded index differs from September19 baseline').",
+  "No step joins the two winners end to end: Poppler extraction feeding a QMD index, then retrieval of the original body. They are qualified separately.",
+  "MarkItDown's PDF/Office extras, and Docling's and LlamaIndex's ingestion paths, have not been executed. Untested is not failed.",
+  "Whether Context Hub is current and maintained, and its value on documentation questions, is unestablished beyond the retained operation; that comparison grew by 85 tokens."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "qmd-bm25 (c5)",
+   "qmd-hybrid",
+   "poppler pdftotext -bbox-layout (c2)",
+   "docling (c6)",
+   "markitdown with PDF/Office extras (c1)"
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/retrieval-evaluation/fixture.json",
+   "blueprints/convergence-practice/document-ingestion/",
+   "tests/test_document_ingestion.py"
+  ],
+  "metric": "Retrieval is judged on recall@3, MRR and correct absent-query refusal, with repeated average end-to-end latency, on a sealed corpus. Ingestion is judged on exact page text, table-cell matches and positive/absent query oracle passes, with source/page citations."
+ },
+ "overturn_when": "Two results would change this verdict, either way:\n1. A sealed, representative rerun of the QMD benchmark on blueprints/us-equities/retrieval-evaluation/fixture.json, or a successor sealed corpus, with repeated warm/cold runs. It must show a non-BM25 mode, or another retriever, with useful recall@3/MRR gains at acceptable end-to-end latency. It must also include absent queries.\n2. A frozen, license-permitted corpus of multi-column, table-heavy and scanned documents, run under the blueprints/convergence-practice/document-ingestion protocol. Check with python3 blueprints/convergence-practice/document-ingestion/audit.py and python3 -m unittest discover -s tests -p test_document_ingestion.py -v. It would overturn the verdict if Poppler fails the provenance/answer oracle while Docling or MarkItDown passes it at justified runtime cost.",
+ "packet_sha256": "30406ee8413f03011b72ad305ee1e1eb7d1f37a4947a721fcbb5ee14bda0b6d3",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__document-retrieval.json",
+  "catalogs/foundation/decisions.json (lines 715-864, plus grep)",
+  "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+  "docs/foundation-rd-readiness.md (lines 20-74)",
+  "docs/token-native-saturation.md (lines 1-80)",
+  "catalogs/us-equities/foundation-memory.json (grep: foundation-llama_index lines 980-1018, foundation-docling lines 1131-1170)",
+  "blueprints/convergence-practice/document-ingestion/README.md",
+  "blueprints/convergence-practice/wsl-document-ingestion/README.md (lines 1-40)",
+  "evidence/receipts/portable-cli-artifacts.json (grep for markitdown)",
+  "Existence confirmed by glob: blueprints/us-equities/retrieval-evaluation/fixture.json, tests/test_document_ingestion.py, blueprints/convergence-practice/document-ingestion/audit.py, blueprints/convergence-practice/document-ingestion/source-review.json"
+ ],
+ "why_selected": "The requirement has two parts: controlled ingestion, and retrieving the original body before relying on a result. Two candidates cover them with native execution; no other candidate does.\n\nc5 (QMD BM25) handles Markdown search and get. In catalogs/foundation/decisions.json (lines 721-765, scoped-document-bm25, selection \"default\"), native scoped QMD search/get passed. On the fixed twelve-query benchmark, the intended source was in the top three for 8 of 12 queries. The catalog repair returned exact source bodies. The later diagnostic, evidence/artifacts/foundation-rd-20260921/qmd-comparison.json, is one ordered native CLI run with exit_code 0. It reported:\n- bm25: recall_at_3 0.5, mrr 0.508, average_latency_ms 5\n- hybrid: recall_at_3 0.5, mrr 0.503, average_latency_ms 10328\n- full: recall_at_5 0.5, average_latency_ms 75920\n- vector: recall_at_3 0.25\nSo hybrid, full and vector modes gave no recall gain at much higher latency. docs/foundation-rd-readiness.md (line 29, lines 64-69) retains BM25 on this basis.\n\nc2 (Poppler 26.09.0) handles controlled PDF ingestion. blueprints/convergence-practice/document-ingestion/README.md (lines 3-13, 34-47) records native pdftotext -bbox-layout runs on a frozen three-page corpus. They extracted exact text on every page and 24 table cells, and passed 8 positive and 4 absent queries, with source/page/coordinate citations. Input was fail-closed and results were capped at 3 records / 240 characters. blueprints/convergence-practice/wsl-document-ingestion/README.md (lines 3-9) shows a fresh native WSL run whose output is byte-identical to the Mac output.\n\nBoth winners are conditional on their scope: a small fixture corpus and one ordered diagnostic run. Neither is a universal ranking.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "catalogs/foundation/decisions.json",
+  "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+  "docs/foundation-rd-readiness.md",
+  "blueprints/convergence-practice/document-ingestion/README.md",
+  "blueprints/convergence-practice/wsl-document-ingestion/README.md"
+ ],
+ "winner_keys": [
+  "c5",
+  "c2"
+ ]
+}
