@@ -168,6 +168,129 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 "the legitimate opaque pagination cursor itself must remain suppressed",
             )
 
+    def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):
+        """`--exit-code 0` must return process exit code 0 even when real leaks are found.
+
+        Regression for a disclosed review finding: a prior recorded acceptance run
+        used `--exit-code 0` but recorded process exit code 1 for a run that *did*
+        find a leak, which is inconsistent with gitleaks's own `--exit-code N`
+        semantics (N is the exit code used when leaks ARE found; 0 means "always
+        exit 0"). Pass/fail must be read from the report/log output, never from the
+        process exit code, whenever this flag is used. This pins that behavior
+        against the installed binary so a similar mis-recorded result cannot recur
+        unnoticed.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            nonallow = target / "some" / "other" / "path"
+            nonallow.mkdir(parents=True)
+            (nonallow / "data.json").write_text(json.dumps({"api_key": HEX64}))
+            report_path = target / "gitleaks-report.json"
+            proc = subprocess.run(
+                [
+                    GITLEAKS, "dir", ".",
+                    "--config", str(CONFIG_PATH),
+                    "--no-banner", "--exit-code", "0",
+                    "--report-format", "json", "--report-path", str(report_path),
+                ],
+                cwd=str(target),
+                capture_output=True, text=True, check=False,
+            )
+            if "lock" in proc.stderr.lower():
+                self.skipTest(f"gitleaks per-user lock held by another scan: {proc.stderr.strip()}")
+            findings = json.loads(report_path.read_text()) if report_path.exists() else []
+            self.assertTrue(findings, "fixture must contain a detected leak for this test to be meaningful")
+            self.assertEqual(
+                proc.returncode, 0,
+                "`--exit-code 0` must yield process exit code 0 even though a leak was found "
+                f"(got {proc.returncode}); a nonzero code here means the earlier mis-recorded "
+                "exit-code finding could recur",
+            )
+
+
+class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
+    """Regression coverage for the branch-ancestry acceptance result recorded in
+    .gitleaks.toml's header comment: PR-3-codexfix-major-2.
+
+    A prior review round found that the published acceptance command (default
+    log-opts, i.e. all refs reachable in this shared repository) does not reach
+    zero findings because a concurrently active sibling branch contains an
+    unrelated synthetic-fixture leak that is not an ancestor of this branch.
+    `--log-opts="HEAD"` scopes the scan to commits this branch actually owns
+    (its own ancestry) and is this unit's real acceptance-relevant result; this
+    test asserts that scoped scan stays at zero findings for the real repository
+    history, independent of what other branches in the shared repo contain.
+
+    This is a local integration check against the real git history in this
+    worktree (not a synthetic fixture): it is slower (full-history scan, ~30s)
+    than the synthetic-fixture tests above, and it is skipped, not failed, if
+    gitleaks is absent or its per-user scan lock is held by another scan.
+    """
+
+    def setUp(self):
+        if GITLEAKS is None:
+            self.skipTest("gitleaks not found on PATH")
+        self.assertTrue(CONFIG_PATH.exists(), ".gitleaks.toml must exist at repo root")
+
+    def test_head_ancestry_scoped_scan_has_zero_findings(self):
+        report_path = Path(tempfile.mkstemp(suffix=".json")[1])
+        try:
+            proc = subprocess.run(
+                [
+                    GITLEAKS, "git", ".",
+                    "--config", str(CONFIG_PATH),
+                    "--max-target-megabytes", "2",
+                    "--no-banner", "--exit-code", "0",
+                    "--log-opts=HEAD",
+                    "--report-format", "json", "--report-path", str(report_path),
+                ],
+                cwd=str(ROOT),
+                capture_output=True, text=True, check=False,
+            )
+            if "lock" in proc.stderr.lower():
+                self.skipTest(f"gitleaks per-user lock held by another scan: {proc.stderr.strip()}")
+            findings = json.loads(report_path.read_text()) if report_path.exists() and report_path.stat().st_size else []
+            self.assertEqual(
+                findings, [],
+                "this branch's own ancestry (--log-opts=HEAD) must scan clean; a nonempty "
+                f"result here is this unit's own regression, not a sibling branch: {findings}",
+            )
+        finally:
+            report_path.unlink(missing_ok=True)
+
+
+class GithubAutomationDocConsistencyTests(unittest.TestCase):
+    """Regression coverage for PR-3-codexfix-major-1: docs/github-automation.md
+    must not restate the dated full-history scan counts that .gitleaks.toml's
+    header comment owns, so the two files cannot drift back into contradicting
+    each other about the same facts ("one canonical statement per fact")."""
+
+    DOC_PATH = ROOT / "docs" / "github-automation.md"
+    # Exact stale figures from the pre-fix allowlist regime that were previously
+    # duplicated (and went stale) in docs/github-automation.md. These must live
+    # only in .gitleaks.toml's header comment now.
+    STALE_STRINGS = ("251 matches", "522 commits", "777 MB", "224 64-hex")
+
+    def test_doc_does_not_restate_gitleaks_toml_owned_counts(self):
+        text = self.DOC_PATH.read_text()
+        for needle in self.STALE_STRINGS:
+            self.assertNotIn(
+                needle, text,
+                f"docs/github-automation.md must not restate the dated count {needle!r}; "
+                ".gitleaks.toml's header comment is the single canonical source",
+            )
+
+    def test_doc_does_not_claim_unqualified_zero_findings(self):
+        text = self.DOC_PATH.read_text()
+        section_start = text.index("### Secret-scan coverage boundary")
+        section = text[section_start:section_start + 2000]
+        self.assertNotIn(
+            "the same scan and the working-tree scan report zero findings",
+            section,
+            "the doc must not claim an unqualified zero-findings result for the "
+            "default (all-refs) scan; only the branch-ancestry-scoped scan is zero",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

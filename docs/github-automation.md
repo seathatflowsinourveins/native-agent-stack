@@ -467,14 +467,22 @@ runner, not a second-machine developer-laptop acceptance.
 The first hosted run of the `secret-scan` job was cancelled by its own timeout while
 scanning history: every commit re-diffs the 11 MB generated explorer
 `docs/ecosystem/index.html`. The job now passes `--config .gitleaks.toml` and
-`--max-target-megabytes 2`. Measured on this host before the change: a full-history
-scan with the size skip covers 522 commits / 777 MB in 34 s and reported 251 matches,
-all classified by shape before allowlisting (224 64-hex SHA-256 digests, 23 40-hex git
-ids, four opaque Alpaca `next_page_token` cursors in a retained historical-bars receipt);
-with the config the same scan and the working-tree scan report zero findings. The
-size skip means the generated explorer HTML is **not** scanned in either mode; this is
-recorded as incomplete coverage, mitigated because the explorer is built only from
-repository sources that are scanned and is rebuilt by `scripts/build_ecosystem.py`.
-Local scans on this host go through the guarded `gitleaks` launcher (memory-capped,
-one scan per user); do not raise its limits to retry a failed scan.
+`--max-target-megabytes 2`. The size skip means the generated explorer HTML is
+**not** scanned in either `git` or working-tree mode; this is recorded as
+incomplete coverage, mitigated because the explorer is built only from repository
+sources that are scanned and is rebuilt by `scripts/build_ecosystem.py`.
+
+`.gitleaks.toml`'s own header comment is the single canonical source for the
+dated full-history counts (default-rule baseline, allowlist breakdown, and the
+post-config scan results); this doc does not duplicate those numbers so they
+cannot drift out of sync here. As of this unit's last re-measurement (recorded
+in `.gitleaks.toml`), the branch-ancestry-scoped scan (`--log-opts="HEAD"`) is
+the acceptance-relevant result for this unit and reports zero findings; the
+unrestricted default-log-opts scan of this shared, concurrently used repository
+currently reports one residual finding attributable to a different, active
+sibling branch (not an ancestor of this branch and not a path this unit owns),
+which the `.gitleaks.toml` header records as a coordinator decision pending
+resolution before merge, not something this unit can fix. Local scans on this
+host go through the guarded `gitleaks` launcher (memory-capped, one scan per
+user); do not raise its limits to retry a failed scan.
 

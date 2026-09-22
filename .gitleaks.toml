@@ -49,14 +49,33 @@
 #   - sha256sum-style "<64-hex>  <filename>" lines inside a JSON string array in two
 #     sealed comparison-protocol files, restricted to those two exact files.
 # After this config, `gitleaks git . --config .gitleaks.toml --max-target-megabytes 2`
-# restricted to this branch's own ancestry (--log-opts="HEAD") scanned 375 commits
-# (~756 MB) and produced 0 findings (recorded 2026-09-22). The same command with
-# default log-opts (which walks all refs reachable in this shared, concurrently
-# used repository, not just this branch) scanned 533 commits and produced exactly 1
-# residual finding: tests/test_lane_packets.py on commit 34fc51b, which is not an
-# ancestor of this branch and is not one of this unit's owned paths - a synthetic
-# fixture on a different, concurrently active sibling branch. `gitleaks dir .`
-# (working tree only) produced 0 findings.
+# restricted to this branch's own ancestry (--log-opts="HEAD") scanned 376 commits
+# (~756 MB) and produced 0 findings (re-measured 2026-09-22, this fix round;
+# `git merge-base --is-ancestor` confirms every commit scanned this way is an
+# ancestor of this branch's HEAD). The same command with default log-opts (which
+# walks all refs reachable in this shared, concurrently used repository, not just
+# this branch) scanned 542 commits and produced exactly 1 residual finding:
+# tests/test_lane_packets.py on commit 34fc51b, confirmed NOT an ancestor of this
+# branch (`git merge-base --is-ancestor 34fc51b HEAD` fails) and not a path this
+# unit owns or created - a synthetic fixture on a different, concurrently active
+# sibling branch (PR-5, "packets unit"). `gitleaks dir .` (working tree only)
+# produced 0 findings. The default-log-opts commit count and the sibling-branch
+# finding are NOT stable invariants: this is a shared repository with other
+# active branches, so a rerun on a different day can see a different count or a
+# different (or zero) number of out-of-ancestry findings; only the HEAD-scoped
+# 0-findings result is this unit's own acceptance evidence. This means the
+# published acceptance command (default log-opts, no --log-opts restriction)
+# does not currently reach 0 findings by itself; reaching 0 requires either
+# `--log-opts="HEAD"` or the sibling branch merging/rebasing its own fix. This
+# is flagged for a coordinator decision, not resolved by this unit.
+#
+# `--exit-code 0` tells gitleaks to always return process exit code 0, findings
+# or not (it does NOT mean "0 findings required"); pass/fail must be read from
+# the "leaks found: N" / "no leaks found" log line or the JSON report, never
+# from the process exit code, when this flag is used. tests/test_gitleaks_config.py
+# test_exit_code_zero_flag_always_returns_zero_even_with_findings pins this
+# behavior against the installed binary so a wrongly-recorded exit code (as
+# happened once during this unit's review) cannot recur unnoticed.
 #
 # validate.yml's secret-scan job passes --config .gitleaks.toml and
 # --max-target-megabytes 2; the generated explorer HTML is therefore NOT scanned and
