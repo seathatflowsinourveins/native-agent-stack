@@ -7369,8 +7369,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "d950c5b734d59a0427f00dc4d230997cf6dade4d074d4f763c4b8670a7d858c9",
-      "bytes": 19963
+      "sha256": "393cd81a07e4b4a61bf62fa716e59335c1cff87af9e4573a94e160f5584a7897",
+      "bytes": 20661
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -12086,6 +12086,31 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-agents-models-workers-20260922.json",
       "sha256": "cc48e0009abf6a5bee0ec3511e176b091ed1e23ac11ac2fe74c63c2eea919a09",
       "bytes": 26372
+    },
+    {
+      "path": "blueprints/us-equities/pit-availability/README.md",
+      "sha256": "38927add939457ee81552dd87e366fa4caa7154ce7743131edbcf5ea0cbe2902",
+      "bytes": 12233
+    },
+    {
+      "path": "blueprints/us-equities/pit-availability/measure.py",
+      "sha256": "430383f1cfa67632c0aa095cbbf153035dc5bcb760001732aaa42851dda737b8",
+      "bytes": 41428
+    },
+    {
+      "path": "blueprints/us-equities/pit-availability/plan.json",
+      "sha256": "a7289c28b392de33a4e5fc36786bf2062f53936d27f2687af5e5c5803f9cbd3c",
+      "bytes": 4666
+    },
+    {
+      "path": "evidence/receipts/pit-availability.json",
+      "sha256": "1bbae79fec7cd519571f42470e05b4784e36d72d21da34a210ab8adc864823f4",
+      "bytes": 107713
+    },
+    {
+      "path": "tests/test_pit_availability.py",
+      "sha256": "4f9cb899edcd84950a71014d4efe588a4d9d70e5ee74f91ecf0c3a40f860c40b",
+      "bytes": 20615
     }
   ],
   "convergence_records": [
