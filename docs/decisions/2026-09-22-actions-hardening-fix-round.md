@@ -80,22 +80,33 @@ instruction to extend the bounded objective and update
 in the same follow-up commit, or a following fix round that adds these jobs
 to the finding list.
 
-**Integration follow-up (coordinator, 2026-09-22).** The coordinator's
-review found the hardening had no regression test. `tests/test_workflow_hardening.py`
-now fails when any downloading `ubuntu` job does not start with harden-runner
-in audit mode, when any workflow sets `egress-policy: block`, when Scorecard
-publishes or escalates permissions, when dependency review blocks or runs
-outside `pull_request`, or when a third-party action is not pinned by full
-SHA. Its first run found `owned-guest-reboot` (`native-service-reboot.yml`)
-still unhardened. That workflow's retained `freeze.json` files pin an older
-hash (`33fc35a6…`) that the current file (`6aa1b1b9…` before this change)
-already did not match, and no plan pins its current bytes, so the step was
-added there. `native-offhost-app-state.yml` (`76a49ffe…`, `plan.json`) and
-`native-offhost-restore.yml` (`91ecb7bd…`, `hosted-plan.json`) stay exempt
-by name, and a companion test asserts each still matches its pinning plan, so
-the exemption expires the moment either workflow is edited. Overturn: a
-re-run of the offhost evidence that re-pins both workflows with the step in
-place.
+**Integration follow-up (coordinator, 2026-09-22; supersedes the job counts
+and the gap paragraph above).** The coordinator's review found the hardening
+had no regression test, and a verification review of the first test found it
+matched download commands in workflow text, so it missed jobs that download
+through helper scripts (`upstream-dagu-retry` runs `upstream-tests.sh`, which
+curls the Dagu source; `native-token-tools` runs `native_token_ci.py
+--install`). `tests/test_workflow_hardening.py` now classifies every job
+instead: each `ubuntu` job must start with harden-runner in audit mode unless
+its workflow's exact bytes are pinned by retained evidence, `macos` jobs are
+skipped because harden-runner supports Linux only, and any other runner label
+fails as unclassified. It also fails on `egress-policy: block`, on any Scorecard
+or dependency-review permissions block other than exactly `contents: read`, on
+a published Scorecard result, on dependency review outside `pull_request` or
+without `warn-only`, and on a third-party action not pinned by full SHA; when
+PyYAML is importable it cross-checks its job parser against `yaml.safe_load`.
+
+Hardened as a result: `owned-guest-reboot` and `upstream-dagu-retry`
+(`native-service-reboot.yml`, whose retained `freeze.json` files pin an older
+hash, `33fc35a6…`, that the file already did not match), `token-report` and
+`dependency-review`. That makes 14 hardened `ubuntu` jobs. Exempt by name, each
+with a test that its current SHA-256 still appears in the pinning file:
+`native-offhost-app-state.yml` (`source`, `destination`; `plan.json`),
+`native-offhost-restore.yml` (`synthetic-restore`; `hosted-plan.json`) and
+`native-token-e2e.yml` (`native-token-tools`; recorded in four dated
+execution receipts). The exemption expires the moment one of those workflows
+is edited. Overturn: a re-run of that evidence which re-pins the workflow with
+the step in place.
 
 ### Major: stale "every `ubuntu-24.04` job" claim in `docs/github-automation.md` and the decision record
 

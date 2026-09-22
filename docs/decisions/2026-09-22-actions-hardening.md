@@ -206,7 +206,10 @@ covered by this original decision, not because they were newly added by it.
 reason. That fix round also tried and reverted the same step on `source`
 (`native-offhost-app-state.yml`) after it broke a frozen-source-hash test,
 and records `source`, `destination`, `synthetic-restore`, and
-`owned-guest-reboot` as an out-of-bounded-scope gap for a later decision.
+`owned-guest-reboot` as an out-of-bounded-scope gap for a later decision. The
+fix round's "Integration follow-up" closes that gap: every `ubuntu` job is now
+hardened except the four whose workflows are byte-pinned by retained evidence,
+and `tests/test_workflow_hardening.py` enforces it.
 
 ## Evidence class
 
@@ -222,4 +225,8 @@ hosted workflow run; no `scorecard.yml`, `dependency-review.yml`, or
 `harden-runner`-added step has executed on GitHub Actions yet, so their
 actual hosted behavior (Scorecard's computed score, harden-runner's audit
 log contents, dependency-review's PR comment) remains unobserved until the
-first hosted run after integration.
+first hosted run after integration. Update: on PR #78 every pull-request
+check passed, including the hardened jobs and dependency review (after the
+correction above); Scorecard runs on push to `main` and weekly, so its first
+hosted run follows the merge, and `native-service-reboot.yml` runs only on
+`workflow_dispatch`.

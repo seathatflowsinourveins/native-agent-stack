@@ -3028,8 +3028,8 @@
     },
     {
       "path": ".github/workflows/native-service-reboot.yml",
-      "sha256": "9f8366e587b769eb12648765f9e45d08172c97a87163efd24d1deae8530a0cda",
-      "bytes": 3014
+      "sha256": "02f3f5e6d41ecac8708747ba5aae2e6de818f3ef5f06ac3097d0471600de09bd",
+      "bytes": 3212
     },
     {
       "path": ".github/workflows/native-token-e2e.yml",
@@ -3048,8 +3048,8 @@
     },
     {
       "path": ".github/workflows/token-report.yml",
-      "sha256": "c5f8465130ccb06c4e96d6fa5f241c3ef57da27a2f47e3b1688f580c6c80ca9d",
-      "bytes": 723
+      "sha256": "984dbaa21d8e6fbad70a6df75776daa6b0db7daa54df4b246adb2a7b3e01d913",
+      "bytes": 921
     },
     {
       "path": ".github/workflows/validate.yml",
@@ -7624,7 +7624,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "9c475fe4c658a2c9f419a8c2caf6b76477ec90982f48821e697d355847882d56",
+      "sha256": "e1ff5954be10bd19f7b48a129abe389d4c94a05ddbc231dbdcc3552b492b0cb5",
       "bytes": 12918514
     },
     {
@@ -7694,8 +7694,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "a5b036eaec2c7e9328d40ee069087b755f1161b15e447ba0403315fe2e205616",
-      "bytes": 36591
+      "sha256": "3a36438408cfb9855e6494064c8d8e3b04a1c714a213be8c426315ba33141d5e",
+      "bytes": 36065
     },
     {
       "path": "docs/grand-catalog-handbook.md",
