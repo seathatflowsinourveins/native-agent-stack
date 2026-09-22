@@ -127,7 +127,7 @@
       "flip_condition": {
         "type": "exists"
       },
-      "note": "Survivorship before 2020 (broad-universe README: 25/47/167 symbols for 2016-2018 versus 541-756 for 2021-2025); the only candidate found was a 1-star repository. Blocks strategy promotion on the early panel, not the runtime path. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit."
+      "note": "Partial evidence, qualified 2026-09-22 by independent review (status unchanged): evidence/receipts/pre-2020-delisting-coverage.json with per-document classes in evidence/artifacts/pre-2020-delisting/classifications-2016-2019.json. EDGAR 2016-2019 gives 3,577 accession-deduped Form 25/25-NSE filings; keyword classification yields 378/296/268/294 common-equity rows with measured residual errors (58 LP units as units, ~16 REITs as funds, ~55 fund-named issuers, 2 preference ADS); the sample resolved 1/40 tickers with 0 confirmed price paths. Remaining: a corrected equity-event list with point-in-time tickers and price history through delisting. Survivorship before 2020 (broad-universe README: 25/47/167 symbols for 2016-2018 versus 541-756 for 2021-2025); the only candidate found was a 1-star repository. Blocks strategy promotion on the early panel, not the runtime path. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit."
     },
     {
       "id": "dated-security-identity",

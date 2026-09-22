@@ -7369,8 +7369,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "393cd81a07e4b4a61bf62fa716e59335c1cff87af9e4573a94e160f5584a7897",
-      "bytes": 20661
+      "sha256": "863ea6ec82195ed6d6e4e9ad25850b7ae5b3512b7773cd1a902d924e48be63a6",
+      "bytes": 21311
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -12111,6 +12111,31 @@
       "path": "tests/test_pit_availability.py",
       "sha256": "4f9cb899edcd84950a71014d4efe588a4d9d70e5ee74f91ecf0c3a40f860c40b",
       "bytes": 20615
+    },
+    {
+      "path": "blueprints/us-equities/delisting-coverage/README.md",
+      "sha256": "7c34f1ce12f763d0546fd71251816773cb6a232fc72c73d1c20f390884054143",
+      "bytes": 13331
+    },
+    {
+      "path": "blueprints/us-equities/delisting-coverage/collect.py",
+      "sha256": "20eee6e5ce9692a752302512a8ee96b16eafca6213ad26f5bf5a0ac432664609",
+      "bytes": 52839
+    },
+    {
+      "path": "evidence/artifacts/pre-2020-delisting/classifications-2016-2019.json",
+      "sha256": "c4136fac7d8c341708e65aa7c6a8f78e4adeab57baa8b443065c5f4551318fc1",
+      "bytes": 1365997
+    },
+    {
+      "path": "evidence/receipts/pre-2020-delisting-coverage.json",
+      "sha256": "26b96da55760463aefc53bc400d41681019a20976e24756cd451646ed1094a69",
+      "bytes": 1276550
+    },
+    {
+      "path": "tests/test_delisting_coverage.py",
+      "sha256": "c33b6dd7b33691dcac0ec84db6c600f8777abb06f6fce6d992b7f5fa2d277af5",
+      "bytes": 24344
     }
   ],
   "convergence_records": [
