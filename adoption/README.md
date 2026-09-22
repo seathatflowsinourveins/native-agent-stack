@@ -2,6 +2,10 @@
 
 Start from a reviewed checkout, select capabilities, and record new local evidence. Historical receipts describe the authoring host; a clone does not inherit its logins, service state, tool discovery or acceptance.
 
+Use the [grand catalog handbook](../docs/grand-catalog-handbook.md) to connect
+repository quality, native runtime review, profile selection and the current
+[clean-install evidence](../blueprints/catalog-clean-install/README.md).
+
 For daily Codex use, environment setup, reload decisions and the complete 24-repository token workflow, use the [session handbook](../docs/token-session-handbook.md). It maps native integration and upstream commands to the task that needs each capability.
 
 The initial target is **Linux/WSL2 x86_64**. The SDK was recreated in a new prefix on the existing host with **Python 3.13.15 and uv 0.12.17**. A second physical machine, macOS, Windows-native and ARM are not accepted by that result. See [the receipt](receipt.json) and [SDK lock/replay](sdk/README.md).
@@ -13,7 +17,8 @@ These adoption profiles select from the existing component catalog; they do not 
 | Adoption profile | Selects | Next native acceptance |
 | --- | --- | --- |
 | `foundation-cpu` | Codex, Claude Code, Context Mode, RTK, QMD BM25, explicitly scoped ai-memory, MCPorter | Native client setup; one useful context/document call and scoped memory retrieval |
-| `research-runtime` | Hash-locked SDK/DuckDB, native Dagu and LEAN | Accepted input → backtest → Parquet → bounded evidence packet; model task after account readiness |
+| `research-runtime` | Historical hash-locked SDK/DuckDB, Dagu and LEAN comparison lane | Reproduce the retained comparison; this profile does not override the Nautilus destination |
+| `trading-nautilus` | Selected pinned Nautilus engine and separate Alpaca boundary | Reproduce the bounded engine check; qualify SPY/LEAN parity and each broker independently |
 | `observability` | Collector, Prometheus, Loki, Grafana, Alertmanager, ntfy | Native config validation, actual task/event delivery, matching usage categories |
 | `semantic-rag` | HF, vLLM, Qdrant, SocratiCode | Hardware-compatible model serving, explicit project index and real retrieval/watcher behavior |
 | `recovery` | Restic plus selected ai-memory/Qdrant application state | Isolated restore, logical comparison, independent key/destination, then explicit consumer cutover |
@@ -92,6 +97,12 @@ Transfer public configuration templates and explicitly selected private **applic
 [Dagu hosting](../blueprints/us-equities/hosting/README.md) is the accepted manual local research lane. A user service starts only the selected local runtime; it cannot keep a stopped WSL VM running. Paid hosting, unattended schedules and broker orders remain separate operational choices. DeerFlow/ACP and OmniRoute have their own [blueprint evidence](../blueprints/us-equities/README.md); a routed text response does not prove native tools, hooks or model-session parity.
 
 ## Continue in a future session
+
+Start with the [current 20-layer research queue](../catalogs/landscape/research-state.json)
+and [continuation guide](../docs/landscape-continuation.md). They connect each
+current selection to its evidence, next useful comparison and bounded stopping
+rule. The [deployment comparison](../docs/hosting-container-practice.md) keeps
+Docker/Compose and Podman conditional on a demonstrated requirement.
 
 After the native observability services are accepted on the new host, install the
 [grand dashboard and progress emitter](../observability/grand-dashboard/README.md)

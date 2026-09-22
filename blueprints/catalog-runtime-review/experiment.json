@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Review the existing catalog through native harnesses; preserve actual source-based qualifications, capacity errors and incomplete attempts rather than treating a built harness as a quality guarantee.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "dac2d1a3f880c04f6afadebe8bf3a251a64ab605"
+    }
+  ],
+  "discovery_provenance": [
+    "Existing supported Codex Python SDK, native Claude CLI and Dagu; no new runtime installation or hosted deployment."
+  ],
+  "license_and_compatibility": "Existing native client/account scopes; upstream product/service terms remain applicable. Linux/WSL x86_64; this review is not a license audit or cross-platform qualification.",
+  "baseline_and_candidate": {
+    "baseline": "Existing source-reviewed catalog before native advisory review; no new baseline model trial.",
+    "candidate": "Native reviewers receive a frozen catalog packet; completion pass receives bounded original-source excerpts after preserving source-tool and service failures."
+  },
+  "frozen_inputs": {
+    "base_revision": "dac2d1a3f880c04f6afadebe8bf3a251a64ab605",
+    "tasks": [
+      "catalog-review"
+    ],
+    "roles": [
+      "codex-reviewer",
+      "claude-reviewer"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/catalog-runtime-review-20260921/input-provenance.json",
+        "sha256": "7ba99e5c53cfc8ecebad6b79c1c6973f651530dddd0d61d3bf44e5918f324932"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/catalog-runtime-review-20260921/frozen-20-layer-packet.json",
+        "sha256": "569505abd5d8b4f02a8f5bfb63e8e980e27e80e272d9d49d65c633203d349cc7"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/catalog-runtime-review-20260921/successful-claude-prompt.txt",
+        "sha256": "5adfec8f0d547c563a9bfa96f6e5906a7be5058e59ab6bcd32dc8a4320546755"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "The executed prompt requires all 20 layer IDs exactly once, evidence-linked findings, remaining test requirements and no unsupported global-best ranking; see retained prompt and original/public input provenance.",
+    "usage_rule": "Preserve returned usage categories, all failed attempts and unknowns. No token-savings or cost comparison."
+  },
+  "runtime_and_platform": {
+    "platform": "Linux/WSL x86_64 on the existing host",
+    "tools": [
+      {
+        "name": "Codex",
+        "version": "0.155.1"
+      },
+      {
+        "name": "openai-codex Python SDK",
+        "version": "0.154.0"
+      },
+      {
+        "name": "Claude native model",
+        "version": "claude-opus-5; high requested, resolved effort unavailable"
+      },
+      {
+        "name": "Claude CLI",
+        "version": "2.1.278"
+      },
+      {
+        "name": "Dagu",
+        "version": "2.16.6"
+      }
+    ],
+    "isolation": "Independent read-only checkout, owned private Dagu state, original Claude read tools followed by tool-free completion; source hashes and clean checkout independently checked. Existing accounts preserved; no shared service, credential or broker change."
+  },
+  "commands": [
+    "Observed argv: [\"<SDK_PYTHON>\",\"<STACK_REPO>/blueprints/us-equities/workers/native_worker.py\",\"run\",\"--codex-bin\",\"<NATIVE_CODEX_BIN>\",\"--codex-home\",\"<NATIVE_CODEX_HOME>\",\"--workspace\",\"<STACK_REPO>\",\"--prompt\",\"<PRIVATE_REVIEW>/codex.prompt.txt\",\"--receipt\",\"<PRIVATE_REVIEW>/codex.native.json\",\"--turn-deadline-seconds\",\"420\"]",
+    "Observed argv: [\"<NATIVE_CLAUDE_BIN>\",\"-p\",\"--model\",\"opus\",\"--effort\",\"high\",\"--output-format\",\"stream-json\",\"--verbose\",\"--max-turns\",\"18\",\"--tools\",\"Read,Grep,Glob\",\"--allowedTools\",\"Read\",\"Grep\",\"Glob\",\"--permission-mode\",\"dontAsk\",\"--permission-prompts\",\"none\",\"--no-session-persistence\",\"--strict-mcp-config\",\"--mcp-config\",\"{\\\"mcpServers\\\":{}}\"]",
+    "Observed argv: [\"<NATIVE_CLAUDE_BIN>\",\"-p\",\"--model\",\"opus\",\"--effort\",\"high\",\"--output-format\",\"stream-json\",\"--verbose\",\"--max-turns\",\"2\",\"--tools\",\"\",\"--disallowedTools\",\"*\",\"--permission-mode\",\"dontAsk\",\"--permission-prompts\",\"none\",\"--no-session-persistence\",\"--strict-mcp-config\",\"--mcp-config\",\"{\\\"mcpServers\\\":{}}\"]",
+    "Observed argv: [\"<NATIVE_CLAUDE_BIN>\",\"-p\",\"--model\",\"opus\",\"--effort\",\"high\",\"--output-format\",\"stream-json\",\"--verbose\",\"--max-turns\",\"2\",\"--tools\",\"\",\"--disallowedTools\",\"*\",\"--permission-mode\",\"dontAsk\",\"--permission-prompts\",\"none\",\"--no-session-persistence\",\"--strict-mcp-config\",\"--mcp-config\",\"{\\\"mcpServers\\\":{}}\"]"
+  ],
+  "observations": [
+    {
+      "id": "codex-capacity",
+      "task": "catalog-review",
+      "role": "codex-reviewer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "model_task_execution",
+      "scope": "Bounded native advisory review of the frozen 20-layer catalog; no comparative repository or new-PC qualification",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/catalog-runtime-review-20260921/native-review.json",
+          "sha256": "88c5269063973dd20b97eb4d5b990ec7b6f69d2d37661dcb69f69f9163050c1f"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-turn-cap",
+      "task": "catalog-review",
+      "role": "claude-reviewer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "model_task_execution",
+      "scope": "Bounded native advisory review of the frozen 20-layer catalog; no comparative repository or new-PC qualification",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/catalog-runtime-review-20260921/native-review.json",
+          "sha256": "88c5269063973dd20b97eb4d5b990ec7b6f69d2d37661dcb69f69f9163050c1f"
+        }
+      ],
+      "usage": {
+        "uncached_input": 32,
+        "cache_creation": 66861,
+        "cache_read": 1090979,
+        "output": 5347,
+        "reasoning_in_output": 1847,
+        "total": 1163219,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-http500",
+      "task": "catalog-review",
+      "role": "claude-reviewer",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 2,
+      "evidence_class": "model_task_execution",
+      "scope": "Bounded native advisory review of the frozen 20-layer catalog; no comparative repository or new-PC qualification",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/catalog-runtime-review-20260921/native-review.json",
+          "sha256": "88c5269063973dd20b97eb4d5b990ec7b6f69d2d37661dcb69f69f9163050c1f"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-completed",
+      "task": "catalog-review",
+      "role": "claude-reviewer",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "Bounded native advisory review of the frozen 20-layer catalog; no comparative repository or new-PC qualification",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/catalog-runtime-review-20260921/native-review.json",
+          "sha256": "88c5269063973dd20b97eb4d5b990ec7b6f69d2d37661dcb69f69f9163050c1f"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2,
+        "cache_creation": 37981,
+        "cache_read": 531,
+        "output": 9715,
+        "reasoning_in_output": 4798,
+        "total": 48229,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "codex-capacity",
+      "reason": "Selected model at capacity; no review verdict or usage; no Codex retry/fallback."
+    },
+    {
+      "run_id": "claude-turn-cap",
+      "reason": "Exceeded original 18-turn cap after 29 source calls; no completed 20-layer report."
+    },
+    {
+      "run_id": "claude-http500",
+      "reason": "CLI payload is_error=true with HTTP500; subtype success is not a successful review. One transient retry completed."
+    }
+  ],
+  "limitations": [
+    "Record assembled after execution from retained commands, prompts and returned outputs; it is not a prospective independent benchmark registration.",
+    "The initial Dagu run failed; successful Claude review ran separately through its native CLI.",
+    "Published input sanitization and terminal-newline normalization are explicitly recorded; original executed input hashes remain available.",
+    "Successful frozen-baseline review precedes later candidate-quality/HTML edits; those have separate source and integration review.",
+    "Reported token sum includes cache categories; Codex usage and enclosing coordinator/worker usage remain unknown."
+  ],
+  "decision_and_scope": {
+    "decision": "retain",
+    "scope": "Bounded native advisory review of the frozen 20-layer catalog; no comparative repository or new-PC qualification",
+    "qualification_run_ids": []
+  },
+  "rollback": "No runtime default or service was changed. Revert only owned catalog documentation/code changes if a supported error is found; retain failed-attempt evidence.",
+  "next_decision_changing_test": "Run a frozen matched corpus for ai-memory versus Hindsight and Basic Memory, or a full research-runtime workload only when its requirements justify that service. Establish actual target-PC install and useful operation after connection.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

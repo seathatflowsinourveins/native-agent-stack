@@ -1,0 +1,1481 @@
+{
+ "evidence_class": "independent observation (Prometheus counters exported by Claude Code through the collector; Grafana provisioning read from disk)",
+ "follow_up": "render.py per-model panel: sum by (model, type) (increase(ecosystem_claude_code_token_usage_tokens_total{job=\"claude-code\"}[$__range])) and the query_source variant; documented, not changed in this PR",
+ "grafana": {
+  "dashboards": [
+   {
+    "claude_token_panels": [
+     {
+      "expr": "sum by (type) (ecosystem_claude_code_token_usage_tokens_total)",
+      "panel": "Claude native token counters"
+     }
+    ],
+    "file": "ecosystem-dashboard.json",
+    "title": "Native agent ecosystem",
+    "uid": "ecosystem-native",
+    "version": 8
+   },
+   {
+    "claude_token_panels": [
+     {
+      "expr": "sum by (type) (ecosystem_claude_code_token_usage_tokens_total)",
+      "panel": "Claude provider telemetry \u00b7 typed counters"
+     }
+    ],
+    "file": "native-foundation-data.json",
+    "title": "Native foundation \u00b7 memory, retrieval and savings",
+    "uid": "native-foundation-data",
+    "version": 4
+   },
+   {
+    "claude_token_panels": [],
+    "file": "research-grand.json",
+    "title": "Research grand dashboard",
+    "uid": "research-grand",
+    "version": 5
+   }
+  ],
+  "health": {
+   "commit": "1bea008f7e4e858b6824c9e364d608bd4d10b13a",
+   "database": "ok",
+   "version": "13.2.2"
+  },
+  "source": "provisioned dashboard JSON files read from the running Grafana provisioning path (anonymous API exposes search but not dashboard bodies)"
+ },
+ "method": "primary (attempts 5 and 6): every metric of a run carries client_scope=<run scope> from OTEL_RESOURCE_ATTRIBUTES=ecosystem.client.scope, which the collector keeps as a label; the scoped sum by (model,type,query_source) is empty at launch and read after the export wait. Secondary (attempt 3): host-wide per-series delta of the cumulative counter between launch and the after-wait snapshot; per-session scoping was unavailable because the collector privacy transform keeps no session.id on metric datapoints and the instance label is not the session id (0 of the instance values matched any known session id), and the host-wide sum drifts once a session ends (stream staleness), so only same-window snapshots are comparable",
+ "runs": {
+  "F": {
+   "comparison_with_child_usage": [
+    {
+     "cacheCreation": {
+      "child_usage": 81252,
+      "exact": false,
+      "exporter": 13274.0,
+      "ratio": 0.163
+     },
+     "cacheRead": {
+      "child_usage": 337137,
+      "exact": false,
+      "exporter": 21588.0,
+      "ratio": 0.064
+     },
+     "child_usage_present": true,
+     "exporter_subagent_present": true,
+     "input": {
+      "child_usage": 16,
+      "exact": false,
+      "exporter": 2.0,
+      "ratio": 0.125
+     },
+     "model_family": "opus",
+     "output": {
+      "child_usage": 32405,
+      "exact": false,
+      "exporter": 3128.0,
+      "ratio": 0.097
+     },
+     "source": "client_scope"
+    },
+    {
+     "cacheCreation": {
+      "child_usage": 38076,
+      "exact": true,
+      "exporter": 38076.0,
+      "ratio": 1.0
+     },
+     "cacheRead": {
+      "child_usage": 76105,
+      "exact": true,
+      "exporter": 76105.0,
+      "ratio": 1.0
+     },
+     "child_usage_present": true,
+     "exporter_subagent_present": true,
+     "input": {
+      "child_usage": 14,
+      "exact": true,
+      "exporter": 14.0,
+      "ratio": 1.0
+     },
+     "model_family": "sonnet",
+     "output": {
+      "child_usage": 9261,
+      "exact": true,
+      "exporter": 9261.0,
+      "ratio": 1.0
+     },
+     "source": "client_scope"
+    }
+   ],
+   "prometheus": {
+    "client_scope": "portable-qualification-attempt-6-default-review-changes",
+    "concurrent_native_runs_by_this_coordinator": "none: this coordinator ran no other native workflow during the window",
+    "method": "scoped: metrics of this run carry client_scope=<run scope> from OTEL_RESOURCE_ATTRIBUTES (kept by the collector), read at t1 after the export wait; before-query at t0 must be empty. Secondary: host-wide per-series delta of the cumulative counter between t0 and t1",
+    "run_seconds": 594.8,
+    "scoped_after": [
+     {
+      "delta": 42115.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 175316.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 102.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 12447.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 13274.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 21588.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 2.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 3128.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 38076.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 76105.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 14.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 9261.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     }
+    ],
+    "scoped_before_rows": 0,
+    "scoped_subagent_by_model": [
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheCreation"
+      ],
+      13274.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheRead"
+      ],
+      21588.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "input"
+      ],
+      2.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "output"
+      ],
+      3128.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "cacheCreation"
+      ],
+      38076.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "cacheRead"
+      ],
+      76105.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "input"
+      ],
+      14.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "output"
+      ],
+      9261.0
+     ]
+    ],
+    "snapshot_after_utc": "2026-09-22T01:47:05+00:00",
+    "snapshot_before_utc": "2026-09-22T01:36:26+00:00",
+    "subagent_delta_by_model": [
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheCreation"
+      ],
+      13274.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheRead"
+      ],
+      21588.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "input"
+      ],
+      2.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "output"
+      ],
+      3128.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "cacheCreation"
+      ],
+      38076.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "cacheRead"
+      ],
+      76105.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "input"
+      ],
+      14.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "output"
+      ],
+      9261.0
+     ]
+    ],
+    "wait_seconds": 45.0,
+    "window_delta": [
+     {
+      "delta": 95465.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 1798734.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 416.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 35176.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 6320.0,
+      "metric": {
+       "model": "claude-opus-5",
+       "query_source": "main",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 44664.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 176675.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 8.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 4224.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 108978.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 276272.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 14.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 5296.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     }
+    ]
+   }
+  },
+  "F-attempt-3": {
+   "comparison_with_child_usage": [
+    {
+     "cacheCreation": {
+      "child_usage": 55953,
+      "exact": false,
+      "exporter": 3156.0,
+      "ratio": 0.056
+     },
+     "cacheRead": {
+      "child_usage": 243983,
+      "exact": false,
+      "exporter": 4990.0,
+      "ratio": 0.02
+     },
+     "child_usage_present": true,
+     "exporter_subagent_present": true,
+     "input": {
+      "child_usage": 16,
+      "exact": false,
+      "exporter": null,
+      "ratio": null
+     },
+     "model_family": "opus",
+     "output": {
+      "child_usage": 20497,
+      "exact": false,
+      "exporter": 3464.0,
+      "ratio": 0.169
+     },
+     "source": "host-wide delta"
+    },
+    {
+     "cacheCreation": {
+      "child_usage": 18515,
+      "exact": false,
+      "exporter": null,
+      "ratio": null
+     },
+     "cacheRead": {
+      "child_usage": 65416,
+      "exact": false,
+      "exporter": 31600.0,
+      "ratio": 0.483
+     },
+     "child_usage_present": true,
+     "exporter_subagent_present": true,
+     "input": {
+      "child_usage": 16,
+      "exact": false,
+      "exporter": 4.0,
+      "ratio": 0.25
+     },
+     "model_family": "sonnet",
+     "output": {
+      "child_usage": 6572,
+      "exact": false,
+      "exporter": 4766.0,
+      "ratio": 0.725
+     },
+     "source": "host-wide delta"
+    }
+   ],
+   "prometheus": {
+    "concurrent_native_runs_by_this_coordinator": "none: this coordinator ran no other native workflow during the window (other sessions on the host may have)",
+    "method": "instant snapshots of the cumulative counter at t0 (before launch) and t1 (after the export wait), per-series delta; host-wide, not session-scoped",
+    "run_seconds": 679.3,
+    "snapshot_after_utc": "2026-09-22T00:59:32+00:00",
+    "snapshot_before_utc": "2026-09-22T00:47:27+00:00",
+    "subagent_delta_by_model": [
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheCreation"
+      ],
+      3156.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheRead"
+      ],
+      4990.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "output"
+      ],
+      3464.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "cacheRead"
+      ],
+      31600.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "input"
+      ],
+      4.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "output"
+      ],
+      4766.0
+     ]
+    ],
+    "wait_seconds": 45.0,
+    "window_delta": [
+     {
+      "delta": 174.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "auxiliary",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 665511.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "auxiliary",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 506.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "auxiliary",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 15.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "auxiliary",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 7996.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 46286.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 32.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 6127.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 3156.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 4990.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 3464.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 31600.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 4.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 4766.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     }
+    ]
+   }
+  },
+  "F-attempt-5": {
+   "comparison_with_child_usage": [
+    {
+     "cacheCreation": {
+      "child_usage": 46012,
+      "exact": false,
+      "exporter": 4794.0,
+      "ratio": 0.104
+     },
+     "cacheRead": {
+      "child_usage": 127001,
+      "exact": false,
+      "exporter": 34075.0,
+      "ratio": 0.268
+     },
+     "child_usage_present": true,
+     "exporter_subagent_present": true,
+     "input": {
+      "child_usage": 10,
+      "exact": false,
+      "exporter": 2.0,
+      "ratio": 0.2
+     },
+     "model_family": "opus",
+     "output": {
+      "child_usage": 10928,
+      "exact": false,
+      "exporter": 4661.0,
+      "ratio": 0.427
+     },
+     "source": "client_scope"
+    },
+    {
+     "cacheCreation": {
+      "child_usage": 26077,
+      "exact": true,
+      "exporter": 26077.0,
+      "ratio": 1.0
+     },
+     "cacheRead": {
+      "child_usage": 66722,
+      "exact": true,
+      "exporter": 66722.0,
+      "ratio": 1.0
+     },
+     "child_usage_present": true,
+     "exporter_subagent_present": true,
+     "input": {
+      "child_usage": 16,
+      "exact": true,
+      "exporter": 16.0,
+      "ratio": 1.0
+     },
+     "model_family": "sonnet",
+     "output": {
+      "child_usage": 6067,
+      "exact": true,
+      "exporter": 6067.0,
+      "ratio": 1.0
+     },
+     "source": "client_scope"
+    }
+   ],
+   "prometheus": {
+    "client_scope": "portable-qualification-attempt-5-default-review-changes",
+    "concurrent_native_runs_by_this_coordinator": "none: this coordinator ran no other native workflow during the window",
+    "method": "scoped: metrics of this run carry client_scope=<run scope> from OTEL_RESOURCE_ATTRIBUTES (kept by the collector), read at t1 after the export wait; before-query at t0 must be empty. Secondary: host-wide per-series delta of the cumulative counter between t0 and t1",
+    "run_seconds": 316.2,
+    "scoped_after": [
+     {
+      "delta": 38967.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 131742.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 70.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 8158.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 4794.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 34075.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 2.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 4661.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 26077.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 66722.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 16.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 6067.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     }
+    ],
+    "scoped_before_rows": 0,
+    "scoped_subagent_by_model": [
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheCreation"
+      ],
+      4794.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheRead"
+      ],
+      34075.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "input"
+      ],
+      2.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "output"
+      ],
+      4661.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "cacheCreation"
+      ],
+      26077.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "cacheRead"
+      ],
+      66722.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "input"
+      ],
+      16.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "output"
+      ],
+      6067.0
+     ]
+    ],
+    "snapshot_after_utc": "2026-09-22T01:32:51+00:00",
+    "snapshot_before_utc": "2026-09-22T01:26:50+00:00",
+    "subagent_delta_by_model": [
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheCreation"
+      ],
+      4794.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheRead"
+      ],
+      34075.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "input"
+      ],
+      2.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "output"
+      ],
+      4661.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "cacheCreation"
+      ],
+      26077.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "cacheRead"
+      ],
+      66722.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "input"
+      ],
+      16.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "output"
+      ],
+      6067.0
+     ]
+    ],
+    "wait_seconds": 45.0,
+    "window_delta": [
+     {
+      "delta": 38967.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 131742.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 70.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 8158.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 4794.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 34075.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 2.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 4661.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 26077.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 66722.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 16.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 6067.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     }
+    ]
+   }
+  },
+  "P-pinned": {
+   "comparison_with_child_usage": [
+    {
+     "cacheCreation": {
+      "child_usage": null,
+      "exact": false,
+      "exporter": 109002.0,
+      "ratio": null
+     },
+     "cacheRead": {
+      "child_usage": null,
+      "exact": false,
+      "exporter": 597205.0,
+      "ratio": null
+     },
+     "child_usage_present": false,
+     "exporter_subagent_present": true,
+     "input": {
+      "child_usage": null,
+      "exact": false,
+      "exporter": 24.0,
+      "ratio": null
+     },
+     "model_family": "opus",
+     "output": {
+      "child_usage": null,
+      "exact": false,
+      "exporter": 35319.0,
+      "ratio": null
+     },
+     "source": "host-wide delta"
+    },
+    {
+     "cacheCreation": {
+      "child_usage": null,
+      "exact": false,
+      "exporter": 149932.0,
+      "ratio": null
+     },
+     "cacheRead": {
+      "child_usage": null,
+      "exact": false,
+      "exporter": 1886238.0,
+      "ratio": null
+     },
+     "child_usage_present": false,
+     "exporter_subagent_present": true,
+     "input": {
+      "child_usage": null,
+      "exact": false,
+      "exporter": 72.0,
+      "ratio": null
+     },
+     "model_family": "sonnet",
+     "output": {
+      "child_usage": null,
+      "exact": false,
+      "exporter": 23762.0,
+      "ratio": null
+     },
+     "source": "host-wide delta"
+    }
+   ],
+   "prometheus": {
+    "client_scope": "portable-qualification-attempt-6-project-only-pinned-review-changes",
+    "concurrent_native_runs_by_this_coordinator": "none: this coordinator ran no other native workflow during the window",
+    "method": "scoped: metrics of this run carry client_scope=<run scope> from OTEL_RESOURCE_ATTRIBUTES (kept by the collector), read at t1 after the export wait; before-query at t0 must be empty. Secondary: host-wide per-series delta of the cumulative counter between t0 and t1",
+    "run_seconds": 129.3,
+    "scoped_after": [
+     {
+      "delta": 37412.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 245951.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 226.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 11974.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "output"
+      }
+     }
+    ],
+    "scoped_before_rows": 0,
+    "scoped_subagent_by_model": [],
+    "snapshot_after_utc": "2026-09-22T01:50:00+00:00",
+    "snapshot_before_utc": "2026-09-22T01:47:05+00:00",
+    "subagent_delta_by_model": [
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheCreation"
+      ],
+      109002.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheRead"
+      ],
+      597205.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "input"
+      ],
+      24.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "output"
+      ],
+      35319.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "cacheCreation"
+      ],
+      149932.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "cacheRead"
+      ],
+      1886238.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "input"
+      ],
+      72.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "output"
+      ],
+      23762.0
+     ]
+    ],
+    "wait_seconds": 45.0,
+    "window_delta": [
+     {
+      "delta": 37412.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 245951.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 226.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 11974.0,
+      "metric": {
+       "model": "claude-fable-5-1",
+       "query_source": "main",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 109002.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 597205.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 24.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 35319.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 149932.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 1886238.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 72.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 23762.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     }
+    ]
+   }
+  },
+  "readiness": {
+   "comparison_with_child_usage": [
+    {
+     "cacheCreation": {
+      "child_usage": 41469,
+      "exact": false,
+      "exporter": 37573.0,
+      "ratio": 0.906
+     },
+     "cacheRead": {
+      "child_usage": 379439,
+      "exact": false,
+      "exporter": 363406.0,
+      "ratio": 0.958
+     },
+     "child_usage_present": true,
+     "exporter_subagent_present": true,
+     "input": {
+      "child_usage": 26,
+      "exact": false,
+      "exporter": 24.0,
+      "ratio": 0.923
+     },
+     "model_family": "opus",
+     "output": {
+      "child_usage": 10099,
+      "exact": false,
+      "exporter": 6022.0,
+      "ratio": 0.596
+     },
+     "source": "host-wide delta"
+    },
+    {
+     "cacheCreation": {
+      "child_usage": 19945,
+      "exact": false,
+      "exporter": 1430.0,
+      "ratio": 0.072
+     },
+     "cacheRead": {
+      "child_usage": 44426,
+      "exact": false,
+      "exporter": null,
+      "ratio": null
+     },
+     "child_usage_present": true,
+     "exporter_subagent_present": true,
+     "input": {
+      "child_usage": 14,
+      "exact": false,
+      "exporter": null,
+      "ratio": null
+     },
+     "model_family": "sonnet",
+     "output": {
+      "child_usage": 2018,
+      "exact": false,
+      "exporter": null,
+      "ratio": null
+     },
+     "source": "host-wide delta"
+    }
+   ],
+   "prometheus": {
+    "concurrent_native_runs_by_this_coordinator": "none: this coordinator ran no other native workflow during the window (other sessions on the host may have)",
+    "method": "instant snapshots of the cumulative counter at t0 (before launch) and t1 (after the export wait), per-series delta; host-wide, not session-scoped",
+    "run_seconds": 433.2,
+    "snapshot_after_utc": "2026-09-22T01:08:18+00:00",
+    "snapshot_before_utc": "2026-09-22T01:00:19+00:00",
+    "subagent_delta_by_model": [
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheCreation"
+      ],
+      37573.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "cacheRead"
+      ],
+      363406.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "input"
+      ],
+      24.0
+     ],
+     [
+      [
+       "claude-opus-5[1m]",
+       "output"
+      ],
+      6022.0
+     ],
+     [
+      [
+       "claude-sonnet-5",
+       "cacheCreation"
+      ],
+      1430.0
+     ]
+    ],
+    "wait_seconds": 45.0,
+    "window_delta": [
+     {
+      "delta": 37573.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     },
+     {
+      "delta": 363406.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "cacheRead"
+      }
+     },
+     {
+      "delta": 24.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "input"
+      }
+     },
+     {
+      "delta": 6022.0,
+      "metric": {
+       "model": "claude-opus-5[1m]",
+       "query_source": "subagent",
+       "type": "output"
+      }
+     },
+     {
+      "delta": 1430.0,
+      "metric": {
+       "model": "claude-sonnet-5",
+       "query_source": "subagent",
+       "type": "cacheCreation"
+      }
+     }
+    ]
+   }
+  }
+ },
+ "why_not_exact": [
+  "exporter type names (input, output, cacheRead, cacheCreation) are not the provider usage keys",
+  "export and scrape timing",
+  "streaming partials are counted per response by the exporter and once per message id by child-usage.mjs",
+  "auxiliary calls are exported under their own query_source",
+  "other sessions on the host may add to the window"
+ ]
+}

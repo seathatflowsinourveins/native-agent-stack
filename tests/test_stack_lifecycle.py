@@ -64,7 +64,10 @@ class StackLifecycleTests(unittest.TestCase):
             self.assertIn(baseline["category"], {"guidance", "direct_context", "supporting_workflow"})
             self.assertEqual(baseline["retained_artifact_comparisons"], len(row["artifact_baselines"]))
             self.assertEqual(baseline["matched_lifetime_provider_baseline"], "not_established")
-        self.assertEqual(self.rows["claude-hud"]["lifecycle_stages"]["use"]["status"], "partial_acceptance")
+        hud = self.rows["claude-hud"]["lifecycle_stages"]
+        self.assertEqual(hud["use"]["status"], "accepted_within_scope")
+        self.assertIn("evidence/receipts/foundation-closure-20260921.json", hud["use"]["evidence_refs"])
+        self.assertEqual(hud["recovery"]["status"], "not_established")
         self.assertEqual(self.rows["codex-for-claude"]["lifecycle_stages"]["use"]["status"], "partial_acceptance")
         self.assertEqual(self.rows["postgresql"]["lifecycle_stages"]["recovery"]["status"], "not_established")
         self.assertIn("macOS", self.rows["apple-container"]["installation_assessment"])

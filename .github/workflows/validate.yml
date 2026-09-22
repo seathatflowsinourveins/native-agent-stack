@@ -49,6 +49,10 @@ jobs:
         run: python3 scripts/validate_catalogs.py
       - name: Validate general foundation capability claims
         run: python3 scripts/validate_foundation.py --root . --json
+      - name: Validate landscape choices and alternative evidence
+        run: python3 scripts/landscape.py --root .
+      - name: Reproduce independent source-report accounting
+        run: python3 blueprints/blind-catalog-convergence/audit_reports.py --check
       - name: Validate declared convergence evidence and scope
         run: >-
           python3 scripts/validate_convergence.py
@@ -57,3 +61,5 @@ jobs:
         run: python3 scripts/build_ecosystem.py --check
       - name: Test validation failure modes
         run: python3 -m unittest
+      - name: Test semantic evidence contract boundaries
+        run: node --test blueprints/native-skill-practice/test-contract.cjs

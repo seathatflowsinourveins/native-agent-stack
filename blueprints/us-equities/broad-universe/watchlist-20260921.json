@@ -1,0 +1,4320 @@
+{
+  "counts": {
+    "eligibility_unknown": 611,
+    "eligible": 1795,
+    "missing": 2,
+    "previous_session": 164,
+    "scanned": 13171,
+    "stale_bar": 444,
+    "today_session": 12561
+  },
+  "history": {
+    "history_last_session": "2026-09-18",
+    "history_not_adjacent": false,
+    "history_path": "daily.parquet",
+    "history_used": true,
+    "previous_regular_session": "2026-09-18"
+  },
+  "limitations": [
+    "Signal flags are research_flag_not_prediction, never a prediction of return.",
+    "Provider screens are bounded_top_n_provider_screen_includes_sub_5_names_not_market_coverage.",
+    "Daily bars may still be revised by late prints after the close.",
+    "This artifact carries no quotes, prices, headline text or full news URLs (only url host and a sha256 of the full url); see the private artifact for full rows."
+  ],
+  "lists": {
+    "signal_flagged": [
+      "ACA",
+      "ACMR",
+      "ADI",
+      "AKAM",
+      "ALAB",
+      "AMBQ",
+      "AMD",
+      "AMRX",
+      "AN",
+      "ASX",
+      "AXTI",
+      "BAP",
+      "BMO",
+      "BNS",
+      "CLSK",
+      "COHR",
+      "CPA",
+      "FIVN",
+      "FLNC",
+      "FORM",
+      "GENI",
+      "GRAL",
+      "GSAT",
+      "HUT",
+      "INTC",
+      "KEYS",
+      "LUV",
+      "MANE",
+      "META",
+      "MRVL",
+      "MSTR",
+      "MU",
+      "NEOG",
+      "NUAI",
+      "OLLI",
+      "PENG",
+      "PI",
+      "QUBT",
+      "RIOT",
+      "RMBS",
+      "SATA",
+      "SBS",
+      "SG",
+      "SHLS",
+      "SLF",
+      "SNX",
+      "TBBB",
+      "TD",
+      "TSM",
+      "TWLO",
+      "VICR",
+      "VRNS",
+      "VRSN",
+      "WBD",
+      "XP"
+    ],
+    "top_50_dollar_volume": [
+      "NVDA",
+      "META",
+      "MU",
+      "AMD",
+      "INTC",
+      "SNDK",
+      "MSFT",
+      "TSLA",
+      "SPCX",
+      "AAPL",
+      "AMZN",
+      "GOOGL",
+      "AVGO",
+      "WBD",
+      "MSTR",
+      "GOOG",
+      "MRVL",
+      "LITE",
+      "DELL",
+      "TSM",
+      "AMAT",
+      "PLTR",
+      "BE",
+      "MRNA",
+      "QCOM",
+      "HOOD",
+      "LRCX",
+      "WDC",
+      "CRWV",
+      "CRWD",
+      "ORCL",
+      "COIN",
+      "LLY",
+      "V",
+      "WMT",
+      "CRM",
+      "XOM",
+      "GEV",
+      "COHR",
+      "BRK.B",
+      "CSCO",
+      "JPM",
+      "UNH",
+      "TXN",
+      "ALAB",
+      "PANW",
+      "APP",
+      "SMCI",
+      "NVO",
+      "COST"
+    ],
+    "top_50_gainers": [
+      "GRAL",
+      "NUAI",
+      "FSLY",
+      "YSS",
+      "AXTI",
+      "FIVN",
+      "APPS",
+      "LUNR",
+      "ALAB",
+      "AKAM",
+      "DOCN",
+      "MRNA",
+      "INTC",
+      "META",
+      "WBD",
+      "RMBS",
+      "HELP",
+      "NN",
+      "AMD",
+      "MSTR",
+      "QCOM",
+      "SATL",
+      "USAR",
+      "P",
+      "TWLO",
+      "HHH",
+      "FLY",
+      "OUST",
+      "NNE",
+      "BMNR",
+      "NET",
+      "ATEX",
+      "AMBQ",
+      "WOLF",
+      "RKLB",
+      "VYX",
+      "BAND",
+      "RDW",
+      "AMRX",
+      "RNG",
+      "GDDY",
+      "QXO",
+      "APP",
+      "RBLX",
+      "LION",
+      "INOD",
+      "BB",
+      "SBET",
+      "LEU",
+      "DDOG"
+    ],
+    "top_50_losers": [
+      "CXW",
+      "NVO",
+      "RSI",
+      "MHK",
+      "BBT",
+      "PBF",
+      "SM",
+      "DINO",
+      "SMMT",
+      "MPC",
+      "INVX",
+      "NOG",
+      "PLNT",
+      "VLO",
+      "DK",
+      "MTDR",
+      "SUNC",
+      "GEO",
+      "HMY",
+      "CRGY",
+      "SUN",
+      "RDNT",
+      "UPS",
+      "FPS",
+      "KGS",
+      "HPQ",
+      "EC",
+      "PSX",
+      "SMTC",
+      "PRCT",
+      "HYMC",
+      "ADT",
+      "PURR",
+      "IOT",
+      "CHTR",
+      "MEOH",
+      "CPB",
+      "MGY",
+      "GOLD",
+      "BFAM",
+      "AAP",
+      "DHT",
+      "OVV",
+      "CHRD",
+      "NUTX",
+      "UTI",
+      "UNP",
+      "PR",
+      "CF",
+      "TALO"
+    ]
+  },
+  "news": [
+    {
+      "created_at": "2026-09-21T20:37:14Z",
+      "headline_sha256": "23bc1b1c8b320ccdca95b6b29b0da160960824333fcda0bd4f3e85679a11eb25",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "DOCN"
+      ],
+      "updated_at": "2026-09-21T20:37:14Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "5cb2b7aa20073e8ac428b2905c73eed0fe65930a9aefd3c2dc6f1d6a678e9215"
+    },
+    {
+      "created_at": "2026-09-21T20:02:53Z",
+      "headline_sha256": "ef27bc4bb5f99c519b9fb0cb7bad4d122fa21d3f536d08658a11bc73680b4e3e",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "AMD",
+        "INTC",
+        "META"
+      ],
+      "updated_at": "2026-09-21T20:02:53Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "e88a22240310a792e12452dbdd13c8d0c48812e099b85808a466498ee12ac9bb"
+    },
+    {
+      "created_at": "2026-09-21T18:42:13Z",
+      "headline_sha256": "9cd3c77221a30a985476d2a3963ff5b6ba6c74926b378de2d0af4d22fc33ed29",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "META"
+      ],
+      "updated_at": "2026-09-21T19:55:31Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "b0cd3dbd1f81be70e9b213c775f32a1c8ea457a0c4cbfc50901a3f4fab45dbcd"
+    },
+    {
+      "created_at": "2026-09-21T19:09:47Z",
+      "headline_sha256": "1e8bf84ad0c12d2c4a576448b75c2f048b85d6043029f5f43e4a935a3858cdef",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "META"
+      ],
+      "updated_at": "2026-09-21T19:09:47Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "32f35094dacadafea6951410b8d5c2f015c8146c7b8df311d9a1b4115936a20e"
+    },
+    {
+      "created_at": "2026-09-21T18:37:01Z",
+      "headline_sha256": "19e1daaa12023ce89ee65fa9ec07af17e5419b38aeab15c2eeda03aa0c8e1f65",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "WBD"
+      ],
+      "updated_at": "2026-09-21T18:37:01Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "ef1ee53f20529ffd40f10b5dd453cf10a34b620e0983ea4dd9a6b07286f0439a"
+    },
+    {
+      "created_at": "2026-09-21T18:32:46Z",
+      "headline_sha256": "a879f051f8fc95cb33992b65af334260cd426308c9f62755a7d064062bfd5436",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "INTC"
+      ],
+      "updated_at": "2026-09-21T18:32:46Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "51b694e33cdd6bc64533ebec58288445c8b091d0751798edb29655e5029b3a95"
+    },
+    {
+      "created_at": "2026-09-21T18:04:53Z",
+      "headline_sha256": "b58444ac50512ae68ddb6213a11a3f1c0ae5b101cbd85e90bd17881dcbf1461b",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "DOCN"
+      ],
+      "updated_at": "2026-09-21T18:04:53Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "1c341574bbab015c4ad5032b7757f065e4e2ffd83ff974d23849ce861c9ab159"
+    },
+    {
+      "created_at": "2026-09-21T17:51:25Z",
+      "headline_sha256": "9453bbb229db9ca0ec3b56ec1f9b7b2392295e904ea48be475f0cd8d122dce5a",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "AKAM",
+        "AMD",
+        "DOCN",
+        "INTC",
+        "META",
+        "RMBS",
+        "WBD"
+      ],
+      "updated_at": "2026-09-21T17:51:26Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "2cdf1e5730aaa31ed422e9038043799c574872ae57b46cdf24f41474aeb32420"
+    },
+    {
+      "created_at": "2026-09-21T17:35:17Z",
+      "headline_sha256": "2c8417b1ebd74e5d109defc93003a699b066470b65f592345aefaa766a51500c",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "MRNA"
+      ],
+      "updated_at": "2026-09-21T17:35:17Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "3a19b55a710b9863736ec19a891c523851a6eac0d1f727dfed9b6578eca32ddd"
+    },
+    {
+      "created_at": "2026-09-21T17:35:17Z",
+      "headline_sha256": "c167f63c2b326287b84813b1b5ff64523d191f9ccca9d462374c1856ed36ef07",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "AXTI",
+        "INTC"
+      ],
+      "updated_at": "2026-09-21T17:35:17Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "5c9662533c65636096cff9f54b105819004ce68488b3edff963fb906c71fe5d7"
+    },
+    {
+      "created_at": "2026-09-21T17:34:40Z",
+      "headline_sha256": "5a8a9e434e015f3fd2082ada397c38547020fbf604ef417706163639b8d1bf93",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "MRNA"
+      ],
+      "updated_at": "2026-09-21T17:34:40Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "3d03107e9cc50537522a72018578b9feb6f86916f1bce1a129e7b78bf6082b97"
+    },
+    {
+      "created_at": "2026-09-21T17:28:54Z",
+      "headline_sha256": "259f5d8af8748564a4bb1d0a428f8e50a8b96773ece739a022d0cf97c01022fa",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "MSTR"
+      ],
+      "updated_at": "2026-09-21T17:28:54Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "e1a8bd9e730c9e56e4bdeea21416bb7278367dbb30d093036488595481fe36df"
+    },
+    {
+      "created_at": "2026-09-21T17:17:39Z",
+      "headline_sha256": "e494679db68f9064505c21961e01b5784eb7a1160d62684876f752709352a730",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "GRAL"
+      ],
+      "updated_at": "2026-09-21T17:17:39Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "834c5a4ad470e3bf83effcaf1d0f2226936e24120969ba56c8a47697ca3a5243"
+    },
+    {
+      "created_at": "2026-09-21T17:06:17Z",
+      "headline_sha256": "27c2884733aed554fea70ff1bbc42acae9ec788f5f6ba1bc0904d4f7ac33cc81",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "GRAL"
+      ],
+      "updated_at": "2026-09-21T17:06:17Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "0b8ee492878a1b8f1b8af09bda9b824d4e4452b5e00d0b4d4644753a015b6a71"
+    },
+    {
+      "created_at": "2026-09-21T16:34:16Z",
+      "headline_sha256": "82d091bd21e837858890242dcf394651df97d47565b37117f68e90de77b9a62c",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "AMD"
+      ],
+      "updated_at": "2026-09-21T16:34:16Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "61ec85ac64373a0709c66cc9691e3df59d9f70065f04c65d998bb4b4bd130a30"
+    },
+    {
+      "created_at": "2026-09-21T16:30:58Z",
+      "headline_sha256": "07c2f779ace1f7d9a3bf88921063587a00c1de52745ffb8f22703735b0e39180",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "WBD"
+      ],
+      "updated_at": "2026-09-21T16:30:58Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "ea2101c847c059825129297eaeff5c44bb47f57c4c0ed36f5723851bc097b27c"
+    },
+    {
+      "created_at": "2026-09-21T16:04:39Z",
+      "headline_sha256": "34102e4ed999c72164e6640a83e2ddf66c2bc455974f0ea8f470de218f1e7d16",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "INTC"
+      ],
+      "updated_at": "2026-09-21T16:04:39Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "33cc514f7219c1df637daecdebf039d756e64e200cd6d3e4121f8d73d28819dd"
+    },
+    {
+      "created_at": "2026-09-21T15:54:42Z",
+      "headline_sha256": "a366349c676db5bee561c6062145da00abba0c7dfbd7ca7dfd26eb0c6750b28a",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "NUAI"
+      ],
+      "updated_at": "2026-09-21T15:55:45Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "2d925aa38cab63a2f9d8069272e3998f7f9c0051bdf87976e07286f343d31d5a"
+    },
+    {
+      "created_at": "2026-09-21T15:49:01Z",
+      "headline_sha256": "ee1aacc76b428f407eeda9f6cf63a77701f2b279f1ed38ed30b8423c3bde0a64",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "META"
+      ],
+      "updated_at": "2026-09-21T15:49:01Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "52cdab02973197c25757b8383722b922f73591610eba75b75a5658513b11d8d0"
+    },
+    {
+      "created_at": "2026-09-21T15:44:26Z",
+      "headline_sha256": "daf5463dd339b82361dbff212dc59690151163ecc32bef7c007f42453a657615",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "META"
+      ],
+      "updated_at": "2026-09-21T15:44:26Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "ca1a82e33685de480597c5fa2950b6205b6f5cffb09a046d32e3c6f622042f05"
+    },
+    {
+      "created_at": "2026-09-21T15:33:57Z",
+      "headline_sha256": "d8d83077c72b6017cf55ae3a1b9a628046c904959730b34bda3498b0c28d8aac",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "AMD"
+      ],
+      "updated_at": "2026-09-21T15:33:57Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "3472bd14c72ea7ab9e36d7c3e1184d4721a5fd59c79cefe128c3dd8ad1a809e7"
+    },
+    {
+      "created_at": "2026-09-21T15:30:15Z",
+      "headline_sha256": "55deb4ebbd0381fcbd9048d4c019cb7db75ac24f8c9d21f4e539f48b299948f0",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "META"
+      ],
+      "updated_at": "2026-09-21T15:30:15Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "da15dfaa5153ee3218bc0924abda5e6ddf5a6ea1fadf00487948476b2f852427"
+    },
+    {
+      "created_at": "2026-09-21T15:21:46Z",
+      "headline_sha256": "3d86f76264021b58cf6d3bcc02d9d9b7c975f4ce57af82e1b6975bf1fc46df75",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "LUNR"
+      ],
+      "updated_at": "2026-09-21T15:21:46Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "b9a4576fb19a424aea1d02138c16b8bf781590340957607a5eac6fe067a24387"
+    },
+    {
+      "created_at": "2026-09-21T15:20:47Z",
+      "headline_sha256": "aa5a6a57ee15454958af4b228e591567a26ad0956df74dec487c563b22556a9d",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "MSTR"
+      ],
+      "updated_at": "2026-09-21T15:20:47Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "49c1c9f6e6bd987f5af82cd532f847693cc9affa790f2aea2e526faadc7b2490"
+    },
+    {
+      "created_at": "2026-09-21T14:58:06Z",
+      "headline_sha256": "af08f48caf038b638a4e397af08309a86e01110d444c59e388072218924c7e82",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "META"
+      ],
+      "updated_at": "2026-09-21T14:58:06Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "1d3eea3d259fbf3a34df53cda5c302d204336f748d0d228ca58fa8a68623ad8b"
+    },
+    {
+      "created_at": "2026-09-21T14:48:43Z",
+      "headline_sha256": "a2ebe1081db90cc6a40b78bf6ec1ec7797b87c42007706d92f67df43ddb771fe",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "MSTR"
+      ],
+      "updated_at": "2026-09-21T14:48:43Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "2989f53f044fe54cf09bcf6eab6f3deb5b77d2894f8e469313c3d72523cd1db1"
+    },
+    {
+      "created_at": "2026-09-21T14:33:08Z",
+      "headline_sha256": "6d16a8889754ec0612ecc6cc1f7baf142db613c2a3c3959bcad642476299c5ca",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "MSTR"
+      ],
+      "updated_at": "2026-09-21T14:33:08Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "d967d80746b1e6e8d1307c1a2787e89e08c3c6141a6723450cae31fe02f66125"
+    },
+    {
+      "created_at": "2026-09-21T14:09:14Z",
+      "headline_sha256": "4384ccf97007bceb8561b945f5c69053aedb1ea5f622b6638077ecd81fa25cda",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "AMD",
+        "AXTI",
+        "GRAL",
+        "INTC",
+        "META",
+        "MRNA",
+        "MSTR",
+        "NUAI"
+      ],
+      "updated_at": "2026-09-21T14:09:14Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "ca151d8a1c9d9c1b36930968ac402f19bbdccedd7c1f809425ed73a9d503b928"
+    },
+    {
+      "created_at": "2026-09-21T13:32:04Z",
+      "headline_sha256": "6c8c45397b7af0ae26ead3f5da0fbd28653938eb8700008fc0efd1a5d9d5ce08",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "MSTR"
+      ],
+      "updated_at": "2026-09-21T13:32:04Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "1bae2460b27702ced0077fd1dd88d6a1e5b04c582f09ec4b2f7fe4e528881c3f"
+    },
+    {
+      "created_at": "2026-09-21T12:45:42Z",
+      "headline_sha256": "9e343b06be1d5f3f8369a44d2a69b58c7f54a76c7ca285cbd01ec77452225b77",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "MSTR"
+      ],
+      "updated_at": "2026-09-21T12:45:42Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "6afa4c74220b87a3d1d0f936b5b491dd3550a1cd54b127bb4b20c13cc71943f1"
+    },
+    {
+      "created_at": "2026-09-21T10:02:21Z",
+      "headline_sha256": "c87a8baec565d0ce14a2dfb2930083df75ffc5cfc234a988f5e49117cbd3670b",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "META"
+      ],
+      "updated_at": "2026-09-21T12:29:40Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "07c904a264c85dcc291beded2c5ae729db23bfa8196b01ce7c9e62a332bcfdd6"
+    },
+    {
+      "created_at": "2026-09-21T12:26:51Z",
+      "headline_sha256": "842bd07b626a431f13a0b196fc038c08c1adb503f6cee84b91af7513936927e0",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "AMD"
+      ],
+      "updated_at": "2026-09-21T12:26:51Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "65dbedf560c91643c3d081a74c05f4d67637bb9e8e40a7486a91075da8ee945f"
+    },
+    {
+      "created_at": "2026-09-21T12:15:57Z",
+      "headline_sha256": "90399ea3903377abeb37c18f5aacbc4072a58714a75dd5ed605429136336bbb9",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "WBD"
+      ],
+      "updated_at": "2026-09-21T12:15:57Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "07e40fdaeeb2b109893fca597903f0522f4b8434dba98fb1a3004476b8d638d9"
+    },
+    {
+      "created_at": "2026-09-21T12:06:17Z",
+      "headline_sha256": "20d680f6a0a15466cabe14acb536b09c256ee6101e83c36d923ec24bc548c621",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "INTC"
+      ],
+      "updated_at": "2026-09-21T12:11:16Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "687e2e942198927c74be93c2e8ec609d29cf4c8a2613ba5b0d88b1831e67a002"
+    },
+    {
+      "created_at": "2026-09-21T09:22:29Z",
+      "headline_sha256": "5e8cc727b993a4644e2b82a81a153aae5e5f956b5b2e56c81ee87c663f3b9daa",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "WBD"
+      ],
+      "updated_at": "2026-09-21T11:02:37Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "f33326d883f08122f1f88dcc75ddcaa1154b31cd63fae3c63ecfd0bf6cfa9cb4"
+    },
+    {
+      "created_at": "2026-09-21T10:17:14Z",
+      "headline_sha256": "1c801da2a6aa08435fc17f60da3d01f75b29187c96b5985d9d3488d106afc6a4",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "META"
+      ],
+      "updated_at": "2026-09-21T10:17:14Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "afdbf500d82282f55ac9f8ccff41c4420377531f91cd38513cf4309f0f8b2529"
+    },
+    {
+      "created_at": "2026-09-21T07:28:43Z",
+      "headline_sha256": "b9204672b8b1e40257367c5452f83661b0773c7c56c0f479865fdbded0daec10",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "MSTR"
+      ],
+      "updated_at": "2026-09-21T07:28:43Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "845a26bed04024622013ae86c34a1e6e49b1b96ea3e4cc343f6ec891ca5f7281"
+    },
+    {
+      "created_at": "2026-09-21T06:47:25Z",
+      "headline_sha256": "ec2a723b25728ce98395b47fc8b402479613903cc04d3d1b7092cf71028d07fc",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "MSTR"
+      ],
+      "updated_at": "2026-09-21T06:47:25Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "1a6d5d8d9d979847f8991029df1628bf6117c702b01e47050c20eefdb22a719a"
+    },
+    {
+      "created_at": "2026-09-21T05:52:19Z",
+      "headline_sha256": "1df70758de91bae1b1adae4be0722c7b646e840506093bb3372e3350a1e5a933",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "MSTR"
+      ],
+      "updated_at": "2026-09-21T05:52:19Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "81f9bcda7b71bb3e3b5747b273275e0e7c03e013160ea3c03d5d9b5eb44ede03"
+    },
+    {
+      "created_at": "2026-09-21T02:02:54Z",
+      "headline_sha256": "76d68e9fa647e73c2d70ea4c2a45b91e91c608dd50b6a23f7d0fae1038e8477d",
+      "observed_at": "2026-09-21T23:48:17.796125Z",
+      "source": "benzinga",
+      "symbols": [
+        "MSTR"
+      ],
+      "updated_at": "2026-09-21T02:02:54Z",
+      "url_host": "www.benzinga.com",
+      "url_sha256": "22139b1477e77023a10115ecac05dacfd36bd850bd5de7f6dd4ef5214b80dc22"
+    }
+  ],
+  "news_window_status": "returned_provider_window",
+  "pinned": {
+    "AMD": {
+      "dollar_volume_rank_among_eligible": 4,
+      "eligible": true,
+      "observation_class": "today_session",
+      "pct_change_rank_among_eligible": 19,
+      "present_in_universe": true,
+      "symbol": "AMD"
+    },
+    "META": {
+      "dollar_volume_rank_among_eligible": 2,
+      "eligible": true,
+      "observation_class": "today_session",
+      "pct_change_rank_among_eligible": 14,
+      "present_in_universe": true,
+      "symbol": "META"
+    }
+  },
+  "provider_screens": {
+    "most_actives": {
+      "label": "bounded_top_n_provider_screen_includes_sub_5_names_not_market_coverage",
+      "symbols": [
+        "BTTC",
+        "WBD",
+        "GRML",
+        "INTC",
+        "GLND",
+        "NVDA",
+        "LOBO",
+        "ZEO",
+        "CYAB",
+        "VRME"
+      ]
+    },
+    "movers": {
+      "gainers_symbols": [
+        "GRML",
+        "GLNDW",
+        "GLND",
+        "BTTC",
+        "VEEE",
+        "CRMU",
+        "ILLRW",
+        "BNCWZ",
+        "CRMX",
+        "VRME"
+      ],
+      "label": "bounded_top_n_provider_screen_includes_sub_5_names_not_market_coverage",
+      "losers_symbols": [
+        "RIV.RT",
+        "ASGI.RTWI",
+        "DFSCW",
+        "PDYNW",
+        "VEEAW",
+        "KFIIR",
+        "NIVFW",
+        "MSAIW",
+        "SMX",
+        "NBRGR"
+      ]
+    }
+  },
+  "requests": {
+    "rate_headers_last": {
+      "x-ratelimit-limit": "10000",
+      "x-ratelimit-remaining": "9999",
+      "x-ratelimit-reset": "1790034497"
+    },
+    "request_cap": 2000,
+    "total_requests": 30
+  },
+  "run": {
+    "current_or_last_regular_session": "2026-09-21",
+    "next_close": "2026-09-22T20:00:00Z",
+    "next_open": "2026-09-22T13:30:00Z",
+    "previous_regular_session": "2026-09-18",
+    "run_time_et": "2026-09-21T19:48:09.237650-04:00",
+    "run_time_utc": "2026-09-21T23:48:09.237650Z",
+    "session_state": "after_hours"
+  },
+  "schema_version": 1,
+  "symbols": [
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1026,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.182301Z",
+      "pct_change_rank_among_eligible": 1755,
+      "percent_change": -3.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "AAP"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 10,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.182301Z",
+      "pct_change_rank_among_eligible": 676,
+      "percent_change": 0.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "AAPL"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1048,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.182301Z",
+      "pct_change_rank_among_eligible": 910,
+      "percent_change": 0.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "ACA"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 812,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.182301Z",
+      "pct_change_rank_among_eligible": 54,
+      "percent_change": 6.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S5_gap_and_hold"
+      ],
+      "stale_quote": false,
+      "symbol": "ACMR"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 65,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.182301Z",
+      "pct_change_rank_among_eligible": 392,
+      "percent_change": 1.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": null,
+      "symbol": "ADI"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 920,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.182301Z",
+      "pct_change_rank_among_eligible": 1764,
+      "percent_change": -4.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "ADT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 201,
+      "list_membership": [
+        "top_50_gainers",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.182301Z",
+      "pct_change_rank_among_eligible": 10,
+      "percent_change": 12.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "AKAM"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 45,
+      "list_membership": [
+        "top_50_gainers",
+        "top_50_dollar_volume",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.182301Z",
+      "pct_change_rank_among_eligible": 9,
+      "percent_change": 12.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "ALAB"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 21,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.182301Z",
+      "pct_change_rank_among_eligible": 117,
+      "percent_change": 4.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "AMAT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1203,
+      "list_membership": [
+        "top_50_gainers",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.182301Z",
+      "pct_change_rank_among_eligible": 33,
+      "percent_change": 8.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "AMBQ"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 4,
+      "list_membership": [
+        "top_50_gainers",
+        "top_50_dollar_volume",
+        "signal_flagged",
+        "pinned"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.182301Z",
+      "pct_change_rank_among_eligible": 19,
+      "percent_change": 9.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S1_momentum_breakout",
+        "S2_volume_shock_continuation",
+        "S5_gap_and_hold"
+      ],
+      "stale_quote": false,
+      "symbol": "AMD"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 794,
+      "list_membership": [
+        "top_50_gainers",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.229234Z",
+      "pct_change_rank_among_eligible": 39,
+      "percent_change": 7.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S2_volume_shock_continuation"
+      ],
+      "stale_quote": false,
+      "symbol": "AMRX"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 11,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.229234Z",
+      "pct_change_rank_among_eligible": 412,
+      "percent_change": 1.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "AMZN"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 855,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.229234Z",
+      "pct_change_rank_among_eligible": 899,
+      "percent_change": 0.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S3_oversold_reversal"
+      ],
+      "stale_quote": false,
+      "symbol": "AN"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 47,
+      "list_membership": [
+        "top_50_gainers",
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.229234Z",
+      "pct_change_rank_among_eligible": 43,
+      "percent_change": 7.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "APP"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1392,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.229234Z",
+      "pct_change_rank_among_eligible": 7,
+      "percent_change": 13.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "APPS"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 382,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.229234Z",
+      "pct_change_rank_among_eligible": 87,
+      "percent_change": 5.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "ASX"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1446,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.229234Z",
+      "pct_change_rank_among_eligible": 32,
+      "percent_change": 8.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "ATEX"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 13,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.229234Z",
+      "pct_change_rank_among_eligible": 497,
+      "percent_change": 1.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "AVGO"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 103,
+      "list_membership": [
+        "top_50_gainers",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.229234Z",
+      "pct_change_rank_among_eligible": 5,
+      "percent_change": 14.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout",
+        "S5_gap_and_hold"
+      ],
+      "stale_quote": false,
+      "symbol": "AXTI"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1455,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.268894Z",
+      "pct_change_rank_among_eligible": 37,
+      "percent_change": 8.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "BAND"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1047,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.268894Z",
+      "pct_change_rank_among_eligible": 358,
+      "percent_change": 2.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "BAP"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 771,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.268894Z",
+      "pct_change_rank_among_eligible": 47,
+      "percent_change": 6.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "BB"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1040,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.268894Z",
+      "pct_change_rank_among_eligible": 1791,
+      "percent_change": -6.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "BBT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 23,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.268894Z",
+      "pct_change_rank_among_eligible": 254,
+      "percent_change": 2.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "BE"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1145,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.268894Z",
+      "pct_change_rank_among_eligible": 1756,
+      "percent_change": -3.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "BFAM"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 73,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.268894Z",
+      "pct_change_rank_among_eligible": 30,
+      "percent_change": 8.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "BMNR"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 344,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.268894Z",
+      "pct_change_rank_among_eligible": 475,
+      "percent_change": 1.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "BMO"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 935,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.268894Z",
+      "pct_change_rank_among_eligible": 515,
+      "percent_change": 1.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "BNS"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 40,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.307954Z",
+      "pct_change_rank_among_eligible": 1551,
+      "percent_change": -1.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "BRK.B"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 281,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.307954Z",
+      "pct_change_rank_among_eligible": 1747,
+      "percent_change": -3.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "CF"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 849,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 1752,
+      "percent_change": -3.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "CHRD"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 349,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 1761,
+      "percent_change": -3.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "CHTR"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 332,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 381,
+      "percent_change": 2.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "CLSK"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 39,
+      "list_membership": [
+        "top_50_dollar_volume",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 529,
+      "percent_change": 1.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "COHR"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 32,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 169,
+      "percent_change": 3.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "COIN"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 50,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 858,
+      "percent_change": 0.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "COST"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1112,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 131,
+      "percent_change": 4.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "CPA"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 577,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 1759,
+      "percent_change": -3.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "CPB"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1083,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 1776,
+      "percent_change": -4.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "CRGY"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 36,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 1305,
+      "percent_change": -0.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "CRM"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 30,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 94,
+      "percent_change": 4.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "CRWD"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 29,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 88,
+      "percent_change": 5.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "CRWV"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 41,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.358471Z",
+      "pct_change_rank_among_eligible": 432,
+      "percent_change": 1.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "CSCO"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1137,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.398644Z",
+      "pct_change_rank_among_eligible": 1795,
+      "percent_change": -8.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "CXW"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 144,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.398644Z",
+      "pct_change_rank_among_eligible": 50,
+      "percent_change": 6.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "DDOG"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 19,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.398644Z",
+      "pct_change_rank_among_eligible": 535,
+      "percent_change": 1.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "DELL"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 890,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.398644Z",
+      "pct_change_rank_among_eligible": 1754,
+      "percent_change": -3.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "DHT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 314,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.398644Z",
+      "pct_change_rank_among_eligible": 1788,
+      "percent_change": -5.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "DINO"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 756,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.398644Z",
+      "pct_change_rank_among_eligible": 1781,
+      "percent_change": -4.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "DK"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 155,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.398644Z",
+      "pct_change_rank_among_eligible": 11,
+      "percent_change": 12.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "DOCN"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1507,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.452201Z",
+      "pct_change_rank_among_eligible": 1769,
+      "percent_change": -4.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "EC"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 673,
+      "list_membership": [
+        "top_50_gainers",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.505664Z",
+      "pct_change_rank_among_eligible": 6,
+      "percent_change": 14.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S1_momentum_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "FIVN"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 999,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.505664Z",
+      "pct_change_rank_among_eligible": 641,
+      "percent_change": 1.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S3_oversold_reversal"
+      ],
+      "stale_quote": false,
+      "symbol": "FLNC"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1138,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.505664Z",
+      "pct_change_rank_among_eligible": 27,
+      "percent_change": 8.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "FLY"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 662,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.505664Z",
+      "pct_change_rank_among_eligible": 694,
+      "percent_change": 0.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "FORM"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 240,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.505664Z",
+      "pct_change_rank_among_eligible": 1772,
+      "percent_change": -4.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "FPS"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 438,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.550260Z",
+      "pct_change_rank_among_eligible": 3,
+      "percent_change": 14.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "FSLY"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 421,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.550260Z",
+      "pct_change_rank_among_eligible": 41,
+      "percent_change": 7.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "GDDY"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1381,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.550260Z",
+      "pct_change_rank_among_eligible": 360,
+      "percent_change": 2.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S3_oversold_reversal"
+      ],
+      "stale_quote": false,
+      "symbol": "GENI"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 945,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.550260Z",
+      "pct_change_rank_among_eligible": 1778,
+      "percent_change": -4.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "GEO"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 38,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.550260Z",
+      "pct_change_rank_among_eligible": 747,
+      "percent_change": 0.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "GEV"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1573,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.550260Z",
+      "pct_change_rank_among_eligible": 1757,
+      "percent_change": -3.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "GOLD"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 16,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.550260Z",
+      "pct_change_rank_among_eligible": 411,
+      "percent_change": 1.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "GOOG"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 12,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.550260Z",
+      "pct_change_rank_among_eligible": 470,
+      "percent_change": 1.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "GOOGL"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 298,
+      "list_membership": [
+        "top_50_gainers",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.593661Z",
+      "pct_change_rank_among_eligible": 1,
+      "percent_change": 33.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S1_momentum_breakout",
+        "S2_volume_shock_continuation",
+        "S4_contraction_breakout",
+        "S5_gap_and_hold"
+      ],
+      "stale_quote": false,
+      "symbol": "GRAL"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1351,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.593661Z",
+      "pct_change_rank_among_eligible": 919,
+      "percent_change": 0.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "GSAT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1409,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.593661Z",
+      "pct_change_rank_among_eligible": 17,
+      "percent_change": 10.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "HELP"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 931,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.593661Z",
+      "pct_change_rank_among_eligible": 26,
+      "percent_change": 8.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "HHH"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 728,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.593661Z",
+      "pct_change_rank_among_eligible": 1777,
+      "percent_change": -4.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "HMY"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 26,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.593661Z",
+      "pct_change_rank_among_eligible": 238,
+      "percent_change": 2.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "HOOD"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 212,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.593661Z",
+      "pct_change_rank_among_eligible": 1770,
+      "percent_change": -4.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "HPQ"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 185,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.593661Z",
+      "pct_change_rank_among_eligible": 105,
+      "percent_change": 4.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "HUT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1553,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.593661Z",
+      "pct_change_rank_among_eligible": 1765,
+      "percent_change": -4.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "HYMC"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 845,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.633134Z",
+      "pct_change_rank_among_eligible": 46,
+      "percent_change": 6.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "INOD"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 5,
+      "list_membership": [
+        "top_50_gainers",
+        "top_50_dollar_volume",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.633134Z",
+      "pct_change_rank_among_eligible": 13,
+      "percent_change": 12.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout",
+        "S5_gap_and_hold"
+      ],
+      "stale_quote": false,
+      "symbol": "INTC"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1693,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.633134Z",
+      "pct_change_rank_among_eligible": 1785,
+      "percent_change": -5.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "INVX"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 511,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.633134Z",
+      "pct_change_rank_among_eligible": 1762,
+      "percent_change": -3.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "IOT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 42,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.674174Z",
+      "pct_change_rank_among_eligible": 724,
+      "percent_change": 0.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "JPM"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 457,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.674174Z",
+      "pct_change_rank_among_eligible": 364,
+      "percent_change": 2.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "KEYS"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 853,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.674174Z",
+      "pct_change_rank_among_eligible": 1771,
+      "percent_change": -4.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "KGS"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 724,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.719853Z",
+      "pct_change_rank_among_eligible": 49,
+      "percent_change": 6.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "LEU"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1225,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.719853Z",
+      "pct_change_rank_among_eligible": 45,
+      "percent_change": 6.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "LION"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 18,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.719853Z",
+      "pct_change_rank_among_eligible": 282,
+      "percent_change": 2.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "LITE"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 33,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.719853Z",
+      "pct_change_rank_among_eligible": 610,
+      "percent_change": 1.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "LLY"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 27,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.719853Z",
+      "pct_change_rank_among_eligible": 96,
+      "percent_change": 4.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "LRCX"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 597,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.719853Z",
+      "pct_change_rank_among_eligible": 8,
+      "percent_change": 12.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "LUNR"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 451,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.719853Z",
+      "pct_change_rank_among_eligible": 394,
+      "percent_change": 1.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "LUV"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1129,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.719853Z",
+      "pct_change_rank_among_eligible": 66,
+      "percent_change": 5.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "MANE"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1488,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.719853Z",
+      "pct_change_rank_among_eligible": 1760,
+      "percent_change": -3.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "MEOH"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 2,
+      "list_membership": [
+        "top_50_gainers",
+        "top_50_dollar_volume",
+        "signal_flagged",
+        "pinned"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.719853Z",
+      "pct_change_rank_among_eligible": 14,
+      "percent_change": 11.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S1_momentum_breakout",
+        "S2_volume_shock_continuation"
+      ],
+      "stale_quote": false,
+      "symbol": "META"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 972,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.759681Z",
+      "pct_change_rank_among_eligible": 1758,
+      "percent_change": -3.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "MGY"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 504,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.759681Z",
+      "pct_change_rank_among_eligible": 1792,
+      "percent_change": -7.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "MHK"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 56,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.759681Z",
+      "pct_change_rank_among_eligible": 1786,
+      "percent_change": -5.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "MPC"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 24,
+      "list_membership": [
+        "top_50_gainers",
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.759681Z",
+      "pct_change_rank_among_eligible": 12,
+      "percent_change": 12.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "MRNA"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 17,
+      "list_membership": [
+        "top_50_dollar_volume",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.759681Z",
+      "pct_change_rank_among_eligible": 73,
+      "percent_change": 5.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "MRVL"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 7,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.759681Z",
+      "pct_change_rank_among_eligible": 463,
+      "percent_change": 1.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "MSFT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 15,
+      "list_membership": [
+        "top_50_gainers",
+        "top_50_dollar_volume",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.759681Z",
+      "pct_change_rank_among_eligible": 20,
+      "percent_change": 9.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S1_momentum_breakout",
+        "S5_gap_and_hold"
+      ],
+      "stale_quote": null,
+      "symbol": "MSTR"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 814,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.759681Z",
+      "pct_change_rank_among_eligible": 1780,
+      "percent_change": -4.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "MTDR"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 3,
+      "list_membership": [
+        "top_50_dollar_volume",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.759681Z",
+      "pct_change_rank_among_eligible": 250,
+      "percent_change": 2.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "MU"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1185,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.796462Z",
+      "pct_change_rank_among_eligible": 110,
+      "percent_change": 4.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S1_momentum_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "NEOG"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 79,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.796462Z",
+      "pct_change_rank_among_eligible": 31,
+      "percent_change": 8.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "NET"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1348,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.796462Z",
+      "pct_change_rank_among_eligible": 18,
+      "percent_change": 10.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "NN"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1236,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.796462Z",
+      "pct_change_rank_among_eligible": 29,
+      "percent_change": 8.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "NNE"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1286,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.796462Z",
+      "pct_change_rank_among_eligible": 1784,
+      "percent_change": -5.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "NOG"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 563,
+      "list_membership": [
+        "top_50_gainers",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.796462Z",
+      "pct_change_rank_among_eligible": 2,
+      "percent_change": 30.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S1_momentum_breakout",
+        "S2_volume_shock_continuation",
+        "S5_gap_and_hold"
+      ],
+      "stale_quote": false,
+      "symbol": "NUAI"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1661,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.796462Z",
+      "pct_change_rank_among_eligible": 1751,
+      "percent_change": -3.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "NUTX"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 1,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.796462Z",
+      "pct_change_rank_among_eligible": 321,
+      "percent_change": 2.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "NVDA"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 49,
+      "list_membership": [
+        "top_50_losers",
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.796462Z",
+      "pct_change_rank_among_eligible": 1794,
+      "percent_change": -8.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "NVO"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 667,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.836580Z",
+      "pct_change_rank_among_eligible": 84,
+      "percent_change": 5.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "OLLI"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 31,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.836580Z",
+      "pct_change_rank_among_eligible": 739,
+      "percent_change": 0.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "ORCL"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 818,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.836580Z",
+      "pct_change_rank_among_eligible": 28,
+      "percent_change": 8.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "OUST"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 668,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.836580Z",
+      "pct_change_rank_among_eligible": 1753,
+      "percent_change": -3.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "OVV"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 124,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.836580Z",
+      "pct_change_rank_among_eligible": 24,
+      "percent_change": 9.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "P"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 46,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.836580Z",
+      "pct_change_rank_among_eligible": 330,
+      "percent_change": 2.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "PANW"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 377,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.836580Z",
+      "pct_change_rank_among_eligible": 1790,
+      "percent_change": -6.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "PBF"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1063,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.836580Z",
+      "pct_change_rank_among_eligible": 226,
+      "percent_change": 3.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "PENG"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1377,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.836580Z",
+      "pct_change_rank_among_eligible": 471,
+      "percent_change": 1.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "PI"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 743,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.876395Z",
+      "pct_change_rank_among_eligible": 1783,
+      "percent_change": -4.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "PLNT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 22,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.876395Z",
+      "pct_change_rank_among_eligible": 214,
+      "percent_change": 3.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "PLTR"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 550,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.876395Z",
+      "pct_change_rank_among_eligible": 1748,
+      "percent_change": -3.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "PR"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1700,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.876395Z",
+      "pct_change_rank_among_eligible": 1766,
+      "percent_change": -4.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "PRCT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 114,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.876395Z",
+      "pct_change_rank_among_eligible": 1768,
+      "percent_change": -4.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "PSX"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 247,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.876395Z",
+      "pct_change_rank_among_eligible": 1763,
+      "percent_change": -3.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "PURR"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 25,
+      "list_membership": [
+        "top_50_gainers",
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.876395Z",
+      "pct_change_rank_among_eligible": 21,
+      "percent_change": 9.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "QCOM"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1052,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.876395Z",
+      "pct_change_rank_among_eligible": 228,
+      "percent_change": 3.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "QUBT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 418,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.917599Z",
+      "pct_change_rank_among_eligible": 42,
+      "percent_change": 7.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "QXO"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 231,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.917599Z",
+      "pct_change_rank_among_eligible": 44,
+      "percent_change": 7.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "RBLX"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1200,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.917599Z",
+      "pct_change_rank_among_eligible": 1774,
+      "percent_change": -4.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "RDNT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 639,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.917599Z",
+      "pct_change_rank_among_eligible": 38,
+      "percent_change": 8.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "RDW"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 213,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.917599Z",
+      "pct_change_rank_among_eligible": 425,
+      "percent_change": 1.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "RIOT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 54,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.917599Z",
+      "pct_change_rank_among_eligible": 35,
+      "percent_change": 8.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "RKLB"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 275,
+      "list_membership": [
+        "top_50_gainers",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.917599Z",
+      "pct_change_rank_among_eligible": 16,
+      "percent_change": 10.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "RMBS"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 819,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.917599Z",
+      "pct_change_rank_among_eligible": 40,
+      "percent_change": 7.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "RNG"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 827,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.917599Z",
+      "pct_change_rank_among_eligible": 1793,
+      "percent_change": -7.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "RSI"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1146,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.917599Z",
+      "pct_change_rank_among_eligible": 1040,
+      "percent_change": 0.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "SATA"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1495,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.917599Z",
+      "pct_change_rank_among_eligible": 22,
+      "percent_change": 9.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "SATL"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 726,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.963181Z",
+      "pct_change_rank_among_eligible": 48,
+      "percent_change": 6.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "SBET"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1535,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.963181Z",
+      "pct_change_rank_among_eligible": 293,
+      "percent_change": 2.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "SBS"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1368,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.963181Z",
+      "pct_change_rank_among_eligible": 157,
+      "percent_change": 3.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "SG"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1655,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.963181Z",
+      "pct_change_rank_among_eligible": 211,
+      "percent_change": 3.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "SHLS"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1284,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.963181Z",
+      "pct_change_rank_among_eligible": 937,
+      "percent_change": 0.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "SLF"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 618,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.963181Z",
+      "pct_change_rank_among_eligible": 1789,
+      "percent_change": -6.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "SM"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 48,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.963181Z",
+      "pct_change_rank_among_eligible": 72,
+      "percent_change": 5.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "SMCI"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 907,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.963181Z",
+      "pct_change_rank_among_eligible": 1787,
+      "percent_change": -5.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "SMMT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 126,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.963181Z",
+      "pct_change_rank_among_eligible": 1767,
+      "percent_change": -4.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "SMTC"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 6,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.963181Z",
+      "pct_change_rank_among_eligible": 1525,
+      "percent_change": -1.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "SNDK"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 351,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:11.963181Z",
+      "pct_change_rank_among_eligible": 86,
+      "percent_change": 5.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "SNX"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 9,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.009718Z",
+      "pct_change_rank_among_eligible": 1282,
+      "percent_change": -0.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "SPCX"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1378,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.009718Z",
+      "pct_change_rank_among_eligible": 1775,
+      "percent_change": -4.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "SUN"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1548,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.009718Z",
+      "pct_change_rank_among_eligible": 1779,
+      "percent_change": -4.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "SUNC"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1589,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.009718Z",
+      "pct_change_rank_among_eligible": 1746,
+      "percent_change": -3.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "TALO"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1569,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.009718Z",
+      "pct_change_rank_among_eligible": 342,
+      "percent_change": 2.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "TBBB"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 857,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.009718Z",
+      "pct_change_rank_among_eligible": 505,
+      "percent_change": 1.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "TD"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 8,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.048287Z",
+      "pct_change_rank_among_eligible": 223,
+      "percent_change": 3.0,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "TSLA"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 20,
+      "list_membership": [
+        "top_50_dollar_volume",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.048287Z",
+      "pct_change_rank_among_eligible": 302,
+      "percent_change": 2.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "TSM"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 127,
+      "list_membership": [
+        "top_50_gainers",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.048287Z",
+      "pct_change_rank_among_eligible": 25,
+      "percent_change": 9.1,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S1_momentum_breakout",
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "TWLO"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 44,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.048287Z",
+      "pct_change_rank_among_eligible": 462,
+      "percent_change": 1.6,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "TXN"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 43,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.091246Z",
+      "pct_change_rank_among_eligible": 962,
+      "percent_change": 0.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "UNH"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 66,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.091246Z",
+      "pct_change_rank_among_eligible": 1749,
+      "percent_change": -3.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "UNP"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 109,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.091246Z",
+      "pct_change_rank_among_eligible": 1773,
+      "percent_change": -4.4,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "UPS"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 400,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.091246Z",
+      "pct_change_rank_among_eligible": 23,
+      "percent_change": 9.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "USAR"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 941,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.091246Z",
+      "pct_change_rank_among_eligible": 1750,
+      "percent_change": -3.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "UTI"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 34,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.091246Z",
+      "pct_change_rank_among_eligible": 816,
+      "percent_change": 0.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "V"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 485,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.091246Z",
+      "pct_change_rank_among_eligible": 784,
+      "percent_change": 0.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "VICR"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 67,
+      "list_membership": [
+        "top_50_losers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.091246Z",
+      "pct_change_rank_among_eligible": 1782,
+      "percent_change": -4.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "VLO"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 975,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.091246Z",
+      "pct_change_rank_among_eligible": 410,
+      "percent_change": 1.9,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "VRNS"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 277,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.091246Z",
+      "pct_change_rank_among_eligible": 446,
+      "percent_change": 1.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S1_momentum_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "VRSN"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1536,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.091246Z",
+      "pct_change_rank_among_eligible": 36,
+      "percent_change": 8.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "VYX"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 14,
+      "list_membership": [
+        "top_50_gainers",
+        "top_50_dollar_volume",
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.134245Z",
+      "pct_change_rank_among_eligible": 15,
+      "percent_change": 10.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S1_momentum_breakout",
+        "S2_volume_shock_continuation",
+        "S5_gap_and_hold"
+      ],
+      "stale_quote": false,
+      "symbol": "WBD"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 28,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.134245Z",
+      "pct_change_rank_among_eligible": 477,
+      "percent_change": 1.5,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "WDC"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 35,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.134245Z",
+      "pct_change_rank_among_eligible": 728,
+      "percent_change": 0.7,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "WMT"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1060,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.134245Z",
+      "pct_change_rank_among_eligible": 34,
+      "percent_change": 8.3,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "WOLF"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=1B",
+      "dollar_volume_rank_among_eligible": 37,
+      "list_membership": [
+        "top_50_dollar_volume"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.134245Z",
+      "pct_change_rank_among_eligible": 1733,
+      "percent_change": -3.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "XOM"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=100M",
+      "dollar_volume_rank_among_eligible": 633,
+      "list_membership": [
+        "signal_flagged"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.134245Z",
+      "pct_change_rank_among_eligible": 145,
+      "percent_change": 3.8,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [
+        "S4_contraction_breakout"
+      ],
+      "stale_quote": false,
+      "symbol": "XP"
+    },
+    {
+      "ambiguous_suffix_flag": false,
+      "daily_bar_t": "2026-09-21T04:00:00Z",
+      "dollar_volume_bucket": ">=20M",
+      "dollar_volume_rank_among_eligible": 1322,
+      "list_membership": [
+        "top_50_gainers"
+      ],
+      "observation_class": "today_session",
+      "observed_at": "2026-09-21T23:48:12.162105Z",
+      "pct_change_rank_among_eligible": 4,
+      "percent_change": 14.2,
+      "possible_corporate_action": false,
+      "prev_bar_mismatch": false,
+      "research_flag_not_prediction": true,
+      "signal_flags": [],
+      "stale_quote": false,
+      "symbol": "YSS"
+    }
+  ]
+}

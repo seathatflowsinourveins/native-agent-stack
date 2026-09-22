@@ -2120,43 +2120,53 @@
     },
     {
       "id": "interactive-hud-boundary",
-      "capability": "Retain synthetic HUD rendering separately from live activation",
+      "capability": "Render the configured HUD in a native Claude terminal",
       "capability_key": "interactive-hud-boundary",
       "checked_at": "2026-09-21",
       "layer_ids": [
         "observation-inference"
       ],
       "selection": "optional",
-      "review_status": "partial_acceptance",
+      "review_status": "accepted_within_scope",
       "activation": "Keep the configured optional statusline scoped and use native usage for authoritative accounting.",
       "component_ids": [
-        "claude-hud"
+        "claude-hud",
+        "claude-code"
       ],
       "candidate": null,
       "evidence_ids": [
         "token-practice-gap-followup-20260920",
-        "native-claude-hud-interactive-20260920"
+        "native-claude-hud-interactive-20260920",
+        "foundation-closure-20260921"
       ],
-      "evidence_scope": "Historical synthetic rendering passed and the older native attempt reached onboarding. Two current authenticated resumes stopped at the effort overlay; actual HUD rendering remains unverified.",
+      "evidence_scope": "The retained foundation-closure native PTY observations show configured claude-hud 0.8.0 in Claude 2.1.278 before and after a bounded review, including model, project, context and usage fields. This catalog reconciliation reuses those observations without a new terminal or model run. Earlier onboarding and effort-overlay attempts remain retained.",
       "limitations": [
-        "Live interactive HUD rendering remains unverified despite existing authentication; a synthetic rendering pass does not replace it."
+        "Evidence for the visible statusline is the original coordinator's screen observations and independent installed-plugin audit, separate from the native context export.",
+        "Not every HUD statistic, exact billing reconciliation, Windows Terminal dropdown interaction, automatic compaction or new-host activation was qualified."
       ],
       "source_paths": [
         "docs/convergence-architecture.md",
         "adoption/lifecycle.md",
         "docs/full-stack-convergence.md",
-        "evidence/artifacts/full-stack-convergence-20260921/hud-observation.json"
+        "evidence/artifacts/full-stack-convergence-20260921/hud-observation.json",
+        "docs/foundation-closure-20260921.md",
+        "evidence/artifacts/foundation-closure-20260921/observations.json"
       ],
-      "next_gap": "Observe the actual statusline after resolving the current terminal/effort-dialog boundary; sign-in and onboarding are no longer the observed blocker.",
+      "next_gap": "Verify target-host activation or a specific untested statistic only when that capability is needed; reuse the accepted recorded rendering scope.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
-        "scope": "Only the listed canonical stages and their original scopes apply. Current native resumes did not reach the statusline; historical synthetic output does not replace that observation.",
-        "unknown": "Interactive HUD rendering remains unestablished. Observe the actual statusline after resolving the current terminal/effort-dialog boundary; sign-in and onboarding are no longer the observed blocker.",
+        "scope": "The recorded native Claude terminal rendered the configured HUD. Earlier synthetic and interrupted interactive attempts preserve their own results; no fresh execution is claimed by this reconciliation.",
+        "unknown": "Other lifecycle stages, every HUD statistic, billing reconciliation and destination-host activation retain their original limits.",
         "stage_refs": [
           {
             "component_id": "claude-hud",
             "stage": "use",
-            "status": "partial_acceptance"
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "claude-code",
+            "stage": "use",
+            "status": "accepted_within_scope"
           }
         ]
       },
@@ -2627,6 +2637,62 @@
           {
             "component_id": "claude-code",
             "stage": "recovery",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "lean-workflow-child-routing",
+      "capability": "Route native Claude Workflow stages to lean task-matched project agents with explicit model, effort and deferred named tool lanes, and size each workflow to its task",
+      "capability_key": "lean-workflow-child-routing",
+      "checked_at": "2026-09-21",
+      "layer_ids": [
+        "workers",
+        "scheduling-supervision"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Name `agentType` where the role fits: `source-scout` (Sonnet/medium) for extraction, inventories and acceptance commands, `evidence-reviewer` (Opus/high, read-only) for independent review, `isolated-builder` (Sonnet/medium, own worktree) for bounded implementation; keep the default child for a stage that must re-run commands and judge them; never omit a stage's model or effort; run `workflowSizeGuideline: unrestricted` with three concurrent agents and size by task; record every run with `child-usage.mjs --latest`.",
+      "component_ids": [
+        "claude-code",
+        "codex"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "ultracode-token-routing-20260921",
+        "portable-claude-native-qualification-20260921"
+      ],
+      "evidence_scope": "On one identical task the provider-returned first prompt fell from 42,396 tokens (default child) to 12,164 (named MCP grants behind ToolSearch) and 8,048 (source-scout); eight native review-changes runs, two readiness audits, one builder run and one Codex cross-family review are retained as sanitized receipts; the portable copies were adopted into a scratch project and run natively under the full host profile with the observational layer recorded; the project-only profile was not qualified (provider errors, then a permission-layer refusal of the Workflow tool).",
+      "limitations": [
+        "First-prompt figures bound one tiny task on one host and model; they are not a savings rate.",
+        "Haiku is not routed on one packet and one Opus verifier (Sonnet 14/14 lane rows, Haiku 9/14 with a misattributed quote).",
+        "The review workflow's strict accepted status was never returned during the deployment; the gate was fix-and-commit after independent review.",
+        "Local suites are stubbed or synthetic; only the native runs and the Prometheus deltas are provider evidence. Per-session scoping of the exported metric is unavailable by design (the collector keeps no session id on metrics), so observational deltas are host-wide time windows with concurrent activity declared.",
+        "Codex agent examples inherit model and effort and have no end-to-end run of their own.",
+        "The project-only settings profile is not qualified: three provider errors and, with the coordinator model pinned, a permission-layer refusal of the Workflow tool; headless runs need a loaded settings source whose permission mode or allow rule covers the Workflow tool."
+      ],
+      "source_paths": [
+        "docs/ultracode-token-routing-20260921.md",
+        "recipes/claude-native-ultracode.md",
+        "recipes/claude-codex-cooperation-lanes.md",
+        "examples/claude-native/workflows/README.md"
+      ],
+      "next_gap": "Overturn only on evidence: Haiku after a repeat trial with no unanchored citation on two distinct extraction packets; the unrestricted guideline if recorded runs exceed their independent units or pause on fan-out rate limits; a one-hour child cache class only for a child that idles more than five minutes between requests; the Codex agent examples after a task-level run of their own.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Native Workflow child routing, packet identity, acceptance reproduction and usage accounting with owned local integration and one scratch adoption under the full host profile.",
+        "unknown": "Long-idle child cache behavior, Codex agent runs, the project-only settings profile (no headless run completed), and behavior on a machine without the MCP lanes.",
+        "stage_refs": [
+          {
+            "component_id": "claude-code",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "codex",
+            "stage": "use",
             "status": "accepted_within_scope"
           }
         ]

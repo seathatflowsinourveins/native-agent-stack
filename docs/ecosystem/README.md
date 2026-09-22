@@ -1,21 +1,53 @@
 # Offline ecosystem manifest
 
-Open [index.html](index.html) locally in a browser. It is one self-contained file:
+**Open [index.html](index.html), not template.html.** The template is the build
+source and contains no catalog data. Opening it now shows a link to the sibling
+index instead of inactive catalog controls. Keep the checkout's directory layout
+when using that link; a copied standalone template cannot find a missing index.
+
+The generated index is one self-contained file:
 the styles, application script and public search data are embedded. The page
 makes no background requests and needs no server, account, package install or
 external font. Source links navigate only when selected. GitHub shows HTML source;
 download the file to view it locally. The same file can be served by an existing
 static host, but this change does not configure GitHub Pages or paid hosting.
 
-The five views connect a layered ecosystem map, the canonical repository explorer,
-selected-stack setup, token-efficiency evidence, and dated source provenance. Every
+If the catalog cannot initialize, its opening screen remains visible with links
+to this guide and the manifest. Enable JavaScript for the interactive views. For
+missing or damaged embedded data, download a fresh generated `index.html`, or run
+the rebuild command below from a complete checkout. The index does not redirect,
+fetch missing data, or depend on the template being beside it. A standalone copy
+still works offline; the guide and manifest links require the checkout layout.
+
+The views connect a layered ecosystem map, foundation and trading capabilities,
+current choices and alternatives, the repository explorer, selected-stack setup,
+token-efficiency evidence, and dated source provenance. Every
 current public index identity and the existing 342-star snapshot are retained. The separate
 current-integrations lane makes newly observed Tavily setup searchable without
 silently enlarging the canonical index or accepted component manifest. Stars and
 awesome lists remain discovery signals. Layer tags are navigation heuristics,
 not adoption decisions or quality scores.
 
+The broad-universe research and adaptive-paper cards open complete embedded
+reports without network access. Their recorded receipts are also available in
+the selected components' returned-results viewer. These are dated research and
+runtime records: the September 21 scan is not a live quote feed, and none of the
+15 broad-universe signal/horizon checks established a strategy for promotion.
+Optional public-source links resolve after publication; local reading does not
+depend on those links.
+
 ## Use the setup and efficiency views
+
+**Choices & alternatives** covers all 16 foundation layers and four domain
+research layers. Each card states the requirement, current choice, named candidate
+outcomes, linked evidence, limitations and the comparison that would reopen the
+decision. Search across layers/candidates or filter by catalog and outcome.
+The 152 original domain candidate cards remain expandable with their historical
+dates and recommendations. The current interpretation stays visibly separate.
+Download the complete joined comparison JSON from this view. Fresh upstream
+metadata is linked separately; release recency does not establish superiority.
+The [landscape manifest](../../catalogs/landscape/manifest.json) drives this view,
+and `python3 scripts/landscape.py` checks coverage and reference integrity.
 
 **Selected stack & setup** includes every component in `manifests/stack.json`,
 with layer and adoption-profile filters, the selected version, native command

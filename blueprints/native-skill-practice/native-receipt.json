@@ -1,0 +1,423 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-09-21",
+  "scope": "Actual native CLI source-review invocations using supplied TypeSafe advice; bounded interoperability observation, not matched model-quality or efficiency acceptance.",
+  "versions": {
+    "codex": "0.155.1",
+    "claude": "2.1.278"
+  },
+  "requested_model_effort": {
+    "model": "inherit",
+    "effort": "inherit",
+    "overrides": false
+  },
+  "source_recovery_boundary": "Source identity was verified by the coordinator against pinned upstream bytes. Workers recovered local evidence; underlying catalog experiments were not rerun. Claude performs textual recovery; Codex reports matching excerpt hashes, with no raw child trace exposed by this CLI stream.",
+  "installation": {
+    "method": "npx skills only",
+    "global_clients": [
+      "codex",
+      "claude-code"
+    ],
+    "global_skills": [
+      "typesafe-ai",
+      "gh-fix-ci",
+      "security-best-practices"
+    ],
+    "project_skills": [
+      "typesafe-ai"
+    ],
+    "skills_ref_validation": {
+      "typesafe-ai": {
+        "exit_code": 0
+      },
+      "gh-fix-ci": {
+        "exit_code": 0
+      },
+      "security-best-practices": {
+        "exit_code": 0
+      }
+    },
+    "source_identity_ref": "catalogs/landscape/native-practice.json"
+  },
+  "attempts": [
+    {
+      "client": "codex",
+      "launcher": "plain codex with inherited desktop configuration",
+      "command_template": "codex -a never exec --sandbox read-only --json --output-last-message <private-final> - < <private-prompt>",
+      "exit_code": 0,
+      "functional_status": "source_access_failed",
+      "dispatcher_evidence": "Returned coordinator report only; raw child invocation and tool trace not exposed by CLI JSON stream.",
+      "resolved_model": null,
+      "resolved_effort": null,
+      "cases_completed": 0,
+      "errors": [
+        "node_repl/js: sandboxCwd is not a local file URI",
+        "Context Mode file access required approval under never policy"
+      ],
+      "recovery": "Preserve this failed attempt; use the already supported Linux ecosystem-codex launcher and explicit native read-only file access for the same project.",
+      "reported_skill_listing": [
+        "typesafe-ai",
+        "gh-fix-ci",
+        "security-best-practices"
+      ],
+      "usage": {
+        "input_tokens": 202136,
+        "cached_input_tokens": 181504,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1341,
+        "reasoning_output_tokens": 381
+      },
+      "returned_report": "Dispatcher metadata: exactly one worker launched as `semantic-evidence-reviewer`, task `/root/native_semantic_evidence_review`, status `completed`. No model or effort overrides supplied; resolved values were not exposed. Role configuration specifies read-only scope.\n\nWorker’s exact result:\n\n```json\n{\"role\":\"semantic-evidence-reviewer\",\"loaded_skill_path\":null,\"discovered_skills\":{\"typesafe-ai\":\"listed by client; load failed\",\"gh-fix-ci\":\"listed by client; body not loaded\",\"security-best-practices\":\"listed by client; body not loaded\"},\"cases\":[],\"limits\":[\"Attempted skill: $PROJECT/.agents/skills/typesafe-ai/SKILL.md. node_repl/js failed: sandboxCwd is not a local file URI. context-mode ctx_execute_file was rejected: approval required under never policy.\",\"Packet $CATALOG/blueprints/native-skill-practice/worker-packet.json and named originals were not recovered. Case IDs, claims, provider judgments and deterministic availability decision remain unavailable; no case verdicts or corrections can be substantiated.\",\"Evidence remains unverified. No installed-copy quotation check or network verification was completed. No availability rejection was overridden.\",\"Actual model and effort unavailable. No shell commands, credential access, API requests, file modifications or worker dispatch occurred.\"]}\n```"
+    },
+    {
+      "client": "codex",
+      "launcher": "ecosystem-codex with explicit project and native Linux configuration",
+      "command_template": "ecosystem-codex --project <adopted-project> exec --sandbox read-only --json --output-last-message <private-final> - < <private-prompt>",
+      "exit_code": 0,
+      "functional_status": "completed_returned_source_review",
+      "dispatcher_evidence": "One child launch and completed review are reported by the coordinator; this retained CLI stream exposes the returned report and completion, not the child tool trace or resolved model.",
+      "resolved_model": null,
+      "resolved_effort": null,
+      "cases_completed": 8,
+      "usage": {
+        "input_tokens": 148161,
+        "cached_input_tokens": 127872,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1670,
+        "reasoning_output_tokens": 138
+      },
+      "returned_report": {
+        "dispatcher_metadata": {
+          "tool": "collaboration.spawn_agent",
+          "agent_type": "semantic-evidence-reviewer",
+          "fork_turns": "all",
+          "workers_launched": 1,
+          "model_override": null,
+          "effort_override": null,
+          "spawn_response": {
+            "task_name": "/root/semantic_evidence_review"
+          },
+          "observed_status": "completed",
+          "resolved_model": null,
+          "resolved_effort": null,
+          "limits": "The dispatcher did not expose resolved model or effort values."
+        },
+        "result": {
+          "role": "semantic-evidence-reviewer",
+          "loaded_skill_path": "$PROJECT/.agents/skills/typesafe-ai/SKILL.md",
+          "discovered_skills": [
+            "typesafe-ai"
+          ],
+          "actual_model": "unavailable",
+          "actual_effort": "unavailable",
+          "cases": [
+            {
+              "case_id": "C1",
+              "verdict": "supported",
+              "disposition": "advisory_supported",
+              "source_ref": "evidence/artifacts/foundation-closure-20260921/compaction.json",
+              "source_recovered": true,
+              "reason": "The manual compaction record reports successful ai-memory and Context Mode hook observations."
+            },
+            {
+              "case_id": "C2",
+              "verdict": "insufficient",
+              "disposition": "advisory_insufficient",
+              "source_ref": "evidence/artifacts/foundation-closure-20260921/compaction.json",
+              "source_recovered": true,
+              "reason": "Automatic compaction and preservation of every fact remain explicitly untested, not failed."
+            },
+            {
+              "case_id": "C3",
+              "verdict": "supported",
+              "disposition": "advisory_supported",
+              "source_ref": "docs/native-workflow-writing-recovery-20260921.md",
+              "source_recovered": true,
+              "reason": "The source explicitly records independent unpiped verification accepting both repairs."
+            },
+            {
+              "case_id": "C4",
+              "verdict": "insufficient",
+              "disposition": "advisory_insufficient",
+              "source_ref": "docs/native-workflow-writing-recovery-20260921.md",
+              "source_recovered": true,
+              "reason": "One ordered repair comparison leaves the universal runtime ranking unqualified."
+            },
+            {
+              "case_id": "C5",
+              "verdict": "contradicted",
+              "disposition": "advisory_contradicted",
+              "source_ref": "docs/landscape-foundation-notes.md",
+              "source_recovered": true,
+              "reason": "Reported average latency was 10,328 ms for hybrid versus 5 ms for BM25."
+            },
+            {
+              "case_id": "C6",
+              "verdict": "supported",
+              "disposition": "reject_evidence",
+              "source_ref": "docs/landscape-foundation-notes.md",
+              "source_recovered": true,
+              "reason": "The excerpt supports the bounded claim, but the deterministic availability rejection remains binding."
+            },
+            {
+              "case_id": "C7",
+              "verdict": "contradicted",
+              "disposition": "advisory_contradicted",
+              "source_ref": "https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai/SKILL.md",
+              "source_recovered": true,
+              "reason": "The installed skill states that typed output guarantees the interface, not truth."
+            },
+            {
+              "case_id": "C8",
+              "verdict": "insufficient",
+              "disposition": "advisory_insufficient",
+              "source_ref": "https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai/SKILL.md",
+              "source_recovered": true,
+              "reason": "The supplied quotation provides no evidence of profitable trading qualification across markets."
+            }
+          ],
+          "limits": [
+            "Case verdicts are this independent source review; supplied jev-1.13.0 verdicts were retained except C4, corrected from contradicted to insufficient.",
+            "Every supplied excerpt was recovered locally and matched its packet SHA-256.",
+            "C7 and C8 use the quotation recovered from the installed skill; the remote pinned commit identity was not independently verified.",
+            "Source records were inspected without rerunning their underlying experiments.",
+            "Actual reviewer model and effort were not exposed; no overrides or further workers were requested.",
+            "No credentials, network calls, writes, catalog-cases.json, or typesafe-result.json were used; embedded source oracle metadata was not used to determine verdicts."
+          ]
+        }
+      }
+    },
+    {
+      "client": "claude",
+      "launcher": "native claude --agent semantic-evidence-reviewer",
+      "execution_mode": "Top-level --agent role invocation; native subagent_stats.spawned=0. This does not verify Claude child-agent dispatch.",
+      "command_template": "claude --agent semantic-evidence-reviewer -p --output-format stream-json --verbose --max-turns 8 --tools Read,Glob,Grep --strict-mcp-config --mcp-config <empty-servers-json> --add-dir <catalog> --no-session-persistence < <private-prompt>",
+      "exit_code": 0,
+      "functional_status": "completed_source_review_with_direct_tool_trace",
+      "resolved_model": "claude-fable-5-1",
+      "resolved_effort": null,
+      "client_discovery": [
+        "gh-fix-ci",
+        "security-best-practices",
+        "typesafe-ai"
+      ],
+      "role_discovered": true,
+      "skill_body_preload": "Full preload is not established. Read loaded the first 40 lines and targeted Grep recovered the typed-output rule: relevant selected sections, not full-body loading. Client initialization lists all three installed skills, which differs from worker-context visibility.",
+      "cases_completed": 8,
+      "duration_ms": 144375,
+      "duration_api_ms": 143790,
+      "reported_turns": 15,
+      "usage": {
+        "input_tokens": 12,
+        "cache_creation_input_tokens": 33012,
+        "cache_read_input_tokens": 110023,
+        "output_tokens": 12694,
+        "thinking_tokens": 8594
+      },
+      "observed_tools": [
+        {
+          "tool": "Read",
+          "file": "$CATALOG/blueprints/native-skill-practice/worker-packet.json"
+        },
+        {
+          "tool": "Glob",
+          "file": "$PROJECT"
+        },
+        {
+          "tool": "Glob",
+          "file": "$CATALOG"
+        },
+        {
+          "tool": "Read",
+          "file": "$CATALOG/evidence/artifacts/foundation-closure-20260921/compaction.json"
+        },
+        {
+          "tool": "Read",
+          "file": "$CATALOG/docs/native-workflow-writing-recovery-20260921.md"
+        },
+        {
+          "tool": "Grep",
+          "file": "$CATALOG/docs/landscape-foundation-notes.md"
+        },
+        {
+          "tool": "Grep",
+          "file": "$PROJECT/.agents/skills/typesafe-ai/SKILL.md"
+        },
+        {
+          "tool": "Glob",
+          "file": "$PROJECT/.claude"
+        },
+        {
+          "tool": "Read",
+          "file": "$PROJECT/.claude/agents/semantic-evidence-reviewer.md"
+        },
+        {
+          "tool": "Read",
+          "file": "$PROJECT/.agents/skills/typesafe-ai/SKILL.md"
+        },
+        {
+          "tool": "Grep",
+          "file": "$PROJECT"
+        },
+        {
+          "tool": "Grep",
+          "file": "$CATALOG/evidence/artifacts/foundation-rd-20260921/qmd-comparison.json"
+        },
+        {
+          "tool": "Glob",
+          "file": "$PROJECT/.agents/skills"
+        },
+        {
+          "tool": "Read",
+          "file": "$CATALOG/evidence/artifacts/foundation-rd-20260921/qmd-comparison.json"
+        }
+      ],
+      "returned_report": {
+        "role": "semantic-evidence-reviewer",
+        "loaded_skill_path": "$PROJECT/.agents/skills/typesafe-ai/SKILL.md (read from disk; the skill body was not visibly preloaded in this worker's context)",
+        "model": "claude-fable-5-1 per the session environment block; no run metadata to confirm. Effort: unavailable.",
+        "discovered_skills": {
+          "client_listing_exposed": false,
+          "typesafe-ai": "not listed by the client; named by the role contract and found on disk via Glob",
+          "gh-fix-ci": "not listed by the client; absent from agent-lab/.agents/skills",
+          "security-best-practices": "not listed by the client; absent from agent-lab/.agents/skills",
+          "note": "No Skill tool or available-skills list appeared in context. Other skill locations were not checked. No unrelated skill bodies were loaded."
+        },
+        "cases": [
+          {
+            "case_id": "C1",
+            "verdict": "supported",
+            "disposition": "advisory_supported retained; reviewer concurs",
+            "source_ref": "evidence/artifacts/foundation-closure-20260921/compaction.json L3, L10-13",
+            "source_recovered": true,
+            "reason": "trigger=manual; ai-memory_success=true and context-mode_success=true under precompact_hook_observation."
+          },
+          {
+            "case_id": "C2",
+            "verdict": "insufficient",
+            "disposition": "advisory_insufficient retained; reviewer concurs",
+            "source_ref": "same file, L25",
+            "source_recovered": true,
+            "reason": "The run was manual compaction with three selected facts only. The source states 'automatic compaction and all-fact preservation untested.' Untested does not mean failed, so the claim is not contradicted."
+          },
+          {
+            "case_id": "C3",
+            "verdict": "supported",
+            "disposition": "advisory_supported retained; reviewer concurs",
+            "source_ref": "docs/native-workflow-writing-recovery-20260921.md L1-8 (L6-7)",
+            "source_recovered": true,
+            "reason": "'Independent unpiped verification accepted both repairs' and 'this small repair'. Entity and scope match the claim."
+          },
+          {
+            "case_id": "C4",
+            "verdict": "insufficient",
+            "disposition": "Reviewer diverges: the claim is unqualified and not supported. The provider judgment (contradicted, confidence 0.76, 0.16 on insufficient) is retained as data. The packet's eligible/advisory_contradicted decision is not overridden.",
+            "source_ref": "same doc, L3-8",
+            "source_recovered": true,
+            "reason": "The excerpt gives no efficiency measurements. It says superiority was 'not established' and that 'this one ordered pair is not a cross-task model ranking'. Both arms had compliance defects. 'Keep a capable single agent as the economical choice for this small repair' reads as a decision to keep the default, not a measured finding that the workflow was less efficient. Conflicting reasonable reading: that sentence is one counterexample to 'all task types', which supports contradicted. Under either reading the claim must not be promoted."
+          },
+          {
+            "case_id": "C5",
+            "verdict": "contradicted",
+            "disposition": "advisory_contradicted retained; reviewer concurs",
+            "source_ref": "docs/landscape-foundation-notes.md L17-18",
+            "source_recovered": true,
+            "reason": "By parallel order BM25 averaged 5 ms and hybrid 10,328 ms, so hybrid was slower. The sentence does not say 'respectively'. The linked artifact, which is outside the supplied excerpt, corroborates this: evidence/artifacts/foundation-rd-20260921/qmd-comparison.json L52-57 shows bm25 at 5 ms and L68-73 shows hybrid at 10328 ms."
+          },
+          {
+            "case_id": "C6",
+            "verdict": "supported (semantic only)",
+            "disposition": "reject_evidence retained (eligible=false). The semantic match cannot override the deterministic gate, so this is not usable as evidence.",
+            "source_ref": "docs/landscape-foundation-notes.md L18-20",
+            "source_recovered": true,
+            "reason": "The text nearly verbatim limits the diagnostic to 'a reason to keep the present default pending a representative repeated comparison'. The packet does not state why the evidence was rejected."
+          },
+          {
+            "case_id": "C7",
+            "verdict": "contradicted",
+            "disposition": "advisory_contradicted retained; reviewer concurs",
+            "source_ref": "installed copy $PROJECT/.agents/skills/typesafe-ai/SKILL.md L142 (pinned upstream URL not fetched)",
+            "source_recovered": "installed-copy only",
+            "reason": "The exact sentence 'Typed output guarantees the interface, not truth.' is present. It directly negates the claim that typed output guarantees truth."
+          },
+          {
+            "case_id": "C8",
+            "verdict": "insufficient",
+            "disposition": "advisory_insufficient retained; reviewer concurs",
+            "source_ref": "same installed copy, L142",
+            "source_recovered": "installed-copy only",
+            "reason": "The excerpt says nothing about Jev, trading, profitability or markets. An untested capability has not failed, so the claim is not contradicted. The adjacent line 'validate their performance in the target domain' (L142-143) sits outside the supplied excerpt and was not used for the verdict."
+          }
+        ],
+        "limits": [
+          "With no shell, the excerpt SHA-256 values were not recomputed. Recovery is a textual comparison, and byte identity (trailing newline, whitespace) is unverified.",
+          "The C5/C6 excerpt starts mid-paragraph. It omits the L16 lead-in that names the QMD diagnostic, and it ends mid-line at L20.",
+          "C7/C8: the installed SKILL.md carries no embedded commit pin. That it matches upstream commit 65a39f39 is asserted only by project records (docs/typesafe-practice.md L120, tools/ecosystem/e2e-spec-v3.json L3240) and was not verified here.",
+          "No TypeSafe inference, network fetch or live-docs read was performed. The jev-1.13.0 judgments are supplied data, not authority.",
+          "catalog-cases.json, typesafe-result.json and cases.json were not read. The packet declares oracle_labels_included=false.",
+          "C4's verdict is genuinely ambiguous between insufficient and contradicted.",
+          "C5 applies to this single ordered diagnostic only."
+        ]
+      }
+    }
+  ],
+  "raw_receipts": [
+    {
+      "name": "claude-worker.jsonl",
+      "sha256": "d9331b667c6f449b7f820fdb39fb45d0a65348cd5063cce59c1e3787ae4485b1",
+      "bytes": 174343,
+      "retention": "Private host receipt; contains session metadata and is not published."
+    },
+    {
+      "name": "claude-worker.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "retention": "Private host receipt; contains session metadata and is not published."
+    },
+    {
+      "name": "codex-worker.jsonl",
+      "sha256": "fc9c3ea98e211699400cac679c633dcc8e3615f298b402f28b727a220fc45cc7",
+      "bytes": 6582,
+      "retention": "Private host receipt; contains session metadata and is not published."
+    },
+    {
+      "name": "codex-worker.stderr",
+      "sha256": "b636a2cc29328baaedb76182c3b7be0ee318c7511d51892f46243b45fb83f172",
+      "bytes": 2538,
+      "retention": "Private host receipt; contains session metadata and is not published."
+    },
+    {
+      "name": "codex-worker-final.txt",
+      "sha256": "99943e002d6a29c8305a36342edc6b24bfadd946dbd9a132fc3f84b1d43666d5",
+      "bytes": 1395,
+      "retention": "Private host receipt; contains session metadata and is not published."
+    },
+    {
+      "name": "codex-linux.jsonl",
+      "sha256": "18a6d1441dbe3b75722f1bb1f1213ee845a851550223e258caf9c32224155865",
+      "bytes": 6426,
+      "retention": "Private host receipt; contains session metadata and is not published."
+    },
+    {
+      "name": "codex-linux.stderr",
+      "sha256": "33ca7ce446111ac91d99f2d8f02b118664c6699b33571d47ce46e04c0aaa0ce9",
+      "bytes": 38,
+      "retention": "Private host receipt; contains session metadata and is not published."
+    },
+    {
+      "name": "codex-linux-final.txt",
+      "sha256": "3a8fb2cc4a44991ce3e61ec15c8ece0d7013e652730aed1fb2cc84741038e71a",
+      "bytes": 4379,
+      "retention": "Private host receipt; contains session metadata and is not published."
+    }
+  ],
+  "interpretation": [
+    "Both completed reviews leave the universal C4 claim unqualified and retain C6 availability rejection. Claude returns descriptive dispositions and one qualified verdict string; it is not a schema-validated machine-action interface.",
+    "Claude C4 preserves provider advice as provenance while independently judging insufficient. Never feed retained provider disposition into execution; final evidence remains advisory.",
+    "Codex cached input is a subset of total input; reasoning output is a subset of output. Codex parent usage coverage of the child is unspecified. Claude thinking tokens are a subset of output. Do not sum overlapping categories or compare these unmatched runs as savings.",
+    "Claude resolved model is confirmed by initialization and modelUsage. Codex model/effort and Claude effort are unavailable; configuration or role inheritance is not proof of actual resolution.",
+    "No worker receives service credentials or is asked to call TypeSafe. Claude tool trace confirms read-only tools; Codex absence of credential/network/write actions is the returned worker report, not a separately captured child trace.",
+    "Existing accounts, model defaults and unrelated workflow settings are preserved. Current host workflow size is unrestricted; the earlier small recipe is dated historical guidance.",
+    "These observations qualify the selected bounded source-review path only. Failing-CI repair quality, security findings/false positives, runtime ranking, distributed recovery and matched model/cost comparisons remain unqualified."
+  ]
+}

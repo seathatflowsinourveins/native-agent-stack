@@ -1,0 +1,48 @@
+Write or update a wiki page atomically (also indexes it in the store)
+
+Usage: ai-memory write-page [OPTIONS] --path <PATH> --body <BODY>
+
+Options:
+      --data-dir <DATA_DIR>
+          Override the data directory.
+
+          Defaults to a platform path under `dirs::data_local_dir()`. The config loader also honours `AI_MEMORY_DATA_DIR`.
+
+      --path <PATH>
+          Relative wiki path (e.g. `notes/foo.md`)
+
+          [aliases: --p]
+
+      --body <BODY>
+          Markdown body. Use `-` to read from stdin
+
+          [aliases: --b]
+
+      --config <CONFIG>
+          Path to an explicit config file (defaults to `<data_dir>/config.toml`)
+
+      --title <TITLE>
+          Optional page title; otherwise derived from the first `# heading` in the body, or the path stem
+
+      --kind <KIND>
+          Semantic kind: fact | rule | decision | gotcha (stored in frontmatter)
+
+  -t, --tag <TAG>
+          Repeatable tag to add to the frontmatter `tags` array
+
+      --tier <TIER>
+          Tier (`working`, `episodic`, `semantic`, `procedural`)
+
+          [default: semantic]
+
+      --pinned
+          Pin the page so the future decay sweep skips it
+
+      --workspace <WORKSPACE>
+          Workspace name (auto-created if absent)
+
+      --project <PROJECT>
+          Project name within the workspace. When omitted, auto-detect from the current project using the same resolver as read-page/search
+
+  -h, --help
+          Print help (see a summary with '-h')

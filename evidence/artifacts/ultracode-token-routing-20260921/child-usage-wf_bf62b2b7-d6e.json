@@ -1,0 +1,49 @@
+{
+ "status": "complete",
+ "reason": "every child has an explicit requested model, a matching resolved model, returned usage and a non-null result",
+ "multi_model_children": [],
+ "children": [
+  {
+   "agent_id": "ad0f0d9821f1faf9c",
+   "label": "deferred-lane-check",
+   "phase": "Check",
+   "agent_type": "probe-reviewer-b",
+   "requested_model": "sonnet",
+   "resolved_models": [
+    "claude-sonnet-5"
+   ],
+   "efforts": [
+    "low"
+   ],
+   "requests": 3,
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 591,
+    "cache_read_input_tokens": 28806,
+    "cache_creation_input_tokens": 16571
+   },
+   "usage_by_model": {
+    "claude-sonnet-5": {
+     "input_tokens": 6,
+     "output_tokens": 591,
+     "cache_read_input_tokens": 28806,
+     "cache_creation_input_tokens": 16571
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 12487,
+   "complete": true,
+   "issues": []
+  }
+ ],
+ "by_resolved_model": {
+  "claude-sonnet-5": {
+   "children": 1,
+   "input_tokens": 6,
+   "output_tokens": 591,
+   "cache_read_input_tokens": 28806,
+   "cache_creation_input_tokens": 16571
+  }
+ },
+ "run_id": "wf_bf62b2b7-d6e"
+}

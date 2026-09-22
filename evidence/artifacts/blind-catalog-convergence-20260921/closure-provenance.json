@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-22",
+  "scope": "Sealed returned source-review outputs and independent documentary reconciliation, not runtime qualification",
+  "sealed_inventory_sha256": "6659f03df84625590785c97f2fe4be61b4c317f84793b4e36b0eb3c120fb20f0",
+  "sealed_files_verified": 28,
+  "all_sealed_hashes_match": true,
+  "sealed_sources": [
+    {
+      "path": "./child-usage-latest.txt",
+      "sha256": "dfc1e0e32e826ba6319f13507b901476aa26ca1ac43493d8cab314213afb43bd",
+      "matched": true
+    },
+    {
+      "path": "./child-usage-wf_268e1f89-a91.json",
+      "sha256": "168a3b0045032171fee2b0243f302a6f2e01f989889cd5a61db7ca68c5c3265e",
+      "matched": true
+    },
+    {
+      "path": "./child-usage-wf_36d3049e-7ee.json",
+      "sha256": "bf2ca2811ed5de41d204fbc09f393a2384703bed4f45ea2c582b0f02ae1b5cd6",
+      "matched": true
+    },
+    {
+      "path": "./child-usage-wf_72e7aefc-8ad.json",
+      "sha256": "5e6a8bc8b8598e3340acb4cefd11e7c97e0a5f3c2a0bd9c6c658910ba02b3fae",
+      "matched": true
+    },
+    {
+      "path": "./child-usage-wf_a2cc6150-8bb.json",
+      "sha256": "94661ac81b974f7d56d2292cdec3e1e170e2dc2c72dd99efdfb4a3bbeac473fc",
+      "matched": true
+    },
+    {
+      "path": "./codex-lane-c/codex-output.md",
+      "sha256": "f23afaff2dd0a3727213a04a7cf25dc5c8de48b72530d83afb166f9d00e59ff5",
+      "matched": true
+    },
+    {
+      "path": "./codex-lane-c/codex-review-prompt.md",
+      "sha256": "e9eafe739e92ba0b0ec5bd0bfe36d3c6993534e98cc69c78d9f1ba8488898bab",
+      "matched": true
+    },
+    {
+      "path": "./codex-lane-c/envelope.json",
+      "sha256": "f38df707f83ff6b3122458164a1ca4d549cbb8ac92689ee972da2a13693736b1",
+      "matched": true
+    },
+    {
+      "path": "./codex-lane-c/result.json",
+      "sha256": "0be5ec76387fec1cd2e4ea71517347408a5d4499f37aba86eb950e15641cbfdb",
+      "matched": true
+    },
+    {
+      "path": "./codex-lane-c/status.json",
+      "sha256": "4b2da4e4e37bccc7c973a151c27418e362d9027e38632a5885a237ec2d6d0d91",
+      "matched": true
+    },
+    {
+      "path": "./final-layers.json",
+      "sha256": "a4da939ad696a741be34267113b79a9fc9393d7c405474e02498fe634b973c3c",
+      "matched": true
+    },
+    {
+      "path": "./wf1/journal.jsonl",
+      "sha256": "47cdb3238a8abe78914121b7f56c9fd14c5fcf5b3a4b0deebeec50359029ad19",
+      "matched": true
+    },
+    {
+      "path": "./wf1/script.js",
+      "sha256": "15aa511a92996e6428367851a1ad4316991120be45069381a7781fadc3b29189",
+      "matched": true
+    },
+    {
+      "path": "./wf1/verified-layers.json",
+      "sha256": "70c4ea20447d87a7fa8716909b7369946c4cead2d8905870d689fb7378b6ae84",
+      "matched": true
+    },
+    {
+      "path": "./wf1/verified-section.md",
+      "sha256": "e9b5ae5c2e92352b16863dae726b3ea3091933073694f4bf583c3c9b1ec99d0b",
+      "matched": true
+    },
+    {
+      "path": "./wf1/workflow-result.json",
+      "sha256": "bd5fadc5cb1d7a1e4955fd58022e82bca0a70d49909866c5a2c3443276e49316",
+      "matched": true
+    },
+    {
+      "path": "./wf2/compact.json",
+      "sha256": "353a911625dd083c207c45686b4f25a5d683c09b7b98ecc03a4f4ec3bf84ef3a",
+      "matched": true
+    },
+    {
+      "path": "./wf2/journal.jsonl",
+      "sha256": "de6ee24d95fb1f409ead8d4769474b88f392ac7d7a4079f2dc67563a91968b60",
+      "matched": true
+    },
+    {
+      "path": "./wf2/limits-hit.txt",
+      "sha256": "d9596a0d0b753c0cb89ea05a9ac0210468892a1902aadedc39120496ce6ab306",
+      "matched": true
+    },
+    {
+      "path": "./wf2/script.js",
+      "sha256": "da95b938526f5eda320f7e7c7c8fd1ee1a198efedec265ab332900e1a63e011f",
+      "matched": true
+    },
+    {
+      "path": "./wf2/workflow-result.json",
+      "sha256": "0c25f38b2cf0ee9209e15dbe606bc5a5932820589564bd62a52b51cd23028593",
+      "matched": true
+    },
+    {
+      "path": "./wf3/journal.jsonl",
+      "sha256": "6b9fdeb28107c40ff7006faba46c4b1da92d4acff618e1b3a2ca4700e6d4a4ca",
+      "matched": true
+    },
+    {
+      "path": "./wf3/script.js",
+      "sha256": "e1ebbe2c1932c0404e7c585b896589f65e24dfd61e9d5e54f59d5c6fb7bf92ed",
+      "matched": true
+    },
+    {
+      "path": "./wf3/threeway.json",
+      "sha256": "b4bfdb8fcfc40cdf694c8639f9d23dc22cfbb8ba253247861ec9cbe592a36615",
+      "matched": true
+    },
+    {
+      "path": "./wf3/workflow-result.json",
+      "sha256": "c4ad446c7a5acca5aefe607786d5d45a3c1275cf1c8ba670228131a55c0b3279",
+      "matched": true
+    },
+    {
+      "path": "./wf4/journal.jsonl",
+      "sha256": "f3a434bb906b04717357fcfa855f66a714c859359574019aabb7d45678e44466",
+      "matched": true
+    },
+    {
+      "path": "./wf4/script.js",
+      "sha256": "01865d92db45f00a55527e8eaf1b8007627025854aae1e67444faeabb975dd0a",
+      "matched": true
+    },
+    {
+      "path": "./wf4/workflow-result.json",
+      "sha256": "ed9669c59d67e03bd4604b4ad441c62449ab7e63d1136bcceb959d8b2a2fb56b",
+      "matched": true
+    }
+  ],
+  "public_files": [
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+      "sha256": "c1a6cad2d0b2dca4a1bb94a869e5b253b6d22c65905364e87af7e38ecd8383b2"
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-threeway.json",
+      "sha256": "5b372b6c4c6ae23e837418aa757c5dca3da7f936d4401afebaaae1656705d7de"
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-screening-repair.json",
+      "sha256": "92668178d6245d10149f39a8004a00e48bcd20e7ce1f7d33f6fab7e1ebdc26a1"
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json",
+      "sha256": "6413e8ec05fe9c1d1efed3e693106c4dd707e465db3379d6b05d37bdf56b45fe"
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf3-usage.json",
+      "sha256": "c49b84ac81dfa6d07ad5b95591a14a028068845f485f760797f4fe867cd51b2b"
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf4-usage.json",
+      "sha256": "1ffd1e9c75779deead989a5ac03ce1140ce7b6a933516937716eaadb7cc3e864"
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+      "sha256": "5f989503c33774e3086287d6183ff10e51d5756958fe880d204be3fc0bf5b84e"
+    }
+  ],
+  "transformations": [
+    "Extract workflow-result.result only for WF3 and WF4; omit native logs and journal envelopes. Serialize JSON with two-space indentation and trailing LF.",
+    "Replace private projects/home prefixes and the parent native session identifier with explicit placeholders in public reports.",
+    "Publish final-layers and threeway with the same serialization and substitutions.",
+    "Derive usage using the exact workflow directories; remove transcript_dir and agent_id, add stable child ordinals; preserve all per-model counters and completion fields.",
+    "screening-ledger is generated by audit_reports.py and retains original and later decisions."
+  ],
+  "peer_read_confirmation": {
+    "source": "peer task record section Codex adjudication corrections",
+    "status": "explicitly_confirmed",
+    "scope": "Five material earlier corrections independently confirmed by the live Claude owner; not blanket reviewer agreement."
+  },
+  "outcome": {
+    "documentary_coverage": "complete_for_returned_reports",
+    "original_critic_ready": false,
+    "runtime_replacements": 0,
+    "selected_component_count": 68,
+    "new_pc_acceptance": "pending_destination_connection"
+  },
+  "workflow_summaries": [
+    {
+      "name": "WF3",
+      "started": 11,
+      "complete": 11,
+      "summary_tokens": 1217857,
+      "tool_uses": 219
+    },
+    {
+      "name": "WF4",
+      "started": 7,
+      "complete": 7,
+      "summary_tokens": 423646,
+      "tool_uses": 84
+    }
+  ],
+  "usage_boundary": "Native summary tokens and input/output/cache categories differ; no savings claim. WF2 two incomplete attempts and separate Lane C partial failure remain retained."
+}

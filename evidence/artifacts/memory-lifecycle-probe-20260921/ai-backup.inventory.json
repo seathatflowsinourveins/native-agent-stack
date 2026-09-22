@@ -1,0 +1,1123 @@
+{
+  "publication": "Archive withheld; exact original retained privately. Public inventory and original hash only.",
+  "original_archive_sha256": "78a248fe402935023601e871b3fddef21c1f6c12f2abaa4bf30bd34affb7e239",
+  "original_archive_bytes": 52306,
+  "inspection": "Inspected tar metadata, regular-member bytes including config and SQLite DB, and decompressed loose Git objects for bounded personal-path and common credential patterns. No content values are published. This is not a proof that every possible secret pattern is absent.",
+  "inspection_counts": {
+    "personal_path_matches": 0,
+    "secret_pattern_matches": 0,
+    "compressed_git_objects_examined": 35
+  },
+  "members": [
+    {
+      "name": "wiki",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/info",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/info/exclude",
+      "kind": "file",
+      "size": 240,
+      "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/config",
+      "kind": "file",
+      "size": 92,
+      "sha256": "ce8dabcde6974bb73bbd4ca0f6fb2972b176eba04303d836de2fa1f3f7000465",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/bb",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/bb/dcf76bfb12d159caf7b95de42e1d3952a95f8a",
+      "kind": "file",
+      "size": 116,
+      "sha256": "e4ecb52e8b4c44d80fc27a0a9ae300e0a91d72f9ceac63f84ad39ebf0d2a4936",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/info",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/77",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/77/6c5a6af8a578089d88f24691e1ea99ed8f7575",
+      "kind": "file",
+      "size": 79,
+      "sha256": "84be3af18236246515bfafaef434b0c2f1271183336c8787dcbdc255e167a92c",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/41",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/41/006ffe63b76e049475487d0e1567e9fbf06212",
+      "kind": "file",
+      "size": 85,
+      "sha256": "e4ae078fd515d9461a8725edd2b144e68329e791b7d0ddd4940b39413984a6fd",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/pack",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/93",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/93/640d98c0bdf8d6ee393d6a57109585019198f9",
+      "kind": "file",
+      "size": 58,
+      "sha256": "9ef3d62a7c4657089962a3e4254724f44f63240f07f56e0aab7c4a05f407c80c",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/55",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/55/e87380070f0f9d8bf68bae6efbc1d2f6e3c9f1",
+      "kind": "file",
+      "size": 79,
+      "sha256": "e9dc5874a33c8f70a02aabc3d1c1ea77b60def22941f4d65d3557fa5f0516380",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/ca",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/ca/a8e7ca245aac54c8ef12d6d84c097b874f4288",
+      "kind": "file",
+      "size": 180,
+      "sha256": "c2129f2b874d6b4468839f76a9c977ef45596acdc93094885cde7414c29e1ae2",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/ef",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/ef/084fa575fb949a54edad6ec5fac6f7aa36dc88",
+      "kind": "file",
+      "size": 115,
+      "sha256": "b04da82cbf51e75e589d1267d9ef3eb41dab20c30ff811f070b6446a0898cc68",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/d5",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/d5/0a35a30b05c0c8bb636e2db1e84a31b08b01de",
+      "kind": "file",
+      "size": 78,
+      "sha256": "696ae0eb98189984c1515517aedc633ba8f1b69a12169dc4ef40169068557f51",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/e7",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/e7/5776bb289ccdc9d763530816317d712e8e4db0",
+      "kind": "file",
+      "size": 78,
+      "sha256": "fa7b48b90e2d973a0542ee9bed6b03574f3c5923d46c6bf7aec50bb73ea078cd",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/c0",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/c0/62fe3c643297578dd13b3e5734ec3c9d57e517",
+      "kind": "file",
+      "size": 53,
+      "sha256": "6c8b174996d413f71276e2f215b1c8d78e970d79b67e4f7baeb7d78e0719d91d",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/2a",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/2a/9db78b9f2b74dfda5db22ce78a3df196ec65ac",
+      "kind": "file",
+      "size": 180,
+      "sha256": "ef9934b2212078c9bae442c793198c0db5494ae3469230dc1fcc841a8b186300",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/cc",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/cc/ad23dc01f70eca1e78590177f17b6dfab75379",
+      "kind": "file",
+      "size": 98,
+      "sha256": "ad8fbb8a5d120df1e4be0c9b1abeacd030e0da2bff24f70e9ff851eaa8854c06",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/7a",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/7a/689dd4ed84ccc345e3094f972ebf8cbbb9fa09",
+      "kind": "file",
+      "size": 155,
+      "sha256": "f583d636895666c3d71277861f332dd226348c2ae01d7fd6da0be9b7476dbb03",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/db",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/db/08fd2ab490c039cc4f2274ca09de1811c078df",
+      "kind": "file",
+      "size": 115,
+      "sha256": "7834c7e034f954bdecf21619c5c5e1da11242ac8798f938212235ddea583fd35",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/12",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/12/588e2a71151f0b13a3095f34e4f7d8fed616ae",
+      "kind": "file",
+      "size": 96,
+      "sha256": "61b8f671b7aa0a0b896b99f838891d3c5adbec281fefaae9479c16bb3f7325fb",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/75",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/75/c7a6ae89405d14d3b7992eae8fb3cedcc937cc",
+      "kind": "file",
+      "size": 116,
+      "sha256": "b7572231aeaec773f7b194492b2d38f6c028f4d63eaec41daecb9d38b335c27c",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/46",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/46/e23e9e695e2b51c76ef110822b6ca4800d5d9c",
+      "kind": "file",
+      "size": 170,
+      "sha256": "1d574408757a12abcb382c3fac57c3ca7c4ce9d0d4ec3d03efd42d530b2fd265",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/0e",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/0e/0b66e020bb696b158ef9f65707ecd1d7afd5d0",
+      "kind": "file",
+      "size": 115,
+      "sha256": "8eac75c683523797fdb008c540292e75524b631c677bd0240fc6cf8801998518",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/95",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/95/978fc15bbb5599d5fd9e33e68673f210cdcf6a",
+      "kind": "file",
+      "size": 171,
+      "sha256": "cf5f824083cdf2e82fc4fee35a854354a8747d1195daeac63b56b5172c22485d",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/5b",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/5b/f58e117fe924b38c38ae1143b42ef7fae16ade",
+      "kind": "file",
+      "size": 180,
+      "sha256": "38475c578aa786b8c74ff99a4fe857f0c3525be1b5d0d3e910de080b148e842a",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/98",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/98/2fb7bc4e1e376b60b1b1f0b20e74eb059e8e94",
+      "kind": "file",
+      "size": 85,
+      "sha256": "a491f888a8018a1ae318f3faf07bbde51bfb103b2a0fb12eede07f199dd94d6d",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/71",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/71/d45daa3b51204d5f99fefaf5607c8cced4b561",
+      "kind": "file",
+      "size": 135,
+      "sha256": "ae09ef9721200a830d4a89412c5bc1a652bffced1a1abe307b19f9bd4defac7a",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/33",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/33/3037db1c1fb388607160c41ce57dba2f176af2",
+      "kind": "file",
+      "size": 60,
+      "sha256": "132e95a0825ae1853126251af96202e0e5694e8e95dbedf11d8f3b8f733aa4ce",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/7e",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/7e/3e3920cee78db3eff1496611a38785f574e5c7",
+      "kind": "file",
+      "size": 79,
+      "sha256": "d60b696fe7ed2aec1a17b69897007b416e506be9c1ef2e8d7a851240bcff80db",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/43",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/43/47bcf6c815695e86d50a119ec443f56f6845a3",
+      "kind": "file",
+      "size": 164,
+      "sha256": "d25e12172f0a5ad295dbf5cc5fbca9ce0fbbb0943ceebb7021bff4c51171af02",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/f5",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/f5/032560c3cf610538427aa61594087dcee1868f",
+      "kind": "file",
+      "size": 135,
+      "sha256": "83ef0c301c20976a25a62b59f6401772d50b05e84f4c9685dd2ec405cf9e5aa2",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/10",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/10/9cb8ac7927f9c546a4aae65e496bb84d9198ba",
+      "kind": "file",
+      "size": 62,
+      "sha256": "8f84bdb70513a8dd7e8f5bb39490cb3bfac9dba9a04e8c8f097fde7020aa116e",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/af",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/af/59b4877af984e6f8244734323d1bc2845010b4",
+      "kind": "file",
+      "size": 179,
+      "sha256": "ac804fae9f3529393dbb46a2359c289bfababc21bf9c8064fced55ea7999b97b",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/af/59439c1de71ed581508f9e8f4fdacfa592ae5f",
+      "kind": "file",
+      "size": 175,
+      "sha256": "28a5067b69f6c00a23da03c593dcd82e38835247db9a9740bbda90ddf0479484",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/85",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/85/fc8feb6d8852e819e4683c7781cd68d2f24418",
+      "kind": "file",
+      "size": 78,
+      "sha256": "aa322aa78b5ace3565415c1343af68a0ecbaf7f58597f812b645dad51efb0326",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/20",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/20/b2270de93ee589eece0fa9ac3be8de563bee0f",
+      "kind": "file",
+      "size": 85,
+      "sha256": "a89dce7606f11c5037dc51a6166266f3878579551dec09884854f0e360193aca",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/96",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/96/2ddd27104441a8fa049e0f655ff1a79835c872",
+      "kind": "file",
+      "size": 85,
+      "sha256": "ab2ef6088c0a1acfbaccfd9b450387c68af73c8a22b6342a946b1c1e5acfc11b",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/6a",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/6a/708a899905742f71be0dc047035bb2b418c3f0",
+      "kind": "file",
+      "size": 84,
+      "sha256": "729985128ff5095e9f9d434046e9fb192196bd9dbb616bb4c34d48c7a9853228",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/6a/d6b8e02e6951f10d44618ecb128dbfc5c28e53",
+      "kind": "file",
+      "size": 177,
+      "sha256": "63e382591566b404919c850ad7d0f50b1d395d22582778a94108881b62ad2325",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/objects/6a/c6644ebabf735ed4a3ef5dbf3e3818f4d1b99a",
+      "kind": "file",
+      "size": 116,
+      "sha256": "b94c8a676db372239fe2b0cd20c77fa20436c020dc2a267defe71b25c2cc7336",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/HEAD",
+      "kind": "file",
+      "size": 23,
+      "sha256": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/index",
+      "kind": "file",
+      "size": 961,
+      "sha256": "44addfe7dd90382e5ed9a137839bc4047dd78920e56d50c7473a7898d0d5c6b3",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/refs",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/refs/tags",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/refs/heads",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/refs/heads/master",
+      "kind": "file",
+      "size": 41,
+      "sha256": "52dc99cd6df788076e64fc3c472d94823bc18a993d384ce5081e775dbf065fb5",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/logs",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/logs/HEAD",
+      "kind": "file",
+      "size": 1139,
+      "sha256": "f760971a86bfdc79930979336e9a4525c1895fed51906b00186d80661a7d3577",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/logs/refs",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/logs/refs/heads",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/logs/refs/heads/master",
+      "kind": "file",
+      "size": 1139,
+      "sha256": "f760971a86bfdc79930979336e9a4525c1895fed51906b00186d80661a7d3577",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/commit-msg.sample",
+      "kind": "file",
+      "size": 896,
+      "sha256": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/pre-push.sample",
+      "kind": "file",
+      "size": 1374,
+      "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/pre-rebase.sample",
+      "kind": "file",
+      "size": 4898,
+      "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/pre-applypatch.sample",
+      "kind": "file",
+      "size": 424,
+      "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/push-to-checkout.sample",
+      "kind": "file",
+      "size": 2783,
+      "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/post-update.sample",
+      "kind": "file",
+      "size": 189,
+      "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/prepare-commit-msg.sample",
+      "kind": "file",
+      "size": 1492,
+      "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/applypatch-msg.sample",
+      "kind": "file",
+      "size": 478,
+      "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/fsmonitor-watchman.sample",
+      "kind": "file",
+      "size": 4726,
+      "sha256": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/pre-receive.sample",
+      "kind": "file",
+      "size": 544,
+      "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/pre-merge-commit.sample",
+      "kind": "file",
+      "size": 416,
+      "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/sendemail-validate.sample",
+      "kind": "file",
+      "size": 2308,
+      "sha256": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/update.sample",
+      "kind": "file",
+      "size": 3650,
+      "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/hooks/pre-commit.sample",
+      "kind": "file",
+      "size": 1643,
+      "sha256": "f9af7d95eb1231ecf2eba9770fedfa8d4797a12b02d7240e98d568201251244a",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/.git/description",
+      "kind": "file",
+      "size": 73,
+      "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/SYNTHETIC-ID-003",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/SYNTHETIC-ID-003/SYNTHETIC-ID-004",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/SYNTHETIC-ID-003/SYNTHETIC-ID-004/notes",
+      "kind": "directory",
+      "size": 0,
+      "sha256": null,
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/SYNTHETIC-ID-003/SYNTHETIC-ID-004/notes/alpine-kite.md",
+      "kind": "file",
+      "size": 188,
+      "sha256": "c35b2cb77a83bd933a25ecdcd26a71ca28a138500b7abac51ceb2cbc63eeeb4c",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/SYNTHETIC-ID-003/SYNTHETIC-ID-004/notes/orchard-pump.md",
+      "kind": "file",
+      "size": 209,
+      "sha256": "4f0cfd72ee8b24113e0f6cf1cc17adb804caa2e9b346872700fe8750f14dbe76",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/SYNTHETIC-ID-003/SYNTHETIC-ID-004/_meta.md",
+      "kind": "file",
+      "size": 48,
+      "sha256": "e8f7a71cc7a2f59965b5e43505cb460bbc0e984d6e930f5cd07b5d042a28b8b1",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "wiki/SYNTHETIC-ID-003/_meta.md",
+      "kind": "file",
+      "size": 46,
+      "sha256": "f1a03987af6f34564765a0953a0e6ab5600ac6a7ede944c32982d329d309613e",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "db/memory.sqlite",
+      "kind": "file",
+      "size": 741376,
+      "sha256": "524c9dcd9eaf6d54a97154b9d45c87761754b6cc697ea35ccab23980e20f77ee",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    },
+    {
+      "name": "config.toml",
+      "kind": "file",
+      "size": 15185,
+      "sha256": "41125ff4223c6c0b6bd92d8df5ace24b96b9305bbef7cbbfcb90580e5baeb766",
+      "uid": 0,
+      "gid": 0,
+      "uname_present": false,
+      "gname_present": false
+    }
+  ]
+}

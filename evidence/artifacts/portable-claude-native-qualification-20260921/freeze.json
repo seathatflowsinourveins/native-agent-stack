@@ -1,0 +1,702 @@
+{
+ "attempt-1": {
+  "agent_lab_head": "a45cb0a0b73ef45486599ebe3f1ae07d6278d065",
+  "catalog_origin_main": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
+  "claude": "2.1.278 (Claude Code)",
+  "codex": "codex-cli 0.155.1",
+  "companion": "{\"version\":\"1.0.6\",\"path\":\"~/.claude/plugins/cache/openai-codex/codex/1.0.6/scripts/codex-companion.mjs\"}",
+  "expected_totals": {
+   "test-child-usage": 16,
+   "test-codex-envelope": 7,
+   "test-contract-mutations": 15,
+   "test-envelope": 165,
+   "test-usage-receipts": 18
+  },
+  "frozen_utc": "2026-09-22T00:40:16+00:00",
+  "gates": [
+   "every local check exits 0 with its frozen total",
+   "native envelope status in {accepted,rejected,incomplete} with accepted boolean and requested_checks",
+   "child-usage complete with three children on source-scout/evidence-reviewer/source-scout resolving to sonnet/opus/sonnet",
+   "Prometheus before-query for the session instance is empty; after-query shows subagent-scoped sonnet and opus",
+   "Lane C outcome completed"
+  ],
+  "grafana_health": {
+   "commit": "1bea008f7e4e858b6824c9e364d608bd4d10b13a",
+   "database": "ok",
+   "version": "13.2.2"
+  },
+  "node": "v24.21.0",
+  "portable_files": {
+   "agents/evidence-reviewer.md": {
+    "bytes": 2069,
+    "sha256": "75067deabb854902f680e2edbd24d975d055ef64552aa2a9dd514c20cd7f58b1"
+   },
+   "agents/isolated-builder.md": {
+    "bytes": 2016,
+    "sha256": "48938a39d10f33a2eef490d885da379cd63a03b7e42e53e4cb3ee3b8c80e1599"
+   },
+   "agents/source-scout.md": {
+    "bytes": 1681,
+    "sha256": "55062f9e65e91a29b0b2c800f1e83c84b8d9596ab86f75fd76ab288a29852647"
+   },
+   "settings.json": {
+    "bytes": 235,
+    "sha256": "6332b0cea25cd469a301b99b5a5d84a8dda709b89348c471625dc7290905d155"
+   },
+   "workflows/check-syntax.mjs": {
+    "bytes": 978,
+    "sha256": "ca62177687420fe22e03d0510a18e4f32b5d150e0156f6651c48367c3da506e1"
+   },
+   "workflows/child-usage.mjs": {
+    "bytes": 7767,
+    "sha256": "b91055db5d2f38fba3197673d2f5536da57b5a440aa81bc916a6000a4d9d40ca"
+   },
+   "workflows/codex-cross-review.mjs": {
+    "bytes": 8460,
+    "sha256": "1b7e8812a2aa908dc327978706cfe30f59c21a3cdbeccb710a96fd0eb1d9b984"
+   },
+   "workflows/contract.config.json": {
+    "bytes": 350,
+    "sha256": "2e73ed523e115e6a1f55a4cc992bf052e157d9cdd85aeb09cf4ef93d3f996771"
+   },
+   "workflows/readiness-audit.js": {
+    "bytes": 13143,
+    "sha256": "d0d5afb3f4f8d635d0a75e48b4c4cda4a074e842130d9c80eb6633a5bfe1701a"
+   },
+   "workflows/review-changes.js": {
+    "bytes": 16830,
+    "sha256": "d3848f33c412b5f70e0ae61e0655e6ee6fa6f8964947564b95871197cca5c435"
+   },
+   "workflows/test-child-usage.mjs": {
+    "bytes": 5612,
+    "sha256": "fd23f5c7d1118e4b67bd00fc6212f0db4b0f2cbac1f2aaa0c76ee5f07e780c56"
+   },
+   "workflows/test-codex-envelope.mjs": {
+    "bytes": 2342,
+    "sha256": "2617c081f606268ed20a6e00f6472495fad950db433ca3afbb44ea970aaac446"
+   },
+   "workflows/test-contract-mutations.mjs": {
+    "bytes": 6039,
+    "sha256": "1a44be3e019fccd4791a8033f90129b51fcac253e6861b2e25db1b184a8bc4f2"
+   },
+   "workflows/test-envelope.mjs": {
+    "bytes": 40418,
+    "sha256": "39ec5ef86929dc7f916c7b2ecd15eb5cf6e83192dd8405868ef7ec0cd76a3281"
+   },
+   "workflows/test-usage-receipts.mjs": {
+    "bytes": 8037,
+    "sha256": "8d4438112545fa8541a71bef27c2c1208d74a2769aeb0c4a5ccad1bae30fe805"
+   }
+  },
+  "prometheus_buildinfo": "3.14.0",
+  "timeouts_s": {
+   "codex": 600,
+   "local": 120,
+   "native": 1200
+  }
+ },
+ "attempt-2": {
+  "agent_lab_head": "a45cb0a0b73ef45486599ebe3f1ae07d6278d065",
+  "catalog_origin_main": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
+  "claude": "2.1.278 (Claude Code)",
+  "codex": "codex-cli 0.155.1",
+  "companion": "{\"version\":\"1.0.6\",\"path\":\"~/.claude/plugins/cache/openai-codex/codex/1.0.6/scripts/codex-companion.mjs\"}",
+  "expected_totals": {
+   "test-child-usage": 16,
+   "test-codex-envelope": "7 PASS lines, no SUMMARY line",
+   "test-contract-mutations": 15,
+   "test-envelope": 159,
+   "test-usage-receipts": 18
+  },
+  "frozen_utc": "2026-09-22T00:41:39+00:00",
+  "gates": [
+   "every local check exits 0 with its frozen total",
+   "native envelope status in {accepted,rejected,incomplete} with accepted boolean and requested_checks",
+   "child-usage complete with three children on source-scout/evidence-reviewer/source-scout resolving to sonnet/opus/sonnet",
+   "Prometheus before-query for the session instance is empty; after-query shows subagent-scoped sonnet and opus",
+   "Lane C outcome completed"
+  ],
+  "grafana_health": {
+   "commit": "1bea008f7e4e858b6824c9e364d608bd4d10b13a",
+   "database": "ok",
+   "version": "13.2.2"
+  },
+  "node": "v24.21.0",
+  "notes": [
+   "attempt-1 froze 165 for test-envelope (the agent-lab tree has one more agent file; 6 assertions per agent) and passed an unsupported --setting-sources flag to claude plugin validate; both were harness errors, kept in attempt-1",
+   "claude plugin validate parses agent frontmatter (an unterminated YAML string fails it) but does not flag a missing name or model; those are covered by test-envelope.mjs",
+   "plugin validate reads no settings, so it has no per-profile variant"
+  ],
+  "portable_files": {
+   "agents/evidence-reviewer.md": {
+    "bytes": 2069,
+    "sha256": "75067deabb854902f680e2edbd24d975d055ef64552aa2a9dd514c20cd7f58b1"
+   },
+   "agents/isolated-builder.md": {
+    "bytes": 2016,
+    "sha256": "48938a39d10f33a2eef490d885da379cd63a03b7e42e53e4cb3ee3b8c80e1599"
+   },
+   "agents/source-scout.md": {
+    "bytes": 1681,
+    "sha256": "55062f9e65e91a29b0b2c800f1e83c84b8d9596ab86f75fd76ab288a29852647"
+   },
+   "settings.json": {
+    "bytes": 235,
+    "sha256": "6332b0cea25cd469a301b99b5a5d84a8dda709b89348c471625dc7290905d155"
+   },
+   "workflows/check-syntax.mjs": {
+    "bytes": 978,
+    "sha256": "ca62177687420fe22e03d0510a18e4f32b5d150e0156f6651c48367c3da506e1"
+   },
+   "workflows/child-usage.mjs": {
+    "bytes": 7767,
+    "sha256": "b91055db5d2f38fba3197673d2f5536da57b5a440aa81bc916a6000a4d9d40ca"
+   },
+   "workflows/codex-cross-review.mjs": {
+    "bytes": 8460,
+    "sha256": "1b7e8812a2aa908dc327978706cfe30f59c21a3cdbeccb710a96fd0eb1d9b984"
+   },
+   "workflows/contract.config.json": {
+    "bytes": 350,
+    "sha256": "2e73ed523e115e6a1f55a4cc992bf052e157d9cdd85aeb09cf4ef93d3f996771"
+   },
+   "workflows/readiness-audit.js": {
+    "bytes": 13143,
+    "sha256": "d0d5afb3f4f8d635d0a75e48b4c4cda4a074e842130d9c80eb6633a5bfe1701a"
+   },
+   "workflows/review-changes.js": {
+    "bytes": 16830,
+    "sha256": "d3848f33c412b5f70e0ae61e0655e6ee6fa6f8964947564b95871197cca5c435"
+   },
+   "workflows/test-child-usage.mjs": {
+    "bytes": 5612,
+    "sha256": "fd23f5c7d1118e4b67bd00fc6212f0db4b0f2cbac1f2aaa0c76ee5f07e780c56"
+   },
+   "workflows/test-codex-envelope.mjs": {
+    "bytes": 2342,
+    "sha256": "2617c081f606268ed20a6e00f6472495fad950db433ca3afbb44ea970aaac446"
+   },
+   "workflows/test-contract-mutations.mjs": {
+    "bytes": 6039,
+    "sha256": "1a44be3e019fccd4791a8033f90129b51fcac253e6861b2e25db1b184a8bc4f2"
+   },
+   "workflows/test-envelope.mjs": {
+    "bytes": 40418,
+    "sha256": "39ec5ef86929dc7f916c7b2ecd15eb5cf6e83192dd8405868ef7ec0cd76a3281"
+   },
+   "workflows/test-usage-receipts.mjs": {
+    "bytes": 8037,
+    "sha256": "8d4438112545fa8541a71bef27c2c1208d74a2769aeb0c4a5ccad1bae30fe805"
+   }
+  },
+  "prometheus_buildinfo": "3.14.0",
+  "timeouts_s": {
+   "codex": 600,
+   "local": 120,
+   "native": 1200
+  }
+ },
+ "attempt-3": {
+  "agent_lab_head": "a45cb0a0b73ef45486599ebe3f1ae07d6278d065",
+  "catalog_origin_main": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
+  "claude": "2.1.278 (Claude Code)",
+  "codex": "codex-cli 0.155.1",
+  "companion": "{\"version\":\"1.0.6\",\"path\":\"~/.claude/plugins/cache/openai-codex/codex/1.0.6/scripts/codex-companion.mjs\"}",
+  "expected_totals": {
+   "test-child-usage": 16,
+   "test-codex-envelope": "7 PASS lines, no SUMMARY line",
+   "test-contract-mutations": 18,
+   "test-envelope": 159,
+   "test-usage-receipts": 18
+  },
+  "frozen_utc": "2026-09-22T00:47:20+00:00",
+  "gates": [
+   "every local check exits 0 with its frozen total",
+   "native envelope status in {accepted,rejected,incomplete} with accepted boolean and requested_checks",
+   "child-usage complete with three children on source-scout/evidence-reviewer/source-scout resolving to sonnet/opus/sonnet",
+   "Prometheus: per-session scoping is unavailable by design (collector keeps no session.id on metrics; instance is not the session id); gate = timestamped host-wide delta shows sonnet and opus under query_source=subagent during the run window, with this coordinator running no other native workflow",
+   "Lane C outcome completed"
+  ],
+  "grafana_health": {
+   "commit": "1bea008f7e4e858b6824c9e364d608bd4d10b13a",
+   "database": "ok",
+   "version": "13.2.2"
+  },
+  "node": "v24.21.0",
+  "notes": [
+   "attempt-2 native run (profile default): valid envelope, status rejected because the inventory scout read the acceptance command as an example in a sentence about empty output and ran nothing; the recheck stage ran it; fix: both stage prompts now list acceptance commands one per line with a count. attempt-2 also showed 0 Prometheus rows for instance=<session id>: the collector privacy transform strips session.id; method changed to timestamped deltas",
+   "attempt-2 concurrent: this coordinator had one review-changes workflow running in agent-lab during the native run, so its host-wide deltas are contaminated; kept as a recorded attempt",
+   "the review-changes.js diff since attempt-2 is the two prompt listings only; the mutation harness gained two config mutations and a relative-binding assertion (18 cases)"
+  ],
+  "portable_files": {
+   "agents/evidence-reviewer.md": {
+    "bytes": 2069,
+    "sha256": "75067deabb854902f680e2edbd24d975d055ef64552aa2a9dd514c20cd7f58b1"
+   },
+   "agents/isolated-builder.md": {
+    "bytes": 2016,
+    "sha256": "48938a39d10f33a2eef490d885da379cd63a03b7e42e53e4cb3ee3b8c80e1599"
+   },
+   "agents/source-scout.md": {
+    "bytes": 1681,
+    "sha256": "55062f9e65e91a29b0b2c800f1e83c84b8d9596ab86f75fd76ab288a29852647"
+   },
+   "settings.json": {
+    "bytes": 235,
+    "sha256": "6332b0cea25cd469a301b99b5a5d84a8dda709b89348c471625dc7290905d155"
+   },
+   "workflows/check-syntax.mjs": {
+    "bytes": 978,
+    "sha256": "ca62177687420fe22e03d0510a18e4f32b5d150e0156f6651c48367c3da506e1"
+   },
+   "workflows/child-usage.mjs": {
+    "bytes": 7767,
+    "sha256": "b91055db5d2f38fba3197673d2f5536da57b5a440aa81bc916a6000a4d9d40ca"
+   },
+   "workflows/codex-cross-review.mjs": {
+    "bytes": 8460,
+    "sha256": "1b7e8812a2aa908dc327978706cfe30f59c21a3cdbeccb710a96fd0eb1d9b984"
+   },
+   "workflows/contract.config.json": {
+    "bytes": 350,
+    "sha256": "2e73ed523e115e6a1f55a4cc992bf052e157d9cdd85aeb09cf4ef93d3f996771"
+   },
+   "workflows/readiness-audit.js": {
+    "bytes": 13143,
+    "sha256": "d0d5afb3f4f8d635d0a75e48b4c4cda4a074e842130d9c80eb6633a5bfe1701a"
+   },
+   "workflows/review-changes.js": {
+    "bytes": 16978,
+    "sha256": "1a0a5b3459b30e53d10521e844cfae50406f39492355b6fc41da7d5c4d2717d6"
+   },
+   "workflows/test-child-usage.mjs": {
+    "bytes": 5612,
+    "sha256": "fd23f5c7d1118e4b67bd00fc6212f0db4b0f2cbac1f2aaa0c76ee5f07e780c56"
+   },
+   "workflows/test-codex-envelope.mjs": {
+    "bytes": 2342,
+    "sha256": "2617c081f606268ed20a6e00f6472495fad950db433ca3afbb44ea970aaac446"
+   },
+   "workflows/test-contract-mutations.mjs": {
+    "bytes": 6851,
+    "sha256": "a6b29773ee3c4e4d10037a0e448c145cae97d9c4a71ad5ad969abcd2428f9e20"
+   },
+   "workflows/test-envelope.mjs": {
+    "bytes": 40418,
+    "sha256": "39ec5ef86929dc7f916c7b2ecd15eb5cf6e83192dd8405868ef7ec0cd76a3281"
+   },
+   "workflows/test-usage-receipts.mjs": {
+    "bytes": 8037,
+    "sha256": "8d4438112545fa8541a71bef27c2c1208d74a2769aeb0c4a5ccad1bae30fe805"
+   }
+  },
+  "prometheus_buildinfo": "3.14.0",
+  "timeouts_s": {
+   "codex": 600,
+   "local": 120,
+   "native": 1200
+  }
+ },
+ "attempt-4": {
+  "agent_lab_head": "a4d8525209dc39a95b4be77b09ca5d29fcb7677f",
+  "catalog_origin_main": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
+  "claude": "2.1.278 (Claude Code)",
+  "codex": "codex-cli 0.155.1",
+  "companion": "{\"version\":\"1.0.6\",\"path\":\"~/.claude/plugins/cache/openai-codex/codex/1.0.6/scripts/codex-companion.mjs\"}",
+  "expected_totals": {
+   "test-child-usage": 16,
+   "test-codex-envelope": "7 PASS lines, no SUMMARY line",
+   "test-contract-mutations": 19,
+   "test-envelope": 162,
+   "test-usage-receipts": 18
+  },
+  "frozen_utc": "2026-09-22T01:10:29+00:00",
+  "gates": [
+   "every local check exits 0 with its frozen total",
+   "native envelope status in {accepted,rejected,incomplete} with accepted boolean and requested_checks",
+   "child-usage complete with three children on source-scout/evidence-reviewer/source-scout resolving to sonnet/opus/sonnet",
+   "Prometheus: timestamped host-wide delta shows sonnet and opus under query_source=subagent during the run window; this coordinator runs no other native workflow (other sessions on the host are possible and declared)",
+   "Lane C outcome completed"
+  ],
+  "grafana_health": {
+   "commit": "1bea008f7e4e858b6824c9e364d608bd4d10b13a",
+   "database": "ok",
+   "version": "13.2.2"
+  },
+  "node": "v24.21.0",
+  "notes": [
+   "attempt-3: profile default review-changes valid envelope (rejected: 4 defects in the mutation harness, all fixed here; the acceptance command ran in both stages), readiness-audit complete, profile project-only ended in an API 500 after 2.6 s and is retried here",
+   "files changed since attempt-3: test-envelope.mjs (config reads never throw; every configured path is checked) and test-contract-mutations.mjs (depth counted per \"..\" segment, missing sources skipped, every case must reach a SUMMARY line, one more mutation); review-changes.js and the agents are unchanged since attempt-3, so the attempt-3 profile-default native run stands for them"
+  ],
+  "portable_files": {
+   "agents/evidence-reviewer.md": {
+    "bytes": 2069,
+    "sha256": "75067deabb854902f680e2edbd24d975d055ef64552aa2a9dd514c20cd7f58b1"
+   },
+   "agents/isolated-builder.md": {
+    "bytes": 2016,
+    "sha256": "48938a39d10f33a2eef490d885da379cd63a03b7e42e53e4cb3ee3b8c80e1599"
+   },
+   "agents/source-scout.md": {
+    "bytes": 1681,
+    "sha256": "55062f9e65e91a29b0b2c800f1e83c84b8d9596ab86f75fd76ab288a29852647"
+   },
+   "settings.json": {
+    "bytes": 235,
+    "sha256": "6332b0cea25cd469a301b99b5a5d84a8dda709b89348c471625dc7290905d155"
+   },
+   "workflows/check-syntax.mjs": {
+    "bytes": 978,
+    "sha256": "ca62177687420fe22e03d0510a18e4f32b5d150e0156f6651c48367c3da506e1"
+   },
+   "workflows/child-usage.mjs": {
+    "bytes": 7767,
+    "sha256": "b91055db5d2f38fba3197673d2f5536da57b5a440aa81bc916a6000a4d9d40ca"
+   },
+   "workflows/codex-cross-review.mjs": {
+    "bytes": 8460,
+    "sha256": "1b7e8812a2aa908dc327978706cfe30f59c21a3cdbeccb710a96fd0eb1d9b984"
+   },
+   "workflows/contract.config.json": {
+    "bytes": 350,
+    "sha256": "2e73ed523e115e6a1f55a4cc992bf052e157d9cdd85aeb09cf4ef93d3f996771"
+   },
+   "workflows/readiness-audit.js": {
+    "bytes": 13143,
+    "sha256": "d0d5afb3f4f8d635d0a75e48b4c4cda4a074e842130d9c80eb6633a5bfe1701a"
+   },
+   "workflows/review-changes.js": {
+    "bytes": 16978,
+    "sha256": "1a0a5b3459b30e53d10521e844cfae50406f39492355b6fc41da7d5c4d2717d6"
+   },
+   "workflows/test-child-usage.mjs": {
+    "bytes": 5612,
+    "sha256": "fd23f5c7d1118e4b67bd00fc6212f0db4b0f2cbac1f2aaa0c76ee5f07e780c56"
+   },
+   "workflows/test-codex-envelope.mjs": {
+    "bytes": 2342,
+    "sha256": "2617c081f606268ed20a6e00f6472495fad950db433ca3afbb44ea970aaac446"
+   },
+   "workflows/test-contract-mutations.mjs": {
+    "bytes": 7432,
+    "sha256": "e69ed8af0f377a5e14fb4c29374dbea69e67d1ef71e6edc6181b9e810a8f6870"
+   },
+   "workflows/test-envelope.mjs": {
+    "bytes": 40656,
+    "sha256": "4d8c72a2c3184f220ca8f93c93c1b3ac1a80fb078c93417fdb378831e853a818"
+   },
+   "workflows/test-usage-receipts.mjs": {
+    "bytes": 8037,
+    "sha256": "8d4438112545fa8541a71bef27c2c1208d74a2769aeb0c4a5ccad1bae30fe805"
+   }
+  },
+  "prometheus_buildinfo": "3.14.0",
+  "timeouts_s": {
+   "codex": 600,
+   "local": 120,
+   "native": 1200
+  }
+ },
+ "attempt-5": {
+  "agent_lab_head": "a4d8525209dc39a95b4be77b09ca5d29fcb7677f",
+  "catalog_origin_main": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
+  "claude": "2.1.278 (Claude Code)",
+  "codex": "codex-cli 0.155.1",
+  "companion": "{\"version\":\"1.0.6\",\"path\":\"~/.claude/plugins/cache/openai-codex/codex/1.0.6/scripts/codex-companion.mjs\"}",
+  "expected_totals": {
+   "test-child-usage": 16,
+   "test-codex-envelope": "7 PASS lines, no SUMMARY line",
+   "test-contract-mutations": 19,
+   "test-envelope": 162,
+   "test-usage-receipts": 18
+  },
+  "frozen_utc": "2026-09-22T01:10:29+00:00",
+  "gates": [
+   "every local check exits 0 with its frozen total",
+   "native envelope status in {accepted,rejected,incomplete} with accepted boolean and requested_checks",
+   "child-usage complete with three children on source-scout/evidence-reviewer/source-scout resolving to sonnet/opus/sonnet",
+   "Prometheus: the client_scope query for the run is empty at t0 and shows sonnet and opus under query_source=subagent at t1; host-wide deltas kept as secondary",
+   "Lane C outcome completed"
+  ],
+  "grafana_health": {
+   "commit": "1bea008f7e4e858b6824c9e364d608bd4d10b13a",
+   "database": "ok",
+   "version": "13.2.2"
+  },
+  "node": "v24.21.0",
+  "notes": [
+   "attempt-3: profile default review-changes valid envelope (rejected: 4 defects in the mutation harness, all fixed here; the acceptance command ran in both stages), readiness-audit complete, profile project-only ended in an API 500 after 2.6 s and is retried here",
+   "files changed since attempt-3: test-envelope.mjs (config reads never throw; every configured path is checked) and test-contract-mutations.mjs (depth counted per \"..\" segment, missing sources skipped, every case must reach a SUMMARY line, one more mutation); review-changes.js and the agents are unchanged since attempt-3, so the attempt-3 profile-default native run stands for them",
+   "attempt-5: same portable file hashes as attempt-4; native runs now carry OTEL_RESOURCE_ATTRIBUTES=ecosystem.client.scope=<run scope> (kept by the collector as client_scope) and the project-only profile receives the host telemetry exporter variables explicitly; profile project-only is on its second and last retry after API 500 (attempt-3) and API 529 (attempt-4)"
+  ],
+  "portable_files": {
+   "agents/evidence-reviewer.md": {
+    "bytes": 2069,
+    "sha256": "75067deabb854902f680e2edbd24d975d055ef64552aa2a9dd514c20cd7f58b1"
+   },
+   "agents/isolated-builder.md": {
+    "bytes": 2016,
+    "sha256": "48938a39d10f33a2eef490d885da379cd63a03b7e42e53e4cb3ee3b8c80e1599"
+   },
+   "agents/source-scout.md": {
+    "bytes": 1681,
+    "sha256": "55062f9e65e91a29b0b2c800f1e83c84b8d9596ab86f75fd76ab288a29852647"
+   },
+   "settings.json": {
+    "bytes": 235,
+    "sha256": "6332b0cea25cd469a301b99b5a5d84a8dda709b89348c471625dc7290905d155"
+   },
+   "workflows/check-syntax.mjs": {
+    "bytes": 978,
+    "sha256": "ca62177687420fe22e03d0510a18e4f32b5d150e0156f6651c48367c3da506e1"
+   },
+   "workflows/child-usage.mjs": {
+    "bytes": 7767,
+    "sha256": "b91055db5d2f38fba3197673d2f5536da57b5a440aa81bc916a6000a4d9d40ca"
+   },
+   "workflows/codex-cross-review.mjs": {
+    "bytes": 8460,
+    "sha256": "1b7e8812a2aa908dc327978706cfe30f59c21a3cdbeccb710a96fd0eb1d9b984"
+   },
+   "workflows/contract.config.json": {
+    "bytes": 350,
+    "sha256": "2e73ed523e115e6a1f55a4cc992bf052e157d9cdd85aeb09cf4ef93d3f996771"
+   },
+   "workflows/readiness-audit.js": {
+    "bytes": 13143,
+    "sha256": "d0d5afb3f4f8d635d0a75e48b4c4cda4a074e842130d9c80eb6633a5bfe1701a"
+   },
+   "workflows/review-changes.js": {
+    "bytes": 16978,
+    "sha256": "1a0a5b3459b30e53d10521e844cfae50406f39492355b6fc41da7d5c4d2717d6"
+   },
+   "workflows/test-child-usage.mjs": {
+    "bytes": 5612,
+    "sha256": "fd23f5c7d1118e4b67bd00fc6212f0db4b0f2cbac1f2aaa0c76ee5f07e780c56"
+   },
+   "workflows/test-codex-envelope.mjs": {
+    "bytes": 2342,
+    "sha256": "2617c081f606268ed20a6e00f6472495fad950db433ca3afbb44ea970aaac446"
+   },
+   "workflows/test-contract-mutations.mjs": {
+    "bytes": 7432,
+    "sha256": "e69ed8af0f377a5e14fb4c29374dbea69e67d1ef71e6edc6181b9e810a8f6870"
+   },
+   "workflows/test-envelope.mjs": {
+    "bytes": 40656,
+    "sha256": "4d8c72a2c3184f220ca8f93c93c1b3ac1a80fb078c93417fdb378831e853a818"
+   },
+   "workflows/test-usage-receipts.mjs": {
+    "bytes": 8037,
+    "sha256": "8d4438112545fa8541a71bef27c2c1208d74a2769aeb0c4a5ccad1bae30fe805"
+   }
+  },
+  "prometheus_buildinfo": "3.14.0",
+  "timeouts_s": {
+   "codex": 600,
+   "local": 120,
+   "native": 1200
+  }
+ },
+ "attempt-6": {
+  "agent_lab_head": "a4d8525209dc39a95b4be77b09ca5d29fcb7677f",
+  "catalog_origin_main": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
+  "claude": "2.1.278 (Claude Code)",
+  "codex": "codex-cli 0.155.1",
+  "companion": "{\"version\":\"1.0.6\",\"path\":\"~/.claude/plugins/cache/openai-codex/codex/1.0.6/scripts/codex-companion.mjs\"}",
+  "expected_totals": {
+   "test-child-usage": 16,
+   "test-codex-envelope": "7 PASS lines, no SUMMARY line",
+   "test-contract-mutations": 21,
+   "test-envelope": 167,
+   "test-usage-receipts": 18
+  },
+  "frozen_utc": "2026-09-22T01:36:18+00:00",
+  "gates": [
+   "every local check exits 0 with its frozen total",
+   "native envelope status in {accepted,rejected,incomplete} with accepted boolean and requested_checks",
+   "child-usage complete with three children on source-scout/evidence-reviewer/source-scout resolving to sonnet/opus/sonnet",
+   "Prometheus: the client_scope query for the run is empty at t0 and shows sonnet and opus under query_source=subagent at t1; sonnet children reconcile with child-usage.mjs; host-wide deltas kept as secondary",
+   "Lane C outcome completed"
+  ],
+  "grafana_health": {
+   "commit": "1bea008f7e4e858b6824c9e364d608bd4d10b13a",
+   "database": "ok",
+   "version": "13.2.2"
+  },
+  "node": "v24.21.0",
+  "notes": [
+   "attempt-5: profile default (scoped) valid envelope, rejected with 3 defects in the attempt-4 harness, all fixed here; the scoped observation reconciled the two Sonnet children exactly on all four counters while the Opus child exported 27-43% of its provider-returned usage (unexplained, published as a finding); profile project-only failed a third time with API 529 (500, 529, 529 across attempts 3-5) and is recorded as unqualified",
+   "attempt-6 is the closing attempt on the final file set: the Codex lane C review (attempt-4, 8 findings) and the attempt-5 native review are resolved; changes since attempt-5 are in review-changes.js (argument validation, repository-relative coverage, full summary comparison), child-usage.mjs and codex-cross-review.mjs (main guard), test-envelope.mjs, test-usage-receipts.mjs and test-contract-mutations.mjs",
+   "project-only-pinned is a new sub-profile (bare settings, coordinator model pinned to the user profile value) run once to separate a provider-overload cause from the settings-source difference; it is not a retry of project-only"
+  ],
+  "portable_files": {
+   "agents/evidence-reviewer.md": {
+    "bytes": 2069,
+    "sha256": "75067deabb854902f680e2edbd24d975d055ef64552aa2a9dd514c20cd7f58b1"
+   },
+   "agents/isolated-builder.md": {
+    "bytes": 2016,
+    "sha256": "48938a39d10f33a2eef490d885da379cd63a03b7e42e53e4cb3ee3b8c80e1599"
+   },
+   "agents/source-scout.md": {
+    "bytes": 1681,
+    "sha256": "55062f9e65e91a29b0b2c800f1e83c84b8d9596ab86f75fd76ab288a29852647"
+   },
+   "settings.json": {
+    "bytes": 235,
+    "sha256": "6332b0cea25cd469a301b99b5a5d84a8dda709b89348c471625dc7290905d155"
+   },
+   "workflows/check-syntax.mjs": {
+    "bytes": 978,
+    "sha256": "ca62177687420fe22e03d0510a18e4f32b5d150e0156f6651c48367c3da506e1"
+   },
+   "workflows/child-usage.mjs": {
+    "bytes": 7780,
+    "sha256": "75a6d74b07b62d8bb1be0ed37bcffece18781c9c1bdff4a94c23cd5ce9dbe60b"
+   },
+   "workflows/codex-cross-review.mjs": {
+    "bytes": 8498,
+    "sha256": "cd303779df6521c804070a319aa04c86ed2d6fe1c099c537836f037dec5f4e8b"
+   },
+   "workflows/contract.config.json": {
+    "bytes": 350,
+    "sha256": "2e73ed523e115e6a1f55a4cc992bf052e157d9cdd85aeb09cf4ef93d3f996771"
+   },
+   "workflows/readiness-audit.js": {
+    "bytes": 13143,
+    "sha256": "d0d5afb3f4f8d635d0a75e48b4c4cda4a074e842130d9c80eb6633a5bfe1701a"
+   },
+   "workflows/review-changes.js": {
+    "bytes": 17723,
+    "sha256": "8a9718cefb029ab24d94bf292b71a9c25f2ff7d6bfe0486b7062ddfc886c476d"
+   },
+   "workflows/test-child-usage.mjs": {
+    "bytes": 5612,
+    "sha256": "fd23f5c7d1118e4b67bd00fc6212f0db4b0f2cbac1f2aaa0c76ee5f07e780c56"
+   },
+   "workflows/test-codex-envelope.mjs": {
+    "bytes": 2342,
+    "sha256": "2617c081f606268ed20a6e00f6472495fad950db433ca3afbb44ea970aaac446"
+   },
+   "workflows/test-contract-mutations.mjs": {
+    "bytes": 8409,
+    "sha256": "1dab63d691d5a4acbbc02cef6a42a0236c21a45d6ae3d1ef644583247a1af3cd"
+   },
+   "workflows/test-envelope.mjs": {
+    "bytes": 43246,
+    "sha256": "bbd82eaa7a5ecbd0a5a63d29ef57705440c5597d9b3a97e7a4e636a4e969c628"
+   },
+   "workflows/test-usage-receipts.mjs": {
+    "bytes": 8262,
+    "sha256": "fd2f51b28f30d7e42f970b843e890e4d3d3cfd8e033c8dacfa75563e17af3d34"
+   }
+  },
+  "prometheus_buildinfo": "3.14.0",
+  "timeouts_s": {
+   "codex": 600,
+   "local": 120,
+   "native": 1200
+  }
+ },
+ "attempt-7": {
+  "agent_lab_head": "a4d8525209dc39a95b4be77b09ca5d29fcb7677f",
+  "catalog_origin_main": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
+  "claude": "2.1.278 (Claude Code)",
+  "codex": "codex-cli 0.155.1",
+  "companion": "{\"version\":\"1.0.6\",\"path\":\"~/.claude/plugins/cache/openai-codex/codex/1.0.6/scripts/codex-companion.mjs\"}",
+  "expected_totals": {
+   "test-child-usage": 16,
+   "test-codex-envelope": "7 PASS lines, no SUMMARY line",
+   "test-contract-mutations": 23,
+   "test-envelope": 169,
+   "test-usage-receipts": 18
+  },
+  "frozen_utc": "2026-09-22T01:52:24+00:00",
+  "gates": [
+   "every local check exits 0 with its frozen total",
+   "native envelope status in {accepted,rejected,incomplete} with accepted boolean and requested_checks",
+   "child-usage complete with three children on source-scout/evidence-reviewer/source-scout resolving to sonnet/opus/sonnet",
+   "Prometheus before-query for the session instance is empty; after-query shows subagent-scoped sonnet and opus",
+   "Lane C outcome completed"
+  ],
+  "grafana_health": {
+   "commit": "1bea008f7e4e858b6824c9e364d608bd4d10b13a",
+   "database": "ok",
+   "version": "13.2.2"
+  },
+  "node": "v24.21.0",
+  "notes": [
+   "attempt-7 is local-only on the final published file set: it follows the closing native run (attempt-6, profile default) whose reviewer reported six defects in the attempt-6 files; those fixes (argument validation for absolute paths, first-run totals must reappear in the recheck, dead diagnostic removed, placement guard self-tested, receipts suite fails closed with a SUMMARY line) are covered by these suites and by the envelope tests, not by another native run",
+   "attempt-6 profile project-only-pinned: the coordinator ran (Fable 5.1, pinned) and invoked the Workflow tool three ways; every invocation was refused by the permission layer (\"Review dynamic workflow before running\") because the project-only profile has no permission rule covering the Workflow tool, while the full profile runs under the user settings' permissions.defaultMode; no workflow ran; recorded as an adoption boundary, not a provider failure"
+  ],
+  "portable_files": {
+   "agents/evidence-reviewer.md": {
+    "bytes": 2069,
+    "sha256": "75067deabb854902f680e2edbd24d975d055ef64552aa2a9dd514c20cd7f58b1"
+   },
+   "agents/isolated-builder.md": {
+    "bytes": 2016,
+    "sha256": "48938a39d10f33a2eef490d885da379cd63a03b7e42e53e4cb3ee3b8c80e1599"
+   },
+   "agents/source-scout.md": {
+    "bytes": 1681,
+    "sha256": "55062f9e65e91a29b0b2c800f1e83c84b8d9596ab86f75fd76ab288a29852647"
+   },
+   "settings.json": {
+    "bytes": 235,
+    "sha256": "6332b0cea25cd469a301b99b5a5d84a8dda709b89348c471625dc7290905d155"
+   },
+   "workflows/check-syntax.mjs": {
+    "bytes": 978,
+    "sha256": "ca62177687420fe22e03d0510a18e4f32b5d150e0156f6651c48367c3da506e1"
+   },
+   "workflows/child-usage.mjs": {
+    "bytes": 7780,
+    "sha256": "75a6d74b07b62d8bb1be0ed37bcffece18781c9c1bdff4a94c23cd5ce9dbe60b"
+   },
+   "workflows/codex-cross-review.mjs": {
+    "bytes": 8498,
+    "sha256": "cd303779df6521c804070a319aa04c86ed2d6fe1c099c537836f037dec5f4e8b"
+   },
+   "workflows/contract.config.json": {
+    "bytes": 350,
+    "sha256": "2e73ed523e115e6a1f55a4cc992bf052e157d9cdd85aeb09cf4ef93d3f996771"
+   },
+   "workflows/readiness-audit.js": {
+    "bytes": 13143,
+    "sha256": "d0d5afb3f4f8d635d0a75e48b4c4cda4a074e842130d9c80eb6633a5bfe1701a"
+   },
+   "workflows/review-changes.js": {
+    "bytes": 17859,
+    "sha256": "12c078107d45ca5690b6d4a5e3e7c6522453a0f7d3846355337b17e1901b3ad6"
+   },
+   "workflows/test-child-usage.mjs": {
+    "bytes": 5612,
+    "sha256": "fd23f5c7d1118e4b67bd00fc6212f0db4b0f2cbac1f2aaa0c76ee5f07e780c56"
+   },
+   "workflows/test-codex-envelope.mjs": {
+    "bytes": 2342,
+    "sha256": "2617c081f606268ed20a6e00f6472495fad950db433ca3afbb44ea970aaac446"
+   },
+   "workflows/test-contract-mutations.mjs": {
+    "bytes": 9440,
+    "sha256": "f418a9da354cb766cbab4f779be754359797b110ac4f3c28cdcda5e319d3c0a1"
+   },
+   "workflows/test-envelope.mjs": {
+    "bytes": 44353,
+    "sha256": "42e31e482482f437495bb492327ff1ccc39bef2743886a9a8c37814b41949c0f"
+   },
+   "workflows/test-usage-receipts.mjs": {
+    "bytes": 8495,
+    "sha256": "2ed3323db76d0104327a0c0bb35f00cf6a05018bdd9f49982b0c279cf2540871"
+   }
+  },
+  "prometheus_buildinfo": "3.14.0",
+  "timeouts_s": {
+   "codex": 600,
+   "local": 120,
+   "native": 1200
+  }
+ }
+}

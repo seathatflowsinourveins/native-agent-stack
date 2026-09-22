@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "ultracode-token-routing-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "claude-code",
+    "codex"
+  ],
+  "claim": "Claude Code 2.1.278 native Workflow stages re-routed to lean project agents cut the provider-returned first-request prompt from 42,396 tokens (default child) to 12,164 (named MCP grants behind ToolSearch) and 8,048 (source-scout) on one identical task; eight native review runs, two readiness audits, a builder run and probes plus one Codex cross-family review are retained as sanitized usage receipts; Haiku was not routed after an Opus-verified 9/14 versus 14/14 extraction trial; workflowSizeGuideline moved from small to unrestricted with a task sizing rule.",
+  "recorded_date_utc": "2026-09-21",
+  "base_commit": "FILLED-BY-APPLY",
+  "status": "bounded-native-operation-with-corrections",
+  "guide": "docs/ultracode-token-routing-20260921.md",
+  "artifacts": [
+    "examples/claude-native/agents/source-scout.md",
+    "examples/claude-native/agents/evidence-reviewer.md",
+    "examples/claude-native/agents/isolated-builder.md",
+    "examples/claude-native/workflows/review-changes.js",
+    "examples/claude-native/workflows/readiness-audit.js",
+    "examples/claude-native/workflows/child-usage.mjs",
+    "examples/claude-native/workflows/test-envelope.mjs",
+    "examples/claude-native/workflows/test-contract-mutations.mjs",
+    "examples/claude-native/workflows/test-child-usage.mjs",
+    "examples/claude-native/workflows/test-usage-receipts.mjs",
+    "examples/claude-native/workflows/codex-cross-review.mjs",
+    "examples/claude-native/workflows/contract.config.json",
+    "examples/claude-native/ultracode.settings.json",
+    "evidence/artifacts/ultracode-token-routing-20260921/"
+  ],
+  "observations": {
+    "native_version": "2.1.278",
+    "first_prompt_tokens": {
+      "default_workflow_child": 42396,
+      "previous_reviewer_bare_server_grants": 42220,
+      "named_tools_without_toolsearch_probe": 21565,
+      "named_tools_with_toolsearch_probe": 12164,
+      "source_scout": 8048,
+      "adopted_reviewer_real_run": 17535,
+      "adopted_builder_real_run": 17864
+    },
+    "haiku_trial": {
+      "sonnet_lane_rows_correct": "14/14",
+      "haiku_lane_rows_correct": "9/14",
+      "haiku_requests": 22,
+      "sonnet_requests": 17,
+      "verifier": "claude-opus-5 high"
+    },
+    "native_runs": {
+      "review_changes": 8,
+      "readiness_audit": 1,
+      "builder": 1,
+      "probes": 3,
+      "codex_cross_review": 1
+    },
+    "receipt_files": 22
+  },
+  "limitations": [
+    "First-prompt figures come from one tiny task on one host and model; they bound a fixed spawn cost, not a savings rate.",
+    "The Haiku judgment rests on one packet and one Opus verifier.",
+    "The strict accepted envelope status was never returned in the deploying project; the commit gate was fix-and-commit after each review's findings were resolved.",
+    "Local suites are stubbed or synthetic; provider figures reach the receipts only as sanitized child-usage.mjs output, with raw transcripts outside Git.",
+    "Codex thread and turn identifiers were redacted from the cross-review record."
+  ]
+}

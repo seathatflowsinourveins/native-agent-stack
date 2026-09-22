@@ -80,7 +80,8 @@ portable fallback. Do not repeatedly run either command unless another tab is wa
 
 Merge the [short instruction example](../examples/claude-native/CLAUDE.md) into
 the user's existing `~/.claude/CLAUDE.md`, preserving independent preferences and
-managed imports. Keep project-specific tests, memory scope and domain policy in
+managed imports; it now carries the task sizing rule for the `unrestricted`
+workflow size guideline. Keep project-specific tests, memory scope and domain policy in
 that project's `CLAUDE.md`/`AGENTS.md`. Do not preload this catalog or duplicate
 the installed tool inventory in every worker.
 

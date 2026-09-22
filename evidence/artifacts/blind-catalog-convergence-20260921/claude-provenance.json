@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "scope": "Claude sealed discovery report and coordinator publication/adjudication; not native runtime acceptance or zero-bias ranking.",
+  "original_compact_sha256": "353a911625dd083c207c45686b4f25a5d683c09b7b98ecc03a4f4ec3bf84ef3a",
+  "public_report": "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+  "public_compact_sha256": "e422f576df3f94b1d4f7202316f28d7a83cd1d6aafab8a0891ee1cf76495cf75",
+  "first_sealed_inventory_sha256": "76d523e426fd9f8439bc54e8257abe272208864cf4475eb6e3a5ddbc0a47c701",
+  "all_first_sealed_inventory_files_matched": true,
+  "transformations": [
+    "Replace the private projects-root prefix with <PROJECTS_ROOT> and private home prefix with <OPERATOR_HOME>; retain all claims, scores, source URLs, refutations and failures.",
+    "Append one final LF to the sealed compact JSON, which had none; apart from that and the two disclosed private-prefix substitutions, the public report is unchanged.",
+    "Do not publish raw workflow journals, transcripts or session identifiers. Usage uses stable child ordinals; exact raw inputs remain private."
+  ],
+  "count_corrections": {
+    "reported_unique_candidates": 514,
+    "measured_merged_group_rows": 514,
+    "distinct_merged_repositories": 426,
+    "distinct_refuter_alternatives": 41,
+    "additional_refuter_repositories": 15,
+    "combined_discovery_repositories": 441
+  },
+  "workflow_counts": {
+    "reported_completed_agents": 63,
+    "observed_started_attempts": 65,
+    "observed_completed_children": 63,
+    "incomplete_judge_attempts": 2,
+    "reported_workflow_errors": 0,
+    "interpretation": "Workflow-level zero errors excludes two earlier judge attempts without terminal journal results; retain both scopes."
+  },
+  "usage_scope_correction": "The handed-over child-usage-latest.txt describes the subsequently running WF3, not WF2. Public WF2 usage is re-derived with the exact WF2 directory, retaining missing terminal results and unknown tails.",
+  "boundary": "Discovery uses broad grouped roles and a top-12-by-stars screen. Test/CI presence, native worker count, scores and refuter agreement do not prove comparative repository quality.",
+  "wf2_handoff_observed_sha256": "221fb3d515588c20d0020b10b2f197ebb49492d7d3b1f429697cc2a736972a24",
+  "handoff_hash_scope": "Return document observed at publication capture; the peer may append later WF3 material. The sealed compact report and first inventory are separately hashed."
+}

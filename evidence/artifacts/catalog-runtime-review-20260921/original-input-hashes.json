@@ -1,0 +1,71 @@
+{
+  "base_commit": "dac2d1a3f880c04f6afadebe8bf3a251a64ab605",
+  "files": {
+    "packet.json": "c87f0e8af6fbe81ab2a75783a9b6cfd2e82b004c0ccf8ab43a8f2ec8332b4aef",
+    "typesafe-context.md": "f7c22f3e2786ea97abe66dae994249608515e13ac8a50c5484305da3c2ff988d",
+    "codex.prompt.txt": "acf328e91aacb04028e7cc66c066109637728d09a6854d163b3b7875bb2b6878",
+    "claude.prompt.txt": "0d10d4638da7930ea3ba9d0e710dc0af719b5bd46967ce61f862c248ee51e85f"
+  },
+  "source_manifest": [
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "sha256": "196c8dcbc77272b1fcb91cb459e1124c4bc0ab0d15dee0e9c307c8a9712f5010"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "sha256": "bf212503dc1975935dbb12a82a92c8298a669c9de7b1c529e839402dfacf8a6e"
+    },
+    {
+      "path": "catalogs/landscape/manifest.json",
+      "sha256": "35212896482dbbff457b7bdb271fa3056912cb44ffbe9768581bc4d6019226c8"
+    },
+    {
+      "path": "adoption/manifest.json",
+      "sha256": "adc0c6a3c58dc0daf8c1c29061b349ca0ffd62b17950b4d6c31a7e9f63c34a76"
+    },
+    {
+      "path": "adoption/update.md",
+      "sha256": "9116102ebb4df576139194178d8e901d2088d7fa0629af4f1b9bf455bf65dccd"
+    },
+    {
+      "path": "docs/landscape-continuation.md",
+      "sha256": "535f1275cdee442758fac58173f78ce144ecb60d25709cd2826d02db4d740862"
+    },
+    {
+      "path": "docs/acceptance-evidence-policy.md",
+      "sha256": "f2b27f9fb431cbc91fcc399d9105c1ab6aac23767f2d617f319911360cdfa400"
+    },
+    {
+      "path": "blueprints/us-equities/workers/receipt.json",
+      "sha256": "4308f002936d354757ab819b1b537e26db41c76bf8201f58e0ce559750986afc"
+    },
+    {
+      "path": "blueprints/us-equities/deerflow/research-receipt.json",
+      "sha256": "b34779394c4fbc2a8444075ea002627e2e6bc4ec187e2cfa436d5c646101e95f"
+    },
+    {
+      "path": "blueprints/us-equities/convergence-program/review-receipt.json",
+      "sha256": "d7b940fcd8433fb422ae2a24b2b735e0a9c00da7cab41a5991a17c83479eb77b"
+    },
+    {
+      "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
+      "sha256": "970de5c2170bb0b55384ada8876bacca46c679ac8bc48e2b2d851d56f27c2431"
+    },
+    {
+      "path": "blueprints/us-equities/state-recovery/memory/receipt.json",
+      "sha256": "027c8e9c512ad0edb7a0c1c5ff5b2a98204082649d8520ff01d0c9cd41e22e59"
+    },
+    {
+      "path": "docs/native-skill-practice-20260921.md",
+      "sha256": "2acc1dc060996d3e2abd734053142ce7fce17ca9b604d8f8a8456058d01e6544"
+    },
+    {
+      "path": "docs/foundation-closure-20260921.md",
+      "sha256": "2b490d0bcfca6c7300079f36ced0e21ab708fb3f6517f4fc06076d5391b18164"
+    },
+    {
+      "path": "catalogs/foundation/community-practice-20260920.json",
+      "sha256": "3be2e20d06643032dccf9ce24fdaac369c21afdf705ee9e024ede1cb74c9d056"
+    }
+  ]
+}

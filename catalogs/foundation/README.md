@@ -6,7 +6,12 @@ Start with the layer needed for the task in [manifest.json](manifest.json), then
 read its scoped capability decision in [decisions.json](decisions.json). A default
 is a selected way to do a task, not permission to install or activate every tool.
 
-The catalog references 61 selected components through 46 capability decisions. Its
+The [current layer comparisons](../landscape/foundation.json) explain why each
+choice is retained, what happened to named alternatives, and what evidence would
+change the decision. Open [Choices & alternatives](../../docs/ecosystem/index.html#landscape)
+for the searchable offline view.
+
+The catalog references 61 selected components through 47 capability decisions. Its
 registered evidence references are listed per capability. These are coverage counts, not a
 score of complete installation, execution or lifecycle acceptance.
 
@@ -49,12 +54,13 @@ and original results remain in the canonical manifests linked below.
 | Recovery and portability | Restic, ai-memory, Qdrant, Dagu, systemd, native session continuation | [Lifecycle operations](../../adoption/lifecycle.md), [off-host application restore](../../blueprints/convergence-practice/offhost-app-state/README.md) |
 | Observation and inference | OpenTelemetry Collector/otel-tui, Prometheus, Grafana, Loki, Alertmanager, ntfy, AgentsView, ccusage; vLLM/llama.cpp | [Observation setup](../../observability/README.md), [native backends](../../observability/backends/README.md), [GPU compatibility evidence](../../blueprints/convergence-practice/gpu-inference/README.md) |
 
-The September 21 selected baseline has 42 accepted capabilities, three partial
+The September 21 reconciled baseline has 43 accepted capabilities, two partial
 optional capabilities and one source-review capability. Layer coverage overlaps:
 do not add per-layer counts. No required installation gap is declared in the
-current manifest. Interactive Claude sign-in/context/HUD, the outer companion
-plugin, exact-model optional gateway inference, four retained QMD benchmark
-misses and whole-task causal savings keep their explicit evidence boundaries.
+current manifest. The retained native Claude terminal observations establish
+configured HUD rendering; every statistic and new-host activation remain separate.
+The outer companion plugin, exact-model optional gateway inference, four retained
+QMD benchmark misses and whole-task causal savings keep their explicit boundaries.
 
 Each layer records its purpose, selected approach, activation condition, lifecycle
 scope and next actionable gap. Decisions join actual `component_ids` and

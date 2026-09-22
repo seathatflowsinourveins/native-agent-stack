@@ -1,0 +1,240 @@
+{
+  "status": "complete",
+  "reason": "every child has an explicit requested model, a matching resolved model, returned usage and a non-null result",
+  "multi_model_children": [],
+  "children": [
+    {
+      "label": "repair:F-ops",
+      "phase": "Repair",
+      "agent_type": "workflow-subagent",
+      "requested_model": "sonnet",
+      "resolved_models": [
+        "claude-sonnet-5"
+      ],
+      "efforts": [
+        "medium"
+      ],
+      "requests": 12,
+      "usage": {
+        "input_tokens": 24,
+        "output_tokens": 14458,
+        "cache_read_input_tokens": 594870,
+        "cache_creation_input_tokens": 61557
+      },
+      "usage_by_model": {
+        "claude-sonnet-5": {
+          "input_tokens": 24,
+          "output_tokens": 14458,
+          "cache_read_input_tokens": 594870,
+          "cache_creation_input_tokens": 61557
+        }
+      },
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 43572,
+      "complete": true,
+      "issues": [],
+      "attempt_label": "child-001"
+    },
+    {
+      "label": "repair:F-research-efficiency",
+      "phase": "Repair",
+      "agent_type": "workflow-subagent",
+      "requested_model": "sonnet",
+      "resolved_models": [
+        "claude-sonnet-5"
+      ],
+      "efforts": [
+        "medium"
+      ],
+      "requests": 16,
+      "usage": {
+        "input_tokens": 32,
+        "output_tokens": 16187,
+        "cache_read_input_tokens": 798809,
+        "cache_creation_input_tokens": 42355
+      },
+      "usage_by_model": {
+        "claude-sonnet-5": {
+          "input_tokens": 32,
+          "output_tokens": 16187,
+          "cache_read_input_tokens": 798809,
+          "cache_creation_input_tokens": 42355
+        }
+      },
+      "first_request_cache_read": 22542,
+      "first_request_prompt_tokens": 43580,
+      "complete": true,
+      "issues": [],
+      "attempt_label": "child-002"
+    },
+    {
+      "label": "repair:T-data",
+      "phase": "Repair",
+      "agent_type": "workflow-subagent",
+      "requested_model": "sonnet",
+      "resolved_models": [
+        "claude-sonnet-5"
+      ],
+      "efforts": [
+        "medium"
+      ],
+      "requests": 11,
+      "usage": {
+        "input_tokens": 22,
+        "output_tokens": 12619,
+        "cache_read_input_tokens": 534453,
+        "cache_creation_input_tokens": 41726
+      },
+      "usage_by_model": {
+        "claude-sonnet-5": {
+          "input_tokens": 22,
+          "output_tokens": 12619,
+          "cache_read_input_tokens": 534453,
+          "cache_creation_input_tokens": 41726
+        }
+      },
+      "first_request_cache_read": 22542,
+      "first_request_prompt_tokens": 43570,
+      "complete": true,
+      "issues": [],
+      "attempt_label": "child-003"
+    },
+    {
+      "label": "repair:F-retrieval-memory",
+      "phase": "Repair",
+      "agent_type": "workflow-subagent",
+      "requested_model": "sonnet",
+      "resolved_models": [
+        "claude-sonnet-5"
+      ],
+      "efforts": [
+        "medium"
+      ],
+      "requests": 9,
+      "usage": {
+        "input_tokens": 18,
+        "output_tokens": 8129,
+        "cache_read_input_tokens": 403595,
+        "cache_creation_input_tokens": 30878
+      },
+      "usage_by_model": {
+        "claude-sonnet-5": {
+          "input_tokens": 18,
+          "output_tokens": 8129,
+          "cache_read_input_tokens": 403595,
+          "cache_creation_input_tokens": 30878
+        }
+      },
+      "first_request_cache_read": 22542,
+      "first_request_prompt_tokens": 43582,
+      "complete": true,
+      "issues": [],
+      "attempt_label": "child-004"
+    },
+    {
+      "label": "repair:T-engines",
+      "phase": "Repair",
+      "agent_type": "workflow-subagent",
+      "requested_model": "sonnet",
+      "resolved_models": [
+        "claude-sonnet-5"
+      ],
+      "efforts": [
+        "medium"
+      ],
+      "requests": 8,
+      "usage": {
+        "input_tokens": 16,
+        "output_tokens": 9477,
+        "cache_read_input_tokens": 374339,
+        "cache_creation_input_tokens": 39307
+      },
+      "usage_by_model": {
+        "claude-sonnet-5": {
+          "input_tokens": 16,
+          "output_tokens": 9477,
+          "cache_read_input_tokens": 374339,
+          "cache_creation_input_tokens": 39307
+        }
+      },
+      "first_request_cache_read": 22542,
+      "first_request_prompt_tokens": 43572,
+      "complete": true,
+      "issues": [],
+      "attempt_label": "child-005"
+    },
+    {
+      "label": "repair:T-strategies",
+      "phase": "Repair",
+      "agent_type": "workflow-subagent",
+      "requested_model": "sonnet",
+      "resolved_models": [
+        "claude-sonnet-5"
+      ],
+      "efforts": [
+        "medium"
+      ],
+      "requests": 11,
+      "usage": {
+        "input_tokens": 22,
+        "output_tokens": 8432,
+        "cache_read_input_tokens": 530030,
+        "cache_creation_input_tokens": 36488
+      },
+      "usage_by_model": {
+        "claude-sonnet-5": {
+          "input_tokens": 22,
+          "output_tokens": 8432,
+          "cache_read_input_tokens": 530030,
+          "cache_creation_input_tokens": 36488
+        }
+      },
+      "first_request_cache_read": 22542,
+      "first_request_prompt_tokens": 43574,
+      "complete": true,
+      "issues": [],
+      "attempt_label": "child-006"
+    },
+    {
+      "label": "repair:T-portfolio-risk",
+      "phase": "Repair",
+      "agent_type": "workflow-subagent",
+      "requested_model": "sonnet",
+      "resolved_models": [
+        "claude-sonnet-5"
+      ],
+      "efforts": [
+        "medium"
+      ],
+      "requests": 17,
+      "usage": {
+        "input_tokens": 34,
+        "output_tokens": 8518,
+        "cache_read_input_tokens": 842744,
+        "cache_creation_input_tokens": 36032
+      },
+      "usage_by_model": {
+        "claude-sonnet-5": {
+          "input_tokens": 34,
+          "output_tokens": 8518,
+          "cache_read_input_tokens": 842744,
+          "cache_creation_input_tokens": 36032
+        }
+      },
+      "first_request_cache_read": 22542,
+      "first_request_prompt_tokens": 43582,
+      "complete": true,
+      "issues": [],
+      "attempt_label": "child-007"
+    }
+  ],
+  "by_resolved_model": {
+    "claude-sonnet-5": {
+      "children": 7,
+      "input_tokens": 168,
+      "output_tokens": 77820,
+      "cache_read_input_tokens": 4078840,
+      "cache_creation_input_tokens": 288343
+    }
+  }
+}

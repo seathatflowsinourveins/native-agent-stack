@@ -1,0 +1,374 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-21T23:25:19.701Z",
+  "source_kind": "fresh_provider_execution_on_selected_public_excerpts",
+  "case_pack_sha256": "7cc28c50afb9842de3d8dc923e80159bf99d0f0e9acd643684a99b61b3ad3a40",
+  "raw_report_sha256": "2b3e87e21689506728626a0fa691f152782ffb3f7600c36b9bea1b8b45d5494c",
+  "promptfoo_exit_code": 100,
+  "service_errors": 0,
+  "no_label_or_prompt_tuning_after_inference": true,
+  "providers": {
+    "exact-text-baseline-v1": {
+      "correct": 3,
+      "cases": 8,
+      "median_latency_ms": 0.0,
+      "rows": [
+        {
+          "case_id": "C1",
+          "expected": "supported",
+          "verdict": "insufficient",
+          "eligible": true,
+          "disposition": "advisory_insufficient",
+          "passed": false,
+          "latency_ms": 2,
+          "previous_summary_trimmed_excerpt_sha256": "81b5898828924531619f318f6d944406560bff056402cbe7e9ef5bb14449c319",
+          "frozen_source_excerpt_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "Promptfoo compacted JSON; parsed content equals the frozen excerpt.",
+          "source_excerpt_sha256": "00f168bda67b70cfe3b8ab63a4cbc4ed739e10965a1217ccae146e84429c051b"
+        },
+        {
+          "case_id": "C2",
+          "expected": "insufficient",
+          "verdict": "insufficient",
+          "eligible": true,
+          "disposition": "advisory_insufficient",
+          "passed": true,
+          "latency_ms": 0,
+          "previous_summary_trimmed_excerpt_sha256": "81b5898828924531619f318f6d944406560bff056402cbe7e9ef5bb14449c319",
+          "frozen_source_excerpt_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "Promptfoo compacted JSON; parsed content equals the frozen excerpt.",
+          "source_excerpt_sha256": "00f168bda67b70cfe3b8ab63a4cbc4ed739e10965a1217ccae146e84429c051b"
+        },
+        {
+          "case_id": "C3",
+          "expected": "supported",
+          "verdict": "insufficient",
+          "eligible": true,
+          "disposition": "advisory_insufficient",
+          "passed": false,
+          "latency_ms": 0,
+          "previous_summary_trimmed_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+          "frozen_source_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "none",
+          "source_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9"
+        },
+        {
+          "case_id": "C4",
+          "expected": "insufficient",
+          "verdict": "insufficient",
+          "eligible": true,
+          "disposition": "advisory_insufficient",
+          "passed": true,
+          "latency_ms": 0,
+          "previous_summary_trimmed_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+          "frozen_source_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "none",
+          "source_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9"
+        },
+        {
+          "case_id": "C5",
+          "expected": "contradicted",
+          "verdict": "insufficient",
+          "eligible": true,
+          "disposition": "advisory_insufficient",
+          "passed": false,
+          "latency_ms": 0,
+          "previous_summary_trimmed_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+          "frozen_source_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "none",
+          "source_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f"
+        },
+        {
+          "case_id": "C6",
+          "expected": "supported",
+          "verdict": "insufficient",
+          "eligible": false,
+          "disposition": "reject_evidence",
+          "passed": false,
+          "latency_ms": 0,
+          "previous_summary_trimmed_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+          "frozen_source_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "none",
+          "source_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f"
+        },
+        {
+          "case_id": "C7",
+          "expected": "contradicted",
+          "verdict": "insufficient",
+          "eligible": true,
+          "disposition": "advisory_insufficient",
+          "passed": false,
+          "latency_ms": 1,
+          "previous_summary_trimmed_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+          "frozen_source_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "none",
+          "source_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df"
+        },
+        {
+          "case_id": "C8",
+          "expected": "insufficient",
+          "verdict": "insufficient",
+          "eligible": true,
+          "disposition": "advisory_insufficient",
+          "passed": true,
+          "latency_ms": 1,
+          "previous_summary_trimmed_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+          "frozen_source_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "none",
+          "source_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df"
+        }
+      ]
+    },
+    "typesafe-jev-1.13.0-evidence-v1": {
+      "correct": 7,
+      "cases": 8,
+      "median_latency_ms": 171.5,
+      "rows": [
+        {
+          "case_id": "C1",
+          "expected": "supported",
+          "verdict": "supported",
+          "eligible": true,
+          "disposition": "advisory_supported",
+          "passed": true,
+          "latency_ms": 344,
+          "previous_summary_trimmed_excerpt_sha256": "81b5898828924531619f318f6d944406560bff056402cbe7e9ef5bb14449c319",
+          "frozen_source_excerpt_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "Promptfoo compacted JSON; parsed content equals the frozen excerpt.",
+          "source_excerpt_sha256": "00f168bda67b70cfe3b8ab63a4cbc4ed739e10965a1217ccae146e84429c051b",
+          "model": "jev-1.13.0",
+          "confidence": 1,
+          "probabilities": {
+            "supported": 1,
+            "insufficient": 0,
+            "contradicted": 0
+          },
+          "inference": "live",
+          "request_id": "req_01a0c649cb59781abeeb82b0a2ada9af",
+          "usage": {
+            "input_tokens": 849,
+            "output_tokens": 45,
+            "requests": 1
+          }
+        },
+        {
+          "case_id": "C2",
+          "expected": "insufficient",
+          "verdict": "insufficient",
+          "eligible": true,
+          "disposition": "advisory_insufficient",
+          "passed": true,
+          "latency_ms": 171,
+          "previous_summary_trimmed_excerpt_sha256": "81b5898828924531619f318f6d944406560bff056402cbe7e9ef5bb14449c319",
+          "frozen_source_excerpt_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "Promptfoo compacted JSON; parsed content equals the frozen excerpt.",
+          "source_excerpt_sha256": "00f168bda67b70cfe3b8ab63a4cbc4ed739e10965a1217ccae146e84429c051b",
+          "model": "jev-1.13.0",
+          "confidence": 0.95,
+          "probabilities": {
+            "insufficient": 0.96,
+            "contradicted": 0.04,
+            "supported": 0
+          },
+          "inference": "live",
+          "request_id": "req_01a0c649cc0b7d14a9e725d4acc6f4a1",
+          "usage": {
+            "input_tokens": 840,
+            "output_tokens": 48,
+            "requests": 1
+          }
+        },
+        {
+          "case_id": "C3",
+          "expected": "supported",
+          "verdict": "supported",
+          "eligible": true,
+          "disposition": "advisory_supported",
+          "passed": true,
+          "latency_ms": 124,
+          "previous_summary_trimmed_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+          "frozen_source_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "none",
+          "source_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+          "model": "jev-1.13.0",
+          "confidence": 1,
+          "probabilities": {
+            "supported": 1,
+            "insufficient": 0,
+            "contradicted": 0
+          },
+          "inference": "live",
+          "request_id": "req_01a0c649ccc1766d85701513d60cf070",
+          "usage": {
+            "input_tokens": 562,
+            "output_tokens": 45,
+            "requests": 1
+          }
+        },
+        {
+          "case_id": "C4",
+          "expected": "insufficient",
+          "verdict": "contradicted",
+          "eligible": true,
+          "disposition": "advisory_contradicted",
+          "passed": false,
+          "latency_ms": 172,
+          "previous_summary_trimmed_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+          "frozen_source_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "none",
+          "source_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+          "model": "jev-1.13.0",
+          "confidence": 0.76,
+          "probabilities": {
+            "supported": 0,
+            "insufficient": 0.16,
+            "contradicted": 0.84
+          },
+          "inference": "live",
+          "request_id": "req_01a0c649cd4b79a8a14ac2c1e2a34ca6",
+          "usage": {
+            "input_tokens": 566,
+            "output_tokens": 48,
+            "requests": 1
+          }
+        },
+        {
+          "case_id": "C5",
+          "expected": "contradicted",
+          "verdict": "contradicted",
+          "eligible": true,
+          "disposition": "advisory_contradicted",
+          "passed": true,
+          "latency_ms": 193,
+          "previous_summary_trimmed_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+          "frozen_source_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "none",
+          "source_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+          "model": "jev-1.13.0",
+          "confidence": 1,
+          "probabilities": {
+            "supported": 0,
+            "contradicted": 1,
+            "insufficient": 0
+          },
+          "inference": "live",
+          "request_id": "req_01a0c649ce037152bd20ff7daf316372",
+          "usage": {
+            "input_tokens": 536,
+            "output_tokens": 48,
+            "requests": 1
+          }
+        },
+        {
+          "case_id": "C6",
+          "expected": "supported",
+          "verdict": "supported",
+          "eligible": false,
+          "disposition": "reject_evidence",
+          "passed": true,
+          "latency_ms": 164,
+          "previous_summary_trimmed_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+          "frozen_source_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "none",
+          "source_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+          "model": "jev-1.13.0",
+          "confidence": 0.97,
+          "probabilities": {
+            "contradicted": 0,
+            "insufficient": 0.02,
+            "supported": 0.98
+          },
+          "inference": "live",
+          "request_id": "req_01a0c649cecc79d7836e6851e6d831b5",
+          "usage": {
+            "input_tokens": 537,
+            "output_tokens": 45,
+            "requests": 1
+          }
+        },
+        {
+          "case_id": "C7",
+          "expected": "contradicted",
+          "verdict": "contradicted",
+          "eligible": true,
+          "disposition": "advisory_contradicted",
+          "passed": true,
+          "latency_ms": 143,
+          "previous_summary_trimmed_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+          "frozen_source_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "none",
+          "source_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+          "model": "jev-1.13.0",
+          "confidence": 1,
+          "probabilities": {
+            "supported": 0,
+            "insufficient": 0,
+            "contradicted": 1
+          },
+          "inference": "live",
+          "request_id": "req_01a0c649cf757d8f997c22d4cddd203a",
+          "usage": {
+            "input_tokens": 477,
+            "output_tokens": 48,
+            "requests": 1
+          }
+        },
+        {
+          "case_id": "C8",
+          "expected": "insufficient",
+          "verdict": "insufficient",
+          "eligible": true,
+          "disposition": "advisory_insufficient",
+          "passed": true,
+          "latency_ms": 173,
+          "previous_summary_trimmed_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+          "frozen_source_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+          "source_hash_scope": "Actual source string recovered from retained rendered prompt; same in both providers.",
+          "normalization": "none",
+          "source_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+          "model": "jev-1.13.0",
+          "confidence": 0.95,
+          "probabilities": {
+            "supported": 0,
+            "contradicted": 0.03,
+            "insufficient": 0.97
+          },
+          "inference": "live",
+          "request_id": "req_01a0c649d01077c6b2af8824a7d07c3e",
+          "usage": {
+            "input_tokens": 479,
+            "output_tokens": 48,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 4846,
+        "output_tokens": 375,
+        "requests": 8
+      }
+    }
+  },
+  "limitations": [
+    "Eight selected diagnostic cases, not representative held-out domain or universal-ranking evidence.",
+    "Literal containment is a weak comparator, not a native coding-agent baseline.",
+    "C4 disagrees with the frozen label: contradicted instead of insufficient; preserve as a failure requiring source review.",
+    "C6 availability inputs are illustrative; deterministic rejection is separate from semantic support.",
+    "No calibrated threshold, causal cost saving, trading qualification or automatic selection authority."
+  ]
+}

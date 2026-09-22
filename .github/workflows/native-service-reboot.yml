@@ -24,7 +24,7 @@ jobs:
         run: bash blueprints/convergence-practice/service-reboot/upstream-tests.sh
       - name: Preserve upstream native output and source identity
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: native-service-reboot-upstream-dagu-tests
           path: ${{ runner.temp }}/native-service-reboot-upstream/reports
@@ -60,7 +60,7 @@ jobs:
             --work "$RUNNER_TEMP/native-service-reboot"
       - name: Preserve success or failure evidence without keys or disks
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: native-service-reboot-evidence
           path: ${{ runner.temp }}/native-service-reboot/reports

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "frozen_at_utc": "2026-09-22 02:33:43 UTC",
+  "report_scope": "Independent source discovery, partially selection-blinded; no native runtime qualification.",
+  "files": [
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+      "original_sha256": "281207f17a26966a91814978e1fa9646176e0e3121917edaec61a4de56fece61",
+      "published_sha256": "24001f4bed3298909d4493a82501590dd5725d1df0445a666ffd81cbc318f84b",
+      "transformation": "Replace one private local_input path with the portable neutral-requirements path; all other bytes unchanged."
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.md",
+      "original_sha256": "c7e437ed1d0d7e2776a8a73597b4e6b0f027e9afb3cbb9b331cdc28e619e483a",
+      "published_sha256": "c7e437ed1d0d7e2776a8a73597b4e6b0f027e9afb3cbb9b331cdc28e619e483a",
+      "transformation": "None; exact sealed bytes."
+    }
+  ],
+  "neutral_input": {
+    "path": "blueprints/blind-catalog-convergence/neutral-requirements.json",
+    "sha256": "923af7463aa21bdf69dec28137b89e6c5dd9ac37c4f917757ded8acb8377b443"
+  }
+}

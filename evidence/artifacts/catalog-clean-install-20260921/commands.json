@@ -1,0 +1,232 @@
+{
+  "scope": "Exact observed commands with personal paths replaced by documented placeholders; original log hashes describe retained private logs. Published log bytes can differ after sanitization. Suite log is a bounded excerpt.",
+  "commands": [
+    {
+      "label": "00-clean-status-before",
+      "args": [
+        "git",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all"
+      ],
+      "command": "git status --porcelain=v1 --untracked-files=all",
+      "started_at": "2026-09-22T01:33:54.484754+00:00",
+      "duration_seconds": 0.005,
+      "exit_code": 0,
+      "private_log_sha256": "3c70eeaaf2014fc3f59d66856e6b3877ab10341f127abb2f3c03c778bb8dcdc3",
+      "public_log": null
+    },
+    {
+      "label": "01-uv-version",
+      "args": [
+        "${UV_BIN}",
+        "--version"
+      ],
+      "command": "${UV_BIN} --version",
+      "started_at": "2026-09-22T01:33:54.489875+00:00",
+      "duration_seconds": 0.004,
+      "exit_code": 0,
+      "private_log_sha256": "a559e56bb2b01c7115cafc7cab3fa0cdb400ea334226863f8d7761d9e1e177a1",
+      "public_log": null
+    },
+    {
+      "label": "02-python-version",
+      "args": [
+        "${PYTHON_BIN}",
+        "--version"
+      ],
+      "command": "${PYTHON_BIN} --version",
+      "started_at": "2026-09-22T01:33:54.494234+00:00",
+      "duration_seconds": 0.001,
+      "exit_code": 0,
+      "private_log_sha256": "c6b6a468165d86f13c89b49179eb516a018890002613f000c5df222bd41fd1d1",
+      "public_log": null
+    },
+    {
+      "label": "03-create-prefix",
+      "args": [
+        "${UV_BIN}",
+        "--no-config",
+        "--no-cache",
+        "venv",
+        "--python",
+        "${PYTHON_BIN}",
+        "--no-python-downloads",
+        "${SDK_ENV}"
+      ],
+      "command": "${UV_BIN} --no-config --no-cache venv --python ${PYTHON_BIN} --no-python-downloads ${SDK_ENV}",
+      "started_at": "2026-09-22T01:33:54.495431+00:00",
+      "duration_seconds": 0.034,
+      "exit_code": 0,
+      "private_log_sha256": "fcf1fc9cbbacfa6d914c41bf6c69c1ead3c5435a6834ce64683f6e4cf6d6e4d2",
+      "public_log": null
+    },
+    {
+      "label": "04-locked-sdk-sync",
+      "args": [
+        "${UV_BIN}",
+        "--no-config",
+        "--no-cache",
+        "pip",
+        "sync",
+        "--python",
+        "${SDK_ENV}/bin/python",
+        "--require-hashes",
+        "--no-build",
+        "--strict",
+        "--default-index",
+        "https://pypi.org/simple",
+        "--no-sources",
+        "--reinstall",
+        "${STACK_REPO}/adoption/sdk/requirements-linux-x86_64-py313.lock"
+      ],
+      "command": "${UV_BIN} --no-config --no-cache pip sync --python ${SDK_ENV}/bin/python --require-hashes --no-build --strict --default-index https://pypi.org/simple --no-sources --reinstall ${STACK_REPO}/adoption/sdk/requirements-linux-x86_64-py313.lock",
+      "started_at": "2026-09-22T01:33:54.529372+00:00",
+      "duration_seconds": 6.618,
+      "exit_code": 0,
+      "private_log_sha256": "a3b74348f7f9027071a1c50e071202fa2d5138c1d4f278699ecf6a8983f2e42e",
+      "public_log": "04-locked-sdk-sync.log"
+    },
+    {
+      "label": "05-package-consistency",
+      "args": [
+        "${UV_BIN}",
+        "--no-config",
+        "--no-cache",
+        "pip",
+        "check",
+        "--python",
+        "${SDK_ENV}/bin/python"
+      ],
+      "command": "${UV_BIN} --no-config --no-cache pip check --python ${SDK_ENV}/bin/python",
+      "started_at": "2026-09-22T01:34:01.148190+00:00",
+      "duration_seconds": 0.044,
+      "exit_code": 0,
+      "private_log_sha256": "d0900a966d7c3f804cd32924678b1d61b7b4a05e502f3134ab8f7405b79af221",
+      "public_log": "05-package-consistency.log"
+    },
+    {
+      "label": "06-sdk-imports-inventory",
+      "args": [
+        "${SDK_ENV}/bin/python",
+        "-I",
+        "-c",
+        "\nimport importlib.metadata as m\nimport json,re,site,sys\nfrom pathlib import Path\nimport duckdb,pandas,alpaca,exchange_calendars,openai,openai_codex,numpy\nfrom openai_codex import AsyncCodex, ApprovalMode, CodexConfig, Sandbox\nfrom openai_codex.client import CodexClient\nfrom openai_codex.generated.v2_all import GetAccountRateLimitsResponse\ndef norm(s): return re.sub(r'[-_.]+','-',s).lower()\nlock=Path('adoption/sdk/requirements-linux-x86_64-py313.lock').read_text()\nexpected={norm(n):v for n,v in re.findall(r'^([A-Za-z0-9_.-]+)==([^\\\\\\s]+)',lock,re.M)}\ninstalled={norm(d.metadata['Name']):d.version for d in m.distributions()}\nmodules={name: {'version':m.version(dist),'file':str(Path(mod.__file__).resolve()),'inside_prefix':Path(mod.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())} for name,dist,mod in [('duckdb','duckdb',duckdb),('pandas','pandas',pandas),('alpaca','alpaca-py',alpaca),('exchange_calendars','exchange-calendars',exchange_calendars),('openai','openai',openai),('openai_codex','openai-codex',openai_codex),('numpy','numpy',numpy)]}\nresult=dict(python=sys.version,prefix=sys.prefix,base_prefix=sys.base_prefix,system_site_packages='include-system-site-packages = true' in (Path(sys.prefix)/'pyvenv.cfg').read_text(),user_site_enabled=site.ENABLE_USER_SITE,lock_count=len(expected),installed_count=len(installed),exact_name_version_match=installed==expected,missing=sorted(set(expected)-set(installed)),extra=sorted(set(installed)-set(expected)),version_mismatches={k:[v,installed.get(k)] for k,v in expected.items() if installed.get(k)!=v},imports=modules,sdk_worker_symbols_imported=['AsyncCodex','ApprovalMode','CodexConfig','Sandbox','CodexClient','GetAccountRateLimitsResponse'],duckdb_fixture=duckdb.sql('select sum(x) from (values (1),(2),(3)) t(x)').fetchone()[0])\nprint(json.dumps(result,indent=2))\nassert installed==expected\nassert all(v['inside_prefix'] for v in modules.values())\nassert result['duckdb_fixture']==6\nassert not result['system_site_packages'] and not result['user_site_enabled']\n"
+      ],
+      "command": "${SDK_ENV}/bin/python -I -c '\nimport importlib.metadata as m\nimport json,re,site,sys\nfrom pathlib import Path\nimport duckdb,pandas,alpaca,exchange_calendars,openai,openai_codex,numpy\nfrom openai_codex import AsyncCodex, ApprovalMode, CodexConfig, Sandbox\nfrom openai_codex.client import CodexClient\nfrom openai_codex.generated.v2_all import GetAccountRateLimitsResponse\ndef norm(s): return re.sub(r'\"'\"'[-_.]+'\"'\"','\"'\"'-'\"'\"',s).lower()\nlock=Path('\"'\"'adoption/sdk/requirements-linux-x86_64-py313.lock'\"'\"').read_text()\nexpected={norm(n):v for n,v in re.findall(r'\"'\"'^([A-Za-z0-9_.-]+)==([^\\\\\\s]+)'\"'\"',lock,re.M)}\ninstalled={norm(d.metadata['\"'\"'Name'\"'\"']):d.version for d in m.distributions()}\nmodules={name: {'\"'\"'version'\"'\"':m.version(dist),'\"'\"'file'\"'\"':str(Path(mod.__file__).resolve()),'\"'\"'inside_prefix'\"'\"':Path(mod.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())} for name,dist,mod in [('\"'\"'duckdb'\"'\"','\"'\"'duckdb'\"'\"',duckdb),('\"'\"'pandas'\"'\"','\"'\"'pandas'\"'\"',pandas),('\"'\"'alpaca'\"'\"','\"'\"'alpaca-py'\"'\"',alpaca),('\"'\"'exchange_calendars'\"'\"','\"'\"'exchange-calendars'\"'\"',exchange_calendars),('\"'\"'openai'\"'\"','\"'\"'openai'\"'\"',openai),('\"'\"'openai_codex'\"'\"','\"'\"'openai-codex'\"'\"',openai_codex),('\"'\"'numpy'\"'\"','\"'\"'numpy'\"'\"',numpy)]}\nresult=dict(python=sys.version,prefix=sys.prefix,base_prefix=sys.base_prefix,system_site_packages='\"'\"'include-system-site-packages = true'\"'\"' in (Path(sys.prefix)/'\"'\"'pyvenv.cfg'\"'\"').read_text(),user_site_enabled=site.ENABLE_USER_SITE,lock_count=len(expected),installed_count=len(installed),exact_name_version_match=installed==expected,missing=sorted(set(expected)-set(installed)),extra=sorted(set(installed)-set(expected)),version_mismatches={k:[v,installed.get(k)] for k,v in expected.items() if installed.get(k)!=v},imports=modules,sdk_worker_symbols_imported=['\"'\"'AsyncCodex'\"'\"','\"'\"'ApprovalMode'\"'\"','\"'\"'CodexConfig'\"'\"','\"'\"'Sandbox'\"'\"','\"'\"'CodexClient'\"'\"','\"'\"'GetAccountRateLimitsResponse'\"'\"'],duckdb_fixture=duckdb.sql('\"'\"'select sum(x) from (values (1),(2),(3)) t(x)'\"'\"').fetchone()[0])\nprint(json.dumps(result,indent=2))\nassert installed==expected\nassert all(v['\"'\"'inside_prefix'\"'\"'] for v in modules.values())\nassert result['\"'\"'duckdb_fixture'\"'\"']==6\nassert not result['\"'\"'system_site_packages'\"'\"'] and not result['\"'\"'user_site_enabled'\"'\"']\n'",
+      "started_at": "2026-09-22T01:34:01.192419+00:00",
+      "duration_seconds": 2.298,
+      "exit_code": 0,
+      "private_log_sha256": "406bb206b4e6c82450414e2754502a5908bd460431b9caf9402f43f455c270e2",
+      "public_log": "06-sdk-imports-inventory.log"
+    },
+    {
+      "label": "07-portable-integrity",
+      "args": [
+        "${SDK_ENV}/bin/python",
+        "scripts/validate.py"
+      ],
+      "command": "${SDK_ENV}/bin/python scripts/validate.py",
+      "started_at": "2026-09-22T01:34:03.490681+00:00",
+      "duration_seconds": 2.009,
+      "exit_code": 0,
+      "private_log_sha256": "38360bd8f5c17ac3d244395bcf9e6a5b80e49a08f04fa02608c6d35406dab8af",
+      "public_log": "07-portable-integrity.log"
+    },
+    {
+      "label": "08-catalog-integrity",
+      "args": [
+        "${SDK_ENV}/bin/python",
+        "scripts/validate_catalogs.py"
+      ],
+      "command": "${SDK_ENV}/bin/python scripts/validate_catalogs.py",
+      "started_at": "2026-09-22T01:34:05.499968+00:00",
+      "duration_seconds": 0.091,
+      "exit_code": 0,
+      "private_log_sha256": "63befdacdc5ca70295eb60699cab5892fb92ca12406fc0d5b245d36fb92d3608",
+      "public_log": "08-catalog-integrity.log"
+    },
+    {
+      "label": "09-existing-test-suite",
+      "args": [
+        "${SDK_ENV}/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "command": "${SDK_ENV}/bin/python -m unittest discover -s tests -v",
+      "started_at": "2026-09-22T01:34:05.591786+00:00",
+      "duration_seconds": 17.761,
+      "exit_code": 1,
+      "private_log_sha256": "524a7d47a0609ccf189a79d9bd562cf427909622d0cd537447db44da3b3ed5e8",
+      "public_log": "09-existing-test-suite.log"
+    },
+    {
+      "label": "10-profile-prerequisites",
+      "args": [
+        "${SDK_ENV}/bin/python",
+        "scripts/adoption_status.py",
+        "--profile",
+        "foundation-cpu",
+        "--profile",
+        "research-runtime",
+        "--profile",
+        "observability",
+        "--profile",
+        "semantic-rag",
+        "--profile",
+        "recovery",
+        "--profile",
+        "trading-nautilus",
+        "--json"
+      ],
+      "command": "${SDK_ENV}/bin/python scripts/adoption_status.py --profile foundation-cpu --profile research-runtime --profile observability --profile semantic-rag --profile recovery --profile trading-nautilus --json",
+      "started_at": "2026-09-22T01:34:23.353631+00:00",
+      "duration_seconds": 0.333,
+      "exit_code": 2,
+      "private_log_sha256": "db0a56a053acf4208600872d43c70ca8233afa5e27b98adeada39373378a172a",
+      "public_log": "10-profile-prerequisites.log"
+    },
+    {
+      "label": "11-clean-status-after",
+      "args": [
+        "git",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all"
+      ],
+      "command": "git status --porcelain=v1 --untracked-files=all",
+      "started_at": "2026-09-22T01:34:23.686948+00:00",
+      "duration_seconds": 0.004,
+      "exit_code": 0,
+      "private_log_sha256": "872f450549e947ec2915019523bee2905020c2eb315a4805eb6f58d65841c98c",
+      "public_log": null
+    },
+    {
+      "label": "12-home-preserved-failed-test-only",
+      "args": [
+        "${SDK_ENV}/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_native_token_ci.py",
+        "-k",
+        "test_timeout_retains_exit_and_scoped_environment",
+        "-v"
+      ],
+      "command": "${SDK_ENV}/bin/python -m unittest discover -s tests -p test_native_token_ci.py -k test_timeout_retains_exit_and_scoped_environment -v",
+      "started_at": "2026-09-22T01:36:09.115440+00:00",
+      "duration_seconds": 0.114,
+      "exit_code": 0,
+      "reason": "Previous audit process omitted HOME; original test line101 expects unchanged native HOME. This replay preserves existing HOME without loading auth env or changing account settings; packages and repo unchanged.",
+      "private_log_sha256": "1cdae485e5ad0ecdca52d2c403b55f4045352966f15d563352d42900e2358461",
+      "public_log": "12-home-preserved-failed-test-only.log"
+    }
+  ]
+}

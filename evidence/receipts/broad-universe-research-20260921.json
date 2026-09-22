@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "broad-universe-research-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "alpaca-py",
+    "duckdb",
+    "claude-code",
+    "codex"
+  ],
+  "claim": "Widest entitled SIP daily coverage measured for 17,997 US-listed symbols over 2,693 sessions (2016-01-04 to 2026-09-18) with page-hash and pagination proofs; a frozen broad-universe mover protocol evaluated chronologically once, establishing no predictive signal; and a dated full-universe scan in which META and AMD ranked 14th and 19th of 1,795 eligible names.",
+  "limitations": [
+    "Survivorship exposure before 2020: only 25/47/167 symbols end in 2016/2017/2018 because the provider asset list under-enumerates delisted names and corporate-action records are thin before 2020.",
+    "Daily-bar event study with modelled costs; no opening-auction price, halts, quotes or portfolio simulation; not attainable P&L and not a paper or broker result.",
+    "Identity is provider-symbol based: 155 duplicated ticker series were removed, 80 partial overlaps (0.12% of rows) and 235 undated ticker collisions remain.",
+    "No paper order was placed: no signal met promotion, the session was closed, and multi-session horizons do not fit the frozen 300-second adaptive trial.",
+    "Scan flags are research flags, not predictions; provider mover screens are bounded top-N lists; tests are local synthetic-fixture checks."
+  ],
+  "native_evidence": "blueprints/us-equities/broad-universe/receipt.json",
+  "source_review": "blueprints/us-equities/broad-universe/README.md"
+}

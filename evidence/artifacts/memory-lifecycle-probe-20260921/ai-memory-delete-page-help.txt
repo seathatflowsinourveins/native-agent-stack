@@ -1,0 +1,24 @@
+Delete a single wiki page. The server routes scope resolution through `resolve_ws_proj`, so a delete targeting a project that exists in multiple workspaces never silently lands in the wrong slot (the MCP `memory_delete_page` had that gap until this build)
+
+Usage: ai-memory delete-page [OPTIONS] --path <PATH>
+
+Options:
+      --data-dir <DATA_DIR>
+          Override the data directory.
+
+          Defaults to a platform path under `dirs::data_local_dir()`. The config loader also honours `AI_MEMORY_DATA_DIR`.
+
+      --path <PATH>
+          Exact wiki path to delete (e.g. `notes/foo.md`)
+
+      --config <CONFIG>
+          Path to an explicit config file (defaults to `<data_dir>/config.toml`)
+
+      --workspace <WORKSPACE>
+          Workspace name. Defaults to the nearest `.ai-memory.toml` marker's `workspace`, else `default`. Resolution is announced on stderr so a cross-workspace project-name collision can never silently route the delete to the wrong slot
+
+      --project <PROJECT>
+          Project name. When omitted, auto-derived from the current project (same heuristic write-page/read-page use)
+
+  -h, --help
+          Print help (see a summary with '-h')

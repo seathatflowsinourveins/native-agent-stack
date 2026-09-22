@@ -1,0 +1,13 @@
+{
+  "label": "08-catalog-integrity",
+  "args": [
+    "<PRIVATE_EVIDENCE>/sdk/bin/python",
+    "scripts/validate_catalogs.py"
+  ],
+  "command": "<PRIVATE_EVIDENCE>/sdk/bin/python scripts/validate_catalogs.py",
+  "started_at": "2026-09-22T01:34:05.499968+00:00",
+  "duration_seconds": 0.091,
+  "exit_code": 0,
+  "stdout": "{\"beyond_star_catalog_repositories\": 105, \"models\": 20, \"public_stars\": 342, \"repository_entries\": 152, \"starred_catalog_repositories\": 42, \"unique_catalog_repositories\": 147}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun.\n",
+  "stderr": ""
+}

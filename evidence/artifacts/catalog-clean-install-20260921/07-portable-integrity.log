@@ -1,0 +1,13 @@
+{
+  "label": "07-portable-integrity",
+  "args": [
+    "<PRIVATE_EVIDENCE>/sdk/bin/python",
+    "scripts/validate.py"
+  ],
+  "command": "<PRIVATE_EVIDENCE>/sdk/bin/python scripts/validate.py",
+  "started_at": "2026-09-22T01:34:03.490681+00:00",
+  "duration_seconds": 2.009,
+  "exit_code": 0,
+  "stdout": "{\"components\": 68, \"hashed_files\": 1454, \"profiles\": 4, \"receipts\": 128, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+  "stderr": ""
+}

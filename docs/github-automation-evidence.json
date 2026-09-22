@@ -8,16 +8,37 @@
     "base": "4a4382736804bffab6754d92492af282dcb2f165",
     "independent_review": "No actionable findings in original diff; hosted runs and native artifact availability independently inspected.",
     "reused_local_evidence": "actionlint 1.7.12 on four changed workflows; zizmor on six workflows; 49 security/registry tests; integrity validation and exact HTML rebuild. No unchanged qualification rerun.",
-    "hosted_runs": [35539623928, 35539623855, 35539623917, 35539623932],
-    "hosted_events": {"pull_request": 4, "push": 0},
+    "hosted_runs": [
+      35539623928,
+      35539623855,
+      35539623917,
+      35539623932
+    ],
+    "hosted_events": {
+      "pull_request": 4,
+      "push": 0
+    },
     "hosted_conclusions": "All four success",
-    "native_artifacts_observed_unexpired": [10614510695, 10614272134]
+    "native_artifacts_observed_unexpired": [
+      10614510695,
+      10614272134
+    ]
   },
   "settings_before": {
     "rulesets_response": [],
-    "main_protection_response": {"message": "Branch not protected", "status": "404"},
-    "workflow_permissions_response": {"default_workflow_permissions": "read", "can_approve_pull_request_reviews": false},
-    "actions_permissions_response": {"enabled": true, "allowed_actions": "all", "sha_pinning_required": false}
+    "main_protection_response": {
+      "message": "Branch not protected",
+      "status": "404"
+    },
+    "workflow_permissions_response": {
+      "default_workflow_permissions": "read",
+      "can_approve_pull_request_reviews": false
+    },
+    "actions_permissions_response": {
+      "enabled": true,
+      "allowed_actions": "all",
+      "sha_pinning_required": false
+    }
   },
   "settings_after": {
     "command": "gh api --method POST repos/seathatflowsinourveins/native-agent-stack/rulesets --input .github/main-ruleset.json",
@@ -26,7 +47,10 @@
     "returned_enforcement": "active",
     "source_configuration": ".github/main-ruleset.json",
     "observation_command": "gh api repos/seathatflowsinourveins/native-agent-stack/rules/branches/main",
-    "observed_required_contexts": ["validate", "token-report"],
+    "observed_required_contexts": [
+      "validate",
+      "token-report"
+    ],
     "observed_integration_id": 15368,
     "observed_strict_required_status_checks_policy": false,
     "independent_configuration_comparison": "GET rulesets/23739774 fields matched every field of reviewed main-ruleset.json",
@@ -75,5 +99,177 @@
     "Publication attestation issuance and consumer verification require trusted-main dispatch after integration.",
     "Local structural validation is not upstream whole-stack E2E or useful model research acceptance.",
     "Hosted platform logs are retained under GitHub retention; their URLs are not permanent raw-log storage."
-  ]
+  ],
+  "workflow_review_20260921": {
+    "observed_date_utc": "2026-09-21",
+    "scope": "All nine workflow files; static scanners and upstream pin currency only. No workflow was dispatched by this review.",
+    "zizmor": {
+      "version": "1.30.1",
+      "latest_upstream_release": "v1.30.1 (2026-09-09)",
+      "command": "zizmor --offline --no-config --no-ignores --no-progress --persona <persona> --strict-collection --format json .github/workflows",
+      "before": {
+        "regular": {
+          "exit_code": 0,
+          "findings": 0
+        },
+        "pedantic": {
+          "exit_code": 12,
+          "findings": 19,
+          "by_rule": {
+            "anonymous-definition": 12,
+            "concurrency-limits": 6,
+            "undocumented-permissions": 1
+          }
+        },
+        "auditor": {
+          "exit_code": 13,
+          "findings": 22,
+          "by_rule": {
+            "anonymous-definition": 12,
+            "concurrency-limits": 6,
+            "secrets-outside-env": 3,
+            "undocumented-permissions": 1
+          }
+        }
+      },
+      "after": {
+        "regular": {
+          "exit_code": 0,
+          "findings": 0
+        },
+        "pedantic": {
+          "exit_code": 12,
+          "findings": 18,
+          "by_rule": {
+            "anonymous-definition": 12,
+            "concurrency-limits": 6
+          }
+        },
+        "auditor": {
+          "exit_code": 13,
+          "findings": 21,
+          "by_rule": {
+            "anonymous-definition": 12,
+            "concurrency-limits": 6,
+            "secrets-outside-env": 3
+          }
+        }
+      }
+    },
+    "actionlint": {
+      "version": "1.7.12",
+      "latest_upstream_release": "v1.7.12 (2026-03-30)",
+      "archive_sha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+      "gh_attestation_verify_exit_code": 0,
+      "checksum_check_exit_code": 0,
+      "all_workflows_exit_code": 0,
+      "stdout_bytes": 0,
+      "installation": "task-local download into an owned temporary directory per the documented upstream procedure; nothing installed globally"
+    },
+    "action_pins": [
+      {
+        "action": "actions/checkout",
+        "pinned_sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "release": "v7.0.1",
+        "tag_resolves_to_pinned_sha": true,
+        "latest_release": "v7.0.1"
+      },
+      {
+        "action": "actions/upload-artifact",
+        "pinned_sha": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "release": "v7.0.1",
+        "tag_resolves_to_pinned_sha": true,
+        "latest_release": "v7.0.1"
+      },
+      {
+        "action": "actions/download-artifact",
+        "pinned_sha": "3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "release": "v8.0.1",
+        "tag_resolves_to_pinned_sha": true,
+        "latest_release": "v8.0.1"
+      },
+      {
+        "action": "actions/setup-python",
+        "pinned_sha": "5fda3b95a4ea91299a34e894583c3862153e4b97",
+        "release": "v7.0.0",
+        "tag_resolves_to_pinned_sha": true,
+        "latest_release": "v7.0.0"
+      },
+      {
+        "action": "actions/setup-go",
+        "pinned_sha": "b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+        "release": "v7.0.0",
+        "tag_resolves_to_pinned_sha": true,
+        "latest_release": "v7.0.0"
+      },
+      {
+        "action": "actions/setup-node",
+        "pinned_sha": "820762786026740c76f36085b0efc47a31fe5020",
+        "release": "v7.0.0",
+        "tag_resolves_to_pinned_sha": true,
+        "latest_release": "v7.0.0"
+      },
+      {
+        "action": "actions/attest",
+        "pinned_sha": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+        "release": "v4.2.2",
+        "tag_resolves_to_pinned_sha": true,
+        "latest_release": "v4.2.2"
+      }
+    ],
+    "pin_check_method": "gh api repos/<owner>/<repo>/commits/<tag> for the commit each release tag resolves to, and gh api repos/<owner>/<repo>/releases/latest; read-only.",
+    "changes": [
+      "Release comments on three upload-artifact lines in native-service-reboot.yml and native-foundation-e2e.yml named only the moving major tag (v7); they now name the exact release the unchanged SHA resolves to (v7.0.1), so a later pin update is visible as a version change. No SHA, permission, trigger or step changed.",
+      "The publication job's id-token and attestations write permissions carry explanatory comments; zizmor's undocumented-permissions finding is resolved."
+    ],
+    "retained_findings": [
+      {
+        "rule": "secrets-outside-env",
+        "persona": "auditor",
+        "count": 3,
+        "decision": "retained",
+        "reason": "The three off-host workflows are manual dispatch only. Moving their secrets behind deployment environments is a repository settings change that belongs to the GitHub automation maintainer; it was not made here."
+      },
+      {
+        "rule": "concurrency-limits",
+        "persona": "pedantic",
+        "count": 6,
+        "decision": "retained",
+        "reason": "The flagged workflows are stateful or manually dispatched (restore, application state, service reboot, publication) or path-filtered E2E runs; cancelling an in-progress run is not safe to add without the maintainer's review. The two always-running required checks already declare concurrency groups."
+      },
+      {
+        "rule": "anonymous-definition",
+        "persona": "pedantic",
+        "count": 12,
+        "decision": "retained",
+        "reason": "Informational naming finding with no security effect."
+      }
+    ],
+    "limitations": [
+      "Static checks do not execute a job or establish that a workflow's native checks pass; the pull request's own runs are the execution evidence.",
+      "Pin currency was observed on one date; Dependabot remains the updater of record."
+    ],
+    "frozen_sources": {
+      "finding": "The same comment change was first applied to three more workflows and then reverted, leaving six release comments that read v7 or v8 (native-token-e2e.yml 1, native-offhost-restore.yml 1, native-offhost-app-state.yml 4).",
+      "bindings": [
+        {
+          "path": ".github/workflows/native-offhost-restore.yml",
+          "bound_by": "frozen_sources in blueprints/convergence-practice/offhost-restore/hosted-plan.json",
+          "test": "tests.test_active_recovery_plans raised ValueError 'frozen source changed'"
+        },
+        {
+          "path": ".github/workflows/native-offhost-app-state.yml",
+          "bound_by": "frozen_sources in blueprints/convergence-practice/offhost-app-state/plan.json",
+          "test": "tests.test_active_recovery_plans raised ValueError 'frozen local source differs'"
+        },
+        {
+          "path": ".github/workflows/native-token-e2e.yml",
+          "bound_by": "its current SHA-256 is recorded in four execution receipts and artifacts (portable-userspace-install-20260921 token-clean-install and token-clean-install-unprivileged receipts; full-stack-convergence-20260921 native-token-workflow.json and hosted-native-token-workflow.json)",
+          "test": "none; no plan or test guards it"
+        }
+      ],
+      "evidence": "python3 -m unittest tests.test_active_recovery_plans: 2 errors with the edit, 0 after the revert",
+      "decision": "A cosmetic comment is not worth re-freezing a recovery plan or detaching a dated receipt from the current file. Normalize those comments with the next functional change."
+    }
+  }
 }

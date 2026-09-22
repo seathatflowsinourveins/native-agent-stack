@@ -1,0 +1,78 @@
+Run the MCP server (with watcher) over stdio or HTTP
+
+Usage: ai-memory serve [OPTIONS]
+
+Options:
+      --data-dir <DATA_DIR>
+          Override the data directory.
+
+          Defaults to a platform path under `dirs::data_local_dir()`. The config loader also honours `AI_MEMORY_DATA_DIR`.
+
+      --transport <TRANSPORT>
+          Transport to expose the MCP server on
+
+          Possible values:
+          - stdio: Stdio — what `claude mcp add` uses
+          - http:  Streamable HTTP — for HTTP clients and `mcp-inspector`
+
+          [default: stdio]
+
+      --bind <BIND>
+          Bind address for `--transport http` (default: from config)
+
+      --config <CONFIG>
+          Path to an explicit config file (defaults to `<data_dir>/config.toml`)
+
+      --allow-insecure-no-auth
+          DANGEROUS: allow unauthenticated plain HTTP on a non-loopback bind.
+
+          HTTP-only. Unnecessary for loopback binds; prefer AI_MEMORY_AUTH_TOKEN or a loopback bind instead.
+
+      --no-watcher
+          Skip the filesystem watcher; useful for transient debugging
+
+      --force
+          DANGEROUS: start even when another process holds the single-instance serve lock.
+
+          Only for an operator who is certain the previous server is gone (a hung holder, or a mount with unreliable locking): two live servers on one data directory corrupt wiki and index state.
+
+      --workspace <WORKSPACE>
+          Workspace name (auto-created).
+
+          Not marker-aware, unlike the client commands: the server has no caller cwd to walk up from, and this is the baked fallback for hook events that arrive without a usable one.
+
+          [default: default]
+
+      --project <PROJECT>
+          Project name within the workspace (auto-created)
+
+          [default: scratch]
+
+      --enable-web
+          Mount the web surface at `/web`. Off by default. A custom SPA shell is public so it can render password login; `/api/v1` and the built-in server-rendered wiki remain protected by a web session or machine Bearer
+
+      --web-ui-dir <WEB_UI_DIR>
+          Serve this static directory at /web instead of the built-in UI.
+
+          The read-only /api/v1 frontend API is still mounted when --enable-web is set.
+
+      --base-path <BASE_PATH>
+          Base path the whole HTTP surface is served under. Empty (default) keeps every route at the host root — byte-identical to previous behaviour. Set e.g. `/wiki` to host ai-memory under a URL subpath behind a reverse proxy that preserves the prefix; then `/mcp`, `/api/v1`, `/hook` and the web UI all live under it (`/wiki/mcp`, `/wiki/api/v1`, …). The value is normalised to `/<core>` (leading slash, no trailing); `/` and `` both mean root
+
+          [env: AI_MEMORY_BASE_PATH=]
+          [default: ""]
+
+      --web-slug <WEB_SLUG>
+          Slug the web UI is mounted at, WITHIN `--base-path`. Default `/web` (the read-only `/api/v1` API always stays at `<base>/api/v1`). Set `/` to serve the UI at the base root itself (e.g. `/wiki` instead of `/wiki/web`). The server injects a normalised `<base href>` into the served HTML so the built-in UI and a custom `--web-ui-dir` SPA both resolve their assets under the prefix without a rebuild
+
+          [env: AI_MEMORY_WEB_SLUG=]
+          [default: /web]
+
+      --http-stateful
+          Run the HTTP transport in stateful (session) mode: the server issues an `Mcp-Session-Id` on `initialize` and requires it on every later request, with SSE-framed responses. Off by default — the HTTP transport is stateless and returns plain JSON, so stateless clients (OpenCode `type: "remote"`, `curl`) work without an `mcp-remote` stdio shim (issue #3). Enable this only for clients that need session continuity or server-initiated SSE streams. No effect on `--transport stdio`
+
+      --cors-allow-origin <CORS_ALLOW_ORIGIN>
+          Origin allowed to call /api/v1 cross-origin (CORS). Repeat the flag for multiple origins, or set AI_MEMORY_CORS_ALLOW_ORIGINS to a comma-separated list. Must be a fully-qualified origin (e.g. https://app.example.com); `*` is rejected (CORS spec forbids credentials + wildcard). Empty = same-origin only
+
+  -h, --help
+          Print help (see a summary with '-h')

@@ -105,6 +105,17 @@ Chronos-2's `amazon/chronos-2` model announcement was October 20, 2025; the libr
 
 FinRL's current source directs deployment work toward FinRL-Trading; neither its older PyPI wheel nor that successor's production wording establishes accepted deployment here. FinGPT's package, source and base-model licenses are separate concerns. Financial agents may produce hypotheses, citations and bounded research artifacts. An LLM debate or a role named “risk manager” is not deterministic pre-trade risk control. Recent-star coverage includes [ai-berkshire](https://github.com/xbtlin/ai-berkshire/tree/v1.0.0), [TradingAgents](https://github.com/TauricResearch/TradingAgents/tree/v0.5.0) and [Dexter](https://github.com/virattt/dexter/tree/v1.0.5) as individual structured watch entries, not installed trading systems.
 
+## September21 adaptive practice extension
+
+The [adaptive paper lane](../../blueprints/us-equities/adaptive-paper/README.md)
+wires five baseline policy families through the actual Nautilus2.0.0rc5 LiveNode
+and a custom official-SDK Alpaca boundary. Its local synthetic capacity and
+unchanged upstream adapter tests are distinct from actual broker acceptance.
+The bounded dated news/snapshot collector feeds an advisory research queue;
+Claude source-support review does not enable catalyst orders or qualify alpha.
+See its [receipt](../../blueprints/us-equities/adaptive-paper/receipt.json) for
+observed results, exact source versions and unresolved market-open qualification.
+
 ## Strategy families to evaluate as hypotheses
 
 | Family | First comparison | Data and main failure mode |

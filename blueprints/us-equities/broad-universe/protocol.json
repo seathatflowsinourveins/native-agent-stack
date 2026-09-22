@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "id": "broad-universe-mover-v1-20260921",
+  "status": "frozen_before_empirical_returns",
+  "base_commit": "8959e540e199f1a65b9d2f56e9292da00d5956c5",
+  "intent": "Measure whether simple, predeclared end-of-day price/volume signals select next-session and multi-session large movers across the widest entitled US-listed universe, counting every failed signal. Numeric values are predeclared research assumptions, not tuned results. Realized movers are outcomes only; they never define the candidate set.",
+  "relation_to_frozen_protocols": {
+    "catalyst-experiment-v1-20260920": "Unchanged and still frozen. Its $1-$50 prior-close band, 8-K Item 1.01 catalyst requirement and $5M liquidity floor answer a different question and would exclude requested names such as META and AMD. None of its filters are applied here and none of its acceptance is rewritten.",
+    "adaptive-paper config.json": "Unchanged. Its 24-symbol IEX list is an execution fixture, not this research universe. No numeric risk limit is changed by this protocol."
+  },
+  "scope": {
+    "market": "US exchange-listed us_equity symbols present in the provider asset master (active and inactive), excluding OTC and CUSIP-style placeholder symbols, restricted at each decision to symbols with an entitled SIP daily bar on that session",
+    "long_only": true,
+    "regular_session_only": true,
+    "orders": false,
+    "live_promotion": false,
+    "frequency": "daily bars; intraday horizons are an unresolved data gate in v1"
+  },
+  "source_contract": {
+    "bars": "Alpaca market-data v2 /v2/stocks/bars, feed=sip, timeframe=1Day, explicit pagination to a terminal page per symbol group, every page retained with sha256. Two series per symbol: adjustment=raw (prices and volume as traded) and adjustment=all (split/dividend/spin-off adjusted).",
+    "identity": "Bars are requested by the ticker current on the collection date (provider default asof). Renamed issuers appear under the current ticker (FB history is returned as META). A ticker reused after delisting resolves to the current holder; asset-master symbol collisions are counted as an unresolved identity gate, never silently merged or dropped.",
+    "universe_as_known": "The provider exposes no listing/delisting dates or historical security type. Membership on session t is 'has an entitled SIP daily bar on t'. Names the provider never carried are absent; this survivorship exposure is measured by last-bar-year counts of inactive symbols and stays an open gate.",
+    "availability": "Bars downloaded on 2026-09-21 do not prove what was published at each historical close. Later vendor corrections are unknown. v1 assumes a session's daily OHLCV was known after that session's regular close and records this as an assumption, not evidence.",
+    "raw_vs_adjusted": "Eligibility price and dollar volume use raw bars of session t and earlier. Every return and price-ratio feature uses the adjustment=all series so splits and distributions do not create false movers. A (symbol, session) present in one series but not the other is quarantined.",
+    "calendar": "Session order is the sorted set of distinct SIP bar dates of SPY in the dataset; horizons count those sessions."
+  },
+  "eligibility": {
+    "decision_time": "after the regular close of session t, using only bars of sessions <= t",
+    "min_raw_close_usd": "5",
+    "max_raw_close_usd": null,
+    "median_dollar_volume_lookback_sessions": 20,
+    "median_dollar_volume_min_usd": "20000000",
+    "min_prior_sessions_with_bars": 60,
+    "bar_required_on_decision_session": true,
+    "symbol_exclusion_pattern": "Symbols whose dotted suffix is WS, W, U, R or RT (warrants, units, rights) are excluded. Five-letter NASDAQ tickers ending in W, R or U are flagged, not excluded, because the letter convention is ambiguous.",
+    "instrument_lanes": {
+      "primary_operating_company_heuristic": "Excludes assets whose CURRENT asset-master name matches ETF|ETN|Fund|Trust|Shares|ProShares|Direxion|iShares|SPDR|Index|Portfolio (case-insensitive). The name is a current attribute, not as-known-then; fund status rarely changes, and the lane is reported beside the unrestricted lane so the heuristic cannot hide a result.",
+      "secondary_all_instruments": "No name filter."
+    },
+    "justification": {
+      "no_price_cap": "A cap has no economic basis for a liquid-universe study and would exclude requested large-cap names (META and AMD both trade above $500 on 2026-09-21).",
+      "min_close_5": "Below $5 a one-cent tick exceeds 20 bps, SIP prints are dominated by odd lots and the SEC penny-stock threshold restricts margin and borrow. Sub-$5 names are studied only in the separate descriptive lane.",
+      "min_dollar_volume_20m": "Keeps a $200k order under 1% of median daily dollar volume and makes the 5-20 bps per-side cost tiers defensible. Computed only from sessions before t.",
+      "min_history_60": "The longest feature window (60-session high) must be fully observed; the first 60 sessions after a listing are excluded rather than imputed."
+    },
+    "descriptive_microcap_lane": {
+      "min_raw_close_usd": "1",
+      "median_dollar_volume_min_usd": "2000000",
+      "per_side_cost_bps": 50,
+      "promotion": "never; reported for base rates only because most extreme percentage movers live here and quoted data cannot support execution claims"
+    }
+  },
+  "features_at_t": {
+    "dv": "raw_close[t] * raw_volume[t]",
+    "med20": "median(dv[t-20..t-1]); requires 20 prior sessions with bars",
+    "r1": "all_close[t] / all_close[t-1] - 1",
+    "r5": "all_close[t] / all_close[t-5] - 1",
+    "high60": "max(all_high[t-60..t-1])",
+    "high20": "max(all_high[t-20..t-1])",
+    "clv": "(raw_close[t] - raw_low[t]) / (raw_high[t] - raw_low[t]); 0.5 when high equals low",
+    "range10": "(max(all_high[u-9..u]) - min(all_low[u-9..u])) / all_close[u], evaluated at u = t-1",
+    "range10_p20": "20th percentile of range10 over u in [t-121, t-2]; requires 120 observations",
+    "gap": "all_open[t] / all_close[t-1] - 1",
+    "note": "Offsets count the symbol's own consecutive bars; a symbol missing a market session inside a window is flagged has_gap and excluded from that decision."
+  },
+  "signals": {
+    "S1_momentum_breakout": "all_close[t] > high60 AND dv >= 2 * med20 AND clv >= 0.75",
+    "S2_volume_shock_continuation": "r1 >= 0.05 AND dv >= 3 * med20 AND clv >= 0.5",
+    "S3_oversold_reversal": "r5 <= -0.15 AND raw_close[t] > raw_open[t] AND dv >= med20",
+    "S4_contraction_breakout": "range10 <= range10_p20 AND all_close[t] > high20",
+    "S5_gap_and_hold": "gap >= 0.04 AND all_close[t] >= all_open[t] AND dv >= 2 * med20"
+  },
+  "controls": {
+    "C0_all_eligible": "Every eligible (symbol, t) with identical entry, exit and cost mechanics. This is the base rate every signal must beat.",
+    "C1_hash_sample": "Eligible (symbol, t) where the first 8 hex digits of sha256(symbol + '|' + session_date) as an integer modulo 20 equals 0; a deterministic 5% placebo selection.",
+    "market_reference": "SPY open[t+1] to the same exit close, reported for context only; SPY is not the strategy universe."
+  },
+  "execution_assumptions": {
+    "entry": "Buy at all_open[t+1], the next session's first regular SIP print from the daily bar. The daily bar open is not guaranteed to equal the primary-listing opening auction price; flagged as an assumption.",
+    "no_entry": "No bar on session t+1 means no fill. The event is kept with outcome no_entry and excluded from return means but counted.",
+    "horizons": {"H1": "exit all_close[t+1]", "H5": "exit all_close[t+5]", "H20": "exit all_close[t+20]"},
+    "terminated_early": "If the series ends before the exit session, exit at the last available close and flag terminated_early. Stress applies a further -50% to that exit because delisting returns are unknown.",
+    "exit_stale": "If the symbol has no bar on the exit session but trades later, exit at its most recent close at or before the exit session and flag exit_stale.",
+    "horizon_incomplete": "If the dataset calendar does not yet contain the exit session the event is counted as horizon_incomplete and excluded; it is never scored as zero.",
+    "net_return": "exit / entry * (1 - c) / (1 + c) - 1, with c the per-side cost in decimal from the med20 tier at t; stress uses 3c.",
+    "window_contiguity": "A window of k prior bars is valid only when those bars are calendar-contiguous (calendar index difference equals k). Eligibility uses k=60; each signal also requires contiguity over its own longest window. Invalid decisions are flagged has_gap, excluded and counted.",
+    "per_side_cost_bps": {"med20_ge_100m": 5, "med20_ge_50m": 10, "otherwise": 20},
+    "stress_cost_multiplier": 3,
+    "fees": "Commission-free broker assumed; regulatory fees under 1 bp are inside the tiers.",
+    "capacity": "Order notional assumed <= 1% of med20; reported, not optimised.",
+    "portfolio": "Event-level study. Overlapping events are allowed; inference is clustered by entry date. Per date and signal, top_20 keeps at most 20 events ranked by dv/med20 descending then symbol ascending; all_events keeps every event. Both are reported. No equity curve, leverage, shorting or intraday stop is simulated in v1."
+  },
+  "labels_retrospective_only": {
+    "up_mover_1d": "all_close[t+1] / all_close[t] - 1 >= 0.10",
+    "extreme_up_1d": "all_close[t+1] / all_close[t] - 1 >= 0.20",
+    "up_mover_5d": "all_close[t+5] / all_close[t] - 1 >= 0.20",
+    "extreme_up_5d": "all_close[t+5] / all_close[t] - 1 >= 0.50",
+    "down_mover_1d": "all_close[t+1] / all_close[t] - 1 <= -0.10",
+    "use": "Outcomes for precision, recall, base rate and lift only. Close-to-close label returns are not attainable returns; attainable return starts at the t+1 open. Incomplete horizons are unknown, never zero."
+  },
+  "metrics": {
+    "per_signal_horizon_segment_lane_selection": [
+      "events, distinct symbols, distinct entry dates, no_entry count, terminated_early count",
+      "mean, median, 5th and 95th percentile of net return; share of events with net return <= 0 and their mean loss (failed signals)",
+      "date-clustered mean net return and mean net excess over C0 on the same entry date and horizon",
+      "moving-block bootstrap confidence interval of the date-level mean excess",
+      "stress-cost mean net return",
+      "label precision, base rate in C0, lift and recall for each retrospective label"
+    ],
+    "bootstrap": {"resamples": 2000, "seed": 20260921, "block_sessions": {"H1": 5, "H5": 5, "H20": 20}, "unit": "entry date"}
+  },
+  "chronology": {
+    "warmup": ["2016-01-04", "2016-12-30"],
+    "development": ["2017-01-01", "2021-12-31"],
+    "validation": ["2022-01-01", "2023-12-31"],
+    "reserved": ["2024-01-01", "2026-08-14"],
+    "segment_assignment": "by decision session t; the reserved end leaves 20 sessions plus margin before the dataset end of 2026-09-18",
+    "trial_policy": "Exactly 5 signals x 3 horizons x 2 selections x 2 instrument lanes, all predeclared, plus 2 controls and the descriptive microcap lane. No parameter search. Every variant and segment is reported. Any later variant needs a new protocol version and may not reuse the reserved segment as untouched.",
+    "freeze": "This file and evaluate.py are committed before evaluate.py reads real bars. The commit hash is recorded in the results."
+  },
+  "amendments": [
+    {
+      "at": "2026-09-21T22:05Z",
+      "before_any_real_evaluation": true,
+      "change": "Spelled out exit_stale, horizon_incomplete, the net-return formula and window contiguity. These are mechanical clarifications handed to the evaluator author together with the original freeze; no threshold, signal, horizon, cost, segment or promotion rule changed, and no historical return had been computed."
+    }
+  ],
+  "inspection_registry": {
+    "before_freeze": [
+      "Coordinator saw on 2026-09-21: META and AMD SIP daily bars for 2026-09-14..2026-09-21, the provider movers/most-actives screens for 2026-09-21, three AMD bars from January 2016, FB/META/TWTR bar counts for 2022 windows. No historical signal or return statistic was computed.",
+      "Earlier programme diagnostics (AAPL 2020, FB/META June 2022, 2021Q1 ETF control, SPY cost scenarios) remain inspected and are not holdouts."
+    ],
+    "after_freeze": "Every real-data evaluation run appends its date, commit, dataset ledger hash and result hash to the results file."
+  },
+  "promotion": {
+    "scope": "Permission to design a separately reviewed paper candidate. Never an automatic order, a limit change or a prediction claim.",
+    "requirements": [
+      "development, validation and reserved each have >= 250 events on >= 100 distinct entry dates",
+      "date-clustered mean net excess over C0 > 0 in all three segments with the Bonferroni-adjusted (0.05/15) bootstrap lower bound > 0 in validation and reserved",
+      "stress-cost mean net return >= 0 in validation and reserved",
+      "identical sign in both instrument lanes",
+      "identity, availability and delisting gates either closed or shown not to change the sign under the terminated_early stress"
+    ],
+    "reject_or_defer": "Anything else is reported as not established. A negative result is a result and is kept."
+  },
+  "unresolved_gates": [
+    "historical security type and listing/delisting dates are not available from the entitled source",
+    "ticker reuse collisions cannot be resolved without dated identity data",
+    "original publication time and later vendor revisions of bars are unknown",
+    "opening-auction price, halts and LULD state are not in daily bars",
+    "intraday (minute/quote) evaluation across the full universe is not collected in v1",
+    "news and filings are not used as features in v1 because their historical availability is unproven"
+  ]
+}

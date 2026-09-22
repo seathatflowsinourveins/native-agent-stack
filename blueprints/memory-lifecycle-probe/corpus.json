@@ -1,0 +1,16 @@
+{
+  "scope": "Public synthetic lifecycle fixture; no actual project facts",
+  "pages": [
+    {"slug": "orchard-pump", "title": "Orchard Pump", "body": "# Orchard Pump\n\nThe orchard pump inspection uses the amber checklist. The inspection interval is 17 days.\n"},
+    {"slug": "harbor-lantern", "title": "Harbor Lantern", "body": "# Harbor Lantern\n\nThe harbor lantern inventory contains 23 copper brackets. Its keeper is Juniper.\n"},
+    {"slug": "alpine-kite", "title": "Alpine Kite", "body": "# Alpine Kite\n\nThe alpine kite trial uses a cobalt spool. The wind limit is 12 knots.\n"}
+  ],
+  "queries": [
+    {"query": "amber", "expected_slug": "orchard-pump", "expected_fact": "17 days"},
+    {"query": "Juniper", "expected_slug": "harbor-lantern", "expected_fact": "23 copper brackets"},
+    {"query": "cobalt", "expected_slug": "alpine-kite", "expected_fact": "12 knots"}
+  ],
+  "update": {"slug": "orchard-pump", "title": "Orchard Pump", "body": "# Orchard Pump\n\nThe orchard pump inspection uses the violet checklist. The inspection interval is 19 days.\n", "new_query": "violet", "old_query": "amber"},
+  "delete": {"slug": "harbor-lantern", "query": "Juniper"},
+  "acceptance": ["Write all three pages", "Retrieve each by frozen lexical query and full page read", "Overwrite orchard; retrieve new fact and confirm old query absent", "Delete harbor; confirm query absent", "Restart across commands and ai-memory server and retain remaining facts", "Rebuild or restore using supported safe isolated native command if available"]
+}

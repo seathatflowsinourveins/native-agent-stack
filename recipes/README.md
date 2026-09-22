@@ -4,6 +4,12 @@ This guide contains the shared native recipes. The [adoption recipe map](../adop
 
 The examples target Linux/WSL x86_64. Use a current native Node.js 24, npm, Python 3.13, uv, Git and GitHub CLI as applicable. GPU serving additionally requires a compatible NVIDIA driver and enough free device memory. Desktop's Linux runtime and native Codex can have different configuration homes: run each client's own supported setup in its intended home, without copying authentication files between them.
 
+## Recipe index
+
+| Recipe | Scope |
+| --- | --- |
+| [SOTA convergence practice](sota-convergence-practice.md) | Reproducible dated repository-convergence recipe (`tools/sota-convergence/`): when to rerun, the six commands, evidence classes, the never-promote rule, and the cross-family review/PR/CI step. |
+
 ## Paths, pins and installation conventions
 
 Set these in the current shell, replacing the project path with this clone's absolute path:
@@ -218,6 +224,13 @@ ai-memory init
 ```
 
 Use the relevant fields from [ai-memory-config.toml.example](../examples/ai-memory-config.toml.example) in the default data directory's `config.toml`. The selected semantic-memory profile uses upstream `embedding_provider="local"`: checksum-pinned MiniLM, 384 dimensions, about 87 MiB downloaded once, with inference inside ai-memory. Use `none` for a deliberately FTS-only profile. Leave the LLM provider and reranker unset; literal `llm_provider="none"` is invalid. Historical transcript backfill, assistant capture and session-end LLM consolidation remain disabled. Embedding backfill is separate: an enabled server embeds existing latest pages across its configured store, so inspect that store's scope first. Keep one data directory/config shared by service and native hooks; choosing a different server config alone does not redirect hook fallback storage. See the [qualified memory/RAG workflow](../docs/memory-rag-native-practice.md) for native returns, recovery and interface boundaries.
+
+For a text-only clean-install trial, explicitly set `embedding_provider="none"`
+or the supported `AI_MEMORY_EMBEDDING_PROVIDER=none` in that owned service's
+environment. An unset embedding provider can select the local default and start
+a model download; it is not a text-only opt-out. Verify the resulting startup
+log and store before treating a no-model-download trial as passed. This does not
+change the accepted semantic profile above or disable an existing user's service.
 
 After reviewing scope, copy [ai-memory-project.toml.example](../examples/ai-memory-project.toml.example) to **only this project's** `.ai-memory.toml`. It names both workspace and project and excludes selected sensitive paths. Exclusions cover recognized file tools; they do not sanitize arbitrary shell output by path. Start the upstream service directly:
 

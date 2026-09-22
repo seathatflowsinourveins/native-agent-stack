@@ -13,9 +13,11 @@ import re
 from urllib.parse import quote, urlsplit
 
 try:
-    from .catalog_decisions import InvalidDecisionIndex, load, pointer, safe_file
+    from .catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
+    from .landscape import build_landscape
 except ImportError:
-    from catalog_decisions import InvalidDecisionIndex, load, pointer, safe_file
+    from catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
+    from landscape import build_landscape
 
 
 CONFIG = "docs/ecosystem/manifest.json"
@@ -44,28 +46,50 @@ TOKEN_RECEIPT_FAMILIES = {
     "current-session-observation", "native-token-stack-final", "foundation-native",
 }
 RETURNED_RECEIPT_FAMILIES = {
+    "memory-lifecycle-probe",
     "claude-foundation-finalization",
     "native-returned-results", "native-memory-rag-alignment", "hf-memory-models",
     "native-dashboard-data", "native-dashboard-access", "full-stack-convergence",
     "dashboard-render-e2e", "dashboard-gap-resolution", "memory-landscape", "memory-landscape-lifecycle", "foundation-convergence",
     "foundation-rd",
     "claude-upstream-checks",
+    "broad-universe-research", "adaptive-paper-practice",
+    "claude-repository-evidence",
 }
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
 NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
+                    "docs/native-skill-practice-20260921.md",
+                    "docs/hosting-container-practice.md", "docs/landscape-continuation.md",
+                    "docs/token-native-saturation.md", "catalogs/us-equities/README.md",
+                    "catalogs/us-equities/decision-index.json", "catalogs/us-equities/manifest.json",
                     "docs/claude-upstream-checks.md", "docs/ecosystem/claude-upstream-checks.html",
                     "evidence/artifacts/claude-upstream-checks-20260921/results.json",
                     "evidence/artifacts/claude-upstream-checks-20260921/provenance.json",
                     "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-6h-20260921.png",
                     "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-72h-20260921.png",
                     "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
+                    "docs/claude-repository-evidence.md",
+                    "docs/ecosystem/claude-repository-evidence.html",
+                    "evidence/artifacts/claude-repository-evidence-20260921/summary.json",
+                    "evidence/artifacts/claude-repository-evidence-20260921/provenance.json",
+                    "evidence/artifacts/claude-repository-evidence-20260921/shots/prometheus-targets.png",
+                    "evidence/artifacts/claude-repository-evidence-20260921/shots/qdrant-collections.png",
+                    "evidence/artifacts/claude-repository-evidence-20260921/shots/dagu-dag-latest-run.png",
                     "docs/claude-foundation-finalization-20260921.md", "examples/claude-native/workflows/README.md",
                     "docs/foundation-rd-readiness.md", "recipes/claude-codex-foreground-review.md",
                     "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
                     "evidence/artifacts/foundation-rd-20260921/qmd-bench-output.txt",
                     "evidence/artifacts/foundation-rd-20260921/native-review.json",
                     "recipes/claude-native-ultracode.md", "examples/claude-native/ultracode.settings.json",
+                    "docs/ultracode-token-routing-20260921.md", "recipes/claude-codex-cooperation-lanes.md", "examples/codex-native/README.md",
+                    "blueprints/us-equities/broad-universe/README.md", "blueprints/us-equities/adaptive-paper/README.md",
+                    "evidence/receipts/broad-universe-research-20260921.json", "evidence/receipts/adaptive-paper-practice-20260921.json",
+                    "docs/harness-rules-convergence-20260922.md", "docs/new-workstation-runtime-profile-20260922.md",
+                    "evidence/artifacts/harness-rules-convergence-20260922/runs.json",
+                    "evidence/artifacts/harness-rules-convergence-20260922/official-doc-excerpts.json",
+                    "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
+                    "evidence/receipts/ultracode-token-routing-20260921.json", "evidence/receipts/portable-claude-native-qualification-20260921.json",
                     "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
                     "docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md", "docs/foundation-convergence-20260921.md",
                     "docs/harness-defaults.md", "catalogs/README.md", STACK, ADOPTION,
@@ -317,6 +341,9 @@ def build_data(root):
     require(config.get("schema_version") == 1, "unsupported explorer manifest version")
     repository_key(config["repository_url"])
     require(bool(re.fullmatch(r"[a-f0-9]{40}", config["source_revision"])), "source revision must be a full commit")
+    publication_ref = config.get("publication_ref", "main")
+    require(isinstance(publication_ref, str) and bool(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_./-]*", publication_ref))
+            and ".." not in publication_ref, "unsafe publication ref")
     layers = config["layers"]
     layer_ids = [layer["id"] for layer in layers]
     require(len(set(layer_ids)) == len(layer_ids) and "beyond" in layer_ids,
@@ -327,13 +354,32 @@ def build_data(root):
         safe_file(root, path)
         # This packet is newer than the immutable base; its own new pages resolve
         # at the public branch after publication, with exact input hashes retained.
-        new_catalog = path.startswith("catalogs/foundation/") or path in config.get("grand_catalogs", {}).values()
-        revision = "main" if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or path in current_public_paths else config["source_revision"]
+        new_catalog = path.startswith(("catalogs/foundation/", "catalogs/landscape/", "docs/landscape-")) or path in config.get("grand_catalogs", {}).values()
+        new_practice = path.startswith(("blueprints/native-skill-practice/", "examples/codex-native/agents/semantic-", "examples/claude-native/agents/semantic-"))
+        # Artifact bundles that arrived with this packet do not exist at the immutable base.
+        new_catalog = new_catalog or path.startswith(("evidence/artifacts/ultracode-token-routing-20260921/", "evidence/artifacts/portable-claude-native-qualification-20260921/", "evidence/artifacts/blind-catalog-convergence-20260921/", "blueprints/blind-catalog-convergence/", "blueprints/memory-lifecycle-probe/", "evidence/artifacts/memory-lifecycle-probe-20260921/", "evidence/receipts/memory-lifecycle-probe-"))
+        revision = publication_ref if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or new_practice or path in current_public_paths else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 
     index, stack, evidence, stars, review = (read(path) for path in (INDEX, STACK, EVIDENCE, STARS, REVIEW))
     star_map = {row["repository"].casefold(): row for row in stars["repositories"]}
     require(len(star_map) == stars["count"], "public-star count or duplicate identity mismatch")
+    stars_observed_at = stars["retrieved_at"]
+    if config.get("landscape_manifest"):
+        landscape_manifest = read(config["landscape_manifest"])
+        current_public_paths.update(guide["path"] for guide in landscape_manifest.get("handbook_guides", []))
+        if landscape_manifest["sources"].get("quality_review"):
+            quality_source = read(landscape_manifest["sources"]["quality_review"])
+            current_public_paths.add(quality_source["source_snapshot"])
+        current_stars = read(landscape_manifest["sources"]["freshness_snapshot"])["stars"]
+        require(current_stars.get("status") == "checked", "current public-star snapshot must be checked")
+        latest_map = {}
+        for row in current_stars["repositories"]:
+            key = canonical(repository_key(row["repository"]), index.get("aliases", {}))
+            require(key not in latest_map, "duplicate current public-star identity")
+            latest_map[key] = {**star_map.get(key, {}), **row}
+        star_map = latest_map
+        stars_observed_at = current_stars["repository_snapshot_checked_at"]
     receipts_by_id = {row["id"]: row for row in evidence["receipts"]}
     require(len(receipts_by_id) == len(evidence["receipts"]), "duplicate evidence receipt identity")
     receipt_ids = set(TOKEN_RECEIPTS)
@@ -366,20 +412,22 @@ def build_data(root):
             entry = pointer(document, ref["pointer"])
             require(isinstance(entry, dict), "source pointer must address a record")
             fields = {name: text(entry.get(name) or ref.get(name)) for name in (
-                "role", "decision", "rationale", "evidence_level", "review_level",
+                "role", "decision", "disposition", "rationale", "evidence_kind", "evidence_level", "review_level",
                 "review_depth", "evidence_depth", "version_or_commit", "source_commit",
                 "version", "license", "acceptance_gate")}
             pin = (fields["source_commit"] or text(entry.get("reviewed_source", {}).get("commit"))
                    or fields["version_or_commit"] or fields["version"])
             depth = " ".join(fields[name] for name in (
-                "evidence_level", "review_level", "review_depth", "evidence_depth"))
+                "evidence_kind", "evidence_level", "review_level", "review_depth", "evidence_depth"))
             reviewed = reviewed or "source_review" in depth or "primary_source" in depth
             if pin and pin not in pins:
                 pins.append(pin)
             if fields["decision"] and fields["decision"] not in decisions:
                 decisions.append(fields["decision"])
+            if fields["disposition"] and fields["disposition"] not in decisions:
+                decisions.append(fields["disposition"])
             role = role or fields["role"] or text(entry.get("description"))
-            terms.extend([fields["role"], text(entry.get("layer"))])
+            terms.extend([fields["role"], fields["rationale"], text(entry.get("name")), text(entry.get("layer"))])
             terms.extend(entry.get("layers", []))
             refs.append({"kind": ref["kind"], "path": ref["path"], "pointer": ref["pointer"],
                          "url": file_url(ref["path"]), "date": stamp(entry) if stamp(entry).startswith("20") else stamp(document),
@@ -422,6 +470,7 @@ def build_data(root):
                        "search": " ".join([haystack, *decisions, *record.get("aliases", [])])})
     require(set(star_map).issubset(seen), "public-star inventory has repositories missing from the canonical index")
     curated = {}
+    offline_guide_paths = set()
     for name in ("policies", "guides", "highlights"):
         curated[name] = []
         for value in config[name]:
@@ -431,6 +480,10 @@ def build_data(root):
                 require(safe_file(root, path).is_file(), "curated source file missing")
                 track(path)
                 item["url"] = file_url(path)
+                if item.pop("offline", False):
+                    require(path.endswith(".md"), "offline curated source must be Markdown")
+                    item["recipe_path"] = path
+                    offline_guide_paths.add(path)
             elif "url" in item:
                 item["url"] = public_url(item["url"])
             curated[name].append(item)
@@ -465,14 +518,25 @@ def build_data(root):
     for profile in profiles:
         require(set(profile["component_ids"]).issubset(component_ids),
                 "adoption profile references an unknown component")
-    guide_paths = list(SETUP_GUIDES)
+    guide_paths = list(SETUP_GUIDES) + sorted(offline_guide_paths)
     for path in ("docs/claude-foundation-finalization-20260921.md", "examples/claude-native/workflows/README.md", "docs/foundation-convergence-20260921.md", "docs/native-memory-rag-lifecycle.md", "docs/memory-landscape-maintenance.md", "adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md", "docs/token-session-handbook.md",
                  "docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md",
                  "docs/community-native-practice.md", "examples/claude-native/CLAUDE.md",
                  "recipes/claude-native-ultracode.md", "docs/foundation-rd-readiness.md",
-                 "recipes/claude-codex-foreground-review.md", "docs/claude-upstream-checks.md"):
+                 "recipes/claude-codex-foreground-review.md", "docs/claude-upstream-checks.md",
+                 "docs/claude-repository-evidence.md", "docs/ultracode-token-routing-20260921.md",
+                 "recipes/claude-codex-cooperation-lanes.md", "examples/codex-native/README.md",
+                 "docs/harness-rules-convergence-20260922.md", "docs/new-workstation-runtime-profile-20260922.md"):
         if (root / path).exists():
             guide_paths.append(path)
+    if config.get("landscape_manifest"):
+        guide_paths.extend(guide["path"] for guide in landscape_manifest.get("handbook_guides", []))
+        guide_paths.extend(["catalogs/landscape/README.md", "docs/landscape-foundation-notes.md",
+                            "docs/landscape-domain-notes.md", "docs/landscape-freshness-notes.md"])
+        if landscape_manifest["sources"].get("native_practice"):
+            guide_paths.extend(["docs/native-skill-practice-20260921.md", "blueprints/native-skill-practice/README.md"])
+        if landscape_manifest["sources"].get("research_state"):
+            guide_paths.extend(["docs/landscape-continuation.md", "docs/hosting-container-practice.md"])
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
     recipes = []
     for path in documents_to_embed:
@@ -597,15 +661,20 @@ def build_data(root):
             topic_rows.append(item)
         token_topic = {**topic_source, "rows": topic_rows, "url": file_url(TOKEN_TOPIC)}
     grand_catalogs = build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url, root)
+    landscape = None
+    if config.get("landscape_manifest"):
+        landscape = build_landscape(root, config["landscape_manifest"], read=read,
+                                    track=track, file_url=file_url)
     return {"schema_version": 1, "snapshot_date": config["snapshot_date"],
             "repository_url": config["repository_url"], "source_revision": config["source_revision"],
-            "stars_observed_at": stars["retrieved_at"], "component_snapshot_at": stamp(stack),
+            "stars_observed_at": stars_observed_at, "historical_star_audit_count": stars["count"],
+            "component_snapshot_at": stamp(stack),
             "counts": {"repositories": len(output), "stars": len(star_map),
                        "components": len(stack["components"]),
                        "source_reviewed": sum(row["source_reviewed"] for row in output),
                        "executed": sum(row["executed"] for row in output)},
             "layers": layers, "repositories": output, "integrations": integrations, "awesome": awesome,
-            "grand_catalogs": grand_catalogs,
+            "grand_catalogs": grand_catalogs, "landscape": landscape,
             "setup": {"components": selected, "profiles": profiles, "recipes": recipes,
                       "default_profile": adoption["default_profile"],
                       "supported_platforms": adoption.get("supported_platforms", []),
@@ -628,7 +697,7 @@ def render(root):
     body = '<noscript><h2>JavaScript is disabled</h2><p>Enable JavaScript for local search and filters. '
     body += 'No data leaves this page. Public source repository: <a href="'
     body += html.escape(data["repository_url"], quote=True) + '">native-agent-stack</a>.</p></noscript>'
-    result = template.replace("@@DATA@@", encoded).replace("@@BODY@@", body)
+    result = template.replace("@@DATA@@", encoded).replace("<!--@@BODY@@-->", body)
     scripts = re.findall(r"<script>(.*?)</script>", result, re.S)
     require(len(scripts) == 1, "template must have one inline application script")
     script_hash = base64.b64encode(hashlib.sha256(scripts[0].encode()).digest()).decode()
