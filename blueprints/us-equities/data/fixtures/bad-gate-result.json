@@ -1,6 +1,11 @@
 {
-  "checked_at": "2026-09-22T07:52:22.428411+00:00",
+  "checked_at": "2026-09-22T15:12:36.900809+00:00",
   "checks": [
+    {
+      "detail": "ok",
+      "name": "rows_present",
+      "status": "pass"
+    },
     {
       "detail": "ok",
       "name": "symbol_nonempty",
@@ -33,7 +38,7 @@
     },
     {
       "detail": "1 of 4 rows failed; example row indices [2]",
-      "name": "volume_non_negative",
+      "name": "volume_integral_non_negative",
       "status": "fail"
     },
     {

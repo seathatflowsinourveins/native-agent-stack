@@ -18,8 +18,13 @@ code only until a caller adds that dependency).
 Required columns: symbol, session, open, high, low, close, volume, observed_at.
 `session` must be an ISO date (YYYY-MM-DD) that is a valid session on the
 selected exchange calendar (default XNYS). Rows must be unique on
-(symbol, session). OHLC must be positive, high >= max(open, close),
-low <= min(open, close), volume >= 0, and observed_at must not be in the future.
+(symbol, session). The snapshot must contain at least one row (`rows_present`).
+OHLC must be positive, high >= max(open, close), low <= min(open, close),
+observed_at must not be in the future, and volume must be a finite,
+integral, non-negative value -- checked against the RAW column before any
+lossy numeric coercion (`volume_integral_non_negative`; a raw value like
+`-0.5` would otherwise be silently truncated to `0` by `astype('int64')`
+and pass a post-coercion `>= 0` check).
 
 Any exception -- schema failure or otherwise -- produces `status: "fail"`.
 This script never raises past its own `main()`; a fail-closed result file is
@@ -38,8 +43,8 @@ from pathlib import Path
 
 REQUIRED_COLUMNS = ("symbol", "session", "open", "high", "low", "close", "volume", "observed_at")
 CHECK_NAMES = (
-    "symbol_nonempty", "valid_trading_session", "open_positive", "high_positive",
-    "low_positive", "close_positive", "volume_non_negative", "observed_at_not_future",
+    "rows_present", "symbol_nonempty", "valid_trading_session", "open_positive", "high_positive",
+    "low_positive", "close_positive", "volume_integral_non_negative", "observed_at_not_future",
     "high_ge_max_open_close", "low_le_min_open_close", "unique_symbol_session",
 )
 DUCKDB_TABLE_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_.]*$")
@@ -92,7 +97,28 @@ def _load_frame(input_spec: str):
     raise ValueError(f"unsupported_input_format: {suffix or '(none)'}")
 
 
+def _raw_volume_failure_indices(raw_frame) -> list:
+    """Row indices where the RAW (pre-coercion) `volume` value is non-finite,
+    has a non-zero fractional part, or is negative.
+
+    Must run on `raw_frame` before `_prepare()`'s `.astype('int64')`
+    coercion: that cast silently truncates a fractional/negative value
+    (e.g. `-0.5` -> `0`), which would otherwise pass a `>= 0` check computed
+    on the already-coerced column. `pd.to_numeric(..., errors="coerce")`
+    maps any unparseable raw value to NaN, which `np.isfinite` correctly
+    rejects.
+    """
+    import numpy as np
+    import pandas as pd
+
+    numeric = pd.to_numeric(raw_frame["volume"], errors="coerce").to_numpy(dtype="float64")
+    finite = np.isfinite(numeric)
+    valid = finite & (numeric == np.trunc(numeric)) & (numeric >= 0)
+    return [int(index) for index, ok in zip(raw_frame.index, valid) if not ok]
+
+
 def _prepare(raw_frame):
+    import numpy as np
     import pandas as pd
 
     missing = [column for column in REQUIRED_COLUMNS if column not in raw_frame.columns]
@@ -103,7 +129,15 @@ def _prepare(raw_frame):
     frame["session"] = frame["session"].astype(str)
     for column in ("open", "high", "low", "close"):
         frame[column] = frame[column].astype("float64")
-    frame["volume"] = frame["volume"].astype("int64")
+    # Safe for downstream schema typing ONLY: pass/fail for volume is decided
+    # exclusively by `_raw_volume_failure_indices()` run on `raw_frame` before
+    # this function (see `evaluate()`). This substitution exists only so an
+    # out-of-range/fractional/NaN raw value cannot raise a casting exception
+    # past `_prepare` and collapse the per-check report into a single opaque
+    # `gate_execution` failure.
+    numeric_volume = pd.to_numeric(raw_frame["volume"], errors="coerce")
+    safe_volume = numeric_volume.where(np.isfinite(numeric_volume), 0.0).round(0).clip(lower=0)
+    frame["volume"] = safe_volume.astype("int64")
     observed = pd.to_datetime(frame["observed_at"], utc=True, errors="coerce")
     if observed.isna().any():
         raise ValueError("unparseable_observed_at_timestamp")
@@ -128,8 +162,11 @@ def _schema(calendar, now):
             "high": pa.Column("float64", pa.Check.gt(0, name="high_positive", error="high_positive")),
             "low": pa.Column("float64", pa.Check.gt(0, name="low_positive", error="low_positive")),
             "close": pa.Column("float64", pa.Check.gt(0, name="close_positive", error="close_positive")),
-            "volume": pa.Column("int64", pa.Check.ge(0, name="volume_non_negative",
-                                                       error="volume_non_negative")),
+            # No pandera-level check here: pass/fail for volume is decided by
+            # `_raw_volume_failure_indices()` on the RAW column before `_prepare()`'s
+            # coercion (see that function and `evaluate()`). This column's already-
+            # sanitized int64 values would trivially pass any post-coercion check.
+            "volume": pa.Column("int64"),
             "observed_at": pa.Column("datetime64[ns, UTC]", nullable=False, checks=pa.Check(
                 lambda value: value <= now, element_wise=True, name="observed_at_not_future")),
         },
@@ -143,30 +180,48 @@ def _schema(calendar, now):
     )
 
 
-def _summarize(failure_cases, row_count: int) -> list:
+def _summarize(failure_cases, row_count: int, extra_failures: dict | None = None) -> list:
     """Fail closed: any pandera failure identifier not in the fixed
     CHECK_NAMES set (e.g. pandera's own `not_nullable` for a null cell) is
     never silently dropped. It is reported under a synthetic
     `unmapped_failures` check with status "fail", so `evaluate()`'s
-    any-check-failed status computation still yields "fail" for it."""
+    any-check-failed status computation still yields "fail" for it.
+
+    `extra_failures` (name -> failing row indices) carries checks computed
+    OUTSIDE pandera on raw, pre-coercion data (currently only
+    `volume_integral_non_negative`; see `_raw_volume_failure_indices`) and is
+    merged into the same per-check report. `rows_present` is handled
+    separately below: it is a snapshot-level check (row_count == 0), not a
+    per-row one, so it is never driven by failure indices.
+    """
+    extra_failures = {name: list(indices) for name, indices in (extra_failures or {}).items() if indices}
     if failure_cases is None or len(failure_cases) == 0:
-        return [{"name": name, "status": "pass", "detail": "ok"} for name in CHECK_NAMES]
-    renamed = failure_cases.copy()
-    renamed["check"] = renamed["check"].replace({"multiple_fields_uniqueness": "unique_symbol_session"})
-    failing = set(renamed["check"].unique())
+        failing_indices = dict(extra_failures)
+    else:
+        renamed = failure_cases.copy()
+        renamed["check"] = renamed["check"].replace({"multiple_fields_uniqueness": "unique_symbol_session"})
+        failing_indices = {}
+        for name in sorted(renamed["check"].unique()):
+            subset = renamed[renamed["check"] == name]
+            failing_indices[name] = sorted({int(index) for index in subset["index"].dropna()})
+        for name, indices in extra_failures.items():
+            failing_indices[name] = sorted(set(failing_indices.get(name, [])) | set(indices))
+
     checks = []
     for name in CHECK_NAMES:
-        if name not in failing:
+        if name == "rows_present":
+            checks.append({"name": name, "status": "pass", "detail": "ok"} if row_count > 0 else
+                          {"name": name, "status": "fail", "detail": f"snapshot contains {row_count} rows"})
+            continue
+        indices = failing_indices.get(name)
+        if not indices:
             checks.append({"name": name, "status": "pass", "detail": "ok"})
             continue
-        subset = renamed[renamed["check"] == name]
-        indices = sorted({int(index) for index in subset["index"].dropna()})
         checks.append({"name": name, "status": "fail",
                         "detail": f"{len(indices)} of {row_count} rows failed; example row indices {indices[:5]}"})
-    unmapped = sorted(failing - set(CHECK_NAMES))
+    unmapped = sorted(set(failing_indices) - set(CHECK_NAMES))
     if unmapped:
-        subset = renamed[renamed["check"].isin(unmapped)]
-        indices = sorted({int(index) for index in subset["index"].dropna()})
+        indices = sorted({index for name in unmapped for index in failing_indices[name]})
         checks.append({"name": "unmapped_failures", "status": "fail",
                         "detail": f"unrecognized pandera check identifiers {unmapped}; "
                                   f"{len(indices)} of {row_count} rows failed; "
@@ -192,6 +247,11 @@ def evaluate(input_spec: str, calendar_code: str) -> dict:
         input_sha256 = hashlib.sha256(snapshot_path.read_bytes()).hexdigest()
         raw_frame = _load_frame(input_spec)
         row_count = int(len(raw_frame))
+        # Computed on raw_frame BEFORE _prepare()'s lossy volume coercion; see
+        # _raw_volume_failure_indices and _prepare for why ordering matters.
+        extra_failures = {}
+        if "volume" in raw_frame.columns:
+            extra_failures["volume_integral_non_negative"] = _raw_volume_failure_indices(raw_frame)
         frame = _prepare(raw_frame)
         calendar = xcal.get_calendar(calendar_code)
         now = pd.Timestamp.now(tz="UTC")
@@ -201,7 +261,7 @@ def evaluate(input_spec: str, calendar_code: str) -> dict:
             failure_cases = None
         except pa.errors.SchemaErrors as exc:
             failure_cases = exc.failure_cases
-        checks = _summarize(failure_cases, row_count)
+        checks = _summarize(failure_cases, row_count, extra_failures=extra_failures)
         status = "fail" if any(check["status"] == "fail" for check in checks) else "pass"
         return {"status": status, "input_sha256": input_sha256, "row_count": row_count,
                 "checks": checks, "versions": versions, "checked_at": checked_at}

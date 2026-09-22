@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -5852,8 +5852,8 @@
     },
     {
       "path": "blueprints/us-equities/data/README.md",
-      "sha256": "1b5d5e629a51335f7e701d0647613588aa90c649e85a5dca305b7ff3b31ee9dd",
-      "bytes": 5602
+      "sha256": "f9f07342a632a61e75e3e702d6cd59a95ccb1aea75d05e2f9400c88101375aa8",
+      "bytes": 7217
     },
     {
       "path": "blueprints/us-equities/data/fixtures/bad-gate-result.json",
@@ -11217,8 +11217,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_metrics.py",
-      "sha256": "97d0541bf8916b395703ab7000f4b92ab4f85b475700f1bbbcb1c95b32dc7ef5",
-      "bytes": 12828
+      "sha256": "8f839b79ad6050bcf111af9b6e4b5b5fab2153f623944610e8636c4fd1a0ec64",
+      "bytes": 18263
     },
     {
       "path": "tests/test_adaptive_paper_native.py",
@@ -11654,6 +11654,26 @@
       "path": "tools/token-report/token_manifest.py",
       "sha256": "7b1c0511e9a56f587392309330e447bb190e5c819950892997a44065f2714e33",
       "bytes": 50793
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/empty-snapshot.csv",
+      "sha256": "058ad8f0954ce1ce1e1397c9db29548a169ceabac6e3c81a63c6f462b24f1e73",
+      "bytes": 54
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/empty-snapshot-gate-result.json",
+      "sha256": "5e2a2af2d73a3254e0b27d280b5fdf2f4cfd2c70b72a441b3d04c0b7f256d7cf",
+      "bytes": 1499
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/fractional-negative-volume.csv",
+      "sha256": "971a078a9c23b1229443e07495411124c35aa9f5f1bc0a3d4679261bf95998ba",
+      "bytes": 189
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/fractional-negative-volume-gate-result.json",
+      "sha256": "985249539ef5f507a3953c36724e3d5507e79eb90b0fd72656977d6d42d70191",
+      "bytes": 1518
     }
   ],
   "convergence_records": [

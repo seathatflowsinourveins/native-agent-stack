@@ -1,10 +1,10 @@
 {
-  "checked_at": "2026-09-22T15:12:37.385411+00:00",
+  "checked_at": "2026-09-22T15:12:37.844198+00:00",
   "checks": [
     {
-      "detail": "ok",
+      "detail": "snapshot contains 0 rows",
       "name": "rows_present",
-      "status": "pass"
+      "status": "fail"
     },
     {
       "detail": "ok",
@@ -60,15 +60,10 @@
       "detail": "ok",
       "name": "unique_symbol_session",
       "status": "pass"
-    },
-    {
-      "detail": "unrecognized pandera check identifiers ['not_nullable']; 1 of 2 rows failed; example row indices [0]",
-      "name": "unmapped_failures",
-      "status": "fail"
     }
   ],
-  "input_sha256": "1718d0cdc84850734cc17692407d5b2a145a84ee7476bc5ac19b03491988f730",
-  "row_count": 2,
+  "input_sha256": "058ad8f0954ce1ce1e1397c9db29548a169ceabac6e3c81a63c6f462b24f1e73",
+  "row_count": 0,
   "status": "fail",
   "versions": {
     "exchange_calendars": "4.13.2",
