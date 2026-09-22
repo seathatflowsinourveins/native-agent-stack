@@ -571,8 +571,9 @@ the full commit SHA of its latest release `v5.0.0`
 `pull_request` only with `warn-only: true` and `contents: read`; it is not
 in `required_status_checks` and never blocks a PR. This repository is
 public (`gh api repos/seathatflowsinourveins/native-agent-stack --jq
-.visibility` returns `public`), so GitHub's dependency graph is on
-automatically and no GitHub Advanced Security requirement applies -- the
-private-repo conditional in the decision record's evidence section does not
-apply here and is recorded only as the check that was performed.
+.visibility` returns `public`) and needs no GitHub Advanced Security, but
+its dependency graph was not on automatically: the first hosted run failed
+until the graph was enabled through `PUT .../vulnerability-alerts` (which also
+enables Dependabot alerts), after which the re-run passed. The correction and
+its rollback are recorded in the decision record.
 

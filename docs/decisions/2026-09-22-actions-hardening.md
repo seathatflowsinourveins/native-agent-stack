@@ -113,6 +113,18 @@ its latest release `v5.0.0`, on `pull_request` only, `warn-only: true`,
   public repo, because there is nothing to toggle). Had the repository been
   private with no dependency graph or Advanced Security, this section would
   instead record that finding and withhold the workflow.
+- **Correction from the first hosted run (2026-09-22, coordinator).** The
+  premise above was wrong for this repository: on PR #78 the job failed in
+  7 s with `Dependency review is not supported on this repository. Please
+  ensure that Dependency graph is enabled` (run 35797766463), and
+  `gh api repos/seathatflowsinourveins/native-agent-stack/dependency-graph/sbom`
+  returned 404, so the graph was off despite public visibility.
+  It was enabled with `gh api -X PUT
+  repos/seathatflowsinourveins/native-agent-stack/vulnerability-alerts`
+  (HTTP 204; this also turns on Dependabot alerts; rollback is the same path
+  with `-X DELETE`). The SBOM export then listed 60 packages, and the re-run
+  job succeeded ("did not detect any vulnerable packages with severity level
+  \"low\" or higher"; no denied licenses).
 - **Scope.** `pull_request` trigger only (no `push`); `warn-only: true`
   means the job "will always complete with success, overriding
   `fail-on-severity`" (per `action.yml`'s own input description read at the
