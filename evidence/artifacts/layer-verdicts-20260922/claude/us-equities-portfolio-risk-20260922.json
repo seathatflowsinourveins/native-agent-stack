@@ -1,110 +1,37 @@
 {
  "alternatives": [
   {
-   "disposition": "conditional",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/research-evaluation/receipt.json",
-    "catalogs/us-equities/engines-strategies.json"
-   ],
-   "key": "c4",
-   "name": "skfolio",
-   "repository": "https://github.com/skfolio/skfolio",
-   "why_not_default": "blueprints/us-equities/research-evaluation/receipt.json covers only the installed WalkForward splitter. It was run on a raw-price label study: 20 development folds, one reserved 2021Q1 evaluation, 21 frozen selections and 6605 candidate records. The receipt states this is 'not new LEAN execution or portfolio P&L'. The catalog card (engines-strategies.json, skfolio entry) states 'no portfolio optimization'. It notes that purge and embargo default to zero and that estimates are not pre-trade enforcement or broker reconciliation. It supports causal split policy for strategy qualification, but it has no executed allocation or risk-model evidence. The pin (1.2.9) is behind upstream v1.3.0 per the packet."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "local_integration",
-   "evidence_refs": [
-    "blueprints/us-equities/engine/resolution-receipt.json",
-    "catalogs/us-equities/engines-strategies.json",
-    "catalogs/us-equities/runtime-target.json"
-   ],
-   "key": "c6",
-   "name": "LEAN Alpaca brokerage",
-   "repository": "https://github.com/quantconnect/lean.brokerages.alpaca",
-   "why_not_default": "blueprints/us-equities/engine/resolution-receipt.json shows the adapter compiling without credentials (runtime subscription validation not invoked). Its catalog card says account connection is unexecuted, no Alpaca paper orders were accepted, and QuantConnect product347 entitlement is still required. It is also not the selected Nautilus destination (runtime-target.json). The Alpaca boundary with observed paper execution is alpaca-py (c8)."
-  },
-  {
-   "disposition": "conditional",
+   "disposition": "unqualified",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "catalogs/landscape/hosting-practice.json",
-    "docs/hosting-container-practice.md",
-    "catalogs/us-equities/runtime-target.json"
+    "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst"
    ],
    "key": "c1",
-   "name": "Dockerized IB Gateway",
-   "repository": "https://github.com/gnzsnz/ib-gateway-docker",
-   "why_not_default": "catalogs/landscape/hosting-practice.json records decision conditional, evidence_level source_review and native_acceptance not_established. Image digest, sign-in, restart, API connectivity and broker reconciliation are all unqualified. docs/hosting-container-practice.md keeps the native external TWS/IB Gateway as a valid path. The IBKR boundary itself has local_broker_acceptance not_established (runtime-target.json)."
+   "name": "cvxportfolio",
+   "repository": "https://github.com/cvxgrp/cvxportfolio",
+   "why_not_default": "The only evidence is a source review of an upstream README URL (https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst), and this lane could not open it locally. No local receipt, test or fixture under the repository runs cvxportfolio. The packet card says its multi-period policy/cost-model workflow is unexecuted, that its simulator may download risk-free data when cash returns are absent, and that optimizer feasibility is not execution feasibility. It is also GPL-3.0, while skfolio is BSD-3-Clause. Its multi-period transaction/holding-cost modelling is scope that the skfolio splitter receipt does not cover, so it remains a comparison target rather than a rejected tool."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "catalogs/us-equities/engines-strategies.json",
-    "catalogs/us-equities/runtime-target.json"
+    "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/README.md"
    ],
-   "key": "c12",
-   "name": "ib_async",
-   "repository": "https://github.com/ib-api-reloaded/ib_async",
-   "why_not_default": "Its engines-strategies.json card is decision alternative, evidence_level source_review, and its workflow is 'Prospective and unexecuted'. It is a community SDK, and its card says local contract construction is not IBKR paper acceptance. runtime-target.json selects Nautilus's native IBKR socket adapter for IBKR, with local_broker_acceptance not_established."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/engines-strategies.json"
-   ],
-   "key": "c13",
-   "name": "PyPortfolioOpt",
-   "repository": "https://github.com/pyportfolio/pyportfolioopt",
-   "why_not_default": "Its engines-strategies.json card is decision alternative, evidence_level source_review, and its workflow is 'Prospective and unexecuted'. The card's own rationale prefers skfolio when model selection is central. It has no executed allocation, risk-model or reconciliation evidence."
+   "key": "c2",
+   "name": "empyrical-reloaded",
+   "repository": "https://github.com/stefan-jansen/empyrical-reloaded",
+   "why_not_default": "Supported only by a source review of an upstream README URL (https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/README.md), which this lane did not open. No local execution receipt exists. The packet card records an import-name collision with the older empyrical package and says the pandas-datareader integration is incompatible with Python >=3.12. That matters because the accepted research environment is Python 3.13.15, per receipt.json runtime.python. It computes return/risk metrics only; it does not do portfolio construction or chronological validation."
   },
   {
    "disposition": "overlap",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "catalogs/us-equities/engines-strategies.json"
+    "https://github.com/ranaroussi/quantstats/blob/v0.0.81/README.md"
    ],
-   "key": "c5",
-   "name": "Zipline Reloaded",
-   "repository": "https://github.com/stefan-jansen/zipline-reloaded",
-   "why_not_default": "Its engines-strategies.json card is decision alternative, source_review, workflow unexecuted. The card's rationale says to 'avoid adopting a second event engine without a specific need'. It has no Alpaca paper route and no retained accounting or risk receipt."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/engines-strategies.json",
-    "catalogs/us-equities/data-research.json"
-   ],
-   "key": "c7",
-   "name": "Qlib",
-   "repository": "https://github.com/microsoft/qlib",
-   "why_not_default": "The engines-strategies.json card is decision conditional and the data-research.json data-qlib card is decision watch. Both are source_review with unexecuted workflows. The reviewed Alpha158/LightGBM YAML defaults to China/CSI300. The official dataset is temporarily disabled per the pinned README. Adoption waits on a point-in-time US dataset. It has no execution or risk role."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/engines-strategies.json"
-   ],
-   "key": "c9",
-   "name": "vectorbt",
-   "repository": "https://github.com/polakowo/vectorbt",
-   "why_not_default": "Its engines-strategies.json card is decision alternative, source_review, workflow unexecuted. The license is Apache-2.0 with a Commons Clause condition. Its card says research outputs must be re-verified in the execution engine. It has no broker route and no retained accounting receipt."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/engines-strategies.json"
-   ],
-   "key": "c10",
-   "name": "Lumibot",
-   "repository": "https://github.com/lumiwealth/lumibot",
-   "why_not_default": "Its engines-strategies.json card is decision alternative, source_review, workflow unexecuted. The license conflict is unresolved: the LICENSE file is GPL-3.0 while setup.py declares MIT. It would be a second active engine alongside the selected Nautilus destination. No paper or accounting receipt is retained."
+   "key": "c4",
+   "name": "quantstats",
+   "repository": "https://github.com/ranaroussi/quantstats",
+   "why_not_default": "Supported only by a source review of an upstream README URL (https://github.com/ranaroussi/quantstats/blob/v0.0.81/README.md), which this lane did not open. No local execution receipt exists. It produces descriptive return-period tear sheets and overlaps c2's metric role. The packet card says it does not fix leakage, trial selection, fills or accounting errors, and it assumes a 252-period convention. It is a reporting aid, not portfolio or risk construction."
   }
  ],
  "catalog": "us-equities",
@@ -112,74 +39,56 @@
  "lane": "claude",
  "layer_id": "portfolio-risk",
  "limits": [
-  "Remote evidence refs (the gnzsnz/ib-gateway-docker README and Nautilus interactive_brokers.md at their pinned commits) were not opened; this lane had no network access. c1 was judged from local catalog text only.",
-  "Large receipts were read in part: native-nautilus-v2 lines 1-120, research-evaluation lines 1-120, historical-simulation lines 1-80 plus grep, resolution-receipt lines 1-80. The unread sections were not verified.",
-  "No commands were run. Receipt results are recorded execution evidence, not re-observed now.",
-  "I did not open evidence/artifacts/comparison-progress-20260922/summary.json or docs/blind-catalog-source-adjudication-20260921.md. The parity-blocked status and the Nautilus risk-test defect are taken from the packet and runtime-target.json.",
-  "No TypeSafe inference results were supplied. All dispositions are my own source review, not provider judgments. The typesafe-ai skill was preloaded from <host-path>/typesafe-ai.",
-  "The model field copies the required fixed value claude-opus-5/high. The client reports the executing model as claude-opus-5-5[1m]."
+  "Four packet evidence_refs are GitHub URLs: the cvxportfolio 1.5.1, empyrical-reloaded 0.5.12 and quantstats v0.0.81 READMEs, and the skfolio v1.2.8 README.rst. This lane is restricted to local files and has no web access, so none were opened. The source-review status of c1, c2 and c4, and skfolio's documented optimizer scope, remain unverified here.",
+  "receipt.json was read at lines 1-1343 and 1477-1794. Lines 1344-1476 (the reserved-segment candidate details) were not read in full; the reserved summary was taken from the README table.",
+  "tests/test_research_evaluation.py, evaluate.py and plan.json were confirmed to exist only by a glob listing, not opened. No commands were run and no receipt result was re-executed; all numbers are the recorded values.",
+  "The existing prior lane artifact evidence/artifacts/layer-verdicts-20260922/claude/us-equities-portfolio-risk-20260922.json was deliberately not read, to keep this verdict independent.",
+  "No TypeSafe inference results were supplied by the coordinator. All judgments are this lane's own source review, not retained provider judgments.",
+  "Skill path: <host-path>/SKILL.md. The client reports the actual model as claude-opus-5-5[1m]; the output model field keeps the fixed value 'opus'/'high' as instructed."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "SPY/LEAN parity is not accepted. runtime-target.json next_acceptance records 'reported_execution_blocked_review_incomplete', with four failed checks attributed to dividend cash posting and market-on-open mappings.",
-  "The AAPL Nautilus replay uses 15 bars, excludes known dividend/split dates, and uses retrospective close fills with unlimited synthetic depth. It does not establish finite liquidity, partial fills, impact or halts.",
-  "No native in-flight broker fault (partial fill, cancel, reject, disconnect, crash) was induced. The 27 Alpaca lifecycle tests are synthetic.",
-  "The IBKR boundary is not established: local_broker_acceptance not_established, and Dockerized IB Gateway native_acceptance not_established.",
-  "No executed portfolio-optimization or risk-model receipt exists for any candidate. The skfolio native run covers WalkForward splitting on raw-price labels only.",
-  "The packet lists three SOTA components outside the candidate set: quantstats (confirmed_default), cvxportfolio (not_individually_reviewed) and empyrical-reloaded (unmaintained_signal). None of their receipts were in scope for this packet, so their role in this layer is unjudged.",
-  "No point-in-time universe, strategy merit, financing-inclusive performance or profitability follows from any receipt.",
-  "NautilusTrader 2.0.0rc5 is a prerelease; GitHub's latest non-prerelease is v1.231.0. The packet also records an unasserted-denial-variant test defect in Nautilus risk tests. I did not verify it from source here."
+  "The skfolio native evidence covers only the WalkForward splitter in a raw-price label study. No skfolio optimizer, risk measure or portfolio weight output has been executed (README.md, 'This accepts the splitter used here, not every skfolio optimizer').",
+  "No candidate provides deterministic pre-trade numeric risk enforcement or broker reconciliation. The receipt limitations state there is 'No cash/position/fee/dividend reconciliation or new LEAN engine execution'.",
+  "The receipt says its labels are not portfolio P&L, total return, annualized return or Sharpe; the cost proxy is a fixed 20bp round trip. Only 11 completed reserved episodes per candidate exist, with no alpha or superiority claim.",
+  "No integration of any candidate with the selected NautilusTrader 2.0.0rc5 destination is evidenced.",
+  "The packet shows the skfolio pin (1.2.9) behind upstream v1.3.0, and v1.3.0 has not been accepted natively.",
+  "cvxportfolio, empyrical-reloaded and quantstats have no local execution receipts, so their fitness is untested, which is not the same as failed.",
+  "No executed comparison exists between any pair of candidates on the same frozen inputs.",
+  "Native acceptance is limited to a Linux/WSL Python 3.13.15 environment (receipt limitations)."
  ],
  "overturn_protocol": {
   "arms": [
-   "NautilusTrader 2.0.0rc5 (c15) equity replay",
-   "LEAN 985ef30 (c16) oracle on the same frozen SPY inputs",
-   "alpaca-py 0.44.0 (c8) paper boundary vs IBKR boundary via Nautilus native adapter or ib_async (c12)",
-   "skfolio (c4) vs PyPortfolioOpt (c13) allocation on the same frozen return matrix"
+   "c3 skfolio optimizer + WalkForward (native, pinned)",
+   "c1 cvxportfolio 1.5.1 multi-period policy with explicit cash column (native, pinned)"
   ],
   "fixture_paths": [
-   "blueprints/us-equities/engine-nautilus/acceptance-plan.md",
-   "blueprints/us-equities/engine-nautilus/equity-replay/plan.json",
-   "blueprints/us-equities/historical-simulation/receipt.json",
-   "tests/test_nautilus_equity_replay.py",
-   "tests/test_alpaca_paper.py"
+   "blueprints/us-equities/research-evaluation/plan.json",
+   "blueprints/us-equities/research-evaluation/receipt.json",
+   "tests/test_research_evaluation.py"
   ],
-  "metric": "Per-value absolute difference in native cash/equity (tolerance at most $0.01 per acceptance-plan.md section 3). Exact match on fills, fees, dividends and decision order. Pass/fail on the deterministic broker-state cases (duplicate intent, lost response, partial/duplicate fills, cancel race, crash boundaries, stale/risk breach, kill switch) with zero unexplained position/cash/open-order differences."
+  "metric": "On identical frozen inputs: native exit status, focused boundary-test pass count, number of training exits that precede their evaluation cutoff, cost-inclusive result reproducibility (hash-equal reruns), and whether the tool can express the transaction/holding-cost and constraint semantics the portfolio-risk layer requires"
  },
- "overturn_when": "Reopen the winner set in any of these cases:\n- The preregistered SPY/LEAN one_zero replay fails the $0.01 absolute-tolerance cash/equity check, or cannot map distributions_and_cash or market_on_open. The contract is in blueprints/us-equities/engine-nautilus/acceptance-plan.md section 3, against the LEAN oracle blueprints/us-equities/historical-simulation/receipt.json. It is currently recorded as a completed BLOCKED comparison, not accepted parity.\n- The replay `python3 blueprints/us-equities/engine-nautilus/equity-replay/launch.py --python <NAUTILUS_ENV>/bin/python --run <RETAINED_ALPACA_RUN> --out <PRIVATE_EVIDENCE>/<RUN_ID>` no longer reproduces the recorded economic hashes.\n- `python3 -m unittest tests.test_nautilus_equity_replay -v` or the tests/test_alpaca_paper.py suite regresses.\n- A native in-flight fault case (partial, cancel race, crash boundary, or stale/risk breach, per acceptance-plan.md section 4) fails on the Alpaca or IBKR boundary.\n- A portfolio/risk library (skfolio c4, PyPortfolioOpt c13, or the non-candidate cvxportfolio) produces an executed allocation/risk receipt on the same frozen inputs. That would add or replace a portfolio-construction winner.",
- "packet_sha256": "55cd1b8391c467f1f683750ff7554d3b8ab0652a4ce28035f148b48fa1814eb7",
+ "overturn_when": "Reopen the verdict if either of two runs on the frozen inputs in blueprints/us-equities/research-evaluation/plan.json turns out differently. First: a native skfolio optimizer/risk-measure run on those inputs, with tests added alongside tests/test_research_evaluation.py and run as `python3 -m unittest discover -s tests -p test_research_evaluation.py -v`, fails or cannot express the required cost or constraint semantics. Second: an equivalently receipted native cvxportfolio (c1) run on the same plan produces cost-aware multi-period results with a reproducible cash ledger and passing boundary tests that skfolio cannot match. Either outcome would promote c1 or demote c3. A regression in the existing focused suite, or a WalkForward source hash that no longer matches the receipt, would also reopen c3.",
+ "packet_sha256": "824673a65fddc83cc26de5e8b6ae139effdaf62ec0feb2e11562cb97eda768f6",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/us-equities__portfolio-risk.json",
-  "catalogs/us-equities/runtime-target.json",
-  "catalogs/us-equities/engines-strategies.json (lines 1-420, 460-499, 640-773, 1360-1403)",
-  "catalogs/us-equities/data-research.json (lines 1340-1379, data-qlib)",
-  "catalogs/landscape/hosting-practice.json (Dockerized IB Gateway entry, lines 41-54)",
-  "docs/hosting-container-practice.md (line 14)",
-  "evidence/receipts/native-nautilus-v2-20260920.json (lines 1-120)",
-  "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json",
-  "blueprints/us-equities/research-evaluation/receipt.json (lines 1-120)",
-  "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
-  "blueprints/us-equities/historical-simulation/receipt.json (lines 1-80 plus grep of status/over_limit)",
-  "blueprints/us-equities/engine/resolution-receipt.json (lines 1-80)",
-  "blueprints/us-equities/engine-nautilus/acceptance-plan.md (lines 136-195 plus grep)"
+  "blueprints/us-equities/research-evaluation/receipt.json",
+  "blueprints/us-equities/research-evaluation/README.md",
+  "<host-path>/SKILL.md (preloaded skill body)"
  ],
- "why_selected": "The requirement asks for four things: the NautilusTrader destination, reproducible equity accounting, the retained LEAN oracle, and a broker boundary with numeric risk and independent reconciliation. These three candidates are the only adopted ones with executed evidence for those parts.\n\nc15 NautilusTrader 2.0.0rc5:\n- evidence/receipts/native-nautilus-v2-20260920.json records the unchanged upstream synthetic EURUSD quickstart (commit 1b0a49d) run twice in isolation. Both runs ended at 1000431.00000 USD cash, realized PnL 431.00, all positions flat.\n- blueprints/us-equities/engine-nautilus/equity-replay/receipt.json is a local integration, not an upstream test. It replayed 15 AAPL bars in two scenarios, twice each, with exit code 0. Baseline: realized PnL -133.40, ending cash 99866.60. Fee/slippage stress: fees 10.00, realized PnL -144.40. It verified 10 cash transitions per scenario, the account CSV repeated byte-identically, a separate reviewer recomputed the cash and PnL, and the 8 local synthetic tests passed.\n- catalogs/us-equities/runtime-target.json names it the selected destination (engine.decision \"selected_destination\").\n\nc16 LEAN:\n- blueprints/us-equities/historical-simulation/receipt.json records 6 native simulations at source pin 985ef30. Five invested scenarios ended flat with fill, fee and dividend cash reconciled. The over_limit scenario got one native buying-power rejection and zero fills. The first case ended at 90734.08 USD with 428.64 USD dividends.\n- blueprints/us-equities/engine/resolution-receipt.json shows the unchanged bundled backtest still passing: Completed, 3943 data points, 3 orders, matching the original order-list hash.\n- This is the numeric risk and cash oracle the requirement says to preserve.\n\nc8 alpaca-py 0.44.0:\n- blueprints/us-equities/paper-e2e-20260921/paper-receipt.json records a real paper run. SPY was bought and sold (1 share each) with 2 writes and gross PnL -0.08 USD.\n- A separate read-only SDK process then reconciled the account: 5 GET requests, all HTTP 200, 0 positions, 0 open orders, cash delta matching the reported PnL.\n- Frozen numeric limits were in force: maximum order notional 1000, maximum gross exposure 1000, maximum 4 write attempts.\n- Completed-trial recovery made 0 additional writes.\n- This is the only broker boundary with observed execution plus independent reconciliation. runtime-target.json names alpaca-py as the selected Alpaca path.",
- "winner_evidence_class": "local_integration",
+ "why_selected": "c3 (skfolio) is the only adopted candidate with retained local execution evidence. What was actually observed comes from blueprints/us-equities/research-evaluation/receipt.json (kind \"native_cli_e2e\", observed_utc 2026-09-19T22:59:04Z, status \"accepted_for_causal_raw_price_label_control_only\"). In that run, the installed upstream skfolio 1.2.9 WalkForward was called with 252/63/6 and reduce_test=True on SPY/QQQ/IWM session rows. It produced 20 development folds, 21 frozen selections and 6605 candidate records. The run command exited 0 with empty stderr (0 bytes). The focused tests reported \"12 passed\" and the full suite \"214 passed, 0 skipped\". The dependency check reported \"All 19 installed packages compatible.\" An independent review verified 42 private artifact hashes with 0 mismatches and reported no blocking findings. The receipt records a walkforward_source_sha256 and reviewed revision c99fcf71349e2df4a7a1033ee85ca2e9ced9abee. The README \"Observed native results\" section also says \"This accepts the splitter used here, not every skfolio optimizer.\" The native evidence therefore covers skfolio's chronological validation splitter in a raw-price label study. It does not cover skfolio's portfolio optimizers, risk measures, portfolio P&L or pre-trade risk enforcement. skfolio is selected because it is the only portfolio-layer candidate whose own component has actually run here. It is not selected because it has been shown to satisfy the full portfolio-and-risk requirement. The other three candidates rely on GitHub README URLs, which this lane could not open.",
+ "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
-  "evidence/receipts/native-nautilus-v2-20260920.json",
-  "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json",
-  "catalogs/us-equities/runtime-target.json",
-  "blueprints/us-equities/historical-simulation/receipt.json",
-  "blueprints/us-equities/engine/resolution-receipt.json",
-  "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
+  "blueprints/us-equities/research-evaluation/receipt.json",
+  "blueprints/us-equities/research-evaluation/README.md",
+  "https://github.com/skfolio/skfolio/blob/v1.2.8/README.rst"
  ],
  "winner_keys": [
-  "c15",
-  "c16",
-  "c8"
+  "c3"
  ]
 }
