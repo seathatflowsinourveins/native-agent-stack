@@ -62,6 +62,22 @@ normally live in `docs/github-automation.md` is therefore kept here.
    `platform.supported == false`. Alternative considered: `|| true` around the
    command (rejected — it would swallow a genuine crash).
 
+   **Fail-closed correction (independent review, 2026-09-22).** Accepting exit
+   `2` initially removed the Linux job's fail-closed property: when the manifest
+   or the requested profile is broken, `inspect_adoption` returns early with
+   `manifest.status == "invalid"`, `"profiles": []` and a non-empty `errors`
+   list, and `main()` still returns `2`. Against that report every emptiness
+   assertion above passes vacuously (`[.profiles[].commands[] | select(...)] |
+   length == 0` is `true` over an empty array, and `platform.supported` is
+   initialised `false`), so a broken macOS profile — exactly what this smoke has
+   to catch — would have gone green. A positive step now runs *before* the
+   emptiness assertions and checks that the report is a real
+   `macos-arm64-foundation` report: `.manifest.status == "valid"`,
+   `.errors | length == 0`, exactly one profile with that id, its `commands` and
+   `recipes` arrays non-empty, and its `status == "prerequisites_present"`. The
+   last check subsumes the emptiness pair; both are kept because they localise
+   the failure to a command versus a recipe in the step log.
+
 3. **Portable-runner provenance.** `runs-on: macos-15` is GitHub's Apple
    Silicon image and is free for public repositories; the job additionally
    asserts `uname -m = arm64` and captures `sw_vers` rather than trusting the
@@ -111,6 +127,27 @@ normally live in `docs/github-automation.md` is therefore kept here.
    not jobs, and `adoption-bootstrap.yml` is already listed at line 56. The
    brief's condition for extending it ("only if its coverage set enumerates
    jobs") is not met.
+
+9. **`gh --version` is printed for the run log, not as pinned-install
+   evidence.** `gh` is not in the `macos-arm64-foundation` profile's
+   `required_commands` and is preinstalled on the runner image, so the line
+   normally reports the image's `gh` rather than anything the pinned bootstrap
+   installed. A comment on that line says so, and the artifact's
+   `installed-versions.txt` (hashed into the receipt as
+   `installed_versions_sha256`) stays the authoritative pinned-version record.
+
+10. **Static coverage of the profile id is an integration follow-up.**
+    `tests/test_adoption_bootstrap.py` is outside this unit's owned paths. Its
+    `test_profile_ids_referenced_by_workflow_exist_in_manifest` asserts only
+    `foundation-cpu`, and `WorkflowReferenceTests` asserts only the Linux script
+    path, so nothing statically fails if `macos-arm64-foundation` is renamed or
+    dropped from `adoption/manifest.json`. The profile does exist today (ids:
+    `foundation-cpu`, `research-runtime`, `observability`, `semantic-rag`,
+    `recovery`, `macos-arm64-foundation`, `trading-nautilus`), and the new
+    positive `jq` step in Decision 2 catches the rename at run time. The
+    coordinator or U-D should still add `assertIn("macos-arm64-foundation",
+    profile_ids)` and a `WorkflowReferenceTests` assertion for
+    `adoption/bootstrap-macos.sh` at integration.
 
 ## Verification
 

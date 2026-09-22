@@ -129,6 +129,21 @@ jobs:
             exit 1
           fi
           echo "adoption_status.py exit code: $code"
+      - name: Assert the report is a real macos-arm64-foundation profile report
+        shell: bash
+        run: |
+          set -euo pipefail
+          # scripts/adoption_status.py returns an early error report -- manifest
+          # status "invalid", "profiles": [] and a non-empty "errors" list -- and
+          # still exits 2 when the manifest or the requested profile is broken.
+          # Without these positive checks the emptiness assertions below would
+          # pass vacuously on exactly the wiring failure this smoke must catch.
+          jq -e '.manifest.status == "valid"' status.json
+          jq -e '.errors | length == 0' status.json
+          jq -e '[.profiles[] | select(.id == "macos-arm64-foundation")] | length == 1' status.json
+          jq -e '[.profiles[] | select(.id == "macos-arm64-foundation")][0].commands | length >= 1' status.json
+          jq -e '[.profiles[] | select(.id == "macos-arm64-foundation")][0].recipes | length >= 1' status.json
+          jq -e '[.profiles[] | select(.id == "macos-arm64-foundation")][0].status == "prerequisites_present"' status.json
       - name: Assert every required command for the macOS profile is present
         shell: bash
         run: |
@@ -161,6 +176,10 @@ jobs:
           llama-server --version
           uv --version
           node --version
+          # gh is NOT in the macos-arm64-foundation profile's required_commands
+          # and is preinstalled on the runner image, so this line usually
+          # reports the image's gh, not a pinned install. The artifact's
+          # installed-versions.txt stays the authoritative pinned-version record.
           gh --version
       - name: Collect the artifact payload
         if: always()
