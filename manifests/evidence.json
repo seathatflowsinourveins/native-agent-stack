@@ -12521,6 +12521,51 @@
       "path": "blueprints/gap-resolution-20260922/xnys-multiyear-holiday-check/compute.py",
       "sha256": "70a4b238208e125e48784f238b11ec490e80464d49cfc933572e72b19e239ab0",
       "bytes": 4903
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/upstream-currency-sweep/currency_sweep.py",
+      "sha256": "c8406015cfe72495e832af7fe024f056aad0e888506fa7030bb403af947a24c0",
+      "bytes": 2250
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/document-retrieval/upstream-currency-sweep.json",
+      "sha256": "c5e09557e535502d12bed7defed756f87d5845f87cb2ca0a33abdd2e9013aeef",
+      "bytes": 18257
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/evaluation-experiments/upstream-currency-sweep.json",
+      "sha256": "df8eec41e1d0e01b32c7cc29b71c2455d2376ef9d47111c9d7dcc2ab8752185f",
+      "bytes": 18261
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/git-github-automation/upstream-currency-sweep.json",
+      "sha256": "eb6206d442261fbd9dfeff02731cebebca3629c8698a6fabe521057d073abb1d",
+      "bytes": 18260
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/scheduling-supervision/upstream-currency-sweep.json",
+      "sha256": "c52a9f8596e281bd1a3d40ba7b8d9b03ef36bbd7d19fee39221920da9aab0eee",
+      "bytes": 18261
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/secrets-credentials/attestation-endpoint-recheck.json",
+      "sha256": "e9b955e87b5be3aa247238b35ad3eec2a65975e8a2b0aeea6fc995076a18a43c",
+      "bytes": 6451
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/secrets-credentials/gitleaks-repo-history-scan.json",
+      "sha256": "bb22b30efed95387aa939330272390c61387f75d240dad5b8e41ac5d914b261a",
+      "bytes": 9165
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/upstream-currency-sweep.json",
+      "sha256": "5e2fbf11cac69016ddf70875e5010e7a42d73d997dcf60b45dac156b61ea2533",
+      "bytes": 18255
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/workers/upstream-currency-sweep.json",
+      "sha256": "5588aebc536561d71923261f9161204ea27341dfb40d596cd5bda23240e61f48",
+      "bytes": 18246
     }
   ],
   "convergence_records": [
