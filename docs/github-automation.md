@@ -135,6 +135,8 @@ installed zizmor returned exit 0 and `[]` for all six workflows. The existing
 workflow-security/registry tests ran 49 tests and returned `OK`. These are local
 static and integrity results, not hosted scheduling or improved research results.
 
+The `validate` job also provisions the fail-closed promotion gate's isolated venv (pinned/checksummed `uv`, `uv pip sync --require-hashes` against `blueprints/us-equities/data/requirements.lock`) before running the test suite and sets `REQUIRE_PROMOTION_GATE_VENV=1`, so `tests/test_promotion_gate.py`'s fixture tests fail instead of silently skipping if that provisioning ever breaks. Locally (cold `uv` cache, this machine's network, not a hosted runner), that venv creation plus hash-verified sync of the 20 locked packages measured about 1.4-2.2 s.
+
 ## Advanced automation: bounded upstream adoption
 
 [GitHub Agentic Workflows](https://github.com/github/gh-aw) is the upstream candidate
