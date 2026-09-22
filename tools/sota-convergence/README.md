@@ -506,6 +506,28 @@ evidence rather than copying the existing selection, and writes one packet
 per `(catalog, layer_id)` to `<work_dir>/packets/<catalog>__<layer_id>.json`
 plus a `<work_dir>/packets/SHA256SUMS` (`sha256sum` format).
 
+**Layer-specific trading candidates** (`--trading-candidates manifest`). The trading
+ledger rows carry four group-wide candidate lists (one per domain card), so sibling layers
+chose from identical candidates and several 2026-09-22 verdicts named tools that are not the
+layer's own. In manifest mode each us-equities packet instead holds the sota manifest's own
+entries for that layer (adopted when their domain card decision is `default` or
+`conditional`), then the layer's newcomer and keep-but-compare repositories (never adopted).
+Evidence paths, role and limitations come from the entry's card in
+`catalogs/us-equities/{agents-operations,data-research,engines-strategies,foundation-memory}.json`;
+the card rationale and decision are withheld, and manifest review labels are not carried
+at all: over the 112 2026-09-22 trading entries every label value, including
+`not_individually_reviewed` and `unmaintained_signal`, correlates with the withheld decision.
+The `pin_behind_upstream` flag and the upstream metadata stay. Because the ledger's requirement, limitations and
+overturn text is shared by the layer's group, each packet also carries the layer's own scope
+terms from the manifest taxonomy (`layer_scope_terms`) with a `requirement_note` telling the
+lane to judge fit against them. A manifest entry without a card is an error, not a silent
+non-adopted candidate. Card `role` and limitation prose and newcomer notes are passed through
+as evidence and can still name the current pick ("selected destination runtime"); like the
+`adopted` flag, that is a known limit of the withholding. So is evidence strength: over
+the 112 2026-09-22 trading entries, `native_proven` evidence and a resolvable `recipe_ref`
+occur far more often on default entries than on conditional ones. Foundation packets are identical in
+both modes, and the default `ledger` mode still reproduces the 2026-09-22 packets byte for byte.
+
 Known limit of the withholding (2026-09-22 independent review): each
 candidate keeps its `adopted` flag, which the never-promote rule needs, and
 foundation packets attach the matched decisions' `selection` value
