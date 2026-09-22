@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-09-22T22:48:42.367056021Z",
+  "created_by": "probe",
+  "description": "scratch issue for lease-recovery test",
+  "id": "beads-gap-probe-3cg",
+  "issue_type": "task",
+  "owner": "probe@example.com",
+  "priority": 2,
+  "schema_version": 1,
+  "status": "open",
+  "title": "worker-crash-probe",
+  "updated_at": "2026-09-22T22:48:42.367056021Z"
+}

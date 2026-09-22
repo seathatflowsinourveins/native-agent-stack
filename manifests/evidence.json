@@ -12181,6 +12181,31 @@
       "path": "blueprints/gap-resolution-20260922/difftastic-larger-fixture/reanalyze_reports.py",
       "sha256": "adb2104d77be381887de9536f5d5db6e8f4e756596ac2a93cf375b379c9b41cd",
       "bytes": 3306
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/workers/beads-lease-recovery-probe.json",
+      "sha256": "fe899c7c28eebef119acb2352922758e4a54216afe5cb72fba41e7b437221968",
+      "bytes": 14399
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/beads-lease-recovery-probe/run.sh",
+      "sha256": "b9eb2bb74201008e4dcd9e6278699784f94dff42e97ec762a7a431a7e0db8c05",
+      "bytes": 4004
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/beads-lease-recovery-probe/pilot-confounded-run.log",
+      "sha256": "9be91e325969042bc03604d5e719bafd8d30f4d983ab26fe2ccb74bf4e42a434",
+      "bytes": 1123
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/beads-lease-recovery-probe/corrected-run.log",
+      "sha256": "67038440f0d7319931b20b8c76f40db851af587e971b910db95c0cafd6a23ab1",
+      "bytes": 1652
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/beads-lease-recovery-probe/pilot-create-out.json",
+      "sha256": "4869e57320a8d53c39debad6d368ee57b1a743d30d8a5292a5b9085c30ace14e",
+      "bytes": 366
     }
   ],
   "convergence_records": [
