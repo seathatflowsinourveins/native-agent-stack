@@ -12089,8 +12089,8 @@
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/headroom-0.38.0-upgrade-recovery.json",
-      "sha256": "5a678203430da7904df64d66e72cbd1f82d22ab64742f0dc5104a3d495594704",
-      "bytes": 9110
+      "sha256": "da5dae9851fa8ef2e7ecaf131fecac56827fd76d7a16d03d9d5b2de776856dd3",
+      "bytes": 16427
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/rtk-second-artifact-pair.json",
@@ -12109,8 +12109,23 @@
     },
     {
       "path": "blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/run.sh",
-      "sha256": "c635d9a13c1c9092f7a5bc3d7a55572cc9e615d5b12e8574b85281d5d8f99f1e",
-      "bytes": 2289
+      "sha256": "45ac3a653bfc77d613e2b32457538f9bc276065f5e7eb43bbf401d01ef3cf19e",
+      "bytes": 3185
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/run_v2.sh",
+      "sha256": "dba338720b8a37e17f8481bbcf3d83da44d1ad5d9746f160fdd57763b53dc933",
+      "bytes": 4508
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/make_mcp_listing_fixture.py",
+      "sha256": "015fc6622763f580953f30e384f0b81d84b3268ccf29c5a52ef2d71b5278d2e1",
+      "bytes": 5343
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/mcp-tool-listing.json",
+      "sha256": "2b17eb36da607cc8d2f6f0e2802193c0a0587ffbae361e667d093930d3a5533d",
+      "bytes": 183628
     },
     {
       "path": "blueprints/gap-resolution-20260922/rtk-second-artifact-pair/run.sh",

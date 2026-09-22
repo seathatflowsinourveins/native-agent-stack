@@ -1,10 +1,24 @@
 #!/usr/bin/env bash
-# Install headroom-ai[mcp]==0.38.0 into a NEW isolated uv-tool prefix (never
-# touches the pinned 0.37.0 at
-# /home/example/.local/share/codex-ecosystem/python-tools-versioned/headroom-ai-0.37.0/),
-# then run the same guarded MCP compress/retrieve recovery check the 0.37.0
-# receipt (evidence/receipts/native-headroom-mcp-20260920.json) ran, using this
-# repo's owned fixtures/rag-note.md as the compressed artifact.
+# HISTORICAL / SUPERSEDED — kept unmodified as the exact record of what this
+# script actually ran (fix-round blocker finding, 2026-09-22).
+#
+# This script installs headroom-ai[mcp]==0.38.0 into a NEW isolated uv-tool
+# prefix (correctly isolated from the pinned 0.37.0 install), but the MCP
+# server it launches was NOT isolated: it omits HEADROOM_WORKSPACE_DIR,
+# HEADROOM_OFFLINE and HEADROOM_TELEMETRY, so running it wrote into the live
+# default Headroom store at ~/.headroom (ccr_store.db, session_stats.jsonl)
+# and made an online update check (update_check.json), confirmed by file
+# mtimes and content at the time of the fix-round finding. Its fixture
+# (fixtures/rag-note.md, 351 bytes) also only ever triggered Headroom's
+# no-op router, so it never exercised a real compressing transform. See
+# run_v2.sh for the corrected, isolated re-run (disposable
+# HEADROOM_WORKSPACE_DIR, HEADROOM_OFFLINE=1, HEADROOM_TELEMETRY=off, and a
+# larger fixture that does trigger compression) and
+# evidence/artifacts/gap-resolution-20260922/token-efficiency/
+# headroom-0.38.0-upgrade-recovery.json for the corrected receipt. The
+# ~/.headroom entries this script wrote were left in place: the fix-round
+# task authorized removing them only with explicit coordinator authorization,
+# which this round did not grant.
 set -euo pipefail
 
 PREFIX=/home/example/.local/share/codex-ecosystem/tools/headroom-ai-0.38.0
