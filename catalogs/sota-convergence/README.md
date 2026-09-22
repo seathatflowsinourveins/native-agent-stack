@@ -145,3 +145,8 @@ evidence is the separate `evidence_level` field carried from each entry's
 catalog cards set `evidence_level: source_review` and their manifest notes say the same
 in prose -- confirmed selections with no reproducible execution receipt yet, not a
 contradiction in the manifest.
+
+A rerun of the practice tooling with GitHub-slug normalization (after the Codex review of
+2026-09-22) resolves release/tree-style stack URLs that the first build missed and counts
+17 component pins behind upstream (repomix and markitdown join the 15 above). The published
+manifest is a dated record and is not regenerated; the tooling is the source for the next run.
