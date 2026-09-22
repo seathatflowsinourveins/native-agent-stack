@@ -1,93 +1,76 @@
 {
  "alternatives": [
   {
-   "disposition": "conditional",
+   "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md"
-   ],
+   "evidence_refs": [],
    "key": "c14",
    "name": "Databento",
    "repository": "https://github.com/databento/databento-python",
-   "why_not_default": "The only evidence is the README (source review). No acquisition, entitlement or cost receipt is retained. The card lists three limits: an exchange-specific feed is not consolidated US coverage, a late adjustment factor can leak into earlier decisions, and corporate-action redistribution is contract-restricted. It is the natural comparison arm against c9 for consolidated history and delistings, but it is unexecuted."
+   "why_not_default": "The only evidence is an upstream README (packet line 395). There is no retained acquisition, entitlement or corporate-action receipt. Its card says the feed is exchange-specific rather than consolidated, and that redistribution is restricted. It is the natural comparison arm against c9 for gaps c9 leaves open: delisted-name coverage, dividend currency and instrument definitions. That comparison has not been run."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md"
-   ],
+   "evidence_refs": [],
    "key": "c7",
    "name": "Massive Python client",
    "repository": "https://github.com/massive-com/client-python",
-   "why_not_default": "The only evidence is the README; no request was executed. The card says the free-tier terms do not grant commercial use or redistribution, and inactive/date ticker filters do not prove a survivorship-free universe. It overlaps c9, which has retained native bar and corporate-action acquisition."
+   "why_not_default": "README source review only, with no retained data request. Its card says the free tier does not grant commercial use or every endpoint, and that ticker filters do not prove a complete historical universe. It overlaps c9's retained native SIP bar coverage without any evidence of its own."
   },
   {
-   "disposition": "out_of_scope",
+   "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/README.md"
-   ],
+   "evidence_refs": [],
    "key": "c8",
    "name": "data-fredapi",
    "repository": "https://github.com/mortada/fredapi",
-   "why_not_default": "It supplies macro series and vintages, not US-equity observations. The only evidence is the README, and the card says no data request was run. The last release was 2024-05-05 and review_status is unmaintained_signal. A vintage date lacks an intraday availability time."
+   "why_not_default": "Macro and vintage access is backed only by README source review; its card says no data request was run. It also has an unmaintained signal: latest release 2024-05-05 (packet line 230)."
   },
   {
-   "disposition": "out_of_scope",
+   "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/README.md"
-   ],
+   "evidence_refs": [],
    "key": "c5",
    "name": "data-gdeltdoc",
    "repository": "https://github.com/alex9smith/gdelt-doc-api",
-   "why_not_default": "It is a news-coverage client, not an equity market-data or reference source. The only evidence is the README, and review_status is unmaintained_signal. The card says GDELT first-seen time is not publication or tradable-availability time."
+   "why_not_default": "README source review only, with an unmaintained signal. Its card says GDELT first-seen time is not publication time or tradable availability time, and that results are bounded rather than exhaustive."
   },
   {
    "disposition": "out_of_scope",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md"
-   ],
+   "evidence_refs": [],
    "key": "c1",
    "name": "data-feast",
    "repository": "https://github.com/feast-dev/feast",
-   "why_not_default": "It is a feature store for downstream retrieval, not an acquisition or reference source. The only evidence is the README. The card says event-time point-in-time retrieval does not exclude late corrections. The retained as-of gates are project DuckDB and Python code (security-identity/ledger.py, catalyst.py)."
+   "why_not_default": "This is a feature store for point-in-time joins, not an acquisition source, and it has README source review only. Its card says event-time retrieval does not exclude late corrections. The retained as-of selection is done by DuckDB (identity-readiness temporal_ledger), not Feast."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md"
-   ],
+   "evidence_refs": [],
    "key": "c2",
    "name": "data-dlt",
    "repository": "https://github.com/dlt-hub/dlt",
-   "why_not_default": "It is a generic extraction/loading pipeline with no retained run. The card says schema inference is not a financial data-quality contract, and watermark-only extraction can miss late revisions. The retained acquisitions use project adapters with hashed private pages; no comparison against dlt was executed."
+   "why_not_default": "An ingestion framework backed only by README source review; no pipeline receipt is retained. Its card says schema inference is not a financial data-quality contract and that watermark extraction can miss revisions. Retained ingestion uses custom collectors such as alpaca-historical/collect.py."
   },
   {
    "disposition": "out_of_scope",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md"
-   ],
+   "evidence_refs": [],
    "key": "c10",
    "name": "data-kafka",
    "repository": "https://github.com/apache/kafka",
-   "why_not_default": "It is event-log transport, not a data source. The only evidence is the README. The packet's existing_overturn_when says to add a server only after local throughput/concurrency measurements justify it, and none is retained."
+   "why_not_default": "Event-log infrastructure with README source review only; the upstream released_at is null. The packet's existing_overturn_when (line 437) says to add a server only after local throughput and concurrency measurements, and none are retained."
   },
   {
-   "disposition": "unqualified",
+   "disposition": "out_of_scope",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md",
-    "blueprints/us-equities/data/summarize_backtest.py"
-   ],
+   "evidence_refs": [],
    "key": "c12",
    "name": "QuestDB",
    "repository": "https://github.com/questdb/questdb",
-   "why_not_default": "The card says no server was installed or started, and dedup/upsert can overwrite corrections. The retained snapshot path is DuckDB/Parquet with sha256 hashes (data/summarize_backtest.py; identity-readiness ledger materialize). No throughput measurement justifies a server."
+   "why_not_default": "A time-series server backed only by README source review; its card says the catalog did not install or start a server. The card also warns that dedup/upsert can overwrite corrections. No measurement justifies it over the retained DuckDB/Parquet path, which handled 24310292 bars per adjustment in broad-universe/receipt.json."
   },
   {
    "disposition": "overlap",
@@ -96,7 +79,7 @@
    "key": "c4",
    "name": "sec-api-io/sec-api-python",
    "repository": "https://github.com/SEC-API-io/sec-api-python",
-   "why_not_default": "It is not adopted and has no evidence_refs. It overlaps c6, which has retained native SEC acquisition (access-resolution.json: http_status 200, 371 rows), and no evidence shows a gap that it closes."
+   "why_not_default": "Not adopted and has no evidence_refs. It overlaps c6, which has native SEC acquisition evidence in access-resolution.json (HTTP 200, 371 rows)."
   },
   {
    "disposition": "unqualified",
@@ -105,7 +88,7 @@
    "key": "c3",
    "name": "atilaahmettaner/tradingview-mcp",
    "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
-   "why_not_default": "It is not adopted and has no evidence_refs. The packet's entry conditions are documented data rights and an as-of query reconciled against Alpaca news timestamps. Neither is shown as met."
+   "why_not_default": "Not adopted and has no evidence_refs. The packet note describes the as-of reconciliation it would need, not an executed result."
   },
   {
    "disposition": "unqualified",
@@ -114,7 +97,7 @@
    "key": "c11",
    "name": "rossod4/quantlab",
    "repository": "https://github.com/Rossod4/quantlab",
-   "why_not_default": "It is not adopted. The packet note says it has 0 stars, no license and no release, and describes itself as in progress. It demonstrates nothing."
+   "why_not_default": "Not adopted and has no evidence_refs. The packet note says it has 0 stars, no license and no release, and describes itself as 'in progress'."
   }
  ],
  "catalog": "us-equities",
@@ -122,75 +105,87 @@
  "lane": "claude",
  "layer_id": "market-data-reference",
  "limits": [
-  "Correction to the prior round: I earlier said the authenticated Alpaca receipt could not be located and that alpaca-probe.json was the only Alpaca artifact. Both statements were wrong. I have now opened blueprints/us-equities/authenticated-data/native-receipt.json and identity-readiness/native-receipt.json. Neither is among c9's packet evidence_refs (packet lines 245-247). The packet's c9 evidence_kind source_review therefore understates the retained evidence; it is a packet-construction gap.",
-  "I did not open the GitHub README evidence_refs because I have no network access. Upstream card_limitations, review_status and notes are carried over as packet/provider judgments.",
-  "I could not run commands, so every exit code, count and sha256 in the receipts is documented-as-done, not observed-now. The overturn commands in check 2 need host-private run artifacts that are not in the checkout.",
-  "I did not open collect.py, compare.py, ledger.py, catalyst.py or the test files; only their existence was confirmed, by Glob. I did not open the exchange-calendars-native-check-20260922 receipt. The identity-readiness receipt was read in sections (lines 1-70, 320-479, 1235-1373), and historical-simulation/receipt.json only through line 1368.",
-  "The refuter findings were treated as claims to verify. I re-opened each cited line; the numbers used here come from my own reads, not from the refuter text. catalogs/landscape/us-equities.json and manifests/evidence.json, which the challenger cited, were not opened or used.",
-  "No TypeSafe inference results were supplied, so every disposition here is my own source review. Actual runtime model: Opus 5.5 (claude-opus-5-5[1m]); the fixed packet value opus/high is reported as instructed. Skill path: <host-path>/SKILL.md."
+  "I could not open the GitHub README evidence_refs (c1, c2, c5, c6, c7, c8, c9, c10, c12, c13, c14), because reads were restricted to the repository root. Every source_review classification is taken from the packet, not independently verified.",
+  "c9's native evidence is linked through manifests/stack.json evidence_ids and manifests/evidence.json paths, not through c9's own packet evidence_refs. Those refs contain only a README, and the packet marks c9 evidence_kind as source_review. My native_proven classification comes from my own reading of those linked receipts.",
+  "In broad-universe/receipt.json I read only lines 1-110. The value 2,693 sessions (lines 225, 1087) was confirmed only by grep, and the body beyond line 110 is unread.",
+  "Correction of round 1: my earlier limit said the authenticated Alpaca receipt could not be located. That was a search failure, not missing evidence. The receipt is at blueprints/us-equities/authenticated-data/native-receipt.json. The line 'Authenticated Alpaca historical fetch remains deferred' in corporate-action-readiness/receipt.json (observed 2026-09-20T00:22:25Z) is superseded by that receipt, which was observed at 2026-09-20T01:09:45Z.",
+  "manifests/stack.json line 1545 (the exchange-calendars-native-check evidence body) remains unread.",
+  "Private runtime artifacts referenced by hash (Alpaca pages, SEC headers) sit outside the repository and were not checked. Counts and hashes are copied from the receipts.",
+  "I ran no commands and executed no tests. Exit codes, the 292-test count, the independent review status and other results are documented results, not observed now.",
+  "The coordinator supplied no TypeSafe inference results. All dispositions are my own source review; the only retained provider judgments are the packet's card_limitations and limitations. The actual client model is claude-opus-5-5[1m]; the fixed value opus/high was copied as instructed."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "Original historical availability is not established for any winner. The authenticated-data receipt records original_historical_availability not_established (line 107). The identity-readiness receipt records provider_revision_availability_established false and historical_delisting_established false (lines 449, 467). All five SEC events qualify only as of the 2026-09-19 local observation. The cutoff gates reject rows only before local observation; they do not reconstruct as-known history.",
-  "The c9 coverage is small: one retrospective AAPL sample of 25 sessions (2020-08-03 to 2020-09-04) and 2 corporate actions, plus FB/META over 3 sessions in 2022-06. There is no survivorship-free universe and no delisting case, and action coverage is incomplete. The process-date window may omit events (authenticated-data receipt line 129).",
-  "The dividend currency is unknown for 1 action, so corporate actions are not fully reconciled to cash units (authenticated-data receipt lines 119-128). Corporate actions were not routed through the ledger.py cutoff gate; only bars were.",
-  "One meta_unmapped row is quarantined (documentation_discrepancy_rows 1), and the original capture exited 1 with invalid_numeric_field (identity-readiness receipt lines 10-13, 429-446).",
-  "The temporal gates are project code (catalyst.py, security-identity/ledger.py), not upstream SDK capabilities. Transport also uses pinned private _session/_retry seams (authenticated-data receipt lines 215-218).",
-  "The c13 evidence covers one hardcoded XNYS session (summarize_backtest.py line 30) and a 104-session date check that does not prove row or market coverage. Holidays, early closes, halts and extended hours are untested. The 4.13.2 version is inferred from requirements.txt and stack.json; data/receipt.json does not record it.",
-  "Licensing and redistribution rights for the Alpaca SIP data are not established. The historical SIP response does not establish real-time access or entitlements (authenticated-data receipt line 223).",
-  "EdgarTools dependencies are version-pinned, not wheel-hash-locked, and a new host needs its own native acceptance."
+  "No adopted candidate establishes original point-in-time availability. The c9 authenticated receipt says original_historical_availability is \"not_established\" (line 107). The identity-readiness as-of gate sets availability to local observation time (manifests/evidence.json line 1289), so it rejects historical data by construction rather than reconstructing as-known state. The c6 gate likewise uses local first_observed_at.",
+  "Corporate-action reconciliation is incomplete. c9 matched both numeric action values, but 1 dividend has unknown currency (status reconciliation_incomplete), and historical_coverage_established is false (authenticated-data/native-receipt.json lines 63, 119-128).",
+  "The survivorship-free universe is not established. broad-universe limitations: only 25/47/167 symbols end in 2016/2017/2018 because the provider asset list under-enumerates delisted names; 235 undated ticker collisions remain; identity is provider-symbol based (evidence/receipts/broad-universe-research-20260921.json lines 13-15). identity-readiness gives historical_identity_established false.",
+  "Licensing and entitlement scope beyond historical SIP daily bars is not established. The receipt says there is no real-time access, unlimited history or redistribution right (authenticated-data/native-receipt.json line 223).",
+  "The c6 evidence covers one SEC index day (2020-03-02) with 5 headers. No filing-completeness claim follows.",
+  "The c13 evidence directly shows one XNYS session plus a 104-session date check. Holidays, half-days, future schedules, halts and extended hours are not established.",
+  "Macro, news, fundamentals, vintage-data and stream-ingestion scope terms have only README-level candidates (c8, c5, c10, c2). They remain unqualified."
  ],
  "overturn_protocol": {
   "arms": [
-   "c9 alpaca-py bars/corporate actions + c6 EdgarTools filings + c13 exchange_calendars sessions (current retained baseline, gated by project ledger.py/catalyst.py)",
-   "c14 Databento bars/definitions/corporate actions through the same ledger.py cutoff gate",
-   "c7 Massive client through the same gate, if data rights permit"
+   "c9 alpaca-py SIP bars and corporate actions through the DuckDB as-of ledger (current)",
+   "c14 Databento historical data and instrument definitions through an equivalent as-of gate",
+   "c6 EdgarTools with the catalyst.py temporal gate (current, SEC scope)"
   ],
   "fixture_paths": [
    "blueprints/us-equities/authenticated-data/native-receipt.json",
+   "blueprints/us-equities/authenticated-data/compare.py",
+   "blueprints/us-equities/alpaca-historical/collect.py",
    "blueprints/us-equities/identity-readiness/native-receipt.json",
+   "blueprints/us-equities/broad-universe/receipt.json",
    "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+   "blueprints/us-equities/catalyst-provenance/fixture.idx",
    "blueprints/us-equities/data/receipt.json",
    "blueprints/us-equities/historical-simulation/receipt.json",
-   "tests/test_security_identity.py",
-   "tests/test_alpaca_historical.py",
    "tests/test_catalyst_provenance.py"
   ],
-  "metric": "For identical representative securities and dates, including a delisting, the FB/META alias and an AAPL split/dividend: (a) the number of rows accepted at a historical cutoff whose first observation or availability is unknown or later, which must be 0; (b) corporate-action coverage reconciled to cash units, where the currency must be known; (c) raw-page sha256 reproducibility across reruns; (d) closes equal to an independent reference (currently 25/25 against the frozen LEAN probe); (e) XNYS holiday and early-close session boundaries matching the published schedule."
+  "metric": "Per provider, over the same representative securities (including delistings, ticker reuse and cash dividends): (a) the fraction of records carrying source identity, feed, page hash and a first-availability timestamp; (b) the fraction of corporate actions fully reconciled including cash currency; (c) the fraction correctly excluded at a historical as-of cutoff. Current baselines:\n- c9 AAPL: bars 25/25 equal; actions numeric 2/2 equal, unknown_currency 1; historical-cutoff count 0 (identity-readiness).\n- c6 SEC: eligible_count 0 of 5 at 2020-03-03T00:00:00Z and 5 of 5 at observation time."
  },
- "overturn_when": "Four checks could change this verdict.\n\n1. A retained blueprints/us-equities/ receipt shows c14 Databento (or another feed) acquiring consolidated bars and corporate actions for the same representative securities with raw-page sha256 hashes. The securities must include a delisting, the FB/META alias case and an AAPL split/dividend with a known currency. The rows must pass the same cutoff gate (security-identity/ledger.py select returns count 0 before observation) and close c9's open gaps: delisting, dividend currency and action coverage. That would replace or join c9. The reverse also counts: a rerun of blueprints/us-equities/alpaca-historical/collect.py verify or authenticated-data/compare.py that no longer reproduces 25/25 equal closes or the recorded page sha256 values would demote c9.\n2. Rerunning `python3 -m unittest tests.test_security_identity tests.test_alpaca_historical tests.test_catalyst_provenance` could fail. Separately, the private-run commands recorded in the receipts could fail to reproduce their recorded results. For ledger.py select, those are counts 0/0/2 and their selected_rows_sha256 values. For catalyst.py packet --as-of 2020-03-03T00:00:00Z, the result is before_first_availability 5. Either outcome would demote c9 or c6. These reruns need host-private $ACQUISITION_RUN/$IDENTITY_LEDGER artifacts; the unit tests alone use offline fixtures.\n3. summarize_backtest.py hardcodes session 2013-10-07 (line 30), so it cannot test new dates. The runnable c13 check is `python3 -c \"import exchange_calendars as x; c=x.get_calendar('XNYS'); [print(d, c.is_session(d), c.session_close(d) if c.is_session(d) else None) for d in ('2013-07-04','2013-11-29','2013-12-24')]\"` under exchange-calendars 4.13.2. Its output would be compared with the NYSE-published 2013 holiday and early-close schedule. A mismatch would demote c13.\n4. The comparison in the packet's existing_overturn_when is still unexecuted. Once run, it should replace this sample-bounded verdict.",
- "packet_sha256": "528ffcc0fa46130d00ab5f74be68d465921d73c4caee477c9505ed36b175036a",
+ "overturn_when": "Any of these checks would change the verdict:\n- c9 displaced or narrowed:\n  - `python3 blueprints/us-equities/authenticated-data/compare.py` (with the --run/--receipt-sha256/--lean/--lean-sha256 arguments recorded in authenticated-data/native-receipt.json) or `blueprints/us-equities/alpaca-historical/collect.py verify` stops reproducing 25/25 equal closes, or fails its private-artifact hash verification.\n  - Or a c14 Databento arm, collected into a retained blueprints/us-equities/ receipt over the same representative securities (including delisted names, ticker reuse and dividends with currency), closes the gaps c9 leaves open with auditable page hashes: under-enumerated pre-2020 delistings, 235 undated ticker collisions, and unknown dividend currency.\n- c6 displaced: a re-run of blueprints/us-equities/catalyst-provenance/native_edgar.py no longer returns HTTP 200 with a hash-verified complete source, or `python3 -m unittest tests.test_catalyst_provenance` fails.\n- c13 displaced: the XNYS session check in blueprints/us-equities/data/summarize_backtest.py disagrees with a verified holiday/half-day fixture.",
+ "packet_sha256": "3d870aa061c8b8215e80d8652746e79791b28743322d1179db205386329d30c9",
  "schema_version": 1,
  "sources_read": [
-  "<host-path>/us-equities__market-data-reference.json (initial round full; revision lines 1-4, 230-269, 420-459)",
-  "blueprints/us-equities/authenticated-data/native-receipt.json (full, 324 lines)",
-  "blueprints/us-equities/identity-readiness/native-receipt.json (lines 1-70, 320-479, 1235-1373)",
-  "blueprints/us-equities/catalyst-provenance/access-resolution.json",
-  "blueprints/us-equities/catalyst-provenance/receipt.json",
-  "blueprints/us-equities/data/receipt.json",
-  "blueprints/us-equities/data/summarize_backtest.py (full, re-read in revision)",
-  "blueprints/us-equities/workers/requirements.txt",
-  "blueprints/us-equities/historical-simulation/receipt.json (lines 1-1368 of 1749)",
-  "manifests/stack.json (lines 1522-1551)",
-  "blueprints/us-equities/architecture/alpaca-probe.json (lines 1-40)",
-  "Glob existence check only: blueprints/us-equities/alpaca-historical/collect.py, blueprints/us-equities/authenticated-data/compare.py, blueprints/us-equities/security-identity/ledger.py, tests/test_security_identity.py, tests/test_alpaca_historical.py",
-  "<host-path>/SKILL.md (skill body preloaded in context)"
+  "<host-path>/us-equities__market-data-reference.json (round 1 in full; this round lines 230-274, 340-479)",
+  "<host-path>/SKILL.md (preloaded in context)",
+  "blueprints/us-equities/authenticated-data/native-receipt.json (full, lines 1-324)",
+  "manifests/stack.json (lines 1400-1424; round 1 lines 1524-1545 via grep)",
+  "manifests/evidence.json (lines 1265-1294, 2703-2720)",
+  "blueprints/us-equities/identity-readiness/native-receipt.json (lines 790-851)",
+  "evidence/receipts/broad-universe-research-20260921.json (full, lines 1-21)",
+  "blueprints/us-equities/broad-universe/receipt.json (lines 1-110; grep for 17997/2693)",
+  "blueprints/us-equities/alpaca-historical/collect.py (existence via glob only)",
+  "blueprints/us-equities/authenticated-data/compare.py (existence via glob only)",
+  "blueprints/us-equities/catalyst-provenance/receipt.json (round 1)",
+  "blueprints/us-equities/catalyst-provenance/access-resolution.json (round 1)",
+  "blueprints/us-equities/data/receipt.json (round 1)",
+  "blueprints/us-equities/data/summarize_backtest.py (round 1)",
+  "blueprints/us-equities/workers/requirements.txt (round 1)",
+  "blueprints/us-equities/historical-simulation/receipt.json (round 1, lines 1-45)",
+  "blueprints/us-equities/corporate-action-readiness/receipt.json (round 1, grep lines 10, 176-231)",
+  "tests/test_catalyst_provenance.py (existence via glob only, round 1)",
+  "blueprints/us-equities/catalyst-provenance/fixture.idx (existence via glob only, round 1)"
  ],
- "why_selected": "This revision adds c9 to the winner set. The packet lists only c9's README (packet lines 244-247), but the repository retains native receipts for it. Between them, c6, c9 and c13 cover every requirement clause that has native evidence. Each clause remains bounded to a sample.\n\nc9 alpaca-py:\n- blueprints/us-equities/authenticated-data/native-receipt.json (kind native_cli_e2e, observed 2026-09-20T01:09:45Z) records a native Alpaca-py 0.44.0 GET run through collect.py collect (exit_code 0).\n- It acquired 25 AAPL SIP/raw daily bars over 3 pages and 2 corporate actions over 2 pages. All 5 pages returned HTTP 200, each with its own sha256, and terminal pagination was observed on both stages.\n- compare.py (exit_code 0) found 25/25 raw closes equal to the frozen LEAN probe, with maximum difference 0.00. Both numeric action values were equal, and 1 dividend currency is unknown (actions status reconciliation_incomplete).\n- blueprints/us-equities/identity-readiness/native-receipt.json (native_cli_e2e, alpaca-py 0.44.0 plus DuckDB 1.5.5) retained 10 FB/META query observations over 8 HTTP 200 responses: 9 qualified and 1 quarantined. The original capture exited 1 (meta_unmapped invalid_numeric_field), and that failure is preserved.\n- The mapped FB/META alias comparison shows 3 equal rows and 0 field mismatches.\n- ledger.py materialize (exit 0) wrote DuckDB Parquet with exact BIGINT observation eligibility. ledger.py select for meta_mapped returned count 0 at cutoff 2022-06-11T00:00:00Z, count 0 at 2026-09-20T01:42:36.567740474Z, and count 2 one nanosecond later. Each selection carries a selected_rows_sha256.\n- This is the only retained native evidence for price observations, feed (SIP/raw), identity aliasing and corporate actions, and it rejects rows before observation.\n\nc6 EdgarTools:\n- blueprints/us-equities/catalyst-provenance/access-resolution.json records native edgartools 5.58.0 get_filings: exit_code 0, http_status 200, cohort_rows 371, unique_accessions 360, 8-K 362 / 8-K/A 9. The source is 5079824 bytes, its sha256 is recorded and gzip validation passed.\n- The historical packet at as_of 2020-03-03T00:00:00Z had eligible_count 0 (before_first_availability 5). The observed packet qualified 5.\n- The earlier HTTP 403 in catalyst-provenance/receipt.json remains a dated failure.\n\nc13 exchange_calendars:\n- blueprints/us-equities/data/receipt.json is a native run of data/summarize_backtest.py, which calls get_calendar('XNYS'). It produced session open 2013-10-07T13:30:00+00:00 and close 20:00:00+00:00, plus source and parquet sha256 values.\n- historical-simulation/receipt.json shows expected_xnys_sessions 104 against daily_rows_in_window 104, with no missing or extra dates.\n\nBoundary: in all three, the eligibility gate is project code (catalyst.py, security-identity/ledger.py), not an upstream SDK feature. Both receipts also say original historical availability is not established.",
+ "why_selected": "This is my own source review of retained native receipts. It corrects my earlier proposal, which was wrong to say c6 and c13 were the only adopted candidates with local receipts. Together the three winners cover the market-data/corporate-actions, sec and market-calendars scope terms. None of them satisfies the whole requirement.\n\nc9 alpaca-py 0.44.0\n- Packet evidence: only a README URL (packet line 246).\n- Native evidence: manifests/stack.json lines 1402-1422 link alpaca-py to evidence_ids native-alpaca-historical-20260920, native-security-identity-20260920 and broad-universe-research-20260921. manifests/evidence.json line 1274 maps the first of these to blueprints/us-equities/authenticated-data/native-receipt.json.\n- That receipt (kind native_cli_e2e, observed_utc 2026-09-20T01:09:45.784858656Z) records 5 HTTP 200 pages, each with its own sha256 and observed_at (lines 137-193).\n  - Bars: 25 rows over 3 pages, terminal page observed.\n  - Actions: 2 rows over 2 pages.\n  - The native collect, verify and compare commands all have exit_code 0 (lines 194-213).\n  - Comparison with the frozen LEAN probe: bars equal 25/25 with maximum_absolute_close_difference \"0.00\". Actions status is \"reconciliation_incomplete\", with numeric_values_equal 2 and unknown_currency 1 (lines 104-130).\n  - original_historical_availability is \"not_established\" (line 107). independent_review status is \"accepted\" (line 306).\n- blueprints/us-equities/identity-readiness/native-receipt.json temporal_ledger (lines 796-847) gives these counts:\n  - historical cutoff 1654905600000000000: 0\n  - before_first_observation: 0\n  - at_first_observation: 2\n  - at_last_observation: 10 (9 qualified, 1 quarantined)\n  - This is an as-of rejection gate, but evidence.json line 1289 says availability is conservatively set to local observation time.\n- blueprints/us-equities/broad-universe/receipt.json records plan feed \"sip\" and timeframe 1Day (lines 75-76), symbols_with_raw_bar 17997 (line 98), page_sha256_reverification 5108/5108 with 0 mismatches (lines 65-71), pagination violations 0 (lines 61-64), and asof \"provider default (request date)\" (line 90).\n\nc6 EdgarTools 5.58.0\n- blueprints/us-equities/catalyst-provenance/access-resolution.json records a native get_filings call: exit_code 0, http_status 200, cohort_rows 371, unique_accessions 360, and form.gz 5079824 bytes with gzip_validation passed.\n- It also records 6 hashed requests, each with first_observed_at. The historical packet at 2020-03-03T00:00:00Z has eligible_count 0 (before_first_availability 5); the observation-time packet has eligible_count 5.\n- The as-of gate is custom code in catalyst.py.\n- An earlier HTTP 403 is kept as a failure in catalyst-provenance/receipt.json.\n\nc13 exchange_calendars 4.13.2\n- blueprints/us-equities/data/receipt.json: XNYS session 2013-10-07, open 13:30:00+00:00, close 20:00:00+00:00.\n- summarize_backtest.py calls get_calendar(\"XNYS\"), and workers/requirements.txt pins exchange-calendars==4.13.2.\n- historical-simulation/receipt.json: expected_xnys_sessions 104 matched by daily_rows_in_window 104.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
   "blueprints/us-equities/authenticated-data/native-receipt.json",
   "blueprints/us-equities/identity-readiness/native-receipt.json",
+  "blueprints/us-equities/broad-universe/receipt.json",
+  "evidence/receipts/broad-universe-research-20260921.json",
+  "manifests/stack.json",
+  "manifests/evidence.json",
   "blueprints/us-equities/catalyst-provenance/access-resolution.json",
   "blueprints/us-equities/catalyst-provenance/receipt.json",
   "blueprints/us-equities/data/receipt.json",
   "blueprints/us-equities/data/summarize_backtest.py",
-  "blueprints/us-equities/historical-simulation/receipt.json",
   "blueprints/us-equities/workers/requirements.txt",
-  "manifests/stack.json"
+  "blueprints/us-equities/historical-simulation/receipt.json"
  ],
  "winner_keys": [
   "c9",

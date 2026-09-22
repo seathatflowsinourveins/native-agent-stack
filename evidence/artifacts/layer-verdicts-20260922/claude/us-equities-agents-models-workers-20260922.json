@@ -4,14 +4,79 @@
    "disposition": "overlap",
    "evidence_class": "native_proven",
    "evidence_refs": [
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/native-context-memory.json"
+   ],
+   "key": "c9",
+   "name": "Serena",
+   "repository": "https://github.com/oraios/serena",
+   "why_not_default": "This is the exact-symbol and reference lane that complements c12's semantic search, and the requirement's 'exact code' clause fits it best. It was observed natively in Claude ('Actual fetch symbol and 3 references retrieved'), in Codex, and with 23 tools in Desktop (component-history.json lines 101-103). It is not the default code slot because the installed version is 2.0.0.dev0 @ c6fbd1c5 (line 99), which does not match the packet pin v1.7.0, and no automatic index refresh is recorded for it. There is no measured comparison of exact-source recall against c12."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/routing/astra-receipt.json",
+    "blueprints/us-equities/routing/health-receipt.json",
+    "blueprints/us-equities/routing/README.md",
+    "blueprints/us-equities/routing/omniroute-astra.py"
+   ],
+   "key": "c6",
+   "name": "omniroute",
+   "repository": "https://github.com/diegosouzapw/OmniRoute",
+   "why_not_default": "The gateway completed one text-only Responses request: HTTP 200 with 81+55=136 tokens. Two failed attempts came first, a 400 version rejection and a 499 client disconnect, and their usage is unknown (astra-receipt.json attempts 1-3). The receipt states that model tools, hooks, MCP, memory, compaction and worker parity were not demonstrated, and that the native worker remains the default. The gateway strips max_output_tokens. health-receipt.json only checks status. The recipe script hardcodes its request file (omniroute-astra.py line 38), so it cannot run another task without an edit."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/deerflow/research-receipt.json",
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "blueprints/us-equities/deerflow/research-task.md"
+   ],
+   "key": "c21",
+   "name": "deerflow",
+   "repository": "https://github.com/bytedance/deer-flow",
+   "why_not_default": "The evidence is one embedded invoke_acp_agent research prompt: 31027 ms, 42345 cumulative tokens, correct counts returned. There was no DeerFlow planner, UI, scheduler or standing service. It ran development commit 42334f26 (backend 2.1.0-rc0), not stable v2.0.0. DeerFlow discards ACP usage, so usage came from private adapter logs. The task explicitly forbade MCP tools (deerflow/research-task.md line 3), so tool support through this route is untested. The earlier discovery receipt was model-free."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/deerflow/research-receipt.json",
+    "blueprints/us-equities/deerflow/native-receipt.json"
+   ],
+   "key": "c19",
+   "name": "codex-acp",
+   "repository": "https://github.com/agentclientprotocol/codex-acp",
+   "why_not_default": "It worked as the ACP transport for the single DeerFlow prompt. ACP 1.12.0's read-only mode maps to workspaceWrite with approvalPolicy on-request, so strict filesystem read-only is not enforced (research-receipt.json limitations and sandbox_policy). For enforced read-only research, the hardcoded read-only launcher of the native SDK path (c20; workers/research-task.md line 10) is the one to use."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/workers/receipt.json",
+    "observability/restart-receipt.json",
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/native-context-memory.json"
+   ],
+   "key": "c11",
+   "name": "Context Mode",
+   "repository": "https://github.com/mksglu/context-mode",
+   "why_not_default": "It is a tool-output lane, not durable or retrievable project knowledge. In native Codex, ctx_execute_file and ctx_stats succeeded (component-history.json line 117), and 11 direct Desktop tools were exposed (observability/restart-receipt.json). In the SDK worker, ctx_execute_file failed in all three recorded turns: workers/receipt.json lines 77, 163 and 200, the first failing on the project-root restriction (line 111). ctx_execute extraction completed. Zero estimated_tokens_saved is recorded only in workers/receipt.json line 94 and restart-receipt.json line 62. component-history.json line 240 retains a historical nonzero five-call ctx_stats estimate (2.7K/62.3%). All of these are estimates, not provider savings."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/component-history.json",
     "evidence/receipts/native-cli-gaps.json",
-    "evidence/receipts/desktop-cli-workflows.json",
-    "evidence/receipts/component-history.json"
+    "evidence/receipts/desktop-cli-workflows.json"
    ],
    "key": "c14",
    "name": "foundation-codebase-memory-mcp",
    "repository": "https://github.com/DeusData/codebase-memory-mcp",
-   "why_not_default": "This is a static-graph exact-code fallback. It has runs in both client families, but only through bridges. evidence/receipts/native-cli-gaps.json records native Claude running search_graph and trace_path through MCPorter with status passed, returning collect at lines 91-127 with 4 callees. The native Codex CLI follow-up there was blocked_before_tools by usage_limit_exceeded. evidence/receipts/desktop-cli-workflows.json (lines 11 and 25-41) records the active Codex Desktop task running static graph search and trace with search_exit 0 and trace_exit 0. It returned collect in tools/ecosystem/linux-usage-report.cjs at lines 91-127 with callees installation, sourcesFor, runParser and overlaps, and runtime_execution_trace false. evidence/receipts/component-history.json (lines 249-251) records native_claude and native_codex as 'not independently demonstrated' and current_desktop as a 'Root CLI bridge'. So c14 has no native MCP registration proof, its static edges do not prove runtime execution, and it overlaps c9 and c12 for exact code. A head-to-head against c9 on exact-symbol recall has not been run."
+   "why_not_default": "It is a static-graph fallback. The evidence covers a CLI-bridge search_graph/trace_path and an Inspector index of 1118 nodes and 1755 edges. The receipts disagree about native Claude: component-history.json lists it as 'not independently demonstrated', while native-cli-gaps.json claims Claude executed static-graph workflows. It cannot resolve dynamic dependencies."
   },
   {
    "disposition": "overlap",
@@ -23,21 +88,7 @@
    "key": "c16",
    "name": "Qdrant",
    "repository": "https://github.com/qdrant/qdrant",
-   "why_not_default": "Qdrant is the vector store behind c12, not a separate retrieval interface. evidence/receipts/native-rag.json shows collection codebase_72cfa87c5abf with status green, reached through SocratiCode. component-history.json records it as a supporting local service. Its card states that no financial-document corpus exists yet. Selecting c12 already includes it."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "evidence/receipts/native-context-memory.json",
-    "observability/restart-receipt.json",
-    "blueprints/us-equities/workers/receipt.json",
-    "evidence/receipts/artifact-reductions.json"
-   ],
-   "key": "c11",
-   "name": "Context Mode",
-   "repository": "https://github.com/mksglu/context-mode",
-   "why_not_default": "Context Mode ran in both clients: native-context-memory.json fresh_startup records ctx_execute, and observability/restart-receipt.json records 11 tools and 14 successful results. It executes large outputs and returns bounded results, which does not make it a durable project-knowledge or code retrieval store. blueprints/us-equities/workers/receipt.json records ctx_execute_file failing in the SDK worker on the project-root restriction, with a scoped override blocked by the approval policy. estimated_tokens_saved was 0 in workers/receipt.json and restart-receipt.json."
+   "why_not_default": "It is the vector store behind c12 (native-rag.json collection codebase_72cfa87c5abf, line 94; component-history.json qdrant proof). It is a dependency, not a separately chosen agent lane. No financial corpus with as-of metadata exists yet."
   },
   {
    "disposition": "conditional",
@@ -49,11 +100,23 @@
    "key": "c4",
    "name": "vllm",
    "repository": "https://github.com/vllm-project/vllm",
-   "why_not_default": "vLLM is a runtime dependency that serves c12's local embeddings, not a retrieval layer. evidence/receipts/vllm-compatibility.json shows 0.29.0 installed but failing GPU startup with 'RuntimeError: UVA is not available' on the WSL host. 0.25.0 was restored, and desktop-direct-rag.json records active_model_service_version 0.25.0 with retrieval passing. The packet's upstream v0.30.0 is untested."
+   "why_not_default": "It is only the local embedding runtime for c12. Version 0.29.0 failed GPU startup on this host with 'RuntimeError: UVA is not available', and 0.25.0 was restored (vllm-compatibility.json). The catalog adds no inference or serving benchmark."
   },
   {
-   "disposition": "conditional",
-   "evidence_class": "synthetic",
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/artifact-reductions.json"
+   ],
+   "key": "c13",
+   "name": "RTK",
+   "repository": "https://github.com/rtk-ai/rtk",
+   "why_not_default": "It compacts tool output rather than retrieving knowledge. The only measurement is one artifact of 533 to 176 o200k tokens (66.98%). RTK's own estimate differs (184 to 168), native Claude short commands showed 0 reduction, and there is no provider-savings or quality benchmark (component-history.json rtk; artifact-reductions.json historical_rtk)."
+  },
+  {
+   "disposition": "out_of_scope",
+   "evidence_class": "local_integration",
    "evidence_refs": [
     "evidence/receipts/portable-cli-artifacts.json",
     "evidence/receipts/component-history.json"
@@ -61,11 +124,11 @@
    "key": "c8",
    "name": "foundation-repomix",
    "repository": "https://github.com/yamadashy/repomix",
-   "why_not_default": "Repomix builds selected-file handoff bundles only. evidence/receipts/portable-cli-artifacts.json records one standalone CLI fixture pack (repomix_contains_selected_paths true) and says it is 'not an LLM invocation'. component-history.json records native Claude and Codex use as 'not independently demonstrated' and one lossy artifact at 3679\u2192645 o200k tokens. The output is not a retrievable index and has no quality measure. I corrected the evidence class to synthetic because only a fixture CLI run is retained."
+   "why_not_default": "It is a handoff packager, not a worker, memory or retrieval lane. The evidence is a native CLI run: portable-cli-artifacts.json has kind native_cli_e2e, and component-history.json lines 208 and 212 record 'Root native pack/full/outline comparison accepted' and one real source artifact reduced from 3679 to 645 o200k tokens, a lossy outline. Neither native model client demonstrated it as an agent tool."
   },
   {
    "disposition": "out_of_scope",
-   "evidence_class": "synthetic",
+   "evidence_class": "local_integration",
    "evidence_refs": [
     "evidence/receipts/portable-cli-artifacts.json",
     "evidence/receipts/component-history.json"
@@ -73,127 +136,52 @@
    "key": "c1",
    "name": "foundation-toon",
    "repository": "https://github.com/toon-format/toon",
-   "why_not_default": "TOON is a serialization format, not retrieval. portable-cli-artifacts.json records one standalone encode/decode fixture roundtrip (toon_roundtrip_equal true) that is 'not an LLM invocation'. component-history.json says it is not independently demonstrated in native clients, and a nested fixture grew from 69 to 94 tokens. I corrected the evidence class to synthetic."
+   "why_not_default": "It is a serialization format, not a worker or retrieval layer. It ran through the native CLI (portable-cli-artifacts.json toon-encode/decode, kind native_cli_e2e), including a real-data JSON semantic roundtrip from 30414 to 23635 o200k tokens (component-history.json line 136). A nested fixture grew from 69 to 94 tokens. It was not independently demonstrated inside either native model client."
   },
   {
-   "disposition": "out_of_scope",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "evidence/receipts/native-context-memory.json",
-    "evidence/receipts/artifact-reductions.json",
-    "evidence/receipts/component-history.json"
-   ],
-   "key": "c13",
-   "name": "RTK",
-   "repository": "https://github.com/rtk-ai/rtk",
-   "why_not_default": "RTK compacts command output and does not retrieve knowledge. The native hook and explicit calls passed (component-history.json id rtk; native-context-memory.json 'rtk git log -6' exit 0). The only measure is a lossy artifact count of 533\u2192176 tokens (artifact-reductions.json historical_rtk), which is not a retrieval-quality result."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/workers/receipt.json",
-    "blueprints/us-equities/workers/policy.md"
-   ],
-   "key": "c20",
-   "name": "codex-native-sdk",
-   "repository": "https://github.com/openai/codex",
-   "why_not_default": "This is the evidenced worker runtime that matches the layer title, but it does not meet the stated retrieval requirement. blueprints/us-equities/workers/receipt.json records one completed research turn that read receipts through Context Mode ctx_execute. ctx_execute_file failed, and the configured model is not independent provider attestation. policy.md delegates retrieval to the QMD, Serena, SocratiCode, ai-memory and Context Mode lanes."
-  },
-  {
-   "disposition": "out_of_scope",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/deerflow/native-receipt.json",
-    "blueprints/us-equities/deerflow/research-receipt.json"
-   ],
-   "key": "c19",
-   "name": "codex-acp",
-   "repository": "https://github.com/agentclientprotocol/codex-acp",
-   "why_not_default": "This is an ACP worker adapter. deerflow/research-receipt.json records one embedded prompt that completed, but the 'read-only' mode maps to workspaceWrite/on-request. The receipt says no memory/RAG integration was exercised."
-  },
-  {
-   "disposition": "out_of_scope",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/deerflow/native-receipt.json",
-    "blueprints/us-equities/deerflow/research-receipt.json"
-   ],
-   "key": "c21",
-   "name": "deerflow",
-   "repository": "https://github.com/bytedance/deer-flow",
-   "why_not_default": "DeerFlow is an optional research host. native-receipt.json shows memory disabled and the discovery database running in memory. research-receipt.json records one invoke_acp_agent prompt with no planner, UI or standing service, and states that no memory/RAG integration or durable recovery was exercised."
-  },
-  {
-   "disposition": "out_of_scope",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/routing/health-receipt.json",
-    "blueprints/us-equities/routing/README.md",
-    "blueprints/us-equities/routing/astra-receipt.json"
-   ],
-   "key": "c6",
-   "name": "omniroute",
-   "repository": "https://github.com/diegosouzapw/OmniRoute",
-   "why_not_default": "OmniRoute is a provider gateway, not retrieval. health-receipt.json holds status-only HTTP 200 checks. astra-receipt.json and routing/README.md record one Astra text response of 136 tokens after an initial HTTP 400 and an HTTP 499. The README says tools, compaction and worker parity remain unproved."
-  },
-  {
-   "disposition": "out_of_scope",
+   "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/langchain-ai/langgraph/blob/sdk==0.4.4/README.md"
-   ],
+   "evidence_refs": [],
    "key": "c3",
    "name": "langgraph",
    "repository": "https://github.com/langchain-ai/langgraph",
-   "why_not_default": "LangGraph provides an agent-state graph, not retrieval. Its only evidence is a source-review URL, which I did not open. Its card says the import is an installation smoke test only and that InMemorySaver loses state on restart."
+   "why_not_default": "The packet classifies it as source_review only. I did not open its README ref; the facts here come from the packet's card_limitations and upstream fields. No local agent run is retained, and the packet notes InMemorySaver is not durable across restarts. An untested capability has not failed."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/VectifyAI/PageIndex/blob/9a8dd6658278fec90347e8ac3388a205305667a3/README.md",
-    "https://github.com/VectifyAI/PageIndex/releases/tag/v0.2.18"
-   ],
+   "evidence_refs": [],
    "key": "c2",
    "name": "foundation-pageindex",
    "repository": "https://github.com/VectifyAI/PageIndex",
-   "why_not_default": "PageIndex is the only candidate whose role targets document and financial retrieval, but its evidence is a source-review URL only. I did not open it, and nothing was run on a financial corpus. The pin is behind upstream (v0.2.18 vs v0.2.19). Untested does not mean it failed."
+   "why_not_default": "The packet classifies it as source_review only, and I did not open the README ref. No local financial-document retrieval run exists. Per the packet (c2 pin v0.2.18, upstream latest v0.2.19), the pin is behind. Publisher benchmark claims are unverified here."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/getzep/graphiti/blob/de8eb5b896c05ed1b5b329d4cb52015446d65e21/README.md",
-    "https://github.com/getzep/graphiti/releases/tag/v0.30.2"
-   ],
+   "evidence_refs": [],
    "key": "c15",
    "name": "Graphiti",
    "repository": "https://github.com/getzep/graphiti",
-   "why_not_default": "Graphiti's evidence is source review only (URLs, not opened). The card says there is no graph deployment and no extraction-accuracy proof. Dated sourced relationships would fit the financial-source part of the requirement, but nothing was executed."
+   "why_not_default": "The packet classifies it as source_review only, and I did not open the README ref. There is no graph deployment and no proof of extraction accuracy. Per the packet's card_limitations, the default examples require model API credentials."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/pgvector/pgvector/blob/efa08fda9ec485d80292d0487a77939c087dedcc/README.md"
-   ],
+   "evidence_refs": [],
    "key": "c10",
    "name": "foundation-pgvector",
    "repository": "https://github.com/pgvector/pgvector",
-   "why_not_default": "pgvector's evidence is source review only (URL, not opened). The card says a build is not extension activation and that it adds no benefit over the current Qdrant index without an established SQL integration need."
+   "why_not_default": "The packet classifies it as source_review only, and I did not open the README ref. The extension is not activated. The packet's card (lines 283-284) says it adds nothing to the current Qdrant code index unless a specific SQL integration need is established."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
-    "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1"
-   ],
+   "evidence_refs": [],
    "key": "c22",
    "name": "foundation-agent-retrieval-bench",
    "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
-   "why_not_default": "This is an evaluation harness that could supply the measurable-quality part of the requirement, but nothing was downloaded or evaluated, and I did not open its URLs. The card states that its 427 examples across 25 repositories are not a financial-document benchmark."
+   "why_not_default": "The packet classifies it as source_review only, and I did not open the README ref. The facts come from the packet's card_limitations, which describe its code examples as not a financial-document benchmark. It is a possible way to measure retrieval quality, not a worker or retrieval lane. It was not downloaded or run."
   }
  ],
  "catalog": "us-equities",
@@ -201,90 +189,94 @@
  "lane": "claude",
  "layer_id": "agents-models-workers",
  "limits": [
-  "External URL evidence_refs for c2, c3, c10, c15 and c22 were not opened. Those candidates are judged only on the packet's card text and upstream metadata.",
-  "I ran no commands. tests/test_memory_lifecycle.py and run-bm25.mjs were not executed, and I did not open the contents of fixture.json or run-bm25.mjs (existence confirmed only by Glob). Every native result cited is a historical receipt, not observed now.",
-  "I read large receipts only in part: component-history.json (the relevant entries), native-cli-gaps.json and workers/receipt.json (first 150-200 lines), restart-receipt.json, astra-receipt.json and the deerflow receipts (first 80-120 lines), and retrieval-evaluation/receipt.json (the cited line ranges).",
-  "I dropped fixtures/rag-note.md from the overturn protocol because it is a 3-line note, not a retrieval set. The existing retrieval-evaluation harness replaces it.",
-  "I deliberately did not read the prior Claude verdict artifact for this layer.",
-  "No TypeSafe inference results were supplied or used. All dispositions are my own source review, informed by the refuter findings, which I verified against the cited files. No provider judgments were retained.",
-  "Skill path: <host-path>/SKILL.md. The client reports the actual model as claude-opus-5-5[1m]. The fixed schema value opus/high was copied as instructed, and the actual effort setting is not exposed."
+  "TypeSafe skill: <host-path>/SKILL.md was preloaded. The coordinator supplied no TypeSafe inference results and I made no service calls. Every disposition is my own source review; none is a retained provider judgment.",
+  "Actual model: the client reports claude-opus-5-5[1m]. The fixed packet model field (opus/high) was copied as instructed.",
+  "Revision corrections from the refuters, re-verified against source: c12 relabelled as semantic retrieval, with the choice over c9 justified; c11 failure count corrected to three and the zero-savings claim scoped; the 8/12 source located (retrieval-evaluation, QMD only); c8 and c1 reclassified as local_integration; c5 and c17 removed for lack of evidence; the overturn protocol corrected for hardcoded prompts and mismatched tasks.",
+  "I did not open blueprints/us-equities/workers/native_worker.py this round. Its --prompt interface is taken from workers/research-task.md line 3, and whether its workspace can include the DeerFlow input JSONs is unverified.",
+  "I did not open the external evidence_refs (GitHub READMEs and release URLs) for c2, c3, c10, c15 and c22. Their stated facts come from the packet, not from my own source review, and their evidence_refs are empty.",
+  "The only verification is opened files; I ran no commands. Private logs and hashes referenced by the receipts cannot be checked.",
+  "Large receipts were read only in bounded sections, as listed in sources_read.",
+  "All native evidence is dated 2026-09-19 on this host. It is historical, not current availability, and does not carry over to another PC.",
+  "The packet withholds current_choice and decision labels, so this verdict could not be compared against the catalog's recorded decision."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "No adopted candidate has evidence of retrieving dated financial sources. The Qdrant card says no financial-document corpus exists, the deerflow research receipt says no memory/RAG integration was exercised, and the memory-lifecycle README (line 28) covers ingestion-time rather than market valid-time data.",
-  "No winner has measured retrieval quality. SocratiCode has one limit-1 query (score 0.6429), and ai-memory has one read of a known page in each client. The packet's '8/12 exact-source recall at three' is retained at blueprints/us-equities/retrieval-evaluation/receipt.json (lines 362-368 and 703). It measures QMD 2.8.3 BM25, which is not a packet candidate. The receipt itself says it is not an independent holdout or complete financial RAG (line 706).",
-  "Candidate coverage: the only lane with measured retrieval quality over the us-equities corpus (QMD) is absent from the candidate set, and the packet lists sota_components_not_in_candidates as empty. It therefore cannot be recorded in challenger_preferred.",
-  "The layer title 'Agents, models and workers' does not match the retrieval requirement text. Worker candidates (c20, c19, c21) were judged against the retrieval requirement.",
-  "Serena's native Claude proof is one component-history inventory line (component-history.json line 101), which the file itself labels as provenance rather than a live test (line 46). The recorded version is 2.0.0.dev0, not the packet pin v1.7.0. Structured Serena calls are retained only for Codex.",
-  "The ai-memory Codex receipt does not record explicit scope or the heading text (native-memory.json line 21). The ai-memory pin v2.3.1 is behind upstream v2.4.0. Current pins were not re-executed.",
-  "No exact-symbol comparison between c9 and c14 exists, and c14's runs in both families were through CLI bridges, not native MCP.",
-  "Off-host durability and new-host client rebinding for the memory store remain unqualified. The memory-lifecycle run did not exercise service restart durability or the active hooks.",
-  "The source-review-only candidates (c2, c10, c15, c22) have not failed. They are untested."
+  "There is no measured head-to-head comparison between the worker routes (native SDK, DeerFlow/ACP, OmniRoute). Each ran a different single task, and the two task files differ: workers/research-task.md is an unfilled template, and deerflow/research-task.md forbids MCP tools. No route is established as a universal winner.",
+  "Native SDK worker: all three native turns completed, but only 1 of 3 tasks succeeded (successful_research_tasks 1, blocked_file_extraction_tasks 2; workers/receipt.json lines 218-219). ctx_execute_file failed in every turn. A general success rate is unestablished.",
+  "The configured model and provider identity is not an independent per-request provider attestation, and model-reroute notifications were not collected in the SDK run.",
+  "Retrieval quality for the winners is unmeasured. The only measurement is QMD BM25 recall@3 of 8/12 on 12 curated, non-holdout queries (retrieval-evaluation/README.md line 28; receipt.json line 706). The README says it does not evaluate SocratiCode or memory (line 141). SocratiCode evidence is one limit-1 query with score 0.6429.",
+  "No financial-document corpus with as-of, source or tenant metadata exists, and no dated financial-source retrieval was exercised. The requirement's 'dated financial sources' clause is unmet by all candidates.",
+  "c12 versus c9 for exact code retrieval is an unmeasured trade-off: c12 matches its pin and refreshes its index automatically, while c9 is the exact-symbol lane but runs a dev snapshot that differs from its pin.",
+  "ai-memory: the heuristic handoff injection stays active even with the briefing disabled (component-history.json). Independent key recovery, off-host durability and new-host rebinding are not qualified (packet limitations line 721).",
+  "Non-adopted newcomers c5 (loopx), c17 (beads) and c18 have no retained evidence, so they are not listed as alternatives. They are untested, not failed.",
+  "The read-only filesystem sandbox does not restrict inherited MCP or remote-tool mutation authority, so the broker-tool exclusion depends on the environment."
  ],
  "overturn_protocol": {
   "arms": [
-   "c7 ai-memory + c12 SocratiCode/c16 Qdrant + c9 Serena (current selection)",
-   "QMD 2.8.3 BM25 baseline from the existing retrieval-evaluation receipt (not a packet candidate)",
-   "c14 codebase-memory-mcp versus c9 Serena on the exact-symbol subset",
-   "c2 PageIndex on the financial-document subset",
-   "c15 Graphiti on the dated financial-relationship subset",
-   "c10 pgvector as the vector backend in place of c16"
+   "c20 native Codex SDK worker via native_worker.py run --prompt (default)",
+   "c21+c19 DeerFlow invoke_acp_agent via native-research.py",
+   "c6 OmniRoute Responses route (requires parameterizing omniroute-astra.py first)",
+   "c7 ai-memory + c12 SocratiCode retrieval (default) vs c9 Serena exact-symbol vs QMD BM25 baseline vs any source-reviewed challenger (c2, c15, c3)"
   ],
   "fixture_paths": [
+   "blueprints/us-equities/deerflow/research-task.md",
+   "blueprints/us-equities/deerflow/native-research.py",
+   "blueprints/us-equities/workers/native_worker.py",
+   "blueprints/us-equities/workers/research-task.md",
+   "blueprints/us-equities/routing/omniroute-astra.py",
    "blueprints/us-equities/retrieval-evaluation/fixture.json",
-   "blueprints/us-equities/retrieval-evaluation/run-bm25.mjs",
-   "blueprints/us-equities/retrieval-evaluation/receipt.json",
-   "tests/test_memory_lifecycle.py",
-   "blueprints/us-equities/memory-lifecycle/run.py"
+   "blueprints/us-equities/retrieval-evaluation/run-bm25.mjs"
   ],
-  "metric": "Exact-source recall@3 and correct-abstention rate on a preregistered held-out extension of the frozen 12-query fixture (financial documents with as-of dates, code symbols, project decisions), at a matched context budget, with task cost from native provider usage and zero cross-project hits"
+  "metric": "Worker routes are measured on the same no-MCP task, deerflow/research-task.md, with these fields per route: exact-field correctness against the input receipts, strict filesystem read-only enforced (yes/no), model-identity evidence, and complete native usage including failed or blocked turns. Tool/MCP success is scored in a separate task that permits tools. Retrieval is exact intended-source recall@3 and abstention on a new held-out set with frozen queries and fixed gold, at a fixed context budget. The existing QMD BM25 run (8/12) is the format template and baseline, not a held-out set."
  },
- "overturn_when": "The verdict changes if the frozen 12-query harness at blueprints/us-equities/retrieval-evaluation/ (fixture.json, run-bm25.mjs, receipt.json) is extended into a preregistered held-out set and run at a matched context budget. The set should cover dated financial documents with as-of dates, exact code symbols and project decisions, with gold source spans. The receipt currently measures only QMD 2.8.3 BM25, with recall@3 of 8/12. A candidate would need to beat c7/c12/c9 on exact-source recall@3 and on correct abstention without higher measured native task cost. It must also keep project isolation, checked with `python3 -m unittest discover -s tests -p test_memory_lifecycle.py` (the command documented in blueprints/us-equities/memory-lifecycle/README.md line 37) and a fresh run of blueprints/us-equities/memory-lifecycle/run.py. An exact-symbol head-to-head in which c14 beats c9 in native MCP registration in both clients would move c14 into the winner set. A native failure of c7, c12 or c9 on current pins in either client would also overturn the verdict.",
- "packet_sha256": "ec4d43f820eb5e04404fb54cf3b8acfd1d3edf2d0444fcd715f1a55784a4f2e6",
+ "overturn_when": "1. Worker routes. Run the concrete DeerFlow task blueprints/us-equities/deerflow/research-task.md through two routes with the same two input JSON files in the workspace. The routes are `python3 blueprints/us-equities/deerflow/native-research.py`, which hardcodes this prompt at line 84, and `python3 blueprints/us-equities/workers/native_worker.py run --prompt` with that same task text. Change the c20 default if c19+c21 matches c20 on exact-field correctness and complete usage including failed turns, while enforcing strict filesystem read-only. The task forbids MCP tools, so this pair scores the no-tool case only. OmniRoute (c6) can join only after omniroute-astra.py and omniroute-astra-request.json are changed to accept the same task, because the request is hardcoded at line 38. That change does not exist yet.\n2. Retrieval. The only runnable retrieval measurement is `CI=true node blueprints/us-equities/retrieval-evaluation/run-bm25.mjs --fixture blueprints/us-equities/retrieval-evaluation/fixture.json` (README lines 125-130). It scores QMD BM25 only, at 8/12 recall@3. Use its frozen-query and fixed-gold format as the template for a new held-out code and financial-document set. Change the c7/c12 verdict only if another candidate, run at the same context budget, improves exact-source recall@3 and abstention over ai-memory+SocratiCode, or over Serena for exact symbols. An ai-memory or SocratiCode runner does not exist yet.",
+ "packet_sha256": "084d0ca601d5c787e9e4e1be6998d78a083b8fb4e01a50cbf1dbf14bf1fbde55",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/us-equities__agents-models-workers.json",
-  "<host-path>/SKILL.md (preloaded skill body)",
-  "evidence/receipts/native-memory.json (full, re-read in revision)",
-  "evidence/receipts/native-rag.json",
-  "evidence/receipts/desktop-direct-rag.json",
-  "evidence/receipts/native-context-memory.json",
-  "evidence/receipts/artifact-reductions.json",
-  "evidence/receipts/vllm-compatibility.json",
-  "evidence/receipts/native-cli-gaps.json (lines 1-150)",
-  "evidence/receipts/portable-cli-artifacts.json",
-  "evidence/receipts/desktop-cli-workflows.json (full, re-read in revision)",
-  "evidence/receipts/component-history.json (lines 40-49, 78-147, 198-262, 476-530)",
-  "blueprints/us-equities/workers/receipt.json (lines 1-200)",
+  "blueprints/us-equities/workers/receipt.json",
   "blueprints/us-equities/workers/policy.md",
-  "observability/restart-receipt.json (lines 1-120)",
+  "blueprints/us-equities/workers/research-task.md",
+  "blueprints/us-equities/deerflow/native-receipt.json",
+  "blueprints/us-equities/deerflow/research-receipt.json",
+  "blueprints/us-equities/deerflow/research-task.md",
   "blueprints/us-equities/routing/health-receipt.json",
-  "blueprints/us-equities/routing/astra-receipt.json (lines 1-80)",
-  "blueprints/us-equities/routing/README.md (lines 1-60)",
-  "blueprints/us-equities/deerflow/native-receipt.json (lines 1-80)",
-  "blueprints/us-equities/deerflow/research-receipt.json (lines 1-80)",
-  "blueprints/us-equities/memory-lifecycle/README.md (full, added in revision)",
-  "blueprints/us-equities/retrieval-evaluation/receipt.json (lines 1-20, 360-369, 695-714, added in revision)",
-  "<host-path>/retrieval-evaluation (Glob listing: README.md, full-corpus-manifest.json, fixture.json, receipt.json, run-bm25.mjs, source-manifest.json)",
-  "tests/test_memory_lifecycle.py (lines 1-40)",
-  "fixtures/rag-note.md"
+  "blueprints/us-equities/routing/astra-receipt.json",
+  "blueprints/us-equities/routing/README.md",
+  "blueprints/us-equities/routing/omniroute-astra.py",
+  "blueprints/us-equities/retrieval-evaluation/README.md",
+  "blueprints/us-equities/retrieval-evaluation/receipt.json (lines 695-714)",
+  "evidence/receipts/native-memory.json",
+  "evidence/receipts/native-context-memory.json (lines 1-150)",
+  "evidence/receipts/native-rag.json (lines 1-150)",
+  "evidence/receipts/vllm-compatibility.json",
+  "evidence/receipts/desktop-direct-rag.json",
+  "observability/restart-receipt.json (lines 1-80)",
+  "evidence/receipts/component-history.json (lines 40-260, 480-549)",
+  "evidence/receipts/portable-cli-artifacts.json (grep ids/claim; lines 66-125)",
+  "evidence/receipts/artifact-reductions.json (lines 1-70)",
+  "evidence/receipts/native-cli-gaps.json (grep id/claim/kind)",
+  "evidence/receipts/desktop-cli-workflows.json (grep id/claim/kind)",
+  "<host-path>/SKILL.md (preloaded skill body)"
  ],
- "why_selected": "This verdict is my own review of the retained receipts, revised to address the refuter findings. No TypeSafe inference results were supplied, and no provider judgment was retained. The requirement asks for durable project knowledge, exact code and dated financial sources, with cross-client retrieval, source recovery, explicit project scope and measurable quality.\n\nc7 ai-memory. Native execution in evidence/receipts/native-memory.json. Native Codex 0.155.1 exited 0, and its receipt says only that it \"called native MCP memory_read_page; returned correct heading and four disabled features\" (line 21). It records neither the heading text nor explicit scope. Native Claude 2.1.277 exited 0 with terminal_reason completed. Its receipt records the heading \"Shared project memory deployment\" and \"Single memory_read_page call with explicit scope\" (line 47). The same receipt records cross_client_handoff_received true and 8 Codex and 9 Claude ai_memory_observations. For explicit project scope, blueprints/us-equities/memory-lifecycle/README.md (lines 3 and 5) records a native run of the upstream ai-memory 2.3.1 binary: 31 MCP tool calls and 23 fixture checks passed. Each project got back its own body, searches for the other project's unique term returned zero hits, and a superseded page was retrievable at its ingestion-time instant. Line 28 limits this: it covers ingestion-time rather than market valid-time data and does not exercise the Codex or Claude hooks or semantic retrieval quality.\n\nc12 SocratiCode. Native execution in evidence/receipts/native-rag.json. Native Codex and native Claude each ran MCP codebase_search with limit 1. Both returned tools/ecosystem/linux-usage-report.cjs lines 2-39 with score 0.6429. The index held 35 files and 139 chunks with status green. Embeddings came from local Nemotron-3-Embed-1B-BF16 through vLLM. evidence/receipts/desktop-direct-rag.json repeats the result in the Desktop client.\n\nc9 Serena. The structured calls, completed find_symbol and find_referencing_symbols, appear only under historical_codex in evidence/receipts/native-context-memory.json. The Claude side rests on a single inventory line, \"Actual fetch symbol and 3 references retrieved.\", in evidence/receipts/component-history.json (line 101). That file calls itself \"a provenance statement, not a new live test\" (line 46), and it records version 2.0.0.dev0 rather than the packet pin v1.7.0.\n\nWhy these three. Each performs native MCP retrieval for one part of the requirement: memory (c7), conceptual code (c12) or exact symbols and references (c9). The correction to my earlier text is that they are not the only adopted candidates run in both client families. c14 ran in native Claude through the MCPorter bridge and in Codex Desktop through a CLI bridge. c11 ran in both clients. c14 still stays an overlap fallback, because component-history.json records neither native Claude nor native Codex MCP registration for it and its edges are static. c11 returns bounded output and is not durable-knowledge retrieval.\n\nNone of the winners has measured retrieval quality beyond single queries, and none covers dated financial sources.",
+ "why_selected": "Source of these verdicts: I reviewed the retained receipts myself. The coordinator supplied no TypeSafe inference results, and I did not treat the packet's withheld labels or any provider judgment as authority. Each winner was executed natively in a real client task. None has been measured head-to-head against its alternatives.\n\n- c20, codex-native-sdk (worker). blueprints/us-equities/workers/receipt.json (2026-09-19, native_model_e2e) records a native SDK run with openai-codex 0.154.0 and native-codex 0.155.1, configured model gpt-6-astra. It completed in 58410 ms and returned exact facts: engine_data_points 3943, simulated orders 3, failed data requests 0 and deerflow_skills 23. Usage was 135311 total tokens for that turn and 204091 across all three native turns. The receipt also records failures. All three turns have native_turn_status \"completed\" (lines 135, 172 and the main run). ctx_execute_file failed in every turn (lines 77, 163, 200), and the summary is successful_research_tasks 1 and blocked_file_extraction_tasks 2 (lines 218-219). policy.md sets the contract: read-only, no orders, one retrieval lane per artifact, and native usage reported only when the provider returns it. routing/astra-receipt.json (result.native_worker_remains_default: true) and routing/README.md keep this as the default over the gateway.\n- c7, ai-memory (durable project knowledge and cross-client continuity). evidence/receipts/native-memory.json records a native Codex 0.155.1 session (gpt-6-astra) and a native Claude 2.1.277 session (claude-opus-5[1m]). Both retrieved the same scoped durable page through MCP memory_read_page, with 8 and 9 lifecycle observations, and cross_client_handoff_received is true. native-context-memory.json shows memory_status called with an explicit agent-lab workspace and project. This satisfies the requirement's \"explicit project scope\" clause.\n- c12, SocratiCode (semantic code retrieval; exact-symbol lookup is Serena's lane, see c9). evidence/receipts/native-rag.json records native Codex and native Claude each making one limit-1 codebase_search (lines 31-35, 58). Both returned the same chunk, tools/ecosystem/linux-usage-report.cjs lines 2-39, score 0.6429 (lines 38, 62), so the source location is recoverable. The index held 35 files and 139 chunks (lines 91-92), with real local embeddings from nvidia/Nemotron-3-Embed-1B-BF16 at 2048 dimensions (lines 101-102). automatic_watch observed add, update and delete with no SocratiCode call between mutation and observation (lines 113-130).\n\nWhy c12 rather than c9 Serena for the code slot. Serena was also observed natively in Claude, Codex and Desktop (component-history.json lines 101-103). c12 is preferred on two grounds. First, its installed version matches the packet pin v1.14.0, while Serena runs 2.0.0.dev0 @ c6fbd1c5 (component-history.json line 99) against the pin v1.7.0. Second, c12 has an observed automatic index refresh. The two are complementary lanes, and this is a trade-off rather than a quality result.\n\nRetrieval quality is not measured for any winner. The repository's only retrieval measurement is QMD BM25: exact intended-source recall@3 of 8/12 (blueprints/us-equities/retrieval-evaluation/README.md line 28). Line 141 of that README states it does not evaluate SocratiCode or memory.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
+  "blueprints/us-equities/workers/receipt.json",
+  "blueprints/us-equities/workers/policy.md",
+  "blueprints/us-equities/routing/astra-receipt.json",
+  "blueprints/us-equities/routing/README.md",
   "evidence/receipts/native-memory.json",
-  "blueprints/us-equities/memory-lifecycle/README.md",
-  "evidence/receipts/native-rag.json",
-  "evidence/receipts/desktop-direct-rag.json",
   "evidence/receipts/native-context-memory.json",
+  "evidence/receipts/native-rag.json",
   "evidence/receipts/component-history.json"
  ],
  "winner_keys": [
+  "c20",
   "c7",
-  "c12",
-  "c9"
+  "c12"
  ]
 }

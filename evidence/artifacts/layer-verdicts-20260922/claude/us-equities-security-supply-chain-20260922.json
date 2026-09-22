@@ -3,20 +3,26 @@
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [],
+   "evidence_refs": [
+    "https://github.com/openbao/openbao/blob/v2.6.2/README.md"
+   ],
    "key": "c1",
    "name": "openbao",
    "repository": "https://github.com/openbao/openbao",
-   "why_not_default": "Its only evidence is an upstream README reference (https://github.com/openbao/openbao/blob/v2.6.2/README.md), which I could not open under this lane's local-read boundary. The packet marks it source_review and not_individually_reviewed. The card itself says no server config is supplied, no service starts and credential handling is unaccepted. There is no local receipt of scoped secret issuance or of denying broker credentials to research workers. That is the clause of the requirement it would most directly serve, but it is untested, not failed."
+   "why_not_default": "Its only evidence ref is the upstream v2.6.2 README URL (evidence_kind source_review, review_status not_individually_reviewed). The card limitations state that no server config is supplied, no service starts and no dev-mode recipe is offered. No retained receipt shows a running secret lifecycle or service identity. The broker credential handling therefore remains unaccepted. The 'secrets' scope term is covered natively only for detection (gitleaks), not for storage, rotation or lifecycle."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [],
+   "evidence_refs": [
+    "https://github.com/sigstore/cosign/blob/v3.1.3/README.md",
+    "blueprints/us-equities/supply-chain/receipt.json",
+    "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json"
+   ],
    "key": "c5",
    "name": "cosign",
    "repository": "https://github.com/sigstore/cosign",
-   "why_not_default": "Its only evidence is an upstream README reference (https://github.com/sigstore/cosign/blob/v3.1.3/README.md), which I could not open under this lane's local-read boundary. The packet marks it source_review and not_individually_reviewed, and its card says no signing or identity flow was started. The retained syft and grype receipts both record signature_verified: false with checksum-only verification. Cosign would close that gap, but no verification run is retained."
+   "why_not_default": "Its only evidence ref is the upstream v3.1.3 README URL (source_review, not_individually_reviewed). The card states that no signing or identity flow was initiated. Both native receipts record signature_verified false for the Syft and Grype release archives; only checksum matching was performed. No cosign verification of any artifact is retained, so the signature/provenance gap stays open."
   }
  ],
  "catalog": "us-equities",
@@ -24,57 +30,59 @@
  "lane": "claude",
  "layer_id": "security-supply-chain",
  "limits": [
-  "I did not open the GitHub-hosted evidence_refs: the openbao v2.6.2, grype v0.119.0, syft v1.52.0 and cosign v3.1.3 READMEs. This lane may read only local files under <host-path>/nas-wt-trading-layers. Their content is unverified here, and the source_review claims for c1 and c5 are unverified.",
-  "I could not run commands, so I did not execute tests/test_catalogs.py or any re-scan. The raw Syft/Grype/gitleaks artifacts are private and referenced only by sha256, so the recorded counts could not be re-derived. All figures are copied from the retained receipts.",
-  "Prior layer-verdict artifacts exist under evidence/artifacts/layer-verdicts-20260922/claude/ and I deliberately did not read them, to keep this verdict independent. No TypeSafe inference results were supplied or used; all judgments here are my own source review.",
-  "Skill path: <host-path>/typesafe-ai (in context). The actual model exposed by the client is claude-opus-5-5[1m]. The model field is the fixed value the packet requires."
+  "I could not open the upstream README URLs for openbao v2.6.2, grype v0.119.0, cosign v3.1.3 or syft v1.52.0: they are outside the repository root and no network access was used. Upstream source claims are therefore unverified by this lane.",
+  "I could not run commands, so tests/test_supply_chain_scan.py was read (lines 1-60 only), not executed. No scan was re-run.",
+  "The raw Syft/Grype/gitleaks outputs are held outside the repository and are recorded only by sha256, so recorded counts could not be checked against them.",
+  "No TypeSafe inference was supplied or used. This verdict is my own source review of the retained receipts. The packet's card_limitations are provider-retained text that I treated as data and cross-checked against the receipts where possible.",
+  "Skill path: <host-path>/SKILL.md. The client reports the actual model as claude-opus-5-5[1m]; model and effort were copied as instructed (opus/high)."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "The packet's requirement text (bounded research, native identity, process supervision, telemetry, no broker execution authority for research workers) and its existing_overturn_when (scheduler/graph escalation) match the agents-operations group, not a security/supply-chain requirement. I judged the candidates against it as supplied; the coordinator should confirm the requirement mapping.",
-  "None of the evidence establishes separation of broker credentials from research workers. OpenBao has no execution receipt, and its card says IBKR credential handling is 'selected live-primary, unaccepted'.",
-  "No release signature or build provenance is verified for syft or grype. Both receipts record signature_verified: false with checksum-only matching.",
-  "The Grype scan covers Python package metadata only. It does not cover bundled Rust/Cython extensions, host OS packages, transitive shared libraries or IBKR-side software. Its zero matches are tied to the 2026-09-22T06:30:41Z database snapshot.",
-  "The Syft inventory covers one SDK prefix (36 packages). Three outbound symlinks were not followed, and whole-host and external-interpreter coverage is absent.",
-  "The gitleaks receipt does not name which repository its 22 commits came from. It is a 2026-09-19 point-in-time result with no recurring scan evidence, and its sandbox network denial was 'configured but not separately exercised'.",
-  "There is no measured comparison between these tools and alternatives (e.g. other SBOM, vulnerability or secret scanners). Selection rests on native receipts, not on a head-to-head comparison."
+  "No secret storage, rotation or lifecycle service is established: OpenBao has source review only and no running service.",
+  "No signature or build-provenance verification: both the Syft and Grype receipts record signature_verified false, and only checksums were matched.",
+  "The Grype zero-match result covers Python package metadata only. It does not cover bundled Rust/Cython extensions, host OS packages, unpinned transitive shared libraries, IBKR-side software, or vulnerabilities disclosed after the 2026-09-22T06:30:41Z DB build.",
+  "The Syft inventory covers one SDK prefix (36 packages); whole-host coverage and complete vendored-library discovery are not established.",
+  "The gitleaks receipt (2026-09-19) records neither the repository it scanned nor the gitleaks version. The v8.30.1 pin comes from recipes/README.md, not from the receipt, and the 22-commit, 0-finding result is scoped and dated, not a statement that no secrets exist.",
+  "No recurring or scheduled scan policy is established; every result is point-in-time.",
+  "The group-level requirement (research workers kept without broker execution authority, supervised processes) is not addressed by any candidate in this layer."
  ],
  "overturn_protocol": {
   "arms": [
-   "current winners syft+grype+gitleaks (native_proven, scoped)",
-   "openbao native scoped-credential issuance/denial run",
-   "cosign native signature verification of pinned syft/grype releases"
+   "c4 syft + c2 grype + c3 gitleaks (current native-proven set)",
+   "c5 cosign signature/identity verification of pinned release artifacts",
+   "c1 openbao secret lifecycle for the broker credential environment variables"
   ],
   "fixture_paths": [
-   "blueprints/us-equities/supply-chain/receipt.json",
    "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+   "blueprints/us-equities/supply-chain/receipt.json",
    "evidence/receipts/runtime-tools.json",
-   "tests/test_catalogs.py"
+   "tests/test_supply_chain_scan.py"
   ],
-  "metric": "A native receipt with exit code 0 and an explicit pass or fail for the layer requirement. For OpenBao: a scoped credential is issued to the paper runtime and denied to a research-worker identity. For cosign: release signature and identity are verified for the pinned syft/grype artifacts. This is compared against the current checksum-only, no-secret-lifecycle evidence of the winners."
+  "metric": "Native exit codes, and Grype match counts reconciled with disposition rows (tests/test_supply_chain_scan.py); Syft package agreement with installed metadata; gitleaks findings/exit; presence of a retained cosign verification or OpenBao lifecycle receipt"
  },
- "overturn_when": "Change the verdict if either of these is retained. (a) A native OpenBao receipt under blueprints/us-equities/ showing the paper runtime received scoped, revocable broker credentials while a research-worker identity was denied them. That would directly satisfy the requirement's 'without granting research workers broker execution authority' clause and would warrant adding c1 as a winner. (b) A native cosign verification of the pinned syft/grype release artifacts that turns their signature_verified: false into a verified identity. A re-run of the scan recorded in blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json against a later database changes the findings, not the tool selection. After any receipt change, run python3 -m pytest tests/test_catalogs.py; it asserts local evidence refs exist and grype is native_proven.",
- "packet_sha256": "36aa3f94798ed32da75140ec011287b67b8c848724f806044adf45bf2ca7d9a9",
+ "overturn_when": "Any of the following changes the verdict. (1) A re-scan receipt at blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json (or a successor dated receipt) records nonzero Grype matches without dispositions, or a Syft/Grype command with a nonzero exit, so that `python3 -m unittest tests/test_supply_chain_scan.py` fails. (2) A newer receipt in blueprints/us-equities/supply-chain/ shows Syft inventory disagreeing with installed metadata. (3) A gitleaks re-scan in evidence/receipts/runtime-tools.json reports findings or an operational error. (4) A retained blueprints/ receipt shows cosign verifying an exact signer identity on a pinned artifact, which would add c5 to the winner set. (5) A retained blueprints/ receipt shows an OpenBao server issuing scoped secrets with a lifecycle, which would add c1 to the winner set.",
+ "packet_sha256": "1884662f97de81ed8d28a6bb7e9f140941cbfa08819f405b4bf0262f1e693ecd",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/us-equities__security-supply-chain.json",
   "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
   "blueprints/us-equities/supply-chain/receipt.json",
   "blueprints/us-equities/supply-chain/README.md",
-  "evidence/receipts/runtime-tools.json",
-  "recipes/README.md (gitleaks rows, lines 64-93)",
-  "tests/test_catalogs.py (lines 505-534)"
+  "evidence/receipts/runtime-tools.json (grep for gitleaks, lines 1-51)",
+  "recipes/README.md (grep for gitleaks, lines 64-93)",
+  "tests/test_supply_chain_scan.py (lines 1-60)",
+  "<host-path>/SKILL.md (skill body preloaded in context)"
  ],
- "why_selected": "Only syft (c4), grype (c2) and gitleaks (c3) have retained native execution evidence. The other adopted candidates have only upstream README references. (1) Syft: blueprints/us-equities/supply-chain/receipt.json (id syft-sdk-inventory-20260919, status passed_scoped_inventory_acceptance) records a native Syft 1.52.0 scan. It ran in a read-only, network-isolated bubblewrap namespace, exited 0 and found 36 Python packages. The package name/version/PURL entries matched 36/36 between the Syft and CycloneDX outputs and 36/36 against installed dist-info metadata. The source fingerprint was unchanged before and after the scan. The release archive matched the publisher checksum list and the GitHub asset digest; signature_verified is false. (2) Grype: blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json (status passed_scoped_scan_zero_findings) records native Grype 0.119.0 with database schema v6.1.9, built 2026-09-22T06:30:41Z. It scanned the Syft SBOMs of the NautilusTrader 2.0.0rc5 runtime site-packages (21 packages) and the adaptive-paper requirements.txt pins (2 packages). Every syft/grype command exited 0, with 0 runtime matches and 0 adapter matches. The archive checksum matched and signature_verified is false. (3) Gitleaks: evidence/receipts/runtime-tools.json (kind native_cli_e2e, recorded 2026-09-19T04:55:03Z) records a native gitleaks history scan that exited 0 over 22 commits (1174704 bytes, approximate) with 0 findings and 100 percent redaction. The pinned command is in recipes/README.md line 93. Together these three cover dependency inventory, known-vulnerability matching and secret scanning. All are scoped, dated native_proven results, not security certifications.",
+ "why_selected": "Judged against the layer title and scope terms (security, sbom, secrets, vulnerability-analysis), as the packet's requirement_note directs, because the requirement text is shared across the group. Only these three adopted candidates have retained native execution receipts. c4 syft: blueprints/us-equities/supply-chain/receipt.json records a native Syft 1.52.0 run (receipt id syft-sdk-inventory-20260919). It ran inside bubblewrap, read-only and network-isolated, exited 0 in 1.2522 s, and found 36 Python packages. All 36 matched the installed dist-info/METADATA, and the Syft and CycloneDX outputs agreed on 36/36 name/version/PURL tuples. The archive checksum matched both the publisher's list and the GitHub asset digest. c2 grype: blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json records native Grype 0.119.0 with DB schema v6.1.9, built 2026-09-22T06:30:41Z. Grype scanned Syft SBOMs of the pinned NautilusTrader 2.0.0rc5 runtime site-packages (21 packages) and the adaptive-paper requirements.txt (2 packages). Every recorded command exited 0, with 0 matches at every severity, and the disposition table is empty by construction. c3 gitleaks: evidence/receipts/runtime-tools.json (recorded 2026-09-19T04:55:03Z) shows a native history scan with exit_code 0, commits_scanned 22, bytes_scanned 1174704 (approximate) and findings 0, at 100 percent redaction. Together these three tools cover SBOM inventory, vulnerability analysis and secret detection, the parts of the layer with native evidence. All three results are point-in-time and scoped.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
   "blueprints/us-equities/supply-chain/receipt.json",
   "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
-  "blueprints/us-equities/supply-chain/README.md",
   "evidence/receipts/runtime-tools.json",
+  "blueprints/us-equities/supply-chain/README.md",
   "recipes/README.md"
  ],
  "winner_keys": [
