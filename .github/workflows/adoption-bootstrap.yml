@@ -177,8 +177,7 @@ jobs:
           uv --version
           node --version
           # gh is NOT in the macos-arm64-foundation profile's required_commands
-          # and is preinstalled on the runner image, so this line usually
-          # reports the image's gh, not a pinned install. The artifact's
+          # gh is installed by the bootstrap into $ECO_INSTALL_ROOT/bin, which is first on PATH here,
           # installed-versions.txt stays the authoritative pinned-version record.
           gh --version
       - name: Collect the artifact payload

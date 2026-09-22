@@ -188,7 +188,7 @@ round (this round's own working tree; base commit `9d9ce2b`):
 | `python3 scripts/validate_convergence.py --all-recorded --root . --json` | 0 | `"valid": true` overall, every recorded experiment valid with `"errors": []` |
 | `python3 -m unittest` | 0 | `Ran 1428 tests` / `OK (skipped=204)` (1,427 before the two assertions added in this round; the skips are optional-runtime gates — duckdb, alpaca-py, Nautilus, QEMU, promtool/amtool — and their count moves with what is installed on the host) |
 | `shellcheck -S style adoption/bootstrap-macos.sh` | 0 | no findings; ShellCheck 0.11.0 on this host, run after the `trap cleanup EXIT`/lock reordering |
-| `gitleaks git . --config .gitleaks.toml --log-opts d093a4c..HEAD --max-target-megabytes 2 --max-decode-depth 0` through the guarded ecosystem launcher | 0 | `11 commits scanned` / `no leaks found`, through `9d9ce2b`. Coverage exclusions: targets over 2 MB and nested decoding. The fix-round commit itself is scanned by the same command once it lands, not by this run. |
+| `gitleaks git . --config .gitleaks.toml --log-opts d093a4c..HEAD --max-target-megabytes 2 --max-decode-depth 0` through the guarded ecosystem launcher | 0 | `11 commits scanned (re-run after the fix commit: 12 commits scanned, no leaks found)` / `no leaks found`, through `9d9ce2b`. Coverage exclusions: targets over 2 MB and nested decoding. The fix-round commit itself is scanned by the same command once it lands, not by this run. |
 
 Deltas against the pre-fix-round integration gate run are the two new unit
 tests, the new receipt file and its `files[]`/`receipts[]` registration, and

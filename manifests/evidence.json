@@ -3003,8 +3003,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "adf084e751df15b50c555aef19e6d50d86a51f8746acbd86a9179cf2e760d98e",
-      "bytes": 9255
+      "sha256": "fad51d0ac95811d9749250aaf5e536127e4a219fa49610e73d40125a5e690e11",
+      "bytes": 9210
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -7759,8 +7759,8 @@
     },
     {
       "path": "docs/tasks/2026-09-22-new-machine-install.md",
-      "sha256": "c4ee784d59cae482a004aa24e2cf69b14d98de052e0e1b6b545ab26c68c7d87b",
-      "bytes": 18599
+      "sha256": "bd98458ab89d7def8511fdccd88e2ae862005a0868f37f34b44e79f9ca727ba2",
+      "bytes": 18665
     },
     {
       "path": "docs/token-efficiency-stack.json",
@@ -10204,8 +10204,8 @@
     },
     {
       "path": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json",
-      "sha256": "0b5dd6eddd43f2f0fbce6ae67fbfe4194acf2fd21d5605a1b26c0dcc83d9753c",
-      "bytes": 4263
+      "sha256": "2548ce67040bf68b0cead4fccc7f8fd22aa7eb06d975e13475dad605c0c17a57",
+      "bytes": 4713
     },
     {
       "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
