@@ -53,6 +53,7 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             "native-token-e2e.yml",
             "action-compatibility.yml",
             "publish-catalog.yml",
+            "adoption-bootstrap.yml",
         }
         self.assertEqual(
             actual, expected,

@@ -6791,8 +6791,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 11106658,
-      "sha256": "7ada6da0c2a68212755554060590cf4efe97edf458ed09bc146be29acddd8446"
+      "bytes": 11119531,
+      "sha256": "e7ef4ae310c5ddfe517c1b8e36b44fe566f5f301b18a9c1effbdc043b5869cb6"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7736,8 +7736,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "7b8574fdf46a42258d43652b377edb67612fb7eeae7a5298a8b6b8465e887bef",
-      "bytes": 3378
+      "sha256": "33b357c30449f78754b94fe10329d74eb057ebb1e17c06ab4bcf834e0f9eda4a",
+      "bytes": 3416
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
@@ -9061,8 +9061,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "974aec831f5a81f7f7237701cde12afdfd7259ec99d9d13c50764b6371d76041",
-      "bytes": 25289
+      "sha256": "00968b4a8743510b0878cc788b068d5e8dab642de6dc418fa847546749bf4069",
+      "bytes": 28339
     },
     {
       "path": "docs/research-task-acceptance.md",
@@ -9481,8 +9481,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "3008206e8dc19ceda53f091a683ef153449fd994d2f06494cb9fabc39fbd293d",
-      "bytes": 17083
+      "sha256": "b191557ed9b762e6abd6a9f9bb51efd29b0937a2272b285c4d4034444c956edc",
+      "bytes": 19528
     },
     {
       "path": "docs/tasks/2026-09-20-automation-resolution.md",
