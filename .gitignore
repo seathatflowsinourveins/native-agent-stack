@@ -13,3 +13,5 @@ node_modules/
 *.sqlite*
 *.db
 *.jsonl
+adoption/hosts/*.json
+!adoption/hosts/example.json

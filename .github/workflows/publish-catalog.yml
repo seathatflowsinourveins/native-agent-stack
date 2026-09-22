@@ -2,13 +2,16 @@ name: Publish attested catalog archive
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
 
 permissions:
   contents: read
 
 jobs:
   publish:
-    if: github.repository == 'seathatflowsinourveins/native-agent-stack' && github.ref == 'refs/heads/main'
+    if: github.repository == 'seathatflowsinourveins/native-agent-stack' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -49,6 +52,35 @@ jobs:
           cd "$PUBLICATION_DIR"
           sha256sum "$(basename "$archive")" | tee archive.sha256
           stat --format='archive_bytes=%s' "$archive" | tee -a source.log
+      - name: Fetch and SHA-checked-verify syft
+        shell: bash
+        run: |
+          set -euo pipefail
+          syft_dir="$RUNNER_TEMP/syft-1.52.0"
+          mkdir -p "$syft_dir"
+          curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \
+            'https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_checksums.txt' \
+            --output "$syft_dir/checksums.txt"
+          curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \
+            'https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_linux_amd64.tar.gz' \
+            --output "$syft_dir/syft.tar.gz"
+          expected="$(grep '  syft_1.52.0_linux_amd64.tar.gz$' "$syft_dir/checksums.txt" | awk '{print $1}')"
+          test -n "$expected"
+          printf '%s  %s\n' "$expected" "$syft_dir/syft.tar.gz" | sha256sum --check --status
+          # Pinned and independently re-verified 2026-09-22 against the upstream checksums file.
+          test "$expected" = 'caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d'
+          tar -xzf "$syft_dir/syft.tar.gz" -C "$syft_dir" syft
+          install -m 0755 "$syft_dir/syft" "$RUNNER_TEMP/syft"
+          "$RUNNER_TEMP/syft" version
+      - name: Generate the SPDX SBOM for the archived commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          sbom="$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.spdx.json"
+          "$RUNNER_TEMP/syft" scan "dir:." --output "spdx-json=$sbom"
+          cd "$PUBLICATION_DIR"
+          sha256sum "$(basename "$sbom")" | tee -a archive.sha256
+        working-directory: ${{ github.workspace }}
       - name: Attest the catalog archive
         id: attest
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
@@ -56,6 +88,31 @@ jobs:
           subject-path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.tar.gz
           push-to-registry: false
           create-storage-record: false
+      - name: Attest the SBOM
+        id: attest-sbom
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.spdx.json
+          predicate-type: https://spdx.dev/Document
+          predicate-path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.spdx.json
+          push-to-registry: false
+          create-storage-record: false
+      - name: Verify SBOM attestation provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SBOM_ATTESTATION_BUNDLE: ${{ steps.attest-sbom.outputs.bundle-path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          sbom="$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.spdx.json"
+          cp "$SBOM_ATTESTATION_BUNDLE" "$PUBLICATION_DIR/attestation-sbom.json"
+          gh attestation verify "$sbom" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/publish-catalog.yml" \
+            --source-digest "$GITHUB_SHA" \
+            --predicate-type https://spdx.dev/Document \
+            --deny-self-hosted-runners --format json \
+            > "$PUBLICATION_DIR/verify-sbom.json" 2> "$PUBLICATION_DIR/verify-sbom.log"
       - name: Verify provenance and reject modified archive bytes
         env:
           GH_TOKEN: ${{ github.token }}
@@ -67,7 +124,7 @@ jobs:
           cp "$ATTESTATION_BUNDLE" "$PUBLICATION_DIR/attestation.json"
           policy=(--repo "$GITHUB_REPOSITORY"
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/publish-catalog.yml"
-            --source-ref refs/heads/main --source-digest "$GITHUB_SHA"
+            --source-ref "$GITHUB_REF" --source-digest "$GITHUB_SHA"
             --deny-self-hosted-runners --format json)
           gh attestation verify "$archive" "${policy[@]}" \
             > "$PUBLICATION_DIR/verify-online.json" 2> "$PUBLICATION_DIR/verify-online.log"
@@ -98,6 +155,7 @@ jobs:
         id: archive
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
+          name: native-agent-stack-${{ github.sha }}-archive
           path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.tar.gz
           archive: false
           if-no-files-found: error
@@ -113,6 +171,25 @@ jobs:
           read -r expected _ < "$PUBLICATION_DIR/archive.sha256"
           printf 'expected_sha256=%s\nuploaded_sha256=%s\nartifact_id=%s\nartifact_url=%s\n' \
             "$expected" "$UPLOADED_DIGEST" "$ARTIFACT_ID" "$ARTIFACT_URL" | tee "$PUBLICATION_DIR/upload.log"
+          test "$UPLOADED_DIGEST" = "$expected"
+      - name: Upload the SBOM next to the archive
+        id: sbom-upload
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: native-agent-stack-${{ github.sha }}-sbom
+          path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.spdx.json
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+      - name: Match the uploaded SBOM digest to the attested file
+        env:
+          UPLOADED_DIGEST: ${{ steps.sbom-upload.outputs.artifact-digest }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="$(sha256sum "$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.spdx.json" | awk '{print $1}')"
+          printf 'expected_sbom_sha256=%s\nuploaded_sbom_sha256=%s\n' \
+            "$expected" "$UPLOADED_DIGEST" | tee "$PUBLICATION_DIR/sbom-upload.log"
           test "$UPLOADED_DIGEST" = "$expected"
       - name: Preserve publication success or failure evidence
         if: always()

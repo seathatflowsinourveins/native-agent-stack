@@ -2,6 +2,8 @@
 
 Start from a reviewed checkout, select capabilities, and record new local evidence. Historical receipts describe the authoring host; a clone does not inherit its logins, service state, tool discovery or acceptance.
 
+For a single ordered new-machine walkthrough, use [the bootstrap page](bootstrap.md). It links each step to this reference's profiles below and to the per-platform page: [Linux/WSL2 x86_64](platforms/linux-wsl2.md) (accepted) and [macOS arm64](platforms/macos-arm64.md) (drafted, not accepted). Render native client configs for a selected host with [`tools/adoption/render_config.py`](../tools/adoption/render_config.py) and its [templates](templates/).
+
 Use the [grand catalog handbook](../docs/grand-catalog-handbook.md) to connect
 repository quality, native runtime review, profile selection and the current
 [clean-install evidence](../blueprints/catalog-clean-install/README.md).

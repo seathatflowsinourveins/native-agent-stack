@@ -163,13 +163,19 @@ do not transfer a native client's credential store.
 
 ## Publication and practical acceptance
 
-The active [main ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
+As of this writing, the active [main ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
 requires the always-running `validate` and `token-report` jobs from GitHub Actions
-(app ID 15368). Its reviewed configuration is [main-ruleset.json](../.github/main-ruleset.json).
-It adds no human approval count, strict up-to-date requirement or bypass actor.
-Native path-filtered and manually dispatched checks are not global requirements.
-Require native acceptance separately when its capability changes. No merge queue
-is enabled; add `merge_group` support before adopting one.
+(app ID 15368). It adds no human approval count, strict up-to-date requirement or
+bypass actor. Native path-filtered and manually dispatched checks are not global
+requirements. Require native acceptance separately when its capability changes.
+No merge queue is enabled; add `merge_group` support before adopting one.
+
+The committed [main-ruleset.json](../.github/main-ruleset.json) no longer
+describes this applied state: it has been edited ahead of application to add
+`secret-scan` and the other rules described in "Ruleset upgrade, 2026-09-22"
+below. Until the coordinator applies it, treat `main-ruleset.json` as the
+*reviewed, not-yet-applied* configuration, and the "active ruleset" GET below
+as the ground truth for what GitHub currently enforces.
 
 The prior state had no rulesets and returned `Branch not protected` for main.
 After applying the configuration, a separate `GET /repos/OWNER/REPO/rules/branches/main`
@@ -238,3 +244,229 @@ manual off-host workflows (a repository settings decision for the automation
 maintainer), concurrency limits on stateful or manually dispatched workflows, and
 informational naming notes. Static checks execute no job; a pull request's own runs
 remain the execution evidence.
+
+## Scheduled report-only lanes, 2026-09-22
+
+Three lanes run on a schedule and never gate a merge: `catalog-freshness.yml`
+(Mondays 06:17 UTC, plus manual dispatch with a `max_repos` bound), the
+`sbom-vuln` job in `supply-chain.yml` (weekly, plus push/PR when its own paths
+change) and a later `adoption-bootstrap` lane (not yet built). None of these
+three appear in `main-ruleset.json`'s required status checks; a required check
+must run on every PR, and a report-only scheduled lane does not.
+
+`catalog-freshness.yml` reuses `tools/sota-convergence/extract_layers.py` and
+`github_freshness.py` unchanged, then rebuilds a manifest with
+`build_manifest.py --lanes <empty {"lanes": [], "critic": null, "lost": []}>`.
+`build_manifest.py`'s pin-vs-upstream baseline is computed directly from the
+extracted foundation/trading layers and the freshness snapshot, not from
+`lanes.json` (`lanes.json` only carries lane-proposed *candidates*), so an
+empty lanes record still recomputes the real drift while skipping the
+interactive lane-review step -- exactly the "Monthly ... skip a full lane
+re-review if no selection changed" bounded check
+[recipes/sota-convergence-practice.md](../recipes/sota-convergence-practice.md)
+documents. The job diffs the rebuilt manifest's per-component `pin` /
+`upstream.latest` / `pin_behind_upstream` against the published
+`catalogs/sota-convergence/manifest-20260922.json`, writes `drift.md`, appends
+a fixed-tool pin table (actionlint, gitleaks, syft, zizmor, `nautilus_trader`
+vs each `gh api repos/<owner>/<repo>/releases/latest`) to
+`$GITHUB_STEP_SUMMARY`, and uploads both as a 30-day artifact. It opens no
+issue and writes nothing back to the repository; a maintainer reads the
+summary/artifact and decides whether a real lane review is warranted.
+
+`sbom-vuln` reproduces `native-foundation-e2e.yml`'s pinned
+download/verify/install steps for the exact same `nautilus_trader==2.0.0rc5`
+wheel set into an isolated venv (no bwrap sandbox -- this job only needs an
+installed environment to scan, not to execute the engine), generates an SPDX
+and a CycloneDX SBOM with syft 1.52.0, scans both with grype (see pin below),
+and writes `summary.json` (versions, `grype db status`, package count,
+findings by severity). It never passes `--fail-on`; nothing blocks a merge on
+a vulnerability finding, and no threshold has been decided yet (see below).
+
+## Secret and supply-chain scanning, 2026-09-22
+
+`validate.yml`'s `secret-scan` job runs gitleaks 8.30.1 (SHA-256 verified
+against `blueprints/convergence-practice/wsl-native-tools/pins.json`,
+`components[name=gitleaks].archive.sha256`,
+`551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb`) in `git`
+mode (full history, `fetch-depth: 0`) and `dir` mode (working tree), both
+`--redact`. The redacted JSON report is uploaded with `if: always()` so a
+failed scan still leaves the report retrievable; it never prints a matched
+secret to the job log. This job is not yet in `main-ruleset.json`'s required
+checks by default merge policy -- it *is* listed in the required-status-checks
+parameters below, pending the coordinator applying the updated ruleset (see
+"Ruleset upgrade" below).
+
+`supply-chain.yml`'s `sbom-vuln` job uses syft 1.52.0 (linux_amd64 tarball
+SHA-256 `caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d`,
+read from `https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_checksums.txt`)
+and grype 0.119.0, the latest release as of 2026-09-22 (linux_amd64 tarball
+SHA-256 `3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b`,
+read from `https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_checksums.txt`).
+Unlike the other pins on this page, grype tracks upstream's latest release
+rather than a fixed version, because it ships its own vulnerability-matching
+logic (not just a data feed) and this lane is report-only; the freshness
+job's fixed-tool table does not include grype for that reason and the pin
+should be re-checked whenever `sbom-vuln`'s own workflow path changes.
+
+Receipts land as workflow artifacts only: `secret-scan-<run_id>` (30-day
+retention) and `supply-chain-<run_id>` (90-day retention, matching the SBOM's
+longer useful life). Neither report is committed to the repository. The
+threshold decision -- whether a grype finding of a given severity should ever
+fail a build -- is explicitly **pending**; today both scans are report-only
+and a human reads the artifact.
+
+`native-foundation-e2e.yml`'s package set has no dedicated lock file (its
+pins live inline in the workflow's `packages=(...)` array); the task that
+requested a "SDK lock file" for `supply-chain.yml`'s path filter found none,
+so the filter instead watches the workflow file itself.
+
+## Repository policy files
+
+[`.github/CODEOWNERS`](../.github/CODEOWNERS) names the automation maintainer
+as the default owner and again for `.github/` and a not-yet-created
+`adoption/` directory (reserved for a future adoption-bootstrap lane).
+[`SECURITY.md`](../SECURITY.md) documents scope (a catalog, not a deployed
+service), the private-vulnerability-reporting path (falling back to a public
+issue without secret detail while private reporting is not yet enabled),
+supported refs (`main` and the latest `v*` tag) and `gh attestation verify`
+for released artifacts. [`.github/pull_request_template.md`](../.github/pull_request_template.md)
+requires scope, base commit, a per-claim evidence-class table, exact local
+commands run, a decision-record path and a checklist covering SHA pins,
+`contents: read`, no secrets, no paid hosting and preserved peer-owned
+untracked files.
+
+## Ruleset upgrade, 2026-09-22
+
+[`.github/main-ruleset.json`](../.github/main-ruleset.json) gained
+`deletion`, `non_fast_forward`, `required_linear_history`, a `pull_request`
+rule (`required_approving_review_count: 0` -- unchanged from today's
+zero-approval practice, `dismiss_stale_reviews_on_push: true`,
+`require_code_owner_review: false`, `require_last_push_approval: false`,
+`required_review_thread_resolution: true`,
+`allowed_merge_methods: ["squash", "rebase"]`) and `secret-scan` added to
+`required_status_checks`. A new [`.github/tag-ruleset.json`](../.github/tag-ruleset.json)
+targets `refs/tags/*` with only `deletion` and `non_fast_forward` -- protects
+published tags without adding a tag-level review requirement. **Neither
+ruleset file is applied by this change**; both are coordinator-only, per the
+task boundary that only the coordinator regenerates repository-wide settings
+after all lane PRs land. Apply and verify with:
+
+```sh
+gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774 --input .github/main-ruleset.json
+gh api repos/seathatflowsinourveins/native-agent-stack/rules/branches/main
+
+# First application of the tag ruleset creates it; record the returned id
+# and reuse it (PUT .../rulesets/<id>) for any future edit instead of
+# creating a duplicate.
+gh api --method POST repos/seathatflowsinourveins/native-agent-stack/rulesets --input .github/tag-ruleset.json
+gh api repos/seathatflowsinourveins/native-agent-stack/rules/branches/main
+```
+
+## Recorded decisions, 2026-09-22
+
+**Dependabot's `pip` ecosystem is NOT activated.** Dependabot's `pip`
+ecosystem discovers ordinary requirements/lock files by name; the checksum
+lock actually used here is `.github/requirements-ci.lock`, a name Dependabot
+does not recognize as a Python dependency file, and four of the five pinned
+CI binaries (actionlint, gitleaks, syft, grype) are curl-downloaded release
+tarballs with no manifest Dependabot understands at all. The new
+`catalog-freshness.yml` drift table already covers all five pins (including
+`nautilus_trader`) against each tool's latest upstream release, so the gap is
+covered by a different, already-built lane rather than by Dependabot.
+Precondition to revisit: rename `.github/requirements-ci.lock` to a
+Dependabot-discoverable name (e.g. `requirements-ci.txt` with a
+`--require-hashes` format Dependabot's pip ecosystem parses) and re-evaluate.
+
+**CodeQL is NOT activated.** GitHub's default CodeQL setup needs
+`security-events: write` (this repository's workflows are `contents: read`
+only) and pins no exact CodeQL bundle version by default (violates the "no
+floating pin" rule every other lane here follows). The scannable surface is
+stdlib-only Python (`scripts/`, `tools/`) and a handful of `.mjs` files with
+no served application, no user input boundary and no authentication code --
+exactly the profile `docs/github-automation.md`'s existing web-application
+scanning discussion (above) already excludes. Re-evaluate if this repository
+ever serves a live application path (e.g. a hosted dashboard) rather than
+generating catalogs and running local scripts.
+
+**Ownership.** The GitHub automation maintainer owns binary pins (actionlint,
+gitleaks, syft, grype, and workflow-declared package pins like
+`nautilus_trader`) and repository rulesets. Dependabot owns only GitHub
+Actions references (`.github/dependabot.yml`, unchanged by this batch) --
+it does not, and per the decision above still does not, own any Python or
+binary pin.
+
+Each decision above names its evidence (the exact filename/permission gap
+checked), the alternative considered (activate now) and the exact
+observation that would overturn it (a renamed lock file; a served
+application path), per this project's adoption-decision convention.
+## Publication on tags
+
+`publish-catalog.yml` now runs on `push: tags: ['v*']` in addition to its
+existing `workflow_dispatch`, and its job condition is
+`startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'` so a
+pushed release tag or the trusted-main dispatch path both qualify; any other
+ref still short-circuits. Creating and pushing a `v*` tag is a coordinator-only
+action: the ruleset above protects `main`, and only a maintainer with push
+access to tag refs can trigger this path — a fork or an unprivileged
+contributor cannot cause a publication run by opening a pull request. Treat a
+tag push the same as the manual dispatch it extends: it still requires
+`github.repository == 'seathatflowsinourveins/native-agent-stack'` and the
+job's `contents: read`, `id-token: write`, `attestations: write` permissions
+are unchanged.
+
+The job now produces two attested artifacts per run, not one. After the
+existing archive-and-hash step, a SHA-256-checked download of syft 1.52.0
+(`syft_1.52.0_linux_amd64.tar.gz`, verified against the upstream
+`syft_1.52.0_checksums.txt` and pinned in-workflow to
+`caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d`) scans the
+checked-out tree and writes
+`native-agent-stack-${GITHUB_SHA}.spdx.json`. A second `actions/attest` step
+(same pinned action SHA as the archive's) attests that SBOM with
+`predicate-type: https://spdx.dev/Document`, `push-to-registry: false`, and no
+storage record, mirroring the archive attestation's `subject-path`/predicate
+shape. Both attestations are verified in-run with `gh attestation verify`
+(archive and SBOM each get their own `GH_TOKEN`-scoped step) before the SBOM is
+uploaded next to the archive artifact and its digest is matched, the same
+upload-then-match pattern already used for the archive. A verify command an
+operator can reuse after download:
+
+```sh
+gh attestation verify native-agent-stack-<sha>.spdx.json \
+  --repo seathatflowsinourveins/native-agent-stack \
+  --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml \
+  --source-digest <sha> \
+  --predicate-type https://spdx.dev/Document
+```
+
+`gh attestation verify` defaults `--predicate-type` to
+`https://slsa.dev/provenance/v1`; the SBOM attestation's predicate is
+`https://spdx.dev/Document`, so the flag above is required or verification
+fails.
+
+`adoption-bootstrap.yml` is a separate, lower-stakes job
+(`bootstrap-linux`, 20-minute timeout, plain `ubuntu-24.04`, no elevated
+permissions) that runs `adoption/bootstrap-linux.sh --profile foundation-cpu`
+into `$RUNNER_TEMP/eco` on push to `main`, on pull requests touching
+`adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`,
+weekly (Monday 06:47 UTC), and on manual dispatch, then asserts every
+`foundation-cpu` required command is present via
+`scripts/adoption_status.py --profile foundation-cpu --json`. Its workflow
+header records this as synthetic/local-integration evidence on a disposable
+runner, not a second-machine developer-laptop acceptance.
+
+### Secret-scan coverage boundary (2026-09-22)
+
+The first hosted run of the `secret-scan` job was cancelled by its own timeout while
+scanning history: every commit re-diffs the 11 MB generated explorer
+`docs/ecosystem/index.html`. The job now passes `--config .gitleaks.toml` and
+`--max-target-megabytes 2`. Measured on this host before the change: a full-history
+scan with the size skip covers 522 commits / 777 MB in 34 s and reported 251 matches,
+all classified by shape before allowlisting (224 64-hex SHA-256 digests, 23 40-hex git
+ids, four opaque Alpaca `next_page_token` cursors in a retained historical-bars receipt);
+with the config the same scan and the working-tree scan report zero findings. The
+size skip means the generated explorer HTML is **not** scanned in either mode; this is
+recorded as incomplete coverage, mitigated because the explorer is built only from
+repository sources that are scanned and is rebuilt by `scripts/build_ecosystem.py`.
+Local scans on this host go through the guarded `gitleaks` launcher (memory-capped,
+one scan per user); do not raise its limits to retry a failed scan.
+

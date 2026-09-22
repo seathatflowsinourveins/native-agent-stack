@@ -22,6 +22,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Check example workflow byte identity
+        run: |
+          cd examples/claude-native/workflows
+          sha256sum --check --strict SHA256SUMS
       - name: Install checksum-locked CI analyzer
         run: >-
           python3 -m pip install --disable-pip-version-check --no-input
@@ -65,3 +69,47 @@ jobs:
         run: python3 -m unittest
       - name: Test semantic evidence contract boundaries
         run: node --test blueprints/native-skill-practice/test-contract.cjs
+
+  secret-scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install checksum-verified pinned gitleaks
+        env:
+          GITLEAKS_VERSION: '8.30.1'
+          # blueprints/convergence-practice/wsl-native-tools/pins.json, components[name=gitleaks].archive.sha256
+          GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+        run: |
+          mkdir -p "$RUNNER_TEMP/gitleaks"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            --output "$RUNNER_TEMP/gitleaks/archive.tar.gz"
+          printf '%s  %s\n' "$GITLEAKS_SHA256" "$RUNNER_TEMP/gitleaks/archive.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/gitleaks/archive.tar.gz" -C "$RUNNER_TEMP/gitleaks" gitleaks
+          "$RUNNER_TEMP/gitleaks/gitleaks" version
+      - name: Scan git history for secrets
+        if: always()
+        run: |
+          # --config: reviewed allowlists (.gitleaks.toml); --max-target-megabytes 2: the
+          # generated explorer HTML is skipped (recorded as incomplete coverage in
+          # docs/github-automation.md); measured 2026-09-22: 522 commits, 777 MB, 34 s locally.
+          "$RUNNER_TEMP/gitleaks/gitleaks" git . --config .gitleaks.toml --max-target-megabytes 2 \
+            --redact --no-banner --report-format json --report-path "$RUNNER_TEMP/gitleaks/gitleaks.json"
+      - name: Scan working tree for secrets
+        if: always()
+        run: |
+          "$RUNNER_TEMP/gitleaks/gitleaks" dir . --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner
+      - name: Upload redacted secret-scan report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: secret-scan-${{ github.run_id }}
+          path: ${{ runner.temp }}/gitleaks/gitleaks.json
+          if-no-files-found: warn
+          include-hidden-files: false
+          retention-days: 30
