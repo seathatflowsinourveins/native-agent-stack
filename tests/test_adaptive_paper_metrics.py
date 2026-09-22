@@ -348,11 +348,19 @@ class SqliteReadOnlyUriTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             m._sqlite_ro_uri(probe)
 
-    def test_quoted_uri_is_percent_encoded_and_read_only_immutable(self):
+    def test_quoted_uri_is_percent_encoded_and_read_only(self):
         uri = m._sqlite_ro_uri(Path("/tmp/plain ledger.sqlite3"))
         self.assertTrue(uri.startswith("file:"))
-        self.assertTrue(uri.endswith("?mode=ro&immutable=1"))
+        self.assertTrue(uri.endswith("?mode=ro"))
         self.assertIn("plain%20ledger.sqlite3", uri)
+
+    def test_uri_does_not_assert_immutable(self):
+        """Regression (codexfix pr4-codexfix): ``immutable=1`` was removed --
+        it asserts the file never changes for the connection's lifetime, which
+        is false for the live WAL ledger a running trial keeps open and
+        writes to (see test_render_metrics_sees_live_wal_writes_while_ledger_is_open)."""
+        uri = m._sqlite_ro_uri(Path("/tmp/plain ledger.sqlite3"))
+        self.assertNotIn("immutable", uri)
 
     def test_open_ledger_readonly_connection_rejects_a_write_attempt(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -366,6 +374,37 @@ class SqliteReadOnlyUriTests(unittest.TestCase):
                     conn.execute("CREATE TABLE canary (x INTEGER)")
             finally:
                 conn.close()
+
+    def test_render_metrics_sees_live_wal_writes_while_ledger_is_open(self):
+        """Regression (codexfix pr4-codexfix major finding): the ledger the
+        exporter reads is a live WAL database that ``safety.Ledger`` holds
+        open and writes to for the whole duration of a trial. Opening the
+        read-only connection with ``immutable=1`` asserted the file could not
+        change, and against this actively-written WAL file that produced an
+        outright ``sqlite3.OperationalError: no such table: meta`` on every
+        scrape taken while a trial was running (observed empirically: the
+        immutable connection never sees the WAL-resident schema at all, not
+        even a stale-but-valid snapshot). This keeps a real ``safety.Ledger``
+        connection open (never closed, never checkpointed) for the whole
+        test, freezes it to produce a fresh WAL-only write, and asserts a
+        concurrent scrape via ``render_metrics`` both succeeds and observes
+        that freshly committed state -- proving the exporter no longer goes
+        stale (or errors) against a live trial."""
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger_path = Path(tmp) / "ledger.sqlite3"
+            trial_path = Path(tmp) / "trial.json"
+            ledger = Ledger(ledger_path, RiskLimits())
+            self.addCleanup(ledger.close)
+            ledger.start_trial(time.time())
+            ledger.freeze("live_wal_probe")
+
+            text = m.render_metrics(ledger_path, trial_path, now=time.time())
+
+            samples = parse(text)
+            self.assertEqual(samples[("paper_ledger_readable", ())], "1")
+            self.assertEqual(
+                samples[("paper_ledger_frozen", (("reason", "live_wal_probe"),))], "1"
+            )
 
 
 if __name__ == "__main__":

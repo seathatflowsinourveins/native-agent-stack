@@ -11217,8 +11217,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_metrics.py",
-      "sha256": "8f839b79ad6050bcf111af9b6e4b5b5fab2153f623944610e8636c4fd1a0ec64",
-      "bytes": 18263
+      "sha256": "8b0627f752ddf11c87005200e76d0ad4873261905ba073163476c66659d564f9",
+      "bytes": 20491
     },
     {
       "path": "tests/test_adaptive_paper_native.py",

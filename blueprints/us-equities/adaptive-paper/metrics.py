@@ -169,18 +169,33 @@ def _read_trial_json(path: Path):
 
 
 def _sqlite_ro_uri(path: Path) -> str:
-    """Build a `file:` URI that SQLite opens strictly read-only and treats as
-    immutable. Built from `urllib.parse.quote` of the path, never by naive
-    string concatenation: a raw `?`/`#` in the path would otherwise be
-    interpreted as the start of the URI's query string, letting a filename
-    like `.../probe?mode=memory&ignored=` silently override `mode=ro` (or
-    escape the target file entirely) and yield a writable connection. As a
-    second, independent guard, a resolved path containing `?` or `#` is
-    refused outright rather than relying solely on percent-encoding."""
+    """Build a `file:` URI that SQLite opens strictly read-only. Built from
+    `urllib.parse.quote` of the path, never by naive string concatenation: a
+    raw `?`/`#` in the path would otherwise be interpreted as the start of
+    the URI's query string, letting a filename like
+    `.../probe?mode=memory&ignored=` silently override `mode=ro` (or escape
+    the target file entirely) and yield a writable connection. As a second,
+    independent guard, a resolved path containing `?` or `#` is refused
+    outright rather than relying solely on percent-encoding.
+
+    Deliberately does **not** add `immutable=1`: the ledger this exporter
+    reads is a live WAL database that `safety.Ledger` holds open and keeps
+    writing to for the whole duration of a trial (see the module docstring).
+    SQLite's `immutable` hint asserts the file's content and schema never
+    change for the life of the connection; against an actively-written WAL
+    file that assertion is false, and the observed failure mode is not mere
+    staleness but an outright `sqlite3.OperationalError: no such table: meta`
+    on every scrape taken while a trial is running (the immutable connection
+    does not read the WAL, and this database has no non-WAL schema image to
+    fall back to). A plain `mode=ro` connection ignores `PRAGMA
+    journal_mode`/state changes it doesn't need to and correctly reads
+    committed WAL frames on each scrape, still strictly read-only: any write
+    attempt raises `sqlite3.OperationalError` (see
+    `test_open_ledger_readonly_connection_rejects_a_write_attempt`)."""
     text = str(path)
     if "?" in text or "#" in text:
         raise ValueError(f"ledger_path_rejected: reserved URI character in {text!r}")
-    return "file:" + urllib.parse.quote(text) + "?mode=ro&immutable=1"
+    return "file:" + urllib.parse.quote(text) + "?mode=ro"
 
 
 def _open_ledger_readonly(path: Path) -> sqlite3.Connection:
