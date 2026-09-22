@@ -12094,13 +12094,13 @@
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/workers/worktrunk-crash-cleanup-probe.json",
-      "sha256": "9532065c73e2987f88093f743997b4a36b6701050cc0a13ec16fe41cd7a3ca56",
-      "bytes": 9881
+      "sha256": "172c98dd95c898f3df495337851b062e5502479f2f5fd3150c55fb6ad4a934dd",
+      "bytes": 11920
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/git-github-automation/difftastic-larger-fixture.json",
-      "sha256": "ee55eab1801140844e8fa367045aaa97fcbd19beedeec7e6ba47c36ddd1d70a2",
-      "bytes": 5529
+      "sha256": "a594a66a62b302ee73a9b38dbef413a36490ece80d32be00594e6f1fe613c95b",
+      "bytes": 9566
     },
     {
       "path": "blueprints/gap-resolution-20260922/worktrunk-0-79-0-requalify/install.py",
@@ -12129,8 +12129,13 @@
     },
     {
       "path": "blueprints/gap-resolution-20260922/difftastic-larger-fixture/run_difft.sh",
-      "sha256": "033e64a6e657c7a20ffb2b4a0a34b766c3c2ed0b7fce3322af76c469879833e0",
-      "bytes": 1845
+      "sha256": "5d1b8cb3f4c2838fca1b7626258f96aa381f3bab163c9b3ae19c3564ea8a41ce",
+      "bytes": 2724
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/difftastic-larger-fixture/reanalyze_reports.py",
+      "sha256": "adb2104d77be381887de9536f5d5db6e8f4e756596ac2a93cf375b379c9b41cd",
+      "bytes": 3306
     }
   ],
   "convergence_records": [

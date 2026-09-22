@@ -25,8 +25,22 @@ while IFS=$'\t' read -r status path; do
   out_sha=$(sha256sum "$outfile" | cut -d' ' -f1)
   out_bytes=$(wc -c < "$outfile")
   # did difft actually recognize/parse the file, rather than emit a fallback notice?
+  # CORRECTED 2026-09-22 (fix round): the original check below only matched
+  # crash/hard-error strings and never matched difftastic's actual fallback
+  # header line ("<path> --- Text" / "<path> --- n/m --- Text (exceeded
+  # DFT_BYTE_LIMIT|DFT_GRAPH_LIMIT)"), so it silently counted every
+  # size-limited or unsupported-language fallback as a successful structural
+  # parse. Detect the real header instead: difft prints "<path> --- <Lang>"
+  # or "<path> --- <n>/<m> --- <Lang>" on its first output line; "Text" is
+  # difftastic's own fallback language name. See reanalyze_reports.py in this
+  # directory, which reprocesses the already-retained reports/ output with
+  # this corrected rule without re-invoking difft.
   parsed_ok=true
   if echo "$out" | grep -qi "failed to parse\|could not find a parser\|panicked"; then
+    parsed_ok=false
+  fi
+  first_line=$(printf '%s' "$out" | head -1)
+  if printf '%s' "$first_line" | grep -qE -- '--- ([0-9]+/[0-9]+ --- )?Text\b'; then
     parsed_ok=false
   fi
   python3 - "$path" "$code" "$out_bytes" "$out_sha" "$parsed_ok" <<'PYEOF' >> "$OUT"
