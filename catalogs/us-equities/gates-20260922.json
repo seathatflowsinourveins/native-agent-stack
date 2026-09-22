@@ -59,9 +59,11 @@
       "required": true,
       "receipt_path": "blueprints/us-equities/engine-nautilus/spy-parity/dividend-module-receipt.json",
       "flip_condition": {
-        "type": "exists"
+        "type": "equals",
+        "pointer": "/status",
+        "equals": "closed"
       },
-      "note": "No manifest-accepted design exists yet. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit. 2026-09-22: the bound mapping manifest (blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json) concludes from its symbol scan (probes/dividend-symbol-scan.json records the raw matches) that the rc5 backtest engine ingests no dividend data type and exposes no mechanism that credits a simulated account, and its fill-semantics probes show AT_THE_OPEN is rejected and market orders fill at the bar close. The manifest injects no balancing cash entry, which acceptance-plan.md forbids ('no invented balancing cash entry'), and states that synthetic open-priced data would fabricate the mapping; a module posting invented dividend cash or a synthetic open tick is therefore not an accepted route. Closing this gate needs a mechanism the pinned engine supports natively or a newly preregistered mapping manifest; none is identified yet. Not implemented. The gate id and receipt_path keep their original names."
+      "note": "No manifest-accepted design exists yet. Required receipt schema (no receipt exists yet, so this is preregistered here rather than copied from a committed file): {\"schema_version\": 1, \"status\": \"closed\", \"mappings_closed\": [\"market_on_open_proxy\", \"distributions_and_cash\"]}, where both mapping ids also read \"resolved\" (not \"unsupported\" or \"blocked\", per the status_vocabulary already defined in blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json) in that manifest. The checker only verifies /status == \"closed\"; that both mappings actually moved to \"resolved\" in the manifest is qualified manually before the dated commit that flips this gate. 2026-09-22: the bound mapping manifest (blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json) concludes from its symbol scan (probes/dividend-symbol-scan.json records the raw matches) that the rc5 backtest engine ingests no dividend data type and exposes no mechanism that credits a simulated account, and its fill-semantics probes show AT_THE_OPEN is rejected and market orders fill at the bar close. The manifest injects no balancing cash entry, which acceptance-plan.md forbids ('no invented balancing cash entry'), and states that synthetic open-priced data would fabricate the mapping; a module posting invented dividend cash or a synthetic open tick is therefore not an accepted route. Closing this gate needs a mechanism the pinned engine supports natively or a newly preregistered mapping manifest; none is identified yet. Not implemented. The gate id and receipt_path keep their original names."
     },
     {
       "id": "snapshot-promotion-gate",
@@ -125,9 +127,11 @@
       "required": false,
       "receipt_path": "evidence/receipts/pre-2020-delisting-coverage.json",
       "flip_condition": {
-        "type": "exists"
+        "type": "equals",
+        "pointer": "/coverage_status",
+        "equals": "confirmed"
       },
-      "note": "Survivorship before 2020 (broad-universe README: 25/47/167 symbols for 2016-2018 versus 541-756 for 2021-2025); the only candidate found was a 1-star repository. Blocks strategy promotion on the early panel, not the runtime path. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit."
+      "note": "Survivorship before 2020 (broad-universe README: 25/47/167 symbols for 2016-2018 versus 541-756 for 2021-2025); the only candidate found was a 1-star repository. Blocks strategy promotion on the early panel, not the runtime path. Required receipt schema (no receipt exists yet, so this is preregistered here): {\"schema_version\": 1, \"coverage_status\": \"confirmed\", \"years_covered\": [2016, 2017, 2018, 2019], \"source\": {\"name\": \"...\", \"kind\": \"entitled\"|\"open\"}}. The checker only verifies /coverage_status == \"confirmed\"; that the named source is actually entitled or open, and actually covers 2016-2019, is qualified manually before the dated commit that flips this gate."
     },
     {
       "id": "dated-security-identity",
@@ -140,9 +144,11 @@
       "required": false,
       "receipt_path": "evidence/receipts/dated-security-identity.json",
       "flip_condition": {
-        "type": "exists"
+        "type": "equals",
+        "pointer": "/unresolved_collisions",
+        "equals": 0
       },
-      "note": "No catalogued entry addresses it; the only path is an entitled source (Databento, conditional). Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit."
+      "note": "No catalogued entry addresses it; the only path is an entitled source (Databento, conditional). Required receipt schema (no receipt exists yet, so this is preregistered here): {\"schema_version\": 1, \"collisions_total\": 235, \"unresolved_collisions\": 0, \"source\": \"...\"}. The checker only verifies /unresolved_collisions == 0 against the 235 asset-master ticker collisions named in this title; that the source actually resolves them (not a fabricated zero) is qualified manually before the dated commit that flips this gate."
     },
     {
       "id": "pit-news-filings",
@@ -155,9 +161,11 @@
       "required": false,
       "receipt_path": "evidence/receipts/pit-availability.json",
       "flip_condition": {
-        "type": "exists"
+        "type": "equals",
+        "pointer": "/pit_status",
+        "equals": "confirmed"
       },
-      "note": "Bars downloaded on 2026-09-21 do not prove what was published at each historical close; the one 2026 dataset found is survivorship-selected by construction. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit."
+      "note": "Bars downloaded on 2026-09-21 do not prove what was published at each historical close; the one 2026 dataset found is survivorship-selected by construction. Required receipt schema (no receipt exists yet, so this is preregistered here): {\"schema_version\": 1, \"pit_status\": \"confirmed\", \"vintage_source\": \"...\", \"survivorship_free\": true}. The checker only verifies /pit_status == \"confirmed\"; that the named source is actually as-published and not survivorship-selected is qualified manually before the dated commit that flips this gate."
     },
     {
       "id": "databento-arm-b",
@@ -170,9 +178,11 @@
       "required": false,
       "receipt_path": "evidence/receipts/data-research-databento-arm-b.json",
       "flip_condition": {
-        "type": "exists"
+        "type": "equals",
+        "pointer": "/status",
+        "equals": "executed"
       },
-      "note": "Arm A (Alpaca/SEC) ran; arm B not run because paid data was not authorised, so the comparison closed as unresolved (agent-lab docs/tasks/2026-09-22-executed-comparisons.md, tools/compare/data/out/20260922T060611Z/). Not a decision that the incumbent wins. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit."
+      "note": "Arm A (Alpaca/SEC) ran; arm B not run because paid data was not authorised, so the comparison closed as unresolved (agent-lab docs/tasks/2026-09-22-executed-comparisons.md, tools/compare/data/out/20260922T060611Z/). Not a decision that the incumbent wins. Required receipt schema (no receipt exists yet at this path in this worktree, so this is preregistered here rather than copied from the arm-A output, which this unit did not have access to): {\"schema_version\": 1, \"arm\": \"B\", \"provider\": \"databento\", \"status\": \"executed\", \"window\": {\"start\": \"2016-01-01\", \"end\": \"2026-01-01\"}}. The checker only verifies /status == \"executed\"; that the run actually covers the frozen 2016-2026 window on paid Databento data is qualified manually before the dated commit that flips this gate."
     },
     {
       "id": "alpaca-paper-smoke",
@@ -302,9 +312,11 @@
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
       "flip_condition": {
-        "type": "exists"
+        "type": "equals",
+        "pointer": "/status",
+        "equals": "native_faults_passed"
       },
-      "note": "runtime-target.json next_acceptance broker-state-failures: bounded_alpaca_synthetic_cases_passed_native_faults_pending. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit."
+      "note": "runtime-target.json next_acceptance broker-state-failures: bounded_alpaca_synthetic_cases_passed_native_faults_pending. Required receipt schema (no receipt exists yet, so this is preregistered here following the next_acceptance status-string convention already used in catalogs/us-equities/runtime-target.json): {\"schema_version\": 1, \"kind\": \"native_fault_behaviour_receipt\", \"status\": \"native_faults_passed\", \"broker\": \"alpaca\"}. The checker only verifies /status == \"native_faults_passed\"; that native (non-synthetic) faults were actually exercised, distinct from the 27 bounded synthetic cases already passed, is qualified manually before the dated commit that flips this gate."
     },
     {
       "id": "ibkr-local-acceptance",
@@ -317,9 +329,11 @@
       "required": true,
       "receipt_path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/receipt.json",
       "flip_condition": {
-        "type": "exists"
+        "type": "equals",
+        "pointer": "/kind",
+        "equals": "native_ibkr_local_acceptance"
       },
-      "note": "runtime-target.json next_acceptance separate-paper-adapters: bounded_alpaca_paper_smoke_passed_ibkr_pending. Needs the user's broker sign-in; the selected live-primary path is unexercised until then. Presence-only condition: the checker verifies that a non-empty file exists at receipt_path, not its content; qualification of what the file establishes is manual and the status changes only by a dated commit."
+      "note": "runtime-target.json next_acceptance separate-paper-adapters: bounded_alpaca_paper_smoke_passed_ibkr_pending. Needs the user's broker sign-in; the selected live-primary path is unexercised until then. Required receipt schema (no receipt exists yet, so this is preregistered here reusing the /kind literal-match pattern already used by the alpaca-paper-smoke gate's receipt): {\"schema_version\": 1, \"kind\": \"native_ibkr_local_acceptance\", \"status\": \"passed\", \"broker\": \"ibkr\"}. The checker only verifies /kind == \"native_ibkr_local_acceptance\"; that a signed-in TWS or IB Gateway actually accepted the adapter locally is qualified manually before the dated commit that flips this gate."
     },
     {
       "id": "live-go",

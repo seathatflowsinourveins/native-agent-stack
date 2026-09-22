@@ -149,5 +149,119 @@ class RepositoryGatesTests(unittest.TestCase):
         self.assertEqual(result["errors"], [], result["errors"])
 
 
+class GatePointerContentTests(unittest.TestCase):
+    """A presence-only ('exists') flip condition is satisfiable by an empty
+    placeholder file. Every not-yet-established gate in the repository ladder
+    that used to use 'exists' now uses a content condition instead. For each
+    of those gates this proves an empty JSON placeholder at the receipt path
+    does not make the checker list the gate as a flip candidate, while a
+    well-formed passing receipt (matching the schema recorded in the gate's
+    own note) does.
+    """
+
+    # Gate id -> a well-formed receipt payload that satisfies the gate's
+    # current flip_condition, per the schema documented in its note.
+    GOOD_RECEIPTS = {
+        "dividend-sim-module": {
+            "schema_version": 1,
+            "status": "closed",
+            "mappings_closed": ["market_on_open_proxy", "distributions_and_cash"],
+        },
+        "pre-2020-delisting": {
+            "schema_version": 1,
+            "coverage_status": "confirmed",
+            "years_covered": [2016, 2017, 2018, 2019],
+            "source": {"name": "example-entitled-source", "kind": "entitled"},
+        },
+        "dated-security-identity": {
+            "schema_version": 1,
+            "collisions_total": 235,
+            "unresolved_collisions": 0,
+            "source": "example-entitled-source",
+        },
+        "pit-news-filings": {
+            "schema_version": 1,
+            "pit_status": "confirmed",
+            "vintage_source": "example-vintage-source",
+            "survivorship_free": True,
+        },
+        "databento-arm-b": {
+            "schema_version": 1,
+            "arm": "B",
+            "provider": "databento",
+            "status": "executed",
+            "window": {"start": "2016-01-01", "end": "2026-01-01"},
+        },
+        "native-fault-behaviour": {
+            "schema_version": 1,
+            "kind": "native_fault_behaviour_receipt",
+            "status": "native_faults_passed",
+            "broker": "alpaca",
+        },
+        "ibkr-local-acceptance": {
+            "schema_version": 1,
+            "kind": "native_ibkr_local_acceptance",
+            "status": "passed",
+            "broker": "ibkr",
+        },
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        path = ROOT / trading_gates.GATES
+        if not path.exists():
+            raise unittest.SkipTest("gate ladder not yet recorded in this tree")
+        cls.gates_by_id = {gate["id"]: gate for gate in trading_gates.load_json(path)["gates"]}
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def write(self, relative, text):
+        path = self.root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+        return path
+
+    def test_every_designated_gate_dropped_the_exists_condition(self):
+        for gate_id in self.GOOD_RECEIPTS:
+            with self.subTest(gate=gate_id):
+                condition = self.gates_by_id[gate_id]["flip_condition"]
+                self.assertIsNotNone(condition, f"{gate_id}: flip_condition must not be null")
+                self.assertNotEqual(condition["type"], "exists",
+                                     f"{gate_id}: still uses a presence-only 'exists' condition")
+
+    def test_empty_placeholder_is_not_a_flip_candidate_but_a_passing_receipt_is(self):
+        for gate_id, good_content in self.GOOD_RECEIPTS.items():
+            with self.subTest(gate=gate_id):
+                gate = self.gates_by_id[gate_id]
+                self.assertNotEqual(gate["status"], "established", f"{gate_id}: fixture assumes a non-established gate")
+
+                # An empty JSON placeholder (what a presence-only 'exists' flip
+                # would have accepted) must not satisfy the content condition.
+                self.write(gate["receipt_path"], "{}")
+                empty_result = trading_gates.check(self.root, self.write("gates.json", json.dumps(document(gate))))
+                self.assertEqual(
+                    [c["id"] for c in empty_result["flip_candidates"]], [],
+                    f"{gate_id}: empty placeholder was listed as a flip candidate",
+                )
+                holds, detail = trading_gates.condition_holds(self.root, gate)
+                self.assertFalse(holds, f"{gate_id}: empty placeholder unexpectedly holds ({detail})")
+
+                # A well-formed, passing receipt must satisfy the condition
+                # and be reported as a flip candidate.
+                self.write(gate["receipt_path"], json.dumps(good_content))
+                passing_result = trading_gates.check(self.root, self.write("gates.json", json.dumps(document(gate))))
+                self.assertEqual(
+                    [c["id"] for c in passing_result["flip_candidates"]], [gate_id],
+                    f"{gate_id}: well-formed passing receipt was not listed as a flip candidate",
+                )
+                holds, detail = trading_gates.condition_holds(self.root, gate)
+                self.assertTrue(holds, f"{gate_id}: well-formed passing receipt does not hold ({detail})")
+
+
 if __name__ == "__main__":
     unittest.main()
