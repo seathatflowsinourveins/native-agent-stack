@@ -1,0 +1,157 @@
+{
+ "status": "complete",
+ "reason": "every child has an explicit requested model, a matching resolved model, returned usage and a non-null result",
+ "multi_model_children": [],
+ "children": [
+  {
+   "agent_id": "ad5d383928474d0e7",
+   "label": "inventory:sonnet",
+   "phase": "Audit",
+   "agent_type": "workflow-subagent",
+   "requested_model": "sonnet",
+   "resolved_models": [
+    "claude-sonnet-5"
+   ],
+   "efforts": [
+    "medium"
+   ],
+   "requests": 17,
+   "usage": {
+    "input_tokens": 34,
+    "output_tokens": 19543,
+    "cache_read_input_tokens": 1014367,
+    "cache_creation_input_tokens": 79805
+   },
+   "usage_by_model": {
+    "claude-sonnet-5": {
+     "input_tokens": 34,
+     "output_tokens": 19543,
+     "cache_read_input_tokens": 1014367,
+     "cache_creation_input_tokens": 79805
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 43706,
+   "complete": true,
+   "issues": []
+  },
+  {
+   "agent_id": "aa605d8528131bb7d",
+   "label": "inventory:haiku",
+   "phase": "Audit",
+   "agent_type": "workflow-subagent",
+   "requested_model": "haiku",
+   "resolved_models": [
+    "claude-haiku-4-5-20251001"
+   ],
+   "efforts": [],
+   "requests": 22,
+   "usage": {
+    "input_tokens": 178,
+    "output_tokens": 14243,
+    "cache_read_input_tokens": 1247560,
+    "cache_creation_input_tokens": 77105
+   },
+   "usage_by_model": {
+    "claude-haiku-4-5-20251001": {
+     "input_tokens": 178,
+     "output_tokens": 14243,
+     "cache_read_input_tokens": 1247560,
+     "cache_creation_input_tokens": 77105
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 27032,
+   "complete": true,
+   "issues": []
+  },
+  {
+   "agent_id": "aee96809a61b62681",
+   "label": "official-docs",
+   "phase": "Audit",
+   "agent_type": "workflow-subagent",
+   "requested_model": "sonnet",
+   "resolved_models": [
+    "claude-sonnet-5"
+   ],
+   "efforts": [
+    "medium"
+   ],
+   "requests": 8,
+   "usage": {
+    "input_tokens": 16,
+    "output_tokens": 10367,
+    "cache_read_input_tokens": 404254,
+    "cache_creation_input_tokens": 73514
+   },
+   "usage_by_model": {
+    "claude-sonnet-5": {
+     "input_tokens": 16,
+     "output_tokens": 10367,
+     "cache_read_input_tokens": 404254,
+     "cache_creation_input_tokens": 73514
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 43282,
+   "complete": true,
+   "issues": []
+  },
+  {
+   "agent_id": "aa00faeb5fe32be93",
+   "label": "verify",
+   "phase": "Verify",
+   "agent_type": "workflow-subagent",
+   "requested_model": "opus",
+   "resolved_models": [
+    "claude-opus-5"
+   ],
+   "efforts": [
+    "high"
+   ],
+   "requests": 12,
+   "usage": {
+    "input_tokens": 24,
+    "output_tokens": 37045,
+    "cache_read_input_tokens": 910876,
+    "cache_creation_input_tokens": 117002
+   },
+   "usage_by_model": {
+    "claude-opus-5": {
+     "input_tokens": 24,
+     "output_tokens": 37045,
+     "cache_read_input_tokens": 910876,
+     "cache_creation_input_tokens": 117002
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 58577,
+   "complete": true,
+   "issues": []
+  }
+ ],
+ "by_resolved_model": {
+  "claude-sonnet-5": {
+   "children": 2,
+   "input_tokens": 50,
+   "output_tokens": 29910,
+   "cache_read_input_tokens": 1418621,
+   "cache_creation_input_tokens": 153319
+  },
+  "claude-haiku-4-5-20251001": {
+   "children": 1,
+   "input_tokens": 178,
+   "output_tokens": 14243,
+   "cache_read_input_tokens": 1247560,
+   "cache_creation_input_tokens": 77105
+  },
+  "claude-opus-5": {
+   "children": 1,
+   "input_tokens": 24,
+   "output_tokens": 37045,
+   "cache_read_input_tokens": 910876,
+   "cache_creation_input_tokens": 117002
+  }
+ },
+ "run_id": "wf_d0d741b1-9c6"
+}

@@ -3,7 +3,9 @@
 The native Workflow and same-host cross-session messaging paths now have actual
 execution evidence on Claude Code 2.1.278. No additional orchestration package
 was installed. The [portable recipe](../recipes/claude-native-ultracode.md)
-contains supported commands and the task-to-model starting policy.
+contains supported commands and the task-to-model starting policy; the routing,
+size guideline and Haiku decision were superseded on the same day by the
+[lean routing guide](ultracode-token-routing-20260921.md).
 
 ## Observed execution
 

@@ -124,3 +124,24 @@ validation, explicit collection selection, payload privacy, private files,
 command failures/deadlines/output bounds and loopback-only publication. They do
 not establish service uptime or an actual Loki publication; deployment and
 browser checks belong to the integrating task.
+
+## Per-model Claude token usage
+
+The collector keeps the `model` attribute on Claude Code token counters, so a
+per-model view needs only a query change, not a pipeline change. The rendered
+dashboard still sums by `type`; the per-model form, kept here as a documented
+follow-up for the render step, is:
+
+```promql
+sum by (model, type) (increase(ecosystem_claude_code_token_usage_tokens_total{job="claude-code"}[$__range]))
+sum by (model, type, query_source) (increase(ecosystem_claude_code_token_usage_tokens_total{job="claude-code"}[$__range]))
+```
+
+`query_source` separates the coordinator (`main`) from workflow children
+(`subagent`) and auxiliary calls; `instance` carries the session id, which is how
+the dated qualification scoped one headless run to its own counters. Per-child
+provider usage inside one native Workflow run comes from
+`examples/claude-native/workflows/child-usage.mjs`, which reads the run's
+transcript directory; its counters are provider-returned and are not the same
+quantity as the exported metric (type names differ, streaming partials are
+counted per response by the exporter and once per message id by the script).

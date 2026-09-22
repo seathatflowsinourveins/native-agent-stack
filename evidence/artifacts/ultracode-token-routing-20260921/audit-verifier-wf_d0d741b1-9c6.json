@@ -1,0 +1,340 @@
+{
+ "run_id": "wf_d0d741b1-9c6",
+ "stage": "verify",
+ "model": "claude-opus-5",
+ "effort": "high",
+ "haiku_trial": {
+  "lane_rows_correct_sonnet": "14/14",
+  "lane_rows_correct_haiku": "9/14",
+  "haiku_adequate_for_exact_extraction": "no",
+  "reason": "Both inventories received the same packet and the same 14 lanes. Sonnet's 14 in_agents/in_workflows/in_hooks classifications all hold against source as it stood when it read (the QMD and prompt-caching rows are stale only because the files were rewritten at 18:19, after extraction); its defect is a systematic citation slip - it repeatedly cites evidence-reviewer.md:6 for the tools list, which is actually line 4 (line 5 is model, line 6 is effort). Haiku got five rows materially wrong: (1) RTK in_agents 'no' - isolated-builder.md:9 says 'keep RTK-filtered output and preserve raw-output recovery paths'; (2) Context Mode in_workflows 'no' - both PACKETs say 'Context Mode ctx_execute for large outputs' (review-changes.js:22, readiness-audit.js:25), and Haiku itself cites the PACKET for other lanes; (3) prompt-caching in_workflows 'no' with evidence that pairs a post-fix comment (review-changes.js:17) with the pre-fix divergence, a state that cannot have coexisted per git diff; (4) ToolSearch in_agents 'partial' on a fabricated attribution - it quotes 'load a schema with ToolSearch when it is deferred' as evidence-reviewer.md:9, but that string appears only in the workflow PACKET, and its second cite 'docs/native-token-workflow.md line 24 mentions ToolSearch' has no matching content (rg finds no ToolSearch at :24); (5) per-child model/usage 'no / not implemented' - it never found .claude/workflows/child-usage.mjs, which implements exactly that at :18 and :53 and passes its own test. Haiku did catch one thing Sonnet missed (the unwired cheap-extraction/Haiku task class at recipe line 69). On balance: for exact source extraction where a quote is attributed to a file and line, Haiku/low produced at least one quote attributed to a file that does not contain it and one doc line cite with no matching content. That failure class is disqualifying for this role, because a verifier cannot distinguish a fabricated cite from a stale one without re-reading everything, which defeats the delegation. Notably Haiku's line numbers were in places better than Sonnet's (it correctly cited evidence-reviewer.md:4 for tools where Sonnet said :6), so the problem is not precision but unanchored assertion."
+ },
+ "gap_verdicts": [
+  {
+   "origin": "sonnet",
+   "id": "G1",
+   "verdict": "corrected",
+   "evidence": "Accurate against the committed version, stale against the working tree. `git diff -- .claude/workflows/review-changes.js .claude/workflows/readiness-audit.js` shows the removed HEAD lines matching G1's quotes verbatim (review-changes HEAD: 'bounded objective, the listed source paths only'; 'Never claim token savings.'; 'Preserve failures, empty results and uncertainty as such'; readiness-audit HEAD: 'Never print credential values.'; 'Distinguish documented-as-done from observed-now. Preserve failures and unknowns.'). As of now the divergence is gone: review-changes.js:18-23 and readiness-audit.js:21-26 hold identical text (node comparison of the two PACKET array bodies: identical: true, len 879 879). Files were rewritten at 18:19:15 / 18:19:21, after extraction.",
+   "correction": "The divergence was real at the commit the inventory read but has since been fixed in the working tree; docs/native-token-workflow.md:59 is now satisfied between these two files."
+  },
+  {
+   "origin": "sonnet",
+   "id": "G2",
+   "verdict": "corrected",
+   "evidence": "No PACKET assertion existed at HEAD (git diff --stat .claude/workflows/test-envelope.mjs shows +20 lines, all new). The working tree now has it: test-envelope.mjs:215-218 builds `packets` by regex from ['.claude/workflows/review-changes.js', '.claude/workflows/readiness-audit.js'] and asserts 'contract: PACKET text is byte-identical across saved workflows' via `new Set(packets).size === 1`. `node .claude/workflows/test-envelope.mjs` -> SUMMARY passed=101 failed=0 total=101, exit 0.",
+   "correction": "Assertion now exists and passes; it covers only the two named files (see missed gaps)."
+  },
+  {
+   "origin": "sonnet",
+   "id": "G3",
+   "verdict": "corrected",
+   "evidence": "The narrow grep claim still holds (no 'child-usage'/'summarizeChild'/'summarizeRun' in test-envelope.mjs or test-codex-envelope.mjs), and the non-invocation claim is confirmed: a repo-wide `rg --hidden 'child-usage'` shows child-usage.mjs referenced only by itself (child-usage.mjs:5,85) and test-child-usage.mjs (:2,:4,:26) - never by review-changes.js or readiness-audit.js. But 'has no test coverage' is now false: .claude/workflows/test-child-usage.mjs:4 imports { summarizeChild, summarizeRun } from './child-usage.mjs'; `node .claude/workflows/test-child-usage.mjs` exits 0 with PASS lines including 'per-model totals come from returned usage only'.",
+   "correction": "Untested -> tested offline against synthetic transcript rows; still uninvoked by any workflow."
+  },
+  {
+   "origin": "sonnet",
+   "id": "G4",
+   "verdict": "confirmed",
+   "evidence": "codex-cross-review.mjs:10-11 reads verbatim: '// Accounting boundary: the companion JSON omits usage/model/effort; retrieve / those only from scoped native Codex records via the returned threadId.' child-usage.mjs:5 scopes its CLI to a workflow transcript dir and :43 reads `meta.agentType`; no file under .claude/workflows/ reads a Codex threadId record (rg over the directory returns no such retrieval)."
+  },
+  {
+   "origin": "sonnet",
+   "id": "G5",
+   "verdict": "corrected",
+   "evidence": "Half refuted by the current source. Both workflow PACKETs now name QMD: review-changes.js:22 and readiness-audit.js:25 both contain 'scoped qmd search for Markdown'. The agent half stands: `rg -n 'QMD|qmd' .claude/agents/` matches only isolated-builder.md:9 ('QMD (`qmd search`) for scoped Markdown'); evidence-reviewer.md:9 lists Serena, SocratiCode, jCodeMunch, ai-memory, Context Mode and no QMD.",
+   "correction": "QMD is absent only from evidence-reviewer.md, not from the workflow PACKETs (which gained it in the same 18:19 edit)."
+  },
+  {
+   "origin": "sonnet",
+   "id": "G6",
+   "verdict": "confirmed",
+   "evidence": "`rg -n 'QMD|qmd|Repomix|repomix|TOON|Headroom|headroom|RTK|rtk' .claude/agents/ .claude/workflows/*.js .claude/workflows/*.mjs` returns four lines: readiness-audit.js:25 and review-changes.js:22 (qmd lane text), child-usage.mjs:8 ('they are not comparable to RTK/Context Mode/jCodeMunch/Headroom estimates'), isolated-builder.md:9. Repomix and TOON have zero hits anywhere in .claude/agents or .claude/workflows; Headroom's only hit is the non-functional child-usage.mjs:8 comment. Doc availability confirmed at docs/native-token-workflow.md:9 (lane list naming Repomix, guarded Headroom, TOON), :34 ('## Guarded Headroom') and :45 (TOON/Headroom counters). The gap's own grep line is now stale for QMD only."
+  },
+  {
+   "origin": "sonnet",
+   "id": "G7",
+   "verdict": "confirmed",
+   "evidence": "`jq -c '.hooks | to_entries[] | {event:.key, entries:[.value[]? | {matcher, commands:[.hooks[]?.command[0:100]]}]}' ~/.claude/settings.json` returns PreToolUse with exactly two entries: {matcher:'Bash', commands:['rtk hook claude']} and {matcher:'', commands:[the ai-memory hook binary]}. No context-mode entry on PreToolUse; context-mode appears only under SessionStart (context-mode-cache-heal.mjs). The gap's hedge ('does not prove the claim is false') is the correct framing."
+  },
+  {
+   "origin": "sonnet",
+   "id": "G8",
+   "verdict": "confirmed",
+   "evidence": ".claude/agents/isolated-builder.md frontmatter is lines 1-7: name (2), description (3), model: sonnet (4), effort: medium (5), isolation: worktree (6), closing --- (7). No `tools:` key. .claude/agents/evidence-reviewer.md:4 has `tools: Read, Glob, Grep, mcp__serena, mcp__socraticode, mcp__jcodemunch, mcp__plugin_context-mode_context-mode, mcp__ai-memory__memory_query, mcp__ai-memory__memory_read_page, mcp__ai-memory__memory_read_session_observations`. The gap's line range '1-6' is one short of the actual frontmatter close at 7; the substance is exact.",
+   "correction": "Frontmatter spans lines 1-7, not 1-6, in both files."
+  },
+  {
+   "origin": "haiku",
+   "id": "packet-not-identical",
+   "verdict": "corrected",
+   "evidence": "The three divergences quoted match the HEAD version exactly (git diff removed lines). But the supporting cite is internally inconsistent: the comment it quotes, 'Shared worker packet: byte-identical in every saved workflow (test-envelope.mjs asserts it).' at review-changes.js:17 and readiness-audit.js:20, does not exist at HEAD - git diff shows that comment ADDED in the same working-tree edit that unified the PACKETs. As of now the packets are byte-identical (879 chars each, verified by node string comparison), so the gap is resolved.",
+   "correction": "Real at the commit, fixed now; the quoted 'byte-identical' comment belongs to the post-fix version, so the two halves of the evidence cannot both describe one file state."
+  },
+  {
+   "origin": "haiku",
+   "id": "packet-identity-not-tested",
+   "verdict": "refuted",
+   "evidence": "test-envelope.mjs:215-218 does exactly this: `const files = ['.claude/workflows/review-changes.js', '.claude/workflows/readiness-audit.js']`, regex-extracts each PACKET block, and asserts 'contract: PACKET text is byte-identical across saved workflows'. Running it: SUMMARY passed=101 failed=0 total=101, exit 0. The file is 232 lines now, not the '211 lines' the gap states.",
+   "correction": "The assertion exists and passes in the current working tree."
+  },
+  {
+   "origin": "haiku",
+   "id": "resolved-model-usage-not-recorded",
+   "verdict": "corrected",
+   "evidence": "The envelope half is right: readiness-audit.js:162 returns { question, status, unread_sources, missing_sources, evidence_issues, packets, verify } and review-changes.js:130 returns { status, accepted, reason, requested_checks, missing_checks, evidence_issues, unresolved_claims, inventory, review, base, scope } - no model/usage fields. The conclusion 'not implemented' is wrong: child-usage.mjs:18 (summarizeChild) and :53 (summarizeRun) read journal.jsonl + agent-<id>.meta.json + agent-<id>.jsonl and compute requested vs resolved model and per-model usage; test-child-usage.mjs passes with exit 0. Haiku missed the file entirely.",
+   "correction": "Implemented in a standalone script (child-usage.mjs), just not invoked from either workflow's return envelope."
+  },
+  {
+   "origin": "haiku",
+   "id": "haiku-extraction-no-wiring",
+   "verdict": "confirmed",
+   "evidence": "~/code/native-agent-stack-token-practice-review/recipes/claude-native-ultracode.md:69 is the row '| Cheap exact extraction | Haiku when adequate | Candidate; not exercised in this trial |' (table header at :64, so the cited 64-75 span is close; the table ends at :72). `rg -n \"model: '\" .claude/workflows/*.js` returns only sonnet and opus at readiness-audit.js:6,7,84,97 and review-changes.js:6,7,52,65 - no haiku stage. A new .claude/agents/source-scout.md for exact extraction was created at 18:22:06 (after extraction), but it sets `model: sonnet` (:5) and no workflow references it."
+  },
+  {
+   "origin": "haiku",
+   "id": "repomix-not-wired",
+   "verdict": "confirmed",
+   "evidence": "Zero hits for 'Repomix|repomix' in .claude/agents/ or .claude/workflows/*.js|*.mjs. Documented at docs/native-token-workflow.md:9 ('Repomix for selected source handoffs') and :11, not line 8 as cited.",
+   "correction": "Doc line is 9 (and 11), not 8."
+  },
+  {
+   "origin": "haiku",
+   "id": "headroom-not-wired",
+   "verdict": "confirmed",
+   "evidence": "'Headroom' appears in .claude/workflows/ only at child-usage.mjs:8, a comment ('not comparable to RTK/Context Mode/jCodeMunch/Headroom estimates'), and nowhere in .claude/agents/. Documented at docs/native-token-workflow.md:9, the '## Guarded Headroom' heading at :34, and :45.",
+   "correction": "Doc lines are 9 and 34/45, not 8 and 34-41."
+  },
+  {
+   "origin": "haiku",
+   "id": "toon-not-wired",
+   "verdict": "confirmed",
+   "evidence": "Zero hits for 'TOON' in .claude/agents/ or .claude/workflows/*.js|*.mjs. Documented at docs/native-token-workflow.md:9 ('Use TOON only when the actual conversion is smaller than compact JSON'), :11 and :45, plus docs/token-efficiency.md:25.",
+   "correction": "Doc lines are 9/11/45, not 8-9."
+  },
+  {
+   "origin": "haiku",
+   "id": "isolated-builder-no-explicit-tools",
+   "verdict": "confirmed",
+   "evidence": "isolated-builder.md frontmatter (lines 1-7) has name, description, model, effort, isolation and no `tools:`; evidence-reviewer.md:4 has an explicit tools allowlist. isolated-builder.md:9 states the assumption in prose: 'Context lanes (all MCP tools are inherited)'."
+  }
+ ],
+ "fact_verdicts": [
+  {
+   "id": "f1",
+   "verdict": "confirmed",
+   "evidence": "Quote from code.claude.com/docs/en/sub-agents (official Claude Code docs domain) enumerates the same field list including isolation, and names the `prompt` field; `name` is covered separately by f8."
+  },
+  {
+   "id": "f2",
+   "verdict": "confirmed",
+   "evidence": "Quote states the values sonnet/opus/haiku/fable/full model ID/inherit and the omission behavior; matches the fact one-to-one. Official docs URL."
+  },
+  {
+   "id": "f3",
+   "verdict": "confirmed",
+   "evidence": "Quote covers inheritance when omitted and the 'use the `skills` field rather than listing `Skill`' instruction. Official docs URL."
+  },
+  {
+   "id": "f4",
+   "verdict": "confirmed",
+   "evidence": "Quote states removal from inherited or specified list and that a specifier such as Bash(git push *) still removes the whole tool."
+  },
+  {
+   "id": "f5",
+   "verdict": "confirmed",
+   "evidence": "Quote lists all seven modes, the manual alias, the v2.1.200 requirement and the plugin-subagent exclusion."
+  },
+  {
+   "id": "f6",
+   "verdict": "confirmed",
+   "evidence": "Quote covers the name-reference vs inline-definition forms and the plugin-subagent exclusion."
+  },
+  {
+   "id": "f7",
+   "verdict": "confirmed",
+   "evidence": "Quote states the turn cap, the partial marking and resumability."
+  },
+  {
+   "id": "f8",
+   "verdict": "confirmed",
+   "evidence": "Quote covers lowercase-hyphen uniqueness, agent_type in hooks, and the ':' restriction reserved for plugin-scoped identifiers."
+  },
+  {
+   "id": "f9",
+   "verdict": "confirmed",
+   "evidence": "Quote covers the cwd start, non-persisting cd, and the isolation: worktree alternative."
+  },
+  {
+   "id": "f10",
+   "verdict": "confirmed",
+   "evidence": "Quote supports the nesting requirement. The parenthetical example value '1h' is not in the quote but is not the load-bearing claim."
+  },
+  {
+   "id": "f11",
+   "verdict": "corrected",
+   "evidence": "The quote supports only 'inherits from the main conversation, unless you set CLAUDE_CODE_SUBAGENT_MODEL and force it onto every subagent'. It does not support 'as of v2.1.198', 'capped at Opus on the Claude API', or the user/project-subagent-named-Explore override.",
+   "correction": "Supported portion: Explore inherits the main conversation's model unless CLAUDE_CODE_SUBAGENT_MODEL is forced onto every subagent. The version pin, the Opus cap and the same-name override need their own quotes."
+  },
+  {
+   "id": "f12",
+   "verdict": "corrected",
+   "evidence": "The quote begins 'For any other blocked value...' and covers the fallback-to-inherited case plus the CLAUDE_CODE_SUBAGENT_MODEL-first rule. The fact's leading clause about a family alias like opus being substituted with the newest permitted version of that family is not in the supplied quote.",
+   "correction": "Supported portion: for blocked values outside the alias case, the subagent runs on the inherited model, and CLAUDE_CODE_SUBAGENT_MODEL is tried first under the same rules. The family-alias substitution claim is unsupported by this quote."
+  },
+  {
+   "id": "f13",
+   "verdict": "confirmed",
+   "evidence": "Quote from code.claude.com/docs/en/workflows states the shared ordering with subagents, the per-invocation status of a script-named model, and the session-model fallback."
+  },
+  {
+   "id": "f14",
+   "verdict": "confirmed",
+   "evidence": "Quote states allowlist blocking, the shared substitution rules and the /workflows warning naming both requested and substituted models."
+  },
+  {
+   "id": "f15",
+   "verdict": "confirmed",
+   "evidence": "Quote names phase(), log() and the args global alongside agent()/pipeline()/parallel()."
+  },
+  {
+   "id": "f16",
+   "verdict": "confirmed",
+   "evidence": "Quote points to the Agent SDK reference for the Workflow tool's inputs, exactly as the fact states."
+  },
+  {
+   "id": "f17",
+   "verdict": "confirmed",
+   "evidence": "Quote covers the v2.1.178 save location, loading from every .claude/workflows/ on the path, closest-wins on name collision, and project-over-personal precedence."
+  },
+  {
+   "id": "f18",
+   "verdict": "confirmed",
+   "evidence": "Quote covers the workflows/ directory at plugin root, the workflows manifest field, and the /acme-tools:release-audit namespacing example."
+  },
+  {
+   "id": "f19",
+   "verdict": "confirmed",
+   "evidence": "Quote states the args parameter and the args global."
+  },
+  {
+   "id": "f20",
+   "verdict": "confirmed",
+   "evidence": "Quoted table rows give SubagentStart/SubagentStop with matcher 'Agent type name' and the begin/complete timings."
+  },
+  {
+   "id": "f21",
+   "verdict": "confirmed",
+   "evidence": "Quote states the automatic Stop -> SubagentStop conversion for frontmatter hooks."
+  },
+  {
+   "id": "f22",
+   "verdict": "confirmed",
+   "evidence": "Quote from code.claude.com/docs/en/hooks covers non-blocking, context injection, the launch copy staying in place to leave the prompt cache intact, and re-injection after auto-compaction."
+  },
+  {
+   "id": "f23",
+   "verdict": "confirmed",
+   "evidence": "Quote lists stop_hook_active, agent_id, agent_type, agent_transcript_path, last_assistant_message and confirms agent_type is the matcher field, same values as SubagentStart."
+  },
+  {
+   "id": "f24",
+   "verdict": "confirmed",
+   "evidence": "Quote gives the EndConversation exclusion and the built-in tool list including Agent and Workflow, supporting the fact's inference that PreToolUse fires for those calls."
+  },
+  {
+   "id": "f25",
+   "verdict": "confirmed",
+   "evidence": "Quoted table rows match the three model groups and their level lists exactly, including Opus 4.6 / Sonnet 4.6 lacking xhigh. Official model-config docs URL."
+  },
+  {
+   "id": "f26",
+   "verdict": "confirmed",
+   "evidence": "Quote states the fallback to the highest supported level at or below the requested one, with the xhigh-on-Opus-4.6 example."
+  },
+  {
+   "id": "f27",
+   "verdict": "confirmed",
+   "evidence": "Quote gives the ultracode-off resolution order, the three explicit-choice mechanisms, the per-model default hold for Fable 5 / Opus 4.8 / Opus 4.7, and the Opus 5 / Fable 5.1 exception."
+  },
+  {
+   "id": "f28",
+   "verdict": "confirmed",
+   "evidence": "Quoted capability table lists effort, xhigh_effort, max_effort, thinking, adaptive_thinking and interleaved_thinking."
+  },
+  {
+   "id": "f29",
+   "verdict": "confirmed",
+   "evidence": "Quoted table lists all five variables and states DISABLE_PROMPT_CACHING takes precedence over the per-model settings."
+  },
+  {
+   "id": "f30",
+   "verdict": "confirmed",
+   "evidence": "Quote from code.claude.com/docs/en/costs covers /clear between unrelated tasks, custom compaction instructions, and the Sonnet-vs-Opus guidance with /model."
+  },
+  {
+   "id": "f31",
+   "verdict": "confirmed",
+   "evidence": "The quote is only the section heading 'Move instructions from CLAUDE.md to skills', which is exactly what the fact claims to have captured; the fact itself flags that the body text was not captured."
+  },
+  {
+   "id": "f32",
+   "verdict": "corrected",
+   "evidence": "The quoted bash snippet supports the filtering-hook example for npm test/pytest/go test and the token-reduction intent. It does not support the verification clause about /hooks and a --debug-file 'modified tool input keys' line.",
+   "correction": "Supported portion: the costs page shows a PreToolUse hook that rewrites test commands to show only failures. The /hooks and --debug-file verification detail is not evidenced by this quote."
+  },
+  {
+   "id": "f33",
+   "verdict": "confirmed",
+   "evidence": "Quote covers the fresh isolated context window, the excluded history/skills/files, the delegation message and the fork exception."
+  },
+  {
+   "id": "f34",
+   "verdict": "confirmed",
+   "evidence": "Quote covers the full CLAUDE.md hierarchy including AGENTS.md, the Explore/Plan exception and the omitClaudeMd behavior."
+  },
+  {
+   "id": "f35",
+   "verdict": "confirmed",
+   "evidence": "Quote covers the ultracode keyword in a prompt, running a single task as a workflow without changing session effort, and saving it as a command afterward."
+  },
+  {
+   "id": "f36",
+   "verdict": "confirmed",
+   "evidence": "Quote states the size guideline is sent as advice, not a cap, and that a prompt calling for a different scale overrides it."
+  }
+ ],
+ "missed_gaps": [
+  {
+   "gap": "The new PACKET/model contract test hardcodes only two files, so it cannot catch a third saved workflow diverging: `const files = ['.claude/workflows/review-changes.js', '.claude/workflows/readiness-audit.js']`. codex-cross-review.mjs and any future saved workflow sit outside the byte-identity and explicit-model assertions, while the comment the test backs claims the packet is 'byte-identical in every saved workflow'.",
+   "source": ".claude/workflows/test-envelope.mjs:215 (claim it backs at .claude/workflows/review-changes.js:17 and readiness-audit.js:20)"
+  },
+  {
+   "gap": "No test covers .claude/agents/*.md at all. The workflows now have a static contract test for explicit model+effort, but nothing asserts the equivalent for agent definitions, so an agent file could drop model:/effort: and silently inherit the coordinator model - the exact failure docs/native-token-workflow.md:60 warns about. A third agent, source-scout.md, was added at 18:22:06 with no test touching it and no workflow referencing it.",
+   "source": ".claude/workflows/test-envelope.mjs:212-231 (files list contains only workflow .js paths); .claude/agents/source-scout.md:1-9"
+  },
+  {
+   "gap": "Prompt caching is the stated reason for the shared prefix, but no agent sets experimental.cacheTtl, the one frontmatter control the official sub-agents docs give for subagent cache lifetime. `rg -n 'cacheTtl' .claude/` returns nothing outside .claude/worktrees/. Both inventories scored a 'native prompt caching' lane without checking this field.",
+   "source": "requirement at docs/native-token-workflow.md:59; absence across .claude/agents/evidence-reviewer.md:1-7, isolated-builder.md:1-7 and source-scout.md:1-9"
+  },
+  {
+   "gap": "evidence-reviewer.md declares MCP grants as bare server prefixes (mcp__serena, mcp__socraticode, mcp__jcodemunch, mcp__plugin_context-mode_context-mode) rather than full tool names. Per the sub-agents docs, a tools list where no entry resolves to a tool makes the subagent fail to launch. Neither inventory verified that the prefix form resolves; both scored these lanes 'yes' from the presence of the string alone.",
+   "source": ".claude/agents/evidence-reviewer.md:4"
+  },
+  {
+   "gap": "evidence-reviewer grants no Bash, so it cannot run any acceptance command, and its own prompt defers to the coordinator ('If you need a command result, ask the coordinator to supply it') - but review-changes.js passes the reviewer only the inventory JSON and prompt text, with no channel for command results. The independent-review lane therefore cannot re-run any check it is asked to refute.",
+   "source": ".claude/agents/evidence-reviewer.md:4 and :9; .claude/workflows/review-changes.js:61-65"
+  },
+  {
+   "gap": "Nothing runs the new test automatically. There is no package.json in the repository root (`jq .scripts package.json` -> no package.json), and the recorded acceptance command set does not include `node .claude/workflows/test-child-usage.mjs` - it lists only jq on settings, check-syntax.mjs, test-envelope.mjs, node --check on codex-cross-review.mjs, test-codex-envelope.mjs, the ~ grep and git diff --check.",
+   "source": "docs/tasks/2026-09-21-native-workflow-alignment.md:46; absence of package.json"
+  },
+  {
+   "gap": "readiness-audit.js logs 'more than three reader packets requested; running N with the concurrency cap' and then dispatches every group through parallel() unconditionally. The cap exists only as CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS=3 in .claude/settings.json env, which the script neither reads nor enforces, so the log states a guarantee the script does not itself provide.",
+   "source": ".claude/workflows/readiness-audit.js:75 and :78; .claude/settings.json (env block)"
+  },
+  {
+   "gap": "child-usage.mjs can only run against a workflow transcript directory supplied by hand (`node .claude/workflows/child-usage.mjs <transcriptDir>`), and no workflow emits, logs or returns that path. The requirement to 'record requested and resolved child model' therefore has an implementation with no route from an actual run to its input.",
+   "source": ".claude/workflows/child-usage.mjs:5 and :82-85; requirement at docs/native-token-workflow.md:60"
+  }
+ ]
+}

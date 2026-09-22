@@ -1,0 +1,145 @@
+{
+ "status": "complete",
+ "reason": "every child has an explicit requested model, a matching resolved model, returned usage and a non-null result",
+ "multi_model_children": [],
+ "children": [
+  {
+   "agent_id": "a92944785ff3fc5e6",
+   "label": "probe:default",
+   "phase": "Probe",
+   "agent_type": "workflow-subagent",
+   "requested_model": "sonnet",
+   "resolved_models": [
+    "claude-sonnet-5"
+   ],
+   "efforts": [
+    "low"
+   ],
+   "requests": 2,
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 170,
+    "cache_read_input_tokens": 42394,
+    "cache_creation_input_tokens": 44190
+   },
+   "usage_by_model": {
+    "claude-sonnet-5": {
+     "input_tokens": 4,
+     "output_tokens": 170,
+     "cache_read_input_tokens": 42394,
+     "cache_creation_input_tokens": 44190
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 42396,
+   "complete": true,
+   "issues": []
+  },
+  {
+   "agent_id": "ab0ba6c6c2397b9d3",
+   "label": "probe:evidence-reviewer",
+   "phase": "Probe",
+   "agent_type": "evidence-reviewer",
+   "requested_model": "sonnet",
+   "resolved_models": [
+    "claude-sonnet-5"
+   ],
+   "efforts": [
+    "low"
+   ],
+   "requests": 2,
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 1011,
+    "cache_read_input_tokens": 42218,
+    "cache_creation_input_tokens": 44966
+   },
+   "usage_by_model": {
+    "claude-sonnet-5": {
+     "input_tokens": 4,
+     "output_tokens": 1011,
+     "cache_read_input_tokens": 42218,
+     "cache_creation_input_tokens": 44966
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 42220,
+   "complete": true,
+   "issues": []
+  },
+  {
+   "agent_id": "a87c3e5501a6a2646",
+   "label": "probe:source-scout",
+   "phase": "Probe",
+   "agent_type": "source-scout",
+   "requested_model": "sonnet",
+   "resolved_models": [
+    "claude-sonnet-5"
+   ],
+   "efforts": [
+    "low"
+   ],
+   "requests": 2,
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 170,
+    "cache_read_input_tokens": 8046,
+    "cache_creation_input_tokens": 9842
+   },
+   "usage_by_model": {
+    "claude-sonnet-5": {
+     "input_tokens": 4,
+     "output_tokens": 170,
+     "cache_read_input_tokens": 8046,
+     "cache_creation_input_tokens": 9842
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 8048,
+   "complete": true,
+   "issues": []
+  },
+  {
+   "agent_id": "abf328fa25888d471",
+   "label": "probe:evidence-reviewer",
+   "phase": "Probe",
+   "agent_type": "evidence-reviewer",
+   "requested_model": "sonnet",
+   "resolved_models": [
+    "claude-sonnet-5"
+   ],
+   "efforts": [
+    "low"
+   ],
+   "requests": 2,
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 602,
+    "cache_read_input_tokens": 76680,
+    "cache_creation_input_tokens": 9435
+   },
+   "usage_by_model": {
+    "claude-sonnet-5": {
+     "input_tokens": 4,
+     "output_tokens": 602,
+     "cache_read_input_tokens": 76680,
+     "cache_creation_input_tokens": 9435
+    }
+   },
+   "first_request_cache_read": 34591,
+   "first_request_prompt_tokens": 42091,
+   "complete": true,
+   "issues": []
+  }
+ ],
+ "by_resolved_model": {
+  "claude-sonnet-5": {
+   "children": 4,
+   "input_tokens": 16,
+   "output_tokens": 1953,
+   "cache_read_input_tokens": 169338,
+   "cache_creation_input_tokens": 108433
+  }
+ },
+ "run_id": "wf_c9b03b9e-30e"
+}

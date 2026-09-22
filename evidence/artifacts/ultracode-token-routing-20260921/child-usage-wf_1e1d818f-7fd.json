@@ -1,0 +1,81 @@
+{
+ "status": "complete",
+ "reason": "every child has an explicit requested model, a matching resolved model, returned usage and a non-null result",
+ "multi_model_children": [],
+ "children": [
+  {
+   "agent_id": "aa972280125b4e025",
+   "label": "probe-reviewer-a",
+   "phase": "Probe",
+   "agent_type": "probe-reviewer-a",
+   "requested_model": "sonnet",
+   "resolved_models": [
+    "claude-sonnet-5"
+   ],
+   "efforts": [
+    "low"
+   ],
+   "requests": 2,
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 569,
+    "cache_read_input_tokens": 21563,
+    "cache_creation_input_tokens": 23500
+   },
+   "usage_by_model": {
+    "claude-sonnet-5": {
+     "input_tokens": 4,
+     "output_tokens": 569,
+     "cache_read_input_tokens": 21563,
+     "cache_creation_input_tokens": 23500
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 21565,
+   "complete": true,
+   "issues": []
+  },
+  {
+   "agent_id": "a8da5cfb02d3910bb",
+   "label": "probe-reviewer-b",
+   "phase": "Probe",
+   "agent_type": "probe-reviewer-b",
+   "requested_model": "sonnet",
+   "resolved_models": [
+    "claude-sonnet-5"
+   ],
+   "efforts": [
+    "low"
+   ],
+   "requests": 2,
+   "usage": {
+    "input_tokens": 4,
+    "output_tokens": 541,
+    "cache_read_input_tokens": 12162,
+    "cache_creation_input_tokens": 14099
+   },
+   "usage_by_model": {
+    "claude-sonnet-5": {
+     "input_tokens": 4,
+     "output_tokens": 541,
+     "cache_read_input_tokens": 12162,
+     "cache_creation_input_tokens": 14099
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 12164,
+   "complete": true,
+   "issues": []
+  }
+ ],
+ "by_resolved_model": {
+  "claude-sonnet-5": {
+   "children": 2,
+   "input_tokens": 8,
+   "output_tokens": 1110,
+   "cache_read_input_tokens": 33725,
+   "cache_creation_input_tokens": 37599
+  }
+ },
+ "run_id": "wf_1e1d818f-7fd"
+}

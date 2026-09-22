@@ -1476,6 +1476,16 @@
             "id": "claude-foundation-finalization-20260921",
             "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "ultracode-token-routing-20260921",
+            "path": "evidence/receipts/ultracode-token-routing-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "portable-claude-native-qualification-20260921",
+            "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1956,6 +1966,16 @@
             "id": "claude-foundation-finalization-20260921",
             "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "ultracode-token-routing-20260921",
+            "path": "evidence/receipts/ultracode-token-routing-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "portable-claude-native-qualification-20260921",
+            "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -6112,6 +6132,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "portable-claude-native-qualification-20260921",
+            "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],

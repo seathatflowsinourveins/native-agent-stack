@@ -22,15 +22,17 @@ The portable [settings file](../examples/claude-native/ultracode.settings.json):
 {
   "enableWorkflows": true,
   "ultracode": true,
-  "workflowSizeGuideline": "small",
+  "workflowSizeGuideline": "unrestricted",
   "env": {
     "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "3"
   }
 }
 ```
 
-The example persists `enableWorkflows`, `ultracode`, the small advisory size and
-the per-workflow concurrency setting of three. It does not select a model,
+The example persists `enableWorkflows`, `ultracode`, the `unrestricted` advisory size
+(each workflow sized to its task; it replaced `small` on 2026-09-21, see the
+[routing guide](../docs/ultracode-token-routing-20260921.md)) and the per-workflow
+concurrency setting of three, which makes a large run queue rather than burst. It does not select a model,
 account or permission mode. To adopt it as a project default, merge only those
 keys into the existing `.claude/settings.json`; preserve all unrelated settings.
 Project environment settings require workspace trust, and organizational policy
@@ -40,10 +42,15 @@ or feature availability can still restrict the profile.
 and takes precedence over the stored `effortLevel` setting. Preserving that
 stored value therefore does not mean effective effort is unchanged. An existing
 `CLAUDE_CODE_EFFORT_LEVEL` value other than `xhigh` overrides Ultracode and leaves
-its orchestration inactive. Ultracode is not a provider model name. The `small`
+its orchestration inactive. Ultracode is not a provider model name. The size
 guideline is advisory; the environment
 variable provides a per-workflow concurrency setting, not a total account or
-cross-session budget. Keep existing sign-in, permissions, plugins and caching.
+cross-session budget. Size by the task: solo for conversational or mechanical
+turns; a scout plus review for a bounded change; one agent per independent unit
+plus verification for multi-unit work; tens of agents only for an enumerated
+work-list run through `pipeline()` with lean `agentType` stages. Never drop a
+verification stage to save tokens; save them with lean agents, deferred lanes and
+focused reads. Keep existing sign-in, permissions, plugins and caching.
 
 The dated trial explicitly used `--model fable --effort ultracode`; `fable`
 resolved to `claude-fable-5-1` on that account. Verify the actually returned model
@@ -64,9 +71,10 @@ token-saving switch. In a `-p` run, load this opted-in settings file or pass
 | Role | Starting choice | Qualification |
 | --- | --- | --- |
 | Requirements, decomposition, integration and hard judgments | Fable, Ultracode for substantial graphs | Coordinator observed as Fable 5.1/xhigh |
-| Bounded inventory, implementation from a clear contract, routine checks | Sonnet, medium initially | Read-only inventory and independent message worker observed on Sonnet 5; implementation quality still needs task evidence |
-| Ambiguous source analysis or independent review | Opus, high initially | Read-only analysis observed on Opus 5/high |
-| Cheap exact extraction | Haiku when adequate | Candidate; not exercised in this trial |
+| Exact extraction, inventories, running acceptance commands | `source-scout` (Sonnet, medium; four built-in tools, no project instructions) | First prompt 8,048 tokens versus 42,396 for the default child on one identical task; ran the inventory and recheck stages of eight native reviews and two readiness audits |
+| Implementation from a clear contract | `isolated-builder` (Sonnet, medium, own worktree, named MCP tools behind ToolSearch) | One real task: a manifest probe implemented, checked and committed from its own worktree (first prompt 17,864) |
+| Independent review from source and recorded evidence | `evidence-reviewer` (Opus, high; read-only named MCP tools behind ToolSearch, no Bash/Edit/Write) | Eight native review runs; first prompt 12,164 for the deferred shape versus 42,220 with bare server grants |
+| Cheap exact extraction | Haiku | Not routed: on one byte-identical packet the Opus verifier scored Sonnet 14/14 lane rows and Haiku 9/14 with a quote attributed to a file that does not contain it; overturn only after a repeat trial with no unanchored citation on two distinct packets |
 | Independent cross-family review | Existing official Codex companion | Reuse its separately recorded native acceptance; this trial did not run Codex inside a Workflow graph |
 
 These are starting choices, not a universal quality ranking. Set worker model
@@ -91,8 +99,13 @@ metadata reads separately from owned source writes. Run acceptance commands
 without output pipelines that mask their exit status.
 
 The portable [saved workflow examples](../examples/claude-native/workflows/README.md)
-now include the deployed review and readiness scripts, their local regression
-checks and the two [native agent definitions](../examples/claude-native/agents/).
+are byte-identical copies of the deployed review and readiness scripts, the
+three [native agent definitions](../examples/claude-native/agents/), the per-child
+usage extractor `child-usage.mjs`, the Codex bridge and their local checks (a
+static contract suite, a mutation harness and receipt bindings driven by a sibling
+`contract.config.json`). `review-changes` re-runs every acceptance command with a
+second worker and compares both runs in code. Record each run's children with
+`node .claude/workflows/child-usage.mjs --latest`.
 Adopt selected files into a project's existing `.claude/` directories without
 overwriting its instructions, accounts or permissions. A saved script is a
 supported native extension, not an upstream-authored acceptance policy.

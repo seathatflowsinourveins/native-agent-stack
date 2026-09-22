@@ -66,6 +66,7 @@ NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-c
                     "evidence/artifacts/foundation-rd-20260921/qmd-bench-output.txt",
                     "evidence/artifacts/foundation-rd-20260921/native-review.json",
                     "recipes/claude-native-ultracode.md", "examples/claude-native/ultracode.settings.json",
+                    "docs/ultracode-token-routing-20260921.md", "recipes/claude-codex-cooperation-lanes.md", "examples/codex-native/README.md",
                     "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
                     "docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md", "docs/foundation-convergence-20260921.md",
                     "docs/harness-defaults.md", "catalogs/README.md", STACK, ADOPTION,
@@ -470,7 +471,8 @@ def build_data(root):
                  "docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md",
                  "docs/community-native-practice.md", "examples/claude-native/CLAUDE.md",
                  "recipes/claude-native-ultracode.md", "docs/foundation-rd-readiness.md",
-                 "recipes/claude-codex-foreground-review.md", "docs/claude-upstream-checks.md"):
+                 "recipes/claude-codex-foreground-review.md", "docs/claude-upstream-checks.md",
+                 "docs/ultracode-token-routing-20260921.md", "recipes/claude-codex-cooperation-lanes.md", "examples/codex-native/README.md"):
         if (root / path).exists():
             guide_paths.append(path)
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
