@@ -2,12 +2,21 @@
   "schema_version": 1,
   "id": "vllm-0.30.0-uva-smoke",
   "date": "2026-09-22",
-  "layer_ids": ["semantic-rag", "observation-inference"],
-  "gap_refs": [
-    {"layer_id": "semantic-rag", "gap_index": 4},
-    {"layer_id": "observation-inference", "gap_index": 4}
+  "layer_ids": [
+    "semantic-rag",
+    "observation-inference"
   ],
-  "purpose": "Determine whether vLLM 0.30.0 (latest upstream release) starts on this WSL2/RTX 5090 host, settling the vLLM-version gap shared by semantic-rag gap 4 (executable_now) and observation-inference gap 4 (needs_hardware), per the Opus critic correction 'vllm-upgrade-smoke' which found the two layers' categorization inconsistent for the same underlying 0.29.0 UVA failure.",
+  "gap_refs": [
+    {
+      "layer_id": "semantic-rag",
+      "gap_index": 4
+    },
+    {
+      "layer_id": "observation-inference",
+      "gap_index": 4
+    }
+  ],
+  "purpose": "Determine whether vLLM 0.30.0 (latest upstream release) starts on this WSL2/RTX 5090 host, addressing the vLLM-version sub-question shared by semantic-rag gap 4 (executable_now) and observation-inference gap 4 (needs_hardware), per the Opus critic correction 'vllm-upgrade-smoke' which found the two layers' categorization inconsistent for the same underlying 0.29.0 UVA failure. This check settles the narrow tried/not-tried and category-inconsistency question only; observation-inference gap 4 also covers the llama.cpp single-trial finding and OmniRoute's unsuccessful gateway tasks, which this check does not exercise, and settling the full gap would additionally need vLLM to be qualified as an optional generative model route under task conditions, not just an embedding-model startup smoke test.",
   "preregistered": "Read vLLM 0.30.0 release notes and merged PRs first for any UVA/WSL/pinned-memory change. If nvidia-smi, free disk (<=15GB needed) or an absence of other GPU jobs fail, record as not_run with the reason. Otherwise install vLLM 0.30.0 into a new isolated uv venv prefix (never touching vllm-0.25.0 or the live 127.0.0.1:8231 embedding service), start `vllm serve` for the already-cached nvidia/Nemotron-3-Embed-1B-BF16 model on a free port under ecosystem-bounded-run with a memory cap, and record whichever of these two outcomes actually occurs: (a) the server reaches 'Application startup complete' and answers one embedding request, which would refute the incumbent needs_hardware/blocked verdict on observation-inference gap 4 and settle semantic-rag gap 4 as executable_now confirmed; or (b) it fails at startup with 'RuntimeError: UVA is not available' or another CUDA/UVA error, which would confirm the incumbent needs_hardware verdict unchanged for both layers. No re-run is planned regardless of which outcome occurs.",
   "commands": [
     {
@@ -92,12 +101,12 @@
       "sha256": "pypi wheel vllm-0.30.0-cp38-abi3-manylinux_2_28_x86_64.whl, installed via uv from PyPI index (uv resolver-verified hash, not independently re-checksummed by this receipt; see limitations)"
     }
   ],
-  "result": "vLLM 0.30.0 starts successfully on this WSL2/RTX 5090 host and serves a real embedding request. The 0.29.0 'RuntimeError: UVA is not available' fatal crash does NOT reproduce at 0.30.0. Upstream PR #56908 ('[Model Runner V2] Tolerate lack of pinned memory support', merged into v0.30.0, released 2026-09-22) replaces the fatal UVA requirement with a graceful device-memory fallback ('Pinned memory is not available on this platform; falling back to device memory for UVA buffers.'). The server reached readiness in ~52s and answered one /v1/embeddings request (200 OK, 2048-dim vector) before being cleanly stopped; GPU memory returned to the exact pre-test baseline.",
-  "settles_gap": true,
+  "result": "vLLM 0.30.0 starts successfully on this WSL2/RTX 5090 host and serves a real embedding request. The 0.29.0 'RuntimeError: UVA is not available' fatal crash does NOT reproduce at 0.30.0. Upstream PR #56908 ('[Model Runner V2] Tolerate lack of pinned memory support', merged into v0.30.0, released 2026-09-22) replaces the fatal UVA requirement with a graceful device-memory fallback ('Pinned memory is not available on this platform; falling back to device memory for UVA buffers.'). The server reached readiness in ~52s and answered one /v1/embeddings request (200 OK, 2048-dim vector) before being cleanly stopped; GPU memory returned to the exact pre-test baseline. This establishes that the network-install path works on this host without new hardware; it does not by itself establish vLLM 0.30.0 as a qualified 'optional model route' for observation-inference (only a small embedding model's startup and one embedding request were exercised, not generative serving under task conditions), and it says nothing about that gap's llama.cpp single-trial or OmniRoute gateway-task findings.",
+  "settles_gap": "partially",
   "verdict_impact": {
-    "could_change_verdict": true,
-    "direction": "refutes_incumbent",
-    "explanation": "Refutes the observation-inference gap-4 'needs_hardware' blocker text, which asserted that closing the vLLM-version gap 'needs either different GPU/driver hardware or a new network install outside this session's pinned toolset' -- the network install alone (no new hardware) now closes it, on this exact host. Also converts semantic-rag gap 4 from an open 'no opened source records whether v0.30.0 was tried' question to a confirmed-working answer. This does not itself change which vLLM version is the pinned default (0.25.0 stays the running production embedding service per the task's explicit instruction not to touch it); a separate promotion decision would be needed to move the pin, and is out of scope for this smoke check."
+    "could_change_verdict": false,
+    "direction": "not_applicable",
+    "explanation": "This result resolves a gap-triage blocker/category question, not a layer verdict, for either layer. Semantic-rag's incumbent (SocratiCode+Qdrant with vLLM 0.25.0 serving) is unchanged: a successful vLLM 0.30.0 startup on a separate, non-serving prefix does not challenge which stack currently serves production retrieval; 0.25.0 remains the pinned production install by design, and promoting the pin would need its own evaluation (throughput/stability/serving test), out of scope here. Observation-inference's candidate-set status is likewise unchanged: this check disproves only the needs_hardware blocker's claim that closing the vLLM-version question 'needs either different GPU/driver hardware' -- a network install alone sufficed on this exact host -- but it does not establish vLLM as a qualified 'optional model route' (only embedding-model startup and one embedding request were exercised, not generative serving under task conditions), and it says nothing about that gap's llama.cpp single-trial or OmniRoute gateway-task portions. The preregistration's framing ('would refute the incumbent needs_hardware/blocked verdict') incorrectly treated a gap-triage category label as a layer verdict; this corrected field treats the result as a blocker/category resolution only, with no change to either layer's incumbent verdict."
   },
   "evidence_class": "native_proven",
   "limitations": [
@@ -105,7 +114,8 @@
     "The 'falling back to device memory for UVA buffers' path may carry a performance cost relative to genuine pinned-memory UVA (not benchmarked here); this receipt establishes functional startup and one successful request, not throughput/latency parity with 0.25.0 or 0.29.0-on-non-WSL.",
     "vLLM 0.30.0 was installed into a fresh prefix but was not promoted to the shared ~/.local/share/codex-ecosystem/bin/vllm shim or made the active embedding-service version; 0.25.0 remains the pinned production install by design (task instruction).",
     "The downloaded wheel's integrity relies on uv's standard PyPI-hash verification during resolution/install; this receipt did not independently fetch and compare a published sha256 checksum file for vllm-0.30.0-cp38-abi3-manylinux_2_28_x86_64.whl outside of uv's own verification.",
-    "gh api calls for release notes/PR text are source_review-grade evidence for the 'why it now works' explanation; the 'it does work here' claim itself is native_proven from the actual serve+request run recorded above."
+    "gh api calls for release notes/PR text are source_review-grade evidence for the 'why it now works' explanation; the 'it does work here' claim itself is native_proven from the actual serve+request run recorded above.",
+    "settles_gap is 'partially', not true: this closes the needs_hardware blocker's 'no network-install path exists without new hardware' claim and answers semantic-rag gap 4's narrow tried/not-tried question, but it does not settle observation-inference gap 4 as a whole -- it does not qualify vLLM 0.30.0 as an optional generative model route under task conditions (only an embedding model's startup and one request were exercised) and it does not address that gap's llama.cpp single-trial or OmniRoute gateway-task findings."
   ],
   "raw_artifacts": [
     {

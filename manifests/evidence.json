@@ -12089,13 +12089,13 @@
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/semantic-rag/vllm-0.30.0-uva-smoke.json",
-      "sha256": "9d6416d9643c2107d7a8c06a3875b60f507b21e5c6daeee074bf3473bd528584",
-      "bytes": 11619
+      "sha256": "f98c681d9eb8d0e922123cf29579e97918d5d20f6ab5ef74102299772bec2d91",
+      "bytes": 13656
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/observation-inference/vllm-0.30.0-uva-smoke.json",
-      "sha256": "9d6416d9643c2107d7a8c06a3875b60f507b21e5c6daeee074bf3473bd528584",
-      "bytes": 11619
+      "sha256": "f98c681d9eb8d0e922123cf29579e97918d5d20f6ab5ef74102299772bec2d91",
+      "bytes": 13656
     }
   ],
   "convergence_records": [
