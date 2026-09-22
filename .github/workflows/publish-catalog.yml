@@ -19,6 +19,10 @@ jobs:
       id-token: write # OIDC token for keyless signing of the archive attestation; this job only
       attestations: write # store the build-provenance attestation for the published archive
     steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
       - name: Prepare publication evidence
         run: |
           PUBLICATION_DIR="$RUNNER_TEMP/catalog-publication"

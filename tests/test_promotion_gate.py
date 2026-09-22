@@ -1,13 +1,18 @@
 """Fail-closed data-snapshot promotion gate: pure-Python parsing tests always
 run; fixture tests that execute pandera/exchange_calendars validation run
 through the gate's own isolated venv (never the ambient test interpreter) and
-are skipped when that venv is not present on this host.
+are skipped when that venv is not present on this host. When
+REQUIRE_PROMOTION_GATE_VENV=1 (set by the CI validate workflow after it
+provisions the venv), a missing venv fails this module at import time instead
+of silently skipping, so a broken provisioning step cannot pass CI as a
+silent skip.
 """
 import hashlib
 import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -36,6 +41,101 @@ def _find_gate_python():
 
 
 GATE_PYTHON = _find_gate_python()
+
+if os.environ.get("REQUIRE_PROMOTION_GATE_VENV") == "1" and not GATE_PYTHON:
+    # The CI validate workflow sets this after it provisions the gate venv
+    # from blueprints/us-equities/data/requirements.lock; a missing venv here
+    # means that provisioning step did not run or did not produce a working
+    # interpreter. Fail loudly at import time instead of letting
+    # FixtureGateRuns silently skip, so CI cannot go green without actually
+    # classifying the fixtures. Local developer runs are unaffected: this
+    # variable is unset by default and GATE_PYTHON absence still just skips.
+    raise RuntimeError(
+        "REQUIRE_PROMOTION_GATE_VENV=1 but no promotion-gate venv was found "
+        "(checked PROMOTION_GATE_PYTHON and the documented ecosystem tool "
+        "location); the fixture gate tests cannot run.")
+
+
+class ImportTimeVenvGuard(unittest.TestCase):
+    """Regression: REQUIRE_PROMOTION_GATE_VENV must fail this module's import
+    when no gate venv is found (so a broken CI provisioning step cannot pass
+    as a silent skip), and must never fail the import when unset, even if the
+    venv is absent (so local developer runs without the venv still just skip
+    FixtureGateRuns). Runs this file's own import in a subprocess with a
+    fake HOME so Path.home()'s documented ecosystem-tool candidate cannot
+    resolve to a real venv on this host."""
+
+    def _reimport(self, env_overrides):
+        env = dict(os.environ)
+        env.pop("PROMOTION_GATE_PYTHON", None)
+        env.pop("REQUIRE_PROMOTION_GATE_VENV", None)
+        env.update(env_overrides)
+        return subprocess.run(
+            [sys.executable, "-c", "import runpy; runpy.run_path(%r)" % str(Path(__file__).resolve())],
+            env=env, capture_output=True, text=True, timeout=30)
+
+    def test_require_venv_with_missing_venv_fails_at_import(self):
+        with tempfile.TemporaryDirectory() as empty_home:
+            proc = self._reimport({"REQUIRE_PROMOTION_GATE_VENV": "1", "HOME": empty_home})
+        self.assertNotEqual(proc.returncode, 0, proc.stderr)
+        self.assertIn("REQUIRE_PROMOTION_GATE_VENV=1 but no promotion-gate venv was found", proc.stderr)
+
+    def test_require_venv_unset_with_missing_venv_still_imports(self):
+        with tempfile.TemporaryDirectory() as empty_home:
+            proc = self._reimport({"HOME": empty_home})
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+
+    def test_require_venv_unset_with_missing_venv_skips_fixture_tests(self):
+        """End-to-end companion to the two import checks above: with the
+        guard variable unset and no venv discoverable, actually running
+        FixtureGateRuns must skip every test in it rather than error."""
+        with tempfile.TemporaryDirectory() as empty_home:
+            env = dict(os.environ, HOME=empty_home)
+            env.pop("PROMOTION_GATE_PYTHON", None)
+            env.pop("REQUIRE_PROMOTION_GATE_VENV", None)
+            proc = subprocess.run(
+                [sys.executable, "-m", "unittest", "-v", "tests.test_promotion_gate.FixtureGateRuns"],
+                cwd=ROOT, env=env, capture_output=True, text=True, timeout=30)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertIn("skipped", proc.stderr)
+        self.assertNotIn("ERROR", proc.stderr)
+
+
+class WorkflowProvisioningContract(unittest.TestCase):
+    """Regression: nothing else asserts that validate.yml keeps the venv
+    provisioning step, its hash-locked/require-hashes install and the
+    REQUIRE_PROMOTION_GATE_VENV=1 export, or that it still runs before the
+    step that runs this test module. Without this, deleting the step (or
+    just the env export line) would silently bring back skip-as-pass."""
+
+    VALIDATE_YML = ROOT / ".github/workflows/validate.yml"
+
+    def _step_bodies(self):
+        text = self.VALIDATE_YML.read_text()
+        names = re.findall(r"^ {6}- name: (.+)$", text, re.MULTILINE)
+        bodies = re.split(r"^ {6}- name: .+$", text, flags=re.MULTILINE)[1:]
+        self.assertEqual(len(names), len(bodies))
+        return list(zip(names, bodies))
+
+    def test_provisioning_step_present_before_the_unittest_step(self):
+        steps = self._step_bodies()
+        step_names = [name for name, _ in steps]
+        self.assertIn("Provision the promotion gate's isolated venv", step_names)
+        self.assertIn("Test validation failure modes", step_names)
+        self.assertLess(step_names.index("Provision the promotion gate's isolated venv"),
+                         step_names.index("Test validation failure modes"),
+                         "provisioning must run before python3 -m unittest")
+
+    def test_provisioning_step_sets_require_hashes_and_the_guard_env_var(self):
+        steps = dict(self._step_bodies())
+        body = steps["Provision the promotion gate's isolated venv"]
+        self.assertIn("--require-hashes", body)
+        self.assertIn("blueprints/us-equities/data/requirements.lock", body)
+        self.assertIn('echo "REQUIRE_PROMOTION_GATE_VENV=1" >> "$GITHUB_ENV"', body)
+
+    def test_unittest_step_runs_the_full_suite(self):
+        steps = dict(self._step_bodies())
+        self.assertIn("python3 -m unittest", steps["Test validation failure modes"])
 
 
 class PurePythonParsing(unittest.TestCase):
