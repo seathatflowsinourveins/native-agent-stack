@@ -1,0 +1,70 @@
+{
+  "checked_at": "2026-09-22T07:52:21.788623+00:00",
+  "checks": [
+    {
+      "detail": "ok",
+      "name": "symbol_nonempty",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "valid_trading_session",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "open_positive",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "high_positive",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "low_positive",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "close_positive",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "volume_non_negative",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "observed_at_not_future",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "high_ge_max_open_close",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "low_le_min_open_close",
+      "status": "pass"
+    },
+    {
+      "detail": "ok",
+      "name": "unique_symbol_session",
+      "status": "pass"
+    }
+  ],
+  "input_sha256": "65d3fef1b51e5ece56b51e3c29e6f49f0f3639f2a77b51b1119f152d50a6a448",
+  "row_count": 4,
+  "status": "pass",
+  "versions": {
+    "exchange_calendars": "4.13.2",
+    "pandas": "3.0.6",
+    "pandera": "0.33.1",
+    "pyarrow": "25.0.1",
+    "python": "3.13.15"
+  }
+}

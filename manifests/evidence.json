@@ -5533,8 +5533,8 @@
     },
     {
       "path": "blueprints/us-equities/data/README.md",
-      "sha256": "2d638a5f76fb1b3cb850425b125c9df20d2eaf7021135fa7e9d2d424ba4feafe",
-      "bytes": 1717
+      "sha256": "1b5d5e629a51335f7e701d0647613588aa90c649e85a5dca305b7ff3b31ee9dd",
+      "bytes": 5602
     },
     {
       "path": "blueprints/us-equities/data/receipt.json",
@@ -10318,8 +10318,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "bytes": 26787,
-      "sha256": "000f7e93e596ff56ae576a3c799370dfe232e81d117455ef21bb4195724479ee"
+      "bytes": 31117,
+      "sha256": "7679fc819af21794a1e82fe5e5d0218f5c9fd67c96baa0e7f604a2bb50a6bc51"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -10368,8 +10368,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "bytes": 8476,
-      "sha256": "5abec2ee309e89cc391882b0f238a06571b2b1ed972b6f8ec9baf09992b27dcf"
+      "bytes": 22196,
+      "sha256": "548925d2b9eac34962f478cf1d5c9c159d9aff4c2c35966434a29d8034e629e2"
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -11390,6 +11390,51 @@
       "path": "tests/test_observability_backends_alerts.py",
       "sha256": "c015775d7072829877361f358f79d560075e0d84c06c9155146aa0c58875ba90",
       "bytes": 8168
+    },
+    {
+      "path": "blueprints/us-equities/data/promotion_gate.py",
+      "sha256": "0f9fcf22119ae19491f32ecb23d59ca7c67135edd1fc5778974d757419c93913",
+      "bytes": 11464
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/good.csv",
+      "sha256": "65d3fef1b51e5ece56b51e3c29e6f49f0f3639f2a77b51b1119f152d50a6a448",
+      "bytes": 331
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/bad.csv",
+      "sha256": "06b5e9c1b068d603c5a82bee582f5e34ccbe29458aa9c3c1d12f999439293f37",
+      "bytes": 324
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/good-gate-result.json",
+      "sha256": "80818156b0ecb502a71dd36e83479a09b2fd72e13af41b945ca691085209570f",
+      "bytes": 1380
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/bad-gate-result.json",
+      "sha256": "9d97c66150e354be376e7b9aabbe0c6c03ab541433dec885b0a46bf90bf461ad",
+      "bytes": 1588
+    },
+    {
+      "path": "tests/test_promotion_gate.py",
+      "sha256": "5b1e6701ee4ee1b491e189390a015326ac6482ec3a9d1717cfd74c856352e3b8",
+      "bytes": 8793
+    },
+    {
+      "path": "docs/decisions/2026-09-22-broker-credential-handling.md",
+      "sha256": "4e32f464b3466e03be4122471fec9cc46886238f602a7ec3d128bfe2eac4e9e7",
+      "bytes": 4241
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/null-price-cell.csv",
+      "sha256": "1718d0cdc84850734cc17692407d5b2a145a84ee7476bc5ac19b03491988f730",
+      "bytes": 188
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/null-price-cell-gate-result.json",
+      "sha256": "f11f55c42ceed4af50f3d679005829521bf4b44136751e37c9e5dc4f0080fecf",
+      "bytes": 1571
     }
   ],
   "convergence_records": [

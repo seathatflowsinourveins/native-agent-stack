@@ -2,6 +2,9 @@
 import asyncio
 from dataclasses import replace
 from decimal import Decimal
+import hashlib
+import json
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -21,6 +24,13 @@ try:
     NATIVE = True
 except ImportError:
     NATIVE = False
+
+# runner.py itself (and safety.py) import cleanly without nautilus_trader/alpaca
+# (those are only imported lazily inside run_native/recovery paths), so the
+# promotion-gate and credential-permission tests below run unconditionally.
+import runner as runner_module
+from runner import credentials, validate_preflight as validate_preflight_always
+from safety import SafetyError as SafetyErrorAlways
 
 
 @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
@@ -150,6 +160,256 @@ class IntegratedRunner(unittest.TestCase):
         validate_preflight(observation, config, require_open=True, allow_existing=True)
         with self.assertRaisesRegex(SafetyError, "account_not_ready"):
             validate_preflight(observation, config, require_open=True)
+
+
+def _paper_ready_observation(now_ns, symbols=("SPY",)):
+    return {"account": {"status": "ACTIVE", "currency": "USD", "cash": "10000", "equity": "30000",
+                        "trading_blocked": False, "account_blocked": False, "trade_suspended_by_user": False},
+            "clock": {"timestamp_ns": now_ns, "received_at_ns": now_ns, "next_close_ns": now_ns + 3600_000_000_000,
+                      "is_open": True},
+            "positions": [], "orders": [],
+            "assets": [{"symbol": s, "status": "active", "tradable": True} for s in symbols],
+            "quotes": [{"symbol": s, "ts_ns": now_ns} for s in symbols]}
+
+
+def _paper_ready_config(symbols=("SPY",)):
+    return {"capital_usd": "10000", "duration_seconds": 60, "cleanup_seconds": 10,
+            "symbols": list(symbols), "benchmarks": list(symbols), "quote_max_age_seconds": 5}
+
+
+class PromotionGatePreflight(unittest.TestCase):
+    """`mode="paper"` requires a passing, hash-matched promotion-gate result;
+    `mode=None` (every pre-existing call) is unaffected. Does not require the
+    pinned nautilus_trader/alpaca runtime: runner.py imports those lazily."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.snapshot = self.root / "config.json"
+        self.snapshot.write_text('{"symbols": ["SPY"]}')
+        self.snapshot_hash = hashlib.sha256(self.snapshot.read_bytes()).hexdigest()
+        self.now_ns = time.time_ns()
+        self.observation = _paper_ready_observation(self.now_ns)
+        self.config = _paper_ready_config()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _call(self, **gate_kwargs):
+        return validate_preflight_always(self.observation, self.config, require_open=True,
+                                          mode="paper", **gate_kwargs)
+
+    def test_mode_none_is_unaffected_by_missing_gate_arguments(self):
+        # Every pre-existing preflight/recover call site omits mode/gate args.
+        validate_preflight_always(self.observation, self.config, require_open=True)
+
+    def test_missing_gate_result_path_raises_promotion_gate_missing(self):
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_missing"):
+            self._call(snapshot_path=self.snapshot)
+
+    def test_missing_snapshot_path_raises_promotion_gate_missing(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": self.snapshot_hash}))
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_missing"):
+            self._call(gate_result_path=gate_path)
+
+    def test_nonexistent_gate_result_file_raises_promotion_gate_missing(self):
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_missing"):
+            self._call(gate_result_path=self.root / "does-not-exist.json", snapshot_path=self.snapshot)
+
+    def test_unparseable_gate_result_file_raises_promotion_gate_missing(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text("not json")
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_missing"):
+            self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+
+    def test_failing_gate_status_raises_promotion_gate_failed(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps({"status": "fail", "input_sha256": self.snapshot_hash}))
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_failed"):
+            self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+
+    def test_mismatched_hash_raises_promotion_gate_mismatch(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": "0" * 64}))
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_mismatch"):
+            self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+
+    def test_passing_matched_gate_allows_preflight_to_proceed(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": self.snapshot_hash}))
+        close = self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+        self.assertEqual(close, (self.now_ns + 3600_000_000_000) / 1e9)
+
+    def test_passing_gate_still_enforces_ordinary_account_checks(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": self.snapshot_hash}))
+        self.observation["account"]["trading_blocked"] = True
+        with self.assertRaisesRegex(SafetyErrorAlways, "account_not_ready"):
+            self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+
+
+class MainCommandGateWiring(unittest.TestCase):
+    """Regression: review found `python3 runner.py paper ...` bypassed the
+    promotion gate entirely -- `main()` registered no `--gate-result`/
+    `--snapshot` arguments and its `paper`/`recover` call site omitted the
+    new `mode`/`gate_result_path`/`snapshot_path` kwargs, so `validate_preflight`
+    always ran with `mode=None`. These tests drive `runner.main()` itself
+    (mocking only the network-touching `preflight` call and the
+    native-runtime entry past the gate check) to prove the CLI wiring, not
+    just the already-covered `validate_preflight` unit behavior."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.env_file = self.root / "paper.env"
+        self.env_file.write_text("APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
+        os.chmod(self.env_file, 0o600)
+        self.config_file = self.root / "config.json"
+        self.config_file.write_text("{}")
+        self.output = self.root / "output.json"
+        self.snapshot = self.root / "universe.csv"
+        self.snapshot.write_text("symbol\nSPY\n")
+        self.snapshot_hash = hashlib.sha256(self.snapshot.read_bytes()).hexdigest()
+        self.now_ns = time.time_ns()
+        self.observation = _paper_ready_observation(self.now_ns)
+        self.observation["account_identity_sha256"] = "fixture-account"
+        self.config = _paper_ready_config()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _argv(self, command, extra):
+        return ["runner.py", command, "--env-file", str(self.env_file), "--config", str(self.config_file),
+                "--output", str(self.output), "--state-root", str(self.root / "state"), *extra]
+
+    def _run_main(self, command, extra=()):
+        """Patches every dependency `main()` reaches before/at the gate check
+        (config loading, credential parsing, the network preflight call) and
+        makes `account_lock_fingerprint` -- the first thing `main()` touches
+        immediately *after* a passing gate check -- raise a sentinel so the
+        test can tell "gate check passed and execution continued" apart from
+        "gate check raised/returned" without needing the pinned native
+        runtime or an SQLite ledger. Returns `(sentinel, code, raised)`:
+        `code` is `main()`'s return value (`None` if it raised instead), and
+        `raised` is the exception instance if one propagated out of `main()`."""
+        sentinel = RuntimeError("reached_post_gate_execution")
+        with patch.object(sys, "argv", self._argv(command, extra)), \
+             patch.object(runner_module, "load_config", return_value=(self.config, None, None)), \
+             patch.object(runner_module, "credentials", return_value=("fixture-key", "fixture-secret")), \
+             patch.object(runner_module, "preflight", return_value=self.observation), \
+             patch.object(runner_module, "account_lock_fingerprint", side_effect=sentinel):
+            try:
+                code = runner_module.main()
+                return sentinel, code, None
+            except Exception as exc:  # noqa: BLE001 -- deliberately catches the sentinel too
+                return sentinel, None, exc
+
+    def test_paper_without_gate_arguments_is_blocked_before_execution_continues(self):
+        sentinel, code, raised = self._run_main("paper")
+        self.assertIsNone(raised)
+        self.assertEqual(code, 2)
+        result = json.loads(self.output.read_text())
+        self.assertEqual(result["status"], "not_started")
+        self.assertEqual(result["reason"], "promotion_gate_missing")
+
+    def test_paper_with_failing_gate_result_is_blocked_before_execution_continues(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps({"status": "fail", "input_sha256": self.snapshot_hash}))
+        sentinel, code, raised = self._run_main("paper", ["--gate-result", str(gate_path), "--snapshot", str(self.snapshot)])
+        self.assertIsNone(raised)
+        self.assertEqual(code, 2)
+        result = json.loads(self.output.read_text())
+        self.assertEqual(result["status"], "not_started")
+        self.assertEqual(result["reason"], "promotion_gate_failed")
+
+    def test_paper_with_mismatched_snapshot_hash_is_blocked(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": "0" * 64}))
+        sentinel, code, raised = self._run_main("paper", ["--gate-result", str(gate_path), "--snapshot", str(self.snapshot)])
+        self.assertIsNone(raised)
+        self.assertEqual(code, 2)
+        result = json.loads(self.output.read_text())
+        self.assertEqual(result["reason"], "promotion_gate_mismatch")
+
+    def test_paper_with_passing_matched_gate_reaches_post_gate_execution(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps({"status": "pass", "input_sha256": self.snapshot_hash}))
+        sentinel, code, raised = self._run_main("paper", ["--gate-result", str(gate_path), "--snapshot", str(self.snapshot)])
+        self.assertIsNone(code)
+        self.assertIs(raised, sentinel)
+
+    def test_recover_command_is_unaffected_by_missing_gate_arguments(self):
+        """`recover` resumes a trial already admitted by an earlier `paper`
+        run; it must not additionally require --gate-result/--snapshot."""
+        self.observation["positions"] = [{"symbol": "SPY", "qty": "1"}]
+        sentinel, code, raised = self._run_main("recover")
+        self.assertIsNone(code)
+        self.assertIs(raised, sentinel)
+
+    def test_preflight_command_is_unaffected_by_missing_gate_arguments(self):
+        sentinel, code, raised = self._run_main("preflight")
+        self.assertIsNone(raised)
+        self.assertEqual(code, 0)
+        result = json.loads(self.output.read_text())
+        self.assertEqual(result["status"], "ready")
+
+
+class CredentialFilePermissions(unittest.TestCase):
+    """runner.credentials() fails closed on env-file mode, ownership, and
+    Git-worktree location before any line of the file is parsed."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _write_env(self, directory, name="paper.env", mode=0o600):
+        path = directory / name
+        path.write_text("APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
+        os.chmod(path, mode)
+        return path
+
+    def test_wrong_mode_is_rejected(self):
+        path = self._write_env(self.root, mode=0o644)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+            credentials(path)
+
+    def test_group_or_other_readable_mode_is_rejected(self):
+        path = self._write_env(self.root, mode=0o640)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+            credentials(path)
+
+    def test_wrong_owner_is_rejected(self):
+        path = self._write_env(self.root)
+        with patch.object(runner_module.os, "getuid", return_value=os.getuid() + 1):
+            with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+                credentials(path)
+
+    def test_inside_git_worktree_is_rejected(self):
+        repo_root = Path(__file__).resolve().parents[1]
+        self.assertTrue((repo_root / ".git").exists(), "test assumes this checkout is a Git worktree")
+        with tempfile.TemporaryDirectory(dir=repo_root) as inside:
+            path = self._write_env(Path(inside))
+            with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+                credentials(path)
+
+    def test_missing_file_is_rejected(self):
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+            credentials(self.root / "does-not-exist.env")
+
+    def test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials(self):
+        path = self._write_env(self.root)
+        self.assertEqual(credentials(path), ("fixture-key", "fixture-secret"))
+
+    def test_error_never_includes_file_contents(self):
+        path = self._write_env(self.root, mode=0o644)
+        with self.assertRaises(SafetyErrorAlways) as ctx:
+            credentials(path)
+        self.assertNotIn("fixture-key", str(ctx.exception))
+        self.assertNotIn("fixture-secret", str(ctx.exception))
 
 
 if __name__ == "__main__":
