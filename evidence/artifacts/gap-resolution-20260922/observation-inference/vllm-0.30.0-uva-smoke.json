@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "id": "vllm-0.30.0-uva-smoke",
+  "date": "2026-09-22",
+  "layer_ids": ["semantic-rag", "observation-inference"],
+  "gap_refs": [
+    {"layer_id": "semantic-rag", "gap_index": 4},
+    {"layer_id": "observation-inference", "gap_index": 4}
+  ],
+  "purpose": "Determine whether vLLM 0.30.0 (latest upstream release) starts on this WSL2/RTX 5090 host, settling the vLLM-version gap shared by semantic-rag gap 4 (executable_now) and observation-inference gap 4 (needs_hardware), per the Opus critic correction 'vllm-upgrade-smoke' which found the two layers' categorization inconsistent for the same underlying 0.29.0 UVA failure.",
+  "preregistered": "Read vLLM 0.30.0 release notes and merged PRs first for any UVA/WSL/pinned-memory change. If nvidia-smi, free disk (<=15GB needed) or an absence of other GPU jobs fail, record as not_run with the reason. Otherwise install vLLM 0.30.0 into a new isolated uv venv prefix (never touching vllm-0.25.0 or the live 127.0.0.1:8231 embedding service), start `vllm serve` for the already-cached nvidia/Nemotron-3-Embed-1B-BF16 model on a free port under ecosystem-bounded-run with a memory cap, and record whichever of these two outcomes actually occurs: (a) the server reaches 'Application startup complete' and answers one embedding request, which would refute the incumbent needs_hardware/blocked verdict on observation-inference gap 4 and settle semantic-rag gap 4 as executable_now confirmed; or (b) it fails at startup with 'RuntimeError: UVA is not available' or another CUDA/UVA error, which would confirm the incumbent needs_hardware verdict unchanged for both layers. No re-run is planned regardless of which outcome occurs.",
+  "commands": [
+    {
+      "cmd": "nvidia-smi --query-gpu=memory.used,memory.free,memory.total --format=csv; df -h ~; pgrep -af vllm; ss -ltnp | grep 823",
+      "exit": 0,
+      "duration_s": 2,
+      "output_excerpt": "5117 MiB, 19021 MiB, 24463 MiB total; / has 836G avail (13% used); only PID 399 vllm-0.25.0 serving 127.0.0.1:8231 (the permitted baseline embedding service, not touched) was running; no other GPU job present.",
+      "output_sha256": null
+    },
+    {
+      "cmd": "gh api repos/vllm-project/vllm/releases/latest -q '\"\\(.tag_name) \\(.published_at)\"'",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "v0.30.0 2026-09-22T05:20:54Z -- confirms v0.30.0 is genuinely the current upstream latest (resolves the version-label note in the observation-inference gap-4 evidence about a 'v0.30.0 vs v0.29.0' inconsistency: v0.30.0 was not yet released when that earlier snapshot was taken; it released today).",
+      "output_sha256": null
+    },
+    {
+      "cmd": "gh api repos/vllm-project/vllm/releases/tags/v0.30.0 -q '.body' | grep -iE 'uva|wsl|windows|pinned memory' -B3",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "Engine Core section: 'platforms without pinned memory such as WSL (#56908)'.",
+      "output_sha256": null
+    },
+    {
+      "cmd": "gh api repos/vllm-project/vllm/pulls/56908 -q '\"\\(.title)\\n\\(.body)\"'",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "Title: '[Model Runner V2] Tolerate lack of pinned memory support'. Body: 'In MRV2 we use UVA with static pointers which requires pinned memory. This change allows it to work on platforms pinned memory isn't supported/enabled, in particular WSL.' This is the exact upstream fix for the 0.29.0 'UVA is not available' crash.",
+      "output_sha256": null
+    },
+    {
+      "cmd": "~/.local/share/codex-ecosystem/bin/uv venv --python ~/.local/share/codex-ecosystem/python/cpython-3.13-linux-x86_64-gnu/bin/python3.13 ~/.local/share/codex-ecosystem/tools/vllm-0.30.0",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "Creating virtual environment at: ~/.local/share/codex-ecosystem/tools/vllm-0.30.0 (new prefix; vllm-0.25.0 and vllm-0.29.0 prefixes untouched)",
+      "output_sha256": null
+    },
+    {
+      "cmd": "ECOSYSTEM_JOB_MEMORY_HIGH=6G ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_SECONDS=590 ~/codex-ecosystem/bin/ecosystem-bounded-run ~/.local/share/codex-ecosystem/bin/uv pip install --python ~/.local/share/codex-ecosystem/tools/vllm-0.30.0/bin/python vllm==0.30.0",
+      "exit": 0,
+      "duration_s": 26,
+      "output_excerpt": "Resolved 196 packages in 2.78s; downloaded ~593.4MB net-new (vllm wheel 300.3MiB, nvidia-cutlass-dsl-libs, flashinfer-python, tokenspeed-triton, mistral-common, anthropic; torch==2.13.0 and most other deps reused from the existing 22G uv cache shared with the 0.29.0/0.25.0 installs); 'Installed 196 packages in 391ms'; python -c 'import vllm; print(vllm.__version__)' -> 0.30.0. Disk delta on / was ~2GB (well under the 3GB download cap and 15GB free-disk floor; 834G still available afterward).",
+      "output_sha256": "731325f409c96f3121c1f647a644539d2b265f1db3cb84a3919f0d2ef4a7c6c7"
+    },
+    {
+      "cmd": "ECOSYSTEM_JOB_MEMORY_HIGH=6G ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_SECONDS=300 ~/codex-ecosystem/bin/ecosystem-bounded-run ~/.local/share/codex-ecosystem/tools/vllm-0.30.0/bin/python -m vllm.entrypoints.cli.main serve ~/.local/share/codex-ecosystem/models/nemotron-3-embed-1b-c0c9fea --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 --host 127.0.0.1 --port 8235 --max-model-len 4096 --max-num-seqs 4 --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests",
+      "exit": 143,
+      "duration_s": 64,
+      "output_excerpt": "SUCCESS, not the 0.29.0 UVA crash. Key line: 'WARNING 09-22 19:36:04 [buffer_utils.py:47] Pinned memory is not available on this platform; falling back to device memory for UVA buffers.' -- this is the PR #56908 fallback firing exactly as advertised, in place of 0.29.0's fatal RuntimeError. Model loaded (2.23 GiB, 6.7s), engine init took 19.19s, and 'INFO: Application startup complete.' was reached at 19:36:33 (~52s after launch). Process was then deliberately SIGTERM'd by the operator after the embedding request below succeeded (exit 143 = 128+SIGTERM, expected for a clean manual stop, not a crash); log shows 'Shutting down' / 'Application shutdown complete.' with no error.",
+      "output_sha256": "cc802ba6b49a4b404647b1bd15b3d7aa451adaf2499a317c0797e876fb9dc72d"
+    },
+    {
+      "cmd": "curl -s -m 20 -X POST http://127.0.0.1:8235/v1/embeddings -H 'Content-Type: application/json' -d '{\"model\":\"nvidia/Nemotron-3-Embed-1B-BF16\",\"input\":\"vLLM 0.30.0 UVA smoke test on WSL2\"}'",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "HTTP 200; 2048-dim embedding returned in data[0].embedding; usage.prompt_tokens=18. One real completion served end-to-end by the 0.30.0 server.",
+      "output_sha256": "8e1812b7524514301128b263ceda3051adbc1906bc5cc3fd82d215bf7d0d8eab"
+    },
+    {
+      "cmd": "kill -TERM <serve pid>; pkill -TERM -f vllm-0.30.0; nvidia-smi --query-gpu=memory.used,memory.free --format=csv",
+      "exit": 0,
+      "duration_s": 5,
+      "output_excerpt": "Server exited cleanly. GPU memory returned to the exact pre-test baseline (5117 MiB used / 19021 MiB free), confirming no leaked GPU allocation and the pre-existing 0.25.0 embedding service on 127.0.0.1:8231 was undisturbed throughout.",
+      "output_sha256": null
+    }
+  ],
+  "tool_versions": {
+    "uv": "0.12.17",
+    "python": "3.13.15",
+    "vllm": "0.30.0 (new prefix; vllm-0.25.0 and vllm-0.29.0 unchanged)",
+    "gh": "2.101.0",
+    "torch": "2.13.0",
+    "gpu": "NVIDIA GeForce RTX 5090 (driver 610.43.02, CUDA UMD 13.3)",
+    "os": "Linux 6.18.33.2-microsoft-standard-WSL2"
+  },
+  "installs": [
+    {
+      "name": "vllm",
+      "version": "0.30.0",
+      "prefix": "~/.local/share/codex-ecosystem/tools/vllm-0.30.0",
+      "source_url": "https://pypi.org/simple/vllm/",
+      "sha256": "pypi wheel vllm-0.30.0-cp38-abi3-manylinux_2_28_x86_64.whl, installed via uv from PyPI index (uv resolver-verified hash, not independently re-checksummed by this receipt; see limitations)"
+    }
+  ],
+  "result": "vLLM 0.30.0 starts successfully on this WSL2/RTX 5090 host and serves a real embedding request. The 0.29.0 'RuntimeError: UVA is not available' fatal crash does NOT reproduce at 0.30.0. Upstream PR #56908 ('[Model Runner V2] Tolerate lack of pinned memory support', merged into v0.30.0, released 2026-09-22) replaces the fatal UVA requirement with a graceful device-memory fallback ('Pinned memory is not available on this platform; falling back to device memory for UVA buffers.'). The server reached readiness in ~52s and answered one /v1/embeddings request (200 OK, 2048-dim vector) before being cleanly stopped; GPU memory returned to the exact pre-test baseline.",
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "refutes_incumbent",
+    "explanation": "Refutes the observation-inference gap-4 'needs_hardware' blocker text, which asserted that closing the vLLM-version gap 'needs either different GPU/driver hardware or a new network install outside this session's pinned toolset' -- the network install alone (no new hardware) now closes it, on this exact host. Also converts semantic-rag gap 4 from an open 'no opened source records whether v0.30.0 was tried' question to a confirmed-working answer. This does not itself change which vLLM version is the pinned default (0.25.0 stays the running production embedding service per the task's explicit instruction not to touch it); a separate promotion decision would be needed to move the pin, and is out of scope for this smoke check."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Single smoke test, single small embedding model (nvidia/Nemotron-3-Embed-1B-BF16, already HF-cached locally); a larger generative model, higher --gpu-memory-utilization, tensor-parallel, or a sustained/concurrent load was not exercised and could surface different failure modes.",
+    "The 'falling back to device memory for UVA buffers' path may carry a performance cost relative to genuine pinned-memory UVA (not benchmarked here); this receipt establishes functional startup and one successful request, not throughput/latency parity with 0.25.0 or 0.29.0-on-non-WSL.",
+    "vLLM 0.30.0 was installed into a fresh prefix but was not promoted to the shared ~/.local/share/codex-ecosystem/bin/vllm shim or made the active embedding-service version; 0.25.0 remains the pinned production install by design (task instruction).",
+    "The downloaded wheel's integrity relies on uv's standard PyPI-hash verification during resolution/install; this receipt did not independently fetch and compare a published sha256 checksum file for vllm-0.30.0-cp38-abi3-manylinux_2_28_x86_64.whl outside of uv's own verification.",
+    "gh api calls for release notes/PR text are source_review-grade evidence for the 'why it now works' explanation; the 'it does work here' claim itself is native_proven from the actual serve+request run recorded above."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "evidence_class_scratch:~/codex-ecosystem/state/gap-resolution-20260922/vllm-smoke/vllm-0.30.0-install.log",
+      "sha256": "731325f409c96f3121c1f647a644539d2b265f1db3cb84a3919f0d2ef4a7c6c7"
+    },
+    {
+      "path": "evidence_class_scratch:~/codex-ecosystem/state/gap-resolution-20260922/vllm-smoke/vllm-0.30.0-serve.log",
+      "sha256": "cc802ba6b49a4b404647b1bd15b3d7aa451adaf2499a317c0797e876fb9dc72d"
+    },
+    {
+      "path": "evidence_class_scratch:~/codex-ecosystem/state/gap-resolution-20260922/vllm-smoke/embed-response.json",
+      "sha256": "8e1812b7524514301128b263ceda3051adbc1906bc5cc3fd82d215bf7d0d8eab"
+    }
+  ]
+}

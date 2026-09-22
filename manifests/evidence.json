@@ -12086,6 +12086,16 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-agents-models-workers-20260922.json",
       "sha256": "cc48e0009abf6a5bee0ec3511e176b091ed1e23ac11ac2fe74c63c2eea919a09",
       "bytes": 26372
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/semantic-rag/vllm-0.30.0-uva-smoke.json",
+      "sha256": "9d6416d9643c2107d7a8c06a3875b60f507b21e5c6daeee074bf3473bd528584",
+      "bytes": 11619
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/observation-inference/vllm-0.30.0-uva-smoke.json",
+      "sha256": "9d6416d9643c2107d7a8c06a3875b60f507b21e5c6daeee074bf3473bd528584",
+      "bytes": 11619
     }
   ],
   "convergence_records": [
