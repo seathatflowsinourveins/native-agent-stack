@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "exchange-calendars-native-check-20260922",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "exchange-calendars"
+  ],
+  "claim": "exchange_calendars 4.13.2 was installed in an isolated venv from PyPI and its XNYS calendar was queried natively for the 2013-10-07 session: session_open/session_close returned 2013-10-07T13:30:00+00:00 and 2013-10-07T20:00:00+00:00, matching the session_open_utc/session_close_utc values already recorded in blueprints/us-equities/data/receipt.json. Independent GitHub API checks (repos/gerrymanoim/exchange_calendars, its releases/latest, and commits for both the recorded source_pin dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a and the 4.13.2 tag) confirm the pin resolves to a real public commit and that tag 4.13.2 resolves to the identical commit.",
+  "limitations": [
+    "This is a single-session, single-calendar (XNYS) check, not a survey of holidays, breaks, other calendars or the package's full test suite.",
+    "It does not establish that blueprints/us-equities/data/receipt.json or blueprints/us-equities/historical-simulation/receipt.json themselves invoked exchange_calendars internally; it independently reproduces the same published session boundary values using the pinned package version.",
+    "No paper/live trading, broker calendar reconciliation or holiday-schedule regression was performed.",
+    "The PyPI install and GitHub API calls used live network access on 2026-09-22; they are not offline-attested or independently mirrored.",
+    "This receipt does not extend, retro-label or otherwise change the scope of native-historical-leverage-stress-20260919 (lean), which remains scoped to its own six LEAN simulations only."
+  ],
+  "data": {
+    "package": "exchange-calendars",
+    "installed_version": "4.13.2",
+    "install_command": "uv pip install --python <venv>/bin/python 'exchange-calendars==4.13.2'",
+    "check_command": "python - <<'PY'\nimport exchange_calendars as xcals\ncalendar = xcals.get_calendar('XNYS')\nprint(calendar.session_open('2013-10-07'))\nprint(calendar.session_close('2013-10-07'))\nPY",
+    "check_exit_code": 0,
+    "session_open_utc": "2013-10-07T13:30:00+00:00",
+    "session_close_utc": "2013-10-07T20:00:00+00:00",
+    "compared_receipt": "blueprints/us-equities/data/receipt.json",
+    "compared_receipt_session_open_utc": "2013-10-07T13:30:00+00:00",
+    "compared_receipt_session_close_utc": "2013-10-07T20:00:00+00:00",
+    "source_pin": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+    "github_checks": [
+      {
+        "endpoint": "repos/gerrymanoim/exchange_calendars",
+        "exit_code": 0,
+        "status": "ok"
+      },
+      {
+        "endpoint": "repos/gerrymanoim/exchange_calendars/releases/latest",
+        "exit_code": 0,
+        "status": "ok",
+        "tag_name": "4.13.2"
+      },
+      {
+        "endpoint": "repos/gerrymanoim/exchange_calendars/commits/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+        "exit_code": 0,
+        "status": "ok",
+        "sha": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a"
+      },
+      {
+        "endpoint": "repos/gerrymanoim/exchange_calendars/commits/4.13.2",
+        "exit_code": 0,
+        "status": "ok",
+        "sha": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a"
+      }
+    ],
+    "checked_at": "2026-09-22T08:07:00+00:00"
+  }
+}

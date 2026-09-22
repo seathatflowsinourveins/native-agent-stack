@@ -385,6 +385,28 @@ process.stdout.write(JSON.stringify({nodes, errors, renderAttempts, navigations}
         self.assertIn("search --native", next(recipe for recipe in setup["recipes"]
                                               if recipe["path"] == "recipes/search.md")["text"])
 
+    def test_real_stack_manifest_exchange_calendars_addition_is_internally_consistent(self):
+        """Sanity check on the real repository manifest, not the synthetic fixture above.
+
+        exchange-calendars was newly selected in manifests/stack.json (pr4-stack
+        unit) while pinned in catalogs/us-equities/data-research.json. This does
+        not run scripts/build_ecosystem.py --write against the real repository
+        (the coordinator regenerates the explorer); it only confirms the raw
+        manifest/catalog cross-reference this unit owns.
+        """
+        stack = json.loads((ROOT / "manifests/stack.json").read_text())
+        components = {c["id"]: c for c in stack["components"]}
+        self.assertIn("exchange-calendars", components)
+        component = components["exchange-calendars"]
+        profiles = {p["id"]: p for p in stack["profiles"]}
+        self.assertIn(component["profile"], profiles)
+        self.assertIn("exchange-calendars", profiles[component["profile"]]["component_ids"])
+
+        data_research = json.loads((ROOT / "catalogs/us-equities/data-research.json").read_text())
+        card = next(entry for entry in data_research["entries"] if entry["id"] == "data-exchange-calendars")
+        self.assertIn(component["repository"], card["repository"])
+        self.assertIn("manifests/stack.json", card["evidence_refs"])
+
     def test_recipe_coverage_drift_and_unknown_profile_components_fail(self):
         self.adoption["recipe_map"] = {}
         self.save()

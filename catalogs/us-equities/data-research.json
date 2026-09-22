@@ -1083,7 +1083,9 @@
         "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md",
         "blueprints/us-equities/data/receipt.json",
         "blueprints/us-equities/data/summarize_backtest.py",
-        "blueprints/us-equities/workers/requirements.txt"
+        "blueprints/us-equities/workers/requirements.txt",
+        "manifests/stack.json",
+        "blueprints/us-equities/historical-simulation/receipt.json"
       ],
       "native_workflow": [
         "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",

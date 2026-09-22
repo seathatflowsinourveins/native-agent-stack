@@ -31,13 +31,13 @@
     ]
   },
   "counts": {
-    "selected_components": 68,
+    "selected_components": 69,
     "catalog_identities": 844,
-    "nonselected_catalog_identities": 776,
+    "nonselected_catalog_identities": 775,
     "exclusive_identity_groups": {
       "star_review": 275,
-      "component_record": 68,
-      "catalog_card": 115,
+      "component_record": 69,
+      "catalog_card": 114,
       "research_supplement": 384,
       "legacy_candidate": 2
     },
@@ -8994,6 +8994,93 @@
         "recovery": {
           "status": "not_established",
           "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "evidence_refs": []
+        }
+      },
+      "baseline_applicability": {
+        "category": "supporting_workflow",
+        "scope": "This role supports quality, execution, state or observation. A direct token-saving claim needs a separately defined same-task comparison; installation alone has no token baseline.",
+        "retained_artifact_comparisons": 0,
+        "matched_lifetime_provider_baseline": "not_established",
+        "regression_policy": "Keep the cheaper adequate native path when a candidate expands tokens or fails required information/quality checks."
+      }
+    },
+    {
+      "component_id": "exchange-calendars",
+      "repository": "https://github.com/gerrymanoim/exchange_calendars",
+      "version": "4.13.2",
+      "profile": "supporting",
+      "role": "Trading sessions, holidays, breaks and UTC boundaries for the native XNYS calendar used by the local historical-simulation session-date check",
+      "installation_assessment": "runtime present in an isolated venv at retained native operation date (2026-09-22)",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/exchange-calendars",
+        "documented_commands": [
+          "python -m pip install 'exchange-calendars==4.13.2'",
+          "python - <<'PY'\nimport exchange_calendars as xcals\ncalendar = xcals.get_calendar('XNYS')\nprint(calendar.session_open('2013-10-07'))\nprint(calendar.session_close('2013-10-07'))\nPY"
+        ],
+        "scope": "Use the selected native recipe only when its task applies.",
+        "recipe_document": "blueprints/us-equities/data/README.md",
+        "lifecycle_guide": "adoption/lifecycle.md"
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "exchange-calendars-native-check-20260922",
+            "path": "evidence/receipts/exchange-calendars-native-check-20260922.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI or library invocation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
+      "source_pin": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+      "lifecycle_stages": {
+        "install": {
+          "status": "observed_installed",
+          "scope": "Dated native venv package availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
+          "evidence_refs": [
+            "evidence/receipts/exchange-calendars-native-check-20260922.json"
+          ]
+        },
+        "use": {
+          "status": "accepted_within_scope",
+          "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings.",
+          "evidence_refs": [
+            "evidence/receipts/exchange-calendars-native-check-20260922.json"
+          ]
+        },
+        "persistence": {
+          "status": "not_applicable",
+          "scope": "The selected operation is a finite library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.",
+          "evidence_refs": []
+        },
+        "restart": {
+          "status": "not_applicable",
+          "scope": "The selected operation is a finite library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.",
+          "evidence_refs": []
+        },
+        "cleanup": {
+          "status": "documented_not_replayed",
+          "scope": "The selected command should exit and leave no owned child process; removal of its package/prefix was not replayed by this matrix.",
+          "evidence_refs": [
+            "adoption/lifecycle.md"
+          ]
+        },
+        "recovery": {
+          "status": "not_applicable",
+          "scope": "The selected operation is a finite library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.",
           "evidence_refs": []
         }
       },
