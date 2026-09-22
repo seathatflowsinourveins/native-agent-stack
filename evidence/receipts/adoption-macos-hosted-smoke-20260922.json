@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "id": "adoption-macos-hosted-smoke-20260922",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-22T17:08:59Z",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "context-mode",
+    "ai-memory",
+    "mcporter",
+    "llama-cpp",
+    "qdrant"
+  ],
+  "claim": "adoption/bootstrap-macos.sh --profile macos-arm64-foundation --skip-system-packages ran to completion on a GitHub-hosted macOS arm64 runner (label macos-15, macOS 15.7.9 build 24G830, Python 3.13.15) into a disposable ECO_INSTALL_ROOT, installing the pinned darwin-arm64 archives and npm packages listed in adoption/pins-macos-arm64.json; scripts/adoption_status.py --profile macos-arm64-foundation --json then reported the profile prerequisites_present with no missing command and platform.supported false, and the job uploaded status.json, installed-versions.txt and sw_vers.txt as its artifact.",
+  "limitations": [
+    "Native operation on a GitHub-hosted macOS arm64 runner only; not acceptance on a user's Mac workstation, which must record its own receipt.",
+    "platform_profiles[macos-arm64] stays drafted_not_accepted and adoption/manifest.json supported_platforms stays Linux/x86_64; the overall adoption_status is prerequisites_missing by design on an unsupported platform.",
+    "No native client sign-in, no launchd service bootstrap, no llama-server embedding acceptance and no Homebrew system-package step ran (--skip-system-packages; the runner image already carried the prerequisites).",
+    "npm packages resolve their darwin-arm64 optional binaries from the registry unpinned; the registry tarball sha256 is what the pins verify.",
+    "socraticode is the profile's documented unpinned skip and was not installed."
+  ],
+  "data": {
+    "workflow": ".github/workflows/adoption-bootstrap.yml",
+    "job": "bootstrap-macos",
+    "run_id": "35753801691",
+    "run_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35753801691",
+    "run_attempt": 1,
+    "job_id": "106834376649",
+    "head_sha": "9d9ce2b8eae7415cee4899d4176378bfad942fda",
+    "runner_label": "macos-15",
+    "runner_image_provisioner": "20260828.587",
+    "macos_product_version": "15.7.9",
+    "macos_build": "24G830",
+    "python": "3.13.15",
+    "adoption_status": {
+      "overall": "prerequisites_missing",
+      "profile": "macos-arm64-foundation",
+      "profile_status": "prerequisites_present",
+      "missing_commands": [],
+      "platform": {
+        "os": "darwin",
+        "architecture": "arm64",
+        "supported": false
+      }
+    },
+    "installed_versions_observed": {
+      "node": "v24.21.0",
+      "uv": "0.12.17",
+      "gh": "2.101.0",
+      "codex-cli": "0.155.1",
+      "claude-code": "2.1.278",
+      "mcporter": "0.13.13",
+      "ai-memory": "2.3.2",
+      "qdrant": "1.19.1",
+      "llama-cpp": "build 11057 (llama-server)",
+      "source": "installed-versions.txt in the run artifact; the image additionally ships gh 2.100.0 under brew"
+    },
+    "artifact_name": "adoption-bootstrap-macos-status-35753801691-1",
+    "artifact_bytes": {
+      "status.json": 1834,
+      "installed-versions.txt": 2715,
+      "sw_vers.txt": 66
+    },
+    "status_json_sha256": "e59c1881a99e81dbef996ee685219cf4496032d77bcf425afa052780a05cdd7c",
+    "installed_versions_sha256": "bcef0ebbba22b5b1edfb3e64c72228ba67e0b70ca24446e68e0488cd5af1f406",
+    "sw_vers_sha256": "31fd674ddb951680692d7b68cafdeab5baa6b3e82aae843269dad73b53f25fc5",
+    "first_green_run": {
+      "run_id": "35753384567",
+      "head_sha": "585032a",
+      "note": "first hosted run at the PR head before the SC2317 test fix; validate failed on that run for an unrelated shellcheck code, the macOS job itself passed"
+    },
+    "pr_head_run": {
+      "run_id": "35753801691",
+      "head_sha": "9d9ce2b",
+      "job_id": "106834376649",
+      "status_json_sha256": "e59c1881a99e81dbef996ee685219cf4496032d77bcf425afa052780a05cdd7c",
+      "installed_versions_sha256": "bcef0ebbba22b5b1edfb3e64c72228ba67e0b70ca24446e68e0488cd5af1f406",
+      "sw_vers_sha256": "31fd674ddb951680692d7b68cafdeab5baa6b3e82aae843269dad73b53f25fc5"
+    },
+    "checkout_note": "pull_request event: the job checked out the synthesised refs/pull/65/merge commit (status.json git.current_commit), not the head sha alone; head_sha records the PR head the run was reported against."
+  },
+  "host_scope": {
+    "profile": "github-hosted-macos-15-arm64",
+    "platform": "macOS 15 arm64 (GitHub-hosted runner)",
+    "identity": "GitHub Actions runner; no personal host",
+    "import_limit": "Recorded hosted-runner execution only; importing this receipt does not qualify installation or behaviour on a user's Mac or on any Linux host."
+  }
+}

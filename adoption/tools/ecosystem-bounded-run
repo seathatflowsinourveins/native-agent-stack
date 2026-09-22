@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Keep one heavy job and its children in their own native systemd cgroup.
+set -euo pipefail
+
+fail() { printf 'ecosystem-bounded-run: %s\n' "$*" >&2; exit 78; }
+
+if (( $# == 0 )); then
+    printf 'Usage: ecosystem-bounded-run COMMAND [ARG ...]\n' >&2
+    exit 64
+fi
+
+job_uid=$(id -u)
+job_runtime="/run/user/$job_uid"
+[[ -f /sys/fs/cgroup/cgroup.controllers ]] || fail 'cgroup v2 is required; command was not started'
+[[ -d "$job_runtime" && ! -L "$job_runtime" && -S "$job_runtime/bus" && ! -L "$job_runtime/bus" ]] || fail 'native user manager is unavailable; command was not started'
+[[ $(stat -c %u "$job_runtime") == "$job_uid" && $(stat -c %u "$job_runtime/bus") == "$job_uid" ]] || fail 'unexpected user-manager ownership; command was not started'
+
+job_high=${ECOSYSTEM_JOB_MEMORY_HIGH:-4G}
+job_max=${ECOSYSTEM_JOB_MEMORY_MAX:-6G}
+job_swap=${ECOSYSTEM_JOB_SWAP_MAX:-0}
+job_seconds=${ECOSYSTEM_JOB_SECONDS:-600}
+job_tasks=${ECOSYSTEM_JOB_TASKS_MAX:-256}
+for job_size in "$job_high" "$job_max"; do
+    [[ "$job_size" =~ ^[1-9][0-9]*[KMGT]?$ ]] || fail 'memory limits must be positive finite sizes'
+done
+[[ "$job_swap" =~ ^(0|[1-9][0-9]*[KMGT]?)$ ]] || fail 'swap limit must be a finite size'
+[[ "$job_seconds" =~ ^[1-9][0-9]*$ && "$job_tasks" =~ ^[1-9][0-9]*$ ]] || fail 'runtime and task limits must be positive integers'
+
+# A scope inherits the caller's working directory, environment and standard IO.
+# Never fall back to running the command without containment.
+export XDG_RUNTIME_DIR="$job_runtime"
+export DBUS_SESSION_BUS_ADDRESS="unix:path=$job_runtime/bus"
+job_unit="ecosystem-job-${job_uid}-${BASHPID}-${RANDOM}.scope"
+job_pid=
+# Invoked by the signal traps below, which ShellCheck does not follow here.
+# shellcheck disable=SC2329
+stop_job() {
+    local job_status=$1
+    trap '' HUP INT TERM
+    # Native scope stop also reaches grandchildren; a PID-only signal does not.
+    /usr/bin/timeout 8s /usr/bin/systemctl --user stop "$job_unit" >/dev/null 2>&1 || true
+    if [[ -n "$job_pid" ]]; then
+        kill -TERM "$job_pid" 2>/dev/null || true
+        wait "$job_pid" 2>/dev/null || true
+    fi
+    exit "$job_status"
+}
+trap 'stop_job 129' HUP
+trap 'stop_job 130' INT
+trap 'stop_job 143' TERM
+/usr/bin/systemd-run --user --scope --quiet --collect \
+    --unit="$job_unit" \
+    --description='Bounded ecosystem job' \
+    --expand-environment=no \
+    --property="MemoryHigh=$job_high" \
+    --property="MemoryMax=$job_max" \
+    --property="MemorySwapMax=$job_swap" \
+    --property="TasksMax=$job_tasks" \
+    --property="RuntimeMaxSec=$job_seconds" \
+    --property=TimeoutStopSec=5s \
+    --property=OOMPolicy=kill \
+    -- "$@" <&0 &
+job_pid=$!
+if wait "$job_pid"; then
+    exit 0
+else
+    exit "$?"
+fi

@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Preserve upstream Gitleaks scanning semantics, with host-local containment.
+set -euo pipefail
+
+gitleaks_native="${GITLEAKS_NATIVE:-${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/gitleaks-8.30.1/gitleaks}"
+gitleaks_runner="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)/ecosystem-bounded-run"
+[[ -x "$gitleaks_native" && -x "$gitleaks_runner" ]] || { printf 'gitleaks: native binary or containment runner is missing\n' >&2; exit 78; }
+
+# These exact invocations cannot start a scan and need no user manager or lock.
+if (( $# == 1 )) && [[ "$1" == version || "$1" == --version || "$1" == --help || "$1" == -h ]]; then
+    exec "$gitleaks_native" "$@"
+fi
+
+gitleaks_runtime="/run/user/$(id -u)"
+[[ -d "$gitleaks_runtime" && ! -L "$gitleaks_runtime" && $(stat -c %u "$gitleaks_runtime") == "$(id -u)" ]] || { printf 'gitleaks: private runtime directory unavailable; scan was not started\n' >&2; exit 78; }
+
+# One scan per user, across worktrees and clients. A busy scanner is a failure,
+# never a successful empty result. Caps apply even if the caller has job defaults.
+export ECOSYSTEM_JOB_MEMORY_HIGH=4G ECOSYSTEM_JOB_MEMORY_MAX=6G
+export ECOSYSTEM_JOB_SWAP_MAX=0 ECOSYSTEM_JOB_SECONDS=600 ECOSYSTEM_JOB_TASKS_MAX=256
+exec {gitleaks_lock_fd}>"$gitleaks_runtime/ecosystem-gitleaks.lock"
+if /usr/bin/flock --nonblock --conflict-exit-code 75 "$gitleaks_lock_fd"; then
+    :
+else
+    gitleaks_lock_status=$?
+    if (( gitleaks_lock_status == 75 )); then
+        printf 'gitleaks: another scan holds the per-user lock; retry after it finishes\n' >&2
+    else
+        printf 'gitleaks: could not acquire the per-user lock; scan was not started\n' >&2
+    fi
+    exit "$gitleaks_lock_status"
+fi
+# The runner handles ordinary cancellation of the whole scope. The lock remains
+# inherited; findings may use any native --exit-code without misclassification.
+exec "$gitleaks_runner" "$gitleaks_native" "$@"

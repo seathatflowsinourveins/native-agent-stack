@@ -75,6 +75,7 @@ class ProfileMappingTests(unittest.TestCase):
         manifest = json.loads(MANIFEST_PATH.read_text())
         profile_ids = {profile["id"] for profile in manifest["profiles"]}
         self.assertIn("foundation-cpu", profile_ids)
+        self.assertIn("macos-arm64-foundation", profile_ids)
 
     def test_foundation_cpu_component_ids_covered_by_pins_or_documented(self):
         manifest = json.loads(MANIFEST_PATH.read_text())
@@ -397,6 +398,10 @@ class WorkflowReferenceTests(unittest.TestCase):
     def test_workflow_references_the_bootstrap_script_path(self):
         text = WORKFLOW_PATH.read_text()
         self.assertIn("adoption/bootstrap-linux.sh", text)
+
+    def test_workflow_references_the_macos_bootstrap_script_path(self):
+        text = WORKFLOW_PATH.read_text()
+        self.assertIn("adoption/bootstrap-macos.sh", text)
 
     def test_workflow_references_the_status_script(self):
         text = WORKFLOW_PATH.read_text()
