@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-09-22",
+  "platform": "linux-x86_64",
+  "source": "Ported from agent-lab .devcontainer/bootstrap-linux.sh (node, uv, gh, codex, claude) plus fresh 2026-09-22 fetches for qmd, mcporter, rtk, ai-memory, context-mode. Each archive was downloaded into a disposable worktree temp directory and hashed with sha256sum; npm entries were additionally cross-checked against `npm view <pkg> dist.integrity` (sha512, base64) computed with `openssl dgst -sha512 -binary | base64` over the same downloaded tarball -- all five matched exactly.",
+  "tools": [
+    {
+      "id": "node",
+      "version": "24.21.0",
+      "kind": "tarball",
+      "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz",
+      "sha256": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
+      "install_note": "Verified against https://nodejs.org/dist/v24.21.0/SHASUMS256.txt fetched 2026-09-22; also matches the pin already carried in agent-lab .devcontainer/bootstrap-linux.sh. Extract with --strip-components=1 into tools/node-24.21.0; symlink bin/{node,npm,npx,corepack}."
+    },
+    {
+      "id": "uv",
+      "version": "0.12.17",
+      "kind": "tarball",
+      "url": "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63",
+      "install_note": "Verified against the release's .sha256 sidecar fetched 2026-09-22; matches the existing agent-lab devcontainer pin. Archive also contains uvx; install both."
+    },
+    {
+      "id": "gh",
+      "version": "2.101.0",
+      "kind": "tarball",
+      "url": "https://github.com/cli/cli/releases/download/v2.101.0/gh_2.101.0_linux_amd64.tar.gz",
+      "sha256": "9bca2d1c16825f109907a23307628a2f0698fbf99662b73a5cf0b020293072b8",
+      "install_note": "v2.101.0 was GitHub's actual 'latest' release for cli/cli on 2026-09-22 (queried via `gh api repos/cli/cli/releases/latest`); hash verified against the release's gh_2.101.0_checksums.txt. Binary is at bin/gh inside the archive."
+    },
+    {
+      "id": "codex",
+      "version": "0.155.1",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.155.1.tgz",
+      "sha256": "fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66",
+      "install_note": "npm registry tarball for @openai/codex@0.155.1 (thin wrapper package, 4904 bytes); npm dist.integrity sha512-02fAAGyBtlA1zPjEo3kTj/bOSYbPz5DvjLwRZJdV7weFFEDzNFOMjQGmZ/+5CuirYV0hE+AZTrnjzwXYU4AdAQ== matches a fresh openssl sha512/base64 digest of the same download. `npm install --global --prefix tools/codex-0.155.1 @openai/codex@0.155.1`. The complete native package (codex-code-mode-host, bundled rg) used by the agent-lab devcontainer script is a separate, larger GitHub release asset; this pin follows the npm alternative the task specified."
+    },
+    {
+      "id": "claude-code",
+      "version": "2.1.278",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.1.278.tgz",
+      "sha256": "08c6dfcf3dafcfd30e09b2926c596e274f0fa20844a5801ada7f1c8e6227157e",
+      "install_note": "npm registry tarball for @anthropic-ai/claude-code@2.1.278 (27538 bytes); npm dist.integrity sha512-mfNRqC0GaEXqmP97NiwJBeYBmRuqe2VzgLUreUUaEhyJxJWx2Z6ClW1tBOncGNNXdhj6EY4LPvUIWP+oq311CA== matches a fresh openssl sha512/base64 digest. `npm install --global --prefix tools/claude-2.1.278 @anthropic-ai/claude-code@2.1.278`. Wrapper should export DISABLE_AUTOUPDATER=1, matching the agent-lab devcontainer script's pinned-version intent."
+    },
+    {
+      "id": "qmd",
+      "version": "2.8.3",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/@tobilu/qmd/-/qmd-2.8.3.tgz",
+      "sha256": "2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0",
+      "install_note": "npm dist.integrity sha512-zjfVwrObPB618B6x8SdhlGv/tX9OxRHsbQnr5DUtBvqPK6HGQ27lM+9/BAY5okpjrHVnW56hLyDkqoTcsrVLzA== matched. `npm install --global --prefix tools/qmd-2.8.3 @tobilu/qmd@2.8.3`, matching recipes/README.md."
+    },
+    {
+      "id": "rtk",
+      "version": "0.49.0",
+      "kind": "tarball",
+      "url": "https://github.com/rtk-ai/rtk/releases/download/v0.49.0/rtk-x86_64-unknown-linux-musl.tar.gz",
+      "sha256": "7278231dfd7e6a730a4ab7f847b195bcf02289c2d57622b0dab75a6411100c8f",
+      "install_note": "Verified against the release's checksums.txt fetched 2026-09-22, matching blueprints/convergence-practice/wsl-native-tools style pins and recipes/README.md's rtk 0.49.0 row."
+    },
+    {
+      "id": "ai-memory",
+      "version": "2.3.2",
+      "kind": "tarball",
+      "url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.3.2/ai-memory-linux-x86_64.tar.gz",
+      "sha256": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
+      "install_note": "Verified against the release's ai-memory-linux-x86_64.tar.gz.sha256 sidecar fetched 2026-09-22, following the upstream source named in blueprints/convergence-practice/wsl-native-tools/pins.json's convention and recipes/README.md's ai-memory row (official akitaonrails/ai-memory v2.3.2 archive)."
+    },
+    {
+      "id": "mcporter",
+      "version": "0.13.13",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.13.13.tgz",
+      "sha256": "ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d",
+      "install_note": "npm dist.integrity sha512-rgltHjpmdsBzErnWfAlNsW6Sn5B3y3Qli8phNtKkgn7s/Lk3Uf1YWLpqJXrIXjhxzBR67Oi5Z3+wxptn/vxFkA== matched. `npm install --global --prefix tools/mcporter-0.13.13 mcporter@0.13.13`, matching recipes/README.md. Requires Node >=24."
+    },
+    {
+      "id": "context-mode",
+      "version": "1.0.169",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/context-mode/-/context-mode-1.0.169.tgz",
+      "sha256": "09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
+      "install_note": "npm dist.integrity sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ== matched. recipes/README.md flags that the npm context-mode@1.0.169 release is a DIFFERENT source revision from the native plugin pin (git 6f0cc6841c687e754059f36714a11233fda1a02b installed via `codex plugin marketplace add` / `claude plugin marketplace add`) and is not a substitute for full plugin evidence. This pin installs the npm CLI package only (`npm install --global --prefix tools/context-mode-1.0.169 context-mode@1.0.169`) so the script can place an executable on PATH; it does NOT install or replace the client-native plugin, and does not by itself establish the plugin-level acceptance recorded elsewhere in the catalog."
+    }
+  ]
+}
