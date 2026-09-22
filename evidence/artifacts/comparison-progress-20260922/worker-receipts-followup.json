@@ -265,6 +265,11 @@
       }
     ],
     "finding": "The early cancellation return suppresses this explicit model/provider-mismatch status before its later handler. Independently reproduced by reviewer and coordinator; no provider call.",
-    "implication": "Do not claim complete explicit-block preservation or adopt this classifier as a default; original source owner retains the correction."
+    "implication": "Do not claim complete explicit-block preservation or adopt this classifier as a default; original source owner retains the correction.",
+    "followup": {
+      "status": "resolved_in_later_reviewed_return",
+      "evidence": "worker-classifier-correction.json",
+      "historical_finding_preserved": true
+    }
   }
 }

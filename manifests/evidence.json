@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -6773,8 +6773,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 11114369,
-      "sha256": "010c58852ff31e80e498b3c0b8ca237c27b0c04cafa7f5723ad9791d5e612164"
+      "bytes": 11115299,
+      "sha256": "3de646b31f3733a93c3d6f3be9478375f774b45c1ef15a78bed1f47477309c7a"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -11363,13 +11363,13 @@
     },
     {
       "path": "docs/comparison-progress-20260922.md",
-      "sha256": "fed4d51273a2c6b3b65c183ee5b5257fcf48db84d87c87206df81f98b4f51e3a",
-      "bytes": 6476
+      "sha256": "fb71b39497ff91540e555c3b25c4fa9c4ef760a3c767366c8d27c6524e2eecaf",
+      "bytes": 7392
     },
     {
       "path": "evidence/artifacts/comparison-progress-20260922/summary.json",
-      "sha256": "189af76ecafc54263484887b10903a01e6e04d23ff92b6dbb652e6585fddb2e3",
-      "bytes": 9849
+      "sha256": "0a19fd133aca4bffdc692f8dd851a333dab80b4f2ecd5959cb000a75165adc92",
+      "bytes": 10021
     },
     {
       "path": "evidence/artifacts/comparison-progress-20260922/tests/compare/closure-script.test.mjs",
@@ -11388,8 +11388,13 @@
     },
     {
       "path": "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json",
-      "sha256": "6db8fc715835ec90f8384adfcc766e4bcf2d8162e7f27f42d417e97256d77c7f",
-      "bytes": 10955
+      "sha256": "5b43a56c1bb8be4df24431ab5f947925c328a36f01c9b7bf308143809e5f1ddd",
+      "bytes": 11131
+    },
+    {
+      "path": "evidence/artifacts/comparison-progress-20260922/worker-classifier-correction.json",
+      "sha256": "7205bf2ec7bb10cace37cb09f3949c194cebc7bc1edc4023f854c9e34ea191fa",
+      "bytes": 2475
     }
   ],
   "convergence_records": [

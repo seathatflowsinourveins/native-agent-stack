@@ -45,9 +45,16 @@ zero reported usage without claiming zero provider consumption. Twelve selected
 local classifier tests pass in the original source layout; direct invocation
 from the flat seal fails to resolve imports. Recovery, artifact acceptance and
 refuted judgments remain open. A further synthetic check found that the
-classifier suppresses an explicit model/provider-mismatch block during
-cancellation; this does not affect the observed cancelled submission, but
-remains an open classifier defect. No worker or SDK becomes a new accepted default.
+classifier suppressed an explicit model/provider-mismatch block during
+cancellation. Claude's next return corrected that edge case: an independent
+review verified all five new sealed hashes and 13 selected classifier tests.
+The exact failing input now preserves the block both with and without
+cancellation. All nine rescored receipts differ only in their rescore timestamp;
+the observed outcomes are unchanged. The
+[correction record](../evidence/artifacts/comparison-progress-20260922/worker-classifier-correction.json)
+retains the original defect, corrected result and test scope. The owner's broader
+77-test result was not independently rerun. No worker or SDK becomes a new
+accepted default.
 
 ai-memory remains the operational memory of record. Basic Memory's returned
 lexical-retrieval results do not establish a replacement: both executed stores
@@ -92,8 +99,15 @@ decisions. Reopen a selection with a relevant measured comparison; preserve
 failed attempts, missing metrics and source provenance. Stars, newer releases
 and reviewer agreement do not close these gates.
 
-The current convergence work has not returned an explicit joint completion.
-Prepare the new WSL workstation after that handoff and the user's connection,
+The owner has now returned a foundation/runtime/memory scope status, separate
+from trading. The executed comparisons are complete within their reported
+limits; unresolved research rows and the unrun Hindsight arm do not themselves
+block a foundation handoff. Joint landing still requires canonical publication
+of the reviewed progress and a reviewed commit of the foundation tooling in its
+owning repository. The WSL runbook is written but remains under review; a file's
+existence does not qualify its setup commands.
+
+Prepare the new WSL workstation after the joint handoff and the user's connection,
 then collect its own installation, useful-operation and recovery evidence.
 macOS is a later, separately qualified target. Trading implementation and broker
 acceptance remain separately owned; no account or order action follows from this

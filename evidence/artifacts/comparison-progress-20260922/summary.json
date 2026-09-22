@@ -149,7 +149,11 @@
         "Two judging rounds refuted claims; no arm accepted as a winner and no SDK adoption follows.",
         "Cancellation usage can be zero or unavailable in returned receipts; this does not prove zero provider consumption."
       ],
-      "receipt_provenance_followup": "worker-receipts-followup.json"
+      "receipt_provenance_followup": "worker-receipts-followup.json",
+      "classifier_correction": {
+        "status": "reported_defect_resolved_observed_outcomes_unchanged",
+        "evidence": "worker-classifier-correction.json"
+      }
     },
     {
       "layer": "data-research",
