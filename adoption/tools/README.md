@@ -1,0 +1,140 @@
+# Portable guarded runners
+
+Two host-local launchers that keep a heavy maintenance job, and every process it
+spawns, inside its own native systemd scope with hard memory, task and runtime
+limits. They exist because an unbounded scan or build on a WSL2 host can exhaust
+the VM and take the whole session down; the scope kills the job instead.
+
+| Script | Role |
+| --- | --- |
+| `ecosystem-bounded-run` | Generic launcher: runs `COMMAND [ARG ...]` in a transient `--user --scope` unit with `MemoryHigh`/`MemoryMax`/`MemorySwapMax`/`TasksMax`/`RuntimeMaxSec` applied. Refuses to run at all when it cannot contain the job. |
+| `gitleaks-guarded` | Gitleaks front end: preserves upstream Gitleaks argument and exit-code semantics, adds a per-user non-blocking lock so two scans cannot run at once, and delegates the actual scan to `ecosystem-bounded-run`. |
+
+## Provenance
+
+- Source: the `bin` directory of the private `codex-ecosystem` checkout on the
+  WSL2 host that developed them (not published here; the two files below are the
+  whole of what was copied).
+- Copied: 2026-09-22.
+- Original sha256 as read with `sha256sum` at copy time:
+  - `ecosystem-bounded-run` —
+    `7680fe1173b35a8472023772c8973c4a9b65c4e444414ac44efa199cbabe17db`
+  - `gitleaks-guarded` —
+    `66db06f653520ad49c2531ab2d5df762d1e952b1d1655ba5f509b6014cbc52f1`
+- `ecosystem-bounded-run` is byte-for-byte identical to its source; its copy here
+  still hashes to the value above.
+
+### Exact lines changed in `gitleaks-guarded`
+
+Only lines 5 and 6 differ from the source. Both originally held a literal
+personal home path, which this repository forbids and which would not resolve on
+another host.
+
+| Line | Was | Is now | Why |
+| --- | --- | --- | --- |
+| 5 | a literal absolute path to the pinned Gitleaks binary under one user's home | `gitleaks_native="${GITLEAKS_NATIVE:-${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/gitleaks-8.30.1/gitleaks}"` | Resolves through the same `ECO_INSTALL_ROOT` contract the bootstrap scripts use, with `GITLEAKS_NATIVE` as an explicit override. The pinned version string `gitleaks-8.30.1` is unchanged. |
+| 6 | a literal absolute path to `ecosystem-bounded-run` in one user's checkout | `gitleaks_runner="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)/ecosystem-bounded-run"` | The guarded launcher finds its runner next to itself, so the pair stays correct wherever it is installed or symlinked from. |
+
+Nothing else was touched. Every absolute `/usr/bin` tool path
+(`/usr/bin/systemd-run`, `/usr/bin/systemctl`, `/usr/bin/timeout`,
+`/usr/bin/flock`), every exit code (`64` usage, `75` lock held by another scan,
+`78` refusal to run uncontained) and every default limit (`MemoryHigh=4G`,
+`MemoryMax=6G`, `MemorySwapMax=0`, `RuntimeMaxSec=600`, `TasksMax=256`) is
+unchanged.
+
+## Install on a new Linux/WSL2 host
+
+The agent rule these scripts serve assumes a PATH-resolved `gitleaks` *is* the
+guarded launcher, so that no caller can reach the raw binary by habit.
+
+```bash
+export ECO_INSTALL_ROOT="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
+mkdir -p "$ECO_INSTALL_ROOT/bin"
+
+# Keep the pair together: gitleaks-guarded resolves its runner next to itself.
+install -m 0755 adoption/tools/ecosystem-bounded-run "$ECO_INSTALL_ROOT/bin/ecosystem-bounded-run"
+install -m 0755 adoption/tools/gitleaks-guarded      "$ECO_INSTALL_ROOT/bin/gitleaks-guarded"
+
+# The guarded launcher must win PATH resolution for the name `gitleaks`.
+ln -sfn "$ECO_INSTALL_ROOT/bin/gitleaks-guarded" "$ECO_INSTALL_ROOT/bin/gitleaks"
+
+# Put that bin directory ahead of any directory holding the raw binary.
+export PATH="$ECO_INSTALL_ROOT/bin:$PATH"
+```
+
+Symlinking instead of copying works equally well, because line 6 resolves
+`BASH_SOURCE` with `pwd -P`; a `gitleaks` symlink therefore still finds the
+runner beside the real `gitleaks-guarded`, not beside the link.
+
+Verify the install without starting a scan:
+
+```bash
+gitleaks version                      # execs the native binary directly
+ecosystem-bounded-run true; echo $?   # 0 from inside a scope
+ecosystem-bounded-run; echo $?        # 64, usage
+```
+
+The pinned native Gitleaks binary itself is installed by the host bootstrap, not
+by these scripts. Point `GITLEAKS_NATIVE` at it if it lives outside
+`$ECO_INSTALL_ROOT/tools/gitleaks-8.30.1/`.
+
+Do not bypass the guarded launcher by calling the native binary directly, and do
+not raise the limits to retry a scan that the scope killed: select a narrower
+commit range or file set instead, and record any size-based exclusion as
+incomplete coverage.
+
+## Runtime boundary
+
+These scripts are **Linux-only**, and only on a host that provides all of:
+
+- **cgroup v2** — `ecosystem-bounded-run` requires
+  `/sys/fs/cgroup/cgroup.controllers` to exist. Without it the memory and task
+  limits cannot be enforced.
+- **A native `systemd --user` bus** at `/run/user/$UID/bus` — it must be a real
+  socket, not a symlink, and both it and `/run/user/$UID` must be owned by the
+  calling user. On WSL2 this means systemd is enabled for the distribution
+  (`systemd=true` under `[boot]` in `/etc/wsl.conf`) and a user manager is
+  running.
+
+When any of those preconditions fails the runner exits **78** and the command is
+**not started**. There is deliberately no uncontained fallback: a refusal is the
+designed outcome, because running the heavy job unbounded is the exact failure
+being prevented. `gitleaks-guarded` refuses the same way (78) when the native
+binary, the runner or the private runtime directory is unavailable — before any
+scan begins.
+
+**macOS has no equivalent.** launchd provides no per-job memory cgroup, so there
+is no way to reproduce `MemoryMax`/`MemorySwapMax` containment for a transient
+scope. The "always run Gitleaks through the guarded launcher" rule is therefore
+scoped to Linux/WSL2 hosts; a macOS bootstrap must not pretend to satisfy it by
+installing an unbounded shim.
+
+## What the tests establish
+
+`tests/test_adoption_guarded_runners.py` covers two different evidence classes,
+and prints which containment branch it took.
+
+- **Structural validation** — ShellCheck (`-S style`, gated on `shutil.which`)
+  finds no finding in either script; neither file contains a personal home path
+  literal; both enable strict mode; `ecosystem-bounded-run` with no arguments
+  exits 64. This proves artifact consistency, not that containment works.
+- **Local integration check** — on a host that has cgroup v2 and a working
+  `systemd --user` bus, the test asserts that `ecosystem-bounded-run sh -c 'exit
+  3'` propagates exit 3, that `ecosystem-bounded-run true` exits 0, and that no
+  `ecosystem-job-*` unit survives afterwards (`--collect` cleanup). That
+  cleanup is asynchronous: the runner returns while systemd is still tearing
+  the scope down, measured on the developing WSL2 host at 0.003s-0.028s over
+  three runs, so the test polls to a 15s deadline and prints the observed
+  settle time rather than sleeping a fixed interval. A listing taken in the
+  same instant the runner exits can legitimately still show the scope. It also
+  drives `gitleaks-guarded version` at a stub binary via `GITLEAKS_NATIVE`,
+  through an instrumented copy of the runner, and asserts the stub's oracle file
+  exists while the runner's oracle file does not — i.e. the fast `version` path
+  really does `exec` the native binary and never pays for a scope.
+- On a host **without** the user bus, the same test asserts the refusal property
+  instead: exit 78 and the oracle file the wrapped command would have created
+  does not exist — the "never runs a command uncontained" guarantee.
+
+The integration branch is evidence for the host that ran it. It is not upstream
+Gitleaks evidence, and it says nothing about a host with a different systemd or
+cgroup configuration.
