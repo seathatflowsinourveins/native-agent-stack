@@ -1,0 +1,97 @@
+{
+ "accepted": false,
+ "defects": [
+  "The new '## Per-model Claude token usage' section states the opposite of the qualification evidence it cites: it says `instance` carries the session id and that this is how the dated qualification scoped one headless run. The in-scope guide and receipt say the collector keeps no session.id, `instance` is not the session id, and the run was scoped with OTEL_RESOURCE_ATTRIBUTES=ecosystem.client.scope=<run> kept as the `client_scope` label. An adopter following this section would try a nonexistent scoping path.",
+  "The new decision's evidence_scope claims native runs under a project-only profile, which the cited receipt explicitly records as not qualified with zero launches. The decision's limitations array does not carry that non-qualification, and lifecycle.unknown ('beyond the project-only profile recorded here') reinforces the overstatement. This promotes a failed condition into accepted evidence in the validated catalog union.",
+  "Both files assert the shipped examples are 'byte-identical copies of the deployed agent-lab files', but the dated guide records different assertion totals for the same three suites in the deployed checkout than the shipped copies produce, so byte-identity cannot hold (test-child-usage even drops from 31 to 16 assertions). Nothing in scope reconciles the two states.",
+  "The Codex examples are documented as carrying `sandbox_mode`, and the README's 'Sandbox' column says 'as declared in the file' for both agents, but neither .toml declares sandbox_mode: each file has exactly three keys (name, description, developer_instructions). The read-only posture of the Codex evidence-reviewer is therefore documented only in prose, with no sandbox declaration to point at.",
+  "The source-scout qualification cell overstates the stored run evidence in two ways: it credits source-scout with 'two readiness audits' where the receipt and guide record one, and it credits it with 'the inventory and recheck stages of eight native reviews' although the recheck stage was only added after review 9 and first ran natively in the eleventh run.",
+  "The 'Not changed, with reason' paragraph states that the portable examples still carry the previous packet and agents and that syncing them is a separate, unrequested change to another repository. The same change set that adds this guide to this repository performs exactly that sync (examples/claude-native README, contract.config.json, settings, CLAUDE.md, plus the synced agents/workflows the README now documents), so the published statement is false in the repository that carries it and contradicts examples/claude-native/workflows/README.md:4-5.",
+  "The same exporter-coverage figure is quoted with two different percentages across the two in-scope artifacts (9% in the guide, 10 percent in the receipt limitation) for the identical ratio 3128/32,405 = 9.65%. Minor, but it is a quoted number that does not match between guide and receipt.",
+  "The owned-files list omits files this change set relies on and that the receipts list as artifacts: test-usage-receipts.mjs (the suite that binds the quoted figures, run as an acceptance command), codex-cross-review.mjs, test-codex-envelope.mjs and contract.config.json are not in the owned set, although the guide's own findings (reviews 5, 7, 10) and evidence/receipts/ultracode-token-routing-20260921.json:14-29 treat them as produced by this task."
+ ],
+ "duration_ms": 115173,
+ "evidence_class": "independent native review of the catalog commit 73f4334 against fb04bf7 by the portable review-changes workflow itself, run headlessly in the catalog checkout with the three agents supplied inline (--agents) because the catalog has no .claude/agents",
+ "gaps": [
+  "The behavioral core of the change - examples/claude-native/workflows/review-changes.js, readiness-audit.js, the five .mjs suites, child-usage.mjs, codex-cross-review.mjs and examples/claude-native/agents/*.md - is outside the requested diff scope, so the in-scope diff cannot show which of them changed in this change set. I read review-changes.js and test-usage-receipts.mjs directly and they match the documented three-stage routing and receipt bindings, but the revision history of those files (and hence the 'byte-identical' claim and the 161-vs-169 discrepancy) is unresolved from the requested scope.",
+  "No in-scope artifact reconciles the deployed agent-lab suite totals (161/31/15, docs:49) with the shipped copies' totals (169/23/16/18, docs:66-67 and the portable receipt), so the 'byte-identical copies' descriptor in examples/claude-native/workflows/README.md:4-5 and recipes/claude-native-ultracode.md:101-102 has no supporting evidence in scope.",
+  "No native run of the final shipped file set returned an accepted envelope: evidence/receipts/portable-claude-native-qualification-20260921.json:35-36 records envelope_status 'rejected', accepted false for the closing run, and :112 states the fixes made after that run are covered by the local suites and envelope tests only. The three-stage workflow's accepted path therefore remains locally-asserted, not provider-observed, on the shipped bytes.",
+  "Only two of the receipt's five local check totals (test-envelope 169, test-usage-receipts 18) are covered by the requested acceptance commands. test-contract-mutations 23, test-child-usage 16 and test-codex-envelope '7 PASS' (receipt lines 104-107) have no re-run recorded in the packet, so those quoted totals are documented-as-done only.",
+  "The Opus child's exported-counter coverage (3128 of 32,405 output tokens, ratio 0.097; 43% in the previous run) is recorded as unexplained in evidence/receipts/portable-claude-native-qualification-20260921.json:114. The new observability/native-data/README.md per-model section is published on top of that unexplained gap, and its `instance`/session-id sentence (defect 1) is itself wrong, so the documented per-model query path has no verified scoping mechanism in scope.",
+  "The Codex agent examples have no end-to-end run of their own (disclosed at examples/codex-native/README.md:18-22, decisions.json limitation line 2665). Combined with the missing sandbox_mode keys (defect 4), the read-only posture of examples/codex-native/agents/evidence-reviewer.toml is instruction text with neither a declared sandbox nor a run, while catalogs/foundation/decisions.json:2669-2674 records component_id 'codex' at stage 'use' / 'accepted_within_scope'.",
+  "Acceptance commands were deliberately not executed by this role (read-only, and a separate recheck stage re-runs them); the recorded exit codes and outputs in the packet were judged only against source, not reproduced here."
+ ],
+ "inventory_checks_run": [
+  {
+   "command": "python3 scripts/validate.py",
+   "exit": "0"
+  },
+  {
+   "command": "python3 scripts/validate_foundation.py --root . --json",
+   "exit": "0"
+  },
+  {
+   "command": "python3 scripts/build_ecosystem.py --check",
+   "exit": "0"
+  },
+  {
+   "command": "bash -c \"cd examples/claude-native/workflows && node test-envelope.mjs\"",
+   "exit": "0"
+  },
+  {
+   "command": "bash -c \"cd examples/claude-native/workflows && node test-usage-receipts.mjs\"",
+   "exit": "0"
+  },
+  {
+   "command": "git diff --check",
+   "exit": "0"
+  }
+ ],
+ "reason": "8 defect(s) reported ; 7 verification gap(s) reported",
+ "recheck_checks_run": [
+  {
+   "command": "python3 scripts/validate.py",
+   "exit": "0"
+  },
+  {
+   "command": "python3 scripts/validate_foundation.py --root . --json",
+   "exit": "0"
+  },
+  {
+   "command": "python3 scripts/build_ecosystem.py --check",
+   "exit": "0"
+  },
+  {
+   "command": "bash -c \"cd examples/claude-native/workflows && node test-envelope.mjs\"",
+   "exit": "0"
+  },
+  {
+   "command": "bash -c \"cd examples/claude-native/workflows && node test-usage-receipts.mjs\"",
+   "exit": "0"
+  },
+  {
+   "command": "git diff --check",
+   "exit": "0"
+  }
+ ],
+ "resolution": "defects 1, 2 and 4 were already resolved in 8504e11 (Codex review overlap); the guide was regenerated from the current deployed record so its checks, owned files and the sync sentence match (3, 6, 8), the decision limitations carry the project-only boundary (2), the readiness-audit count names both audits (5), and the coverage percentage reads 10% in both artifacts (7)",
+ "status": "rejected",
+ "verdicts": [
+  {
+   "claim": "examples/claude-native/ultracode.settings.json: workflowSizeGuideline changed from 'small' to 'unrestricted' (per-workflow concurrency env var CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS stays '3').",
+   "verdict": "confirmed"
+  },
+  {
+   "claim": "examples/claude-native/workflows/README.md 'review-changes' workflow now runs three stages (source-scout inventory, evidence-reviewer review, source-scout recheck) instead of the previous two (Sonnet inventory, Opus review), with acceptance requiring exit codes and quoted totals to agree across both runs.",
+   "verdict": "confirmed"
+  },
+  {
+   "claim": "New local check scripts referenced as added/expected: test-contract-mutations.mjs, test-child-usage.mjs, test-usage-receipts.mjs, test-codex-envelope.mjs, plus contract.config.json and codex-cross-review.mjs, alongside the pre-existing test-envelope.mjs.",
+   "verdict": "confirmed"
+  },
+  {
+   "claim": "Haiku routing decision: 'not routed' based on a stored trial where Sonnet scored 14/14 lane rows and Haiku scored 9/14 with a misattributed quote; overturn condition requires a repeat trial with no unanchored citation on two distinct packets.",
+   "verdict": "confirmed"
+  }
+ ]
+}

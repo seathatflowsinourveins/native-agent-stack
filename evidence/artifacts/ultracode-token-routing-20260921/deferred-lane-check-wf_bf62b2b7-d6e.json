@@ -1,0 +1,12 @@
+{
+ "run_id": "wf_bf62b2b7-d6e",
+ "agent_type": "probe-reviewer-b",
+ "returned": {
+  "find_symbol_loaded": "yes",
+  "find_symbol_call": "Found function summarizeRun in .claude/workflows/child-usage.mjs, lines 55-80.",
+  "codebase_search_loaded": "yes",
+  "replace_content_loaded": "no",
+  "ctx_purge_loaded": "no",
+  "toolsearch_raw": "ToolSearch returned schemas for find_symbol and codebase_search only; replace_content and ctx_purge were not matched/returned."
+ }
+}

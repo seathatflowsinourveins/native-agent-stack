@@ -17,11 +17,12 @@ if (!docs.length && !commands.length) {
   return { status: 'incomplete', reason: 'no source documents or commands supplied', claims: [], verify: null, question }
 }
 
+// Shared worker packet: byte-identical in every saved workflow (test-envelope.mjs asserts it).
 const PACKET = [
-  'Worker packet contract: bounded objective, only the listed sources, read-only effects, return only the schema.',
-  'Cite every claim with file path and section/line or the exact command. Copy numbers exactly. Never print credential values.',
-  'Distinguish documented-as-done from observed-now. Preserve failures and unknowns.',
-  'Context lanes (MCP tools are inherited by workflow agents; call them directly, or load a schema with ToolSearch when it is deferred): Serena for known symbols/references, SocratiCode for conceptual code, jCodeMunch for indexed retrieval, ai-memory query for prior decisions, Context Mode ctx_execute for large outputs; one lane per artifact.',
+  'Worker packet contract: bounded objective, only the listed sources, no writes except what an acceptance command named in your task itself produces, return only the schema.',
+  'Cite every claim with file path and section/line or the exact command. Copy numbers exactly. Never print credential or env values. Never claim token savings.',
+  'Distinguish documented-as-done from observed-now. Preserve failures, empty results and unknowns as such; do not restate them as passes.',
+  'Context lanes, limited to the tools your role has (load a deferred one with ToolSearch "select:<tool name>" before calling it; skip lanes your role lacks): focused rg/Read or Serena for known symbols/references, SocratiCode for conceptual code, jCodeMunch for indexed retrieval, scoped qmd search for Markdown, ai-memory query for prior decisions, Context Mode ctx_execute for large outputs; one lane per artifact, and open the original source before judging retrieved text.',
 ].join(' ')
 
 const CLAIMS = {
@@ -80,7 +81,7 @@ const readers = await parallel(groups.map((g, i) => () => agent(
     ? 'Read these documents fully and extract every claim relevant to the question: ' + g.items.join(', ')
     : 'Run these read-only commands exactly and report their returned results as claims: ' + g.items.join(' ; ')) +
   '\nReturn exactly one sources entry for each listed document or command, copying its identifier exactly into source. Mark observed only after reading the document or receiving the command result, with nonblank returned evidence; observed command failures are evidence and must retain their integer exit_code. Use null exit_code for documents or commands not executed. Record unavailable documents as not_found and commands you did not run as not_executed. Never silently omit a requested source.',
-  { label: 'read:' + g.kind + '-' + (i + 1), phase: 'Read', schema: claimsForPacket(g.items), model: 'sonnet', effort: 'medium' },
+  { label: 'read:' + g.kind + '-' + (i + 1), phase: 'Read', schema: claimsForPacket(g.items), agentType: 'source-scout', model: 'sonnet', effort: 'medium' },
 )))
 // Preserve every packet identity, including failed/null readers, so an unread
 // source cannot vanish from the verdict.

@@ -80,6 +80,8 @@ NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-c
                     "evidence/artifacts/foundation-rd-20260921/qmd-bench-output.txt",
                     "evidence/artifacts/foundation-rd-20260921/native-review.json",
                     "recipes/claude-native-ultracode.md", "examples/claude-native/ultracode.settings.json",
+                    "docs/ultracode-token-routing-20260921.md", "recipes/claude-codex-cooperation-lanes.md", "examples/codex-native/README.md",
+                    "evidence/receipts/ultracode-token-routing-20260921.json", "evidence/receipts/portable-claude-native-qualification-20260921.json",
                     "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
                     "docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md", "docs/foundation-convergence-20260921.md",
                     "docs/harness-defaults.md", "catalogs/README.md", STACK, ADOPTION,
@@ -346,6 +348,8 @@ def build_data(root):
         # at the public branch after publication, with exact input hashes retained.
         new_catalog = path.startswith(("catalogs/foundation/", "catalogs/landscape/", "docs/landscape-")) or path in config.get("grand_catalogs", {}).values()
         new_practice = path.startswith(("blueprints/native-skill-practice/", "examples/codex-native/agents/semantic-", "examples/claude-native/agents/semantic-"))
+        # Artifact bundles that arrived with this packet do not exist at the immutable base.
+        new_catalog = new_catalog or path.startswith(("evidence/artifacts/ultracode-token-routing-20260921/", "evidence/artifacts/portable-claude-native-qualification-20260921/"))
         revision = publication_ref if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or new_practice or path in current_public_paths else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 
@@ -507,7 +511,8 @@ def build_data(root):
                  "docs/community-native-practice.md", "examples/claude-native/CLAUDE.md",
                  "recipes/claude-native-ultracode.md", "docs/foundation-rd-readiness.md",
                  "recipes/claude-codex-foreground-review.md", "docs/claude-upstream-checks.md",
-                 "docs/claude-repository-evidence.md"):
+                 "docs/claude-repository-evidence.md", "docs/ultracode-token-routing-20260921.md",
+                 "recipes/claude-codex-cooperation-lanes.md", "examples/codex-native/README.md"):
         if (root / path).exists():
             guide_paths.append(path)
     if config.get("landscape_manifest"):

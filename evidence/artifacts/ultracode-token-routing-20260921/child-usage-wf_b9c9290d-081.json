@@ -1,0 +1,120 @@
+{
+ "status": "complete",
+ "reason": "every child has an explicit requested model, a matching resolved model, returned usage and a non-null result",
+ "multi_model_children": [],
+ "children": [
+  {
+   "agent_id": "a9a2b062c5e3efac1",
+   "label": "inventory",
+   "phase": "Inventory",
+   "agent_type": "source-scout",
+   "requested_model": "sonnet",
+   "resolved_models": [
+    "claude-sonnet-5"
+   ],
+   "efforts": [
+    "medium"
+   ],
+   "requests": 10,
+   "usage": {
+    "input_tokens": 20,
+    "output_tokens": 18518,
+    "cache_read_input_tokens": 398681,
+    "cache_creation_input_tokens": 78196
+   },
+   "usage_by_model": {
+    "claude-sonnet-5": {
+     "input_tokens": 20,
+     "output_tokens": 18518,
+     "cache_read_input_tokens": 398681,
+     "cache_creation_input_tokens": 78196
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 10084,
+   "complete": true,
+   "issues": []
+  },
+  {
+   "agent_id": "a40907ac8ef241b8d",
+   "label": "review",
+   "phase": "Review",
+   "agent_type": "evidence-reviewer",
+   "requested_model": "opus",
+   "resolved_models": [
+    "claude-opus-5"
+   ],
+   "efforts": [
+    "high"
+   ],
+   "requests": 13,
+   "usage": {
+    "input_tokens": 26,
+    "output_tokens": 25597,
+    "cache_read_input_tokens": 686231,
+    "cache_creation_input_tokens": 99334
+   },
+   "usage_by_model": {
+    "claude-opus-5": {
+     "input_tokens": 26,
+     "output_tokens": 25597,
+     "cache_read_input_tokens": 686231,
+     "cache_creation_input_tokens": 99334
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 19098,
+   "complete": true,
+   "issues": []
+  },
+  {
+   "agent_id": "a94842b0bfe45c098",
+   "label": "recheck",
+   "phase": "Recheck",
+   "agent_type": "source-scout",
+   "requested_model": "sonnet",
+   "resolved_models": [
+    "claude-sonnet-5"
+   ],
+   "efforts": [
+    "medium"
+   ],
+   "requests": 3,
+   "usage": {
+    "input_tokens": 6,
+    "output_tokens": 1435,
+    "cache_read_input_tokens": 25103,
+    "cache_creation_input_tokens": 17328
+   },
+   "usage_by_model": {
+    "claude-sonnet-5": {
+     "input_tokens": 6,
+     "output_tokens": 1435,
+     "cache_read_input_tokens": 25103,
+     "cache_creation_input_tokens": 17328
+    }
+   },
+   "first_request_cache_read": 0,
+   "first_request_prompt_tokens": 9118,
+   "complete": true,
+   "issues": []
+  }
+ ],
+ "by_resolved_model": {
+  "claude-sonnet-5": {
+   "children": 2,
+   "input_tokens": 26,
+   "output_tokens": 19953,
+   "cache_read_input_tokens": 423784,
+   "cache_creation_input_tokens": 95524
+  },
+  "claude-opus-5": {
+   "children": 1,
+   "input_tokens": 26,
+   "output_tokens": 25597,
+   "cache_read_input_tokens": 686231,
+   "cache_creation_input_tokens": 99334
+  }
+ },
+ "run_id": "wf_b9c9290d-081"
+}

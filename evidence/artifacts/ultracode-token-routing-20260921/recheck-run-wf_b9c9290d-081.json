@@ -1,0 +1,82 @@
+{
+ "run_id": "wf_b9c9290d-081",
+ "inventory_checks_run": [
+  {
+   "command": "node .claude/workflows/test-envelope.mjs",
+   "exit": "0",
+   "result": "SUMMARY passed=157 failed=0 total=157 (all lines PASS)"
+  },
+  {
+   "command": "node .claude/workflows/test-child-usage.mjs",
+   "exit": "0",
+   "result": "SUMMARY passed=30 failed=0 total=30 (all lines PASS)"
+  },
+  {
+   "command": "node .claude/workflows/test-contract-mutations.mjs",
+   "exit": "0",
+   "result": "SUMMARY passed=15 failed=0 total=15 (all lines PASS)"
+  },
+  {
+   "command": "node .claude/workflows/test-codex-envelope.mjs",
+   "exit": "0",
+   "result": "7 PASS lines: completed job + payload status 0 is success with ids; failed job keeps ids and is not success; cancelled job without payload is not success, resul"
+  },
+  {
+   "command": "node .claude/workflows/check-syntax.mjs .claude/workflows/review-changes.js .claude/workflows/readiness-audit.js",
+   "exit": "0",
+   "result": "SYNTAX_OK .claude/workflows/review-changes.js\nSYNTAX_OK .claude/workflows/readiness-audit.js"
+  },
+  {
+   "command": "claude plugin validate .claude/agents",
+   "exit": "0",
+   "result": "Validating components in: .claude/agents\nValidation passed"
+  },
+  {
+   "command": "git diff --check",
+   "exit": "0",
+   "result": "(Bash completed with no output) - no whitespace errors reported"
+  }
+ ],
+ "recheck_checks_run": [
+  {
+   "command": "node .claude/workflows/test-envelope.mjs",
+   "exit": "0",
+   "result": "SUMMARY passed=157 failed=0 total=157 (157 PASS lines shown, no FAIL lines)"
+  },
+  {
+   "command": "node .claude/workflows/test-child-usage.mjs",
+   "exit": "0",
+   "result": "SUMMARY passed=30 failed=0 total=30 (30 PASS lines shown, no FAIL lines)"
+  },
+  {
+   "command": "node .claude/workflows/test-contract-mutations.mjs",
+   "exit": "0",
+   "result": "SUMMARY passed=15 failed=0 total=15 (15 PASS lines shown, no FAIL lines)"
+  },
+  {
+   "command": "node .claude/workflows/test-codex-envelope.mjs",
+   "exit": "0",
+   "result": "7 PASS lines shown, no FAIL lines; no SUMMARY line was printed by this command (unlike the other three test scripts)"
+  },
+  {
+   "command": "node .claude/workflows/check-syntax.mjs .claude/workflows/review-changes.js .claude/workflows/readiness-audit.js",
+   "exit": "0",
+   "result": "SYNTAX_OK .claude/workflows/review-changes.js\nSYNTAX_OK .claude/workflows/readiness-audit.js"
+  },
+  {
+   "command": "claude plugin validate .claude/agents",
+   "exit": "0",
+   "result": "Validating components in: .claude/agents\n\u2714 Validation passed"
+  },
+  {
+   "command": "git diff --check",
+   "exit": "0",
+   "result": "No output produced by the command (empty stdout/stderr)"
+  }
+ ],
+ "replay_with_final_post_processing": {
+  "evidence_issues": [],
+  "missing_checks": [],
+  "subagent_tokens": 0
+ }
+}

@@ -2738,6 +2738,41 @@
         "Superseded observations, including the author's own probe and invocation errors, remain recorded."
       ],
       "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+      "id": "ultracode-token-routing-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex"
+      ],
+      "claim": "Claude Code 2.1.278 native Workflow stages re-routed to lean project agents cut the provider-returned first-request prompt from 42,396 tokens (default child) to 12,164 (named MCP grants behind ToolSearch) and 8,048 (source-scout) on one identical task; eight native review runs, two readiness audits, a builder run and probes plus one Codex cross-family review are retained as sanitized usage receipts; Haiku was not routed after an Opus-verified 9/14 versus 14/14 extraction trial; workflowSizeGuideline moved from small to unrestricted with a task sizing rule.",
+      "limitations": [
+        "First-prompt figures come from one tiny task on one host and model; they bound a fixed spawn cost, not a savings rate.",
+        "The Haiku judgment rests on one packet and one Opus verifier.",
+        "The strict accepted envelope status was never returned in the deploying project; the commit gate was fix-and-commit after each review's findings were resolved.",
+        "Local suites are stubbed or synthetic; provider figures reach the receipts only as sanitized child-usage.mjs output, with raw transcripts outside Git.",
+        "Codex thread and turn identifiers were redacted from the cross-review record."
+      ],
+      "path": "evidence/receipts/ultracode-token-routing-20260921.json"
+    },
+    {
+      "id": "portable-claude-native-qualification-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "prometheus"
+      ],
+      "claim": "The portable Claude Code practice in examples/claude-native (three agents, ten workflow and check scripts, a sibling contract config, the unrestricted settings example) was adopted byte-for-byte into a scratch project and run on the upstream Claude Code 2.1.278 runtime: every local check passed from two working directories on the final file set; a headless review-changes run produced a valid envelope with source-scout, evidence-reviewer and source-scout children on Sonnet, Opus and Sonnet and reproduced the acceptance command in both the inventory and the independent recheck; a readiness-audit run completed; the run's metrics, tagged with an OpenTelemetry client scope the collector keeps as a label, showed both models under query_source=subagent and reconciled the Sonnet children exactly with child-usage.mjs; a Codex lane C review of the copied files completed with eight findings, all resolved.",
+      "limitations": [
+        "Local integration on one host with a synthetic one-line change; not an unchanged upstream test and not a benchmark.",
+        "The workflow's strict accepted status was not returned: every native reviewer found defects in the files under qualification, which were fixed and re-run; the fixes after the closing native run are covered by the local suites and envelope tests only.",
+        "The project-only settings profile was not qualified: three provider failures (500, 529, 529) and, with the coordinator model pinned, a permission-layer refusal of the Workflow tool because that profile carries no permission rule for it; headless runs need a loaded settings source whose permission mode or allow rule covers the Workflow tool.",
+        "Per-session scoping of the exported metrics is unavailable by design; the client scope comes from OTEL_RESOURCE_ATTRIBUTES and other sessions on the host were active during the windows. The Opus child's exported counters covered 10 percent (closing run) and 43 percent (previous run) of its provider-returned output while the Sonnet children reconciled exactly; unexplained.",
+        "Session, job, thread and turn identifiers are redacted; raw streams stay outside Git."
+      ],
+      "path": "evidence/receipts/portable-claude-native-qualification-20260921.json"
     }
   ],
   "files": [
@@ -3313,8 +3348,8 @@
     },
     {
       "path": "observability/native-data/README.md",
-      "sha256": "875bb6330e4d22d5e955d353a3d1b086ba109d005d522da4acd4363723332298",
-      "bytes": 8464
+      "sha256": "39d2a43ace58d34e679f401a742e1d2de831012a39b2aeedfac3758b9de436bd",
+      "bytes": 9829
     },
     {
       "path": "observability/native-data/config.example.json",
@@ -3443,13 +3478,13 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "652ed9d13c40597619762313663d18a1ef206d467886932bbd2944ceda47c252",
-      "bytes": 3616
+      "sha256": "0e255c6072d88303e774a25f90e12d377be5eb79263d7a0b6e37f7881bd983d7",
+      "bytes": 3903
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "a6c19c5693716fc88f7d80d2eea47a0bce5fc450e76943f91685b2764933213e",
-      "bytes": 14950
+      "sha256": "34d95772ef91ec33963ef92ea7bb9adc79fd34a7cdbfa533fd54dd6a04fefbcb",
+      "bytes": 15034
     },
     {
       "path": ".gitattributes",
@@ -4954,8 +4989,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "bytes": 471523,
-      "sha256": "45a3f392abf17b3de32b375e23ad00b49c0be9d17075af7d0a7a13a60f7c9e05"
+      "bytes": 472576,
+      "sha256": "aeb1abf43b5ff6613a83340300df758f90f9f5d02aecd71c04149961fdd9c672"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -6554,8 +6589,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "4cad16a2a0abe2352648c99815dad97d242eeb47e2e6536a786ca37a0a523887",
-      "bytes": 10362421
+      "sha256": "fb890e575f388ae55cfa2040e3ad47a7cfeb7efeace132df31de8f1772628d30",
+      "bytes": 10447335
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7069,8 +7104,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 85191,
-      "sha256": "76976ab76b0f8e172d2260423b89f8d21258509760d71681912e219dfc1df8ce"
+      "bytes": 85450,
+      "sha256": "a57ff14e7635cf919f28697fea1fcb54aa224d4c9b9e52d83f2a55550da2bf18"
     },
     {
       "path": "observability/README.md",
@@ -7259,8 +7294,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "7c395cb25468847448702165c1acf2977063b7cc260dba3aabfeebaeedff794e",
-      "bytes": 44096
+      "sha256": "a12b512e364f5ddcbb3d3ebf1fcbf94f2755024136055dfa4945ab908f12aaf4",
+      "bytes": 44805
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -7559,8 +7594,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "bytes": 117195,
-      "sha256": "4283a3ab0bab103900cf8943c14fd335fb97e88313c322e99235819bf9e4d048"
+      "bytes": 121647,
+      "sha256": "9aef19449c37b392924f35c11f8bad4e58611ce715ae00dcbbeb285f7b8b5212"
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -9304,18 +9339,18 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "3200dca15fe615436fe8973c5d0fb2dbd30f5eff273be1455cbc2da7b111cea2",
-      "bytes": 9875
+      "sha256": "043195efd6686ada4be63138f6af8862a150a83794b6d2a11c8a18a5e42a45b6",
+      "bytes": 11661
     },
     {
       "path": "docs/native-ultracode-20260921.md",
-      "bytes": 8349,
-      "sha256": "4c6973bf8f623d40ff542b9a6eaef378e9dcff08744f0fdcc8d413581db91bdf"
+      "bytes": 8494,
+      "sha256": "1960125c0a2222758aafcf70cb0478d59835c2d74d9c011167274d98c6dcacd7"
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
-      "sha256": "1d35ec9f182a4d3762f772f0ad6991b9b313d03e4e5a1d8e1b33a63d95757d4d",
-      "bytes": 157
+      "sha256": "6332b0cea25cd469a301b99b5a5d84a8dda709b89348c471625dc7290905d155",
+      "bytes": 235
     },
     {
       "path": "evidence/receipts/native-ultracode-20260921.json",
@@ -9959,13 +9994,13 @@
     },
     {
       "path": "catalogs/foundation/surfaces.json",
-      "sha256": "53965cb8d459e4cc7fe59629f8321e733e94766d115599d198e3622bcceed1f9",
-      "bytes": 18780
+      "sha256": "a1bfe1fc858b5a0362250b5a6a606b862d652bbf3d42198edf282261f2da4baa",
+      "bytes": 18885
     },
     {
       "path": "docs/claude-foundation-finalization-20260921.md",
-      "sha256": "e6c1b96aea4a63dd2ea3d71c0304e8ec32087e892c4ddae54624f0d96116bc85",
-      "bytes": 11161
+      "sha256": "7b9fedd0d46c978d9bf1a9bd4d10e386b4be41e043441b30a37048e57deea942",
+      "bytes": 11099
     },
     {
       "path": "evidence/artifacts/claude-foundation-finalization-20260921/qualification.json",
@@ -9989,18 +10024,18 @@
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
-      "sha256": "939ca910e06152a0d273161a43beaddb9d0ce78e0e1451eede8e09680e6e9641",
-      "bytes": 568
+      "sha256": "75067deabb854902f680e2edbd24d975d055ef64552aa2a9dd514c20cd7f58b1",
+      "bytes": 2069
     },
     {
       "path": "examples/claude-native/agents/isolated-builder.md",
-      "sha256": "d8f3cd687dfc1c2089b25322ede53844bdd3a4c9cf47a478dcb61f2515b16dab",
-      "bytes": 624
+      "sha256": "48938a39d10f33a2eef490d885da379cd63a03b7e42e53e4cb3ee3b8c80e1599",
+      "bytes": 2016
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "c46e288d676f9f7d78195d411ed2bce943a8fdda14a1b3272a5c84023f20543d",
-      "bytes": 2707
+      "sha256": "25abde916c404a51edd634828c452c7948690e6813b8d3d691e42d417532d55f",
+      "bytes": 12803
     },
     {
       "path": "examples/claude-native/workflows/check-syntax.mjs",
@@ -10009,18 +10044,18 @@
     },
     {
       "path": "examples/claude-native/workflows/readiness-audit.js",
-      "sha256": "59794f395ecda2dcb86e03db06d53fb98bd190dc1cfcbf92629f473dcd4de53e",
-      "bytes": 12738
+      "sha256": "d0d5afb3f4f8d635d0a75e48b4c4cda4a074e842130d9c80eb6633a5bfe1701a",
+      "bytes": 13143
     },
     {
       "path": "examples/claude-native/workflows/review-changes.js",
-      "sha256": "e3bd599c2355123deab62f5d39abac44ecbe2b04e73b76a9cf08d71a649f925c",
-      "bytes": 10526
+      "sha256": "12c078107d45ca5690b6d4a5e3e7c6522453a0f7d3846355337b17e1901b3ad6",
+      "bytes": 17859
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "d1ecdeea386dcec565ae3a395b16ce00db431991ecabf29b0052e229bb940269",
-      "bytes": 19844
+      "sha256": "42e31e482482f437495bb492327ff1ccc39bef2743886a9a8c37814b41949c0f",
+      "bytes": 44353
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -10144,8 +10179,8 @@
     },
     {
       "path": "examples/claude-native/agents/semantic-evidence-reviewer.md",
-      "sha256": "8fa00b89adfc471e61efcfceb103d6c9a09f6c657fc65032a8bf5a37e89e3b36",
-      "bytes": 1461
+      "sha256": "a8896d029beed2334215e3cc0990c937b385c43d64683580627f1e0f611ad216",
+      "bytes": 1563
     },
     {
       "path": "examples/codex-native/agents/semantic-evidence-reviewer.toml",
@@ -10281,6 +10316,246 @@
       "path": "tests/test_claude_repository_evidence.py",
       "bytes": 10269,
       "sha256": "36e2b158789e765614e5376565727fd7678b9769c8695c617bed4bc45c2d97d6"
+    },
+    {
+      "path": "docs/ultracode-token-routing-20260921.md",
+      "sha256": "bfe12bdb582ea15ab4ce704edab70b7c2bc2ce2cb872938469900871dae3e430",
+      "bytes": 31688
+    },
+    {
+      "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
+      "sha256": "d9d5d282a45d2b7e39b7cffeddaf73e50f07d24344cd77cff0484a33041cc756",
+      "bytes": 80969
+    },
+    {
+      "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle2-observation.json",
+      "sha256": "43f45c0ece9d60c73b96434ebb93ecf4f2c07b34dc863ee42e6ddcda811299a9",
+      "bytes": 31074
+    },
+    {
+      "path": "evidence/artifacts/portable-claude-native-qualification-20260921/codex-lane-c.json",
+      "sha256": "57b4be533a4131717e54246a129e63f76b93a3647132e8101ba4c01bf2f00507",
+      "bytes": 5228
+    },
+    {
+      "path": "evidence/artifacts/portable-claude-native-qualification-20260921/decision-lean-workflow-child-routing.json",
+      "sha256": "c8227fc225149a4587983125eb03beaa9ea938224015193ff4e0a13adff92ad4",
+      "bytes": 3795
+    },
+    {
+      "path": "evidence/artifacts/portable-claude-native-qualification-20260921/freeze.json",
+      "sha256": "145f35de63a4abd73f95100a203907b64b284f6da807283e7a5a80904d297d50",
+      "bytes": 29863
+    },
+    {
+      "path": "evidence/artifacts/portable-claude-native-qualification-20260921/receipt-portable-claude-native-qualification-20260921.json",
+      "sha256": "0e5cc4483a824c7cf4a8507ad46ae2d3cdca876a2f43febec8a919176bb878bf",
+      "bytes": 5288
+    },
+    {
+      "path": "evidence/artifacts/portable-claude-native-qualification-20260921/receipt-ultracode-token-routing-20260921.json",
+      "sha256": "f4ceb3f56f186e3970639ccaebc5c8d56b302a53e91e29d4e26346babc8a3e09",
+      "bytes": 3178
+    },
+    {
+      "path": "evidence/artifacts/portable-claude-native-qualification-20260921/summary.json",
+      "sha256": "4bbc9657c0e56fa135f93c48156dce64b66028646bed89dc12a8a3285b290151",
+      "bytes": 6850
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/audit-verifier-wf_d0d741b1-9c6.json",
+      "sha256": "5e86863b7f6b6c94ec21c712de3f505f95b8a7b02a54ab693b5281e85dbe4fe5",
+      "bytes": 25523
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/builder-run-wf_0de00432-c16.json",
+      "sha256": "ac38fd6ea8a6e234be327b24d11ad5e195b0644448fe3359cfad131bcfa2a5ba",
+      "bytes": 3820
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_0de00432-c16.json",
+      "sha256": "aef0ecaa7a16393063c1714720e2a0c48ff1515e3b460c80e6fa07e182bef58d",
+      "bytes": 1168
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_1e1d818f-7fd.json",
+      "sha256": "883f96150f71c60fc378b326e33971fdfd5b07a34a4074b42c35f35dd6ee687b",
+      "bytes": 1865
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_66150587-664.json",
+      "sha256": "d4c2aaf52d3382271dfa49a7d11b6cea3949bd1bd64d976cf693e01a21f33aee",
+      "bytes": 2039
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_68331421-bfd.json",
+      "sha256": "28efd089f11bfd33b0e3fb9484f3401c25ac7a6043bf02125331f14582c49cd3",
+      "bytes": 2032
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_75df8af9-d78.json",
+      "sha256": "2b009cf6aff0616af20c5107786613ce24cdd94f9406c65ec29b3dfb357e15d5",
+      "bytes": 2035
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_7b5e616f-171.json",
+      "sha256": "a453bb0dec3c50bd3c76493a090600615eeb20134aca541c699cc8cda86a7532",
+      "bytes": 2033
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_7e5b9fe1-f76.json",
+      "sha256": "2f37236026f998ab9450509fcaf028f874be7ff17ff08bc23fcbde7ab34e5222",
+      "bytes": 2032
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_a271d494-608.json",
+      "sha256": "62bbfae05ccdf158cac0e737e7fdf0085bf7aa84feccde6d6274304fd2f3e324",
+      "bytes": 2039
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_b8202e6c-723.json",
+      "sha256": "dd8c0daeb9a29cde386dc7b2942f1ae9e2fc4c7b5cd358e4b421ff047a63e5ab",
+      "bytes": 2037
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_b9c9290d-081.json",
+      "sha256": "a42b43bcae2856aa6b369f08c08187aa848a639229008e34cde3e0d1c097171f",
+      "bytes": 2755
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_bf62b2b7-d6e.json",
+      "sha256": "a024ee8c15e3604254d3f422888c0f880baf89181f7bcb9aadfb8a69dd15d9c3",
+      "bytes": 1146
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_c7474578-e31.json",
+      "sha256": "419d4454a43d91a386ba5790f04e04323e5862cbeb950afd87e6316997171c39",
+      "bytes": 2753
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_c9b03b9e-30e.json",
+      "sha256": "689d45c8c25cedb92f3578c9c79b6c8a9cc753c0824fa752c7049a7a5e0e7321",
+      "bytes": 3321
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/child-usage-wf_d0d741b1-9c6.json",
+      "sha256": "2fc4a86c9cc115646e54290a8220d4ef135acf2ba4b22dc2317586fbad8edd6b",
+      "bytes": 3711
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/codex-cross-review.md",
+      "sha256": "f98bc4727c8a586bda06f3eb7ed3fed63e977fdfe69c439c91b0289853c19327",
+      "bytes": 8119
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/deferred-lane-check-wf_bf62b2b7-d6e.json",
+      "sha256": "04f2873d1b57d759f4e29174b7271935d03aca5a72503681ccaa5cdc3c5a48b2",
+      "bytes": 468
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/hooks-observed-wf_d0d741b1-9c6.json",
+      "sha256": "8c2e4d50498af5d23b812cd86e67ce48d80b515455716a7ec4d7cb5c7e46b982",
+      "bytes": 1975
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/probe-reviewer-a.agent.md",
+      "sha256": "8f0c59d80878733a82cc83c6b4acf76b070f1764848e972459645972a8305515",
+      "bytes": 620
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/probe-reviewer-b.agent.md",
+      "sha256": "ab9aba58c926881c042651b173bff7672681029d76d52341c2d195bc2c532cb5",
+      "bytes": 629
+    },
+    {
+      "path": "evidence/artifacts/ultracode-token-routing-20260921/recheck-run-wf_b9c9290d-081.json",
+      "sha256": "774dbe4b175b97c47b03a32d56d75c4c8b227adf54c1959eb21b025028c8eaee",
+      "bytes": 2803
+    },
+    {
+      "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
+      "sha256": "26bb91c3e965e80a6f14749d0325fef73202934e0457403ad0c89a54c9e24bdd",
+      "bytes": 5314
+    },
+    {
+      "path": "evidence/receipts/ultracode-token-routing-20260921.json",
+      "sha256": "fcb3b15c9f4657f00b92a6c493b33b851136d416e0dbc0f37a8b67360bdedbcf",
+      "bytes": 3204
+    },
+    {
+      "path": "examples/claude-native/agents/source-scout.md",
+      "sha256": "55062f9e65e91a29b0b2c800f1e83c84b8d9596ab86f75fd76ab288a29852647",
+      "bytes": 1681
+    },
+    {
+      "path": "examples/claude-native/workflows/child-usage.mjs",
+      "sha256": "75a6d74b07b62d8bb1be0ed37bcffece18781c9c1bdff4a94c23cd5ce9dbe60b",
+      "bytes": 7780
+    },
+    {
+      "path": "examples/claude-native/workflows/codex-cross-review.mjs",
+      "sha256": "cd303779df6521c804070a319aa04c86ed2d6fe1c099c537836f037dec5f4e8b",
+      "bytes": 8498
+    },
+    {
+      "path": "examples/claude-native/workflows/contract.config.json",
+      "sha256": "2e73ed523e115e6a1f55a4cc992bf052e157d9cdd85aeb09cf4ef93d3f996771",
+      "bytes": 350
+    },
+    {
+      "path": "examples/claude-native/workflows/test-child-usage.mjs",
+      "sha256": "fd23f5c7d1118e4b67bd00fc6212f0db4b0f2cbac1f2aaa0c76ee5f07e780c56",
+      "bytes": 5612
+    },
+    {
+      "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
+      "sha256": "2617c081f606268ed20a6e00f6472495fad950db433ca3afbb44ea970aaac446",
+      "bytes": 2342
+    },
+    {
+      "path": "examples/claude-native/workflows/test-contract-mutations.mjs",
+      "sha256": "f418a9da354cb766cbab4f779be754359797b110ac4f3c28cdcda5e319d3c0a1",
+      "bytes": 9440
+    },
+    {
+      "path": "examples/claude-native/workflows/test-usage-receipts.mjs",
+      "sha256": "2ed3323db76d0104327a0c0bb35f00cf6a05018bdd9f49982b0c279cf2540871",
+      "bytes": 8495
+    },
+    {
+      "path": "examples/codex-native/README.md",
+      "sha256": "d53c58e9d8e2c86ffd0ec901ffbc5bc03e125a2c622951c4c42fba78b822aae6",
+      "bytes": 1374
+    },
+    {
+      "path": "examples/codex-native/agents/evidence-reviewer.toml",
+      "sha256": "618e1aaa8806fa7617a00fc3324b87bbca39151c185ce452a78312b4bc36b75c",
+      "bytes": 543
+    },
+    {
+      "path": "examples/codex-native/agents/isolated-builder.toml",
+      "sha256": "acff8a8fe056781956bcf2002299fbb84886d5945f670d9e08cdaacbf52d1206",
+      "bytes": 599
+    },
+    {
+      "path": "examples/codex-native/config.agents.toml.example",
+      "sha256": "b0e34249e6bdc06da0a94fce043bda1eefbe633433a3fd6e5fba49b3e5bb475c",
+      "bytes": 364
+    },
+    {
+      "path": "recipes/claude-codex-cooperation-lanes.md",
+      "sha256": "7e13cb55bb5e6ebc88c14f2a98840832c701777bcac4a3cee19f035536edf56a",
+      "bytes": 5622
+    },
+    {
+      "path": "evidence/artifacts/portable-claude-native-qualification-20260921/codex-pr-review.json",
+      "sha256": "6821eeae58c350ea3bc79dfb099c7ef7944c1a377ba330a97b821e411c6bb07d",
+      "bytes": 5004
+    },
+    {
+      "path": "evidence/artifacts/portable-claude-native-qualification-20260921/claude-pr-review.json",
+      "sha256": "e412e3abc2d63867c8ba16f304bc4c7578c3ea0a196d7fc08590defbccd2592c",
+      "bytes": 9539
     }
   ],
   "convergence_records": [

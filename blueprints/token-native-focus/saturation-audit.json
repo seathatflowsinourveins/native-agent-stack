@@ -1527,6 +1527,16 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ultracode-token-routing-20260921",
+            "path": "evidence/receipts/ultracode-token-routing-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "portable-claude-native-qualification-20260921",
+            "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -2018,6 +2028,16 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ultracode-token-routing-20260921",
+            "path": "evidence/receipts/ultracode-token-routing-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "portable-claude-native-qualification-20260921",
+            "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -6307,6 +6327,11 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "portable-claude-native-qualification-20260921",
+            "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],

@@ -224,7 +224,9 @@
         "alpaca-paper-e2e-20260921",
         "foundation-rd-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "ultracode-token-routing-20260921",
+        "portable-claude-native-qualification-20260921"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -322,7 +324,9 @@
         "full-stack-convergence-20260921",
         "foundation-rd-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "ultracode-token-routing-20260921",
+        "portable-claude-native-qualification-20260921"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -1117,7 +1121,8 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "portable-claude-native-qualification-20260921"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [

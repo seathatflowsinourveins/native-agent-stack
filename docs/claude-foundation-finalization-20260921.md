@@ -82,10 +82,10 @@ duplicates and empty evidence fail closed. A complete audit can establish that
 the project is not ready, including after an observed command failure.
 
 The [portable workflow scripts](../examples/claude-native/workflows/README.md)
-match the selected deployed scripts. The [reviewer](../examples/claude-native/agents/evidence-reviewer.md)/
-[builder](../examples/claude-native/agents/isolated-builder.md) definitions are
-portable adaptations without this host's MCP allowlist entries and routing text;
-the fixture loader resolves files beside itself for portability. These scripts
+matched the selected deployed scripts at that time; they and the agent definitions
+were later replaced by byte-identical copies of the deployed files, with project
+bindings in a sibling config (superseded by the
+[lean routing guide](ultracode-token-routing-20260921.md)). These scripts
 and tests are locally authored
 extensions using the upstream runtime, not upstream acceptance tests. Read-only
 prompts do not supply operating-system isolation. Original source and actual
