@@ -36,6 +36,10 @@ ALTERNATIVE_SOURCES = {"star", "awesome", "discovery_index", "lane:claude", "lan
 LANE_AGREEMENTS = {"same_winner", "disagree", "codex_absent", "pending"}
 PLATFORM_KEYS = {"linux-wsl2-x86_64", "macos-arm64"}
 PLATFORM_STATUSES = {"accepted", "conditional", "not_established", "untested"}
+PLATFORM_ALLOWED = {
+    "linux-wsl2-x86_64": {"accepted", "conditional", "not_established"},
+    "macos-arm64": {"untested"},
+}
 OVERTURN_MARKERS = ("fixtures/", "blueprints/", "tests/", "python3 ", "node ")
 
 
@@ -138,15 +142,16 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         nonempty(winner.get("why_selected"), str(key) + ".winner.why_selected")
         evidence_maybe_empty(winner.get("evidence_refs"), str(key) + ".winner.evidence_refs")
         recipe_ref = winner.get("recipe_ref")
-        require(isinstance(recipe_ref, str), str(key) + ".winner.recipe_ref must be text")
-        if recipe_ref:
-            require(recipe_ref in recipe_map or safe_file(root, recipe_ref).exists(),
-                    str(key) + ".winner.recipe_ref must resolve to a recipe_map key or an existing path")
+        nonempty(recipe_ref, str(key) + ".winner.recipe_ref")
+        require(recipe_ref in recipe_map or safe_file(root, recipe_ref).exists(),
+                str(key) + ".winner.recipe_ref must resolve to a recipe_map key or an existing path")
         platform_status = winner.get("platform_status")
         require(isinstance(platform_status, dict) and set(platform_status) == PLATFORM_KEYS,
                 str(key) + ".winner.platform_status must cover exactly " + ", ".join(sorted(PLATFORM_KEYS)))
-        require(all(value in PLATFORM_STATUSES for value in platform_status.values()),
-                str(key) + ".winner.platform_status has an unknown status")
+        for platform, value in platform_status.items():
+            require(value in PLATFORM_ALLOWED[platform],
+                    str(key) + ".winner.platform_status." + platform + " must be one of "
+                    + ", ".join(sorted(PLATFORM_ALLOWED[platform])))
 
     alternatives = row.get("alternatives")
     require(isinstance(alternatives, list), str(key) + ".alternatives must be a list")

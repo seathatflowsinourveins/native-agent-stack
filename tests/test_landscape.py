@@ -429,6 +429,30 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         data = self.build()
         self.assertIsNone(data["layers"][0]["winners"][0]["repository"])
 
+    def test_recipe_ref_must_not_be_empty_on_a_recorded_row(self):
+        # Codex cross-family review of PR-2: an empty string used to skip resolution.
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["winners"][0]["recipe_ref"] = ""
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "recipe_ref"):
+            self.build()
+
+    def test_platform_status_vocabulary_is_per_platform(self):
+        # Codex cross-family review of PR-2: macOS may only be untested on this profile
+        # and Linux may not be untested.
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["winners"][0]["platform_status"] = {"linux-wsl2-x86_64": "accepted", "macos-arm64": "accepted"}
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "platform_status.macos-arm64"):
+            self.build()
+        fields = self.recorded_fields()
+        fields["winners"][0]["platform_status"] = {"linux-wsl2-x86_64": "untested", "macos-arm64": "untested"}
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "platform_status.linux-wsl2-x86_64"):
+            self.build()
+
     def test_recipe_ref_must_resolve_to_a_recipe_map_key_or_an_existing_path(self):
         self.seal_claude_run()
         fields = self.recorded_fields()

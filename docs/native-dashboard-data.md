@@ -270,7 +270,7 @@ The table date is report generation, not the date each native check ran; open th
 full report and receipt to inspect its exact acceptance scope. A receipt count
 alone never means the component passed this session.
 Catalog membership, an installed CLI and a populated dashboard are different facts.
-The [sixteen foundation layers](../catalogs/foundation/README.md) remain the overall map:
+The [twenty foundation layers](../catalogs/foundation/README.md) remain the overall map:
 
 | Foundation layer | Appropriate native observation |
 | --- | --- |

@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "checked_at": "2026-09-21",
-  "scope": "Current foundation choices across all 16 canonical layers. Reasons describe fit for the accepted native workload, not universal superiority. This is a reconciliation of pinned source reviews and retained executions at base fb04bf702ea67b14163405f0ebe132e393ebbd8a; it performs no new installation, model run or comparative benchmark. Selected means retained for its stated role, not mandatory activation in every task. Unqualified and conditional alternatives have not failed a test merely because they are not adopted. A bounded primary-source quality refresh on September 21 America/New_York (September 22 UTC) expands runtime/memory challengers without replacing installed pins or historical acceptance.",
+  "scope": "Current foundation choices across all 20 canonical layers. Reasons describe fit for the accepted native workload, not universal superiority. This is a reconciliation of pinned source reviews and retained executions at base fb04bf702ea67b14163405f0ebe132e393ebbd8a; it performs no new installation, model run or comparative benchmark. Selected means retained for its stated role, not mandatory activation in every task. Unqualified and conditional alternatives have not failed a test merely because they are not adopted. A bounded primary-source quality refresh on September 21 America/New_York (September 22 UTC) expands runtime/memory challengers without replacing installed pins or historical acceptance.",
   "layers": [
     {
       "catalog": "foundation",

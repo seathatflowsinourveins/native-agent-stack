@@ -1,7 +1,7 @@
 # Full-stack native practice and returned evidence
 
 The subsequent [landscape reconciliation](../catalogs/landscape/README.md) covers
-all 24 foundation/domain layers, expands the joined research index to 525
+all 32 foundation and trading layers (20 + 12), expands the joined research index to 525
 identities, and records the current 343-public-star snapshot. The original wave
 counts and measurements below retain their dated scope; the current HTML derives
 its totals from the canonical records.
@@ -61,7 +61,7 @@ and [independent review](../evidence/artifacts/full-stack-convergence-20260921/i
 | Recovery/portability | Versioned prefixes, rollback, Restic native restore | Scoped disposable/hosted-job evidence; qualify new PCs |
 | Observation/inference | Grafana/Prometheus/Loki/OTel and native outputs | Source time differs from scrape time; usage differs from savings |
 
-The [foundation catalog](../catalogs/foundation/manifest.json) retains 47 capability
+The [foundation catalog](../catalogs/foundation/manifest.json) retains 51 capability
 decisions. The [lifecycle guide](../adoption/lifecycle.md) covers installation,
 restart, recovery and cleanup. Reuse accepted evidence while its inputs and scope
 match; additional testing should resolve a concrete uncertainty.

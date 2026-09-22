@@ -11,7 +11,7 @@ choice is retained, what happened to named alternatives, and what evidence would
 change the decision. Open [Choices & alternatives](../../docs/ecosystem/index.html#landscape)
 for the searchable offline view.
 
-The catalog references 61 selected components through 47 capability decisions. Its
+The catalog references 61 selected components through 51 capability decisions. Its
 registered evidence references are listed per capability. These are coverage counts, not a
 score of complete installation, execution or lifecycle acceptance.
 
@@ -24,7 +24,8 @@ service or establish installation on another machine. Hosted services, generated
 reports, retained exports and live upstream UIs keep their distinct scopes.
 
 The [September 20 community review](../../docs/community-native-practice.md)
-explains the selected ECC and Claude practice sources across all twenty layers.
+explains the selected ECC and Claude practice sources across the sixteen layers of
+that date (the four layers added on 2026-09-22 postdate it).
 Use the [native Claude profile](../../recipes/claude-native-profile.md) for
 terminal entry, small persistent instructions, selected skills and new-PC checks.
 

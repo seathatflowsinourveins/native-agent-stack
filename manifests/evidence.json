@@ -3457,8 +3457,8 @@
     },
     {
       "path": "docs/native-dashboard-data.md",
-      "sha256": "47feadeeb88475d31f4fd0d1ad6f963471d3540eaac5ae4bb61387668f971234",
-      "bytes": 18699
+      "sha256": "2de43d9a1e32663614748f54c8aa2efa9c5025c027e09234180f3aee3adbcc73",
+      "bytes": 18698
     },
     {
       "path": "evidence/artifacts/native-dashboard-data-20260921/agentsview-selected-sync.json",
@@ -3722,8 +3722,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "b708fd46cba04a41cb5746c75cc5584cb77b417cc71858f582059cf0e7d48767",
-      "bytes": 17917
+      "sha256": "b336d899290b9972f6551c3445cf452c8fb7aeed23d76b15040fda43eea4b3c7",
+      "bytes": 17916
     },
     {
       "path": "adoption/README.md",
@@ -6768,13 +6768,13 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "a0c03b16026e4eba50a11cecc18977c6f9b3ca1c5de9166b6ba42eb68159e0e6",
-      "bytes": 12574
+      "sha256": "0ed9ff3618ec543897d24a98ae81c4cf57f88aaba31c81ee88da6bbe51283ddd",
+      "bytes": 12573
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 12056704,
-      "sha256": "fa1f00ca2c695517e828ad7b9989eb431560e5d70d365e7cf3b74e0742676e23"
+      "bytes": 12056769,
+      "sha256": "64034f40ce5464eeae051c3292aa88a0f8f2161abb89463040d94b6602200268"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6804,7 +6804,7 @@
     {
       "path": "docs/ecosystem/template.html",
       "bytes": 102997,
-      "sha256": "7398753394d67408beef48a905c20402dca0d251b5a97ab9ce26c48111a1cecc"
+      "sha256": "516cce6c31a76ffe7d75ea75ee575e5bf3f185be2bb08722b57c4f8b62275d1e"
     },
     {
       "path": "docs/evidence.md",
@@ -7773,8 +7773,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "8255dd2e6e42345b01cb5ab2fb218fb0633471866814a4de47f2861041f484c2",
-      "bytes": 13882
+      "sha256": "63b3a6ad822e3a76d7cf5e47732b38f3b95c21ee8764d47f613697862a49bb33",
+      "bytes": 13946
     },
     {
       "path": "catalogs/foundation/decisions.json",
@@ -9608,8 +9608,8 @@
     },
     {
       "path": "docs/full-stack-convergence.md",
-      "bytes": 11390,
-      "sha256": "17e03fef1f00f578f94028a1009266292f868784619392f848a17cedb41282a0"
+      "bytes": 11405,
+      "sha256": "4a86b5be7b87cc241af4c75cf9ce483fe32b51f41c6fe4a1a8412e5499ea961c"
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/agentsview-aggregate-safe.png",
@@ -10778,7 +10778,7 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "138b6170873afd36e98855a19415a66fca1a96203aecaca8987afa1931b36a2c",
+      "sha256": "01e755befca7f279f9450b7b4499170f574d90e3916b8bfafaddcc8afde6af4a",
       "bytes": 125902
     },
     {
@@ -10818,13 +10818,13 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "ccc018b63ae5e19f985b1f8f4957ef9248164cbd247d03d5ffc2e86532698d9b",
-      "bytes": 37773
+      "sha256": "d1894bbde159ca88cf13a063ee706055b178c1c24522e075211be5edf17c37d5",
+      "bytes": 37951
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "2fe76046b8f6970f2791a516bf46a27ce1ed680b34db88c39949dbedf6a78bfa",
-      "bytes": 31847
+      "sha256": "0b9b46e4838a5d3e0eb36d68c5a21e2b24f20c003ba3d2a91b061101c4e1f9e4",
+      "bytes": 33052
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
