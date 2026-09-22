@@ -2875,8 +2875,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "5b26e2694aab769f0b303288b9a393dd4b71f76cf0a7661b2804e50a6f770513",
-      "bytes": 17170
+      "sha256": "88f96d004d820b518613151c969dfbc5fa473e6c66fcebc439d0fd703034d04e",
+      "bytes": 17561
     },
     {
       "path": "docs/tasks/2026-09-21-runtime-reviewed-catalog-handbook.md",
@@ -6661,8 +6661,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "53b3cddda1ea0a9c3f37d3399629628ff1d43e4d1adc77894271ba3b06071e65",
-      "bytes": 10962244
+      "sha256": "1d9d4a8298a9d62e4254556869d6daedbbdc5ed7ab4d6ce6eccaeddce2fbbd87",
+      "bytes": 10968908
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7676,8 +7676,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "bytes": 6990,
-      "sha256": "d04e8929115f6e4b8bccdd1ab51d431d5e78697e056de55177c261483cfea866"
+      "bytes": 7249,
+      "sha256": "f7d12a19ef52e1ef80ecc8d5aac1f65b9b5681661527c53bb1497e0a3c915859"
     },
     {
       "path": "docs/harness-defaults.md",
@@ -10141,8 +10141,8 @@
     },
     {
       "path": "catalogs/landscape/manifest.json",
-      "sha256": "67e9092f30332780853b693147e8406dc3c3eccd57a526fced57d45b23022566",
-      "bytes": 4224
+      "sha256": "e517e33f9c159167b6a41fc3874aeeaacd7053373db7423f77e3513e18af206f",
+      "bytes": 4363
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -10958,6 +10958,31 @@
       "path": "tests/test_blind_layer_decisions.py",
       "sha256": "0512e58b967baed9fdc95323cd6867dbb1981785bb3d20e51d6a1df1bcb4fbc1",
       "bytes": 2827
+    },
+    {
+      "path": "docs/comparison-progress-20260922.md",
+      "sha256": "d8b00ac0dfc49623866f63bacf0855ac24e6f455901fb698680f890a084ce5b8",
+      "bytes": 5444
+    },
+    {
+      "path": "evidence/artifacts/comparison-progress-20260922/summary.json",
+      "sha256": "a8ee6e80e6fc2d8b3c18971346367e7256fbb7f9f1c0b42c27e9dee680d76cb5",
+      "bytes": 9575
+    },
+    {
+      "path": "evidence/artifacts/comparison-progress-20260922/tests/compare/closure-script.test.mjs",
+      "sha256": "adfbce650c82c8b8d59c1dc116c99d7a9fcb4f019b007225e6e2956ec94caf03",
+      "bytes": 4869
+    },
+    {
+      "path": "evidence/artifacts/comparison-progress-20260922/tools/compare/closure.mjs",
+      "sha256": "590ef5f76bb2dd72888b9c2c6cf2a27f79fbac623ca3998597cd0cc6491b2b74",
+      "bytes": 4986
+    },
+    {
+      "path": "evidence/artifacts/comparison-progress-20260922/tools/compare/closure.pre-review.mjs",
+      "sha256": "53fc880ab286c07ca4f158ec6bb7c6aafe422f78b4f3d9658a71715e2ccf4d1a",
+      "bytes": 3750
     }
   ],
   "convergence_records": [

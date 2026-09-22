@@ -36,6 +36,10 @@
   ],
   "handbook_guides": [
     {
+      "path": "docs/comparison-progress-20260922.md",
+      "label": "Comparison progress, corrected evidence and open gates"
+    },
+    {
       "path": "docs/catalog-reconciliation-20260922.md",
       "label": "Live Claude reconciliation and canonical decisions"
     },
