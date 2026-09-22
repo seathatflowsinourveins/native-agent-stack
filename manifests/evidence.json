@@ -7624,8 +7624,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "42567324c3140768f2e146e735bf438d5052304adfbf2d12dc94ab113facfa01",
-      "bytes": 13036318
+      "sha256": "90836a5f9dfef72d6f31ce36b07093662117d58f6c6a38f26902589c84cb6dee",
+      "bytes": 13036732
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7699,8 +7699,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "e72c96c75a1822d7aed09aa10ce0f47e67fcb8450d1638523d80c5314ecd56ac",
-      "bytes": 415304
+      "sha256": "9aca6d83b528f812b8bf98983400d09ae1056fb7fcc2f9823defd72f4bcc4876",
+      "bytes": 415707
     },
     {
       "path": "docs/harness-defaults.md",
@@ -11854,8 +11854,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "46cb9857e47d7d835fec40ddf3b531db5a4ba401a2ffbd73ba7b445ab85c2c41",
-      "bytes": 51676
+      "sha256": "6a47e9ae6a754964d218af854ee612831458b23946d0a65df0cc94be06f5e3b1",
+      "bytes": 51863
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

@@ -42,7 +42,8 @@ workers and operations, market data, simulation and execution) survive as the
 
 Each layer was given a stripped evidence packet. An Opus proposer selected the
 winner set from retained evidence, and two Opus refuters attacked it from the
-evidence and challenger angles, with one revision round after any refutation.
+evidence and challenger angles, with one revision round after any refutation or
+major finding.
 The record tool then applied the rules in code: every recorded winner must name
 its evidence class and the reason it beats the alternatives, and the tool derives
 its platform status from that evidence class and supplies its install anchor. The dated
@@ -61,6 +62,9 @@ decision. The recorded trading verdicts come from the final run
 (`lane_packets.py --trading-candidates manifest`). In that run each packet held the
 convergence manifest's own entries for the layer, with evidence from their domain
 cards. It carried no review labels and supplied the layer's taxonomy scope terms.
+Evidence fields still correlate with the withheld decision: incumbent entries more
+often carry native evidence and an install recipe, and some card role text says
+"optional" or "fallback".
 `identity-provenance` was re-run alone after the record step rejected its first
 return. The foundation packets were identical in every run.
 
@@ -395,8 +399,11 @@ their dates and superseding links.
   Alpaca adapter and alpaca-py as `local_integration`. The adapter has placed no
   paper orders (its broker trial is pending), and the Nautilus IBKR adapter has no
   broker acceptance yet.
-- **The two catalogs can pin different versions of one component.** Every winner's
-  pin equals the convergence manifest's pin for that component id. The trading
+- **The two catalogs can pin different versions of one component.** Every trading
+  winner's pin equals the convergence manifest's pin for that component id. Four
+  foundation winners have no manifest component and record `unpinned`
+  (`candidate:typesafe-ai-skills`, `candidate:openai-skills`,
+  `candidate:actions-attest`, `candidate:cli-cli`). The trading
   `agents-models-workers` row records ai-memory v2.3.1, which is what its cited
   receipt executed. The foundation `durable-memory` row records 2.3.2 from later
   evidence. Upgrading one catalog's pin does not upgrade the other's.

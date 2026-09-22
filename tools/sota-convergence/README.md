@@ -523,7 +523,9 @@ terms from the manifest taxonomy (`layer_scope_terms`) with a `requirement_note`
 lane to judge fit against them. A manifest entry without a card is an error, not a silent
 non-adopted candidate. Card `role` and limitation prose and newcomer notes are passed through
 as evidence and can still name the current pick ("selected destination runtime"); like the
-`adopted` flag, that is a known limit of the withholding. Foundation packets are identical in
+`adopted` flag, that is a known limit of the withholding. So is evidence strength: over
+the 112 2026-09-22 trading entries, `native_proven` evidence and a resolvable `recipe_ref`
+occur far more often on default entries than on conditional ones. Foundation packets are identical in
 both modes, and the default `ledger` mode still reproduces the 2026-09-22 packets byte for byte.
 
 Known limit of the withholding (2026-09-22 independent review): each

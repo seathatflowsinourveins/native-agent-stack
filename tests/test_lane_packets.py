@@ -43,6 +43,10 @@ lane_packets = load_module("lane_packets", "lane_packets.py")
 LeakDetected = lane_packets.assert_no_leak.__globals__["LeakDetected"]
 
 
+# Seeded order of the manifest-mode fixture (seed 20260922, layer-b); newcomers have no component id.
+EXPECTED_SEEDED_COMPONENT_ORDER = [None, None, 'data-two', 'data-one', 'data-three']
+
+
 class LanePacketsFixture(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
@@ -518,7 +522,10 @@ class ManifestTradingCandidatesTests(LanePacketsFixture):
         expected = list(unshuffled)
         lane_packets.make_rng(lane_packets.DEFAULT_SEED, "us-equities", "layer-b").shuffle(expected)
         packet = build(lane_packets.DEFAULT_SEED)
-        self.assertEqual([c["repository"] for c in packet["candidates"]], [c["repository"] for c in expected])
+        identity = lambda c: (c["component_id"], c["repository"])
+        self.assertEqual([identity(c) for c in packet["candidates"]], [identity(c) for c in expected])
+        # A literal sequence pins the seed derivation itself, not only agreement with the helper.
+        self.assertEqual([c["component_id"] for c in packet["candidates"]], EXPECTED_SEEDED_COMPONENT_ORDER)
         self.assertEqual([c["key"] for c in packet["candidates"]],
                          [f"c{index}" for index in range(1, len(expected) + 1)])
         orders = {tuple(c["repository"] for c in build(seed)["candidates"]) for seed in ("s1", "s2", "s3", "s4")}
