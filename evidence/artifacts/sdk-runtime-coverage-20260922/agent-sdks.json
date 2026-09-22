@@ -1,0 +1,947 @@
+{
+ "schema_version": 1,
+ "ledger": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
+ "category": "agent-sdks",
+ "note": "Evidence packets (Sonnet, primary sources) and the accuracy and fit refutation votes (Opus) for each shortlisted repository in this category; source_review unless a vote names an executed probe.",
+ "rows": {
+  "567-labs/instructor": {
+   "evidence": {
+    "auth_model": "Caller-supplied provider API key/credential \u2014 no native Claude Code / Codex / GitHub / Google login integration. Instructor is an SDK wrapper that patches a caller-instantiated provider client (`instructor.from_provider(\"openai/gpt-4o\")`, `anthropic/...`, `google/...`, `ollama/...`) and reads provider credentials from provider-specific environment variables (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_API_KEY`, `COHERE_API_KEY`, `MISTRAL_API_KEY`) or an explicit `api_key=` argument passed to `from_provider`. It also supports local models with no key via `ollama/llama3.2`. There is no instructor-specific auth of its own; it inherits whatever the caller's client uses (source: README code samples \"client = instructor.from_provider(\\\"openai/gpt-4o\\\", api_key=\\\"sk-...\\\")\"; docs installation page: \"export OPENAI_API_KEY=your_openai_key\" etc., https://python.useinstructor.com/learning/getting_started/installation/).",
+    "category": "agent-sdks",
+    "claims": [
+     {
+      "claim": "Repository is MIT licensed, Python, not archived",
+      "source": "gh api repos/567-labs/instructor --jq '{license, ...}' -> license: MIT, archived: false, language: Python",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Latest release v1.17.0 published 2026-09-09",
+      "source": "gh api repos/567-labs/instructor/releases?per_page=5 -> tag_name v1.17.0, published_at 2026-09-09T02:25:36Z",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Repo pushed 2026-09-18 (3 days before catalog date 2026-09-22 per judge claim, actually 4 days), active maintenance",
+      "source": "gh api repos/567-labs/instructor --jq '{pushed_at}' -> 2026-09-18T21:58:13Z",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Top-level tree has a tests/ directory and CI workflows (test.yml, ty.yml, ruff.yml, evals.yml, mutation.yml, scheduled-release.yml, package-compatibility.yml, test_docs.yml)",
+      "source": "gh api repos/567-labs/instructor/contents and gh api repos/567-labs/instructor/contents/.github/workflows",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Instructor is a pure client-side SDK wrapper around the caller's own provider client (openai/anthropic/google/ollama/etc.), with no server or daemon component",
+      "source": "README (gh api repos/567-labs/instructor/readme, base64-decoded) code samples using instructor.from_provider(...); WebFetch https://python.useinstructor.com/concepts/ : \"Instructor is a wrapper library that patches LLM provider clients ... How Instructor patches LLM clients\"",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Auth is inherited from the caller's provider client via env vars or an explicit api_key argument; no native Claude Code/Codex/GitHub/Google sign-in integration and no built-in local-model-only mode besides whatever provider client (e.g. ollama) the caller supplies",
+      "source": "WebFetch https://python.useinstructor.com/learning/getting_started/installation/ (quoted env var examples: OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY, COHERE_API_KEY, MISTRAL_API_KEY) and README api_key= examples",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "README explicitly frames Instructor as narrower than PydanticAI: 'Use Instructor for fast extraction, reach for PydanticAI when you need agents... PydanticAI is the official agent runtime from the Pydantic team, adding typed tools, replayable datasets, evals, and production dashboards while using the same Pydantic models.'",
+      "source": "gh api repos/567-labs/instructor/readme, base64-decoded README body",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "No mention in fetched docs of structured/resumable session events, custom tool/MCP dispatch, or sandbox/isolation features; feature surface is schema enforcement, validation/retry, streaming of partial objects, and nested-object extraction",
+      "source": "WebFetch https://python.useinstructor.com/concepts/ summary (\"Sessions/Tools/MCP: Not evident... Sandboxing/Isolation: Not mentioned\")",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "13,935 GitHub stars, 81 open issues at query time (2026-09-22), org-owned (567-labs), not a single-maintainer repo",
+      "source": "gh api repos/567-labs/instructor --jq '{stargazers_count, open_issues_count}'",
+      "evidence_class": "source_review"
+     }
+    ],
+    "fit_with_native_workflow": "Instructor is not an agent SDK/runtime in the sense the incumbent list uses the term (Claude Code, Codex, claude-agent-sdk-python, LangGraph, agent-framework, etc.); it is a typed structured-output extraction wrapper. It does not fit as a workflow-harness layer (no dispatch, no sessions, no worker/isolation model of its own \u2014 C2 and C3 are effectively inherited/not applicable rather than satisfied). Its only credible fit in this project is as a narrowly-scoped Pydantic-model extraction utility that a deterministic pipeline step could call directly against an already-authenticated provider client (e.g., inside an isolated-builder or evidence-reviewer step that needs typed parsing of an LLM response) \u2014 not as a replacement for the Claude Code/Codex native workers, Workflow tool, or the typesafe-ai skill's judgment contract. The project's own AGENTS.md 'C1 native-auth fit' criterion is a real penalty here: it requires a separate paid provider API key/env var per provider rather than riding a Claude Code, Codex, GitHub, or Google native login, and it adds nothing on the sandbox/isolation axis (C3) since it has no execution environment of its own \u2014 deterministic code retains ownership either way.",
+    "interface": "Pure Python SDK/library (`pip install instructor`), no CLI, server or daemon. Usage pattern: `client = instructor.from_provider(\"openai/gpt-4o\")` wraps/patches an existing provider client object, then `client.chat.completions.create(response_model=PydanticModel, messages=[...])` returns a validated, typed Pydantic object instead of raw JSON. Supports streaming of `Partial[Model]` objects, nested Pydantic models, and automatic validation-retry loops on `field_validator` failures. Multi-language variants exist (Python is the reviewed one; also TypeScript, Go, Ruby per docs site) but this review covers the Python package only, matching the repo audited.",
+    "isolation_model": "No isolation/sandbox model of its own. It runs in-process with the caller, invoking whatever HTTP client/session the wrapped provider SDK already uses; there is no worktree, sandbox, or process boundary concept in the library. Per-call state is just the Pydantic response model and retry loop; there is no hidden global state beyond normal Python module import, so multiple callers can each hold independent wrapped clients without cross-talk (deterministic code fully owns the effects, satisfying C3 only in the trivial sense that there is nothing to isolate).",
+    "license": "MIT (confirmed via `gh api repos/567-labs/instructor --jq '.license.spdx_id'` \u2192 \"MIT\")",
+    "maintenance": "Active: org-owned (567-labs, not a single personal repo), 13,935 stars, 81 open issues, last push 2026-09-18 (4 days before the 2026-09-22 catalog date), latest release v1.17.0 on 2026-09-09, and CI workflows present for tests, type-checking (ty), linting (ruff), scheduled releases, and package-compatibility/mutation testing \u2014 consistent with the judges' \"pushed 3 days\"/\"top_level tests/docs/examples\" claims (actual gap measured here is 4 days, a minor discrepancy from the judge text but within the same freshness bracket).",
+    "native_login_support": "api_key_required",
+    "open_gaps": [
+     "Did not execute the preregistered comparison (instructor-typed extraction vs the typesafe-ai skill and pydantic-ai) on a shared extraction fixture \u2014 no measured_comparison or native_execution evidence exists; this task was evidence extraction only, per instructions no command was executed beyond read-only gh api / web fetch calls.",
+     "Did not independently verify the judges' 'has_tests_dir true, has_ci true' claims by opening tests/ contents in depth (only confirmed the top-level tests/ directory exists and CI workflow filenames); did not measure test count, coverage, or CI pass/fail status on the latest commit.",
+     "Did not confirm exact release cadence over the full trailing 6 months (only fetched the 5 most recent releases via releases?per_page=5); did not verify a monotonic 'release cadence in last 6 months' claim beyond the latest tag.",
+     "Did not fetch or quote the official docs pages for 'platform support' (OS/Linux-WSL2/macOS arm64 install path, C6) directly; inferred pip-installable pure-Python package implies broad portability but this was not explicitly quoted from a docs page.",
+     "Did not review pydantic-ai's or the typesafe-ai skill's own documentation in this task to state the actual capability delta for C5; the non-duplication judgment here is qualitative from Instructor's own README framing ('reach for PydanticAI when you need agents'), not a side-by-side feature matrix.",
+     "'Structured events' and 'resumable sessions' (C2) were assessed as absent based on the concepts page fetch summary only; did not exhaustively crawl the full docs site (e.g., API reference, integrations pages) to rule out an undocumented events/session feature."
+    ],
+    "overlap_with_incumbents": "Overlaps none of the listed agent-SDK/orchestration incumbents directly (Claude Code, Codex, claude-agent-sdk-python, OpenHands SDK, Temporal, LangGraph, worktrunk, beads, dagu, sandbox-runtime, mcporter, MCP SDKs, agent-framework, deer-flow, deepagents) since none of them is named by the catalog as providing typed/validated structured-output extraction as a capability \u2014 the judges note \"the catalog names structured output but lists no library providing it.\" The real overlap is with two items not on the incumbent list: pydantic-ai (a superset agent framework built on the same Pydantic validation model, explicitly called out in Instructor's own README) and the project's installed typesafe-ai skill (typed judgment/extraction contract). Per C5, this is keep_but_compare, not adoption, until an executed comparison is run.",
+    "portability": "Pure Python package distributed via PyPI (`pip install instructor`, also `uv add instructor` / `poetry add instructor` per README); no OS-specific binaries, no Docker/server requirement observed in fetched sources. This implies standard Python-wheel portability across Linux/WSL2 x86_64 and macOS arm64, but no docs page enumerating exact platform support/wheel architectures was fetched, so this is an inference from packaging format rather than a quoted platform-support statement (recorded in open_gaps).",
+    "releases_last_6_months": [
+     "v1.17.0 \u2014 2026-09-09 (gh api repos/567-labs/instructor/releases?per_page=5, tag_name v1.17.0, published_at 2026-09-09T02:25:36Z)",
+     "Additional 4 releases exist in the fetched per_page=5 releases list but were not individually transcribed beyond the latest; repo pushed_at 2026-09-18T21:58:13Z shows continued commit activity after the v1.17.0 tag"
+    ],
+    "risks": [
+     "Separate per-provider paid API key required (C1 penalty, not exclusion): no native Claude Code, Codex/ChatGPT, GitHub, or Google login path; credentials must be supplied via provider-specific env vars or an explicit api_key argument, adding a credential-management surface distinct from the project's native sign-ins.",
+     "No isolation, sandboxing, or execution-environment ownership of its own (C3 is trivially satisfied only because there is nothing to isolate) \u2014 it cannot substitute for a worker/sandbox layer.",
+     "No structured events, resumable sessions, or MCP/tool dispatch found in the fetched docs (C2 largely unmet beyond basic streaming of partial Pydantic objects) \u2014 it is not a general agent SDK despite living in the 'agent-sdks' category.",
+     "Overlaps a fuller framework (pydantic-ai) that the maintainers themselves point to for anything beyond simple extraction, and overlaps the project's already-installed typesafe-ai skill's typed-judgment contract; adopting Instructor without an executed comparison would risk introducing a redundant capability (C5 violation) rather than closing a demonstrated gap.",
+     "Judges' 'why' claims (e.g., exact pushed/tests-dir wording) were not all independently reproduced to the letter (see open_gaps); treat the specific freshness figures in this packet, not the judges' paraphrase, as authoritative."
+    ],
+    "slug": "567-labs/instructor",
+    "sources_read": [
+     "gh api repos/567-labs/instructor",
+     "gh api repos/567-labs/instructor/releases?per_page=5",
+     "gh api repos/567-labs/instructor/readme (base64 decoded)",
+     "gh api repos/567-labs/instructor/contents (top-level tree)",
+     "gh api repos/567-labs/instructor/contents/.github/workflows",
+     "https://python.useinstructor.com/learning/getting_started/installation/ (WebFetch)",
+     "https://python.useinstructor.com/concepts/ (WebFetch)",
+     "WebSearch: instructor python library docs.instructor python authentication provider client structured outputs (surfaced python.useinstructor.com pages and github.com/567-labs/instructor as corroborating links)"
+    ],
+    "structured_events": "Not found in the fetched documentation. The only event-like feature is streaming of partial Pydantic model objects during generation (`Partial[User]` yielded incrementally as fields are filled in) \u2014 this is a client-side generator of partially-populated typed objects, not a structured event/session protocol, resumable session, or tool/MCP dispatch mechanism. No SDK-level \"message/event\" stream schema, session IDs, or resumability was documented in the pages fetched (https://python.useinstructor.com/concepts/).",
+    "summary": "567-labs/instructor is an MIT-licensed, actively maintained (v1.17.0, 2026-09-09; last push 2026-09-18; 13,935 stars) pure-Python SDK that patches a caller-supplied LLM provider client (OpenAI, Anthropic, Google, Ollama, etc.) so `create()` calls return validated Pydantic objects instead of raw JSON, with automatic validation-retry and partial-object streaming. It has upstream tests/ and multiple CI workflows (test.yml, ty.yml, ruff.yml, evals.yml, mutation.yml, scheduled-release.yml). It is a library, not a server or agent runtime: no isolation/sandbox model, no structured events/resumable sessions, and no MCP/tool dispatch were found in its docs. Authentication is entirely caller-supplied (provider API keys via env vars or an explicit `api_key` argument) \u2014 there is no native Claude Code/Codex/GitHub/Google login path, matching the judges' recorded C1 penalty. The README itself frames Instructor as a narrower sibling of pydantic-ai (\"Use Instructor for fast extraction, reach for PydanticAI when you need agents\"), supporting the judges' targeted_candidate / keep_but_compare framing: it is worth a bounded, executed comparison (instructor-typed extraction vs the typesafe-ai skill and vs pydantic-ai on a shared extraction fixture) rather than adoption, since agreement among the three judges' shortlist reasons does not itself promote it per the project's evidence policy.",
+    "tests_and_ci": "Top-level `tests/` directory confirmed present via `gh api repos/567-labs/instructor/contents`. `.github/workflows/` contains: evals.yml, mutation.yml, oss-issue-deduplicator.yml, oss-issue-tagger.yml, package-compatibility.yml, python-publish.yml, ruff.yml, scheduled-release.yml, test.yml, test_docs.yml, ty.yml \u2014 i.e. dedicated test, type-check (ty), lint (ruff), doc-test, mutation-testing, and package-compatibility CI jobs, plus a scheduled-release workflow. Individual workflow file contents, current pass/fail status, and coverage numbers were not fetched (recorded in open_gaps); presence of `.coveragerc` at repo root suggests coverage tracking is configured.",
+    "worker_features": "No worker/dispatch model. Instructor has no concept of spawning workers, agents, or parallel tasks; it is a single synchronous or async call wrapper (`client.chat.completions.create(...)`, with an `async_client=True` option per `from_provider`) that returns one validated object per call. Retry behavior (`max_retries=N`) re-issues the same underlying provider call with the validation error appended, which is the closest analogue to a \"worker\" retry loop, but there is no multi-worker orchestration, custom tool registry, or MCP integration documented."
+   },
+   "refutations": [
+    {
+     "lens": "fit",
+     "refuted": true,
+     "findings": [
+      {
+       "claim": "overlap_with_incumbents: \"Overlaps none of the listed agent-SDK/orchestration incumbents directly (Claude Code, Codex, ...) since none of them is named by the catalog as providing typed/validated structured-output extraction as a capability.\"",
+       "problem": "Two incumbents on the list already provide instructor's core capability (JSON-Schema-constrained, validated model output with a retry-on-validation-failure loop), and they provide it on the user's native sign-ins. C5 asks whether the candidate adds capability beyond the incumbents, not whether the catalog text names that capability; the packet substitutes a catalog-naming test for a capability test and so reports zero incumbent overlap where the strongest overlap actually is. This also undercuts the fit section's proposed narrow fit (\"inside an isolated-builder or evidence-reviewer step that needs typed parsing of an LLM response\"): those steps are native Claude Code workers whose returns are already schema-validated by the Workflow tool, so instructor there duplicates the harness rather than extending it.",
+       "evidence": "anthropics/claude-code: $HOME/code/agent-lab/.claude/workflows/layer-verdict-lane.js lines 31-56 pass a JSON Schema to native workers \u2014 agent(..., { agentType: 'semantic-evidence-reviewer', model: 'opus', effort: 'high', schema: LANE_RETURN }) and schema: VOTE \u2014 with LANE_RETURN carrying a required: [...] list; the harness enforces it and re-asks on failure (this subagent's own instructions: \"If the schema validation fails, read the error and call StructuredOutput again with a corrected shape\"), i.e. schema + validation + reask on the Claude subscription login. openai/codex: `codex exec --help` (binary $HOME/.local/share/codex-ecosystem/bin/codex) lists `--output-schema <FILE>  Path to a JSON Schema file describing the model's final response shape` and `--json  Print events to stdout as JSONL`, on the ChatGPT login.",
+       "severity": "major"
+      },
+      {
+       "claim": "fit_with_native_workflow: \"The project's own AGENTS.md 'C1 native-auth fit' criterion is a real penalty here: it requires a separate paid provider API key/env var per provider rather than riding a Claude Code, Codex, GitHub, or Google native login.\"",
+       "problem": "C1 as preregistered reads \"runs on the user's existing native sign-ins ... or a local model; a separate paid API key is a recorded penalty\". The packet's own auth_model field states instructor \"supports local models with no key via ollama/llama3.2\", and this host already runs a local OpenAI-compatible vLLM endpoint an instructor-wrapped client can target. The C1 penalty is therefore overstated and contradicts the packet's own evidence: it applies to hosted-provider arms, not to the library, which has a key-free local path C1 explicitly credits.",
+       "evidence": "Packet auth_model: \"It also supports local models with no key via `ollama/llama3.2`\"; packet interface: from_provider wraps a caller-instantiated client, so an OpenAI-compatible base_url works. Project AGENTS.md (SocratiCode section): \"The SocratiCode `lmstudio` provider setting points to local vLLM; Docker, LM Studio and cloud embedding keys are not required for this profile\" \u2014 a key-free local endpoint exists on this PC. Codex likewise exposes --oss / --local-provider <lmstudio|ollama> (codex exec --help), so C1's local-model clause is live, not hypothetical.",
+       "severity": "major"
+      },
+      {
+       "claim": "overlap_with_incumbents / summary: the named comparison is \"instructor-typed extraction vs the typesafe-ai skill and vs pydantic-ai on a shared extraction fixture\".",
+       "problem": "That comparison cannot settle C5, because it omits both incumbent arms that already deliver the capability on native auth. A keep_but_compare whose comparison excludes the incumbent it overlaps cannot overturn the disposition in either direction; since an executed comparison is the only promotion path, the arms must include the native ones.",
+       "evidence": "Incumbent arms established above (schema: agent returns in .claude/workflows/layer-verdict-lane.js; codex exec --output-schema plus --json). The project already has the runner convention for this: $HOME/code/agent-lab/tools/compare/<domain>/run-arms.mjs with a sealed protocol and out/ (tools/compare/semantic/protocol.sealed.json, tools/compare/retrieval/run-arms.mjs, tools/compare/closure.mjs), driven by the comparison-preregister / comparison-execute / comparison-judge skills.",
+       "severity": "major"
+      },
+      {
+       "claim": "structured_events: \"Not found in the fetched documentation. The only event-like feature is streaming of partial Pydantic model objects ... No SDK-level 'message/event' stream schema ... was documented\"; risks: \"No structured events ... found in the fetched docs (C2 largely unmet)\".",
+       "problem": "Instructor ships a documented named-event hook system; the packet asserted absence from one concepts-page fetch while it had already queried the repo tree that would have shown it. The C2 verdict survives (these are in-process Python callbacks, not a wire protocol, sessions, or MCP/tool dispatch), but the absence claim as written does not hold, and the matching open_gaps entry implies an exhaustive site crawl is needed when one gh api call settles it.",
+       "evidence": "`gh api repos/567-labs/instructor/contents/docs/concepts --jq '.[].name'` lists hooks.md (with partial.md, iterable.md, retrying.md, usage.md). docs/concepts/hooks.md (base64-decoded) defines an event table: completion:kwargs, completion:response, completion:usage (\"Copied snapshot of cumulative retry usage\", handler receives attempt_number), completion:error (attempt_number, max_attempts, is_last_attempt), parse:error, completion:last_attempt.",
+       "severity": "minor"
+      }
+     ],
+     "corrections": [
+      "Replace overlap_with_incumbents with: instructor's core capability (JSON-Schema-constrained, validated model output with a validation-retry loop) is already provided by two incumbents on native sign-ins \u2014 anthropics/claude-code via the Workflow tool's per-stage `schema:` contract with schema-failure re-ask (in use in this repo at .claude/workflows/layer-verdict-lane.js), and openai/codex via `codex exec --output-schema <FILE>` plus `--json` JSONL events. pydantic-ai and the installed typesafe-ai skill remain additional (non-listed) overlaps. Disposition stays keep_but_compare, but on incumbent overlap, not on the absence of it.",
+      "Correct the C1 sentence in fit_with_native_workflow: instructor has a key-free local-model path (ollama/..., or any OpenAI-compatible base_url, which on this host is the local vLLM endpoint named in AGENTS.md), so C1's local-model clause is satisfiable; record the paid-API-key penalty as conditional on a hosted-provider arm rather than as a flat per-provider requirement.",
+      "Correct structured_events and the C2 risk entry: instructor documents a named event-hook taxonomy (docs/concepts/hooks.md: completion:kwargs, completion:response, completion:usage, completion:error, parse:error, completion:last_attempt, with attempt_number/max_attempts/is_last_attempt metadata). Keep C2 unmet for resumable sessions, MCP/tool dispatch and any session/event wire protocol, and drop the open_gaps entry implying a full docs crawl is needed \u2014 `gh api repos/567-labs/instructor/contents/docs/concepts` settles it.",
+      "Rename the overturning comparison as a runnable protocol in the project's existing shape: preregister with the comparison-preregister skill, then `rtk proxy node tools/compare/extraction/run-arms.mjs --protocol tools/compare/extraction/protocol.sealed.json --fixture tools/compare/extraction/cases.json --arms native-claude-schema,codex-output-schema,instructor-vllm,typesafe-ai --out tools/compare/extraction/out/`, with arm A = a Workflow agent(..., { schema }) stage, arm B = `codex exec --output-schema schema.json --json`, arm C = a Python instructor script against the local vLLM base_url (no paid key), arm D = the typesafe-ai skill; metrics: schema-validity rate on first return, re-ask count, wall time, and credit/token cost per lane over one shared extraction fixture. Only a measured delta promotes; agreement does not.",
+      "Add to open_gaps: the packet judged C5 by whether the catalog text names the capability rather than by whether an incumbent provides it, and did not inspect the incumbents' own structured-output surfaces (`codex exec --help`, the Workflow tool `schema:` option) before asserting zero overlap."
+     ],
+     "sources_read": [
+      "$HOME/code/agent-lab/.claude/workflows/layer-verdict-lane.js (lines 15-56: agent stages with schema: LANE_RETURN / schema: VOTE)",
+      "codex exec --help (binary $HOME/.local/share/codex-ecosystem/bin/codex): --output-schema <FILE>, --json, --oss, --local-provider",
+      "gh api repos/567-labs/instructor/contents/docs/concepts --jq '.[].name' (hooks.md, partial.md, iterable.md, retrying.md, usage.md, ...)",
+      "gh api repos/567-labs/instructor/contents/docs/concepts/hooks.md (base64-decoded hook event table)",
+      "gh api repos/567-labs/instructor/contents --jq '.[].name' (top-level tree: tests, instructor, docs, examples, benchmarks, .github)",
+      "$HOME/code/agent-lab/AGENTS.md (C1/C5 context, local vLLM provider statement, typesafe-ai section, parallel-work rules)",
+      "$HOME/code/agent-lab/tools/compare/ listing (semantic/protocol.sealed.json, retrieval/run-arms.mjs, closure.mjs, strip-packet.mjs, seal.mjs) for the comparison-runner convention",
+      "this subagent's own StructuredOutput contract (schema validation plus re-ask on failure) as in-session evidence of native typed returns"
+     ]
+    },
+    {
+     "lens": "accuracy",
+     "refuted": true,
+     "findings": [
+      {
+       "claim": "interface: \"Pure Python SDK/library (`pip install instructor`), no CLI, server or daemon.\" (also worker_features: \"no CLI\" framing, and tests_and_ci sourced only from the top-level tree)",
+       "problem": "Contradicted by the repository the packet says it read. Instructor ships a console-script CLI. The packet listed `gh api repos/567-labs/instructor/contents` as a source but never opened pyproject.toml, instructor/cli/, or docs/cli/, all of which are visible from that same tree listing. C2 (\"SDK or headless/exec mode\") is assessed against a false premise about the shipped interface surface.",
+       "evidence": "gh api repos/567-labs/instructor/contents/pyproject.toml -> `[project.scripts]\\ninstructor = \"instructor.cli.cli:app\"` (lines 114-115). gh api repos/567-labs/instructor/contents/instructor/cli -> __init__.py, batch.py, cli.py, deprecated_hub.py, files.py, jobs.py, usage.py. cli.py is a typer app: `app.add_typer(jobs.app, name=\"jobs\", ...)`, `files`, `usage`, `batch`, plus a `docs` command. gh api repos/567-labs/instructor/contents/docs/cli -> batch.md, finetune.md, index.md, usage.md. The WebFetch of https://python.useinstructor.com/concepts/ also reports \"a CLI Reference section exists in navigation\".",
+       "severity": "major"
+      },
+      {
+       "claim": "structured_events: \"Not found in the fetched documentation. The only event-like feature is streaming of partial Pydantic model objects ... No SDK-level 'message/event' stream schema, session IDs, or resumability was documented in the pages fetched\"; and claims[8]/risks[2] \"No structured events ... found in the fetched docs (C2 largely unmet beyond basic streaming of partial Pydantic objects)\"",
+       "problem": "Instructor has a typed, named-event hook system, and the very page the packet cites lists it. This is a direct C2 mis-scoring: \"structured events\" in the preregistered sense of named lifecycle events with registered handlers is present, even though resumable sessions, MCP and tool dispatch genuinely are not.",
+       "evidence": "WebFetch https://python.useinstructor.com/concepts/ (re-fetched) lists under Error Handling & Validation: \"Hooks\" \u2014 \"Add callbacks for monitoring and debugging\". gh api repos/567-labs/instructor/contents/instructor/v2/core/hooks.py -> `class HookName(Enum): COMPLETION_KWARGS = \"completion:kwargs\"; COMPLETION_RESPONSE = \"completion:response\"; COMPLETION_ERROR = \"completion:error\"; COMPLETION_LAST_ATTEMPT = \"completion:last_attempt\"; COMPLETION_USAGE = \"completion:usage\"; PARSE_ERROR = \"parse:error\"`, with `class Hooks` exposing `on()`, `off()`, `emit()` and per-event emitters, plus typed handler Protocols. instructor/core/hooks.py and docs/hooks/ also exist.",
+       "severity": "major"
+      },
+      {
+       "claim": "native_login_support: \"api_key_required\"; fit_with_native_workflow: \"The project's own AGENTS.md 'C1 native-auth fit' criterion is a real penalty here: it requires a separate paid provider API key/env var per provider rather than riding a Claude Code, Codex, GitHub, or Google native login\"; auth_model: \"no built-in local-model-only mode besides whatever provider client (e.g. ollama) the caller supplies\"",
+       "problem": "The preregistered C1 is satisfied by native sign-ins *or a local model*. Instructor ships a first-class, documented local-model path that needs no paid key at all, so 'requires a separate paid provider API key' is false as an unconditional statement, and 'no built-in local-model-only mode' is false \u2014 the ollama builder is inside the library, not caller-supplied. The packet's own auth_model sentence contradicts its own fit_with_native_workflow sentence. The narrower sub-claim (no Claude Code / Codex / GitHub / Google sign-in) is confirmed and stands.",
+       "evidence": "instructor/v2/auto_client.py (via instructor/auto_client.py shim): `def _build_ollama(...)` with `base_url = kwargs.pop(\"base_url\", \"http://localhost:11434/v1\")` and `api_key = kwargs.pop(\"api_key\", \"ollama\")  # required but unused`, registered in the provider dispatch table as `\"ollama\": _build_ollama`. docs/integrations/ contains ollama.md and llama-cpp-python.md. README line 131-132: `# Ollama (local)` / `client = instructor.from_provider(\"ollama/llama3.2\")`. No OAuth / device-code / subscription path exists anywhere in auto_client.py (grep for oauth|subscription|claude code|codex|device_code|sign-?in returned nothing), so the no-native-login half is confirmed.",
+       "severity": "major"
+      },
+      {
+       "claim": "claims[4] source: \"WebFetch https://python.useinstructor.com/concepts/ : \\\"Instructor is a wrapper library that patches LLM provider clients ... How Instructor patches LLM clients\\\"\" (quoted verbatim)",
+       "problem": "The quoted sentence is not reproducible from the cited URL. A fresh fetch of the same page returns a concept index (Core Concepts: Models, Patching, from_provider, Migration Guide, Types, Validation, Prompting, Multimodal; etc.) and explicitly no definitional statement. The substance (Instructor patches provider clients) is well supported elsewhere, but the packet presents an unverifiable quotation as source text.",
+       "evidence": "WebFetch https://python.useinstructor.com/concepts/ with a prompt asking for any statement defining what Instructor is: \"The page doesn't provide an explicit definition. The closest statement describes the workflow: 'Use the unified interface to create clients for any provider'\". Substance independently supported by the page's \"Patching\" concept entry and by README from_provider samples (lines 17, 91, 123-137).",
+       "severity": "minor"
+      },
+      {
+       "claim": "claims[7]: \"No mention in fetched docs of structured/resumable session events, custom tool/MCP dispatch ...\" sourced to the concepts page summary \"(Sessions/Tools/MCP: Not evident ...)\"",
+       "problem": "The cited page does list tool-related content, so the 'no mention' wording is contradicted by its own source. The underlying judgment survives \u2014 Instructor parses parallel tool-call schemas, it does not dispatch or execute tools, and MCP appears only in a blog post \u2014 but the claim as written overstates what the page says.",
+       "evidence": "WebFetch https://python.useinstructor.com/concepts/ lists \"Parallel Tools\" under Performance Optimization (\"running multiple tools in parallel\"). gh api search/code q='repo:567-labs/instructor mcp' -> total_count 2, both non-feature: docs/blog/posts/why-care-about-mcps.md and sitemap.yaml. No MCP module exists in instructor/.",
+       "severity": "minor"
+      },
+      {
+       "claim": "releases_last_6_months lists only v1.17.0; open_gaps[2]: \"Did not confirm exact release cadence over the full trailing 6 months (only fetched the 5 most recent releases via releases?per_page=5)\"",
+       "problem": "An open gap carried forward that one additional page of the same already-cited endpoint closes. C4 (\"release cadence in the last 6 months\") is left unevidenced in the packet when it is in fact satisfied, understating the maintenance signal.",
+       "evidence": "gh api 'repos/567-labs/instructor/releases?per_page=10' -> v1.17.0 2026-09-09, v1.16.0 2026-08-27, v1.15.4 2026-06-28, v1.15.3 2026-06-15, v1.15.1 2026-04-03, v1.15.0 2026-04-02 (six releases inside the 2026-03-22..2026-09-22 window), then v1.14.5 2026-01-29 and earlier.",
+       "severity": "minor"
+      }
+     ],
+     "corrections": [
+      "interface: replace with \u2014 \"Python SDK/library (`pip install instructor`) plus a small console-script CLI (`[project.scripts] instructor = instructor.cli.cli:app`; typer subcommands `jobs`, `files`, `usage`, `batch`, `docs`, documented at docs/cli/). The CLI manages OpenAI fine-tuning jobs, uploaded files, usage stats and Batch jobs \u2014 it is not a headless agent/exec interface, so the C2 verdict (no agent exec mode, no resumable sessions) is unchanged. No server or daemon component.\"",
+      "structured_events: replace with \u2014 \"Partially present. instructor/v2/core/hooks.py defines a typed HookName enum with six named lifecycle events (completion:kwargs, completion:response, completion:error, completion:last_attempt, completion:usage, parse:error) and a Hooks class with on()/off()/emit() plus typed handler Protocols; the docs concepts index lists Hooks under Error Handling & Validation. These are in-process client-side callbacks, not a serialized event stream, session IDs or resumability. Partial[Model] streaming remains the only incremental-output mechanism. No MCP dispatch (only a blog post mentions MCP) and no tool execution \u2014 `Parallel Tools` is schema-level parsing of parallel tool calls.\"",
+      "native_login_support / C1: replace \"api_key_required\" with \"api_key_or_local_model\". Corrected C1 text: \"No Claude Code, Codex/ChatGPT, GitHub or Google sign-in path exists (confirmed: no OAuth, device-code or subscription flow anywhere in the provider builders). For hosted providers a separate paid API key is required via provider-specific env vars or an explicit api_key= argument \u2014 a recorded penalty. However C1's alternative branch is satisfied natively: instructor ships a built-in ollama provider (_build_ollama, base_url http://localhost:11434/v1, api_key literal 'ollama', 'required but unused') and documented llama-cpp-python and ollama integrations, so `instructor.from_provider('ollama/...')` (or an OpenAI-compatible base_url pointed at this project's local vLLM) runs with no paid credential. The C1 penalty should be scored as 'paid key for hosted providers only', not 'paid key required'.\"",
+      "claims[4] source: drop the unreproducible verbatim quote from the concepts page. Cite instead the page's \"Patching\" / \"from_provider\" concept entries and README lines 17 and 123-137 for the patching model.",
+      "claims[7]: rewrite as \"The fetched docs show no resumable sessions, no MCP integration and no tool execution/dispatch; they do show Hooks (named lifecycle callbacks) and Parallel Tools (schema-level parallel tool-call parsing).\"",
+      "releases_last_6_months: replace with the full list \u2014 v1.17.0 2026-09-09, v1.16.0 2026-08-27, v1.15.4 2026-06-28, v1.15.3 2026-06-15, v1.15.1 2026-04-03, v1.15.0 2026-04-02 (gh api 'repos/567-labs/instructor/releases?per_page=10'); remove open_gaps[2]. C4 cadence is now evidenced.",
+      "portability: the inference can be upgraded to a source-cited fact \u2014 pyproject.toml declares `requires-python = \"<4.0,>=3.9\"` with pure-Python dependencies and no platform markers or binary extensions, so Linux/WSL2 x86_64 and macOS arm64 wheels are the same universal wheel. open_gaps[3] can be narrowed to \"no docs page enumerating OS support was found; portability established from packaging metadata instead\".",
+      "Bottom line unchanged: the disposition is not overturned. Everything the disposition rests on was confirmed exactly \u2014 MIT license, not archived, Python, org-owned 567-labs, 13,935 stars, 81 open issues, pushed_at 2026-09-18T21:58:13Z, v1.17.0 2026-09-09, top-level tests/ and .coveragerc, all 11 workflow filenames verbatim, the README PydanticAI paragraph verbatim, and the five provider env vars on the installation page. Instructor remains not an agent runtime (no isolation model, no sessions, no MCP/tool dispatch) and still overlaps pydantic-ai and the installed typesafe-ai skill, so keep_but_compare / targeted_candidate stands with the named comparison (instructor-typed extraction vs typesafe-ai vs pydantic-ai on a shared extraction fixture). The refutation is of three stated claims inside the packet, not of its verdict."
+     ],
+     "sources_read": [
+      "gh api repos/567-labs/instructor --jq '{license, archived, language, pushed_at, stargazers_count, open_issues_count, owner, owner_type, created_at, default_branch}'",
+      "gh api 'repos/567-labs/instructor/releases?per_page=10' --jq '.[] | {tag_name, published_at}'",
+      "gh api repos/567-labs/instructor/contents (top-level tree)",
+      "gh api repos/567-labs/instructor/contents/.github/workflows",
+      "gh api repos/567-labs/instructor/contents/pyproject.toml (decoded; [project], requires-python, [project.scripts])",
+      "gh api repos/567-labs/instructor/readme (base64-decoded, 295 lines; lines 17, 34, 91, 108, 123-137, 171, 177-187)",
+      "gh api repos/567-labs/instructor/contents/instructor (package tree)",
+      "gh api repos/567-labs/instructor/contents/instructor/cli (and cli/cli.py decoded)",
+      "gh api repos/567-labs/instructor/contents/instructor/core (and core/hooks.py, auto_client.py shim)",
+      "gh api repos/567-labs/instructor/contents/instructor/v2/auto_client.py (decoded, 1556 lines; _build_ollama at line 1223, dispatch table line 1551)",
+      "gh api repos/567-labs/instructor/contents/instructor/v2/core/hooks.py (decoded; HookName enum, Hooks class)",
+      "gh api repos/567-labs/instructor/contents/instructor/providers (provider tree)",
+      "gh api repos/567-labs/instructor/contents/docs (docs tree)",
+      "gh api repos/567-labs/instructor/contents/docs/cli",
+      "gh api repos/567-labs/instructor/contents/docs/hooks",
+      "gh api repos/567-labs/instructor/contents/docs/integrations (29 entries incl. ollama.md, llama-cpp-python.md)",
+      "gh api -X GET search/code -f q='repo:567-labs/instructor mcp'",
+      "WebFetch https://python.useinstructor.com/learning/getting_started/installation/",
+      "WebFetch https://python.useinstructor.com/concepts/",
+      "Local scratch copies: <session-scratchpad> v2_auto.py, auto_client.py"
+     ]
+    }
+   ]
+  },
+  "anthropics/claude-agent-sdk-typescript": {
+   "evidence": {
+    "slug": "claude-agent-sdk-typescript",
+    "category": "agent-sdks",
+    "summary": "anthropics/claude-agent-sdk-typescript (@anthropic-ai/claude-agent-sdk) is Anthropic's official Node/TS headless-agent library that runs the Claude Code binary as a subprocess, exposing query(), session resume/fork, custom SDK-MCP tools, subagents and structured message streaming. Its official docs and quickstart explicitly require ANTHROPIC_API_KEY (or Bedrock/Vertex/AWS/Foundry credentials) and state Anthropic does not allow third-party products to offer claude.ai/Claude Code login, which refutes all three shortlisted judges' C1 fit claims that this repo clears the user's existing Claude Code subscription login. The repo has no license grant (LICENSE.md is 'All rights reserved' under Anthropic's Commercial Terms of Service, matching the GitHub API's null/NOASSERTION field), no tests directory, and its .github/workflows are repo-maintenance automation (issue triage, non-write-user gating, Slack notification), not a build/test CI pipeline, so 'has_ci=true' in the source data overstates what CI actually verifies.",
+    "interface": "npm package @anthropic-ai/claude-agent-sdk (Node.js 18+). Primary entry point query({prompt, options}) returns an AsyncGenerator<SDKMessage> streaming Claude's reasoning, tool calls, tool results and a final ResultMessage; accepts a string prompt or an AsyncIterable<SDKUserMessage> for multi-turn/streaming input. Session helpers: startup() (pre-warm CLI subprocess), listSessions(), getSessionMessages(), getSessionInfo(), renameSession(), tagSession(); resume option continues the most recent session, forkSession creates a new session id from an existing transcript. Bundles native Claude Code platform binaries (darwin-arm64, linux-x64 glibc/musl, win32-x64) as npm optional dependencies, or falls back to pathToClaudeCodeExecutable for a natively installed Claude Code CLI. A non-JS caller can instead run the CLI as a subprocess with `-p --output-format json` per docs.",
+    "auth_model": "Docs (code.claude.com/docs/en/agent-sdk/quickstart) require setting ANTHROPIC_API_KEY from the Claude Console as an environment variable read by the process (the SDK does not load .env files itself), with alternate first-party-cloud paths: Amazon Bedrock (CLAUDE_CODE_USE_BEDROCK=1 + AWS credentials), Claude Platform on AWS (CLAUDE_CODE_USE_ANTHROPIC_AWS=1 + ANTHROPIC_AWS_WORKSPACE_ID), Google Cloud's Agent Platform (CLAUDE_CODE_USE_VERTEX=1 + GCP credentials), and Microsoft Foundry (CLAUDE_CODE_USE_FOUNDRY=1 + Azure credentials). Quoted directly from the docs: \"Unless previously approved, Anthropic does not allow third party developers to offer claude.ai login or rate limits for their products, including agents built on the Claude Agent SDK. Use the API key authentication methods described in the Quickstart instead.\" This appears twice (overview page and quickstart page) and is an explicit policy statement, not an implementation gap.",
+    "native_login_support": "api_key_required",
+    "isolation_model": "Runs as a local subprocess (the bundled or externally installed Claude Code binary) under the caller's OS process, not a managed sandbox by default. permissionMode governs tool execution: 'default' (prompts), 'plan' (read-only + planModeInstructions), 'bypassPermissions' (requires allowDangerouslySkipPermissions: true), plus project/local-settings-only 'auto'. Fine-grained control via allowedTools/disallowedTools (scoped rules like \"Bash(rm *)\"), additionalDirectories, and a canUseTool callback for custom permission logic invoked only when the built-in flow would otherwise prompt. cwd sets the working directory (default process.cwd()); projectConfigRoot can point Claude Code's settings/.mcp.json/commands/agents/skills resolution at a separate trusted checkout from cwd. resolveSettings() and managedSettings support MDM/policy-tier configuration merged as restrictive-only. No SDK-level container/VM sandbox is described in the fetched docs; isolation is whatever the host process/OS provides.",
+    "worker_features": "tool() builds type-safe in-process MCP tool definitions from Zod 3/4 schemas with ToolAnnotations (readOnlyHint, destructiveHint, idempotentHint, openWorldHint); createSdkMcpServer() packages tools into an in-process MCP server (with alwaysLoad/timeout/instructions). External MCP servers are configured via mcpServers: Record<string, McpServerConfig>, with onElicitation for MCP elicitation callbacks and deferred tool loading via searchHint. Subagents: the `agent` option names the main-thread agent persona; `agents` programmatically defines subagent Record<string, AgentDefinition>; agentProgressSummaries and forwardSubagentText control how subagent activity (task_progress events, nested text/thinking) surfaces to the parent stream with parent_tool_use_id/parent_agent_id lineage tags. Hooks, skills, commands, memory and plugins load from .claude/ and ~/.claude/ the same as the Claude Code CLI per the SDK overview capabilities table.",
+    "structured_events": "SDKMessage is a union covering SDKUserMessage (streaming input), SDKTaskProgressMessage (with optional summary), SDKHookStartedMessage/SDKHookProgressMessage/SDKHookResponseMessage (gated by includeHookEvents), partial/delta messages (includePartialMessages), and a prompt_suggestion message (promptSuggestions option). Assistant/tool/result messages carry a `type` discriminator (e.g. 'assistant', 'result') and content blocks; nested/subagent messages carry parent_tool_use_id and parent_agent_id for lineage. This matches C2 (structured events, resumable sessions, custom tools/MCP).",
+    "tests_and_ci": "No `tests` directory in the top-level tree (gh api repos/anthropics/claude-agent-sdk-typescript/contents lists only .claude, .github, CHANGELOG.md, LICENSE.md, README.md, examples, scripts) \u2014 confirms has_tests_dir=false from the source data. .github/workflows contains issue-triage.yml, non-write-users-check.yml, and slack-issue-notification.yml only: these are repository-maintenance/community-ops automations, not a build/lint/test pipeline. No evidence of any unit/integration test suite or CI check that runs code against the package; upstream tests could not be located in this packet.",
+    "releases_last_6_months": [
+     "v0.3.278 (2026-09-19)",
+     "v0.3.277 (2026-09-18)",
+     "v0.3.276 (2026-09-18)",
+     "v0.3.275 (2026-09-17)",
+     "v0.3.274 (2026-09-17)"
+    ],
+    "license": "GitHub API license field is null (NOASSERTION), consistent with the shortlist's flagged gate. LICENSE.md itself is not a template license: full text is \"\u00a9 Anthropic PBC. All rights reserved. Use is subject to Anthropic's Commercial Terms of Service.\" \u2014 i.e. the repository is explicitly proprietary/all-rights-reserved under a commercial ToS, not merely missing a license declaration. README and docs confirm: \"Use of the Claude Agent SDK is governed by Anthropic's Commercial Terms of Service... except to the extent a specific component or dependency is covered by a different license as indicated in that component's LICENSE file.\" This is stronger than NOASSERTION alone and should be recorded as 'proprietary/commercial ToS', not merely 'license missing'.",
+    "maintenance": "Very active: releases roughly daily-to-every-few-days (v0.3.274 to v0.3.278 across 2026-09-17 to 2026-09-19 alone); repo created 2025-09-27, last pushed 2026-09-19T03:10:32Z, last updated 2026-09-22T15:35:25Z; 1,762 stargazers, 228 forks, 216 open issues; Discord community channel and GitHub issue tracker referenced in README. Official Anthropic org repo (anthropics), not a community fork.",
+    "portability": "Bundles native binaries via npm optional dependencies for macOS arm64 (Apple Silicon), Linux x64 glibc and musl, and Windows x64; falls back to pathToClaudeCodeExecutable pointing at a natively installed Claude Code CLI when optional deps are skipped (e.g. npm ci --omit=optional) or unsupported (e.g. some ARM64 Windows/pip cases documented for the Python sibling). This covers the required Linux/WSL2 x86_64 and macOS arm64 targets (C6) directly via the linux-x64 and darwin-arm64 optional packages.",
+    "fit_with_native_workflow": "Node/TypeScript matches this repo's .claude/workflows/*.mjs and *.js glue, and the SDK's subagent/MCP/session-resume feature set programmatically overlaps what this project's Workflow/Agent tooling already does natively inside Claude Code. However, the auth-model finding is decisive: the SDK cannot run on the user's existing Claude Code subscription login for a third-party integration per Anthropic's own documented policy, so any local_integration acceptance run (e.g. the shortlisted `rtk proxy node tests/integration/claude-agent-sdk-ts-smoke.mjs` with ANTHROPIC_API_KEY unset) would be expected to fail authentication or fall back to no credentials at all, not resolve to a Claude Code login source as the gap-first judge's acceptance command implicitly assumed.",
+    "overlap_with_incumbents": "Directly duplicates the already-measured anthropics/claude-agent-sdk-python (same org, same product, same auth/isolation/worker model, just a different language binding) and substantially overlaps anthropics/claude-code's own native Agent/Workflow tooling that this project already uses inside Claude Code sessions. The only differentiator this packet can confirm is language (Node/TS vs Python) for out-of-Claude-Code programmatic embedding \u2014 a real but narrow capability gap (C5), not the 'Claude Code login it uses natively' capability the judges claimed.",
+    "risks": [
+     "Auth-model mismatch: judges assumed native Claude Code subscription login works for this SDK; docs explicitly forbid third-party products from offering claude.ai/Claude Code login and require ANTHROPIC_API_KEY (or Bedrock/Vertex/AWS/Foundry credentials) instead, which is a paid/managed-credential dependency, not a free reuse of the user's existing login.",
+     "License is proprietary 'all rights reserved' under Anthropic's Commercial Terms of Service, not merely an unassigned/NOASSERTION open-source license; using it in an internal tool is likely fine under those commercial terms but it is not a permissive or source-available license per C4's stated preference.",
+     "No test suite and no build/test CI observed at the top level; only repo-ops workflows (issue triage, contributor gating, Slack notifications) exist, so upstream correctness assurance signals for C4 are weaker than 'has_ci=true' alone suggests.",
+     "Runs as a local subprocess with no described sandbox beyond permission modes/tool allow-deny lists; C3 isolation depends entirely on the caller's own process/OS controls (e.g. this project's worktree/sandbox conventions), not anything the SDK itself enforces.",
+     "The shortlisted local_integration acceptance command (`rtk proxy node tests/integration/claude-agent-sdk-ts-smoke.mjs` with ANTHROPIC_API_KEY unset asserting a resolved 'Claude Code login' auth source) is built on the now-refuted auth assumption and should be revised or dropped before being run as written."
+    ],
+    "claims": [
+     {
+      "claim": "GitHub license field is null/NOASSERTION despite LICENSE.md present in top-level tree",
+      "source": "gh api repos/anthropics/claude-agent-sdk-typescript",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "LICENSE.md text is 'All rights reserved... subject to Anthropic's Commercial Terms of Service', i.e. proprietary, not a standard open license",
+      "source": "gh api repos/anthropics/claude-agent-sdk-typescript/contents/LICENSE.md (base64 decoded)",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "No `tests` directory exists at top level; has_tests_dir=false confirmed",
+      "source": "gh api repos/anthropics/claude-agent-sdk-typescript/contents",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": ".github/workflows contains only issue-triage.yml, non-write-users-check.yml, slack-issue-notification.yml \u2014 no build/test CI job",
+      "source": "gh api repos/anthropics/claude-agent-sdk-typescript/contents/.github/workflows",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Five most recent releases are v0.3.274 through v0.3.278, published 2026-09-17 through 2026-09-19",
+      "source": "gh api repos/anthropics/claude-agent-sdk-typescript/releases?per_page=5",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Repo has 1,762 stars, 228 forks, 216 open issues, created 2025-09-27, last pushed 2026-09-19",
+      "source": "gh api repos/anthropics/claude-agent-sdk-typescript",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "README states SDK use is governed by Anthropic's Commercial Terms of Service except where a dependency's own LICENSE differs",
+      "source": "gh api repos/anthropics/claude-agent-sdk-typescript/readme (base64 decoded)",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Docs quote: 'Unless previously approved, Anthropic does not allow third party developers to offer claude.ai login or rate limits for their products, including agents built on the Claude Agent SDK. Use the API key authentication methods described in the Quickstart instead.'",
+      "source": "https://code.claude.com/docs/en/agent-sdk/overview and https://code.claude.com/docs/en/agent-sdk/quickstart",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Quickstart requires setting ANTHROPIC_API_KEY as an environment variable (plus Bedrock/AWS/Vertex/Foundry alternatives); the SDK does not load .env files automatically",
+      "source": "https://code.claude.com/docs/en/agent-sdk/quickstart",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "query() returns AsyncGenerator<SDKMessage>; resume/forkSession session options; startup(), listSessions(), getSessionMessages() session APIs",
+      "source": "https://code.claude.com/docs/en/agent-sdk/typescript",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "SDK bundles native binaries for darwin-arm64, linux-x64 (glibc/musl), win32-x64 via npm optional dependencies, with pathToClaudeCodeExecutable fallback",
+      "source": "https://code.claude.com/docs/en/agent-sdk/typescript and https://code.claude.com/docs/en/agent-sdk/quickstart",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Permission modes are default/plan/bypassPermissions(+allowDangerouslySkipPermissions)/auto(settings-only); allowedTools/disallowedTools/additionalDirectories/canUseTool control tool access; cwd and projectConfigRoot control working directory and settings source",
+      "source": "https://code.claude.com/docs/en/agent-sdk/typescript",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "tool()/createSdkMcpServer() build in-process MCP tools/servers; mcpServers option connects external MCP servers; agent/agents options define subagents; structured messages include SDKTaskProgressMessage, SDKHook*Message, partial messages, prompt_suggestion, with parent_tool_use_id/parent_agent_id lineage",
+      "source": "https://code.claude.com/docs/en/agent-sdk/typescript",
+      "evidence_class": "source_review"
+     }
+    ],
+    "sources_read": [
+     "gh api repos/anthropics/claude-agent-sdk-typescript",
+     "gh api repos/anthropics/claude-agent-sdk-typescript/releases?per_page=5",
+     "gh api repos/anthropics/claude-agent-sdk-typescript/readme",
+     "gh api repos/anthropics/claude-agent-sdk-typescript/contents",
+     "gh api repos/anthropics/claude-agent-sdk-typescript/contents/.github",
+     "gh api repos/anthropics/claude-agent-sdk-typescript/contents/.github/workflows",
+     "gh api repos/anthropics/claude-agent-sdk-typescript/contents/LICENSE.md",
+     "https://code.claude.com/docs/en/agent-sdk/typescript",
+     "https://code.claude.com/docs/en/agent-sdk/overview",
+     "https://code.claude.com/docs/en/agent-sdk/quickstart"
+    ],
+    "open_gaps": [
+     "No .npm test script or test framework was located; whether Anthropic runs an internal (non-public) test suite before each release could not be verified from public repo contents alone.",
+     "No executed local_integration run was performed (per the evidence-class rule, nothing was executed in this packet); the shortlisted `rtk proxy node tests/integration/claude-agent-sdk-ts-smoke.mjs` acceptance command was not run, and given the refuted auth assumption, its exact behavior against a real ANTHROPIC_API_KEY-unset environment is unverified \u2014 only the documented policy that such a run would need an API key (or fail) is confirmed.",
+     "Whether Anthropic's 'unless previously approved' claude.ai-login exception could apply to this specific internal/non-redistributed use case was not investigated; docs do not name an approval process reachable from public documentation.",
+     "Detailed comparison against the measured anthropics/claude-agent-sdk-python (exact API parity, feature lag/lead between the two SDKs) was not performed in this packet; only the overlap is noted structurally from the shared docs page.",
+     "Sandbox/isolation guarantees beyond permission modes (e.g. whether Anthropic recommends or ships any container/seccomp wrapper for the SDK subprocess) were not found in the fetched docs pages and were not separately searched for in a dedicated 'Hosting' or 'Sandboxing' doc page."
+    ]
+   },
+   "refutations": [
+    {
+     "lens": "accuracy",
+     "refuted": true,
+     "findings": [
+      {
+       "claim": "'Its official docs ... state Anthropic does not allow third-party products to offer claude.ai/Claude Code login, which refutes all three shortlisted judges' C1 fit claims that this repo clears the user's existing Claude Code subscription login' / 'the SDK cannot run on the user's existing Claude Code subscription login'",
+       "problem": "The packet converts a product-distribution policy into a technical capability claim, and the technical claim is contradicted by two current first-party Anthropic sources. The docs note restricts third-party developers from OFFERING claude.ai login (and its rate limits) to their own product's end users; it says nothing about a developer running the SDK on their own machine against their own Claude subscription. Anthropic's own help-center article, last updated 2026-06-16, says the opposite is currently true, and the Claude Code headless docs state it explicitly as an implementation fact.",
+       "evidence": "support.claude.com/en/articles/15036540 (June 16, 2026), banner in effect: 'Update June 15: We're pausing the changes to Claude Agent SDK usage described below. For now, nothing has changed: Claude Agent SDK, `claude -p`, and third-party app usage still draw from your subscription's usage limits.' Also code.claude.com/docs/en/headless, `--bare` section: 'Set `ANTHROPIC_API_KEY` before running it, because bare mode doesn't use your subscription login' and 'In bare mode, Claude Code never reads OAuth credentials or the system keychain' \u2014 with the note that '`--bare` ... will become the default for `-p` in a future release', i.e. it is not the default today, so a non-bare SDK-spawned CLI does read OAuth credentials / the subscription login. The overview quote the packet relies on is verbatim correct (verified) but does not carry the meaning assigned to it.",
+       "severity": "blocking"
+      },
+      {
+       "claim": "native_login_support: 'api_key_required'; auth_model 'Docs ... require setting ANTHROPIC_API_KEY'",
+       "problem": "Recorded as an absolute for C1 scoring when it is conditional. API key is required for `--bare`/scripted-clean runs, for hosting/containers where no OAuth credential exists, and for redistributed third-party products under the branding/login policy. It is not required for a developer's own local run on an authenticated Claude Code install. The now-paused help-center content even enumerates 'Third-party apps that authenticate with your Claude subscription through the Agent SDK' as a real billed category, which proves such authentication exists and is supported rather than forbidden.",
+       "evidence": "support.claude.com/en/articles/15036540, 'What the credit covers' list (preserved pre-June-15 content): 'Third-party apps that authenticate with your Claude subscription through the Agent SDK'. Quickstart (verified verbatim) requires ANTHROPIC_API_KEY for its own walkthrough but never states that an existing Claude Code login is unusable.",
+       "severity": "major"
+      },
+      {
+       "claim": "'any local_integration acceptance run (e.g. the shortlisted `rtk proxy node tests/integration/claude-agent-sdk-ts-smoke.mjs` with ANTHROPIC_API_KEY unset) would be expected to fail authentication or fall back to no credentials at all' and 'should be revised or dropped before being run as written'",
+       "problem": "An unsourced behavioural prediction presented as a conclusion, resting entirely on the refuted premise. No cited source describes what the SDK does when ANTHROPIC_API_KEY is unset on a machine with an authenticated Claude Code install; the headless docs imply the opposite outcome. The packet's own open_gaps concede nothing was executed. Under the preregistered rules an executed local check is the only thing that promotes, so the recommendation inverts the correct next step: this is precisely the check that should be run, not dropped.",
+       "evidence": "Packet open_gaps: 'No executed local_integration run was performed ... its exact behavior against a real ANTHROPIC_API_KEY-unset environment is unverified'. Contradicting source: code.claude.com/docs/en/headless, 'In bare mode, Claude Code never reads OAuth credentials or the system keychain' (stated as the exception, not the rule).",
+       "severity": "major"
+      },
+      {
+       "claim": "isolation_model: 'Runs as a local subprocess ... not a managed sandbox by default ... No SDK-level container/VM sandbox is described in the fetched docs; isolation is whatever the host process/OS provides.'",
+       "problem": "Incomplete on the preregistered C3 question ('without hidden global state'). The docs the packet did not fetch document that the SDK-spawned CLI loads user-tier global state by default \u2014 `~/.claude` settings, `~/.claude/CLAUDE.md`, auto memory at `~/.claude/projects/<project>/memory/`, and the shared `~/.claude.json` \u2014 and name the exact options that disable it. The packet neither flags the default hidden global state nor records the controls, so C3 is judged on an incomplete record in both directions.",
+       "evidence": "code.claude.com/docs/en/agent-sdk/hosting, 'Multi-tenant isolation': 'Default SDK behavior reads settings and `CLAUDE.md` memory files from the filesystem ... those files can leak one tenant's context into another tenant's session', with `settingSources: []`, `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`, per-tenant `CLAUDE_CONFIG_DIR` and per-query `cwd`. Same page, 'Container-based sandboxing', links '/docs/en/agent-sdk/secure-deployment#isolation-technologies' for 'Docker, gVisor, and Firecracker'.",
+       "severity": "major"
+      },
+      {
+       "claim": "portability: 'Bundles native binaries via npm optional dependencies for macOS arm64 (Apple Silicon), Linux x64 glibc and musl, and Windows x64'",
+       "problem": "Understates the published matrix by half. The registry manifest for the current version lists eight platform packages, including linux-arm64, linux-arm64-musl, darwin-x64 and win32-arm64. C6's verdict is unaffected (linux-x64 and darwin-arm64 are both covered) but the enumerated claim is wrong as written.",
+       "evidence": "registry.npmjs.org/@anthropic-ai/claude-agent-sdk, version 0.3.278 optionalDependencies: linux-x64, linux-x64-musl, linux-arm64, linux-arm64-musl, darwin-x64, darwin-arm64, win32-x64, win32-arm64 (all pinned 0.3.278).",
+       "severity": "minor"
+      },
+      {
+       "claim": "'README and docs confirm: \"Use of the Claude Agent SDK is governed by Anthropic's Commercial Terms of Service... except to the extent...\"' attributed to `gh api .../readme`; and the claude.ai-login quote 'appears twice (overview page and quickstart page)' with one wording",
+       "problem": "Quote attribution errors. The quoted sentence opening is the overview page's wording; the README says 'Use of this SDK is governed by Anthropic's Commercial Terms of Service'. The login note's exact wording also differs between the two pages ('described in the [Quickstart]' on overview vs 'described in this document' on quickstart), so the packet's single quoted string does not appear verbatim twice. Substance of the license and policy claims is unaffected \u2014 both were verified true.",
+       "evidence": "gh api repos/anthropics/claude-agent-sdk-typescript/readme (decoded): 'Use of this SDK is governed by Anthropic's Commercial Terms of Service, including when you use it to power products and services that you make available to your own customers and end users, except to the extent a specific component or dependency is covered by a different license as indicated in that component's LICENSE file.' Quickstart note: '...Please use the API key authentication methods described in this document instead.'",
+       "severity": "minor"
+      },
+      {
+       "claim": "tests_and_ci: 'No evidence of any unit/integration test suite or CI check that runs code against the package; upstream tests could not be located in this packet.'",
+       "problem": "Literally true but missing the fact that makes it interpretable: the repository publishes no source code at all. The top-level tree has no package.json, no src/, no tsconfig \u2014 only .claude, .github, CHANGELOG.md, LICENSE.md, README.md, examples/ and scripts/ (two shell scripts for issue-label editing), and GitHub reports the repo language as 'Shell'. has_tests_dir=false and the repo-ops-only workflows are therefore artifacts of a changelog-and-issue-tracker front for a package built from a private tree, not evidence about how the shipped package is tested. The packet's C4 direction is right; the decisive fact is absent, and the published package manifest carries no scripts or devDependencies either.",
+       "evidence": "gh api repos/anthropics/claude-agent-sdk-typescript/contents (6 entries, verified); .../contents/scripts \u2192 edit-issue-labels.sh, gh.sh; .../contents/examples \u2192 .gitignore, session-stores; repo metadata 'language':'Shell'; registry.npmjs.org manifest for 0.3.278: scripts=None, devDependencies=[].",
+       "severity": "minor"
+      }
+     ],
+     "corrections": [
+      "Replace native_login_support 'api_key_required' with 'subscription_login_supported_conditional': the user's existing Claude Code subscription login is currently usable by the Agent SDK for their own (non-redistributed) tooling \u2014 Anthropic states Agent SDK and `claude -p` usage 'still draw from your subscription's usage limits' (support.claude.com/en/articles/15036540, 2026-06-16) \u2014 while ANTHROPIC_API_KEY (or Bedrock/AWS/Vertex/Foundry credentials) is required for `--bare` runs, for containers/CI with no OAuth credential, and for products that would offer claude.ai login to their own end users. Record as a C1 pass with two recorded risks: (a) Anthropic announced and then paused a change that would move Agent SDK usage off subscription limits onto a separate monthly credit, and has said it will 'share [an update] before anything takes effect'; (b) `--bare` 'will become the default for `-p` in a future release', and bare mode 'never reads OAuth credentials or the system keychain'.",
+      "Rewrite the auth_model field to separate the two things the packet conflated: (1) the documented policy \u2014 verbatim and correct \u2014 that third-party developers may not OFFER claude.ai login or rate limits to their products' users; (2) the documented implementation \u2014 a non-bare SDK-spawned `claude` subprocess reads OAuth credentials and the subscription login, and only `--bare` does not. (1) does not imply (2).",
+      "Do not revise or drop the shortlisted acceptance command. Keep `rtk proxy node tests/integration/claude-agent-sdk-ts-smoke.mjs` with ANTHROPIC_API_KEY unset, and make it assert on the observed auth source and on whether the run is billed to the subscription. It is the executed local check that settles C1, and per the preregistered rules it is also the only thing that can promote this candidate past keep_but_compare. Have it additionally assert that `--bare` is not in effect, since the documented behaviour differs entirely under it.",
+      "Amend isolation_model for C3: the SDK-spawned CLI DOES carry hidden global state by default \u2014 `~/.claude` settings, `~/.claude/CLAUDE.md`, auto memory under `~/.claude/projects/<project>/memory/`, and the shared `~/.claude.json`. Deterministic per-worktree ownership requires `settingSources: []`, `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`, a per-worker `CLAUDE_CONFIG_DIR`, and an explicit `cwd` on every `query()`. Cite docs/en/agent-sdk/hosting#multi-tenant-isolation and docs/en/agent-sdk/secure-deployment#isolation-technologies (Docker, gVisor, Firecracker) rather than stating no sandbox guidance exists.",
+      "Correct portability to the eight published platform packages: linux-x64, linux-x64-musl, linux-arm64, linux-arm64-musl, darwin-x64, darwin-arm64, win32-x64, win32-arm64 (all pinned to the SDK version). C6 remains satisfied for Linux/WSL2 x86_64 and macOS arm64.",
+      "In tests_and_ci, state the decisive fact: the repository publishes no source code (no package.json, src/ or tsconfig; only .claude, .github, CHANGELOG.md, LICENSE.md, README.md, examples/, scripts/; GitHub language 'Shell'), so has_tests_dir=false and the three repo-ops workflows are properties of a distribution/issue-tracker repo, not evidence about the shipped package's testing. Move 'does Anthropic run a private test suite' from a weak inference to a standing, unresolvable-from-public-sources gap.",
+      "Fix quote attribution: the 'Use of the Claude Agent SDK is governed by...' sentence is the overview page's; the README reads 'Use of this SDK is governed by...'. The claude.ai-login note's wording differs between overview and quickstart, so quote each page separately rather than asserting one string appears twice.",
+      "Revise the disposition that follows from the packet's own C5 reasoning, now that C1 is not a blocker: keep_but_compare against the already-measured anthropics/claude-agent-sdk-python and against this project's native Agent/Workflow tooling, with the named comparison being a single executed run of the smoke check above plus a like-for-like Node-vs-Python session-resume/custom-tool exercise. The genuine differentiator remains the Node/TS binding for out-of-Claude-Code embedding \u2014 a narrow but real C5 gap. Record the license accurately as proprietary/all-rights-reserved under Anthropic's Commercial Terms of Service (npm license field: 'SEE LICENSE IN README.md'), a recorded C4 penalty, not an exclusion."
+     ],
+     "sources_read": [
+      "gh api repos/anthropics/claude-agent-sdk-typescript (verified: license null, stars 1762, forks 228, open_issues 216, created 2025-09-27T20:21:19Z, pushed 2026-09-19T03:10:32Z, updated 2026-09-22T15:35:25Z, language Shell)",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/contents (verified: .claude, .github, CHANGELOG.md, LICENSE.md, README.md, examples, scripts \u2014 no tests dir, no package.json, no src)",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/contents/.github/workflows (verified: issue-triage.yml, non-write-users-check.yml, slack-issue-notification.yml only)",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/contents/scripts (edit-issue-labels.sh, gh.sh)",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/contents/examples (.gitignore, session-stores)",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/contents/LICENSE.md (verified verbatim: '\u00a9 Anthropic PBC. All rights reserved. Use is subject to Anthropic's Commercial Terms of Service.')",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/readme (verified; wording differs from packet's quote)",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/releases?per_page=5 (verified: v0.3.278 2026-09-19, v0.3.277 2026-09-18, v0.3.276 2026-09-18, v0.3.275 2026-09-17, v0.3.274 2026-09-17)",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/contents/CHANGELOG.md",
+      "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk (0.3.278: license 'SEE LICENSE IN README.md', engines node>=18, 8 optionalDependencies, no scripts, no devDependencies, published 2026-09-19T01:49:39Z)",
+      "https://code.claude.com/docs/en/agent-sdk/quickstart (verified: ANTHROPIC_API_KEY, no .env loading, Bedrock/AWS/Vertex/Foundry vars, Node 18+, bundled binary note, pathToClaudeCodeExecutable, login policy note)",
+      "https://code.claude.com/docs/en/agent-sdk/overview (verified: login policy quote verbatim, capabilities table, CLI -p --output-format json, commercial ToS)",
+      "https://code.claude.com/docs/en/agent-sdk/typescript (verified: query() AsyncGenerator<SDKMessage>, resume/forkSession, startup/listSessions/getSessionMessages/getSessionInfo/renameSession/tagSession, tool()/createSdkMcpServer/mcpServers, agent/agents, permissionMode default|plan|bypassPermissions|auto, allowDangerouslySkipPermissions, allowedTools/disallowedTools/additionalDirectories/canUseTool, cwd/projectConfigRoot, SDKTaskProgressMessage/SDKHookStartedMessage/prompt_suggestion/parent_tool_use_id/parent_agent_id, bundled binary; no sandbox option)",
+      "https://code.claude.com/docs/en/agent-sdk/hosting (subprocess model, container-based sandboxing, isolation technologies link, multi-tenant isolation via settingSources/CLAUDE_CONFIG_DIR/CLAUDE_CODE_DISABLE_AUTO_MEMORY/cwd, auth section)",
+      "https://code.claude.com/docs/en/agent-sdk/troubleshooting (CLI discovery and process-exit errors; no claim that an existing login is unusable)",
+      "https://code.claude.com/docs/en/headless (decisive: `--bare` 'doesn't use your subscription login'; 'In bare mode, Claude Code never reads OAuth credentials or the system keychain'; bare is not yet the default for -p)",
+      "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan (decisive, updated 2026-06-16: Agent SDK, `claude -p` and third-party app usage 'still draw from your subscription's usage limits'; announced monthly-credit change paused)"
+     ]
+    },
+    {
+     "lens": "fit",
+     "refuted": true,
+     "findings": [
+      {
+       "claim": "fit_with_native_workflow: \"the SDK cannot run on the user's existing Claude Code subscription login for a third-party integration per Anthropic's own documented policy, so any local_integration acceptance run ... would be expected to fail authentication or fall back to no credentials at all\" (and native_login_support: \"api_key_required\").",
+       "problem": "The packet converts a commercial-terms scope statement into a technical auth impossibility and then predicts an unexecuted run's outcome. The quoted sentence restricts third-party developers from *offering claude.ai login or rate limits for their products* (i.e. to their own end users); it says nothing about whether the locally installed Claude Code binary the SDK spawns resolves the logged-in developer's own OAuth credentials. The SDK's documented architecture is exactly that subprocess (docs: run the CLI as a subprocess with -p; the hosting page says 'the subprocess reads ANTHROPIC_API_KEY from its environment' in the multi-tenant deployment context), and on this host that same binary runs with no ANTHROPIC_API_KEY set at all. The packet's own open_gaps admit nothing was executed, so 'would be expected to fail authentication' is inference presented as a decisive finding. C1 should read 'API key required for hosted/third-party-facing deployment; local subprocess auth on an existing login unverified', not a settled api_key_required verdict.",
+       "evidence": "Verbatim policy text confirmed at https://code.claude.com/docs/en/agent-sdk/overview ('Unless previously approved, Anthropic does not allow third party developers to offer claude.ai login or rate limits for their products, including agents built on the Claude Agent SDK.'); https://code.claude.com/docs/en/agent-sdk/hosting: 'the subprocess reads ANTHROPIC_API_KEY from its environment'; local host checks: `env | grep -c ANTHROPIC_API_KEY` -> 0, <native Claude credential store present>, `claude --version` -> 2.1.278 at $HOME/.local/share/codex-ecosystem/bin/claude; npm @anthropic-ai/claude-agent-sdk 0.3.278 mirrors that CLI build.",
+       "severity": "major"
+      },
+      {
+       "claim": "fit_with_native_workflow: \"Node/TypeScript matches this repo's .claude/workflows/*.mjs and *.js glue\".",
+       "problem": "File-extension match, not an integration point. The agent-dispatch graphs in .claude/workflows/ (review-changes.js, sota-convergence.js, comparison-*.js, layer-verdict-lane.js) are Workflow-tool scripts that `export const meta = {name, description, whenToUse, phases}` and call the client's agent()/parallel()/pipeline() DSL inside a Claude Code session; they are not Node entry points and cannot import('@anthropic-ai/claude-agent-sdk'). Only reporting utilities (child-usage.mjs, test-*.mjs, check-syntax.mjs) actually run under node. The SDK's real integration point here would be a new out-of-session Node process driving Claude Code from outside \u2014 the exact lane the agent-sdks layer records as unselected \u2014 so the packet's only positive fit argument points the wrong way.",
+       "evidence": "$HOME/code/agent-lab/.claude/workflows/review-changes.js lines 1-10 (export const meta with phases: Inventory/Review/Recheck, models sonnet/opus); $HOME/code/agent-lab/.claude/settings.json (enableWorkflows, ultracode, CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS=8); AGENTS.md invokes node only for `node .claude/workflows/child-usage.mjs --latest`.",
+       "severity": "major"
+      },
+      {
+       "claim": "overlap_with_incumbents: \"Directly duplicates the already-measured anthropics/claude-agent-sdk-python\".",
+       "problem": "The Python SDK was never measured. The catalog records it as disposition 'conditional', evidence_kind 'source_review', 'not newly installed or qualified', with an explicit gap that no execution or head-to-head comparison exists. Resting the TS disposition on a supposedly measured sibling misstates the incumbent's evidence class (the task's incumbent label '(measured, not adopted)' is itself contradicted by the catalog). Under C5 both bindings sit at keep_but_compare against the same unrun comparison; neither can be set aside as duplicating a measured incumbent.",
+       "evidence": "$HOME/code/native-agent-stack-token-practice-review/catalogs/landscape/candidate-quality-review.json, layer_id 'agent-sdks' (decision_ref catalogs/landscape/foundation.json#/layers/16): evidence_gap 'Alternative SDKs (Claude Agent SDK, OpenHands SDK, Temporal, LangGraph) are source review only; no fresh execution or head-to-head comparison exists since the 2026-09-21 SDK table'; foundation.json candidate entry for https://github.com/anthropics/claude-agent-sdk-python: disposition 'conditional', evidence_kind 'source_review'.",
+       "severity": "major"
+      },
+      {
+       "claim": "overlap_with_incumbents: \"The only differentiator this packet can confirm is language (Node/TS vs Python)\", with C2 structured events / resumable sessions credited to the SDK.",
+       "problem": "Understates the overlap with the incumbent binary already installed on this host. Claude Code CLI 2.1.278 itself exposes -p/--print, --output-format stream-json, partial-message streaming, --resume <session-id>, --fork-session and --from-pr, so structured events plus resumable/forkable sessions are not added capability \u2014 they are the same feature behind a typed wrapper. The genuinely non-duplicated surface is narrower than the packet states: in-process SDK-MCP tools built from Zod schemas via tool()/createSdkMcpServer(), plus a typed AsyncGenerator query() for a Node host process \u2014 embedding, not events or sessions.",
+       "evidence": "`claude --help` on this host lists --print, --output-format, --resume, --fork-session, --include-partial-messages, --from-pr (claude 2.1.278); the packet's own interface section concedes the non-JS path is 'run the CLI as a subprocess with -p --output-format json'.",
+       "severity": "minor"
+      }
+     ],
+     "corrections": [
+      "C1 restatement: record 'api_key_required for hosted, multi-tenant or third-party-facing deployment (overview + hosting docs); local-subprocess behavior on the developer's existing Claude Code login is unverified' rather than a flat api_key_required. The ToS sentence is a redistribution constraint (it bars shipping agents that sign other people in with claude.ai), not evidence about a local internal run.",
+      "Settling comparison for C1 (runnable, two arms, key explicitly stripped): control arm `env -u ANTHROPIC_API_KEY claude -p 'reply with OK' --output-format json`; candidate arm in a scratch dir, `npm i @anthropic-ai/claude-agent-sdk@0.3.278` then `env -u ANTHROPIC_API_KEY node -e \"import('@anthropic-ai/claude-agent-sdk').then(async ({query})=>{for await (const m of query({prompt:'reply with OK',options:{maxTurns:1,pathToClaudeCodeExecutable:'$HOME/.local/share/codex-ecosystem/bin/claude'}})) if(m.type==='result') console.log(JSON.stringify({subtype:m.subtype,is_error:m.is_error}))})\"`. Record both exit codes and the result subtype/error text. A non-error result in the candidate arm refutes the packet's decisive fit claim; an auth error ('Not logged in' / 'Invalid API key') confirms it technically and leaves only the ToS question. Run under `rtk proxy` as an acceptance command; it spends subscription quota.",
+      "Replace the refuted shortlisted acceptance command: drop `rtk proxy node tests/integration/claude-agent-sdk-ts-smoke.mjs` asserting a resolved 'Claude Code login' auth source (no documented API reports an auth-source name). Assert only the observed outcome \u2014 exit code and result subtype/error string \u2014 of the two arms above.",
+      "Settling comparison for C5 (the exact overlap, fixture under tools/compare/): one bounded task (e.g. 'list the exported names in .claude/workflows/child-usage.mjs') in three arms \u2014 (a) `claude -p <task> --output-format stream-json --include-partial-messages` then resume with `--resume <id> --fork-session`; (b) TS SDK query() with resume/forkSession; (c) claude-agent-sdk-python equivalent \u2014 diffing emitted event kinds, parent_tool_use_id/parent_agent_id lineage, and whether an in-process tool() can be registered in (b)/(c) but not (a). Overturn condition taken from the layer's own overturn_when: adopt only if (b) delivers an event, tool-registration or session-control capability (a) cannot, for a concrete application need. Anchor the record at catalogs/landscape/foundation.json#/layers/16 (layer_id 'agent-sdks').",
+      "Disposition is unchanged by these findings: keep_but_compare on the comparison above \u2014 not adoption, and not 'candidate refuted'. The packet's conclusion survives; its two stated fit reasons and its overlap framing do not.",
+      "C4 evidence note: the GitHub repo is not the SDK source. Top-level contents are only .claude, .github, CHANGELOG.md, LICENSE.md, README.md, examples, scripts \u2014 no package.json, no src/ \u2014 and npm reports license 'SEE LICENSE IN README.md' at 0.3.278. Record 'upstream test evidence is unobservable from the public repo' rather than 'the project has no tests'.",
+      "Confirmed unchanged by source check: license is proprietary all-rights-reserved under Anthropic's Commercial ToS (LICENSE.md decoded: '\u00a9 Anthropic PBC. All rights reserved. Use is subject to Anthropic's Commercial Terms of Service'; GitHub license field null); .github/workflows contains only issue-triage.yml, non-write-users-check.yml, slack-issue-notification.yml; metrics 1762 stars / 228 forks / 216 open issues, created 2025-09-27, pushed 2026-09-19T03:10:32Z."
+     ],
+     "sources_read": [
+      "gh api repos/anthropics/claude-agent-sdk-typescript",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/contents",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/contents/.github/workflows",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/contents/LICENSE.md (base64 decoded)",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/readme (base64 decoded)",
+      "gh api repos/anthropics/claude-agent-sdk-typescript/contents/scripts",
+      "npm view @anthropic-ai/claude-agent-sdk version repository.url license",
+      "https://code.claude.com/docs/en/agent-sdk/overview",
+      "https://code.claude.com/docs/en/agent-sdk/quickstart",
+      "https://code.claude.com/docs/en/agent-sdk/hosting",
+      "$HOME/code/agent-lab/.claude/workflows/ (listing) and $HOME/code/agent-lab/.claude/workflows/review-changes.js",
+      "$HOME/code/agent-lab/.claude/settings.json",
+      "$HOME/code/native-agent-stack-token-practice-review/catalogs/landscape/foundation.json",
+      "$HOME/code/native-agent-stack-token-practice-review/catalogs/landscape/candidate-quality-review.json",
+      "local host checks: env ANTHROPIC_API_KEY unset; <native Claude credential store present>; claude --version 2.1.278; claude --help headless flags"
+     ]
+    }
+   ]
+  },
+  "pydantic/pydantic-ai": {
+   "evidence": {
+    "auth_model": "Per-model-provider API keys/credentials configured in the local environment; no unified native-login layer. Anthropic docs: &quot;Once you have the API key, you can set it as an environment variable&quot; (export ANTHROPIC_API_KEY=...), obtained from console.anthropic.com/settings/keys \u2014 the docs page does not mention reusing a Claude.ai/Claude Code subscription login. Models overview page: &quot;To use each model provider, you need to configure your local environment and make sure you have the right packages installed,&quot; and separately lists &quot;OpenAI Codex (via your ChatGPT/Codex subscription)&quot; as one provider-specific exception (Codex model access can ride an existing ChatGPT/Codex subscription). No provider offers Google-login or GitHub-login auth reuse in what was fetched. Ollama/local-model support exists as a provider option (satisfies the local-model clause of C1) but was not independently confirmed by primary-source quote in this pass.",
+    "category": "agent-sdks",
+    "claims": [
+     {
+      "claim": "Repository is MIT licensed",
+      "source": "gh api repos/pydantic/pydantic-ai (license.spdx_id=MIT)",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Latest release is v2.47.0, published 2026-09-22T03:59:32Z; repo pushed_at 2026-09-22T16:03:34Z (0 days old)",
+      "source": "gh api repos/pydantic/pydantic-ai/releases?per_page=5 and gh api repos/pydantic/pydantic-ai",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Top-level tree contains tests/, docs/, examples/, and a .github/workflows directory with ci.yml plus many other workflow files (has_tests_dir and has_ci both true)",
+      "source": "gh api repos/pydantic/pydantic-ai/contents and gh api repos/pydantic/pydantic-ai/contents/.github/workflows",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "README declares itself \"the Python AI SDK: a typed, extensible agent loop with every model a string swap away\" and lists pydantic_graph and pydantic_evals as separate typed-control-flow and evals packages",
+      "source": "gh api repos/pydantic/pydantic-ai/readme (base64-decoded)",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Primary programmatic interface is code-based (`agent.run(...)` returning a typed result); also offers CLI (`clai`, `agent.to_cli_sync()`), a web chat UI, AG-UI/Vercel AI streaming, ACP editor integration, Agent2Agent, voice/realtime, and sandboxed GitHub Actions execution",
+      "source": "https://pydantic.dev/docs/ai/overview/interfaces/",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Authentication is per-provider API key (Anthropic: ANTHROPIC_API_KEY env var from console.anthropic.com); no documented reuse of Claude Code/claude.ai subscription login; one provider (OpenAI Codex) documents reuse of an existing ChatGPT/Codex subscription",
+      "source": "https://pydantic.dev/docs/ai/models/anthropic/ and https://pydantic.dev/docs/ai/models/overview/",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Sub-agent/worker dispatch: each delegation runs in its own isolated run with separate message history, emits DelegationStartEvent/DelegationEndEvent with outcome status (ok/timeout/budget/failed/contained), usage metrics and duration; parallel delegations run as independent sub-agent runs; dispatch is bounded by max_calls, timeout_seconds, usage_limits, tool_retries",
+      "source": "https://pydantic.dev/docs/ai/harness/subagents/",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Structured streaming events (PartStartEvent, PartDeltaEvent, FinalResultEvent, FunctionToolCallEvent, FunctionToolResultEvent) are available via run_stream(event_stream_handler=...), run_stream_events(), or agent.iter(); resumable sessions work by passing message_history=result.new_messages() forward, and a cancelled run's completed messages/tool results remain retrievable via RunCancelled.all_messages()",
+      "source": "https://pydantic.dev/docs/ai/agents/",
+      "evidence_class": "source_review"
+     }
+    ],
+    "fit_with_native_workflow": "Fits as a pure library dependency (pip/uv install, no daemon), so C3 (isolation/ownership) holds trivially per worktree \u2014 deterministic code owns effects and pydantic-ai only supplies typed model calls inside that process. Its typed structured-output model (Pydantic schemas validating agent output) and dependency-injection style tool wiring overlap conceptually with this project's typesafe-ai skill and with Claude Code's own StructuredOutput tool contract, making it a plausible external peer for a same-fixture comparison rather than a functional gap-filler. It would sit beside, not replace, native Claude Code/Codex workers: those already provide native-login auth, sandboxed execution and structured event streams for this project's actual dispatch path, whereas pydantic-ai requires a separate per-provider API key and its own agent loop.",
+    "interface": "Headless Python SDK/library: `Agent(...).run(...)`/`run_sync()`/`run_stream()` as an ordinary awaitable/call returning typed (Pydantic-validated) output; also exposes CLI (`clai`, `agent.to_cli_sync()`), a built-in web chat UI, AG-UI/Vercel AI frontend streaming protocols, ACP editor integration (Zed), Agent2Agent, realtime voice, and sandboxed execution inside GitHub Actions workflows. No standalone server/daemon is required for the core library path.",
+    "isolation_model": "Library-shaped: no persistent daemon or hidden global state from pydantic-ai itself when used as an SDK \u2014 the host process (and this project's own worktree/sandbox conventions) owns isolation. Sub-agent delegation runs each child in its own isolated run with its own message history (not shared with the parent). Separately, the Pydantic AI Harness / GitHub Actions integration documents sandboxed execution for repo-context/coding-agent use (per README: \"GitHub Workflows \u2013 Sandboxed execution on issues, pull requests, or schedules\"), and the README references \"Monty,\" described as \"the sandboxed Python interpreter that runs model-written code,\" for code execution by the harness \u2014 this was read from the README, not independently verified against the Monty repo in this pass.",
+    "license": "MIT (confirmed via gh api repos/pydantic/pydantic-ai license.spdx_id=MIT)",
+    "maintenance": "Very active: latest tag v2.47.0 published 2026-09-22 (same day as this evidence pull), repo pushed_at 2026-09-22T16:03:34Z (0 days), 20,112 stargazers, 958 open issues, not archived, default branch main. Release cadence over the last 5 releases observed was roughly daily-to-every-few-days (v2.44.0 09-17, v2.45.0 09-18, v2.46.0 09-19, v2.47.0 09-22), indicating a fast-moving, well-maintained project well within the \"release cadence in the last 6 months\" C4 bar.",
+    "native_login_support": "api_key_required",
+    "open_gaps": [
+     "Did not independently verify Ollama/local-model provider support with a primary-source quote (only the models-overview general statement was fetched); local-model fit for C1 is inferred from the project's model-agnostic design claim, not directly quoted.",
+     "Did not fetch the Google/Gemini or GitHub-login-specific auth docs pages, so C1's native-login-reuse question is answered only for Anthropic (API key) and OpenAI Codex (subscription reuse); Google-login and GitHub-login reuse were not checked against primary sources.",
+     "Did not independently verify the Monty sandboxed-interpreter claim against its own repository or docs \u2014 it is quoted from the pydantic-ai README only.",
+     "Did not fetch a dedicated platform-support/install page (C6 portability: Linux/WSL2 x86_64 and macOS arm64); portability is inferred from it being a pure-Python pip/uv-installable package with a pyproject.toml/uv.lock, not from an explicit supported-platforms doc quote.",
+     "Did not run gh api against pydantic_ai_slim/tests or pydantic_evals/tests subdirectories individually to characterize test depth beyond the top-level tests/ directory's presence.",
+     "No executed local comparison was run (per task rules, none is permitted here) so this remains evidence-only extraction; the three judges' fixture-based comparisons (pydantic-ai typed agent output vs. typesafe-ai skill + Claude Code structured output, scored on schema-violation rate) are recommendations to run later, not results."
+    ],
+    "overlap_with_incumbents": "Overlaps this project's typesafe-ai skill and Claude Code's own StructuredOutput/structured-judgment path at the concept level (typed/validated agent output, dependency-injected tool context, multi-step control via pydantic_graph). It does not duplicate anthropics/claude-code's native workers, Workflow tool, or Agent tool (those are harness-level dispatch inside an already-authenticated Claude session), nor openai/codex's exec mode. Per task rules, agreement between judges never promotes adoption on its own: this is keep_but_compare / targeted_candidate, with the named comparison being pydantic-ai's typed agent output vs. the installed typesafe-ai skill plus Claude Code structured output on the same judgment fixture, scored on schema-violation rate (as all three judges independently proposed).",
+    "portability": "Pure-Python package (pyproject.toml + uv.lock at repo root, installable via `pip install pydantic-ai` or `uv add pydantic-ai`), which is OS-agnostic in principle for Linux/WSL2 x86_64 and macOS arm64 \u2014 this is an inference from packaging shape, not a quoted supported-platforms statement (see open_gaps; no explicit platform-support doc page was fetched).",
+    "releases_last_6_months": [
+     "v2.47.0 \u2014 2026-09-22",
+     "v2.46.0 \u2014 2026-09-19",
+     "v2.45.0 \u2014 2026-09-18",
+     "v2.44.0 \u2014 2026-09-17",
+     "v1.107.6 \u2014 2026-09-17"
+    ],
+    "risks": [
+     "Separate paid API key required per model provider (C1 penalty, not exclusion, per all three judges) \u2014 adds a credential-management burden distinct from this project's native-login-first posture.",
+     "Fast release cadence (near-daily tags) means pinning and drift monitoring would be needed if adopted, and the pyproject/version referenced in evidence (v2.47.0) will already be stale by the time any comparison runs.",
+     "Monty sandbox and GitHub Actions sandboxed-execution claims were only read from the README, not verified against their own repos/docs in this pass \u2014 do not treat as confirmed isolation guarantees without a follow-up read.",
+     "No executed comparison exists yet; any 'closes a demonstrated gap' claim would be premature until the named fixture comparison (schema-violation rate) is actually run per this repo's evidence policy."
+    ],
+    "slug": "pydantic-ai",
+    "sources_read": [
+     "gh api repos/pydantic/pydantic-ai",
+     "gh api repos/pydantic/pydantic-ai/releases?per_page=5",
+     "gh api repos/pydantic/pydantic-ai/readme",
+     "gh api repos/pydantic/pydantic-ai/contents",
+     "gh api repos/pydantic/pydantic-ai/contents/.github",
+     "gh api repos/pydantic/pydantic-ai/contents/.github/workflows",
+     "https://pydantic.dev/docs/ai/overview/interfaces/",
+     "https://pydantic.dev/docs/ai/models/overview/",
+     "https://pydantic.dev/docs/ai/models/anthropic/",
+     "https://pydantic.dev/docs/ai/harness/subagents/",
+     "https://pydantic.dev/docs/ai/agents/"
+    ],
+    "structured_events": "Typed streaming event classes (PartStartEvent, PartDeltaEvent, FinalResultEvent, FunctionToolCallEvent, FunctionToolResultEvent) accessible via `run_stream(event_stream_handler=...)`, `run_stream_events()` as an async context manager, or `agent.iter()` for node-by-node graph traversal. Sub-agent delegation additionally emits `DelegationStartEvent` (agent name, task, model selection, tool-inheritance status) and `DelegationEndEvent` (outcome: ok/timeout/budget/failed/contained, output, usage metrics, duration) in the `sub_agents` namespace. Final run output is typed/Pydantic-validated (`result.output`).",
+    "summary": "pydantic/pydantic-ai is a MIT-licensed, very actively maintained (v2.47.0 released same-day, 20k+ stars) headless Python agent SDK: `Agent.run()` returns Pydantic-typed, schema-validated output, with dependency-injected tool context, sub-agent delegation (isolated runs, structured Delegation*Event telemetry), typed control flow via the separate pydantic_graph package, and evals via pydantic_evals. It also exposes CLI, web-UI, and other interfaces, but its core is a library with no daemon. Authentication is per-provider API keys (confirmed for Anthropic via ANTHROPIC_API_KEY); no native Claude Code/Codex/Google/GitHub login reuse was found in the docs fetched, except one documented exception where OpenAI Codex model access can ride an existing ChatGPT/Codex subscription. Top-level repo has tests/, docs/, examples/, and a full .github/workflows CI setup. It overlaps conceptually with this project's typesafe-ai skill and Claude Code's structured-output path; per the preregistered rules, this is a keep_but_compare/targeted_candidate finding, not an adoption \u2014 the named overturning comparison is pydantic-ai typed agent output vs. typesafe-ai + Claude Code structured output on a shared judgment fixture, scored on schema-violation rate.",
+    "tests_and_ci": "has_tests_dir: true (top-level `tests/` present; also `pydantic_ai_slim`, `pydantic_evals`, `pydantic_graph` are separate sub-packages likely carrying their own tests, not individually enumerated here). has_ci: true \u2014 `.github/workflows/ci.yml` plus a large set of additional workflow files (harness-compat.yml, docs-navigation.yml, latest-versions-canary.yml, link-check.yml, pr-guard.yml, several `*-attention-*`/`*-bug-hunter*`/`*-regression-detector*` agentic-maintenance workflow pairs, etc.) and a top-level `.pre-commit-config.yaml`. README also displays a coverage badge reading 100%, which was not independently verified against a live coverage report in this pass.",
+    "worker_features": "Sub-agent delegation capability: parent model calls `delegate_task(agent_name, task)`; each delegation runs the chosen sub-agent in its own run with its own message history (no visibility into parent conversation); parallel delegations run as independent sub-agent runs; per-sub-agent dispatch bounds are `max_calls` (delegations per parent run), `timeout_seconds` (wall-clock budget), `usage_limits` (token/request budget, isolated accounting), and `tool_retries` (default 2). The result returned to the parent is `str(result.output)`. Optional model routing across delegation targets is supported when a menu is configured."
+   },
+   "refutations": [
+    {
+     "corrections": [
+      "auth_model / native_login_support: change `api_key_required` to `mixed \u2014 api_key_default_with_native_login_paths`. The GitHub Copilot provider page states its token is \"An OAuth user token -- what `gh auth token` prints, or what the Copilot CLI stores after `copilot login`\" and that \"no token exchange is needed\" (set as GITHUB_COPILOT_API_KEY). That is reuse of an existing GitHub/Copilot login, so the packet's \"No provider offers Google-login or GitHub-login auth reuse\" is wrong and the C1 penalty is smaller than recorded. Anthropic remains API-key-only (ANTHROPIC_API_KEY from console.anthropic.com/settings/keys \u2014 confirmed verbatim); OpenAI Codex-via-subscription remains listed verbatim.",
+      "isolation_model / interface: delete the quoted README string \"GitHub Workflows \u2013 Sandboxed execution on issues, pull requests, or schedules\". It is not in the README (352 lines, grep for `Sandboxed` matches only the two Monty lines). The actual text is \"[GitHub Agentic Workflows], on issues, pull requests or a schedule\" and \"runs it headless on issues, pull requests or a schedule\" \u2014 headless, not documented as sandboxed. Restate C3 as: the library itself asserts no sandbox; the only sandbox claim in the README is Monty (\"the sandboxed Python interpreter that runs model-written code\"), which the packet correctly flags as unverified.",
+      "worker_features / isolation_model / tests_and_ci / license / maintenance: split the evidence by repository. Sub-agent delegation, DelegationStartEvent/DelegationEndEvent, Coder, FileSystem/Shell and the gh-aw path are Pydantic AI Harness \u2014 a separate package (`uv add pydantic-ai pydantic-ai-harness`) in repo pydantic/pydantic-ai-harness, created 2026-03-20, latest v0.33.0 (2026-09-22), 912 stars, MIT, tests/ + integration_tests/ + .github present (verified here, not in the packet). Record that the differentiating worker layer is a pre-1.0 (0.x) line, which the packet's C4 maturity read on pydantic-ai v2.47.0 does not cover.",
+      "overlap_with_incumbents / named comparison: pydantic-ai ships a first-class TypeSafe (Jev) provider (`pip install 'pydantic-ai-slim[typesafe]'`, `export TYPESAFE_API_KEY=...`), listed on the models/overview page the packet read. The overlap with this project's typesafe-ai skill is therefore not merely conceptual, and the proposed arms are not disjoint \u2014 pydantic-ai can call the same Jev judgments. Rewrite the comparison as: same Jev judgment fixture, arm A = installed typesafe-ai skill path, arm B = pydantic-ai TypeSafe provider with a Pydantic output type, scored on schema-violation rate; and note the credential is already held at <TypeSafe credential file>, further reducing the C1 penalty.",
+      "risks: soften \"Separate paid API key required per model provider\" \u2014 it is the default, not universal (GitHub Copilot token reuse; ChatGPT/Codex subscription; Ollama for local models). Ollama is confirmed on the models/overview page under OpenAI-compatible providers, so that open_gap can be closed.",
+      "maintenance: refresh drift \u2014 pushed_at 2026-09-22T16:22:10Z, 20,113 stars, open_issues_count 959 (GitHub counts PRs in that field, so \"open issues\" overstates). releases_last_6_months is a per_page=5 slice, not the full window (v2.43.0 09-12, v2.42.0 09-09, v2.41.0 09-08 also exist) \u2014 label it as a slice."
+     ],
+     "findings": [
+      {
+       "claim": "\"Authentication is per-provider API key ... no ... reuse ... No provider offers Google-login or GitHub-login auth reuse in what was fetched\"; native_login_support: \"api_key_required\"",
+       "problem": "Contradicted by primary source. pydantic-ai's GitHub Copilot provider explicitly accepts the token an existing GitHub/Copilot login already produces, which is exactly the C1 native-sign-in reuse the packet says no provider offers. The provider was listed on models/overview, a page the packet says it read, yet GitHub-login reuse was filed as an unchecked open_gap while the flat verdict `api_key_required` was still asserted. C1 is scored too harshly.",
+       "evidence": "https://pydantic.dev/docs/ai/models/github-copilot/ : \"An OAuth user token -- what `gh auth token` prints, or what the Copilot CLI stores after `copilot login`\" works directly, set via GITHUB_COPILOT_API_KEY, and \"no token exchange is needed\". models/overview lists \"GitHub Copilot\" among providers (fetched 2026-09-22).",
+       "severity": "major"
+      },
+      {
+       "claim": "isolation_model/interface: \"per README: \\\"GitHub Workflows \u2013 Sandboxed execution on issues, pull requests, or schedules\\\"\" and \"sandboxed execution inside GitHub Actions workflows\"",
+       "problem": "The quoted README sentence does not exist. The README never describes the GitHub Actions path as sandboxed; it says headless. A direct quotation was attributed to a source that does not contain it, and it is the only support offered for a C3 isolation property beyond Monty.",
+       "evidence": "gh api repos/pydantic/pydantic-ai/readme (base64-decoded, 352 lines): grep -i for 'sandbox' matches only lines 30 and 352, both about Monty. Line 79: \"**Run it on GitHub \u2192** [GitHub Agentic Workflows], on issues, pull requests or a schedule\". Line 224: \"[GitHub Agentic Workflows] runs it headless on issues, pull requests or a schedule\". No occurrence of \"Sandboxed execution\".",
+       "severity": "major"
+      },
+      {
+       "claim": "worker_features, isolation_model (\"Sub-agent delegation runs each child in its own isolated run\") and the C4 evidence (MIT license, tests/, ci.yml, v2.47.0 cadence) are all presented as properties of pydantic/pydantic-ai",
+       "problem": "Evidence-scope mismatch. The delegation semantics the packet verified come from /docs/ai/harness/subagents/, i.e. Pydantic AI Harness \u2014 a separate installable package in a separate repository that the packet never queried. The C4 license/tests/CI/maintenance evidence therefore does not cover the layer that makes the project interesting as a worker-dispatch peer, and the harness is a pre-1.0 0.x line, a maturity signal the packet's \"v2.47.0, very active\" reading conceals.",
+       "evidence": "README line: \"uv add pydantic-ai pydantic-ai-harness\" and \"from pydantic_ai_harness import Advisor, Coder\"; doc path https://pydantic.dev/docs/ai/harness/subagents/. gh api repos/pydantic/pydantic-ai-harness: license MIT, created_at 2026-03-20, latest release v0.33.0 (2026-09-22), 912 stars, tree includes tests, integration_tests, gh-aw, .github. None of these calls appear in the packet's sources_read.",
+       "severity": "major"
+      },
+      {
+       "claim": "overlap_with_incumbents: \"Overlaps this project's typesafe-ai skill ... at the concept level\"; named comparison is \"pydantic-ai typed agent output vs. typesafe-ai skill + Claude Code structured output ... scored on schema-violation rate\"",
+       "problem": "Understates the overlap and makes the proposed arms non-independent. pydantic-ai ships TypeSafe (Jev) as a first-class provider, listed on the models/overview page the packet read. The two arms can therefore call the same model, so the comparison as named would not isolate what the packet says it isolates; it must be restated as skill-path vs pydantic-ai-provider-path over the same Jev judgments.",
+       "evidence": "models/overview provider list includes \"TypeSafe (Jev)\"; https://pydantic.dev/docs/ai/models/typesafe/ : \"pip install 'pydantic-ai-slim[typesafe]'\", \"export TYPESAFE_API_KEY='your-api-key'\", Jev \"answers typed questions with confidence scores rather than generating text\".",
+       "severity": "major"
+      },
+      {
+       "claim": "open_gaps: \"Did not independently verify Ollama/local-model provider support with a primary-source quote ... local-model fit for C1 is inferred\"",
+       "problem": "The gap is closable from the page already in sources_read; leaving it open understates C1 fit. Not an error of fact, but the packet declared unverified something its own cited source states.",
+       "evidence": "https://pydantic.dev/docs/ai/models/overview/ lists Ollama explicitly under OpenAI-compatible providers (fetched 2026-09-22).",
+       "severity": "minor"
+      },
+      {
+       "claim": "\"20,112 stargazers, 958 open issues\"; repo pushed_at 2026-09-22T16:03:34Z; releases_last_6_months = 5 entries",
+       "problem": "Numeric drift plus a field-semantics error and an incomplete window. GitHub's open_issues_count includes open pull requests, so \"958 open issues\" is not what the field measures; the 5-release list is a per_page=5 slice presented as the 6-month set.",
+       "evidence": "gh api repos/pydantic/pydantic-ai (2026-09-22): stargazers_count 20113, open_issues_count 959, pushed_at 2026-09-22T16:22:10Z. releases?per_page=8 additionally returns v2.43.0 (09-12), v2.42.0 (09-09), v2.41.0 (09-08).",
+       "severity": "minor"
+      }
+     ],
+     "lens": "accuracy",
+     "refuted": true,
+     "sources_read": [
+      "gh api repos/pydantic/pydantic-ai",
+      "gh api repos/pydantic/pydantic-ai/releases?per_page=8",
+      "gh api repos/pydantic/pydantic-ai/readme (base64-decoded, full 352 lines, grepped for sandbox/GitHub Actions/Monty)",
+      "gh api repos/pydantic/pydantic-ai/contents",
+      "gh api repos/pydantic/pydantic-ai/contents/.github/workflows",
+      "gh api repos/pydantic/pydantic-ai-harness",
+      "gh api repos/pydantic/pydantic-ai-harness/releases?per_page=3",
+      "gh api repos/pydantic/pydantic-ai-harness/contents",
+      "https://pydantic.dev/docs/ai/models/anthropic/",
+      "https://pydantic.dev/docs/ai/models/overview/",
+      "https://pydantic.dev/docs/ai/models/github-copilot/",
+      "https://pydantic.dev/docs/ai/models/typesafe/",
+      "https://pydantic.dev/docs/ai/overview/interfaces/",
+      "https://pydantic.dev/docs/ai/harness/subagents/",
+      "https://pydantic.dev/docs/ai/agents/"
+     ]
+    },
+    {
+     "lens": "fit",
+     "refuted": true,
+     "findings": [
+      {
+       "claim": "overlap_with_incumbents: \"Overlaps this project's typesafe-ai skill and Claude Code's own StructuredOutput/structured-judgment path at the concept level\" and the named settling comparison is \"pydantic-ai's typed agent output vs. the installed typesafe-ai skill plus Claude Code structured output on the same judgment fixture, scored on schema-violation rate\".",
+       "problem": "This is not an overlap, and the named comparison is confounded. pydantic-ai ships TypeSafe (Jev) as a first-class model provider authenticated with the same TYPESAFE_API_KEY this project already stores, so the proposed arm A (pydantic-ai typed output) can be running on arm B's own backend. As written the fixture would measure Pydantic-schema re-validation wrapped around Jev, not pydantic-ai versus TypeSafe. The relationship is complementary (client of the incumbent), which changes the disposition rationale, not just the wording.",
+       "evidence": "https://pydantic.dev/docs/ai/models/overview/ lists \"[TypeSafe (Jev)](https://pydantic.dev/docs/ai/models/typesafe/)\" as a supported provider; https://pydantic.dev/docs/ai/models/typesafe/ : \"Jev is not a language model. You give it a text and typed questions, and it answers each one with a confidence\", install via the `typesafe` optional group, \"get an API key from your TypeSafe account and set it as an environment variable: export TYPESAFE_API_KEY='your-api-key'\", and \"Each field of the output_type becomes one question\". The project already holds that credential (AGENTS.md: TYPESAFE_API_KEY at <TypeSafe credential file>). Settling comparison: pin the pydantic-ai arm to a non-TypeSafe model (e.g. the local vLLM/Ollama endpoint this project already runs) and keep a third arm on TypeSafeModel, otherwise the arms are not independent.",
+       "severity": "major"
+      },
+      {
+       "claim": "overlap_with_incumbents: \"It does not duplicate anthropics/claude-code's native workers, Workflow tool, or Agent tool ... nor openai/codex's exec mode\" \u2014 no other incumbent is named.",
+       "problem": "The overlap analysis skips the two incumbents the packet's own worker_features/structured_events evidence actually lands on: anthropics/claude-agent-sdk-python (measured, not adopted) and openhands/software-agent-sdk (conditional). Isolated sub-agent runs with separate message history, bounded dispatch (max_calls, timeout_seconds, usage_limits, tool_retries) and typed Delegation*Event telemetry is the same capability slot as the Claude Agent SDK arm this repo already installed and probed. C5 asks for the exact overlap; naming only the typed-output sliver understates it and points the comparison at the wrong fixture.",
+       "evidence": "Packet worker_features/structured_events vs. $HOME/code/agent-lab/docs/tasks/2026-09-22-executed-comparisons.md: \"Claude Agent SDK arm C: installed pinned claude-agent-sdk==0.2.157 ... Seamless-login probe with ANTHROPIC_API_KEY and ANTHROPIC_AUTH_TOKEN unset, cli_path = native claude 2.1.278: ResultMessage subtype=success ... arm C is available for the workers comparison.\" The runnable settler already exists: $HOME/code/agent-lab/tools/compare/workers/run-arms.mjs (header: \"arm A native Claude CLI worker / arm B Codex Python SDK worker / arm C Claude Agent SDK worker\", subcommands seal|dryrun|run|rescore|score, preregistered 3 arms x (2 replay + 1 cancel)). The comparison that would settle the real overlap is a pydantic-ai arm D driver added to that harness, run as `node tools/compare/workers/run-arms.mjs run --out <dir> --arms C,D` on the sealed packet, scored on the existing replay/cancel/usage-completeness metrics.",
+       "severity": "major"
+      },
+      {
+       "claim": "fit_with_native_workflow: \"Fits as a pure library dependency (pip/uv install, no daemon), so C3 (isolation/ownership) holds trivially per worktree\" \u2014 asserted for the package whose sub-agent delegation and Delegation*Event telemetry the packet credits.",
+       "problem": "The delegation/worker features cited are not in the pure library at all; they come from a separate package, `pydantic_ai_harness`, attached as an Agent capability. The packet never evaluated that package's install path, dependencies or isolation, and its own isolation_model paragraph concedes the harness's sandboxing claims (Monty, GitHub Actions) were read from the README only. So C3 is asserted for `pydantic-ai` while the capability that would justify adoption lives in an unexamined second package.",
+       "evidence": "https://pydantic.dev/docs/ai/harness/subagents/ : \"from pydantic_ai_harness import SubAgent, SubAgents\" and \"orchestrator = Agent('anthropic:claude-opus-4-7', capabilities=[SubAgents(agents=[SubAgent(researcher), SubAgent(writer)])])\". Packet isolation_model: \"this was read from the README, not independently verified against the Monty repo in this pass.\" Settling check: `uv pip install pydantic-ai-harness && uv pip tree` in a throwaway venv plus a run with no network egress, to see whether the harness path pulls a runtime service or only library code.",
+       "severity": "major"
+      },
+      {
+       "claim": "fit_with_native_workflow: \"whereas pydantic-ai requires a separate per-provider API key and its own agent loop.\"",
+       "problem": "Flatly wrong on the key half, and C1 explicitly accepts a local model as native-auth fit. The same overview page the packet cites lists Ollama/OpenAI-compatible local hosting, OpenAI Codex and GitHub Copilot via an existing ChatGPT/Codex subscription, and TypeSafe (Jev) on a key this project already holds. On this host a pydantic-ai arm can run with zero new paid credentials against the local vLLM endpoint. The recorded C1 penalty is therefore overstated in the fit paragraph (the packet's own open_gaps admits Ollama was never quoted, yet the fit text asserts the conclusion anyway).",
+       "evidence": "https://pydantic.dev/docs/ai/models/overview/ lists \"[Ollama](https://pydantic.dev/docs/ai/models/openai/#ollama)\" under OpenAI-compatible providers (usable with OpenAIChatModel), plus \"OpenAI Codex\" and \"GitHub Copilot\" annotated \"via your ChatGPT/Codex subscription\", and TypeSafe (Jev). Project already runs local vLLM (agent-lab AGENTS.md: the SocratiCode `lmstudio` provider setting points to local vLLM). Settling command: point `OpenAIChatModel` at the local vLLM base_url with a dummy key and run one `agent.run_sync()`; success means no new paid key is required for the comparison arm.",
+       "severity": "minor"
+      },
+      {
+       "claim": "overlap_with_incumbents implicitly treats MCP/tool wiring as non-overlapping (C2 names \"custom tools or MCP\"; no MCP evidence appears in the packet).",
+       "problem": "pydantic-ai's toolset/MCP client surface was never fetched, so the overlap against the selected incumbents `modelcontextprotocol SDKs` and `mcporter (MCP gateway)` is unassessed rather than absent. The packet should carry this as an open gap instead of leaving the overlap section reading as complete.",
+       "evidence": "packet sources_read contains no MCP or toolset page; the interfaces page was fetched but no MCP statement is quoted. Settling read: https://pydantic.dev/docs/ai/ tool/MCP pages, then compare against this repo's mcporter arms config at $HOME/code/agent-lab/tools/compare/semantic/mcporter.arms.json.",
+       "severity": "minor"
+      }
+     ],
+     "corrections": [
+      "Replace the overlap sentence about typesafe-ai with: pydantic-ai integrates TypeSafe (Jev) as a model provider (TYPESAFE_API_KEY, `typesafe` optional group), so it is a client of that incumbent, not an alternative to it; the typed-output framing is a wrapper relationship, not an overlap.",
+      "Rewrite the named comparison so the arms are independent: pydantic-ai on a non-TypeSafe model (local vLLM via OpenAIChatModel) vs. the typesafe-ai skill on Jev vs. Claude Code StructuredOutput, all on the same judgment fixture, scored on schema-violation rate \u2014 the packet's version can silently run both arms on Jev.",
+      "Add anthropics/claude-agent-sdk-python (measured, not adopted) and openhands/software-agent-sdk (conditional) to overlap_with_incumbents as the direct functional overlap for isolated sub-agent runs, bounded dispatch and typed delegation events, and name the runnable settler that already exists here: a pydantic-ai arm D in $HOME/code/agent-lab/tools/compare/workers/run-arms.mjs, executed as `node tools/compare/workers/run-arms.mjs run --out <dir> --arms C,D` on the sealed packet with the existing replay/cancel/usage-completeness scoring.",
+      "Scope the C3 statement: the core library is daemon-free, but sub-agent delegation requires the separate `pydantic_ai_harness` package (SubAgent/SubAgents capabilities), which was not installed or inspected; record that as an open gap and gate any C3 claim on `uv pip install pydantic-ai-harness` plus a dependency-tree and no-egress run.",
+      "Correct the C1 sentence: pydantic-ai does not universally require a separate per-provider API key \u2014 Ollama/OpenAI-compatible local hosting, ChatGPT/Codex-subscription providers (OpenAI Codex, GitHub Copilot) and TypeSafe (a key this project already holds) are documented paths, and C1 accepts a local model; keep the penalty only for the Anthropic provider path.",
+      "Add an open gap: MCP/toolset overlap against the selected modelcontextprotocol SDKs and mcporter gateway was never fetched, so C5 coverage is incomplete on that axis.",
+      "Keep the disposition at keep_but_compare/targeted_candidate, but with the workers-harness arm-D comparison as the primary named comparison and the de-confounded schema-violation fixture as secondary."
+     ],
+     "sources_read": [
+      "https://pydantic.dev/docs/ai/models/overview/ (fetched twice: provider list and verbatim TypeSafe/Ollama entries)",
+      "https://pydantic.dev/docs/ai/models/typesafe/",
+      "https://pydantic.dev/docs/ai/harness/subagents/",
+      "$HOME/code/agent-lab/docs/tasks/2026-09-22-executed-comparisons.md",
+      "$HOME/code/agent-lab/tools/compare/workers/run-arms.mjs (header, CLI subcommands, arm definitions)",
+      "$HOME/code/agent-lab/tools/compare/workers/arm_c_driver.py (path/existence)",
+      "$HOME/code/agent-lab/tools/compare/semantic/mcporter.arms.json",
+      "$HOME/code/agent-lab/AGENTS.md (TypeSafe credential path, local vLLM provider setting)",
+      "$HOME/code/agent-lab/docs/tasks/2026-09-21-sota-catalog-independent-review.md (workers layer incumbents)"
+     ]
+    }
+   ]
+  },
+  "strands-agents/harness-sdk": {
+   "evidence": {
+    "auth_model": "Per-provider, all requiring credentials the caller supplies to the process (no native CLI-login flow): Amazon Bedrock uses \"the standard credential chain\" (AWS credentials) and mints short-lived bearer tokens; Anthropic requires \"an Anthropic API key\" passed when constructing the model client; OpenAI (via the Vercel AI SDK integration) reads `OPENAI_API_KEY` from the environment; Bedrock via Vercel AI SDK also uses the AWS credential chain. No mention in the docs pages read of accepting a Claude Code subscription login, Codex/ChatGPT login, GitHub login, or Google login as an auth source \u2014 it is a programmatic SDK, not a CLI that shells out to another product's login.",
+    "category": "agent-sdks",
+    "claims": [
+     {
+      "claim": "Repo strands-agents/harness-sdk is the Strands Agents monorepo: Apache-2.0, ~7,535 stars, 1,183 forks, 789 open issues, pushed 2026-09-22, containing harness-py, harness-ts, strands-py (Python SDK), strands-ts (TypeScript SDK), strands-cli, strands-mcp, and the docs site.",
+      "source": "gh api repos/strands-agents/harness-sdk",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "README states: 'Strands Agents is an open-source SDK for building and running AI agents in Python and TypeScript... it runs in your process with no hosted control plane' and covers lifecycle controls (turn limits, token budgets, cancellation, stop reasons), tools, structured output, MCP, multi-agent patterns, memory and sessions, model portability, streaming, guardrails, tracing, and evals.",
+      "source": "gh api repos/strands-agents/harness-sdk/readme",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Install/quickstart: `pip install strands-agents strands-agents-tools` then `from strands import Agent`; or `pip install strands-harness` for the batteries-included `create_harness()`. TypeScript equivalents: `npm install @strands-agents/sdk` / `@strands-agents/harness`, Node.js 22+ required, Python 3.10+ required.",
+      "source": "gh api repos/strands-agents/harness-sdk/readme",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Development/test commands documented per package: Python SDK (`cd strands-py; pip install hatch; hatch test; hatch fmt`), TypeScript SDK (`npm ci; npm run build; npm test`), docs site (`cd site; npm install; npm run dev`).",
+      "source": "gh api repos/strands-agents/harness-sdk/readme",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "strands-py contains a `tests/`, `tests_integ/` (integration tests) and `tests_typing/` directory alongside `src/`, plus its own AGENTS.md/CLAUDE.md and a `.pre-commit-config.yaml`.",
+      "source": "gh api repos/strands-agents/harness-sdk/contents/strands-py",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "CI is extensive: `.github/workflows/` contains per-package pr-and-push, test-lint, integration-test, security-audit, and package-build/pack workflows for harness-cli, harness-py, harness-ts, mcp, python (strands-py) and typescript (strands-ts), plus a generic `ci.yml`, docs CI/deploy workflows, and separate release workflows per package (release-harness-cli.yml, release-harness-py.yml, release-harness-ts.yml, release-mcp.yml, release-python.yml, release-typescript.yml).",
+      "source": "gh api repos/strands-agents/harness-sdk/contents/.github/workflows",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Five releases in the last 6 months window sampled (most recent 5): harness-typescript/v0.1.0 (2026-09-21), harness-python/v0.1.1 (2026-09-21), harness-python/v0.1.0 (2026-09-21), harness-cli/v0.1.0 (2026-09-21), typescript/v1.18.0 (2026-09-15) \u2014 indicating active, frequent, per-package release cadence as of the query date 2026-09-22.",
+      "source": "gh api repos/strands-agents/harness-sdk/releases?per_page=5",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "License is Apache-2.0 per the GitHub repo metadata (license.key=\"apache-2.0\") and README's License section pointing to LICENSE.APACHE.",
+      "source": "gh api repos/strands-agents/harness-sdk and gh api repos/strands-agents/harness-sdk/readme",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Model-provider authentication: Bedrock uses the AWS standard credential chain and mints short-lived bearer tokens; Anthropic requires passing an Anthropic API key when constructing the model instance; OpenAI (via the Vercel AI SDK integration) reads OPENAI_API_KEY from the environment; Bedrock via Vercel AI SDK uses the AWS credential chain. First-party providers are Amazon Bedrock, Anthropic, OpenAI, and Google, with community/custom providers and a LiteLLM unified-API path also documented.",
+      "source": "https://strandsagents.com/docs/user-guide/concepts/model-providers/ and https://strandsagents.com/docs/user-guide/concepts/model-providers/anthropic/ and https://strandsagents.com/docs/user-guide/concepts/model-providers/amazon-bedrock/ and https://strandsagents.com/docs/user-guide/concepts/model-providers/vercel/ (retrieved via WebSearch snippets; direct WebFetch to these URLs returned HTTP 404 in this session)",
+      "evidence_class": "source_review"
+     },
+     {
+      "claim": "Session management: a SessionManager persists conversation and agent state across invocations via pluggable storage backends (FileSessionManager, S3SessionManager, RepositorySessionManager, SnapshotSessionManager); multi-agent orchestrators (Graph, Swarm) are supported via a MultiAgentPlugin interface, and multi-agent session managers track only the current Graph/Swarm execution state, not full per-agent conversation histories.",
+      "source": "https://strandsagents.com/docs/user-guide/concepts/agents/session-management/ and https://strandsagents.com/docs/api/typescript/SessionManager/ (retrieved via WebSearch snippets; direct WebFetch returned HTTP 404 in this session)",
+      "evidence_class": "source_review"
+     }
+    ],
+    "fit_with_native_workflow": "No native fit today: it requires either an Anthropic/OpenAI API key or AWS Bedrock credentials configured in-process; it does not consume the user's existing Claude Code subscription login, Codex/ChatGPT login, GitHub login, or Google login. It would need a new credential (e.g., ANTHROPIC_API_KEY or AWS creds in `$HOME/.config/...`) kept out of the repo, and would run as an in-process Python/TypeScript library rather than a CLI the orchestration layer shells out to \u2014 a different integration shape than the project's Claude Code / Codex worker model.",
+    "interface": "Programmatic SDK (Python `strands` package, TypeScript `@strands-agents/sdk`), plus an optional `strands-harness` batteries-included wrapper (`create_harness()`/`createHarness()`) and a separate `strands` CLI (`strands-cli/`) for prototyping/chatting with a harness agent from the terminal. No headless/exec automation mode was found in the material read; the CLI is described as for interactive prototyping, not scripted dispatch.",
+    "isolation_model": "Runs in the caller's own process with no hosted control plane (\"it runs in your process with no hosted control plane\" \u2014 README). No sandbox, container, or worktree isolation model is described in the material reviewed; session state isolation is handled at the SessionManager/storage-backend level (file, S3, or repository-format backends), not via OS-level or filesystem isolation of agent execution. This is a library embedded in the host application's process, not a supervised/sandboxed external agent.",
+    "license": "Apache License 2.0 (confirmed via GitHub repo metadata `license.key = \"apache-2.0\"` and README pointing to `LICENSE.APACHE`).",
+    "maintenance": "Very active: 7,535 stars, 1,183 forks, 789 open issues on a monorepo pushed same-day as this evidence pull (2026-09-22); dense multi-workflow CI (dozens of per-package workflows: pr-and-push, test-lint, integration-test, security-audit, package-build/pack, plus doc-site CI/deploy and release automation per package); five distinct package releases sampled within roughly a week window (2026-09-15 to 2026-09-21). Backed by AWS/Strands team (topics include `bedrock`, `anthropic`, `openai`; org `strands-agents`).",
+    "native_login_support": "api_key_required",
+    "open_gaps": [
+     "Did not verify actual test counts, pass/fail status, or CI green/red state for any workflow \u2014 only that the workflow files exist (source_review of the file listing, not an executed run).",
+     "Could not directly WebFetch strandsagents.com/docs/user-guide/concepts/model-providers/ or /agents/session-management/ (both returned HTTP 404 to WebFetch in this session); the auth-model and session-management claims rely on WebSearch result snippets of those and related pages (e.g. the Anthropic/Bedrock/Vercel provider subpages, the TypeScript SessionManager API page), not a direct fetch of the primary page text, so exact wording beyond the quoted snippets is unverified.",
+     "Did not read strands-mcp, harness-py/harness-ts, or strands-cli source or docs in depth, so MCP server details, harness-specific defaults, and CLI headless/exec capabilities (if any) beyond the README's characterization are unverified.",
+     "Did not execute any local comparison against incumbent agent SDKs already in the catalog (e.g. OpenAI Agents SDK, Pydantic AI, LangGraph); C5 non-duplication is therefore unresolved and the disposition below reflects that per the preregistered rule (agreement never promotes; only an executed comparison promotes to adopted).",
+     "Did not verify whether the `strands` CLI supports any local-model or API-key-free operation path (e.g. via Ollama, mentioned in the Quickstart line 'configuring providers (Amazon Bedrock, Anthropic, OpenAI, Gemini, Ollama, and more)') which could partially mitigate the C1 penalty \u2014 this is flagged but not independently confirmed from primary docs due to the WebFetch 404s.",
+     "Portability (C6) is inferred from stated runtime requirements (Python 3.10+, Node.js 22+, `pip`/`npm` install) and general cross-platform nature of these ecosystems; no explicit Linux/WSL2 x86_64 or macOS arm64 install matrix or wheel/binary listing was inspected."
+    ],
+    "overlap_with_incumbents": "General-purpose, model-agnostic agent SDK with agent loop, tools, structured output, MCP, multi-agent patterns (Graph/Swarm), memory/sessions, streaming, guardrails, and tracing \u2014 this is squarely in the same space as other \"agent-sdks\" category incumbents (e.g., OpenAI Agents SDK, LangGraph, Pydantic AI) that the catalog already carries or has evaluated. No executed comparison exists in the evidence gathered here.",
+    "portability": "Python SDK requires Python 3.10+ (`pip install strands-agents strands-agents-tools` or `strands-harness`); TypeScript SDK requires Node.js 22+ (`npm install @strands-agents/sdk` or `@strands-agents/harness`). Both are standard cross-platform package-manager installs (PyPI/npm) with no OS-specific binary noted in the README; a concrete Linux/WSL2 x86_64 and macOS arm64 install-path check (e.g. wheel availability, native extensions) was not independently executed in this pass.",
+    "releases_last_6_months": [
+     "harness-typescript/v0.1.0 \u2014 2026-09-21",
+     "harness-python/v0.1.1 \u2014 2026-09-21",
+     "harness-python/v0.1.0 \u2014 2026-09-21",
+     "harness-cli/v0.1.0 \u2014 2026-09-21",
+     "typescript/v1.18.0 \u2014 2026-09-15"
+    ],
+    "risks": [
+     "Credential handling: Bedrock/Anthropic/OpenAI paths all require the host application to supply and manage credentials (AWS credential chain or API keys) in-process \u2014 a new secret-handling surface if adopted, requiring careful scoping (e.g. per project's TYPESAFE_API_KEY-style env-file pattern) to avoid leaking into logs, prompts or commits.",
+     "No sandbox/isolation layer described: the SDK executes tools and agent logic directly in the host process, so a misbehaving or malicious tool call has the same blast radius as any other in-process code \u2014 unlike a worktree-isolated coding harness.",
+     "Overlap risk: adopting this without an executed comparison against incumbent agent SDKs would violate the project's non-duplication rule (C5) and the stated preregistration principle that agreement/recency never promotes.",
+     "Fast-moving pre-1.0 harness packages (harness-python v0.1.1, harness-typescript v0.1.0, harness-cli v0.1.0) indicate the harness layer specifically is very new and its API may still be unstable, even though the core `strands-agents`/`@strands-agents/sdk` packages are more mature (typescript SDK at v1.18.0)."
+    ],
+    "slug": "strands-agents-harness-sdk",
+    "sources_read": [
+     "gh api repos/strands-agents/harness-sdk",
+     "gh api repos/strands-agents/harness-sdk/releases?per_page=5",
+     "gh api repos/strands-agents/harness-sdk/readme",
+     "gh api repos/strands-agents/harness-sdk/contents",
+     "gh api repos/strands-agents/harness-sdk/contents/.github/workflows",
+     "gh api repos/strands-agents/harness-sdk/contents/strands-py",
+     "WebSearch: strandsagents.com model providers authentication Bedrock Anthropic OpenAI",
+     "WebSearch: strandsagents.com session management multi-agent"
+    ],
+    "structured_events": "Not independently verified from primary docs in this pass (both direct doc-page WebFetches 404'd). README states the SDK provides streaming, hooks that \"intercept any step\" of the agent loop, and lifecycle controls (turn limits, token budgets, cancellation, stop reasons); the SessionManager persists structured conversation/state records to pluggable backends (file, S3, repository-format). Whether these constitute a formally typed \"structured events\" stream comparable to a headless-exec JSON-event protocol was not confirmed against primary source in this session.",
+    "summary": "strands-agents/harness-sdk is the Strands Agents monorepo (AWS-backed, Apache-2.0, ~7.5k stars): a model-agnostic Python/TypeScript SDK for building in-process AI agents (agent loop, tools, structured output, MCP, multi-agent Graph/Swarm patterns, sessions/memory, streaming, guardrails, tracing) plus an optional batteries-included \"harness\" wrapper and a prototyping CLI. It is actively maintained with dense per-package CI (test-lint, integration-test, security-audit, package-build, release workflows) and frequent releases, but authentication is API-key/AWS-credential based (Bedrock credential chain, Anthropic API key, OpenAI env var) with no native Claude Code/Codex/GitHub/Google login path found, and it runs unsandboxed in the host process rather than under worktree/sandbox isolation. It substantially overlaps the existing agent-sdks category (OpenAI Agents SDK, LangGraph, Pydantic AI, etc.) with no executed local comparison performed here.",
+    "tests_and_ci": "Confirmed via file listing (not executed): strands-py has `tests/`, `tests_integ/` (integration), and `tests_typing/` directories; the README documents `hatch test` for Python and `npm test` for TypeScript as the unit-test entry points. `.github/workflows/` contains, per package (harness-cli, harness-py, harness-ts, mcp/strands-mcp, python/strands-py, typescript/strands-ts): a `*-pr-and-push.yml`, `*-test-lint.yml`, `*-integration-test.yml`, `*-security-audit.yml`, and `*-test-package-build.yml`/`*-test-package-pack.yml` workflow, plus a top-level `ci.yml`, docs-site CI/deploy workflows, and per-package `release-*.yml` workflows \u2014 indicating a comprehensive CI matrix, though pass/fail status of recent runs was not queried.",
+    "worker_features": "Multi-agent orchestration via Graph and Swarm patterns, exposed through a `MultiAgentPlugin` session-manager interface; multi-agent session managers track only the current Graph/Swarm execution state rather than persisting each sub-agent's full conversation history (per WebSearch snippet of the session-management and SessionManager API docs \u2014 not independently confirmed by direct page fetch in this session). Hooks allow intercepting any agent-loop step to log, validate, or redirect it. No evidence was gathered in this pass of a distinct \"worker pool\"/job-dispatch feature beyond these multi-agent patterns and Agent-to-Agent (A2A) protocol support referenced in search results."
+   },
+   "refutations": [
+    {
+     "lens": "fit",
+     "refuted": true,
+     "findings": [
+      {
+       "claim": "fit_with_native_workflow: \"it would run as an in-process Python/TypeScript library rather than a CLI the orchestration layer shells out to \u2014 a different integration shape than the project's Claude Code / Codex worker model\", supported by interface: \"No headless/exec automation mode was found in the material read; the CLI is described as for interactive prototyping, not scripted dispatch.\"",
+       "problem": "Contradicted by primary source. The repo's own strands-cli/README.md documents exactly the shell-out shape the packet says is absent: a Print mode (`-p`/`--print`, or stdin piped) that answers once and exits, and an ACP server mode (`--acp-server`) that serves the agent over newline-delimited ACP on stdin/stdout, plus `--session-id <id>` to resume a conversation by id and `--set <field=value>` (JSON-aware) for scripted config override. That is C2 (headless/exec mode with structured events, resumable sessions, custom tools or MCP) satisfied by a CLI, and it removes the stated integration-shape mismatch. The packet listed `gh api .../contents` among sources_read but never read strands-cli/README.md (it says so in open_gaps), then drew a definite negative conclusion from that gap.",
+       "evidence": "gh api repos/strands-agents/harness-sdk/contents/strands-cli/README.md (579 lines). L114-117 mode table: \"**Print** | `--print` is set, or stdin is piped | One request, then exit\"; \"**ACP server** | `--acp-server` is set | Serve the agent over newline-delimited ACP on stdin/stdout\". L126-127: `printf 'summarize README.md' | strands` and `strands --acp-server`. L149-166 flag table: `-p, --print` \"Answer once and exit\"; `--session <mode>` on/off; `--session-id <id>` \"Resume a conversation by id\"; `--set <field=value>` \"repeatable and JSON-aware\"; `--skills <dirs>`; `--builtin-tools <tools>`. L337: \"Print and ACP-server mode never prompt\".",
+       "severity": "major"
+      },
+      {
+       "claim": "native_login_support: \"api_key_required\"; fit_with_native_workflow: \"it requires either an Anthropic/OpenAI API key or AWS Bedrock credentials configured in-process\" and \"would need a new credential (e.g., ANTHROPIC_API_KEY or AWS creds)\".",
+       "problem": "C1 reads \"runs on the user's existing native sign-ins ... **or a local model**\". Two of the CLI's seven first-party providers need no credential at all: Ollama is \"Auto-detected locally; `OLLAMA_HOST` only for a custom server\" and LiteLLM proxy is \"Auto-detected locally; `LITELLM_BASE_URL` for a custom proxy, optional key\". The Python SDK ships matching first-party providers `ollama.py`, `llamacpp.py`, `litellm.py` alongside anthropic/bedrock/openai/gemini. This project already runs a local vLLM behind an OpenAI-compatible endpoint (the SocratiCode `lmstudio` provider), so the local-model path is reachable here without any new paid key. The packet flagged this itself in open_gaps (\"Did not verify whether the `strands` CLI supports any local-model or API-key-free operation path\") and then recorded the unmitigated penalty anyway. The C1 penalty as written overstates the cost: no-paid-key operation is documented in the repo, not only on the 404'ing docs site.",
+       "evidence": "strands-cli/README.md L262-270 provider/credential table: `ollama/` \u2192 \"Auto-detected locally; `OLLAMA_HOST` only for a custom server\"; `litellm/` \u2192 \"Auto-detected locally; `LITELLM_BASE_URL` for a custom proxy, optional key\". L271-272: \"The CLI does not store provider secrets.\" L66: \"The CLI detects standard credential sources but never writes API keys to its config.\" gh api repos/strands-agents/harness-sdk/contents/strands-py/src/strands/models \u2192 ollama.py, llamacpp.py, litellm.py, sagemaker.py, anthropic.py, bedrock.py, gemini.py, openai.py, openai_responses.py, mistral.py, writer.py, llamaapi.py, routing/.",
+       "severity": "major"
+      },
+      {
+       "claim": "isolation_model: \"No sandbox, container, or worktree isolation model is described in the material reviewed ... This is a library embedded in the host application's process, not a supervised/sandboxed external agent.\" Restated as risk: \"No sandbox/isolation layer described: the SDK executes tools and agent logic directly in the host process\".",
+       "problem": "The Python SDK ships a first-class `strands.sandbox` package with Docker and SSH backends, and the CLI documents `agent.sandbox` as the execution environment for shell, file, MCP, delegate and Background Task work, with the host process being only the *default* (`not_a_sandbox_local_environment.py`) when no sandbox is supplied. So C3 (\"works per worktree/sandbox without hidden global state\") has a real, pluggable mechanism to evaluate, rather than the categorical absence the packet records. The packet's own sources_read includes `gh api .../contents/strands-py`, one level above the module listing that shows this.",
+       "evidence": "gh api repos/strands-agents/harness-sdk/contents/strands-py/src/strands \u2192 `sandbox` module present; gh api .../src/strands/sandbox \u2192 base.py, docker.py, ssh.py, posix_shell.py, stream_process.py, not_a_sandbox_local_environment.py, types.py, errors.py, constants.py. strands-cli/README.md L396-406: \"Unless a caller supplies a Strands `sandbox`, the harness's shell, file, MCP, delegate, and Background Task work runs in the host process with the user's permissions ... library consumers can pass their own `interventions` and `sandbox` options to `createHarness()`\" and \"It executes through the same `agent.sandbox` used by the harness's tools and inherits that sandbox's isolation.\"",
+       "severity": "major"
+      },
+      {
+       "claim": "overlap_with_incumbents: \"squarely in the same space as other 'agent-sdks' category incumbents (e.g., OpenAI Agents SDK, LangGraph, Pydantic AI) that the catalog already carries or has evaluated.\"",
+       "problem": "Two defects. (a) Two of the three named comparators \u2014 OpenAI Agents SDK and Pydantic AI \u2014 do not appear in the incumbent list supplied for this judgment; the overlap is asserted against incumbents the packet carries no evidence for, so the C5 comparison target is misnamed. The incumbents it does overlap on the SDK axis are langchain-ai/langgraph (unqualified), microsoft/agent-framework (conditional), langchain-ai/deepagents (conditional), openhands/software-agent-sdk (conditional) and anthropics/claude-agent-sdk-python (measured, not adopted). (b) It misses the sharper overlap: the `strands` CLI is a headless-capable coding agent that discovers Agent Skills from `.claude/skills`, `.codex/skills`, `.agents/skills` and MCP servers from `~/.claude.json` and `.codex/config.toml` \u2014 i.e. it overlaps anthropics/claude-code and openai/codex on their own config surface, which is the overlap that actually matters for this project's worker model and is the one an executed comparison must target.",
+       "evidence": "Task-supplied incumbent list contains no OpenAI Agents SDK and no Pydantic AI entry. strands-cli/README.md L325-333 MCP discovery order: \"1. `~/.claude.json` (user servers, plus the current workspace's local servers and opt-outs) 2. `~/.kiro/settings/mcp.json` 3. `~/.gemini/settings.json` ... 5. `~/.strands/cli/mcp.json`\" then project files \"`.mcp.json`, `.kiro/settings/mcp.json`, `.gemini/settings.json`, `.codex/config.toml`, and `.strands/mcp.json`\". L349-352 skills discovery: \"`.agents/skills`, `.claude/skills`, `.codex/skills`, ... `.strands/skills`\". L43-45: built-in tools include \"a `subagent` delegate\" and background delegates.",
+       "severity": "major"
+      },
+      {
+       "claim": "structured_events: \"Whether these constitute a formally typed 'structured events' stream comparable to a headless-exec JSON-event protocol was not confirmed against primary source in this session.\"",
+       "problem": "The unresolved question is answered in the repo itself, not on the 404'ing docs site: ACP server mode serves the agent over newline-delimited ACP (Agent Client Protocol) frames on stdin/stdout, with MCP servers in that mode supplied by the ACP client. This is exactly the \"headless-exec JSON-event protocol\" comparator the packet says it could not confirm, and it is one `gh api` call from the sources already listed. The gap is recorded as unresolvable when it was reachable from primary source.",
+       "evidence": "strands-cli/README.md L117, L127, L151, L344-345: \"In ACP server mode, they are combined with servers supplied by the ACP client.\"",
+       "severity": "minor"
+      }
+     ],
+     "corrections": [
+      "Rewrite fit_with_native_workflow: the integration shape is not library-only. `strands` ships a CLI with Print mode (`-p`/`--print`, stdin piped) and ACP-server mode (`--acp-server`, newline-delimited ACP on stdin/stdout), `--session-id` resume, `--set` JSON config override, `--skills`, `--builtin-tools` and `--mcp-config` \u2014 the same shell-out shape the orchestration layer already uses for `claude -p` and `codex exec`. C2 is satisfied by primary source.",
+      "Change native_login_support from \"api_key_required\" to local-model-capable-without-key. No Claude Code / Codex / GitHub / Google login is accepted (that part holds), but C1's explicit \"or a local model\" clause is met: `ollama/` and `litellm/` are auto-detected locally with no required key, and strands-py ships ollama.py, llamacpp.py and litellm.py as first-party providers. Record the penalty as \"no native sign-in reuse\", not \"a new paid API key is required\".",
+      "Rewrite isolation_model and the matching risk: `strands.sandbox` is a first-class pluggable package with docker.py, ssh.py, posix_shell.py and an explicit not_a_sandbox_local_environment.py default; the host-process blast radius is the default, not the only model. C3 becomes a thing to test, not a recorded absence.",
+      "Retarget overlap_with_incumbents. Drop OpenAI Agents SDK and Pydantic AI (not in the incumbent set for this judgment). State the SDK-axis overlap against langgraph / agent-framework / deepagents / software-agent-sdk / claude-agent-sdk-python, and add the CLI-axis overlap against claude-code and codex, evidenced by the CLI reading `~/.claude.json`, `.codex/config.toml`, `.claude/skills` and `.codex/skills`.",
+      "Disposition: targeted_candidate, not a no-native-fit not_adopted. C5 still blocks adoption (no executed comparison), and agreement never promotes.",
+      "Name the C5 comparison that would settle it (runnable, one bounded task, identical inputs): run the same fixture task through three arms with the same project MCP config and skills dir \u2014 arm A `claude -p \"<task>\" --output-format stream-json`, arm B `codex exec \"<task>\" --json`, arm C `printf '<task>' | npx -y @strands-agents/cli@latest --print --mcp-config .mcp.json --skills .agents/skills` \u2014 and compare exit code, output hash, wall time and provider usage. Register it under tools/compare with a deterministic runner so comparison-execute can re-run it.",
+      "Name the C1 check that would settle the local-model claim: `OLLAMA_HOST=http://127.0.0.1:11434 printf 'reply with the word OK' | npx -y @strands-agents/cli@latest --print --set 'model=\"ollama/<local-tag>\"'` with ANTHROPIC_API_KEY/OPENAI_API_KEY/AWS_* unset in the child environment; acceptance is exit 0 with model output and no credential prompt. Equivalent litellm arm: `LITELLM_BASE_URL=<local vLLM OpenAI-compatible URL> ... --set 'model=\"litellm/<id>\"'`.",
+      "Name the C3 check that would settle isolation: `pip install strands-agents` in a scratch venv, then run the upstream sandbox tests (`cd strands-py && hatch test tests/ -k sandbox`) and a bounded local_integration check that executes one shell tool call through the docker sandbox backend from inside a throwaway worktree, asserting the host filesystem outside the worktree is unchanged.",
+      "Name the C2 check for structured events: `strands --acp-server` fed a newline-delimited ACP initialize frame on stdin, capturing stdout frames; then `--print --session-id <id>` twice to confirm the second run resumes the first's conversation.",
+      "Close the open_gap about the docs-site 404s by reading the in-repo sources instead: strands-cli/README.md, strands-py/src/strands/models/, strands-py/src/strands/sandbox/ and strands-py/src/strands/session/ all answer the auth, provider, isolation and session questions from primary source without the docs site."
+     ],
+     "sources_read": [
+      "gh api repos/strands-agents/harness-sdk (license apache-2.0, 7535 stars, pushed_at 2026-09-22T17:15:35Z, archived=false)",
+      "gh api repos/strands-agents/harness-sdk/contents (top-level: harness-py, harness-ts, strands-cli, strands-mcp, strands-py, strands-ts, site, team, test-infra, .agents, .claude, .kiro)",
+      "gh api repos/strands-agents/harness-sdk/readme (197 lines; L96 quickstart names Ollama among providers)",
+      "gh api repos/strands-agents/harness-sdk/contents/strands-cli (file listing)",
+      "gh api repos/strands-agents/harness-sdk/contents/strands-cli/README.md (579 lines; mode table L114-117, examples L126-127, flag table L149-178, provider/credential table L262-272, MCP discovery L325-345, skills discovery L347-358, sandbox/approval L396-406, Ink commands L408-433)",
+      "gh api repos/strands-agents/harness-sdk/contents/strands-py/src/strands (module listing incl. sandbox, session, multiagent, hooks, interventions, plugins, telemetry, background_tasks)",
+      "gh api repos/strands-agents/harness-sdk/contents/strands-py/src/strands/models (anthropic.py, bedrock.py, gemini.py, litellm.py, llamaapi.py, llamacpp.py, mistral.py, ollama.py, openai.py, openai_responses.py, sagemaker.py, writer.py, routing/)",
+      "gh api repos/strands-agents/harness-sdk/contents/strands-py/src/strands/sandbox (base.py, docker.py, ssh.py, posix_shell.py, stream_process.py, not_a_sandbox_local_environment.py, types.py, errors.py, constants.py)"
+     ]
+    },
+    {
+     "lens": "accuracy",
+     "refuted": true,
+     "findings": [
+      {
+       "claim": "interface: \"No headless/exec automation mode was found in the material read; the CLI is described as for interactive prototyping, not scripted dispatch.\"",
+       "problem": "Refuted by primary source. The `strands` CLI documents four run modes including a non-interactive Print mode and a machine protocol server. This is the exact capability C2 (programmatic control: \"SDK or headless/exec mode with structured events, resumable sessions, custom tools or MCP\") asks for, so the packet's C2 evidence base and its whole integration-shape conclusion rest on a false negative.",
+       "evidence": "gh api repos/strands-agents/harness-sdk/contents/strands-cli/README.md \u2014 \"## Run modes\" table: \"**Print** | `--print` is set, or stdin is piped | One request, then exit\"; \"**ACP server** | `--acp-server` is set | Serve the agent over newline-delimited ACP on stdin/stdout\". Examples block: `strands -p \"list the top-level modules\"`, `printf 'summarize README.md' | strands`, `strands --acp-server`. Options table also lists `--session-id <id>` \"Resume a conversation by id\", `--mcp-config <path>` \"Add an MCP configuration file\", `--agent <path>`, `--set <field=value>`. Confirmed in source: strands-cli/src/cli/arguments.ts declares `-p, --print` ('answer the request and exit, without entering the chat loop'), `--acp-server` ('serve the agent over ACP on stdin/stdout'), `CliRunMode = 'acp' | 'ink' | 'plain' | 'print'`, and strands-cli/src/tui/acp/ exists in the tree.",
+       "severity": "blocking"
+      },
+      {
+       "claim": "fit_with_native_workflow: \"...would run as an in-process Python/TypeScript library rather than a CLI the orchestration layer shells out to \u2014 a different integration shape than the project's Claude Code / Codex worker model.\"",
+       "problem": "Refuted by the same source. `strands -p \"<request>\"` / `printf ... | strands` / `strands --acp-server --session-id <id>` is precisely a CLI an orchestration layer shells out to, with resumable sessions and a stdio protocol \u2014 the same shape as the project's existing Claude Code / Codex workers. The packet's stated reason for 'no native fit' is factually wrong on the integration-shape half of the argument.",
+       "evidence": "strands-cli/README.md Run modes + Options tables (as above); `npm install -g @strands-agents/cli   # gives you the `strands` command`; strands-cli/bin/strands.js and strands-cli/package.json in the repo tree (gh api repos/strands-agents/harness-sdk/git/trees/main?recursive=1).",
+       "severity": "major"
+      },
+      {
+       "claim": "isolation_model: \"No sandbox, container, or worktree isolation model is described in the material reviewed... This is a library embedded in the host application's process, not a supervised/sandboxed external agent.\" and risks[1]: \"No sandbox/isolation layer described: the SDK executes tools and agent logic directly in the host process, so a misbehaving or malicious tool call has the same blast radius as any other in-process code.\"",
+       "problem": "Refuted for C3. The project ships Strands Shell \u2014 an in-process shell sandbox with filesystem binds, a network allowlist and credential mediation \u2014 documented as a first-class section of this monorepo's docs site, plus a tool-call gating layer (`--interventions` with ask/smart/Cedar policy). The packet's stated blast-radius risk is contradicted by the shipped mediation layer, and C3 was judged on an absence that does not hold.",
+       "evidence": "gh api repos/strands-agents/harness-sdk/contents/site/src/content/docs/user-guide/shell/index.mdx \u2014 \"Strands Shell is an in-process shell sandbox that gives agents a fast, isolated command line with filesystem, network, and credential mediation built in... You declare which host files, internal URLs, and credentials the shell can reach, and everything else doesn't exist to the agent\"; binds example maps /my/project -> /workspace. Sibling pages site/.../user-guide/shell/{security,configuration,mcp-server,how-it-works}.mdx. Gating: strands-cli/README.md `--interventions <policy>` \"Gate tool calls with `ask`, `smart`, a `.cedar` policy file, or a natural-language rule\"; site/.../user-guide/sdk/agents/interventions/cedar-authorization.mdx.",
+       "severity": "major"
+      },
+      {
+       "claim": "fit_with_native_workflow / native_login_support: \"No native fit today: it requires either an Anthropic/OpenAI API key or AWS Bedrock credentials configured in-process\"; open_gaps[4]: \"Did not verify whether the `strands` CLI supports any local-model or API-key-free operation path (e.g. via Ollama)... this is flagged but not independently confirmed from primary docs due to the WebFetch 404s.\"",
+       "problem": "C1 explicitly credits \"or a local model\", so this is the criterion's alternative limb, not an optional nicety. The local-model path is documented in primary source and reachable from the harness and CLI, and the packet's stated blocker (WebFetch 404s) was not a real obstacle \u2014 the docs are files in the repo the packet was already querying with gh api. The C1 verdict of 'no native fit' is therefore unsupported as written.",
+       "evidence": "gh api .../contents/site/src/content/docs/user-guide/sdk/model-providers/ollama.mdx \u2014 \"Strands provides native support for Ollama, allowing you to use locally-hosted models in your agents\", `pip install 'strands-agents[ollama]'`. Harness level: site/.../user-guide/harness/configure/model.mdx \u2014 \"The `provider/` prefix has aliases for `bedrock`, `bedrock-mantle`, `anthropic`, `openai`, `google`, `ollama`, and `litellm`\", which the CLI exposes via `--model <provider/model>`. Additional local providers in the same directory: llamacpp.mdx, and site/.../integrations/model-providers/{vllm,mlx,sglang}.mdx.",
+       "severity": "major"
+      },
+      {
+       "claim": "claims[9] and claims[10] sourced to \"https://strandsagents.com/docs/user-guide/concepts/model-providers/ ... (retrieved via WebSearch snippets; direct WebFetch to these URLs returned HTTP 404 in this session)\", and open_gaps[1] treating that 404 as an unavoidable limit.",
+       "problem": "The 404 is reproducible and the URLs are dead because the docs site was restructured (`user-guide/concepts/...` no longer exists; it is now `user-guide/sdk/...`). Two claims are therefore cited to non-existent pages via search snippets, i.e. no live supporting source, when the authoritative text was directly retrievable from the repo the packet was already hitting. The substance of the auth claims does hold \u2014 I verified it independently \u2014 but the packet's sourcing and its stated gap are both wrong, and the same shortcut is what produced findings 1, 3 and 4.",
+       "evidence": "WebFetch https://strandsagents.com/docs/user-guide/concepts/model-providers/ -> \"The server returned HTTP 404 Not Found\" (reproduced). Live tree: gh api repos/strands-agents/harness-sdk/git/trees/main?recursive=1 shows site/src/content/docs/user-guide/sdk/model-providers/{index,anthropic,amazon-bedrock,openai,vercel,ollama,litellm,...}.mdx and site/src/content/docs/user-guide/sdk/agents/session-management.mdx \u2014 no user-guide/concepts/ path exists. Substance verified from those files: anthropic.mdx `AnthropicModel(client_args={\"api_key\": \"<KEY>\"})`; openai.mdx \"Set the `OPENAI_API_KEY` environment variable or pass it via the `apiKey` parameter\"; amazon-bedrock.mdx \"Strands uses boto3... Boto3 has its own credential resolution system\" and \"mints short-lived bearer tokens from your AWS credentials\".",
+       "severity": "major"
+      },
+      {
+       "claim": "structured_events: \"Whether these constitute a formally typed 'structured events' stream comparable to a headless-exec JSON-event protocol was not confirmed against primary source in this session.\"",
+       "problem": "Resolvable and resolved against primary source: the CLI serves the agent over newline-delimited ACP (Agent Client Protocol) on stdin/stdout, which is exactly the headless structured-event protocol the field says was unconfirmed. C2's 'structured events' limb is satisfied, not open.",
+       "evidence": "strands-cli/README.md Run modes: \"**ACP server** | `--acp-server` is set | Serve the agent over newline-delimited ACP on stdin/stdout\"; strands-cli/src/cli/arguments.ts `acpServer` flag; strands-cli/src/tui/acp/projection.ts in the repo tree.",
+       "severity": "major"
+      },
+      {
+       "claim": "tests_and_ci: \".github/workflows/ contains, per package (harness-cli, harness-py, harness-ts, mcp/strands-mcp, python/strands-py, typescript/strands-ts): a `*-pr-and-push.yml`, `*-test-lint.yml`, `*-integration-test.yml`, `*-security-audit.yml`, and `*-test-package-build.yml`/`*-test-package-pack.yml` workflow\" (and the same per-package list in claims[5]).",
+       "problem": "Overstates uniformity of the CI matrix. The listing the packet cites shows the set is not complete for every package. The overall conclusion (dense, comprehensive CI) survives; the specific per-package enumeration does not.",
+       "evidence": "gh api repos/strands-agents/harness-sdk/contents/.github/workflows \u2014 no `harness-cli-pr-and-push.yml`; no `mcp-integration-test.yml`; no `typescript-test-lint.yml` or `typescript-test-package-build.yml` (typescript instead has `typescript-ts-check.yml`, `typescript-ts-test.yml`, `typescript-test-package-pack.yml`).",
+       "severity": "minor"
+      },
+      {
+       "claim": "overlap_with_incumbents: \"this is squarely in the same space as other 'agent-sdks' category incumbents (e.g., OpenAI Agents SDK, LangGraph, Pydantic AI)\".",
+       "problem": "Under-identifies the overlap and so names the wrong comparison for C5. With create_harness/createHarness defaults, a `strands` CLI with print + ACP modes, resumable sessions, an Agent Skills directory, a `subagent` delegate, MCP config, shell/read/write/edit/web tools and a shell sandbox, the nearest incumbents are the project's coding harnesses (Claude Code, Codex CLI), not only library-level agent SDKs. The keep_but_compare disposition stands either way, but the comparison it should name is different.",
+       "evidence": "strands-cli/README.md: \"By default you get Claude Opus 4.8 on Amazon Bedrock, with reasoning, shell and file tools, web access, caching, todos, environment context, a `subagent` delegate, Agent Skills, resumable sessions, long-term memory, and automatic context management\"; `--skills <dirs>` \"defaults to `./.agent/skills`\"; `--builtin-tools` \"defaults to `shell,read,write,edit,web_fetch,web_search,programmatic_tool_caller,subagent`\". Docs: site/.../user-guide/harness/configure/{subagents,skills,mcp-servers,sessions,checkpoints-and-memory}.mdx.",
+       "severity": "minor"
+      }
+     ],
+     "corrections": [
+      "interface: the package ships a real headless path. `strands -p \"<request>\"` answers once and exits; a piped stdin request does the same; `strands --acp-server` serves the agent over newline-delimited ACP on stdin/stdout. `--session-id <id>` resumes a conversation, `--mcp-config <path>` adds MCP servers, `--agent <path>` loads an agent ZIP/folder/agent.ts/agent.py, `--set field=value` overrides any portable config field. C2 is satisfied on all four limbs (headless/exec, structured events, resumable sessions, MCP/custom tools).",
+      "native_login_support: keep `api_key_required` for the hosted providers (Bedrock credential chain incl. short-lived bearer tokens, Anthropic `api_key`, `OPENAI_API_KEY`) \u2014 I confirmed all three from primary in-repo docs \u2014 but record that C1's local-model limb is met: Ollama is a documented native provider, is a harness/CLI `provider/` alias (`--model ollama/<name>`), and llama.cpp, vLLM, MLX and SGLang provider pages also exist. No Claude Code / Codex / GitHub / Google subscription login path was found, so the C1 penalty stands but is smaller than the packet states.",
+      "isolation_model: replace \"no sandbox described\" with: tools run through Strands Shell, an in-process Bourne-compatible shell sandbox with explicit filesystem binds, a network allowlist and credential mediation (source at github.com/strands-agents/shell, documented under site/.../user-guide/shell/), and tool calls can be gated with `--interventions ask|smart|<file>.cedar|<natural-language rule>` (Cedar authorization). It is still not worktree isolation and the SDK itself runs in the caller's process, so C3 should be scored as partial, not absent.",
+      "structured_events: resolved \u2014 ACP over stdin/stdout is the structured protocol; remove it from open_gaps.",
+      "Sourcing: drop the dead `strandsagents.com/docs/user-guide/concepts/...` URLs. The live paths are `strandsagents.com/docs/user-guide/sdk/model-providers/` and `.../user-guide/sdk/agents/session-management/`, and the authoritative text is in-repo at `site/src/content/docs/user-guide/...`, retrievable with `gh api repos/strands-agents/harness-sdk/contents/<path>`. Re-cite claims 9 and 10 to those files.",
+      "tests_and_ci: soften the per-package enumeration \u2014 harness-cli has no pr-and-push workflow, mcp has no integration-test workflow, and typescript uses `typescript-ts-check.yml`/`typescript-ts-test.yml`/`typescript-test-package-pack.yml` rather than `-test-lint`/`-test-package-build`.",
+      "Disposition: the packet's evidence does not support `not_adopted` on the grounds given (no headless mode, no sandbox, API key only) \u2014 each of those three grounds is refuted. On corrected evidence the fitting disposition is keep_but_compare, and the comparison to name is against the incumbent coding harnesses (Claude Code, Codex CLI) on a bounded worker task, not against library agent SDKs. A bounded local_integration acceptance command now exists and should be recorded: `npx -y @strands-agents/cli@0.1.0 -p \"<fixture prompt>\" --model ollama/<local-model> --builtin-tools \"\" --session off` (exit 0 plus non-empty stdout), which exercises the headless path with no paid API key; an ACP variant would be `strands --acp-server` driven over stdio.",
+      "Verified as stated and needing no change: repo identity and metadata (Apache-2.0, 7,535 stars, 1,183 forks, 789 open issues, pushed 2026-09-22, monorepo layout), the README quotes including \"it runs in your process with no hosted control plane\", the install/quickstart commands and Python 3.10+ / Node.js 22+ floors, the per-package dev/test commands, the strands-py tests/tests_integ/tests_typing layout, the five sampled releases and their dates, the license, and the substance of the three provider auth mechanisms."
+     ],
+     "sources_read": [
+      "gh api repos/strands-agents/harness-sdk",
+      "gh api repos/strands-agents/harness-sdk/releases?per_page=8",
+      "gh api repos/strands-agents/harness-sdk/readme",
+      "gh api repos/strands-agents/harness-sdk/contents",
+      "gh api repos/strands-agents/harness-sdk/contents/.github/workflows",
+      "gh api repos/strands-agents/harness-sdk/contents/strands-py",
+      "gh api repos/strands-agents/harness-sdk/git/trees/main?recursive=1",
+      "gh api repos/strands-agents/harness-sdk/contents/strands-cli/README.md",
+      "gh api repos/strands-agents/harness-sdk/contents/strands-cli/src/cli/arguments.ts",
+      "gh api repos/strands-agents/harness-sdk/contents/site/src/content/docs/user-guide/shell/index.mdx",
+      "gh api repos/strands-agents/harness-sdk/contents/site/src/content/docs/user-guide/sdk/model-providers/index.mdx",
+      "gh api repos/strands-agents/harness-sdk/contents/site/src/content/docs/user-guide/sdk/model-providers/anthropic.mdx",
+      "gh api repos/strands-agents/harness-sdk/contents/site/src/content/docs/user-guide/sdk/model-providers/amazon-bedrock.mdx",
+      "gh api repos/strands-agents/harness-sdk/contents/site/src/content/docs/user-guide/sdk/model-providers/openai.mdx",
+      "gh api repos/strands-agents/harness-sdk/contents/site/src/content/docs/user-guide/sdk/model-providers/ollama.mdx",
+      "gh api repos/strands-agents/harness-sdk/contents/site/src/content/docs/user-guide/harness/configure/model.mdx",
+      "gh api repos/strands-agents/harness-sdk/contents/site/src/content/docs/user-guide/sdk/agents/session-management.mdx",
+      "gh api search/code?q=repo:strands-agents/harness-sdk+RepositorySessionManager",
+      "WebFetch https://strandsagents.com/docs/user-guide/concepts/model-providers/ (HTTP 404, reproduced)"
+     ]
+    }
+   ]
+  }
+ }
+}
