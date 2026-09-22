@@ -30,7 +30,7 @@ class BlindLayerDecisionTests(unittest.TestCase):
         path.write_text(json.dumps(data))
 
     def test_current_catalog_matches_canonical(self):
-        self.assertEqual(AUDIT.check_layer_decisions(self.root), 24)
+        self.assertEqual(AUDIT.check_layer_decisions(self.root), 32)
 
     def test_rejects_retain_when_comparison_is_open(self):
         self.mutate(lambda data: next(row for row in data['layers'] if row['layer_id'] == 'workers').update(coordinator_disposition='retain'))
@@ -55,4 +55,4 @@ class BlindLayerDecisionTests(unittest.TestCase):
 
     def test_historical_peer_label_does_not_override_canonical(self):
         self.mutate(lambda data: data['layers'][0].update(claude_final_disposition='historical_source_only_judgment'))
-        self.assertEqual(AUDIT.check_layer_decisions(self.root), 24)
+        self.assertEqual(AUDIT.check_layer_decisions(self.root), 32)

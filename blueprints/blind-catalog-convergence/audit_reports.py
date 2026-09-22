@@ -37,7 +37,7 @@ def check_layer_decisions(root=ROOT):
             key = layer['layer_id']
             assert key not in canonical, f'duplicate canonical layer: {key}'
             canonical[key] = (layer['decision'], path, f'/layers/{index}/decision')
-    assert len(canonical) == 24, 'expected the 24 canonical layers'
+    assert len(canonical) == 32, 'expected the 32 canonical layers'
     synthesis = json.loads((root / 'catalogs/landscape/blind-convergence.json').read_text())
     assert synthesis['decision_authority'] == {
         'catalogs': ['catalogs/landscape/foundation.json', 'catalogs/landscape/us-equities.json'],
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     if sys.argv[1:] == ['--check']:
         assert result == read('screening-ledger.json'), 'retained screening ledger is stale'
         check_layer_decisions()
-        print('PASS: 514 original rows, 159 later repairs, 125 action joins, 24 canonical layer labels; no adoption inferred')
+        print('PASS: 514 original rows, 159 later repairs, 125 action joins, 32 canonical layer labels; no adoption inferred')
     else:
         assert not sys.argv[1:], 'only --check is supported'
         print(json.dumps(result, indent=2))

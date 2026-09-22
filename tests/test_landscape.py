@@ -66,7 +66,11 @@ class LandscapeTests(unittest.TestCase):
             "id": "old", "repository": "https://github.com/example/alternative", "role": "Old source candidate",
             "decision": "default", "rationale": "Historical reason", "evidence_level": "source_review",
             "version_or_commit": "v1", "limitations": ["Historical only"], "evidence_refs": ["receipt.json"]}]})
-        self.write("taxonomy.json", {"foundation": [{"layer": "native-clients", "components": [
+        # The sota-pin check is scoped per layer_id (matching
+        # tools/sota-convergence/build_verdicts.py's own sota_layer_index
+        # join), so the taxonomy row's "layer" must equal self.layer's own
+        # layer_id ("retrieval") for the pin-match tests below to exercise it.
+        self.write("taxonomy.json", {"foundation": [{"layer": "retrieval", "components": [
             {"id": "selected", "pin": "1"}]}], "trading": [{"layer": "data", "entries": [
             {"id": "old-trading", "pin": "2"}]}]})
         self.write("adoption/manifest.json", {"recipe_map": {"selected-recipe": "recipes/example.md"}})
@@ -444,6 +448,21 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         with self.assertRaisesRegex(ValueError, "pin differs from the sota manifest pin"):
             self.build()
 
+    def test_sota_pin_check_does_not_conflate_a_shared_component_id_across_layers(self):
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        # A different layer ("data", the us-equities row) pins the same
+        # component id to a different value; the winner check must use the
+        # pin recorded for this row's own layer_id ("retrieval"), not
+        # whichever layer happened to be read last while building a single
+        # flattened component_id -> pin map (the fixed bug).
+        self.write("taxonomy.json", {"foundation": [{"layer": "retrieval", "components": [
+            {"id": "selected", "pin": "1"}]}], "trading": [{"layer": "data", "entries": [
+            {"id": "selected", "pin": "9"}]}]})
+        self.layer.update(fields)
+        data = self.build()
+        self.assertEqual(data["layers"][0]["winners"][0]["pin"], "1")
+
     def test_sealed_sha256_needs_a_retained_lane_file(self):
         self.layer.update(self.recorded_fields())
         with self.assertRaisesRegex(ValueError, "sealed_sha256 needs a sealed file"):
@@ -488,6 +507,10 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         for row in us_layers:
             self.assertEqual(len(row["catalog_candidates"]), 1)
             self.assertEqual(row["catalog_candidates"][0]["id"], "old")
+        # One domain document, one historical card: fanning that same card
+        # out onto every row sharing its group must not multiply the
+        # published count (it must stay 1, not len(us_layers)).
+        self.assertEqual(data["counts"]["historical_candidate_cards"], 1)
 
     def test_domain_document_must_map_to_at_least_one_row(self):
         # "data.json" (group "data-domain") still matches the row; "orphan.json"

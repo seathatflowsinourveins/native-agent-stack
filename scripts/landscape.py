@@ -212,13 +212,17 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
     require(bool(trading_layer_ids), "trading taxonomy needs at least one layer")
     expected.update(("us-equities", layer_id) for layer_id in trading_layer_ids)
     recipe_map = read("adoption/manifest.json").get("recipe_map", {})
-    sota_pins = {}
+    # Per-layer, not a single flattened map: a component id can recur across
+    # layers with a different pin in each (tools/sota-convergence/build_verdicts.py's
+    # sota_layer_index keeps the same per-layer scope for its own join, so the
+    # generator and this validator agree on which pin governs a given winner).
+    sota_pins_by_layer = defaultdict(dict)
     for row in trading_taxonomy_doc.get("foundation", []):
         for component in row.get("components", []):
-            sota_pins[component["id"]] = component.get("pin")
+            sota_pins_by_layer[row["layer"]][component["id"]] = component.get("pin")
     for row in trading_taxonomy_doc.get("trading", []):
         for entry in row.get("entries", []):
-            sota_pins[entry["id"]] = entry.get("pin")
+            sota_pins_by_layer[row["layer"]][entry["id"]] = entry.get("pin")
 
     def evidence(values, label):
         result = []
@@ -257,7 +261,8 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
             else:
                 require(group is None, str(key) + ".group is only used for trading rows")
             validate_verdict_row(row, key, root=root, identities=identities, aliases=aliases,
-                                  evidence=evidence, recipe_map=recipe_map, sota_pins=sota_pins)
+                                  evidence=evidence, recipe_map=recipe_map,
+                                  sota_pins=sota_pins_by_layer.get(key[1], {}))
             source_links = evidence(row.get("evidence_refs"), str(key))
             candidates, candidate_ids = [], set()
             require(isinstance(row.get("candidates"), list) and row["candidates"], "layer needs candidates")
@@ -406,7 +411,13 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
               "comparison_candidates": sum(len(row["candidates"]) for row in layers),
               "comparison_repositories": len({candidate["repository_id"] for row in layers
                                                for candidate in row["candidates"]}),
-              "historical_candidate_cards": sum(len(row["catalog_candidates"]) for row in layers),
+              # Distinct cards, not the sum across every matched row: schema v2
+              # fans the same domain-document entry out onto every row in its
+              # group (rows sharing one "group" all show the same historical
+              # cards), so summing catalog_candidates per row would multiply
+              # each card by the number of rows in its group.
+              "historical_candidate_cards": sum(len(document["entries"])
+                                                 for document in domain_documents.values()),
               "dispositions": dict(sorted(Counter(candidate["disposition"] for row in layers
                                                     for candidate in row["candidates"]).items()))}
     practice = None

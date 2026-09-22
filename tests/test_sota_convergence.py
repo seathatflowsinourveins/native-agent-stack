@@ -501,6 +501,60 @@ class CountsReconcileTests(unittest.TestCase):
         self.assertNotIn("why_selected", status_absent[key])
         self.assertNotIn("comparison_that_would_overturn", status_absent[key])
 
+    def test_why_selected_and_comparison_that_would_overturn_reach_the_merged_manifest_rows(self):
+        # Fix round finding 4: merge_lanes attaching these fields to
+        # status[key] alone has no observable effect unless build_manifest()
+        # actually copies them onto the merged components[]/entries[] it
+        # writes to the manifest -- assert on that output, not the
+        # intermediate status dict.
+        foundation_layers = {"checked_at": "2026-01-01", "layers": [{
+            "layer_id": "layer-a", "title": "Layer A", "components": [{
+                "id": "winner-component", "repository": "https://github.com/example/winner",
+                "version": "1.0.0",
+            }],
+        }]}
+        trading_by_layer = {
+            "taxonomy": {"layer-b": ["tag-a"]},
+            "layers": {"layer-b": [{
+                "id": "winner-entry", "repository": "https://github.com/example/trade-winner",
+                "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-a"],
+            }]},
+        }
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        lanes_doc = {
+            "critic": None,
+            "lanes": [{
+                "lane": "combined",
+                "result": {"calls": {}, "limits": [], "layers": [
+                    {"layer_id": "layer-a", "selected": [{
+                        "repository": "https://github.com/example/winner",
+                        "status": "confirmed_default", "evidence": [], "note": None,
+                        "why_selected": "Passed the native scoped operation",
+                        "comparison_that_would_overturn": "A sealed head-to-head replay",
+                    }], "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": []},
+                    {"layer_id": "layer-b", "selected": [{
+                        "repository": "https://github.com/example/trade-winner",
+                        "status": "confirmed_default", "evidence": [], "note": None,
+                    }], "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": []},
+                ]},
+                "proposals": [],
+            }],
+        }
+        manifest = build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="test scope",
+            foundation_layers=foundation_layers, trading_by_layer=trading_by_layer,
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[],
+            taxonomy=trading_by_layer["taxonomy"],
+        )
+        component = manifest["foundation"][0]["components"][0]
+        self.assertEqual(component["why_selected"], "Passed the native scoped operation")
+        self.assertEqual(component["comparison_that_would_overturn"], "A sealed head-to-head replay")
+        # The trading lane's selected item set neither optional field: they
+        # must be omitted from the merged entry, never invented as None/"".
+        entry = manifest["trading"][0]["entries"][0]
+        self.assertNotIn("why_selected", entry)
+        self.assertNotIn("comparison_that_would_overturn", entry)
+
 
 class SelectedVerdictNullSurvivesTests(unittest.TestCase):
     """2026-09-22 review finding 5: merge_lanes' selected-status handling

@@ -395,10 +395,10 @@
       }
     },
     {
-      "layer_id": "foundation-memory",
+      "layer_id": "market-data-reference",
       "coordinator_disposition": "keep_but_compare",
-      "rationale": "The source-first filings/documents/code proposal complements the memory/retrieval division. EdgarTools and DuckDB belong to provenance/analysis; they do not substitute for cross-session knowledge ownership.",
-      "claude_independent_finding": "Retain complementary memory and source-retrieval responsibilities. Versioned tables and temporal graphs do not establish when vendor information was actually knowable; representative financial retrieval and supersession checks remain open.",
+      "rationale": "Databento's coverage/reference-data case is a real challenge to choosing a provider solely for broker convenience. Keep the qualified bounded Alpaca path, and compare rights, point-in-time universe, corporate actions, corrections and total cost on identical securities/dates before changing provider.",
+      "claude_independent_finding": "Keep bounded official Alpaca/EdgarTools/local analysis and compare Databento for requirements. LEAN samples are not a full point-in-time universe; storage versioning alone does not establish publication-time correctness.",
       "evidence_refs": [
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/us-equities.json",
@@ -417,10 +417,10 @@
       }
     },
     {
-      "layer_id": "agents-operations",
-      "coordinator_disposition": "retain",
-      "rationale": "Native clients and systemd agree. Prefect and LangGraph are conditional research-application choices; the accepted Dagu/telemetry/recovery path has execution evidence the independent source report did not inspect.",
-      "claude_independent_finding": "Retain native research/review, local effect ownership and shared telemetry. No comparative runtime trial in WF2 establishes migration to a framework, gateway or hosted stack.",
+      "layer_id": "identity-provenance",
+      "coordinator_disposition": "keep_but_compare",
+      "rationale": "Databento's coverage/reference-data case is a real challenge to choosing a provider solely for broker convenience. Keep the qualified bounded Alpaca path, and compare rights, point-in-time universe, corporate actions, corrections and total cost on identical securities/dates before changing provider.",
+      "claude_independent_finding": "Keep bounded official Alpaca/EdgarTools/local analysis and compare Databento for requirements. LEAN samples are not a full point-in-time universe; storage versioning alone does not establish publication-time correctness.",
       "evidence_refs": [
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/us-equities.json",
@@ -431,7 +431,7 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
       "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
-      "claude_final_disposition": "retain",
+      "claude_final_disposition": "keep_but_compare",
       "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
       "canonical_decision_ref": {
         "path": "catalogs/landscape/us-equities.json",
@@ -439,7 +439,7 @@
       }
     },
     {
-      "layer_id": "data-research",
+      "layer_id": "storage-compute",
       "coordinator_disposition": "keep_but_compare",
       "rationale": "Databento's coverage/reference-data case is a real challenge to choosing a provider solely for broker convenience. Keep the qualified bounded Alpaca path, and compare rights, point-in-time universe, corporate actions, corrections and total cost on identical securities/dates before changing provider.",
       "claude_independent_finding": "Keep bounded official Alpaca/EdgarTools/local analysis and compare Databento for requirements. LEAN samples are not a full point-in-time universe; storage versioning alone does not establish publication-time correctness.",
@@ -461,7 +461,29 @@
       }
     },
     {
-      "layer_id": "engines-strategies",
+      "layer_id": "data-quality-orchestration",
+      "coordinator_disposition": "retain",
+      "rationale": "Native clients and systemd agree. Prefect and LangGraph are conditional research-application choices; the accepted Dagu/telemetry/recovery path has execution evidence the independent source report did not inspect.",
+      "claude_independent_finding": "Retain native research/review, local effect ownership and shared telemetry. No comparative runtime trial in WF2 establishes migration to a framework, gateway or hosted stack.",
+      "evidence_refs": [
+        "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+        "catalogs/landscape/us-equities.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
+      ],
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/us-equities.json",
+        "pointer": "/layers/3/decision"
+      }
+    },
+    {
+      "layer_id": "research-factors-ml",
       "coordinator_disposition": "keep_but_compare",
       "rationale": "LEAN has inspectable engine, equity tests and both broker plugins, which strengthens its comparison case. Keep the user's Nautilus destination with explicit broker/accounting gaps. Source-test weaknesses must be checked narrowly; neither an engine feature list nor a model preference establishes paper readiness or strategy performance.",
       "claude_independent_finding": "Keep Nautilus destination and LEAN comparison. LEAN equity actions/borrow remain a strong challenge. Issue #4983 reports the Rust IB path at v1.227.0 and explicitly distinguishes Python; no whole-engine or selected-version failure is inferred. Alpaca remains a separate qualified path.",
@@ -479,7 +501,161 @@
       "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
       "canonical_decision_ref": {
         "path": "catalogs/landscape/us-equities.json",
-        "pointer": "/layers/3/decision"
+        "pointer": "/layers/4/decision"
+      }
+    },
+    {
+      "layer_id": "backtesting-engine",
+      "coordinator_disposition": "keep_but_compare",
+      "rationale": "LEAN has inspectable engine, equity tests and both broker plugins, which strengthens its comparison case. Keep the user's Nautilus destination with explicit broker/accounting gaps. Source-test weaknesses must be checked narrowly; neither an engine feature list nor a model preference establishes paper readiness or strategy performance.",
+      "claude_independent_finding": "Keep Nautilus destination and LEAN comparison. LEAN equity actions/borrow remain a strong challenge. Issue #4983 reports the Rust IB path at v1.227.0 and explicitly distinguishes Python; no whole-engine or selected-version failure is inferred. Alpaca remains a separate qualified path.",
+      "evidence_refs": [
+        "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+        "catalogs/landscape/us-equities.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
+      ],
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/us-equities.json",
+        "pointer": "/layers/5/decision"
+      }
+    },
+    {
+      "layer_id": "execution-broker",
+      "coordinator_disposition": "keep_but_compare",
+      "rationale": "LEAN has inspectable engine, equity tests and both broker plugins, which strengthens its comparison case. Keep the user's Nautilus destination with explicit broker/accounting gaps. Source-test weaknesses must be checked narrowly; neither an engine feature list nor a model preference establishes paper readiness or strategy performance.",
+      "claude_independent_finding": "Keep Nautilus destination and LEAN comparison. LEAN equity actions/borrow remain a strong challenge. Issue #4983 reports the Rust IB path at v1.227.0 and explicitly distinguishes Python; no whole-engine or selected-version failure is inferred. Alpaca remains a separate qualified path.",
+      "evidence_refs": [
+        "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+        "catalogs/landscape/us-equities.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
+      ],
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/us-equities.json",
+        "pointer": "/layers/6/decision"
+      }
+    },
+    {
+      "layer_id": "portfolio-risk",
+      "coordinator_disposition": "keep_but_compare",
+      "rationale": "LEAN has inspectable engine, equity tests and both broker plugins, which strengthens its comparison case. Keep the user's Nautilus destination with explicit broker/accounting gaps. Source-test weaknesses must be checked narrowly; neither an engine feature list nor a model preference establishes paper readiness or strategy performance.",
+      "claude_independent_finding": "Keep Nautilus destination and LEAN comparison. LEAN equity actions/borrow remain a strong challenge. Issue #4983 reports the Rust IB path at v1.227.0 and explicitly distinguishes Python; no whole-engine or selected-version failure is inferred. Alpaca remains a separate qualified path.",
+      "evidence_refs": [
+        "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+        "catalogs/landscape/us-equities.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
+      ],
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/us-equities.json",
+        "pointer": "/layers/7/decision"
+      }
+    },
+    {
+      "layer_id": "evaluation-experiments",
+      "coordinator_disposition": "retain",
+      "rationale": "Native clients and systemd agree. Prefect and LangGraph are conditional research-application choices; the accepted Dagu/telemetry/recovery path has execution evidence the independent source report did not inspect.",
+      "claude_independent_finding": "Retain native research/review, local effect ownership and shared telemetry. No comparative runtime trial in WF2 establishes migration to a framework, gateway or hosted stack.",
+      "evidence_refs": [
+        "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+        "catalogs/landscape/us-equities.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
+      ],
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/us-equities.json",
+        "pointer": "/layers/8/decision"
+      }
+    },
+    {
+      "layer_id": "agents-models-workers",
+      "coordinator_disposition": "keep_but_compare",
+      "rationale": "The source-first filings/documents/code proposal complements the memory/retrieval division. EdgarTools and DuckDB belong to provenance/analysis; they do not substitute for cross-session knowledge ownership.",
+      "claude_independent_finding": "Retain complementary memory and source-retrieval responsibilities. Versioned tables and temporal graphs do not establish when vendor information was actually knowable; representative financial retrieval and supersession checks remain open.",
+      "evidence_refs": [
+        "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+        "catalogs/landscape/us-equities.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
+      ],
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/us-equities.json",
+        "pointer": "/layers/9/decision"
+      }
+    },
+    {
+      "layer_id": "observability-hosting",
+      "coordinator_disposition": "retain",
+      "rationale": "Native clients and systemd agree. Prefect and LangGraph are conditional research-application choices; the accepted Dagu/telemetry/recovery path has execution evidence the independent source report did not inspect.",
+      "claude_independent_finding": "Retain native research/review, local effect ownership and shared telemetry. No comparative runtime trial in WF2 establishes migration to a framework, gateway or hosted stack.",
+      "evidence_refs": [
+        "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+        "catalogs/landscape/us-equities.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
+      ],
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/us-equities.json",
+        "pointer": "/layers/10/decision"
+      }
+    },
+    {
+      "layer_id": "security-supply-chain",
+      "coordinator_disposition": "retain",
+      "rationale": "Native clients and systemd agree. Prefect and LangGraph are conditional research-application choices; the accepted Dagu/telemetry/recovery path has execution evidence the independent source report did not inspect.",
+      "claude_independent_finding": "Retain native research/review, local effect ownership and shared telemetry. No comparative runtime trial in WF2 establishes migration to a framework, gateway or hosted stack.",
+      "evidence_refs": [
+        "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+        "catalogs/landscape/us-equities.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
+      ],
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern.",
+      "canonical_decision_ref": {
+        "path": "catalogs/landscape/us-equities.json",
+        "pointer": "/layers/11/decision"
       }
     },
     {
