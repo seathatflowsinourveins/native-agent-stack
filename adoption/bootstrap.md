@@ -96,7 +96,8 @@ nothing on that page has been executed on a Mac; see
    MCPorter daemon to "clean up" another component), `launchctl` on macOS
    (table in [the macOS page](platforms/macos-arm64.md#launchd-services); not
    yet exercised on a Mac). For the portable guarded runner wrappers used by
-   these services, see [`adoption/tools/README.md`](tools/README.md).
+   these services, see `adoption/tools/README.md` (added by a sibling unit;
+   the link resolves once that file lands alongside this one).
 
 6. **Prerequisite report.** `python3 scripts/adoption_status.py --profile <id> --json`
    reports command presence and recipe-path presence only; it never logs in,

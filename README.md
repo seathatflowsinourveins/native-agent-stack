@@ -199,7 +199,7 @@ python3 scripts/validate_catalogs.py
 python3 -m unittest discover -s tests -v
 ```
 
-### Fresh WSL2 x86_64 in six commands
+### Fresh WSL2 x86_64 in six steps
 
 ```bash
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git && cd native-agent-stack
@@ -212,10 +212,16 @@ codex login   # and/or: claude
 
 Each command's per-host receipt (installed component versions, checks passed)
 goes in the host receipt described by [`adoption/bootstrap.md`](adoption/bootstrap.md).
-This sequence has a native acceptance receipt on Linux/WSL2 x86_64; see
-[`adoption/platforms/linux-wsl2.md`](adoption/platforms/linux-wsl2.md).
+Claim boundary: [`adoption/receipt.json`](adoption/receipt.json) records a
+native uv SDK-reproduction run (`native_cli_e2e`, `codex`/`duckdb`) on an
+existing WSL2 host — not a run of this exact `bootstrap-linux.sh` command
+sequence. This bootstrap script sequence itself has no per-host acceptance
+receipt yet; record one for your host by following steps 6-7 in
+[`adoption/bootstrap.md`](adoption/bootstrap.md) and see
+[`adoption/platforms/linux-wsl2.md`](adoption/platforms/linux-wsl2.md) for
+what is currently accepted.
 
-### Fresh macOS arm64 (drafted; hosted-runner smoke pending/green as recorded in `adoption/manifest.json` `platform_profiles`)
+### Fresh macOS arm64 (drafted, not yet accepted)
 
 ```bash
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git && cd native-agent-stack
@@ -226,11 +232,14 @@ python3 scripts/adoption_status.py --profile macos-arm64-foundation --json
 codex login   # and/or: claude
 ```
 
-Explicit claim boundary: a hosted GitHub macOS arm64 runner run is native
-operation on that hosted runner, not acceptance on a user's own Mac; a green
-hosted-runner smoke run there does not substitute for it. `launchd`
-integration and local embedding-backend steps on macOS remain unrun outside
-that hosted runner — see
+`adoption/manifest.json` `platform_profiles` records this profile's actual
+current state: `{"id": "macos-arm64", "status": "drafted_not_accepted",
+"evidence_ref": null}` — there is no separate hosted-runner-smoke field to
+cite here. Explicit claim boundary: a hosted GitHub macOS arm64 runner run
+(if and when one is added) is native operation on that hosted runner, not
+acceptance on a user's own Mac; a green hosted-runner smoke run there would
+not substitute for it. `launchd` integration and local embedding-backend
+steps on macOS remain unrun outside any such hosted runner — see
 [`adoption/platforms/macos-arm64.md`](adoption/platforms/macos-arm64.md).
 
 To reproduce the public text measurement with the same upstream tokenizer:
