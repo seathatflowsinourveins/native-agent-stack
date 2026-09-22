@@ -156,11 +156,16 @@ def run_attempt(cmd: list, timeout: float) -> dict:
         }
     except subprocess.TimeoutExpired as exc:
         # subprocess.run kills the child and re-raises after collecting
-        # whatever communicate() had already buffered -- exc.stdout/stderr
-        # hold that partial text (already str-decoded, since text=True was
-        # passed through to the underlying Popen).
-        stdout = exc.stdout if isinstance(exc.stdout, str) else ""
-        stderr = exc.stderr if isinstance(exc.stderr, str) else ""
+        # whatever communicate() had already buffered. On POSIX the partial
+        # output arrives as bytes even with text=True, so decode it rather
+        # than discard the events and usage an attempt produced before timing out.
+        def decoded(value):
+            if isinstance(value, bytes):
+                return value.decode("utf-8", errors="replace")
+            return value if isinstance(value, str) else ""
+
+        stdout = decoded(exc.stdout)
+        stderr = decoded(exc.stderr)
         return {
             "exit_code": None,
             "stdout": stdout,

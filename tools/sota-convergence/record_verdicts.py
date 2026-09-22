@@ -92,6 +92,37 @@ VERDICT_DATE = "20260922"
 SEALED_BASE = "evidence/artifacts/layer-verdicts-20260922"
 
 
+SCHEMA_PATH = Path(__file__).resolve().parent / "lane-return.schema.json"
+
+
+def _schema_properties():
+    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+    props = schema["properties"]
+
+    def object_props(node):
+        if node.get("type") == "object" or "properties" in node:
+            return set(node.get("properties", {}))
+        for option in node.get("anyOf", []) + node.get("oneOf", []):
+            if isinstance(option, dict) and option.get("properties"):
+                return set(option["properties"])
+        return set()
+
+    return {
+        "top": set(props), "model": object_props(props["model"]),
+        "alternative": object_props(props["alternatives"]["items"]),
+        "challenger": object_props(props["challenger_preferred"]),
+        "overturn_protocol": object_props(props["overturn_protocol"]),
+    }
+
+
+SCHEMA_PROPERTIES = _schema_properties()
+
+
+def require_known_properties(value: dict, allowed: set, label: str):
+    extra = sorted(set(value) - allowed)
+    require_lane(not extra, f"{label} has properties outside the lane-return schema: {', '.join(extra)}")
+
+
 class LaneRejected(ValueError):
     """A lane return file failed schema or recording-rule validation and is
     treated as absent for its layer (never aborts the run)."""
@@ -170,6 +201,7 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
         raise LaneRejected(f"unreadable or invalid JSON: {error}") from error
 
     require_lane(isinstance(data, dict), "lane return must be a JSON object")
+    require_known_properties(data, SCHEMA_PROPERTIES["top"], "lane return")
     require_lane(data.get("schema_version") == 1, "schema_version must be 1")
     require_lane(data.get("lane") == lane, f"lane field must be {lane!r}")
     require_lane(data.get("catalog") == catalog, f"catalog field must be {catalog!r}")
@@ -185,6 +217,7 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
     model = data.get("model")
     require_lane(isinstance(model, dict) and nonempty_str(model.get("name")) and nonempty_str(model.get("effort")),
                  "model must be an object with nonempty name and effort")
+    require_known_properties(model, SCHEMA_PROPERTIES["model"], "model")
 
     winner_keys = data.get("winner_keys")
     require_lane(isinstance(winner_keys, list) and 1 <= len(winner_keys) <= 3
@@ -207,11 +240,16 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
     require_lane(isinstance(winner_evidence_refs, list) and all(isinstance(item, str) for item in winner_evidence_refs),
                  "winner_evidence_refs must be a list of text")
 
+    cited_paths = [citation_path(item) for item in winner_evidence_refs]
+    require_lane(any(path and path in why_selected for path in cited_paths),
+                 "why_selected must name at least one of its winner_evidence_refs paths")
+
     alternatives = data.get("alternatives")
     require_lane(isinstance(alternatives, list) and bool(alternatives), "alternatives must be a nonempty list")
     why_not_defaults = set()
     for alternative in alternatives:
         require_lane(isinstance(alternative, dict), "alternative must be an object")
+        require_known_properties(alternative, SCHEMA_PROPERTIES["alternative"], "alternative")
         require_lane(alternative.get("key") is None or nonempty_str(alternative.get("key")),
                      "alternative key must be text or null")
         require_lane(nonempty_str(alternative.get("name")), "alternative name must be nonempty text")
@@ -243,7 +281,8 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
         require_lane(challenger.get("key") is None or nonempty_str(challenger.get("key")),
                      "challenger_preferred key must be text or null")
         require_lane(nonempty_str(challenger.get("name")), "challenger_preferred name must be nonempty text")
-        require_lane(nonempty_str(challenger.get("repository")), "challenger_preferred repository must be nonempty text")
+        require_known_properties(challenger, SCHEMA_PROPERTIES["challenger"], "challenger_preferred")
+        require_lane(https_url(challenger.get("repository")), "challenger_preferred repository must be an https URL")
         require_lane(nonempty_str(challenger.get("why")), "challenger_preferred why must be nonempty text")
         required_comparison = challenger.get("required_comparison")
         require_lane(isinstance(required_comparison, str)
@@ -257,6 +296,7 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
 
     overturn_protocol = data.get("overturn_protocol")
     require_lane(isinstance(overturn_protocol, dict), "overturn_protocol must be an object")
+    require_known_properties(overturn_protocol, SCHEMA_PROPERTIES["overturn_protocol"], "overturn_protocol")
     require_lane(isinstance(overturn_protocol.get("fixture_paths"), list)
                  and all(isinstance(item, str) for item in overturn_protocol["fixture_paths"]),
                  "overturn_protocol.fixture_paths must be a list of text")
@@ -453,25 +493,60 @@ def choose_overturn_protocol(valid: dict) -> dict:
     return claude["overturn_protocol"]
 
 
-def load_adjudication(adjudications_dir, catalog, layer_id):
+def load_adjudication(adjudications_dir, catalog, layer_id, issues: list = None):
+    """Return the adjudication for one layer, or None. A file that exists but is
+    malformed is reported through ``issues`` (never silently ignored)."""
     if adjudications_dir is None:
         return None
     path = Path(adjudications_dir) / f"{catalog}__{layer_id}.json"
     if not path.is_file():
         return None
+
+    def reject(reason):
+        if issues is not None:
+            issues.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication", "reason": reason})
+        return None
+
     try:
         raw = load_json(path)
-    except (OSError, UnicodeError, ValueError):
-        return None
+    except (OSError, UnicodeError, ValueError) as error:
+        return reject(f"unreadable or invalid JSON: {error}")
     if not isinstance(raw, dict):
-        return None
+        return reject("adjudication must be a JSON object")
     winner_lane = raw.get("winner_lane")
     evidence_refs = raw.get("evidence_refs")
     if winner_lane not in ("claude", "codex") or not nonempty_str(raw.get("why")):
-        return None
+        return reject("adjudication needs winner_lane claude|codex and a nonempty why")
     if not isinstance(evidence_refs, list) or not all(isinstance(item, str) for item in evidence_refs):
-        return None
+        return reject("adjudication evidence_refs must be a list of text")
     return {"winner_lane": winner_lane, "raw": raw}
+
+
+def relativize_source(entry: str, root: Path) -> str:
+    """A lane records the absolute paths it opened. Rewrite the longest path suffix
+    that names a file in this repository to its repository-relative form (keeping
+    any trailing note); other absolute paths are left for sanitize_value to redact."""
+    if not isinstance(entry, str) or not entry.startswith("/"):
+        return entry
+    head, _, rest = entry.partition(" ")
+    path_part = head.split("#", 1)[0]
+    path_part = _LINE_SUFFIX.sub("", path_part)
+    tail = head[len(path_part):]
+    parts = [part for part in path_part.split("/") if part]
+    for start in range(len(parts)):
+        candidate = "/".join(parts[start:])
+        try:
+            if safe_file(root, candidate).is_file():
+                return candidate + tail + ((" " + rest) if rest else "")
+        except ValueError:
+            continue
+    return entry
+
+
+def with_relative_sources(data: dict, root: Path) -> dict:
+    result = dict(data)
+    result["sources_read"] = [relativize_source(entry, root) for entry in data.get("sources_read") or []]
+    return result
 
 
 def sealed_text(data: dict) -> str:
@@ -493,7 +568,15 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
         return []
 
     packet_filename = f"{catalog}__{layer_id}.json"
-    packet = load_packet(work_dir / "packets" / packet_filename)
+    packet_path = work_dir / "packets" / packet_filename
+    packet = load_packet(packet_path)
+    packet_mismatch = None
+    if packet is not None:
+        actual = hashlib.sha256(packet_path.read_bytes()).hexdigest()
+        if packet_filename not in sha256sums:
+            packet_mismatch = f"packets/SHA256SUMS has no entry for {packet_filename}"
+        elif sha256sums[packet_filename] != actual:
+            packet_mismatch = f"packet file packets/{packet_filename} does not match packets/SHA256SUMS"
     candidates_by_key = {c["key"]: c for c in packet.get("candidates", [])} if packet else {}
     v1_candidates_by_repository = index_v1_candidates_by_repository(row)
 
@@ -504,6 +587,8 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
         try:
             if packet is None:
                 raise LaneRejected(f"packet missing or invalid: packets/{packet_filename}")
+            if packet_mismatch:
+                raise LaneRejected(packet_mismatch)
             valid[lane] = validate_lane_return(
                 path, lane=lane, catalog=catalog, layer_id=layer_id, candidates_by_key=candidates_by_key,
                 packet_sha256sums=sha256sums, packet_filename=packet_filename)
@@ -516,10 +601,18 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     run_id = f"{catalog}-{layer_id}-{VERDICT_DATE}"
     sealed_writes = []
     lanes_field = {"claude": {"run_id": "", "sealed_sha256": ""}, "codex": {"run_id": "", "sealed_sha256": ""}}
-    for lane, data in valid.items():
-        text = sealed_text(data)
+    for lane in list(valid):
+        try:
+            text = sealed_text(with_relative_sources(valid[lane], root))
+        except ValueError as error:  # LeakDetected: a marker survived sanitization
+            rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": lane,
+                               "reason": f"sealing refused: {error}"})
+            del valid[lane]
+            continue
         lanes_field[lane] = {"run_id": run_id, "sealed_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest()}
         sealed_writes.append((root / SEALED_BASE / lane / f"{run_id}.json", text))
+    if not valid:
+        return []
 
     if "claude" in valid and "codex" in valid:
         agreement = ("same_winner"
@@ -572,7 +665,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
         # opaque and the packet itself is not part of the retained record.
         ids_text = (f"claude={','.join(sorted(component_ids_for(valid['claude'], candidates_by_key)))}; "
                     f"codex={','.join(sorted(component_ids_for(valid['codex'], candidates_by_key)))}")
-        adjudication = load_adjudication(adjudications_dir, catalog, layer_id)
+        adjudication = load_adjudication(adjudications_dir, catalog, layer_id, rejections)
         if adjudication is not None and adjudication["winner_lane"] in valid:
             chosen_lane = adjudication["winner_lane"]
             for gap in valid[chosen_lane].get("open_gaps") or []:
@@ -602,10 +695,20 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
 
     if verdict_status == "recorded" and chosen_lane:
         data = valid[chosen_lane]
-        alternatives = alternatives_computed
         winners = build_winners(data, candidates_by_key, LEDGER_FILES[catalog], v1_candidates_by_repository,
                                 root, unresolved_citations)
+        # The losing lane (or a lane's own list) can name a winner as an alternative;
+        # a recorded row never lists its winner among its alternatives.
+        winner_ids = {canonical(safe_identity(w["repository"]), aliases) for w in winners
+                      if safe_identity(w.get("repository"))}
+        alternatives = [alt for alt in alternatives_computed
+                        if canonical(safe_identity(alt["repository"]), aliases) not in winner_ids]
         verdict_overturn_when = data["overturn_when"]
+        if not alternatives:
+            # scripts/landscape.py requires at least one alternative for a recorded verdict.
+            add_gap("no indexed alternative remains for this verdict; recording deferred")
+            winners, verdict_overturn_when, verdict_status = [], "", "pending_lanes"
+
     if unresolved_citations:
         add_gap(f"{len(unresolved_citations)} lane citation(s) name no repository evidence file (an "
                 f"unresolved path or a generated index); the full citations are kept in the sealed lane return")
@@ -685,6 +788,11 @@ def main(argv=None) -> int:
         if changed:
             print("layer-verdict ledger differs from the recomputed output: " + ", ".join(changed))
             ok = False
+        for sealed_path, text in sealed_writes:
+            relative = sealed_path.relative_to(root).as_posix()
+            if not sealed_path.is_file() or sealed_path.read_text(encoding="utf-8") != text:
+                print(f"sealed file differs from the recomputed output: {relative}")
+                ok = False
         if ok:
             print(json.dumps({"status": "checked", "rejections": len(rejections)}, sort_keys=True))
 

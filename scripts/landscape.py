@@ -112,8 +112,11 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
             require(bool(re.fullmatch(r"[a-f0-9]{64}", sealed)),
                     str(key) + f".lanes.{lane_name}.sealed_sha256 must be a lowercase 64-digit hash")
             sealed_path = f"evidence/artifacts/layer-verdicts-20260922/{lane_name}/{lane['run_id']}.json"
-            require(safe_file(root, sealed_path).is_file(),
+            sealed_file = safe_file(root, sealed_path)
+            require(sealed_file.is_file(),
                     str(key) + f".lanes.{lane_name}.sealed_sha256 needs a sealed file: {sealed_path}")
+            require(hashlib.sha256(sealed_file.read_bytes()).hexdigest() == sealed,
+                    str(key) + f".lanes.{lane_name}.sealed_sha256 does not match {sealed_path}")
     require(lanes_field.get("agreement") in LANE_AGREEMENTS, str(key) + ".lanes.agreement is unknown")
 
     open_gaps = row.get("open_gaps")
@@ -182,6 +185,9 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
                     str(key) + ".winner.why_selected must differ from every alternative's why_not_default")
         # The v1 ``overturn_when`` belongs to the dated review that the quality
         # comparison mirrors; a recorded verdict carries its own condition.
+        winner_ids = {canonical(identity(w["repository"]), aliases) for w in winners if w.get("repository")}
+        require(not any(canonical(identity(a["repository"]), aliases) in winner_ids for a in alternatives),
+                str(key) + " lists a winner repository among its alternatives")
         require(any(marker in verdict_overturn_when for marker in OVERTURN_MARKERS),
                 str(key) + ".verdict_overturn_when must name a fixture/blueprint/test path or a runnable command "
                            "for a recorded verdict")

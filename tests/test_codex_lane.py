@@ -229,6 +229,18 @@ class CodexLaneTests(CodexLaneFixture):
 
         self.assertFalse(self.out_path("foundation", "native-clients").exists())
 
+    def test_timed_out_attempt_keeps_its_partial_event_stream(self):
+        self.write_packet("foundation", "native-clients")
+        os.environ["CODEX_FAKE_SLEEP_SECONDS"] = "3"
+        os.environ["CODEX_FAKE_EMIT_BEFORE_SLEEP"] = "1"
+
+        self.assertEqual(self.run_lane(["--timeout", "1"]), 1)
+        events_path = self.work_dir / "codex" / "events" / "foundation__native-clients.jsonl"
+        self.assertTrue(events_path.exists())
+        captured = events_path.read_text(encoding="utf-8")
+        first_event = CANNED_EVENTS.strip().splitlines()[0]
+        self.assertIn(first_event, captured, "partial output of a timed-out attempt must be kept, not discarded")
+
     def test_layers_filter_only_runs_the_selected_layer(self):
         self.write_packet("foundation", "layer-a")
         self.write_packet("foundation", "layer-b")
