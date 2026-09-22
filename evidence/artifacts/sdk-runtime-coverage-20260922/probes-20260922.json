@@ -125,7 +125,7 @@
      {
       "severity": "minor",
       "claim": "The key observations cited in the receipt (the weekly-limit text, 'Would you like to proceed', the claude --permission-mode plan command line) do not appear in any of the listed artifacts. They exist only in raw logs the receipt does not list.",
-      "evidence": "A grep across logs/ found 'weekly limit', 'Would you like to proceed' and 'permission-mode plan' only in receipt.json. They do appear in the unlisted <probe-dir>/cao/cao-home/logs/terminal/5e14076c.log, which contains '<subscription usage line redacted>\u00b7 resets Sep 28, 5am (America/New_York)', the menu text, '<subscription tier>' and the claude --permission-mode plan command. So the claims are supported, but the receipt's artifact list is incomplete. Also, logs/docs-agent-profile.md, docs-settings.md, docs-working-directory.md, docs-listing.txt, resolved-commit.txt and the empty docs-err.log and readme-err.log are present but unlisted."
+      "evidence": "A grep across logs/ found 'weekly limit', 'Would you like to proceed' and 'permission-mode plan' only in receipt.json. They do appear in the unlisted <probe-dir>/cao/cao-home/logs/terminal/5e14076c.log, which contains '<subscription usage line redacted>', the menu text, '<subscription tier>' and the claude --permission-mode plan command. So the claims are supported, but the receipt's artifact list is incomplete. Also, logs/docs-agent-profile.md, docs-settings.md, docs-working-directory.md, docs-listing.txt, resolved-commit.txt and the empty docs-err.log and readme-err.log are present but unlisted."
      },
      {
       "severity": "minor",

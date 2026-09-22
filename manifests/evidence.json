@@ -7059,8 +7059,8 @@
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
-      "sha256": "c35305b60a1e6d18e218ad86679bb0a79d4875258dacd0b472f39096515cd5ce",
-      "bytes": 1095229
+      "sha256": "0bbfdc62fc4fb1c85018fba4bf1e36aba2298ebc93734f0b0e7885476382aa5e",
+      "bytes": 1095279
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.md",
@@ -10094,8 +10094,8 @@
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/probes-20260922.json",
-      "sha256": "0b4d40a8c66b1b52da6414019ccd1ed59169f7b224826d534a2825c32d27d7cd",
-      "bytes": 54049
+      "sha256": "8a499e37741ce545d6c5e92ea8b66256505139933b7606975eb1a0d6de72a871",
+      "bytes": 54005
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/protocol-sdks.json",

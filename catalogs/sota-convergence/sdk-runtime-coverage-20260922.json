@@ -7763,7 +7763,7 @@
     "category": "dispatch-frameworks",
     "version": "v0.13.0 AppImage (sha256 and sha512 matched; bundled daemon reports dev)",
     "supported": "ao daemon ran with no Electron process (display independence untested: DISPLAY was set), bound loopback, answered status, agent ls, doctor and readyz, stopped cleanly via POST /shutdown",
-    "open_defects": "without being asked, the daemon imported the host native Codex login into its data directory as a managed account (a copy of auth.json with access, id and refresh tokens, models cache and account metadata), made a Codex account-capacity read, and the host Codex auth and models cache files were rewritten a second later (probably a token refresh); the parent-death auto-stop failed to start; the probe copy was deleted after review",
+    "open_defects": "without being asked, the daemon imported the host native Codex login into its data directory as a managed account (a copy of auth.json with access, id and refresh tokens, models cache and account metadata), made a Codex account-capacity read, and the host Codex auth and models cache files were rewritten a second later (probably a token refresh; concurrent probes make the attribution uncertain); the parent-death auto-stop failed to start; the probe copy was deleted after review",
     "effect": "stays targeted_candidate with a recorded credential-import finding: any further run needs a separate HOME/CODEX_HOME and must treat its data directory as holding credentials"
    }
   ]
