@@ -15,11 +15,15 @@ or proof of quality. The complete list of every child link in every awesome list
 has not been independently evaluated.
 
 The current combined discovery index contains **843 repository identities**.
-The selected manifest remains **68 components**. The
+The selected manifest remains **68 versioned components**; shared skill selections
+and SDK environments have their own linked practice records and locks. The
 [independent Claude adjudication](claude-blind-adjudication-20260921.md) retains
 the wider search, corrections and screening limits; the
 [20-layer findings](blind-catalog-layer-findings-20260921.md) compare both sealed
-source reports. Source-only candidates remain separate from qualified defaults.
+source reports. The final Claude coverage critique and 159-row repair are now
+[adjudicated with original decisions preserved](claude-blind-adjudication-20260921.md).
+This closes the dated catalog review; matched quality and destination-host gates
+remain explicit. Source-only candidates remain separate from qualified defaults.
 
 ## What qualifies a selection
 

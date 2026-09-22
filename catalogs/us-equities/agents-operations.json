@@ -1446,8 +1446,8 @@
         "vulnerability-analysis"
       ],
       "role": "Scan a recorded SBOM against vulnerability data",
-      "decision": "default",
-      "rationale": "Pair with Syft so security results are tied to the same artifact; preserve database age and advisory context.",
+      "decision": "conditional",
+      "rationale": "Source-reviewed scanner candidate for a demonstrated vulnerability-analysis need. Qualify it against the recorded Syft artifact with database age and advisory context before adoption; no Grype execution is established here.",
       "version_or_commit": "v0.119.0",
       "release_date": "2026-09-17T16:45:23Z",
       "license": "Apache-2.0",

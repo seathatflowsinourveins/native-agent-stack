@@ -2795,13 +2795,13 @@
   "files": [
     {
       "path": "blueprints/blind-catalog-convergence/experiment.json",
-      "sha256": "8af7006f27d7e42629807fcdafd8c56b0e4bf49e5264d3dceb03da15f650ba54",
-      "bytes": 9419
+      "sha256": "d825ca043915cd78c2287050ddf84fe8829b2bfb035b659cbc179f09cb887331",
+      "bytes": 12895
     },
     {
       "path": "catalogs/landscape/blind-convergence.json",
-      "sha256": "46b7bbcb458798da6f907be6a8027838ac5b1f80131e9f448be241192043db21",
-      "bytes": 24639
+      "sha256": "2f916fdb1f871aca0fabe5f08f503877c62424601d3fa61444e960be0e591a28",
+      "bytes": 35483
     },
     {
       "path": "catalogs/landscape/independent-discovery.json",
@@ -2810,8 +2810,8 @@
     },
     {
       "path": "docs/blind-catalog-layer-findings-20260921.md",
-      "sha256": "5d3fc68a623d18daa653dbd23ecfa7d1651cd796480e2c93fabf00471a703639",
-      "bytes": 10694
+      "sha256": "771731f48751e7576a1b5f143ff5fbc82055c3cc360ed4416f0ee45bacd6afb6",
+      "bytes": 10821
     },
     {
       "path": "docs/blind-catalog-source-adjudication-20260921.md",
@@ -2845,8 +2845,8 @@
     },
     {
       "path": "docs/blind-catalog-convergence-20260921.md",
-      "sha256": "afeef2e48a444584ee990c38c8e0641b1928ce468c00f2ec3b5d17b221574a7b",
-      "bytes": 7885
+      "sha256": "cb0b07c3fd3b8626965bbd87e8ac88c320c77ab2d33a5cd317dc877027617a22",
+      "bytes": 8141
     },
     {
       "path": "blueprints/catalog-runtime-review/experiment.json",
@@ -2875,8 +2875,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "7d03fbc84b056290d96a6a23f2f3f8ceca3cb91517b055a949afd2f27e2349f7",
-      "bytes": 16454
+      "sha256": "11905494ae7496c94cd0b00985cfe88988fea7d427fbb6a4c8a8babb33fc65df",
+      "bytes": 16807
     },
     {
       "path": "docs/tasks/2026-09-21-runtime-reviewed-catalog-handbook.md",
@@ -3580,8 +3580,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "b568f2d00cde06350355afb8c4c0b7d814ab66cea69748ff6da90cb5d1f5df4d",
-      "bytes": 2853
+      "sha256": "cd9e3e61630c06c5e54337de345c8f715c5eaafdb6f7848f0ec6a139b4a9bce4",
+      "bytes": 2997
     },
     {
       "path": ".gitignore",
@@ -6356,13 +6356,13 @@
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
-      "sha256": "5e021e4ab1ac59fae856ca8f21e0e499fc7189af832f2dacddfb29904fb86c1c",
-      "bytes": 97526
+      "sha256": "b94046c240a1e0b93875e3f3eabc44c821b3deeeae4977ebefc54e9268202e08",
+      "bytes": 97644
     },
     {
       "path": "catalogs/us-equities/agents-operations.md",
-      "sha256": "da3319fdd04dc6c6ee41a092f18f179ce3ff2b3c281999b4908de8f05de1c097",
-      "bytes": 26472
+      "sha256": "c7e35db1bf0216eb49410250d8fb1261c97893a4527e41fcc9c32ecf20ef528f",
+      "bytes": 26507
     },
     {
       "path": "catalogs/us-equities/architecture/README.md",
@@ -6496,8 +6496,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "d598dd769155894a2789ba096dd45e06b17d36ac86c90a74de4158a40a14c19c",
-      "bytes": 688154
+      "sha256": "273191fbc46d24a337e52d7eba6ddc8a763d0ce37878f868710029b176b7ec5f",
+      "bytes": 688158
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -6571,8 +6571,8 @@
     },
     {
       "path": "catalogs/us-equities/repository-index.md",
-      "sha256": "54b6308af96861caaf297c851e4ace705ae3f878194c2f493435895ef5ce791a",
-      "bytes": 86010
+      "sha256": "6f9473762c1271cc66ad81858ffd23e9443dc111afced7823a54e1f8d0df8c91",
+      "bytes": 86033
     },
     {
       "path": "catalogs/us-equities/research-receipt.json",
@@ -6661,8 +6661,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "83aacf4cf9b69a30e990b3cff1cac85f41af78c254c64c8ab6d8e92804286906",
-      "bytes": 10946030
+      "sha256": "d3a2736132efbfde824d809cc1a89bf61953d05e24f79eb3f130e57c7dbf73b3",
+      "bytes": 10955097
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -10866,8 +10866,8 @@
     },
     {
       "path": "docs/claude-blind-adjudication-20260921.md",
-      "sha256": "62760dcc6b152b3408929485f9637c0f599606362d682692b977e78dbc1cbe7f",
-      "bytes": 8081
+      "sha256": "fc0f85376e9cde4017b1b708cddba522713a22ab7a27f778242fb0d4786639d1",
+      "bytes": 15932
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-provenance.json",
@@ -10883,6 +10883,56 @@
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf2-usage.json",
       "sha256": "0cf1c372f8d5c9c9d3888a78131690716b789216803dc0bfd2ef84e309e5342a",
       "bytes": 56355
+    },
+    {
+      "path": "blueprints/blind-catalog-convergence/audit_reports.py",
+      "sha256": "720cb819376652c06e5ad85685af8559d19f4ea8454b50d6368dfac877d32d37",
+      "bytes": 6774
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+      "sha256": "c1a6cad2d0b2dca4a1bb94a869e5b253b6d22c65905364e87af7e38ecd8383b2",
+      "bytes": 534950
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json",
+      "sha256": "6413e8ec05fe9c1d1efed3e693106c4dd707e465db3379d6b05d37bdf56b45fe",
+      "bytes": 56144
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-screening-repair.json",
+      "sha256": "92668178d6245d10149f39a8004a00e48bcd20e7ce1f7d33f6fab7e1ebdc26a1",
+      "bytes": 77038
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-threeway.json",
+      "sha256": "5b372b6c4c6ae23e837418aa757c5dca3da7f936d4401afebaaae1656705d7de",
+      "bytes": 24986
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf3-usage.json",
+      "sha256": "c49b84ac81dfa6d07ad5b95591a14a028068845f485f760797f4fe867cd51b2b",
+      "bytes": 9634
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf4-usage.json",
+      "sha256": "1ffd1e9c75779deead989a5ac03ce1140ce7b6a933516937716eaadb7cc3e864",
+      "bytes": 6358
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/closure-provenance.json",
+      "sha256": "e12c91de527ee15caef4616d1fe7f1d7f58ef85888f4a08a650dfaa3f1743940",
+      "bytes": 7918
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+      "sha256": "5f989503c33774e3086287d6183ff10e51d5756958fe880d204be3fc0bf5b84e",
+      "bytes": 590235
+    },
+    {
+      "path": "blueprints/blind-catalog-convergence/README.md",
+      "sha256": "eb0725143ef73697b220605d0adbbd3c5961f1c805b98587c2a28d883a44bd95",
+      "bytes": 2223
     }
   ],
   "convergence_records": [

@@ -16,7 +16,10 @@ giving a current union of 843; additions remain discovery only. Read the
 [Claude source adjudication](claude-blind-adjudication-20260921.md) for corrected
 counts, screening omissions, source findings and native-attempt accounting.
 Read the [findings by layer](blind-catalog-layer-findings-20260921.md) for the
-coordinator's reasons and the strongest remaining comparisons.
+coordinator's reasons and the strongest remaining comparisons. The final peer
+coverage critique and seven-worker screening repair have returned; the original
+false readiness verdict, 159 later decisions and independent corrections are all
+retained. Documentary convergence is closed; runtime quality gates remain open.
 The [original-source adjudication](blind-catalog-source-adjudication-20260921.md)
 checks the new code-memory recommendation and the narrow Nautilus test finding.
 

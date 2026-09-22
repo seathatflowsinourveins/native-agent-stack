@@ -118,7 +118,7 @@ The following decisions refer to architecture selection, not installation status
 | [promptfoo](https://github.com/promptfoo/promptfoo) | alternative | source review | Declarative prompt regression and adversarial testing |
 | [gitleaks](https://github.com/gitleaks/gitleaks) | default | bounded native receipt | Redacted secret scanning of code and history |
 | [syft](https://github.com/anchore/syft) | default | bounded native receipt | Native artifact dependency inventory |
-| [grype](https://github.com/anchore/grype) | default | source review | Scan a recorded SBOM against vulnerability data |
+| [grype](https://github.com/anchore/grype) | conditional | source review | Scan a recorded SBOM against vulnerability data; execution remains unqualified |
 | [trivy](https://github.com/aquasecurity/trivy) | alternative | source review | Alternative integrated vulnerability/IaC/secret scanner |
 | [cosign](https://github.com/sigstore/cosign) | conditional | source review | Artifact signature and identity verification |
 | [openbao](https://github.com/openbao/openbao) | conditional | source review | Separate service identity and secret lifecycle |

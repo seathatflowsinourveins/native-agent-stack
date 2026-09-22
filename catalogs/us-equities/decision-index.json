@@ -2134,7 +2134,7 @@
           "path": "catalogs/us-equities/agents-operations.json",
           "pointer": "/entries/34",
           "id": "grype",
-          "decision": "default",
+          "decision": "conditional",
           "evidence_level": "source_review"
         }
       ]

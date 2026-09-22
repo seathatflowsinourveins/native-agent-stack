@@ -3,7 +3,7 @@
   "kind": "convergence_experiment",
   "status": "observed",
   "lane": "native-agent-engineering",
-  "task_and_failure": "Resolve selection anchoring and omissions through separate sealed source discovery, then adjudicate against original implementations and scoped evidence. Both source reports returned; the peer coverage-synthesis return remains separately pending.",
+  "task_and_failure": "Resolve selection anchoring and omissions through sealed independent source discovery, peer coverage critique and a separately recorded later screening repair. Close supported publication defects while keeping quality and destination-PC gates explicit.",
   "primary_sources_and_pins": [
     {
       "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
@@ -20,7 +20,7 @@
   ],
   "discovery_provenance": [
     "One Codex subagent, fork_turns=none, received only neutral-requirements.json as assigned local input. It reports residual ambient project/tool exposure and no catalog, memory or other-review artifact access.",
-    "Supported native Claude messaging preserved the existing independent-sota-research workflow. The sealed WF2 report was received and hashed before adjudication; a corrective return is queued to the peer for its already-running coverage synthesis.",
+    "Supported native Claude messaging preserved the live owner. WF2 discovery, WF3 coverage critique and WF4 screening repair returned sealed; the peer explicitly confirmed five material coordinator corrections. Native Lane C partial failure is retained, not relabeled successful.",
     "Reports are frozen before conclusions are shared across reviewers. Original/public hash mapping preserves the one private-path substitution."
   ],
   "license_and_compatibility": "Source review only. Existing native accounts and installed pins unchanged; candidate repository/model/service licenses and destination Linux/WSL compatibility remain separately qualified.",
@@ -52,6 +52,30 @@
       {
         "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf2-usage.json",
         "sha256": "0cf1c372f8d5c9c9d3888a78131690716b789216803dc0bfd2ef84e309e5342a"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/closure-provenance.json",
+        "sha256": "e12c91de527ee15caef4616d1fe7f1d7f58ef85888f4a08a650dfaa3f1743940"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "sha256": "c1a6cad2d0b2dca4a1bb94a869e5b253b6d22c65905364e87af7e38ecd8383b2"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-screening-repair.json",
+        "sha256": "92668178d6245d10149f39a8004a00e48bcd20e7ce1f7d33f6fab7e1ebdc26a1"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "sha256": "5f989503c33774e3086287d6183ff10e51d5756958fe880d204be3fc0bf5b84e"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf3-usage.json",
+        "sha256": "c49b84ac81dfa6d07ad5b95591a14a028068845f485f760797f4fe867cd51b2b"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf4-usage.json",
+        "sha256": "1ffd1e9c75779deead989a5ac03ce1140ce7b6a933516937716eaadb7cc3e864"
       }
     ],
     "inputs": [
@@ -91,7 +115,8 @@
   },
   "commands": [
     "python3 scripts/catalog_decisions.py --write --supplement catalogs/landscape/independent-discovery.json#/candidates",
-    "python3 scripts/landscape.py --root ."
+    "python3 scripts/landscape.py --root .",
+    "python3 blueprints/blind-catalog-convergence/audit_reports.py --check"
   ],
   "observations": [
     {
@@ -163,6 +188,41 @@
         "total": null,
         "native_retries": null
       }
+    },
+    {
+      "id": "claude-final-coverage-reconciliation",
+      "task": "catalog-source-convergence",
+      "role": "coordinator-artifact-check",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 2,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Exact original/later screening accounting and all125 action identity joins; no runtime-quality or destination-host acceptance.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/blind-catalog-convergence-20260921/closure-provenance.json",
+          "sha256": "e12c91de527ee15caef4616d1fe7f1d7f58ef85888f4a08a650dfaa3f1743940"
+        },
+        {
+          "path": "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+          "sha256": "5f989503c33774e3086287d6183ff10e51d5756958fe880d204be3fc0bf5b84e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [],
@@ -171,8 +231,12 @@
     "Partial selection blinding: ambient instructions/tool identities were visible to both families.",
     "Most evidence is documentation/interface inspection; only selected source assertions were inspected, with no upstream tests rerun.",
     "A successful inventory check does not certify original-source truth, reviewer independence beyond disclosed boundaries or repository quality.",
-    "The original Codex report retains failed source fetches. Live Claude workflow failures and outcomes remain pending until returned.",
-    "Claude top-12-by-stars screening omitted relevant smaller tools and its broad role groups do not independently qualify every layer. Its source scores and refuter outcomes are attributed, not accepted performance measurements."
+    "Claude top-12-by-stars screening omitted relevant smaller tools and its broad role groups do not independently qualify every layer. Its source scores and refuter outcomes are attributed, not accepted performance measurements.",
+    "WF3 originally reported final_list_ready=false. The original 159 missing decisions, later WF4 dispositions, contradictory drop annotations and independent corrections remain visible. Exact source accounting does not prove screening accuracy or comparative quality.",
+    "WF3 critic's six-binding-star-caps claim was corrected by independent audit; all ten shortlists match the top twelve recorded stars in residual sets with no recorded rule exclusion. These are not certified passers.",
+    "WF4 OctoBot no-backtesting rationale is rejected by its pinned upstream README; crypto versus US-equities suitability remains a separate question.",
+    "WF2 retains two incomplete historical judge attempts. The peer's separate Codex Lane C review failed with only a partial result; supported source corrections were independently checked.",
+    "WF3's original false readiness verdict and missing159screening decisions are retained; WF4laterrepaired thosepairs. Fresh source audit rejects WF4OctoBotno-backtesting rationale. No candidate runtime or quality gate was executed by these research workflows."
   ],
   "decision_and_scope": {
     "decision": "retain",
@@ -180,7 +244,7 @@
     "qualification_run_ids": []
   },
   "rollback": "Installed defaults and services unchanged. Revert owned catalog changes if source findings are disproved; retain dated discovery and failure history.",
-  "next_decision_changing_test": "Incorporate the final Claude coverage return and resolve concrete supported differences. Qualify code-memory freshness/model fit, matched ai-memory/Basic Memory/Hindsight recall and lifecycle, or shared Nautilus/LEAN accounting and broker recovery only within frozen scopes. Establish useful operation on the destination PC.",
+  "next_decision_changing_test": "Use the dated reviewed baseline to qualify the destination PC. Reopen only relevant gates: matched memory recall/lifecycle; research runtime task quality and recovery; document/RAG quality; Nautilus/LEAN accounting and broker recovery. Do not adopt from reviewer votes or source freshness alone.",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",

@@ -1,0 +1,1395 @@
+{
+  "repaired": [
+    {
+      "commands_run": 3,
+      "sublayer": "F-ops",
+      "undispositioned_before": 56,
+      "limits": [
+        "merit.rows already had complete stars/pushed_at/archived/license for all 56 undispositioned candidates, so no gh api repos/<owner>/<repo> lookups or gh api .../contents LICENSE checks were needed and none were run.",
+        "No gh rate limits were hit (no gh api calls made beyond the jq extraction from the existing compact JSON).",
+        "Staleness check used pushed_at only against the 12-month cutoff (2025-09-21); all 56 rows have pushed_at in 2025-09-21..2026-09-22 range, so none tripped the 18-month release fallback either.",
+        "Irrelevance judged against the sub-layer title's five listed facets (CI/supply-chain security, scheduling/workflow supervision, local service hosting fixtures, backup/recovery, observability, optional local inference/gateways); all 56 candidates map to at least one facet, so no irrelevant drops were found.",
+        "Contradiction check covered only shortlist/dropped URL overlap and dropped-reasons naming the cap, per the task scope; did not re-verify correctness of existing dropped 'license NOASSERTION' entries since merit.dropped is explicitly not to be changed."
+      ],
+      "contradictions_fixed": [],
+      "metadata_completed": [],
+      "dispositions": [
+        {
+          "repository_url": "https://github.com/sigstore/cosign",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=6317, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; CI/supply-chain signing tool fits sub-layer; not in shortlist/dropped",
+          "stars": 6317,
+          "pushed_at": "2026-09-21T16:28:40Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/google/osv-scanner",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=11073, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; supply-chain vuln scanner fits sub-layer",
+          "stars": 11073,
+          "pushed_at": "2026-09-21T21:00:43Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/anchore/grype",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=12913, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; vuln scanner fits CI/supply-chain security",
+          "stars": 12913,
+          "pushed_at": "2026-09-21T20:04:57Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/anchore/syft",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=9594, pushed_at=2026-09-18 (fresh), archived=false, license=Apache-2.0; SBOM generator fits supply-chain security",
+          "stars": 9594,
+          "pushed_at": "2026-09-18T13:30:43Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/ossf/scorecard",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=5699, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; supply-chain security posture scanner",
+          "stars": 5699,
+          "pushed_at": "2026-09-21T08:29:07Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/DependencyTrack/dependency-track",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=4227, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; SBOM/SCA platform fits supply-chain security",
+          "stars": 4227,
+          "pushed_at": "2026-09-21T12:43:35Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/step-security/harden-runner",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=1273, pushed_at=2026-08-31 (fresh), archived=false, license=Apache-2.0; CI runner hardening fits CI/supply-chain security",
+          "stars": 1273,
+          "pushed_at": "2026-08-31T05:03:59Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/gitleaks/gitleaks",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=29419, pushed_at=2026-09-09 (fresh), archived=false, license=MIT; secret scanner fits CI/supply-chain security",
+          "stars": 29419,
+          "pushed_at": "2026-09-09T04:18:49Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/trufflesecurity/trufflehog",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=28013, pushed_at=2026-09-21 (fresh), archived=false, license=AGPL-3.0; secret scanner fits CI/supply-chain security",
+          "stars": 28013,
+          "pushed_at": "2026-09-21T18:25:05Z",
+          "license": "AGPL-3.0"
+        },
+        {
+          "repository_url": "https://github.com/in-toto/witness",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=546, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; attestation tool fits supply-chain security",
+          "stars": 546,
+          "pushed_at": "2026-09-21T18:33:19Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/temporalio/temporal",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=23217, pushed_at=2026-09-22 (fresh), archived=false, license=MIT; durable workflow engine fits scheduling/workflow supervision",
+          "stars": 23217,
+          "pushed_at": "2026-09-22T01:11:59Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/PrefectHQ/prefect",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=23891, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; workflow orchestrator fits sub-layer",
+          "stars": 23891,
+          "pushed_at": "2026-09-21T21:38:35Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/dagster-io/dagster",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=16192, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; data/workflow orchestrator fits sub-layer",
+          "stars": 16192,
+          "pushed_at": "2026-09-21T23:52:39Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/argoproj/argo-workflows",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=16997, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; k8s workflow engine fits scheduling/workflow supervision",
+          "stars": 16997,
+          "pushed_at": "2026-09-21T15:45:39Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/kestra-io/kestra",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=28209, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; workflow orchestrator fits sub-layer",
+          "stars": 28209,
+          "pushed_at": "2026-09-21T21:24:38Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/testcontainers/testcontainers-java",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=8740, pushed_at=2026-09-18 (fresh), archived=false, license=MIT; local service fixture tooling fits sub-layer",
+          "stars": 8740,
+          "pushed_at": "2026-09-18T10:26:47Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/getmoto/moto",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=8667, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; AWS mock fits local service hosting fixtures",
+          "stars": 8667,
+          "pushed_at": "2026-09-21T12:46:20Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/wiremock/wiremock",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=7377, pushed_at=2026-09-18 (fresh), archived=false, license=Apache-2.0; HTTP mock server fits local service hosting fixtures",
+          "stars": 7377,
+          "pushed_at": "2026-09-18T10:54:52Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/restic/restic",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=36172, pushed_at=2026-09-20 (fresh), archived=false, license=BSD-2-Clause; backup tool fits sub-layer",
+          "stars": 36172,
+          "pushed_at": "2026-09-20T20:05:21Z",
+          "license": "BSD-2-Clause"
+        },
+        {
+          "repository_url": "https://github.com/velero-io/velero",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=10304, pushed_at=2026-09-22 (fresh), archived=false, license=Apache-2.0; k8s backup/recovery fits sub-layer",
+          "stars": 10304,
+          "pushed_at": "2026-09-22T01:22:39Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/kopia/kopia",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=14169, pushed_at=2026-09-20 (fresh), archived=false, license=Apache-2.0; backup tool fits sub-layer",
+          "stars": 14169,
+          "pushed_at": "2026-09-20T12:22:55Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/open-telemetry/opentelemetry-collector",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=7581, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; OTel collector fits observability facet",
+          "stars": 7581,
+          "pushed_at": "2026-09-21T20:11:04Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/grafana/loki",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=28930, pushed_at=2026-09-22 (fresh), archived=false, license=AGPL-3.0; log aggregation fits observability facet",
+          "stars": 28930,
+          "pushed_at": "2026-09-22T00:13:16Z",
+          "license": "AGPL-3.0"
+        },
+        {
+          "repository_url": "https://github.com/grafana/tempo",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=5485, pushed_at=2026-09-22 (fresh), archived=false, license=AGPL-3.0; tracing backend fits observability facet",
+          "stars": 5485,
+          "pushed_at": "2026-09-22T01:03:22Z",
+          "license": "AGPL-3.0"
+        },
+        {
+          "repository_url": "https://github.com/openobserve/openobserve",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=22067, pushed_at=2026-09-22 (fresh), archived=false, license=AGPL-3.0; observability platform fits sub-layer",
+          "stars": 22067,
+          "pushed_at": "2026-09-22T01:05:33Z",
+          "license": "AGPL-3.0"
+        },
+        {
+          "repository_url": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=17752, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; metrics DB fits observability facet",
+          "stars": 17752,
+          "pushed_at": "2026-09-21T15:49:59Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/jaegertracing/jaeger",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=23231, pushed_at=2026-09-22 (fresh), archived=false, license=Apache-2.0; distributed tracing fits observability facet",
+          "stars": 23231,
+          "pushed_at": "2026-09-22T02:13:54Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/sgl-project/sglang",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=36282, pushed_at=2026-09-22 (fresh), archived=false, license=Apache-2.0; local LLM inference server fits optional local inference/gateways facet",
+          "stars": 36282,
+          "pushed_at": "2026-09-22T02:19:05Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/llm-d/llm-d",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=4613, pushed_at=2026-09-22 (fresh), archived=false, license=Apache-2.0; distributed inference serving fits local inference/gateways facet",
+          "stars": 4613,
+          "pushed_at": "2026-09-22T01:23:22Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/sigstore/model-transparency",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=245, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; model provenance/signing fits supply-chain security facet",
+          "stars": 245,
+          "pushed_at": "2026-09-21T13:13:02Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/slsa-framework/slsa-github-generator",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=600, pushed_at=2026-08-07 (fresh, within 12mo), archived=false, license=Apache-2.0; SLSA provenance generator fits CI/supply-chain security",
+          "stars": 600,
+          "pushed_at": "2026-08-07T03:19:49Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/guacsec/guac",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=1541, pushed_at=2026-09-22 (fresh), archived=false, license=Apache-2.0; supply-chain metadata aggregator fits sub-layer",
+          "stars": 1541,
+          "pushed_at": "2026-09-22T01:01:59Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/zizmorcore/zizmor",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=6551, pushed_at=2026-09-21 (fresh), archived=false, license=MIT; GitHub Actions security linter fits CI/supply-chain security",
+          "stars": 6551,
+          "pushed_at": "2026-09-21T18:01:57Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/boostsecurityio/poutine",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=518, pushed_at=2026-07-09 (fresh, within 12mo), archived=false, license=Apache-2.0; CI/CD pipeline security scanner fits sub-layer",
+          "stars": 518,
+          "pushed_at": "2026-07-09T18:40:29Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/owasp-dep-scan/dep-scan",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=1286, pushed_at=2026-09-21 (fresh), archived=false, license=MIT; dependency/SCA scanner fits CI/supply-chain security",
+          "stars": 1286,
+          "pushed_at": "2026-09-21T17:54:59Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/safedep/vet",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=1106, pushed_at=2026-09-16 (fresh), archived=false, license=Apache-2.0; OSS dependency vetting fits CI/supply-chain security",
+          "stars": 1106,
+          "pushed_at": "2026-09-16T16:09:12Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/chainloop-dev/chainloop",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=582, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; supply-chain attestation platform fits sub-layer",
+          "stars": 582,
+          "pushed_at": "2026-09-21T13:53:10Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/kpcyrd/rebuilderd",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=429, pushed_at=2026-09-07 (fresh), archived=false, license=GPL-3.0; reproducible-build verification fits supply-chain security",
+          "stars": 429,
+          "pushed_at": "2026-09-07T15:09:38Z",
+          "license": "GPL-3.0"
+        },
+        {
+          "repository_url": "https://github.com/apache/dolphinscheduler",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=14491, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; distributed workflow scheduler fits sub-layer",
+          "stars": 14491,
+          "pushed_at": "2026-09-21T12:04:41Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/dagucloud/dagu",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=4054, pushed_at=2026-09-21 (fresh), archived=false, license=GPL-3.0; workflow/job scheduler fits sub-layer",
+          "stars": 4054,
+          "pushed_at": "2026-09-21T13:05:30Z",
+          "license": "GPL-3.0"
+        },
+        {
+          "repository_url": "https://github.com/Netflix/maestro",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=3842, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; workflow orchestrator (org-backed) fits sub-layer",
+          "stars": 3842,
+          "pushed_at": "2026-09-21T22:36:12Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/inngest/inngest-js",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=1008, pushed_at=2026-09-21 (fresh), archived=false, license=GPL-3.0; event-driven workflow orchestration fits sub-layer",
+          "stars": 1008,
+          "pushed_at": "2026-09-21T23:50:03Z",
+          "license": "GPL-3.0"
+        },
+        {
+          "repository_url": "https://github.com/cylc/cylc-flow",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=381, pushed_at=2026-09-21 (fresh), archived=false, license=GPL-3.0; cyclic/scheduled workflow engine fits scheduling/workflow supervision",
+          "stars": 381,
+          "pushed_at": "2026-09-21T15:41:07Z",
+          "license": "GPL-3.0"
+        },
+        {
+          "repository_url": "https://github.com/PowerJob/PowerJob",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=7796, pushed_at=2026-03-07 (~6.5mo ago, within 12mo cutoff), archived=false, license=Apache-2.0, latest release v5.1.2 2025-08-17 (within 18mo); distributed job scheduling fits sub-layer",
+          "stars": 7796,
+          "pushed_at": "2026-03-07T04:58:29Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/testcontainers/testcontainers-go",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=4987, pushed_at=2026-09-21 (fresh), archived=false, license=MIT; local service fixture tooling fits sub-layer",
+          "stars": 4987,
+          "pushed_at": "2026-09-21T14:07:25Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/testcontainers/testcontainers-python",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=2299, pushed_at=2026-09-14 (fresh), archived=false, license=Apache-2.0; local service fixture tooling fits sub-layer",
+          "stars": 2299,
+          "pushed_at": "2026-09-14T23:33:51Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/rustic-rs/rustic",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=3270, pushed_at=2026-09-01 (fresh), archived=false, license=Apache-2.0; backup tool fits sub-layer",
+          "stars": 3270,
+          "pushed_at": "2026-09-01T20:59:25Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/pgmoneta/pgmoneta",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=319, pushed_at=2026-09-14 (fresh), archived=false, license=BSD-3-Clause; Postgres backup/recovery fits sub-layer",
+          "stars": 319,
+          "pushed_at": "2026-09-14T23:24:08Z",
+          "license": "BSD-3-Clause"
+        },
+        {
+          "repository_url": "https://github.com/grafana/mimir",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=5237, pushed_at=2026-09-22 (fresh), archived=false, license=AGPL-3.0; metrics backend fits observability facet",
+          "stars": 5237,
+          "pushed_at": "2026-09-22T02:07:27Z",
+          "license": "AGPL-3.0"
+        },
+        {
+          "repository_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=4945, pushed_at=2026-09-22 (fresh), archived=false, license=Apache-2.0; OTel collector contrib fits observability facet",
+          "stars": 4945,
+          "pushed_at": "2026-09-22T02:21:09Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/fluent/fluent-bit",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=8114, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; log/metrics shipper fits observability facet",
+          "stars": 8114,
+          "pushed_at": "2026-09-21T19:13:54Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/Portkey-AI/gateway",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=13053, pushed_at=2026-05-25 (~3.9mo ago, within 12mo), archived=false, license=MIT, latest release 2026-01-12 (within 18mo); LLM gateway fits optional local inference/gateways facet",
+          "stars": 13053,
+          "pushed_at": "2026-05-25T13:54:51Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/maximhq/bifrost",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=8222, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; LLM gateway fits local inference/gateways facet",
+          "stars": 8222,
+          "pushed_at": "2026-09-21T22:23:57Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/InternLM/lmdeploy",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=8088, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; LLM deployment/inference toolkit fits local inference/gateways facet",
+          "stars": 8088,
+          "pushed_at": "2026-09-21T09:34:45Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/kserve/kserve",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=5984, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; model serving on k8s fits local inference/gateways facet",
+          "stars": 5984,
+          "pushed_at": "2026-09-21T21:34:10Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/bentoml/BentoML",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=8854, pushed_at=2026-09-07 (fresh), archived=false, license=Apache-2.0; model serving framework fits local inference/gateways facet",
+          "stars": 8854,
+          "pushed_at": "2026-09-07T17:43:01Z",
+          "license": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "commands_run": 12,
+      "limits": [
+        "No gh api calls were needed: every undispositioned candidate already had complete stars/pushed_at/archived/license in merit.rows, so no rate limits were hit.",
+        "An initial jq-based extraction of the sublayer produced corrupted/mismatched results (selected object reported key=F-retrieval-memory with a dropped[] of 30 despite the select filter asking for key==F-research-efficiency, and even a jq syntax error mid-pipeline); discarded and redone with python's json module reading the source file directly, which gave internally consistent counts (merged 50, rows 50, shortlist 12, dropped 4) and was used for all reported results.",
+        "Filesystem was read-only outside the scratchpad as instructed; only /tmp/claude-.../scratchpad files were written."
+      ],
+      "undispositioned_before": 34,
+      "sublayer": "F-research-efficiency",
+      "metadata_completed": [],
+      "contradictions_fixed": [],
+      "dispositions": [
+        {
+          "repository_url": "https://github.com/microsoft/playwright-mcp",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=37453, pushed_at=2026-09-18 (fresh), archived=false, license=Apache-2.0; browser-automation MCP, on-topic; passed all mechanical rules, excluded only by 12-slot cap",
+          "stars": 37453,
+          "pushed_at": "2026-09-18T23:35:04Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/Skyvern-AI/skyvern",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=23048, pushed_at=2026-09-22 (fresh), archived=false, license=AGPL-3.0; vision-LLM web automation, on-topic; cap-cut",
+          "stars": 23048,
+          "pushed_at": "2026-09-22T00:47:02Z",
+          "license": "AGPL-3.0"
+        },
+        {
+          "repository_url": "https://github.com/SeleniumHQ/selenium",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=34507, pushed_at=2026-09-22 (fresh), archived=false, license=Apache-2.0; browser automation, on-topic; cap-cut",
+          "stars": 34507,
+          "pushed_at": "2026-09-22T00:58:41Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/steel-dev/steel-browser",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=7678, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; browser automation as a service, on-topic; cap-cut",
+          "stars": 7678,
+          "pushed_at": "2026-09-21T21:01:15Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/bytedance/UI-TARS",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=11509, pushed_at=2026-01-27 (~7.8mo before cutoff, within 12mo window), archived=false, license=Apache-2.0; GUI/vision agent automation, on-topic; cap-cut",
+          "stars": 11509,
+          "pushed_at": "2026-01-27T04:57:26Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/deepset-ai/haystack",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=26575, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; RAG/literature-retrieval framework, fits 'literature retrieval' in title, not clearly outside; cap-cut",
+          "stars": 26575,
+          "pushed_at": "2026-09-21T16:12:41Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/SciPhi-AI/R2R",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=8002, pushed_at=2025-11-07 (~10.5mo before cutoff, within 12mo window), archived=false, license=MIT; RAG/retrieval framework, on-topic; cap-cut",
+          "stars": 8002,
+          "pushed_at": "2025-11-07T01:02:44Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/zilliztech/claude-context",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=12559, pushed_at=2026-07-14 (~2.2mo before cutoff), archived=false, license=MIT; agent code-context/token-efficiency tooling, on-topic; cap-cut",
+          "stars": 12559,
+          "pushed_at": "2026-07-14T12:00:38Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/cocoindex-io/cocoindex",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=11585, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; retrieval/indexing pipeline tooling, on-topic; cap-cut",
+          "stars": 11585,
+          "pushed_at": "2026-09-21T13:18:04Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/open-compress/claw-compactor",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=2022, pushed_at=2026-04-01 (~5.7mo before cutoff, within 12mo window), archived=false, license=MIT; context/token efficiency tooling, directly on-topic; cap-cut",
+          "stars": 2022,
+          "pushed_at": "2026-04-01T08:31:20Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/confident-ai/deepeval",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=18375, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; LLM eval framework, on-topic; cap-cut",
+          "stars": 18375,
+          "pushed_at": "2026-09-21T17:42:26Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/vibrantlabsai/ragas",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=15813, pushed_at=2026-02-24 (~6.9mo before cutoff, within 12mo window), archived=false, license=Apache-2.0; RAG eval framework, on-topic; cap-cut",
+          "stars": 15813,
+          "pushed_at": "2026-02-24T07:47:19Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/promptfoo/promptfoo",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=25345, pushed_at=2026-09-22 (fresh), archived=false, license=MIT; LLM/agent eval + red-teaming CLI, on-topic; cap-cut",
+          "stars": 25345,
+          "pushed_at": "2026-09-22T02:17:19Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/truera/trulens",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=3569, pushed_at=2026-09-21 (fresh), archived=false, license=MIT; LLM eval framework, on-topic; cap-cut",
+          "stars": 3569,
+          "pushed_at": "2026-09-21T02:17:06Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/semgrep/semgrep",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=16715, pushed_at=2026-09-22 (fresh), archived=false, license=LGPL-2.1; static-review tool, on-topic; cap-cut",
+          "stars": 16715,
+          "pushed_at": "2026-09-22T00:03:59Z",
+          "license": "LGPL-2.1"
+        },
+        {
+          "repository_url": "https://github.com/zizmorcore/zizmor",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=6551, pushed_at=2026-09-21 (fresh), archived=false, license=MIT; static-review (GitHub Actions security scanner), on-topic; cap-cut",
+          "stars": 6551,
+          "pushed_at": "2026-09-21T18:01:57Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/The-PR-Agent/pr-agent",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=13102, pushed_at=2026-09-21 (fresh), archived=false, license=MIT; automated PR/code review, fits static/quality-review category, not clearly outside; cap-cut",
+          "stars": 13102,
+          "pushed_at": "2026-09-21T23:21:04Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/assafelovic/gpt-researcher",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=29559, pushed_at=2026-08-27 (fresh), archived=false, license=Apache-2.0; web research agent, directly on-topic; cap-cut",
+          "stars": 29559,
+          "pushed_at": "2026-08-27T19:34:56Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/Alibaba-NLP/DeepResearch",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=19978, pushed_at=2026-02-27 (~6.7mo before cutoff, within 12mo window), archived=false, license=Apache-2.0; web/deep research agent, directly on-topic; cap-cut",
+          "stars": 19978,
+          "pushed_at": "2026-02-27T13:12:11Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/arc53/DocsGPT",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=18282, pushed_at=2026-09-21 (fresh), archived=false, license=MIT; document/literature retrieval QA, on-topic; cap-cut",
+          "stars": 18282,
+          "pushed_at": "2026-09-21T23:58:57Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/zilliztech/deep-searcher",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=8275, pushed_at=2025-11-19 (~10.1mo before cutoff, within 12mo window), archived=false, license=Apache-2.0; deep-search RAG agent (literature retrieval), on-topic; cap-cut",
+          "stars": 8275,
+          "pushed_at": "2025-11-19T06:04:16Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/tavily-ai/tavily-mcp",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=2397, pushed_at=2026-09-16 (fresh), archived=false, license=MIT; search-API MCP, directly on-topic; cap-cut",
+          "stars": 2397,
+          "pushed_at": "2026-09-16T20:56:42Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/tavily-ai/tavily-python",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=1403, pushed_at=2026-09-18 (fresh), archived=false, license=MIT; search-API SDK, directly on-topic; cap-cut",
+          "stars": 1403,
+          "pushed_at": "2026-09-18T15:20:38Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/exa-labs/exa-py",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=234, pushed_at=2026-09-21 (fresh), archived=false, license=MIT; search-API SDK, directly on-topic; cap-cut",
+          "stars": 234,
+          "pushed_at": "2026-09-21T17:37:05Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/open-compass/opencompass",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=7462, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; LLM eval benchmark suite, on-topic; cap-cut",
+          "stars": 7462,
+          "pushed_at": "2026-09-21T06:28:36Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/stanford-crfm/helm",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=2916, pushed_at=2026-09-01 (fresh), archived=false, license=Apache-2.0; LLM eval framework, on-topic; cap-cut",
+          "stars": 2916,
+          "pushed_at": "2026-09-01T01:33:19Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/Giskard-AI/giskard-oss",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=5833, pushed_at=2026-09-21 (fresh), archived=false, license=Apache-2.0; ML/LLM quality testing & eval, on-topic; cap-cut",
+          "stars": 5833,
+          "pushed_at": "2026-09-21T15:41:40Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/evidentlyai/evidently",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=7932, pushed_at=2026-09-11 (fresh), archived=false, license=Apache-2.0; ML/LLM quality-evaluation monitoring, on-topic; cap-cut",
+          "stars": 7932,
+          "pushed_at": "2026-09-11T09:03:28Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/vectara/open-rag-eval",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=410, pushed_at=2026-06-02 (~3.6mo before cutoff), archived=false, license=Apache-2.0; RAG-eval framework, on-topic; cap-cut",
+          "stars": 410,
+          "pushed_at": "2026-06-02T21:55:43Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/relari-ai/continuous-eval",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=517, pushed_at=2026-08-10 (~1.4mo before cutoff), archived=false, license=Apache-2.0; LLM/RAG eval framework, on-topic; cap-cut",
+          "stars": 517,
+          "pushed_at": "2026-08-10T22:12:03Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/Scale3-Labs/langtrace",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=1232, pushed_at=2025-11-17 (~10.1mo before cutoff, within 12mo window), archived=false, license=AGPL-3.0; LLM observability/quality tracing, not clearly outside title; cap-cut",
+          "stars": 1232,
+          "pushed_at": "2025-11-17T15:08:48Z",
+          "license": "AGPL-3.0"
+        },
+        {
+          "repository_url": "https://github.com/nanobrowser/nanobrowser",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=13818, pushed_at=2026-08-18 (fresh), archived=false, license=Apache-2.0; browser automation agent, on-topic; cap-cut",
+          "stars": 13818,
+          "pushed_at": "2026-08-18T00:42:48Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/tinyfish-io/agentql",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=1464, pushed_at=2026-09-18 (fresh), archived=false, license=MIT; web-query/browser automation agent, on-topic; cap-cut",
+          "stars": 1464,
+          "pushed_at": "2026-09-18T21:33:52Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/test-zeus-ai/testzeus-hercules",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "stars=1165, pushed_at=2026-08-04 (~1.6mo before cutoff), archived=false, license=AGPL-3.0; browser/UI testing agent, on-topic; cap-cut",
+          "stars": 1165,
+          "pushed_at": "2026-08-04T09:37:17Z",
+          "license": "AGPL-3.0"
+        }
+      ]
+    },
+    {
+      "commands_run": 6,
+      "undispositioned_before": 22,
+      "dispositions": [
+        {
+          "repository_url": "https://github.com/alpacahq/alpaca-py",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-18 (0.1mo, within 12mo); license Apache-2.0; in-scope broker/data SDK",
+          "stars": 1526,
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-18T11:13:19Z"
+        },
+        {
+          "repository_url": "https://github.com/alphanome-ai/sec-parser",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-06-25 (2.9mo); license MIT; in-scope SEC EDGAR fundamentals parser",
+          "stars": 294,
+          "license": "MIT",
+          "pushed_at": "2026-06-25T10:07:23Z"
+        },
+        {
+          "repository_url": "https://github.com/apptastic-software/trading-calendar",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-01 (0.6mo); license MIT; in-scope exchange calendars",
+          "stars": 70,
+          "license": "MIT",
+          "pushed_at": "2026-09-01T16:14:39Z"
+        },
+        {
+          "repository_url": "https://github.com/cuemacro/findatapy",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-07-02 (2.6mo); license Apache-2.0; in-scope market data downloader",
+          "stars": 2125,
+          "license": "Apache-2.0",
+          "pushed_at": "2026-07-02T14:29:12Z"
+        },
+        {
+          "repository_url": "https://github.com/databento/databento-python",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-17 (0.1mo); license Apache-2.0; in-scope broker/data SDK",
+          "stars": 302,
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-17T15:39:55Z"
+        },
+        {
+          "repository_url": "https://github.com/databento/dbn",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-18 (0.1mo); license Apache-2.0; in-scope market-data encoding/storage format",
+          "stars": 172,
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-18T17:07:54Z"
+        },
+        {
+          "repository_url": "https://github.com/defeat-beta/defeatbeta-api",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-20 (<1mo); license Apache-2.0; in-scope market data API",
+          "stars": 750,
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-20T08:00:51Z"
+        },
+        {
+          "repository_url": "https://github.com/dgunning/edgartools",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-21 (<1mo); license MIT; in-scope SEC EDGAR fundamentals",
+          "stars": 2734,
+          "license": "MIT",
+          "pushed_at": "2026-09-21T10:27:25Z"
+        },
+        {
+          "repository_url": "https://github.com/finnhub-stock-api/finnhub-python",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-06-24 (2.9mo); license Apache-2.0; in-scope market data SDK",
+          "stars": 1082,
+          "license": "Apache-2.0",
+          "pushed_at": "2026-06-24T07:15:10Z"
+        },
+        {
+          "repository_url": "https://github.com/gerrymanoim/exchange_calendars",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-15 (0.2mo); license Apache-2.0; in-scope exchange calendars",
+          "stars": 667,
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-15T09:27:58Z"
+        },
+        {
+          "repository_url": "https://github.com/gigapi/gigapi",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2025-10-20 (11.0mo, within 12mo); license MIT; in-scope columnar/timeseries storage",
+          "stars": 391,
+          "license": "MIT",
+          "pushed_at": "2025-10-20T12:01:02Z"
+        },
+        {
+          "repository_url": "https://github.com/hydrosquall/tiingo-python",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2025-12-14 (9.2mo, within 12mo); license MIT; in-scope market data client",
+          "stars": 319,
+          "license": "MIT",
+          "pushed_at": "2025-12-14T05:20:08Z"
+        },
+        {
+          "repository_url": "https://github.com/ib-api-reloaded/ib_async",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-08-19 (1.1mo); license BSD-2-Clause; in-scope IBKR broker SDK matching project's target broker",
+          "stars": 1742,
+          "license": "BSD-2-Clause",
+          "pushed_at": "2026-08-19T03:04:44Z"
+        },
+        {
+          "repository_url": "https://github.com/jadchaar/sec-edgar-downloader",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-06-22 (3.0mo); license MIT; in-scope SEC EDGAR downloader",
+          "stars": 715,
+          "license": "MIT",
+          "pushed_at": "2026-06-22T02:13:06Z"
+        },
+        {
+          "repository_url": "https://github.com/jenskeiner/exchange_calendars_extensions",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-08-09 (1.4mo); license Apache-2.0; in-scope exchange calendars extension",
+          "stars": 6,
+          "license": "Apache-2.0",
+          "pushed_at": "2026-08-09T14:15:32Z"
+        },
+        {
+          "repository_url": "https://github.com/jerbouma/financetoolkit",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-10 (0.3mo); license MIT; in-scope fundamentals/financial analysis toolkit",
+          "stars": 5367,
+          "license": "MIT",
+          "pushed_at": "2026-09-10T16:10:58Z"
+        },
+        {
+          "repository_url": "https://github.com/romeltorres/alpha_vantage",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-07-26 (1.8mo, within 12mo -- recency alone satisfies the staleness rule despite an old 2024-07-17 release); license MIT; in-scope market data SDK",
+          "stars": 4924,
+          "license": "MIT",
+          "pushed_at": "2026-07-26T20:31:57Z"
+        },
+        {
+          "repository_url": "https://github.com/rsheftel/pandas_market_calendars",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-07-12 (2.3mo); license MIT; in-scope exchange calendars",
+          "stars": 998,
+          "license": "MIT",
+          "pushed_at": "2026-07-12T22:35:10Z"
+        },
+        {
+          "repository_url": "https://github.com/stefan-jansen/zipline-reloaded",
+          "disposition": "dropped:irrelevant",
+          "evidence": "algorithmic backtesting/trading engine, not a market-data/data-engineering tool (T-data's scope is data SDKs, fundamentals, calendars, storage and validation, not a strategy backtester); pushed 2026-01-06 (8.5mo, within 12mo) so it was not excluded on staleness grounds",
+          "stars": 1940,
+          "license": "Apache-2.0",
+          "pushed_at": "2026-01-06T13:01:54Z"
+        },
+        {
+          "repository_url": "https://github.com/stefanoamorelli/sec-edgar-toolkit",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-08-18 (1.1mo); license AGPL-3.0; in-scope SEC EDGAR toolkit",
+          "stars": 38,
+          "license": "AGPL-3.0",
+          "pushed_at": "2026-08-18T14:59:48Z"
+        },
+        {
+          "repository_url": "https://github.com/unionai-oss/pandera",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-19 (<1mo); license MIT; in-scope data validation framework (matches title's 'validation')",
+          "stars": 4460,
+          "license": "MIT",
+          "pushed_at": "2026-09-19T21:05:18Z"
+        },
+        {
+          "repository_url": "https://github.com/voyz/ibind",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-06 (0.5mo); license Apache-2.0; in-scope IBKR client library (broker SDK)",
+          "stars": 446,
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-06T07:36:16Z"
+        }
+      ],
+      "metadata_completed": [],
+      "contradictions_fixed": [
+        "https://github.com/timescale/timescaledb appears in both merit.shortlist and merit.dropped (with a dropped 'why' text explicitly stating 'NOT dropped mechanically (kept eligible)'). Correct reading: it is shortlisted -- the dual dual/Apache-2.0 core license passes the license rule -- and the merit.dropped entry is an erroneous duplicate flag that should be removed from the dropped list, not a real drop.",
+        "https://github.com/OpenBB-finance/OpenBB appears in both merit.shortlist and merit.dropped (with a dropped 'why' text explicitly stating 'NOT dropped mechanically (kept eligible, in shortlist)'). Correct reading: it is shortlisted -- AGPL-3.0 passes the license rule -- and the merit.dropped entry is an erroneous duplicate flag that should be removed from the dropped list, not a real drop.",
+        "https://github.com/man-group/ArcticDB is recorded in merit.dropped, but its own 'why' text states it was 'NOT dropped mechanically (kept eligible)' (BSL 1.1 counts as explicit commercial/source-available terms, passing the license rule) and it names no violated rule; it is also not in merit.shortlist. Correct reading: it should be reclassified as rule-pass-cut-by-cap (passed every mechanical rule, excluded from the shortlist only by the 12-slot cap), not recorded under merit.dropped, which is reserved for genuine rule-driven exclusions."
+      ],
+      "limits": [
+        "Scoped strictly to sublayer T-data per the harness's blind-review isolation; no file under <PROJECTS_ROOT> was opened.",
+        "All 22 undispositioned candidates already had complete merit.rows metadata (stars/pushed_at/archived/license), so no gh api repos/<owner>/<repo> lookups were needed and no rate limits were encountered.",
+        "Used session-scratchpad-prefixed filenames (tdata_*) after an initial generic-filename pass produced cross-contaminated results, evidencing that the shared scratchpad directory is written concurrently by sibling sublayer tasks in this same workflow run; unprefixed temp filenames are unsafe there.",
+        "Per the task's own literal contradiction check (URL in both shortlist and dropped), 3 contradictions were found in the existing ledger and reported with corrected readings; the shortlist itself was not modified."
+      ],
+      "sublayer": "T-data"
+    },
+    {
+      "commands_run": 0,
+      "contradictions_fixed": [],
+      "dispositions": [
+        {
+          "repository_url": "https://github.com/ast-grep/ast-grep",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-21 (current); license=MIT; latest_release 0.45.3 (2026-08-31); structural code search tool, clearly in-scope. Passed all mechanical rules, excluded only by the 12-slot cap.",
+          "license": "MIT",
+          "pushed_at": "2026-09-21T20:17:14Z",
+          "stars": 15989
+        },
+        {
+          "repository_url": "https://github.com/semgrep/semgrep",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-22 (current); license=LGPL-2.1; latest_release v1.177.0 (2026-09-10); structural/semantic code search, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "LGPL-2.1",
+          "pushed_at": "2026-09-22T00:03:59Z",
+          "stars": 16715
+        },
+        {
+          "repository_url": "https://github.com/tree-sitter/tree-sitter",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-21 (current); license=MIT; latest_release v0.27.0 (2026-08-30); core parsing/structural-search infrastructure, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "MIT",
+          "pushed_at": "2026-09-21T21:34:41Z",
+          "stars": 27014
+        },
+        {
+          "repository_url": "https://github.com/sourcegraph/zoekt",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-16 (within 12mo, satisfies staleness OR despite no formal release); license=Apache-2.0; code search engine, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-16T03:51:18Z",
+          "stars": 1919
+        },
+        {
+          "repository_url": "https://github.com/chroma-core/chroma",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-22 (current); license=Apache-2.0; latest_release 1.5.9 (2026-05-05); vector store used for code/doc RAG, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-22T01:43:21Z",
+          "stars": 29350
+        },
+        {
+          "repository_url": "https://github.com/hkuds/rag-anything",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-15 (within 12mo); license=MIT; latest_release v1.4.1 (2026-09-02); document/RAG ingestion, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "MIT",
+          "pushed_at": "2026-09-15T02:37:26Z",
+          "stars": 23386
+        },
+        {
+          "repository_url": "https://github.com/unstructured-io/unstructured",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-22 (current); license=Apache-2.0; latest_release 0.27.6 (2026-09-14); document ingestion for RAG, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-22T01:42:24Z",
+          "stars": 15464
+        },
+        {
+          "repository_url": "https://github.com/deepset-ai/haystack",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-21 (current); license=Apache-2.0; latest_release v3.1.1 (2026-09-03); document/code RAG framework, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-21T16:12:41Z",
+          "stars": 26575
+        },
+        {
+          "repository_url": "https://github.com/letta-ai/letta",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-10 (within 12mo); license=Apache-2.0; latest_release 0.16.8 (2026-05-14); durable agent memory framework, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-10T17:59:08Z",
+          "stars": 24831
+        },
+        {
+          "repository_url": "https://github.com/getzep/zep",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-18 (within 12mo); license=Apache-2.0; latest_release zep-ingest-v0.3.0 (2026-08-28); durable agent memory, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-18T01:35:08Z",
+          "stars": 4925
+        },
+        {
+          "repository_url": "https://github.com/vectorize-io/hindsight",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-21 (current); license=MIT; latest_release v0.10.1 (2026-09-21); agent memory/retrieval, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "MIT",
+          "pushed_at": "2026-09-21T19:27:53Z",
+          "stars": 24735
+        },
+        {
+          "repository_url": "https://github.com/rohitg00/agentmemory",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-21 (current); license=Apache-2.0; latest_release v0.9.29 (2026-08-16); durable agent memory, clearly in-scope (row notes short track record but that is not one of the four mechanical rules). Passed all mechanical rules, excluded only by cap.",
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-21T06:13:05Z",
+          "stars": 28688
+        },
+        {
+          "repository_url": "https://github.com/probelabs/probe",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-21 (current); license=Apache-2.0; latest_release v0.6.0-rc339 (2026-09-08); code search/structural retrieval tool, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-21T11:51:18Z",
+          "stars": 714
+        },
+        {
+          "repository_url": "https://github.com/zilliztech/claude-context",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-07-14 (2.2mo ago, within 12mo despite no formal release); license=MIT; code RAG/context tool, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "MIT",
+          "pushed_at": "2026-07-14T12:00:38Z",
+          "stars": 12559
+        },
+        {
+          "repository_url": "https://github.com/kantord/seagoat",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-11 (0.3mo ago, within 12mo; push recency governs even though latest release v0.54.17 from 2025-05-14 is older); license=MIT; local code search/RAG, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "MIT",
+          "pushed_at": "2026-09-11T21:09:59Z",
+          "stars": 1309
+        },
+        {
+          "repository_url": "https://github.com/qdrant/fastembed",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-21 (current); license=Apache-2.0; latest_release v0.8.0 (2026-03-23); local embedding serving, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-21T18:38:18Z",
+          "stars": 3211
+        },
+        {
+          "repository_url": "https://github.com/lancedb/lancedb",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-21 (current); license=Apache-2.0; latest_release v0.39.0 (2026-09-17); vector store, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-21T22:37:26Z",
+          "stars": 11494
+        },
+        {
+          "repository_url": "https://github.com/huggingface/text-embeddings-inference",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-17 (within 12mo); license=Apache-2.0; latest_release v1.9.4 (2026-09-15); local embedding serving, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-17T13:13:59Z",
+          "stars": 5058
+        },
+        {
+          "repository_url": "https://github.com/letta-ai/letta-code",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-22 (current); license=Apache-2.0; latest_release v0.32.16 (2026-09-22); coding-agent memory tool, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "Apache-2.0",
+          "pushed_at": "2026-09-22T01:47:43Z",
+          "stars": 3398
+        },
+        {
+          "repository_url": "https://github.com/plastic-labs/honcho",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-21 (within 12mo; no release ever published but the push-recency OR is satisfied); license=AGPL-3.0 (present, satisfies license rule regardless of copyleft terms); durable agent memory, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "AGPL-3.0",
+          "pushed_at": "2026-09-21T22:51:41Z",
+          "stars": 7293
+        },
+        {
+          "repository_url": "https://github.com/supermemoryai/supermemory",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-20 (current); license=MIT; latest_release server-v0.0.8 (2026-08-17); durable agent memory, clearly in-scope. Passed all mechanical rules, excluded only by cap.",
+          "license": "MIT",
+          "pushed_at": "2026-09-20T05:42:08Z",
+          "stars": 30780
+        }
+      ],
+      "limits": [
+        "No GitHub API rate limits encountered: all 21 undispositioned candidates already had complete metadata (stars/pushed_at/archived/license) in merit.rows, so no gh api calls were required."
+      ],
+      "metadata_completed": [],
+      "sublayer": "F-retrieval-memory",
+      "undispositioned_before": 21
+    },
+    {
+      "commands_run": 2,
+      "sublayer": "T-engines",
+      "undispositioned_before": 20,
+      "dispositions": [
+        {
+          "repository_url": "https://github.com/stefan-jansen/zipline-reloaded",
+          "stars": 1940,
+          "pushed_at": "2026-01-06T13:01:54Z",
+          "license": "Apache-2.0",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-01-06 (within 12mo of 2026-09-21); Apache-2.0 license; on-topic (backtesting engine, Pipeline API); excluded only by 12-slot cap per existing row notes."
+        },
+        {
+          "repository_url": "https://github.com/pmorissette/bt",
+          "stars": 2989,
+          "pushed_at": "2026-09-20T20:44:20Z",
+          "license": "MIT",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-20; MIT license; on-topic vectorized backtester; row notes confirm passes all rules, cut by star cap."
+        },
+        {
+          "repository_url": "https://github.com/edtechre/pybroker",
+          "stars": 3544,
+          "pushed_at": "2026-09-21T16:16:26Z",
+          "license": "NOASSERTION (verified Other/explicit terms via contents/license)",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-21; license row already recorded a contents/license check resolving NOASSERTION to an explicit-terms pass; on-topic ML backtesting framework; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/barter-rs/barter-rs",
+          "stars": 2309,
+          "pushed_at": "2026-08-24T07:23:22Z",
+          "license": "MIT",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-08-24; MIT license; on-topic Rust event-driven backtest/live framework; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/cvxgrp/cvxportfolio",
+          "stars": 1290,
+          "pushed_at": "2026-04-27T14:11:17Z",
+          "license": "GPL-3.0",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-04-27; GPL-3.0; on-topic (portfolio backtesting with modeled fees/borrow costs); cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/Quod-Financial/quantreplay",
+          "stars": 50,
+          "pushed_at": "2026-09-16T13:21:22Z",
+          "license": "Apache-2.0",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-16; Apache-2.0; on-topic multi-asset market simulator; low stars but mechanical rules only govern archived/stale/license/relevance, not star count; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/nkaz001/hftbacktest",
+          "stars": 4746,
+          "pushed_at": "2025-12-23T15:57:58Z",
+          "license": "MIT",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2025-12-23 (within 12mo of 2026-09-21); MIT; on-topic high-fidelity HFT backtester; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/fasiondog/hikyuu",
+          "stars": 3521,
+          "pushed_at": "2026-09-20T18:14:58Z",
+          "license": "Apache-2.0",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-20; Apache-2.0; on-topic backtest/research framework; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/quarkfin/qf-lib",
+          "stars": 970,
+          "pushed_at": "2026-08-31T11:22:43Z",
+          "license": "Apache-2.0",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-08-31; Apache-2.0; on-topic event-driven multi-asset backtester; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/gbeced/basana",
+          "stars": 867,
+          "pushed_at": "2026-08-09T23:02:19Z",
+          "license": "NOASSERTION (verified Other/explicit terms via contents/license)",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-08-09; license already verified as explicit-terms pass per row notes; on-topic async event-driven backtest/live framework; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/Lumiwealth/lumibot",
+          "stars": 2079,
+          "pushed_at": "2026-09-21T06:09:41Z",
+          "license": "GPL-3.0",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-21; GPL-3.0; on-topic same-code backtest/live multi-broker framework; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/goldspanlabs/optopsy",
+          "stars": 1479,
+          "pushed_at": "2026-06-30T17:46:49Z",
+          "license": "AGPL-3.0",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-06-30; AGPL-3.0; on-topic options-specific backtesting library; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/Drakkar-Software/OctoBot",
+          "stars": 6598,
+          "pushed_at": "2026-09-21T22:16:39Z",
+          "license": "GPL-3.0",
+          "disposition": "dropped:irrelevant",
+          "evidence": "not archived, not stale, GPL-3.0 licensed, but description ('crypto trading bot to automate AI, Grid, DCA and TradingView strategies on 15+ exchanges') is a live multi-exchange automation/execution bot with no backtest/simulation-fidelity focus (no mention of historical simulation, point-in-time data, corporate actions, slippage/borrow modeling), so it falls outside the T-engines title of backtest and simulation engines / historical backtest fidelity rather than merely being cut by the cap."
+        },
+        {
+          "repository_url": "https://github.com/zvtvz/zvt",
+          "stars": 4311,
+          "pushed_at": "2026-07-01T09:42:05Z",
+          "license": "MIT",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-07-01; MIT; modular quant framework that includes backtest capability, on-topic; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/coding-kitties/investing-algorithm-framework",
+          "stars": 2080,
+          "pushed_at": "2026-09-17T11:20:31Z",
+          "license": "Apache-2.0",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-17; Apache-2.0; on-topic dev/backtest/deploy framework; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/cloudQuant/backtrader",
+          "stars": 185,
+          "pushed_at": "2026-09-21T15:10:43Z",
+          "license": "GPL-3.0",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-21; GPL-3.0; on-topic maintained backtrader fork; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/AsyncAlgoTrading/aat",
+          "stars": 835,
+          "pushed_at": "2026-07-27T02:34:06Z",
+          "license": "Apache-2.0",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-07-27; Apache-2.0; on-topic async event-driven backtest/live engine; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/pst-group/pysystemtrade",
+          "stars": 3522,
+          "pushed_at": "2026-09-21T10:55:15Z",
+          "license": "GPL-3.0",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "row was missing (org-transferred from robcarver17/pysystemtrade); fetched via gh api: archived=false, pushed_at=2026-09-21T10:55:15Z, license=GPL-3.0, stars=3522; on-topic backtesting/trading engine; passes all rules, cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/cuemacro/finmarketpy",
+          "stars": 3810,
+          "pushed_at": "2026-04-16T09:29:35Z",
+          "license": "Apache-2.0",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-04-16 (within 12mo of 2026-09-21); Apache-2.0; on-topic backtesting library; cut by cap."
+        },
+        {
+          "repository_url": "https://github.com/manifoldbt/manifoldbt",
+          "stars": 35,
+          "pushed_at": "2026-09-21T11:12:16Z",
+          "license": "NOASSERTION (verified Other/explicit terms via contents/license)",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "not archived; pushed 2026-09-21; license already verified as explicit-terms pass per row notes; on-topic Rust vectorized backtester targeting fidelity criteria (fees/slippage/look-ahead); very low star count (35) is not itself a mechanical drop rule; cut by cap."
+        }
+      ],
+      "metadata_completed": [
+        {
+          "repository_url": "https://github.com/pst-group/pysystemtrade",
+          "fields_filled": [
+            "stars",
+            "pushed_at",
+            "archived",
+            "license"
+          ]
+        }
+      ],
+      "contradictions_fixed": [],
+      "limits": [
+        "No rate limits hit: gh api rate_limit showed 5000/5000 remaining after the one supplementary call.",
+        "Only 1 of the 20 undispositioned candidates lacked a merit row (pst-group/pysystemtrade, due to an org-transfer from robcarver17/pysystemtrade); its metadata was fetched live via gh api.",
+        "For the three NOASSERTION-license candidates (pybroker, basana, manifoldbt) this pass relied on the existing row notes, which already record that a repos/{owner}/{repo}/license (or contents) check resolved the license to an explicit-terms pass; no redundant gh api call was made for these since the evidence was already present in merit.rows.",
+        "Zero URL appeared in both merit.shortlist and merit.dropped, and no merit.dropped 'why' field mentions a cap while its URL is in the shortlist, so contradictions_fixed is empty — the existing ledger's shortlist/dropped split is internally consistent for this sub-layer.",
+        "Filesystem access was kept read-only outside the scratchpad copy of the sub-layer JSON and no path under <PROJECTS_ROOT> was opened for this task."
+      ]
+    },
+    {
+      "commands_run": 7,
+      "contradictions_fixed": [],
+      "dispositions": [
+        {
+          "repository_url": "https://github.com/AlanJiang98/Awesome-LLM-Trading",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-01-11 (~8.3mo before 2026-09-21, not stale, no release needed within 18mo since not stale); license MIT present; relevant (LLM-in-trading curated resource list, same treatment precedent as other awesome-lists in this sublayer which were evaluated on the same 4 rules, not auto-flagged irrelevant); row already complete, no gh api call needed.",
+          "stars": 9,
+          "pushed_at": "2026-01-11T15:18:16Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/eslazarev/purged-cross-validation",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-09-04 (~0.5mo, not stale); license MIT present; clearly relevant (direct CPCV/deflated-Sharpe implementation, the named validation-methods sub-area); row already complete, no gh api call needed.",
+          "stars": 35,
+          "pushed_at": "2026-09-04T06:57:57Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/HammerGPT/Hyper-Alpha-Arena",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-05-13 (~4.3mo, not stale); license Apache-2.0 present; relevant (LLM factor-research/validation platform); row already complete, no gh api call needed.",
+          "stars": 1174,
+          "pushed_at": "2026-05-13T15:37:52Z",
+          "license": "Apache-2.0"
+        },
+        {
+          "repository_url": "https://github.com/HKUSTDial/DeepFund",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2026-03-18 (~6.1mo, not stale); license MIT present; relevant (multi-agent trading benchmark/leaderboard, a strategy-validation resource); row already complete, no gh api call needed.",
+          "stars": 296,
+          "pushed_at": "2026-03-18T03:43:42Z",
+          "license": "MIT"
+        },
+        {
+          "repository_url": "https://github.com/stefan-jansen/alphalens-reloaded",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "archived=false; pushed_at 2025-12-15 (~9.2mo, not stale on its own; also has latest_release 0.4.5 dated 2025-07-23, ~14mo before 2026-09-21, within the 18mo stable-release window); license Apache-2.0 present; relevant (maintained alpha-factor validation tool); row already complete, no gh api call needed.",
+          "stars": 653,
+          "pushed_at": "2025-12-15T04:03:16Z",
+          "license": "Apache-2.0"
+        }
+      ],
+      "metadata_completed": [],
+      "sublayer": "T-strategies",
+      "undispositioned_before": 5,
+      "limits": [
+        "Shared scratchpad collision: the working scratchpad directory is shared by parallel workflow workers processing other sublayers; an initial extraction into generically-named files (tstrat.json, merged_norm.txt, shortlist_norm.txt) was silently overwritten mid-task by another worker's concurrent writes to identically-named files, producing a bogus undispositioned set (RAG/memory/tooling repos unrelated to T-strategies). Recovered by redoing the extraction atomically into a dedicated Tstrat_work/ subdirectory and re-verifying merged/rows/shortlist/dropped counts (49/49/12/32) matched the sublayer before computing the diff.",
+        "No gh api calls were needed or run: all 5 undispositioned candidates' merit.rows entries already had complete stars/pushed_at/archived/license fields (and matching pre-existing 'MECHANICAL PASS ... cut for cap' notes), so no rate limits were encountered.",
+        "No shortlist/dropped contradictions found (no URL present in both lists; no dropped reason citing 'cap' for a shortlisted repo).",
+        "Read-only on the filesystem outside the scratchpad was maintained; no files under <PROJECTS_ROOT> were opened or modified."
+      ]
+    },
+    {
+      "commands_run": 1,
+      "contradictions_fixed": [
+        "https://github.com/PyPortfolio/PyPortfolioOpt — present in both merit.shortlist and merit.dropped. dropped.why states 'Passed all four mechanical filters ... cut by the 12-repository shortlist cap; ranked #7 by star count among 31 passers, included in the final 12' — the dropped entry itself admits inclusion in the final 12. Correct reading: this repo IS shortlisted (per merit.shortlist); the dropped-array row is a stray erroneous duplicate and should be disregarded, not treated as a cap-cut drop.",
+        "https://github.com/dcajasn/Riskfolio-Lib — present in both merit.shortlist and merit.dropped. dropped.why states 'this row is actually one of the final 12 (rank #8 by stars) — see shortlist; listed here only if a stricter cap were applied below 12.' Correct reading: shortlisted, not dropped; the dropped row is an erroneous duplicate.",
+        "https://github.com/microsoft/qlib — present in both merit.shortlist and merit.dropped. dropped.why states 'this row belongs in the final shortlist (rank #2 by stars); erroneously duplicated here — see shortlist array, not actually dropped.' Correct reading: shortlisted, not dropped; the dropped row is an erroneous duplicate that should be removed/ignored."
+      ],
+      "dispositions": [
+        {
+          "repository_url": "https://github.com/ml4t/backtest",
+          "disposition": "rule-pass-cut-by-cap",
+          "evidence": "merit.rows entry already complete: stars=27, pushed_at=2026-09-21T10:19:04Z (current, well within 12mo), archived=false, license=MIT, latest_release=v0.1.8 (2026-09-21). Passes archived, staleness and license rules. On relevance: it is an event-driven backtesting/execution engine explicitly advertising configurable execution, accounting and risk modules with ML4T (Machine Learning for Trading) affiliation — plausibly adjacent to the T-portfolio-risk title (risk models, transaction-cost modelling) rather than clearly outside it. The row's own notes field already states the mechanical conclusion: 'PASS all mechanical rules. Not in final 12 (cut by cap, rank #30 of 31).' No gh api call was needed since stars/pushed_at/archived/license were already populated in merit.rows.",
+          "stars": 27,
+          "pushed_at": "2026-09-21T10:19:04Z",
+          "license": "MIT"
+        }
+      ],
+      "limits": [
+        "No gh api calls were made: the single undispositioned candidate (ml4t/backtest) already had a complete merit.rows entry (stars, pushed_at, archived, license all present), so no network/API call or rate-limit exposure was needed for this sub-layer."
+      ],
+      "metadata_completed": [],
+      "sublayer": "T-portfolio-risk",
+      "undispositioned_before": 1
+    }
+  ],
+  "missing": []
+}

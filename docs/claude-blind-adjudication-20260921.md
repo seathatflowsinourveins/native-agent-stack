@@ -10,8 +10,8 @@ retains its discovery, screening, judge and refuter outputs. Its claims and scor
 are attributed reviewer output, not automatically accepted catalog conclusions.
 [Publication provenance](../evidence/artifacts/blind-catalog-convergence-20260921/claude-provenance.json)
 records original/public hashes and the private-path substitutions. Raw journals,
-conversations and native session identifiers remain private. Claude's final
-coverage-return workflow is still running at this intermediate checkpoint.
+conversations and native session identifiers remain private. The completed
+coverage review and its later screening repair are preserved separately below.
 
 ## What was actually reviewed
 
@@ -71,6 +71,120 @@ No candidate was cloned, built or executed by this discovery workflow.
   vendor published information or whether a strategy could know it at the time.
   Playwright traces support debugging; deterministic archival replay needs its
   own capture, completeness and replay checks.
+
+
+## Final coverage return and independent correction
+
+The sealed WF3 coverage review returned **11/11 completed children** and
+`final_list_ready=false`. Its critic found 159 candidate-group rows with no
+original screening decision. The later sealed WF4 repair returned **7/7 completed
+children** and dispositions for exactly those 159 pairs, with no extras or
+duplicates. The peer's task record explicitly acknowledges and independently
+confirms Codex's five corrective findings. Queued delivery has therefore been
+superseded by an actual read and returned adjudication.
+
+Read the unchanged attributed [coverage report](../evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json),
+[later repair](../evidence/artifacts/blind-catalog-convergence-20260921/claude-screening-repair.json),
+[peer final layers](../evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json)
+and [publication provenance](../evidence/artifacts/blind-catalog-convergence-20260921/closure-provenance.json).
+The [complete screening ledger](../evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json)
+retains original and later decisions side by side. Reproduce its accounting with
+`python3 blueprints/blind-catalog-convergence/audit_reports.py --check`.
+
+| Original WF2 record | Candidate-group rows |
+| --- | ---: |
+| Shortlisted, including five conflicting/annotation drop entries | 120 |
+| Recorded rule exclusion | 169 |
+| Explicit star-cap exclusion | 65 |
+| No recorded disposition | 159 |
+| Eligible annotation only, ArcticDB | 1 |
+| Total | 514 |
+
+The later repair labels 157 previously silent rows as cap exclusions and two as
+irrelevant. Those are later documentary decisions, not evidence that the original
+screen recorded them or that the repositories failed a test. Preserve both dates
+and all five overlap flags. Metadata gaps affect 115 rows: 49 omit a required key
+and 66 explicitly say `unknown`. Zero issue counts in all 68 Alpaca-group rows
+are suspicious metadata, not 68 established upstream errors.
+
+The independent artifact audit also corrected the final critic: its “only six
+binding star caps” calculation counted cap-exclusion entries as failed rules.
+All ten shortlists match the top 12 by recorded stars among candidates without a
+recorded rule exclusion. That residual set is not a certified set of rule-passers.
+Judge agreement and refuter survival therefore cannot establish a quality ranking.
+Eighteen repository-group pairs had all their *sampled superlative claims* refuted; this does
+not invalidate their actual capabilities or separate native receipts.
+
+The returned JSON now permits exact counting: 75 reported absent-catalog rows,
+62 selected-but-unsurfaced rows, 75 disagreements and **125 recommendations**.
+All 125 recommendations (96 distinct normalized identities) and all 75 reported
+absences already resolve in the current 843-identity index. The reports compared
+an earlier catalog snapshot, and a missing selection in one layer is not absence
+from the whole catalog. The ledger explicitly routes all 125 recommendations to
+existing identity records or conditional comparison/source-review work. No row
+promotes a repository from popularity, recency or an unsupported comparison.
+
+### Decision-changing corrections to the final peer return
+
+- **OctoBot:** WF4 inferred no backtesting focus from a short description. Its
+  [pinned README](https://github.com/Drakkar-Software/OctoBot/blob/85ae511a56dc3c782fcc528ba3a96d29eb6e5e03/README.md#L96)
+  documents historical-data backtesting. Reject that rationale; crypto versus
+  US-equities fit is a separate scope question. No adoption follows.
+- **pysystemtrade:** the [pinned README](https://github.com/pst-group/pysystemtrade/blob/8958c49c38b1e4a8c07f0e4375d5e9cb68a087f7/README.md#L20)
+  confirms the January 2026 transfer from robcarver17 to pst-group. The ledger
+  explicitly bridges the old merit-row identity while preserving both URLs.
+- **DVC:** `treeverse/dvc` is the verified canonical identity, not a mistaken
+  substitution from lakeFS. The retained
+  [identity follow-up](../catalogs/us-equities/data-evaluation-followup.json)
+  records the same repository ID across its redirect. The suggested reversal is
+  rejected; [current upstream](https://github.com/treeverse/dvc) confirms it.
+- **Letta:** an active repository or old release does not refute retirement of
+  a particular product generation. The
+  [pinned README](https://github.com/letta-ai/letta/blob/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md)
+  explicitly puts retired V1 in the archive branch and active source in
+  letta-code. Keep the historical-server exclusion and separate successor
+  comparison; do not reinstall V1 from a popularity ranking.
+- **LEAN Alpaca terms:** the catalog already records Apache-2.0 declarations in
+  the [pinned README](https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md)
+  and [source header](https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/QuantConnect.AlpacaBrokerage/AlpacaBrokerageFactory.cs).
+  A missing root LICENSE/API label does not establish missing terms.
+  Account/product entitlement and broker execution remain separate gates.
+- **Pins outside the component manifest:** TypeSafe and both OpenAI skills have
+  commit and byte hashes in [native practice](../catalogs/landscape/native-practice.json);
+  actionlint 1.7.12 has an archive checksum in the
+  [validation workflow](../.github/workflows/validate.yml), and actions/attest
+  4.2.2 is commit-pinned in the
+  [publication workflow](../.github/workflows/publish-catalog.yml).
+  uv 0.12.17 and exchange-calendars 4.13.2 are recorded in the
+  [adoption manifest](../adoption/manifest.json) and SDK lock.
+  Dependabot is a configured hosted service with a version-2
+  [configuration](../.github/dependabot.yml), not a locally installable package.
+  These records do not add eight unpinned packages to the 68-component manifest.
+- **Single-sided citations:** the critic identifies 12 disagreements with
+  evidence on only one side; independent audit directly confirmed all seven
+  runtime examples. Treat the remaining count as an attributed critic finding.
+  None supports replacement without the other source and relevant acceptance.
+- **Version review versus installation:** retain the existing vLLM failure and
+  qualified hardware/version path, and the manifest's other accepted pins.
+  Freshness flags remain review inputs. The source comparison did not test
+  newer skfolio, Headroom, llama.cpp or other releases on this workload.
+  SGLang's alternative role and unqualified deployment status are compatible.
+  Grype's domain card is corrected to conditional because its own record says
+  it has not executed; the accepted Syft inventory does not qualify a scanner.
+
+The peer's supplementary Codex Lane C job failed and returned only a partial
+review. Its two supported corrections (exchange-calendars pin location and
+Headroom/TOON conditional/tradeoff scope) were verified separately. Preserve the
+failure; it is not a successful native review receipt. WF2's two incomplete
+attempts also remain in the usage record. WF3 and WF4 completed, with usage in
+[WF3](../evidence/artifacts/blind-catalog-convergence-20260921/claude-wf3-usage.json)
+and [WF4](../evidence/artifacts/blind-catalog-convergence-20260921/claude-wf4-usage.json).
+Native workflow summary tokens are not billable usage or savings.
+
+This closes the dated documentary convergence and its publication corrections.
+It does not rewrite the original critic's false readiness result, claim complete
+research saturation, or close unperformed quality comparisons. The reviewed
+foundation is ready to guide setup; the destination PC earns its own acceptance.
 
 ## Useful additional comparisons
 

@@ -51,6 +51,8 @@ jobs:
         run: python3 scripts/validate_foundation.py --root . --json
       - name: Validate landscape choices and alternative evidence
         run: python3 scripts/landscape.py --root .
+      - name: Reproduce independent source-report accounting
+        run: python3 blueprints/blind-catalog-convergence/audit_reports.py --check
       - name: Validate declared convergence evidence and scope
         run: >-
           python3 scripts/validate_convergence.py

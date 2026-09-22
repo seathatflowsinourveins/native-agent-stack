@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "checked_at": "2026-09-22",
-  "status": "source_reports_adjudicated_claude_coverage_return_pending",
+  "status": "dated_source_convergence_closed_comparative_quality_gates_open",
   "scope": "Dated source-review comparison against the existing 20-layer baseline. No runtime replacement, universal quality ranking or target-PC acceptance.",
   "baseline_revision": "99f580c187100d064853b977376697394decbefe",
   "integrated_claude_inputs": [
@@ -23,13 +23,22 @@
     "read_observed_at_utc": "2026-09-22T02:14:36.255Z",
     "workflow": "independent-sota-research",
     "workflow_run": "wf_268e1f89-a91",
-    "result_status": "sealed_WF2_received_adjudicated",
-    "boundary": "Both independent source reports are sealed and coordinator-adjudicated. The peer is running its planned coverage synthesis; that final return is not yet present. No reviewer vote changes runtime qualification.",
+    "result_status": "sealed_WF2_WF3_WF4_received_adjudicated",
+    "boundary": "Both independent source reports, peer coverage critique and later screening repair are sealed. Original critic false readiness is retained; audited publication corrections and later decisions are explicit. No reviewer vote changes runtime qualification.",
     "source_report": "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
     "provenance": "evidence/artifacts/blind-catalog-convergence-20260921/claude-provenance.json",
     "usage": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf2-usage.json",
-    "coverage_return_status": "WF3_running",
-    "coordinator_return_status": "corrections_queued_read_unconfirmed"
+    "coverage_return_status": "WF3_complete_WF4_repair_complete",
+    "coordinator_return_status": "read_and_material_corrections_confirmed_in_peer_task_record",
+    "coverage_report": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+    "screening_repair": "evidence/artifacts/blind-catalog-convergence-20260921/claude-screening-repair.json",
+    "final_layers": "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json",
+    "screening_ledger": "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+    "closure_provenance": "evidence/artifacts/blind-catalog-convergence-20260921/closure-provenance.json",
+    "usage_additional": [
+      "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf3-usage.json",
+      "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf4-usage.json"
+    ]
   },
   "blinding": "Both reviews have residual exposure to ambient project/tool names. Codex reports no catalog-artifact, memory or other-review access before freezing. Claude project instructions can name current domain selections. No zero-bias or superiority claim.",
   "layers": [
@@ -42,9 +51,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "instructions-skills",
@@ -55,9 +69,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "adjust",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "workers",
@@ -68,9 +87,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "isolation",
@@ -81,9 +105,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "code-navigation",
@@ -94,9 +123,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "document-retrieval",
@@ -107,9 +141,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "semantic-rag",
@@ -120,9 +159,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "durable-memory",
@@ -133,9 +177,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "web-research",
@@ -146,9 +195,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "token-efficiency",
@@ -159,9 +213,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "quality-evaluation",
@@ -172,9 +231,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "ci-supply-chain",
@@ -185,9 +249,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "scheduling-supervision",
@@ -198,9 +267,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "hosting-services",
@@ -211,9 +285,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "recovery-portability",
@@ -224,9 +303,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "observation-inference",
@@ -237,9 +321,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/foundation.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "foundation-memory",
@@ -250,9 +339,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/us-equities.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "agents-operations",
@@ -263,9 +357,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/us-equities.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "retain",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "data-research",
@@ -276,9 +375,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/us-equities.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     },
     {
       "layer_id": "engines-strategies",
@@ -289,9 +393,14 @@
         "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
         "catalogs/landscape/us-equities.json",
         "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
-        "docs/claude-blind-adjudication-20260921.md"
+        "docs/claude-blind-adjudication-20260921.md",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json"
       ],
-      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates."
+      "comparison_rule": "Use the canonical layer overturn_when and the independent report's test_that_would_change_choice; adjudicate omissions without treating them as failed candidates.",
+      "claude_final_disposition": "keep_but_compare",
+      "claude_final_scope": "Returned source comparison only. Selected entries can include conditional/tradeoff roles; current landscape disposition and per-host receipts govern."
     }
   ]
 }

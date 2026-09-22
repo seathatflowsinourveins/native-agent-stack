@@ -2,7 +2,7 @@
 
 Both source reports were sealed before coordinator comparison. The table records
 the current synthesis and retains explicit unresolved comparisons. Claude's
-separate final coverage-return workflow is still running. No row claims a
+final coverage return and later screening repair are complete. The [final adjudication](claude-blind-adjudication-20260921.md) records audit corrections and remaining comparison gates. No row claims a
 controlled runtime-quality win, zero bias or destination-PC acceptance.
 
 | Layer | Current disposition | Codex source adjudication | Claude source adjudication |
