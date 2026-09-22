@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "strategies": [
+    {
+      "id": "adaptive_policy_v1",
+      "module": "strategies_v1",
+      "receipt_path": "adaptive_policy_v1.receipt.json",
+      "receipt_sha256": "0e6e93a74364cb0cc297c576e6b476a2548d07b25773d2b5e62a8ee8bd36fdf2",
+      "evidence_class": "SYN",
+      "sessions": ["regular"],
+      "enabled": true
+    }
+  ]
+}

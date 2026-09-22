@@ -592,6 +592,74 @@ class SafetyTests(unittest.TestCase):
             self.ledger.begin_next_trial(self.now, "next-1")
         self.assertEqual(self.ledger.db.execute("SELECT COUNT(*) FROM trials").fetchone()[0], 0)
 
+    def test_resume_held_trial_continues_a_non_flat_held_overnight_position(self):
+        """S2: runner.py's resumable-hold path (a prior run's phase ==
+        "held_overnight") deliberately bypasses its own flat/cash guards,
+        but used to then fall through to begin_next_trial -- which always
+        raises against non-flat state -- defeating the whole point of the
+        bypass. resume_held_trial is the counterpart that continues a held
+        (non-flat) trial instead of requiring flat."""
+        self.reserve()
+        self.fill()  # non-flat: one filled SPY position, no unresolved intents
+        self.assertTrue(self.ledger.positions())
+        self.now += 3600
+        # begin_next_trial still correctly refuses non-flat state for the
+        # ordinary (not a resumed hold) path.
+        with self.assertRaisesRegex(s.SafetyError, "flat_and_terminal"):
+            self.ledger.begin_next_trial(self.now, "run-2")
+        # resume_held_trial continues it instead.
+        self.ledger.resume_held_trial(self.now, "run-2")
+        self.assertTrue(self.ledger.positions())  # the held position survives, adopted not reset
+        self.assertEqual(self.ledger.db.execute(
+            "SELECT COUNT(*) FROM trials WHERE trial_id='run-2'").fetchone()[0], 1)
+
+    def test_resume_held_trial_still_enforces_risk_halt_and_clock_guards(self):
+        """Every guard except the flat/terminal check stays enforced for a
+        resumed hold: trial_id uniqueness, clock monotonicity and an actual
+        (non recovery_only) risk halt."""
+        self.reserve()
+        self.fill()
+        self.ledger.freeze("gross_loss_cap_reached")
+        with self.assertRaisesRegex(s.SafetyError, "cannot_clear_risk_halt"):
+            self.ledger.resume_held_trial(self.now + 1, "run-2")
+
+    def test_two_invocation_sequence_run_one_holds_run_two_resumes_and_proceeds(self):
+        """The exact scenario S2 describes: run 1 ends held_overnight (a
+        broker snapshot with an open position gets adopted mid-run via
+        Ledger.adopt_broker_snapshot -- D1's path); run 2 starts against the
+        same durable ledger, adopts (idempotently) the still-open position
+        from a fresh broker snapshot, and proceeds (begins its own trial
+        window) without raising."""
+        # Run 1: adopt a non-flat broker snapshot (the D1 startup-reconciliation
+        # path used under overnight_holds) and end the run without ever
+        # calling begin_next_trial again (this IS the first trial).
+        snapshot = {"account": {"cash": "9500", "buying_power": "9500", "equity": "10000"},
+                   "positions": [{"symbol": "SPY", "qty": "1", "avg_entry_price": "500.00"}],
+                   "orders": []}
+        self.ledger.adopt_broker_snapshot(snapshot, self.now)
+        self.assertTrue(self.ledger.positions())
+        self.assertEqual(self.ledger.unresolved(), [])
+
+        # Run 2, a later invocation against the same durable ledger file
+        # (simulated here in-process; the resumable-hold gate in runner.py
+        # itself is exercised by the resumable_hold flag, not repeated
+        # here). A fresh broker snapshot for the new invocation still shows
+        # the same open SPY position -- adopt_broker_snapshot is idempotent
+        # (test_seeded_order_already_present_is_not_duplicated already
+        # covers the open-order side of that for adopted orders).
+        run_two_now = self.now + 3600 * 12  # well past the run 1 window
+        self.ledger.resume_held_trial(run_two_now, "run-2")
+        self.ledger.adopt_broker_snapshot(snapshot, run_two_now)
+        self.assertEqual(self.ledger.positions()["SPY"].qty, D("1"))
+        self.ledger.mark_to_market([self.quote("SPY", bid="500", ask="500.01", at=run_two_now)], run_two_now)
+        # The resumed trial proceeds normally: a fresh order can still be
+        # reserved (the ledger is not stuck refusing admissions).
+        reserved = self.ledger.reserve_intent(
+            "buy-2", "AAPL", "buy", "1", "190.00",
+            quote=self.quote("AAPL", bid="189.99", ask="190.01", at=run_two_now),
+            now=run_two_now, market_open=True, session_close=run_two_now + 3600)
+        self.assertTrue(reserved.newly_reserved)
+
     def test_next_trial_clears_only_completed_recovery_only_state(self):
         self.ledger.begin_recovery(self.now)
         self.assertEqual(self.ledger.accounting().halted_reason, "recovery_only")

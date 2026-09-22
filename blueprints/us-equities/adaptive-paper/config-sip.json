@@ -2,7 +2,7 @@
   "schema_version": 1,
   "mode": "adaptive_paper",
   "endpoint": "https://paper-api.alpaca.markets",
-  "feed": "iex",
+  "feed": "sip",
   "regular_session_only": true,
   "duration_seconds": 300,
   "cleanup_seconds": 120,

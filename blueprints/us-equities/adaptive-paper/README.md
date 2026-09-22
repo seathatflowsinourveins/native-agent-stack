@@ -49,6 +49,51 @@ Quotes must be <=3seconds old, future-clock tolerance250ms, entry spread<=15bps.
 Entries stop at least300seconds before close. Marketable limit exits may remain
 unfilled during gaps; these limits cannot guarantee a maximum realized loss.
 
+`config.json` selects the `iex` feed. `config-sip.json` is the same frozen
+trading configuration with `feed: "sip"`, for an account whose SIP entitlement
+has been separately confirmed; the single `feed` value drives both the REST
+quote/snapshot requests and the quote stream endpoint. No SIP run has been
+executed, so nothing here qualifies SIP data quality, entitlement or cost.
+
+Trial continuity is keyed by the SHA-256 of the selected config file, recorded
+as `config_sha256` in the state directory's `trial.json`. `config.json` and
+`config-sip.json` hash differently even though only the feed differs, so
+pointing `--config` at `config-sip.json` under a state directory created for
+`config.json` refuses with `next_trial_config_differs_from_frozen_limits`, and
+`recover` refuses with `recovery_config_differs_from_frozen_trial`. A new
+`--trial` identifier does not avoid this, because the state directory is keyed
+by the account fingerprint alone.
+
+The preferred path is to finish or recover the open IEX trial and start the SIP
+trial in the same state root, so one durable ledger keeps the account-level risk
+and request history. That path is currently refused: continuity is pinned to the
+config file's bytes, not to its trading fields, so
+`next_trial_config_differs_from_frozen_limits` still fires even though
+`config-sip.json` changes only the feed. Comparing the frozen trading fields
+instead of the file hash would unblock it; that change is not made here.
+
+A separate `--state-root` is the remaining option and is not a neutral switch. It
+creates a second, fully independent durable ledger
+(`<state-root>/<account-fingerprint>/adaptive/ledger.sqlite3`) for the *same*
+paper account. Its intent, fill, request, event and trial tables start empty, so
+the account-level gross-loss and drawdown budgets, the baseline cash and the
+durable request-rate history all restart from zero, while the broker account and
+its shared 200/minute limit do not. Within one ledger these are deliberately
+never reset between trials. A second ledger is therefore acceptable only when the
+SIP trial is itself the first trial in that ledger and a fresh risk budget is
+intended; two ledgers driving one account would each believe they hold the full
+loss, drawdown and request budget.
+
+`receipt.json` stays the dated 2026-09-21 record, so some of its counts now
+understate the suites, and it is not restated here. `full_repository_suite.run`
+is 895 against 1,084 today. `independent_review` names 20 runner/strategy tests,
+now 23 (runner 7 to 10; strategies unchanged at 13), and 20 market-research
+tests, now 28. Its safety 46 and recovery 21 are unchanged. The receipt states no
+transport or native per-suite count: the transport suite is 36 to 48, and the
+native suite is 8, which already differed from the "Seven local checks" sentence
+in `README-native.md` before this change. The 42 unchanged upstream adapter tests
+were not rerun.
+
 Every Trading REST attempt counts against the shared durable200/minute budget.
 Buys and sells share a180/minute submission ceiling, reserving at least20 calls
 for account management. Delayed entry admission releases locks immediately so

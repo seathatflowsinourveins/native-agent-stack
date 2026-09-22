@@ -3,12 +3,26 @@
   "recorded_at_utc": "2026-09-21T21:12:00Z",
   "kind": "native_engine_integration_and_shadow_research",
   "status": "local_integration_passed_new_broker_trial_pending",
-  "engine": {"name": "NautilusTrader", "version": "2.0.0rc5", "upstream_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"},
-  "broker_sdk": {"name": "alpaca-py", "version": "0.44.0", "upstream_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"},
+  "engine": {
+    "name": "NautilusTrader",
+    "version": "2.0.0rc5",
+    "upstream_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
+  },
+  "broker_sdk": {
+    "name": "alpaca-py",
+    "version": "0.44.0",
+    "upstream_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+  },
   "runtime": "Isolated Python 3.12.3 runtime; existing broker and research runtimes preserved",
   "source_hashes": "source-hashes.json",
   "private_evidence_hashes": "evidence-hashes.json",
-  "families": ["trend_momentum", "range_breakout", "mean_reversion", "relative_strength", "defensive_cash"],
+  "families": [
+    "trend_momentum",
+    "range_breakout",
+    "mean_reversion",
+    "relative_strength",
+    "defensive_cash"
+  ],
   "execution_contract": {
     "endpoint": "https://paper-api.alpaca.markets",
     "universe_size": 24,
@@ -77,8 +91,24 @@
     "typesafe": "Advisory boundary documented; no API judgment or execution integration qualified in this run"
   },
   "verification": {
-    "full_repository_suite": {"run": 895, "passed": 893, "skipped": 2, "seconds": 23.290, "skip_reasons": ["EdgarTools absent in isolated runtime", "QEMU absent; existing hosted preflight remains mandatory"], "command": "python -m unittest discover -s tests -v"},
-    "unchanged_upstream_nautilus_adapter_tests": {"passed": 42, "seconds": 1.60, "skipped": 0, "network": "isolated", "scope": "Official adapter-template tests at the recorded pin; not Alpaca broker E2E"},
+    "full_repository_suite": {
+      "run": 895,
+      "passed": 893,
+      "skipped": 2,
+      "seconds": 23.29,
+      "skip_reasons": [
+        "EdgarTools absent in isolated runtime",
+        "QEMU absent; existing hosted preflight remains mandatory"
+      ],
+      "command": "python -m unittest discover -s tests -v"
+    },
+    "unchanged_upstream_nautilus_adapter_tests": {
+      "passed": 42,
+      "seconds": 1.6,
+      "skipped": 0,
+      "network": "isolated",
+      "scope": "Official adapter-template tests at the recorded pin; not Alpaca broker E2E"
+    },
     "independent_review": "Native Claude policy/integrated reviews and Codex workers; supported findings resolved. Final coordinator review passed 20 runner/strategy tests; safety 46, recovery 21 and market research 20 tests passed.",
     "review_resolved_model": "claude-fable-5-1",
     "checks": "Repository evidence integrity and catalog structure validators passed; generated HTML rebuilt and checked after evidence binding"
@@ -92,5 +122,266 @@
     "Whole-share native execution retains fractional residuals for explicit SDK recovery; automatic leverage above 1x is disabled.",
     "The observed account supports 200 API requests/minute; neither 200 trades/minute nor Elite 1000 requests/minute is broker-qualified.",
     "News collection is capped, provider-derived and advisory; no news model is calibrated or authorized to submit orders."
-  ]
+  ],
+  "changes_since": {
+    "recorded_at_utc": "2026-09-22T00:00:00Z",
+    "evidence_class": "SYN",
+    "note": "This component receipt (recorded 2026-09-21) under-describes the engine actually shipped in this directory: the G-d (rotation/strategy-pool) and G-s (session model, overnight holds, feed change) deliverables, their first fix round (14 findings: R1-R6, S1-S8) and this second fix round (six findings from the 32/36-confirmed final merged review: D1-D4, D6 code/doc/test changes plus D5 itself) added or changed the files listed below relative to this receipt's original 2026-09-21 recording. Local synthetic integration only (evidence class SYN, matching registry.json's own evidence_class for the shipped adaptive_policy_v1 pool member) -- not a new broker E2E; the original verification block above is unaltered.",
+    "files": {
+      "blueprints/us-equities/adaptive-paper/native_strategy.py": "079dc4329aadb858d9357627d089d5e43613f71bd909cfb115806b1f05137811",
+      "blueprints/us-equities/adaptive-paper/strategies.py": "56e9f639f61111282de3d0795908ea11719a22058899cc59f8839e10529f86cf",
+      "blueprints/us-equities/adaptive-paper/strategies_v1.py": "406bb4b0995df461e3a778eec97d26c7481080273debca009a7555f8e802c538",
+      "blueprints/us-equities/adaptive-paper/selector.py": "28de8ebf66b6e7135979554f73692ede772167682007d8c6ba41da6fb6fb39b3",
+      "blueprints/us-equities/adaptive-paper/runner.py": "0915981434a7a93dd203da8266e605f090d0923459b5f253b7df040615f4baa0",
+      "blueprints/us-equities/adaptive-paper/sessions.py": "9347d82a78a9b72e46e5ad89faecae20fe4f2372935c5d5f95b6e24ad92a8ca9",
+      "blueprints/us-equities/adaptive-paper/safety.py": "8316d9936ea81b0f1c226c0719e2d00460c9b7d25149cb4c71cdcebd2df892d5",
+      "blueprints/us-equities/adaptive-paper/native_adapter.py": "049b1eaeee67010e25b553726e201ce9be951c1a0bc67097908a7f9d86ce86c8",
+      "blueprints/us-equities/adaptive-paper/transport.py": "7287de7b96ecfb4b87776c63d7cf1de247065c751ee23646d441fdb651193b9a",
+      "blueprints/us-equities/adaptive-paper/recovery.py": "52a4c428bde16bd8f7ab758dc5f868cfd25b2ba482e8c1f26176f30d016036bc",
+      "blueprints/us-equities/adaptive-paper/feeds.py": "0db3009a724ae2433572c5070066d6806d7365031f9db4e81c4b69ad1cbebacb",
+      "blueprints/us-equities/adaptive-paper/config.json": "2b555982034af02b9d0d2e1d20e17d22c1e83f2b0c4d60b61d91307ebec63562",
+      "blueprints/us-equities/adaptive-paper/config-sip.json": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+      "blueprints/us-equities/adaptive-paper/registry.json": "60da73b985e718bd1dece7a3350f34636bda0fb38e766a44ae71c5a8c532282a",
+      "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json": "0e6e93a74364cb0cc297c576e6b476a2548d07b25773d2b5e62a8ee8bd36fdf2",
+      "blueprints/us-equities/adaptive-paper/receipts/adaptive_policy_v1.golden.json": "5cb4b21c7d2159e496093c67b3b358810db4e225d9c5ee1c633258050973556e",
+      "blueprints/us-equities/adaptive-paper/source-hashes.json": "4e4ac2111ca5b27383bf108b6aeb0ea75b273a294487c68b304ce6514aa82cab",
+      "tests/test_adaptive_paper_runner.py": "60c4d0e7fd25f23ddf4799a7ec88790ea8b933176634f1cb043483a419b12ebc",
+      "tests/test_adaptive_paper_selector.py": "27b431ac7911372d050f25d32ac24a3df9d2cf3c5e7dafdebfe51db6cab55936",
+      "tests/test_adaptive_paper_strategies.py": "76319884c13693ef82f976a06ddfb69973029d4386e88d667b84bf9b382ccffa",
+      "tests/test_adaptive_paper_sessions.py": "d09b47a66bd80e20928fc8b7ba0c2f02e3ba992c49aa8660ecf1921fbd1238f7",
+      "tests/test_adaptive_paper_safety.py": "4bb1c10347b21fc08f27a3f33e02172f5d570ae9bdced2dd8c16e1eb06b92555"
+    },
+    "test_modules_touched": [
+      "tests/test_adaptive_paper_runner.py",
+      "tests/test_adaptive_paper_selector.py",
+      "tests/test_adaptive_paper_strategies.py",
+      "tests/test_adaptive_paper_sessions.py",
+      "tests/test_adaptive_paper_safety.py"
+    ],
+    "limitations": [
+      "D6: with the shipped single-member registry, strategies.AdaptivePolicy._evaluate_pool always returns that one member as the candidate, so the selector can never propose switching away from it -- a rotation_flatten/liquidate decision is therefore unreachable in production even if rotation.enabled were flipped on today; it only exercises as synthetic (SYN) framework plumbing in tests until a second, independently qualified pool member exists to rotate to."
+    ]
+  },
+  "changes_since_g_f": {
+    "recorded_at_utc": "2026-09-22T00:00:00Z",
+    "evidence_class": "SYN",
+    "note": "G-f (advanced exit plan): added exits.py (an ordered, data-driven ExitPlan replacing _decide_core's inline exit-reason chain, same default ordering/thresholds -- see receipts/adaptive_policy_v1.golden.json, verified byte-identical through both AdaptivePolicy and AdaptivePolicyV1); PolicyConfig gained vol_stop_multiplier/vol_reference_bps/stop_min_bps/stop_max_bps/trailing_min_bps/trailing_max_bps/take_profit_fraction/time_decay_start_seconds/time_decay_min_multiplier/exit_replace_max_attempts, every one defaulting to a no-op against the pre-G-f engine; native_strategy.AdaptiveStrategy gained replace_exit (cancel-then-submit for a resting exit order whose price_rule changed, e.g. a trailing-stop ratchet -- native_adapter.py still rejects order modify) with a busy-set, residue protection and a per-symbol exit_attempts cap; safety.RiskLimits gained max_order_qty_mode (\"fixed\", the shipped default, vs \"notional\", which derives the per-order share cap from max_order_notional_usd/price instead of a literal count) via effective_max_order_qty, wired optionally through runner.load_config's max_order_qty_mode config key (absent in every shipped config.json/config-sip.json, so \"fixed\" stays the default). Local synthetic integration only (evidence class SYN) -- not a new broker E2E; the original verification block above is unaltered. Default configuration behavior (shipped config.json/config-sip.json, both rotation and sessions off, feed iex/sip) is byte-identical: the 16-case golden fixture (receipts/adaptive_policy_v1.golden.json) still matches exactly through both strategies.AdaptivePolicy and strategies_v1.AdaptivePolicy.",
+    "files": {
+      "blueprints/us-equities/adaptive-paper/exits.py": "189133e6df99bda201d73d36a15f45ccbfb38979a3319ae6f75d077f5db5b3df",
+      "blueprints/us-equities/adaptive-paper/strategies_v1.py": "a4435c02cd726bf3d02a1fe254c7c0dadda67a48d14359c4d4c103ab1f717190",
+      "blueprints/us-equities/adaptive-paper/native_strategy.py": "831770ef12d286f18a11911a954d74a8537a9c92d5ba477fc9832dfde07c3631",
+      "blueprints/us-equities/adaptive-paper/safety.py": "c7fcd8969ac861685931b4b5ea2130d2098b4ba98dba83cc413ff57557a9745d",
+      "blueprints/us-equities/adaptive-paper/runner.py": "9deb9d37d2723758d281350af2ac9b5fc2663db60abc3849b8dd97be65e84c94",
+      "blueprints/us-equities/adaptive-paper/source-hashes.json": "84b333da0ee0d5cbc78d3545705d925b7c14e0a862566acd8744991616c70548",
+      "tests/test_adaptive_paper_exits.py": "96e25664b8110c44eee50a60efddade1be9bdc95ffe97ac3a58f3490346ff7cf"
+    },
+    "test_modules_touched": [
+      "tests/test_adaptive_paper_exits.py"
+    ],
+    "limitations": [
+      "replace_exit is only invoked from rebalance()'s existing busy-symbol skip branch when a resting sell's recorded price_rule differs from the current tick's reason; it is exercised directly with fakes (tests/test_adaptive_paper_exits.py's ReplaceExitTests), not through a full nautilus node roundtrip.",
+      "gap-risk/overnight rules (native_strategy._gap_risk_stop_symbols, safety.evaluate_gap_risk) are unchanged by G-f -- exits.py documents their position in the precedence order but does not duplicate them, since _decide_core does not have the prior-session-close input they need.",
+      "notional max_order_qty mode is validated directly against safety.py (RiskLimits.effective_max_order_qty, Ledger.reserve_intent) and is not wired into PolicyConfig.max_shares (policy-level sizing), which still comes from config.json's existing max_order_quantity field unchanged."
+    ]
+  },
+  "changes_since_g_f_round3": {
+    "recorded_at_utc": "2026-09-22T00:00:00Z",
+    "evidence_class": "SYN",
+    "note": "G-f round 3 (four defects left open by round 2's independent review): D1 -- _exit_replace_busy/the staged cancel-then-replace used to be released only inside _submit_replacement_exit (on_order_canceled). AdaptiveStrategy now releases it (and drops the staged replacement, never submitting it) from on_order_filled, on_order_rejected, on_order_expired, and the newly added on_order_cancel_rejected too, via a shared _release_staged_replacement helper; a partial fill's residue protection still holds since the next rebalance() tick re-derives sell quantity from live held-vs-target once the symbol is free again. D2 -- _gap_risk_stop_symbols' trigger now applies the same QUOTE_FUTURE_TOLERANCE_SECONDS/quote_age_seconds freshness window every other order path in this file uses; fire-once (_gap_stop_applied) is marked only in rebalance(), once the exit action is actually accepted into the submit path (a direct submit_order(), or a replace_exit() that returns True) -- a stale-at-trigger-time or refused-at-submit-time gap stop now stays armed for retry instead of being silently consumed. D3 -- replace_exit now stores the caller-supplied now (not real wall-clock time) plus a wall-clock reference on the staged replacement; _submit_replacement_exit refreshes that now forward by however much real time actually elapsed before the cancel acknowledged, and uses it (not raw time.time()) for the replacement order's own created stamp, while the quote-freshness check itself still correctly uses real wall-clock time against the quote's own (market-clock) timestamp -- keeping cancel_expired's timeout arithmetic on one consistent clock. D4 -- safety.RiskLimits.effective_max_order_qty gained an explicit quote_price keyword (used for the notional-implied share count when given, falling back to the order's own limit price only when it is not); reserve_intent now passes quote.ask/quote.bid (the live quote's own executable-side price) explicitly, matching the docstring's original 'live quote price' contract instead of silently substituting the order's own (possibly offset) limit price. Also fixed the stale, self-contradicting docstring on tests/test_adaptive_paper_sessions.py's test_replayed_older_resumed_message_cannot_clear_a_newer_halt (claimed 'no per-symbol out-of-order/replay guard' while its own body -- and the code -- demonstrate the guard exists). Local synthetic integration only (evidence class SYN) -- not a new broker E2E; the original verification block above is unaltered. Default configuration behavior (shipped config.json/config-sip.json) remains byte-identical: the 16-case golden fixture still matches exactly through both strategies.AdaptivePolicy and strategies_v1.AdaptivePolicy.",
+    "files": {
+      "blueprints/us-equities/adaptive-paper/native_strategy.py": "dbb1d7f52b0253f3727e7e3d9d4c8eae8637020355afad75504c44e0dbd5ed06",
+      "blueprints/us-equities/adaptive-paper/safety.py": "e0357211e50c5eb0e36194d1cd71e1a35bdeb1434624ae79924b167cf3920c7d",
+      "blueprints/us-equities/adaptive-paper/source-hashes.json": "b2d70db71f80a0689532303dcb1fcfca333e2cd0e0728348dcaedce26c15b8a1",
+      "tests/test_adaptive_paper_exits.py": "9e5562fa847ae6eec746bd34edcdaaa98001a2d76837d4a1a8e6acf2fd03ac61",
+      "tests/test_adaptive_paper_sessions.py": "0c3a0b230e9b5d76115c52fc4fa0f29a37ccf52d59c6877c9f85689cba366fb6"
+    },
+    "test_modules_touched": [
+      "tests/test_adaptive_paper_exits.py",
+      "tests/test_adaptive_paper_sessions.py"
+    ],
+    "limitations": [
+      "The rebalance()-level gap-risk fire-once tests (GapStopFireOnceOnlyAfterSubmitTests) monkeypatch _gap_risk_stop_symbols to force a trigger rather than driving a real session-clock crossing end to end; the trigger's own freshness guard is covered separately and directly by StaleQuoteGapRiskTests in test_adaptive_paper_sessions.py.",
+      "D3's clock-refresh design (store the caller now plus a wall-clock reference, refresh forward by real elapsed wall-clock time on ack) is validated with a synthetic `now` far from real wall-clock time in tests, not against an actual divergent backtest/simulation clock integration.",
+      "D4's fix is only observable end-to-end via reserve_intent for a SELL (whose marketable limit price sits below the quote's bid); for a BUY, reserve_intent's separate, unchanged qty*limit_price notional check is mathematically always at least as tight as the old limit-price-based qty cap, so the quote-price-vs-limit-price distinction for a BUY is only demonstrated at the effective_max_order_qty unit level, not through a BUY-side reserve_intent integration case."
+    ]
+  },
+  "changes_since_g_f_round4": {
+    "recorded_at_utc": "2026-09-22T00:00:00Z",
+    "evidence_class": "SYN",
+    "note": "G-f round 4 (7 defects from the final review, mostly in the gap-risk hook; D7 was an inventory citation only, no code change): D1 -- replace_exit now returns an explicit outcome (\"cancel_requested\"/\"noop\"/\"refused\") instead of a bool; rebalance()'s busy-branch call to it no longer marks self._gap_stop_applied on \"cancel_requested\" alone (that only means a cancel was requested, not that any order reached the broker) -- fire-once for the replace path is now marked inside _submit_replacement_exit, only once the replacement order is actually submitted. D2 -- the quote used to DERIVE the armed stop price (previously read with no age guard at all inside the crossed_into_rth arm block) now goes through the same freshness window every other order path uses; arming is decoupled from the single crossing tick via a new _gap_arm_pending set, drained one symbol at a time across however many RTH ticks it takes for that symbol's own quote to become fresh, instead of a stale quote at the crossing instant permanently skipping arming for the rest of the session. D3 -- the quote used to CAPTURE the prior RTH close (at the RTH -> non-RTH crossing) is now guarded with the same freshness window before being persisted; safety.Ledger.record_prior_rth_close/prior_rth_closes now carry {price, session_date, ts_ns} instead of a bare price string, and native_strategy.py only arms against a loaded prior close whose session_date is exactly the trading day immediately before the session being armed (sessions.py gained a public previous_trading_day helper for this) -- any other date is refused and recorded via a new \"stale_prior_close_ignored\" event, never silently armed against. D4 -- PolicyConfig gained gap_stop_trigger_bps (default None -> resolves to stop_bps, so the shipped default's effective behavior is unchanged -- see the limitations note on why this is unreachable anyway); the gap stop now only arms when the adverse (downward) gap magnitude from safety.evaluate_gap_risk's own gap_bps is at least the trigger, previously computed and discarded entirely (armed for ANY gap, including a gap up). gap_bps is recorded in self._gap_bps regardless of arming and surfaced in rebalance()'s \"decision\" event (moved to fire after _gap_risk_stop_symbols so the same-tick gap_bps values are available to include). D5 -- removed the round-3 wall-clock freshness read in _submit_replacement_exit entirely (and the now-inaccurate comment claiming it matched _operational_status's convention, which actually already used the caller-supplied now); replace_exit/_submit_replacement_exit now use ONE clock -- the caller-supplied now, staged on the replacement at cancel time -- for both the quote-freshness check and the replacement order's \"created\" stamp, matching every other freshness check in this file; a synchronous-clock test proves replacement works end to end when now != time.time(). D6 -- a gap_risk_stop sell truncated by PolicyConfig.max_shares (both the direct-submit path and the replace-then-resubmit path) no longer marks fire-once -- only when the FULL held quantity was actually submitted, leaving an untruncated remainder's stop armed for the next tick instead of permanently unprotected. Local synthetic integration only (evidence class SYN) -- not a new broker E2E; the original verification block above is unaltered. Default configuration behavior (shipped config.json/config-sip.json) remains byte-identical: the 16-case golden fixture still matches exactly through both strategies.AdaptivePolicy and strategies_v1.AdaptivePolicy.",
+    "files": {
+      "blueprints/us-equities/adaptive-paper/strategies_v1.py": "cfd482adf4c9f338d1f62c1024ea31b4b4aae5a1692ba3810fa3bbffe48cf654",
+      "blueprints/us-equities/adaptive-paper/native_strategy.py": "eef81f7f3721f803a04a4743963e251072a37fa111552ae94d1b3b04542759fe",
+      "blueprints/us-equities/adaptive-paper/safety.py": "24783aa0c2209798a98e8f8491fd7f5f8ff4d27858f3dfff0d41999c7325642f",
+      "blueprints/us-equities/adaptive-paper/sessions.py": "1920952ac8219caf09e622fe517179e2766652fc7f987f7a11258481aa881998",
+      "blueprints/us-equities/adaptive-paper/source-hashes.json": "c1d2b3c7f1fabd57018a91ac3a6dd01585199b7b320a7ddd84fc314519c6a710",
+      "tests/test_adaptive_paper_exits.py": "63a5c4c37299b51706f75483ea7c80fde66204a513f2d799f78090f00fc22c6d",
+      "tests/test_adaptive_paper_sessions.py": "7a41465b82e713772d1752cb1fddaa6eec392c1e2eb24990ffae9a9c9c268e7a"
+    },
+    "test_modules_touched": [
+      "tests/test_adaptive_paper_exits.py",
+      "tests/test_adaptive_paper_sessions.py"
+    ],
+    "limitations": [
+      "gap_stop_trigger_bps' default resolves to stop_bps, not a literal no-op threshold; this changes nothing in the shipped default path because overnight_holds=false there means no position ever survives to a gap-risk arming tick regardless of this field's value -- not because the threshold itself is inert.",
+      "D3's session_date persistence format ({price, session_date, ts_ns} JSON instead of a bare price string) is a breaking change to Ledger.record_prior_rth_close's signature and Ledger.prior_rth_closes' return shape; a pre-D3 (round <4) persisted record (a bare price string) is now unparseable and silently dropped by prior_rth_closes() rather than migrated -- an already-running ledger from an earlier round crossing an RTH<->POST boundary for the first time after this change starts with no usable prior close for that symbol until a fresh capture.",
+      "GapStopTriggerThresholdTests' and DeferredArmingOnStaleQuoteTests' synthetic quote arithmetic uses Python float rounding to 2 decimal places to stay within safety.decimal()'s precision bound; this is a test-construction detail, not a production code path."
+    ]
+  },
+  "changes_since_g_f_round5": {
+    "recorded_at_utc": "2026-09-22T00:00:00Z",
+    "evidence_class": "SYN",
+    "note": "G-f round 5 (8 defects from the round-4 review, again mostly in the gap-risk hook; D8 was an inventory citation only, no code change). Also: the entire gap-risk hook is now opt-in on a new PolicyConfig.gap_stop_enabled (default False), read from an optional \"sessions.gap_stop.enabled\" config key (absent -> False) validated separately from sessions.validate_session_policy's own well-tested return shape. Disabled, _gap_risk_stop_symbols returns immediately before touching self._prior_rth_close, self.ledger, or any quote -- including the prior-close capture/persist side, not just arming/triggering. Neither shipped config.json nor config-sip.json was touched (both confirmed byte-identical to their prior hashes); test_frozen_sip_config_matches_the_iex_lane_except_the_feed does not force a \"gap_stop\" block to exist in either file, so nothing required adding one. D3 (decisive) -- strategies_v1.PolicyConfig.stop_bps/gap_stop_trigger_bps are plain Python floats (the field's real, declared type); safety.decimal() explicitly rejects float (`type(value) not in (str, int, Decimal)`), so evaluate_gap_risk's internal decimal(stop_bps) call raised for any actual float value, silently swallowed by _gap_risk_stop_symbols' own except-continue -- disabling the whole hook for any config using a genuine float stop_bps, independent of gap_stop_enabled. Fixed by converting explicitly via str(...) at the two call sites (evaluate_gap_risk's stop_bps argument, and the Decimal(gap_stop_trigger_bps) comparison against gap_bps, since Decimal does not support direct rich comparison with float either). A new test drives derivation with the real, unmodified PolicyConfig dataclass (stop_bps=25.0) to prove it. D1 -- fire-once (_gap_stop_applied) is now cleared, via a shared _clear_gap_stop_applied_if_matches helper reading a new \"reason\" field recorded on every pending order, in on_order_rejected/denied/expired/cancel_rejected for a gap_risk_stop order that terminates without filling; a genuine fill (on_order_filled) deliberately does not clear it. D2 -- the CAPTURE side (RTH -> non-RTH crossing) gained the same retry treatment arming already had: a new _prior_close_capture_pending set, seeded at the crossing and drained on this or any later non-RTH tick once each symbol's quote is fresh, emitting \"prior_close_captured\" on success or \"prior_close_capture_abandoned\" if still pending once the next RTH session opens. D4 -- record_prior_rth_close's call is now wrapped in try/except SafetyError -> a \"prior_close_persist_failed\" event, never raised into rebalance(); the captured midpoint is rounded to the same tick precision (quantize to $0.01 at/above $1, $0.0001 below) reserve_intent's own price-increment check uses, before persisting, avoiding safety.decimal()'s 9-decimal-digit bound a raw (bid+ask)/2 division can otherwise exceed. D5 -- corrected the stale \"_arm_gap_stop\" docstring references (a method that never existed) in native_strategy.py's __init__ and safety.py's record_prior_rth_close to the real _gap_risk_stop_symbols. D6 -- removed safety.RiskLimits.__post_init__'s dead \"self.overnight_gross_multiple <= 0\" branch (decimal(zero=False), already applied to that field a few lines above, already refuses a non-positive value before this check could ever be reached); no existing test asserted this specific branch. D7 -- previous_trading_day at the first trading day of the frozen calendar (2026-01-02, since 2026-01-01 is a holiday) walks back into 2025, outside sessions.CALENDAR_YEARS, and raises ValueError; _gap_risk_stop_symbols already caught this (round 4) and treated it as validation-unknown (do not arm, record via the existing \"stale_prior_close_ignored\" event) rather than letting it propagate -- confirmed already correct behavior with a dedicated test for the actual 2026-01-02 boundary date, per the brief's second offered alternative (no change to the frozen calendar table itself). Local synthetic integration only (evidence class SYN) -- not a new broker E2E; the original verification block above is unaltered. Default configuration behavior (shipped config.json/config-sip.json) remains byte-identical: the 16-case golden fixture still matches exactly through both strategies.AdaptivePolicy and strategies_v1.AdaptivePolicy, and the gap-risk hook is now unreachable in the shipped default for two independent reasons (overnight_holds=false, as before, AND gap_stop_enabled=false).",
+    "files": {
+      "blueprints/us-equities/adaptive-paper/strategies_v1.py": "089316c10d8dc60df4ee20513d077f9779e1c6e58298f4b6c03379cfa11537e2",
+      "blueprints/us-equities/adaptive-paper/native_strategy.py": "f648d67fe4376d1c5e7a0f29db3394f61206f0cfde461e9c6e64a686f7675b55",
+      "blueprints/us-equities/adaptive-paper/safety.py": "e521cbf18f44e24cb3bd67a2eab7481fe39680c1bf748fe12374f63c926657e8",
+      "blueprints/us-equities/adaptive-paper/runner.py": "a6baaf66499663a71c44d7be0e508b776d6d8b06e61d164f927d0cd38c6ec460",
+      "blueprints/us-equities/adaptive-paper/source-hashes.json": "51f17625eac78a35c87c1dbfcccf733442d448f19741f2217f312bbb6a7e32c4",
+      "tests/test_adaptive_paper_exits.py": "5b082b657bd8b133d66ceff031cce5a065bf29125573c29cd00d9fbadca9734c",
+      "tests/test_adaptive_paper_sessions.py": "9eaffa221f7af767bb8e1f5c377d28bfd33ab05b539521550ba568b2ed2fdcc4"
+    },
+    "test_modules_touched": [
+      "tests/test_adaptive_paper_exits.py",
+      "tests/test_adaptive_paper_sessions.py"
+    ],
+    "limitations": [
+      "The shipped config.json's stop_bps literal (25, no decimal point) happens to parse as a Python int via json.loads, which safety.decimal() already accepted before this fix -- so D3's decisive bug was not actually reachable through today's exact shipped literal even before this fix, only through a genuine float value (25.5, or an explicit float(...) cast, or direct PolicyConfig(stop_bps=25.0, ...) construction). The fix is still correct and necessary: the field's declared type is float, runner.py does not cast it, and any config author writing a decimal stop_bps would have hit this immediately once gap_stop_enabled is turned on.",
+      "D1's cancel_rejected clearing is conservative rather than strictly necessary: the order that failed to cancel is still resting, unmodified, still protecting the position; clearing fire-once there only costs a harmless redundant re-check on the next tick (replace_exit on an unchanged order returns \"noop\").",
+      "The gap_stop opt-in flag is read as a sibling of sessions.validate_session_policy's own \"sessions\" block but validated separately in runner.py, not folded into that function's return shape, to avoid touching its existing strict-equality test (test_default_policy_matches_legacy_flags_byte_identical)."
+    ]
+  },
+  "changes_since_g_f_round6": {
+    "recorded_at_utc": "2026-09-22T00:00:00Z",
+    "evidence_class": "SYN",
+    "note": "G-f round 6 (4 defects left open by the round-5 review, all in the gap-risk/exit-replacement hook and one in runner.py's forced-recovery path). D1 -- on_order_canceled was the only terminal handler that never called _clear_gap_stop_applied_if_matches; an ORDINARY cancel (e.g. cancel_expired's plain timeout cancel, no staged cancel-then-replace) of a gap_risk_stop sell reached it with fire-once left permanently marked. Fixed: on_order_canceled now clears fire-once when there is no staged replacement on the cancelled order; when there IS one (the cancel is itself the staged cancel-then-replace of that same gap exit), it does not clear it here -- the replacement carries the reason and (re-)marks fire-once itself only once actually submitted. D2 -- the replacement freshness check used the frozen requested_now staged at cancel-REQUEST time; in live asynchronous operation a cancel ack arriving any real time later (network/broker latency) made a quote genuinely fresh at ACK time look 'from the future' relative to that stale frozen clock, silently skipping the replacement. Fixed by giving AdaptiveStrategy its own swappable self._clock (constructor kwarg clock=time.time, mirroring runner.Controller's own clock= convention -- note: the attribute is named _clock, not clock, because nautilus_trader.trading.Strategy already defines a read-only 'clock' property that a plain attribute assignment cannot override); rebalance()'s own now=None default and on_order_canceled's ack-time now both come from self._clock() now. _submit_replacement_exit takes an explicit `now` parameter (the ack-time clock reading) for both the freshness check and the 'created' stamp; requested_now is still staged on the replacement dict but only for the min-interval/attempt accounting replace_exit itself already performs at request time -- not read by _submit_replacement_exit any more. D3 -- the session_open midpoint used for ARMING (unlike the capture side, already fixed in round 5) was never rounded to tick precision, so a raw (bid+ask)/2 division could exceed safety.decimal()'s 9-decimal-digit bound; also, any arming evaluation failure permanently discarded the symbol from _gap_arm_pending. Fixed: _round_to_tick is now applied to the arming session_open too, and a failed evaluation keeps the symbol pending for retry on the next RTH tick, recorded via a new 'gap_arm_evaluation_failed' event, instead of giving up silently for the rest of the session. D4 -- main()'s forced-recovery branch set outcome['flat'] = recovery['flat'] but never re-derived outcome['status'], so a forced liquidation that failed to actually flatten the account could leave a pre-recovery status (e.g. 'held_overnight', from run_native's own now-stale snapshot) exposed to trial_phase_and_exit_code, reporting exit 0/resumable phase for a genuinely non-flat account. Factored into a new, directly unit- testable _apply_forced_recovery_outcome(outcome, recovery) (matching this file's existing pattern of factoring _run_native_status/_honest_overnight_hold/trial_phase_and_exit_code out for the same reason) that overwrites both flat and status from recover()'s own already-correct post-recovery result; _run_native_status' docstring corrected to describe this explicitly (it is run_native's OWN status, not necessarily main()'s final one). Local synthetic integration only (evidence class SYN) -- not a new broker E2E; the original verification block above is unaltered. Default configuration behavior (shipped config.json/config-sip.json, confirmed byte-identical) remains byte-identical: the 16-case golden fixture still matches exactly through both strategies.AdaptivePolicy and strategies_v1.AdaptivePolicy.",
+    "files": {
+      "blueprints/us-equities/adaptive-paper/native_strategy.py": "798c7170caa025adf4856dffde02f8574cdcc26df3b4365243c19e435b143649",
+      "blueprints/us-equities/adaptive-paper/runner.py": "b6ed0f95be1b040cb01a6a3a14bf2283bf6ebb208dfaac9b556edaf72b39cd22",
+      "blueprints/us-equities/adaptive-paper/source-hashes.json": "b44ec33e2beed7a0e49e77580772dc703e6402e2077b171b2db38ba0aea51c9f",
+      "tests/test_adaptive_paper_exits.py": "0b053e5b6312f26495076a03a5afab2a8abc76c387d8a840bee04861bea88303",
+      "tests/test_adaptive_paper_sessions.py": "6fb5f03cdbdb7fd4cf0105cfd4002a41ae0adb1ef18770f0bdaaae054661e92b",
+      "tests/test_adaptive_paper_runner.py": "6dc9089e147abc64c163575cda77ba215477af3b1a1d7dc9df5967763f321546"
+    },
+    "test_modules_touched": [
+      "tests/test_adaptive_paper_exits.py",
+      "tests/test_adaptive_paper_sessions.py",
+      "tests/test_adaptive_paper_runner.py"
+    ],
+    "acceptance": {
+      "named_nine_suites": "Ran 412 tests ... OK (skipped=1)",
+      "unittest_discover": "Ran 1350 tests ... OK (skipped=3)",
+      "scripts_validate": "{\"status\": \"passed\", \"hashed_files\": 1525, ...}"
+    },
+    "limitations": [
+      "D4's new test covers _apply_forced_recovery_outcome and trial_phase_and_exit_code directly (a pure-function unit test, matching this file's existing testability pattern for these exact helpers); it does not drive main()'s full async CLI path (argparse, env files, a real/simulated port) end to end -- that would require substantially more scaffolding than this defect's fix warrants.",
+      "D1's on_order_canceled fix only clears fire-once when replace_with is absent from the cancelled order's pending record; a cancel whose replace_with was already cleared by some other path before the ack arrives would also (correctly) clear fire-once here, since that is indistinguishable from an ordinary cancel by the time this handler runs."
+    ]
+  },
+  "changes_since_g_f_round7": {
+    "recorded_at_utc": "2026-09-22T00:00:00Z",
+    "evidence_class": "SYN",
+    "note": "G-f round 7 (3 narrow defects left open by the round-6 review). D1 -- runner._apply_forced_recovery_outcome unconditionally overwrote outcome['status'] with recover()'s own status; this correctly stopped a FAILED forced liquidation from leaving an optimistic pre-recovery status exposed, but also, wrongly, let a SUCCESSFUL forced liquidation silently UPGRADE a genuinely failed pre-recovery session (status 'needs_attention', from a real mid-RTH error/halt/reconciliation mismatch run_native itself already detected) to 'passed'/exit 0 just because the liquidation that followed happened to work. Fixed with an explicit severity order (needs_attention/failed > held_overnight > completed_no_signals/passed, an unrecognized status treated as maximally severe) and a monotone (worse-of-both) composition; flat is still always taken from recovery's own, current, post-recovery ledger state; both the pre-recovery status (outcome['status_before_recovery']) and the full recovery dict (outcome['recovery'], carrying its own 'status') are retained so neither input is lost. D2 -- fire-once (self._gap_stop_applied) was left marked whenever a cancel-then-replace was staged for a gap_risk_stop order, on the premise that the replacement would re-mark it once submitted; when that staged replacement is instead dropped or abandoned before ever being submitted (no fresh quote at ack time in _submit_replacement_exit, or the order it was meant to replace terminating some other way in _release_staged_replacement) the OLD resting order is already gone by then, so nothing was left resting to protect the position, yet fire-once stayed marked as 'already fired' for the rest of the RTH session. Fixed via a new shared _clear_gap_stop_for_dropped_replacement helper, called from both _submit_replacement_exit's stale-quote abandonment and _release_staged_replacement. D3 -- on_order_cancel_rejected did not roll back the exit_attempts increment or the last_replace_at advance replace_exit performs BEFORE calling cancel_order; when the cancel itself fails (no replacement ever happens), those should not have been consumed at all. Fixed by staging the pre-attempt values (previous_attempts, previous_last_replace_at) on the replacement dict at request time and restoring them in on_order_cancel_rejected -- restoring the actual prior values (not merely clearing to 'never replaced'), so a symbol already replaced once before a subsequently cancel-rejected attempt keeps its real attempt count and min-interval clock. Local synthetic integration only (evidence class SYN) -- not a new broker E2E; the original verification block above is unaltered. Default configuration behavior (shipped config.json/config-sip.json, confirmed byte-identical) remains byte-identical: the 16-case golden fixture still matches exactly through both strategies.AdaptivePolicy and strategies_v1.AdaptivePolicy.",
+    "files": {
+      "blueprints/us-equities/adaptive-paper/native_strategy.py": "78700fd71f65657eaddd130c1a6733dcb25b4e29a4b47b1c6fa05d3b82e5982f",
+      "blueprints/us-equities/adaptive-paper/runner.py": "3fcef8b652d2c744a42a2459c31e8ea086ed38b6b31847525b4f43eb5a51eaa0",
+      "blueprints/us-equities/adaptive-paper/source-hashes.json": "370cb722d78ae289d9f404474232396f6b86ffbb0e919aaa634e7879323accc6",
+      "tests/test_adaptive_paper_exits.py": "bde9c27d78cf9166f96f7fbc64dd601a522807b477022ddc62990bbc76e5ab3f",
+      "tests/test_adaptive_paper_runner.py": "a5c248a0e0ae29ada068aa1f46baa31fe9518eef7be0066c1379fea1ee374426"
+    },
+    "test_modules_touched": [
+      "tests/test_adaptive_paper_exits.py",
+      "tests/test_adaptive_paper_runner.py"
+    ],
+    "acceptance": {
+      "named_nine_suites": "Ran 419 tests ... OK (skipped=1)",
+      "unittest_discover": "Ran 1357 tests ... OK (skipped=3)",
+      "scripts_validate": "{\"status\": \"passed\", \"hashed_files\": 1525, ...}"
+    },
+    "limitations": [
+      "D2's clearing in _release_staged_replacement is defensive (the brief names both _submit_replacement_exit and _release_staged_replacement explicitly): the ORIGINAL resting order's own reason may differ from the staged replacement's own reason (a ratchet, e.g. trailing_stop -> gap_risk_stop), so this path can clear fire-once for a scenario that is harder to construct in practice than the primary stale-quote-at-ack-time case; it costs nothing extra beyond a redundant re-arm check on the next tick, matching this file's established conservative pattern for on_order_cancel_rejected.",
+      "D1's severity order is a fixed, hardcoded table (_STATUS_SEVERITY); a future new run_native/recover status value not added to that table is treated as maximally severe by default (safe, but silently -- no validation error is raised for an unrecognized status string)."
+    ]
+  },
+  "changes_since_g_f_round8": {
+    "recorded_at_utc": "2026-09-22T20:05:00Z",
+    "evidence_class": "SYN",
+    "summary": "G-f round 8 (6 review defects D1-D6 + cancel-then-replace made opt-in). Builder stopped on a provider session limit after its nine suites passed; the coordinator ran the full suite, repinned the hashes and wrote this addendum.",
+    "changes": [
+      "exits.replace_enabled (optional, default false; PolicyConfig.exit_replace_enabled) gates cancel-then-replace; off = pre-G-f busy-symbol skip",
+      "D1 cancel-reject keeps the min-interval, restores the attempt count and adds a capped per-symbol cancel_reject count",
+      "D2 _run_native_status docstring corrected to the monotone composition",
+      "D3 a fill racing a staged gap replacement keeps gap-stop fire-once",
+      "D4 write-only requested_now removed",
+      "D5/D6 status-first phase derivation and two-tier status composition after forced recovery (failed statuses sticky; held_overnight never survives a successful flatten)"
+    ],
+    "files": {
+      "blueprints/us-equities/adaptive-paper/native_strategy.py": "03eb8ea62bb60b7aa2799fa2f3e78908d30846cce77292148d4617031fc75b4d",
+      "blueprints/us-equities/adaptive-paper/runner.py": "19d7a27e77f442dd18e0021f3e186a80bafd0c1b738850570a3454e105d5688f",
+      "blueprints/us-equities/adaptive-paper/strategies_v1.py": "5721d077d321347d769ad0b35ccd75ffb805076f3d6fc11d9a59168334e98a8c",
+      "tests/test_adaptive_paper_exits.py": "13a82d65ad1b2e72a8ca0fbb8bbb178a01ded1301399604c9e304ae213456764",
+      "tests/test_adaptive_paper_runner.py": "e07aae76085df085567c362b0b0ba69108afcc22caea69e6aec306da2245506e"
+    },
+    "acceptance": {
+      "named_nine_suites": "Ran 424 tests in 12.011s / OK (skipped=1)",
+      "unittest_discover": "Ran 1362 tests in 49.682s / OK (skipped=3)",
+      "scripts_validate": "recorded after this repin (see task record)"
+    },
+    "limitations": [
+      "gap-risk hook and cancel-then-replace are opt-in SYN features; shipped configs never reach them",
+      "no broker-observed receipt for cancel-then-replace, partial take-profit or the gap stop",
+      "forced-recovery composition tested at unit level; main() CLI path not driven end to end",
+      "round-8 review not yet run at this addendum"
+    ]
+  },
+  "changes_since_rebase_onto_main": {
+    "recorded_at_utc": "2026-09-22T20:08:29Z",
+    "evidence_class": "SYN",
+    "summary": "Reviewed engine change (feed selection, rotation selector, session model/overnight holds, exit plan with opt-in cancel-then-replace and opt-in gap-risk stop; G-f rounds 1-8) rebased from c2019e6 onto canonical main 03f0ad4, keeping PR-4/#64 guards: validate_preflight promotion gate (_check_promotion_gate full contract), hardened credentials(), metrics.py confinement and their tests.",
+    "conflicts_resolved": [
+      "runner.validate_preflight: union of the promotion-gate kwargs (mode, gate_result_path, snapshot_path) and the session kwargs (allow_existing_positions, session_policy); gate check first",
+      "runner.main paper/recover call site: passes both sets",
+      "tests/test_adaptive_paper_runner.py imports: union; _paper_ready_config fixture extended with the shipped session-policy defaults (main() now validates the session policy of the config load_config returns)"
+    ],
+    "files": {
+      "blueprints/us-equities/adaptive-paper/README-research.md": "d8493265d8c032fd313b40cc6eedcf9d2d341d85eea0122a6a723b6da152e76e",
+      "blueprints/us-equities/adaptive-paper/README-transport.md": "a21d8bc518384017e038182658ddbc58e85cc24a406d69e9ca04766b9c6cd111",
+      "blueprints/us-equities/adaptive-paper/README.md": "ad50a78997d267a12df136697f3b82fc1529bb953f5bcd4d806f1b35d3298872",
+      "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json": "0e6e93a74364cb0cc297c576e6b476a2548d07b25773d2b5e62a8ee8bd36fdf2",
+      "blueprints/us-equities/adaptive-paper/config-sip.json": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+      "blueprints/us-equities/adaptive-paper/config.json": "2b555982034af02b9d0d2e1d20e17d22c1e83f2b0c4d60b61d91307ebec63562",
+      "blueprints/us-equities/adaptive-paper/exits.py": "189133e6df99bda201d73d36a15f45ccbfb38979a3319ae6f75d077f5db5b3df",
+      "blueprints/us-equities/adaptive-paper/feeds.py": "0db3009a724ae2433572c5070066d6806d7365031f9db4e81c4b69ad1cbebacb",
+      "blueprints/us-equities/adaptive-paper/market_research.py": "692f0f16f56709204002d587d2e4da8045f0ffe8249294055cf36b51e29abe68",
+      "blueprints/us-equities/adaptive-paper/native_adapter.py": "049b1eaeee67010e25b553726e201ce9be951c1a0bc67097908a7f9d86ce86c8",
+      "blueprints/us-equities/adaptive-paper/native_strategy.py": "03eb8ea62bb60b7aa2799fa2f3e78908d30846cce77292148d4617031fc75b4d",
+      "blueprints/us-equities/adaptive-paper/receipts/adaptive_policy_v1.golden.json": "5cb4b21c7d2159e496093c67b3b358810db4e225d9c5ee1c633258050973556e",
+      "blueprints/us-equities/adaptive-paper/recovery.py": "52a4c428bde16bd8f7ab758dc5f868cfd25b2ba482e8c1f26176f30d016036bc",
+      "blueprints/us-equities/adaptive-paper/registry.json": "60da73b985e718bd1dece7a3350f34636bda0fb38e766a44ae71c5a8c532282a",
+      "blueprints/us-equities/adaptive-paper/runner.py": "3a40c5a92a82a7fac97c5d660dcb18f632cff3a5058e9b392d350fa3fe133fae",
+      "blueprints/us-equities/adaptive-paper/safety.py": "e521cbf18f44e24cb3bd67a2eab7481fe39680c1bf748fe12374f63c926657e8",
+      "blueprints/us-equities/adaptive-paper/selector.py": "28de8ebf66b6e7135979554f73692ede772167682007d8c6ba41da6fb6fb39b3",
+      "blueprints/us-equities/adaptive-paper/sessions.py": "1920952ac8219caf09e622fe517179e2766652fc7f987f7a11258481aa881998",
+      "blueprints/us-equities/adaptive-paper/source-hashes.json": "5d389c0652fc73d5d33e8cae433bb4501badf28c4fce2e5fc3aad6d63d061121",
+      "blueprints/us-equities/adaptive-paper/strategies.py": "56e9f639f61111282de3d0795908ea11719a22058899cc59f8839e10529f86cf",
+      "blueprints/us-equities/adaptive-paper/strategies_v1.py": "5721d077d321347d769ad0b35ccd75ffb805076f3d6fc11d9a59168334e98a8c",
+      "blueprints/us-equities/adaptive-paper/transport.py": "7287de7b96ecfb4b87776c63d7cf1de247065c751ee23646d441fdb651193b9a",
+      "tests/test_adaptive_paper_exits.py": "13a82d65ad1b2e72a8ca0fbb8bbb178a01ded1301399604c9e304ae213456764",
+      "tests/test_adaptive_paper_recovery.py": "d10af6928bf3ba946c82e632e545ee9eb53a1feea275b2e20a818c283eb1b6aa",
+      "tests/test_adaptive_paper_runner.py": "d20e32e5d40a5e061ce834d109fbde01747f9f485bb19b91fbd782e5951f22f7",
+      "tests/test_adaptive_paper_safety.py": "4bb1c10347b21fc08f27a3f33e02172f5d570ae9bdced2dd8c16e1eb06b92555",
+      "tests/test_adaptive_paper_selector.py": "27b431ac7911372d050f25d32ac24a3df9d2cf3c5e7dafdebfe51db6cab55936",
+      "tests/test_adaptive_paper_sessions.py": "6fb5f03cdbdb7fd4cf0105cfd4002a41ae0adb1ef18770f0bdaaae054661e92b",
+      "tests/test_adaptive_paper_strategies.py": "76319884c13693ef82f976a06ddfb69973029d4386e88d667b84bf9b382ccffa",
+      "tests/test_adaptive_paper_transport.py": "b0a5e05bb7a6122e28267ae72a3be6e0e710881cf1b97e0758229021460bbab5"
+    },
+    "acceptance": {
+      "engine_and_pr4_suites": "Ran 523 tests / OK (skipped=1)",
+      "unittest_discover": "Ran 1729 tests / OK (skipped=5)"
+    },
+    "limitations": [
+      "earlier changes_since blocks record pre-rebase hashes for runner.py and its tests; this block supersedes them",
+      "paper command now also requires a passing promotion-gate result (--gate-result/--snapshot) from PR-4"
+    ]
+  }
 }

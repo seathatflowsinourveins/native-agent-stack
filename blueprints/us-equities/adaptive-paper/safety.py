@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
+from datetime import date, datetime, timezone
 from decimal import Decimal, localcontext
 import fcntl
 import hashlib
@@ -16,7 +17,16 @@ import os
 from pathlib import Path
 import re
 import sqlite3
+import sys
 import threading
+
+# This module is sometimes loaded directly via importlib file-spec without its
+# own directory on sys.path; self-heal so the local sessions.py sibling import
+# below resolves regardless of how the caller imported this module.
+_HERE = str(Path(__file__).resolve().parent)
+if _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
+from sessions import SessionKind, session_at as _session_at  # noqa: E402
 
 D = Decimal
 ZERO = D(0)
@@ -75,6 +85,14 @@ class RiskLimits:
     max_gross_exposure_usd: Decimal = D("5000")
     max_order_notional_usd: Decimal = D("1000")
     max_order_qty: Decimal = D("1")
+    # G-f deliverable 3: "fixed" (default) keeps max_order_qty a literal
+    # per-order share cap, exactly the pre-G-f behavior. "notional" instead
+    # derives the effective per-order share cap from max_order_notional_usd
+    # at the live quote price (floor), via effective_max_order_qty below --
+    # max_order_qty itself is then unused for the cap (still validated
+    # above, but only ever consulted through effective_max_order_qty).
+    # Every notional/gross/count cap is unchanged either way.
+    max_order_qty_mode: str = "fixed"
     max_gross_loss_usd: Decimal = D("25")
     max_drawdown_usd: Decimal = D("25")
     max_spread_bps: Decimal = D("15")
@@ -86,16 +104,24 @@ class RiskLimits:
     trial_seconds: int = 300
     cleanup_seconds: int = 120
     min_entry_close_seconds: int = 300
+    overnight_gross_multiple: Decimal = D("1.0")
 
     def __post_init__(self):
         for field in ("capital_usd", "max_gross_exposure_usd", "max_order_notional_usd",
-                      "max_order_qty", "max_gross_loss_usd", "max_drawdown_usd", "max_spread_bps"):
+                      "max_order_qty", "max_gross_loss_usd", "max_drawdown_usd", "max_spread_bps",
+                      "overnight_gross_multiple"):
             object.__setattr__(self, field, decimal(getattr(self, field)))
         if (self.capital_usd > D("1000000") or self.max_gross_exposure_usd > self.capital_usd
                 or self.max_order_notional_usd > min(self.max_gross_exposure_usd, D("10000"))
                 or self.max_order_qty > 100 or self.max_order_qty != self.max_order_qty.to_integral_value()
                 or self.max_gross_loss_usd > self.capital_usd / 10
-                or self.max_drawdown_usd > self.capital_usd / 10 or self.max_spread_bps > 100):
+                or self.max_drawdown_usd > self.capital_usd / 10 or self.max_spread_bps > 100
+                # D6 (round 5): "self.overnight_gross_multiple <= 0" was
+                # dead here -- the decimal(getattr(...)) conversion loop
+                # above (zero=False, the default) already refuses a
+                # non-positive overnight_gross_multiple before this
+                # __post_init__ body ever reaches this check.
+                or self.overnight_gross_multiple > D("2.0")):
             raise SafetyError("risk_limit_out_of_bounds")
         caps = {"max_held_symbols": 50, "max_outstanding_orders": 100,
                 "max_rest_per_minute": 200, "max_submits_per_minute": 180,
@@ -108,6 +134,79 @@ class RiskLimits:
         if (self.max_submits_per_minute > self.max_rest_per_minute - 20
                 or self.min_entry_close_seconds < self.cleanup_seconds):
             raise SafetyError("cleanup_reserve_required")
+        if self.max_order_qty_mode not in ("fixed", "notional"):
+            raise SafetyError("invalid_max_order_qty_mode")
+
+    def effective_max_order_qty(self, price, *, quote_price=None):
+        """The per-order share cap `reserve_intent` enforces.
+
+        "fixed" mode (the shipped default): `max_order_qty` unchanged,
+        independent of price -- neither `price` nor `quote_price` is
+        consulted at all.
+
+        "notional" mode (D6, round 2; D4, round 3): min(max_order_qty,
+        floor(max_order_notional_usd / reference_price), 100) -- the
+        *smallest* of the operator's own configured `max_order_qty`, the
+        notional cap expressed as a share count at `reference_price`, and
+        the hard 100-share ceiling. The pre-round-2 version discarded the
+        operator's configured max_order_qty entirely in notional mode, so
+        an explicit operator cap (set for a reason -- e.g. a deliberately
+        conservative per-order size even though the notional budget would
+        allow more) silently stopped binding the moment notional mode was
+        selected. An operator who wants notional mode to actually allow
+        *more* than the "fixed" literal-1 default must now also raise
+        max_order_qty explicitly (e.g. to the same ceiling "fixed" mode
+        would have used); notional mode then narrows that cap further
+        whenever the notional budget is the tighter constraint at
+        `reference_price`, but it can never widen a cap the operator
+        explicitly set.
+
+        D4 (round 3): `reference_price` is `quote_price` -- the live
+        quote's own price -- when the caller supplies one; `price` (the
+        order's own limit price, which may already include a marketable
+        offset from the quote -- see strategies_v1.limit_price) is only
+        used as a fallback when no `quote_price` is given. Before this fix
+        the docstring promised "the live quote price" but `reserve_intent`
+        actually always passed the order's limit price; the two are now
+        made consistent by making `reserve_intent` pass the quote's own
+        price explicitly (see its call site) rather than by silently
+        redefining what `price` alone means here."""
+        price = decimal(price)
+        reference_price = decimal(quote_price) if quote_price is not None else price
+        if self.max_order_qty_mode == "fixed":
+            return self.max_order_qty
+        notional_implied = (self.max_order_notional_usd / reference_price).to_integral_value(rounding="ROUND_FLOOR")
+        return min(self.max_order_qty, notional_implied, D("100"))
+
+    def overnight_gross_exposure_cap_usd(self):
+        """The gross-exposure ceiling that applies to a position carried
+        through an overnight hold (deliverable 4). Never exceeds the
+        RiskLimits-enforced <=2.0x bound on overnight_gross_multiple, and with
+        the default multiple of 1.0 this equals the ordinary intraday cap."""
+        return self.max_gross_exposure_usd * self.overnight_gross_multiple
+
+
+def evaluate_gap_risk(prior_close, session_open, stop_bps):
+    """Gap-risk rule (deliverable 4): evaluated at the first RTH bar after an
+    overnight hold. Compares the new session's open against the prior
+    session's close and returns the stop level implied by the configured
+    ``stop_bps``, applied from the actual open rather than from the stale
+    prior-session reference price. Pure and side-effect free: callers apply
+    the returned stop through the existing exit chain, this function does not
+    submit or cancel anything.
+
+    Returns a dict: {"gap_bps": signed gap in bps, "stop_price": Decimal, the
+    price at which the existing stop-loss exit should now trigger}.
+    """
+    # decimal(..., zero=False) (the default) already rejects non-positive,
+    # non-finite and out-of-precision inputs by raising SafetyError, so no
+    # separate "<= 0" guard is reachable here; do not add a dead check back.
+    prior_close = decimal(prior_close)
+    session_open = decimal(session_open)
+    stop_bps = decimal(stop_bps)
+    gap_bps = (session_open - prior_close) * 10000 / prior_close
+    stop_price = session_open * (1 - stop_bps / 10000)
+    return {"gap_bps": gap_bps, "stop_price": stop_price}
 
 
 @dataclass(frozen=True)
@@ -116,6 +215,7 @@ class Quote:
     bid: Decimal
     ask: Decimal
     timestamp: float
+    halted: bool = False
 
     def __post_init__(self):
         symbol_name(self.symbol)
@@ -124,6 +224,8 @@ class Quote:
         object.__setattr__(self, "timestamp", instant(self.timestamp))
         if self.ask < self.bid:
             raise SafetyError("crossed_quote")
+        if type(self.halted) is not bool:
+            raise SafetyError("invalid_halt_flag")
 
 
 @dataclass(frozen=True)
@@ -301,6 +403,62 @@ class Ledger:
         self.db.execute("INSERT INTO events(kind,client_id,payload) VALUES (?,?,?)",
                         (kind, client_id, json.dumps(data, default=str, sort_keys=True, allow_nan=False)))
 
+    _PRIOR_RTH_CLOSE_PREFIX = "prior_rth_close:"
+
+    def record_prior_rth_close(self, symbol, price, session_date, ts_ns):
+        """S5 (+ D3, round 4): persist the RTH-close price captured for
+        ``symbol`` at the RTH->non-RTH session crossing, keyed in the
+        durable meta table so native_strategy.py's D5 gap-risk stop
+        survives a process restart (it previously lived only in
+        AdaptiveStrategy._prior_rth_close, per-process memory, so the stop
+        could never fire across invocations under overnight_holds).
+
+        D3 (round 4): the pre-fix version persisted only the bare price,
+        with no date or staleness bound -- a value captured days or weeks
+        earlier (e.g. a symbol that stopped trading, or a long-idle
+        ledger) could still be loaded and armed against today's open with
+        no way to tell it was never actually "yesterday's close". Persist
+        ``session_date`` (the RTH session date, as an ISO "YYYY-MM-DD"
+        string, that this close was captured for) and ``ts_ns`` (the
+        capturing quote's own market-clock timestamp, nanoseconds) so a
+        loader (native_strategy.py's ``_gap_risk_stop_symbols``) can refuse to arm
+        against a close whose session_date is not exactly the trading day
+        immediately before the session being armed."""
+        symbol = symbol_name(symbol)
+        price = decimal(price)
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(session_date)):
+            raise SafetyError("invalid_session_date")
+        session_date = date.fromisoformat(str(session_date)).isoformat()
+        if type(ts_ns) is not int or isinstance(ts_ns, bool) or ts_ns <= 0:
+            raise SafetyError("invalid_ts_ns")
+        payload = json.dumps({"price": str(price), "session_date": session_date, "ts_ns": ts_ns}, sort_keys=True)
+        with self._transaction():
+            self._set(f"{self._PRIOR_RTH_CLOSE_PREFIX}{symbol}", payload)
+
+    def prior_rth_closes(self):
+        """Every persisted prior-RTH-close record, keyed by symbol, for
+        native_strategy.py to load back at startup under overnight_holds.
+        Each value is ``{"price": Decimal, "session_date": date, "ts_ns":
+        int}`` (D3, round 4: previously a bare price with no date/staleness
+        information at all)."""
+        rows = self.db.execute("SELECT key, value FROM meta WHERE key LIKE ?",
+                               (f"{self._PRIOR_RTH_CLOSE_PREFIX}%",)).fetchall()
+        result = {}
+        for key, value in rows:
+            symbol = key[len(self._PRIOR_RTH_CLOSE_PREFIX):]
+            try:
+                record = json.loads(value)
+                result[symbol] = {"price": decimal(record["price"]),
+                                  "session_date": date.fromisoformat(record["session_date"]),
+                                  "ts_ns": int(record["ts_ns"])}
+            except (ValueError, KeyError, TypeError):
+                # A record written before D3 (round 4) (a bare price
+                # string, no session_date/ts_ns) or otherwise malformed:
+                # there is no date to validate it against, so the loader
+                # must treat it as unusable rather than guess a date.
+                continue
+        return result
+
     def start_trial(self, now):
         now = instant(now)
         with self._transaction():
@@ -337,6 +495,28 @@ class Ledger:
         fresh broker flat/idle cash/position reconciliation before invoking this.
         Durable risk, fill accounting and request history are never reset.
         """
+        return self._begin_trial(now, trial_id, require_flat=True, event_kind="next_trial_started")
+
+    def resume_held_trial(self, now, trial_id):
+        """S2: start an explicitly requested new bounded trial that
+        continues (adopts) an existing "held_overnight" position/open-order
+        state instead of requiring flat -- the resumable-hold counterpart
+        to begin_next_trial.
+
+        The runner.py resumable-hold path (a prior run's phase ==
+        "held_overnight" under overnight_holds) deliberately bypasses its
+        own earlier flat/cash-reconciliation guards for this case (D1's
+        broker-snapshot adoption, not a fresh-flat requirement, is what
+        reconciles the resumed state), but used to then fall straight
+        through to begin_next_trial -- which always raises
+        "next_trial_requires_flat_and_terminal" against exactly the
+        non-flat state a hold is expected to have. Every other guard
+        (trial_id uniqueness, clock monotonicity, risk halt, risk budget)
+        stays enforced unchanged.
+        """
+        return self._begin_trial(now, trial_id, require_flat=False, event_kind="held_trial_resumed")
+
+    def _begin_trial(self, now, trial_id, *, require_flat, event_kind):
         now = instant(now)
         if type(trial_id) is not str or not re.fullmatch(r"[a-z0-9-]{1,24}", trial_id):
             raise SafetyError("invalid_trial_id")
@@ -348,7 +528,7 @@ class Ledger:
             if ((start is not None and now < float(start)) or
                     (latest_request is not None and now < latest_request)):
                 raise SafetyError("trial_clock_moved_backward")
-            if self._positions() or any(not i.terminal for i in self.intents()):
+            if require_flat and (self._positions() or any(not i.terminal for i in self.intents())):
                 raise SafetyError("next_trial_requires_flat_and_terminal")
             state = self._state()
             if state.halted_reason not in (None, "recovery_only"):
@@ -362,8 +542,9 @@ class Ledger:
             self.db.execute("DELETE FROM meta WHERE key IN ('recovery_start','recovery_only')")
             if state.halted_reason == "recovery_only":
                 self.db.execute("DELETE FROM meta WHERE key='halted_reason'")
-            self._event("next_trial_started", trial_id=trial_id, at=now,
-                        required_external_proof="fresh_broker_flat_idle_and_cash_reconciled")
+            self._event(event_kind, trial_id=trial_id, at=now,
+                        required_external_proof="fresh_broker_flat_idle_and_cash_reconciled" if require_flat
+                        else "held_position_adopted_from_broker_snapshot")
             return now
 
     def _check_window(self, side, now):
@@ -386,6 +567,12 @@ class Ledger:
             raise SafetyError("quote_required")
         if not -0.25 <= now - quote.timestamp <= self.limits.quote_max_age_seconds:
             raise SafetyError("quote_not_fresh")
+        # check_spread doubles as "this is a new-risk (entry) check"; a halted
+        # or LULD-flagged quote blocks new risk exactly like a stale or
+        # over-wide quote does, while the existing exit (sell) chain, which
+        # already skips the spread gate here, is left untouched.
+        if check_spread and quote.halted:
+            raise SafetyError("quote_halted")
         if check_spread and (quote.ask - quote.bid) * 10000 / ((quote.ask + quote.bid) / 2) > self.limits.max_spread_bps:
             raise SafetyError("quote_spread_exceeds_cap")
 
@@ -421,7 +608,44 @@ class Ledger:
                             peak, max(ZERO, peak - realized - unrealized), len(active), len(symbols),
                             self._get("halted_reason"))
 
-    def _refresh_risk(self):
+    def _effective_gross_cap(self, now):
+        """The gross-exposure cap that applies at ``now`` (D2, widened by D3).
+        With the default overnight_gross_multiple of 1.0 this is always equal
+        to max_gross_exposure_usd, so default behaviour is byte-identical; it
+        only differs once a caller has configured overnight_gross_multiple !=
+        1.0 (only reachable when the session policy allows overnight holds,
+        which D8 requires extended_hours for).
+
+        D3: an overnight hold spans PRE (04:00-09:30) as well as POST/CLOSED
+        -- the cap must not snap back to the ordinary intraday cap at the
+        CLOSED->PRE crossing and trip the halt trigger before RTH reopens.
+        The gross-exposure model here is account-level (it has no per-
+        position entry timestamp), so this widens for any session kind other
+        than RTH rather than only for positions individually proven to
+        predate the last RTH close; that is a documented simplification, not
+        a per-position age check.
+
+        A date outside the frozen session calendar's supported years (D7)
+        cannot be classified; this falls back to the ordinary cap rather than
+        raising, so the risk engine's default hot path never breaks for a
+        timestamp outside the calendar table (e.g. synthetic test fixtures)."""
+        try:
+            info = _session_at(datetime.fromtimestamp(now, tz=timezone.utc))
+        except ValueError:
+            return self.limits.max_gross_exposure_usd
+        if info.kind != SessionKind.RTH:
+            return self.limits.overnight_gross_exposure_cap_usd()
+        return self.limits.max_gross_exposure_usd
+
+    def _refresh_risk(self, now=None):
+        # now=None (e.g. record_order's optional timestamp) falls back to the
+        # ordinary intraday cap, the same behaviour as before D2; when now is
+        # available this circuit breaker uses the same session-aware cap as
+        # reserve_intent/validate_pending, so a position that is within the
+        # configured overnight_gross_multiple never trips an unconditional
+        # ordinary-cap halt during POST/CLOSED (D2's gross checks are the
+        # entry gate AND this halt trigger, kept consistent with each other).
+        cap = self._effective_gross_cap(now) if now is not None else self.limits.max_gross_exposure_usd
         state = self._state()
         self._set("peak_pnl", max(state.peak_pnl_usd, state.realized_pnl_usd + state.unrealized_pnl_usd))
         state = self._state()
@@ -430,7 +654,7 @@ class Ledger:
             reason = "gross_loss_cap_reached"
         elif state.drawdown_usd >= self.limits.max_drawdown_usd:
             reason = "drawdown_cap_reached"
-        elif state.gross_exposure_usd > self.limits.max_gross_exposure_usd:
+        elif state.gross_exposure_usd > cap:
             reason = "gross_exposure_cap_exceeded"
         if reason and not state.halted_reason:
             self._set("halted_reason", reason)
@@ -460,12 +684,24 @@ class Ledger:
             if market_open is not True or close - now < (self.limits.min_entry_close_seconds if side == "buy" else 1):
                 raise SafetyError("outside_allowed_session")
             self._check_window(side, now)
-            if qty > self.limits.max_order_qty or qty * price > self.limits.max_order_notional_usd:
+            # D4 (round 3): the notional-implied per-order cap is derived
+            # from the live quote's own price (the executable side: ask
+            # for a buy, bid for a sell), not the order's own limit price
+            # -- `price` here already carries strategies_v1.limit_price's
+            # marketable offset baked in, which would otherwise silently
+            # bias the notional-implied share count. `quote` was already
+            # checked (`_check_quote` above) and is always present at this
+            # point, so effective_max_order_qty's "price" fallback path
+            # (no quote_price given) is only exercised by a direct,
+            # standalone caller of effective_max_order_qty itself.
+            quote_price = quote.ask if side == "buy" else quote.bid
+            if (qty > self.limits.effective_max_order_qty(price, quote_price=quote_price)
+                    or qty * price > self.limits.max_order_notional_usd):
                 raise SafetyError("order_size_cap_exceeded")
             if side == "buy" and qty != qty.to_integral_value():
                 raise SafetyError("entry_requires_whole_shares")
             self._mark(quote)
-            state = self._refresh_risk()
+            state = self._refresh_risk(now)
             if state.outstanding_orders >= self.limits.max_outstanding_orders:
                 raise SafetyError("outstanding_order_cap_reached")
             if side == "buy":
@@ -479,7 +715,7 @@ class Ledger:
                     if mark is None or not -0.25 <= now - mark[0] <= self.limits.quote_max_age_seconds:
                         raise SafetyError("held_position_mark_stale")
                 equity = self.limits.capital_usd + state.realized_pnl_usd + state.unrealized_pnl_usd
-                if state.gross_exposure_usd + qty * price > min(self.limits.max_gross_exposure_usd, equity):
+                if state.gross_exposure_usd + qty * price > min(self._effective_gross_cap(now), equity):
                     raise SafetyError("aggregate_exposure_cap_exceeded")
                 exposed = set(self._positions()) | {r[0] for r in self.db.execute(
                     "SELECT symbol FROM intents WHERE side='buy' AND status NOT IN ('filled','canceled','expired','rejected','not_sent','broker_refused')")}
@@ -519,7 +755,7 @@ class Ledger:
                 raise SafetyError("outside_allowed_session")
             self._check_window(intent.side, now)
             self._mark(quote)
-            state = self._refresh_risk()
+            state = self._refresh_risk(now)
             if state.outstanding_orders > self.limits.max_outstanding_orders:
                 raise SafetyError("outstanding_order_cap_reached")
             if intent.side == "buy":
@@ -532,7 +768,7 @@ class Ledger:
                     if mark is None or not -0.25 <= now - mark[0] <= self.limits.quote_max_age_seconds:
                         raise SafetyError("held_position_mark_stale")
                 equity = self.limits.capital_usd + state.realized_pnl_usd + state.unrealized_pnl_usd
-                if state.gross_exposure_usd > min(self.limits.max_gross_exposure_usd, equity):
+                if state.gross_exposure_usd > min(self._effective_gross_cap(now), equity):
                     raise SafetyError("aggregate_exposure_cap_exceeded")
                 if state.held_symbols > self.limits.max_held_symbols:
                     raise SafetyError("held_symbol_cap_reached")
@@ -656,7 +892,7 @@ class Ledger:
                             (broker_id, effective_status, str(filled), str(average) if average else None, at, client_id))
             self._event("order_observed", client_id, broker_id=broker_id, status=status, filled_qty=filled,
                         average_price=average, at=at, delta_qty=delta, delta_notional=delta_notional)
-            self._refresh_risk()
+            self._refresh_risk(at)
             return True
 
     def request_budget(self, now, kind, client_id=None):
@@ -700,7 +936,7 @@ class Ledger:
         with self._transaction(keep_observations_on_refusal=True):
             for quote in values:
                 self._mark(quote)
-            state = self._refresh_risk()
+            state = self._refresh_risk(now)
             for symbol in self._positions():
                 mark = self.db.execute("SELECT at FROM marks WHERE symbol=?", (symbol,)).fetchone()
                 if mark is None or not -0.25 <= now - mark[0] <= self.limits.quote_max_age_seconds:
@@ -714,6 +950,108 @@ class Ledger:
             if self._get("halted_reason") is None:
                 self._set("halted_reason", reason)
                 self._event("risk_halt", reason=reason)
+
+    def adopt_broker_snapshot(self, snapshot, now):
+        """Seed local positions/open-order intents from a broker snapshot at
+        startup reconciliation (D1), for an overnight_holds start where
+        native_adapter accepted a non-flat broker account instead of
+        requiring flat.
+
+        The first call against a fresh (empty) ledger is the common case,
+        for which the returned ``ledger_delta`` -- broker minus ledger, per
+        D1 -- equals the imported broker totals (computed from before/after
+        snapshots of this ledger, never assumed). This method is also
+        called on every subsequent resumed invocation (S2's
+        ``resume_held_trial`` path) against a ledger that already carries
+        the locally, fill-derived cost basis for a held position: D2 --
+        that local basis is authoritative and is never overwritten by the
+        broker's own average price here. A position the ledger already has
+        a row for is left untouched (only positions the ledger *lacks* are
+        inserted); the broker's average price and the resulting cost-basis
+        delta for any already-held symbol are recorded in the returned
+        dict's ``resumed_position_basis`` list for the reconciliation
+        receipt, never silently applied to the local row.
+
+        Each open order is inserted as an already-``submit_attempted`` intent
+        under its own broker-issued client_order_id (not a freshly-generated
+        one), so a subsequent native/broker status update for that order is
+        recognized by Controller.observe() instead of freezing the trial as
+        an "external_order_detected" order.
+        """
+        now = instant(now)
+        with self._transaction(keep_observations_on_refusal=True):
+            before_positions = {p.symbol: p.qty for p in self._positions().values()}
+            before_open_orders = len(self.unresolved())
+            before_cash_basis = sum((p.cost_basis_usd for p in self._positions().values()), ZERO)
+            resumed_position_basis = []
+            for row in snapshot.get("positions", []):
+                qty = decimal(row["qty"], zero=True)
+                if qty <= 0:
+                    continue
+                symbol = symbol_name(row["symbol"])
+                avg_price = decimal(row.get("avg_entry_price", row.get("cost_basis", "0")) or "0")
+                cost_basis = qty * avg_price
+                existing = self.db.execute(
+                    "SELECT qty, cost_basis FROM positions WHERE symbol=?", (symbol,)).fetchone()
+                if existing is None:
+                    self.db.execute("INSERT INTO positions VALUES (?,?,?)", (symbol, str(qty), str(cost_basis)))
+                    self._event("position_adopted", symbol=symbol, qty=str(qty), avg_price=str(avg_price), at=now)
+                    continue
+                # D2: resume path -- an existing local row's cost basis is
+                # fill-derived and authoritative; never overwrite it with
+                # the broker's average price. Only record the broker figure
+                # and the delta for the reconciliation receipt.
+                local_qty, local_cost_basis = D(existing[0]), D(existing[1])
+                resumed_position_basis.append({
+                    "symbol": symbol, "local_qty": str(local_qty),
+                    "local_cost_basis_usd": str(local_cost_basis), "broker_qty": str(qty),
+                    "broker_avg_price": str(avg_price), "broker_cost_basis_usd": str(cost_basis),
+                    "basis_delta_usd": str(cost_basis - local_cost_basis)})
+                self._event("position_resume_basis_retained", symbol=symbol,
+                            local_cost_basis=str(local_cost_basis), broker_avg_price=str(avg_price), at=now)
+            for row in snapshot.get("orders", []):
+                if row.get("status") in TERMINAL:
+                    continue
+                cid = row.get("client_order_id")
+                if not cid or self.db.execute("SELECT 1 FROM intents WHERE client_id=?", (cid,)).fetchone():
+                    continue
+                symbol = symbol_name(row["symbol"])
+                qty = decimal(row["qty"])
+                price = decimal(row.get("limit_price", "0") or "0")
+                filled_qty = decimal(row.get("filled_qty", "0") or "0", zero=True)
+                status = row.get("status")
+                if status not in RANK:
+                    raise SafetyError("unadoptable_broker_order_status")
+                # S8: side is interpolated straight into the intents row and
+                # later compared/relied on (e.g. sign of position deltas,
+                # order-side-specific reconciliation); a malformed or
+                # unexpected broker value must be refused explicitly here,
+                # not silently stored.
+                if row.get("side") not in ("buy", "sell"):
+                    raise SafetyError("unadoptable_broker_order_side")
+                self.db.execute(
+                    "INSERT INTO intents(client_id,symbol,side,qty,limit_price,status,filled_qty,"
+                    "average_price,broker_id,submit_attempted,updated_at) VALUES (?,?,?,?,?,?,?,?,?,1,?)",
+                    (cid, symbol, row["side"], str(qty), str(price), status, str(filled_qty),
+                     str(decimal(row["filled_avg_price"])) if row.get("filled_avg_price") and filled_qty else None,
+                     row.get("id"), now))
+                self._event("intent_adopted", cid, symbol=symbol, side=row["side"], qty=qty, at=now)
+            after_positions = {p.symbol: p.qty for p in self._positions().values()}
+            after_open_orders = len(self.unresolved())
+            after_cash_basis = sum((p.cost_basis_usd for p in self._positions().values()), ZERO)
+        return {"positions_before": len(before_positions), "positions_after": len(after_positions),
+                "open_orders_before": before_open_orders, "open_orders_after": after_open_orders,
+                "cost_basis_delta_usd": str(after_cash_basis - before_cash_basis),
+                "resumed_position_basis": resumed_position_basis}
+
+    def halted_reason(self):
+        """Read-only: current halt reason, or None/"recovery_only" (see
+        begin_recovery/begin_next_trial). Callers that need to distinguish a
+        genuine risk halt from the reconciliation-pending marker should
+        compare against "recovery_only" explicitly, as selector.py's
+        OperationalStatus wiring in native_strategy.py does."""
+        with self._lock:
+            return self._get("halted_reason")
 
     def intents(self):
         with self._lock:

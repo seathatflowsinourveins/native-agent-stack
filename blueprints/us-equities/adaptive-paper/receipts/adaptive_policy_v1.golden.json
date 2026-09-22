@@ -1,0 +1,437 @@
+{
+  "breakout": {
+    "effective_leverage": 0.020041,
+    "exits": {},
+    "reason": "ranked_cost_hurdle_allocation",
+    "regime": "range",
+    "signals": [
+      {
+        "edge_bps": 20.000000000000018,
+        "family": "range_breakout",
+        "reason": "fresh rolling range breakout",
+        "score": 5.747369664856797,
+        "symbol": "AAPL",
+        "volatility_bps": 3.4798527267687667
+      },
+      {
+        "edge_bps": 20.000000000000018,
+        "family": "range_breakout",
+        "reason": "fresh rolling range breakout",
+        "score": 5.747369664856797,
+        "symbol": "MSFT",
+        "volatility_bps": 3.4798527267687667
+      }
+    ],
+    "targets": {
+      "AAPL": "1",
+      "MSFT": "1"
+    },
+    "timestamp": 1039
+  },
+  "exits": {
+    "stop_loss": {
+      "effective_leverage": 0.0,
+      "exits": {
+        "AAPL": "stop_loss"
+      },
+      "reason": "ranked_cost_hurdle_allocation",
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1039.1
+    },
+    "take_profit": {
+      "effective_leverage": 0.0,
+      "exits": {
+        "AAPL": "take_profit"
+      },
+      "reason": "ranked_cost_hurdle_allocation",
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 50.499999999999986,
+          "family": "range_breakout",
+          "reason": "fresh rolling range breakout",
+          "score": 5.659799760886717,
+          "symbol": "AAPL",
+          "volatility_bps": 8.922577146455122
+        },
+        {
+          "edge_bps": 50.499999999999986,
+          "family": "relative_strength",
+          "reason": "positive momentum above benchmark basket",
+          "score": 5.659799760886717,
+          "symbol": "AAPL",
+          "volatility_bps": 8.922577146455122
+        }
+      ],
+      "targets": {},
+      "timestamp": 1039.1
+    },
+    "trailing_stop": {
+      "effective_leverage": 0.0,
+      "exits": {
+        "AAPL": "trailing_stop"
+      },
+      "reason": "ranked_cost_hurdle_allocation",
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 10.499999999999954,
+          "family": "range_breakout",
+          "reason": "fresh rolling range breakout",
+          "score": 5.659799760886717,
+          "symbol": "AAPL",
+          "volatility_bps": 1.8551893076787802
+        }
+      ],
+      "targets": {},
+      "timestamp": 1039.1
+    }
+  },
+  "expensive_share": {
+    "effective_leverage": 0.1214655,
+    "exits": {},
+    "reason": "ranked_cost_hurdle_allocation",
+    "regime": "trend",
+    "signals": [
+      {
+        "edge_bps": 88.78300630086987,
+        "family": "relative_strength",
+        "reason": "positive momentum above benchmark basket",
+        "score": 88.78300630086987,
+        "symbol": "AAPL",
+        "volatility_bps": 0.016636912095575183
+      },
+      {
+        "edge_bps": 53.04852171452712,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 53.04852171452712,
+        "symbol": "AAPL",
+        "volatility_bps": 0.016636912095575183
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "DIA",
+        "volatility_bps": 0.002063502395712067
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "IWM",
+        "volatility_bps": 0.002063502395712067
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "MSFT",
+        "volatility_bps": 0.002063502395712067
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "QQQ",
+        "volatility_bps": 0.002063502395712067
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "SPY",
+        "volatility_bps": 0.002063502395712067
+      },
+      {
+        "edge_bps": 4.217036828788601,
+        "family": "range_breakout",
+        "reason": "fresh rolling range breakout",
+        "score": 4.217036828788601,
+        "symbol": "AAPL",
+        "volatility_bps": 0.016636912095575183
+      }
+    ],
+    "targets": {
+      "AAPL": "1",
+      "DIA": "1",
+      "IWM": "1",
+      "MSFT": "1",
+      "QQQ": "1",
+      "SPY": "1"
+    },
+    "timestamp": 1039
+  },
+  "mean_reversion_no": {
+    "effective_leverage": 0.0,
+    "exits": {},
+    "reason": "ranked_cost_hurdle_allocation",
+    "regime": "range",
+    "signals": [],
+    "targets": {},
+    "timestamp": 1040
+  },
+  "mean_reversion_yes": {
+    "effective_leverage": 0.019941,
+    "exits": {},
+    "reason": "ranked_cost_hurdle_allocation",
+    "regime": "range",
+    "signals": [
+      {
+        "edge_bps": 16.106782281782863,
+        "family": "mean_reversion",
+        "reason": "below range mean with observed turn",
+        "score": 2.921590111772678,
+        "symbol": "AAPL",
+        "volatility_bps": 5.513019166131437
+      },
+      {
+        "edge_bps": 16.106782281782863,
+        "family": "mean_reversion",
+        "reason": "below range mean with observed turn",
+        "score": 2.921590111772678,
+        "symbol": "MSFT",
+        "volatility_bps": 5.513019166131437
+      }
+    ],
+    "targets": {
+      "AAPL": "1",
+      "MSFT": "1"
+    },
+    "timestamp": 1040
+  },
+  "never_churn": {
+    "effective_leverage": 0.0,
+    "exits": {},
+    "reason": "ranked_cost_hurdle_allocation",
+    "regime": "range",
+    "signals": [],
+    "targets": {},
+    "timestamp": 1119
+  },
+  "quote_bucket_regime": "trend",
+  "regime_shift_to_cash": {
+    "effective_leverage": 0.0,
+    "exits": {
+      "AAPL": "risk_off"
+    },
+    "reason": "benchmark_risk",
+    "regime": "risk_off",
+    "signals": [],
+    "targets": {},
+    "timestamp": 1079
+  },
+  "stale_no_liq": {
+    "effective_leverage": 0.0012346296183944998,
+    "exits": {},
+    "reason": "benchmark_unavailable",
+    "regime": "unavailable",
+    "signals": [],
+    "targets": {
+      "AAPL": "0.123456789"
+    },
+    "timestamp": 1043
+  },
+  "stale_stop_1": {
+    "effective_leverage": 0.0,
+    "exits": {},
+    "reason": "ranked_cost_hurdle_allocation",
+    "regime": "trend",
+    "signals": [
+      {
+        "edge_bps": 79.69294785349801,
+        "family": "relative_strength",
+        "reason": "positive momentum above benchmark basket",
+        "score": 79.69294785349801,
+        "symbol": "AAPL",
+        "volatility_bps": 0.014511009439610137
+      },
+      {
+        "edge_bps": 79.69294785349801,
+        "family": "relative_strength",
+        "reason": "positive momentum above benchmark basket",
+        "score": 79.69294785349801,
+        "symbol": "MSFT",
+        "volatility_bps": 0.014511009439610137
+      },
+      {
+        "edge_bps": 49.54419342053207,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 49.54419342053207,
+        "symbol": "AAPL",
+        "volatility_bps": 0.014511009439610137
+      },
+      {
+        "edge_bps": 49.54419342053207,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 49.54419342053207,
+        "symbol": "MSFT",
+        "volatility_bps": 0.014511009439610137
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "DIA",
+        "volatility_bps": 0.002063502395712067
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "IWM",
+        "volatility_bps": 0.002063502395712067
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "QQQ",
+        "volatility_bps": 0.002063502395712067
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "SPY",
+        "volatility_bps": 0.002063502395712067
+      }
+    ],
+    "targets": {},
+    "timestamp": 1039
+  },
+  "stale_stop_2": {
+    "effective_leverage": 0.0,
+    "exits": {},
+    "reason": "benchmark_unavailable",
+    "regime": "unavailable",
+    "signals": [],
+    "targets": {},
+    "timestamp": 1043
+  },
+  "stale_stop_3": {
+    "effective_leverage": 0.0,
+    "exits": {},
+    "reason": "benchmark_unavailable",
+    "regime": "unavailable",
+    "signals": [],
+    "targets": {},
+    "timestamp": 1043
+  },
+  "trailing_high_start": {
+    "effective_leverage": 0.0010005,
+    "exits": {},
+    "reason": "ranked_cost_hurdle_allocation",
+    "regime": "range",
+    "signals": [],
+    "targets": {
+      "AAPL": "1"
+    },
+    "timestamp": 1039
+  },
+  "trailing_high_start_hb": "0",
+  "trend": {
+    "effective_leverage": 0.06054899999999999,
+    "exits": {},
+    "reason": "ranked_cost_hurdle_allocation",
+    "regime": "trend",
+    "signals": [
+      {
+        "edge_bps": 79.69294785349801,
+        "family": "relative_strength",
+        "reason": "positive momentum above benchmark basket",
+        "score": 79.69294785349801,
+        "symbol": "AAPL",
+        "volatility_bps": 0.014511009439610137
+      },
+      {
+        "edge_bps": 79.69294785349801,
+        "family": "relative_strength",
+        "reason": "positive momentum above benchmark basket",
+        "score": 79.69294785349801,
+        "symbol": "MSFT",
+        "volatility_bps": 0.014511009439610137
+      },
+      {
+        "edge_bps": 49.54419342053207,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 49.54419342053207,
+        "symbol": "AAPL",
+        "volatility_bps": 0.014511009439610137
+      },
+      {
+        "edge_bps": 49.54419342053207,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 49.54419342053207,
+        "symbol": "MSFT",
+        "volatility_bps": 0.014511009439610137
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "DIA",
+        "volatility_bps": 0.002063502395712067
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "IWM",
+        "volatility_bps": 0.002063502395712067
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "QQQ",
+        "volatility_bps": 0.002063502395712067
+      },
+      {
+        "edge_bps": 18.685534904578915,
+        "family": "trend_momentum",
+        "reason": "fast mean above slow mean",
+        "score": 18.685534904578915,
+        "symbol": "SPY",
+        "volatility_bps": 0.002063502395712067
+      }
+    ],
+    "targets": {
+      "AAPL": "1",
+      "DIA": "1",
+      "IWM": "1",
+      "MSFT": "1",
+      "QQQ": "1",
+      "SPY": "1"
+    },
+    "timestamp": 1039
+  },
+  "warmup": {
+    "effective_leverage": 0.0,
+    "exits": {},
+    "reason": "benchmark_unavailable",
+    "regime": "unavailable",
+    "signals": [],
+    "targets": {},
+    "timestamp": 1009
+  }
+}

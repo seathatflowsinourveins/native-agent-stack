@@ -3,11 +3,14 @@ from datetime import datetime, timedelta, timezone
 import importlib.util
 import json
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
 
-PATH = Path(__file__).resolve().parents[1] / "blueprints/us-equities/adaptive-paper/market_research.py"
+SOURCE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/adaptive-paper"
+sys.path.insert(0, str(SOURCE))
+PATH = SOURCE / "market_research.py"
 SPEC = importlib.util.spec_from_file_location("market_research", PATH)
 m = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(m)
@@ -143,6 +146,40 @@ class NewsNormalization(unittest.TestCase):
                 m.credentials(path)
 
 
+class ResearchFeedSelection(unittest.TestCase):
+    """The one configured feed reaches the snapshot request and every row."""
+
+    def test_unqualified_feed_is_refused_with_a_bounded_reason(self):
+        for value in ("otc", "delayed_sip", "boats", "IEX", "iex ", "", None, 1, ["iex"]):
+            with self.subTest(feed=value):
+                with self.assertRaises(m.ResearchError) as caught:
+                    m.normalize_snapshot("SPY", snapshot(), m.iso(OBSERVED), feed=value)
+                self.assertEqual(str(caught.exception), "unqualified_data_feed")
+
+    def test_snapshot_row_records_the_configured_feed(self):
+        self.assertEqual(m.DATA_FEEDS, ("iex", "sip"))
+        self.assertEqual(m.normalize_snapshot("SPY", snapshot(), m.iso(OBSERVED), feed="sip")["feed"], "sip")
+        self.assertEqual(m.normalize_snapshot("SPY", snapshot(), m.iso(OBSERVED))["feed"], "iex")
+
+    def test_one_qualified_feed_vocabulary_is_shared_with_the_transport(self):
+        import feeds
+        import transport
+        self.assertIs(m.DATA_FEEDS, feeds.DATA_FEEDS)
+        self.assertIs(transport.DATA_FEEDS, feeds.DATA_FEEDS)
+        self.assertIs(m.is_qualified_feed, feeds.is_qualified_feed)
+        self.assertIs(transport.is_qualified_feed, feeds.is_qualified_feed)
+        self.assertEqual(feeds.DATA_FEEDS, ("iex", "sip"))
+
+    @unittest.skipUnless(HAS_SDK, "requires reviewed isolated Alpaca runtime")
+    def test_sdk_enum_members_are_refused_rather_than_recorded_as_a_feed(self):
+        from alpaca.data.enums import DataFeed
+        for member in (DataFeed.IEX, DataFeed.SIP):
+            with self.subTest(feed=member):
+                with self.assertRaises(m.ResearchError) as caught:
+                    m.normalize_snapshot("SPY", snapshot(), m.iso(OBSERVED), feed=member)
+                self.assertEqual(str(caught.exception), "unqualified_data_feed")
+
+
 @unittest.skipUnless(HAS_SDK, "requires reviewed isolated Alpaca runtime")
 class NativeSDKIntegration(unittest.TestCase):
     def collect(self, **kwargs):
@@ -170,6 +207,51 @@ class NativeSDKIntegration(unittest.TestCase):
         self.assertNotIn("fixture-key", json.dumps(result))
         self.assertNotIn("fixture-secret", json.dumps(result))
         self.assertEqual(result["http_observations"][0]["rate_headers"], {"x-ratelimit-limit": "10000"})
+
+    def test_configured_sip_feed_reaches_the_snapshot_request_and_rows(self):
+        def request(method, url, **kwargs):
+            if url.endswith("/news"):
+                return response({"news": [article()], "next_page_token": None})
+            self.assertEqual(url, m.ORIGIN + "/v2/stocks/snapshots")
+            self.assertEqual(kwargs["params"]["feed"], "sip")
+            return response({"SPY": snapshot()})
+        with patch("requests.Session.request", side_effect=request):
+            result = self.collect(feed="sip")
+        self.assertEqual(result["feed"], "sip")
+        self.assertEqual(result["market_context"][0]["feed"], "sip")
+        self.assertEqual(result["status"], "complete_bounded_shadow")
+
+    def test_default_feed_remains_iex_in_the_request_and_the_artifact(self):
+        def request(method, url, **kwargs):
+            if url.endswith("/news"):
+                return response({"news": [article()], "next_page_token": None})
+            self.assertEqual(kwargs["params"]["feed"], "iex")
+            return response({"SPY": snapshot()})
+        with patch("requests.Session.request", side_effect=request):
+            result = self.collect()
+        self.assertEqual(result["feed"], "iex")
+        self.assertEqual(result["market_context"][0]["feed"], "iex")
+
+    def test_collect_refuses_an_unqualified_feed_before_any_request(self):
+        from alpaca.data.enums import DataFeed
+        for value in ("otc", DataFeed.SIP):
+            with self.subTest(feed=value), patch("requests.Session.request") as http:
+                with self.assertRaises(m.ResearchError) as caught:
+                    self.collect(feed=value)
+                self.assertEqual(str(caught.exception), "unqualified_data_feed")
+                http.assert_not_called()
+
+    def test_missing_snapshot_row_still_records_the_configured_feed(self):
+        def request(method, url, **kwargs):
+            if url.endswith("/news"):
+                return response({"news": [article()], "next_page_token": None})
+            return response({})
+        with patch("requests.Session.request", side_effect=request):
+            result = self.collect(feed="sip")
+        row = result["market_context"][0]
+        self.assertEqual(row["limitations"], ["snapshot_missing"])
+        self.assertEqual(row["feed"], "sip")
+        self.assertTrue(all("feed" in context for context in result["market_context"]))
 
     def test_explicit_item_limit_stops_sdk_auto_pagination_and_marks_more(self):
         payload = {"news": [article(id=i) for i in range(50)], "next_page_token": "more"}

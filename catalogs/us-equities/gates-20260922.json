@@ -197,7 +197,7 @@
       "layer": "execution-broker",
       "title": "Adaptive paper runtime completes a regular-session broker trial",
       "status": "not_established",
-      "owner": "this-effort",
+      "owner": "peer:sota-workflow-resolution",
       "evidence_class": "none",
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/receipt.json",
@@ -206,7 +206,7 @@
         "pointer": "/broker_readiness/status",
         "equals": "passed"
       },
-      "note": "Current receipt: status local_integration_passed_new_broker_trial_pending, broker_readiness not_started (regular_session_window_unavailable). Synthetic capacity fixture (180 fills / 90 round trips in 60.42 s) used zero broker connections and is not this gate. Authorized paper work, not run by the 2026-09-22 handbook wave."
+      "note": "Current receipt: status local_integration_passed_new_broker_trial_pending, broker_readiness not_started (regular_session_window_unavailable). Synthetic capacity fixture (180 fills / 90 round trips in 60.42 s) used zero broker connections and is not this gate. Authorized paper work, not run by the 2026-09-22 handbook wave. 2026-09-22 10:55 ET: one SIP trial in the default state root ended completed_no_signals in 0.35 s with 0 orders and a flat reconciliation, which does not meet the flip condition. Root cause measured: the Windows host clock was +0.64 s off NTP and WSL's hv_utils time sync pulled the guest to it, so live quotes looked future-stamped and tripped the transport's -0.25 s quote guard (quote_timestamp_stale -> start_not_ready); an environment fault, not an engine or feed fault. Next attempt needs `w32tm /resync /force` on the host (user OS action) and, since PR-4, a passing promotion-gate result for the paper command (--gate-result/--snapshot). Ownership passed to peer:sota-workflow-resolution with adaptive-paper integration on 2026-09-22."
     },
     {
       "id": "broker-path-alerts",
@@ -246,7 +246,7 @@
       "layer": "portfolio-risk",
       "title": "Paper leverage ladder rung 1x completes with zero needs_attention",
       "status": "not_established",
-      "owner": "this-effort",
+      "owner": "peer:sota-workflow-resolution",
       "evidence_class": "none",
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/ladder/1x/receipt.json",
@@ -263,7 +263,7 @@
       "layer": "portfolio-risk",
       "title": "Paper leverage ladder rung 2x completes with zero needs_attention",
       "status": "not_established",
-      "owner": "this-effort",
+      "owner": "peer:sota-workflow-resolution",
       "evidence_class": "none",
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/ladder/2x/receipt.json",
@@ -280,7 +280,7 @@
       "layer": "portfolio-risk",
       "title": "Paper leverage ladder rung 4x (intraday cap; 2x overnight) completes with zero needs_attention",
       "status": "not_established",
-      "owner": "this-effort",
+      "owner": "peer:sota-workflow-resolution",
       "evidence_class": "none",
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/ladder/4x/receipt.json",
@@ -297,7 +297,7 @@
       "layer": "execution-broker",
       "title": "Broker-state failure handling exercised against native (non-synthetic) faults",
       "status": "not_established",
-      "owner": "this-effort",
+      "owner": "peer:sota-workflow-resolution",
       "evidence_class": "none",
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
