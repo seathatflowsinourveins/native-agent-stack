@@ -466,6 +466,41 @@ class CountsReconcileTests(unittest.TestCase):
         self.assertIsNone(candidate["adversarial_verification"]["survives"])
         self.assertEqual(candidate["disposition"], "targeted_candidate_unverified")
 
+    def test_why_selected_and_comparison_that_would_overturn_are_carried_through_when_present(self):
+        # pr2-schema unit 5: optional lane fields on a *selected* item (not a
+        # new_candidate, which already carries comparison_that_would_overturn)
+        # must reach merge_lanes' returned status[key] unchanged when the lane
+        # sets them, and must be absent (never invented) when it does not.
+        def lanes_doc(selected_extra):
+            return {
+                "critic": None,
+                "lanes": [{
+                    "lane": "trading",
+                    "result": {"calls": {}, "limits": [], "layers": [{
+                        "layer_id": "layer-a",
+                        "selected": [{
+                            "repository": "https://github.com/example/winner",
+                            "status": "confirmed_default", "evidence": [], "note": None,
+                            **selected_extra,
+                        }],
+                        "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                    }]},
+                    "proposals": [],
+                }],
+            }
+
+        key = ("layer-a", "https://github.com/example/winner")
+        status = build_manifest_mod.merge_lanes(lanes_doc({
+            "why_selected": "Passed the native scoped operation",
+            "comparison_that_would_overturn": "A sealed head-to-head replay",
+        }), {})[0]
+        self.assertEqual(status[key]["why_selected"], "Passed the native scoped operation")
+        self.assertEqual(status[key]["comparison_that_would_overturn"], "A sealed head-to-head replay")
+
+        status_absent = build_manifest_mod.merge_lanes(lanes_doc({}), {})[0]
+        self.assertNotIn("why_selected", status_absent[key])
+        self.assertNotIn("comparison_that_would_overturn", status_absent[key])
+
 
 class SelectedVerdictNullSurvivesTests(unittest.TestCase):
     """2026-09-22 review finding 5: merge_lanes' selected-status handling

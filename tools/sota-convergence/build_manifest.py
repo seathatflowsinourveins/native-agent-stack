@@ -373,6 +373,15 @@ def merge_lanes(lanes_doc: dict, repositories: dict):
                     # beyond what the lane itself proposed).
                 status[key] = {"status": status_value, "evidence": evidence,
                                 "note": selected.get("note"), "lane": lane["lane"]}
+                # Optional lane fields, carried through only when the lane's
+                # selected item actually sets them -- never invented here.
+                # build_manifest() (not owned by this change) can copy these
+                # from ``status[key]`` onto the merged components[]/entries[]
+                # the same way it already copies "note"/"evidence".
+                if "why_selected" in selected:
+                    status[key]["why_selected"] = selected["why_selected"]
+                if "comparison_that_would_overturn" in selected:
+                    status[key]["comparison_that_would_overturn"] = selected["comparison_that_would_overturn"]
             for alt in layer.get("alternatives_keep_but_compare", []):
                 alts[layer_id].append({**alt, "lane": lane["lane"]})
             for candidate in layer.get("new_candidates", []):

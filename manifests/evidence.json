@@ -2987,8 +2987,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "5b26e2694aab769f0b303288b9a393dd4b71f76cf0a7661b2804e50a6f770513",
-      "bytes": 17170
+      "sha256": "32c0e5ecc804ebbdf69c31e2150faeb7925565f7b800883556b25811236ff716",
+      "bytes": 23966
     },
     {
       "path": "docs/tasks/2026-09-21-runtime-reviewed-catalog-handbook.md",
@@ -3692,8 +3692,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "cd9e3e61630c06c5e54337de345c8f715c5eaafdb6f7848f0ec6a139b4a9bce4",
-      "bytes": 2997
+      "sha256": "7eed2412ec33d7f6a3bb89c4dc956e3160980fcf0960117bdb4391e9fee678d5",
+      "bytes": 3129
     },
     {
       "path": ".gitignore",
@@ -10718,8 +10718,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "bytes": 12348,
-      "sha256": "0848f312469c0188b3b7d6348b7dce800731a57718b92e76be8910ad0db0898c"
+      "bytes": 14890,
+      "sha256": "f81cadadad8ee47a4ce75bdac37c5b95867019445d29b21b82a2032ae0b28f09"
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",
@@ -10733,8 +10733,8 @@
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "bytes": 34937,
-      "sha256": "a7e3516476fd84aae076b3e0cea7d10d9b1cad5bb5de27e9ff610ebcc308927b"
+      "bytes": 35610,
+      "sha256": "f6d7a5b4ecf571d9f533c8cf184ca5f1e203d990219ba890e306e5f6b500c337"
     },
     {
       "path": "tools/sota-convergence/reconciliations-20260922.json",
@@ -10743,8 +10743,8 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "bytes": 54265,
-      "sha256": "988985554930f5faf1be726551206a27a6149876376acc09c4f1f8f1a98c5de6"
+      "bytes": 56133,
+      "sha256": "4732dc69b8aea1d7fee42627037314ffc93940bc515efa011a8c6716199cec37"
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -10773,18 +10773,18 @@
     },
     {
       "path": "catalogs/landscape/README.md",
-      "sha256": "f174f6bff493ea058335d2912fde42fc6b9addf80438c992f3089a19fed8dd68",
-      "bytes": 5450
+      "sha256": "592625d91924cf25f186955a090473ec6e06c7fafe9f9b0fa560df813db16554",
+      "bytes": 9549
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "ec2ae41a7ccd6f7c34c446cfb6a520df0f8f5ed94408ad0d011096df44a1e8c5",
-      "bytes": 98839
+      "sha256": "138b6170873afd36e98855a19415a66fca1a96203aecaca8987afa1931b36a2c",
+      "bytes": 125902
     },
     {
       "path": "catalogs/landscape/manifest.json",
-      "sha256": "67e9092f30332780853b693147e8406dc3c3eccd57a526fced57d45b23022566",
-      "bytes": 4224
+      "sha256": "a861b8db59ba3300ec5aee9d9041e194e7b865392c22cfc3bba0aedb11c1b557",
+      "bytes": 4300
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -10793,8 +10793,8 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "86495ce8e99645a358f3d06aad4f920c8462384e0a66463b1593e46e939811a9",
-      "bytes": 59247
+      "sha256": "15f2c59dee5c7e7b7c96d07d242ce89c104ac46cdc85745f93923ca05690361f",
+      "bytes": 250953
     },
     {
       "path": "docs/landscape-domain-notes.md",
@@ -10818,13 +10818,13 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "be100170cf13bf46c67a333ce8d352a0acbe1ad764f3db2153ae5579a79386e3",
-      "bytes": 26889
+      "sha256": "d7b0b5e683cf28ff9e3b04171f0a33cfda1cb5fe2d399112471e4743b6269885",
+      "bytes": 36882
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "a4418f3b3b8c8e90cd4fc2dc8c05f336cabb249b4b3c30fc9ae92051b6b950df",
-      "bytes": 20699
+      "sha256": "d71f6ded5c87d7b37dd1e3f1c8b0e3b2ad69ac413008657940ac782bd98c03b3",
+      "bytes": 30405
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
@@ -11360,6 +11360,21 @@
       "path": "tests/test_blind_layer_decisions.py",
       "sha256": "5b111b1b21c9ab4fda55d18b01390bf6355d18ffffea72b1aec2ccfe62b5e743",
       "bytes": 2827
+    },
+    {
+      "path": "tools/sota-convergence/build_verdicts.py",
+      "sha256": "03861ee58426eedf5cc5f659bb2415dd7b4ecc5ac0ea08c2ca39b9c210d9c7c9",
+      "bytes": 12248
+    },
+    {
+      "path": "tests/test_layer_verdicts.py",
+      "sha256": "c7743e5cb6add04001330960dd2f4a919692ec4bf4d77be69a4fcd2907fa429e",
+      "bytes": 10454
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "sha256": "c91b282a354c44b3066e40908d94815c810ec705320827183438f9a0d59b846a",
+      "bytes": 124069
     }
   ],
   "convergence_records": [

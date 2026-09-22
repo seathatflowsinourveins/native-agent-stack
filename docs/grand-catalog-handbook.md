@@ -240,3 +240,51 @@ candidate. Preserve historical records with their dates and superseding links.
 The catalog can be a complete handbook for its declared review set while
 comparative quality remains open. New-host acceptance is recorded on that host;
 neither a cloned receipt nor this HTML page certifies it.
+
+<!-- verdicts:begin -->
+## Per-layer verdicts (generated)
+
+Joins the landscape ledger's layer-verdict schema v2 rows with the dated SOTA-convergence manifest's per-layer components/entries and adoption/manifest.json's recipe_map. Every row currently pending_lanes was carried over unchanged; this generator does not itself run a lane, select a winner or claim an execution result.
+
+### foundation
+
+| Layer | Group | Verdict status | Winner(s) + pin | Evidence class | Alternatives | Overturn when | Recipe anchor | Platform status |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| agent-sdks | - | pending | - | - | 0 | A concrete application needs durable multi-host state/replay (Temporal), explicit graph checkpoints (LangGraph), a remo… | - | - |
+| ci-supply-chain | - | pending | - | - | 0 | A specific dependency/update or vulnerability gap is demonstrated and one alternative covers it with pinned database/pr… | - | - |
+| code-navigation | - | pending | - | - | 0 | A sealed task set in the target languages shows a challenger returning more correct source/references at an acceptable … | - | - |
+| document-retrieval | - | pending | - | - | 0 | A sealed representative corpus/query set shows useful quality gains with acceptable repeated end-to-end latency, or lay… | - | - |
+| durable-memory | - | pending | - | - | 0 | An isolated representative corpus and question set shows better source-grounded recall/usefulness and acceptable comple… | - | - |
+| git-github-automation | - | pending | - | - | 0 | A concrete cross-repository or multi-host Git/GitHub workflow needs capabilities beyond gh/worktrunk/difftastic, and a … | - | - |
+| hosting-services | - | pending | - | - | 0 | A defined production, remote-team or GPU deployment requirement exceeds the local fixture, and one alternative passes i… | - | - |
+| instructions-skills | - | pending | - | - | 0 | A specific task exposes a missing procedure, and a pinned candidate works in native discovery and task execution with l… | - | - |
+| isolation | - | pending | - | - | 0 | Untrusted code or a deployment target requires a stronger VM/OCI boundary, and the selected alternative passes workload… | - | - |
+| mcp-surfaces | - | pending | - | - | 0 | A concrete MCP surface gap needs a new server, and a reviewed registry entry passes the same bridge/inspection acceptan… | - | - |
+| native-clients | - | pending | - | - | 0 | A required structured-event, custom-tool or application state capability is unavailable through the native path and a s… | - | - |
+| observation-inference | - | pending | - | - | 0 | A required trace, evaluation or supported model/hardware workload is unanswerable by the current path, and one alternat… | - | - |
+| quality-evaluation | - | pending | - | - | 0 | A defined tool-use/extraction or experiment-tracking requirement cannot be expressed adequately in the current test lan… | - | - |
+| recovery-portability | - | pending | - | - | 0 | A real multi-language/system dependency or state-loss case exceeds the selected recipes, and the proposed environment/b… | - | - |
+| scheduling-supervision | - | pending | - | - | 0 | Real jobs require host-loss survival, days-long waits or durable cross-host effects, and one challenger passes the decl… | - | - |
+| secrets-credentials | - | pending | - | - | 0 | A concrete multi-host or multi-operator secret-sharing need appears, and openbao (or a comparable secret manager) passe… | - | - |
+| semantic-rag | - | pending | - | - | 0 | A sealed project/domain retrieval set shows improved source-grounded quality and acceptable latency, memory and lifecyc… | - | - |
+| token-efficiency | - | pending | - | - | 0 | A frozen task/artifact and repeated controlled comparison improves answer correctness or retrieval completeness while r… | - | - |
+| web-research | - | pending | - | - | 0 | A defined source-coverage or ingestion task exceeds the current commands and a candidate improves attributable retrieva… | - | - |
+| workers | - | pending | - | - | 0 | A real task needs durable multi-host state, approval waits or effect recovery beyond native workers, and one challenger… | - | - |
+
+### us-equities
+
+| Layer | Group | Verdict status | Winner(s) + pin | Evidence class | Alternatives | Overturn when | Recipe anchor | Platform status |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| agents-models-workers | foundation-memory | pending | - | - | 0 | Run a preregistered, representative held-out financial/document and code retrieval set at the same context budget; repl… | - | - |
+| backtesting-engine | engines-strategies | pending | - | - | 0 | Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/… | - | - |
+| data-quality-orchestration | agents-operations | pending | - | - | 0 | Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/bac… | - | - |
+| evaluation-experiments | agents-operations | pending | - | - | 0 | Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/bac… | - | - |
+| execution-broker | engines-strategies | pending | - | - | 0 | Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/… | - | - |
+| identity-provenance | data-research | pending | - | - | 0 | Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on … | - | - |
+| market-data-reference | data-research | pending | - | - | 0 | Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on … | - | - |
+| observability-hosting | agents-operations | pending | - | - | 0 | Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/bac… | - | - |
+| portfolio-risk | engines-strategies | pending | - | - | 0 | Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/… | - | - |
+| research-factors-ml | engines-strategies | pending | - | - | 0 | Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/… | - | - |
+| security-supply-chain | agents-operations | pending | - | - | 0 | Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/bac… | - | - |
+| storage-compute | data-research | pending | - | - | 0 | Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on … | - | - |
+<!-- verdicts:end -->

@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import argparse
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import date
 import hashlib
 import json
@@ -26,6 +26,17 @@ EVIDENCE_KINDS = {
     "source_review", "native_execution", "measured_comparison", "requirement_fit", "mixed",
 }
 DECISIONS = {"retain", "adjust", "keep_but_compare"}
+
+# Layer-verdict schema v2 (catalogs/landscape/{foundation,us-equities}.json).
+VERDICT_STATUSES = {"pending_lanes", "recorded", "no_selection"}
+WINNER_EVIDENCE_CLASSES = {
+    "native_proven", "local_integration", "synthetic", "source_review", "measured_comparison",
+}
+ALTERNATIVE_SOURCES = {"star", "awesome", "discovery_index", "lane:claude", "lane:codex"}
+LANE_AGREEMENTS = {"same_winner", "disagree", "codex_absent", "pending"}
+PLATFORM_KEYS = {"linux-wsl2-x86_64", "macos-arm64"}
+PLATFORM_STATUSES = {"accepted", "conditional", "not_established", "untested"}
+OVERTURN_MARKERS = ("fixtures/", "blueprints/", "tests/", "python3 ", "node ")
 
 
 def require(condition, message):
@@ -59,6 +70,116 @@ def https_url(value):
         return False
 
 
+def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recipe_map, sota_pins):
+    """Layer-verdict schema v2 checks for a single landscape row. ``evidence``
+    is the confined evidence()/track() helper already bound to this run; a
+    winner/alternative's ``evidence_refs`` may be an empty list (schema v2
+    allows empty containers while ``verdict_status`` is ``pending_lanes``)."""
+
+    def evidence_maybe_empty(values, label):
+        require(isinstance(values, list), label + " must be a list")
+        return evidence(values, label) if values else []
+
+    require(row.get("verdict_status") in VERDICT_STATUSES, str(key) + ".verdict_status is unknown")
+    require(isinstance(row.get("checked_at"), str) and bool(row["checked_at"]),
+            str(key) + ".checked_at must be nonempty text")
+    try:
+        date.fromisoformat(row["checked_at"])
+    except ValueError as error:
+        raise ValueError(str(key) + ".checked_at must be an ISO date") from error
+
+    protocol = row.get("overturn_protocol")
+    require(isinstance(protocol, dict), str(key) + ".overturn_protocol must be an object")
+    require(isinstance(protocol.get("fixture_paths"), list)
+            and all(isinstance(item, str) for item in protocol["fixture_paths"]),
+            str(key) + ".overturn_protocol.fixture_paths must be a list of text")
+    require(isinstance(protocol.get("metric"), str), str(key) + ".overturn_protocol.metric must be text")
+    require(isinstance(protocol.get("arms"), list), str(key) + ".overturn_protocol.arms must be a list")
+
+    lanes_field = row.get("lanes")
+    require(isinstance(lanes_field, dict), str(key) + ".lanes must be an object")
+    for lane_name in ("claude", "codex"):
+        lane = lanes_field.get(lane_name)
+        require(isinstance(lane, dict), str(key) + f".lanes.{lane_name} must be an object")
+        require(isinstance(lane.get("run_id"), str), str(key) + f".lanes.{lane_name}.run_id must be text")
+        sealed = lane.get("sealed_sha256")
+        require(isinstance(sealed, str), str(key) + f".lanes.{lane_name}.sealed_sha256 must be text")
+        if sealed:
+            require(bool(re.fullmatch(r"[a-f0-9]{64}", sealed)),
+                    str(key) + f".lanes.{lane_name}.sealed_sha256 must be a lowercase 64-digit hash")
+            sealed_path = f"evidence/artifacts/layer-verdicts-20260922/{lane_name}/{lane['run_id']}.json"
+            require(safe_file(root, sealed_path).is_file(),
+                    str(key) + f".lanes.{lane_name}.sealed_sha256 needs a sealed file: {sealed_path}")
+    require(lanes_field.get("agreement") in LANE_AGREEMENTS, str(key) + ".lanes.agreement is unknown")
+
+    open_gaps = row.get("open_gaps")
+    require(isinstance(open_gaps, list) and all(isinstance(gap, str) and gap.strip() for gap in open_gaps),
+            str(key) + ".open_gaps must be a list of nonempty text")
+
+    winners = row.get("winners")
+    require(isinstance(winners, list), str(key) + ".winners must be a list")
+    winner_component_ids = set()
+    for winner in winners:
+        require(isinstance(winner, dict), str(key) + ".winner must be an object")
+        component_id = nonempty(winner.get("component_id"), str(key) + ".winner.component_id")
+        require(component_id not in winner_component_ids, str(key) + " has a duplicate winner component_id")
+        winner_component_ids.add(component_id)
+        repository = winner.get("repository")
+        if repository is not None:
+            require(https_url(repository), str(key) + ".winner.repository must be an https URL or null")
+            repo_id = canonical(identity(repository), aliases)
+            require(repo_id in identities, str(key) + ".winner.repository absent from canonical index")
+        require(isinstance(winner.get("pin"), str), str(key) + ".winner.pin must be text")
+        if component_id in sota_pins:
+            require(winner["pin"] == sota_pins[component_id],
+                    str(key) + ".winner.pin differs from the sota manifest pin for " + component_id)
+        require(winner.get("evidence_class") in WINNER_EVIDENCE_CLASSES,
+                str(key) + ".winner.evidence_class is unknown")
+        nonempty(winner.get("why_selected"), str(key) + ".winner.why_selected")
+        evidence_maybe_empty(winner.get("evidence_refs"), str(key) + ".winner.evidence_refs")
+        recipe_ref = winner.get("recipe_ref")
+        require(isinstance(recipe_ref, str), str(key) + ".winner.recipe_ref must be text")
+        if recipe_ref:
+            require(recipe_ref in recipe_map or safe_file(root, recipe_ref).exists(),
+                    str(key) + ".winner.recipe_ref must resolve to a recipe_map key or an existing path")
+        platform_status = winner.get("platform_status")
+        require(isinstance(platform_status, dict) and set(platform_status) == PLATFORM_KEYS,
+                str(key) + ".winner.platform_status must cover exactly " + ", ".join(sorted(PLATFORM_KEYS)))
+        require(all(value in PLATFORM_STATUSES for value in platform_status.values()),
+                str(key) + ".winner.platform_status has an unknown status")
+
+    alternatives = row.get("alternatives")
+    require(isinstance(alternatives, list), str(key) + ".alternatives must be a list")
+    why_not_defaults = set()
+    for alternative in alternatives:
+        require(isinstance(alternative, dict), str(key) + ".alternative must be an object")
+        nonempty(alternative.get("name"), str(key) + ".alternative.name")
+        repository = alternative.get("repository")
+        require(https_url(repository), str(key) + ".alternative.repository must be an https URL")
+        repo_id = canonical(identity(repository), aliases)
+        require(repo_id in identities, str(key) + ".alternative.repository absent from canonical index")
+        require(alternative.get("disposition") in DISPOSITIONS, str(key) + ".alternative.disposition is unknown")
+        why_not = nonempty(alternative.get("why_not_default"), str(key) + ".alternative.why_not_default")
+        why_not_defaults.add(why_not)
+        require(alternative.get("evidence_class") in WINNER_EVIDENCE_CLASSES,
+                str(key) + ".alternative.evidence_class is unknown")
+        evidence_maybe_empty(alternative.get("evidence_refs"), str(key) + ".alternative.evidence_refs")
+        require(alternative.get("source") in ALTERNATIVE_SOURCES, str(key) + ".alternative.source is unknown")
+
+    status = row["verdict_status"]
+    if status == "recorded":
+        require(bool(winners), str(key) + " recorded verdict needs at least one winner")
+        require(bool(alternatives), str(key) + " recorded verdict needs at least one alternative")
+        for winner in winners:
+            require(winner.get("why_selected") not in why_not_defaults,
+                    str(key) + ".winner.why_selected must differ from every alternative's why_not_default")
+        require(any(marker in row.get("overturn_when", "") for marker in OVERTURN_MARKERS),
+                str(key) + ".overturn_when must name a fixture/blueprint/test path or a runnable command "
+                           "for a recorded verdict")
+    elif status == "no_selection":
+        require(bool(open_gaps), str(key) + " no_selection verdict needs open_gaps")
+
+
 def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file_url=None):
     """Resolve references using the explorer's existing confined loader/hash registry."""
     root = Path(root).resolve()
@@ -83,7 +204,21 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
     stack = read(sources["selected_manifest"])
     expected = {("foundation", row["id"]) for row in foundation["layers"]}
     domain_documents = {path: read(path) for path in domain["catalog_files"]}
-    expected.update(("us-equities", document["layer"]) for document in domain_documents.values())
+    domain_group_ids = {document["layer"] for document in domain_documents.values()}
+    # The 12-layer US-equities taxonomy is sourced live from the dated SOTA-
+    # convergence manifest's trading[].layer ids, never hardcoded here.
+    trading_taxonomy_doc = read(sources["trading_taxonomy"])
+    trading_layer_ids = sorted({row["layer"] for row in trading_taxonomy_doc.get("trading", [])})
+    require(bool(trading_layer_ids), "trading taxonomy needs at least one layer")
+    expected.update(("us-equities", layer_id) for layer_id in trading_layer_ids)
+    recipe_map = read("adoption/manifest.json").get("recipe_map", {})
+    sota_pins = {}
+    for row in trading_taxonomy_doc.get("foundation", []):
+        for component in row.get("components", []):
+            sota_pins[component["id"]] = component.get("pin")
+    for row in trading_taxonomy_doc.get("trading", []):
+        for entry in row.get("entries", []):
+            sota_pins[entry["id"]] = entry.get("pin")
 
     def evidence(values, label):
         result = []
@@ -102,7 +237,7 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
     layers, seen, decision_pointers = [], set(), {}
     for catalog, path in documents.items():
         document = read(path)
-        require(document.get("schema_version") == 1, "unsupported layer comparison schema")
+        require(document.get("schema_version") == 2, "unsupported layer comparison schema")
         require(document.get("checked_at") == manifest["checked_at"], "layer review date differs from manifest")
         nonempty(document.get("scope"), path + ".scope")
         require(isinstance(document.get("layers"), list), path + " needs layers")
@@ -116,6 +251,13 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 nonempty(row.get(field), str(key) + "." + field)
             require(row.get("decision") in DECISIONS, "unknown layer decision")
             strings(row.get("limitations"), str(key) + ".limitations")
+            group = row.get("group")
+            if catalog == "us-equities":
+                require(group in domain_group_ids, str(key) + ".group must be a domain document id")
+            else:
+                require(group is None, str(key) + ".group is only used for trading rows")
+            validate_verdict_row(row, key, root=root, identities=identities, aliases=aliases,
+                                  evidence=evidence, recipe_map=recipe_map, sota_pins=sota_pins)
             source_links = evidence(row.get("evidence_refs"), str(key))
             candidates, candidate_ids = [], set()
             require(isinstance(row.get("candidates"), list) and row["candidates"], "layer needs candidates")
@@ -200,11 +342,21 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
 
     # All historical candidate cards remain visible with their original date and
     # role. They do not override the explicitly dated current comparison above.
+    # Schema v2: a domain document (foundation-memory/agents-operations/
+    # data-research/engines-strategies) no longer binds 1:1 to a us-equities
+    # layer_id; it binds through every row whose "group" equals the document's
+    # own "layer" id, since the 12-layer trading taxonomy consolidates several
+    # taxonomy layers under one domain document's primary contribution.
     by_key = {(row["catalog"], row["layer_id"]): row for row in layers}
+    group_rows = defaultdict(list)
+    for row in layers:
+        if row["catalog"] == "us-equities":
+            group_rows[row.get("group")].append(row)
     for path, document in domain_documents.items():
-        layer = by_key[("us-equities", document["layer"])]
+        matched_rows = group_rows.get(document["layer"], [])
+        require(matched_rows, "domain document maps to no landscape row group: " + document["layer"])
         for position, row in enumerate(document["entries"]):
-            layer["catalog_candidates"].append({
+            candidate_entry = {
                 "id": row["id"], "name": row["repository"].removeprefix("https://github.com/"),
                 "repository": row["repository"], "role": row["role"], "decision": row["decision"],
                 "rationale": row["rationale"], "evidence_kind": row["evidence_level"],
@@ -212,7 +364,9 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 "checked_at": document["checked_at"], "url": file_url(path) + "#L1",
                 "pointer": "/entries/" + str(position),
                 "sources": evidence(row["evidence_refs"], row["id"]),
-            })
+            }
+            for matched in matched_rows:
+                matched["catalog_candidates"].append(dict(candidate_entry))
 
     freshness = read(sources["freshness_snapshot"])
     require(freshness.get("schema_version") == 1, "unsupported upstream snapshot schema")
