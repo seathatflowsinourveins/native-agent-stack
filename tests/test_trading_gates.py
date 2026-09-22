@@ -63,6 +63,20 @@ class TradingGatesTests(unittest.TestCase):
         self.assertEqual(result["status"], "failed")
         self.assertIn("/ok", result["errors"][0])
 
+    def test_equals_condition_is_type_strict(self):
+        # Codex fix-round finding: Python's == treats False == 0 and 0.0 == 0,
+        # so an untyped comparison would let a boolean or float receipt value
+        # satisfy an integer flip condition (e.g. /unresolved_collisions == 0).
+        self.write("r.json", {"ok": False})
+        result = self.run_check(document(gate(flip_condition={"type": "equals", "pointer": "/ok", "equals": 0})))
+        self.assertEqual(result["status"], "failed")
+        holds, _ = trading_gates.condition_holds(self.root, gate(flip_condition={"type": "equals", "pointer": "/ok", "equals": 0}))
+        self.assertFalse(holds)
+
+        self.write("r.json", {"ok": 0})
+        result = self.run_check(document(gate(status="not_established", flip_condition={"type": "equals", "pointer": "/ok", "equals": 0})))
+        self.assertEqual([c["id"] for c in result["flip_candidates"]], ["g"])
+
     def test_absent_pointer_is_reported_not_crashed(self):
         self.write("r.json", {"other": 1})
         result = self.run_check(document(gate(flip_condition={"type": "equals", "pointer": "/a/b/0", "equals": 1})))
@@ -206,6 +220,20 @@ class GatePointerContentTests(unittest.TestCase):
         },
     }
 
+    # Gate id -> a well-formed receipt payload (same shape as GOOD_RECEIPTS)
+    # whose terminal value fails the gate's flip condition. Regression for the
+    # ibkr-local-acceptance finding: a receipt with the right kind/shape but a
+    # failing result must not be a flip candidate.
+    BAD_RECEIPTS = {
+        "dividend-sim-module": {**GOOD_RECEIPTS["dividend-sim-module"], "status": "open"},
+        "pre-2020-delisting": {**GOOD_RECEIPTS["pre-2020-delisting"], "coverage_status": "unconfirmed"},
+        "dated-security-identity": {**GOOD_RECEIPTS["dated-security-identity"], "unresolved_collisions": 3},
+        "pit-news-filings": {**GOOD_RECEIPTS["pit-news-filings"], "pit_status": "unconfirmed"},
+        "databento-arm-b": {**GOOD_RECEIPTS["databento-arm-b"], "status": "not_executed"},
+        "native-fault-behaviour": {**GOOD_RECEIPTS["native-fault-behaviour"], "status": "bounded_alpaca_synthetic_cases_passed_native_faults_pending"},
+        "ibkr-local-acceptance": {**GOOD_RECEIPTS["ibkr-local-acceptance"], "status": "failed"},
+    }
+
     @classmethod
     def setUpClass(cls):
         path = ROOT / trading_gates.GATES
@@ -261,6 +289,35 @@ class GatePointerContentTests(unittest.TestCase):
                 )
                 holds, detail = trading_gates.condition_holds(self.root, gate)
                 self.assertTrue(holds, f"{gate_id}: well-formed passing receipt does not hold ({detail})")
+
+    def test_well_formed_failing_receipt_is_not_a_flip_candidate(self):
+        for gate_id, bad_content in self.BAD_RECEIPTS.items():
+            with self.subTest(gate=gate_id):
+                gate = self.gates_by_id[gate_id]
+                self.assertNotEqual(gate["status"], "established", f"{gate_id}: fixture assumes a non-established gate")
+
+                self.write(gate["receipt_path"], json.dumps(bad_content))
+                result = trading_gates.check(self.root, self.write("gates.json", json.dumps(document(gate))))
+                self.assertEqual(
+                    [c["id"] for c in result["flip_candidates"]], [],
+                    f"{gate_id}: well-formed but failing receipt was listed as a flip candidate",
+                )
+                holds, detail = trading_gates.condition_holds(self.root, gate)
+                self.assertFalse(holds, f"{gate_id}: well-formed failing receipt unexpectedly holds ({detail})")
+
+    def test_no_non_established_gate_in_the_repository_ladder_uses_presence_only_exists(self):
+        # Generic guard (not limited to GOOD_RECEIPTS' seven ids): any gate
+        # that is not yet established must not rely on a presence-only
+        # 'exists' flip condition, which an empty placeholder file satisfies.
+        for gate_id, gate in self.gates_by_id.items():
+            if gate["status"] == "established":
+                continue
+            condition = gate["flip_condition"]
+            if condition is None:
+                continue
+            with self.subTest(gate=gate_id):
+                self.assertNotEqual(condition["type"], "exists",
+                                     f"{gate_id}: non-established gate uses a presence-only 'exists' condition")
 
 
 if __name__ == "__main__":

@@ -182,7 +182,7 @@
         "pointer": "/status",
         "equals": "executed"
       },
-      "note": "Arm A (Alpaca/SEC) ran; arm B not run because paid data was not authorised, so the comparison closed as unresolved (agent-lab docs/tasks/2026-09-22-executed-comparisons.md, tools/compare/data/out/20260922T060611Z/). Not a decision that the incumbent wins. Required receipt schema (no receipt exists yet at this path in this worktree, so this is preregistered here rather than copied from the arm-A output, which this unit did not have access to): {\"schema_version\": 1, \"arm\": \"B\", \"provider\": \"databento\", \"status\": \"executed\", \"window\": {\"start\": \"2016-01-01\", \"end\": \"2026-01-01\"}}. The checker only verifies /status == \"executed\"; that the run actually covers the frozen 2016-2026 window on paid Databento data is qualified manually before the dated commit that flips this gate."
+      "note": "Arm A (Alpaca/SEC) ran; arm B not run because paid data was not authorised, so the comparison closed as unresolved (agent-lab docs/tasks/2026-09-22-executed-comparisons.md, tools/compare/data/out/20260922T060611Z/). Not a decision that the incumbent wins. Required receipt schema (newly preregistered here; not derived from the arm-A output): {\"schema_version\": 1, \"arm\": \"B\", \"provider\": \"databento\", \"status\": \"executed\", \"window\": {\"start\": \"2016-01-01\", \"end\": \"2026-01-01\"}}. The checker only verifies /status == \"executed\"; that the run actually covers the frozen 2016-2026 window on paid Databento data is qualified manually before the dated commit that flips this gate."
     },
     {
       "id": "alpaca-paper-smoke",
@@ -330,10 +330,10 @@
       "receipt_path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/receipt.json",
       "flip_condition": {
         "type": "equals",
-        "pointer": "/kind",
-        "equals": "native_ibkr_local_acceptance"
+        "pointer": "/status",
+        "equals": "passed"
       },
-      "note": "runtime-target.json next_acceptance separate-paper-adapters: bounded_alpaca_paper_smoke_passed_ibkr_pending. Needs the user's broker sign-in; the selected live-primary path is unexercised until then. Required receipt schema (no receipt exists yet, so this is preregistered here reusing the /kind literal-match pattern already used by the alpaca-paper-smoke gate's receipt): {\"schema_version\": 1, \"kind\": \"native_ibkr_local_acceptance\", \"status\": \"passed\", \"broker\": \"ibkr\"}. The checker only verifies /kind == \"native_ibkr_local_acceptance\"; that a signed-in TWS or IB Gateway actually accepted the adapter locally is qualified manually before the dated commit that flips this gate."
+      "note": "runtime-target.json next_acceptance separate-paper-adapters: bounded_alpaca_paper_smoke_passed_ibkr_pending. Needs the user's broker sign-in; the selected live-primary path is unexercised until then. Required receipt schema (no receipt exists yet, so this is preregistered here): {\"schema_version\": 1, \"kind\": \"native_ibkr_local_acceptance\", \"status\": \"passed\", \"broker\": \"ibkr\"}. The checker only verifies /status == \"passed\"; /kind names the receipt type but is not itself a result, so it is not the flip condition. That a signed-in TWS or IB Gateway actually accepted the adapter locally is qualified manually before the dated commit that flips this gate."
     },
     {
       "id": "live-go",
