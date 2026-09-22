@@ -6982,13 +6982,13 @@
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
-      "sha256": "c91b282a354c44b3066e40908d94815c810ec705320827183438f9a0d59b846a",
-      "bytes": 124069
+      "sha256": "d9493924a0095acf1d303792a0f4f7be9669faffd1851cfc552afa108573bbfd",
+      "bytes": 131595
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260922.json",
-      "sha256": "01869fe708b9fb71f78200a06ce4b7cf6eb86532feb7edf96ffa616b3af3b18f",
-      "bytes": 401431
+      "sha256": "6c9fddc0c664521782f7cad64f6a3d16e4db5ce968834ee5e5940a9bfb56ca77",
+      "bytes": 504565
     },
     {
       "path": "catalogs/us-equities/README.md",
@@ -7422,7 +7422,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "9d6446fe2002cf03c56d46bf7b59d156c9655bbfb0f60d21f46c1b786f7fb0fb",
+      "sha256": "e66bd50f637124185038e08863764783828bf4856ea0a76b67ef86105b7e0890",
       "bytes": 12139743
     },
     {
@@ -11527,8 +11527,8 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "sha256": "c342724f2c4ab9292db3f604a765eaff32470c930a2125d2a59e4d92d068f9a9",
-      "bytes": 59286
+      "sha256": "557605ad4b390785ca9b9927be43fede3c66cc4a74b8f42976cb605ce87b69f2",
+      "bytes": 133084
     },
     {
       "path": "tests/test_stack_lifecycle.py",
@@ -11587,13 +11587,13 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "f81cadadad8ee47a4ce75bdac37c5b95867019445d29b21b82a2032ae0b28f09",
-      "bytes": 14890
+      "sha256": "d8415ac76312c55f898cb30eb4562aae59899a0e31be8a6f3d3f82bdd1167b16",
+      "bytes": 32362
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "7f9797504ad1b7020e62c4e746f2ef2608266f408f90d5a72b531dc3e85c7943",
-      "bytes": 36285
+      "sha256": "f3b3dfc83c53e2972ffed67ca7ce7635d828e2179a00e829a7645bf8abcd15aa",
+      "bytes": 74139
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
@@ -11679,6 +11679,11 @@
       "path": "tests/test_gitleaks_config.py",
       "sha256": "ed9710e611064809690f66744026b18ae5f9554ba19881a8c6ca8d2a0e91a123",
       "bytes": 14407
+    },
+    {
+      "path": "evidence/artifacts/sota-convergence-review-20260922/manifest-citation-review.json",
+      "sha256": "97ffac75c1208a58d9700ad5e30d1c0aa0f3decfc3199f10ce4d88135b7d10e4",
+      "bytes": 90508
     }
   ],
   "convergence_records": [
