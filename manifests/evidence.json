@@ -12631,6 +12631,21 @@
       "path": "evidence/artifacts/gap-resolution-20260922/observation-inference/vllm-0.30.0-uva-smoke.json",
       "sha256": "f98c681d9eb8d0e922123cf29579e97918d5d20f6ab5ef74102299772bec2d91",
       "bytes": 13656
+    },
+    {
+      "path": "catalogs/landscape/gap-resolution-20260922.json",
+      "bytes": 337793,
+      "sha256": "efcca76540b19017504c8142046d7887cda3f24ce05babad960556f834d70bdb"
+    },
+    {
+      "path": "docs/gap-resolution-20260922.md",
+      "bytes": 13408,
+      "sha256": "2c675d3a49d4fc08be85f4a17931b5e3c892a4ca053259f9df777f26ba8fab61"
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/headroom-live-store-cleanup.json",
+      "bytes": 1946,
+      "sha256": "51ffcfcb71945a7c2698ab290737c53f24a5a9dc60441a97a8515d6ac5e0e820"
     }
   ],
   "convergence_records": [
