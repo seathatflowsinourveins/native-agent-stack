@@ -7298,8 +7298,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "1493e365b67413712ddcdde4b826799e37b0351adc5cbf3568ba269cf8bc6473",
-      "bytes": 12207
+      "sha256": "8f72fc88a1e80645a509f8671832cc748e6091000a22b8fca5b0fd5b9e2390f0",
+      "bytes": 15802
     },
     {
       "path": "observability/backends/check_persistence.py",
@@ -7328,8 +7328,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-alertmanager.yml.example",
-      "sha256": "68a204ad1f470fd8559ea220289a9a0e768689595c2a0eca9e0bc16fee88d479",
-      "bytes": 315
+      "sha256": "693ecb28036e88fac500419009db4a88617377124c8ebe31e2764c7f1006bda7",
+      "bytes": 418
     },
     {
       "path": "observability/backends/templates/ecosystem-dashboard.json.example",
@@ -7363,13 +7363,13 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
-      "sha256": "4927e3b754d8dd228e9b0710988af00e1cc6dcb7f058c7875bc15d5bdc1fa0ce",
-      "bytes": 3834
+      "sha256": "45c5ca5fcfd2575e398494f353289634056c0064e0b216045e5092f320d5a931",
+      "bytes": 9373
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus.yml.example",
-      "sha256": "4bfbe5b6fb4d78e1813f68410b84dd2a663ccc31ba4dfe9bcfa4a296b32463c1",
-      "bytes": 1006
+      "sha256": "fdaae9c4934c33585f9cade2a38c77767958b648f358295ef8220302fb49bb7b",
+      "bytes": 1092
     },
     {
       "path": "observability/collector/README.md",
@@ -10268,8 +10268,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "bytes": 7987,
-      "sha256": "085d204a3769dc549e8cd3b82c4e132d3010f8d99a0b76032049ff94930a00f6"
+      "bytes": 10610,
+      "sha256": "55eb09d9173d74a6acfc7549135654b05e7c7f6ec10e7c4c1e6a90c7e7b69872"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/benchmark.py",
@@ -11370,6 +11370,26 @@
       "path": "tests/test_supply_chain_scan.py",
       "sha256": "a4e3e5a6f40a7f3b4e679b21dc56f443a27ccdd9f097423bdf64d9e41eef19f8",
       "bytes": 6838
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/metrics.py",
+      "sha256": "bcaa6023a34707555963b6916023dd94280ab1cd5854b995e35fd62b6bb34c20",
+      "bytes": 15907
+    },
+    {
+      "path": "observability/backends/broker-path-rules-receipt.json",
+      "sha256": "3c729b21531bb4088472bed73442897597da27dee2e376a9dbef3d859e04313d",
+      "bytes": 7219
+    },
+    {
+      "path": "tests/test_adaptive_paper_metrics.py",
+      "sha256": "97d0541bf8916b395703ab7000f4b92ab4f85b475700f1bbbcb1c95b32dc7ef5",
+      "bytes": 12828
+    },
+    {
+      "path": "tests/test_observability_backends_alerts.py",
+      "sha256": "c015775d7072829877361f358f79d560075e0d84c06c9155146aa0c58875ba90",
+      "bytes": 8168
     }
   ],
   "convergence_records": [

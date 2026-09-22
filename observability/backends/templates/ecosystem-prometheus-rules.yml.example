@@ -2,14 +2,14 @@ groups:
   - name: ecosystem-local
     rules:
       - alert: EcosystemServiceUnavailable
-        expr: up{job!="acceptance-fixture"} == 0
+        expr: up{job!~"acceptance-fixture|adaptive-paper"} == 0
         for: 2m
         labels:
           severity: warning
           scope: local-ecosystem
         annotations:
           summary: 'Local service {{ $labels.job }} is unavailable'
-          description: 'Prometheus could not scrape {{ $labels.instance }} for two minutes.'
+          description: 'Prometheus could not scrape {{ $labels.instance }} for two minutes. The adaptive-paper job is excluded here: that exporter is a separate process not started by install.py/configure.py, so it is down (and this job would otherwise fire permanently) outside an active paper trial. EquitiesPaperMetricsMissing (scope=equities-broker) covers its unavailability instead, with wording matched to that expected lifecycle.'
       - alert: EcosystemOmniRouteHealthUnexpected
         expr: '(max(ecosystem_httpcheck_status{http_url="http://127.0.0.1:20128/api/health",http_status_class="2xx"}) or vector(0)) < 1'
         for: 2m
@@ -77,3 +77,64 @@ groups:
         annotations:
           summary: 'WSL root filesystem observations are missing'
           description: 'Missing data is unknown, not proof of available space.'
+  - name: equities-broker-path
+    rules:
+      - alert: EquitiesOrderStateDivergence
+        expr: 'increase(paper_order_state_divergence_total[5m]) > 0'
+        for: 1m
+        labels:
+          severity: critical
+          scope: equities-broker
+        annotations:
+          summary: 'Adaptive-paper ledger recorded a broker order-state divergence'
+          description: 'paper_order_state_divergence_total increased in the last 5 minutes: the durable ledger observed a broker order it never reserved (reason=external_order_detected). The runner freezes entries on this; treat as an unowned position/order until an explicit recovery run reconciles it.'
+      - alert: EquitiesReconciliationFailed
+        expr: |
+          paper_needs_attention == 1
+          or
+          paper_reconciliation_status{result="needs_attention"} == 1
+          or
+          ((time() - paper_reconciliation_last_success_timestamp_seconds) > 120 and paper_trial_active == 1)
+        for: 1m
+        labels:
+          severity: critical
+          scope: equities-broker
+        annotations:
+          summary: 'Adaptive-paper trial needs attention or has not reconciled recently'
+          description: 'Fires if the durable trial.json phase is needs_attention (the last bounded run did not end flat/clean), or if trial.json status is needs_attention even though phase ended finished (runner.py sets phase from the post-recovery flat flag and status from the original run result independently, so a run that failed and was then recovered flat reports phase=finished/status=needs_attention -- the paper_needs_attention clause alone misses this, the paper_reconciliation_status clause catches it), or an active trial has gone over 120 seconds since its last successful reconciliation. paper_reconciliation_last_success_timestamp_seconds is not currently exported by metrics.py (documented schema gap); that clause is dormant until that changes -- it is also the only clause that could catch a hard-killed runner whose trial.json is stuck at phase=starting, which remains an unguarded gap until it is exported.'
+      - alert: EquitiesRequestBudgetExhausted
+        expr: 'paper_request_budget_remaining <= 0 or increase(paper_request_budget_wait_exceeded_total[5m]) > 0'
+        for: 2m
+        labels:
+          severity: warning
+          scope: equities-broker
+        annotations:
+          summary: 'Adaptive-paper Alpaca request budget is exhausted or waits are being denied'
+          description: 'The rolling one-minute request budget (paper_request_budget_remaining, by kind=rest|submit) reached zero, or paper_request_budget_wait_exceeded_total increased. paper_request_budget_wait_exceeded_total is not currently exported by metrics.py (documented schema gap: it is raised only in the runner process, not recorded in the ledger); this clause is dormant until that changes, so this alert currently fires from paper_request_budget_remaining alone.'
+      - alert: EquitiesLedgerFrozen
+        expr: 'max by (reason) (paper_ledger_frozen) == 1'
+        for: 1m
+        labels:
+          severity: critical
+          scope: equities-broker
+        annotations:
+          summary: 'Adaptive-paper ledger {{ $labels.reason }} is frozen'
+          description: 'The durable ledger persisted a halted_reason ({{ $labels.reason }}); safety.Ledger blocks new buy entries until an explicit recovery run or a fresh qualified next trial clears it. This does not stop confirmed owned exits.'
+      - alert: EquitiesPaperMetricsMissing
+        expr: 'absent(paper_trial_active)'
+        for: 2m
+        labels:
+          severity: warning
+          scope: equities-broker
+        annotations:
+          summary: 'Adaptive-paper metrics exporter is not being scraped'
+          description: 'paper_trial_active has been absent from Prometheus for two minutes: the read-only exporter process (metrics.py, loopback 127.0.0.1:18890) is down, unreachable, or its HTTP listener is misconfigured. paper_trial_active/paper_needs_attention/paper_ledger_readable are always exported by a running exporter regardless of ledger state, so this specifically means the exporter itself is not answering scrapes -- it does not cover an unreadable ledger path (see EquitiesLedgerUnreadable for that case). Missing data is unknown state, not proof of no active trial.'
+      - alert: EquitiesLedgerUnreadable
+        expr: 'paper_ledger_readable == 0'
+        for: 2m
+        labels:
+          severity: critical
+          scope: equities-broker
+        annotations:
+          summary: 'Adaptive-paper exporter cannot read its ledger'
+          description: 'The exporter is answering scrapes (paper_ledger_readable is present) but its most recent read-only open of --ledger failed or the file is missing for two minutes straight: a wrong --ledger path, a permissions problem, or a failed sqlite mode=ro open. paper_order_state_divergence_total, paper_ledger_frozen, and paper_request_budget_remaining/limit are conditionally emitted (unlike paper_trial_active/paper_needs_attention) and go silently absent in this state with no absent()-based rule able to target them directly; this alert is the guard for that gap.'
