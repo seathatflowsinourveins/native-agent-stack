@@ -425,9 +425,19 @@ class ManifestTradingCandidatesTests(LanePacketsFixture):
         layer["entries"].append({"id": "data-two", "repository": "https://github.com/acme/data-one",
                                  "pin": "3.1.0", "upstream": None, "pin_behind_upstream": False,
                                  "review_status": "not_individually_reviewed"})
+        layer["entries"].append({"id": "data-three", "repository": "https://github.com/acme/data-three",
+                                 "pin": "1.0.0", "upstream": None, "pin_behind_upstream": True,
+                                 "review_status": "confirmed_conditional"})
         layer["candidates"] = [{"repository": "https://github.com/acme/newcomer",
-                                "demonstrated_gap": "names the gap but demonstrates nothing"}]
-        layer["alternatives_keep_but_compare"] = []
+                                "demonstrated_gap": "names the gap but demonstrates nothing"},
+                               {"repository": "https://github.com/acme/data-three",
+                                "demonstrated_gap": "already an entry, must not be added twice"}]
+        layer["alternatives_keep_but_compare"] = [
+            {"repository": "https://github.com/acme/newcomer",
+             "comparison_that_would_overturn": "listed in both newcomer lists"},
+            {"repository": "https://github.com/acme/kbc-only",
+             "comparison_that_would_overturn": "an executed comparison would overturn it"}]
+        manifest["taxonomy"] = {"layer-b": ["market-data", "reference"]}
         self.write("catalogs/sota-convergence/manifest-20260922.json", manifest)
         self.write("docs/card-evidence.md", "card evidence")
         cards = {"entries": [
@@ -438,6 +448,9 @@ class ManifestTradingCandidatesTests(LanePacketsFixture):
             {"id": "data-two", "repository": "https://github.com/acme/data-one", "decision": "rejected",
              "evidence_level": "source_review", "evidence_refs": [], "role": "Second card, same repository",
              "limitations": [], "rationale": "INCUMBENT RATIONALE MUST NOT APPEAR"},
+            {"id": "data-three", "repository": "https://github.com/acme/data-three", "decision": "conditional",
+             "evidence_level": "local_integration", "evidence_refs": ["docs/card-evidence.md"],
+             "role": "Third card", "limitations": ["Local only"], "rationale": "INCUMBENT RATIONALE MUST NOT APPEAR"},
         ]}
         for relative in lane_packets.TRADING_CARD_FILES:
             self.write(relative, {"entries": []})
@@ -449,15 +462,25 @@ class ManifestTradingCandidatesTests(LanePacketsFixture):
     def test_candidates_are_the_manifest_layer_entries_plus_newcomers(self):
         packet = self.manifest_packet()
         by_component = {c["component_id"]: c for c in packet["candidates"]}
-        self.assertEqual(set(by_component), {"data-one", "data-two", None})
+        self.assertEqual(set(by_component), {"data-one", "data-two", "data-three", None})
         self.assertTrue(by_component["data-one"]["adopted"])
         self.assertFalse(by_component["data-two"]["adopted"], "a card decision outside default/conditional is not adopted")
         self.assertEqual(by_component["data-one"]["evidence_refs"], ["docs/card-evidence.md"])
         self.assertEqual(by_component["data-one"]["pin"], "3.0.0")
         self.assertEqual(by_component["data-two"]["pin"], "3.1.0", "two entries sharing a repository keep their own ids and pins")
-        newcomer = by_component[None]
-        self.assertFalse(newcomer["adopted"])
-        self.assertEqual(newcomer["note"], "names the gap but demonstrates nothing")
+        others = [c for c in packet["candidates"] if c["component_id"] is None]
+        self.assertEqual(sorted(c["repository"] for c in others),
+                         ["https://github.com/acme/kbc-only", "https://github.com/acme/newcomer"],
+                         "a repository already an entry is not added, and one in both lists appears once")
+        self.assertTrue(all(not c["adopted"] and c["review_status"] == "newcomer" for c in others))
+        notes = {c["repository"]: c["note"] for c in others}
+        self.assertEqual(notes["https://github.com/acme/newcomer"], "names the gap but demonstrates nothing")
+        self.assertEqual(notes["https://github.com/acme/kbc-only"], "an executed comparison would overturn it")
+        self.assertTrue(by_component["data-three"]["adopted"], "a conditional card decision is adopted")
+        self.assertEqual(by_component["data-three"]["role"], "Third card")
+        self.assertEqual(by_component["data-three"]["card_limitations"], ["Local only"])
+        self.assertEqual(packet["layer_scope_terms"], ["market-data", "reference"])
+        self.assertIn("layer_scope_terms", packet["requirement_note"])
         self.assertEqual(packet["candidate_source"], lane_packets.MANIFEST_CANDIDATE_SOURCE)
 
     def test_card_rationale_and_decision_are_withheld(self):
@@ -472,6 +495,37 @@ class ManifestTradingCandidatesTests(LanePacketsFixture):
         manifest = self.build(trading_candidates="manifest")
         self.assertEqual(ledger["foundation__layer-a.json"], manifest["foundation__layer-a.json"])
         self.assertNotIn("candidate_source", json.loads(ledger["us-equities__layer-b.json"]))
+
+    def test_decision_bearing_review_labels_are_masked(self):
+        by_component = {c["component_id"]: c for c in self.manifest_packet()["candidates"]}
+        self.assertEqual(by_component["data-one"]["review_status"], "reviewed", "confirmed_default is masked")
+        self.assertEqual(by_component["data-three"]["review_status"], "reviewed", "confirmed_conditional is masked")
+        self.assertEqual(by_component["data-two"]["review_status"], "not_individually_reviewed", "neutral labels stay")
+        self.assertNotIn("confirmed_", json.dumps(self.manifest_packet()))
+
+    def test_keys_follow_the_seeded_shuffle(self):
+        packet = self.manifest_packet()
+        self.assertEqual([c["key"] for c in packet["candidates"]],
+                         [f"c{index}" for index in range(1, len(packet["candidates"]) + 1)])
+        # The order is the seeded permutation, identical across builds and different seeds change it.
+        other = json.loads(lane_packets.build_all_packets(
+            self.root, catalogs=["us-equities"], seed="another-seed", checked_at=lane_packets.DEFAULT_CHECKED_AT,
+            trading_candidates="manifest")["us-equities__layer-b.json"])
+        self.assertEqual(sorted(c["repository"] for c in packet["candidates"]),
+                         sorted(c["repository"] for c in other["candidates"]))
+
+    def test_a_manifest_entry_without_a_card_fails_loudly(self):
+        manifest = self.read("catalogs/sota-convergence/manifest-20260922.json")
+        manifest["trading"][0]["entries"].append({"id": "no-card", "repository": "https://github.com/acme/no-card"})
+        self.write("catalogs/sota-convergence/manifest-20260922.json", manifest)
+        with self.assertRaisesRegex(ValueError, "has no domain catalog card"):
+            self.build(trading_candidates="manifest")
+
+    def test_ledger_mode_packets_carry_no_manifest_mode_fields(self):
+        packet = self.packet("us-equities", "layer-b")
+        for key in ("candidate_source", "layer_scope_terms", "requirement_note"):
+            self.assertNotIn(key, packet)
+        self.assertTrue(all("card_limitations" not in c and "role" not in c for c in packet["candidates"]))
 
     def test_manifest_mode_is_deterministic(self):
         self.assertEqual(self.build(trading_candidates="manifest"), self.build(trading_candidates="manifest"))

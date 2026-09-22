@@ -514,8 +514,17 @@ entries for that layer (adopted when their domain card decision is `default` or
 `conditional`), then the layer's newcomer and keep-but-compare repositories (never adopted).
 Evidence paths, role and limitations come from the entry's card in
 `catalogs/us-equities/{agents-operations,data-research,engines-strategies,foundation-memory}.json`;
-the card rationale and decision are withheld. Foundation packets are identical in both modes,
-and the default `ledger` mode still reproduces the 2026-09-22 packets byte for byte.
+the card rationale and decision are withheld, and manifest review labels that carry the
+decision (`confirmed_default`, `confirmed_conditional` and the like) are reported as
+`reviewed`; neutral labels (`pin_behind_upstream`, `unmaintained_signal`,
+`not_individually_reviewed`) stay. Because the ledger's requirement, limitations and
+overturn text is shared by the layer's group, each packet also carries the layer's own scope
+terms from the manifest taxonomy (`layer_scope_terms`) with a `requirement_note` telling the
+lane to judge fit against them. A manifest entry without a card is an error, not a silent
+non-adopted candidate. Card `role` and limitation prose and newcomer notes are passed through
+as evidence and can still name the current pick ("selected destination runtime"); like the
+`adopted` flag, that is a known limit of the withholding. Foundation packets are identical in
+both modes, and the default `ledger` mode still reproduces the 2026-09-22 packets byte for byte.
 
 Known limit of the withholding (2026-09-22 independent review): each
 candidate keeps its `adopted` flag, which the never-promote rule needs, and

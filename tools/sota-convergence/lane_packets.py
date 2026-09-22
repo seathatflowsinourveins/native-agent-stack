@@ -85,6 +85,12 @@ TRADING_CARD_FILES = (
     "catalogs/us-equities/engines-strategies.json", "catalogs/us-equities/foundation-memory.json",
 )
 CARD_DECISION_ADOPTED = {"default", "conditional"}
+# Manifest review labels that do not reveal the card decision; every other label
+# (confirmed_default, confirmed_conditional, keep_but_compare, ...) is reported as
+# "reviewed" so a lane cannot tell the incumbent default from a conditional entry.
+NEUTRAL_REVIEW_STATUSES = {"pin_behind_upstream", "unmaintained_signal", "not_individually_reviewed"}
+LAYER_REQUIREMENT_NOTE = ("The requirement, limitations and existing_overturn_when text is shared by this layer's "
+                          "group; judge fit against the layer title and layer_scope_terms.")
 MANIFEST_CANDIDATE_SOURCE = "sota_manifest_layer_entries"
 
 
@@ -226,6 +232,12 @@ def trading_cards_by_id(root: Path) -> dict:
     return cards
 
 
+def neutral_review_status(value):
+    if value is None or value in NEUTRAL_REVIEW_STATUSES:
+        return value
+    return "reviewed"
+
+
 def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: dict,
                               recipe_map: dict, root: Path) -> list:
     """Layer-specific trading candidates: the sota manifest's own entries for this
@@ -236,7 +248,10 @@ def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: di
     component id directly, because two entries can share one repository."""
     candidates = []
     for entry in layer.get("entries", []):
-        card = cards.get(entry["id"], {})
+        card = cards.get(entry["id"])
+        if card is None:
+            # A missing card would silently turn an incumbent into a non-adopted candidate.
+            raise ValueError(f"manifest trading entry {entry['id']!r} has no domain catalog card")
         repository = entry.get("repository") or card.get("repository")
         evidence_refs = list(card.get("evidence_refs") or [])
         candidates.append({
@@ -250,7 +265,7 @@ def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: di
             "component_id": entry["id"],
             "pin": entry.get("pin"),
             "upstream": entry.get("upstream"),
-            "review_status": entry.get("review_status"),
+            "review_status": neutral_review_status(entry.get("review_status")),
             "pin_behind_upstream": entry.get("pin_behind_upstream"),
             "recipe_ref": resolve_recipe_ref(entry["id"], recipe_map, evidence_refs, root),
             "decisions": [],
@@ -266,7 +281,7 @@ def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: di
             "name": item.get("name") or item.get("id") or slug, "repository": repository, "adopted": False,
             "evidence_kind": None, "evidence_refs": [], "role": None,
             "card_limitations": [], "component_id": None, "pin": None, "upstream": None,
-            "review_status": item.get("decision") or item.get("review_status"), "pin_behind_upstream": None,
+            "review_status": "newcomer", "pin_behind_upstream": None,
             "recipe_ref": None, "decisions": [],
             "note": item.get("demonstrated_gap") or item.get("comparison_that_would_overturn"),
         })
@@ -275,7 +290,8 @@ def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: di
 
 def build_packet(row: dict, *, catalog: str, sota_components: list, recipe_map: dict,
                   decisions_by_component: dict, seed: str, checked_at: str, root: Path, rules: list,
-                  catalog_components: list = None, layer_candidates: list = None) -> dict:
+                  catalog_components: list = None, layer_candidates: list = None,
+                  layer_scope_terms: list = None) -> dict:
     """``sota_components`` is the manifest slice for this ledger layer (it feeds
     ``sota_components_not_in_candidates``); the candidate join runs by repository
     slug against the layer slice first and then the whole catalog
@@ -324,7 +340,10 @@ def build_packet(row: dict, *, catalog: str, sota_components: list, recipe_map: 
     if layer_candidates is not None:
         # Only added in manifest mode, so ledger-mode packets stay byte-identical.
         packet["candidate_source"] = MANIFEST_CANDIDATE_SOURCE
-        packet["withheld"] = list(WITHHELD) + ["candidates[].card_rationale", "candidates[].card_decision"]
+        packet["layer_scope_terms"] = list(layer_scope_terms or [])
+        packet["requirement_note"] = LAYER_REQUIREMENT_NOTE
+        packet["withheld"] = list(WITHHELD) + ["candidates[].card_rationale", "candidates[].card_decision",
+                                              "candidates[].review_status (decision-bearing labels)"]
     return packet
 
 
@@ -369,6 +388,8 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 catalog_components=catalog_components(sota_index, catalog),
                 recipe_map=recipe_map, decisions_by_component=decisions_by_component,
                 seed=seed, checked_at=checked_at, root=root, rules=rules, layer_candidates=layer_candidates,
+                layer_scope_terms=(sota_doc.get("taxonomy") or {}).get(row["layer_id"]) if layer_candidates is not None
+                else None,
             )
             packets[packet_filename(catalog, row["layer_id"])] = serialize(packet)
     return packets
