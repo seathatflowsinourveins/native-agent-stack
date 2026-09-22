@@ -389,5 +389,26 @@
       "fix-verification review (2026-09-22): the pre-lock phase read treats a non-object trial.json as no resumable phase (strict flat gate; test_non_object_state_file_keeps_the_flat_gate); the locked re-check trial_state_changed_during_preflight is covered in both directions (test_hold_appearing/disappearing_between_preflight_and_lock_is_refused; removing the check fails both); validate_preflight and _run_native_status docstrings corrected"
     ],
     "files_note": "hashes recorded after the rebase-review fix commit; source-hashes.json does not pin receipt.json, so this map and source-hashes.json agree for every shared path"
+  },
+  "held_resume_ledger_match": {
+    "recorded_at_utc": "2026-09-22T21:45:00Z",
+    "evidence_class": "SYN",
+    "summary": "Resuming a held_overnight trial now requires the broker's positions to equal the ledger's held positions (symbol and quantity, shorts and fractional quantities included) and every open broker order to be a ledger intent; otherwise main() raises held_resume_position_mismatch or held_resume_external_order before resume_held_trial, keeps the persisted held phase, and builds no broker transport. Closes the gap named by the PR #69 fix-verification review: Ledger.adopt_broker_snapshot inserts positions the ledger lacks, so a position opened outside the trial between sessions would otherwise be adopted.",
+    "opt_in_scope": "overnight_holds is false in the shipped config and DEFAULT_SESSION_POLICY; the default path never reaches this check",
+    "tests": [
+      "test_held_resume_accepts_exactly_the_ledger_holdings",
+      "test_held_resume_refuses_a_foreign_or_changed_position",
+      "test_held_resume_refuses_an_order_the_ledger_does_not_own",
+      "test_main_refuses_held_resume_when_broker_holds_what_the_ledger_does_not",
+      "test_held_resume_accepts_exactly_the_ledger_holdings covers Decimal equality, fractional quantity, zero-quantity rows and a ledger-owned open order"
+    ],
+    "mutation_check": "with the held_resume_matches_ledger call removed (run under bwrap --unshare-net), the wiring test errors with broker_transport_constructed: main() proceeded to build the broker transport",
+    "residual_limitation": "the comparison uses the pre-lock preflight observation; an order that fills between that observation and run_native's startup snapshot is still seeded by adopt_broker_snapshot",
+    "files": {
+      "blueprints/us-equities/adaptive-paper/runner.py": "71b06d57135affc8a39e1ed10b10b174ddfbcbdc82e627896963285e7d8eab7c",
+      "tests/test_adaptive_paper_runner.py": "859ef8541e3723b5296be51b5f723ff34e34fd707eb34afde493e0b1a6a0e54a"
+    },
+    "after_refusal": "recover liquidates only ledger-owned holdings (recovery.py) and requires a flat broker proof, so a foreign position leaves recovery at needs_attention until the operator closes it by hand; an overnight fill of the trial's own open order also refuses the resume (quantity differs), and recover resolves that case through the ledger's own intents",
+    "review": "fix-verification review of e1fe5af: no correctness defect; follow-ups applied (recover wording, wiring test independent of the 2026 built-in calendar via a session_at stub, edge-case coverage)"
   }
 }

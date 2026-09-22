@@ -525,6 +525,23 @@ def reconcile(ledger, snapshot, baseline_cash):
             "open_orders": len(ledger.unresolved()), "positions": len(expected)}
 
 
+def held_resume_matches_ledger(ledger, observation):
+    """A resumed held_overnight trial may carry only what its own ledger
+    holds: broker positions must equal the ledger's held positions symbol for
+    symbol and quantity for quantity (a short or fractional foreign position
+    counts), and every open broker order must be one of the ledger's own
+    intents. A position or order created outside the trial between sessions
+    refuses the resume instead of being adopted by the startup broker-snapshot
+    seed (Ledger.adopt_broker_snapshot inserts positions the ledger lacks)."""
+    actual = {p["symbol"]: Decimal(p["qty"]) for p in observation["positions"] if Decimal(p["qty"])}
+    expected = {p.symbol: p.qty for p in ledger.positions().values() if p.qty}
+    if actual != expected:
+        raise SafetyError("held_resume_position_mismatch")
+    known = {i.client_id for i in ledger.intents()}
+    if any(order.get("client_order_id") not in known for order in observation["orders"]):
+        raise SafetyError("held_resume_external_order")
+
+
 class Controller:
     def __init__(self, ledger, close, *, market_open, clock=time.time):
         self.ledger, self.close, self.market_open, self.clock = ledger, close, market_open, clock
@@ -1161,6 +1178,7 @@ def main():
                 # next_trial_requires_flat_and_terminal against exactly
                 # that, defeating the bypass above.
                 if resumable_hold:
+                    held_resume_matches_ledger(ledger, observation)
                     ledger.resume_held_trial(now, args.trial)
                 else:
                     ledger.begin_next_trial(now, args.trial)
