@@ -33,8 +33,11 @@ always written when the output path is writable.
 from __future__ import annotations
 
 import argparse
+import decimal
 import hashlib
 import json
+import math
+import numbers
 import re
 import sys
 import traceback
@@ -48,6 +51,7 @@ CHECK_NAMES = (
     "high_ge_max_open_close", "low_le_min_open_close", "unique_symbol_session",
 )
 DUCKDB_TABLE_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_.]*$")
+INT64_MAX = 9223372036854775807
 
 
 def _versions() -> dict:
@@ -93,28 +97,84 @@ def _load_frame(input_spec: str):
     if suffix == ".parquet":
         return pd.read_parquet(path)
     if suffix == ".csv":
-        return pd.read_csv(path)
+        # dtype=str keeps every cell as its exact source text (missing cells
+        # still become NaN; keep_default_na's detection runs before the
+        # dtype cast). `_prepare()` casts the columns it needs numerically;
+        # `_raw_volume_failure_indices()` depends on this exact text to
+        # Decimal-parse `volume` without an intervening lossy float
+        # conversion (e.g. `-1e-400` underflowing to `-0.0`, or
+        # `9007199254740992.5` losing its fractional part) -- see that
+        # function. Parquet's typed columns cannot offer this: a Parquet
+        # `volume` column already stores a float/int at write time, so this
+        # exactness guarantee is CSV-only (documented in README.md).
+        return pd.read_csv(path, dtype=str)
     raise ValueError(f"unsupported_input_format: {suffix or '(none)'}")
 
 
+def _volume_cell_fails(raw_value) -> bool:
+    """True if a single RAW (pre-coercion) `volume` cell fails
+    `volume_integral_non_negative`: non-finite, negative (including a `-0`
+    that came from a negative literal), a non-zero fractional part, or above
+    int64 max.
+
+    Parses the value's EXACT string form with `decimal.Decimal` instead of
+    `float`/`pd.to_numeric`: a float round-trip is lossy for values like
+    `-1e-400` (underflows to `-0.0`, which then reads as non-negative and
+    integral) or `9007199254740992.5` (loses its fractional part once past
+    float64's ~15-17 significant digits) -- both silently passed the gate's
+    previous float-based check (Codex cross-family review finding). An
+    integer already read by pandas as int64 (a whole-number CSV column with
+    `dtype=str` still yields plain decimal-digit text, and a Parquet int64
+    column yields a Python/numpy int) is exact either way; `Decimal(int(..))`
+    never touches a float.
+    """
+    # `numbers.Integral`/`numbers.Real` (stdlib): numpy registers its
+    # int64/float64 types with these ABCs, so this branches correctly on a
+    # numpy cell without an unconditional `import numpy` here (this function
+    # must stay callable with no third-party packages installed; see module
+    # docstring).
+    if raw_value is None:
+        return True
+    if isinstance(raw_value, bool):
+        return True  # not a numeric volume
+    if isinstance(raw_value, float) and math.isnan(raw_value):
+        return True  # pandas' missing-cell sentinel
+    try:
+        if isinstance(raw_value, numbers.Integral):
+            dec = decimal.Decimal(int(raw_value))
+        elif isinstance(raw_value, float):
+            # Only reached when the loader could not preserve raw text (a
+            # Parquet float column): the exact source literal is already
+            # gone by the time it is a Python float, so this is a documented
+            # best-effort fallback, not the exactness guarantee CSV gets.
+            if not math.isfinite(raw_value):
+                return True
+            dec = decimal.Decimal(repr(raw_value))
+        else:
+            dec = decimal.Decimal(str(raw_value).strip())
+    except (decimal.InvalidOperation, ValueError, TypeError):
+        return True
+    if not dec.is_finite():
+        return True
+    if dec.is_signed():  # negative, including "-0"/"-0.0" literals
+        return True
+    if dec != dec.to_integral_value():
+        return True
+    if dec > INT64_MAX:
+        return True
+    return False
+
+
 def _raw_volume_failure_indices(raw_frame) -> list:
-    """Row indices where the RAW (pre-coercion) `volume` value is non-finite,
-    has a non-zero fractional part, or is negative.
+    """Row indices where the RAW (pre-coercion) `volume` value fails
+    `volume_integral_non_negative` (see `_volume_cell_fails`).
 
     Must run on `raw_frame` before `_prepare()`'s `.astype('int64')`
     coercion: that cast silently truncates a fractional/negative value
     (e.g. `-0.5` -> `0`), which would otherwise pass a `>= 0` check computed
-    on the already-coerced column. `pd.to_numeric(..., errors="coerce")`
-    maps any unparseable raw value to NaN, which `np.isfinite` correctly
-    rejects.
+    on the already-coerced column.
     """
-    import numpy as np
-    import pandas as pd
-
-    numeric = pd.to_numeric(raw_frame["volume"], errors="coerce").to_numpy(dtype="float64")
-    finite = np.isfinite(numeric)
-    valid = finite & (numeric == np.trunc(numeric)) & (numeric >= 0)
-    return [int(index) for index, ok in zip(raw_frame.index, valid) if not ok]
+    return [int(index) for index, value in raw_frame["volume"].items() if _volume_cell_fails(value)]
 
 
 def _prepare(raw_frame):
@@ -187,25 +247,46 @@ def _summarize(failure_cases, row_count: int, extra_failures: dict | None = None
     `unmapped_failures` check with status "fail", so `evaluate()`'s
     any-check-failed status computation still yields "fail" for it.
 
+    A recognized pandera failure case is counted for its named check
+    regardless of whether pandera attached a row index to it: some element-
+    wise checks (e.g. a `calendar.is_session()` call raising on an
+    unparseable date) report `index: null` in `failure_cases`, and a prior
+    version of this function used `.dropna()` on that column, which silently
+    discarded index-less failures and let the check report "pass" (Codex
+    cross-family review finding). `.dropna()` is now used only to build the
+    optional example-index list; the fail/pass decision for a check is driven
+    by whether ANY failure case (indexed or not) was recorded for its name.
+
     `extra_failures` (name -> failing row indices) carries checks computed
     OUTSIDE pandera on raw, pre-coercion data (currently only
     `volume_integral_non_negative`; see `_raw_volume_failure_indices`) and is
-    merged into the same per-check report. `rows_present` is handled
-    separately below: it is a snapshot-level check (row_count == 0), not a
-    per-row one, so it is never driven by failure indices.
+    merged into the same per-check report; those failures always carry a row
+    index. `rows_present` is handled separately below: it is a snapshot-level
+    check (row_count == 0), not a per-row one, so it is never driven by
+    failure indices.
     """
     extra_failures = {name: list(indices) for name, indices in (extra_failures or {}).items() if indices}
-    if failure_cases is None or len(failure_cases) == 0:
-        failing_indices = dict(extra_failures)
-    else:
+    failing = {}  # name -> {"count": int, "indices": [int, ...]}
+    if failure_cases is not None and len(failure_cases) > 0:
         renamed = failure_cases.copy()
         renamed["check"] = renamed["check"].replace({"multiple_fields_uniqueness": "unique_symbol_session"})
-        failing_indices = {}
         for name in sorted(renamed["check"].unique()):
             subset = renamed[renamed["check"] == name]
-            failing_indices[name] = sorted({int(index) for index in subset["index"].dropna()})
-        for name, indices in extra_failures.items():
-            failing_indices[name] = sorted(set(failing_indices.get(name, [])) | set(indices))
+            failing[name] = {"count": int(len(subset)),
+                              "indices": sorted({int(index) for index in subset["index"].dropna()})}
+    for name, indices in extra_failures.items():
+        entry = failing.setdefault(name, {"count": 0, "indices": []})
+        merged = sorted(set(entry["indices"]) | set(indices))
+        entry["indices"] = merged
+        entry["count"] = max(entry["count"], len(merged))
+
+    def _detail(count: int, indices: list) -> str:
+        detail = f"{count} of {row_count} rows failed"
+        if indices:
+            detail += f"; example row indices {indices[:5]}"
+        if count > len(indices):
+            detail += "; row index unavailable"
+        return detail
 
     checks = []
     for name in CHECK_NAMES:
@@ -213,19 +294,17 @@ def _summarize(failure_cases, row_count: int, extra_failures: dict | None = None
             checks.append({"name": name, "status": "pass", "detail": "ok"} if row_count > 0 else
                           {"name": name, "status": "fail", "detail": f"snapshot contains {row_count} rows"})
             continue
-        indices = failing_indices.get(name)
-        if not indices:
+        entry = failing.get(name)
+        if not entry or entry["count"] == 0:
             checks.append({"name": name, "status": "pass", "detail": "ok"})
             continue
-        checks.append({"name": name, "status": "fail",
-                        "detail": f"{len(indices)} of {row_count} rows failed; example row indices {indices[:5]}"})
-    unmapped = sorted(set(failing_indices) - set(CHECK_NAMES))
+        checks.append({"name": name, "status": "fail", "detail": _detail(entry["count"], entry["indices"])})
+    unmapped = sorted(set(failing) - set(CHECK_NAMES))
     if unmapped:
-        indices = sorted({index for name in unmapped for index in failing_indices[name]})
+        indices = sorted({index for name in unmapped for index in failing[name]["indices"]})
+        count = sum(failing[name]["count"] for name in unmapped)
         checks.append({"name": "unmapped_failures", "status": "fail",
-                        "detail": f"unrecognized pandera check identifiers {unmapped}; "
-                                  f"{len(indices)} of {row_count} rows failed; "
-                                  f"example row indices {indices[:5]}"})
+                        "detail": f"unrecognized pandera check identifiers {unmapped}; " + _detail(count, indices)})
     return checks
 
 

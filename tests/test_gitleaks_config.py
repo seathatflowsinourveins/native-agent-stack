@@ -147,25 +147,83 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 "disk_token field outside the allowlisted paths must still be detected",
             )
 
-    def test_c_ghp_token_beside_allowlisted_cursor_is_still_detected(self):
-        """A synthetic ghp_ token on the same line as a legitimate next_page_token cursor
-        under the allowlisted receipt path is still caught; only the cursor itself
-        is suppressed (regexTarget = "secret", not the whole line)."""
+    def test_c_ghp_token_on_a_different_line_from_the_allowlisted_cursor_is_still_detected(self):
+        """A synthetic ghp_ token on a DIFFERENT line from a legitimate, alone-on-its-
+        own-line `next_page_token` cursor under the allowlisted receipt path is still
+        caught; the cursor itself (its own whole line, keyed on "next_page_token") is
+        suppressed. Regression fixture for `codex-review-64`: an earlier revision used
+        `regexTarget = "secret"` (the cursor's base64 shape, unkeyed, matched anywhere
+        on the line) instead of a keyed, line-anchored regex; see test_c2/test_c3 below
+        for the two scenarios that revision got wrong (a same-line pair, and an
+        unrelated key sharing the cursor's shape)."""
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp)
             allow_dir = target / "blueprints" / "us-equities" / "broad-universe"
             allow_dir.mkdir(parents=True)
-            line = json.dumps({"next_page_token": CURSOR, "leaked_token": GH_PAT_SHAPED_VALUE})
-            (allow_dir / "receipt.json").write_text(line + "\n")
+            (allow_dir / "receipt.json").write_text(
+                json.dumps({"next_page_token": CURSOR, "leaked_token": GH_PAT_SHAPED_VALUE}, indent=2) + "\n"
+            )
             findings = self._scan(target)
             secrets = {f["Secret"] for f in findings}
             self.assertIn(
                 GH_PAT_SHAPED_VALUE, secrets,
-                "a ghp_ token on the same line as an allowlisted cursor must still be detected",
+                "a ghp_ token on a different line from the allowlisted cursor must still be detected",
             )
             self.assertNotIn(
                 CURSOR, secrets,
-                "the legitimate opaque pagination cursor itself must remain suppressed",
+                "the legitimate opaque pagination cursor, alone on its own line, must remain suppressed",
+            )
+
+    def test_c2_sha256_and_api_key_sharing_one_line_the_api_key_is_still_detected(self):
+        """Codex cross-family review finding (codex-review-64, .gitleaks.toml:134):
+        a line holding BOTH an allowlisted digest field ("sha256") AND an unrelated
+        secret ("api_key") -- e.g. compact (non-pretty-printed) JSON that puts two
+        key/value pairs on one physical line -- must not have the api_key swept up
+        as exempted merely because the same line ALSO contains the allowlisted
+        "sha256" field/value pair. The base gitleaks generic-api-key rule does not
+        independently flag a bare "sha256"-labeled hex value on its own (unlike
+        "api_key"/"token"/"disk_token"; see test_b's docstring), so this scenario is
+        a real regression check on the ALLOWLIST's suppression of the api_key
+        finding, not on whether "sha256" itself is ever flagged: with the prior
+        unanchored regex, the allowlist regex matched the "sha256" substring
+        anywhere on the line and exempted the WHOLE line (including the unrelated
+        api_key finding on it); the whole-line anchor now requires the line to be
+        EXACTLY one "sha256": "<hex>" pair with nothing else, so this two-field line
+        never matches the allowlist and the api_key finding surfaces normally."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            allow_dir = target / "evidence" / "artifacts" / "native-service-reboot-20260920"
+            allow_dir.mkdir(parents=True)
+            # Deliberately compact (no indent): both fields on one physical line.
+            line = json.dumps({"sha256": HEX64, "api_key": HEX64})
+            (allow_dir / "guest-after.json").write_text(line + "\n")
+            findings = self._scan(target)
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(
+                HEX64, secrets,
+                f"the api_key finding co-located with an allowlisted sha256 field on the "
+                f"same line must still be detected, got: {findings}",
+            )
+
+    def test_c3_unrelated_key_sharing_the_cursors_base64_shape_is_detected(self):
+        """Codex cross-family review finding (codex-review-64, .gitleaks.toml:192): the
+        next_page_token exemption must be keyed on the literal "next_page_token" field
+        name, not merely the cursor's base64-with-padding shape. An unrelated key
+        (e.g. "api_key") holding a same-shaped value, even under the SAME allowlisted
+        receipt path, must still be detected."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            allow_dir = target / "blueprints" / "us-equities" / "broad-universe"
+            allow_dir.mkdir(parents=True)
+            (allow_dir / "receipt.json").write_text(
+                json.dumps({"next_page_token": CURSOR, "api_key": CURSOR}, indent=2) + "\n"
+            )
+            findings = self._scan(target)
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(
+                CURSOR, secrets,
+                "the same base64-shaped value under an unrelated 'api_key' field must be detected "
+                "even though the identical value under 'next_page_token' is legitimately suppressed",
             )
 
     def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):

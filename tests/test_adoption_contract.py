@@ -1,6 +1,7 @@
 """Keep portable adoption references and accepted SDK dependency artifacts aligned."""
 import json
 import re
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -100,6 +101,53 @@ class AdoptionContractTests(unittest.TestCase):
         self.assertEqual(host['local_receipts'], [])
         for client in host['clients'].values():
             self.assertEqual(set(client.values()), {'not_checked'})
+
+    def test_bootstrap_step_zero_checks_out_the_attested_release_not_the_pre_adoption_baseline(self):
+        """Codex cross-family review finding (codex-review-64): adoption/bootstrap.md
+        step 0 used to check out `source.baseline_commit`
+        (8f1da51757e925d319e2a50f080b02742e7e7168), a revision that predates
+        `adoption/` and `tools/adoption/` entirely, so every later step on that page
+        failed. Step 0 must check out `source.release_tag` (an attested release, at
+        or after `source.release_commit`, which must actually contain both
+        directories -- verified below with `git cat-file` on the named commit, not
+        by trusting the manifest's own claim), and `baseline_commit` must remain
+        exactly what it always meant (the pre-adoption comparison point
+        `scripts/adoption_status.py` uses), never a checkout target."""
+        source = self.adoption['source']
+        self.assertIn('release_tag', source)
+        self.assertIn('release_commit', source)
+        self.assertEqual(source['baseline_commit'], '8f1da51757e925d319e2a50f080b02742e7e7168')
+
+        bootstrap_text = (ROOT / 'adoption/bootstrap.md').read_text()
+        step_zero_start = bootstrap_text.index('Step 0')
+        step_zero = bootstrap_text[step_zero_start:step_zero_start + 1500]
+        self.assertIn("['source']['release_tag']", step_zero)
+        self.assertNotIn("['source']['baseline_commit']", step_zero)
+
+        for path in ('adoption/bootstrap.md', 'tools/adoption/render_config.py'):
+            result = subprocess.run(
+                ['git', 'cat-file', '-e', f"{source['release_commit']}:{path}"],
+                cwd=str(ROOT), capture_output=True, text=True,
+            )
+            self.assertEqual(
+                result.returncode, 0,
+                f"source.release_commit ({source['release_commit']}) must contain {path} "
+                f"(git cat-file -e failed: {result.stderr.strip()})",
+            )
+        # The pre-adoption baseline_commit is the actual regression case: it must
+        # NOT contain these paths, confirming step 0's fix was necessary in the
+        # first place (this is checking real git history, not a synthetic fixture).
+        for path in ('adoption', 'tools/adoption'):
+            result = subprocess.run(
+                ['git', 'cat-file', '-e', f"{source['baseline_commit']}:{path}"],
+                cwd=str(ROOT), capture_output=True, text=True,
+            )
+            self.assertNotEqual(
+                result.returncode, 0,
+                f"source.baseline_commit ({source['baseline_commit']}) unexpectedly contains "
+                f"{path}; if this now passes, baseline_commit is no longer a reason to avoid "
+                "checking it out in step 0 and this test (and the doc fix it guards) should be reviewed",
+            )
 
 
 if __name__ == '__main__':

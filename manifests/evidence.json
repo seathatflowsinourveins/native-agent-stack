@@ -3063,8 +3063,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "2bf170acb2a9527670644829ed556df77cda3e56eb304d1f547b601a1bb663c5",
-      "bytes": 18825
+      "sha256": "3da1c244edf1b3a29e3ddb63eca70bbd0b01c42bcc2da890337759dc3365dfad",
+      "bytes": 21858
     },
     {
       "path": "AGENTS.md",
@@ -3108,8 +3108,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "64d25035e3ae24e08fb8f0f46d965f3e55ea02e55307bb7aa7bcd48cb7a12dac",
-      "bytes": 7460
+      "sha256": "ce2e77f4d7578dd5804ec922d553678f719f67487de54d889164c5e5f0db431c",
+      "bytes": 8343
     },
     {
       "path": "adoption/host-state.example.json",
@@ -3128,8 +3128,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "06ffa9db66016b2ad52b4d9ffbf15632a298ff2f20fb2c7581aaea6ec1effd4e",
-      "bytes": 17563
+      "sha256": "69f013fd49c01a65dd59e14f94eefa6571f13b488dfaf54fe8347cbbfc42bfb6",
+      "bytes": 18192
     },
     {
       "path": "adoption/paired/README.md",
@@ -5944,8 +5944,8 @@
     },
     {
       "path": "blueprints/us-equities/data/README.md",
-      "sha256": "f9f07342a632a61e75e3e702d6cd59a95ccb1aea75d05e2f9400c88101375aa8",
-      "bytes": 7217
+      "sha256": "b47b5132fbde199191dfcac7c43efc7280682c202756adb982bcb31d2bc3f9c2",
+      "bytes": 9983
     },
     {
       "path": "blueprints/us-equities/data/fixtures/bad-gate-result.json",
@@ -5999,8 +5999,8 @@
     },
     {
       "path": "blueprints/us-equities/data/promotion_gate.py",
-      "sha256": "d5ac87da9fcfc0f76ccef1dd9cfceec59943e8c54012a2ce90e867599302b5fb",
-      "bytes": 14896
+      "sha256": "ac87c217b610a95da18f8d43aea939fc19bb3ac737a61f94c5e39e572810c7bc",
+      "bytes": 18943
     },
     {
       "path": "blueprints/us-equities/data/receipt.json",
@@ -7084,8 +7084,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "a15605acd5bece752167aca985aab6e0900bd455cc7a1872891b984be5a0b9dd",
-      "bytes": 19809
+      "sha256": "a1cd24f9ec9ed4e90443650dd445bc9f78526720ec33371772ed0040eb3e7d13",
+      "bytes": 20074
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -7694,8 +7694,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "e5d5c19a9347a6198cfb926d1c6b6e59c1bd8781b38b2732240057285111cac7",
-      "bytes": 30881
+      "sha256": "b7c2b6adc67ad8a262a1bd54c65711d8e57e035bd886f84177d36e9fa0911506",
+      "bytes": 31448
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -11514,8 +11514,8 @@
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "e93aeaa36c15584f8137621a0c407fa85307d33fc31be22309a06f020af5c678",
-      "bytes": 5861
+      "sha256": "5eb6580f4cc5ccdd8cfc8e2d395405c1f4d53d75a9a2c67e2bea86b371438d45",
+      "bytes": 8715
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
@@ -11634,8 +11634,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "ed9710e611064809690f66744026b18ae5f9554ba19881a8c6ca8d2a0e91a123",
-      "bytes": 14407
+      "sha256": "d94ab0982ad2aaed4132f85464e4ace5bfebb170cb9979046649316b324281bc",
+      "bytes": 18172
     },
     {
       "path": "tests/test_gpu_inference.py",
@@ -12111,6 +12111,31 @@
       "path": "tests/test_pit_availability.py",
       "sha256": "4f9cb899edcd84950a71014d4efe588a4d9d70e5ee74f91ecf0c3a40f860c40b",
       "bytes": 20615
+    },
+    {
+      "path": "tests/test_promotion_gate_codex_review.py",
+      "sha256": "1be6900128f60f9146d38522ec64ddec8a739758138f704a0141f4eb69d96af7",
+      "bytes": 12284
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/null-index-session.csv",
+      "sha256": "d9ae2976ef24a6b64e769a4acac6c7fe3ba2314d113f2875f6a75fe309a00318",
+      "bytes": 124
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/null-index-session-gate-result.json",
+      "sha256": "31acc51383f4732097b7e8bc4bef80bc59c3a5292bdb083a4e59f8c41db8e161",
+      "bytes": 1516
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/lossy-volume-conversion.csv",
+      "sha256": "4912552c419c9f2627658bb7d9c441ae9cbb40fb7fc9f0bc993c36f8e298e3cd",
+      "bytes": 202
+    },
+    {
+      "path": "blueprints/us-equities/data/fixtures/lossy-volume-conversion-gate-result.json",
+      "sha256": "b1addf4a85ac0111b3a090bafc2bc01af1bbd07dfe3188cc0622a10fdd7cae58",
+      "bytes": 1521
     }
   ],
   "convergence_records": [

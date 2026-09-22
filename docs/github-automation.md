@@ -304,13 +304,21 @@ committed file (see "Ruleset upgrade" below).
 `supply-chain.yml`'s `sbom-vuln` job uses syft 1.52.0 (linux_amd64 tarball
 SHA-256 `caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d`,
 read from `https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_checksums.txt`)
-and grype 0.119.0, the latest release as of 2026-09-22 (linux_amd64 tarball
-SHA-256 `3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b`,
-read from `https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_checksums.txt`).
-Unlike the other pins on this page, grype tracks upstream's latest release
-rather than a fixed version, because it ships its own vulnerability-matching
-logic (not just a data feed) and this lane is report-only; the freshness
-job's fixed-tool table does not include grype for that reason and the pin
+and grype 0.119.0 (`GRYPE_VERSION` in `supply-chain.yml`, a fixed pin like
+the other CI binaries on this page, linux_amd64 tarball SHA-256
+`3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b`,
+read from `https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_checksums.txt`,
+latest upstream release as of the 2026-09-22 pin date). Grype's binary
+version is pinned exactly the same way syft/gitleaks/actionlint are; what is
+NOT pinned is its vulnerability database (`grype db status`), which grype
+fetches fresh on every run regardless of the binary pin, so a binary-version
+freshness check alone would not capture the tool's actual drift surface.
+`catalog-freshness.yml`'s fixed-tool pin-drift table does not include grype
+(corrected 2026-09-22, Codex cross-family review finding: an earlier revision
+of this paragraph incorrectly claimed grype "tracks upstream's latest
+release rather than a fixed version," which `supply-chain.yml`'s
+checksum-verified `GRYPE_VERSION` pin contradicts) -- this is a gap in that
+table's coverage, not a consequence of how grype is versioned, and the pin
 should be re-checked whenever `sbom-vuln`'s own workflow path changes.
 
 Receipts land as workflow artifacts only: `secret-scan-<run_id>` (30-day
