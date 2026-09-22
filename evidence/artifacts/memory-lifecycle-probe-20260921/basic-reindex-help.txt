@@ -27,4 +27,3 @@
 │ --project     -p      <str>  Reindex a specific project (default: all)       │
 │ --help                       Show this message and exit.                     │
 ╰──────────────────────────────────────────────────────────────────────────────╯
-

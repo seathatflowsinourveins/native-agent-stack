@@ -122,7 +122,8 @@
         "hf-memory-models-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "memory-lifecycle-probe-20260921"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",

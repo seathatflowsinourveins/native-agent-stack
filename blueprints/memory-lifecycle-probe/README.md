@@ -4,8 +4,8 @@ Both installed ai-memory 2.3.2 and pinned Basic Memory 0.23.2 returned the three
 frozen lexical facts, reflected an overwrite, and removed a deleted note from
 search. ai-memory retained the results across an owned server restart. Basic
 Memory retained them after its native full text-index rebuild. **28/28 content
-checks passed across 41 recorded native command processes in the accepted
-evidence.** This is a small synthetic lifecycle check, not a semantic-quality,
+checks passed across 41 completed CLI invocations and two owned server
+lifecycles in the accepted evidence.** This is a small synthetic lifecycle check, not a semantic-quality,
 production-readiness, performance, or overall product ranking.
 
 ## Outcome and important failed attempt
@@ -89,8 +89,8 @@ Evidence is in `../../evidence/artifacts/memory-lifecycle-probe-20260921/`:
 
 - `commands.json`: command arrays, constructed environment, stdin,
   exit codes, measured per-process durations, and returned outputs. Personal
-  executable paths are replaced with `<AI_MEMORY_BIN>`; all other JSON payload
-  values are retained. It
+  executable paths are replaced with `<AI_MEMORY_BIN>` and generated UUIDs with
+  stable synthetic labels; all other JSON payload values are retained. It
   combines the accepted original Basic Memory lane and corrected ai-memory lane.
 - `verification.json`: fact checks against the frozen corpus, including zero
   results for removed/replaced keywords.
@@ -106,7 +106,11 @@ Evidence is in `../../evidence/artifacts/memory-lifecycle-probe-20260921/`:
 - `provenance.json`: original/public SHA-256 pairs and per-file transformations.
   Personal executable paths were replaced, public drivers now require an
   explicit `AI_MEMORY_BIN`, and literal trailing spaces/tabs were removed from
-  publication text. Escaped whitespace inside JSON output values was retained.
+  publication text, with exactly one final newline. Escaped whitespace inside
+  JSON output values was retained.
+  Eight generated UUIDs in command results and backup inventory paths were
+  replaced consistently with `SYNTHETIC-ID-001` through `SYNTHETIC-ID-008`.
+  Original archive/member hashes, facts, exit codes and timings are unchanged.
   Public drivers are sanitized examples, not byte-identical executed scripts;
   both executed-original script hashes are recorded. Exact originals remain
   outside the repository in a private directory. No memory operations were
@@ -126,3 +130,5 @@ No latency summary is promoted: recorded durations include different process
 startup and server architectures, were collected once, and are not comparable
 steady-state retrieval benchmarks. No concurrency, crash recovery, semantic
 retrieval, graph quality, TTL, handoff, hooks or real agent E2E was tested.
+Deletion checks concern current lexical search results; they do not establish
+erasure from earlier page versions, Git history, logs or retained backups.

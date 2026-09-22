@@ -2,6 +2,23 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "memory-lifecycle-probe-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory"
+      ],
+      "claim": "A frozen three-note lexical fixture passed 28 content checks across 41 completed CLI invocations and two owned server lifecycles. Both ai-memory 2.3.2 and Basic Memory 0.23.2 reflected writes, reads, updates and current-search deletion. ai-memory restart and native backup, and Basic Memory text-index rebuild, passed within their distinct scopes.",
+      "limitations": [
+        "First ai-memory attempt failed the no-model-download constraint. A corrected run explicitly set its documented none embedding provider. No completed model files were found after stopping; transferred network bytes were not measured.",
+        "The already passing Basic Memory lane was reused, not rerun. Its source was pinned but dependencies resolved during installation rather than from an upstream lock; resolved package versions are retained.",
+        "ai-memory restore/reindex were not executed because their process guard checks sibling processes. Earlier separate restore receipts retain their own scope. Basic Memory reindex is not a lost-database restore.",
+        "Deletion checks do not establish erasure from version history, Git, logs or backups. No semantic-quality, cross-project isolation, hooks, live-client E2E, concurrency, timing advantage or universal winner is established.",
+        "This is the existing WSL host using isolated synthetic stores. No new physical-PC or fresh-WSL acceptance is implied; installed ai-memory binary/source equivalence was not rebuilt.",
+        "Public artifacts replace personal executable paths, normalize publication whitespace and withhold backup archive bytes. Original/public hashes and safe backup inventories retain provenance."
+      ],
+      "path": "evidence/receipts/memory-lifecycle-probe-20260921.json"
+    },
+    {
       "id": "catalog-runtime-review-20260921",
       "kind": "native_model_e2e",
       "component_ids": [
@@ -2793,8 +2810,8 @@
     },
     {
       "path": "docs/blind-catalog-layer-findings-20260921.md",
-      "sha256": "fc1a22561da1d8205251bd4d698d10c7daced8b80649b7727350dd2d3bf12f74",
-      "bytes": 5802
+      "sha256": "edaed3b78830cab5769bc1bc1b80fa4442ef6377e9b2d9ff1d1e06e74ba49a5d",
+      "bytes": 5801
     },
     {
       "path": "docs/blind-catalog-source-adjudication-20260921.md",
@@ -2803,8 +2820,8 @@
     },
     {
       "path": "docs/tasks/2026-09-21-blind-catalog-convergence.md",
-      "sha256": "f436ce631fd6060f800f28146202d0d766ececa7338f81b1420b36e3605723e9",
-      "bytes": 6218
+      "sha256": "31b1f9026812a0537282fce068951a26fc5c1a3a74e249023875afd130d3ff9e",
+      "bytes": 10540
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-provenance.json",
@@ -2848,8 +2865,8 @@
     },
     {
       "path": "catalogs/landscape/candidate-quality-review.json",
-      "sha256": "828467deb7a9d92fe3b064a543c69dd4cd1004cd694ed13fd06142e8ddb0b653",
-      "bytes": 120712
+      "sha256": "b1bc757545b4680080942503ccfb63fcae0856c2a6201a4939aa1fa44b48b049",
+      "bytes": 120980
     },
     {
       "path": "docs/candidate-quality-review-20260921.md",
@@ -2858,8 +2875,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "3f0165a8864fe18a05bda90761a7021978afc1b0c4557b31e34405fc148f9357",
-      "bytes": 14532
+      "sha256": "532e2d7c7c0f7b9887097dc02fe9e3dc5cfb5291ee8aafd502f84b014a8155d1",
+      "bytes": 15092
     },
     {
       "path": "docs/tasks/2026-09-21-runtime-reviewed-catalog-handbook.md",
@@ -5044,8 +5061,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "bytes": 472576,
-      "sha256": "aeb1abf43b5ff6613a83340300df758f90f9f5d02aecd71c04149961fdd9c672"
+      "bytes": 472835,
+      "sha256": "85fc102738a466d66c617803d51aed55558775be380c4fb022916563ddae511b"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -6644,8 +6661,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "5ab15abf6de65079a61be078409fd1b92f2cb202d733a21a7118da97fe480156",
-      "bytes": 10526405
+      "sha256": "c85105c9c06cdfeae490ba931cfd4248699a5904b20465990a9dfb04dc1ce045",
+      "bytes": 10544579
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7159,8 +7176,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 85450,
-      "sha256": "a57ff14e7635cf919f28697fea1fcb54aa224d4c9b9e52d83f2a55550da2bf18"
+      "bytes": 85493,
+      "sha256": "edccd28ed6239f0f3b1572e9a5da255da52c46d70fe1015a8327284ebc3ef6f2"
     },
     {
       "path": "observability/README.md",
@@ -7339,8 +7356,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "e2ff79e118781eb3cda801d6f66f7fe69a4e46c90677bba1e7043f1df8a38cfc",
-      "bytes": 56483
+      "sha256": "25df65f45942c69328c589311b16b61a4a96dbb368528ee57732d491fe2b700d",
+      "bytes": 56962
     },
     {
       "path": "scripts/adoption_status.py",
@@ -7349,8 +7366,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "91ef18bb6119d3dc02b6a6d73ee2e7561293764e51817c2220626e398433e236",
-      "bytes": 44904
+      "sha256": "bfd58a94358e9228c9d730c1167d6fa4ab8ae42fd84cd6a2a7fd3a04a306b4d6",
+      "bytes": 45072
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -10119,13 +10136,13 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "92f86aa2e4f3d0112a179212bb86bac2d322a68e7a926d8871058bfde6542f86",
-      "bytes": 89194
+      "sha256": "0146c6d958c3309a806b873fb224b3de3e77b55a278f1c7e21f54bbaccf359a1",
+      "bytes": 89462
     },
     {
       "path": "catalogs/landscape/manifest.json",
-      "sha256": "137bbae4f46d1492534255bd151d5d1bd3ecf3af622c4102c13e114afd084460",
-      "bytes": 3741
+      "sha256": "accb8548ba998b2f2dd8c1c1af74687c6e69f2b767c08eeaf41570030ca6115b",
+      "bytes": 3860
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -10611,9 +10628,240 @@
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/claude-pr-review.json",
       "sha256": "e412e3abc2d63867c8ba16f304bc4c7578c3ea0a196d7fc08590defbccd2592c",
       "bytes": 9539
+    },
+    {
+      "path": "blueprints/blind-catalog-convergence/memory-experiment.json",
+      "sha256": "000227d49e206b9c19f0ed59e3b6d650d47618858964c96a2953bd4369c6d21a",
+      "bytes": 10598
+    },
+    {
+      "path": "blueprints/memory-lifecycle-probe/README.md",
+      "sha256": "c50ba6b05cba66095a357f1185429761b251462b9b91d1d23a51532b317bc042",
+      "bytes": 9126
+    },
+    {
+      "path": "blueprints/memory-lifecycle-probe/corpus.json",
+      "sha256": "ae0625d292eb66a2d67de0e696b57830f9e621c75da41d60d97569d3901755f5",
+      "bytes": 1543
+    },
+    {
+      "path": "blueprints/memory-lifecycle-probe/probe.py",
+      "sha256": "36e5cce42e4297b01dfaf7bd07cbfc283062b9fda9df3c7b5f9e9f934fa727e1",
+      "bytes": 7315
+    },
+    {
+      "path": "blueprints/memory-lifecycle-probe/verify.py",
+      "sha256": "98372718acdc11c4236a54ccd47bfcd091386a2d91c2b737b4674584187e8cd4",
+      "bytes": 4172
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/SHA256SUMS",
+      "sha256": "5e7e26f2ca49da6e81dddd26a043034a94bca70524881b4f1bd9e0689e9faedb",
+      "bytes": 6032
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-backup.inventory.json",
+      "sha256": "4628d60ab8c636233400169d20036371d2c530cfe1f133e054376c01a35896f0",
+      "bytes": 29183
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-backup-help.txt",
+      "sha256": "76769634dd72ccd92171ee9b8ef71f4976f9951a7f6ed3f283823bf60639534a",
+      "bytes": 532
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-delete-page-help.txt",
+      "sha256": "1cff5e4f688ccbc03c642157c7bdc8984432acd457f6df486faa837062fda04e",
+      "bytes": 1171
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-init-help.txt",
+      "sha256": "9e22683ed7894c665a07d77a34911781f6dbbe20793b9853fcfd262be0987074",
+      "bytes": 510
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-read-page-help.txt",
+      "sha256": "988315f926bca26b70cc875bed8f195044d5a360de1732f5388b4192484b2e92",
+      "bytes": 1112
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-reindex-help.txt",
+      "sha256": "3ad4f8f12033918133fd64720334449dc86dea4d9ebecd14f1c4e5d79c67ae50",
+      "bytes": 668
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-restore-help.txt",
+      "sha256": "44f2e1604246365ca30f419afb9f422fc10715ea74e1f62eb6caeb7197eddde1",
+      "bytes": 579
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-search-help.txt",
+      "sha256": "c1053b4dcca1cf8e6e204e153fd70c69b69349b7c74fa2aee5bb7fcfb491dd0a",
+      "bytes": 915
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-serve-help.txt",
+      "sha256": "fb4761159a546a2b7eb51620b592baea81198559d95dc8fe292c81ff296079da",
+      "bytes": 4183
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-write-page-help.txt",
+      "sha256": "3c32fc608c971776685f3278c84e2d9154642682956afbf9db1091a62f462686",
+      "bytes": 1455
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-root-help.txt",
+      "sha256": "7e1b5129693dce01e91c9a2e915a9ba978fe899a36e010dfb727a06c1836b9e1",
+      "bytes": 8561
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-server-1.log",
+      "sha256": "b19947eb1058a75715389bb8d4362174418fa96f038e796c12d52c2946c741df",
+      "bytes": 165785
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-server-2.log",
+      "sha256": "29b127cb52f6ef643189e599681f49b47f7efc961be24a075a5ccea943a0314d",
+      "bytes": 2111
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/ai-backup.inventory.json",
+      "sha256": "ed346a92792e4adf244d4c563a5cfbd092761bef21fb8236661ab50eb4007f0f",
+      "bytes": 29807
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/ai-server-1.log",
+      "sha256": "95ef8f46a23facb4ae7dd5a182b81b299a025e93d8bd356db50e41d6b191558e",
+      "bytes": 165972
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/ai-server-2.log",
+      "sha256": "08ffd4599c538607ec14b847fc3c8edb4b0c57108b5b0f3144be79f6b64a79d2",
+      "bytes": 2298
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/commands.json",
+      "sha256": "95f5852ea6d8bb3ad07f4155e526964585f89eaa09ea80223001870dc9a5adad",
+      "bytes": 45400
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/probe.py",
+      "sha256": "9f0309ad39ddb5416d5db4253b0a391ac9339edc543ff8136db9dd4c45f2b447",
+      "bytes": 6920
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/run.log",
+      "sha256": "a451890960d60e461a08d371631f7ca2c35ac8492ab555bac69e57c6e6f183b8",
+      "bytes": 883
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/verification.json",
+      "sha256": "0215283a18b44151a7e5e065b84e51713861bbee2cea7021457119905045bd17",
+      "bytes": 3818
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-db-help.txt",
+      "sha256": "576abe5138e26b0d6504953fc61998237654bd058763d7036dac16cd8f8d5593",
+      "bytes": 617
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-help.txt",
+      "sha256": "698ba3378b7d86aa0076e2a8d023b0b8a8b1bd59aa492734f9cfb6a693bf39b6",
+      "bytes": 4342
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-install.log",
+      "sha256": "872d01d124ceaad8170c3c9c2e68ce776a33c110ed55b05638f37c06061db60c",
+      "bytes": 4868
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-installed-packages.txt",
+      "sha256": "f194f6e2f0a4076ed5eb80c3014b46c9c84b6a8c8a559341799da29b4301f3cd",
+      "bytes": 3283
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-project-add-help.txt",
+      "sha256": "b61752dbbdf3feb35a16d44fd393c3e76b33a8bc231b2767a15abded26867791",
+      "bytes": 2904
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-reindex-help.txt",
+      "sha256": "c830b906ce33c1442ab4005b58c0a22b090765adb2dc633f6998be84c15f2c81",
+      "bytes": 1865
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-search-notes-help.txt",
+      "sha256": "446e4722d4c231d858256429ccea2ca795bc3b2c14d85c517a37875368de2e49",
+      "bytes": 4372
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-sync-help.txt",
+      "sha256": "97bbef78fc7e201ca069937618a4f122fe78b9695567fc92405c58d6ad639f7d",
+      "bytes": 617
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-tool-delete-note-help.txt",
+      "sha256": "ba7c652987fd1c6ce1379863eb83d935a261861577ae46abe2aaa10e721c7b91",
+      "bytes": 1980
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-tool-read-note-help.txt",
+      "sha256": "35ea5cd7a7df0b1437e943060f715e0d49322cf288edb4e21f31365061c21774",
+      "bytes": 4163
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-version.txt",
+      "sha256": "77406aac039b94bd3b85566affb3c5aaa83abd825cc520cc810af929211ad8f0",
+      "bytes": 29
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-write-note-help.txt",
+      "sha256": "dfc94e06ebbc239fc13aaf663a2b8bebda3e940299540a97c843c5e3eab5d73e",
+      "bytes": 2584
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/commands.json",
+      "sha256": "ff411c82720c71ce2bb1dcbcbde02cf2c852ca71a52984ee129ebb84d4ebdfb8",
+      "bytes": 47017
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/frozen-corpus-sha256.txt",
+      "sha256": "2a6803ff4bb95f021e97095e73f1f86bb179c93e2773b6fe3ca861ab8f2034b7",
+      "bytes": 78
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/identity.json",
+      "sha256": "43cf69b6c605a733fce5883d6d94be49e0b71d94dc4cd7c671e3069fcb7026c4",
+      "bytes": 2368
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/isolation-observations.json",
+      "sha256": "73b47fdd5e7deb64ac50d6af4a62db57599384e05be65a1b7932a470cf79b393",
+      "bytes": 820
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/provenance.json",
+      "sha256": "90a01a182f1c00310049a749b5d04033cb3fa7166e001412de479751c51d7455",
+      "bytes": 27403
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/run.log",
+      "sha256": "3887b484abfa0f60005ce2b890c8bc5b8de3920dab101e20fff6526db0fa9892",
+      "bytes": 416
+    },
+    {
+      "path": "evidence/artifacts/memory-lifecycle-probe-20260921/verification.json",
+      "sha256": "d827cc6baf134f9f1b3e6a4a5d3f4d675d8c1d563386d9a735b1bc7797504eea",
+      "bytes": 3915
+    },
+    {
+      "path": "evidence/receipts/memory-lifecycle-probe-20260921.json",
+      "sha256": "fa38a4da448b427fac146affb7199ac6fff610eaa1fd156ce64172a5fefa52be",
+      "bytes": 2496
     }
   ],
   "convergence_records": [
+    "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/blind-catalog-convergence/experiment.json",
     "blueprints/catalog-runtime-review/experiment.json",
     "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",

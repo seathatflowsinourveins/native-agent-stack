@@ -1070,7 +1070,7 @@
       "layer_id": "workers",
       "decision_ref": "catalogs/landscape/foundation.json#/layers/2",
       "requirement": "Delegate bounded independent work, preserve owned edits and actual failed results, and integrate only after relevant review.",
-      "current_choice": "Native Claude/Codex workers with owned Worktrunk worktrees; Beads for a real dependency queue, optional qualified cross-client review and an opt-in semantic-evidence-reviewer with explicit TypeSafe context.",
+      "current_choice": "Native Claude/Codex workers with owned Worktrunk worktrees; optional Beads when dependency tracking is needed, optional qualified cross-client review and an opt-in semantic-evidence-reviewer with explicit TypeSafe context.",
       "decision": "keep_but_compare",
       "evidence_gap": "Graceful native Workflow resume is separate from the systemd child-crash fixture; neither transfers every hard-crash guarantee to the other. The restricted reviewer tool profile is not the accepted inherited-tool lane. The older companion backend acceptance does not certify every outer plugin invocation. Native model/effort settings are inherited and returned identities recorded. Skill propagation is not a universal runtime/model ranking; account scopes and failed read paths remain evidence. The September 21 New York / September 22 UTC source refresh adds Deep Agents, OpenHands SDK/Agent Canvas, Microsoft Agent Framework and DeerFlow comparisons. It does not install them or establish a head-to-head worker winner; historical DeerFlow adapter evidence applies only to its recorded revision.",
       "challenger_repositories": [
@@ -1102,7 +1102,7 @@
       "layer_id": "isolation",
       "decision_ref": "catalogs/landscape/foundation.json#/layers/3",
       "requirement": "Separate edits and apply a real filesystem/network boundary only where the selected task requires enforced restrictions.",
-      "current_choice": "Worktrunk/Git worktrees for edit ownership, sandbox-runtime for qualified Linux restrictions, and platform-specific Apple Container use only on an eligible host.",
+      "current_choice": "Worktrunk/Git worktrees for edit ownership and sandbox-runtime for qualified Linux restrictions. Apple Container remains conditional on an eligible macOS host and a matching container requirement.",
       "decision": "retain",
       "evidence_gap": "A worktree is not a security sandbox. Ordinary native or Dagu processes are not automatically sandboxed. Selected access/network fixtures do not certify hostile workloads, resource limits or unsupported platforms.",
       "challenger_repositories": [
@@ -1231,7 +1231,7 @@
       "layer_id": "token-efficiency",
       "decision_ref": "catalogs/landscape/foundation.json#/layers/9",
       "requirement": "Supply useful task context with recoverable originals and measure artifact reductions separately from provider usage.",
-      "current_choice": "Focused reads and scoped retrieval first; RTK, Context Mode, guarded Headroom, explicit-file Repomix and TOON only for suitable artifacts; ccusage observes native usage.",
+      "current_choice": "Focused reads and scoped retrieval first; task-selected RTK, Context Mode and explicit-file Repomix; optional guarded Headroom and TOON only after a suitable same-artifact comparison; ccusage observes native usage.",
       "decision": "keep_but_compare",
       "evidence_gap": "The current native tasks have no matched baseline; counters, bytes avoided, artifact token counts and provider usage must not be summed. TOON expands the full catalog relative to compact JSON; guarded compression must return originals on rejection. Exact whole-PC lifetime savings are unmeasured.",
       "challenger_repositories": [
@@ -1251,7 +1251,7 @@
       "layer_id": "quality-evaluation",
       "decision_ref": "catalogs/landscape/foundation.json#/layers/10",
       "requirement": "Verify the changed behavior using relevant upstream/project checks, independent observations and explicit failure-preserving evidence.",
-      "current_choice": "Project/upstream tests, Playwright browser checks, bounded Promptfoo assertions, ShellCheck and Difftastic where applicable.",
+      "current_choice": "Project/upstream tests, Playwright browser checks, bounded Promptfoo assertions, ShellCheck and Difftastic where applicable. MCP Inspector supports scoped protocol checks; TypeSafe supplies task-specific advisory judgments, and selected OpenAI skills supply CI or security procedures when needed.",
       "decision": "retain",
       "evidence_gap": "Promptfoo's earlier echo fixture and later four-pair upstream example are not held-out model-quality evaluations. Local test totals, structural validation and reviewer agreement cannot establish upstream end-to-end behavior. TypeSafe matched 7/8 pre-inference labels versus 3/8 for weak literal containment. The disagreement, selected small corpus and unmatched native review prevent a universal quality, speed or cost ranking.",
       "challenger_repositories": [

@@ -138,6 +138,14 @@ model/context budget, independent frozen answers, repeated runs and complete
 ingestion/query/maintenance usage. Include deletion and empty-target restoration.
 There is no completed matched quality/cost comparison yet.
 
+A later [tiny lexical lifecycle comparison](../blueprints/memory-lifecycle-probe/README.md)
+passed 28 content checks for ai-memory and Basic Memory: writes, reads, updates
+and current-search deletion, plus ai-memory restart/backup and Basic Memory
+text-index rebuild. Its first ai-memory attempt failed a no-model-download
+constraint; the corrected run explicitly disabled embeddings. Unequal recovery
+checks and this three-note fixture do not settle semantic recall or justify a
+memory-store migration. The failed attempt and public provenance are retained.
+
 Graphiti, Cognee and OpenViking are credible for temporal/relationship or broader
 research-context requirements. Mem0 and Supermemory may fit application memory;
 Letta Code changes the worker/runtime architecture. Claude-mem is an alternative

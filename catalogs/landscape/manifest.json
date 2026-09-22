@@ -35,6 +35,10 @@
   ],
   "handbook_guides": [
     {
+      "path": "blueprints/memory-lifecycle-probe/README.md",
+      "label": "Memory lifecycle comparison"
+    },
+    {
       "path": "docs/blind-catalog-source-adjudication-20260921.md",
       "label": "Original-source adjudication"
     },

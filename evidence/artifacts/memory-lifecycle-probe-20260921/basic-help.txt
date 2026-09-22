@@ -46,4 +46,3 @@
 │ hook       Harness lifecycle hook front door                                 │
 │ install    Install Basic Memory resources into an agent host.                │
 ╰──────────────────────────────────────────────────────────────────────────────╯
-

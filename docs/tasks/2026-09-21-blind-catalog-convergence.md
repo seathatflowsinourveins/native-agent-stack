@@ -100,3 +100,69 @@ discovery workflow. Its final return is still pending in this intermediate
 checkpoint. Before closing this task, retain that return/failures, resolve the
 dated synthesis and record final validation/publication. Do not infer completed
 cooperation from a read acknowledgement or promote agreement into measured quality.
+
+## Subsequent bounded memory check and current host practice
+
+The isolated memory worker returned a three-note lexical comparison: 28 content
+checks, 41 completed CLI invocations and two owned server lifecycles in accepted
+evidence. Its initial ai-memory attempt failed the no-model-download condition;
+that attempt remains recorded. One corrected ai-memory run used the documented
+`none` provider and reused the already passing 20-command Basic Memory lane.
+Native ai-memory backup/restart and Basic Memory text reindex are unequal recovery
+checks. Restore/reindex for ai-memory were not run because the guard inspects
+sibling processes. Previous separate restore receipts retain their dated scope.
+No semantic-quality, latency, full erasure or production-readiness claim follows.
+
+Only sanitized worker commit `ac8f729` was integrated, as `39d29f8`; the earlier
+personal-path commit was not integrated. Public provenance maps original/public
+bytes, executable-path substitutions, synthetic identifier labels and whitespace normalization. Backup archives
+remain private with public hashes/inventories. Root clarified 41 CLI calls plus
+two server lifecycles and current-search deletion scope. Independent offline
+replay reproduced all 28 checks and verified the public inventory before closure.
+
+The latest user instructions set the current 24-core WSL Claude cap to eight and
+retain task-sized workflows and full verification. Portable settings/recipe now
+match, with host-specific tuning and shared-account boundaries. The existing live
+discovery run retains its original cap of three. Historical provider receipts
+were unchanged. Five portable Node suites pass after the configuration change;
+neither a throughput optimum nor a quality improvement was measured.
+
+## Publication corrections and verification
+
+Publication validation caught a receipt attached to agent-browser instead of
+ai-memory and synthetic UUIDs in the memory packet. The receipt now joins only
+ai-memory in both stack and lifecycle matrix. Eight generated identifiers were
+replaced consistently with stable synthetic labels. A byte-for-byte comparison
+against the preceding committed packet verifies that these are the only changes
+to its four command/inventory files. Original hashes remain in provenance.
+The failed-attempt observation now references its own verification artifact.
+
+Coordinator replay with file writes intercepted reproduced all 28 checks and
+the exact retained verification bytes. All 42 public provenance hash/size pairs
+and 43 checksum entries matched. A separate reviewer examined supplied source
+excerpts and returned results, finding no remaining issue; that follow-up did
+not independently execute commands or access private originals. The earlier
+independent direct packet review retains its narrower dated scope.
+
+A read-only layer review found no incorrect winner and requested clearer labels
+for optional Beads, Apple Container, Headroom and TOON, plus explicit protocol and
+skill support in the evaluation summary. Those four summaries were clarified in
+both the landscape and its quality-coverage copy without changing dispositions.
+The full test suite found a stale lifecycle total of 527 after independent
+discovery had added 13 research-only identities. The total is now 540, with 472
+nonselected identities and 81 in the exclusive research-supplement group; no
+previous identity was removed.
+
+After those corrections, the 780-test Python suite passed with two documented
+skips (778 passed), all five Claude Node suites and the six native-skill contract
+tests passed, the 20-layer landscape validated, and all 17 recorded convergence
+experiments validated. Publication integrity passed with 68 components, 1,610
+hashed files and 134 receipts. These results cover the current integration;
+final peer findings and publication still require their own checks.
+
+The independent layer reviewer directly confirmed the four mirrored summaries,
+unchanged dispositions, all 13 research-only additions, zero removals and the
+corrected count partition against `648cb71`. Native browser inspection of the
+rebuilt local HTML at 390 pixels confirmed the 540-identity display, no horizontal
+overflow and zero external resource requests. These checks do not certify every
+remote source URL or replace the final publication check.

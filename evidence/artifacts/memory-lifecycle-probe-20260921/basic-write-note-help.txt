@@ -34,4 +34,3 @@
 │    --cloud                    Force cloud API routing                        │
 │    --help                     Show this message and exit.                    │
 ╰──────────────────────────────────────────────────────────────────────────────╯
-

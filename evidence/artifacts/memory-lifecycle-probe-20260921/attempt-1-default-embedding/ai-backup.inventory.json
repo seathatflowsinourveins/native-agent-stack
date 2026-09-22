@@ -20,7 +20,7 @@
       "gname_present": false
     },
     {
-      "name": "wiki/01a0c703-33cc-7ec1-8353-001136b235fa",
+      "name": "wiki/SYNTHETIC-ID-001",
       "kind": "directory",
       "size": 0,
       "sha256": null,
@@ -30,7 +30,7 @@
       "gname_present": false
     },
     {
-      "name": "wiki/01a0c703-33cc-7ec1-8353-001136b235fa/01a0c703-33cd-7571-933d-d2e506a46333",
+      "name": "wiki/SYNTHETIC-ID-001/SYNTHETIC-ID-002",
       "kind": "directory",
       "size": 0,
       "sha256": null,
@@ -40,7 +40,7 @@
       "gname_present": false
     },
     {
-      "name": "wiki/01a0c703-33cc-7ec1-8353-001136b235fa/01a0c703-33cd-7571-933d-d2e506a46333/notes",
+      "name": "wiki/SYNTHETIC-ID-001/SYNTHETIC-ID-002/notes",
       "kind": "directory",
       "size": 0,
       "sha256": null,
@@ -50,7 +50,7 @@
       "gname_present": false
     },
     {
-      "name": "wiki/01a0c703-33cc-7ec1-8353-001136b235fa/01a0c703-33cd-7571-933d-d2e506a46333/notes/alpine-kite.md",
+      "name": "wiki/SYNTHETIC-ID-001/SYNTHETIC-ID-002/notes/alpine-kite.md",
       "kind": "file",
       "size": 188,
       "sha256": "777b8e9d786d529d6defc7772ced97cd0df0ae82537bfc9809ff1969b68fe45a",
@@ -60,7 +60,7 @@
       "gname_present": false
     },
     {
-      "name": "wiki/01a0c703-33cc-7ec1-8353-001136b235fa/01a0c703-33cd-7571-933d-d2e506a46333/notes/orchard-pump.md",
+      "name": "wiki/SYNTHETIC-ID-001/SYNTHETIC-ID-002/notes/orchard-pump.md",
       "kind": "file",
       "size": 209,
       "sha256": "eceb2d776332c26cfe3d1d5e59c33754a83ccb0e425260fdbe69be0af06aaf00",
@@ -70,7 +70,7 @@
       "gname_present": false
     },
     {
-      "name": "wiki/01a0c703-33cc-7ec1-8353-001136b235fa/01a0c703-33cd-7571-933d-d2e506a46333/_meta.md",
+      "name": "wiki/SYNTHETIC-ID-001/SYNTHETIC-ID-002/_meta.md",
       "kind": "file",
       "size": 48,
       "sha256": "e8f7a71cc7a2f59965b5e43505cb460bbc0e984d6e930f5cd07b5d042a28b8b1",
@@ -80,7 +80,7 @@
       "gname_present": false
     },
     {
-      "name": "wiki/01a0c703-33cc-7ec1-8353-001136b235fa/_meta.md",
+      "name": "wiki/SYNTHETIC-ID-001/_meta.md",
       "kind": "file",
       "size": 46,
       "sha256": "f1a03987af6f34564765a0953a0e6ab5600ac6a7ede944c32982d329d309613e",
