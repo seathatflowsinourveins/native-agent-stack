@@ -273,7 +273,10 @@ def main(argv=None) -> int:
     # found") is not covered: it stays pending so a resumed run retries
     # exactly the repositories that previously failed or are incomplete,
     # instead of only genuinely-fetched ones.
-    already_covered_slugs = {rec.get("slug") for rec in results.values()
+    # Snapshots written before slug lower-casing keep mixed-case slugs; normalize
+    # before comparing so a resume reuses their retained metadata instead of
+    # refetching (and possibly overwriting a good record with a transient error).
+    already_covered_slugs = {str(rec.get("slug") or "").lower() for rec in results.values()
                               if isinstance(rec, dict) and not rec.get("error")
                               and not rec.get("partial_errors")}
     pending = {slug: url for slug, url in sorted(targets.items())

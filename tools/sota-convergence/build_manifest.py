@@ -591,6 +591,7 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
         "components_confirmed": sum(
             1 for row in all_rows for component in all_components(row)
             if str(component["review_status"]).startswith("confirmed")
+            and not str(component["review_status"]).endswith("_unverified")
         ),
         "pins_behind_upstream": sum(
             1 for row in all_rows for component in all_components(row) if component["pin_behind_upstream"]

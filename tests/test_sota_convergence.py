@@ -945,5 +945,32 @@ class GithubFreshnessAliasAndObservationTests(unittest.TestCase):
             self.assertEqual(resumed["observation_window"], document["observation_window"])
 
 
+
+class CodexSecondPassRegressionTests(unittest.TestCase):
+    """Second Codex pass (2026-09-22): unverified confirmed_* statuses must not count as
+    confirmed, and mixed-case slugs saved by an older snapshot must still count as
+    covered on resume."""
+
+    def test_confirmed_status_with_null_verdict_is_unverified_and_not_counted(self):
+        lanes = {"lanes": [{"lane": "foundation", "result": {"layers": [{"layer_id": "workers",
+                 "selected": [{"repository": "https://github.com/example/tool", "status": "confirmed_default",
+                               "evidence": []}], "new_candidates": [], "open_gaps": []}]},
+                 "proposals": [{"layer": "workers", "kind": "confirmed_default",
+                                "repository": "https://github.com/example/tool", "survives": None, "votes": []}]}],
+                 "critic": None, "lost": []}
+        status_map = build_manifest_mod.merge_lanes(lanes, {})[0]
+        status = status_map[("workers", "https://github.com/example/tool")]["status"]
+        self.assertEqual(status, "confirmed_default_unverified")
+        self.assertTrue(status.startswith("confirmed") and status.endswith("_unverified"))
+        counted = sum(1 for st in [status] if st.startswith("confirmed") and not st.endswith("_unverified"))
+        self.assertEqual(counted, 0)
+
+    def test_mixed_case_saved_slug_counts_as_covered_on_resume(self):
+        saved = {"https://github.com/QuantConnect/Lean": {"slug": "QuantConnect/Lean", "stargazers_count": 1}}
+        covered = {str(rec.get("slug") or "").lower() for rec in saved.values()
+                   if isinstance(rec, dict) and not rec.get("error") and not rec.get("partial_errors")}
+        self.assertIn(github_freshness.github_slug("https://github.com/quantconnect/lean"), covered)
+
+
 if __name__ == "__main__":
     unittest.main()
