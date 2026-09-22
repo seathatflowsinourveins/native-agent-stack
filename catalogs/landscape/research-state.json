@@ -241,31 +241,7 @@
     },
     {
       "catalog": "us-equities",
-      "layer_id": "foundation-memory",
-      "status": "comparison_required",
-      "next_action": "Create held-out finance/document/code relevance judgments; compare fidelity, abstention and total task cost while preserving source timestamps, project isolation and original recovery.",
-      "decision_ref": "catalogs/landscape/us-equities.json",
-      "evidence_refs": [
-        "catalogs/us-equities/foundation-memory.json",
-        "evidence/receipts/foundation-native-20260920.json"
-      ],
-      "saturation": "not_established"
-    },
-    {
-      "catalog": "us-equities",
-      "layer_id": "agents-operations",
-      "status": "on_requirement_change",
-      "next_action": "Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.",
-      "decision_ref": "catalogs/landscape/us-equities.json",
-      "evidence_refs": [
-        "catalogs/us-equities/agents-operations.json",
-        "docs/foundation-closure-20260921.md"
-      ],
-      "saturation": "not_established"
-    },
-    {
-      "catalog": "us-equities",
-      "layer_id": "data-research",
+      "layer_id": "market-data-reference",
       "status": "comparison_required",
       "next_action": "Freeze the intended universe/history and rights; obtain auditable delisting, ticker-reuse, action/currency and publication-revision evidence before accepting an as-known research dataset.",
       "decision_ref": "catalogs/landscape/us-equities.json",
@@ -277,13 +253,181 @@
     },
     {
       "catalog": "us-equities",
-      "layer_id": "engines-strategies",
+      "layer_id": "identity-provenance",
+      "status": "comparison_required",
+      "next_action": "Freeze the intended universe/history and rights; obtain auditable delisting, ticker-reuse, action/currency and publication-revision evidence before accepting an as-known research dataset.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/data-research.json",
+        "catalogs/us-equities/runtime-target.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "storage-compute",
+      "status": "comparison_required",
+      "next_action": "Freeze the intended universe/history and rights; obtain auditable delisting, ticker-reuse, action/currency and publication-revision evidence before accepting an as-known research dataset.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/data-research.json",
+        "catalogs/us-equities/runtime-target.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "data-quality-orchestration",
+      "status": "on_requirement_change",
+      "next_action": "Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "research-factors-ml",
       "status": "comparison_required",
       "next_action": "Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/engines-strategies.json",
         "catalogs/us-equities/runtime-target.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine",
+      "status": "comparison_required",
+      "next_action": "Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "execution-broker",
+      "status": "comparison_required",
+      "next_action": "Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "portfolio-risk",
+      "status": "comparison_required",
+      "next_action": "Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "evaluation-experiments",
+      "status": "on_requirement_change",
+      "next_action": "Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "agents-models-workers",
+      "status": "comparison_required",
+      "next_action": "Create held-out finance/document/code relevance judgments; compare fidelity, abstention and total task cost while preserving source timestamps, project isolation and original recovery.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/foundation-memory.json",
+        "evidence/receipts/foundation-native-20260920.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "observability-hosting",
+      "status": "on_requirement_change",
+      "next_action": "Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "security-supply-chain",
+      "status": "on_requirement_change",
+      "next_action": "Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "agent-sdks",
+      "status": "on_requirement_change",
+      "next_action": "Qualify a concrete application need (durable multi-host state, explicit graph checkpoints, a remote/container worker or programmatic Claude session control) before promoting a deferred SDK alternative; the SDK table in docs/foundation-closure-20260921.md (lines 78-84) has not been revisited by any lane since 2026-09-21.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/foundation-closure-20260921.md",
+        "catalogs/foundation/decisions.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "mcp-surfaces",
+      "status": "on_requirement_change",
+      "next_action": "Review a specific MCP registry entry, such as punkpeye/awesome-mcp-servers, only against a concrete surface gap; do not adopt a new server from a registry listing alone.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "recipes/README.md",
+        "catalogs/foundation/decisions.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "secrets-credentials",
+      "status": "on_requirement_change",
+      "next_action": "Qualify openbao, or a comparable secret manager, only against a concrete multi-host or multi-operator secret-sharing need; broker credential handling stays a trading gate, not a foundation selection.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "adoption/manifest.json",
+        "catalogs/foundation/decisions.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "git-github-automation",
+      "status": "on_requirement_change",
+      "next_action": "Qualify gh CLI's own lifecycle evidence and a changed codex-for-claude review-bridge version before extending acceptance beyond worktrunk, gh and difftastic.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/github-automation.md",
+        "catalogs/foundation/decisions.json"
       ],
       "saturation": "not_established"
     }

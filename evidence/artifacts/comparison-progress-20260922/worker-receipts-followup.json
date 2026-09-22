@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-09-22",
+  "status": "receipt_provenance_reconciled_comparison_unresolved",
+  "supersedes": "Return3 lacked original/rescored per-submission measurement receipts and retained the pre-fix summary. Those historical source bytes remain preserved.",
+  "source": {
+    "return": "claude-return-4.md",
+    "return_sha256": "cedbb3aec68fcb861c1914686b7497e159a773cc086376fd168d4fb58d420651",
+    "phase": "workers-receipts-r3",
+    "sealed_at_utc": "2026-09-22T07:49:48Z",
+    "seal_manifest_sha256": "c49e31db4647a97809c2ae7cdc4f9cfe2a46b2618e2490ea7de76895d23970d9",
+    "new_seal_entries_verified": 26,
+    "total_manifest_entries": 189,
+    "prior_phase_checks_reused": true,
+    "source_hashes": {
+      "receipt-mapping.json": "45a2598fcc3b6a7486d9e1766d3e63e521476a8ec0ff36818eb42ef0f1941496",
+      "run-summary.rescored.json": "509281c54d1d151897d6761d45f7d6457e00eebeaef7b4bc97ba0bca21271cec",
+      "rescore-summary.json": "2822efd440f61964d9c1d84c83bca098f9bb7eb98c081e29a233ded66fa46947",
+      "judgments.json": "6c68cf119f085e196584abb2b1d0e2102a80ba9e28fe61fd01f292cb9b6ec5d9",
+      "judgments.pre-classifier-fix.json": "714c3ceaed4446ea49bb3d4995b16e45a2bd218e402a4630af3d54403bb9a26e",
+      "blocked.mjs": "7a959108d9064b7425460a4308cee9c9a3e6e5425535d9b731033d52b88f3300",
+      "workers-blocked.test.mjs": "da1b45db9daeefd00776aa4d9c2e844ba088d76e0db1f7573a2b265080e1fa38"
+    },
+    "availability": "Original and rescored measurement receipts are now present in the new private seal; row paths below are relative to that private phase. This public file is a sanitized derived index. Raw stdout/stderr and per-arm native output remain in the source run directories; existence checked without rereading full output."
+  },
+  "verification": {
+    "receipt_hashes_checked": 18,
+    "receipt_hash_mismatches": 0,
+    "corrected_summary_rows_matched": 9,
+    "rescore_summary_matches": true,
+    "independent_review": true,
+    "offline_classifier_tests": {
+      "passed": 12,
+      "failed": 0,
+      "scope": "Nine existing classifier cases and three regression cases selected from the unchanged local test source; unrelated skill tests excluded. Original-layout reconstruction used; direct flat-seal invocation fails ERR_MODULE_NOT_FOUND."
+    },
+    "new_provider_trials": 0
+  },
+  "changes": {
+    "classification_fields": "Only A3/C3 block_reason and B3 blocked, block_kind, block_reason, block_error_text change classification. The per-row field list below covers these fields, not every metadata addition.",
+    "all_receipts_add_provenance_fields": [
+      "rescored_at_utc",
+      "rescored_from",
+      "rescored_note"
+    ],
+    "corrected_blocked_submission_count": 0,
+    "qualification": "Not classified as provider-blocked does not mean complete native output, successful recovery, accepted judgments or a runtime winner."
+  },
+  "rows": [
+    {
+      "arm": "A",
+      "index": 1,
+      "role": "replay",
+      "original": {
+        "path": "receipts/arm-38814295.0034d6c75037ad1c-S1.receipt.json",
+        "sha256": "adfea6ee6eecaedc259f66f442ff1b407181d8a0e50771f45ea51513db94c07b"
+      },
+      "rescored": {
+        "path": "receipts/arm-38814295.0034d6c75037ad1c-S1.receipt.json.rescored.json",
+        "sha256": "307814f90d0960b9e8a0f7b9b0880f6599066f5109577b71025c3a2268624331"
+      },
+      "blocked_after_rescore": false,
+      "arm_status": "success",
+      "exit_code": 0,
+      "exit_signal": null,
+      "usage_status": "reported",
+      "reported_completeness": 1,
+      "classification_fields_changed": []
+    },
+    {
+      "arm": "A",
+      "index": 2,
+      "role": "replay",
+      "original": {
+        "path": "receipts/arm-38814295.0034d6c75037ad1c-S2.receipt.json",
+        "sha256": "73a8b51027bef757bbc98988acef4cb15af12d8b51b2735b2cb4257f4bb7a07b"
+      },
+      "rescored": {
+        "path": "receipts/arm-38814295.0034d6c75037ad1c-S2.receipt.json.rescored.json",
+        "sha256": "529ebd6429931d82b5b7ab38a635df71f30ff81a80f36770fb59b127e0d50a0d"
+      },
+      "blocked_after_rescore": false,
+      "arm_status": "success",
+      "exit_code": 0,
+      "exit_signal": null,
+      "usage_status": "reported",
+      "reported_completeness": 1,
+      "classification_fields_changed": []
+    },
+    {
+      "arm": "A",
+      "index": 3,
+      "role": "cancel",
+      "original": {
+        "path": "receipts/arm-38814295.0034d6c75037ad1c-S3.receipt.json",
+        "sha256": "88856f0bbbe8a1ce2edd02c68d80d05a1f3531c769a348e7ce2f0fe8011e63c6"
+      },
+      "rescored": {
+        "path": "receipts/arm-38814295.0034d6c75037ad1c-S3.receipt.json.rescored.json",
+        "sha256": "d21e4b2e9f0cf01ec70831dba10d9695b42db4007f9d949cbbf863bd22f736c0"
+      },
+      "blocked_after_rescore": false,
+      "arm_status": "error:error_during_execution",
+      "exit_code": 0,
+      "exit_signal": null,
+      "usage_status": "reported",
+      "reported_completeness": 0.25,
+      "classification_fields_changed": [
+        "block_reason"
+      ]
+    },
+    {
+      "arm": "B",
+      "index": 1,
+      "role": "replay",
+      "original": {
+        "path": "receipts/arm-6d37c117.0034d6c75037ad1c-S1.receipt.json",
+        "sha256": "5cdf8205dbd40b00e9f6f4f53b1bb15917c98c45c9b25f6e923c67142bab5cbe"
+      },
+      "rescored": {
+        "path": "receipts/arm-6d37c117.0034d6c75037ad1c-S1.receipt.json.rescored.json",
+        "sha256": "a1d20fe9fa9b7b1b20a6470d285bc6e1443e76125d9395d939a3908691c9487b"
+      },
+      "blocked_after_rescore": false,
+      "arm_status": "completed",
+      "exit_code": 0,
+      "exit_signal": null,
+      "usage_status": "reported",
+      "reported_completeness": 1,
+      "classification_fields_changed": []
+    },
+    {
+      "arm": "B",
+      "index": 2,
+      "role": "replay",
+      "original": {
+        "path": "receipts/arm-6d37c117.0034d6c75037ad1c-S2.receipt.json",
+        "sha256": "770721bb76e1ec23766e29982a61e510a5c6496ecbc8de736e56c66f4511f36b"
+      },
+      "rescored": {
+        "path": "receipts/arm-6d37c117.0034d6c75037ad1c-S2.receipt.json.rescored.json",
+        "sha256": "1b94511d94ebd5be1427bde455cf7cf7f0e6aac28bfd49df5f1d7e2fb1011f9b"
+      },
+      "blocked_after_rescore": false,
+      "arm_status": "completed",
+      "exit_code": 0,
+      "exit_signal": null,
+      "usage_status": "reported",
+      "reported_completeness": 1,
+      "classification_fields_changed": []
+    },
+    {
+      "arm": "B",
+      "index": 3,
+      "role": "cancel",
+      "original": {
+        "path": "receipts/arm-6d37c117.0034d6c75037ad1c-S3.receipt.json",
+        "sha256": "cb99a1c34955cdb0dfdc314420db4bc3d90597004ff9b6fb34e26ae62598dbff"
+      },
+      "rescored": {
+        "path": "receipts/arm-6d37c117.0034d6c75037ad1c-S3.receipt.json.rescored.json",
+        "sha256": "8ee21efc18f00bdb76d14dbac9770f40b9dbcd65146b2ee3f391fcdfac237600"
+      },
+      "blocked_after_rescore": false,
+      "arm_status": "no_receipt",
+      "exit_code": null,
+      "exit_signal": "SIGINT",
+      "usage_status": "not_requested",
+      "reported_completeness": 0.25,
+      "classification_fields_changed": [
+        "block_error_text",
+        "block_kind",
+        "block_reason",
+        "blocked"
+      ]
+    },
+    {
+      "arm": "C",
+      "index": 1,
+      "role": "replay",
+      "original": {
+        "path": "receipts/arm-9e6eeff5.0034d6c75037ad1c-S1.receipt.json",
+        "sha256": "58a2cb126b304d40b04476676000b4d94db680881d2df04fa8cac1ce7c57c90f"
+      },
+      "rescored": {
+        "path": "receipts/arm-9e6eeff5.0034d6c75037ad1c-S1.receipt.json.rescored.json",
+        "sha256": "80932b032fc2bc2154db8c8b0b83e49a2f426aa4ceaa47840294d1736f6018ee"
+      },
+      "blocked_after_rescore": false,
+      "arm_status": "success",
+      "exit_code": 0,
+      "exit_signal": null,
+      "usage_status": "reported",
+      "reported_completeness": 1,
+      "classification_fields_changed": []
+    },
+    {
+      "arm": "C",
+      "index": 2,
+      "role": "replay",
+      "original": {
+        "path": "receipts/arm-9e6eeff5.0034d6c75037ad1c-S2.receipt.json",
+        "sha256": "2a93d0797b504fae6a20760a6c3b5c19c892dc11862a3e6585f280d5b2e09d6e"
+      },
+      "rescored": {
+        "path": "receipts/arm-9e6eeff5.0034d6c75037ad1c-S2.receipt.json.rescored.json",
+        "sha256": "55584ed69b9f319d85e5370a3b1a8cd33f851f7ef4bd31f70e47e432823edc9a"
+      },
+      "blocked_after_rescore": false,
+      "arm_status": "success",
+      "exit_code": 0,
+      "exit_signal": null,
+      "usage_status": "reported",
+      "reported_completeness": 1,
+      "classification_fields_changed": []
+    },
+    {
+      "arm": "C",
+      "index": 3,
+      "role": "cancel",
+      "original": {
+        "path": "receipts/arm-9e6eeff5.0034d6c75037ad1c-S3.receipt.json",
+        "sha256": "e3fe7d6590174234d78916ec5e9d2f0785f72ed17db6769b3cc42d957ccc43b6"
+      },
+      "rescored": {
+        "path": "receipts/arm-9e6eeff5.0034d6c75037ad1c-S3.receipt.json.rescored.json",
+        "sha256": "f0135c640fb840ffe6ddafa6b43de2dcc32bab3437e662e210b206b4f76ae406"
+      },
+      "blocked_after_rescore": false,
+      "arm_status": "interrupted",
+      "exit_code": 130,
+      "exit_signal": null,
+      "usage_status": "unavailable_after_interrupt",
+      "reported_completeness": 0.25,
+      "classification_fields_changed": [
+        "block_reason"
+      ]
+    }
+  ],
+  "limits": [
+    "Six replay records return full measured structural completeness; all three cancellation records retain incomplete task output.",
+    "Codex cancellation records SIGINT and arm_status no_receipt with usage not_requested; reconciliation does not invent a missing native return.",
+    "Claude CLI cancellation reports error:error_during_execution with zero reported usage; Claude Agent SDK interruption reports unavailable usage. These observations do not establish zero actual provider consumption.",
+    "Recovery remains unrun and artifact acceptance lacks a pinned judge.",
+    "Recorded worker judging remains refuted and publication-blocked; no quality ranking, SDK adoption or new-host acceptance follows."
+  ],
+  "classifier_residual_finding": {
+    "source": "blocked.mjs:53",
+    "status": "open; does not affect the observed B3 reconciliation",
+    "input": {
+      "arm": "B",
+      "exitCode": 1,
+      "receipt_status": "blocked_model_or_provider_mismatch"
+    },
+    "synthetic_cases": [
+      {
+        "cancelled": false,
+        "blocked": true,
+        "kind": "provider_other"
+      },
+      {
+        "cancelled": true,
+        "blocked": false,
+        "kind": null
+      }
+    ],
+    "finding": "The early cancellation return suppresses this explicit model/provider-mismatch status before its later handler. Independently reproduced by reviewer and coordinator; no provider call.",
+    "implication": "Do not claim complete explicit-block preservation or adopt this classifier as a default; original source owner retains the correction.",
+    "followup": {
+      "status": "resolved_in_later_reviewed_return",
+      "evidence": "worker-classifier-correction.json",
+      "historical_finding_preserved": true
+    }
+  }
+}

@@ -23,6 +23,7 @@ class LandscapeTests(unittest.TestCase):
             "catalogs": {"foundation": "foundation.json", "us-equities": "domain.json"},
             "sources": {"foundation_manifest": "foundation-manifest.json",
                         "foundation_decisions": "decisions.json", "domain_manifest": "domain-manifest.json",
+                        "trading_taxonomy": "taxonomy.json",
                         "repository_index": "index.json", "selected_manifest": "stack.json",
                         "freshness_snapshot": "freshness.json"},
         }
@@ -30,6 +31,18 @@ class LandscapeTests(unittest.TestCase):
             "name": "Native selected tool", "repository": "https://github.com/example/selected",
             "disposition": "selected", "rationale": "Passed the required scoped operation",
             "evidence_kind": "native_execution", "evidence_refs": ["receipt.json"],
+        }
+        # Layer-verdict schema v2 defaults: every row starts "pending_lanes"
+        # with empty winners/alternatives/open_gaps -- the same shape the real
+        # migrated catalogs.landscape.{foundation,us-equities}.json rows use.
+        self.v2_defaults = {
+            "verdict_status": "pending_lanes",
+            "winners": [], "alternatives": [],
+            "overturn_protocol": {"fixture_paths": [], "metric": "", "arms": []},
+            "lanes": {"claude": {"run_id": "", "sealed_sha256": ""},
+                      "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "pending"},
+            "open_gaps": [],
+            "checked_at": "2026-09-21",
         }
         self.layer = {
             "catalog": "foundation", "layer_id": "retrieval", "title": "Retrieval",
@@ -40,17 +53,27 @@ class LandscapeTests(unittest.TestCase):
             "candidates": [self.candidate, {**self.candidate, "name": "Alternative",
                 "repository": "https://github.com/example/alternative", "disposition": "unqualified",
                 "evidence_kind": "source_review", "rationale": "Not tested on this host"}],
+            **copy.deepcopy(self.v2_defaults),
         }
-        self.foundation = {"schema_version": 1, "checked_at": "2026-09-21", "scope": "General",
+        self.foundation = {"schema_version": 2, "checked_at": "2026-09-21", "scope": "General",
                            "layers": [self.layer]}
         self.domain = copy.deepcopy(self.foundation)
-        self.domain["layers"][0].update(catalog="us-equities", layer_id="data", title="Data")
+        self.domain["layers"][0].update(catalog="us-equities", layer_id="data", title="Data",
+                                        group="data-domain")
         self.write("foundation-manifest.json", {"layers": [{"id": "retrieval"}]})
         self.write("domain-manifest.json", {"catalog_files": ["data.json"]})
-        self.write("data.json", {"layer": "data", "checked_at": "2026-09-19", "entries": [{
+        self.write("data.json", {"layer": "data-domain", "checked_at": "2026-09-19", "entries": [{
             "id": "old", "repository": "https://github.com/example/alternative", "role": "Old source candidate",
             "decision": "default", "rationale": "Historical reason", "evidence_level": "source_review",
             "version_or_commit": "v1", "limitations": ["Historical only"], "evidence_refs": ["receipt.json"]}]})
+        # The sota-pin check is scoped per layer_id (matching
+        # tools/sota-convergence/build_verdicts.py's own sota_layer_index
+        # join), so the taxonomy row's "layer" must equal self.layer's own
+        # layer_id ("retrieval") for the pin-match tests below to exercise it.
+        self.write("taxonomy.json", {"foundation": [{"layer": "retrieval", "components": [
+            {"id": "selected", "pin": "1"}]}], "trading": [{"layer": "data", "entries": [
+            {"id": "old-trading", "pin": "2"}]}]})
+        self.write("adoption/manifest.json", {"recipe_map": {"selected-recipe": "recipes/example.md"}})
         self.write("index.json", {"aliases": {}, "records": [{"repository": row["repository"]}
                    for row in self.layer["candidates"]]})
         self.write("stack.json", {"components": [{"id": "selected", "version": "1",
@@ -322,6 +345,214 @@ class LandscapeTests(unittest.TestCase):
         self.write("index.json", {"aliases": {"previous/selected": "example/selected"},
                    "records": [{"repository": row["repository"]} for row in self.layer["candidates"]]})
         self.assertEqual(self.build()["counts"]["selected_components"], 1)
+
+
+class LayerVerdictSchemaV2Tests(LandscapeTests):
+    """Schema v2 rules: verdict_status, winners/alternatives, overturn_protocol,
+    lanes and the group-based binding of a domain document to every landscape
+    row sharing its group. Each rule below has a passing and a failing case."""
+
+    def recorded_fields(self, **overrides):
+        fields = {
+            "verdict_status": "recorded",
+            "winners": [{
+                "component_id": "selected", "repository": self.candidate["repository"],
+                "pin": "1", "evidence_class": "native_proven",
+                "why_selected": "Passed the native scoped operation",
+                "evidence_refs": ["receipt.json"], "recipe_ref": "selected-recipe",
+                "platform_status": {"linux-wsl2-x86_64": "accepted", "macos-arm64": "untested"},
+            }],
+            "alternatives": [{
+                "name": "Alternative", "repository": "https://github.com/example/alternative",
+                "disposition": "unqualified", "why_not_default": "Not tested on this host",
+                "evidence_class": "source_review", "evidence_refs": [], "source": "discovery_index",
+            }],
+            "overturn_when": "python3 tests/test_landscape.py replays the comparison",
+            "lanes": {"claude": {"run_id": "run-1", "sealed_sha256": "a" * 64},
+                      "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "codex_absent"},
+        }
+        fields.update(overrides)
+        return fields
+
+    def seal_claude_run(self, run_id="run-1"):
+        self.write(f"evidence/artifacts/layer-verdicts-20260922/claude/{run_id}.json",
+                   {"run_id": run_id, "lane": "claude"})
+
+    def test_recorded_verdict_with_full_evidence_passes(self):
+        self.seal_claude_run()
+        self.layer.update(self.recorded_fields())
+        data = self.build()
+        self.assertEqual(data["layers"][0]["verdict_status"], "recorded")
+        self.assertEqual(data["layers"][0]["winners"][0]["component_id"], "selected")
+
+    def test_unknown_verdict_status_is_rejected(self):
+        self.layer["verdict_status"] = "maybe"
+        with self.assertRaisesRegex(ValueError, "verdict_status is unknown"):
+            self.build()
+
+    def test_recorded_verdict_needs_at_least_one_winner_and_one_alternative(self):
+        self.seal_claude_run()
+        self.layer.update(self.recorded_fields(winners=[]))
+        with self.assertRaisesRegex(ValueError, "needs at least one winner"):
+            self.build()
+        self.layer.update(self.recorded_fields(alternatives=[]))
+        with self.assertRaisesRegex(ValueError, "needs at least one alternative"):
+            self.build()
+
+    def test_why_selected_cannot_equal_an_alternatives_why_not_default(self):
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["winners"][0]["why_selected"] = fields["alternatives"][0]["why_not_default"]
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "must differ from every alternative"):
+            self.build()
+
+    def test_recorded_overturn_when_needs_a_fixture_or_command_marker(self):
+        self.seal_claude_run()
+        self.layer.update(self.recorded_fields(overturn_when="A vague future improvement"))
+        with self.assertRaisesRegex(ValueError, "must name a fixture"):
+            self.build()
+
+    def test_winner_repository_must_resolve_in_the_canonical_index(self):
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["winners"][0]["repository"] = "https://github.com/example/missing"
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "winner.repository absent from canonical index"):
+            self.build()
+
+    def test_winner_repository_may_be_null(self):
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["winners"][0]["repository"] = None
+        self.layer.update(fields)
+        data = self.build()
+        self.assertIsNone(data["layers"][0]["winners"][0]["repository"])
+
+    def test_recipe_ref_must_not_be_empty_on_a_recorded_row(self):
+        # Codex cross-family review of PR-2: an empty string used to skip resolution.
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["winners"][0]["recipe_ref"] = ""
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "recipe_ref"):
+            self.build()
+
+    def test_platform_status_vocabulary_is_per_platform(self):
+        # Codex cross-family review of PR-2: macOS may only be untested on this profile
+        # and Linux may not be untested.
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["winners"][0]["platform_status"] = {"linux-wsl2-x86_64": "accepted", "macos-arm64": "accepted"}
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "platform_status.macos-arm64"):
+            self.build()
+        fields = self.recorded_fields()
+        fields["winners"][0]["platform_status"] = {"linux-wsl2-x86_64": "untested", "macos-arm64": "untested"}
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "platform_status.linux-wsl2-x86_64"):
+            self.build()
+
+    def test_recipe_ref_must_resolve_to_a_recipe_map_key_or_an_existing_path(self):
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["winners"][0]["recipe_ref"] = "recipes/unknown-nowhere.md"
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "recipe_ref must resolve"):
+            self.build()
+        fields["winners"][0]["recipe_ref"] = "guide.md"
+        self.layer.update(fields)
+        self.build()
+
+    def test_winner_pin_must_match_the_sota_manifest_pin_for_a_known_component(self):
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["winners"][0]["pin"] = "2"
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "pin differs from the sota manifest pin"):
+            self.build()
+
+    def test_sota_pin_check_does_not_conflate_a_shared_component_id_across_layers(self):
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        # A different layer ("data", the us-equities row) pins the same
+        # component id to a different value; the winner check must use the
+        # pin recorded for this row's own layer_id ("retrieval"), not
+        # whichever layer happened to be read last while building a single
+        # flattened component_id -> pin map (the fixed bug).
+        self.write("taxonomy.json", {"foundation": [{"layer": "retrieval", "components": [
+            {"id": "selected", "pin": "1"}]}], "trading": [{"layer": "data", "entries": [
+            {"id": "selected", "pin": "9"}]}]})
+        self.layer.update(fields)
+        data = self.build()
+        self.assertEqual(data["layers"][0]["winners"][0]["pin"], "1")
+
+    def test_sealed_sha256_needs_a_retained_lane_file(self):
+        self.layer.update(self.recorded_fields())
+        with self.assertRaisesRegex(ValueError, "sealed_sha256 needs a sealed file"):
+            self.build()
+
+    def test_no_selection_needs_open_gaps(self):
+        self.layer.update(self.recorded_fields(
+            verdict_status="no_selection", winners=[], alternatives=[],
+            lanes={"claude": {"run_id": "", "sealed_sha256": ""},
+                   "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "pending"}))
+        with self.assertRaisesRegex(ValueError, "no_selection verdict needs open_gaps"):
+            self.build()
+        self.layer["open_gaps"] = ["No qualified candidate reviewed yet"]
+        self.build()
+
+    def test_pending_rows_render_with_empty_winners_and_alternatives(self):
+        data = self.build()
+        self.assertEqual(data["layers"][0]["verdict_status"], "pending_lanes")
+        self.assertEqual(data["layers"][0]["winners"], [])
+        self.assertEqual(data["layers"][0]["alternatives"], [])
+
+    def test_us_equities_row_needs_a_valid_domain_group(self):
+        self.domain["layers"][0]["group"] = "unknown-domain"
+        with self.assertRaisesRegex(ValueError, "group must be a domain document id"):
+            self.build()
+
+    def test_foundation_row_cannot_declare_a_group(self):
+        self.foundation["layers"][0]["group"] = "data-domain"
+        with self.assertRaisesRegex(ValueError, "group is only used for trading rows"):
+            self.build()
+
+    def test_domain_document_binds_through_group_to_every_matching_row(self):
+        second_layer = copy.deepcopy(self.domain["layers"][0])
+        second_layer.update(layer_id="second", title="Second")
+        self.domain["layers"].append(second_layer)
+        self.write("taxonomy.json", {"foundation": [{"layer": "native-clients", "components": [
+            {"id": "selected", "pin": "1"}]}], "trading": [
+            {"layer": "data", "entries": []}, {"layer": "second", "entries": []}]})
+        data = self.build()
+        us_layers = [row for row in data["layers"] if row["catalog"] == "us-equities"]
+        self.assertEqual(len(us_layers), 2)
+        for row in us_layers:
+            self.assertEqual(len(row["catalog_candidates"]), 1)
+            self.assertEqual(row["catalog_candidates"][0]["id"], "old")
+        # One domain document, one historical card: fanning that same card
+        # out onto every row sharing its group must not multiply the
+        # published count (it must stay 1, not len(us_layers)).
+        self.assertEqual(data["counts"]["historical_candidate_cards"], 1)
+
+    def test_domain_document_must_map_to_at_least_one_row(self):
+        # "data.json" (group "data-domain") still matches the row; "orphan.json"
+        # (group "orphan-domain") has no landscape row using that group, so its
+        # domain document cannot bind to anything.
+        self.write("domain-manifest.json", {"catalog_files": ["data.json", "orphan.json"]})
+        self.write("orphan.json", {"layer": "orphan-domain", "checked_at": "2026-09-19", "entries": [{
+            "id": "old", "repository": "https://github.com/example/alternative", "role": "Old source candidate",
+            "decision": "default", "rationale": "Historical reason", "evidence_level": "source_review",
+            "version_or_commit": "v1", "limitations": ["Historical only"], "evidence_refs": ["receipt.json"]}]})
+        with self.assertRaisesRegex(ValueError, "maps to no landscape row group"):
+            self.build()
+
+    def test_trading_layer_set_is_sourced_from_the_taxonomy_document_not_hardcoded(self):
+        self.write("taxonomy.json", {"foundation": [], "trading": [{"layer": "renamed", "entries": []}]})
+        self.domain["layers"][0]["layer_id"] = "renamed"
+        data = self.build()
+        self.assertEqual(data["layers"][1]["layer_id"], "renamed")
 
 
 if __name__ == "__main__":

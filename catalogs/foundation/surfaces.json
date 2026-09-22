@@ -405,6 +405,23 @@
         "docs/native-dashboards.md",
         "docs/native-dashboard-operations-resolution.md"
       ]
+    },
+    {
+      "id": "mcp-cli",
+      "title": "MCP server bridge and inspector",
+      "kind": "cli",
+      "component_ids": [
+        "mcporter",
+        "mcp-inspector"
+      ],
+      "upstream_url": "https://github.com/openclaw/mcporter",
+      "local_url": null,
+      "launch": "mcporter --config \"$MCPORTER_CONFIG\" list --brief --no-oauth",
+      "scope": "Native MCP server bridging and stdio tool inspection for the project's configured servers. Registration and consent are per client; this surface does not grant new server trust.",
+      "source_paths": [
+        "recipes/README.md",
+        "docs/foundation-stack.md"
+      ]
     }
   ],
   "layers": [
@@ -589,6 +606,46 @@
         "observability/README.md",
         "observability/backends/README.md",
         "blueprints/convergence-practice/gpu-inference/README.md"
+      ]
+    },
+    {
+      "layer_id": "agent-sdks",
+      "surface_ids": [
+        "codex-sessions"
+      ],
+      "runbook_paths": [
+        "docs/foundation-closure-20260921.md",
+        "recipes/README.md"
+      ]
+    },
+    {
+      "layer_id": "mcp-surfaces",
+      "surface_ids": [
+        "mcp-cli"
+      ],
+      "runbook_paths": [
+        "recipes/README.md",
+        "docs/foundation-stack.md"
+      ]
+    },
+    {
+      "layer_id": "secrets-credentials",
+      "surface_ids": [
+        "security-cli"
+      ],
+      "runbook_paths": [
+        "adoption/lifecycle.md",
+        "blueprints/convergence-practice/ci-security/README.md"
+      ]
+    },
+    {
+      "layer_id": "git-github-automation",
+      "surface_ids": [
+        "worktree-cli"
+      ],
+      "runbook_paths": [
+        "docs/github-automation.md",
+        "recipes/README.md"
       ]
     }
   ]

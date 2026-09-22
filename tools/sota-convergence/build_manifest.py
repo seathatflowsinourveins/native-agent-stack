@@ -373,6 +373,15 @@ def merge_lanes(lanes_doc: dict, repositories: dict):
                     # beyond what the lane itself proposed).
                 status[key] = {"status": status_value, "evidence": evidence,
                                 "note": selected.get("note"), "lane": lane["lane"]}
+                # Optional lane fields, carried through only when the lane's
+                # selected item actually sets them -- never invented here.
+                # build_manifest() copies these from ``status[key]`` onto the
+                # merged components[]/entries[] the same way it already
+                # copies "note"/"evidence".
+                if "why_selected" in selected:
+                    status[key]["why_selected"] = selected["why_selected"]
+                if "comparison_that_would_overturn" in selected:
+                    status[key]["comparison_that_would_overturn"] = selected["comparison_that_would_overturn"]
             for alt in layer.get("alternatives_keep_but_compare", []):
                 alts[layer_id].append({**alt, "lane": lane["lane"]})
             for candidate in layer.get("new_candidates", []):
@@ -520,13 +529,19 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
         components = []
         for component in row["components"]:
             lane_status = status.get((layer_id, component["repository"]), {})
-            components.append({
+            component_row = {
                 "id": component["id"], "repository": component["repository"], "pin": component["pin"],
                 "upstream": component["upstream"], "pin_behind_upstream": component["behind"],
                 "review_status": lane_status.get("status", "not_individually_reviewed"),
                 "review_note": lane_status.get("note"),
                 "evidence": lane_status.get("evidence", []) + notes.get((layer_id, component["repository"]), []),
-            })
+            }
+            # Optional lane fields: carried through only when the lane's
+            # selected item actually set them on status[key] -- never invented.
+            for field in ("why_selected", "comparison_that_would_overturn"):
+                if field in lane_status:
+                    component_row[field] = lane_status[field]
+            components.append(component_row)
         components.sort(key=row_item_sort_key)
         manifest["foundation"].append({
             "layer": layer_id, "title": row["title"], "components": components,
@@ -549,6 +564,11 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
             }
             if "evidence_level" in entry:
                 row_entry["evidence_level"] = entry["evidence_level"]
+            # Optional lane fields: carried through only when the lane's
+            # selected item actually set them on status[key] -- never invented.
+            for field in ("why_selected", "comparison_that_would_overturn"):
+                if field in lane_status:
+                    row_entry[field] = lane_status[field]
             entries.append(row_entry)
         entries.sort(key=row_item_sort_key)
         manifest["trading"].append({
