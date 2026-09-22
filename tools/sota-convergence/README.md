@@ -602,7 +602,8 @@ mode.
   `v1_pin` field anywhere in the repository -- else the literal string
   `"unpinned"`.
 - **Agreement.** Both lanes valid and their winner component-id sets equal
-  -> `same_winner` (recorded from Claude's `why_selected`/`overturn_when`,
+  -> `same_winner` (recorded from Claude's `why_selected`/`overturn_when`, the latter written to
+  `verdict_overturn_when`,
   Codex's `open_gaps` appended); Claude only -> `codex_absent` (recorded,
   `open_gaps` gets "codex lane absent for this layer"); both valid but
   disagreeing -> `disagree`: recorded from the lane an optional
@@ -625,10 +626,20 @@ mode.
   into `open_gaps` as `"unindexed alternative <name> <url>"` instead of
   being rejected -- this check runs on every processed row, including one
   that stays `pending_lanes` (e.g. a disagreement), not only a `recorded` one.
-- **Never modifies a v1 field** except the shared `overturn_when` text, and
-  only when a verdict is actually recorded (set to the winning lane's own
-  `overturn_when`, which the lane-return contract already requires to carry
-  one of `fixtures/`, `blueprints/`, `tests/`, `python3 ` or `node `).
+- **Never modifies a v1 field.** The winning lane's `overturn_when` (which the
+  lane-return contract requires to carry one of `fixtures/`, `blueprints/`,
+  `tests/`, `python3 ` or `node `) is written to the v2-owned
+  `verdict_overturn_when`; the v1 `overturn_when` stays the dated review's text,
+  which `catalogs/landscape/candidate-quality-review.json` mirrors per layer.
+- **Citations are normalized in code.** A lane cites evidence the way a reader
+  would (`docs/x.md:107-130`, `catalogs/y.json#L564 (note)`, `receipt.json lines
+  10-11`). Each row keeps only the bare canonical repository path (or safe https
+  URL), deduplicated in first-seen order; the sealed lane return keeps every
+  full citation. Citations that resolve to no repository file (for example one
+  naming the lane packet itself) or name a generated publication index
+  (`manifests/evidence.json`, `docs/ecosystem/index.html`, whose citation would
+  make the explorer embed its own hash) are counted in one `open_gaps` entry,
+  never kept in `evidence_refs`.
 - `--check` recomputes every row in memory and exits 1 on any difference
   from what is checked in, without writing; `--write` writes the two ledger
   files (`json.dumps(doc, indent=2, ensure_ascii=False)` + newline -- the

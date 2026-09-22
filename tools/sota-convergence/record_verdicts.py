@@ -10,9 +10,9 @@ file (rejecting -- and treating as absent -- one that fails a schema or
 recording rule, never aborting the run), seals the accepted lane returns as
 retained evidence, derives the row's winner/alternative fields deterministically
 from the packet and the lane returns, and writes the result back into the two
-ledger files, never touching any v1 field except the shared ``overturn_when``
-text (only when a verdict is actually recorded, using the winning lane's own
-``overturn_when``).
+ledger files, never touching any v1 field: the winning lane's ``overturn_when``
+goes to the v2-owned ``verdict_overturn_when`` (empty unless a verdict is
+recorded), because the dated quality comparison mirrors the v1 text.
 
 Inputs (read, never modified):
 
@@ -81,7 +81,7 @@ from build_verdicts import LEDGER_FILES  # noqa: E402
 from scripts.landscape import (  # noqa: E402
     DISPOSITIONS, WINNER_EVIDENCE_CLASSES, OVERTURN_MARKERS, https_url,
 )
-from scripts.catalog_decisions import identity, canonical, load  # noqa: E402
+from scripts.catalog_decisions import identity, canonical, load, safe_file  # noqa: E402
 
 LANES = ("claude", "codex")
 # Frozen to the 2026-09-22 wave, exactly like scripts/landscape.py's own
@@ -318,11 +318,62 @@ def index_v1_candidates_by_repository(row: dict) -> dict:
     return index
 
 
+# A lane cites evidence as a reader would ("docs/x.md:107-130",
+# "catalogs/y.json#L564-L603 (decision id ...)", "adoption/receipt.json lines 10-11").
+# The ledger's evidence_refs are bare canonical repository paths (scripts/landscape.py
+# evidence() -> scripts/catalog_decisions.safe_file), so the row keeps the file path and
+# the sealed lane return keeps the full anchored citation. A citation that resolves to no
+# repository file (for example one naming the lane packet itself) is counted, never kept.
+# Generated publication indexes are not evidence, and citing one from a ledger row makes the
+# explorer embed a hash of a file that embeds the explorer's own hash (no fixed point).
+GENERATED_INDEXES = frozenset({"manifests/evidence.json", "docs/ecosystem/index.html"})
+_LINE_SUFFIX = re.compile(r":[0-9L][0-9L,\-]*$")
+
+
+def citation_path(citation: str) -> str:
+    text = citation.strip()
+    if text.startswith("https://"):
+        return text.split()[0]
+    text = text.split(None, 1)[0] if text else ""
+    text = text.split("#", 1)[0]
+    text = _LINE_SUFFIX.sub("", text)
+    return text.rstrip(".,;)")
+
+
+def normalize_evidence_refs(citations, root: Path):
+    """Return (paths, unresolved): unique canonical repository file paths or safe
+    https URLs in first-seen order, and the citations that resolve to neither."""
+    paths, unresolved = [], []
+    for citation in citations or []:
+        if not isinstance(citation, str):
+            continue
+        path = citation_path(citation)
+        ok = False
+        if path.startswith("https://"):
+            ok = https_url(path)
+        elif path and path not in GENERATED_INDEXES:
+            try:
+                ok = safe_file(root, path).is_file()
+            except ValueError:
+                ok = False
+        if ok:
+            if path not in paths:
+                paths.append(path)
+        else:
+            unresolved.append(citation)
+    return paths, unresolved
+
+
 def build_winners(lane_data: dict, candidates_by_key: dict, ledger_path: str,
-                   v1_candidates_by_repository: dict) -> list:
+                   v1_candidates_by_repository: dict, root: Path = None, unresolved: list = None) -> list:
     why_selected = lane_data["why_selected"]
     evidence_class = lane_data["winner_evidence_class"]
-    evidence_refs = list(lane_data.get("winner_evidence_refs") or [])
+    if root is None:
+        evidence_refs = list(lane_data.get("winner_evidence_refs") or [])
+    else:
+        evidence_refs, missing = normalize_evidence_refs(lane_data.get("winner_evidence_refs"), root)
+        if unresolved is not None:
+            unresolved.extend(missing)
     platform_status = platform_status_for(evidence_class)
     winners = []
     for key in lane_data["winner_keys"]:
@@ -345,7 +396,7 @@ def build_winners(lane_data: dict, candidates_by_key: dict, ledger_path: str,
     return winners
 
 
-def build_alternatives(valid: dict, identities: set, aliases: dict):
+def build_alternatives(valid: dict, identities: set, aliases: dict, root: Path = None, unresolved: list = None):
     """Union of both lanes' alternatives by normalized repository slug,
     Claude's entry first -- first-seen wins, matching the "first-seen wins"
     dedupe pattern used elsewhere in this toolset. An alternative whose
@@ -372,11 +423,19 @@ def build_alternatives(valid: dict, identities: set, aliases: dict):
                 "disposition": alternative.get("disposition"),
                 "why_not_default": alternative.get("why_not_default"),
                 "evidence_class": alternative.get("evidence_class"),
-                "evidence_refs": list(alternative.get("evidence_refs") or []),
+                "evidence_refs": (list(alternative.get("evidence_refs") or []) if root is None
+                                  else _normalized(alternative.get("evidence_refs"), root, unresolved)),
                 "source": f"lane:{lane}",
             }
     alternatives = [value for value in seen.values() if value is not None]
     return alternatives, open_gaps
+
+
+def _normalized(citations, root: Path, unresolved):
+    paths, missing = normalize_evidence_refs(citations, root)
+    if unresolved is not None:
+        unresolved.extend(missing)
+    return paths
 
 
 def is_nonempty_protocol(protocol) -> bool:
@@ -491,7 +550,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     chosen_lane = None
     winners, alternatives = [], []
     verdict_status = "pending_lanes"
-    overturn_when = row.get("overturn_when")
+    verdict_overturn_when = ""
 
     if agreement == "same_winner":
         chosen_lane = "claude"
@@ -535,15 +594,21 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     # regardless of whether a winner was actually recorded this run (a
     # disagree-pending or codex-only/claude-absent row can still name one);
     # gating this on verdict_status == "recorded" would silently drop it.
-    alternatives_computed, unindexed_gaps = build_alternatives(valid, identities, aliases)
+    unresolved_citations: list = []
+    alternatives_computed, unindexed_gaps = build_alternatives(valid, identities, aliases, root,
+                                                               unresolved_citations)
     for gap in unindexed_gaps:
         add_gap(gap)
 
     if verdict_status == "recorded" and chosen_lane:
         data = valid[chosen_lane]
         alternatives = alternatives_computed
-        winners = build_winners(data, candidates_by_key, LEDGER_FILES[catalog], v1_candidates_by_repository)
-        overturn_when = data["overturn_when"]
+        winners = build_winners(data, candidates_by_key, LEDGER_FILES[catalog], v1_candidates_by_repository,
+                                root, unresolved_citations)
+        verdict_overturn_when = data["overturn_when"]
+    if unresolved_citations:
+        add_gap(f"{len(unresolved_citations)} lane citation(s) name no repository evidence file (an "
+                f"unresolved path or a generated index); the full citations are kept in the sealed lane return")
 
     overturn_protocol = choose_overturn_protocol(valid)
 
@@ -551,14 +616,14 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     row["winners"] = sanitize_value(winners)
     row["alternatives"] = sanitize_value(alternatives)
     row["open_gaps"] = sanitize_value(open_gaps)
-    row["overturn_when"] = sanitize_value(overturn_when) if isinstance(overturn_when, str) else overturn_when
+    row["verdict_overturn_when"] = sanitize_value(verdict_overturn_when)
     row["overturn_protocol"] = sanitize_value(overturn_protocol)
     row["lanes"] = {"claude": lanes_field["claude"], "codex": lanes_field["codex"], "agreement": agreement}
     row["checked_at"] = checked_at
 
     assert_no_leak(json.dumps({
         "winners": row["winners"], "alternatives": row["alternatives"], "open_gaps": row["open_gaps"],
-        "overturn_when": row["overturn_when"], "overturn_protocol": row["overturn_protocol"],
+        "verdict_overturn_when": row["verdict_overturn_when"], "overturn_protocol": row["overturn_protocol"],
     }, sort_keys=True))
 
     return sealed_writes

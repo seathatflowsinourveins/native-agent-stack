@@ -102,6 +102,7 @@ def build_verdict_row(row: dict, sota_components: list) -> dict:
             for alt in alternatives
         ],
         "overturn_when": row.get("overturn_when"),
+        "verdict_overturn_when": row.get("verdict_overturn_when") or "",
         "overturn_protocol": row.get("overturn_protocol"),
         "lanes": row.get("lanes"),
         "open_gaps": row.get("open_gaps") or [],
@@ -192,7 +193,8 @@ def render_table(catalog: str, rows: list) -> str:
         lines.append("| " + " | ".join([
             row["layer_id"], row.get("group") or "-", status, winner_summary(row),
             evidence_class_summary(row), str(len(row["alternatives"])),
-            truncate(row.get("overturn_when")), recipe_anchor(row), platform_summary(row),
+            truncate(row.get("verdict_overturn_when") or row.get("overturn_when")), recipe_anchor(row),
+            platform_summary(row),
         ]) + " |")
     return "\n".join(lines)
 
@@ -232,7 +234,7 @@ def render_row_narrative(row: dict) -> str:
     else:
         lines.append("- none")
     lines.append("")
-    lines.append(f"Overturn when: {row.get('overturn_when') or '-'}")
+    lines.append(f"Overturn when: {row.get('verdict_overturn_when') or row.get('overturn_when') or '-'}")
     lines.append("")
     lines.append("Open gaps:")
     gaps = row.get("open_gaps") or []

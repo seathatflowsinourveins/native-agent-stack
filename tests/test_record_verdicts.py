@@ -175,6 +175,7 @@ FOUNDATION_LAYERS = [
     "challenger-layer", "protocol-layer", "codex-only-layer",
     "rejection-winnerkey-layer", "rejection-altmissing-layer", "rejection-whyequal-layer",
     "rejection-overturn-layer", "rejection-nonhttps-layer", "rejection-challenger-layer",
+    "citation-layer",
 ]
 US_EQUITIES_LAYERS = ["unindexed-alt-layer", "unindexed-pending-layer"]
 
@@ -285,7 +286,7 @@ class SameWinnerTests(RecordVerdictsFixture):
         original_row = self.load_row(catalog, layer_id)
         original_v1 = {key: original_row[key] for key in
                        ("requirement", "current_choice", "decision", "rationale", "candidates",
-                        "limitations", "evidence_refs")}
+                        "limitations", "evidence_refs", "overturn_when")}
 
         exit_code = self.run_main(write=True)
         self.assertEqual(exit_code, 0)
@@ -306,7 +307,8 @@ class SameWinnerTests(RecordVerdictsFixture):
         self.assertTrue(row["lanes"]["claude"]["sealed_sha256"])
         self.assertTrue(row["lanes"]["codex"]["sealed_sha256"])
         self.assertEqual(row["checked_at"], "2026-09-22")
-        self.assertIn("tests/test_record_verdicts.py", row["overturn_when"])
+        self.assertIn("tests/test_record_verdicts.py", row["verdict_overturn_when"])
+        self.assertNotIn("tests/test_record_verdicts.py", row["overturn_when"])
 
         # v1 fields byte-identical (the row validator's "never modifies v1
         # fields" contract, checked directly here rather than only implied
@@ -753,3 +755,44 @@ class ValidateLaneReturnRuleTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CitationNormalizationTests(RecordVerdictsFixture):
+    """Lane citations carry line anchors and commentary; the ledger row keeps the bare
+    canonical repository path and the sealed lane return keeps the full citation."""
+
+    def test_citation_path_strips_anchors_and_commentary(self):
+        cases = {
+            "docs/a.md:107-130": "docs/a.md",
+            "catalogs/b.json#L564-L603 (decision id x)": "catalogs/b.json",
+            "adoption/receipt.json lines 10-11, 14": "adoption/receipt.json",
+            "evidence/c.json:1-21,84-105": "evidence/c.json",
+            "blueprints/d/README.md": "blueprints/d/README.md",
+            "https://github.com/acme/x (release notes)": "https://github.com/acme/x",
+        }
+        for citation, expected in cases.items():
+            self.assertEqual(record_verdicts.citation_path(citation), expected, citation)
+
+    def test_recorded_row_keeps_canonical_paths_and_counts_unresolved_citations(self):
+        catalog, layer_id = "foundation", "citation-layer"
+        c1, c2, digest = self.build_packet_pair(catalog, layer_id)
+        alt = make_alternative(c2)
+        alt["evidence_refs"] = ["receipt.json (why not default)"]
+        self.write("manifests/evidence.json", {"files": []})
+        citations = ["receipt.json:10-12", "receipt.json#L3 (anchored note)", "receipt.json lines 1-2",
+                     "packets/foundation__citation-layer.json#candidates[c1]", "manifests/evidence.json#/files"]
+        write_lane(self.work_dir, "claude", catalog, layer_id,
+                   make_lane_return("claude", catalog, layer_id, digest, ["c1"], [alt],
+                                    winner_evidence_refs=citations))
+
+        self.assertEqual(self.run_main(write=True), 0)
+        row = self.load_row(catalog, layer_id)
+        self.assertEqual(row["verdict_status"], "recorded")
+        self.assertEqual(row["winners"][0]["evidence_refs"], ["receipt.json"])
+        self.assertEqual(row["alternatives"][0]["evidence_refs"], ["receipt.json"])
+        self.assertIn("2 lane citation(s) name no repository evidence file (an unresolved path or a generated "
+                      "index); the full citations are kept in the sealed lane return", row["open_gaps"])
+        sealed = json.loads((self.root / "evidence/artifacts/layer-verdicts-20260922/claude"
+                             / f"{catalog}-{layer_id}-20260922.json").read_text(encoding="utf-8"))
+        self.assertEqual(sealed["winner_evidence_refs"], citations)
+        build_landscape(self.root)

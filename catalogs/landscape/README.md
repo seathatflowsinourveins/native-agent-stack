@@ -73,9 +73,13 @@ unchanged):
 - `verdict_status` -- one of `pending_lanes` (no lane has run; `winners` and
   `alternatives` may be empty), `recorded` (a lane selected a winner: needs
   at least one winner and one alternative, a `why_selected` distinct from
-  every alternative's `why_not_default`, and an `overturn_when` naming a
-  fixture/blueprint/test path or a runnable command) or `no_selection` (no
+  every alternative's `why_not_default`, and a `verdict_overturn_when` naming
+  a fixture/blueprint/test path or a runnable command) or `no_selection` (no
   qualified candidate yet: needs a nonempty `open_gaps`).
+- `verdict_overturn_when` -- the recorded verdict's own overturn condition
+  (text; empty or absent unless recorded). The v1 `overturn_when` stays the
+  dated review's condition, which the quality comparison mirrors, and is never
+  rewritten by a lane.
 - `winners[]` -- `{component_id, repository (https URL or null), pin,
   evidence_class, why_selected, evidence_refs[], recipe_ref, platform_status}`.
   `pin` must equal the [sota manifest](../sota-convergence/manifest-20260922.json)

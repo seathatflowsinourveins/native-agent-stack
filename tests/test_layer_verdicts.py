@@ -199,7 +199,7 @@ class BuildVerdictsTests(LayerVerdictFixture):
             "disposition": "conditional", "why_not_default": "Not selected on the retained evidence",
             "evidence_class": "source_review", "source": "lane:codex",
         }]
-        row["overturn_when"] = "See tests/test_layer_verdicts.py for the fixture that would overturn this."
+        row["verdict_overturn_when"] = "See tests/test_layer_verdicts.py for the fixture that would overturn this."
         row["open_gaps"] = ["codex lane absent for this layer"]
         row["lanes"] = {"claude": {"run_id": "foundation-native-clients-20260922", "sealed_sha256": "a" * 64},
                         "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "codex_absent"}
@@ -218,7 +218,7 @@ class BuildVerdictsTests(LayerVerdictFixture):
         self.assertIn("- **Market data** (market-data-reference): pending — no lane has run", text)
         # --check recomputes and covers the narrative, not just the table.
         self.assertEqual(build_verdicts.main(["--check", "--root", str(self.root)]), 0)
-        foundation["layers"][0]["overturn_when"] = "A different, untracked overturn text"
+        foundation["layers"][0]["verdict_overturn_when"] = "A different, untracked overturn text"
         self.write("catalogs/landscape/foundation.json", foundation)
         self.assertEqual(build_verdicts.main(["--check", "--root", str(self.root)]), 1)
 
