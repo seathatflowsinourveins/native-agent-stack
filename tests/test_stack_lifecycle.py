@@ -20,7 +20,11 @@ class StackLifecycleTests(unittest.TestCase):
 
     def test_every_selected_component_has_current_identity_and_receipts(self):
         self.assertEqual(len(self.rows), len(self.audit["components"]))
-        self.assertEqual(set(self.rows), {c["id"] for c in self.stack["components"]})
+        stack_ids = {c["id"] for c in self.stack["components"]}
+        audited_ids = set(self.rows)
+        # Every stack component must have a matching lifecycle-audit row. No
+        # unexpected/undocumented drift between the two files is tolerated.
+        self.assertEqual(audited_ids, stack_ids)
         for component in self.stack["components"]:
             with self.subTest(component=component["id"]):
                 row = self.rows[component["id"]]
@@ -71,6 +75,30 @@ class StackLifecycleTests(unittest.TestCase):
         self.assertEqual(self.rows["codex-for-claude"]["lifecycle_stages"]["use"]["status"], "partial_acceptance")
         self.assertEqual(self.rows["postgresql"]["lifecycle_stages"]["recovery"]["status"], "not_established")
         self.assertIn("macOS", self.rows["apple-container"]["installation_assessment"])
+
+    def test_exchange_calendars_component_has_a_real_dedicated_evidence_target(self):
+        """exchange-calendars is selected in manifests/stack.json (pr4-stack unit).
+
+        It now has a full lifecycle-audit row like every other component (see
+        test_every_selected_component_has_current_identity_and_receipts). This
+        test additionally pins down that its cited receipt genuinely and
+        exclusively covers it: the receipt's own component_ids names only
+        exchange-calendars, not a retro-labeled unrelated receipt.
+        """
+        components = {c["id"]: c for c in self.stack["components"]}
+        self.assertIn("exchange-calendars", components)
+        component = components["exchange-calendars"]
+        self.assertEqual(component["repository"], "https://github.com/gerrymanoim/exchange_calendars")
+        self.assertEqual(component["version"], "4.13.2")
+        self.assertEqual(component["profile"], "supporting")
+        self.assertTrue(component["evidence_ids"])
+        for receipt_id in component["evidence_ids"]:
+            self.assertIn(receipt_id, self.receipts, f"{receipt_id} must be a real receipt id in manifests/evidence.json")
+            receipt = self.receipts[receipt_id]
+            self.assertTrue(receipt.get("path"))
+            self.assertEqual(receipt.get("component_ids"), ["exchange-calendars"])
+        supporting_profile = next(p for p in self.stack["profiles"] if p["id"] == "supporting")
+        self.assertIn("exchange-calendars", supporting_profile["component_ids"])
 
 
 if __name__ == "__main__":

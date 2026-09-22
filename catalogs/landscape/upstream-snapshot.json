@@ -23,12 +23,12 @@
     "change_rule": "Retain accepted selections until a named capability gap and representative comparison justify an adjustment. Metadata recency alone is insufficient."
   },
   "summary": {
-    "selected_components": 68,
-    "unique_github_repositories": 68,
-    "repository_metadata_successes": 68,
+    "selected_components": 69,
+    "unique_github_repositories": 69,
+    "repository_metadata_successes": 69,
     "archived_repositories": 0,
     "disabled_repositories": 0,
-    "latest_stable_release_successes": 63,
+    "latest_stable_release_successes": 64,
     "unavailable_latest_stable_endpoints": [
       "shanraisshan/claude-code-best-practice",
       "skills-ref",
@@ -36,7 +36,7 @@
       "poppler",
       "tavily-cli"
     ],
-    "api_commands": 262,
+    "api_commands": 266,
     "api_nonzero_results": 8,
     "corrected_invalid_archive_digest_ref_attempts": 2,
     "newer_stable_release_review_queue": [
@@ -54,7 +54,7 @@
       }
     ],
     "recommendation": "Retain current qualified pins; review the five newer stable releases against actual capability gaps before upgrading. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
-    "selected_component_api_commands": 245,
+    "selected_component_api_commands": 249,
     "initial_star_delta_commands": 1,
     "complete_star_snapshot_commands": 7,
     "added_candidate_source_screen_commands": 9,
@@ -3463,6 +3463,79 @@
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/dgunning/edgartools",
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_matches_latest_release_commit": true
+    },
+    {
+      "component_id": "exchange-calendars",
+      "repository": "https://github.com/gerrymanoim/exchange_calendars",
+      "selected_repository_url": "https://github.com/gerrymanoim/exchange_calendars",
+      "selected_version": "4.13.2",
+      "selected_source_pin": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+      "checks": [
+        {
+          "endpoint": "repos/gerrymanoim/exchange_calendars",
+          "exit_code": 0,
+          "started_at": "2026-09-22T08:06:19.094449+00:00",
+          "ended_at": "2026-09-22T08:06:19.582084+00:00",
+          "stdout_sha256": "82650b812d779ff8705d83637d0a739f16afe082eaa376457efc706e8805012e",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/gerrymanoim/exchange_calendars/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-09-22T08:06:19.582143+00:00",
+          "ended_at": "2026-09-22T08:06:19.935647+00:00",
+          "stdout_sha256": "4554a0ce4a80a6252ba0c18acd975da10c8e0522c3e5dd604903aa0bbe37b8c2",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/gerrymanoim/exchange_calendars/commits/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+          "exit_code": 0,
+          "started_at": "2026-09-22T08:06:19.935693+00:00",
+          "ended_at": "2026-09-22T08:06:20.406194+00:00",
+          "stdout_sha256": "a1cb2db841841e64ac43cff8b7f520abe1547af8d17dfe850b3d552003bff42f",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/gerrymanoim/exchange_calendars/commits/4.13.2",
+          "exit_code": 0,
+          "started_at": "2026-09-22T08:06:46.825926+00:00",
+          "ended_at": "2026-09-22T08:06:47.266113+00:00",
+          "stdout_sha256": "a1cb2db841841e64ac43cff8b7f520abe1547af8d17dfe850b3d552003bff42f",
+          "status": "ok"
+        }
+      ],
+      "canonical_repository": "https://github.com/gerrymanoim/exchange_calendars",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "master",
+      "license_spdx": "Apache-2.0",
+      "pushed_at": "2026-09-15T09:27:58Z",
+      "latest_stable_release": {
+        "tag_name": "4.13.2",
+        "published_at": "2026-03-10T03:24:04Z",
+        "html_url": "https://github.com/gerrymanoim/exchange_calendars/releases/tag/4.13.2",
+        "target_commitish": "refs/heads/master",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+        "sha": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+        "html_url": "https://github.com/gerrymanoim/exchange_calendars/commit/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+        "committed_at": "2026-03-09T11:55:12Z"
+      },
+      "latest_release_source": {
+        "ref": "4.13.2",
+        "sha": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+        "html_url": "https://github.com/gerrymanoim/exchange_calendars/commit/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+        "committed_at": "2026-03-09T11:55:12Z"
+      },
+      "status": "metadata_checked",
+      "adoption_recommendation": "retain_selected_pending_capability_comparison",
+      "source_pin_kind": "git_commit",
+      "primary_repository": "https://github.com/gerrymanoim/exchange_calendars",
       "release_relationship": "selected_version_matches_latest_stable",
       "selected_pin_matches_latest_release_commit": true
     },

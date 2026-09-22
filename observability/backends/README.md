@@ -195,3 +195,58 @@ the selected range; empty unreported-usage results remain â€œNo matching data.â€
 Two native root-filesystem rules bring the rule count to 8. Their configuration
 and live inputs were checked without inducing disk exhaustion. The original
 six backend restart checks retain their earlier scope.
+
+## Adaptive-paper broker-path alerts
+
+`ecosystem-prometheus.yml.example` adds scrape job `adaptive-paper` at
+`127.0.0.1:18890`, the loopback address of the separate, read-only
+[`blueprints/us-equities/adaptive-paper/metrics.py`](../../blueprints/us-equities/adaptive-paper/metrics.py#L1)
+exporter for that lane's durable ledger. That exporter is a distinct process
+from this profile; it is not installed or started by `install.py`/`configure.py`
+and must be run explicitly alongside a paper trial.
+
+`ecosystem-prometheus-rules.yml.example` adds an `equities-broker-path` group
+(bringing the rendered total from 8 to 14 rules): `EquitiesOrderStateDivergence`,
+`EquitiesReconciliationFailed`, `EquitiesRequestBudgetExhausted`,
+`EquitiesLedgerFrozen`, `EquitiesPaperMetricsMissing`, and
+`EquitiesLedgerUnreadable`, each labelled `scope: equities-broker`.
+`ecosystem-alertmanager.yml.example` adds an explicit `routes:` entry matching
+`scope: equities-broker` to the same `local-ntfy` receiver the default route
+already used, so equities-broker alerts are independently identifiable rather
+than depending on the unmatched default.
+
+A fix round closed three interaction gaps found in review of the first pass:
+the pre-existing `EcosystemServiceUnavailable` rule (`up{job!="acceptance-fixture"} == 0`)
+now also excludes `job="adaptive-paper"`, since that exporter is a separate
+process not started by `install.py`/`configure.py` and would otherwise leave
+that generic alert firing permanently whenever no paper trial is running.
+`metrics.py` now always exports `paper_ledger_readable` (1/0, independent of
+ledger content) so a wrong `--ledger` path, a permissions problem, or a failed
+read-only sqlite open -- which previously left `paper_order_state_divergence_total`,
+`paper_ledger_frozen`, and the `paper_request_budget_*` series silently absent
+with nothing to alert on -- is guarded by the new `EquitiesLedgerUnreadable`
+alert; `EquitiesPaperMetricsMissing`'s description no longer claims to cover
+that case, since `paper_trial_active` stays exported even when the ledger is
+unreadable. `EquitiesReconciliationFailed` now also fires on
+`paper_reconciliation_status{result="needs_attention"} == 1`, because
+`runner.py` can end a trial at `phase=finished`/`status=needs_attention` (a
+failed run that was then recovered flat), which the original
+`paper_needs_attention`-only clause missed. A hard-killed runner whose
+`trial.json` stays stuck at `phase=starting` remains an unguarded gap: the
+only clause that would catch it needs
+`paper_reconciliation_last_success_timestamp_seconds`, which is not currently
+exportable (see the schema-gap note below).
+
+[`broker-path-rules-receipt.json`](broker-path-rules-receipt.json) records the
+`promtool check rules`/`promtool check config`/`amtool check-config` runs
+against these templates rendered into a temporary directory by this profile's
+own `configure.py`, plus the fixture-ledger scenarios `tests/test_adaptive_paper_metrics.py`
+exercises. `evidence_class: synthetic` there: only a fixture ledger built from
+`safety.Ledger`'s own serialisation was used, never a live broker connection
+or credentials. `paper_reconciliation_last_success_timestamp_seconds` and
+`paper_request_budget_wait_exceeded_total` are not exported by `metrics.py` --
+see its module docstring for the exact schema gap -- so the corresponding
+`or` clauses in `EquitiesReconciliationFailed` and
+`EquitiesRequestBudgetExhausted` are syntactically valid but currently
+dormant; each alert still fires from its other clause
+(`paper_needs_attention` / `paper_request_budget_remaining`).

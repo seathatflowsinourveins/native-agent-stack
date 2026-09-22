@@ -1218,7 +1218,8 @@
       "repository": "https://github.com/nautechsystems/nautilus_trader",
       "disposition": "catalog_reviewed",
       "catalog_entry_ids": [
-        "nautilustrader"
+        "nautilustrader",
+        "nautilus-ibkr-adapter"
       ],
       "prior_candidate_decision": false
     },
@@ -2776,6 +2777,12 @@
       "repository": "https://github.com/vllm-project/vllm",
       "catalog_entry_ids": [
         "vllm"
+      ]
+    },
+    {
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "catalog_entry_ids": [
+        "adaptive-paper-alpaca-adapter"
       ]
     }
   ],

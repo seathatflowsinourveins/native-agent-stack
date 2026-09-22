@@ -1447,28 +1447,31 @@
       ],
       "role": "Scan a recorded SBOM against vulnerability data",
       "decision": "conditional",
-      "rationale": "Source-reviewed scanner candidate for a demonstrated vulnerability-analysis need. Qualify it against the recorded Syft artifact with database age and advisory context before adoption; no Grype execution is established here.",
+      "rationale": "Native-proven scanner: run against the recorded Syft artifacts for the pinned NautilusTrader 2.0.0rc5 runtime and the Alpaca adapter, with a recorded database age and zero matches (see evidence_refs receipt). Zero matches are evidence against currently known database matches for these exact installed versions, not proof of runtime safety, supply-chain authenticity or unpublished vulnerabilities; qualify any future re-scan the same way before relying on it.",
       "version_or_commit": "v0.119.0",
       "release_date": "2026-09-17T16:45:23Z",
       "license": "Apache-2.0",
       "us_equities_fit": "Identify affected runtime dependencies before deploying unattended research services.",
       "alpaca_fit": "Triage actual adapter dependency exposure without using broker credentials.",
-      "evidence_level": "source_review",
+      "evidence_level": "native_proven",
       "evidence_refs": [
-        "https://github.com/anchore/grype/blob/v0.119.0/README.md"
+        "https://github.com/anchore/grype/blob/v0.119.0/README.md",
+        "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json"
       ],
       "native_workflow": [
-        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
-        "gh release view v0.119.0 --repo anchore/grype --json assets",
-        "grype sbom:sbom.syft.json --fail-on high"
+        "# Executed for the scan-nautilus-rc5-20260922 receipt (evidence_refs); commands below match those actually run.",
+        "grype db update",
+        "grype db status -o json",
+        "grype sbom:runtime.syft.json -o json > runtime.grype.json",
+        "grype sbom:adapter.syft.json -o json > adapter.grype.json"
       ],
       "requirements": [
         "Verified CLI and vulnerability database with recorded update time",
         "Reviewed severity policy, false-positive/VEX handling and remediation owner"
       ],
       "limitations": [
-        "Database download/network access may occur; not executed here.",
-        "Known-CVE matches do not prove exploitability, and0matches do not prove safety."
+        "Scan covers installed Python package metadata only (site-packages plus the adapter's requirements.txt pins); it does not cover bundled native/C extension code, host OS packages, unpinned transitive shared libraries, or code outside the scanned distributions.",
+        "Zero matches against the 2026-09-22 database do not prove exploitability elsewhere, unpublished-vulnerability absence, or runtime safety; re-scan and re-record before relying on this for a later database or dependency set."
       ],
       "sources": [
         "https://github.com/anchore/grype",
@@ -1588,7 +1591,8 @@
       "limitations": [
         "Server config is not supplied and no service starts in this task.",
         "Development mode is unsuitable for persistent secrets; no dev-mode recipe offered.",
-        "Secret management does not reduce a token’s authority by itself."
+        "Secret management does not reduce a token’s authority by itself.",
+        "IBKR is this catalog's selected live-primary broker path; runtime-target.json broker_boundaries records only selected_path and local_broker_acceptance: not_established, not a 'live-primary' designation. Its credential handling here remains selected live-primary, unaccepted."
       ],
       "sources": [
         "https://github.com/openbao/openbao",

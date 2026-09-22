@@ -1,13 +1,31 @@
 # US-equity engines, strategies and research evaluation
 
-Checked **2026-09-19** for an Alpaca-paper, research-first system. The [structured catalog](engines-strategies.json) records **38 repositories**: 4 defaults, 10 conditional additions, 14 alternatives, 8 watch items and 2 exclusions. These are decisions for this project, not a universal ranking or a claim that a strategy is profitable.
+Checked **2026-09-19** for an Alpaca-paper, research-first system. The [structured catalog](engines-strategies.json) records **40 repositories**: 7 defaults, 10 conditional additions, 13 alternatives, 8 watch items and 2 exclusions. These are decisions for this project, not a universal ranking or a claim that a strategy is profitable.
 
-**Current selection, reconciled September 21:** the [runtime target](runtime-target.json)
-selects NautilusTrader **2.0.0rc5** with native IBKR and a separate Alpaca path;
-LEAN is the retained historical comparator. The installed skfolio **1.2.9**
-acceptance covers its chronological splitter/control study. The earlier engine
-defaults and 1.231.0 source review below are historical, superseded for installation
-by the [dated R&D readiness decision](../../docs/foundation-rd-readiness.md).
+**Current selection, reconciled September 22:** the [runtime target](runtime-target.json)
+selects NautilusTrader **2.0.0rc5** (tag `v2.0.0rc5`; source pin
+`1b0a49d2792a9432a3aca3fcb617ce7a630d905e` from
+[`evidence/receipts/native-nautilus-v2-20260920.json`](../../evidence/receipts/native-nautilus-v2-20260920.json))
+as the **selected destination runtime**, with native IBKR and a separate Alpaca
+path; LEAN is retained as the **frozen historical comparator (oracle), not the
+runtime**. Two broker-adapter cards were added at this reconciliation:
+`nautilus-ibkr-adapter` (same engine pin, `local_broker_acceptance` `not_established`)
+and `adaptive-paper-alpaca-adapter` (custom deterministic adapter in
+`blueprints/us-equities/adaptive-paper`, source-reviewed with the synthetic
+capacity fixture cited, no live broker fills claimed). The installed skfolio
+**1.2.9** acceptance covers its chronological splitter/control study. The earlier
+1.231.0 source review is historical, superseded for installation by the
+[dated R&D readiness decision](../../docs/foundation-rd-readiness.md). NautilusTrader
+remains prerelease: 2.0.0 final has not shipped, and the SPY/LEAN parity gate
+**G-a** (`retained-equity-replay`) is recorded as
+`reported_execution_blocked_review_incomplete` in
+[`runtime-target.json`](runtime-target.json) `next_acceptance`: the retained
+[comparison summary](../../evidence/artifacts/comparison-progress-20260922/summary.json)
+records a completed **BLOCKED** replay of the historical one_zero case with four
+failed checks on the unsupported `distributions_and_cash` and
+`market_on_open_proxy` mappings; a completed blocked comparison is not parity
+acceptance and the per-check total is not retained here. The dividend
+`SimulationModule` needed to close it is owned by the separate parity worktree.
 The current target also records bounded AAPL replay and Alpaca paper evidence;
 neither establishes SPY parity, a strategy edge or complete broker recovery.
 
@@ -34,10 +52,12 @@ current runtime target above for the selected engine.
 
 | Catalog ID | Selected version or source | Decision | Reason and boundary |
 | --- | --- | --- | --- |
-| `lean` | `985ef30` | Default | Existing native event-driven backtest proof; security and paper integration still open. |
+| `lean` | `985ef30` | Default | Frozen historical comparator (oracle), not the runtime; SPY/LEAN parity gate G-a is planned/blocked. |
 | `lean-alpaca` | `1973f61` | Default | Official broker adapter; source/build recipe, no accepted paper session. |
 | `alpaca-py` | 0.44.0 | Default | Official SDK for read-only broker-state observation and market-data interfaces. |
-| `nautilustrader` | 1.231.0 historical review | Alternative at that date; superseded | Current selected destination is 2.0.0rc5 in the runtime target; this older source review has no Alpaca adapter in its inspected tree. |
+| `nautilustrader` | `2.0.0rc5` (tag `v2.0.0rc5`; source `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`) | Default | Selected destination runtime (runtime-target.json). Prerelease; SPY/LEAN parity gate G-a completed BLOCKED (four failed checks on the two unsupported mappings; not parity acceptance; per-check total not retained here). Historical `1.231.0` source review below is superseded. |
+| `nautilus-ibkr-adapter` | same pin as `nautilustrader` | Default | Native IBKR socket adapter; `local_broker_acceptance` `not_established` (runtime-target.json). |
+| `adaptive-paper-alpaca-adapter` | `7e7eefe28315f3de3aa4dc75cc8b6524f70829cb` (`blueprints/us-equities/adaptive-paper`) | Default | Custom deterministic Alpaca adapter for the adaptive-paper lane; source_review with the synthetic capacity fixture cited (180 fills / 90 round trips in 60.4282s, zero broker connections); no live broker fills claimed. |
 | `lumibot` | 4.5.91 | Alternative | Direct Python strategy lifecycle and Alpaca broker; unresolved GPL/MIT license metadata conflict. |
 | `vectorbt` | 1.1.0 | Alternative | Array-based research sweeps; recheck selected hypotheses in the event engine. |
 | `backtrader` | 1.9.78.123 | Alternative | Useful for existing research; package and broker integration age require care. |
@@ -47,7 +67,7 @@ current runtime target above for the selected engine.
 | `ib-async` | 2.1.0 | Alternative | Community IBKR client only if the broker choice later changes. |
 | `alpaca-backtrader-legacy` | 0.15.0 | Excluded | Old SDK/data assumptions; README's default is live, not paper. |
 
-Nautilus's selected stable source includes Interactive Brokers and Databento adapters, but no Alpaca adapter. Its v2 Rust/PyO3 development documentation must not be mixed into a 1.231.0 implementation. The catalog's AAPL example requires separately supplied Databento files; it is not an account-free data promise. [Stable adapter tree](https://github.com/nautechsystems/nautilus_trader/tree/v1.231.0/nautilus_trader/adapters), [example](https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/examples/backtest/databento_ema_cross_long_only_aapl_bars.py).
+The paragraph below is the historical `1.231.0` source review, retained for context; the current selected destination and its IBKR/Alpaca broker cards are the `2.0.0rc5` rows above. Nautilus's stable `1.231.0` source included Interactive Brokers and Databento adapters, but no Alpaca adapter. Its v2 Rust/PyO3 development documentation must not be mixed into a 1.231.0 implementation. The catalog's AAPL example requires separately supplied Databento files; it is not an account-free data promise. [Stable adapter tree](https://github.com/nautechsystems/nautilus_trader/tree/v1.231.0/nautilus_trader/adapters), [example](https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/examples/backtest/databento_ema_cross_long_only_aapl_bars.py).
 
 Lumibot is the most direct reviewed Python-first alternative for reusing a strategy class between historical simulation and Alpaca paper trading. However, its release [LICENSE](https://github.com/Lumiwealth/lumibot/blob/v4.5.91/LICENSE) and [setup metadata](https://github.com/Lumiwealth/lumibot/blob/v4.5.91/setup.py) disagree. Resolve that before adoption. Some current agent examples also invoke model services and enable trading; the catalog deliberately supplies only a deterministic backtest example.
 

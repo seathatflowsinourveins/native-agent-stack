@@ -6,14 +6,22 @@
    "repository": "https://github.com/nautechsystems/nautilus_trader",
    "pin": "2.0.0rc5 (prerelease tag v2.0.0rc5, source 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
    "source": "catalogs/us-equities/runtime-target.json#/engine and docs/foundation-rd-readiness.md",
-   "note": "The engines-strategies card still records lean=default and nautilustrader=alternative at 1.231.0; the runtime target, the adaptive-paper practice and the equity replay run on 2.0.0rc5. GitHub's latest non-prerelease is still v1.231.0; 2.0.0 final has not shipped. LEAN remains the frozen historical comparator (SPY/LEAN parity still planned_not_executed)."
+   "note": "The engines-strategies card still records lean=default and nautilustrader=alternative at 1.231.0; the runtime target, the adaptive-paper practice and the equity replay run on 2.0.0rc5. GitHub's latest non-prerelease is still v1.231.0; 2.0.0 final has not shipped. LEAN remains the frozen historical comparator (the SPY/LEAN parity replay completed BLOCKED with four failed checks on the two unsupported mappings; not parity acceptance)."
   },
   {
    "layer": "execution-broker",
    "kind": "selected_paths",
    "paths": [
-    {"broker": "ibkr", "path": "NautilusTrader native IBKR adapter (crates/adapters/interactive_brokers)", "acceptance": "not_established"},
-    {"broker": "alpaca", "path": "custom deterministic Python adapter in blueprints/us-equities/adaptive-paper on alpaca-py 0.44.0", "acceptance": "bounded paper smoke and adaptive practice receipts; continuous operation and native fault cases unqualified"}
+    {
+     "broker": "ibkr",
+     "path": "NautilusTrader native IBKR adapter (crates/adapters/interactive_brokers)",
+     "acceptance": "not_established"
+    },
+    {
+     "broker": "alpaca",
+     "path": "custom deterministic Python adapter in blueprints/us-equities/adaptive-paper on alpaca-py 0.44.0",
+     "acceptance": "bounded paper smoke and adaptive practice receipts; continuous operation and native fault cases unqualified"
+    }
    ],
    "source": "catalogs/us-equities/runtime-target.json#/broker_boundaries",
    "note": "trading-by-layer has no IBKR entry at default/conditional (ib-async is alternative); lean-alpaca is the LEAN-era default and is retained as reference only."
@@ -25,6 +33,78 @@
    "pin": "ripgrep 14.1.0 (/usr/bin/rg, Ubuntu package)",
    "source": "agent-lab AGENTS.md mandates rg; docs/foundation-closure-20260921.md names it first",
    "note": "Not a manifests/stack.json component; recorded here so the provenance gap the critic found is visible."
+  },
+  {
+   "layer": "backtesting-engine",
+   "kind": "card_reconciled",
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "pin": "2.0.0rc5 (tag v2.0.0rc5, source 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+   "source": "catalogs/us-equities/engines-strategies.json#/entries (id nautilustrader)",
+   "note": "Closes the gap the first entry recorded: engines-strategies.json now sets nautilustrader=default at 2.0.0rc5 with role 'selected destination runtime (runtime-target.json)'. lean stays default with role reframed to 'frozen historical comparator (oracle), not the runtime'. SPY/LEAN parity gate G-a (retained-equity-replay) is recorded as reported_execution_blocked_review_incomplete in runtime-target.json next_acceptance: the retained comparison summary records a completed BLOCKED replay with four failed checks on the unsupported distributions_and_cash and market_on_open_proxy mappings; not parity acceptance, and the per-check total is not retained in this repository. The dividend SimulationModule needed to close it is owned by the separate parity worktree, not this card."
+  },
+  {
+   "layer": "execution-broker",
+   "kind": "card_added",
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "pin": "2.0.0rc5 (tag v2.0.0rc5, source 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+   "source": "catalogs/us-equities/engines-strategies.json#/entries (id nautilus-ibkr-adapter)",
+   "note": "New card for the native IBKR socket adapter at the same selected engine pin, evidence_level source_review, local_broker_acceptance not_established (runtime-target.json). IBKR is selected live-primary, unaccepted."
+  },
+  {
+   "layer": "execution-broker",
+   "kind": "card_added",
+   "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+   "pin": "7e7eefe28315f3de3aa4dc75cc8b6524f70829cb (blueprints/us-equities/adaptive-paper)",
+   "source": "catalogs/us-equities/engines-strategies.json#/entries (id adaptive-paper-alpaca-adapter); blueprints/us-equities/adaptive-paper/receipt.json",
+   "note": "New card for the custom deterministic Alpaca adapter used by the adaptive-paper lane, evidence_level source_review, citing the synthetic capacity fixture in-repo (180 fills / 90 round trips in 60.4282s at 178.7246 submissions/minute, zero broker connections; receipt.json native_capacity block). No live broker fills claimed."
+  },
+  {
+   "layer": "market-data-reference",
+   "kind": "stack_component_added",
+   "repository": "https://github.com/gerrymanoim/exchange_calendars",
+   "pin": "4.13.2",
+   "source": "manifests/stack.json",
+   "note": "pending: produced by a sibling unit in the same wave. exchange_calendars 4.13.2 was not present in manifests/stack.json at recording time (checked 2026-09-22); this entry only reserves the reconciliation row."
+  },
+  {
+   "layer": "security-supply-chain",
+   "kind": "scan_recorded",
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "pin": "2.0.0rc5",
+   "source": "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+   "note": "pending: produced by a sibling unit in the same wave. The 2026-09-22 grype/syft scan of the rc5 dependency tree and the local Alpaca adapter had not landed at recording time; see the grype card's limitations in catalogs/us-equities/agents-operations.json."
+  },
+  {
+   "layer": "observability-hosting",
+   "kind": "alert_rules_added",
+   "repository": "not_applicable",
+   "pin": "not_yet_pinned",
+   "source": "observability/backends/broker-path-rules-receipt.json",
+   "note": "pending: produced by a sibling unit in the same wave. The broker-path alert-rules receipt was not present at recording time."
+  },
+  {
+   "layer": "security-supply-chain",
+   "kind": "decision_recorded",
+   "repository": "not_applicable",
+   "pin": "not_yet_pinned",
+   "source": "agent-lab docs/decisions/2026-09-22-broker-credential-handling.md",
+   "note": "Broker credential handling decision, cross-repository pointer into agent-lab. That path did not exist in the agent-lab checkout at recording time (checked 2026-09-22; only 0001-agent-coordination.md and 2026-09-22-leverage-schedule-and-entitlement.md were present under agent-lab docs/decisions/). This entry records the intended source only, not confirmed content."
+  },
+  {
+   "layer": "data-quality-orchestration",
+   "kind": "gate_wired",
+   "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+   "pin": "not_yet_pinned",
+   "source": "blueprints/us-equities/data/promotion_gate.py",
+   "note": "pending: produced by a sibling unit in the same wave. promotion_gate.py was not present under blueprints/us-equities/data/ at recording time."
+  },
+  {
+   "layer": "execution-broker",
+   "kind": "gate_ladder_recorded",
+   "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+   "pin": "not_yet_pinned",
+   "source": "catalogs/us-equities/gates-20260922.json",
+   "note": "pending: produced by the coordinator in the same wave. catalogs/us-equities/gates-20260922.json was not present at recording time."
   }
  ]
 }

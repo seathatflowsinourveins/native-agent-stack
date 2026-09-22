@@ -154,3 +154,5 @@ A rerun of the practice tooling with GitHub-slug normalization (after the Codex 
 2026-09-22) resolves release/tree-style stack URLs that the first build missed and counts
 17 component pins behind upstream (repomix and markitdown join the 15 above). The published
 manifest is a dated record and is not regenerated; the tooling is the source for the next run.
+
+Gate ladder (2026-09-22): the trading gates named by the critic are tracked in `catalogs/us-equities/gates-20260922.json` and checked by `scripts/trading_gates.py --check`; the reconciliations recorded there and in `tools/sota-convergence/reconciliations-20260922.json` supersede the engine-card note above.
