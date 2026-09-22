@@ -12086,6 +12086,26 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-agents-models-workers-20260922.json",
       "sha256": "cc48e0009abf6a5bee0ec3511e176b091ed1e23ac11ac2fe74c63c2eea919a09",
       "bytes": 26372
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/document-retrieval/cite-executed-retrieval.json",
+      "sha256": "4fa0c046d13944c53d191f2c7cdefc2720a6e59ee00f3507b5159b42857556f0",
+      "bytes": 11102
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/document-retrieval/qmd-repeated-bench-isolated.json",
+      "sha256": "5393a2fd790657ee56b01a74ad5d17343a44cde76dad29e377e639b19fecb610",
+      "bytes": 8715
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/durable-memory/deletion-erasure-probe.json",
+      "sha256": "8326ebb7dc4e6c3a7028d16ea7a10f122b82f126f8809d31605b79eb15cca294",
+      "bytes": 13256
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/agents-models-workers/ai-memory-local-scope-reread.json",
+      "sha256": "b0307934e84f69d62dcefa7aeebd7e9cb765372389260b905609af05dd17e37f",
+      "bytes": 10894
     }
   ],
   "convergence_records": [

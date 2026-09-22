@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "id": "deletion-erasure-probe",
+  "date": "2026-09-22",
+  "layer_ids": ["durable-memory"],
+  "gap_refs": [
+    {"layer_id": "durable-memory", "gap_index": 6}
+  ],
+  "purpose": "With the installed ai-memory 2.3.2 binary and a disposable data dir/port (never the live store at 127.0.0.1:49374), write a synthetic page, delete it, then grep the data dir (wiki markdown tree, SQLite db + WAL, and any backups) for the page text to test whether ai-memory delete-page performs erasure or a search-index-only removal.",
+  "preregistered": "Expectation before running: durable-memory gap 6 states deletion evidence covers only current search results, not erasure from history/logs/backups. The CLI's own `compact --help` and `purge-project` output text ('this was a logical delete...bytes remain in the database file until it is rewritten') both hint delete is logical, not physical. Preregistered prediction: after delete-page, the unique marker token will (a) disappear from `ai-memory search` and from the wiki/ markdown tree on disk, but (b) still be recoverable via direct filesystem grep of the SQLite db file or its WAL journal, confirming deletion is index/API-level removal, not byte-level erasure. A result where the token is unrecoverable anywhere on disk after delete would refute this and mark erasure as complete.",
+  "commands": [
+    {
+      "cmd": "ai-memory init --data-dir <disposable-1>",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "ensured directory .../wiki, .../raw, .../db, .../models; wrote default config; init complete",
+      "output_sha256": "n/a (log-only, not persisted as a file artifact)"
+    },
+    {
+      "cmd": "ai-memory write-page --data-dir <disposable-1> --path scratch/erasure-probe.md --body '# Erasure probe ... unique marker token ...' --title 'Erasure probe' --workspace disposable-ws --project disposable-proj",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "wrote scratch/erasure-probe.md (page_id=01a0cb54) under disposable-ws/disposable-proj",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "INCIDENT: ai-memory status --data-dir <disposable-1> -> reported 'data-dir: $HOME/.local/share/ai-memory' (the LIVE store), not the disposable path. grep -rla <token> $HOME/.local/share/ai-memory found the page under wiki/.../scratch/erasure-probe.md and in db/memory.sqlite.",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "status: 'ai-memory 2.3.2 (server)  server: http://127.0.0.1:49374  data-dir: $HOME/.local/share/ai-memory' -- confirms the write landed in the live store, not the intended disposable one.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "REMEDIATION: ai-memory delete-page --path scratch/erasure-probe.md --workspace disposable-ws --project disposable-proj  (targets the live store, cleaning up the accidental write) ; ai-memory purge-project --workspace disposable-ws --project disposable-proj --confirm",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "deleted scratch/erasure-probe.md under disposable-ws/disposable-proj; Purged disposable-ws/disposable-proj: 0 pages, 0 sessions ... Note: this was a logical delete. The project is unreachable through the API and search, but its bytes remain in the database file until it is rewritten. Re-run with --compact to reclaim them (slow).",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "ROOT CAUSE FIX: sed -i 's/bind = \"127.0.0.1:49374\"/bind = \"127.0.0.1:49483\"/' <disposable-1>/config.toml ; ai-memory serve --data-dir <disposable-1> --transport http --bind 127.0.0.1:49483 --no-watcher &  ; export AI_MEMORY_SERVER_URL=http://127.0.0.1:49483",
+      "exit": 0,
+      "duration_s": 1.5,
+      "output_excerpt": "MCP HTTP server ready (POST /mcp, POST /hook, Ctrl-C to stop) local_addr=127.0.0.1:49483 auth=false; subsequent `ai-memory status --data-dir <disposable-1>` now reports data-dir: <disposable-1>, pages: 0, correctly isolated.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "ai-memory write-page --data-dir <disposable-1> --path scratch/erasure-probe-2.md --body '# Erasure probe 2 (isolated) ... unique marker: XYZZY2-isolated-erasure-probe-20260922-2830945-1790117815 ...' --title 'Erasure probe 2'",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "ai-memory: scope agent-lab/agent-lab (workspace + project from $HOME/code/agent-lab/.ai-memory.toml); wrote scratch/erasure-probe-2.md (page_id=01a0cb56) under agent-lab/agent-lab",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "grep -rl <token2> <disposable-1>  (pre-delete)",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "<disposable-1>/wiki/01a0cb56-.../scratch/erasure-probe-2.md",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "ai-memory delete-page --data-dir <disposable-1> --path scratch/erasure-probe-2.md",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "deleted scratch/erasure-probe-2.md under agent-lab/agent-lab",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "ai-memory search --data-dir <disposable-1> \"isolated erasure probe\"  (post-delete)",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "no results for \"isolated erasure probe\"",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "find <disposable-1>/wiki -type f | xargs grep -l <token2>  (post-delete)",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "(empty -- no wiki markdown file contains the token; the wiki file itself was removed from disk)",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "ai-memory compact --data-dir <disposable-1>  (probed without --confirm, to read the safety text)",
+      "exit": 1,
+      "duration_s": 0.1,
+      "output_excerpt": "Error: compact rewrites the whole database under an exclusive lock: every write blocks until it finishes, and it needs free disk space of roughly the database's own size. Check `ai-memory status` for the reclaimable figure first, then: ai-memory compact --confirm",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "kill -TERM <disposable serve pid>  (clean shutdown, to test whether a graceful close checkpoints the WAL) ; sleep 2 ; grep -la <token2> <disposable-1>/db/memory.sqlite",
+      "exit": 1,
+      "duration_s": 2.1,
+      "output_excerpt": "process exited; port 49483 freed; grep of the MAIN memory.sqlite file for the token returned nothing (not found there)",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "grep -rla <token2> <disposable-1>  (final, post clean-shutdown check across the whole data dir)",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "<disposable-1>/db/memory.sqlite-wal",
+      "output_sha256": "n/a"
+    }
+  ],
+  "tool_versions": {
+    "ai-memory": "2.3.2",
+    "binary_path": "$HOME/.local/share/codex-ecosystem/bin/ai-memory"
+  },
+  "installs": [],
+  "result": "Deletion is confirmed NOT to be byte-level erasure by default, on two independent pieces of evidence from this run. (1) Isolated instance (the intended test): a page containing a unique marker token was written, confirmed present via `search` and on disk under wiki/, then deleted with `delete-page`. Post-delete, `search` returns no results and the token no longer appears in any wiki/ markdown file (the file itself is removed from the filesystem). However, after a CLEAN server shutdown (SIGTERM, allowing normal connection close), the token is STILL recoverable by direct filesystem grep from db/memory.sqlite-wal (the SQLite write-ahead-log journal), though not yet from the main memory.sqlite file at that point. (2) Corroborating evidence from the incident below: the live store's own `purge-project` command states explicitly in its own output, unprompted, 'this was a logical delete. The project is unreachable through the API and search, but its bytes remain in the database file until it is rewritten. Re-run with --compact to reclaim them (slow)' -- and `compact --help`/its safety gate independently describes compact as a whole-database rewrite operation, never invoked here since it would touch the live store. IMPORTANT PROCESS FINDING (not the assigned test, but discovered while setting it up): passing --data-dir alone to a client command (write-page/read-page/search/status/delete-page) does NOT isolate it from an already-running ai-memory server. This CLI is client/server: `AI_MEMORY_SERVER_URL` (default http://127.0.0.1:49374, independent of --data-dir/--bind in the caller's own config file) is what actually routes client commands, and if a server is already listening there (as the project's live agent-lab server was, PID 365, data-dir $HOME/.local/share/ai-memory), every client command silently attaches to THAT live server and ignores --data-dir entirely -- confirmed directly: `ai-memory status --data-dir <disposable>` reported `data-dir: $HOME/.local/share/ai-memory` (the live path) until AI_MEMORY_SERVER_URL was explicitly pointed at a freshly started, differently-bound (127.0.0.1:49483) disposable server. This means --data-dir by itself is not a safe isolation mechanism on a host that already runs a live ai-memory server; true isolation requires starting an own `ai-memory serve --data-dir ... --bind <unused-port>` and exporting AI_MEMORY_SERVER_URL to match. This first attempt inadvertently wrote the synthetic page into the LIVE store under workspace/project 'disposable-ws/disposable-proj'; it was immediately remediated with delete-page + purge-project --confirm against the live store (both logical deletes; no compact/vacuum was run against the live store, so its own memory.sqlite likely still retains the deleted bytes until it is naturally rewritten or an operator runs compact -- this residue is disclosed here rather than hidden, and is not a secret, just a short synthetic marker string).",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "supports_incumbent",
+    "explanation": "This directly settles the narrow factual question durable-memory gap 6 asks (does deletion reach history/backups, or only current search results?): confirmed NOT erasure -- deleted content remains recoverable from the SQLite WAL even after a clean server shutdown, matching the tool's own documented behavior (compact/purge-project text). This does not by itself change the durable-memory verdict (ai-memory remains keep_but_compare on other grounds), but it converts gap 6 from 'unmeasured' to 'measured and confirmed as expected/documented soft-delete behavior' -- a documentation-alignment result, not a new defect, since the tool is honest about this in its own CLI text. Separately, the --data-dir/live-server-hijack finding is a genuine new risk item: any future disposable-instance check on this host that only sets --data-dir (without also setting a distinct bind + AI_MEMORY_SERVER_URL) will silently operate on the live store instead, which is a real footgun for the 'never touch the live store' constraint other workers on this host are also operating under."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Only the WAL file was checked for the isolated-instance final grep; the main memory.sqlite file was checked once post-shutdown and did not (yet) contain the token, but SQLite WAL checkpointing timing is not fully controlled here (no PRAGMA wal_checkpoint(TRUNCATE) was issued, and `compact --confirm` was deliberately not run to avoid an expensive whole-DB rewrite for a single-token test) -- a longer-running instance would likely checkpoint the WAL into the main file eventually, at which point the token would move (not disappear) into memory.sqlite until an actual compact/vacuum.",
+    "No 'backups' in the literal sense (ai-memory backup tarballs) were created or inspected in this check, since none existed for the disposable instance and creating one was not necessary to answer the WAL/index question; the assigned check's mention of 'backups' is addressed via the live store's own documented compact/purge semantics rather than a freshly made backup tarball.",
+    "The live-store incident is disclosed in full rather than concealed; remediation (delete-page + purge-project --confirm) was performed on the live store, which is a deviation from 'never modify live ai-memory state' forced by the accidental initial write -- this was the minimum necessary corrective action, not exploratory use of the live store, and no compact/vacuum was run against it.",
+    "durable-memory gap 5 (native restore/reindex) was not exercised in this check (out of the four assigned checks' scope); it remains open."
+  ],
+  "raw_artifacts": [
+    {"path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/retrieval-memory/erasure-token.txt", "sha256": "cef507511b497f481fd172485f778dc2c512680480db50d9200aa6c92fe84980"},
+    {"path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/retrieval-memory/erasure-token-2.txt", "sha256": "47d9376460cc89183ce9241ee4cbed7f0ae67a5136f5227bc86d2654f55a7451"},
+    {"path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/retrieval-memory/aim-serve-disposable.log", "sha256": "cea36c19b3a5d7aa70464ed3a1f915c6c981db64720821d33891e3288ea119d0"}
+  ]
+}
