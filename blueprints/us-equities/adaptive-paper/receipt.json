@@ -410,5 +410,24 @@
     },
     "after_refusal": "recover liquidates only ledger-owned holdings (recovery.py) and requires a flat broker proof, so a foreign position leaves recovery at needs_attention until the operator closes it by hand; an overnight fill of the trial's own open order also refuses the resume (quantity differs), and recover resolves that case through the ledger's own intents",
     "review": "fix-verification review of e1fe5af: no correctness defect; follow-ups applied (recover wording, wiring test independent of the 2026 built-in calendar via a session_at stub, edge-case coverage)"
+  },
+  "promotion_gate_completeness": {
+    "recorded_at_utc": "2026-09-22T23:05:00Z",
+    "evidence_class": "SYN",
+    "summary": "The paper preflight's promotion-gate check now requires the result's checks to name every promotion_gate.CHECK_NAMES entry exactly once (no missing, extra, unnamed or duplicate checks), a non-empty versions object and an ISO-8601 checked_at; otherwise promotion_gate_incomplete. Closes a blind Codex review finding on #64 (reported by peer finalize-llm-harness-catalogs): a result with checks=[{status:'pass'}], row_count=1, versions=null, checked_at=null and a matching header-only CSV hash previously passed.",
+    "tests": [
+      "test_complete_gate_result_is_accepted",
+      "test_gate_result_without_the_named_checks_is_incomplete",
+      "test_gate_result_missing_one_named_check_is_incomplete",
+      "test_gate_result_with_duplicate_or_unknown_check_is_incomplete",
+      "test_null_or_empty_versions_and_checked_at_are_incomplete",
+      "test_runner_check_names_match_the_gate_module"
+    ],
+    "mutation_check": "with the name-set guard removed, 3 of the new tests fail (missing, duplicate and unknown check cases); the reproduction case is additionally caught by the null-versions guard",
+    "real_input_check": "the 2026-09-22 real SIP snapshot gate result (480 rows, 12/12 checks) and the good fixture are still accepted",
+    "files": {
+      "blueprints/us-equities/adaptive-paper/runner.py": "2147f700348ad9aa60e6149e84ade308ee90c11031321137f60e856560badb46",
+      "tests/test_adaptive_paper_runner.py": "570e88c28ff7ad5b8ba2d96c79641cb605a56f1540047afeaa2644c0c2110ce0"
+    }
   }
 }

@@ -358,6 +358,13 @@ def public_preflight(observation, config):
 
 _GATE_REQUIRED_KEYS = ("status", "input_sha256", "row_count", "checks", "versions", "checked_at")
 _GATE_ACCEPTED_SNAPSHOT_EXTENSIONS = (".csv", ".parquet")
+# Must equal promotion_gate.CHECK_NAMES (blueprints/us-equities/data/promotion_gate.py);
+# tests/test_adaptive_paper_runner.py parses that module and asserts the two agree.
+_GATE_CHECK_NAMES = frozenset((
+    "rows_present", "symbol_nonempty", "valid_trading_session", "open_positive", "high_positive",
+    "low_positive", "close_positive", "volume_integral_non_negative", "observed_at_not_future",
+    "high_ge_max_open_close", "low_le_min_open_close", "unique_symbol_session",
+))
 
 
 def _check_promotion_gate(gate_result_path, snapshot_path):
@@ -383,6 +390,10 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
 
     * every key in `_GATE_REQUIRED_KEYS` is present, else
       `promotion_gate_incomplete`;
+    * `checks` names every entry of `_GATE_CHECK_NAMES` exactly once (no
+      missing, extra, unnamed or duplicate checks), `versions` is a non-empty
+      object and `checked_at` an ISO-8601 timestamp, else
+      `promotion_gate_incomplete`;
     * `checks` is a non-empty list and every entry's `status == "pass"`,
       else `promotion_gate_incomplete` (malformed/missing `checks`) or
       `promotion_gate_failed_check` (a real failing check);
@@ -404,7 +415,19 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
     checks = gate.get("checks")
     if not isinstance(checks, list) or not checks:
         raise SafetyError("promotion_gate_incomplete")
-    if any(not isinstance(check, dict) or check.get("status") != "pass" for check in checks):
+    # Every check the gate emits must be reported exactly once: a result that lists
+    # only some checks (or unnamed ones) has not shown that the snapshot passed the gate.
+    names = [check.get("name") if isinstance(check, dict) else None for check in checks]
+    if len(set(names)) != len(names) or set(names) != _GATE_CHECK_NAMES:
+        raise SafetyError("promotion_gate_incomplete")
+    versions, checked_at = gate.get("versions"), gate.get("checked_at")
+    if not isinstance(versions, dict) or not versions or not isinstance(checked_at, str):
+        raise SafetyError("promotion_gate_incomplete")
+    try:
+        datetime.fromisoformat(checked_at)
+    except ValueError:
+        raise SafetyError("promotion_gate_incomplete")
+    if any(check.get("status") != "pass" for check in checks):
         raise SafetyError("promotion_gate_failed_check")
     row_count = gate.get("row_count")
     if not isinstance(row_count, int) or isinstance(row_count, bool) or row_count <= 0:
