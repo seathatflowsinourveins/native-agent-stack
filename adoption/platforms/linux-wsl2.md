@@ -1,5 +1,20 @@
 # Linux/WSL2 x86_64 — status: accepted
 
+## Get the catalog
+
+Clone the catalog and check out its pinned commit before running any step
+below:
+
+```sh
+git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
+cd native-agent-stack
+git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['baseline_commit'])")"
+```
+
+That checkout target is `adoption/manifest.json` `source.baseline_commit`,
+the same field [`scripts/adoption_status.py`](../../scripts/adoption_status.py)
+compares the working tree's revision against.
+
 `platform_profiles` entry `linux-wsl2-x86_64` in [`adoption/manifest.json`](../manifest.json),
 evidence at [`adoption/receipt.json`](../receipt.json). This is the initial and
 only accepted target platform; `adoption/manifest.json` `supported_platforms`
