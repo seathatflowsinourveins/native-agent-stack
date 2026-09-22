@@ -6468,8 +6468,8 @@
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
-      "sha256": "8e269998f44a5ff61a62b6a53488744c03584109badf91648b4744ff2ad1fcfb",
-      "bytes": 97731
+      "sha256": "b4cdcf1e4f8f5f07fb39036f49de24da0a835b47e6b772a3b468d3f04c6fa40c",
+      "bytes": 98389
     },
     {
       "path": "catalogs/us-equities/agents-operations.md",
