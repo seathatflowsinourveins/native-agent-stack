@@ -13,10 +13,17 @@
       "exit": 0,
       "output_excerpt": "3.13.15\n0.33.1 3.0.6 25.0.1 4.13.2",
       "output_sha256": "a26bbc19b6b85bef36f3c846f1fcc5cb7cbed9b96cace19bbdb088000abf470a"
+    },
+    {
+      "cmd": "cd <REPO> && grep -rn 'pandera' blueprints/us-equities/adaptive-paper/ blueprints/us-equities/alpaca-paper/ --include='*.py'; echo grep_exit=$?",
+      "duration_s": 0.2,
+      "exit": 0,
+      "output_excerpt": "grep_exit=1",
+      "output_sha256": "ca0f7afbf703dbe007eee4d7dd506129c01fb33ab345c9a10d262b0e7cbf2ad1"
     }
   ],
   "date": "2026-09-22",
-  "evidence_class": "native_proven",
+  "evidence_class": "synthetic",
   "gap_refs": [
     {
       "gap_index": 4,
@@ -34,10 +41,12 @@
     "execution-broker"
   ],
   "limitations": [
-    "Only closes gaps 4 (venv runnability) and 5 (paper-runtime import boundary, confirmed separately by source grep, not re-verified by this receipt); gap 3 (real production ingest, needs a licensed market-data feed) remains open per critic correction and is explicitly out of scope for this check.",
-    "Fixture-only: does not exercise the gate against live/production market data."
+    "Closes gap 4 (venv runnability) directly via FixtureGateRuns, and gap 5 (paper-runtime import boundary) via the added grep command below, which checks the actual source of both paper runtimes rather than relying on the project README's claim; gap 3 (real production ingest, needs a licensed market-data feed) remains open per critic correction and is explicitly out of scope for this check.",
+    "Fixture-only: does not exercise the gate against live/production market data.",
+    "Fix round (2026-09-22): the prior pass claimed settles_gap covered gap 5 without recording any command for it (the limitations text said it was 'confirmed separately by source grep, not re-verified by this receipt', but no grep command or output was recorded anywhere). This receipt now includes the actual grep command and its output as commands[2]: recursively searching blueprints/us-equities/adaptive-paper/ and blueprints/us-equities/alpaca-paper/ (the paper runtimes reachable from the layer's overturn_protocol fixture_paths) for the string 'pandera' in every .py file found zero matches (grep_exit=1). This directly verifies the data/README.md claim in runner.py's own source rather than only the README's prose.",
+    "The grep checks source text, not runtime import behavior (e.g. a dynamic `importlib.import_module('pand' + 'era')` would not match); a manual read of runner.py's imports (lines 6-27) and every locally-imported module (safety.py, sessions.py, strategies.py, transport.py, native_adapter.py, native_strategy.py, recovery.py) confirmed only ordinary top-level `import`/`from` statements are used, none importing pandera, pandas or pyarrow; sessions.py imports exchange_calendars only inside a try/except ImportError-guarded optional cross-check function, consistent with the README's description of an optional, non-hard dependency."
   ],
-  "preregistered": "If FixtureGateRuns runs (not skipped) and all named checks in it pass/fail-closed as designed, that settles gap 4 (isolated venv not proven runnable) and gap 5 (paper runtime import-boundary claim) in the supports_incumbent direction. If the class is still reported skipped, or any FixtureGateRuns test fails or errors, that refutes the incumbent's stale-pin/unverified claim status and would change the verdict for gap 4/5 the other way. A run that cannot execute (venv missing, import error) leaves gap 4 unsettled.",
+  "preregistered": "If FixtureGateRuns runs (not skipped) and all named checks in it pass/fail-closed as designed, that settles gap 4 (isolated venv not proven runnable) in the supports_incumbent direction. If the class is still reported skipped, or any FixtureGateRuns test fails or errors, that refutes the incumbent's stale-pin/unverified claim status and would change the verdict for gap 4 the other way. A run that cannot execute (venv missing, import error) leaves gap 4 unsettled. Fix-round addendum (2026-09-22, corrected procedure per reviewer finding): gap 5 (paper runtime never imports pandera) was claimed settled but never actually checked by this receipt. The corrected procedure is a recursive grep for the literal string 'pandera' across every .py file in blueprints/us-equities/adaptive-paper/ and blueprints/us-equities/alpaca-paper/. Zero matches supports the incumbent (no import-boundary violation found in source); any match refutes it and would change the verdict for gap 5.",
   "purpose": "Run the full tests/test_promotion_gate.py suite, including the @unittest.skipUnless-guarded FixtureGateRuns class, through the gate's own pinned isolated venv (never the ambient interpreter), to settle whether the class is still skipped on this host and whether the gate still passes/fails-closed on its fixtures. Per the critic's correction this closes gaps 4 and 5 only, not gap 3 (needs_paid_entitlement / production ingest, out of scope here).",
   "raw_artifacts": [
     {
@@ -45,7 +54,7 @@
       "sha256": "c5af2d188e72b081267e619465bb647f90bc455ca3bf98a6c81c0614d6dbbf7c"
     }
   ],
-  "result": "Ran 18 tests total, 10 of them the FixtureGateRuns subprocess-through-pinned-venv class (test_bad_fixture_fails_the_expected_named_checks, test_empty_snapshot_fails_closed_via_rows_present, test_fractional_negative_volume_fails_closed_via_volume_integral_non_negative, test_good_fixture_passes_every_named_check, test_invalid_calendar_fails_closed, test_missing_input_fails_closed_with_exception_class, test_null_price_cell_fails_closed_via_unmapped_failures, test_prepare_never_raises_on_invalid_raw_volume, test_raw_volume_failure_indices_flags_fractional_negative_before_coercion, test_unsupported_format_fails_closed), plus 8 PurePythonParsing tests. All 18 passed, 0 skipped (no 'skipped=' marker in the summary line). The gate's isolated venv (pandera 0.33.1, pandas 3.0.6, pyarrow 25.0.1, exchange_calendars 4.13.2, Python 3.13.15) is present, importable and functional on this host today, so GATE_PYTHON resolved truthy and no test in the class was skipped.",
+  "result": "Ran 18 tests total, 10 of them the FixtureGateRuns subprocess-through-pinned-venv class (test_bad_fixture_fails_the_expected_named_checks, test_empty_snapshot_fails_closed_via_rows_present, test_fractional_negative_volume_fails_closed_via_volume_integral_non_negative, test_good_fixture_passes_every_named_check, test_invalid_calendar_fails_closed, test_missing_input_fails_closed_with_exception_class, test_null_price_cell_fails_closed_via_unmapped_failures, test_prepare_never_raises_on_invalid_raw_volume, test_raw_volume_failure_indices_flags_fractional_negative_before_coercion, test_unsupported_format_fails_closed), plus 8 PurePythonParsing tests. All 18 passed, 0 skipped (no 'skipped=' marker in the summary line). The gate's isolated venv (pandera 0.33.1, pandas 3.0.6, pyarrow 25.0.1, exchange_calendars 4.13.2, Python 3.13.15) is present, importable and functional on this host today, so GATE_PYTHON resolved truthy and no test in the class was skipped. GAP 5 (fix round): `grep -rn 'pandera' blueprints/us-equities/adaptive-paper/ blueprints/us-equities/alpaca-paper/ --include='*.py'` returned zero matches (grep_exit=1) across both paper runtime directories, confirming the data/README.md claim that the paper runtime never imports pandera. Manual inspection of runner.py's import block and every module it locally imports (safety, sessions, strategies, transport, native_adapter, native_strategy, recovery) found only stdlib/nautilus_trader/local imports; sessions.py's optional exchange_calendars import is guarded by try/except ImportError inside a helper function and is unrelated to pandera.",
   "schema_version": 1,
   "settles_gap": true,
   "tool_versions": {
@@ -59,6 +68,6 @@
   "verdict_impact": {
     "could_change_verdict": true,
     "direction": "supports_incumbent",
-    "explanation": "Confirms the previously-flagged 'unverified because the venv might not exist / class might be skipped' concern is stale on this host: the venv exists, is functional, and every FixtureGateRuns case (fail-closed on empty snapshot, negative volume, null price, invalid calendar, missing input, bad fixture, good fixture) passed as designed with zero skips."
+    "explanation": "Confirms the previously-flagged 'unverified because the venv might not exist / class might be skipped' concern is stale on this host: the venv exists, is functional, and every FixtureGateRuns case (fail-closed on empty snapshot, negative volume, null price, invalid calendar, missing input, bad fixture, good fixture) passed as designed with zero skips. Fix round also adds the actual source-grep evidence for gap 5 (paper runtime never imports pandera), which the initial pass had claimed without recording any command; zero matches across both paper-runtime directories supports the incumbent's import-boundary claim."
   }
 }
