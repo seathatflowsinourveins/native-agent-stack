@@ -88,3 +88,18 @@ behaviour.
   scopes) were redacted before publication; loopback service ports remain, as on `main`.
 - Usage: discovery about 1.3 M, selection about 12.0 M, re-collection about 1.2 M subagent tokens
   (workflow-reported, not lifetime provider totals).
+
+## Viability probes (follow-up, 2026-09-22)
+
+Workflow `wf_1f3da910-f1c` (three Sonnet/high executors, three Opus/high verifiers) probed the TypeScript
+Agent SDK, `awslabs/cli-agent-orchestrator` and the `untrivial-ai/agent-orchestrator` daemon on the WSL2
+host; results are summarised in the ledger's `viability_probes` block and Markdown section, with the
+sanitised receipts, verifications and coordinator notes in
+`evidence/artifacts/sdk-runtime-coverage-20260922/probes-20260922.json`. Executed evidence overturns the
+TypeScript SDK's `api_key_required` C1 label on this host; no disposition changes. The review of this
+record found that the agent-orchestrator daemon had imported the host Codex login (refresh token
+included) into its probe data directory without being asked; that copy was deleted after the review and
+the host login still reports valid. Removed from the user home after verification: a probe plan file,
+two session transcripts, their cache logs and session-env directories. Remaining: one project entry for
+a probe path in the Claude Code user config, ai-memory hook rows naming the two probe sessions, a stale
+tmux socket with no server, and the Codex credential rewrite (not reversible).
