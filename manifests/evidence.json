@@ -7624,8 +7624,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "9a9c8556570576de769cc92193eaf609f482d1af449e5c817c822cfac9419149",
-      "bytes": 12918127
+      "sha256": "d793ce30b7f1cc307b7c0c60a9f5b410085cdbac3da403a1c4399317f3e1f5b7",
+      "bytes": 12918618
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7699,8 +7699,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "121c471b3a498507eba4a3ba85b05cf92c603abedc92b03c7640ec4481198e5a",
-      "bytes": 418298
+      "sha256": "676be8056c875c0775f6de08c91509942cbac93a9aa28485656ff54c97d05586",
+      "bytes": 418783
     },
     {
       "path": "docs/harness-defaults.md",

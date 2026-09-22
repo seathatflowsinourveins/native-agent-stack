@@ -390,9 +390,9 @@ To rerun the verdicts against a later landscape, follow the
    manifest entries and no packet carries a decision-bearing label (the defaults
    reproduce the first run's packets). Build a blind checkout with every recorded
    verdict removed: the v2 fields, the sealed returns, packets and adjudication
-   inputs, this handbook and the explorer, and also every catalog JSON value of
-   `selection`, `decision`, `disposition`, `current_choice` and `review_status`
-   (the September 22 checkout kept those). Point both lanes at it. Then run the Claude lane through the saved
+   inputs, this handbook and the explorer, and also every `selection`, `decision`,
+   `disposition`, `current_choice` and `review_status` value in the catalog and
+   blueprint JSON files (the September 22 checkout kept those). Point both lanes at it. Then run the Claude lane through the saved
    `layer-verdict-lane` workflow, which lives in the agent-lab repository's
    `.claude/workflows/`, not in this catalog.
 4. Run the independent Codex lane (`codex_lane.py`) on the same packets without
@@ -431,12 +431,15 @@ their dates and superseding links.
   - `candidate-quality-review.json`, `hosting-practice.json`, `native-practice.json`
     and other catalog files carry `decision`, `selection` or `disposition` values;
   - trading cards such as `runtime-target.json` (`selected_destination`) and
-    `data-research.json` (`default` entries) carry the trading choices.
+    `data-research.json` (`default` entries), and blueprint receipts such as
+    `blueprints/us-equities/adaptive-paper/receipt.json` (whose `decision` keeps
+    NautilusTrader selected), carry the trading choices.
 
   Every foundation return in both lanes (20 of 20 each) lists at least one of these
   label-bearing files among its sources; 19 of 20 list `decisions.json`, and the
   Claude `durable-memory` return notes that `candidate-quality-review.json` exposes
-  the prior dispositions. Two Claude and three Codex trading returns list one. Some
+  the prior dispositions. Three trading returns in each lane list one
+  (`backtesting-engine` and `execution-broker` in both). Some
   returns and adjudications cite a label as evidence (the Claude `agent-sdks` return
   and the `workers` and `code-navigation` adjudications, for example). The verdicts,
   the foundation ones above all, are therefore not independent of the prior
@@ -446,13 +449,16 @@ their dates and superseding links.
 - **Adjudication is not independent of one lane's family.** The adjudicators are
   Opus 5.5, the same family as the Claude lane. Scrubbed returns and the order swap
   reduce that influence but do not remove it. Scrubbing removed host paths and model
-  names but not process wording. In the retained adjudication inputs, three Claude
-  returns still say they were corrected after an earlier round or after refuter
-  findings, a cue only that lane's pipeline produces (`code-navigation`,
-  `web-research` and `observability-hosting`: one went to each lane and one to
-  neither). The sealed Claude returns carry more such wording in their `limits`,
-  which the adjudication inputs left out. A Codex-side adjudication of the 10 decided
-  layers would test both.
+  names but not process wording. In the retained adjudication inputs, five Claude
+  returns say they were corrected after an earlier round or after refuter findings,
+  a cue only that lane's pipeline produces, and no Codex return does. Three of those
+  layers went to Claude (`instructions-skills`, `observation-inference`,
+  `web-research`), one to Codex (`code-navigation`) and one to neither
+  (`observability-hosting`). Claude won 3 of the 4 decided cue layers and 4 of the 6
+  decided layers without a cue, too few to separate a cue effect from the evidence.
+  The sealed Claude returns carry more such wording in their `limits`, which the
+  adjudication inputs left out. A Codex-side adjudication of the 10 decided layers,
+  with process wording removed, would test both.
 - **Trading candidates are layer-specific; trading requirements are not.** Each
   trading packet held that layer's own manifest entries and scope terms. The four rows
   the first run had flagged for naming other layers' tools now name their own:
