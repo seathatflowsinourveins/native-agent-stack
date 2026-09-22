@@ -269,11 +269,24 @@ re-review if no selection changed" bounded check
 documents. The job diffs the rebuilt manifest's per-component `pin` /
 `upstream.latest` / `pin_behind_upstream` against the published
 `catalogs/sota-convergence/manifest-20260922.json`, writes `drift.md`, appends
-a fixed-tool pin table (actionlint, gitleaks, syft, zizmor, `nautilus_trader`
-vs each `gh api repos/<owner>/<repo>/releases/latest`) to
+a fixed-tool pin table (actionlint, gitleaks, syft, zizmor, grype,
+`nautilus_trader` vs each `gh api repos/<owner>/<repo>/releases/latest`) to
 `$GITHUB_STEP_SUMMARY`, and uploads both as a 30-day artifact. It opens no
 issue and writes nothing back to the repository; a maintainer reads the
 summary/artifact and decides whether a real lane review is warranted.
+
+`catalog-freshness.yml`'s `python3 -m unittest` step runs on this job's
+`setup-python 3.13` interpreter, which has no `requests` package installed
+and no pip-install step for it. `tests/test_broad_universe_scan.py` marks
+its `requests`-dependent cases with `@unittest.skipUnless(HAS_REQUESTS, ...)`
+(the same convention the module already uses for its `duckdb`-dependent
+cases), so those cases report skipped rather than erroring on this
+interpreter -- `SymbolBatching`, `ProviderScreens`, and
+`NewsFetch.test_bounded_pages_and_capped_flag`. `validate.yml`'s `validate`
+job runs the same suite on a system Python that already has `requests`
+available, so those cases still execute there; only this report-only
+freshness lane's copy of the run has reduced coverage, and that reduction is
+not currently visible anywhere the job's own output is read.
 
 `sbom-vuln` reproduces `native-foundation-e2e.yml`'s pinned
 download/verify/install steps for the exact same `nautilus_trader==2.0.0rc5`
@@ -304,14 +317,16 @@ committed file (see "Ruleset upgrade" below).
 `supply-chain.yml`'s `sbom-vuln` job uses syft 1.52.0 (linux_amd64 tarball
 SHA-256 `caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d`,
 read from `https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_checksums.txt`)
-and grype 0.119.0, the latest release as of 2026-09-22 (linux_amd64 tarball
-SHA-256 `3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b`,
-read from `https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_checksums.txt`).
-Unlike the other pins on this page, grype tracks upstream's latest release
-rather than a fixed version, because it ships its own vulnerability-matching
-logic (not just a data feed) and this lane is report-only; the freshness
-job's fixed-tool table does not include grype for that reason and the pin
-should be re-checked whenever `sbom-vuln`'s own workflow path changes.
+and grype 0.119.0 (linux_amd64 tarball SHA-256
+`3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b`, read from
+`https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_checksums.txt`).
+Like the other pins on this page, grype is a fixed, checksum-verified
+version, not a floating "latest" reference; `sbom-vuln` itself never compares
+its pinned grype binary against upstream, it only runs the pinned binary to
+scan the SBOMs it generates. `catalog-freshness.yml`'s fixed-tool table
+covers grype's pin drift against upstream instead (see "Recorded decisions"
+below), so nothing about grype's report-only vulnerability-scanning role
+exempts its own version pin from freshness tracking.
 
 Receipts land as workflow artifacts only: `secret-scan-<run_id>` (30-day
 retention) and `supply-chain-<run_id>` (90-day retention, matching the SBOM's
@@ -384,13 +399,12 @@ lock actually used here is `.github/requirements-ci.lock`, a name Dependabot
 does not recognize as a Python dependency file, and four of the five pinned
 CI binaries (actionlint, gitleaks, syft, grype) are curl-downloaded release
 tarballs with no manifest Dependabot understands at all. The new
-`catalog-freshness.yml` drift table covers four of those five (actionlint,
-gitleaks, syft, zizmor) plus `nautilus_trader` against each tool's latest
-upstream release; grype is intentionally excluded from that table (see
-"Secret and supply-chain scanning" above -- it tracks upstream's latest
-release rather than a fixed pin and belongs to the report-only `sbom-vuln`
-lane instead), so the actionlint/gitleaks/syft/zizmor/nautilus_trader gap is
-covered by a different, already-built lane rather than by Dependabot.
+`catalog-freshness.yml` drift table covers all five (actionlint, gitleaks,
+syft, zizmor, grype) plus `nautilus_trader` against each tool's latest
+upstream release (see "Secret and supply-chain scanning" above for why
+grype's own pin is fixed like the others despite `sbom-vuln`'s scanning role
+being report-only), so the gap is covered by a different, already-built lane
+rather than by Dependabot.
 Precondition to revisit: rename `.github/requirements-ci.lock` to a
 Dependabot-discoverable name (e.g. `requirements-ci.txt` with a
 `--require-hashes` format Dependabot's pip ecosystem parses) and re-evaluate.
