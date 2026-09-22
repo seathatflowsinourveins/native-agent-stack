@@ -7,14 +7,20 @@ set -Eeuo pipefail
 usage() {
   printf '%s\n' \
     'Usage: bash bootstrap-linux.sh --profile <id> [--skip-system-packages]' \
+    '                                [--allow-unpinned <id,id,...>]' \
     '' \
     'Installs the tools pinned in adoption/pins-linux-x86_64.json for the' \
     "given profile's component_ids (from adoption/manifest.json) under" \
     'ECO_INSTALL_ROOT (default ~/.local/share/codex-ecosystem), each in an' \
     'isolated tools/<name>-<version> prefix with bin/ symlinks. Every archive' \
     'is SHA-256 verified before extraction; a pin with a null sha256 refuses' \
-    'to install (fail closed). Uses sudo only for missing Ubuntu/Debian' \
-    'apt prerequisites. Never edits a shell profile.'
+    'to install (fail closed). A selected component with no pin at all also' \
+    'fails closed (exit 3) before installing anything, unless it is named in' \
+    '--allow-unpinned, in which case it is skipped and echoed to the run log.' \
+    'Uses sudo only for missing Ubuntu/Debian apt prerequisites, installed' \
+    'before the curl/git/tar/jq presence check unless --skip-system-packages' \
+    'is given, in which case that check lists what is missing and exits 4.' \
+    'Never edits a shell profile.'
 }
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
@@ -22,6 +28,7 @@ repo_root="$(cd -- "$script_dir/.." >/dev/null 2>&1 && pwd -P)"
 
 profile_id=""
 skip_system=0
+allow_unpinned_ids=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --profile)
@@ -35,6 +42,17 @@ while [[ $# -gt 0 ]]; do
       ;;
     --skip-system-packages)
       skip_system=1
+      shift
+      ;;
+    --allow-unpinned)
+      [[ $# -ge 2 ]] || { printf -- '--allow-unpinned requires a comma-separated id list.\n' >&2; exit 2; }
+      IFS=',' read -r -a _allow_unpinned_chunk <<<"$2"
+      allow_unpinned_ids+=("${_allow_unpinned_chunk[@]}")
+      shift 2
+      ;;
+    --allow-unpinned=*)
+      IFS=',' read -r -a _allow_unpinned_chunk <<<"${1#--allow-unpinned=}"
+      allow_unpinned_ids+=("${_allow_unpinned_chunk[@]}")
       shift
       ;;
     --help|-h)
@@ -62,9 +80,35 @@ case "${ID:-}" in
   *) printf 'This bootstrap supports Ubuntu and Debian.\n' >&2; exit 1 ;;
 esac
 
+# Unless the caller opts out, install missing curl/git/tar/jq (and their apt
+# dependencies) *before* checking for them below, so a bare Ubuntu/Debian host
+# with none of them yet installed satisfies the check without a second run.
+if [[ "$skip_system" == 0 ]]; then
+  packages=(ca-certificates curl git tar gzip xz-utils jq)
+  missing=()
+  for package in "${packages[@]}"; do
+    if [[ "$(dpkg-query -W -f='${Status}' "$package" 2>/dev/null || true)" != 'install ok installed' ]]; then
+      missing+=("$package")
+    fi
+  done
+  if [[ ${#missing[@]} -gt 0 ]]; then
+    command -v sudo >/dev/null || { printf 'sudo is required to install missing system packages.\n' >&2; exit 1; }
+    sudo apt-get update
+    sudo apt-get install -y --no-install-recommends "${missing[@]}"
+  fi
+fi
+
+missing_prerequisites=()
 for required in curl git tar sha256sum realpath flock jq mktemp; do
-  command -v "$required" >/dev/null || { printf 'Missing prerequisite: %s\n' "$required" >&2; exit 1; }
+  command -v "$required" >/dev/null || missing_prerequisites+=("$required")
 done
+if [[ ${#missing_prerequisites[@]} -gt 0 ]]; then
+  printf 'Missing prerequisites: %s\n' "${missing_prerequisites[*]}" >&2
+  if [[ "$skip_system" == 1 ]]; then
+    printf 'Re-run without --skip-system-packages, or install them manually first.\n' >&2
+  fi
+  exit 4
+fi
 
 manifest_path="$repo_root/adoption/manifest.json"
 pins_path="$repo_root/adoption/pins-linux-x86_64.json"
@@ -79,19 +123,37 @@ component_ids_json="$(jq -c --arg id "$profile_id" \
 }
 mapfile -t component_ids < <(printf '%s' "$component_ids_json" | jq -r '.[]')
 
-if [[ "$skip_system" == 0 ]]; then
-  packages=(ca-certificates curl git tar gzip xz-utils jq)
-  missing=()
-  for package in "${packages[@]}"; do
-    if [[ "$(dpkg-query -W -f='${Status}' "$package" 2>/dev/null || true)" != 'install ok installed' ]]; then
-      missing+=("$package")
-    fi
+# Fail closed on any selected component with no pin, before installing
+# anything: install_pin's own "no pin -> skip" path only ever reaches
+# components explicitly allowed via --allow-unpinned below.
+all_selected_ids=(node uv gh)
+for selected_id in "${component_ids[@]}"; do
+  case "$selected_id" in
+    node|uv|gh) continue ;;
+  esac
+  all_selected_ids+=("$selected_id")
+done
+unpinned_ids=()
+for selected_id in "${all_selected_ids[@]}"; do
+  pin_entry="$(jq -c --arg id "$selected_id" '.tools[] | select(.id == $id)' "$pins_path")"
+  [[ -n "$pin_entry" ]] || unpinned_ids+=("$selected_id")
+done
+if [[ ${#unpinned_ids[@]} -gt 0 ]]; then
+  unresolved_unpinned_ids=()
+  for unpinned_id in "${unpinned_ids[@]}"; do
+    allowed=0
+    for allowed_id in "${allow_unpinned_ids[@]}"; do
+      [[ "$unpinned_id" == "$allowed_id" ]] && { allowed=1; break; }
+    done
+    [[ "$allowed" == 1 ]] || unresolved_unpinned_ids+=("$unpinned_id")
   done
-  if [[ ${#missing[@]} -gt 0 ]]; then
-    command -v sudo >/dev/null || { printf 'sudo is required to install missing system packages.\n' >&2; exit 1; }
-    sudo apt-get update
-    sudo apt-get install -y --no-install-recommends "${missing[@]}"
+  if [[ ${#unresolved_unpinned_ids[@]} -gt 0 ]]; then
+    printf 'No pin in %s for selected component(s): %s\n' "$pins_path" "${unresolved_unpinned_ids[*]}" >&2
+    printf 'Pass --allow-unpinned %s to install the rest and skip these explicitly.\n' \
+      "$(IFS=,; printf '%s' "${unresolved_unpinned_ids[*]}")" >&2
+    exit 3
   fi
+  printf 'Allowed unpinned components (--allow-unpinned): %s\n' "${unpinned_ids[*]}"
 fi
 
 ecosystem_root="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"

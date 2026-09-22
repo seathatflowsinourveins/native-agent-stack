@@ -131,10 +131,15 @@ def public_preflight(observation):
             "quote_errors": observation.get("quote_errors", {})}
 
 
+_GATE_REQUIRED_KEYS = ("status", "input_sha256", "row_count", "checks", "versions", "checked_at")
+_GATE_ACCEPTED_SNAPSHOT_EXTENSIONS = (".csv", ".parquet")
+
+
 def _check_promotion_gate(gate_result_path, snapshot_path):
     """Fail closed unless a promotion-gate result file (written by the
     separately venv'd `blueprints/us-equities/data/promotion_gate.py`)
-    reports `status: "pass"` for the exact snapshot bytes this run consumes.
+    reports a complete, fully-passing result for the exact snapshot bytes
+    this run consumes.
 
     This runtime has no live market-data snapshot concept of its own (Alpaca
     quotes are fetched fresh at preflight time, never read from a stored
@@ -145,6 +150,23 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
     `--snapshot` CLI argument) that was actually run through
     `promotion_gate.py`; see `blueprints/us-equities/data/README.md` for the
     current state of that ingest.
+
+    Validates the full gate-result contract, not just `status`/`input_sha256`
+    (a review finding: a gate result whose top-level `status` was "pass" and
+    whose `input_sha256` matched used to be accepted even when it declared
+    `row_count: 0` or carried a failed check):
+
+    * every key in `_GATE_REQUIRED_KEYS` is present, else
+      `promotion_gate_incomplete`;
+    * `checks` is a non-empty list and every entry's `status == "pass"`,
+      else `promotion_gate_incomplete` (malformed/missing `checks`) or
+      `promotion_gate_failed_check` (a real failing check);
+    * `row_count` is a positive integer, else `promotion_gate_empty`;
+    * top-level `status == "pass"`, else `promotion_gate_failed`;
+    * `snapshot_path` is a regular file with an extension the gate accepts
+      (`.csv`/`.parquet`) whose sha256 equals `input_sha256`, else
+      `promotion_gate_missing` (unusable snapshot) or
+      `promotion_gate_mismatch` (hash disagreement).
     """
     if gate_result_path is None or snapshot_path is None:
         raise SafetyError("promotion_gate_missing")
@@ -152,10 +174,23 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
         gate = json.loads(Path(gate_result_path).read_text())
     except (OSError, ValueError):
         raise SafetyError("promotion_gate_missing")
-    if not isinstance(gate, dict) or gate.get("status") != "pass":
+    if not isinstance(gate, dict) or any(key not in gate for key in _GATE_REQUIRED_KEYS):
+        raise SafetyError("promotion_gate_incomplete")
+    checks = gate.get("checks")
+    if not isinstance(checks, list) or not checks:
+        raise SafetyError("promotion_gate_incomplete")
+    if any(not isinstance(check, dict) or check.get("status") != "pass" for check in checks):
+        raise SafetyError("promotion_gate_failed_check")
+    row_count = gate.get("row_count")
+    if not isinstance(row_count, int) or isinstance(row_count, bool) or row_count <= 0:
+        raise SafetyError("promotion_gate_empty")
+    if gate.get("status") != "pass":
         raise SafetyError("promotion_gate_failed")
+    snapshot = Path(snapshot_path)
+    if not snapshot.is_file() or snapshot.suffix.lower() not in _GATE_ACCEPTED_SNAPSHOT_EXTENSIONS:
+        raise SafetyError("promotion_gate_missing")
     try:
-        observed_hash = hashlib.sha256(Path(snapshot_path).read_bytes()).hexdigest()
+        observed_hash = hashlib.sha256(snapshot.read_bytes()).hexdigest()
     except OSError:
         raise SafetyError("promotion_gate_missing")
     if gate.get("input_sha256") != observed_hash:

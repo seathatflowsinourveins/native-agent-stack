@@ -152,15 +152,31 @@ def cmd_check(args: argparse.Namespace) -> int:
             print(f"{name}: live file not found at {live_path}", file=sys.stderr)
             exit_code = 1
             continue
-        live_text = live_path.read_text(encoding="utf-8")
-        if rendered_text == live_text:
+        # Compare actual bytes, not text.read_text()'s universal-newline
+        # normalisation: Path.read_text() silently translates \r\n and \r to
+        # \n, so a live file saved with CRLF line endings could otherwise be
+        # reported "byte-identical" to an LF-rendered template even though
+        # the on-disk bytes differ. "byte-identical" is only ever printed
+        # when the raw bytes actually match.
+        live_bytes = live_path.read_bytes()
+        rendered_bytes = rendered_text.encode("utf-8")
+        if rendered_bytes == live_bytes:
             print(f"{name}: byte-identical to {live_path}")
             continue
         exit_code = 1
-        # If the only difference is JSON formatting, say so explicitly and
-        # still report the diff so the record shows the actual bytes differ.
+        live_text = live_bytes.decode("utf-8", errors="replace")
+        # If the only difference is newline convention or JSON formatting,
+        # say so explicitly and still report the diff so the record shows
+        # the actual bytes differ. Checked in this order because a raw
+        # bytes.decode() does NOT do read_text()'s universal-newline
+        # translation, so a CRLF live file's decoded text still contains
+        # literal "\r\n" and needs its own explicit normalised comparison
+        # rather than relying on the JSON-equality check to notice it.
         note = ""
-        if name.endswith(".json"):
+        live_text_lf = live_text.replace("\r\n", "\n").replace("\r", "\n")
+        if rendered_text == live_text_lf:
+            note = " (content is identical after newline normalisation; on-disk newline bytes differ)"
+        elif name.endswith(".json"):
             try:
                 if json.loads(rendered_text) == json.loads(live_text):
                     note = " (json.tool-normalised content is identical; only formatting differs)"

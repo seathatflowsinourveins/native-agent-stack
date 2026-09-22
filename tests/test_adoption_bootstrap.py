@@ -189,6 +189,149 @@ class ScriptBehaviorTests(unittest.TestCase):
         self.assertIn('"$installed_executable" --version', text)
 
 
+class UnpinnedComponentFailClosedTests(unittest.TestCase):
+    """Regression tests for item 3: a selected component with no pin at all must
+    fail closed (exit 3) before installing anything, unless explicitly allowed
+    via --allow-unpinned. Uses a minimal, fully synthetic manifest/pins pair (no
+    real network-reachable pins) so a "no leaks" run stays offline end to end.
+    """
+
+    def _write_fixture(self, tmp_path: Path, component_ids):
+        adoption_dir = tmp_path / "adoption"
+        adoption_dir.mkdir()
+        (adoption_dir / "bootstrap-linux.sh").write_text(SCRIPT_PATH.read_text())
+        (adoption_dir / "bootstrap-linux.sh").chmod(0o755)
+        manifest = {
+            "schema_version": 1,
+            "profiles": [{"id": "test-profile", "component_ids": component_ids}],
+        }
+        (adoption_dir / "manifest.json").write_text(json.dumps(manifest))
+        # No pins at all: node/uv/gh (always core-selected) and every
+        # component_id above are all unpinned.
+        pins = {"schema_version": 1, "platform": "linux-x86_64", "tools": []}
+        (adoption_dir / "pins-linux-x86_64.json").write_text(json.dumps(pins))
+        return adoption_dir
+
+    def _run(self, adoption_dir: Path, eco_root: Path, extra_args=()):
+        import os
+        return subprocess.run(
+            ["bash", str(adoption_dir / "bootstrap-linux.sh"),
+             "--profile", "test-profile", "--skip-system-packages", *extra_args],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            env={**os.environ, "ECO_INSTALL_ROOT": str(eco_root)},
+        )
+
+    def test_unpinned_component_exits_3_before_installing_anything(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            adoption_dir = self._write_fixture(tmp_path, ["some-unpinned-tool"])
+            eco_root = tmp_path / "eco"
+            result = self._run(adoption_dir, eco_root)
+            self.assertEqual(result.returncode, 3, result.stderr)
+            self.assertIn("No pin in", result.stderr)
+            # node, uv and gh are always core-selected and are unpinned here too.
+            self.assertIn("node", result.stderr)
+            self.assertIn("uv", result.stderr)
+            self.assertIn("gh", result.stderr)
+            self.assertIn("some-unpinned-tool", result.stderr)
+            self.assertIn("--allow-unpinned", result.stderr)
+            self.assertFalse(
+                eco_root.exists() and any(eco_root.glob("tools/*/*")),
+                "no tool files should have been installed before the refusal",
+            )
+
+    def test_allow_unpinned_covering_every_gap_proceeds_and_is_logged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            adoption_dir = self._write_fixture(tmp_path, ["some-unpinned-tool"])
+            eco_root = tmp_path / "eco"
+            result = self._run(
+                adoption_dir, eco_root,
+                extra_args=["--allow-unpinned", "node,uv,gh,some-unpinned-tool"],
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("Allowed unpinned components (--allow-unpinned):", result.stdout)
+            self.assertIn("some-unpinned-tool", result.stdout)
+            self.assertIn("Installation finished", result.stdout)
+            self.assertFalse(
+                eco_root.exists() and any(eco_root.glob("tools/*/*")),
+                "no pin exists for any selected component, so nothing should install",
+            )
+
+    def test_partial_allow_unpinned_still_fails_closed_on_the_rest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            adoption_dir = self._write_fixture(tmp_path, ["some-unpinned-tool"])
+            eco_root = tmp_path / "eco"
+            result = self._run(
+                adoption_dir, eco_root,
+                extra_args=["--allow-unpinned", "some-unpinned-tool"],
+            )
+            self.assertEqual(result.returncode, 3, result.stderr)
+            self.assertIn("node", result.stderr)
+            self.assertIn("uv", result.stderr)
+            self.assertIn("gh", result.stderr)
+            self.assertNotIn("some-unpinned-tool", result.stderr.split("No pin in", 1)[-1].split("\n")[0])
+
+
+class SystemPackagesBeforePrerequisiteCheckTests(unittest.TestCase):
+    """Regression tests for item 4: the apt-managed prerequisite install must
+    run before the curl/git/tar/jq presence check, and --skip-system-packages
+    makes that check list what is missing and exit 4."""
+
+    def test_apt_block_precedes_prerequisite_check_in_source_order(self):
+        text = SCRIPT_PATH.read_text()
+        apt_index = text.index("sudo apt-get install -y --no-install-recommends")
+        check_index = text.index('for required in curl git tar sha256sum realpath flock jq mktemp')
+        self.assertLess(
+            apt_index, check_index,
+            "the apt-get install step must run before the curl/git/tar/jq presence check",
+        )
+
+    def test_skip_system_packages_with_missing_tool_lists_it_and_exits_4(self):
+        # Exercise the real check logic (not just source order) by prepending a
+        # stub PATH directory that shadows `jq` with nothing, so the presence
+        # check itself reports it missing without ever needing apt or network.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            adoption_dir = tmp_path / "adoption"
+            adoption_dir.mkdir()
+            (adoption_dir / "bootstrap-linux.sh").write_text(SCRIPT_PATH.read_text())
+            (adoption_dir / "bootstrap-linux.sh").chmod(0o755)
+            (adoption_dir / "manifest.json").write_text(MANIFEST_PATH.read_text())
+            (adoption_dir / "pins-linux-x86_64.json").write_text(PINS_PATH.read_text())
+
+            stub_bin = tmp_path / "stub-bin"
+            stub_bin.mkdir()
+            # Symlink uname (needed before the check runs) and every normally-
+            # required tool except jq, so only jq is reported missing. PATH is
+            # restricted to exactly this directory so nothing falls back to a
+            # real system jq.
+            import os
+            import shutil as _shutil
+            bash_path = _shutil.which("bash")
+            for tool in ("uname", "curl", "git", "tar", "sha256sum", "realpath", "flock", "mktemp"):
+                found = _shutil.which(tool)
+                if found:
+                    (stub_bin / tool).symlink_to(found)
+            eco_root = tmp_path / "eco"
+            result = subprocess.run(
+                [bash_path, str(adoption_dir / "bootstrap-linux.sh"),
+                 "--profile", "foundation-cpu", "--skip-system-packages"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                env={"PATH": str(stub_bin), "HOME": os.environ.get("HOME", "/root"),
+                     "ECO_INSTALL_ROOT": str(eco_root)},
+            )
+            self.assertEqual(result.returncode, 4, result.stderr)
+            self.assertIn("Missing prerequisites", result.stderr)
+            self.assertIn("jq", result.stderr)
+            self.assertIn("--skip-system-packages", result.stderr)
+
+
 class PublishWorkflowTests(unittest.TestCase):
     """Regression tests for the SBOM publication fixes in publish-catalog.yml."""
 

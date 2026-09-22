@@ -1,6 +1,11 @@
 {
-  "checked_at": "2026-09-22T07:52:21.788623+00:00",
+  "checked_at": "2026-09-22T15:12:36.425193+00:00",
   "checks": [
+    {
+      "detail": "ok",
+      "name": "rows_present",
+      "status": "pass"
+    },
     {
       "detail": "ok",
       "name": "symbol_nonempty",
@@ -33,7 +38,7 @@
     },
     {
       "detail": "ok",
-      "name": "volume_non_negative",
+      "name": "volume_integral_non_negative",
       "status": "pass"
     },
     {

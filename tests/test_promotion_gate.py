@@ -65,15 +65,26 @@ class PurePythonParsing(unittest.TestCase):
             self.assertFalse(out.with_suffix(out.suffix + ".tmp").exists())
 
     def test_check_names_are_fixed_and_cover_the_declared_rules(self):
-        expected = {"symbol_nonempty", "valid_trading_session", "open_positive", "high_positive",
-                    "low_positive", "close_positive", "volume_non_negative", "observed_at_not_future",
-                    "high_ge_max_open_close", "low_le_min_open_close", "unique_symbol_session"}
+        expected = {"rows_present", "symbol_nonempty", "valid_trading_session", "open_positive",
+                    "high_positive", "low_positive", "close_positive", "volume_integral_non_negative",
+                    "observed_at_not_future", "high_ge_max_open_close", "low_le_min_open_close",
+                    "unique_symbol_session"}
         self.assertEqual(set(g.CHECK_NAMES), expected)
 
     def test_summarize_with_no_failures_marks_every_check_pass(self):
         checks = g._summarize(None, row_count=3)
         self.assertEqual(len(checks), len(g.CHECK_NAMES))
         self.assertTrue(all(c["status"] == "pass" for c in checks))
+
+    def test_summarize_with_zero_row_count_fails_rows_present_only(self):
+        """Regression (finding 1): before the fix, a 0-row snapshot with no
+        pandera failure_cases marked every check "pass" (status="pass",
+        row_count=0). rows_present must now fail closed on its own,
+        independent of every other check."""
+        checks = g._summarize(None, row_count=0)
+        by_name = {c["name"]: c["status"] for c in checks}
+        self.assertEqual(by_name["rows_present"], "fail")
+        self.assertTrue(all(status == "pass" for name, status in by_name.items() if name != "rows_present"))
 
 
 @unittest.skipUnless(GATE_PYTHON, "requires the gate's isolated venv "
@@ -90,6 +101,43 @@ class FixtureGateRuns(unittest.TestCase):
                                    capture_output=True, text=True, timeout=60)
             result = json.loads(out.read_text())
             return proc.returncode, result
+
+    def _run_snippet(self, body):
+        """Runs `body` in the gate's own venv with `g` already bound to the
+        freshly loaded promotion_gate module, for unit-testing internal
+        (pandas-dependent) helpers without requiring pandas in the ambient
+        test interpreter."""
+        script = (f"import importlib.util as u\n"
+                   f"spec = u.spec_from_file_location('promotion_gate', {str(GATE_FILE)!r})\n"
+                   "g = u.module_from_spec(spec); spec.loader.exec_module(g)\n" + body)
+        with tempfile.TemporaryDirectory() as tmp:
+            script_path = Path(tmp) / "snippet.py"
+            script_path.write_text(script)
+            return subprocess.run([GATE_PYTHON, str(script_path)], capture_output=True, text=True, timeout=30)
+
+    def test_raw_volume_failure_indices_flags_fractional_negative_before_coercion(self):
+        """Regression (finding 2): a raw volume of -0.5 must be flagged
+        directly, not silently truncated to 0 by int64 coercion first."""
+        proc = self._run_snippet(
+            "import json, pandas as pd\n"
+            "frame = pd.DataFrame({'volume': [-0.5, 100, float('nan'), float('inf'), 3.5, -4]})\n"
+            "print(json.dumps(g._raw_volume_failure_indices(frame)))\n")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(json.loads(proc.stdout), [0, 2, 3, 4, 5])
+
+    def test_prepare_never_raises_on_invalid_raw_volume(self):
+        """`_prepare()`'s coercion must not itself raise on a fractional/NaN/
+        negative raw volume; pass/fail for volume is decided separately by
+        `_raw_volume_failure_indices` on the pre-coercion column."""
+        proc = self._run_snippet(
+            "import json, pandas as pd\n"
+            "raw = pd.DataFrame({'symbol': ['SPY'], 'session': ['2026-09-14'], 'open': [1.0],\n"
+            "                     'high': [1.0], 'low': [1.0], 'close': [1.0], 'volume': [-0.5],\n"
+            "                     'observed_at': ['2026-09-14T20:00:00Z']})\n"
+            "frame = g._prepare(raw)\n"
+            "print(json.dumps(int(frame['volume'].iloc[0])))\n")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(json.loads(proc.stdout), 0)
 
     def test_good_fixture_passes_every_named_check(self):
         code, result = self._run("good.csv")
@@ -110,10 +158,40 @@ class FixtureGateRuns(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertEqual(result["status"], "fail")
         failing = {c["name"] for c in result["checks"] if c["status"] == "fail"}
-        self.assertEqual(failing, {"valid_trading_session", "volume_non_negative", "observed_at_not_future",
-                                    "high_ge_max_open_close", "unique_symbol_session"})
+        self.assertEqual(failing, {"valid_trading_session", "volume_integral_non_negative",
+                                    "observed_at_not_future", "high_ge_max_open_close",
+                                    "unique_symbol_session"})
         passing = {c["name"] for c in result["checks"] if c["status"] == "pass"}
         self.assertEqual(passing, set(g.CHECK_NAMES) - failing)
+
+    def test_empty_snapshot_fails_closed_via_rows_present(self):
+        """Regression (finding 1): a 0-row snapshot with every required
+        column present used to return status="pass", row_count=0. It must
+        now fail closed on a named `rows_present` check, with every other
+        check still reporting "pass" (nothing to violate over 0 rows)."""
+        code, result = self._run("empty-snapshot.csv")
+        self.assertEqual(code, 1)
+        self.assertEqual(result["status"], "fail")
+        self.assertEqual(result["row_count"], 0)
+        by_name = {c["name"]: c["status"] for c in result["checks"]}
+        self.assertEqual(by_name["rows_present"], "fail")
+        self.assertTrue(all(status == "pass" for name, status in by_name.items() if name != "rows_present"),
+                         by_name)
+
+    def test_fractional_negative_volume_fails_closed_via_volume_integral_non_negative(self):
+        """Regression (finding 2): before the fix, a raw volume of -0.5 was
+        coerced to 0 by `.astype('int64')` BEFORE the (then-named)
+        `volume_non_negative` check ran, so the row passed. The raw value
+        must now be validated before any coercion."""
+        code, result = self._run("fractional-negative-volume.csv")
+        self.assertEqual(code, 1)
+        self.assertEqual(result["status"], "fail")
+        by_name = {c["name"]: c["status"] for c in result["checks"]}
+        self.assertEqual(by_name["volume_integral_non_negative"], "fail")
+        volume_check = next(c for c in result["checks"] if c["name"] == "volume_integral_non_negative")
+        self.assertIn("example row indices [0]", volume_check["detail"])
+        self.assertTrue(all(status == "pass" for name, status in by_name.items()
+                             if name != "volume_integral_non_negative"), by_name)
 
     def test_missing_input_fails_closed_with_exception_class(self):
         with tempfile.TemporaryDirectory() as tmp:
