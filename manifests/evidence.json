@@ -2777,6 +2777,61 @@
   ],
   "files": [
     {
+      "path": "blueprints/blind-catalog-convergence/experiment.json",
+      "sha256": "ce3c82aa73cd8e74d1caaff1e913386cb227e838dc42f280d53ea9e29c51e725",
+      "bytes": 6993
+    },
+    {
+      "path": "catalogs/landscape/blind-convergence.json",
+      "sha256": "1fe36a18b7d3095784df14027f9d5dd62524099a72562de37137564fe89fd779",
+      "bytes": 17117
+    },
+    {
+      "path": "catalogs/landscape/independent-discovery.json",
+      "sha256": "b3c294015ffeb4aa488353f9cd86e1e5181a2233bcac70fbc32231495b22bd31",
+      "bytes": 90370
+    },
+    {
+      "path": "docs/blind-catalog-layer-findings-20260921.md",
+      "sha256": "fc1a22561da1d8205251bd4d698d10c7daced8b80649b7727350dd2d3bf12f74",
+      "bytes": 5802
+    },
+    {
+      "path": "docs/blind-catalog-source-adjudication-20260921.md",
+      "sha256": "8499a6b017e4f330d58c46e4af49868848015e0e8fb4d8936dc9c4658edc8093",
+      "bytes": 5670
+    },
+    {
+      "path": "docs/tasks/2026-09-21-blind-catalog-convergence.md",
+      "sha256": "f436ce631fd6060f800f28146202d0d766ececa7338f81b1420b36e3605723e9",
+      "bytes": 6218
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-provenance.json",
+      "sha256": "9ab2bdd7b8270c522ab9a0558b019f35435be3c101ff631e302797926c73bb51",
+      "bytes": 1164
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+      "sha256": "24001f4bed3298909d4493a82501590dd5725d1df0445a666ffd81cbc318f84b",
+      "bytes": 71220
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.md",
+      "sha256": "c7e437ed1d0d7e2776a8a73597b4e6b0f027e9afb3cbb9b331cdc28e619e483a",
+      "bytes": 13007
+    },
+    {
+      "path": "blueprints/blind-catalog-convergence/neutral-requirements.json",
+      "sha256": "923af7463aa21bdf69dec28137b89e6c5dd9ac37c4f917757ded8acb8377b443",
+      "bytes": 7095
+    },
+    {
+      "path": "docs/blind-catalog-convergence-20260921.md",
+      "sha256": "a3bebf63a16b6af9910e488ecc0704465a58fff6fbc5076517db84a17682e396",
+      "bytes": 7542
+    },
+    {
       "path": "blueprints/catalog-runtime-review/experiment.json",
       "sha256": "54e0ea15669f73cdd5fd8c68ac3b5947463750c727fcf0a8460dcd07fa114301",
       "bytes": 10682
@@ -2803,8 +2858,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "68efe92d6e9a75f94c047ec7483bd07adf2fd03d22c116d22d7e17beaf40387b",
-      "bytes": 14055
+      "sha256": "3f0165a8864fe18a05bda90761a7021978afc1b0c4557b31e34405fc148f9357",
+      "bytes": 14532
     },
     {
       "path": "docs/tasks/2026-09-21-runtime-reviewed-catalog-handbook.md",
@@ -3478,8 +3533,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "0e255c6072d88303e774a25f90e12d377be5eb79263d7a0b6e37f7881bd983d7",
-      "bytes": 3903
+      "sha256": "9d72b80f2ccff33171ec930f274f180885e23ea88afd91731931bf507fca870c",
+      "bytes": 4103
     },
     {
       "path": "recipes/claude-native-profile.md",
@@ -3538,7 +3593,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "7196f351d27dfe432966158f96dcc37eb67017a0bddc78c92f7c1a4a4839e044",
+      "sha256": "361d15a10bb9ad17f707850e8d975cb8c2a2762491dabd915923e29d0cfe1cd6",
       "bytes": 17917
     },
     {
@@ -6424,8 +6479,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "fb45334c03aa9d93ac7ca414756c9910f8292f6f7def09383bb102a02124b86e",
-      "bytes": 448333
+      "sha256": "4ac8c2e043d144d5bcc261340015ba0224e616fec92511e840d0ee0eab0ebe2b",
+      "bytes": 471775
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -6469,7 +6524,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "bf5d09875420f2e307436af4c11863c2a9c74f9e8337620a57effbfa9ff66907",
+      "sha256": "44fa294e4d71d474871d13b5780f0750893c74f05e87ffdc102a52d48e4f26c7",
       "bytes": 3112
     },
     {
@@ -6589,8 +6644,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "fb890e575f388ae55cfa2040e3ad47a7cfeb7efeace132df31de8f1772628d30",
-      "bytes": 10447335
+      "sha256": "5ab15abf6de65079a61be078409fd1b92f2cb202d733a21a7118da97fe480156",
+      "bytes": 10526405
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7294,8 +7349,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "a12b512e364f5ddcbb3d3ebf1fcbf94f2755024136055dfa4945ab908f12aaf4",
-      "bytes": 44805
+      "sha256": "91ef18bb6119d3dc02b6a6d73ee2e7561293764e51817c2220626e398433e236",
+      "bytes": 44904
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -9339,8 +9394,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "043195efd6686ada4be63138f6af8862a150a83794b6d2a11c8a18a5e42a45b6",
-      "bytes": 11661
+      "sha256": "2f7a11a25dfda529d91eb81f53f6c1692a5856ea765a4bd3c96294c020a5bb54",
+      "bytes": 12721
     },
     {
       "path": "docs/native-ultracode-20260921.md",
@@ -9349,7 +9404,7 @@
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
-      "sha256": "6332b0cea25cd469a301b99b5a5d84a8dda709b89348c471625dc7290905d155",
+      "sha256": "a1a7e65a9ffd6775363e1c444da55c7a30383c03572eab21d5856368c1b18674",
       "bytes": 235
     },
     {
@@ -10034,8 +10089,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "25abde916c404a51edd634828c452c7948690e6813b8d3d691e42d417532d55f",
-      "bytes": 12803
+      "sha256": "ad38d93ebe6bdb491c41ddbe1e7c6c0932019410895c640d3f623827b2f1939e",
+      "bytes": 13084
     },
     {
       "path": "examples/claude-native/workflows/check-syntax.mjs",
@@ -10064,13 +10119,13 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "ed8a04b87a64e969a8dccf4bbf654682dfe0d61824458a3a436c15b87063429d",
-      "bytes": 88436
+      "sha256": "92f86aa2e4f3d0112a179212bb86bac2d322a68e7a926d8871058bfde6542f86",
+      "bytes": 89194
     },
     {
       "path": "catalogs/landscape/manifest.json",
-      "sha256": "ecbe19528f6cec3795b0b79913d83039c049a775e0c18d4f739fe2494a7c7878",
-      "bytes": 3064
+      "sha256": "137bbae4f46d1492534255bd151d5d1bd3ecf3af622c4102c13e114afd084460",
+      "bytes": 3741
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -10079,8 +10134,8 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "b6271dd91cb2c91d68d494c361a8d254f1fb212cb06be490c28511f024c951c4",
-      "bytes": 58920
+      "sha256": "86495ce8e99645a358f3d06aad4f920c8462384e0a66463b1593e46e939811a9",
+      "bytes": 59247
     },
     {
       "path": "docs/landscape-domain-notes.md",
@@ -10559,6 +10614,7 @@
     }
   ],
   "convergence_records": [
+    "blueprints/blind-catalog-convergence/experiment.json",
     "blueprints/catalog-runtime-review/experiment.json",
     "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
     "blueprints/convergence-practice/application-delivery/experiment.json",

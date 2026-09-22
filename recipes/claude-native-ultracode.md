@@ -24,7 +24,7 @@ The portable [settings file](../examples/claude-native/ultracode.settings.json):
   "ultracode": true,
   "workflowSizeGuideline": "unrestricted",
   "env": {
-    "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "3"
+    "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8"
   }
 }
 ```
@@ -32,7 +32,10 @@ The portable [settings file](../examples/claude-native/ultracode.settings.json):
 The example persists `enableWorkflows`, `ultracode`, the `unrestricted` advisory size
 (each workflow sized to its task; it replaced `small` on 2026-09-21, see the
 [routing guide](../docs/ultracode-token-routing-20260921.md)) and the per-workflow
-concurrency setting of three, which makes a large run queue rather than burst. It does not select a model,
+concurrency setting of eight for the current 24-core WSL host. The September 21
+user-approved change from three applies to fresh sessions; the running discovery
+workflow retains its original cap of three. Eight is a host configuration choice,
+not a measured throughput or quality optimum. It does not select a model,
 account or permission mode. To adopt it as a project default, merge only those
 keys into the existing `.claude/settings.json`; preserve all unrelated settings.
 Project environment settings require workspace trust, and organizational policy
@@ -51,6 +54,18 @@ plus verification for multi-unit work; tens of agents only for an enumerated
 work-list run through `pipeline()` with lean `agentType` stages. Never drop a
 verification stage to save tokens; save them with lean agents, deferred lanes and
 focused reads. Keep existing sign-in, permissions, plugins and caching.
+
+For another host, inspect its CPU count and supported runtime ceiling first.
+Start at eight only when it fits that ceiling and the available account/API
+allowance; otherwise use a lower cap. The current runtime ceiling is
+`min(16, CPUs - 2)` with platform/runtime minimum handling; inspect that runtime
+on a small or different host rather than writing a zero/negative setting.
+Raise toward 12–16 only after a complete run has no rate-limit errors, missing
+results or unintended model substitutions. Preserve verification stages and
+inspect `child-usage.mjs` results. This cap is per workflow: other workflows,
+direct agents and native clients can share the same account quotas. Changing
+concurrency does not request a different model/effort, but quality, wall time and
+total cost still need observation. Do not infer improvement from the setting.
 
 The dated trial explicitly used `--model fable --effort ultracode`; `fable`
 resolved to `claude-fable-5-1` on that account. Verify the actually returned model

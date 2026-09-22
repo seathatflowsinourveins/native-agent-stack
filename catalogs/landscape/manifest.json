@@ -19,7 +19,9 @@
     "freshness_snapshot": "catalogs/landscape/upstream-snapshot.json",
     "native_practice": "catalogs/landscape/native-practice.json",
     "research_state": "catalogs/landscape/research-state.json",
-    "quality_review": "catalogs/landscape/candidate-quality-review.json"
+    "quality_review": "catalogs/landscape/candidate-quality-review.json",
+    "independent_discovery": "catalogs/landscape/independent-discovery.json",
+    "blind_convergence": "catalogs/landscape/blind-convergence.json"
   },
   "rules": [
     "Selected means the supported choice for the stated task and scope; it does not mean universal benchmark winner.",
@@ -32,6 +34,22 @@
     "Reopen a selection when its stated overturning comparison meets the requirement; retain competitive alternatives until then."
   ],
   "handbook_guides": [
+    {
+      "path": "docs/blind-catalog-source-adjudication-20260921.md",
+      "label": "Original-source adjudication"
+    },
+    {
+      "path": "docs/blind-catalog-layer-findings-20260921.md",
+      "label": "Independent findings by layer"
+    },
+    {
+      "path": "docs/blind-catalog-convergence-20260921.md",
+      "label": "Independent convergence practice"
+    },
+    {
+      "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.md",
+      "label": "Independent Codex source review"
+    },
     {
       "path": "docs/grand-catalog-handbook.md",
       "label": "Grand handbook"

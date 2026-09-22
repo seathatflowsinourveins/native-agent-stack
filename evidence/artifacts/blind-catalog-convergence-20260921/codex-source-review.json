@@ -1,0 +1,862 @@
+{
+  "schema_version": 1,
+  "title": "Independent primary-source stack review: 20 functional layers",
+  "review_kind": "source_research_frozen_before_other_review_disclosure",
+  "review_date_local": "2026-09-21",
+  "timezone": "America/New_York",
+  "freeze_prepared_at_utc": "2026-09-22T02:25:50Z",
+  "status": "frozen_initial_report",
+  "local_input": "blueprints/blind-catalog-convergence/neutral-requirements.json",
+  "executive_judgment": "Keep native accounts and clients as the foundation; use complementary exact/structured/semantic retrieval lanes only when their workload merits them. Several lifecycle and test-source distinctions are actionable, but none of these source-based candidates is locally accepted. The equities engine comparison remains open: LEAN has the clearest inspected both-broker repository coverage, while Nautilus is a serious execution-oriented challenger requiring adapter and recovery qualification.",
+  "blinding_disclosure": {
+    "current_catalog_artifact_read": false,
+    "prior_ranking_artifact_read": false,
+    "other_review_seen_before_freeze": false,
+    "project_memory_queried": false,
+    "local_files_read_other_than_neutral_input": [],
+    "ambient_prompt_exposure": "The supplied conversation environment included a skill/tool inventory and project instructions naming existing ecosystem capabilities and a preferred NautilusTrader destination. Those were not read from local files or used as a candidate-ranking authority, but their presence prevents a claim of pristine selection blindness.",
+    "classification": "Independent source search with no catalog-artifact or other-review access; partially selection-blinded because of ambient prompt exposure.",
+    "training_and_discovery_bias": "General model knowledge and familiar repository names influenced discovery. Neither a fresh task nor source lookup proves absence of training, anchoring or selection bias. Candidates not discovered or deeply inspected may outperform this shortlist.",
+    "observed_model": "Codex described in the supplied instructions as based on GPT-6; exact resolved model identifier and reasoning effort were not exposed in the child.",
+    "model_override": "None requested; inherited configuration.",
+    "provider_usage_and_cost": "Unknown. No reliable per-child provider-token, cache or monetary usage record was available; web call counts or text lengths are not substitutes.",
+    "other_review_freeze_rule": "Both report artifacts are written once before any other review is disclosed; later comparison must be a separate artifact."
+  },
+  "method": {
+    "scope": "Linux/WSL2 x86_64 CPU-first native coding/research foundation, then causal US-equity historical research and separately accepted IBKR/Alpaca paper operation.",
+    "selection_basis": "Functional fit, explicit interfaces, failure/recovery semantics, test assertions, source identity and deployment/account constraints. Popularity, stars, vendor percentages, model votes and mere recency were not scoring criteria.",
+    "search_process": "Direct official documentation and repository discovery, followed by focused source reads for selected high-risk behavior. Repository navigation and snippets are not full repository audits. Source search was bounded; this is not exhaustive ecosystem coverage.",
+    "source_recovery": "Official pages were followed where accessible; failed documentation requests were recovered through upstream GitHub source when possible. The exact URLs used for each layer are retained.",
+    "evidence_levels": {
+      "D1": "Primary documentation/README/interface inspection; capability claimed by maintainer, not executed here.",
+      "D2": "Pinned upstream original test assertions or source inspected; still not a passing test run.",
+      "R0": "No candidate runtime, installation, model-serving, backtest, paper order, paid hosting or migration execution occurred."
+    },
+    "independent_measured_evidence": "No head-to-head workload measurements were obtained. Report-specific independent observations concern the source text and sampled assertions, not observed product operation.",
+    "pins": "The 20 commit pins are public GitHub default-branch heads returned during this review. They are source anchors, not installed versions or acceptance claims. Most documentation was read at moving URLs, sometimes through cached web extraction; only explicitly immutable URLs establish the exact inspected revision.",
+    "licensing": "Not a complete license or dependency audit. Several repositories expose familiar open-source licenses, but transitive dependencies, model weights, hosted terms, data entitlements and deployment constraints require separate verification. Notable source observations include Basic Memory AGPL-3.0, Nautilus LGPL-3.0 and the paid-organization condition for LEAN CLI.",
+    "decision_language": "Primary means first defensible qualification candidate for the stated requirement, not an established universal winner or authorization to install. Complementary components should not be ranked as interchangeable products."
+  },
+  "coverage_summary": {
+    "layers_required": 20,
+    "layers_reported": 20,
+    "all_layers_have_primary_sources_challengers_and_overturn_test": true,
+    "runtime_acceptance_passed": 0,
+    "source_test_assertions_inspected_for": [
+      "semantic-rag",
+      "engines-strategies"
+    ],
+    "pinned_manual_source_inspected_for": [
+      "scheduling-supervision",
+      "agents-operations"
+    ],
+    "weakest_or_most_compositional_layers": [
+      "semantic-rag",
+      "durable-memory",
+      "hosting-services",
+      "foundation-memory",
+      "agents-operations"
+    ],
+    "weak_candidate_specific_coverage": [
+      "Massive data client: repository-level capability discovery only.",
+      "LlamaIndex: architecture-level inspection, no selected integration source or workload result.",
+      "Claude Agent SDK: repository-level exploration, no authentication/lifecycle execution.",
+      "Caddy: basic service role only, no configuration/security audit.",
+      "Zipline/vectorbt: research-role discovery only, no strategy or numeric comparison."
+    ],
+    "prior_model_knowledge_only_claims": "No candidate runtime-performance, reliability or benchmark-superiority claim is intentionally based only on model recollection. Stack composition, shortlist order and proposed experiments remain the researcher's engineering inferences from limited evidence."
+  },
+  "layers": [
+    {
+      "layer_id": "native-clients",
+      "primary_stack": [
+        "https://github.com/openai/codex",
+        "https://github.com/anthropics/claude-code"
+      ],
+      "strongest_challengers": [
+        "https://github.com/Aider-AI/aider"
+      ],
+      "why_primary_for_requirement": "Retain each native client for its existing account, model controls and session lifecycle. Codex documents noninteractive execution and resume; Claude documents headless structured results and native workflows. This is an interface-fit preference, not evidence one model produces better changes.",
+      "strongest_case_for_challenger": "Aider offers an inspectable repository map, explicit Git-oriented edits and provider flexibility. It becomes attractive where those controls or a supported local model close a measured native-client gap; it does not establish equivalent subscription authentication.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/openai/codex",
+        "https://github.com/anthropics/claude-code",
+        "https://learn.chatgpt.com/docs/non-interactive-mode",
+        "https://code.claude.com/docs/en/headless",
+        "https://code.claude.com/docs/en/workflows",
+        "https://github.com/Aider-AI/aider"
+      ],
+      "evidence_depth": "Official documentation and READMEs read; remote heads recorded. No client, account, resumability or provider billing trial executed. Claude public repository coverage is not a full implementation audit.",
+      "unresolved_comparison": "Installed client versions, account readiness, model availability, emitted usage completeness and actual resumed-state fidelity remain unknown.",
+      "test_that_would_change_choice": "Run identical bounded edit and read-only research tasks with the accepted native sign-ins; interrupt, resume and inspect exit status, full result, diff and provider usage. Switch a workload only if a challenger completes the same acceptance checks with a material quality, control or cost advantage.",
+      "deployment_and_acceptance_limits": "Keep clients' credential stores separate; SDK or alternate-client authentication is a separate qualification. Never copy sign-in stores during migration.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 1,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "instructions-skills",
+      "primary_stack": [
+        "https://github.com/agentskills/agentskills",
+        "https://github.com/anthropics/skills"
+      ],
+      "strongest_challengers": [
+        "https://github.com/obra/superpowers"
+      ],
+      "why_primary_for_requirement": "Use the upstream skill format for portable procedures and each client's native instruction discovery. The specification supports metadata and progressive disclosure; native instruction precedence differs, so portability requires behavioral verification.",
+      "strongest_case_for_challenger": "Superpowers supplies a coherent design, worktree, test and review workflow plus an evaluation harness. Its strongest case is repeatable project work needing those stages; its mandatory brainstorming and approval sequence can impose unnecessary overhead on already bounded work.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/agentskills/agentskills/blob/main/docs/specification.mdx",
+        "https://github.com/anthropics/skills",
+        "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+        "https://code.claude.com/docs/en/memory",
+        "https://github.com/obra/superpowers"
+      ],
+      "evidence_depth": "Specification, client guidance and workflow README read. No installation or invocation test. Anthropic skill examples were surveyed at repository level, not individually qualified.",
+      "unresolved_comparison": "Format conformance does not prove discovery, instruction priority or tool enforcement. Experimental allowed-tools fields and different ancestor-file semantics need client-specific checks.",
+      "test_that_would_change_choice": "Build a harmless fixture with competing ancestor and project instructions and one explicitly invoked skill. Observe both clients' actual discovery and behavior. Prefer the fuller workflow only when equivalent tasks show better verified outcomes without avoidable stage overhead.",
+      "deployment_and_acceptance_limits": "Pin selected procedures and licenses, keep secrets outside instructions, and treat downloaded skill scripts as code requiring review.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 2,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "workers",
+      "primary_stack": [
+        "https://github.com/openai/codex",
+        "https://github.com/anthropics/claude-code"
+      ],
+      "strongest_challengers": [
+        "https://github.com/anthropics/claude-agent-sdk-python",
+        "https://github.com/langchain-ai/langgraph"
+      ],
+      "why_primary_for_requirement": "Use native subagents and Claude workflows first, with an explicit result contract, owned worktrees and coordinator integration. Current docs expose concurrency, tool/model controls, pause/cancel and saved workflows without replacing native accounts.",
+      "strongest_case_for_challenger": "Claude Agent SDK can embed agent runs in a typed application; LangGraph can persist application state and resumable steps. Their strongest case is a demonstrated need beyond native task lifetimes, with additional authentication and storage responsibilities accepted.",
+      "primary_evidence_urls_actually_read": [
+        "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+        "https://code.claude.com/docs/en/sub-agents",
+        "https://code.claude.com/docs/en/workflows",
+        "https://github.com/anthropics/claude-agent-sdk-python",
+        "https://docs.langchain.com/oss/python/langgraph/persistence"
+      ],
+      "evidence_depth": "Native lifecycle documentation read in detail. SDK repository and LangGraph persistence docs read; no child process or restart trial.",
+      "unresolved_comparison": "Claude workflows can return null for cancellation or unrecoverable errors; filtering such results discards evidence. Documented cancellation does not by itself prove all subprocesses stopped. Checkpointer presence alone does not guarantee durable external effects.",
+      "test_that_would_change_choice": "Use three workers: successful edit, deliberate failure and long-running child process. Cancel and restart the coordinator; require one explicit terminal record per worker, stopped descendants, surviving artifacts and conflict-free reviewed integration. Add a SDK/graph only if native behavior fails a required property.",
+      "deployment_and_acceptance_limits": "Keep writer ownership separate from sandbox policy. Record requested and resolved models, exit/terminal status and observed usage; do not substitute agent agreement for review.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 3,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "isolation",
+      "primary_stack": [
+        "https://github.com/openai/codex",
+        "https://github.com/anthropics/sandbox-runtime",
+        "https://github.com/git/git"
+      ],
+      "strongest_challengers": [
+        "https://github.com/podman-container-tools/podman"
+      ],
+      "why_primary_for_requirement": "Combine each native client's enforced sandbox with Git worktrees for edit ownership. On Linux/WSL2, Claude's documented sandbox uses bubblewrap and network controls; worktrees separate checkout state but provide no filesystem or network security boundary.",
+      "strongest_case_for_challenger": "Rootless Podman provides reproducible process/filesystem/network packaging when native restrictions are insufficient or dependencies conflict. It adds image, mount, networking and host-configuration responsibilities rather than automatically making arbitrary mounts safe.",
+      "primary_evidence_urls_actually_read": [
+        "https://code.claude.com/docs/en/sandboxing",
+        "https://github.com/anthropics/sandbox-runtime",
+        "https://github.com/containers/bubblewrap",
+        "https://git-scm.com/docs/git-worktree",
+        "https://github.com/podman-container-tools/podman",
+        "https://github.com/openai/codex"
+      ],
+      "evidence_depth": "Official sandbox limitations, bubblewrap policy warning, Git documentation and Podman rootless explanation read. No exploit, namespace or host-kernel test.",
+      "unresolved_comparison": "Native fallback to unsandboxed execution and shared allowed network destinations can weaken intended restrictions. WSL2 kernel support and installed Codex policy were not inspected. Bubblewrap is a mechanism, not a complete policy.",
+      "test_that_would_change_choice": "Within disposable fixtures, attempt prohibited read/write, outbound requests and descendant escape; cancel the task and verify termination. Test worktree cross-write denial separately. Choose containers when they demonstrably enforce a required restriction the native policy cannot.",
+      "deployment_and_acceptance_limits": "WSL1 is outside the selected target. Disable unapproved fallback and inherited broker credentials in research workers; domain allowlists alone do not prevent abuse of permitted multi-tenant services.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 4,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "code-navigation",
+      "primary_stack": [
+        "https://github.com/BurntSushi/ripgrep",
+        "https://github.com/ast-grep/ast-grep",
+        "https://github.com/oraios/serena"
+      ],
+      "strongest_challengers": [
+        "https://github.com/scip-code/scip"
+      ],
+      "why_primary_for_requirement": "Use exact text search for known identifiers, structural patterns for syntax-aware edits, and Serena language-server symbols/references where the target language supports them. These complementary lanes expose original source without forcing a heavyweight index for every question.",
+      "strongest_case_for_challenger": "SCIP is attractive for reproducible precomputed semantic indexes across repositories and build contexts, provided an appropriate language indexer exists. It can beat live language-server startup or incomplete dependency discovery in larger workspaces.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/BurntSushi/ripgrep",
+        "https://github.com/ast-grep/ast-grep",
+        "https://github.com/oraios/serena",
+        "https://github.com/scip-code/scip"
+      ],
+      "evidence_depth": "Upstream repository documentation read, including Serena language/backend limitations and SCIP indexer list. No language server, index or edit test.",
+      "unresolved_comparison": "Language support labels do not establish references across generated code, dynamic dispatch or external dependencies. Index freshness and total startup/index cost are unmeasured.",
+      "test_that_would_change_choice": "Prepare a held-out set of exact symbols, callers, renamed files and external references in the real languages. Score source-location accuracy, missing references and stale results after edits, plus cold/warm latency and memory. Replace a lane only where the challenger improves those outcomes.",
+      "deployment_and_acceptance_limits": "Keep the original repository as authority; inspect original implementations before edits. Indexes need explicit project scope and deletion/rebuild behavior.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 5,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "document-retrieval",
+      "primary_stack": [
+        "https://github.com/tobi/qmd",
+        "https://github.com/docling-project/docling"
+      ],
+      "strongest_challengers": [
+        "https://github.com/microsoft/markitdown"
+      ],
+      "why_primary_for_requirement": "Use scoped QMD lexical retrieval for Markdown and Docling when layout, tables or structured document output matter. Preserve originals and structured extraction alongside searchable text; lexical retrieval can start on CPU without embedding downloads.",
+      "strongest_case_for_challenger": "MarkItDown is the simpler conversion option when the selected formats need text only. Its optional format dependencies can be cheaper to operate than a document-understanding pipeline; it should win if richer extraction adds no measured task value.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/tobi/qmd",
+        "https://github.com/docling-project/docling",
+        "https://github.com/microsoft/markitdown"
+      ],
+      "evidence_depth": "Repository interfaces and format/dependency guidance read. No financial PDF, table or corpus benchmark executed.",
+      "unresolved_comparison": "Extraction fidelity, OCR/model download costs and collection leakage are unknown. QMD's documented MCP interface ignores unknown fields, so misspelled scope parameters must not silently broaden retrieval.",
+      "test_that_would_change_choice": "Compare a representative set of filings, scanned pages, tables and Markdown against original page/row ground truth. Require recoverable original locations, correct numbers, scoped retrieval and disappearance of removed records; measure retrieval recall and total conversion cost.",
+      "deployment_and_acceptance_limits": "Pin extraction versions and retain lossless structured outputs where available. Verify actual format extras and model licenses; do not treat a flattened table as reliable financial data.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 6,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "semantic-rag",
+      "primary_stack": [
+        "https://github.com/kapillamba4/code-memory"
+      ],
+      "strongest_challengers": [
+        "https://github.com/run-llama/llama_index",
+        "https://github.com/qdrant/qdrant",
+        "https://github.com/qdrant/fastembed",
+        "https://github.com/tobi/qmd"
+      ],
+      "why_primary_for_requirement": "Low-confidence shortlist leader for a small local code corpus: code-memory combines SQLite-based lexical/vector retrieval and Git-history search behind a compact interface. Its apparent operational simplicity warrants a trial, not a claim of best code understanding.",
+      "strongest_case_for_challenger": "A composed LlamaIndex, Qdrant and FastEmbed stack gives more explicit embedding, metadata-filter and scaling control; QMD's hybrid/AST capabilities may avoid another service for modest repositories. These are alternative architectures, not four mandatory additions.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/kapillamba4/code-memory",
+        "https://raw.githubusercontent.com/kapillamba4/code-memory/5a8db166ca11a90c093ba4a9a54d266cde756f54/tests/test_tools.py",
+        "https://github.com/run-llama/llama_index",
+        "https://github.com/qdrant/qdrant",
+        "https://github.com/qdrant/fastembed",
+        "https://github.com/tobi/qmd"
+      ],
+      "evidence_depth": "Documented interfaces plus one pinned code-memory input-validation test file inspected. That test does not establish retrieval relevance. Embedding-service compatibility was not run; LlamaIndex exploration remained architectural.",
+      "unresolved_comparison": "This is one of the weakest selections: no representative conceptual-code benchmark, no full index-update/deletion audit and no proof of compatibility with the destination embedding endpoint. No universal winner established.",
+      "test_that_would_change_choice": "Use blinded conceptual questions whose answers require cross-file relationships, with independently identified supporting locations. Compare lexical baseline and each candidate on recall, grounded answer accuracy, cross-project leakage, edit/rename/delete freshness, cold index time, RAM and restore. Reject code-memory if compatibility or quality loses.",
+      "deployment_and_acceptance_limits": "Record embedding model, dimensions, normalization, chunking and source revision. CPU feasibility and index portability are hypotheses until measured; do not adopt merely because deployment is compact.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 7,
+      "coverage_tier": "D2/R0"
+    },
+    {
+      "layer_id": "durable-memory",
+      "primary_stack": [
+        "https://github.com/basicmachines-co/basic-memory"
+      ],
+      "strongest_challengers": [
+        "https://github.com/mem0ai/mem0",
+        "https://github.com/tobi/qmd"
+      ],
+      "why_primary_for_requirement": "Basic Memory's Markdown-first local store and SQLite-backed retrieval fit inspectable cross-client knowledge and recoverable source files. Separate explicit decisions and handoffs from automatically captured session noise.",
+      "strongest_case_for_challenger": "Mem0 is compelling when structured user/session/agent memory and richer programmatic retrieval outperform file-centered notes. Plain versioned Markdown plus QMD is the smaller challenger when automated capture and lifecycle semantics are unnecessary.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/basicmachines-co/basic-memory",
+        "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/README.md",
+        "https://github.com/mem0ai/mem0",
+        "https://github.com/tobi/qmd"
+      ],
+      "evidence_depth": "README architecture, local test/consistency commands and license read; no capture hook, multi-client conflict, deletion or restore run. Basic Memory documentation fetch failure is retained below.",
+      "unresolved_comparison": "Basic Memory currently advertises AGPL-3.0 and a FastMCP prerelease dependency path; both require acceptance. Mem0's advertised managed-service benchmark includes proprietary optimizations unavailable in the open-source SDK, so it cannot settle this comparison.",
+      "test_that_would_change_choice": "Across both native clients, record a decision and handoff, restart, edit the original, remove a sensitive entry, rebuild the index and restore into a clean scope. Require no stale deleted material or cross-project retrieval. Compare answer usefulness and maintenance burden against versioned files.",
+      "deployment_and_acceptance_limits": "Inspect capture content and retention before enabling hooks. Treat recalled prose as evidence rather than authority; back up approved source state and test deletion in backups under the intended retention policy.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 8,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "web-research",
+      "primary_stack": [
+        "https://github.com/microsoft/playwright",
+        "https://github.com/tavily-ai/tavily-python"
+      ],
+      "strongest_challengers": [
+        "https://github.com/vercel-labs/agent-browser",
+        "https://github.com/unclecode/crawl4ai"
+      ],
+      "why_primary_for_requirement": "Playwright supplies reproducible browser tests and inspectable traces; Tavily's official SDK supplies attributable discovery and extraction where an external search service is justified. Their roles complement each other rather than establish one web-research winner.",
+      "strongest_case_for_challenger": "Agent-browser offers compact page references and explicit action/domain controls for interactive research. Crawl4AI is attractive for repeatable multi-page extraction and non-LLM structured selectors. Either can win a selected workload on fidelity and operating cost.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/microsoft/playwright",
+        "https://github.com/tavily-ai/tavily-python",
+        "https://github.com/vercel-labs/agent-browser",
+        "https://github.com/unclecode/crawl4ai"
+      ],
+      "evidence_depth": "Primary repository capabilities, security controls and usage fields read. No website automation, authenticated browser or billed API request was performed.",
+      "unresolved_comparison": "Source completeness, dynamic-page fidelity, browser binary cost, external data handling and actual API usage are unknown. Compact browser snapshots can omit evidence; SDK functionality does not prove trustworthy synthesis.",
+      "test_that_would_change_choice": "Use a fixed set of primary pages including dynamic tables, redirects, failed fetches and pagination. Compare exact attributable facts, complete failure accounting, artifact/source recovery, allowed-domain enforcement, latency and billable usage; favor the simplest successful lane per task.",
+      "deployment_and_acceptance_limits": "Use a dedicated browser scope and no implicit profile/credential sharing. Agent-browser controls are useful but do not replace host sandboxing. Follow the target site's access conditions.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 9,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "token-efficiency",
+      "primary_stack": [
+        "https://github.com/yamadashy/repomix",
+        "https://github.com/BurntSushi/ripgrep"
+      ],
+      "strongest_challengers": [
+        "https://github.com/mksglu/context-mode",
+        "https://github.com/tobi/qmd"
+      ],
+      "why_primary_for_requirement": "Start with targeted source reads and explicit-file Repomix bundles for handoffs. This makes the retained information inspectable and avoids charging every task for a persistent context-processing layer.",
+      "strongest_case_for_challenger": "Context Mode can substantially reduce large tool-output representations through indexed retrieval and subprocess output filtering; QMD can retrieve document snippets. They should win where reductions survive end-to-end quality and provider-usage measurement.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/yamadashy/repomix",
+        "https://github.com/mksglu/context-mode",
+        "https://github.com/tobi/qmd",
+        "https://github.com/BurntSushi/ripgrep"
+      ],
+      "evidence_depth": "Representation and retrieval behavior documented upstream; no savings benchmark or provider usage comparison executed.",
+      "unresolved_comparison": "Repomix compression drops implementation detail. Context Mode's percentage claims and counters are not billed-token savings, and its subprocess boundary is not a credential-isolating OS sandbox. Platform hook parity and failure/source recovery require testing.",
+      "test_that_would_change_choice": "Replay the same tasks with fixed source revisions and models, retaining full output and failures. Measure answer correctness, missed evidence, provider input/output/cache usage, retries, latency and total cost separately from projected text size. Enable an extra layer only when the whole task improves.",
+      "deployment_and_acceptance_limits": "Keep raw artifacts recoverable, preserve source locations and avoid compressing away negative evidence. Do not infer lifetime savings from one fixture or compare counters with different scopes.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 10,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "quality-evaluation",
+      "primary_stack": [
+        "https://github.com/pytest-dev/pytest",
+        "https://github.com/HypothesisWorks/hypothesis",
+        "https://github.com/microsoft/playwright",
+        "https://github.com/promptfoo/promptfoo"
+      ],
+      "strongest_challengers": [
+        "https://github.com/confident-ai/deepeval"
+      ],
+      "why_primary_for_requirement": "Use deterministic project tests and property-based boundary checks for software, browser tests for UI behavior, and a versioned promptfoo evaluation set for AI behavior. Independent source observations and retained failing cases provide checks beyond model approval.",
+      "strongest_case_for_challenger": "DeepEval fits Python-centric metric and trajectory evaluation, especially where component-level traces answer a concrete question. Its model-based scores remain advisory unless calibrated against independent task labels.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/pytest-dev/pytest",
+        "https://github.com/HypothesisWorks/hypothesis",
+        "https://github.com/microsoft/playwright",
+        "https://github.com/promptfoo/promptfoo",
+        "https://github.com/confident-ai/deepeval"
+      ],
+      "evidence_depth": "Primary test/evaluation interfaces read; no framework installed, no suite executed and no evaluator calibrated.",
+      "unresolved_comparison": "Test presence is not passing evidence, and a green synthetic fixture is not an upstream or broker E2E result. LLM judges can agree on the same error; evaluator data leakage, nondeterminism and costs are unmeasured.",
+      "test_that_would_change_choice": "Seed known defects, numeric boundary errors, stale references and incomplete agent results. Require tests to reject them and report all negatives. Compare AI evaluators against blinded human/oracle labels, including false positives, false negatives, variance and cost before selecting judge metrics.",
+      "deployment_and_acceptance_limits": "Freeze input sets and acceptance thresholds before comparison. DeepEval documents automatic dotenv loading; isolate or disable that behavior when credentials must remain task-scoped.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 11,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "ci-supply-chain",
+      "primary_stack": [
+        "https://github.com/zizmorcore/zizmor",
+        "https://github.com/rhysd/actionlint",
+        "https://github.com/anchore/syft",
+        "https://github.com/sigstore/cosign"
+      ],
+      "strongest_challengers": [
+        "https://github.com/aquasecurity/trivy"
+      ],
+      "why_primary_for_requirement": "Use complementary workflow-security and syntax/type checks, then generate an inventory from the actual artifact and verify signed provenance with expected identity and issuer. These address different failure modes rather than constitute one comprehensive security scanner.",
+      "strongest_case_for_challenger": "Trivy combines vulnerability, configuration, secret and inventory scanning and may simplify a smaller pipeline. Its advantage is broader integrated coverage, provided false positives, database freshness and artifact scope are acceptable.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/zizmorcore/zizmor",
+        "https://github.com/rhysd/actionlint",
+        "https://github.com/anchore/syft",
+        "https://github.com/sigstore/cosign",
+        "https://github.com/aquasecurity/trivy"
+      ],
+      "evidence_depth": "Official capabilities and verification examples read. No workflow run, image inventory, signature check or vulnerability database queried.",
+      "unresolved_comparison": "Static findings do not prove reproducible builds. A lockfile or source SBOM need not match installed runtime packages. Signing without checking expected issuer/identity does not establish the intended producer.",
+      "test_that_would_change_choice": "Run a disposable workflow containing known expression injection and excess permissions; build the same pinned sources twice; inventory the resulting runtime; verify provenance and deliberately reject a wrong signer and modified artifact. Select the smallest combination that catches the required cases.",
+      "deployment_and_acceptance_limits": "Pin actions and tool releases, record network/database inputs and retained failures. Cosign's README marks an air-gap section outdated, so offline recovery instructions need current verification.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 12,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "scheduling-supervision",
+      "primary_stack": [
+        "https://github.com/systemd/systemd"
+      ],
+      "strongest_challengers": [
+        "https://github.com/PrefectHQ/prefect",
+        "https://github.com/temporalio/temporal"
+      ],
+      "why_primary_for_requirement": "Use systemd services and timers for bounded local jobs, explicit process-group lifecycle and visible logs. Its documented default control-group kill behavior and persistent timers address local supervision without immediately adding an orchestration server.",
+      "strongest_case_for_challenger": "Prefect fits Python data-task history and bounded local/distributed concurrency. Temporal fits long-lived distributed workflows with durable event history, where accepting a service and idempotent activity design is justified.",
+      "primary_evidence_urls_actually_read": [
+        "https://raw.githubusercontent.com/systemd/systemd/e362a4efcbe7366d03f6b60959b752440fe1f69b/man/systemd.kill.xml",
+        "https://raw.githubusercontent.com/systemd/systemd/e362a4efcbe7366d03f6b60959b752440fe1f69b/man/systemd.timer.xml",
+        "https://github.com/PrefectHQ/prefect",
+        "https://docs.prefect.io/v3/concepts/task-runners",
+        "https://github.com/temporalio/temporal",
+        "https://docs.temporal.io/workflow-execution"
+      ],
+      "evidence_depth": "Pinned upstream manual sources and official orchestration lifecycle docs read. No WSL service, reboot, cancellation or distributed failure trial.",
+      "unresolved_comparison": "WSL uptime and service-manager activation are unverified. Timer persistence handles missed activation but is not a guarantee that every missed interval runs. Durable workflow replay does not make external effects exactly once.",
+      "test_that_would_change_choice": "Schedule a fixture with child processes and a recorded side effect, then cancel, crash and restart during each phase. Require no surviving descendants, explicit failures and no duplicated committed effect. Move to Prefect or Temporal only if required retries/history/distribution exceed the accepted local design.",
+      "deployment_and_acceptance_limits": "Bound concurrency and timeouts, use idempotency keys for effects, and wait on every future. Prefect documents that unresolved final futures can leave tasks unfinished.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 13,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "hosting-services",
+      "primary_stack": [
+        "https://github.com/fastapi/fastapi",
+        "https://github.com/pydantic/pydantic",
+        "https://github.com/caddyserver/caddy"
+      ],
+      "strongest_challengers": [
+        "https://github.com/honojs/hono",
+        "https://github.com/podman-container-tools/podman"
+      ],
+      "why_primary_for_requirement": "For Python research services, FastAPI and Pydantic provide typed request/response boundaries; Caddy is an optional reverse proxy when a service actually needs one. Start with explicit local service ownership rather than assume public hosting.",
+      "strongest_case_for_challenger": "Hono is a strong TypeScript/web-standard alternative when the application and workers use that ecosystem. Rootless Podman is an independent packaging challenger when dependency and filesystem isolation outweigh container operations.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/fastapi/fastapi",
+        "https://github.com/pydantic/pydantic",
+        "https://github.com/caddyserver/caddy",
+        "https://github.com/honojs/hono",
+        "https://github.com/podman-container-tools/podman"
+      ],
+      "evidence_depth": "Framework READMEs and interface examples read. Reverse-proxy exploration was shallow; no authentication, deployment, schema or restart test.",
+      "unresolved_comparison": "Required product interfaces, state store, exposed ports, account requirements and hosting budget are unspecified. Pydantic's default coercion is not proof of strict financial validation. No cloud provider is selected.",
+      "test_that_would_change_choice": "Reproduce a minimal required API from a clean environment, validate malformed and boundary requests, bind locally, kill/restart during a write and restore its state. Compare Python and TypeScript only on an actual interface workload and measured operating burden.",
+      "deployment_and_acceptance_limits": "Use strict schemas where exactness matters, explicit authentication for any exposed interface and documented state ownership. Paid hosting and public deployment require their own accepted scope.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 14,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "recovery-portability",
+      "primary_stack": [
+        "https://github.com/astral-sh/uv",
+        "https://github.com/jdx/mise",
+        "https://github.com/restic/restic"
+      ],
+      "strongest_challengers": [
+        "https://github.com/NixOS/nix"
+      ],
+      "why_primary_for_requirement": "Use locked language dependencies and explicit tool/runtime versions, plus application-consistent exported state backed up with restic. Reproducible tooling and state recovery are distinct responsibilities.",
+      "strongest_case_for_challenger": "Nix can provide a more complete reproducible dependency graph across Linux machines when unmanaged system dependencies defeat simpler locks. It remains complementary to state backups and does not transfer account acceptance.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/astral-sh/uv",
+        "https://github.com/jdx/mise",
+        "https://mise.jdx.dev/dev-tools/",
+        "https://github.com/restic/restic",
+        "https://restic.readthedocs.io/en/stable/050_restore.html",
+        "https://github.com/NixOS/nix"
+      ],
+      "evidence_depth": "Version/lock behavior and backup/restore documentation read. No second-PC rebuild, backup or restore run.",
+      "unresolved_comparison": "Exact platform packages, encryption-key custody, database export consistency and download availability remain unknown. Floating tool versions and missing native dependencies can defeat a lock-only recipe.",
+      "test_that_would_change_choice": "Restore approved application exports into a clean Linux/WSL environment, with native sign-in performed anew. Verify checksums, index rebuild, deletion policy and functional acceptance. Adopt Nix if this exercise exposes dependency drift that the simpler pinned recipe cannot reliably remove.",
+      "deployment_and_acceptance_limits": "Exclude credential stores and private session secrets from portable bundles. Test access to backup keys without embedding them in manifests; another PC requires its own performance and operational acceptance.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 15,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "observation-inference",
+      "primary_stack": [
+        "https://github.com/open-telemetry/opentelemetry-collector",
+        "https://github.com/ymtdzzz/otel-tui",
+        "https://github.com/ggml-org/llama.cpp"
+      ],
+      "strongest_challengers": [
+        "https://github.com/vllm-project/vllm"
+      ],
+      "why_primary_for_requirement": "Use scoped OpenTelemetry collection and a local terminal viewer for observable outcomes. Qualify llama.cpp as a CPU-first inference candidate only against the selected model and task; telemetry and inference are complementary roles.",
+      "strongest_case_for_challenger": "vLLM is a strong challenger for serving throughput, batching and operational interfaces. Its current official CPU documentation supports x86 deployments, so it must not be dismissed as GPU-only; hardware-specific gains remain unmeasured.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/open-telemetry/opentelemetry-collector",
+        "https://github.com/ymtdzzz/otel-tui",
+        "https://github.com/ggml-org/llama.cpp",
+        "https://github.com/vllm-project/vllm",
+        "https://docs.vllm.ai/en/latest/getting_started/installation/cpu/"
+      ],
+      "evidence_depth": "Telemetry interfaces, viewer bind default and inference platform docs read. No traces captured and no model downloaded or benchmarked.",
+      "unresolved_comparison": "otel-tui documents a 0.0.0.0 default host: local intent therefore requires an explicit loopback bind. Model quality, quantization effects, RAM, startup, latency and capacity are unknown on the destination hardware.",
+      "test_that_would_change_choice": "Trace a failing and successful job, verify parent/child outcome linkage and redaction, and replay sanitized telemetry. Compare serving candidates with the same model where feasible and a fixed task suite: correctness, p50/p95 latency, throughput, peak RAM, cancellation and total cost.",
+      "deployment_and_acceptance_limits": "Keep collectors/listeners on loopback unless another scope is explicitly required, bound retention and avoid logging credentials or raw sensitive prompts. A model license and acceptable task quality are prerequisites to serving.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 16,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "foundation-memory",
+      "primary_stack": [
+        "https://github.com/dgunning/edgartools",
+        "https://github.com/docling-project/docling",
+        "https://github.com/tobi/qmd",
+        "https://github.com/oraios/serena",
+        "https://github.com/duckdb/duckdb"
+      ],
+      "strongest_challengers": [
+        "https://github.com/run-llama/llama_index",
+        "https://github.com/qdrant/qdrant"
+      ],
+      "why_primary_for_requirement": "Compose attributable filings, preserved document structure, scoped text retrieval, exact source navigation and structured as-of queries. Financial facts need deterministic dates and identities alongside prose; a semantic memory store cannot supply causality by itself.",
+      "strongest_case_for_challenger": "A consolidated LlamaIndex/Qdrant retrieval service may improve cross-document semantic recall and shared interfaces at larger scale. It should replace separate retrieval lanes only if source recovery, scope enforcement and temporal filters remain demonstrably correct.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/dgunning/edgartools",
+        "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+        "https://github.com/docling-project/docling",
+        "https://github.com/tobi/qmd",
+        "https://github.com/oraios/serena",
+        "https://github.com/duckdb/duckdb",
+        "https://github.com/run-llama/llama_index",
+        "https://github.com/qdrant/qdrant"
+      ],
+      "evidence_depth": "Primary extraction, retrieval and SEC dissemination documentation read. No point-in-time knowledge corpus or cross-client retrieval trial built.",
+      "unresolved_comparison": "Latest company facts or filings can contain later amendments. Filing time, observation period, ingestion time and first-available time must remain distinct. Proposed composition is an architectural hypothesis, not an already integrated stack.",
+      "test_that_would_change_choice": "At historical cutoffs, ask questions whose later filings change the answer. Require only then-available sources, original accession/page/row recovery and deterministic structured values; add cross-project canaries and deleted records. Prefer a consolidated service only if it improves recall without temporal or scope leakage.",
+      "deployment_and_acceptance_limits": "Retain immutable source identifiers and revision history; enforce as-of eligibility in code before ranking. Financial text summaries cannot substitute for original numeric records.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 17,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "agents-operations",
+      "primary_stack": [
+        "https://github.com/openai/codex",
+        "https://github.com/anthropics/claude-code",
+        "https://github.com/systemd/systemd",
+        "https://github.com/PrefectHQ/prefect"
+      ],
+      "strongest_challengers": [
+        "https://github.com/langchain-ai/langgraph",
+        "https://github.com/temporalio/temporal"
+      ],
+      "why_primary_for_requirement": "Use native agents for bounded research, systemd for local lifecycle and Prefect only where an explicit research DAG warrants it. Require complete terminal results, artifact manifests and failures, with telemetry linked to the run.",
+      "strongest_case_for_challenger": "LangGraph helps application-level checkpointed reasoning; Temporal helps distributed long-lived operational recovery. Their strongest case is a concrete state/retry requirement that native sessions and bounded research tasks cannot meet.",
+      "primary_evidence_urls_actually_read": [
+        "https://code.claude.com/docs/en/headless",
+        "https://code.claude.com/docs/en/workflows",
+        "https://learn.chatgpt.com/docs/non-interactive-mode",
+        "https://docs.prefect.io/v3/concepts/task-runners",
+        "https://docs.langchain.com/oss/python/langgraph/persistence",
+        "https://docs.temporal.io/workflow-execution",
+        "https://raw.githubusercontent.com/systemd/systemd/e362a4efcbe7366d03f6b60959b752440fe1f69b/man/systemd.kill.xml"
+      ],
+      "evidence_depth": "Official result and lifecycle docs read. Proposed composition has not been integrated or executed; no equity agent benchmark.",
+      "unresolved_comparison": "Research-only prompts do not prevent broker actions. Persistent state can preserve a mistaken plan; returned JSON alone does not establish all expected results were returned. Durable effect semantics remain workload-specific.",
+      "test_that_would_change_choice": "Run bounded research fixtures with success, timeout, invalid data and worker cancellation. Require terminal records for every requested unit, recoverable source artifacts and denied access to broker secrets/endpoints. Crash and resume without duplicating outputs; add a graph/server only for measured missing guarantees.",
+      "deployment_and_acceptance_limits": "Research workers must have no broker credentials and must be blocked from broker control paths by enforced policy. Keep execution/risk code outside worker authority, and retain null/error results rather than filtering them away.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 18,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "data-research",
+      "primary_stack": [
+        "https://github.com/databento/databento-python",
+        "https://github.com/dgunning/edgartools",
+        "https://github.com/duckdb/duckdb",
+        "https://github.com/pola-rs/polars"
+      ],
+      "strongest_challengers": [
+        "https://github.com/massive-com/client-python",
+        "https://github.com/alpacahq/alpaca-py"
+      ],
+      "why_primary_for_requirement": "Databento is a defensible candidate for explicitly identified US-equity market observations and point-in-time reference/corporate-action handling; EdgarTools supplies attributable filings. DuckDB and Polars provide local reproducible transformations over retained raw data.",
+      "strongest_case_for_challenger": "Massive offers an alternative official market-data client; Alpaca's official client can reduce friction with its broker ecosystem. The strongest challenger depends on required symbols, history, feed rights and total data cost, not Python API convenience.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/databento/databento-python",
+        "https://databento.com/docs/venues-and-datasets/corporate-actions",
+        "https://databento.com/docs/schemas-and-data-formats/corporate-actions",
+        "https://github.com/dgunning/edgartools",
+        "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+        "https://github.com/duckdb/duckdb",
+        "https://github.com/pola-rs/polars",
+        "https://github.com/massive-com/client-python",
+        "https://github.com/alpacahq/alpaca-py",
+        "https://docs.alpaca.markets/us/docs/historical-stock-data-1"
+      ],
+      "evidence_depth": "Primary SDK and feed/reference documentation read; no data bought or downloaded and no independent completeness/latency benchmark. Massive coverage remains repository-level and is weaker than the other data sources.",
+      "unresolved_comparison": "Data entitlements, redistribution rights, historical membership, delisted coverage and correction semantics remain unaccepted. Databento documents pit=True for retained historical corporate-action records versus a latest view; Alpaca documents IEX and SIP as different feeds.",
+      "test_that_would_change_choice": "Compare identical instruments/dates, including delistings, splits, dividends, symbol changes, late corrections and halts. Rebuild an as-of eligible universe, reconcile unadjusted/adjusted prices and costs, and measure missing/duplicate records plus actual license and retrieval expense. Choose by required coverage and verified causality.",
+      "deployment_and_acceptance_limits": "SDK license does not grant market-data rights. Preserve event/receive/available timestamps, feed identity, stable instrument mapping and original corporate-action records; do not assume a current ticker list is historical eligibility.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 19,
+      "coverage_tier": "D1/R0"
+    },
+    {
+      "layer_id": "engines-strategies",
+      "primary_stack": [
+        "https://github.com/QuantConnect/Lean",
+        "https://github.com/QuantConnect/Lean.Brokerages.InteractiveBrokers",
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca"
+      ],
+      "strongest_challengers": [
+        "https://github.com/nautechsystems/nautilus_trader",
+        "https://github.com/stefan-jansen/zipline-reloaded",
+        "https://github.com/polakowo/vectorbt"
+      ],
+      "why_primary_for_requirement": "LEAN is the provisional full US-equity workflow candidate because its engine and both requested broker repositories are inspectable, and sampled equity fill/dividend tests assert relevant behavior. This is a fit preference, not proof of broker readiness or superior strategy results.",
+      "strongest_case_for_challenger": "NautilusTrader is the strongest execution-focused challenger for event-driven design, numeric representations and reconciliation, with an IB integration and substantial inspectable Rust tests. Zipline reloaded fits historical research; vectorbt fits parameter screening. They can be complementary stages rather than substitutes for broker qualification.",
+      "primary_evidence_urls_actually_read": [
+        "https://github.com/QuantConnect/Lean",
+        "https://github.com/QuantConnect/Lean.Brokerages.InteractiveBrokers",
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
+        "https://www.quantconnect.com/docs/v2/lean-cli/key-concepts/getting-started",
+        "https://raw.githubusercontent.com/QuantConnect/Lean/b2a01cc15b09c1d448920f4af81c73f8b07ec7d4/Tests/Common/Orders/Fills/EquityFillModelTests.LimitFill.cs",
+        "https://raw.githubusercontent.com/QuantConnect/Lean/b2a01cc15b09c1d448920f4af81c73f8b07ec7d4/Tests/Engine/DataFeeds/Enumerators/DividendEventProviderTests.cs",
+        "https://github.com/nautechsystems/nautilus_trader",
+        "https://github.com/nautechsystems/nautilus_trader/blob/develop/docs/integrations/interactive_brokers.md",
+        "https://github.com/nautechsystems/nautilus_trader/blob/develop/docs/concepts/live.md",
+        "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/82b66fee382086c803e27b9fd5c06f94d24d2831/crates/risk/tests/risk_engine.rs",
+        "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/82b66fee382086c803e27b9fd5c06f94d24d2831/crates/execution/src/reconciliation/proptests.rs",
+        "https://github.com/stefan-jansen/zipline-reloaded",
+        "https://github.com/polakowo/vectorbt"
+      ],
+      "evidence_depth": "Deeper source review: pinned LEAN equity-fill/dividend tests and Nautilus risk/reconciliation tests inspected, plus current integration/live-state documentation. No engine built, backtest executed or paper connection attempted.",
+      "unresolved_comparison": "LEAN CLI currently requires a paid organization and Docker, while the engine documents a direct .NET build route; that route's broker dependency/account setup remains untested. Nautilus currently documents v2 release-candidate status; an official Alpaca integration was not established. Neither candidate is accepted for both broker paper E2E.",
+      "test_that_would_change_choice": "Run the same causal data and deterministic risk/accounting fixture in each engine, reconcile cash/positions/fees/splits/dividends against an independent ledger, then separately qualify IBKR paper and Alpaca paper. Include stale data, rejected/partial/duplicate fills, disconnect-before-ack, restart and reconciliation. Prefer Nautilus if its required adapter path and recovery outperform while both broker gates pass.",
+      "deployment_and_acceptance_limits": "No orders in this review. LEAN source versus CLI pricing must remain distinct. Nautilus documents dispatch/durable-state and account-isolation limitations. Model-generated strategies require held-out historical evaluation; simulated fills do not establish paper or live execution quality.",
+      "status": "provisional_source_based_selection_not_adopted",
+      "order": 20,
+      "coverage_tier": "D2/R0"
+    }
+  ],
+  "source_observations": [
+    {
+      "subject": "Nautilus risk-test assertion strength",
+      "classification": "Bounded independent source observation; not an executed failing test or a conclusion about the whole risk engine.",
+      "source": "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/82b66fee382086c803e27b9fd5c06f94d24d2831/crates/risk/tests/risk_engine.rs",
+      "observation": "In the sampled invalid-price-precision and max-notional tests, event-count assertions are followed by standalone matches! expressions for the denied-event variant. Those boolean expressions are not asserted. Later sampled tests explicitly assert event variants and execution-message outcomes, so this observation must not be generalized to the entire suite.",
+      "implication": "Before counting these two tests as evidence that the denial variant is enforced, confirm a mutation from denied to another single event is rejected. Source test counts alone overstate this specific coverage."
+    },
+    {
+      "subject": "Nautilus reconciliation tests and live boundaries",
+      "classification": "Pinned synthetic property tests plus primary live-operation documentation; no broker result.",
+      "sources": [
+        "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/82b66fee382086c803e27b9fd5c06f94d24d2831/crates/execution/src/reconciliation/proptests.rs",
+        "https://github.com/nautechsystems/nautilus_trader/blob/develop/docs/concepts/live.md"
+      ],
+      "observation": "Sampled property tests explicitly assert position/reconciliation invariants. Current live documentation distinguishes transport uncertainty from rejection and describes durability and multi-client isolation limitations.",
+      "implication": "These are useful execution-engine design facts, but synthetic instrument fixtures and in-process invariants do not establish US-equity accounting or either broker's paper recovery."
+    },
+    {
+      "subject": "LEAN equity test specificity",
+      "classification": "Pinned test-source inspection only.",
+      "sources": [
+        "https://raw.githubusercontent.com/QuantConnect/Lean/b2a01cc15b09c1d448920f4af81c73f8b07ec7d4/Tests/Common/Orders/Fills/EquityFillModelTests.LimitFill.cs",
+        "https://raw.githubusercontent.com/QuantConnect/Lean/b2a01cc15b09c1d448920f4af81c73f8b07ec7d4/Tests/Engine/DataFeeds/Enumerators/DividendEventProviderTests.cs"
+      ],
+      "observation": "Sampled tests assert no fill on stale input, limit-fill behavior and dividend-distribution/reference-data outcomes. They provide more specific support for equity simulation semantics than a README feature list.",
+      "implication": "None was run here. Fixtures do not settle realistic execution, data licensing, survivorship, real broker connectivity or complete paper reconciliation."
+    },
+    {
+      "subject": "Current repository API and deployment distinctions",
+      "classification": "Primary documentation observations.",
+      "observations": [
+        "Claude native workflows now document orchestration and failure returns; excluding them based on an old feature inventory would be unsupported.",
+        "Current vLLM documentation includes x86 CPU serving; a GPU-only exclusion would be unsupported.",
+        "LEAN's local CLI account/Docker conditions differ from building the open-source engine directly.",
+        "Nautilus's current inspected integration list and docs establish IB support, but did not establish an official Alpaca path. Failed guessed URLs alone are not proof that an adapter does not exist.",
+        "QMD scope parameters, memory-store dependency versions and telemetry listener defaults are operational details that deserve direct acceptance checks."
+      ]
+    }
+  ],
+  "head_pins": [
+    {
+      "repository": "https://github.com/openai/codex",
+      "commit": "bf7c87a7b7bdb1b65cbfdca06d15713d3aa20b01",
+      "committed_at_utc": "2026-09-22T02:15:01Z",
+      "commit_url": "https://github.com/openai/codex/commit/bf7c87a7b7bdb1b65cbfdca06d15713d3aa20b01",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code",
+      "commit": "b486776a2eef0d3f39abaebaa3c03e378c7480b8",
+      "committed_at_utc": "2026-09-21T22:23:27Z",
+      "commit_url": "https://github.com/anthropics/claude-code/commit/b486776a2eef0d3f39abaebaa3c03e378c7480b8",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/agentskills/agentskills",
+      "commit": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+      "committed_at_utc": "2026-08-09T20:36:04Z",
+      "commit_url": "https://github.com/agentskills/agentskills/commit/69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/oraios/serena",
+      "commit": "9f19a79a045f3f2681ba7b58f88938b83a81ca8f",
+      "committed_at_utc": "2026-09-21T19:57:33Z",
+      "commit_url": "https://github.com/oraios/serena/commit/9f19a79a045f3f2681ba7b58f88938b83a81ca8f",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/tobi/qmd",
+      "commit": "04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+      "committed_at_utc": "2026-09-09T20:51:54Z",
+      "commit_url": "https://github.com/tobi/qmd/commit/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/docling-project/docling",
+      "commit": "b078ea34921eafe181141e6179e87885196497c3",
+      "committed_at_utc": "2026-09-21T14:39:50Z",
+      "commit_url": "https://github.com/docling-project/docling/commit/b078ea34921eafe181141e6179e87885196497c3",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/basicmachines-co/basic-memory",
+      "commit": "3bf2d523c0a941f71cb144a5502e7557dd025d69",
+      "committed_at_utc": "2026-09-16T03:43:59Z",
+      "commit_url": "https://github.com/basicmachines-co/basic-memory/commit/3bf2d523c0a941f71cb144a5502e7557dd025d69",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/kapillamba4/code-memory",
+      "commit": "5a8db166ca11a90c093ba4a9a54d266cde756f54",
+      "committed_at_utc": "2026-05-20T13:58:06Z",
+      "commit_url": "https://github.com/kapillamba4/code-memory/commit/5a8db166ca11a90c093ba4a9a54d266cde756f54",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/mksglu/context-mode",
+      "commit": "2ea2b2f75f669d3c33a41f5d4b433c1497aec646",
+      "committed_at_utc": "2026-09-21T12:06:46Z",
+      "commit_url": "https://github.com/mksglu/context-mode/commit/2ea2b2f75f669d3c33a41f5d4b433c1497aec646",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/systemd/systemd",
+      "commit": "e362a4efcbe7366d03f6b60959b752440fe1f69b",
+      "committed_at_utc": "2026-09-21T17:46:35Z",
+      "commit_url": "https://github.com/systemd/systemd/commit/e362a4efcbe7366d03f6b60959b752440fe1f69b",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/QuantConnect/Lean",
+      "commit": "b2a01cc15b09c1d448920f4af81c73f8b07ec7d4",
+      "committed_at_utc": "2026-09-21T22:19:49Z",
+      "commit_url": "https://github.com/QuantConnect/Lean/commit/b2a01cc15b09c1d448920f4af81c73f8b07ec7d4",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/QuantConnect/Lean.Brokerages.InteractiveBrokers",
+      "commit": "e4aed821cf63e577c237ad663656e18e8ce4ae41",
+      "committed_at_utc": "2026-09-15T22:17:04Z",
+      "commit_url": "https://github.com/QuantConnect/Lean.Brokerages.InteractiveBrokers/commit/e4aed821cf63e577c237ad663656e18e8ce4ae41",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
+      "commit": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+      "committed_at_utc": "2026-09-15T22:18:57Z",
+      "commit_url": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/commit/1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "commit": "82b66fee382086c803e27b9fd5c06f94d24d2831",
+      "committed_at_utc": "2026-09-22T01:49:50Z",
+      "commit_url": "https://github.com/nautechsystems/nautilus_trader/commit/82b66fee382086c803e27b9fd5c06f94d24d2831",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/databento/databento-python",
+      "commit": "e675ef30369f5ee9f68b04606080c519adf3be69",
+      "committed_at_utc": "2026-09-01T22:42:48Z",
+      "commit_url": "https://github.com/databento/databento-python/commit/e675ef30369f5ee9f68b04606080c519adf3be69",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "commit": "3a468575a6d4a70d610ffe40fcf59f22906432ab",
+      "committed_at_utc": "2026-09-21T10:27:23Z",
+      "commit_url": "https://github.com/dgunning/edgartools/commit/3a468575a6d4a70d610ffe40fcf59f22906432ab",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/vercel-labs/agent-browser",
+      "commit": "b0f3962a131292805fe7c4e276e4bf7a50a4e876",
+      "committed_at_utc": "2026-09-21T19:15:58Z",
+      "commit_url": "https://github.com/vercel-labs/agent-browser/commit/b0f3962a131292805fe7c4e276e4bf7a50a4e876",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/microsoft/playwright",
+      "commit": "b30584c2c8a9c0fc57423f352f7afbd744cc58cd",
+      "committed_at_utc": "2026-09-22T01:05:33Z",
+      "commit_url": "https://github.com/microsoft/playwright/commit/b30584c2c8a9c0fc57423f352f7afbd744cc58cd",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/PrefectHQ/prefect",
+      "commit": "c352eb8668a97d31ba8e7636d26d929f0db84d48",
+      "committed_at_utc": "2026-09-21T21:06:57Z",
+      "commit_url": "https://github.com/PrefectHQ/prefect/commit/c352eb8668a97d31ba8e7636d26d929f0db84d48",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    },
+    {
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "commit": "58367713a6935c0810103378144008df32e3d5db",
+      "committed_at_utc": "2026-09-21T21:49:52Z",
+      "commit_url": "https://github.com/ggml-org/llama.cpp/commit/58367713a6935c0810103378144008df32e3d5db",
+      "lookup": "Unauthenticated public GitHub REST commits endpoint; default branch head."
+    }
+  ],
+  "failed_or_incomplete_fetches": [
+    {
+      "url": "https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html",
+      "outcome": "HTTP 403 through web fetch; recovered selected lifecycle semantics from pinned upstream manuals."
+    },
+    {
+      "url": "https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html",
+      "outcome": "HTTP 403 through web fetch; recovered timer documentation from pinned upstream XML."
+    },
+    {
+      "url": "https://basicmemory.com/docs/cli/",
+      "outcome": "Web-tool internal fetch failure; CLI deletion/restoration procedure remains unverified."
+    },
+    {
+      "url": "https://databento.com/docs/examples/equities/adjusting-prices",
+      "outcome": "Specific example inaccessible; corporate-action reference pages were read instead. No adjusted-price implementation was verified."
+    },
+    {
+      "url": "https://nautilustrader.io/docs/latest/integrations/ib/",
+      "outcome": "Guessed URL fetch failed; recovered interactive_brokers.md from upstream repository."
+    },
+    {
+      "url": "https://nautilustrader.io/docs/latest/integrations/alpaca/",
+      "outcome": "Guessed URL fetch failed. Absence of this URL is not evidence of general impossibility or absence of community adapters."
+    },
+    {
+      "attempt": "A guessed LEAN EquityPortfolioModelTests.cs raw path",
+      "outcome": "404; exact failed URL was not retained in this report. Repository tree discovery recovered the immutable equity fill and dividend tests listed above."
+    },
+    {
+      "url": "https://github.com/anomalyco/opencode",
+      "outcome": "Repository fetched, but targeted provider text was not found in extracted content. Excluded from the selected challenger comparison rather than inferred from prior model knowledge."
+    }
+  ],
+  "qualification_sequence": [
+    "Freeze this independent report, then compare it with the separately frozen study. Preserve disagreements and evidence gaps; do not turn agreement into acceptance.",
+    "On the destination PC, establish native account readiness, hardware/WSL service capabilities and exact selected versions without copying credential stores.",
+    "Qualify enforced worker boundaries and complete cancellation/result accounting, then representative source retrieval, deletion and clean-state restore.",
+    "Measure context and inference alternatives only on fixed task outcomes, separating representation size, provider usage, latency and cost.",
+    "For equities, accept licensed causal data and an independent accounting/risk fixture before historical engine comparison.",
+    "Only after those checks, separately qualify IBKR paper and Alpaca paper with reconnect, uncertain-order and reconciliation cases; this review authorizes or executes none of those operations."
+  ],
+  "overall_limit": "This is a bounded, partly selection-blinded source research artifact. All proposed integrated stacks, workload rankings, migration outcomes, real costs and broker behavior remain untested.",
+  "frozen_at_utc": "2026-09-22 02:33:43 UTC"
+}

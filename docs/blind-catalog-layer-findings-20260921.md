@@ -1,0 +1,29 @@
+# Current Codex findings by layer
+
+This table records coordinator adjudication of the sealed source report. The
+live Claude discovery result is still pending; this table is not a claim of
+completed cross-family convergence or a comparative runtime benchmark.
+
+| Layer | Current disposition | Evidence-based reason |
+| --- | --- | --- |
+| native-clients | retain | Native Codex/Claude match both the installed evidence and the independent interface-fit recommendation. Aider is newly indexed as a provider-flexible alternative; no equivalent account/recovery trial establishes a replacement. |
+| instructions-skills | retain targeted practice | The review favors the Agent Skills format and Anthropic examples; these complement the selected small skill set. Superpowers remains a workflow candidate, not a reason to load another full instruction suite. |
+| workers | retain | Both views favor native Codex/Claude for bounded work. Keep application SDKs and LangGraph conditional on a real application/durable-state requirement. Claude's portable roles/workflow evidence is now integrated. |
+| isolation | retain | Git ownership, client restrictions and container isolation are different responsibilities. Worktrunk remains the accepted ownership helper; native sandbox restrictions require their own enforcement tests. Rootless Podman is conditional. |
+| code-navigation | retain expand discovery | The independent exact/structural/symbol stack agrees with the current responsibility split. ripgrep and SCIP are newly indexed; SCIP needs language/index maintenance evidence before adding another lane. |
+| document-retrieval | keep but compare | QMD agrees. Docling leads the review only when layout/tables require it; the current lightweight accepted conversion remains appropriate until a representative document set demonstrates a useful extraction advantage. |
+| semantic-rag | keep but compare | The review proposes code-memory for smaller local corpora, explicitly at low confidence. Add a scoped comparison lead against the accepted SocratiCode path; no ranking or clean-install result supports replacing it. |
+| durable-memory | keep but compare | Basic Memory's inspectable Markdown and local cross-client interface make it a priority challenger. The independent review did not inspect ai-memory or Hindsight, so it cannot disqualify either. Retain the accepted ai-memory store pending the already required matched recall/deletion/restore comparison. |
+| web-research | retain complementary tools | Playwright and Tavily's SDK complement the accepted CLI/browser tools; API libraries do not inherit native tool or account qualification. Crawl4AI stays conditional on a crawling workload. This report did not adjudicate DeerFlow or full research runtimes. |
+| token-efficiency | retain | Both approaches favor scoped exact retrieval and explicit-file packaging. Context Mode, QMD and other accepted helpers remain selected by task. No report measured causal provider savings. |
+| quality-evaluation | retain expand discovery | Add Hypothesis and DeepEval to discovery alongside pytest/Playwright/Promptfoo. They address generated edge cases and model evaluations, not proof that an untested repository wins; project/upstream acceptance remains the gate. |
+| ci-supply-chain | retain | zizmor, actionlint and Syft agree. Cosign and Trivy are complementary candidates; existing attestations, secret checks and actual workflow evidence retain their precise scopes. |
+| scheduling-supervision | keep but compare | systemd agrees for local service ownership. Dagu has retained local workflow/recovery evidence that the independent report did not examine. Prefect/Temporal need a durable pipeline or cross-host recovery requirement plus matched lifecycle acceptance. |
+| hosting-services | retain complementary tools | FastAPI agrees for Python interfaces; Pydantic supplies typed contracts. Caddy and Hono are newly indexed optional service/application choices. They do not replace a qualified UI/database stack or justify public hosting. |
+| recovery-portability | keep but compare | uv, mise and Restic align. Nix is newly indexed for a demonstrated system-level reproducibility gap; reproducible artifacts and this host's restore do not certify a fresh WSL machine. |
+| observation-inference | retain complementary tools | OTel and otel-tui align; Collector core and Contrib have different scope. llama.cpp and CPU-capable vLLM are workload alternatives, not mandatory infrastructure. Retain the accepted inference pin until target-hardware/model acceptance. |
+| foundation-memory | keep but compare | The source-first filings/documents/code proposal complements the memory/retrieval division. EdgarTools and DuckDB belong to provenance/analysis; they do not substitute for cross-session knowledge ownership. |
+| agents-operations | retain keep comparisons | Native clients and systemd agree. Prefect and LangGraph are conditional research-application choices; the accepted Dagu/telemetry/recovery path has execution evidence the independent source report did not inspect. |
+| data-research | keep but compare | Databento's coverage/reference-data case is a real challenge to choosing a provider solely for broker convenience. Keep the qualified bounded Alpaca path, and compare rights, point-in-time universe, corporate actions, corrections and total cost on identical securities/dates before changing provider. |
+| engines-strategies | keep but compare | LEAN has inspectable engine, equity tests and both broker plugins, which strengthens its comparison case. Keep the user's Nautilus destination with explicit broker/accounting gaps. Source-test weaknesses must be checked narrowly; neither an engine feature list nor a model preference establishes paper readiness or strategy performance. |
+

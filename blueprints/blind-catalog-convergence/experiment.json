@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Resolve selection anchoring and catalog omissions through separate source discovery, then adjudicate findings against original implementations and existing scoped evidence. The live Claude result remains separately pending until its actual return.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "99f580c187100d064853b977376697394decbefe"
+    },
+    {
+      "url": "https://github.com/kapillamba4/code-memory",
+      "revision": "5a8db166ca11a90c093ba4a9a54d266cde756f54"
+    },
+    {
+      "url": "https://github.com/nautechsystems/nautilus_trader",
+      "revision": "82b66fee382086c803e27b9fd5c06f94d24d2831"
+    }
+  ],
+  "discovery_provenance": [
+    "One Codex subagent, fork_turns=none, received only neutral-requirements.json as assigned local input. It reports residual ambient project/tool exposure and no catalog, memory or other-review artifact access.",
+    "A supported native Claude relay delivered one request to preserve the existing independent-sota-research workflow. The peer confirmed reading; final discovery results remain pending.",
+    "Reports are frozen before conclusions are shared across reviewers. Original/public hash mapping preserves the one private-path substitution."
+  ],
+  "license_and_compatibility": "Source review only. Existing native accounts and installed pins unchanged; candidate repository/model/service licenses and destination Linux/WSL compatibility remain separately qualified.",
+  "baseline_and_candidate": {
+    "baseline": "Current 20-layer catalog at 99f580c with existing source and local execution evidence.",
+    "candidate": "Independent provisional discovery followed by coordinator and separate original-source adjudication; discovery candidates and conditional comparisons, not runtime replacements."
+  },
+  "frozen_inputs": {
+    "base_revision": "99f580c187100d064853b977376697394decbefe",
+    "tasks": [
+      "catalog-source-convergence"
+    ],
+    "roles": [
+      "coordinator-artifact-check"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+        "sha256": "24001f4bed3298909d4493a82501590dd5725d1df0445a666ffd81cbc318f84b"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/blind-catalog-convergence/neutral-requirements.json",
+        "sha256": "923af7463aa21bdf69dec28137b89e6c5dd9ac37c4f917757ded8acb8377b443"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-provenance.json",
+        "sha256": "9ab2bdd7b8270c522ab9a0558b019f35435be3c101ff631e302797926c73bb51"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Neutral requirements request 20 layers, primary sources, strongest challengers, limitations and decision-changing comparisons. The recorded command below checks identity/reference consistency only; source truth and comparative quality are not certified.",
+    "usage_rule": "No savings claim. Per-child Codex provider usage was unavailable; native Claude workflow usage/failures must come from its actual returned record. Do not sum estimates or infer zero from missing values."
+  },
+  "runtime_and_platform": {
+    "platform": "Existing Linux/WSL x86_64 host",
+    "tools": [
+      {
+        "name": "Codex application subagent source reviewer",
+        "version": "Exact resolved model/effort not exposed; no override requested"
+      },
+      {
+        "name": "Claude native relay",
+        "version": "CLI 2.1.278; native account and permissions retained"
+      },
+      {
+        "name": "Repository offline validators",
+        "version": "648cb71 integration plus recorded owned source-review additions"
+      }
+    ],
+    "isolation": "Read-only discovery assignment and owned report paths; ambient project instructions remain visible. Coordinator owns an isolated Git worktree. No claim of OS-enforced blindness, active-store isolation testing or target-host acceptance."
+  },
+  "commands": [
+    "python3 scripts/catalog_decisions.py --write --supplement catalogs/landscape/independent-discovery.json#/candidates",
+    "python3 scripts/landscape.py --root ."
+  ],
+  "observations": [
+    {
+      "id": "source-catalog-coverage",
+      "task": "catalog-source-convergence",
+      "role": "coordinator-artifact-check",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Independent source-discovery coverage and catalog integration; no comparative runtime, provider-savings or destination-PC qualification",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-provenance.json",
+          "sha256": "9ab2bdd7b8270c522ab9a0558b019f35435be3c101ff631e302797926c73bb51"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [],
+  "limitations": [
+    "Record assembled after the returned offline checks; it is not a prospective head-to-head benchmark.",
+    "Partial selection blinding: ambient instructions/tool identities were visible to both families.",
+    "Most evidence is documentation/interface inspection; only selected source assertions were inspected, with no upstream tests rerun.",
+    "A successful inventory check does not certify original-source truth, reviewer independence beyond disclosed boundaries or repository quality.",
+    "The original Codex report retains failed source fetches. Live Claude workflow failures and outcomes remain pending until returned."
+  ],
+  "decision_and_scope": {
+    "decision": "retain",
+    "scope": "Independent source-discovery coverage and catalog integration; no comparative runtime, provider-savings or destination-PC qualification",
+    "qualification_run_ids": []
+  },
+  "rollback": "Installed defaults and services unchanged. Revert owned catalog changes if source findings are disproved; retain dated discovery and failure history.",
+  "next_decision_changing_test": "Complete the live Claude return and reconcile both reports. Qualify code-memory freshness/model fit, matched ai-memory/Basic Memory/Hindsight recall and lifecycle, or shared Nautilus/LEAN accounting and broker recovery only within their frozen scopes. Establish actual installation/use on the destination PC.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

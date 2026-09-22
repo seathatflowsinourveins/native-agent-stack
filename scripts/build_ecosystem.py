@@ -349,7 +349,7 @@ def build_data(root):
         new_catalog = path.startswith(("catalogs/foundation/", "catalogs/landscape/", "docs/landscape-")) or path in config.get("grand_catalogs", {}).values()
         new_practice = path.startswith(("blueprints/native-skill-practice/", "examples/codex-native/agents/semantic-", "examples/claude-native/agents/semantic-"))
         # Artifact bundles that arrived with this packet do not exist at the immutable base.
-        new_catalog = new_catalog or path.startswith(("evidence/artifacts/ultracode-token-routing-20260921/", "evidence/artifacts/portable-claude-native-qualification-20260921/"))
+        new_catalog = new_catalog or path.startswith(("evidence/artifacts/ultracode-token-routing-20260921/", "evidence/artifacts/portable-claude-native-qualification-20260921/", "evidence/artifacts/blind-catalog-convergence-20260921/", "blueprints/blind-catalog-convergence/"))
         revision = publication_ref if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or new_practice or path in current_public_paths else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 

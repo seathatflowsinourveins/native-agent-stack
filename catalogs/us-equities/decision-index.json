@@ -135,6 +135,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/landscape/independent-discovery.json",
+      "collection": "/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/landscape/native-practice.json",
       "collection": "/alternatives",
       "repository_field": "repository",
@@ -317,16 +323,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 527,
+    "repositories": 540,
     "public_star_repositories": 342,
-    "beyond_public_stars": 185,
-    "references": 1307,
+    "beyond_public_stars": 198,
+    "references": 1374,
     "repositories_by_record_type": {
       "catalog_card": 147,
       "component_record": 68,
       "legacy_candidate": 20,
       "public_star": 342,
-      "research_supplement": 213,
+      "research_supplement": 230,
       "star_review": 342
     }
   },
@@ -684,6 +690,13 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/3",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/native-practice.json",
           "pointer": "/alternatives/3",
           "decision": "retain_existing_reference",
@@ -815,6 +828,23 @@
           "id": "finrl-x",
           "decision": "watch",
           "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/aider-ai/aider",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/2",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         }
       ]
     },
@@ -1087,6 +1117,13 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/59",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
@@ -1366,6 +1403,13 @@
           "disposition": "selected"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/36",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
           "pointer": "/entries/33",
@@ -1488,6 +1532,13 @@
           "disposition": "conditional"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/6",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
           "pointer": "/entries/39",
@@ -1554,6 +1605,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/2/candidates/0",
           "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/1",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "research_supplement",
@@ -1700,6 +1758,13 @@
           "disposition": "selected"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/8",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
           "pointer": "/entries/18",
@@ -1728,6 +1793,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/1/candidates/8",
           "disposition": "overlap"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/4",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "research_supplement",
@@ -1864,6 +1936,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/11/candidates/6",
           "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/38",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "catalog_card",
@@ -2014,6 +2093,13 @@
           "disposition": "selected"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/12",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
           "kind": "component_record",
           "path": "manifests/stack.json",
           "pointer": "/components/4",
@@ -2045,6 +2131,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/14/candidates/2",
           "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/46",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         }
       ]
     },
@@ -2278,6 +2371,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/7/candidates/2",
           "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/22",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "research_supplement",
@@ -2660,6 +2760,23 @@
       ]
     },
     {
+      "repository": "https://github.com/burntsushi/ripgrep",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/11",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/bytebase/dbhub",
       "aliases": [],
       "public_star": true,
@@ -2748,6 +2865,23 @@
           "decision": "already_covered",
           "review_level": "prior_catalog",
           "review_depth": "prior_evidence_link"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/caddyserver/caddy",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/44",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         }
       ]
     },
@@ -3356,6 +3490,23 @@
       ]
     },
     {
+      "repository": "https://github.com/confident-ai/deepeval",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/33",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/containers/bubblewrap",
       "aliases": [],
       "public_star": false,
@@ -3604,6 +3755,13 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/56",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
@@ -4031,6 +4189,13 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/54",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/2/candidates/1",
           "disposition": "selected"
@@ -4274,6 +4439,13 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/16",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/0/candidates/14",
           "disposition": "conditional"
@@ -4380,6 +4552,13 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/55",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
@@ -4805,6 +4984,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/13/candidates/2",
           "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/42",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "component_record",
@@ -5300,6 +5486,13 @@
           "disposition": "conditional"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/52",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
           "kind": "component_record",
           "path": "manifests/stack.json",
           "pointer": "/components/56",
@@ -5365,6 +5558,23 @@
           "path": "manifests/stack.json",
           "pointer": "/components/32",
           "id": "socraticode"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/git/git",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/9",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         }
       ]
     },
@@ -6126,6 +6336,23 @@
       ]
     },
     {
+      "repository": "https://github.com/honojs/hono",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/45",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/huggingface/huggingface_hub",
       "aliases": [],
       "public_star": false,
@@ -6190,6 +6417,23 @@
           "decision": "obsolete_or_ineligible",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/hypothesisworks/hypothesis",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/31",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         }
       ]
     },
@@ -6451,6 +6695,13 @@
           "disposition": "conditional"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/47",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/139",
@@ -6611,6 +6862,29 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/kapillamba4/code-memory",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/6/candidates/7",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/18",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         }
       ]
     },
@@ -6982,6 +7256,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/2/candidates/4",
           "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/7",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "research_supplement",
@@ -7660,6 +7941,13 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/58",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/2/candidates/5",
           "disposition": "conditional"
@@ -7806,6 +8094,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/7/candidates/3",
           "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/23",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "research_supplement",
@@ -7963,6 +8258,13 @@
           "disposition": "selected"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/17",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/177",
@@ -8006,6 +8308,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/10/candidates/0",
           "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/24",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "component_record",
@@ -8202,6 +8511,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/9/candidates/1",
           "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/29",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "research_supplement",
@@ -8703,6 +9019,13 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/63",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/3/candidates/0",
           "disposition": "selected"
@@ -8856,6 +9179,23 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/nixos/nix",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/49",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         }
       ]
     },
@@ -9069,9 +9409,17 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/5",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -9369,9 +9717,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/50",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -9448,6 +9804,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/2/candidates/1",
           "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/0",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "research_supplement",
@@ -9928,6 +10291,13 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/13",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/0/candidates/2",
           "disposition": "selected"
@@ -10396,6 +10766,13 @@
           "pointer": "/candidates/2",
           "decision": "conditional",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/10",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         }
       ]
     },
@@ -10410,6 +10787,13 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/57",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
@@ -10449,6 +10833,13 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/65",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
@@ -10553,6 +10944,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/12/candidates/4",
           "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/40",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "research_supplement",
@@ -10716,6 +11114,13 @@
           "disposition": "selected"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/32",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
           "pointer": "/entries/31",
@@ -10810,9 +11215,17 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/43",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -10877,9 +11290,17 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/30",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -10893,6 +11314,23 @@
           "decision": "overlaps_established",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/qdrant/fastembed",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/21",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         }
       ]
     },
@@ -10930,6 +11368,13 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/20",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/0/candidates/4",
           "disposition": "selected"
@@ -10960,6 +11405,13 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/60",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
@@ -11021,6 +11473,13 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/62",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/3/candidates/3",
           "disposition": "conditional"
@@ -11039,6 +11498,23 @@
           "id": "lean-alpaca",
           "decision": "default",
           "evidence_level": "native_proven"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/quantconnect/lean.brokerages.interactivebrokers",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/61",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         }
       ]
     },
@@ -11289,6 +11765,13 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/48",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/1/candidates/7",
           "disposition": "selected"
@@ -11368,6 +11851,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/11/candidates/0",
           "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/35",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         }
       ]
     },
@@ -11609,6 +12099,13 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/19",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/0/candidates/13",
           "disposition": "conditional"
@@ -11663,6 +12160,23 @@
           "id": "scikit-learn",
           "decision": "conditional",
           "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/scip-code/scip",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/14",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         }
       ]
     },
@@ -12003,6 +12517,13 @@
           "pointer": "/reviewed_repositories/7"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/37",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
           "pointer": "/entries/36",
@@ -12318,6 +12839,13 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/64",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/3/candidates/8",
           "disposition": "conditional"
@@ -12540,6 +13068,13 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/39",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/convergence-program/hosting.json",
           "pointer": "/candidates/7",
           "decision": "adopt_scoped_supervision_recipe",
@@ -12643,6 +13178,23 @@
       ]
     },
     {
+      "repository": "https://github.com/tavily-ai/tavily-python",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/25",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/tech-leads-club/agent-skills",
       "aliases": [],
       "public_star": true,
@@ -12694,6 +13246,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/2/candidates/5",
           "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/41",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "research_supplement",
@@ -13005,6 +13564,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/5/candidates/0",
           "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/15",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "research_supplement",
@@ -13683,6 +14249,13 @@
           "disposition": "conditional"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/27",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/297",
@@ -13983,6 +14556,13 @@
           "disposition": "selected"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/26",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
           "kind": "component_record",
           "path": "manifests/stack.json",
           "pointer": "/components/1",
@@ -14201,6 +14781,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/6/candidates/2",
           "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/53",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "research_supplement",
@@ -14832,6 +15419,13 @@
           "disposition": "selected"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/28",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/330",
@@ -14976,6 +15570,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/15/candidates/7",
           "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/51",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "legacy_candidate",
@@ -15168,6 +15769,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/11/candidates/2",
           "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/independent-discovery.json",
+          "pointer": "/candidates/34",
+          "decision": "discovery_only",
+          "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
         },
         {
           "kind": "component_record",

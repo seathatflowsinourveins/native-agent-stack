@@ -191,6 +191,13 @@ latest linked evidence; older contracts' unimplemented lists can be historical.
 
 ## How future sessions continue
 
+Use the [independent discovery and cooperation practice](blind-catalog-convergence-20260921.md)
+when reopening a selection. Preserve reports before exposing incumbent rankings,
+adjudicate differences with original sources and record unresolved comparisons.
+The [live Claude repository report](claude-repository-evidence.md) and
+[portable workflow practice](ultracode-token-routing-20260921.md) carry their
+own command, host, model and qualification limits into this handbook.
+
 Read this handbook, the [research queue](../catalogs/landscape/research-state.json)
 and only the selected layer's evidence. Record the checkout revision, host,
 requirement, current result, failed attempts and next decision-changing check.

@@ -11,7 +11,7 @@ results and failures. Source quality, native operation and comparative superiori
 remain separate claims.
 
 The [current token practice and measured results](docs/token-practice.md) connect
-68 selected component records to the 527-repository grand catalog, upstream
+68 selected component records to the 540-repository grand catalog, upstream
 installation recipes and scoped native evidence. The latest wave attaches fresh
 Claude/Codex results, ten dashboard screenshots and four qualified upgrades.
 Earlier 52-component studies retain their original boundaries and mixed results.
@@ -62,8 +62,8 @@ analysis. [Ten-source review and current star delta](catalogs/convergence-practi
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and its retained **342-star coverage ledger**. Its current combined index includes
-**527 repository identities**, including the fresh 343-public-star snapshot and
-184 identities beyond it,
+**540 repository identities**, including the fresh 343-public-star snapshot and
+197 identities beyond it,
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.
