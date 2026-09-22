@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -6859,8 +6859,8 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "a8fc08f6ed50ac3e5490e2db13e91b8c9d68ebe1d6d998f3930e2bc7b4e1f25d",
-      "bytes": 2350
+      "sha256": "7e4c9903951886c308c1e4a0432fd26264bcd186fbc43a66096bf48ff3705ab2",
+      "bytes": 2636
     },
     {
       "path": "catalogs/convergence-practice/architecture-wave/README.md",
@@ -6984,8 +6984,8 @@
     },
     {
       "path": "catalogs/landscape/README.md",
-      "sha256": "e9f2bc5211af9ffa644317a1e26dcebfd3c82eb4cf9b26910561ef9524488f80",
-      "bytes": 9809
+      "sha256": "cc6ff10c80aa1ff9fcf2fb290dcd10c4c511e379f425a71e6fee4b7020105daa",
+      "bytes": 10082
     },
     {
       "path": "catalogs/landscape/blind-convergence.json",
@@ -7044,13 +7044,13 @@
     },
     {
       "path": "catalogs/sota-convergence/README.md",
-      "sha256": "ee820a57742c5807e45a0076b13251b6c13caf9484a0696c76522d50b02e25ac",
-      "bytes": 16192
+      "sha256": "76ee44ca2cdb48b6ce62379b6b1b7fd71276b868c5724138751b333331b1106c",
+      "bytes": 16558
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
-      "sha256": "0710c243083651fb6c44862c74f2a80cd1a07edecec8cd83ca7488f8021582a0",
-      "bytes": 694518
+      "sha256": "0e3c0a2a5b2085f7fa39f93a2a5c663373a643c785a2b3384baaabd942851859",
+      "bytes": 694569
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260922.json",
@@ -7499,8 +7499,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "5aefeec279352438d7187311490b50f8c4f42ffab61e11994899d543ebbac890",
-      "bytes": 13171254
+      "sha256": "a8fb9fa34f9b47264f08aeb4b7b68855a827aa52b4fd6c3c76f720de4354d6b0",
+      "bytes": 13180468
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7564,18 +7564,18 @@
     },
     {
       "path": "docs/github-automation-evidence.json",
-      "sha256": "7bb47481be9904ca1fcbc633ccc4438fcbc53fa9aae2c8f0369ade8c422de5fa",
-      "bytes": 12863
+      "sha256": "bd3ad41bfd8b220b543175c6609e1aa44341f6a41c77c0d14578e17bc3215c57",
+      "bytes": 14047
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "3390a88c71bf9baedeb33a2b75778a1c89a824f2df80bf29c060adf11408fbf7",
-      "bytes": 30445
+      "sha256": "e5d5c19a9347a6198cfb926d1c6b6e59c1bd8781b38b2732240057285111cac7",
+      "bytes": 30881
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "9bb889ba9b3021ed24057d4b9fe3905f84dcedbc0a21c182f09c90ba7d890f43",
-      "bytes": 469209
+      "sha256": "66af604a1dcf43a7b8c865402d6748ac729e2f8f05372f1348eeddfbaf172675",
+      "bytes": 476845
     },
     {
       "path": "docs/harness-defaults.md",
@@ -11219,8 +11219,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "841e850398ff6059c62df204061a3a1952b2b84fc38224edf96ad3af7f620349",
-      "bytes": 57270
+      "sha256": "a6c19b8f948f3dccf5ddd61b8e18c0c8e990ae1e4add0f022738ddbd5cb1af1c",
+      "bytes": 58129
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -11734,8 +11734,8 @@
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "b6dacecd95daa1f28bd233ee76192514edea75375a7b9d371971fc5994cca282",
-      "bytes": 15243
+      "sha256": "4dd8e7c49529e7852f6fb5587d21ad3c550d4bf407c5198184923c9892403a15",
+      "bytes": 15314
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",

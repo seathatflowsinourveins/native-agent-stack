@@ -1,41 +1,66 @@
 # Grand catalog handbook: foundation, runtimes and the north star
 
-This is the portable selection and adoption handbook for the September 21, 2026
-review baseline. Source checks and execution can cross into September 22 UTC;
-their records retain exact timestamps. Start from a reviewed Git revision and
-the [landscape manifest](../catalogs/landscape/manifest.json). A selection answers
-the stated requirement with the available evidence. It is not a claim that a
-repository wins every benchmark or that another PC is already configured.
+This is the handbook for the catalog as frozen on **September 22, 2026**. It covers
+two catalogs: the **foundation** that every native Claude and Codex session runs
+on (20 layers), and the **US-equities north star** that builds simulation, paper
+and live trading on that foundation (12 layers). Every layer records its winning
+repositories, the named alternatives, why the winners were chosen, the evidence
+class behind that choice and the comparison that would overturn it. The
+generated section at the end of this page holds those per-layer verdicts; this
+prose explains how to read them, what they do not establish and how to rerun
+them against a later landscape.
 
-Use the [offline explorer](ecosystem/index.html) for all current candidates,
-alternatives, per-layer notes and evidence. Its counts are derived from the
-canonical identity index; candidate-layer rows are not distinct repositories.
-Public stars and awesome lists contribute discovery, not installation commands
-or proof of quality. The complete list of every child link in every awesome list
-has not been independently evaluated.
+A selection answers a stated requirement with the evidence available on that
+date. It is not a claim that a repository wins every benchmark, and it does not
+certify that another PC is configured. Start from a reviewed Git revision and
+the [landscape manifest](../catalogs/landscape/manifest.json).
 
-The current combined discovery index contains **843 repository identities**.
-The selected manifest remains **68 versioned components**; shared skill selections
-and SDK environments have their own linked practice records and locks. The
-[independent Claude adjudication](claude-blind-adjudication-20260921.md) retains
-the wider search, corrections and screening limits; the
-[20-layer findings](blind-catalog-layer-findings-20260921.md) compare both sealed
-source reports. The final Claude coverage critique and 159-row repair are now
-[adjudicated with original decisions preserved](claude-blind-adjudication-20260921.md).
-This closes the dated catalog review; matched quality and destination-host gates
-remain explicit. Source-only candidates remain separate from qualified defaults.
+| Measure (2026-09-22) | Value |
+| --- | --- |
+| Foundation layers / trading layers | 20 / 12 |
+| Layers with a recorded verdict | 32 of 32 |
+| Selected, versioned components | 69 |
+| Foundation capability decisions | 54 |
+| Repository identities in the discovery index | 844 |
+| Trading gates established / total | 7 / 20 (no rung ready) |
 
-The live Claude owner's [September 22 reconciliation](catalog-reconciliation-20260922.md)
-identified nine ambiguous summary labels. All 20 displayed dispositions now
-mirror the canonical layer decisions, with an automated consistency check.
-No candidate disposition or selected version changed; historical reviewer
-claims and their qualifications remain linked.
+Use the [offline explorer](ecosystem/index.html) for every candidate, alternative
+and evidence file. Its counts come from the canonical identity index;
+candidate-layer rows are not distinct repositories. Public stars and awesome
+lists are discovery sources, not installation commands or proof of quality, and
+not every child link of every awesome list has been evaluated.
 
-The [September 22 comparison progress](comparison-progress-20260922.md) records
-the subsequent worker, retrieval, memory and parity results, including failed
-judgments and the repaired publication check. The comparisons remain unresolved
-or blocked; no selection changed. Joint setup readiness is still pending, and
-the destination WSL host must supply its own acceptance after connection.
+### How the September 22 verdicts were produced
+
+The foundation taxonomy was frozen at 20 layers by adding four layers that had
+been folded into others: agent SDKs and runtime workers, MCP servers and client
+surfaces, secrets and credentials, and git practice with GitHub automation.
+Model routing, packaging and the dashboard remain cards inside existing layers.
+The trading catalog keeps 12 layers; its four older domain rows (research memory,
+workers and operations, market data, simulation and execution) survive as the
+`group` of each trading row.
+
+Each layer was given a stripped evidence packet. An Opus proposer selected the
+winner set from retained evidence, and two Opus refuters attacked it from the
+evidence and challenger angles, with one revision round after any refutation.
+The record tool then applied the rules in code: every recorded winner must name
+its evidence class and the reason it beats the alternatives, and the tool derives
+its platform status from that evidence class and supplies its install anchor. The dated
+[convergence manifest](../catalogs/sota-convergence/manifest-20260922.json) was
+refreshed from the same day's lane run. Sealed lane returns are under
+`evidence/artifacts/layer-verdicts-20260922/claude/`.
+
+**The Codex lane did not run.** The account's usage limit was exhausted until
+September 28, so every row records `lanes.agreement: codex_absent` with that gap
+named. The verdicts are one model family's reading of retained evidence, checked
+by refuters of the same family. They are not a cross-family convergence.
+
+Earlier records remain linked for their own findings: the
+[independent Claude adjudication](claude-blind-adjudication-20260921.md), the
+[20-layer blind findings](blind-catalog-layer-findings-20260921.md), the
+[September 22 reconciliation](catalog-reconciliation-20260922.md) and the
+[comparison progress](comparison-progress-20260922.md), whose worker, retrieval,
+memory and parity comparisons remain unresolved or blocked.
 
 ## What qualifies a selection
 
@@ -58,75 +83,98 @@ Evaluate repository quality against the task before investing in installation:
    maintenance and failed attempts. Mark unmeasured cost or quality unknown.
 
 The [candidate quality review](candidate-quality-review-20260921.md) records the
-current focused source checks. It does not assign invented aggregate scores.
-Native reviewer agreement is advisory: the coordinator checks each finding
-against original sources and actual results. See the
+focused source checks. It does not assign invented aggregate scores. Reviewer
+agreement is advisory: the coordinator checks each finding against original
+sources and actual results. See the
 [runtime review record](../blueprints/catalog-runtime-review/README.md) and the
 [acceptance evidence policy](acceptance-evidence-policy.md).
 
-Use these dispositions consistently:
+Every recorded winner carries one evidence class. Read it before relying on the
+winner:
 
-| Disposition | Meaning |
+| Evidence class | Meaning |
 | --- | --- |
-| Selected | Supported choice for the named requirement and evidence scope |
-| Conditional | Credible candidate when its stated requirement is present |
-| Unqualified | Required local behavior or comparison has not been established |
-| Overlap / out of scope | Does not close the current gap; no failure implied |
-| Measured tradeoff | Retained observations include advantages and disadvantages |
-| Observed failure | A named operation actually failed on recorded inputs/runtime |
+| `native_proven` | The component ran natively on the recorded host and a receipt retains the result |
+| `local_integration` | Our own integration tests or a local run exercised it; upstream behavior is not re-established |
+| `synthetic` | Only fixtures were exercised; no real workload or broker |
+| `source_review` | Read at a source pin; nothing was executed |
+| `measured_comparison` | A matched comparison on the same workload decided it (none recorded yet) |
+
+Layer decisions use these labels:
+
+| Decision | Meaning |
+| --- | --- |
+| Retain | The current choice stands on its evidence |
+| Keep but compare | The current choice stands, but a named comparison is still owed |
+| Adjust | The current choice changes in a recorded, bounded way |
+
+Candidates carry the older dispositions (selected, conditional, unqualified,
+overlap, out of scope, measured tradeoff, observed failure). A candidate is never
+promoted by reviewer agreement, a newer release or a star count.
 
 ## Foundation selection by layer
 
-The [current foundation comparisons](../catalogs/landscape/foundation.json)
-contain the exact alternatives, sources, limits and conditions for replacing
-each choice. The manifest owns versions and installation recipes; this table
-does not create a second package lock.
+The generated table below is authoritative for winners, pins, evidence classes
+and overturn conditions. This summary adds what each layer still needs on a new
+host. The [foundation ledger](../catalogs/landscape/foundation.json) holds the
+full rows; the [convergence manifest](../catalogs/sota-convergence/manifest-20260922.json)
+owns versions, and this table does not create a second package lock.
 
-| Layer | Selected direction | Next meaningful acceptance |
+| Layer | Recorded winners (decision) | Next meaningful acceptance |
 | --- | --- | --- |
-| Native clients | Codex and Claude Code; MCPorter for selected native tool access | Native sign-in, discovery, useful task and continuation per client |
-| Skills | Selected ECC, Agent Skills reference, TypeSafe and OpenAI skills | Relevant task use with source pins and explicit worker context |
-| Workers | Native workers and Worktrunk | Owned writing worktrees, integration and independent evidence review |
-| Isolation | Worktrees for ownership; sandbox-runtime for selected access restrictions | Exercise the required restriction; worktrees do not enforce it |
-| Code navigation | Serena, ast-grep, codebase-memory-mcp, jCodeMunch | Exact source retrieval and original-code confirmation |
-| Documents | QMD, Context Hub, MarkItDown, Poppler | Corpus/format-specific retrieval and conversion checks |
-| Semantic code search | SocratiCode, Qdrant, vLLM, Hugging Face Hub | Hardware-compatible embeddings, scoped indexing and real watcher/retrieval |
-| Durable memory | ai-memory | Scoped cross-client recall, capture and restore; quality comparison remains open |
-| Web research | agent-browser, Playwright CLI, Tavily CLI, OpenResearch | Actual source acquisition, attribution and task-specific completeness |
-| Context and usage | RTK, Context Mode, Repomix, ccusage | Recoverable originals and matching usage categories; no blanket savings claim |
-| Evaluation | Playwright, Promptfoo, ShellCheck, Difftastic, MCP Inspector | Meaningful behavior checks; source validation is not model-quality evidence |
-| CI and provenance | actionlint, zizmor, Gitleaks, Syft, Dependabot, attestations | Actual scoped runs; inventory is not a vulnerability verdict |
-| Scheduling | Dagu and systemd | Required failure/cancellation/restart behavior and effect ownership |
-| Application services | Next.js, React, FastAPI, PostgreSQL | Reproduce the scoped application; production hosting is separate |
-| Portability | uv, Restic and native backup/resume | Empty-target install/restore, logical checks and native consumer use |
-| Observation | OTel, Prometheus, Loki, Grafana, Alertmanager, ntfy and selected agent viewers | Actual task/event delivery and recovery on the destination host |
+| Native clients | Claude Code, Codex (retain) | Native sign-in, discovery, useful task and continuation per client |
+| Instructions and skills | ECC selection, TypeSafe and OpenAI skills (adjust) | Relevant task use with source pins and explicit worker context |
+| Workers | Claude Code, Codex, Worktrunk (keep but compare) | Owned writing worktrees, integration and independent evidence review |
+| Isolation | Worktrunk, sandbox-runtime (retain) | Exercise the required restriction; worktrees do not enforce it |
+| Code navigation | Serena, jCodeMunch, codebase-memory-mcp (retain) | Exact source retrieval and original-code confirmation |
+| Document retrieval | QMD, Poppler (keep but compare) | Corpus- and format-specific retrieval and conversion checks |
+| Semantic RAG | SocratiCode, Qdrant, vLLM (keep but compare) | Hardware-compatible embeddings, scoped indexing and real retrieval |
+| Durable memory | ai-memory (keep but compare) | Scoped cross-client recall and restore; matched quality comparison still owed |
+| Web research | Tavily CLI, agent-browser, OpenResearch (retain) | Actual source acquisition, attribution and task-specific completeness |
+| Token efficiency | RTK, Headroom, ccusage (keep but compare) | Recoverable originals and matching usage categories; no blanket savings claim |
+| Quality and evaluation | promptfoo, Playwright Test (retain) | Meaningful behavior checks; source validation is not model-quality evidence |
+| CI and supply chain | zizmor, Syft, GitHub attestations (retain) | Actual scoped runs; an inventory is not a vulnerability verdict |
+| Scheduling and supervision | systemd, Dagu (keep but compare) | Failure, cancellation and in-flight restart behavior |
+| Hosting and services | FastAPI, PostgreSQL, Next.js (retain) | Reproduce the scoped application; production hosting is separate |
+| Recovery and portability | Restic (keep but compare) | Empty-target install and off-host restore, then consumer verification |
+| Observation and inference | OpenTelemetry Collector, Prometheus, Grafana (keep but compare) | Actual task/event delivery and recovery on the destination host |
+| Agent SDKs and runtime workers | Codex SDK (retain) | A rerun of the matched three-arm worker comparison |
+| MCP servers and client surfaces | MCPorter, MCP Inspector (retain) | Scoped server discovery and contract checks per client |
+| Secrets and credentials | Gitleaks (keep but compare) | Full-coverage scanning and a credential-store decision per host |
+| Git practice and GitHub automation | Worktrunk, Difftastic, gh CLI (retain; source review only) | Executed hosted runs of each automation lane |
 
 Optional container platforms, cloud providers, inference gateways and alternative
 orchestrators are not a universal startup bundle. Select them through the
 [hosting comparison](hosting-container-practice.md) and their per-layer decisions.
 This handbook does not start services, create schedules or select paid hosting.
 
-## Runtime workers and research applications
+## Runtime workers, SDKs and research applications
 
-The exercised programmatic research worker uses the **Codex Python SDK**
-(`openai-codex`), explicitly selecting the native Codex binary. This is distinct
-from **OpenAI Agents SDK** and **Claude Agent SDK**, which remain application
-runtime candidates. The locked environment includes `openai-codex`, `openai`,
-`alpaca-py`, `duckdb` and `exchange-calendars` with 36 transitive distributions.
-Use the [SDK lock and native uv recipe](../adoption/sdk/README.md).
+The agent-SDK layer's recorded winner is the `codex` component (Codex CLI and
+SDK, 0.155.1). The exercised programmatic research worker uses its **Python SDK**
+(`openai-codex`), explicitly selecting the native Codex binary. **OpenAI Agents SDK** and **Claude Agent
+SDK** remain application-runtime candidates; the overturn condition is a matched
+three-arm worker comparison. The locked environment includes `openai-codex`,
+`openai`, `alpaca-py`, `duckdb` and `exchange-calendars`; the lock pins 36
+distributions in total. Use the [SDK lock and native uv recipe](../adoption/sdk/README.md).
 
-Native Claude workers/workflows and a retained Codex-analysis to Claude-review
-pair complement that worker. The pair has completed; an earlier allowance-blocked
-receipt is historical. Neither agreement nor a completed model response proves
-the underlying source claim. The observed pair also shared a cutoff
-overgeneralization that coordinator review corrected.
+The [SDK, harness and runtime coverage sweep](../catalogs/sota-convergence/sdk-runtime-coverage-20260922.md)
+examined agent SDKs, coding harnesses, durable runtimes, sandbox and worker
+runtimes, dispatch frameworks and protocol SDKs beyond Claude and Codex. It
+recorded 18 keep-but-compare, 7 not-adopted, 6 refuted and 6 targeted
+candidates and one integrate-now item, with preregistered criteria and a
+completeness critic. No candidate replaced an incumbent.
 
-**DeerFlow is already exercised within a narrow boundary.** One unmodified,
-pinned embedded `invoke_acp_agent` call used Codex ACP to review two existing
-receipts. This did not qualify its full planner, web-research pipeline, UI,
-persistent service, integrated RAG or recovery. The tested adapter's `read-only`
-label mapped to `workspaceWrite/on-request`; observed read behavior does not
-establish enforced read-only access. See the
+Native Claude workers and workflows, and a retained Codex-analysis to
+Claude-review pair, complement that worker. Neither agreement nor a completed
+model response proves the underlying source claim.
+
+**DeerFlow is exercised only within a narrow boundary.** One unmodified, pinned
+embedded `invoke_acp_agent` call used Codex ACP to review two existing receipts.
+This did not qualify its planner, web-research pipeline, UI, persistent service,
+integrated RAG or recovery. The adapter's `read-only` label mapped to
+`workspaceWrite/on-request`, so observed read behavior does not establish
+enforced read-only access. See the
 [DeerFlow receipt](../blueprints/us-equities/deerflow/research-receipt.json).
 
 | Requirement | Candidate escalation | Comparison needed before promotion |
@@ -139,20 +187,23 @@ establish enforced read-only access. See the
 | Specialized financial research assistant | Dexter and other domain research candidates | Source-grounded answers and point-in-time data boundaries; no execution inference |
 
 Use one coordinator and bounded independent workers. Writers own separate
-worktrees; the coordinator integrates. Supply each worker its requirement,
+worktrees and the coordinator integrates. Give each worker its requirement,
 revision, paths, relevant skill context, output contract and stop condition.
-Preserve requested and returned model/effort separately; record unavailable
-metadata as unknown. Preserve native sign-ins, and never copy authentication
-stores. A filesystem sandbox alone does not remove inherited remote-tool access.
+Record requested and resolved model and effort separately. On September 22 the
+`opus` alias on this host moved from Opus 5 to Opus 5.5 part-way through a lane
+run, so a packet's stamped model can differ from the model a child actually used. Preserve native
+sign-ins and never copy authentication stores. A filesystem sandbox alone does
+not remove inherited remote-tool access.
 
 ## Memory selection and the strongest relevant challengers
 
 ai-memory remains the shared project-memory choice because scoped native
 Codex/Claude use, bounded outcome capture, native Codex task consolidation and
 isolated restoration have actual evidence. ai-memory's own internal LLM
-consolidation was disabled in that test. The 52 restored pages comprised **one ordinary decision
-and 51 System pages**, so that test does not represent a large project corpus.
-Captured excerpts are bounded observations, not complete native transcripts.
+consolidation was disabled in that test. The 52 restored pages comprised **one
+ordinary decision and 51 System pages**, so that test does not represent a large
+project corpus. Captured excerpts are bounded observations, not complete native
+transcripts.
 
 The priority comparison is ai-memory versus **Hindsight and Basic Memory** on
 representative project decisions, superseded facts, failed approaches, exact
@@ -161,96 +212,186 @@ model/context budget, independent frozen answers, repeated runs and complete
 ingestion/query/maintenance usage. Include deletion and empty-target restoration.
 There is no completed matched quality/cost comparison yet.
 
-A later [tiny lexical lifecycle comparison](../blueprints/memory-lifecycle-probe/README.md)
+A [tiny lexical lifecycle comparison](../blueprints/memory-lifecycle-probe/README.md)
 passed 28 content checks for ai-memory and Basic Memory: writes, reads, updates
 and current-search deletion, plus ai-memory restart/backup and Basic Memory
 text-index rebuild. Its first ai-memory attempt failed a no-model-download
 constraint; the corrected run explicitly disabled embeddings. Unequal recovery
 checks and this three-note fixture do not settle semantic recall or justify a
-memory-store migration. The failed attempt and public provenance are retained.
+memory-store migration.
 
 Graphiti, Cognee and OpenViking are credible for temporal/relationship or broader
 research-context requirements. Mem0 and Supermemory may fit application memory;
 Letta Code changes the worker/runtime architecture. Claude-mem is an alternative
-capture/retrieval stack. Current local or multi-client support must be reviewed
-before using an old cloud-only or Claude-only exclusion. Compare stores in
-isolated test scopes; do not silently add competing authoritative capture paths.
+capture/retrieval stack. Review current local or multi-client support before
+reusing an old cloud-only or Claude-only exclusion. Compare stores in isolated
+test scopes, and do not silently add competing authoritative capture paths.
 
-## Clean adoption on a new WSL PC
+## Setting up a new machine
 
-Follow [adoption/README.md](../adoption/README.md) and
-[adoption/lifecycle.md](../adoption/lifecycle.md). The initial target is
-Linux/WSL2 x86_64. Before selecting GPU or platform-specific tools, inspect the
-destination's CPU, RAM, GPU, storage, Windows/WSL and Linux versions.
+Follow [adoption/bootstrap.md](../adoption/bootstrap.md), one ordered page from a
+pinned clone through native sign-in, rendered configuration, services, the status
+report and a per-host receipt. Each step points at the component recipes rather
+than repeating commands.
+
+| Platform | Status | What exists |
+| --- | --- | --- |
+| Linux / WSL2 x86_64 | Accepted | [Platform page](../adoption/platforms/linux-wsl2.md), pinned `bootstrap-linux.sh` that fails closed on unpinned components, weekly hosted bootstrap lane |
+| macOS arm64 | Drafted, not accepted | [Platform page](../adoption/platforms/macos-arm64.md), `bootstrap-macos.sh`, one [hosted-runner smoke run](../evidence/receipts/adoption-macos-hosted-smoke-20260922.json); nothing ran on a Mac workstation |
+
+The macOS profile targets Apple Silicon with 24 GB of unified memory. Its
+embedding backend is llama.cpp Metal serving embeddinggemma-300M. Moving to
+Nemotron-3-Embed-1B on a 48 GB machine is the recorded upgrade. It is an open
+gate, not a scheduled step: it needs a GGUF build upstream, a retrieval
+comparison on the project corpus that favours it, and memory headroom on the
+host.
+
+Configuration comes from templates, not copied files. `tools/adoption/render_config.py`
+renders `~/.claude/settings.json`, `~/.codex/config.toml` and the project Codex
+configuration with host-specific paths, and `--check` confirms byte identity with
+the live files. Credentials are never transferred; each host signs in natively.
 
 | Order | Profile / action | Destination acceptance |
 | --- | --- | --- |
-| 1 | Reviewed checkout and portable validators | Exact revision, intact source references/hashes and explicit installation paths |
-| 2 | `foundation-cpu` | Native Codex/Claude sign-in, selected plugin/tool discovery, useful QMD/context call and scoped memory retrieval |
-| 3 | Shared skills and workers | One bounded source/build/review task, owned changes and useful returned results |
-| 4 | `research-runtime` | Recreate the SDK lock in a new prefix, dependency/import checks and retained research fixture |
-| 5 | `observability` and `recovery` when selected | Real task/event delivery and isolated logical restore, then consumer verification |
+| 1 | Pinned checkout and portable validators | Exact revision, intact hashes and explicit installation paths |
+| 2 | `foundation-cpu` (or `macos-arm64-foundation`) | Native Codex/Claude sign-in, tool discovery, a useful QMD/context call and scoped memory retrieval |
+| 3 | Shared skills and workers | One bounded source/build/review task with owned changes |
+| 4 | `research-runtime` | Recreate the SDK lock in a new prefix and run the retained research fixture |
+| 5 | `observability` and `recovery` when selected | Real event delivery and an isolated logical restore |
 | 6 | `semantic-rag` when hardware fits | Actual inference, scoped index/watch queries and recovered state |
-| 7 | `trading-nautilus` | Engine replay and comparison; each broker's operation remains separately qualified |
+| 7 | `trading-nautilus` | Engine replay; each broker's operation is qualified separately |
 
-The prerequisite report only detects executables/platform requirements. A clean
-prefix on the existing host proves that prefix's reproducibility, not a fresh
-WSL distribution, second physical PC, GPU stack, credentials or all services.
-The recreated SDK environment does not install `context-mode`, `ai-memory` or
-`mcporter`, or qualify the other `foundation-cpu` components.
-Use the [clean-install review](../blueprints/catalog-clean-install/README.md) for
-the actual checks and remaining destination requirements.
-
-Do not synchronize a lock into the system/shared environment: native exact sync
-can remove packages outside that lock. Use reviewed native upstream installers
-and explicit package/source pins. Resolve template placeholders and register
-selected tools through each client's supported interface. Keep Desktop,
-native Linux Codex and native Linux Claude account/configuration scopes separate.
+The prerequisite report only detects executables and platform requirements. A
+clean prefix on the existing host proves that prefix's reproducibility, not a
+fresh distribution, a second physical PC, a GPU stack, credentials or all
+services. See the [clean-install review](../blueprints/catalog-clean-install/README.md).
+Do not synchronize a lock into a system or shared environment, because an exact
+sync can remove packages outside that lock. Keep Desktop, native Linux Codex and
+native Linux Claude account and configuration scopes separate.
 
 ## Foundation to the north star
 
-The four domain layers reuse this foundation: memory/retrieval, research workers
-and operations, market data/filings, then simulation/execution. Current choices
-are in the [domain comparisons](../catalogs/landscape/us-equities.json).
+The trading catalog reuses the foundation and adds data, strategy, risk and
+broker-specific acceptance. Its 12 layers are grouped by the four older domain
+rows. The [trading ledger](../catalogs/landscape/us-equities.json) holds the
+recorded verdicts.
 
-| Domain layer | Selected direction | Remaining decision or acceptance |
-| --- | --- | --- |
-| Research memory and retrieval | ai-memory; QMD; Serena; SocratiCode/Qdrant; task-selected Context Mode/RTK | Representative financial/source recall comparison and project isolation |
-| Research workers and operations | Native Codex/Claude; Dagu/systemd; OTel with Prometheus/Loki/Grafana; scoped sandboxing and Restic | Destination worker ownership, event delivery, cancellation and recovery |
-| Market data and filings | Official alpaca-py; EdgarTools; DuckDB/Parquet; exchange_calendars | Required universe, rights, corporate actions and information-availability evidence; Databento remains conditional |
-| Simulation and broker execution | NautilusTrader destination; LEAN historical comparison; native IBKR and separate alpaca-py paper path | Engine parity and independent broker-specific reconciliation/risk/reconnect acceptance |
-
-NautilusTrader 2.0.0rc5 remains the selected destination; LEAN retains useful
-comparison evidence. The historical SDK/LEAN adoption profile does not override
-that destination. A bounded engine replay or paper roundtrip does not establish
+NautilusTrader 2.0.0rc5 is the selected destination engine and LEAN is the
+frozen historical comparator. IBKR through Nautilus is the selected live-primary
+broker path, with a separate Alpaca paper path. Neither broker path is accepted
+for live use. A bounded engine replay or paper roundtrip does not establish
 point-in-time universe quality, complete broker recovery or a winning strategy.
-Use [runtime-target.json](../catalogs/us-equities/runtime-target.json) and the
-latest linked evidence; older contracts' unimplemented lists can be historical.
+Use [runtime-target.json](../catalogs/us-equities/runtime-target.json) for the
+destination's exact contracts.
+
+The path from simulation to paper to live is tracked as a
+[gate ladder](../catalogs/us-equities/gates-20260922.json) of 20 gates, each
+naming its owner, evidence class, receipt and machine-checkable flip condition.
+`python3 scripts/trading_gates.py --check` verifies the ladder arithmetically; a
+status changes only through a dated commit after the checker lists the gate as a
+flip candidate. On September 22:
+
+| Rung | Established | Open |
+| --- | --- | --- |
+| Simulation | Offline equity replay, rc5 supply-chain scan, fail-closed snapshot gate (synthetic), exchange_calendars in the stack | SPY/LEAN parity (blocked on two unsupported mappings), dividend module, pre-2020 delisting, dated security identity, point-in-time news and filings, paid data arm |
+| Paper | Alpaca paper smoke, broker-path alert rules (synthetic), credential handling | Adaptive-paper broker trial |
+| Live | None | Leverage ladder 1x/2x/4x, native fault behaviour, IBKR local acceptance, explicit live go |
+
+No rung is ready. Catalog inclusion does not authorize live configuration, paid
+data or hosting, or orders.
+
+## Repository automation and releases
+
+The [GitHub automation handbook](github-automation.md) owns the check and
+maintenance design. In brief:
+
+- **Required on `main`:** `validate` (validators, the zizmor and actionlint
+  workflow audit, the verdict check, the examples byte-identity check and the
+  unit tests, which include the gate-ladder check), `token-report` and
+  `secret-scan`. The main ruleset also blocks deletion and force-push and
+  requires linear history and a pull request. Tags cannot be deleted or
+  force-moved. These rulesets were applied on September 22 and observed live
+  through the GitHub API; the generated rows for the CI and git-automation
+  layers cite the records from before that application.
+- **Report-only lanes:** the Monday `catalog-freshness` lane rebuilds the
+  convergence manifest from current GitHub metadata and publishes pin drift as an
+  artifact, without writing back. `supply-chain` inventories and scans the pinned
+  rc5 install with Syft and Grype. `adoption-bootstrap` exercises the pinned
+  bootstrap scripts on hosted runners.
+- **Secret scanning coverage:** `secret-scan` fails on any finding. It uses
+  reviewed, path- and key-scoped allowlists and skips files over 2 MB, so the
+  generated explorer HTML is not scanned; its sources are. Its first hosted run
+  timed out on full history before the size skip was added.
+- **Releases:** pushing a `v*` tag runs `publish-catalog`, which archives the
+  validated commit and attests both the archive and an SPDX SBOM. Verify a
+  release with `gh attestation verify`.
+- **Not activated, with recorded reasons:** CodeQL and Dependabot for Python
+  requirements.
 
 ## How future sessions continue
 
-Use the [independent discovery and cooperation practice](blind-catalog-convergence-20260921.md)
-when reopening a selection. Preserve reports before exposing incumbent rankings,
-adjudicate differences with original sources and record unresolved comparisons.
-The [live Claude repository report](claude-repository-evidence.md) and
-[portable workflow practice](ultracode-token-routing-20260921.md) carry their
-own command, host, model and qualification limits into this handbook.
+Read this handbook, then only the evidence of the layer you are changing. Record
+the checkout revision, host, requirement, current result, failed attempts and the
+next check that could change the decision.
 
-Read this handbook, the [research queue](../catalogs/landscape/research-state.json)
-and only the selected layer's evidence. Record the checkout revision, host,
-requirement, current result, failed attempts and next decision-changing check.
-Reopen on a demonstrated gap, changed requirements, relevant upstream behavior
-or a challenger result. New releases and reviewer votes alone do not promote a
-candidate. Preserve historical records with their dates and superseding links.
+To rerun the verdicts against a later landscape, follow the
+[convergence practice](../recipes/sota-convergence-practice.md) and the tooling in
+[`tools/sota-convergence/`](../tools/sota-convergence/README.md):
 
-The catalog can be a complete handbook for its declared review set while
-comparative quality remains open. New-host acceptance is recorded on that host;
-neither a cloned receipt nor this HTML page certifies it.
+1. Extract the layers and collect current GitHub metadata (`extract_layers.py`,
+   `github_freshness.py`); the weekly freshness lane shows when this is due.
+2. Refresh the dated convergence manifest: run the saved `sota-convergence`
+   workflow, then `build_manifest.py` (see the tooling README).
+3. Build stripped packets per layer with `lane_packets.py`, each carrying that
+   layer's own candidates. Then run the Claude lane through the saved
+   `layer-verdict-lane` workflow, which lives in the agent-lab repository's
+   `.claude/workflows/`, not in this catalog.
+4. Run the independent Codex lane (`codex_lane.py`) on the same packets without
+   exposing the Claude returns.
+5. Record both lanes with `record_verdicts.py`. A row is `same_winner` when both
+   lanes name the same set of winner components. When they disagree, the row
+   stays `pending_lanes` until an adjudication file is supplied.
+6. Regenerate this page's tables with `build_verdicts.py --write` and check with
+   `--check`.
+
+Reopen a layer on a demonstrated gap, a changed requirement, relevant upstream
+behavior or a challenger result. A new release, a star count or reviewer
+agreement alone never promotes a candidate. Preserve historical records with
+their dates and superseding links.
+
+### Limits of the September 22 verdicts
+
+- **No cross-family lane.** Every row is `codex_absent`. Run the Codex lane once
+  the usage limit lifts and record the agreement per row.
+- **Trading packets carried group-level candidates.** Every trading packet was
+  built from its group's shared candidate list, not the layer's own tools. Four
+  rows record the resulting mismatch in their `open_gaps`:
+  - `security-supply-chain` recorded Codex SDK, Dagu and OpenTelemetry instead of
+    Syft, Grype and Gitleaks.
+  - `data-quality-orchestration` has no Pandera candidate.
+  - `evaluation-experiments` omits Inspect AI, promptfoo and MLflow.
+  - `agents-models-workers` carries the research-memory candidates.
+
+  Treat these four winners as unreliable, and the other eight trading rows as
+  drawn from a group-wide set, until the packets are rebuilt with
+  layer-specific candidates and the lane is rerun. Until then, the trading cards
+  and the gate ladder are the reference for those layers.
+- **Recorded pins can lag.** The trading `agents-models-workers` row cites older
+  foundation pins, for example ai-memory 2.3.1 and Serena 1.7.0. The convergence
+  manifest owns current versions.
+- **Evidence strength varies by row.** Three foundation winners and three trading
+  winners are `source_review` only, and no winner rests on a
+  `measured_comparison`. Every `keep_but_compare` row names the comparison it
+  still owes.
+
+The catalog is complete for its declared review set while comparative quality
+remains open. New-host acceptance is recorded on that host; neither a cloned
+receipt nor this page certifies it.
 
 <!-- verdicts:begin -->
 ## Per-layer verdicts (generated)
 
-Joins the landscape ledger's layer-verdict schema v2 rows with the dated SOTA-convergence manifest's per-layer components/entries and adoption/manifest.json's recipe_map. Every row currently pending_lanes was carried over unchanged; this generator does not itself run a lane, select a winner or claim an execution result.
+Joins the landscape ledger's layer-verdict schema v2 rows with the dated SOTA-convergence manifest's per-layer components/entries and adoption/manifest.json's recipe_map. Rows are rendered as the ledger records them (recorded rows from the record tool, pending_lanes rows unchanged); this generator does not itself run a lane, select a winner or claim an execution result.
 
 ### foundation
 

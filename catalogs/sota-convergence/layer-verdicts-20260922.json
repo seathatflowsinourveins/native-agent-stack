@@ -9178,5 +9178,5 @@
  "generated_by": "tools/sota-convergence/build_verdicts.py",
  "id": "layer-verdicts-20260922",
  "schema_version": 1,
- "scope": "Joins the landscape ledger's layer-verdict schema v2 rows with the dated SOTA-convergence manifest's per-layer components/entries and adoption/manifest.json's recipe_map. Every row currently pending_lanes was carried over unchanged; this generator does not itself run a lane, select a winner or claim an execution result."
+ "scope": "Joins the landscape ledger's layer-verdict schema v2 rows with the dated SOTA-convergence manifest's per-layer components/entries and adoption/manifest.json's recipe_map. Rows are rendered as the ledger records them (recorded rows from the record tool, pending_lanes rows unchanged); this generator does not itself run a lane, select a winner or claim an execution result."
 }

@@ -354,10 +354,16 @@ zero-approval practice, `dismiss_stale_reviews_on_push: true`,
 `allowed_merge_methods: ["squash", "rebase"]`) and `secret-scan` added to
 `required_status_checks`. A new [`.github/tag-ruleset.json`](../.github/tag-ruleset.json)
 targets `refs/tags/*` with only `deletion` and `non_fast_forward` -- protects
-published tags without adding a tag-level review requirement. **Neither
-ruleset file is applied by this change**; both are coordinator-only, per the
-task boundary that only the coordinator regenerates repository-wide settings
-after all lane PRs land. Apply and verify with:
+published tags without adding a tag-level review requirement. Neither
+ruleset file was applied by the PR that added them; both are coordinator-only.
+**Both were applied on 2026-09-22** (main ruleset 23739774 updated 11:08 ET; tag
+ruleset 23829417 created 11:08 ET). The live rulesets were compared field by
+field with the committed files through the GitHub API: rule types and every
+committed parameter match; the live `pull_request` rule also carries the
+server-side defaults `required_reviewers: []` and
+`require_extra_approval_for_unattributed_changes: true`. Required checks are
+`validate`, `token-report` and `secret-scan`. Private vulnerability reporting was
+enabled the same day. Apply and verify with:
 
 ```sh
 gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774 --input .github/main-ruleset.json
