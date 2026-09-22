@@ -6773,8 +6773,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 11106603,
-      "sha256": "537221505040e55711996c88570c643e127f0cc625409d7a9758a61c7bd69ba1"
+      "bytes": 11106658,
+      "sha256": "7ada6da0c2a68212755554060590cf4efe97edf458ed09bc146be29acddd8446"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -9523,8 +9523,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "046845d75f02f8f803d35600b25b63d8d278c009e6ee0b4ad6c4a7cd145b59f7",
-      "bytes": 13616
+      "sha256": "954d8d9e4d5fbb30316ad511d0701d1978c1fa13629aa7111e104ae4552e130f",
+      "bytes": 13670
     },
     {
       "path": "docs/native-ultracode-20260921.md",

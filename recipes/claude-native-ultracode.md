@@ -66,13 +66,14 @@ work-list run through `pipeline()` with lean `agentType` stages. Never drop a
 verification stage to save tokens; save them with lean agents, deferred lanes and
 focused reads. Keep existing sign-in, permissions, plugins and caching.
 
-For another host, inspect its CPU count and supported runtime ceiling first.
-Start at eight only when it fits that ceiling and the available account/API
-allowance; otherwise use a lower cap. The current runtime ceiling is
-`min(16, CPUs - 2)` with platform/runtime minimum handling; inspect that runtime
-on a small or different host rather than writing a zero/negative setting.
-Raise toward 12–16 only after a complete run has no rate-limit errors, missing
-results or unintended model substitutions. Preserve verification stages and
+For another host, inspect its CPU count and the available account/API
+allowance first. Start at eight when the allowance supports it; otherwise use a
+lower cap. The setting overrides the client's per-workflow default of
+`min(16, CPUs - 2)` and accepts 1–256 (from 2.1.269), so that formula is the
+default, not a ceiling; on a small host still write a positive setting that the
+runtime can honour rather than a zero/negative one. Raise toward 12–16 only
+after a complete run has no rate-limit errors, missing results or unintended
+model substitutions. Preserve verification stages and
 inspect `child-usage.mjs` results. This cap is per workflow: other workflows,
 direct agents and native clients can share the same account quotas. Changing
 concurrency does not request a different model/effort, but quality, wall time and
