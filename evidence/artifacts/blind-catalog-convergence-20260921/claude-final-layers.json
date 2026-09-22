@@ -1,0 +1,1199 @@
+[
+  {
+    "layer_id": "native-clients",
+    "catalog": "foundation",
+    "decision": "retain",
+    "verdict": "corrected",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "openai/codex",
+        "pin": "0.155.1",
+        "status": "corroborated",
+        "inBlind": true,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "anthropics/claude-code",
+        "pin": "2.1.278",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "openclaw/mcporter",
+        "pin": "0.13.13",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "Aider-AI/aider (Codex challenger)",
+      "SWE-agent/mini-swe-agent (Claude refuter)",
+      "can1357/oh-my-pi (Claude refuter)",
+      "dagger/container-use (Claude refuter)",
+      "opensandbox-group/OpenSandbox (Claude refuter)"
+    ],
+    "overturn_when": "A required structured-event, custom-tool or application state capability is unavailable through the native path and a supported SDK implementation passes the same task, account, effect and recovery checks.",
+    "next_action": "status: on_requirement_change; next_action: Compare a native client and supported SDK only for a missing event, tool or recovery requirement; freeze identical task/account/effect checks.",
+    "freshness_flags": [],
+    "codex_unresolved": "Installed client versions, account readiness, model availability, emitted usage completeness and actual resumed-state fidelity remain unknown."
+  },
+  {
+    "layer_id": "instructions-skills",
+    "catalog": "foundation",
+    "decision": "adjust",
+    "verdict": "confirmed",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "affaan-m/ECC",
+        "pin": "dd6ee538aee0f548d4a6b520118f",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "agentskills/agentskills",
+        "pin": "0.1.0 @ 69ef37e9424c0a7ea9dd",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "typesafe-ai/skills",
+        "pin": "65a39f39 (landscape native-practice.json, MIT)",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "openai/skills",
+        "pin": "49f948fa (landscape native-practice.json, Apache-2.0)",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "anthropics/skills (Codex primary)",
+      "obra/superpowers (Codex challenger)",
+      "SWE-agent/mini-swe-agent (Claude refuter)",
+      "can1357/oh-my-pi (Claude refuter)",
+      "dagger/container-use (Claude refuter)",
+      "opensandbox-group/OpenSandbox (Claude refuter)"
+    ],
+    "overturn_when": "A specific task exposes a missing procedure, and a pinned candidate works in native discovery and task execution with less conflict or better measured results than the current procedure.",
+    "next_action": "status: on_requirement_change; next_action: Use a selected pinned skill on its matching task; retain discovery, loaded sections, concrete findings and baseline conflict/effort before adding another pack.",
+    "freshness_flags": [
+      "affaan-m/ECC: selected dd6ee538aee0f548d4a6b520118f875431fd749e (committed 2026-09-17) vs latest_stable_release v2.2.1 (published 2026-09-08); release_relationship 'selected_source_commit_not_release_comparison' (upstream-snapshot.json component_id affaan-m/ECC)",
+      "skills-ref: selected 0.1.0 @ 69ef37e9...; latest_stable_release null, releases/latest returned HTTP 404; release_relationship 'latest_stable_endpoint_unavailable' and skills-ref is listed in summary.unavailable_latest_stable_endpoints (upstream-snapshot.json)",
+      "typesafe-ai/skills and openai/skills: no upstream-snapshot.json component entry exists, so no freshness relationship is recorded for two 'selected' repositories"
+    ],
+    "codex_unresolved": "Format conformance does not prove discovery, instruction priority or tool enforcement. Experimental allowed-tools fields and different ancestor-file semantics need client-specific checks."
+  },
+  {
+    "layer_id": "workers",
+    "catalog": "foundation",
+    "decision": "keep_but_compare",
+    "verdict": "corrected",
+    "codex_handbook": "diverge",
+    "selected": [
+      {
+        "repo": "anthropics/claude-code",
+        "pin": "2.1.278",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "openai/codex",
+        "pin": "0.155.1",
+        "status": "corroborated",
+        "inBlind": true,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "max-sixty/worktrunk",
+        "pin": "0.79.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "anthropics/claude-agent-sdk-python (Codex challenger)",
+      "langchain-ai/langgraph (Codex challenger)",
+      "SWE-agent/mini-swe-agent (Claude refuter)",
+      "can1357/oh-my-pi (Claude refuter)",
+      "dagger/container-use (Claude refuter)",
+      "opensandbox-group/OpenSandbox (Claude refuter)"
+    ],
+    "overturn_when": "A real task needs durable multi-host state, approval waits or effect recovery beyond native workers, and one challenger passes frozen cancellation, replay, ownership and integration cases.",
+    "next_action": "status: comparison_required; next_action: Freeze one representative coding/research task with output, cancellation and edit-ownership checks; compare native single-agent and selected worker graph with complete returned usage and independent acceptance.",
+    "freshness_flags": [],
+    "codex_unresolved": "Claude workflows can return null for cancellation or unrecoverable errors; filtering such results discards evidence. Documented cancellation does not by itself prove all subprocesses stopped. Checkpointer presence alone does not guarantee durable external effects."
+  },
+  {
+    "layer_id": "isolation",
+    "catalog": "foundation",
+    "decision": "retain",
+    "verdict": "corrected",
+    "codex_handbook": "diverge",
+    "selected": [
+      {
+        "repo": "max-sixty/worktrunk",
+        "pin": "0.79.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "anthropics/sandbox-runtime",
+        "pin": "0.0.77",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "openai/codex (Codex primary)",
+      "git/git (Codex primary)",
+      "podman-container-tools/podman (Codex challenger)",
+      "SWE-agent/mini-swe-agent (Claude refuter)",
+      "can1357/oh-my-pi (Claude refuter)",
+      "dagger/container-use (Claude refuter)",
+      "opensandbox-group/OpenSandbox (Claude refuter)"
+    ],
+    "overturn_when": "Untrusted code or a deployment target requires a stronger VM/OCI boundary, and the selected alternative passes workload, network, resource, cleanup and host compatibility checks.",
+    "next_action": "status: on_requirement_change; next_action: For the intended untrusted workload, compare the current sandbox with one OCI/VM candidate on filesystem/network/resource enforcement, state cleanup and host compatibility.",
+    "freshness_flags": [],
+    "codex_unresolved": "Native fallback to unsandboxed execution and shared allowed network destinations can weaken intended restrictions. WSL2 kernel support and installed Codex policy were not inspected. Bubblewrap is a mechanism, not a complete policy."
+  },
+  {
+    "layer_id": "code-navigation",
+    "catalog": "foundation",
+    "decision": "retain",
+    "verdict": "corrected",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "oraios/serena",
+        "pin": "2.0.0.dev0 @ c6fbd1c5932df24",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "ast-grep/ast-grep",
+        "pin": "0.45.3",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "DeusData/codebase-memory-mcp",
+        "pin": "0.11.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "jgravelle/jcodemunch-mcp",
+        "pin": "1.108.319",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "BurntSushi/ripgrep (Codex primary)",
+      "scip-code/scip (Codex challenger)",
+      "lancedb/lancedb (Claude refuter)",
+      "huggingface/text-embeddings-inference (Claude refuter)",
+      "ast-grep/ast-grep (Claude refuter)",
+      "letta-ai/letta (Claude refuter)"
+    ],
+    "overturn_when": "A sealed task set in the target languages shows a challenger returning more correct source/references at an acceptable total indexing, retrieval and maintenance cost.",
+    "next_action": "on_requirement_change | Seal representative target-language questions with exact source/reference answers; include index build/update cost and known-source reads in the comparison.",
+    "freshness_flags": [
+      "serena: selected 2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143 -> latest stable v1.7.0 (release_relationship selected_development_or_prerelease_channel; upstream-snapshot.json:1903,1946,1970)"
+    ],
+    "codex_unresolved": "Language support labels do not establish references across generated code, dynamic dispatch or external dependencies. Index freshness and total startup/index cost are unmeasured."
+  },
+  {
+    "layer_id": "document-retrieval",
+    "catalog": "foundation",
+    "decision": "keep_but_compare",
+    "verdict": "corrected",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "tobi/qmd",
+        "pin": "2.8.3",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "andrewyng/context-hub",
+        "pin": "0.1.4",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "microsoft/markitdown",
+        "pin": "0.1.7",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "tsdgeos/poppler_mirror",
+        "pin": "26.09.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "docling-project/docling (Codex primary)",
+      "microsoft/markitdown (Codex challenger)",
+      "lancedb/lancedb (Claude refuter)",
+      "huggingface/text-embeddings-inference (Claude refuter)",
+      "ast-grep/ast-grep (Claude refuter)",
+      "letta-ai/letta (Claude refuter)"
+    ],
+    "overturn_when": "A sealed representative corpus/query set shows useful quality gains with acceptable repeated end-to-end latency, or layout/OCR failures justify a separately qualified parser.",
+    "next_action": "comparison_required | Seal a representative document corpus and relevance judgments; repeat randomized lexical/hybrid retrieval plus selected difficult-layout ingestion before changing defaults.",
+    "freshness_flags": [
+      "markitdown: selected 0.1.7 -> latest stable v0.1.8 published 2026-09-21 (newer_stable_release_review_pending; upstream-snapshot.json:1205,1240,1257)",
+      "poppler: latest_stable_release null and releases/latest returned HTTP 404, so no release comparison exists (latest_stable_endpoint_unavailable; upstream-snapshot.json:4204,4232,4244); the recorded source_pin is an archive SHA-256, not a git commit (upstream-snapshot.json:4215,4241)"
+    ],
+    "codex_unresolved": "Extraction fidelity, OCR/model download costs and collection leakage are unknown. QMD's documented MCP interface ignores unknown fields, so misspelled scope parameters must not silently broaden retrieval."
+  },
+  {
+    "layer_id": "semantic-rag",
+    "catalog": "foundation",
+    "decision": "keep_but_compare",
+    "verdict": "corrected",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "giancarloerra/SocratiCode",
+        "pin": "1.14.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "qdrant/qdrant",
+        "pin": "1.19.1",
+        "status": "partly",
+        "inBlind": true,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "vllm-project/vllm",
+        "pin": "0.25.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "huggingface/huggingface_hub",
+        "pin": "1.32.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "kapillamba4/code-memory (Codex primary)",
+      "run-llama/llama_index (Codex challenger)",
+      "qdrant/qdrant (Codex challenger)",
+      "qdrant/fastembed (Codex challenger)",
+      "tobi/qmd (Codex challenger)",
+      "lancedb/lancedb (Claude refuter)",
+      "huggingface/text-embeddings-inference (Claude refuter)",
+      "ast-grep/ast-grep (Claude refuter)",
+      "letta-ai/letta (Claude refuter)"
+    ],
+    "overturn_when": "A sealed project/domain retrieval set shows improved source-grounded quality and acceptable latency, memory and lifecycle costs, or a supported target model cannot run in the current service.",
+    "next_action": "on_requirement_change | Freeze target-project questions and expected source spans; measure retrieval/watcher correctness, latency, memory and restore on the destination hardware.",
+    "freshness_flags": [
+      "vllm: selected 0.25.0 -> latest stable v0.29.0 published 2026-09-09 (newer_stable_release_review_pending; upstream-snapshot.json:2231,2274,2297); the landscape limitations separately retain v0.29.0's initialization failure (foundation.json:106; catalogs/foundation/manifest.json:79)",
+      "socraticode 1.14.0, qdrant 1.19.1 and huggingface-hub-native 1.32.0 are all selected_version_matches_latest_stable (upstream-snapshot.json:2166, 1634, 1199) - no pending flag"
+    ],
+    "codex_unresolved": "This is one of the weakest selections: no representative conceptual-code benchmark, no full index-update/deletion audit and no proof of compatibility with the destination embedding endpoint. No universal winner established."
+  },
+  {
+    "layer_id": "durable-memory",
+    "catalog": "foundation",
+    "decision": "keep_but_compare",
+    "verdict": "corrected",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "akitaonrails/ai-memory",
+        "pin": "2.3.2",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "basicmachines-co/basic-memory (Codex primary)",
+      "mem0ai/mem0 (Codex challenger)",
+      "tobi/qmd (Codex challenger)",
+      "lancedb/lancedb (Claude refuter)",
+      "huggingface/text-embeddings-inference (Claude refuter)",
+      "ast-grep/ast-grep (Claude refuter)",
+      "letta-ai/letta (Claude refuter)"
+    ],
+    "overturn_when": "An isolated representative corpus and question set shows better source-grounded recall/usefulness and acceptable complete provider use, latency, capture/deletion and restore behavior without ambiguous memory ownership.",
+    "next_action": "comparison_required | Run source-grounded recall and abstention cases with scoped capture, useful-write quality, deletion and isolated restore; compare complete usage without duplicating memory owners.",
+    "freshness_flags": [
+      "ai-memory: selected 2.3.2 equals the latest stable release (selected_version_matches_latest_stable; upstream-snapshot.json:260,326) - no pending flag"
+    ],
+    "codex_unresolved": "Basic Memory currently advertises AGPL-3.0 and a FastMCP prerelease dependency path; both require acceptance. Mem0's advertised managed-service benchmark includes proprietary optimizations unavailable in the open-source SDK, so it cannot settle this comparison."
+  },
+  {
+    "layer_id": "web-research",
+    "catalog": "foundation",
+    "decision": "retain",
+    "verdict": "corrected",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "vercel-labs/agent-browser",
+        "pin": "0.38.1",
+        "status": "partly",
+        "inBlind": true,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "microsoft/playwright-cli",
+        "pin": "0.1.21",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "alphaXiv/OpenResearch",
+        "pin": "0.2.7",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "tavily-ai/tavily-cli",
+        "pin": "0.1.8",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "microsoft/playwright (Codex primary)",
+      "tavily-ai/tavily-python (Codex primary)",
+      "vercel-labs/agent-browser (Codex challenger)",
+      "unclecode/crawl4ai (Codex challenger)",
+      "webrecorder/browsertrix-crawler (Claude refuter)",
+      "UKGovernmentBEIS/inspect_ai (Claude refuter)",
+      "unclecode/crawl4ai (Claude refuter)",
+      "microsoft/LLMLingua (Claude refuter)"
+    ],
+    "overturn_when": "A defined source-coverage or ingestion task exceeds the current commands and a candidate improves attributable retrieval completeness, accuracy and total runtime/cost on the same frozen source set. (verbatim from catalogs/landscape/foundation.json layers[web-research].overturn_when)",
+    "next_action": "status: on_requirement_change; next_action: \"Freeze required primary-source coverage and citation checks; add a crawler or research service only if current native retrieval demonstrably misses the requirement.\"; saturation: not_established (catalogs/landscape/research-state.json layers[web-research])",
+    "freshness_flags": [
+      "tavily-cli: selected_version 0.1.8; latest_stable_release = null; release_relationship = latest_stable_endpoint_unavailable (releases/latest check exit_code 1, \"gh: Not Found (HTTP 404)\"); listed in summary.unavailable_latest_stable_endpoints [upstream-snapshot.json components[component_id=tavily-cli]]",
+      "agent-browser, playwright-cli, openresearch: release_relationship = selected_version_matches_latest_stable; none appear in summary.newer_stable_release_review_queue (agentsview, markitdown, vllm, dagu, skfolio) [upstream-snapshot.json]"
+    ],
+    "codex_unresolved": "Source completeness, dynamic-page fidelity, browser binary cost, external data handling and actual API usage are unknown. Compact browser snapshots can omit evidence; SDK functionality does not prove trustworthy synthesis."
+  },
+  {
+    "layer_id": "token-efficiency",
+    "catalog": "foundation",
+    "decision": "keep_but_compare",
+    "verdict": "corrected",
+    "codex_handbook": "diverge",
+    "selected": [
+      {
+        "repo": "rtk-ai/rtk",
+        "pin": "0.49.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "mksglu/context-mode",
+        "pin": "1.0.169",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "yamadashy/repomix",
+        "pin": "1.18.1",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "ccusage/ccusage",
+        "pin": "20.0.24",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "chopratejas/headroom",
+        "pin": "0.37.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "conditional"
+      },
+      {
+        "repo": "toon-format/toon",
+        "pin": "4.1.1",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "measured_tradeoff"
+      }
+    ],
+    "challengers": [
+      "BurntSushi/ripgrep (Codex primary)",
+      "mksglu/context-mode (Codex challenger)",
+      "tobi/qmd (Codex challenger)",
+      "webrecorder/browsertrix-crawler (Claude refuter)",
+      "UKGovernmentBEIS/inspect_ai (Claude refuter)",
+      "unclecode/crawl4ai (Claude refuter)",
+      "microsoft/LLMLingua (Claude refuter)"
+    ],
+    "overturn_when": "A frozen task/artifact and repeated controlled comparison improves answer correctness or retrieval completeness while reducing complete provider use or latency, with successful raw-input recovery. (verbatim from catalogs/landscape/foundation.json layers[token-efficiency].overturn_when)",
+    "next_action": "status: comparison_required; next_action: \"Repeat a matched task at equal quality with original-context recovery; include failed attempts and separate complete provider use from cache subsets and artifact estimates.\"; saturation: not_established; evidence_refs: docs/full-stack-convergence.md, docs/token-native-saturation.md (catalogs/landscape/research-state.json layers[token-efficiency])",
+    "freshness_flags": [
+      "headroom: selected repository https://github.com/chopratejas/headroom redirects to canonical https://github.com/headroomlabs-ai/headroom [upstream-snapshot.json components[headroom].canonical_repository and summary.redirected_repository_identities]; snapshot recommendation: \"Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.\"",
+      "rtk, context-mode, repomix, toon, ccusage, headroom: release_relationship = selected_version_matches_latest_stable; none appear in summary.newer_stable_release_review_queue [upstream-snapshot.json]",
+      "context-mode and ccusage license_spdx = NOASSERTION in upstream-snapshot.json, unlike the Elastic-2.0/MIT values in manifests/stack.json"
+    ],
+    "codex_unresolved": "Repomix compression drops implementation detail. Context Mode's percentage claims and counters are not billed-token savings, and its subprocess boundary is not a credential-isolating OS sandbox. Platform hook parity and failure/source recovery require testing."
+  },
+  {
+    "layer_id": "quality-evaluation",
+    "catalog": "foundation",
+    "decision": "retain",
+    "verdict": "corrected",
+    "codex_handbook": "diverge",
+    "selected": [
+      {
+        "repo": "microsoft/playwright",
+        "pin": "1.63.0",
+        "status": "corroborated",
+        "inBlind": true,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "promptfoo/promptfoo",
+        "pin": "0.123.1",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "koalaman/shellcheck",
+        "pin": "0.11.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "Wilfred/difftastic",
+        "pin": "0.71.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "modelcontextprotocol/inspector",
+        "pin": "2.7.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "typesafe-ai/skills",
+        "pin": "65a39f39 (landscape native-practice.json, MIT)",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "openai/skills",
+        "pin": "49f948fa (landscape native-practice.json, Apache-2.0)",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "pytest-dev/pytest (Codex primary)",
+      "HypothesisWorks/hypothesis (Codex primary)",
+      "confident-ai/deepeval (Codex challenger)",
+      "webrecorder/browsertrix-crawler (Claude refuter)",
+      "UKGovernmentBEIS/inspect_ai (Claude refuter)",
+      "unclecode/crawl4ai (Claude refuter)",
+      "microsoft/LLMLingua (Claude refuter)"
+    ],
+    "overturn_when": "A defined tool-use/extraction or experiment-tracking requirement cannot be expressed adequately in the current test lane and a challenger passes a representative frozen oracle with usable failure inspection. (verbatim from catalogs/landscape/foundation.json layers[quality-evaluation].overturn_when)",
+    "next_action": "status: comparison_required; next_action: \"Evaluate semantic advice on fresh independently labeled task cases, retain uncertain disagreements and a safe negative control; do not tune on the existing eight-case diagnostic.\"; saturation: not_established; evidence_refs: docs/acceptance-evidence-policy.md, docs/promptfoo-upstream-retrieval.md (catalogs/landscape/research-state.json layers[quality-evaluation])",
+    "freshness_flags": [
+      "playwright-test, promptfoo, shellcheck, difftastic, mcp-inspector: release_relationship = selected_version_matches_latest_stable; none in summary.newer_stable_release_review_queue [upstream-snapshot.json]",
+      "mcp-inspector: license_spdx null in upstream-snapshot.json although manifests/stack.json records MIT",
+      "TypeSafe semantic skill and Official OpenAI CI and security skills: no component in upstream-snapshot.json's 68 components, so no version, license or release-freshness evidence exists for either in this snapshot",
+      "shellcheck: latest_stable_release v0.11.0 published 2025-08-04 — the oldest release date among this layer's pinned components, still matching the selected version"
+    ],
+    "codex_unresolved": "Test presence is not passing evidence, and a green synthetic fixture is not an upstream or broker E2E result. LLM judges can agree on the same error; evaluator data leakage, nondeterminism and costs are unmeasured."
+  },
+  {
+    "layer_id": "ci-supply-chain",
+    "catalog": "foundation",
+    "decision": "retain",
+    "verdict": "corrected",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "rhysd/actionlint",
+        "pin": "1.7.12 @ 914e7df2 (catalogs/foundation/automation.json)",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "actions/attest",
+        "pin": "4.2.2 @ 1e69f48a (catalogs/foundation/automation.json)",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "zizmorcore/zizmor",
+        "pin": "1.30.1",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "gitleaks/gitleaks",
+        "pin": "8.30.1",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "anchore/syft",
+        "pin": "1.52.0",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "dependabot/dependabot-core",
+        "pin": "GitHub-native service; no pin applicable",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "sigstore/cosign (Codex primary)",
+      "aquasecurity/trivy (Codex challenger)",
+      "anchore/grype (Claude refuter)",
+      "restic/restic (Claude refuter)",
+      "open-telemetry/opentelemetry-collector (Claude refuter)",
+      "zizmorcore/zizmor (Claude refuter)"
+    ],
+    "overturn_when": "A specific dependency/update or vulnerability gap is demonstrated and one alternative covers it with pinned database/provenance, manageable findings and no duplicate ownership of the same dependency. (verbatim from catalogs/landscape/foundation.json layers[ci-supply-chain].overturn_when)",
+    "next_action": "status: on_requirement_change; next_action: \"Use the installed CI skill when a real Actions check fails; qualify log recovery and repair. Add vulnerability tooling only for a defined artifact/database gap.\"; saturation: not_established; evidence_refs: catalogs/foundation/automation.json, docs/github-automation.md (catalogs/landscape/research-state.json layers[ci-supply-chain])",
+    "freshness_flags": [
+      "zizmor, gitleaks, syft: release_relationship = selected_version_matches_latest_stable and selected_pin_matches_latest_release_commit = true; none in summary.newer_stable_release_review_queue [upstream-snapshot.json]",
+      "actionlint, GitHub Actions attest, Dependabot: no component_id in upstream-snapshot.json's 68 components, so no upstream freshness, archive or license evidence exists for them in this snapshot",
+      "gitleaks: latest_stable_release v8.30.1 published 2026-03-21 while repository pushed_at is 2026-09-09 — unreleased upstream activity since the pinned release, not a newer stable release"
+    ],
+    "codex_unresolved": "Static findings do not prove reproducible builds. A lockfile or source SBOM need not match installed runtime packages. Signing without checking expected issuer/identity does not establish the intended producer."
+  },
+  {
+    "layer_id": "scheduling-supervision",
+    "catalog": "foundation",
+    "decision": "keep_but_compare",
+    "verdict": "corrected",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "dagucloud/dagu",
+        "pin": "2.16.6",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "systemd/systemd",
+        "pin": "255.4-1ubuntu8.17",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "PrefectHQ/prefect (Codex challenger)",
+      "temporalio/temporal (Codex challenger)",
+      "anchore/grype (Claude refuter)",
+      "restic/restic (Claude refuter)",
+      "open-telemetry/opentelemetry-collector (Claude refuter)",
+      "zizmorcore/zizmor (Claude refuter)"
+    ],
+    "overturn_when": "Real jobs require host-loss survival, days-long waits or durable cross-host effects, and one challenger passes the declared effect/retry/recovery cases with acceptable operational burden.",
+    "next_action": "status=on_requirement_change; next_action=\"If jobs must survive host loss or long waits, qualify one durable scheduler against explicit effect/retry/cancellation/recovery cases and operating cost.\" (research-state.json, saturation=not_established)",
+    "freshness_flags": [
+      "dagu: selected 2.16.6 -> latest_stable_release v2.17.0 published 2026-09-21 (release_relationship=newer_stable_release_review_pending; upstream-snapshot.json component dagu), also in summary.newer_stable_release_review_queue",
+      "systemd: selected 255.4-1ubuntu8.17 (distribution package) -> upstream latest_stable_release v261.3 (release_relationship=distribution_package_not_upstream_release_comparison; upstream-snapshot.json component systemd)"
+    ],
+    "codex_unresolved": "WSL uptime and service-manager activation are unverified. Timer persistence handles missed activation but is not a guarantee that every missed interval runs. Durable workflow replay does not make external effects exactly once."
+  },
+  {
+    "layer_id": "hosting-services",
+    "catalog": "foundation",
+    "decision": "retain",
+    "verdict": "corrected",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "vercel/next.js",
+        "pin": "16.3.5",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "react/react",
+        "pin": "19.3.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "fastapi/fastapi",
+        "pin": "0.141.1",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "postgres/postgres",
+        "pin": "18.6",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "pydantic/pydantic (Codex primary)",
+      "caddyserver/caddy (Codex primary)",
+      "honojs/hono (Codex challenger)",
+      "podman-container-tools/podman (Codex challenger)",
+      "anchore/grype (Claude refuter)",
+      "restic/restic (Claude refuter)",
+      "open-telemetry/opentelemetry-collector (Claude refuter)",
+      "zizmorcore/zizmor (Claude refuter)"
+    ],
+    "overturn_when": "A defined production, remote-team or GPU deployment requirement exceeds the local fixture, and one alternative passes its account, data, networking, rollback and workload-cost acceptance.",
+    "next_action": "status=on_requirement_change; next_action=\"Choose deployment requirements first: local development, remote service or GPU job. Qualify one host/container option on data, network, rollback, persistence and measured workload cost.\" (research-state.json, saturation=not_established)",
+    "freshness_flags": [],
+    "codex_unresolved": "Required product interfaces, state store, exposed ports, account requirements and hosting budget are unspecified. Pydantic's default coercion is not proof of strict financial validation. No cloud provider is selected."
+  },
+  {
+    "layer_id": "recovery-portability",
+    "catalog": "foundation",
+    "decision": "keep_but_compare",
+    "verdict": "corrected",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "restic/restic",
+        "pin": "0.19.1",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "astral-sh/uv",
+        "pin": "0.12.17 (adoption recipes)",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "jdx/mise (Codex primary)",
+      "NixOS/nix (Codex challenger)",
+      "anchore/grype (Claude refuter)",
+      "restic/restic (Claude refuter)",
+      "open-telemetry/opentelemetry-collector (Claude refuter)",
+      "zizmorcore/zizmor (Claude refuter)"
+    ],
+    "overturn_when": "A real multi-language/system dependency or state-loss case exceeds the selected recipes, and the proposed environment/backup alternative passes install, restore, resume and cleanup on the target host.",
+    "next_action": "status=new_host_required; next_action=\"On the destination PC, select a small profile; establish native sign-ins, scoped tool calls and useful tasks, then independently restore selected application state and keys.\" (research-state.json, saturation=not_established)",
+    "freshness_flags": [],
+    "codex_unresolved": "Exact platform packages, encryption-key custody, database export consistency and download availability remain unknown. Floating tool versions and missing native dependencies can defeat a lock-only recipe."
+  },
+  {
+    "layer_id": "observation-inference",
+    "catalog": "foundation",
+    "decision": "keep_but_compare",
+    "verdict": "corrected",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "open-telemetry/opentelemetry-collector-contrib",
+        "pin": "0.161.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "prometheus/prometheus",
+        "pin": "3.14.0",
+        "status": "partly",
+        "inBlind": true,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "grafana/loki",
+        "pin": "3.7.8",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "grafana/grafana",
+        "pin": "13.2.2",
+        "status": "partly",
+        "inBlind": true,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "prometheus/alertmanager",
+        "pin": "0.34.1",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "binwiederhier/ntfy",
+        "pin": "2.28.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "kenn-io/agentsview",
+        "pin": "0.43.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "ymtdzzz/otel-tui",
+        "pin": "0.7.5",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "jarrodwatts/claude-hud",
+        "pin": "0.8.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "open-telemetry/opentelemetry-collector (Codex primary)",
+      "ggml-org/llama.cpp (Codex primary)",
+      "vllm-project/vllm (Codex challenger)",
+      "anchore/grype (Claude refuter)",
+      "restic/restic (Claude refuter)",
+      "open-telemetry/opentelemetry-collector (Claude refuter)",
+      "zizmorcore/zizmor (Claude refuter)"
+    ],
+    "overturn_when": "A required trace, evaluation or supported model/hardware workload is unanswerable by the current path, and one alternative passes privacy, fidelity, latency/cost and recovery comparisons without duplicate capture.",
+    "next_action": "status=on_requirement_change; next_action=\"Reconcile one real task across native counters and telemetry; qualify any new model route on actual output, privacy, latency and recovery without duplicate capture.\" (research-state.json, saturation=not_established)",
+    "freshness_flags": [
+      "agentsview: selected 0.43.0 -> latest_stable_release v0.44.0 published 2026-09-21 (release_relationship=newer_stable_release_review_pending; upstream-snapshot.json component agentsview), also in summary.newer_stable_release_review_queue",
+      "llama.cpp (conditional alternative, manifest-tracked): selected b11057 (0.4.1-dev) pin 59657a613ab0... is release_relationship=selected_development_or_prerelease_channel against latest_stable_release v0.4.1 (upstream-snapshot.json component llama-cpp)"
+    ],
+    "codex_unresolved": "otel-tui documents a 0.0.0.0 default host: local intent therefore requires an explicit loopback bind. Model quality, quantization effects, RAM, startup, latency and capacity are unknown on the destination hardware."
+  },
+  {
+    "layer_id": "foundation-memory",
+    "catalog": "us-equities",
+    "decision": "keep_but_compare",
+    "verdict": "corrected",
+    "codex_handbook": "diverge",
+    "selected": [
+      {
+        "repo": "akitaonrails/ai-memory",
+        "pin": "2.3.2 @ 353841d91618d20b110b",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "tobi/qmd",
+        "pin": "2.8.3",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "oraios/serena",
+        "pin": "2.0.0.dev0 @ c6fbd1c5932df24",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "giancarloerra/SocratiCode",
+        "pin": "1.14.0 @ 2218f25153d0f3f4a76",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "qdrant/qdrant",
+        "pin": "1.19.1 @ 6ab21cac18ebb6f4ae2",
+        "status": "partly",
+        "inBlind": true,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "mksglu/context-mode",
+        "pin": "1.0.169",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "rtk-ai/rtk",
+        "pin": "0.49.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "dgunning/edgartools (Codex primary)",
+      "docling-project/docling (Codex primary)",
+      "duckdb/duckdb (Codex primary)",
+      "run-llama/llama_index (Codex challenger)",
+      "qdrant/qdrant (Codex challenger)",
+      "lancedb/lancedb (Claude refuter)",
+      "huggingface/text-embeddings-inference (Claude refuter)",
+      "ast-grep/ast-grep (Claude refuter)",
+      "letta-ai/letta (Claude refuter)"
+    ],
+    "overturn_when": "Run a preregistered, representative held-out financial/document and code retrieval set at the same context budget; replace or supplement a lane only if a candidate improves source/answer fidelity, abstention and measured task cost while preserving isolation, exact source recovery and native client behavior. [verbatim from catalogs/landscape/us-equities.json foundation-memory.overturn_when]",
+    "next_action": "status: comparison_required; saturation: not_established; next_action: 'Create held-out finance/document/code relevance judgments; compare fidelity, abstention and total task cost while preserving source timestamps, project isolation and original recovery.'; evidence_refs: catalogs/us-equities/foundation-memory.json, evidence/receipts/foundation-native-20260920.json [catalogs/landscape/research-state.json layers[foundation-memory]]",
+    "freshness_flags": [
+      "serena: selected 2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143 -> latest stable v1.7.0; release_relationship=selected_development_or_prerelease_channel [catalogs/landscape/upstream-snapshot.json components[serena]]",
+      "markitdown: selected 0.1.7 -> latest stable v0.1.8 (published 2026-09-21); release_relationship=newer_stable_release_review_pending and listed in summary.newer_stable_release_review_queue [catalogs/landscape/upstream-snapshot.json]. markitdown is a 'default' row of this catalog layer (foundation-memory.md line 39).",
+      "All other selected components of this layer (ai-memory, qmd, socraticode, qdrant, context-mode, rtk) show release_relationship=selected_version_matches_latest_stable with selected_pin_matches_latest_release_commit=true where a pin exists [upstream-snapshot.json]."
+    ],
+    "codex_unresolved": "Latest company facts or filings can contain later amendments. Filing time, observation period, ingestion time and first-available time must remain distinct. Proposed composition is an architectural hypothesis, not an already integrated stack."
+  },
+  {
+    "layer_id": "agents-operations",
+    "catalog": "us-equities",
+    "decision": "retain",
+    "verdict": "corrected",
+    "codex_handbook": "diverge",
+    "selected": [
+      {
+        "repo": "openai/codex",
+        "pin": "0.155.1",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "anthropics/claude-code",
+        "pin": "2.1.278",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "dagucloud/dagu",
+        "pin": "2.16.6",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "open-telemetry/opentelemetry-collector-contrib",
+        "pin": "0.161.0",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "prometheus/prometheus",
+        "pin": "3.14.0 @ d7598b7141418fa35be",
+        "status": "partly",
+        "inBlind": true,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "grafana/loki",
+        "pin": "3.7.8 @ 09e6ce2ff1bdc19763a1",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "grafana/grafana",
+        "pin": "13.2.2 @ 3db12332b66497c31f8",
+        "status": "partly",
+        "inBlind": true,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "restic/restic",
+        "pin": "0.19.1",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "systemd/systemd (Codex primary)",
+      "PrefectHQ/prefect (Codex primary)",
+      "langchain-ai/langgraph (Codex challenger)",
+      "temporalio/temporal (Codex challenger)",
+      "Lumiwealth/lumibot (Claude refuter)",
+      "StockSharp/StockSharp (Claude refuter)",
+      "anchore/grype (Claude refuter)",
+      "restic/restic (Claude refuter)"
+    ],
+    "overturn_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners. [verbatim from catalogs/landscape/us-equities.json agents-operations.overturn_when]",
+    "next_action": "status: on_requirement_change; saturation: not_established; next_action: 'Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.'; evidence_refs: catalogs/us-equities/agents-operations.json, docs/foundation-closure-20260921.md [catalogs/landscape/research-state.json layers[agents-operations]]",
+    "freshness_flags": [
+      "dagu: selected 2.16.6 -> latest stable v2.17.0 (published 2026-09-21); release_relationship=newer_stable_release_review_pending and listed in summary.newer_stable_release_review_queue [catalogs/landscape/upstream-snapshot.json components[dagu]]",
+      "vllm: selected 0.25.0 @ 702f4814fe54fabff350d43cb753ae3e47c0c276 -> latest stable v0.29.0; release_relationship=newer_stable_release_review_pending and in summary.newer_stable_release_review_queue [upstream-snapshot.json]. vLLM is candidates[16] of this layer and 'default' at agents-operations.md line 97.",
+      "All other selected components of this layer (codex, claude-code, opentelemetry-collector-contrib, prometheus, loki, grafana, restic) show release_relationship=selected_version_matches_latest_stable [upstream-snapshot.json]."
+    ],
+    "codex_unresolved": "Research-only prompts do not prevent broker actions. Persistent state can preserve a mistaken plan; returned JSON alone does not establish all expected results were returned. Durable effect semantics remain workload-specific."
+  },
+  {
+    "layer_id": "data-research",
+    "catalog": "us-equities",
+    "decision": "keep_but_compare",
+    "verdict": "corrected",
+    "codex_handbook": "unknown",
+    "selected": [
+      {
+        "repo": "alpacahq/alpaca-py",
+        "pin": "0.44.0",
+        "status": "partly",
+        "inBlind": true,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "dgunning/edgartools",
+        "pin": "5.58.0",
+        "status": "partly",
+        "inBlind": false,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "duckdb/duckdb",
+        "pin": "1.5.5",
+        "status": "corroborated",
+        "inBlind": true,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "pandas-dev/pandas",
+        "pin": "3.0.6",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "gerrymanoim/exchange_calendars",
+        "pin": "4.13.2 @ bbda29fe (catalogs/us-equities/data-research.json and architecture/trading-sources.json; absent from manifests/stack.json)",
+        "status": "catalog-only",
+        "inBlind": false,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "databento/databento-python (Codex primary)",
+      "pola-rs/polars (Codex primary)",
+      "massive-com/client-python (Codex challenger)",
+      "alpacahq/alpaca-py (Codex challenger)",
+      "man-group/ArcticDB (Claude refuter)",
+      "dgunning/edgartools (Claude refuter)",
+      "gerrymanoim/exchange_calendars (Claude refuter)",
+      "microsoft/qlib (Claude refuter)"
+    ],
+    "overturn_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+    "next_action": "status=comparison_required; next_action='Freeze the intended universe/history and rights; obtain auditable delisting, ticker-reuse, action/currency and publication-revision evidence before accepting an as-known research dataset.'; saturation=not_established (catalogs/landscape/research-state.json, layer data-research; decision_ref catalogs/landscape/us-equities.json)",
+    "freshness_flags": [
+      "(none) verified: upstream-snapshot.json components alpaca-py, duckdb, pandas, edgartools all have release_relationship=selected_version_matches_latest_stable; none of this layer's selections appear in summary.newer_stable_release_review_queue (agentsview, markitdown, vllm, dagu, skfolio).",
+      "coverage gap, not a staleness flag: exchange_calendars has no component entry in catalogs/landscape/upstream-snapshot.json, so its release currency is unchecked."
+    ],
+    "codex_unresolved": "Data entitlements, redistribution rights, historical membership, delisted coverage and correction semantics remain unaccepted. Databento documents pit=True for retained historical corporate-action records versus a latest view; Alpaca documents IEX and SIP as different feeds."
+  },
+  {
+    "layer_id": "engines-strategies",
+    "catalog": "us-equities",
+    "decision": "keep_but_compare",
+    "verdict": "corrected",
+    "codex_handbook": "agree",
+    "selected": [
+      {
+        "repo": "nautechsystems/nautilus_trader",
+        "pin": "2.0.0rc5",
+        "status": "partly",
+        "inBlind": true,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "QuantConnect/Lean",
+        "pin": "985ef30 with documented depe",
+        "status": "corroborated",
+        "inBlind": true,
+        "inCodex": true,
+        "landscape_disposition": "selected"
+      },
+      {
+        "repo": "alpacahq/alpaca-py",
+        "pin": "0.44.0",
+        "status": "partly",
+        "inBlind": true,
+        "inCodex": false,
+        "landscape_disposition": "selected"
+      }
+    ],
+    "challengers": [
+      "QuantConnect/Lean.Brokerages.InteractiveBrokers (Codex primary)",
+      "QuantConnect/Lean.Brokerages.Alpaca (Codex primary)",
+      "nautechsystems/nautilus_trader (Codex challenger)",
+      "stefan-jansen/zipline-reloaded (Codex challenger)",
+      "polakowo/vectorbt (Codex challenger)",
+      "stefan-jansen/zipline-reloaded (Claude refuter)",
+      "nkaz001/hftbacktest (Claude refuter)",
+      "edtechre/pybroker (Claude refuter)",
+      "Lumiwealth/lumibot (Claude refuter)"
+    ],
+    "overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+    "next_action": "status=comparison_required; next_action='Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.'; saturation=not_established (catalogs/landscape/research-state.json, layer engines-strategies)",
+    "freshness_flags": [
+      "nautilus-trader (selected): selected_version 2.0.0rc5, pin 1b0a49d2792a9432a3aca3fcb617ce7a630d905e -> latest_stable_release v1.231.0 published 2026-08-02; release_relationship=selected_development_or_prerelease_channel (catalogs/landscape/upstream-snapshot.json).",
+      "lean (selected): selected_version '985ef30 with documented dependency remediation', pin 985ef30ad3ac774218c5ac516b4cb0aa2655730f (committed 2026-09-18) -> latest_stable_release v2.4.0.1 published 2017-08-08; release_relationship=selected_source_commit_not_release_comparison.",
+      "alpaca-py (selected): 0.44.0 -> latest_stable_release v0.44.0; release_relationship=selected_version_matches_latest_stable (no action).",
+      "skfolio (alternative, not a selection of this layer): selected 1.2.9 -> latest v1.3.0 published 2026-09-20; release_relationship=newer_stable_release_review_pending and listed in summary.newer_stable_release_review_queue."
+    ],
+    "codex_unresolved": "LEAN CLI currently requires a paid organization and Docker, while the engine documents a direct .NET build route; that route's broker dependency/account setup remains untested. Nautilus currently documents v2 release-candidate status; an official Alpaca integration was not established. Neither candidate is accepted for both broker paper E2E."
+  }
+]

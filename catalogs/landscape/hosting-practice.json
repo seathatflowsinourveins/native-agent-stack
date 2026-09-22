@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-21",
+  "source_checked_date_utc": "2026-09-22",
+  "scope": "Targeted primary-source comparison of native services and optional OCI/gateway deployment. No container installation, service activation or broker operation was performed.",
+  "decision": "Retain the qualified native Linux/WSL, systemd and Dagu lanes. Select a container trial only for a demonstrated packaging, isolation or deployment requirement.",
+  "guide": "docs/hosting-container-practice.md",
+  "candidates": [
+    {
+      "name": "Docker Engine / Moby",
+      "repository": "https://github.com/moby/moby",
+      "version": "docker-v29.8.1",
+      "source_pin": "464cd50c3d9e92877d56940ea160de6fca7bea23",
+      "decision": "conditional",
+      "evidence_level": "source_review",
+      "rationale": "Useful when an upstream image or reproducible OCI deployment closes a dependency/runtime gap. No matched result shows better reproduction or recovery than the accepted native services for this workload.",
+      "sources": ["https://github.com/moby/moby/blob/464cd50c3d9e92877d56940ea160de6fca7bea23/README.md", "https://docs.docker.com/engine/security/rootless/"],
+      "native_acceptance": "not_established"
+    },
+    {
+      "name": "Docker Compose",
+      "repository": "https://github.com/docker/compose",
+      "version": "v5.5.1",
+      "source_pin": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "decision": "conditional",
+      "evidence_level": "source_review",
+      "rationale": "Declarative multi-service packaging is useful once an OCI workload is selected. Its lifecycle value has not been compared with current service coordination; evaluate it with the chosen engine rather than as another default scheduler.",
+      "sources": ["https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/README.md"],
+      "native_acceptance": "not_established"
+    },
+    {
+      "name": "Podman / Quadlet",
+      "repository": "https://github.com/podman-container-tools/podman",
+      "version": "v6.1.2",
+      "source_pin": "04f3aa430e6df81bea059978bc5bafbc846ba3e7",
+      "decision": "conditional",
+      "evidence_level": "source_review",
+      "rationale": "A maintained rootless OCI challenger with systemd-oriented Quadlet management. Image, networking, volume, GPU and Docker-API compatibility remain workload-specific and unmeasured here.",
+      "sources": ["https://github.com/podman-container-tools/podman/blob/04f3aa430e6df81bea059978bc5bafbc846ba3e7/README.md", "https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html"],
+      "native_acceptance": "not_established",
+      "former_repository": "https://github.com/containers/podman"
+    },
+    {
+      "name": "Dockerized IB Gateway",
+      "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+      "version": "inspected HEAD",
+      "source_pin": "e19aa0bebe5d0ddd55c6d0e25549380f9c7d1bf7",
+      "decision": "conditional",
+      "evidence_level": "source_review",
+      "rationale": "The selected Nautilus source supports optional DockerizedIBGateway alongside an external native TWS/Gateway. Image digest, sign-in, restart, API connectivity and broker reconciliation are not qualified; this is independent of Alpaca acceptance.",
+      "sources": ["https://github.com/gnzsnz/ib-gateway-docker/blob/e19aa0bebe5d0ddd55c6d0e25549380f9c7d1bf7/README.md", "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/integrations/interactive_brokers.md"],
+      "native_acceptance": "not_established"
+    }
+  ],
+  "comparison_required": "Compare the same locked application and database workload under native services and one chosen container lane. Measure installation, startup/rebuild, resources, persistent-state backup/restore, interruption and cleanup against frozen acceptance. Add GPU/broker cases only for that selected workload.",
+  "practice": [
+    "Record resolved image digests and locked application dependencies; keep controlled updates and rollback.",
+    "Use build/runtime separation and least-required access appropriate to the selected image and workload.",
+    "Keep secrets outside images, source control, prompts and public receipts; native sign-in remains host-specific.",
+    "Use Linux-filesystem mounts and explicit resource bounds on WSL; choose one intended engine integration instead of conflicting Desktop and independent WSL installations.",
+    "Qualify persistent volumes, health/readiness, networking and recovery; running a container or passing a help command is not acceptance.",
+    "Start Nautilus DockerizedIBGateway separately and pass its host/port to clients; the selected docs reject dockerized_gateway in client config. Resolve the mutable stable image to a recorded digest for a trial."
+  ],
+  "sources": ["https://docs.docker.com/build/building/best-practices/", "https://docs.docker.com/desktop/features/wsl/best-practices/", "blueprints/convergence-practice/container-storage/README.md", "blueprints/us-equities/hosting/README.md", "catalogs/us-equities/runtime-target.json"],
+  "limits": ["Primary source review is not a container or production-hosting trial.", "Apple Container evidence is platform-specific and does not qualify Docker or Podman on Linux.", "Containers do not keep a stopped WSL VM running or establish independent host-loss recovery.", "No matched result establishes universal runtime or hosting superiority."]
+}

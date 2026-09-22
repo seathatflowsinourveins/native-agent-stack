@@ -1,0 +1,1115 @@
+[
+  {
+    "label": "ai-version",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--version"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.004865,
+    "stdout": "ai-memory 2.3.2\n",
+    "stderr": ""
+  },
+  {
+    "label": "ai-init",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "init"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.007764,
+    "stdout": "",
+    "stderr": "2026-09-22T02:47:50.921178Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:49374 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n2026-09-22T02:47:50.921417Z  INFO ai_memory_cli::commands::init: ensured directory path=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state/wiki\n2026-09-22T02:47:50.921504Z  INFO ai_memory_cli::commands::init: ensured directory path=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state/raw\n2026-09-22T02:47:50.921624Z  INFO ai_memory_cli::commands::init: ensured directory path=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state/db\n2026-09-22T02:47:50.922182Z  INFO ai_memory_cli::commands::init: ensured directory path=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state/models\n2026-09-22T02:47:50.922339Z  INFO ai_memory_cli::commands::init: wrote default config path=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state/config.toml\n2026-09-22T02:47:50.922350Z  INFO ai_memory_cli::commands::init: init complete\n"
+  },
+  {
+    "label": "ai-server-1",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "serve",
+      "--transport",
+      "http",
+      "--bind",
+      "127.0.0.1:44743",
+      "--no-watcher",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "pid": 3386038
+  },
+  {
+    "label": "ai-write-orchard-pump",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "write-page",
+      "--path",
+      "notes/orchard-pump.md",
+      "--body",
+      "-",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": "# Orchard Pump\n\nThe orchard pump inspection uses the amber checklist. The inspection interval is 17 days.\n",
+    "exit_code": 0,
+    "elapsed_seconds": 0.019846,
+    "stdout": "\u2713 wrote notes/orchard-pump.md (page_id=01a0c703) under probe/synthetic\n",
+    "stderr": "2026-09-22T02:47:51.041651Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-write-harbor-lantern",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "write-page",
+      "--path",
+      "notes/harbor-lantern.md",
+      "--body",
+      "-",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": "# Harbor Lantern\n\nThe harbor lantern inventory contains 23 copper brackets. Its keeper is Juniper.\n",
+    "exit_code": 0,
+    "elapsed_seconds": 0.019199,
+    "stdout": "\u2713 wrote notes/harbor-lantern.md (page_id=01a0c703) under probe/synthetic\n",
+    "stderr": "2026-09-22T02:47:51.061364Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-write-alpine-kite",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "write-page",
+      "--path",
+      "notes/alpine-kite.md",
+      "--body",
+      "-",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": "# Alpine Kite\n\nThe alpine kite trial uses a cobalt spool. The wind limit is 12 knots.\n",
+    "exit_code": 0,
+    "elapsed_seconds": 0.016457,
+    "stdout": "\u2713 wrote notes/alpine-kite.md (page_id=01a0c703) under probe/synthetic\n",
+    "stderr": "2026-09-22T02:47:51.080412Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-search-amber",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "search",
+      "amber",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.014285,
+    "stdout": "[\n  {\n    \"path\": \"notes/orchard-pump.md\",\n    \"title\": \"Orchard Pump\",\n    \"snippet\": \"# Orchard Pump\\n\\nThe orchard pump inspection uses the <mark>amber</mark> checklist. The inspection interval is 17 days.\\n\",\n    \"rank\": -0.5556801397444577\n  }\n]\n",
+    "stderr": "2026-09-22T02:47:51.098246Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-read-orchard-pump",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "read-page",
+      "--path",
+      "notes/orchard-pump.md",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.013122,
+    "stdout": "{\n  \"path\": \"notes/orchard-pump.md\",\n  \"workspace\": \"probe\",\n  \"project\": \"synthetic\",\n  \"title\": null,\n  \"body\": \"# Orchard Pump\\n\\nThe orchard pump inspection uses the amber checklist. The inspection interval is 17 days.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-22T02:47:51Z\"\n    }\n  }\n}\n",
+    "stderr": "2026-09-22T02:47:51.112379Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-search-Juniper",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "search",
+      "Juniper",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.011925,
+    "stdout": "[\n  {\n    \"path\": \"notes/harbor-lantern.md\",\n    \"title\": \"Harbor Lantern\",\n    \"snippet\": \"# Harbor Lantern\\n\\nThe harbor lantern inventory contains 23 copper brackets. Its keeper is <mark>Juniper</mark>.\\n\",\n    \"rank\": -0.5747927050605091\n  }\n]\n",
+    "stderr": "2026-09-22T02:47:51.125452Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-read-harbor-lantern",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "read-page",
+      "--path",
+      "notes/harbor-lantern.md",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.011798,
+    "stdout": "{\n  \"path\": \"notes/harbor-lantern.md\",\n  \"workspace\": \"probe\",\n  \"project\": \"synthetic\",\n  \"title\": null,\n  \"body\": \"# Harbor Lantern\\n\\nThe harbor lantern inventory contains 23 copper brackets. Its keeper is Juniper.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-22T02:47:51Z\"\n    }\n  }\n}\n",
+    "stderr": "2026-09-22T02:47:51.137598Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-search-cobalt",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "search",
+      "cobalt",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.011964,
+    "stdout": "[\n  {\n    \"path\": \"notes/alpine-kite.md\",\n    \"title\": \"Alpine Kite\",\n    \"snippet\": \"# Alpine Kite\\n\\nThe alpine kite trial uses a <mark>cobalt</mark> spool. The wind limit is 12 knots.\\n\",\n    \"rank\": -0.5556801397444577\n  }\n]\n",
+    "stderr": "2026-09-22T02:47:51.149693Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-read-alpine-kite",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "read-page",
+      "--path",
+      "notes/alpine-kite.md",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.011931,
+    "stdout": "{\n  \"path\": \"notes/alpine-kite.md\",\n  \"workspace\": \"probe\",\n  \"project\": \"synthetic\",\n  \"title\": null,\n  \"body\": \"# Alpine Kite\\n\\nThe alpine kite trial uses a cobalt spool. The wind limit is 12 knots.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-22T02:47:51Z\"\n    }\n  }\n}\n",
+    "stderr": "2026-09-22T02:47:51.161710Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-update",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "write-page",
+      "--path",
+      "notes/orchard-pump.md",
+      "--body",
+      "-",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": "# Orchard Pump\n\nThe orchard pump inspection uses the violet checklist. The inspection interval is 19 days.\n",
+    "exit_code": 0,
+    "elapsed_seconds": 0.017965,
+    "stdout": "\u2713 wrote notes/orchard-pump.md (page_id=01a0c703) under probe/synthetic\n",
+    "stderr": "2026-09-22T02:47:51.174127Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-search-updated",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "search",
+      "violet",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.011499,
+    "stdout": "[\n  {\n    \"path\": \"notes/orchard-pump.md\",\n    \"title\": \"Orchard Pump\",\n    \"snippet\": \"# Orchard Pump\\n\\nThe orchard pump inspection uses the <mark>violet</mark> checklist. The inspection interval is 19 days.\\n\",\n    \"rank\": -0.9243107661887272\n  }\n]\n",
+    "stderr": "2026-09-22T02:47:51.191965Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-search-old",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "search",
+      "amber",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.01246,
+    "stdout": "[]\n",
+    "stderr": "2026-09-22T02:47:51.204399Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-read-updated",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "read-page",
+      "--path",
+      "notes/orchard-pump.md",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.012269,
+    "stdout": "{\n  \"path\": \"notes/orchard-pump.md\",\n  \"workspace\": \"probe\",\n  \"project\": \"synthetic\",\n  \"title\": null,\n  \"body\": \"# Orchard Pump\\n\\nThe orchard pump inspection uses the violet checklist. The inspection interval is 19 days.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-22T02:47:51Z\"\n    }\n  }\n}\n",
+    "stderr": "2026-09-22T02:47:51.217484Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-delete",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "delete-page",
+      "--path",
+      "notes/harbor-lantern.md",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.014751,
+    "stdout": "\u2713 deleted notes/harbor-lantern.md under probe/synthetic\n",
+    "stderr": "2026-09-22T02:47:51.229911Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-search-deleted",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "search",
+      "Juniper",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.011165,
+    "stdout": "[]\n",
+    "stderr": "2026-09-22T02:47:51.243805Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-backup",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "backup",
+      "--to",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-backup.tar.gz"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.026492,
+    "stdout": "\u2713 wrote backup to /tmp/memory-lifecycle-probe-20260921-scratch/ai-backup.tar.gz (51.19 KiB)\n",
+    "stderr": "2026-09-22T02:47:51.255738Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n2026-09-22T02:47:51.276100Z  INFO ai_memory_cli::commands::backup: backup written path=/tmp/memory-lifecycle-probe-20260921-scratch/ai-backup.tar.gz bytes=52417\n"
+  },
+  {
+    "label": "ai-server-2",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "serve",
+      "--transport",
+      "http",
+      "--bind",
+      "127.0.0.1:44743",
+      "--no-watcher",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "pid": 3386500
+  },
+  {
+    "label": "ai-after-restart-updated",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "read-page",
+      "--path",
+      "notes/orchard-pump.md",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.012683,
+    "stdout": "{\n  \"path\": \"notes/orchard-pump.md\",\n  \"workspace\": \"probe\",\n  \"project\": \"synthetic\",\n  \"title\": null,\n  \"body\": \"# Orchard Pump\\n\\nThe orchard pump inspection uses the violet checklist. The inspection interval is 19 days.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-22T02:47:51Z\"\n    }\n  }\n}\n",
+    "stderr": "2026-09-22T02:47:51.400273Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-after-restart-remaining",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "search",
+      "cobalt",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.012054,
+    "stdout": "[\n  {\n    \"path\": \"notes/alpine-kite.md\",\n    \"title\": \"Alpine Kite\",\n    \"snippet\": \"# Alpine Kite\\n\\nThe alpine kite trial uses a <mark>cobalt</mark> spool. The wind limit is 12 knots.\\n\",\n    \"rank\": -0.5619081861425899\n  }\n]\n",
+    "stderr": "2026-09-22T02:47:51.412705Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "ai-after-restart-deleted",
+    "argv": [
+      "<AI_MEMORY_BIN>",
+      "--data-dir",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/ai-state",
+      "search",
+      "Juniper",
+      "--json",
+      "--workspace",
+      "probe",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "AI_MEMORY_SERVER_URL": "http://127.0.0.1:44743"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 0.012382,
+    "stdout": "[]\n",
+    "stderr": "2026-09-22T02:47:51.426043Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374\n"
+  },
+  {
+    "label": "basic-project",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "project",
+      "add",
+      "synthetic",
+      "/tmp/memory-lifecycle-probe-20260921-scratch/basic-synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 6.052595,
+    "stdout": "Project 'synthetic' added successfully\nIndexed 0/0 files (batches: 0, deleted orphans: 0)\nsynthetic: indexed and settled \u2014 0 notes from 0 files\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-write-orchard-pump",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "write-note",
+      "--title",
+      "Orchard Pump",
+      "--folder",
+      "notes",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": "# Orchard Pump\n\nThe orchard pump inspection uses the amber checklist. The inspection interval is 17 days.\n",
+    "exit_code": 0,
+    "elapsed_seconds": 4.688429,
+    "stdout": "{\n  \"title\": \"Orchard Pump\",\n  \"permalink\": \"synthetic/notes/orchard-pump\",\n  \"file_path\": \"notes/Orchard Pump.md\",\n  \"checksum\": null,\n  \"action\": \"created\",\n  \"similar_notes\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-write-harbor-lantern",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "write-note",
+      "--title",
+      "Harbor Lantern",
+      "--folder",
+      "notes",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": "# Harbor Lantern\n\nThe harbor lantern inventory contains 23 copper brackets. Its keeper is Juniper.\n",
+    "exit_code": 0,
+    "elapsed_seconds": 4.777695,
+    "stdout": "{\n  \"title\": \"Harbor Lantern\",\n  \"permalink\": \"synthetic/notes/harbor-lantern\",\n  \"file_path\": \"notes/Harbor Lantern.md\",\n  \"checksum\": null,\n  \"action\": \"created\",\n  \"similar_notes\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-write-alpine-kite",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "write-note",
+      "--title",
+      "Alpine Kite",
+      "--folder",
+      "notes",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": "# Alpine Kite\n\nThe alpine kite trial uses a cobalt spool. The wind limit is 12 knots.\n",
+    "exit_code": 0,
+    "elapsed_seconds": 4.714253,
+    "stdout": "{\n  \"title\": \"Alpine Kite\",\n  \"permalink\": \"synthetic/notes/alpine-kite\",\n  \"file_path\": \"notes/Alpine Kite.md\",\n  \"checksum\": null,\n  \"action\": \"created\",\n  \"similar_notes\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-search-amber",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "search-notes",
+      "amber",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.077219,
+    "stdout": "{\n  \"results\": [\n    {\n      \"title\": \"Orchard Pump\",\n      \"type\": \"entity\",\n      \"score\": -0.50668005964165,\n      \"entity\": \"synthetic/notes/orchard-pump\",\n      \"external_id\": \"SYNTHETIC-ID-008\",\n      \"permalink\": \"synthetic/notes/orchard-pump\",\n      \"content\": \"# Orchard Pump\\n\\nThe orchard pump inspection uses the amber checklist. The inspection interval is 17 days.\",\n      \"content_length\": 105,\n      \"content_truncated\": false,\n      \"file_path\": \"notes/Orchard Pump.md\",\n      \"updated_at\": \"2026-09-21T22:48:00.746428-04:00\",\n      \"metadata\": {\n        \"note_type\": \"note\"\n      },\n      \"entity_id\": 1,\n      \"project_id\": 2,\n      \"project_external_id\": \"SYNTHETIC-ID-007\"\n    }\n  ],\n  \"current_page\": 1,\n  \"page_size\": 10,\n  \"total\": 1,\n  \"total_is_exact\": true,\n  \"has_more\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-read-orchard-pump",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "read-note",
+      "notes/orchard-pump",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.106226,
+    "stdout": "{\n  \"title\": \"Orchard Pump\",\n  \"permalink\": \"synthetic/notes/orchard-pump\",\n  \"file_path\": \"notes/Orchard Pump.md\",\n  \"content\": \"\\n# Orchard Pump\\n\\nThe orchard pump inspection uses the amber checklist. The inspection interval is 17 days.\\n\",\n  \"frontmatter\": {\n    \"title\": \"Orchard Pump\",\n    \"type\": \"note\",\n    \"permalink\": \"synthetic/notes/orchard-pump\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-search-Juniper",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "search-notes",
+      "Juniper",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.128537,
+    "stdout": "{\n  \"results\": [\n    {\n      \"title\": \"Harbor Lantern\",\n      \"type\": \"entity\",\n      \"score\": -0.5193236470818761,\n      \"entity\": \"synthetic/notes/harbor-lantern\",\n      \"external_id\": \"SYNTHETIC-ID-005\",\n      \"permalink\": \"synthetic/notes/harbor-lantern\",\n      \"content\": \"# Harbor Lantern\\n\\nThe harbor lantern inventory contains 23 copper brackets. Its keeper is Juniper.\",\n      \"content_length\": 98,\n      \"content_truncated\": false,\n      \"file_path\": \"notes/Harbor Lantern.md\",\n      \"updated_at\": \"2026-09-21T22:48:05.577271-04:00\",\n      \"metadata\": {\n        \"note_type\": \"note\"\n      },\n      \"entity_id\": 2,\n      \"project_id\": 2,\n      \"project_external_id\": \"SYNTHETIC-ID-007\"\n    }\n  ],\n  \"current_page\": 1,\n  \"page_size\": 10,\n  \"total\": 1,\n  \"total_is_exact\": true,\n  \"has_more\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-read-harbor-lantern",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "read-note",
+      "notes/harbor-lantern",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.094926,
+    "stdout": "{\n  \"title\": \"Harbor Lantern\",\n  \"permalink\": \"synthetic/notes/harbor-lantern\",\n  \"file_path\": \"notes/Harbor Lantern.md\",\n  \"content\": \"\\n# Harbor Lantern\\n\\nThe harbor lantern inventory contains 23 copper brackets. Its keeper is Juniper.\\n\",\n  \"frontmatter\": {\n    \"title\": \"Harbor Lantern\",\n    \"type\": \"note\",\n    \"permalink\": \"synthetic/notes/harbor-lantern\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-search-cobalt",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "search-notes",
+      "cobalt",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.180926,
+    "stdout": "{\n  \"results\": [\n    {\n      \"title\": \"Alpine Kite\",\n      \"type\": \"entity\",\n      \"score\": -0.50668005964165,\n      \"entity\": \"synthetic/notes/alpine-kite\",\n      \"external_id\": \"SYNTHETIC-ID-006\",\n      \"permalink\": \"synthetic/notes/alpine-kite\",\n      \"content\": \"# Alpine Kite\\n\\nThe alpine kite trial uses a cobalt spool. The wind limit is 12 knots.\",\n      \"content_length\": 85,\n      \"content_truncated\": false,\n      \"file_path\": \"notes/Alpine Kite.md\",\n      \"updated_at\": \"2026-09-21T22:48:10.260421-04:00\",\n      \"metadata\": {\n        \"note_type\": \"note\"\n      },\n      \"entity_id\": 3,\n      \"project_id\": 2,\n      \"project_external_id\": \"SYNTHETIC-ID-007\"\n    }\n  ],\n  \"current_page\": 1,\n  \"page_size\": 10,\n  \"total\": 1,\n  \"total_is_exact\": true,\n  \"has_more\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-read-alpine-kite",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "read-note",
+      "notes/alpine-kite",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.098649,
+    "stdout": "{\n  \"title\": \"Alpine Kite\",\n  \"permalink\": \"synthetic/notes/alpine-kite\",\n  \"file_path\": \"notes/Alpine Kite.md\",\n  \"content\": \"\\n# Alpine Kite\\n\\nThe alpine kite trial uses a cobalt spool. The wind limit is 12 knots.\\n\",\n  \"frontmatter\": {\n    \"title\": \"Alpine Kite\",\n    \"type\": \"note\",\n    \"permalink\": \"synthetic/notes/alpine-kite\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-update",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "write-note",
+      "--title",
+      "Orchard Pump",
+      "--folder",
+      "notes",
+      "--overwrite",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": "# Orchard Pump\n\nThe orchard pump inspection uses the violet checklist. The inspection interval is 19 days.\n",
+    "exit_code": 0,
+    "elapsed_seconds": 4.778377,
+    "stdout": "{\n  \"title\": \"Orchard Pump\",\n  \"permalink\": \"synthetic/notes/orchard-pump\",\n  \"file_path\": \"notes/Orchard Pump.md\",\n  \"checksum\": \"bbbb25477c5752c419f1c2d265af91bd826390c44e2156a1893b7b68ccfea3db\",\n  \"action\": \"updated\",\n  \"similar_notes\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-search-updated",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "search-notes",
+      "violet",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.116067,
+    "stdout": "{\n  \"results\": [\n    {\n      \"title\": \"Orchard Pump\",\n      \"type\": \"entity\",\n      \"score\": -0.50668005964165,\n      \"entity\": \"synthetic/notes/orchard-pump\",\n      \"external_id\": \"SYNTHETIC-ID-008\",\n      \"permalink\": \"synthetic/notes/orchard-pump\",\n      \"content\": \"# Orchard Pump\\n\\nThe orchard pump inspection uses the violet checklist. The inspection interval is 19 days.\",\n      \"content_length\": 106,\n      \"content_truncated\": false,\n      \"file_path\": \"notes/Orchard Pump.md\",\n      \"updated_at\": \"2026-09-21T22:48:39.711047-04:00\",\n      \"metadata\": {\n        \"note_type\": \"note\"\n      },\n      \"entity_id\": 1,\n      \"project_id\": 2,\n      \"project_external_id\": \"SYNTHETIC-ID-007\"\n    }\n  ],\n  \"current_page\": 1,\n  \"page_size\": 10,\n  \"total\": 1,\n  \"total_is_exact\": true,\n  \"has_more\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-search-old",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "search-notes",
+      "amber",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.063279,
+    "stdout": "{\n  \"results\": [],\n  \"current_page\": 1,\n  \"page_size\": 10,\n  \"total\": 0,\n  \"total_is_exact\": true,\n  \"has_more\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-read-updated",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "read-note",
+      "notes/orchard-pump",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.164636,
+    "stdout": "{\n  \"title\": \"Orchard Pump\",\n  \"permalink\": \"synthetic/notes/orchard-pump\",\n  \"file_path\": \"notes/Orchard Pump.md\",\n  \"content\": \"\\n# Orchard Pump\\n\\nThe orchard pump inspection uses the violet checklist. The inspection interval is 19 days.\\n\",\n  \"frontmatter\": {\n    \"title\": \"Orchard Pump\",\n    \"type\": \"note\",\n    \"permalink\": \"synthetic/notes/orchard-pump\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-delete",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "delete-note",
+      "notes/harbor-lantern",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.362042,
+    "stdout": "{\n  \"deleted\": true,\n  \"title\": \"Harbor Lantern\",\n  \"permalink\": \"synthetic/notes/harbor-lantern\",\n  \"file_path\": \"notes/Harbor Lantern.md\"\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-search-deleted",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "search-notes",
+      "Juniper",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.456624,
+    "stdout": "{\n  \"results\": [],\n  \"current_page\": 1,\n  \"page_size\": 10,\n  \"total\": 0,\n  \"total_is_exact\": true,\n  \"has_more\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-reindex",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "reindex",
+      "--full",
+      "--search",
+      "--project",
+      "synthetic"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 2.215091,
+    "stdout": "\nProject: synthetic\n  Rebuilding full-text search index (full project index)...\n  project index: 2 observed, 2 indexed, 0 deleted, 1 batches\n  0 stale search rows purged\n  done Full-text search index rebuilt\n\nReindex complete!\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-after-reindex-updated",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "read-note",
+      "notes/orchard-pump",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.050925,
+    "stdout": "{\n  \"title\": \"Orchard Pump\",\n  \"permalink\": \"synthetic/notes/orchard-pump\",\n  \"file_path\": \"notes/Orchard Pump.md\",\n  \"content\": \"\\n# Orchard Pump\\n\\nThe orchard pump inspection uses the violet checklist. The inspection interval is 19 days.\\n\",\n  \"frontmatter\": {\n    \"title\": \"Orchard Pump\",\n    \"type\": \"note\",\n    \"permalink\": \"synthetic/notes/orchard-pump\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-after-reindex-remaining",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "search-notes",
+      "cobalt",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.042396,
+    "stdout": "{\n  \"results\": [\n    {\n      \"title\": \"Alpine Kite\",\n      \"type\": \"entity\",\n      \"score\": -1e-06,\n      \"entity\": \"synthetic/notes/alpine-kite\",\n      \"external_id\": \"SYNTHETIC-ID-006\",\n      \"permalink\": \"synthetic/notes/alpine-kite\",\n      \"content\": \"# Alpine Kite\\n\\nThe alpine kite trial uses a cobalt spool. The wind limit is 12 knots.\",\n      \"content_length\": 85,\n      \"content_truncated\": false,\n      \"file_path\": \"notes/Alpine Kite.md\",\n      \"updated_at\": \"2026-09-21T22:48:10.260421-04:00\",\n      \"metadata\": {\n        \"note_type\": \"note\"\n      },\n      \"entity_id\": 3,\n      \"project_id\": 2,\n      \"project_external_id\": \"SYNTHETIC-ID-007\"\n    }\n  ],\n  \"current_page\": 1,\n  \"page_size\": 10,\n  \"total\": 1,\n  \"total_is_exact\": true,\n  \"has_more\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "label": "basic-after-reindex-deleted",
+    "argv": [
+      "/tmp/memory-lifecycle-probe-20260921-scratch/venv/bin/bm",
+      "tool",
+      "search-notes",
+      "Juniper",
+      "--json",
+      "--project",
+      "synthetic",
+      "--local"
+    ],
+    "environment": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "NO_COLOR": "1",
+      "BASIC_MEMORY_CONFIG_DIR": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-state",
+      "BASIC_MEMORY_HOME": "/tmp/memory-lifecycle-probe-20260921-scratch/basic-notes",
+      "BASIC_MEMORY_SEMANTIC_SEARCH_ENABLED": "false"
+    },
+    "stdin": null,
+    "exit_code": 0,
+    "elapsed_seconds": 4.036353,
+    "stdout": "{\n  \"results\": [],\n  \"current_page\": 1,\n  \"page_size\": 10,\n  \"total\": 0,\n  \"total_is_exact\": true,\n  \"has_more\": false\n}\n",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,15 @@
+Rebuild the SQLite index from the wiki/ markdown (the "DB is rebuildable from files" guarantee). Recreates workspaces/projects from each scope's `_meta.md` manifest and reindexes every page. Run with the server stopped, against a freshly-migrated (clean) data dir
+
+Usage: ai-memory reindex [OPTIONS]
+
+Options:
+      --data-dir <DATA_DIR>
+          Override the data directory.
+
+          Defaults to a platform path under `dirs::data_local_dir()`. The config loader also honours `AI_MEMORY_DATA_DIR`.
+
+      --config <CONFIG>
+          Path to an explicit config file (defaults to `<data_dir>/config.toml`)
+
+  -h, --help
+          Print help (see a summary with '-h')

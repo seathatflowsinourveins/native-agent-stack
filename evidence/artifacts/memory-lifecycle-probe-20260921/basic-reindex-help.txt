@@ -1,0 +1,29 @@
+
+ Usage: bm reindex [OPTIONS]
+
+ Rebuild search indexes and/or vector embeddings without dropping the database.
+
+ By default runs the project-index coordinator + embeddings (if semantic search
+ is enabled).
+ Use --full to request a full project-index run and re-embed all eligible
+ notes.
+ Use --search or --embeddings to rebuild only one side.
+
+ Examples:
+     bm reindex                  # Project index + embeddings
+     bm reindex --full           # Full project index + full re-embed
+     bm reindex --embeddings     # Only rebuild vector embeddings
+     bm reindex --search         # Only run project index
+     bm reindex --full --search  # Full project index only
+     bm reindex --full --embeddings  # Full re-embed only
+     bm reindex -p claw --full   # Full reindex for only the 'claw' project
+
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --embeddings  -e             Rebuild vector embeddings (requires semantic    │
+│                              search)                                         │
+│ --search      -s             Rebuild full-text search index                  │
+│ --full                       Request a full project-index run instead of the │
+│                              default project-index pass                      │
+│ --project     -p      <str>  Reindex a specific project (default: all)       │
+│ --help                       Show this message and exit.                     │
+╰──────────────────────────────────────────────────────────────────────────────╯

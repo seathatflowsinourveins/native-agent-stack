@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "portable_adoption_reference",
-  "updated_at": "2026-09-20",
+  "updated_at": "2026-09-21",
   "source": {
     "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
     "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
@@ -80,7 +80,11 @@
     "trading_convergence": "blueprints/us-equities/convergence-program/plan.json",
     "trading_wave": "blueprints/us-equities/catalyst-convergence/plan.json",
     "current_full_stack_convergence": "docs/full-stack-convergence.md",
-    "current_full_stack_coverage": "evidence/artifacts/full-stack-convergence-20260921/component-coverage.json"
+    "current_full_stack_coverage": "evidence/artifacts/full-stack-convergence-20260921/component-coverage.json",
+    "current_landscape": "catalogs/landscape/manifest.json",
+    "current_research_queue": "catalogs/landscape/research-state.json",
+    "current_native_skills": "catalogs/landscape/native-practice.json",
+    "current_hosting_comparison": "catalogs/landscape/hosting-practice.json"
   },
   "recipe_map": {
     "omniroute": "docs/foundation-stack.md",
@@ -186,7 +190,7 @@
     },
     {
       "id": "research-runtime",
-      "label": "Local deterministic research and native SDK workers",
+      "label": "Historical LEAN/SDK research comparison and native workers",
       "required_commands": [
         "git",
         "python3",
@@ -297,7 +301,7 @@
     },
     {
       "id": "trading-nautilus",
-      "label": "Optional pinned Nautilus engine with separate broker boundaries",
+      "label": "Selected north-star Nautilus engine with separate broker boundaries",
       "required_commands": [
         "python3",
         "uv",
@@ -334,6 +338,9 @@
     "read_on_demand": [
       "catalogs/README.md",
       "catalogs/foundation/README.md",
+      "catalogs/landscape/README.md",
+      "docs/landscape-continuation.md",
+      "docs/native-skill-practice-20260921.md",
       "docs/harness-defaults.md",
       "catalogs/us-equities/convergence-review.json",
       "docs/activation.md",
@@ -344,6 +351,12 @@
       "blueprints/us-equities/catalyst-convergence/README.md"
     ],
     "next_action_refs": [],
+    "next_action_scope": "Foundation required gate IDs only; an empty list does not establish comparative saturation. Optional comparison work lives in research_refs.",
+    "research_refs": [
+      "docs/landscape-continuation.md",
+      "catalogs/landscape/research-state.json",
+      "catalogs/us-equities/runtime-target.json"
+    ],
     "public_state_is_reference_only": true,
     "trading_next_action_refs": [
       "research-specification",

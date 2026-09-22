@@ -1,0 +1,920 @@
+2026-09-22T02:51:44.924768Z  INFO ai_memory_cli: ai-memory starting version="2.3.2" server_url=http://127.0.0.1:46141 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state-no-embedding bind=127.0.0.1:49374
+2026-09-22T02:51:44.924913Z  INFO ai_memory_cli::commands::serve: single-instance serve lock held lock=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state-no-embedding/.serve.lock
+2026-09-22T02:51:44.932427Z  INFO refinery_core::traits: schema history table is empty, going to apply all migrations
+2026-09-22T02:51:44.932451Z  INFO refinery_core::traits::sync: applying migration: V1__init
+2026-09-22T02:51:44.932460Z  INFO refinery_core::traits::sync: applying migration: V2__handoffs
+2026-09-22T02:51:44.932462Z  INFO refinery_core::traits::sync: applying migration: V3__decay
+2026-09-22T02:51:44.932464Z  INFO refinery_core::traits::sync: applying migration: V4__embeddings
+2026-09-22T02:51:44.932465Z  INFO refinery_core::traits::sync: applying migration: V5__cascade_indexes
+2026-09-22T02:51:44.932467Z  INFO refinery_core::traits::sync: applying migration: V6__wiki_migrations
+2026-09-22T02:51:44.932469Z  INFO refinery_core::traits::sync: applying migration: V7__observations_fts_and_link_index
+2026-09-22T02:51:44.932470Z  INFO refinery_core::traits::sync: applying migration: V8__performance_indexes
+2026-09-22T02:51:44.932472Z  INFO refinery_core::traits::sync: applying migration: V9__sessions_supported_agent_kinds
+2026-09-22T02:51:44.932474Z  INFO refinery_core::traits::sync: applying migration: V10__observation_extension_events
+2026-09-22T02:51:44.932476Z  INFO refinery_core::traits::sync: applying migration: V11__sessions_antigravity_agent_kind
+2026-09-22T02:51:44.932478Z  INFO refinery_core::traits::sync: applying migration: V12__fts_remove_diacritics
+2026-09-22T02:51:44.932480Z  INFO refinery_core::traits::sync: applying migration: V13__cross_project_links
+2026-09-22T02:51:44.932481Z  INFO refinery_core::traits::sync: applying migration: V14__users
+2026-09-22T02:51:44.932483Z  INFO refinery_core::traits::sync: applying migration: V15__pages_author_id
+2026-09-22T02:51:44.932485Z  INFO refinery_core::traits::sync: applying migration: V16__audit_log_author_id
+2026-09-22T02:51:44.932487Z  INFO refinery_core::traits::sync: applying migration: V17__pages_fts_index_path
+2026-09-22T02:51:44.932490Z  INFO refinery_core::traits::sync: applying migration: V18__enforce_project_workspace_pairing
+2026-09-22T02:51:44.932492Z  INFO refinery_core::traits::sync: applying migration: V19__repair_orphan_observation_attribution
+2026-09-22T02:51:44.932494Z  INFO refinery_core::traits::sync: applying migration: V20__sessions_grok_agent_kind
+2026-09-22T02:51:44.932496Z  INFO refinery_core::traits::sync: applying migration: V21__auto_improve_pending_proposals
+2026-09-22T02:51:44.932498Z  INFO refinery_core::traits::sync: applying migration: V22__auto_improve_scheduler
+2026-09-22T02:51:44.932500Z  INFO refinery_core::traits::sync: applying migration: V23__auto_improve_patch_proposals
+2026-09-22T02:51:44.932502Z  INFO refinery_core::traits::sync: applying migration: V24__auto_improve_rejections
+2026-09-22T02:51:44.932503Z  INFO refinery_core::traits::sync: applying migration: V25__sessions_pi_agent_kind
+2026-09-22T02:51:44.932505Z  INFO refinery_core::traits::sync: applying migration: V26__sessions_zero_agent_kind
+2026-09-22T02:51:44.932507Z  INFO refinery_core::traits::sync: applying migration: V27__repair_nongit_fragment_attribution
+2026-09-22T02:51:44.932509Z  INFO refinery_core::traits::sync: applying migration: V28__sessions_devin_agent_kind
+2026-09-22T02:51:44.932511Z  INFO refinery_core::traits::sync: applying migration: V29__maintenance_scheduler
+2026-09-22T02:51:44.932513Z  INFO refinery_core::traits::sync: applying migration: V30__sessions_kimi_code_agent_kind
+2026-09-22T02:51:44.932515Z  INFO refinery_core::traits::sync: applying migration: V31__managed_workstreams
+2026-09-22T02:51:44.932517Z  INFO refinery_core::traits::sync: applying migration: V32__sessions_crush_agent_kind
+2026-09-22T02:51:44.932519Z  INFO refinery_core::traits::sync: applying migration: V33__ingest_keys
+2026-09-22T02:51:44.932524Z  INFO refinery_core::traits::sync: applying migration: V34__session_consolidation_jobs
+2026-09-22T02:51:44.932526Z  INFO refinery_core::traits::sync: applying migration: V35__session_end_observation_watermark
+2026-09-22T02:51:44.932528Z  INFO refinery_core::traits::sync: applying migration: V36__page_expiry
+2026-09-22T02:51:44.932529Z  INFO refinery_core::traits::sync: applying migration: V37__page_feedback
+2026-09-22T02:51:44.932531Z  INFO refinery_core::traits::sync: applying migration: V38__entities
+2026-09-22T02:51:44.932533Z  INFO refinery_core::traits::sync: applying migration: V39__handoff_ownership
+2026-09-22T02:51:44.932534Z  INFO refinery_core::traits::sync: applying migration: V40__session_owner
+2026-09-22T02:51:44.932536Z  INFO refinery_core::traits::sync: applying migration: V41__handoffs_listing_index
+2026-09-22T02:51:44.932538Z  INFO refinery_core::traits::sync: applying migration: V42__auto_improve_proposal_author
+2026-09-22T02:51:44.932540Z  INFO refinery_core::traits::sync: applying migration: V43__page_access_by_actor
+2026-09-22T02:51:44.932541Z  INFO refinery_core::traits::sync: applying migration: V44__sessions_hermes_agent_kind
+2026-09-22T02:51:44.932543Z  INFO refinery_core::traits::sync: applying migration: V45__sessions_kiro_cli_agent_kind
+2026-09-22T02:51:44.932545Z  INFO refinery_core::traits::sync: applying migration: V46__client_activity
+2026-09-22T02:51:44.932547Z  INFO refinery_core::traits::sync: applying migration: V47__sessions_command_code_agent_kind
+2026-09-22T02:51:44.932549Z  INFO refinery_core::traits::sync: applying migration: V48__handoff_receiver_index
+2026-09-22T02:51:44.932550Z  INFO refinery_core::traits::sync: applying migration: V49__decay_tombstone_index
+2026-09-22T02:51:44.932552Z  INFO refinery_core::traits::sync: applying migration: V50__sessions_pool_agent_kind
+2026-09-22T02:51:44.932554Z  INFO refinery_core::traits::sync: applying migration: V51__sessions_zcode_agent_kind
+2026-09-22T02:51:44.932556Z  INFO refinery_core::traits::sync: applying migration: V52__purged_sessions_tombstones
+2026-09-22T02:51:44.932557Z  INFO refinery_core::traits::sync: applying migration: V53__page_embed_failures
+2026-09-22T02:51:44.932559Z  INFO refinery_core::traits::sync: applying migration: V54__human_auth
+2026-09-22T02:51:44.932560Z  INFO refinery_core::traits::sync: applying migration: V55__api_credentials
+2026-09-22T02:51:44.932562Z  INFO refinery_core::traits::sync: applying migration: V56__entity_link_validity
+2026-09-22T02:51:44.932564Z  INFO refinery_core::traits::sync: applying migration: V57__experience_pass_state
+2026-09-22T02:51:44.932566Z  INFO refinery_core::traits::sync: applying migration: V58__close_retired_entity_windows
+2026-09-22T02:51:44.932567Z  INFO refinery_core::traits::sync: applying migration: V59__purged_scopes_tombstones
+2026-09-22T02:51:44.932569Z  INFO refinery_core::traits::sync: applying migration: V60__bootstrap_chunk_progress
+2026-09-22T02:51:44.932571Z  INFO refinery_core::traits::sync: applying migration: V61__page_abstract_embeddings
+2026-09-22T02:51:44.932572Z  INFO refinery_core::traits::sync: applying migration: V62__page_ingestion_windows
+2026-09-22T02:51:44.932574Z  INFO refinery_core::traits::sync: applying migration: V63__page_evidence
+2026-09-22T02:51:44.932576Z  INFO refinery_core::traits::sync: applying migration: V64__agent_messages
+2026-09-22T02:51:44.932578Z  INFO refinery_core::traits::sync: preparing to apply 64 migrations: Map {
+    iter: Iter(
+        [
+            Migration {
+                state: Applied,
+                name: "init",
+                checksum: 4381443328546418760,
+                version: 1,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Initial ai-memory schema.\n-- Identity is the 3-tuple (workspace_id, project_id, path) on every domain\n-- table, baked in from M1 so we never inherit basic-memory's v0.20 retrofit\n-- pain (issues #783, #834 and friends).\n\nCREATE TABLE workspaces (\n    id            BLOB PRIMARY KEY NOT NULL,\n    name          TEXT NOT NULL UNIQUE,\n    created_at    INTEGER NOT NULL                       -- microseconds since epoch\n);\n\nCREATE TABLE projects (\n    id            BLOB PRIMARY KEY NOT NULL,\n    workspace_id  BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    name          TEXT NOT NULL,\n    repo_path     TEXT,                                  -- absolute filesystem path, for cwd matching\n    created_at    INTEGER NOT NULL,\n    UNIQUE (workspace_id, name)\n);\n\nCREATE INDEX idx_projects_workspace ON projects(workspace_id);\n\nCREATE TABLE pages (\n    id                  BLOB PRIMARY KEY NOT NULL,\n    workspace_id        BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id          BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    path                TEXT NOT NULL,                  -- POSIX path relative to wiki/\n    title               TEXT NOT NULL,\n    tier                TEXT NOT NULL CHECK (tier IN ('working','episodic','semantic','procedural')),\n    body                TEXT NOT NULL,\n    body_sha256         BLOB NOT NULL,                  -- 32 bytes\n    frontmatter_json    TEXT NOT NULL DEFAULT '{}',\n    is_latest           INTEGER NOT NULL DEFAULT 1 CHECK (is_latest IN (0,1)),\n    supersedes          BLOB REFERENCES pages(id) ON DELETE SET NULL,\n    pinned              INTEGER NOT NULL DEFAULT 0 CHECK (pinned IN (0,1)),\n    created_at          INTEGER NOT NULL,\n    updated_at          INTEGER NOT NULL,\n    -- Embedding columns are NULL through v1 (M9 fills them in).\n    embedding_provider  TEXT,\n    embedding_model     TEXT,\n    embedding_dim       INTEGER\n);\n\n-- One latest version per (workspace, project, path). Older versions stay in\n-- the table with is_latest=0, linked via supersedes.\nCREATE UNIQUE INDEX idx_pages_latest_path\n    ON pages(workspace_id, project_id, path)\n    WHERE is_latest = 1;\n\nCREATE INDEX idx_pages_updated ON pages(updated_at DESC);\nCREATE INDEX idx_pages_supersedes ON pages(supersedes) WHERE supersedes IS NOT NULL;\n\n-- FTS5 over title + body. `content='pages'` keeps the FTS table contentless\n-- (the source row owns the text); the triggers below propagate changes.\nCREATE VIRTUAL TABLE pages_fts USING fts5(\n    title, body,\n    content='pages',\n    content_rowid='rowid',\n    tokenize=\"unicode61 tokenchars '/_-'\"\n);\n\nCREATE TRIGGER pages_fts_ai AFTER INSERT ON pages BEGIN\n    INSERT INTO pages_fts(rowid, title, body)\n        VALUES (new.rowid, new.title, new.body);\nEND;\n\nCREATE TRIGGER pages_fts_ad AFTER DELETE ON pages BEGIN\n    INSERT INTO pages_fts(pages_fts, rowid, title, body)\n        VALUES ('delete', old.rowid, old.title, old.body);\nEND;\n\nCREATE TRIGGER pages_fts_au AFTER UPDATE ON pages BEGIN\n    INSERT INTO pages_fts(pages_fts, rowid, title, body)\n        VALUES ('delete', old.rowid, old.title, old.body);\n    INSERT INTO pages_fts(rowid, title, body)\n        VALUES (new.rowid, new.title, new.body);\nEND;\n\nCREATE TABLE sessions (\n    id               BLOB PRIMARY KEY NOT NULL,\n    workspace_id     BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id       BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind       TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','other')),\n    cwd              TEXT,\n    started_at       INTEGER NOT NULL,\n    ended_at         INTEGER,\n    summary_page_id  BLOB REFERENCES pages(id) ON DELETE SET NULL\n);\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\n\nCREATE TABLE observations (\n    id            BLOB PRIMARY KEY NOT NULL,\n    session_id    BLOB NOT NULL REFERENCES sessions(id)   ON DELETE CASCADE,\n    workspace_id  BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id    BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    kind          TEXT NOT NULL,\n    title         TEXT NOT NULL,\n    body          TEXT NOT NULL,\n    importance    INTEGER NOT NULL DEFAULT 5 CHECK (importance BETWEEN 1 AND 10),\n    created_at    INTEGER NOT NULL\n);\n\nCREATE INDEX idx_observations_session ON observations(session_id, created_at);\n\nCREATE TABLE links (\n    from_page_id  BLOB NOT NULL REFERENCES pages(id) ON DELETE CASCADE,\n    to_page_id    BLOB REFERENCES pages(id) ON DELETE SET NULL,\n    to_path       TEXT NOT NULL,                       -- raw target, may be unresolved\n    link_type     TEXT NOT NULL DEFAULT 'references',\n    PRIMARY KEY (from_page_id, to_path, link_type)\n);\n\nCREATE INDEX idx_links_to ON links(to_page_id) WHERE to_page_id IS NOT NULL;\n\nCREATE TABLE audit_log (\n    id            INTEGER PRIMARY KEY AUTOINCREMENT,\n    at            INTEGER NOT NULL,\n    op            TEXT NOT NULL,\n    workspace_id  BLOB,\n    project_id    BLOB,\n    page_id       BLOB,\n    detail        TEXT NOT NULL DEFAULT '{}'\n);\n\nCREATE INDEX idx_audit_recent ON audit_log(at DESC);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932454151 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "handoffs",
+                checksum: 17494823703579882297,
+                version: 2,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Handoff table. A handoff is a typed snapshot of \"where we are\" so\n-- the next agent CLI can pick up. Created on SessionEnd (auto) or\n-- explicitly via the memory_handoff_begin MCP tool. Accepted by the\n-- next agent via memory_handoff_accept.\n\nCREATE TABLE handoffs (\n    id              BLOB PRIMARY KEY NOT NULL,\n    workspace_id    BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id      BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    from_session_id BLOB,                                   -- references sessions(id), nullable for manual ones\n    from_agent      TEXT NOT NULL,\n    to_agent        TEXT,                                   -- optional target hint\n    cwd             TEXT,\n    summary         TEXT NOT NULL,\n    open_questions  TEXT NOT NULL DEFAULT '[]',             -- JSON array of strings\n    next_steps      TEXT NOT NULL DEFAULT '[]',\n    files_touched   TEXT NOT NULL DEFAULT '[]',\n    state           TEXT NOT NULL DEFAULT 'open' CHECK (state IN ('open','accepted','expired')),\n    created_at      INTEGER NOT NULL,\n    accepted_by     TEXT,\n    accepted_at     INTEGER,\n    accepted_by_session BLOB,\n    FOREIGN KEY (from_session_id) REFERENCES sessions(id) ON DELETE SET NULL,\n    FOREIGN KEY (accepted_by_session) REFERENCES sessions(id) ON DELETE SET NULL\n);\n\nCREATE INDEX idx_handoffs_open_recent\n    ON handoffs(workspace_id, project_id, created_at DESC)\n    WHERE state = 'open';\n\nCREATE INDEX idx_handoffs_cwd_open\n    ON handoffs(workspace_id, project_id, cwd, created_at DESC)\n    WHERE state = 'open';\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.93246118 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "decay",
+                checksum: 4288838958242284757,
+                version: 3,
+                prefix: Versioned,
+                sql: Some(
+                    "-- M8 retention / access tracking columns.\n--\n-- The forget sweep needs two signals to compute retention for a page:\n-- (a) how long since it was last touched (decay) and (b) how often it\n-- gets queried (reinforcement). We track both inline on `pages` to\n-- avoid a hot accesses table on the read path.\n--\n-- `superseded_at` distinguishes the M7 LLM-supersession path (where\n-- `supersedes` points to the previous version) from the M8 forget-sweep\n-- soft-delete path (where `supersedes IS NULL` and `superseded_at`\n-- carries the eviction time). Hard-deletion happens only after\n-- `hard_delete_after_days` days WITH zero subsequent access.\n\nALTER TABLE pages ADD COLUMN last_accessed_at INTEGER;\nALTER TABLE pages ADD COLUMN access_count INTEGER NOT NULL DEFAULT 0;\nALTER TABLE pages ADD COLUMN superseded_at INTEGER;\n\n-- Hot path: list decay candidates (only is_latest=true rows matter).\nCREATE INDEX idx_pages_decay\n    ON pages(workspace_id, project_id, updated_at)\n    WHERE is_latest = 1;\n\n-- Eviction candidates from prior sweeps (for hard-delete pass).\nCREATE INDEX idx_pages_evicted\n    ON pages(superseded_at)\n    WHERE is_latest = 0 AND supersedes IS NULL AND superseded_at IS NOT NULL;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932463394 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "embeddings",
+                checksum: 10631560961098348868,
+                version: 4,
+                prefix: Versioned,
+                sql: Some(
+                    "-- M9 page embeddings.\n--\n-- One row per latest page version. `vector` is a packed\n-- `[u8; dim * 4]` representation of a `Vec<f32>` (host endianness;\n-- our backups are local so no cross-arch hazard in v0.2).\n--\n-- (provider, model, dim) is denormalised onto each row so a single\n-- query against the table reveals heterogeneity in case the user\n-- switched providers without running `ai-memory embed`.\n\nCREATE TABLE page_embeddings (\n    page_id     BLOB PRIMARY KEY NOT NULL REFERENCES pages(id) ON DELETE CASCADE,\n    vector      BLOB NOT NULL,\n    provider    TEXT NOT NULL,\n    model       TEXT NOT NULL,\n    dim         INTEGER NOT NULL CHECK (dim > 0),\n    created_at  INTEGER NOT NULL\n);\n\n-- Used by the refuse-on-mismatch startup check + by ai-memory embed\n-- to find pages still on a stale (provider, model, dim) triple.\nCREATE INDEX idx_page_embeddings_provider\n    ON page_embeddings(provider, model, dim);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932465092 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "cascade_indexes",
+                checksum: 8918373404379914778,
+                version: 5,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Cascade-delete performance indexes.\n--\n-- Schema audit (pre-V05) findings:\n--\n-- PRAGMA foreign_keys status\n-- --------------------------\n-- The writer connection has PRAGMA foreign_keys = ON set in Store::open()\n-- before the writer thread is spawned — correct. Reader connections are\n-- opened read-only and never trigger cascades, so no change needed there.\n--\n-- Missing indexes identified\n-- --------------------------\n-- For DELETE FROM projects WHERE id = ?, SQLite walks every dependent table\n-- looking for rows with a matching FK column. Without an index on the FK\n-- column, each dependent table requires a full-table scan. The tables that\n-- REFERENCES projects(id) ON DELETE CASCADE are:\n--   pages              — project_id (no standalone index; idx_pages_latest_path\n--                        is on (workspace_id, project_id, path) WHERE is_latest=1\n--                        and cannot be used for an unfiltered project_id scan)\n--   sessions           — project_id (idx_sessions_recent covers the prefix\n--                        only when workspace_id is also known)\n--   observations       — project_id (idx_observations_session is on session_id\n--                        only; no project_id index at all)\n--   handoffs           — project_id (both handoff indexes are partial/filtered;\n--                        not usable for an unfiltered project_id scan)\n--\n-- page_embeddings REFERENCES pages(id) ON DELETE CASCADE is covered by the\n-- PRIMARY KEY on page_id — no additional index needed.\n--\n-- links(from_page_id) REFERENCES pages(id) ON DELETE CASCADE is covered by\n-- the PRIMARY KEY on from_page_id — no additional index needed.\n--\n-- Other schema oddities noted (not fixed here — no behaviour change needed):\n--   - audit_log has no FK on workspace_id/project_id/page_id (nullable BLOBs\n--     with no REFERENCES clause). Intentional: the audit log is an append-only\n--     event log; orphan rows are acceptable and expected.\n--   - handoffs.from_session_id is nullable (manual handoffs have no session);\n--     the SET NULL cascade on sessions(id) is correct.\n--   - observations has workspace_id denormalised alongside project_id; both\n--     carry REFERENCES … ON DELETE CASCADE so a workspace delete cascades\n--     through the workspace FK independently of the project FK. Correct.\n\nCREATE INDEX IF NOT EXISTS idx_pages_project\n    ON pages(project_id);\n\nCREATE INDEX IF NOT EXISTS idx_sessions_project\n    ON sessions(project_id);\n\nCREATE INDEX IF NOT EXISTS idx_observations_project\n    ON observations(project_id);\n\nCREATE INDEX IF NOT EXISTS idx_handoffs_project\n    ON handoffs(project_id);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932466708 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "wiki_migrations",
+                checksum: 5562778923159616632,
+                version: 6,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Tracks applied wiki-structure migrations (parallel to refinery's\n-- _refinery_schema_history for SQL-level migrations). Each row is\n-- one wiki migration that has been run against this data dir.\nCREATE TABLE wiki_migrations (\n    name        TEXT PRIMARY KEY,\n    applied_at  INTEGER NOT NULL  -- unix microseconds, UTC\n);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932468684 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "observations_fts_and_link_index",
+                checksum: 9069949130429052508,
+                version: 7,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Raw observation fallback search + unresolved-link lookup support.\n--\n-- Additive migration only: existing observations are backfilled into an\n-- FTS5 index, and future inserts/updates/deletes stay synchronized by\n-- triggers. No existing pages, observations, or wiki paths are rewritten.\n\nCREATE VIRTUAL TABLE observations_fts USING fts5(\n    title, body,\n    content='observations',\n    content_rowid='rowid',\n    tokenize=\"unicode61 tokenchars '/_-'\"\n);\n\nINSERT INTO observations_fts(rowid, title, body)\n    SELECT rowid, title, body FROM observations;\n\nCREATE TRIGGER observations_fts_ai AFTER INSERT ON observations BEGIN\n    INSERT INTO observations_fts(rowid, title, body)\n        VALUES (new.rowid, new.title, new.body);\nEND;\n\nCREATE TRIGGER observations_fts_ad AFTER DELETE ON observations BEGIN\n    INSERT INTO observations_fts(observations_fts, rowid, title, body)\n        VALUES ('delete', old.rowid, old.title, old.body);\nEND;\n\nCREATE TRIGGER observations_fts_au AFTER UPDATE ON observations BEGIN\n    INSERT INTO observations_fts(observations_fts, rowid, title, body)\n        VALUES ('delete', old.rowid, old.title, old.body);\n    INSERT INTO observations_fts(rowid, title, body)\n        VALUES (new.rowid, new.title, new.body);\nEND;\n\n-- Link parsing existed as schema but not as a populated retrieval signal.\n-- This index makes repeated unresolved-link resolution cheap once writers\n-- start filling links(to_path, to_page_id=NULL).\nCREATE INDEX IF NOT EXISTS idx_links_unresolved_path\n    ON links(to_path)\n    WHERE to_page_id IS NULL;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932470177 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "performance_indexes",
+                checksum: 165526243542000286,
+                version: 8,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Performance indexes and narrower FTS maintenance for growing stores.\n--\n-- These are additive except for the FTS update trigger. Page title/body are\n-- the only columns mirrored into pages_fts, so metadata-only updates should\n-- not delete/reinsert FTS rows.\n\nDROP TRIGGER IF EXISTS pages_fts_au;\n\nCREATE TRIGGER pages_fts_au AFTER UPDATE OF title, body ON pages BEGIN\n    INSERT INTO pages_fts(pages_fts, rowid, title, body)\n        VALUES ('delete', old.rowid, old.title, old.body);\n    INSERT INTO pages_fts(rowid, title, body)\n        VALUES (new.rowid, new.title, new.body);\nEND;\n\n-- Incoming-link refresh repoints all links matching a path, not only currently\n-- unresolved links. The partial unresolved index from V07 cannot serve that.\nCREATE INDEX IF NOT EXISTS idx_links_to_path ON links(to_path);\n\n-- Briefing/explore activity windows and latest-observation lookups are ordered\n-- by time across the whole store and per project.\nCREATE INDEX IF NOT EXISTS idx_sessions_started_at ON sessions(started_at DESC);\nCREATE INDEX IF NOT EXISTS idx_observations_created_at ON observations(created_at DESC);\nCREATE INDEX IF NOT EXISTS idx_observations_project_created\n    ON observations(workspace_id, project_id, created_at DESC);\n\n-- Recent-page queries only consider latest rows. Keep superseded history out\n-- of the hot ordered scan.\nCREATE INDEX IF NOT EXISTS idx_pages_latest_updated\n    ON pages(updated_at DESC)\n    WHERE is_latest = 1;\nCREATE INDEX IF NOT EXISTS idx_pages_project_latest_updated\n    ON pages(workspace_id, project_id, updated_at DESC)\n    WHERE is_latest = 1;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932471764 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_supported_agent_kinds",
+                checksum: 6637262488138575225,
+                version: 9,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK to include every currently supported agent.\n--\n-- V01 only allowed claude-code/codex/open-code/other. Hook payloads now parse\n-- Cursor, Gemini CLI, Claude Desktop, OpenClaw, and OMP/Pi into concrete\n-- AgentKind values, so persisting those sessions must not trip the CHECK.\n\nPRAGMA foreign_keys = OFF;\n\nCREATE TABLE sessions_new (\n    id               BLOB PRIMARY KEY NOT NULL,\n    workspace_id     BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id       BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind       TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','omp','other')),\n    cwd              TEXT,\n    started_at       INTEGER NOT NULL,\n    ended_at         INTEGER,\n    summary_page_id  BLOB REFERENCES pages(id) ON DELETE SET NULL\n);\n\nINSERT INTO sessions_new SELECT * FROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932473673 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "observation_extension_events",
+                checksum: 16797321673002355635,
+                version: 10,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Optional third-party event metadata.\n--\n-- Core observation.kind remains the closed ai-memory lifecycle enum. These\n-- nullable fields preserve an opt-in extension namespace + source event name\n-- for custom event vocabularies without letting unknown hook event names sprawl\n-- into the canonical kind column.\n\nALTER TABLE observations ADD COLUMN extension TEXT;\nALTER TABLE observations ADD COLUMN source_event TEXT;\n\nCREATE INDEX idx_observations_extension_event\n    ON observations(workspace_id, project_id, extension, source_event, created_at)\n    WHERE extension IS NOT NULL AND source_event IS NOT NULL;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932475766 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_antigravity_agent_kind",
+                checksum: 6219450647781566218,
+                version: 11,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK for Antigravity CLI (`agy`).\n--\n-- V09 intentionally enumerated every supported agent. Adding a concrete\n-- AgentKind must update the persisted CHECK too, or Antigravity hook events\n-- fail at begin_session on upgraded databases.\n\nPRAGMA foreign_keys = OFF;\n\nCREATE TABLE sessions_new (\n    id               BLOB PRIMARY KEY NOT NULL,\n    workspace_id     BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id       BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind       TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','antigravity-cli','omp','other')),\n    cwd              TEXT,\n    started_at       INTEGER NOT NULL,\n    ended_at         INTEGER,\n    summary_page_id  BLOB REFERENCES pages(id) ON DELETE SET NULL\n);\n\nINSERT INTO sessions_new SELECT * FROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932477528 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "fts_remove_diacritics",
+                checksum: 13844742656979771713,
+                version: 12,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Accent-insensitive full-text search (Portuguese-friendly).\n--\n-- The FTS5 tables were created with `unicode61 tokenchars '/_-'`, which keeps\n-- diacritics: a query for \"descricao\" never matches stored \"descrição\". The\n-- tokenizer is fixed at CREATE time, so the only way to change it is to drop\n-- and recreate the FTS table (+ its sync triggers) and rebuild from the\n-- content table. `remove_diacritics 2` folds diacritics across the full\n-- Unicode range, so \"descricao\"/\"descrição\", \"sessao\"/\"sessão\", etc. unify.\n--\n-- Both FTS tables are contentless (`content='pages'` / `content='observations'`),\n-- so the source rows are untouched; only the derived index is rebuilt.\n\n-- ── pages_fts ────────────────────────────────────────────────────────────\nDROP TRIGGER pages_fts_ai;\nDROP TRIGGER pages_fts_ad;\nDROP TRIGGER pages_fts_au;\nDROP TABLE pages_fts;\n\nCREATE VIRTUAL TABLE pages_fts USING fts5(\n    title, body,\n    content='pages',\n    content_rowid='rowid',\n    tokenize=\"unicode61 remove_diacritics 2 tokenchars '/_-'\"\n);\nINSERT INTO pages_fts(pages_fts) VALUES('rebuild');\n\nCREATE TRIGGER pages_fts_ai AFTER INSERT ON pages BEGIN\n    INSERT INTO pages_fts(rowid, title, body)\n        VALUES (new.rowid, new.title, new.body);\nEND;\nCREATE TRIGGER pages_fts_ad AFTER DELETE ON pages BEGIN\n    INSERT INTO pages_fts(pages_fts, rowid, title, body)\n        VALUES ('delete', old.rowid, old.title, old.body);\nEND;\n-- Matches the V08 narrowing: only re-index on title/body updates.\nCREATE TRIGGER pages_fts_au AFTER UPDATE OF title, body ON pages BEGIN\n    INSERT INTO pages_fts(pages_fts, rowid, title, body)\n        VALUES ('delete', old.rowid, old.title, old.body);\n    INSERT INTO pages_fts(rowid, title, body)\n        VALUES (new.rowid, new.title, new.body);\nEND;\n\n-- ── observations_fts ──────────────────────────────────────────────────────\nDROP TRIGGER observations_fts_ai;\nDROP TRIGGER observations_fts_ad;\nDROP TRIGGER observations_fts_au;\nDROP TABLE observations_fts;\n\nCREATE VIRTUAL TABLE observations_fts USING fts5(\n    title, body,\n    content='observations',\n    content_rowid='rowid',\n    tokenize=\"unicode61 remove_diacritics 2 tokenchars '/_-'\"\n);\nINSERT INTO observations_fts(observations_fts) VALUES('rebuild');\n\nCREATE TRIGGER observations_fts_ai AFTER INSERT ON observations BEGIN\n    INSERT INTO observations_fts(rowid, title, body)\n        VALUES (new.rowid, new.title, new.body);\nEND;\nCREATE TRIGGER observations_fts_ad AFTER DELETE ON observations BEGIN\n    INSERT INTO observations_fts(observations_fts, rowid, title, body)\n        VALUES ('delete', old.rowid, old.title, old.body);\nEND;\nCREATE TRIGGER observations_fts_au AFTER UPDATE ON observations BEGIN\n    INSERT INTO observations_fts(observations_fts, rowid, title, body)\n        VALUES ('delete', old.rowid, old.title, old.body);\n    INSERT INTO observations_fts(rowid, title, body)\n        VALUES (new.rowid, new.title, new.body);\nEND;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932479364 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "cross_project_links",
+                checksum: 145923184916883550,
+                version: 13,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Cross-project links.\n--\n-- A `[[project:path]]` / `[[workspace/project:path]]` wikilink carries an\n-- explicit scope; `to_workspace` / `to_project` are NULL for the common case\n-- (a link within the source page's own project). The scope joins the PRIMARY\n-- KEY so one page can link to the same `to_path` in two different projects\n-- without colliding. `to_page_id` stays a global PageId, so a resolved\n-- cross-project link already surfaces as a backlink on its target with no\n-- query change — the per-project wikis become one graph.\n--\n-- SQLite cannot alter a PRIMARY KEY in place, so rebuild the table. No other\n-- table references `links`, so the drop/rename is safe with FKs enabled.\n\nCREATE TABLE links_new (\n    from_page_id  BLOB NOT NULL REFERENCES pages(id) ON DELETE CASCADE,\n    to_page_id    BLOB REFERENCES pages(id) ON DELETE SET NULL,\n    to_workspace  TEXT,                                  -- NULL = source page's workspace\n    to_project    TEXT,                                  -- NULL = source page's project\n    to_path       TEXT NOT NULL,                         -- root-relative path in the target project\n    link_type     TEXT NOT NULL DEFAULT 'references',\n    PRIMARY KEY (from_page_id, to_workspace, to_project, to_path, link_type)\n);\n\nINSERT INTO links_new (from_page_id, to_page_id, to_workspace, to_project, to_path, link_type)\n    SELECT from_page_id, to_page_id, NULL, NULL, to_path, link_type FROM links;\n\nDROP TABLE links;\nALTER TABLE links_new RENAME TO links;\n\n-- Recreate the indexes the dropped table carried (V01/V07/V08) ...\nCREATE INDEX idx_links_to ON links(to_page_id) WHERE to_page_id IS NOT NULL;\nCREATE INDEX idx_links_unresolved_path ON links(to_path) WHERE to_page_id IS NULL;\nCREATE INDEX idx_links_to_path ON links(to_path);\n-- ... plus one for scoped (cross-project) resolution + refresh.\nCREATE INDEX idx_links_scope ON links(to_project, to_path);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932481193 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "users",
+                checksum: 652269621890290127,
+                version: 14,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Multi-user attribution.\n--\n-- ai-memory's data model stays single-tenant: every authenticated user sees\n-- the same wiki pages (no RBAC, no per-user data scoping). What this table\n-- adds is **attribution** — every page and audit-log row can carry an\n-- `author_id` so the engine, web UI, and `/api/v1` consumers can say \"alice\n-- wrote this page yesterday\" instead of just \"this page exists\".\n--\n-- The root user lives in `config.toml` under `[auth]` (root_username,\n-- root_email, root_name); it's NOT inserted here — auth middleware\n-- synthesises a root ActorContext when the bearer token matches the config\n-- root token, then attributes writes to that synthetic identity. Added\n-- users (created via `ai-memory user add` / `POST /admin/users`) are the\n-- rows in this table.\n--\n-- Token storage: a single SHA-256(token || \":\" || pepper) digest per user.\n-- Tokens are 32 bytes of CSPRNG (256 bits of entropy), so brute-force is\n-- infeasible regardless of hash strength; the per-server pepper (from\n-- `[auth].token_pepper`, auto-generated at `ai-memory init`) makes a\n-- DB-only theft useless to an offline attacker. SHA-256 buys us a\n-- deterministic 32-byte lookup key with O(1) UNIQUE-index hits, which the\n-- per-request auth path needs.\n--\n-- token_expired_at: NULL means the token is active. `ai-memory user expire`\n-- stamps it; `revive` clears it. The user row itself is never deleted —\n-- historical `author_id` references keep pointing at it forever so old\n-- attribution doesn't vanish when a user leaves. `rotate-token` issues a\n-- new hash AND implicitly clears `token_expired_at` (rotating a token only\n-- makes sense if you want it usable again).\n\nCREATE TABLE users (\n    id                BLOB NOT NULL PRIMARY KEY,           -- UUIDv7\n    username          TEXT NOT NULL UNIQUE,                -- validated in core::user\n    name              TEXT,                                -- optional display name\n    email             TEXT UNIQUE COLLATE NOCASE,          -- optional; case-insensitive unique\n    token_hash        BLOB NOT NULL UNIQUE,                -- SHA-256(token || \":\" || pepper); 32 bytes\n    created_at        INTEGER NOT NULL,                    -- microseconds since epoch (V01 convention)\n    last_seen_at      INTEGER,                             -- microseconds since epoch; NULL until first auth'd request\n    token_expired_at  INTEGER                              -- microseconds since epoch; NULL = active token\n);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932482927 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "pages_author_id",
+                checksum: 4608119891662367894,
+                version: 15,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Page-level attribution.\n--\n-- Records which registered user (from V14's `users` table) made each\n-- write. `NULL` is the rule, not the exception:\n--\n--   * Rung 0 (anonymous) writes → NULL.\n--   * Rung 1 (root token) writes → NULL. Root isn't a `users` row; the\n--     bearer-token user's displayed identity comes from\n--     `[auth].root_username` and lands in the page's frontmatter\n--     `last_modified_by` block — not here.\n--   * Rung 2 (DB user) writes → the user's id.\n--\n-- `ON DELETE SET NULL` keeps historical attribution stable when an\n-- operator hard-deletes a user row (which `ai-memory user expire` does\n-- NOT do — see docs/users.md — but a future `purge` op could). The\n-- `last_modified_by` frontmatter on disk is the canonical historical\n-- record; this column is the JOIN key the web UI / `/api/v1` use to\n-- surface a user's current name + email next to their old writes.\n\nALTER TABLE pages\n    ADD COLUMN author_id BLOB\n    REFERENCES users(id) ON DELETE SET NULL;\n\n-- Lookup pattern used by the web UI / `/api/v1` \"pages by author\":\n-- typical query is `WHERE author_id = ? AND is_latest = 1 ORDER BY\n-- updated_at DESC`, the latest-version filter is already covered by\n-- idx_pages_latest_path. A partial index makes the author scan cheap\n-- without bloating the index for the (common) NULL-author rows.\nCREATE INDEX idx_pages_author\n    ON pages(author_id, updated_at DESC)\n    WHERE author_id IS NOT NULL;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932484907 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "audit_log_author_id",
+                checksum: 16872537024714094366,
+                version: 16,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Operator-level attribution on the audit log.\n--\n-- V15 added `pages.author_id` so the latest version of every page\n-- can be JOINed to its author for read paths (`/api/v1`, `/web`).\n-- The audit log is a separate, append-only trail: every mutating op\n-- (page upserts including supersession, retention soft-delete, etc.)\n-- writes one row tagged with workspace/project/page + op + timestamp.\n--\n-- Without an author column on `audit_log`, queries like \"who\n-- expired alice's token last week?\" or \"which user soft-deleted the\n-- gotcha page about X?\" have to cross-reference the page row's\n-- current author — but that's the LATEST author, not the one at the\n-- time of the op (a page that was anonymous when soft-deleted but\n-- since attributed to alice would falsely surface alice). Putting\n-- the author on the audit row itself preserves point-in-time truth.\n--\n-- ON DELETE SET NULL matches V15: if an operator ever hard-deletes\n-- a `users` row (which `ai-memory user expire` does NOT do — see\n-- docs/users.md — but a future `purge` op could), the audit trail's\n-- timestamp + op + page reference all survive; only the\n-- \"who did it\" anchor becomes NULL, which the API surfaces by\n-- omitting the `author` field rather than emitting `null`.\n\nALTER TABLE audit_log\n    ADD COLUMN author_id BLOB\n    REFERENCES users(id) ON DELETE SET NULL;\n\n-- Lookup pattern used by future \"events by author\" queries:\n-- `WHERE author_id = ? ORDER BY at DESC LIMIT N`. Partial index\n-- keeps the cost off the (overwhelming majority of) NULL-author\n-- rows, matching the V15 idx_pages_author shape.\nCREATE INDEX idx_audit_log_author\n    ON audit_log(author_id, at DESC)\n    WHERE author_id IS NOT NULL;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932486898 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "pages_fts_index_path",
+                checksum: 8415781115942856553,
+                version: 17,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Index the page PATH (slug/filename) in the FTS table so a search for a\n-- distinctive slug like `followup-bulk-rename-runbook-titles` finds the page\n-- even when the slug never appears in the prose body or title.\n--\n-- The FTS tokenizer keeps `/`, `_`, `-` as token characters (so identifiers\n-- stay whole), which means a raw path `notes/foo-bar.md` tokenizes as the\n-- single glued token `notes/foo-bar` plus `md`. We index a NORMALISED copy of\n-- the path in BOTH forms so either query style hits:\n--   * segments — `/` and `.` → space, KEEPING `-`/`_` (so the whole hyphenated\n--     slug stays one token: `\"foo-bar\"` matches);\n--   * words — also split `-`/`_` (so `bar` alone matches).\n-- `notes/foo-bar.md` → `notes foo-bar md notes foo bar md`. That text lives in\n-- a real `pages.path_search` column so the FTS stays content-backed (external\n-- content; no body duplication) and the writer keeps it in sync. This SQL MUST\n-- match `ops::path_search_text` byte-for-byte.\n\nALTER TABLE pages ADD COLUMN path_search TEXT NOT NULL DEFAULT '';\n\nUPDATE pages\n   SET path_search =\n       replace(replace(path, '/', ' '), '.', ' ')\n       || ' '\n       || replace(replace(replace(replace(path, '/', ' '), '.', ' '), '-', ' '), '_', ' ');\n\n-- Recreate the FTS table + triggers with the extra column. The old triggers\n-- reference the 2-column shape, so they must be dropped first.\nDROP TRIGGER IF EXISTS pages_fts_ai;\nDROP TRIGGER IF EXISTS pages_fts_ad;\nDROP TRIGGER IF EXISTS pages_fts_au;\nDROP TABLE IF EXISTS pages_fts;\n\nCREATE VIRTUAL TABLE pages_fts USING fts5(\n    title, body, path_search,\n    content='pages',\n    content_rowid='rowid',\n    tokenize=\"unicode61 remove_diacritics 2 tokenchars '/_-'\"\n);\n\nCREATE TRIGGER pages_fts_ai AFTER INSERT ON pages BEGIN\n    INSERT INTO pages_fts(rowid, title, body, path_search)\n        VALUES (new.rowid, new.title, new.body, new.path_search);\nEND;\n\nCREATE TRIGGER pages_fts_ad AFTER DELETE ON pages BEGIN\n    INSERT INTO pages_fts(pages_fts, rowid, title, body, path_search)\n        VALUES ('delete', old.rowid, old.title, old.body, old.path_search);\nEND;\n\nCREATE TRIGGER pages_fts_au AFTER UPDATE OF title, body, path_search ON pages BEGIN\n    INSERT INTO pages_fts(pages_fts, rowid, title, body, path_search)\n        VALUES ('delete', old.rowid, old.title, old.body, old.path_search);\n    INSERT INTO pages_fts(rowid, title, body, path_search)\n        VALUES (new.rowid, new.title, new.body, new.path_search);\nEND;\n\n-- Repopulate the FTS index from the (now path_search-bearing) content table.\nINSERT INTO pages_fts(pages_fts) VALUES('rebuild');\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932488622 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "enforce_project_workspace_pairing",
+                checksum: 15172411195625771508,
+                version: 18,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Enforce the (workspace_id, project_id) identity invariant on write.\n--\n-- The schema denormalises workspace_id onto every domain row but only ever\n-- enforced `project_id → projects(id)` and `workspace_id → workspaces(id)`\n-- INDEPENDENTLY — never that the pair is consistent (that the project actually\n-- lives in that workspace). That gap lets a stale writer (e.g. a hook router\n-- whose per-cwd cache still holds the OLD workspace_id for a project that was\n-- just moved to another workspace) silently insert a split-brain row instead\n-- of failing cleanly.\n--\n-- These BEFORE INSERT triggers close the gap: an INSERT whose workspace_id\n-- disagrees with the project's actual workspace ABORTs. The hook router already\n-- evicts its cache and re-resolves on a write error, so a clean abort turns the\n-- worst case (silent corruption) into self-healing.\n--\n-- Existing split-brain rows must be repaired before the triggers are installed.\n-- SQLite's RAISE() is trigger-only, so this temporary CHECK table gives the\n-- migration a deterministic abort with the table-specific mismatch count.\nCREATE TEMP TABLE _v18_pairing_guard (\n    label TEXT NOT NULL,\n    mismatch_count INTEGER NOT NULL CHECK (mismatch_count = 0)\n);\n\nINSERT INTO _v18_pairing_guard(label, mismatch_count)\nSELECT 'pages', COUNT(*)\nFROM pages pg\nJOIN projects p ON p.id = pg.project_id\nWHERE pg.workspace_id IS NOT p.workspace_id;\n\nINSERT INTO _v18_pairing_guard(label, mismatch_count)\nSELECT 'sessions', COUNT(*)\nFROM sessions s\nJOIN projects p ON p.id = s.project_id\nWHERE s.workspace_id IS NOT p.workspace_id;\n\nINSERT INTO _v18_pairing_guard(label, mismatch_count)\nSELECT 'observations', COUNT(*)\nFROM observations o\nJOIN projects p ON p.id = o.project_id\nWHERE o.workspace_id IS NOT p.workspace_id;\n\nINSERT INTO _v18_pairing_guard(label, mismatch_count)\nSELECT 'handoffs', COUNT(*)\nFROM handoffs h\nJOIN projects p ON p.id = h.project_id\nWHERE h.workspace_id IS NOT p.workspace_id;\n\nDROP TABLE _v18_pairing_guard;\n\n-- INSERT only — never UPDATE — so the move-project re-stamp (which UPDATEs\n-- workspace_id across these tables in one transaction) is unaffected.\n\nCREATE TRIGGER pages_ws_proj_pairing_ai\nBEFORE INSERT ON pages\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'pages.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE TRIGGER sessions_ws_proj_pairing_ai\nBEFORE INSERT ON sessions\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'sessions.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE TRIGGER observations_ws_proj_pairing_ai\nBEFORE INSERT ON observations\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'observations.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE TRIGGER handoffs_ws_proj_pairing_ai\nBEFORE INSERT ON handoffs\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'handoffs.workspace_id does not match the project''s workspace');\nEND;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.93249129 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "repair_orphan_observation_attribution",
+                checksum: 14254357495931938100,
+                version: 19,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Data-repair migration: re-attribute observations & handoffs whose\n-- project_id was set by the hook router's per-event cwd resolution\n-- rather than inherited from the session's project_id.\n--\n-- Root cause:\n-- Prior to v0.12.x, `ai-memory-hooks::router::resolve_project_ids`\n-- derived the project name from `basename(cwd)` (or `basename(repo-root)`)\n-- on every event, ignoring whether any existing project's `repo_path`\n-- already contained the event's cwd. When an agent's tool calls\n-- reported a cwd inside a subdirectory of the session's actual\n-- project (a Read of `manga-plus/reader/src/main.rs`, a Bash call\n-- in `manga-plus/jadx_output/`, ...), the observation landed in a\n-- separate, auto-created \"fragment\" project (`reader`, `jadx_output`,\n-- ...) rather than the session's project (`manga-plus`). The session\n-- row itself stayed correctly attributed; only per-event rows\n-- migrated.\n--\n-- This migration repairs the historical mismatch deterministically:\n-- the session is the source of truth (an agent started one and owns\n-- the observations under it; the FK already enforces session\n-- existence). The runtime fix that prevents recurrence lives in the\n-- hook router (`find_project_by_cwd_prefix`).\n--\n-- The migration is idempotent: re-running on a repaired DB updates\n-- zero rows in steps 1+2 and deletes zero rows in step 3.\n\n-- Step 1: re-attribute observations.\n--\n-- The CASCADE FK guarantees `sessions.id = observations.session_id`\n-- exists, so the subselects always resolve. Updating workspace_id\n-- alongside project_id keeps the V18 pair-trigger invariant after\n-- this migration runs (V18's trigger fires on INSERT only, so this\n-- UPDATE is unaffected by it).\n\nUPDATE observations\nSET project_id   = (SELECT project_id   FROM sessions WHERE sessions.id = observations.session_id),\n    workspace_id = (SELECT workspace_id FROM sessions WHERE sessions.id = observations.session_id)\nWHERE EXISTS (\n    SELECT 1 FROM sessions\n    WHERE sessions.id = observations.session_id\n      AND sessions.project_id != observations.project_id\n);\n\n-- Step 2: re-attribute handoffs that carry a from_session_id.\n--\n-- Standalone handoffs (from_session_id IS NULL) are documented\n-- behaviour: CLAUDE.md invariant #15a names `scratch` as the\n-- defensive default for hook events that arrive without a usable\n-- cwd. Those handoffs were intentionally written to scratch and\n-- stay there — the WHERE clause skips them.\n\nUPDATE handoffs\nSET project_id   = (SELECT project_id   FROM sessions WHERE sessions.id = handoffs.from_session_id),\n    workspace_id = (SELECT workspace_id FROM sessions WHERE sessions.id = handoffs.from_session_id)\nWHERE from_session_id IS NOT NULL\n  AND EXISTS (\n      SELECT 1 FROM sessions\n      WHERE sessions.id = handoffs.from_session_id\n        AND sessions.project_id != handoffs.project_id\n  );\n\n-- Step 3: delete project rows that are now truly empty.\n--\n-- An empty project has no pages, no sessions, no observations, and\n-- no handoffs. After steps 1+2, the fragment projects that existed\n-- only because of the misattribution bug match this profile and\n-- nothing points at them. The CASCADE FKs do nothing here because\n-- the row IS empty by definition.\n--\n-- `scratch` is preserved because of its documented escape-hatch role\n-- — even if it transiently looks empty, the hook router relies on\n-- its existence for cwd-less fallback. (`scratch` will be re-created\n-- by `get_or_create_project` on the next cwd-less hook anyway, so\n-- deleting it is harmless in practice; the explicit carve-out is\n-- defensive against any future code that assumes `scratch` is\n-- always present.)\n\nDELETE FROM projects\nWHERE name != 'scratch'\n  AND NOT EXISTS (SELECT 1 FROM pages        WHERE project_id = projects.id)\n  AND NOT EXISTS (SELECT 1 FROM sessions     WHERE project_id = projects.id)\n  AND NOT EXISTS (SELECT 1 FROM observations WHERE project_id = projects.id)\n  AND NOT EXISTS (SELECT 1 FROM handoffs     WHERE project_id = projects.id);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932493679 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_grok_agent_kind",
+                checksum: 14444437648300490471,
+                version: 20,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK for xAI Grok Build CLI (`grok`).\n--\n-- V09/V11 intentionally enumerated every supported agent. Adding a concrete\n-- AgentKind must update the persisted CHECK too, or Grok hook events\n-- fail at begin_session on upgraded databases (the hook router would WARN\n-- and drop the session, silently breaking Grok capture server-side).\n\nPRAGMA foreign_keys = OFF;\n\nCREATE TABLE sessions_new (\n    id               BLOB PRIMARY KEY NOT NULL,\n    workspace_id     BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id       BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind       TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','antigravity-cli','omp','grok','other')),\n    cwd              TEXT,\n    started_at       INTEGER NOT NULL,\n    ended_at         INTEGER,\n    summary_page_id  BLOB REFERENCES pages(id) ON DELETE SET NULL\n);\n\nINSERT INTO sessions_new SELECT * FROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\n\n-- Recreate the V18 pairing-enforcement trigger: dropping the old `sessions`\n-- table above also dropped its triggers. V11 did not need this (it predates\n-- V18), but every later sessions-table rebuild must reinstate it or the\n-- (workspace_id, project_id) pairing invariant silently stops being enforced\n-- on inserts — breaking the hook router's split-brain self-heal.\nCREATE TRIGGER sessions_ws_proj_pairing_ai\nBEFORE INSERT ON sessions\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'sessions.workspace_id does not match the project''s workspace');\nEND;\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932495791 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "auto_improve_pending_proposals",
+                checksum: 13159116313697887703,
+                version: 21,
+                prefix: Versioned,
+                sql: Some(
+                    "-- DB-authoritative pending auto-improvement proposal state.\n\nCREATE TABLE auto_improve_runs (\n    id                        BLOB PRIMARY KEY NOT NULL,\n    workspace_id              BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id                BLOB NOT NULL REFERENCES projects(id) ON DELETE CASCADE,\n    session_id                BLOB REFERENCES sessions(id) ON DELETE SET NULL,\n    provider                  TEXT,\n    model                     TEXT,\n    summary                   TEXT,\n    warnings_json             TEXT NOT NULL DEFAULT '[]',\n    rejected_candidates_json  TEXT NOT NULL DEFAULT '[]',\n    config_json               TEXT NOT NULL DEFAULT '{}',\n    proposal_actor_json       TEXT NOT NULL,\n    created_at                INTEGER NOT NULL\n);\n\nCREATE TABLE auto_improve_proposals (\n    id                              BLOB PRIMARY KEY NOT NULL,\n    run_id                          BLOB NOT NULL REFERENCES auto_improve_runs(id) ON DELETE CASCADE,\n    workspace_id                    BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id                      BLOB NOT NULL REFERENCES projects(id) ON DELETE CASCADE,\n    status                          TEXT NOT NULL CHECK (status IN ('pending','approved','rejected','conflict','failed')),\n    operation                       TEXT NOT NULL CHECK (operation IN ('create','update')),\n    target_path                     TEXT NOT NULL,\n    kind                            TEXT NOT NULL,\n    title                           TEXT NOT NULL,\n    confidence                      REAL NOT NULL,\n    rationale                       TEXT NOT NULL,\n    evidence_json                   TEXT NOT NULL DEFAULT '[]',\n    body_markdown                   TEXT NOT NULL,\n    body_sha256                     BLOB NOT NULL,\n    artifact_path                   TEXT NOT NULL,\n    artifact_sha256                 BLOB,\n    target_latest_page_id_at_stage  BLOB REFERENCES pages(id) ON DELETE SET NULL,\n    target_body_sha256_at_stage     BLOB,\n    target_updated_at_at_stage      INTEGER,\n    staged_at                       INTEGER NOT NULL,\n    decided_at                      INTEGER,\n    decision_reason                 TEXT,\n    decided_by_author_id            BLOB REFERENCES users(id) ON DELETE SET NULL,\n    decided_by_actor_json           TEXT,\n    applied_page_id                 BLOB REFERENCES pages(id) ON DELETE SET NULL,\n    checkpoint                      TEXT\n);\n\nCREATE TABLE auto_improve_proposal_events (\n    id           INTEGER PRIMARY KEY AUTOINCREMENT,\n    proposal_id  BLOB NOT NULL REFERENCES auto_improve_proposals(id) ON DELETE CASCADE,\n    event        TEXT NOT NULL,\n    actor_json   TEXT NOT NULL,\n    author_id    BLOB REFERENCES users(id) ON DELETE SET NULL,\n    detail_json  TEXT NOT NULL DEFAULT '{}',\n    at           INTEGER NOT NULL\n);\n\nCREATE INDEX idx_auto_improve_runs_scope_recent\n    ON auto_improve_runs(workspace_id, project_id, created_at DESC);\nCREATE INDEX idx_auto_improve_proposals_scope_status_recent\n    ON auto_improve_proposals(workspace_id, project_id, status, staged_at DESC);\nCREATE INDEX idx_auto_improve_proposals_run\n    ON auto_improve_proposals(run_id);\nCREATE INDEX idx_auto_improve_proposal_events_proposal_recent\n    ON auto_improve_proposal_events(proposal_id, at ASC, id ASC);\n\nCREATE UNIQUE INDEX idx_auto_improve_one_pending_target\n    ON auto_improve_proposals(workspace_id, project_id, target_path)\n    WHERE status = 'pending';\n\nCREATE TRIGGER auto_improve_runs_ws_proj_pairing_ai\nBEFORE INSERT ON auto_improve_runs\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_runs.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE TRIGGER auto_improve_proposals_ws_proj_pairing_ai\nBEFORE INSERT ON auto_improve_proposals\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_proposals.workspace_id does not match the project''s workspace');\nEND;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932497571 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "auto_improve_scheduler",
+                checksum: 4183647845445018781,
+                version: 22,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Background auto-improvement scheduler state and lookup indexes.\n\nCREATE TABLE auto_improve_scheduler_state (\n    workspace_id        BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id          BLOB NOT NULL REFERENCES projects(id) ON DELETE CASCADE,\n    watermark_ended_at  INTEGER NOT NULL,\n    initialized_at      INTEGER NOT NULL,\n    updated_at          INTEGER NOT NULL,\n    PRIMARY KEY (workspace_id, project_id)\n);\n\nCREATE TABLE auto_improve_scheduler_claims (\n    workspace_id        BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id          BLOB NOT NULL REFERENCES projects(id) ON DELETE CASCADE,\n    session_id          BLOB NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,\n    claimed_at          INTEGER NOT NULL,\n    PRIMARY KEY (session_id)\n);\n\nCREATE INDEX idx_auto_improve_scheduler_claims_scope_session\n    ON auto_improve_scheduler_claims(workspace_id, project_id, session_id);\n\nCREATE INDEX idx_sessions_scope_ended\n    ON sessions(workspace_id, project_id, ended_at ASC)\n    WHERE ended_at IS NOT NULL;\n\nCREATE INDEX idx_auto_improve_runs_scope_session\n    ON auto_improve_runs(workspace_id, project_id, session_id)\n    WHERE session_id IS NOT NULL;\n\nCREATE TRIGGER auto_improve_scheduler_state_ws_proj_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_state\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_state.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE TRIGGER auto_improve_scheduler_claims_ws_proj_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_claims\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_claims.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE TRIGGER auto_improve_scheduler_claims_session_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_claims\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_claims scope does not match the session scope');\nEND;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932499572 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "auto_improve_patch_proposals",
+                checksum: 17192365329939385411,
+                version: 23,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Add patch proposal metadata while preserving existing full-page rows.\n\nALTER TABLE auto_improve_proposals\n    ADD COLUMN edit_mode TEXT NOT NULL DEFAULT 'full_page'\n        CHECK (edit_mode IN ('full_page','patch'));\n\nALTER TABLE auto_improve_proposals\n    ADD COLUMN patch_json TEXT;\n\nALTER TABLE auto_improve_proposals\n    ADD COLUMN expected_base_body_sha256 BLOB;\n\nALTER TABLE auto_improve_proposals\n    ADD COLUMN materialized_base_body_sha256 BLOB;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932501779 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "auto_improve_rejections",
+                checksum: 6345391763602988538,
+                version: 24,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Persistent rejection buffer for auto-improvement review feedback.\n\nCREATE TABLE auto_improve_rejections (\n    id                         BLOB PRIMARY KEY NOT NULL,\n    workspace_id               BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id                 BLOB NOT NULL REFERENCES projects(id) ON DELETE CASCADE,\n    target_path                TEXT,\n    kind                       TEXT,\n    operation                  TEXT,\n    edit_mode                  TEXT,\n    reason                     TEXT NOT NULL,\n    normalized_fingerprint     TEXT NOT NULL,\n    summary                    TEXT NOT NULL,\n    evidence_json              TEXT NOT NULL DEFAULT '{}',\n    source_run_id              BLOB REFERENCES auto_improve_runs(id) ON DELETE SET NULL,\n    source_proposal_id         BLOB REFERENCES auto_improve_proposals(id) ON DELETE SET NULL,\n    created_at                 INTEGER NOT NULL\n);\n\nCREATE INDEX idx_auto_improve_rejections_scope_recent\n    ON auto_improve_rejections(workspace_id, project_id, created_at DESC);\nCREATE INDEX idx_auto_improve_rejections_scope_fingerprint\n    ON auto_improve_rejections(workspace_id, project_id, normalized_fingerprint, created_at DESC);\nCREATE INDEX idx_auto_improve_rejections_scope_path_recent\n    ON auto_improve_rejections(workspace_id, project_id, target_path, created_at DESC)\n    WHERE target_path IS NOT NULL;\n\nCREATE TRIGGER auto_improve_rejections_ws_proj_pairing_ai\nBEFORE INSERT ON auto_improve_rejections\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_rejections.workspace_id does not match the project''s workspace');\nEND;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932503203 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_pi_agent_kind",
+                checksum: 18378232996491366138,
+                version: 25,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK for Pi coding agent (`pi`).\n--\n-- V09/V11/V20 intentionally enumerated every supported agent. Adding a\n-- concrete AgentKind must update the persisted CHECK too, or Pi hook events\n-- fail at begin_session on upgraded databases (the hook router would WARN\n-- and drop the session, silently breaking Pi capture server-side).\n\nPRAGMA foreign_keys = OFF;\n\nDROP TRIGGER IF EXISTS auto_improve_scheduler_claims_session_pairing_ai;\n\nCREATE TABLE sessions_new (\n    id               BLOB PRIMARY KEY NOT NULL,\n    workspace_id     BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id       BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind       TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','antigravity-cli','omp','pi','grok','other')),\n    cwd              TEXT,\n    started_at       INTEGER NOT NULL,\n    ended_at         INTEGER,\n    summary_page_id  BLOB REFERENCES pages(id) ON DELETE SET NULL\n);\n\nINSERT INTO sessions_new SELECT * FROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\nCREATE INDEX idx_sessions_scope_ended\n    ON sessions(workspace_id, project_id, ended_at ASC)\n    WHERE ended_at IS NOT NULL;\n\n-- Recreate the V18 pairing-enforcement trigger: dropping the old `sessions`\n-- table above also dropped its triggers. Every sessions-table rebuild after\n-- V18 must reinstate it or the (workspace_id, project_id) pairing invariant\n-- silently stops being enforced on inserts.\nCREATE TRIGGER sessions_ws_proj_pairing_ai\nBEFORE INSERT ON sessions\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'sessions.workspace_id does not match the project''s workspace');\nEND;\n\n-- Recreate the V22 claim/session pairing trigger, which references `sessions`\n-- and must be dropped before the table rebuild above.\nCREATE TRIGGER auto_improve_scheduler_claims_session_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_claims\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_claims scope does not match the session scope');\nEND;\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932504716 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_zero_agent_kind",
+                checksum: 4647651842484653297,
+                version: 26,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK for the Zero coding agent (`zero`).\n--\n-- V09/V11/V20/V25 intentionally enumerated every supported agent. Adding a\n-- concrete AgentKind must update the persisted CHECK too, or Zero hook\n-- events fail at begin_session on upgraded databases (the hook router\n-- WARNs and drops the session, silently breaking Zero capture\n-- server-side). Caught live during the #156 integration: the ops-level\n-- `begin_session_accepts_every_agent_kind` test now pins the whole class.\n\nPRAGMA foreign_keys = OFF;\n\nDROP TRIGGER IF EXISTS auto_improve_scheduler_claims_session_pairing_ai;\n\nCREATE TABLE sessions_new (\n    id               BLOB PRIMARY KEY NOT NULL,\n    workspace_id     BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id       BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind       TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','antigravity-cli','omp','pi','grok','zero','other')),\n    cwd              TEXT,\n    started_at       INTEGER NOT NULL,\n    ended_at         INTEGER,\n    summary_page_id  BLOB REFERENCES pages(id) ON DELETE SET NULL\n);\n\nINSERT INTO sessions_new SELECT * FROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\nCREATE INDEX idx_sessions_scope_ended\n    ON sessions(workspace_id, project_id, ended_at ASC)\n    WHERE ended_at IS NOT NULL;\n\n-- Recreate the V18 pairing-enforcement trigger: dropping the old `sessions`\n-- table above also dropped its triggers. Every sessions-table rebuild after\n-- V18 must reinstate it or the (workspace_id, project_id) pairing invariant\n-- silently stops being enforced on inserts.\nCREATE TRIGGER sessions_ws_proj_pairing_ai\nBEFORE INSERT ON sessions\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'sessions.workspace_id does not match the project''s workspace');\nEND;\n\n-- Recreate the V22 claim/session pairing trigger, which references `sessions`\n-- and must be dropped before the table rebuild above.\nCREATE TRIGGER auto_improve_scheduler_claims_session_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_claims\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_claims scope does not match the session scope');\nEND;\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932506543 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "repair_nongit_fragment_attribution",
+                checksum: 16995010226076692832,
+                version: 27,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Data-repair migration: re-run the V19 orphan-attribution repair.\n--\n-- V19 fixed the historical fragment-project class and v0.12.2 added the\n-- runtime prefix-match guard — but that guard keys on `projects.repo_path`,\n-- and #103 deliberately never records a repo_path for NON-GIT parents (a\n-- bare cwd as a prefix key turned $HOME into a catch-all). So sessions\n-- rooted in plain directories kept scattering mid-session subdirectory\n-- events into basename fragments (\"sources\", \"desktop\", …) after V19 ran.\n-- The runtime fix that closes the class for good is session-sticky\n-- attribution in the hook router (an existing session's scope wins over\n-- per-event cwd derivation); this migration drains what accumulated\n-- between V19 and that fix.\n--\n-- Same idempotent shape as V19: re-running on a repaired DB updates zero\n-- rows and deletes zero rows. The session is the source of truth.\n\n-- Step 1: re-attribute observations to their session's scope.\n\nUPDATE observations\nSET project_id   = (SELECT project_id   FROM sessions WHERE sessions.id = observations.session_id),\n    workspace_id = (SELECT workspace_id FROM sessions WHERE sessions.id = observations.session_id)\nWHERE EXISTS (\n    SELECT 1 FROM sessions\n    WHERE sessions.id = observations.session_id\n      AND sessions.project_id != observations.project_id\n);\n\n-- Step 2: re-attribute handoffs that carry a from_session_id. Standalone\n-- handoffs (from_session_id IS NULL) were deliberately scoped and stay put.\n\nUPDATE handoffs\nSET project_id   = (SELECT project_id   FROM sessions WHERE sessions.id = handoffs.from_session_id),\n    workspace_id = (SELECT workspace_id FROM sessions WHERE sessions.id = handoffs.from_session_id)\nWHERE from_session_id IS NOT NULL\n  AND EXISTS (\n      SELECT 1 FROM sessions\n      WHERE sessions.id = handoffs.from_session_id\n        AND sessions.project_id != handoffs.project_id\n  );\n\n-- Step 3: delete project rows that are now truly empty. Unlike V19's\n-- check, \"empty\" here also requires zero auto-improve runs, proposals,\n-- and rejections — those tables didn't exist when V19 was written, and a\n-- project holding staged proposals is NOT empty (deleting it would\n-- cascade the proposals away). The per-project scheduler-state row is\n-- deliberately NOT counted: ensure_scheduler_state creates one for every\n-- project, so it is bookkeeping, not data. Reserved names are exempt:\n-- `scratch` is the documented cwd-less fallback (V19's carve-out), and\n-- `_global` is the reserved preferences scope added in v1.9.0 — it holds\n-- pages so it would survive anyway, but the explicit carve-out is\n-- defensive against any future code that assumes it is always present.\n\nDELETE FROM projects\nWHERE name NOT IN ('scratch', '_global')\n  AND NOT EXISTS (SELECT 1 FROM pages        WHERE project_id = projects.id)\n  AND NOT EXISTS (SELECT 1 FROM sessions     WHERE project_id = projects.id)\n  AND NOT EXISTS (SELECT 1 FROM observations WHERE project_id = projects.id)\n  AND NOT EXISTS (SELECT 1 FROM handoffs     WHERE project_id = projects.id)\n  AND NOT EXISTS (SELECT 1 FROM auto_improve_runs      WHERE project_id = projects.id)\n  AND NOT EXISTS (SELECT 1 FROM auto_improve_proposals WHERE project_id = projects.id)\n  AND NOT EXISTS (SELECT 1 FROM auto_improve_rejections WHERE project_id = projects.id);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932508407 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_devin_agent_kind",
+                checksum: 3305475720830792594,
+                version: 28,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK for Devin CLI (Cognition).\n--\n-- V09/V11/V20/V25/V26 intentionally enumerated every supported agent. Adding\n-- a concrete AgentKind must update the persisted CHECK too, or Devin hook\n-- events fail at begin_session on upgraded databases (the hook router would\n-- WARN and drop the session, silently breaking Devin capture server-side).\n-- V26 (the Zero coding agent) landed first, so this migration's CHECK list\n-- carries 'zero' forward in addition to adding 'devin' — dropping it here\n-- would silently break Zero the same way omitting 'devin' would break us.\n\nPRAGMA foreign_keys = OFF;\n\nDROP TRIGGER IF EXISTS auto_improve_scheduler_claims_session_pairing_ai;\n\nCREATE TABLE sessions_new (\n    id               BLOB PRIMARY KEY NOT NULL,\n    workspace_id     BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id       BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind       TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','antigravity-cli','omp','pi','grok','zero','devin','other')),\n    cwd              TEXT,\n    started_at       INTEGER NOT NULL,\n    ended_at         INTEGER,\n    summary_page_id  BLOB REFERENCES pages(id) ON DELETE SET NULL\n);\n\nINSERT INTO sessions_new SELECT * FROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\nCREATE INDEX idx_sessions_scope_ended\n    ON sessions(workspace_id, project_id, ended_at ASC)\n    WHERE ended_at IS NOT NULL;\n\n-- Recreate the V18 pairing-enforcement trigger: dropping the old `sessions`\n-- table above also dropped its triggers. Every sessions-table rebuild after\n-- V18 must reinstate it or the (workspace_id, project_id) pairing invariant\n-- silently stops being enforced on inserts.\nCREATE TRIGGER sessions_ws_proj_pairing_ai\nBEFORE INSERT ON sessions\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'sessions.workspace_id does not match the project''s workspace');\nEND;\n\n-- Recreate the V22 claim/session pairing trigger, which references `sessions`\n-- and must be dropped before the table rebuild above.\nCREATE TRIGGER auto_improve_scheduler_claims_session_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_claims\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_claims scope does not match the session scope');\nEND;\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932510349 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "maintenance_scheduler",
+                checksum: 1157892591298842940,
+                version: 29,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Global cadence state for maintenance jobs that operate across all scopes.\nCREATE TABLE maintenance_scheduler_state (\n    job             TEXT PRIMARY KEY,\n    last_success_at INTEGER NOT NULL\n);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932512562 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_kimi_code_agent_kind",
+                checksum: 14107199179547937173,
+                version: 30,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK for Kimi Code CLI (Moonshot AI).\n--\n-- V09/V11/V20/V25/V26/V28 intentionally enumerated every supported agent.\n-- Adding a concrete AgentKind must update the persisted CHECK too, or\n-- Kimi Code hook events fail at begin_session on upgraded databases (the\n-- hook router would WARN and drop the session, silently breaking Kimi Code\n-- capture server-side). V28 (the Devin CLI) landed first, so this\n-- migration's CHECK list carries 'devin' forward in addition to adding\n-- 'kimi-code' — dropping it here would silently break Devin the same way\n-- omitting 'kimi-code' would break us.\n\nPRAGMA foreign_keys = OFF;\n\nDROP TRIGGER IF EXISTS auto_improve_scheduler_claims_session_pairing_ai;\n\nCREATE TABLE sessions_new (\n    id               BLOB PRIMARY KEY NOT NULL,\n    workspace_id     BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id       BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind       TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','antigravity-cli','omp','pi','grok','zero','devin','kimi-code','other')),\n    cwd              TEXT,\n    started_at       INTEGER NOT NULL,\n    ended_at         INTEGER,\n    summary_page_id  BLOB REFERENCES pages(id) ON DELETE SET NULL\n);\n\nINSERT INTO sessions_new SELECT * FROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\nCREATE INDEX idx_sessions_scope_ended\n    ON sessions(workspace_id, project_id, ended_at ASC)\n    WHERE ended_at IS NOT NULL;\n\n-- Recreate the V18 pairing-enforcement trigger: dropping the old `sessions`\n-- table above also dropped its triggers. Every sessions-table rebuild after\n-- V18 must reinstate it or the (workspace_id, project_id) pairing invariant\n-- silently stops being enforced on inserts.\nCREATE TRIGGER sessions_ws_proj_pairing_ai\nBEFORE INSERT ON sessions\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'sessions.workspace_id does not match the project''s workspace');\nEND;\n\n-- Recreate the V22 claim/session pairing trigger, which references `sessions`\n-- and must be dropped before the table rebuild above.\nCREATE TRIGGER auto_improve_scheduler_claims_session_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_claims\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_claims scope does not match the session scope');\nEND;\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932514141 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "managed_workstreams",
+                checksum: 7484956624266164267,
+                version: 31,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Optional `ai-memory run` workstreams. Direct harness launches continue to\n-- use sessions/observations/handoffs and never touch these tables.\n\nCREATE TABLE workstreams (\n    id                    BLOB PRIMARY KEY NOT NULL,\n    workspace_id          BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id            BLOB NOT NULL REFERENCES projects(id) ON DELETE CASCADE,\n    repo_fingerprint      TEXT NOT NULL,\n    worktree_fingerprint  TEXT NOT NULL,\n    name                  TEXT NOT NULL,\n    cwd                   TEXT NOT NULL,\n    created_at            INTEGER NOT NULL,\n    selected_at           INTEGER NOT NULL,\n    updated_at            INTEGER NOT NULL,\n    UNIQUE (workspace_id, project_id, repo_fingerprint, worktree_fingerprint, name)\n);\n\nCREATE TRIGGER workstreams_ws_proj_pairing_ai\nBEFORE INSERT ON workstreams\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'workstreams.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE INDEX idx_workstreams_selected\n    ON workstreams(workspace_id, project_id, repo_fingerprint, worktree_fingerprint, selected_at DESC);\n\nCREATE TABLE workstream_native_sessions (\n    workstream_id       BLOB NOT NULL REFERENCES workstreams(id) ON DELETE CASCADE,\n    agent_kind          TEXT NOT NULL,\n    native_session_id   TEXT NOT NULL,\n    is_current          INTEGER NOT NULL DEFAULT 1 CHECK (is_current IN (0, 1)),\n    source_cursor       TEXT,\n    delivery_cursor     INTEGER NOT NULL DEFAULT 0,\n    created_at          INTEGER NOT NULL,\n    updated_at          INTEGER NOT NULL,\n    PRIMARY KEY (workstream_id, agent_kind, native_session_id)\n);\n\nCREATE UNIQUE INDEX idx_workstream_native_current\n    ON workstream_native_sessions(workstream_id, agent_kind)\n    WHERE is_current = 1;\n\nCREATE TABLE managed_runs (\n    id                  BLOB PRIMARY KEY NOT NULL,\n    workstream_id       BLOB NOT NULL REFERENCES workstreams(id) ON DELETE CASCADE,\n    agent_kind          TEXT NOT NULL,\n    lease_owner         TEXT NOT NULL,\n    native_session_id   TEXT,\n    state               TEXT NOT NULL CHECK (state IN ('active', 'finished', 'expired')),\n    sync_after          INTEGER NOT NULL DEFAULT 0,\n    sync_through        INTEGER NOT NULL DEFAULT 0,\n    context_delivered   INTEGER NOT NULL DEFAULT 0 CHECK (context_delivered IN (0, 1)),\n    lease_expires_at    INTEGER NOT NULL,\n    started_at          INTEGER NOT NULL,\n    ended_at            INTEGER,\n    exit_code           INTEGER\n);\n\nCREATE UNIQUE INDEX idx_managed_runs_one_active\n    ON managed_runs(workstream_id)\n    WHERE state = 'active';\n\nCREATE INDEX idx_managed_runs_lease\n    ON managed_runs(state, lease_expires_at);\n\nCREATE TABLE workstream_events (\n    workstream_id       BLOB NOT NULL REFERENCES workstreams(id) ON DELETE CASCADE,\n    sequence            INTEGER NOT NULL,\n    event_id            TEXT NOT NULL,\n    agent_kind          TEXT NOT NULL,\n    native_session_id   TEXT NOT NULL,\n    source_record_id    TEXT,\n    kind                TEXT NOT NULL CHECK (kind IN (\n                            'message', 'tool_call', 'tool_result',\n                            'compaction', 'checkpoint', 'annotation'\n                        )),\n    role                TEXT,\n    content             TEXT NOT NULL,\n    occurred_at         TEXT,\n    metadata_json       TEXT NOT NULL DEFAULT '{}',\n    segment_path        TEXT,\n    created_at          INTEGER NOT NULL,\n    PRIMARY KEY (workstream_id, sequence),\n    UNIQUE (workstream_id, event_id)\n);\n\nCREATE INDEX idx_workstream_events_recent\n    ON workstream_events(workstream_id, sequence DESC);\n\nCREATE VIRTUAL TABLE workstream_events_fts USING fts5(\n    content,\n    role UNINDEXED,\n    agent_kind UNINDEXED,\n    content='workstream_events',\n    content_rowid='rowid',\n    tokenize='unicode61 remove_diacritics 2'\n);\n\nCREATE TRIGGER workstream_events_fts_ai AFTER INSERT ON workstream_events BEGIN\n    INSERT INTO workstream_events_fts(rowid, content, role, agent_kind)\n    VALUES (new.rowid, new.content, new.role, new.agent_kind);\nEND;\n\nCREATE TRIGGER workstream_events_fts_ad AFTER DELETE ON workstream_events BEGIN\n    INSERT INTO workstream_events_fts(workstream_events_fts, rowid, content, role, agent_kind)\n    VALUES ('delete', old.rowid, old.content, old.role, old.agent_kind);\nEND;\n\nCREATE TRIGGER workstream_events_fts_au AFTER UPDATE ON workstream_events BEGIN\n    INSERT INTO workstream_events_fts(workstream_events_fts, rowid, content, role, agent_kind)\n    VALUES ('delete', old.rowid, old.content, old.role, old.agent_kind);\n    INSERT INTO workstream_events_fts(rowid, content, role, agent_kind)\n    VALUES (new.rowid, new.content, new.role, new.agent_kind);\nEND;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932516227 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_crush_agent_kind",
+                checksum: 13627312814053621235,
+                version: 32,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK for Charmbracelet Crush.\n--\n-- Every sessions-table rebuild must retain the complete AgentKind set and the\n-- V18/V22 scope-pairing triggers. Even though managed Crush runs use the\n-- workstream tables, every shared core AgentKind must remain persistable by\n-- the session APIs.\n\nPRAGMA foreign_keys = OFF;\n\nDROP TRIGGER IF EXISTS auto_improve_scheduler_claims_session_pairing_ai;\n\nCREATE TABLE sessions_new (\n    id               BLOB PRIMARY KEY NOT NULL,\n    workspace_id     BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id       BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind       TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','antigravity-cli','omp','pi','crush','grok','zero','devin','kimi-code','other')),\n    cwd              TEXT,\n    started_at       INTEGER NOT NULL,\n    ended_at         INTEGER,\n    summary_page_id  BLOB REFERENCES pages(id) ON DELETE SET NULL\n);\n\nINSERT INTO sessions_new SELECT * FROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\nCREATE INDEX idx_sessions_scope_ended\n    ON sessions(workspace_id, project_id, ended_at ASC)\n    WHERE ended_at IS NOT NULL;\n\nCREATE TRIGGER sessions_ws_proj_pairing_ai\nBEFORE INSERT ON sessions\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'sessions.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE TRIGGER auto_improve_scheduler_claims_session_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_claims\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_claims scope does not match the session scope');\nEND;\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932518288 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "ingest_keys",
+                checksum: 17485705154254588481,
+                version: 33,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Idempotency keys for native hook ingest. A spooled event carries a stable\n-- client-generated key. The writer claims it in the same transaction as the\n-- observation, then marks it complete after downstream hook effects finish.\n-- Incomplete replays resume those effects; completed replays are skipped.\n-- Keys are project-scoped and swept opportunistically after the client spool's\n-- retry horizon.\nCREATE TABLE ingest_keys (\n    project_id   BLOB NOT NULL REFERENCES projects(id) ON DELETE CASCADE,\n    key          TEXT NOT NULL,\n    seen_at      INTEGER NOT NULL,\n    completed_at INTEGER,\n    PRIMARY KEY (project_id, key)\n) WITHOUT ROWID;\n\nCREATE INDEX idx_ingest_keys_seen_at ON ingest_keys (seen_at);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932523816 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "session_consolidation_jobs",
+                checksum: 17192393162381150728,
+                version: 34,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Durable work queue for opt-in SessionEnd LLM consolidation. The hook path\n-- only enqueues a job; one bounded server worker claims jobs outside the HTTP\n-- request lifetime and retries transient failures. `generation` is the number\n-- of observations present when the session was ended, so resumed sessions can\n-- be consolidated again without duplicating work for the same observation set.\nCREATE TABLE session_consolidation_jobs (\n    session_id      BLOB NOT NULL REFERENCES sessions(id)   ON DELETE CASCADE,\n    workspace_id    BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id      BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    generation      INTEGER NOT NULL CHECK (generation > 0),\n    state           TEXT NOT NULL CHECK (state IN ('pending', 'running', 'completed', 'failed', 'superseded')),\n    requested_at    INTEGER NOT NULL,\n    next_attempt_at INTEGER NOT NULL,\n    started_at      INTEGER,\n    completed_at    INTEGER,\n    attempts        INTEGER NOT NULL DEFAULT 0 CHECK (attempts >= 0),\n    claim_id        BLOB,\n    last_error      TEXT,\n    PRIMARY KEY (session_id, generation)\n) WITHOUT ROWID;\n\nCREATE INDEX idx_session_consolidation_jobs_due\n    ON session_consolidation_jobs (state, next_attempt_at, requested_at);\n\nCREATE TRIGGER session_consolidation_jobs_session_pairing_ai\nBEFORE INSERT ON session_consolidation_jobs\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'session_consolidation_jobs scope does not match the session scope');\nEND;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.93252599 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "session_end_observation_watermark",
+                checksum: 556147720919997527,
+                version: 35,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Track the exact observation generation covered by the latest SessionEnd.\n-- Wall-clock comparisons can remain true forever after clock skew, repeatedly\n-- re-ending and re-consolidating a session with no new observations.\nALTER TABLE sessions\n    ADD COLUMN ended_observation_count INTEGER NOT NULL DEFAULT 0\n    CHECK (ended_observation_count >= 0);\n\n-- Treat existing ended sessions as the upgrade baseline. Reprocessing every\n-- historical session would create an unbounded provider backlog on upgrade.\nUPDATE sessions\nSET ended_observation_count = (\n    SELECT COUNT(*)\n    FROM observations\n    WHERE observations.session_id = sessions.id\n)\nWHERE ended_at IS NOT NULL;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.93252781 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "page_expiry",
+                checksum: 457375473229528645,
+                version: 36,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Per-page TTL. `expires_at` (microseconds since epoch, UTC) is derived\n-- from the frontmatter `expires_at:` key — markdown stays the source of\n-- truth and a reindex rebuilds this column. NULL = never expires.\n-- Expired pages are hidden from search/recent/briefing and hard-deleted\n-- (file + rows) by the retention sweep.\nALTER TABLE pages ADD COLUMN expires_at INTEGER;\n\nCREATE INDEX idx_pages_expiry ON pages(expires_at)\n    WHERE is_latest = 1 AND expires_at IS NOT NULL;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932529253 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "page_feedback",
+                checksum: 2728224112113671670,
+                version: 37,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Explicit feedback on retrieval quality, and the per-page salience it\n-- drives. Until now the only reinforcement signal was the coarse\n-- `access_count` / `last_accessed_at` bump every search hit produced;\n-- the retention formula multiplied a single global `salience_default`.\n--\n-- `pages.salience` is NULL for every existing page, which the decay\n-- math reads as \"use salience_default\" — so behaviour is unchanged\n-- until a page actually receives feedback. It is a derived value:\n-- `page_feedback` is the append-only source of truth. Each row stores\n-- the post-signal salience so the derived page value can be rebuilt even\n-- if the configured default changes later.\n--\n-- Feedback attaches to a page *version* (`page_id`), so rewriting a\n-- flagged page retires both its salience and its lint findings: the\n-- rows stay for audit but point at an `is_latest = 0` version, which\n-- the lint query's `is_latest = 1` join filters out. That is the\n-- resolution path — there is no separate \"dismiss\" state.\nALTER TABLE pages ADD COLUMN salience REAL;\n\nCREATE TABLE page_feedback (\n    id            BLOB PRIMARY KEY,\n    page_id       BLOB NOT NULL REFERENCES pages(id) ON DELETE CASCADE,\n    workspace_id  BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id    BLOB NOT NULL REFERENCES projects(id) ON DELETE CASCADE,\n    -- helpful / not_helpful move salience; stale / wrong additionally\n    -- surface the page in memory_lint reports.\n    kind          TEXT NOT NULL CHECK (kind IN ('helpful', 'not_helpful', 'stale', 'wrong')),\n    reason        TEXT,\n    salience_after REAL NOT NULL CHECK (salience_after BETWEEN 0.25 AND 2.0),\n    author_id     BLOB REFERENCES users(id) ON DELETE SET NULL,\n    created_at    INTEGER NOT NULL\n);\n\nCREATE INDEX idx_page_feedback_page ON page_feedback(page_id, created_at DESC);\nCREATE INDEX idx_page_feedback_scope ON page_feedback(workspace_id, project_id, created_at DESC);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932530721 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "entities",
+                checksum: 10080360269389277572,
+                version: 38,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Entity index: the noun layer of the wiki, used as a fourth retrieval\n-- stream alongside FTS5, vector cosine, and page-link neighbours.\n--\n-- Entities come from the frontmatter `entities:` list that the\n-- consolidator writes (extraction happens where an LLM already runs, so\n-- the zero-LLM default path is untouched — an empty table simply\n-- contributes nothing, exactly like the vector stream with no embedder).\n-- Markdown stays the source of truth: `reindex` rebuilds both tables\n-- from the files, same contract as `links`.\n--\n-- Query-time matching is lexical (exact + prefix over `name`), never an\n-- LLM call.\n--\n-- Deliberately a plain noun table, not a triple store. This migration\n-- ships only the retrieval index used by current callers.\nCREATE TABLE entities (\n    id            BLOB PRIMARY KEY,\n    workspace_id  BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id    BLOB NOT NULL REFERENCES projects(id) ON DELETE CASCADE,\n    -- Lowercase-normalized surface form; uniqueness is per project so\n    -- two projects can each have their own `postgres` entity.\n    name          TEXT NOT NULL CHECK (length(name) BETWEEN 1 AND 64),\n    created_at    INTEGER NOT NULL,\n    UNIQUE (workspace_id, project_id, name)\n);\n\nCREATE TABLE entity_page_links (\n    entity_id  BLOB NOT NULL REFERENCES entities(id) ON DELETE CASCADE,\n    page_id    BLOB NOT NULL REFERENCES pages(id) ON DELETE CASCADE,\n    PRIMARY KEY (entity_id, page_id)\n);\n\n-- Reverse lookup for the retrieval stream (page → entities) and for\n-- replacing a page's entity set on rewrite.\nCREATE INDEX idx_entity_page_links_page ON entity_page_links(page_id);\n-- Prefix matching (`name LIKE 'postg%'`) rides this index.\nCREATE INDEX idx_entities_name ON entities(workspace_id, project_id, name);\n\n-- The project id alone is not enough: preserve the universal\n-- (workspace_id, project_id) identity pairing at the storage boundary.\nCREATE TRIGGER entities_ws_proj_pairing_ai\nBEFORE INSERT ON entities\nWHEN NOT EXISTS (\n    SELECT 1 FROM projects p\n    WHERE p.id = NEW.project_id AND p.workspace_id = NEW.workspace_id\n)\nBEGIN\n    SELECT RAISE(ABORT, 'entities workspace/project mismatch');\nEND;\n\n-- An entity may only link to a page version in the same project scope.\nCREATE TRIGGER entity_page_links_scope_pairing_ai\nBEFORE INSERT ON entity_page_links\nWHEN NOT EXISTS (\n    SELECT 1\n    FROM entities e\n    JOIN pages p ON p.id = NEW.page_id\n    WHERE e.id = NEW.entity_id\n      AND e.workspace_id = p.workspace_id\n      AND e.project_id = p.project_id\n)\nBEGIN\n    SELECT RAISE(ABORT, 'entity/page scope mismatch');\nEND;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932532429 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "handoff_ownership",
+                checksum: 2978447339868440716,
+                version: 39,
+                prefix: Versioned,
+                sql: Some(
+                    "-- V39: give handoffs an owner so a shared server stops delivering one\n-- operator's baton to another.\n--\n-- Before this, `handoffs` carried no human identity at all: the open-handoff\n-- lookup filtered on (workspace_id, project_id, state) only, and the session\n-- start hook claims whatever it finds. On a single-operator server that is the\n-- intended 1:1 behaviour; with several operators in one project it means the\n-- next session to start — whoever it belongs to — consumes the pending handoff\n-- and the author never receives it.\n--\n-- Additive on purpose:\n--   * Both columns are nullable. Every pre-existing row keeps `owner_user\n--     IS NULL`, which the reader treats as \"project-wide / shared\" — exactly\n--     the old delivery semantics, so existing deployments see no change.\n--   * A single-operator server whose requests carry no actor keeps writing\n--     NULL owners and keeps behaving as before.\n--   * `ALTER TABLE ... ADD COLUMN` with a NULL default rewrites no rows, so\n--     this is O(1) even on a large table.\nALTER TABLE handoffs ADD COLUMN owner_user TEXT;\n\n-- Who actually consumed it. `accepted_by` records the accepting AGENT kind\n-- ('claude-code', …), which cannot answer \"which teammate took my baton\".\nALTER TABLE handoffs ADD COLUMN accepted_by_user TEXT;\n\n-- The open-handoff lookup is always (workspace, project, state='open') and now\n-- additionally discriminates on owner. Partial index: only open rows are ever\n-- queried this way, and accepted/expired rows are the overwhelming majority\n-- over time.\nCREATE INDEX idx_handoffs_open_owner\n    ON handoffs (workspace_id, project_id, owner_user, created_at DESC)\n    WHERE state = 'open';\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.93253419 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "session_owner",
+                checksum: 12834591111473177729,
+                version: 40,
+                prefix: Versioned,
+                sql: Some(
+                    "-- V40: record which operator a session belongs to.\n--\n-- `sessions` never carried a human identity, so anything that picks \"the open\n-- session\" for a scope picks somebody else's just as easily as your own. That\n-- is how `finalize-session` could end a teammate's LIVE session, synthesise a\n-- page from their observations, and mint an auto handoff containing their raw\n-- prompts.\n--\n-- Additive and nullable: existing rows and any caller without an authenticated\n-- actor keep `actor_user IS NULL`, which every reader treats as shared — the\n-- pre-ownership behaviour a single-operator server depends on.\nALTER TABLE sessions ADD COLUMN actor_user TEXT;\n\n-- Open-session lookups are (workspace, project, agent_kind, ended_at IS NULL)\n-- and now additionally discriminate on the owner.\nCREATE INDEX idx_sessions_open_owner\n    ON sessions (workspace_id, project_id, agent_kind, actor_user)\n    WHERE ended_at IS NULL;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932535815 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "handoffs_listing_index",
+                checksum: 6841382890480459374,
+                version: 41,
+                prefix: Versioned,
+                sql: Some(
+                    "-- V41: support the handoff listing added alongside ownership.\n--\n-- Every existing handoffs index is partial (`WHERE state = 'open'`), including\n-- V39's. The listing endpoint's default call asks for EVERY state — that is how\n-- an operator finds a baton that was already consumed — so it had no usable\n-- index and made SQLite scan the project's entire handoff history and build a\n-- temp B-tree to sort it, on every request.\n--\n-- Non-partial and ordered to match the root recovery query's\n-- `ORDER BY created_at DESC`, so that scan is bounded by the LIMIT instead of\n-- by the table.\nCREATE INDEX idx_handoffs_project_recent\n    ON handoffs (workspace_id, project_id, created_at DESC);\n\n-- The normal listing is owner-scoped. Keep a separate owner-first index so a\n-- project with a high volume of other operators' rows does not have to scan\n-- their history before finding the caller's own/shared rows.\nCREATE INDEX idx_handoffs_project_owner_recent\n    ON handoffs (workspace_id, project_id, owner_user, created_at DESC);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932537494 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "auto_improve_proposal_author",
+                checksum: 2025209046195962031,
+                version: 42,
+                prefix: Versioned,
+                sql: Some(
+                    "-- V42: record who staged an auto-improvement proposal, and scope the\n-- one-pending-per-target rule to that person.\n--\n-- `auto_improve_proposals` recorded `decided_by_author_id` (who approved or\n-- rejected) but never who STAGED the proposal, so a reviewer could not tell\n-- whose suggestion they were looking at.\n--\n-- The bigger problem is the uniqueness rule. `idx_auto_improve_one_pending_target`\n-- allowed exactly one pending proposal per (workspace, project, target_path).\n-- That is right for one operator and wrong for several: one person's pending\n-- suggestion for `_rules/style.md` blocked everybody else's for the same page.\n--\n-- Correct in BOTH modes without a runtime switch, by folding the author into\n-- the key with a NULL-collapsing expression:\n--\n--   * Single operator (or any unattributed caller): every row has\n--     `staged_by_actor_user IS NULL`, so `COALESCE(...)` maps them all onto one\n--     bucket and the existing \"one pending per target\" invariant holds exactly\n--     as before.\n--   * Several operators: each one gets their own bucket, so proposals stop\n--     blocking each other.\n--\n-- `staged_by_actor_user` is TEXT rather than a FK to `users(id)` for the same\n-- reason `handoffs.owner_user`, `sessions.actor_user` and `page_access.actor`\n-- are: the identity may be a proxy username or an issuer-qualified OIDC\n-- subject with no `users` row behind it. Keying on the row id would make every\n-- proxied operator NULL and collapse them all into one bucket, which is\n-- precisely the collision this index exists to break.\n--\n-- The COALESCE matters. A plain `UNIQUE (…, staged_by_actor_user)` would NOT\n-- work: SQLite treats NULLs as distinct in unique indexes, so every existing\n-- single-operator database would silently lose the guarantee and start\n-- accepting unlimited pending proposals per page.\nALTER TABLE auto_improve_proposals ADD COLUMN staged_by_actor_user TEXT;\n\nDROP INDEX IF EXISTS idx_auto_improve_one_pending_target;\n\nCREATE UNIQUE INDEX idx_auto_improve_one_pending_target\n    ON auto_improve_proposals(\n        workspace_id,\n        project_id,\n        target_path,\n        COALESCE(staged_by_actor_user, '')\n    )\n    WHERE status = 'pending';\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932539458 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "page_access_by_actor",
+                checksum: 5542491692940499967,
+                version: 43,
+                prefix: Versioned,
+                sql: Some(
+                    "-- V43: record page reinforcement per operator, alongside the existing counter.\n--\n-- `pages.access_count` is a single number per page. It cannot distinguish\n-- \"50 reads by one person\" from \"one read by each of 50 people\", yet those mean\n-- very different things for whether a page is load-bearing for a team. On a\n-- shared server the scalar also mixes everyone's reading into one signal.\n--\n-- Purely additive, and deliberately NOT a replacement:\n--   * `pages.access_count` keeps being bumped exactly as before, so every\n--     existing query, the retention formula and the hard-delete predicate are\n--     untouched.\n--   * Pages that existed before this simply have no rows here, which reads as\n--     \"breadth unknown\" and is scored identically to breadth 1 — so there is no\n--     eviction cliff and no backfill to run.\n--\n-- `actor` is TEXT rather than a FK to `users(id)` on purpose: an authenticated\n-- identity may be a proxy username or an issuer-qualified OIDC subject with no\n-- `users` row behind it. Same reasoning as `handoffs.owner_user`.\nCREATE TABLE page_access (\n    page_id           BLOB NOT NULL REFERENCES pages(id) ON DELETE CASCADE,\n    actor             TEXT NOT NULL,\n    PRIMARY KEY (page_id, actor)\n) WITHOUT ROWID;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932541115 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_hermes_agent_kind",
+                checksum: 606592612683206246,
+                version: 44,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK for Hermes Agent.\n--\n-- The official Hermes shell-hook protocol identifies the agent separately\n-- from ai-memory's third-party installer surface. Rebuilding this table must\n-- retain the V35 observation watermark, V40 owner, every current index, and\n-- every trigger that validates a child row against its session scope.\n\nPRAGMA foreign_keys = OFF;\n\nDROP TRIGGER IF EXISTS auto_improve_scheduler_claims_session_pairing_ai;\nDROP TRIGGER IF EXISTS session_consolidation_jobs_session_pairing_ai;\n\nCREATE TABLE sessions_new (\n    id                       BLOB PRIMARY KEY NOT NULL,\n    workspace_id             BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id               BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind               TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','antigravity-cli','omp','pi','crush','grok','zero','devin','kimi-code','hermes','other')),\n    cwd                      TEXT,\n    started_at               INTEGER NOT NULL,\n    ended_at                 INTEGER,\n    summary_page_id          BLOB REFERENCES pages(id) ON DELETE SET NULL,\n    ended_observation_count  INTEGER NOT NULL DEFAULT 0 CHECK (ended_observation_count >= 0),\n    actor_user               TEXT\n);\n\nINSERT INTO sessions_new (\n    id, workspace_id, project_id, agent_kind, cwd, started_at, ended_at,\n    summary_page_id, ended_observation_count, actor_user\n)\nSELECT\n    id, workspace_id, project_id, agent_kind, cwd, started_at, ended_at,\n    summary_page_id, ended_observation_count, actor_user\nFROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\nCREATE INDEX idx_sessions_scope_ended\n    ON sessions(workspace_id, project_id, ended_at ASC)\n    WHERE ended_at IS NOT NULL;\nCREATE INDEX idx_sessions_open_owner\n    ON sessions(workspace_id, project_id, agent_kind, actor_user)\n    WHERE ended_at IS NULL;\n\nCREATE TRIGGER sessions_ws_proj_pairing_ai\nBEFORE INSERT ON sessions\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'sessions.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE TRIGGER auto_improve_scheduler_claims_session_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_claims\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_claims scope does not match the session scope');\nEND;\n\nCREATE TRIGGER session_consolidation_jobs_session_pairing_ai\nBEFORE INSERT ON session_consolidation_jobs\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'session_consolidation_jobs scope does not match the session scope');\nEND;\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932542754 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_kiro_cli_agent_kind",
+                checksum: 12362195837897477751,
+                version: 45,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK for AWS Kiro CLI.\n--\n-- Keep the complete V44 schema, indexes, and scope-pairing triggers while\n-- adding the `kiro-cli` wire value.\n\nPRAGMA foreign_keys = OFF;\n\nDROP TRIGGER IF EXISTS auto_improve_scheduler_claims_session_pairing_ai;\nDROP TRIGGER IF EXISTS session_consolidation_jobs_session_pairing_ai;\n\nCREATE TABLE sessions_new (\n    id                       BLOB PRIMARY KEY NOT NULL,\n    workspace_id             BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id               BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind               TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','antigravity-cli','omp','pi','crush','grok','zero','devin','kimi-code','kiro-cli','hermes','other')),\n    cwd                      TEXT,\n    started_at               INTEGER NOT NULL,\n    ended_at                 INTEGER,\n    summary_page_id          BLOB REFERENCES pages(id) ON DELETE SET NULL,\n    ended_observation_count  INTEGER NOT NULL DEFAULT 0 CHECK (ended_observation_count >= 0),\n    actor_user               TEXT\n);\n\nINSERT INTO sessions_new (\n    id, workspace_id, project_id, agent_kind, cwd, started_at, ended_at,\n    summary_page_id, ended_observation_count, actor_user\n)\nSELECT\n    id, workspace_id, project_id, agent_kind, cwd, started_at, ended_at,\n    summary_page_id, ended_observation_count, actor_user\nFROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\nCREATE INDEX idx_sessions_scope_ended\n    ON sessions(workspace_id, project_id, ended_at ASC)\n    WHERE ended_at IS NOT NULL;\nCREATE INDEX idx_sessions_open_owner\n    ON sessions(workspace_id, project_id, agent_kind, actor_user)\n    WHERE ended_at IS NULL;\n\nCREATE TRIGGER sessions_ws_proj_pairing_ai\nBEFORE INSERT ON sessions\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'sessions.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE TRIGGER auto_improve_scheduler_claims_session_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_claims\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_claims scope does not match the session scope');\nEND;\n\nCREATE TRIGGER session_consolidation_jobs_session_pairing_ai\nBEFORE INSERT ON session_consolidation_jobs\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'session_consolidation_jobs scope does not match the session scope');\nEND;\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932544766 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "client_activity",
+                checksum: 6432656997375831710,
+                version: 46,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Per-client MCP tool-call counters, bucketed by UTC day.\n--\n-- Hook-driven agents surface in `sessions.agent_kind` (and the\n-- `/admin/sessions/by-agent` aggregate), but MCP-only clients — VS Code\n-- Copilot, Claude Desktop, ad-hoc scripts — never fire a lifecycle hook,\n-- so they were invisible to \"where is this server's memory traffic\n-- coming from\". This table records what those clients actually do:\n-- tool calls, split into reads and writes.\n--\n-- `client` is the sanitized MCP `clientInfo.name` from the initialize\n-- handshake when the HTTP transport runs stateful, else the\n-- `X-Memory-Actor-Agent` overlay when an ingress proxy asserts one,\n-- else the literal 'unknown'. MCP client names remain an open set rather\n-- than being forced through the `AgentKind` CHECK, but the write boundary\n-- caps both label length and distinct labels per UTC day. Labels beyond\n-- that daily budget fold into the stable 'other' bucket.\n--\n-- One row per (client, day), capped to 128 named clients plus 'other',\n-- keeps growth bounded by the calendar rather than request traffic.\nCREATE TABLE client_activity (\n    client  TEXT NOT NULL CHECK (length(client) BETWEEN 1 AND 64),\n    day     INTEGER NOT NULL,             -- UTC days since the epoch\n    reads   INTEGER NOT NULL DEFAULT 0 CHECK (reads >= 0),\n    writes  INTEGER NOT NULL DEFAULT 0 CHECK (writes >= 0),\n    PRIMARY KEY (client, day)\n) WITHOUT ROWID;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932546778 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_command_code_agent_kind",
+                checksum: 2420949754064418569,
+                version: 47,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK for Command Code CLI.\n--\n-- Keep the complete V45 schema, indexes, and scope-pairing triggers while\n-- adding the `command-code` wire value.\n\nPRAGMA foreign_keys = OFF;\n\nDROP TRIGGER IF EXISTS auto_improve_scheduler_claims_session_pairing_ai;\nDROP TRIGGER IF EXISTS session_consolidation_jobs_session_pairing_ai;\n\nCREATE TABLE sessions_new (\n    id                       BLOB PRIMARY KEY NOT NULL,\n    workspace_id             BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id               BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind               TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','antigravity-cli','omp','pi','crush','grok','zero','devin','kimi-code','kiro-cli','command-code','hermes','other')),\n    cwd                      TEXT,\n    started_at               INTEGER NOT NULL,\n    ended_at                 INTEGER,\n    summary_page_id          BLOB REFERENCES pages(id) ON DELETE SET NULL,\n    ended_observation_count  INTEGER NOT NULL DEFAULT 0 CHECK (ended_observation_count >= 0),\n    actor_user               TEXT\n);\n\nINSERT INTO sessions_new (\n    id, workspace_id, project_id, agent_kind, cwd, started_at, ended_at,\n    summary_page_id, ended_observation_count, actor_user\n)\nSELECT\n    id, workspace_id, project_id, agent_kind, cwd, started_at, ended_at,\n    summary_page_id, ended_observation_count, actor_user\nFROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\nCREATE INDEX idx_sessions_scope_ended\n    ON sessions(workspace_id, project_id, ended_at ASC)\n    WHERE ended_at IS NOT NULL;\nCREATE INDEX idx_sessions_open_owner\n    ON sessions(workspace_id, project_id, agent_kind, actor_user)\n    WHERE ended_at IS NULL;\n\nCREATE TRIGGER sessions_ws_proj_pairing_ai\nBEFORE INSERT ON sessions\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'sessions.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE TRIGGER auto_improve_scheduler_claims_session_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_claims\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_claims scope does not match the session scope');\nEND;\n\nCREATE TRIGGER session_consolidation_jobs_session_pairing_ai\nBEFORE INSERT ON session_consolidation_jobs\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'session_consolidation_jobs scope does not match the session scope');\nEND;\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932548545 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "handoff_receiver_index",
+                checksum: 16717430258210844208,
+                version: 48,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Session-bound startup claims are released when the exact receiver exits\n-- without substantive work. Both the duplicate-claim guard and release path\n-- look up accepted rows by receiver session.\nCREATE INDEX idx_handoffs_accepted_session\n    ON handoffs (accepted_by_session, accepted_at DESC)\n    WHERE state = 'accepted' AND accepted_by_session IS NOT NULL;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932550382 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "decay_tombstone_index",
+                checksum: 18131876005653589752,
+                version: 49,
+                prefix: Versioned,
+                sql: Some(
+                    "-- A decay tombstone is identified by superseded_at, the only column written\n-- by the forget-sweep eviction path. Rewritten page heads legitimately carry\n-- a non-NULL supersedes pointer, so filtering those rows out made their\n-- tombstones permanent and left this partial index unusable by the corrected\n-- cleanup query.\nDROP INDEX idx_pages_evicted;\n\nCREATE INDEX idx_pages_evicted\n    ON pages(workspace_id, project_id, superseded_at)\n    WHERE is_latest = 0 AND superseded_at IS NOT NULL;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932551793 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_pool_agent_kind",
+                checksum: 11619532183832861673,
+                version: 50,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK for Pool (Poolside Agent CLI).\n--\n-- Keep the complete V47 schema, indexes, and scope-pairing triggers while\n-- adding the `pool` wire value.\n\nPRAGMA foreign_keys = OFF;\n\nDROP TRIGGER IF EXISTS auto_improve_scheduler_claims_session_pairing_ai;\nDROP TRIGGER IF EXISTS session_consolidation_jobs_session_pairing_ai;\n\nCREATE TABLE sessions_new (\n    id                       BLOB PRIMARY KEY NOT NULL,\n    workspace_id             BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id               BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind               TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','antigravity-cli','omp','pi','crush','grok','zero','devin','kimi-code','kiro-cli','command-code','hermes','pool','other')),\n    cwd                      TEXT,\n    started_at               INTEGER NOT NULL,\n    ended_at                 INTEGER,\n    summary_page_id          BLOB REFERENCES pages(id) ON DELETE SET NULL,\n    ended_observation_count  INTEGER NOT NULL DEFAULT 0 CHECK (ended_observation_count >= 0),\n    actor_user               TEXT\n);\n\nINSERT INTO sessions_new (\n    id, workspace_id, project_id, agent_kind, cwd, started_at, ended_at,\n    summary_page_id, ended_observation_count, actor_user\n)\nSELECT\n    id, workspace_id, project_id, agent_kind, cwd, started_at, ended_at,\n    summary_page_id, ended_observation_count, actor_user\nFROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\nCREATE INDEX idx_sessions_scope_ended\n    ON sessions(workspace_id, project_id, ended_at ASC)\n    WHERE ended_at IS NOT NULL;\nCREATE INDEX idx_sessions_open_owner\n    ON sessions(workspace_id, project_id, agent_kind, actor_user)\n    WHERE ended_at IS NULL;\n\nCREATE TRIGGER sessions_ws_proj_pairing_ai\nBEFORE INSERT ON sessions\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'sessions.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE TRIGGER auto_improve_scheduler_claims_session_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_claims\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_claims scope does not match the session scope');\nEND;\n\nCREATE TRIGGER session_consolidation_jobs_session_pairing_ai\nBEFORE INSERT ON session_consolidation_jobs\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'session_consolidation_jobs scope does not match the session scope');\nEND;\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932553502 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "sessions_zcode_agent_kind",
+                checksum: 17717678260914244640,
+                version: 51,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Expand sessions.agent_kind CHECK for ZCode (z.ai).\n--\n-- Keep the complete V50 schema, indexes, and scope-pairing triggers while\n-- adding the `zcode` wire value.\n\nPRAGMA foreign_keys = OFF;\n\nDROP TRIGGER IF EXISTS auto_improve_scheduler_claims_session_pairing_ai;\nDROP TRIGGER IF EXISTS session_consolidation_jobs_session_pairing_ai;\n\nCREATE TABLE sessions_new (\n    id                       BLOB PRIMARY KEY NOT NULL,\n    workspace_id             BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id               BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    agent_kind               TEXT NOT NULL CHECK (agent_kind IN ('claude-code','codex','open-code','cursor','gemini-cli','claude-desktop','openclaw','antigravity-cli','omp','pi','crush','grok','zero','devin','kimi-code','kiro-cli','command-code','hermes','pool','zcode','other')),\n    cwd                      TEXT,\n    started_at               INTEGER NOT NULL,\n    ended_at                 INTEGER,\n    summary_page_id          BLOB REFERENCES pages(id) ON DELETE SET NULL,\n    ended_observation_count  INTEGER NOT NULL DEFAULT 0 CHECK (ended_observation_count >= 0),\n    actor_user               TEXT\n);\n\nINSERT INTO sessions_new (\n    id, workspace_id, project_id, agent_kind, cwd, started_at, ended_at,\n    summary_page_id, ended_observation_count, actor_user\n)\nSELECT\n    id, workspace_id, project_id, agent_kind, cwd, started_at, ended_at,\n    summary_page_id, ended_observation_count, actor_user\nFROM sessions;\n\nDROP TABLE sessions;\n\nALTER TABLE sessions_new RENAME TO sessions;\n\nCREATE INDEX idx_sessions_recent ON sessions(workspace_id, project_id, started_at DESC);\nCREATE INDEX idx_sessions_project ON sessions(project_id);\nCREATE INDEX idx_sessions_started_at ON sessions(started_at DESC);\nCREATE INDEX idx_sessions_scope_ended\n    ON sessions(workspace_id, project_id, ended_at ASC)\n    WHERE ended_at IS NOT NULL;\nCREATE INDEX idx_sessions_open_owner\n    ON sessions(workspace_id, project_id, agent_kind, actor_user)\n    WHERE ended_at IS NULL;\n\nCREATE TRIGGER sessions_ws_proj_pairing_ai\nBEFORE INSERT ON sessions\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM projects WHERE id = NEW.project_id)\nBEGIN\n    SELECT RAISE(ABORT, 'sessions.workspace_id does not match the project''s workspace');\nEND;\n\nCREATE TRIGGER auto_improve_scheduler_claims_session_pairing_ai\nBEFORE INSERT ON auto_improve_scheduler_claims\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'auto_improve_scheduler_claims scope does not match the session scope');\nEND;\n\nCREATE TRIGGER session_consolidation_jobs_session_pairing_ai\nBEFORE INSERT ON session_consolidation_jobs\nFOR EACH ROW\nWHEN NEW.workspace_id IS NOT (SELECT workspace_id FROM sessions WHERE id = NEW.session_id)\n  OR NEW.project_id IS NOT (SELECT project_id FROM sessions WHERE id = NEW.session_id)\nBEGIN\n    SELECT RAISE(ABORT, 'session_consolidation_jobs scope does not match the session scope');\nEND;\n\nPRAGMA foreign_keys = ON;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932555313 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "purged_sessions_tombstones",
+                checksum: 16118106949691522618,
+                version: 52,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Tombstones for sessions removed by `purge_session` (#387).\n--\n-- A purge deletes the session's rows, but the events that produced them may\n-- still be sitting in a client hook spool, undelivered. When that spool\n-- eventually drains, `begin_session` recreates the session row and the\n-- observations land again — the purge is silently undone, and an application\n-- that promised to forget the conversation has not.\n--\n-- The tombstone makes the deletion terminal: ingest checks it and refuses to\n-- recreate a session that was purged. Keyed by session id, with the scope kept\n-- so a purge in one project cannot suppress a same-id session elsewhere (ids\n-- are UUIDv7 and collisions are not expected, but the check costs nothing and\n-- the alternative is a cross-scope denial of ingest).\n--\n-- `purged_at` exists so the ledger can be pruned. A tombstone only has to\n-- outlive the spool that might replay the session, and `MAX_AGE_MS` in the\n-- drain caps that at 7 days.\nCREATE TABLE purged_sessions (\n    session_id   BLOB PRIMARY KEY NOT NULL,\n    workspace_id BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    project_id   BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    purged_at    INTEGER NOT NULL\n);\n\nCREATE INDEX idx_purged_sessions_at ON purged_sessions(purged_at);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932557344 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "page_embed_failures",
+                checksum: 17409792432690558975,
+                version: 53,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Durable record of an embed attempt that did NOT produce an embedding (#528).\n--\n-- `page_embeddings` records only successes, and its upsert rewrites\n-- `created_at`, so a global `embed --force` erases any signal about which row\n-- was previously stale. A failed or skipped embed left nothing at all: the\n-- inline write path warns and returns success, and the backfill's per-page\n-- warnings live only in container logs that a restart takes with them. The\n-- result was that `status` could report a page missing an embedding with no\n-- way to ask when it was last attempted or why it did not take.\n--\n-- Deliberately failure-only. A success writes nothing here — it is already\n-- recorded by the existence of a `page_embeddings` row — so the common path\n-- pays no extra write. A row therefore means \"the last attempt on this page\n-- did not produce an embedding\", and joining against `page_embeddings` tells\n-- an operator whether that is still true or whether a later pass recovered it.\n-- Keeping the row after recovery is intentional: it is the history that\n-- `--force` used to destroy.\n--\n-- One row per page, cascading with it, so the ledger cannot outgrow the corpus.\nCREATE TABLE page_embed_failures (\n    page_id  BLOB PRIMARY KEY NOT NULL REFERENCES pages(id) ON DELETE CASCADE,\n    at       INTEGER NOT NULL,\n    outcome  TEXT NOT NULL CHECK (outcome IN ('failed', 'unreadable', 'skipped_empty')),\n    -- Truncated provider/IO error. NULL for `skipped_empty`, which has no error.\n    detail   TEXT\n);\n\nCREATE INDEX idx_page_embed_failures_at ON page_embed_failures(at DESC);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932558855 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "human_auth",
+                checksum: 3138033977127579317,
+                version: 54,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Human authentication: nullable legacy token_hash, role/password\n-- columns, bootstrap marker, and web sessions.\n--\n-- `Store::open` disables foreign keys around refinery's migration runner;\n-- migration-local PRAGMA toggles are ineffective inside refinery's\n-- transaction. Rebuild `users` while preserving pages.author_id /\n-- audit_log.author_id blob values.\n--\n-- token_hash stays nullable and UNIQUE (SQLite UNIQUE allows many\n-- NULLs) without a length CHECK so a pre-V14 malformed blob can still\n-- be copied; V53 aborts on length != 32. Backfill every existing row\n-- as role='user'. Defaults let a restored pre-V52 binary INSERT.\n\n\nCREATE TABLE users_new (\n    id                    BLOB NOT NULL PRIMARY KEY,\n    username              TEXT NOT NULL UNIQUE,\n    name                  TEXT,\n    email                 TEXT UNIQUE COLLATE NOCASE,\n    token_hash            BLOB UNIQUE,\n    created_at            INTEGER NOT NULL,\n    last_seen_at          INTEGER,\n    token_expired_at      INTEGER,\n    role                  TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('root', 'user')),\n    password_hash         TEXT,\n    must_change_password  INTEGER NOT NULL DEFAULT 0 CHECK (must_change_password IN (0, 1)),\n    disabled_at           INTEGER\n);\n\nINSERT INTO users_new (\n    id, username, name, email, token_hash, created_at, last_seen_at,\n    token_expired_at, role, password_hash, must_change_password, disabled_at\n)\nSELECT\n    id, username, name, email, token_hash, created_at, last_seen_at,\n    token_expired_at, 'user', NULL, 0, NULL\nFROM users;\n\nDROP TABLE users;\nALTER TABLE users_new RENAME TO users;\n\nCREATE TABLE human_auth_state (\n    id                   INTEGER PRIMARY KEY NOT NULL CHECK (id = 1),\n    bootstrap_completed  INTEGER NOT NULL DEFAULT 0 CHECK (bootstrap_completed IN (0, 1))\n);\nINSERT INTO human_auth_state (id, bootstrap_completed) VALUES (1, 0);\n\nCREATE TABLE web_sessions (\n    id            BLOB NOT NULL PRIMARY KEY,\n    session_hash  BLOB NOT NULL UNIQUE CHECK (length(session_hash) = 32),\n    user_id       BLOB NOT NULL REFERENCES users(id) ON DELETE CASCADE,\n    csrf_hash     BLOB NOT NULL CHECK (length(csrf_hash) = 32),\n    created_at    INTEGER NOT NULL,\n    last_used_at  INTEGER NOT NULL,\n    expires_at    INTEGER NOT NULL,\n    revoked_at    INTEGER\n);\n\nCREATE INDEX idx_web_sessions_user ON web_sessions(user_id);\nCREATE INDEX idx_web_sessions_expires ON web_sessions(expires_at);\n\n-- `PRAGMA foreign_key_check` alone only returns rows under execute_batch and\n-- cannot abort. Fail the migration if this rebuild damaged either V52-owned\n-- author reference, without scanning unrelated pre-existing violations.\nCREATE TABLE v52_fk_guard (\n    ok INTEGER NOT NULL CHECK (ok = 0)\n);\nINSERT INTO v52_fk_guard (ok)\nSELECT\n    (SELECT COUNT(*) FROM pragma_foreign_key_check('pages')) +\n    (SELECT COUNT(*) FROM pragma_foreign_key_check('audit_log'));\nDROP TABLE v52_fk_guard;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932560439 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "api_credentials",
+                checksum: 8971077015065273699,
+                version: 55,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Native API credentials. Copy existing 32-byte users.token_hash\n-- values losslessly (id = user_id, label = legacy-user-token).\n-- Abort — no partial commit — if any non-NULL hash is the wrong length.\n-- Keep users.token_hash / token_expired_at as the deprecated 1.x\n-- compatibility write path. These mirror triggers are load-bearing until\n-- the user token shims are removed in 2.0; auth lookup uses api_credentials.\n\nCREATE TABLE v53_token_hash_guard (\n    ok INTEGER NOT NULL CHECK (ok = 0)\n);\nINSERT INTO v53_token_hash_guard (ok)\nSELECT COUNT(*) FROM users WHERE token_hash IS NOT NULL AND length(token_hash) != 32;\nDROP TABLE v53_token_hash_guard;\n\nCREATE TABLE api_credentials (\n    id            BLOB NOT NULL PRIMARY KEY,\n    user_id       BLOB NOT NULL REFERENCES users(id) ON DELETE CASCADE,\n    label         TEXT NOT NULL,\n    token_hash    BLOB NOT NULL UNIQUE CHECK (length(token_hash) = 32),\n    preview       TEXT,\n    created_at    INTEGER NOT NULL,\n    last_used_at  INTEGER,\n    expires_at    INTEGER,\n    revoked_at    INTEGER\n);\n\nCREATE INDEX idx_api_credentials_user ON api_credentials(user_id);\n\nINSERT INTO api_credentials (\n    id, user_id, label, token_hash, preview, created_at, last_used_at, expires_at, revoked_at\n)\nSELECT\n    id,\n    id,\n    'legacy-user-token',\n    token_hash,\n    NULL,\n    created_at,\n    last_seen_at,\n    NULL,\n    token_expired_at\nFROM users\nWHERE token_hash IS NOT NULL AND length(token_hash) = 32;\n\nCREATE TRIGGER users_token_hash_length_ai\nBEFORE INSERT ON users\nFOR EACH ROW\nWHEN NEW.token_hash IS NOT NULL AND length(NEW.token_hash) != 32\nBEGIN\n    SELECT RAISE(ABORT, 'users.token_hash must be 32 bytes');\nEND;\n\nCREATE TRIGGER users_token_hash_length_au\nBEFORE UPDATE OF token_hash ON users\nFOR EACH ROW\nWHEN NEW.token_hash IS NOT NULL AND length(NEW.token_hash) != 32\nBEGIN\n    SELECT RAISE(ABORT, 'users.token_hash must be 32 bytes');\nEND;\n\nCREATE TRIGGER users_token_hash_mirror_ai\nAFTER INSERT ON users\nFOR EACH ROW\nWHEN NEW.token_hash IS NOT NULL AND length(NEW.token_hash) = 32\nBEGIN\n    INSERT INTO api_credentials (\n        id, user_id, label, token_hash, preview, created_at, last_used_at, expires_at, revoked_at\n    ) VALUES (\n        NEW.id, NEW.id, 'legacy-user-token', NEW.token_hash, NULL,\n        NEW.created_at, NULL, NULL, NEW.token_expired_at\n    )\n    ON CONFLICT(id) DO UPDATE SET\n        token_hash = excluded.token_hash,\n        revoked_at = excluded.revoked_at;\nEND;\n\nCREATE TRIGGER users_token_hash_mirror_au\nAFTER UPDATE OF token_hash, token_expired_at ON users\nFOR EACH ROW\nWHEN NEW.token_hash IS NOT NULL AND length(NEW.token_hash) = 32\nBEGIN\n    INSERT INTO api_credentials (\n        id, user_id, label, token_hash, preview, created_at, last_used_at, expires_at, revoked_at\n    ) VALUES (\n        NEW.id, NEW.id, 'legacy-user-token', NEW.token_hash, NULL,\n        NEW.created_at, NULL, NULL, NEW.token_expired_at\n    )\n    ON CONFLICT(id) DO UPDATE SET\n        token_hash = excluded.token_hash,\n        revoked_at = excluded.revoked_at;\nEND;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932562075 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "entity_link_validity",
+                checksum: 15484722571598889798,
+                version: 56,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Bi-temporal-lite (2.0 item 4, docs/temporal.md): entity links inherit\n-- their page version's ingestion-time timeline. Additive columns +\n-- one-shot backfill; no row is deleted or rewritten beyond the two new\n-- columns.\n--\n-- valid_from    = created_at of the page version the link belongs to\n-- superseded_at = created_at of the version that superseded it\n--                 (NULL while the version is latest)\n\nALTER TABLE entity_page_links ADD COLUMN valid_from INTEGER;\nALTER TABLE entity_page_links ADD COLUMN superseded_at INTEGER;\n\nUPDATE entity_page_links\nSET valid_from = (SELECT p.created_at FROM pages p WHERE p.id = page_id);\n\nUPDATE entity_page_links\nSET superseded_at = (\n    SELECT p2.created_at FROM pages p2 WHERE p2.supersedes = page_id\n)\nWHERE page_id IN (SELECT id FROM pages WHERE is_latest = 0);\n\n-- The as_of window scan: (entity, window) probes ride this.\nCREATE INDEX idx_entity_page_links_validity\n    ON entity_page_links(entity_id, valid_from, superseded_at);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932564083 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "experience_pass_state",
+                checksum: 9247475063277846708,
+                version: 57,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Cross-session abstraction (\"experience\") pass state — 2.0 item 6.\n-- One nullable column on the existing per-scope scheduler row: when the\n-- pass last ran. NULL = never; the cadence rule compares completed\n-- sessions' ended_at against COALESCE(this, initialized_at), so\n-- enabling the pass on an old store does not immediately re-digest all\n-- of history.\nALTER TABLE auto_improve_scheduler_state ADD COLUMN last_experience_run_at INTEGER;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932565822 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "close_retired_entity_windows",
+                checksum: 11364793615889012174,
+                version: 58,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Post-audit fix (docs/temporal.md): pages retired WITHOUT a\n-- superseding version (decay tombstones, purge-regenerate, graveyard\n-- merges) left their entity-link windows open, so `as_of` resurrected\n-- retired knowledge for every later instant. Close them retroactively\n-- at the page's own updated_at (the best available retirement instant).\n-- The runtime paths now close windows at retire time.\nUPDATE entity_page_links\nSET superseded_at = (SELECT p.updated_at FROM pages p WHERE p.id = page_id)\nWHERE superseded_at IS NULL\n  AND page_id IN (\n      SELECT p.id FROM pages p\n      WHERE p.is_latest = 0\n        AND NOT EXISTS (SELECT 1 FROM pages s WHERE s.supersedes = p.id)\n  );\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.93256744 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "purged_scopes_tombstones",
+                checksum: 8679808645961216819,
+                version: 59,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Tombstones for project/workspace scopes removed by `purge_project` /\n-- `delete_workspace` (#607, item 2).\n--\n-- A purge commits the DB deletion first, then removes the on-disk wiki files\n-- best-effort. A crash (or a file-removal failure) in that window leaves the\n-- project's markdown directory — `_meta.md` included — on disk with no row in\n-- `projects`. A later `ai-memory reindex` rebuilds the DB from markdown and\n-- calls `ensure_project_with_id` / `ensure_workspace_with_id` from each\n-- `_meta.md`, which would recreate the scope and resurrect its pages, silently\n-- undoing the purge.\n--\n-- The tombstone makes the deletion terminal: `reindex_all` checks it and\n-- refuses to recreate a scope that was purged. Unlike `purged_sessions`, this\n-- table carries NO foreign keys — the workspace/project rows it names are the\n-- ones being deleted, so an `ON DELETE CASCADE` reference would either fail or\n-- cascade the tombstone away with them.\n--\n-- Keyed by (workspace_id, project_id). A project purge inserts the real\n-- project id. A workspace delete inserts a 16-byte all-zero project id\n-- (`zeroblob(16)`) as a whole-workspace tombstone, which never collides with a\n-- real UUIDv7 project id. Ids are terminal: a legitimately recreated\n-- workspace/project gets a fresh UUID, so a tombstone never blocks new work.\n--\n-- `purged_at` exists so the ledger can be pruned; a tombstone only has to\n-- outlive any surviving on-disk directory that a reindex might otherwise\n-- resurrect.\nCREATE TABLE purged_scopes (\n    workspace_id BLOB NOT NULL,\n    project_id   BLOB NOT NULL,\n    purged_at    INTEGER NOT NULL,\n    PRIMARY KEY (workspace_id, project_id)\n);\n\nCREATE INDEX idx_purged_scopes_at ON purged_scopes(purged_at);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932568814 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "bootstrap_chunk_progress",
+                checksum: 12395801066546121075,
+                version: 60,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Durable per-chunk bootstrap progress so `bootstrap --resume` recovers the\n-- pages earlier chunks already produced instead of re-paying for every LLM\n-- call after a crash or a chunk that failed past its retry budget (#621).\n-- Keyed by a fingerprint of the run's pruned source set + chunk budget, so a\n-- resume only reuses progress when the inputs are byte-identical (a re-run\n-- after new commits re-chunks and starts fresh). No foreign key: the\n-- fingerprint is content-derived, not a row.\nCREATE TABLE bootstrap_chunk_progress (\n    fingerprint  TEXT    NOT NULL,\n    chunk_index  INTEGER NOT NULL,\n    pages_json   TEXT    NOT NULL,\n    rationale    TEXT    NOT NULL,\n    created_at   INTEGER NOT NULL,\n    PRIMARY KEY (fingerprint, chunk_index)\n);\nCREATE INDEX idx_bootstrap_chunk_progress_at ON bootstrap_chunk_progress(created_at);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932570562 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "page_abstract_embeddings",
+                checksum: 17976884385229254031,
+                version: 61,
+                prefix: Versioned,
+                sql: Some(
+                    "-- L0 abstract embeddings (opt-in `[retrieval] abstract_vectors`).\n--\n-- A page whose frontmatter carries `abstract:` — the one-line summary the\n-- consolidator writes, or a curator adds — gets that line embedded on its\n-- own, separately from the body. A short abstract embeds far more sharply\n-- than a multi-thousand-character body, so this table backs a fifth RRF\n-- stream in hybrid search. Mirrors `page_embeddings`: one row per page,\n-- keyed on the same `(provider, model, dim)` triple so the same\n-- refuse-on-mismatch and stale-row rules apply.\nCREATE TABLE page_abstract_embeddings (\n    page_id     BLOB PRIMARY KEY NOT NULL REFERENCES pages(id) ON DELETE CASCADE,\n    vector      BLOB NOT NULL,\n    provider    TEXT NOT NULL,\n    model       TEXT NOT NULL,\n    dim         INTEGER NOT NULL CHECK (dim > 0),\n    created_at  INTEGER NOT NULL\n);\n\nCREATE INDEX idx_page_abstract_embeddings_provider\n    ON page_abstract_embeddings(provider, model, dim);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932572132 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "page_ingestion_windows",
+                checksum: 12264967794252011804,
+                version: 62,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Page-grain ingestion windows (issue #656,\n-- docs/design-page-ingestion-windows.md): materialize each page version's\n-- ingestion window so `as_of` can run version-filtered FTS alongside the\n-- V56 entity-link windows. Same dimension, same predicate shape, page\n-- grain: `valid_from` is the version's own `created_at`; `valid_to` is the\n-- superseding version's `created_at` (NULL while the version is latest).\n--\n-- DDL-only by design (issue #776). This migration used to backfill the two\n-- windows in a single in-migration transaction (`UPDATE pages SET\n-- valid_from = created_at`, plus the two `valid_to` supersession rules).\n-- On a large store that one transaction ran for hours and grew the WAL to\n-- roughly the size of the database, with no progress and no way to bound\n-- it — refinery runs a migration as one transaction before the server\n-- accepts traffic. The backfill now lives in a chunked, resumable,\n-- WAL-bounded boot-path step (`ops::backfill_page_windows`, invoked from\n-- `Store::open`), which reproduces the identical end state (`valid_from =\n-- created_at`; `valid_to` per the two rules below) in bounded batches with\n-- a checkpoint between each. A store that already applied the ORIGINAL V62\n-- has these columns fully populated; the boot step detects that (no page\n-- has a NULL `valid_from`) and is a fast no-op. Such stores recorded the\n-- original migration's checksum, so the runner tolerates this reshape via\n-- `set_abort_divergent(false)` (see `migrations::run`).\n--\n-- `valid_to`, not `superseded_at`: `pages.superseded_at` already means\n-- the V03 decay-tombstone eviction marker (written exactly when\n-- `supersedes IS NULL`), so reusing the name would conflate \"evicted by\n-- the forget sweep\" with \"replaced by a newer version\".\n--\n-- The boot backfill reproduces exactly these rules over every page whose\n-- `valid_from` is still NULL:\n--   * `valid_from` = the version's own `created_at`.\n--   * Ordinary supersession: `valid_to` = the earliest successor's\n--     `created_at` (MIN over pages whose `supersedes` is this page).\n--   * Successor-less retirement (is_latest = 0, no successor): `valid_to`\n--     = COALESCE(superseded_at, MIN(entity_page_links.superseded_at),\n--     updated_at) — decay marker, then the existing link-window close,\n--     then the updated_at fallback.\n--   * A latest version with no successor stays open (`valid_to` NULL).\n\nALTER TABLE pages ADD COLUMN valid_from INTEGER;\nALTER TABLE pages ADD COLUMN valid_to INTEGER;\n\n-- The as_of window scan over page versions: (scope, window) probes ride\n-- this, mirroring idx_entity_page_links_validity at link grain.\nCREATE INDEX idx_pages_validity\n    ON pages(workspace_id, project_id, valid_from, valid_to);\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932573735 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "page_evidence",
+                checksum: 3310094680693179743,
+                version: 63,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Belief-strength evidence substrate (P2, docs/design-hindsight-borrowings.md\n-- §3): record what produced or reaffirmed each page version, so retrieval\n-- can eventually surface \"how many independent sources support this\" as a\n-- confidence signal. Additive only, no backfill: evidence accrues going\n-- forward from the write path (V63 threads it through\n-- `NewPage`/`WritePageRequest`), and a page with zero rows simply reads as\n-- \"unknown\" (count 0), not \"unsupported\".\n--\n-- This release ships the substrate and an explain-only surface\n-- (`SearchExplain::evidence_count`) — nothing here feeds `PageAuthority` or\n-- ranking. The confidence -> authority flip is deferred behind the R2 eval.\n--\n-- `source_kind` is a closed vocabulary matching\n-- `ai_memory_core::PageEvidenceKind`: 'session' (a consolidated session),\n-- 'observation' (a raw observation cited directly), 'feedback' (a\n-- reaffirming `page_feedback` row), 'reconsolidation' (a rewrite/re-confirm\n-- pass). `source_id` is opaque to the store — whatever id the citing kind\n-- uses (a session id, observation id, etc.) — and the PK makes re-citing the\n-- same source from the same page idempotent (`INSERT OR IGNORE`), matching\n-- V56/V58's WITHOUT ROWID join-table style.\n--\n-- `ON DELETE CASCADE` follows `page_id` through `pages` deletes (purge,\n-- graveyard), so evidence never outlives the page version it supports.\n\nCREATE TABLE page_evidence (\n    page_id     BLOB NOT NULL REFERENCES pages(id) ON DELETE CASCADE,\n    source_kind TEXT NOT NULL CHECK (source_kind IN ('session','observation','feedback','reconsolidation')),\n    source_id   TEXT NOT NULL,\n    created_at  INTEGER NOT NULL,\n    PRIMARY KEY (page_id, source_kind, source_id)\n) WITHOUT ROWID;\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.932575837 +00:00:00,
+                ),
+            },
+            Migration {
+                state: Applied,
+                name: "agent_messages",
+                checksum: 720756890761060097,
+                version: 64,
+                prefix: Versioned,
+                sql: Some(
+                    "-- Cross-project agent message inbox/queue (docs/agent-messaging.md).\n--\n-- A directed, claim-once mailbox between projects: an agent in one project\n-- (the sender coordinate) drops a message addressed to another project (the\n-- recipient coordinate); the next session working in the recipient project\n-- pops it exactly once. This is the ONE place ai-memory deliberately crosses\n-- the per-project isolation boundary (AGENTS.md invariant #4/#16), so the\n-- crossing is explicit and bidirectionally scoped: a project can only ever\n-- read mail addressed TO it (its inbox) or sent FROM it (its outbox). No\n-- query joins across a third project.\n--\n-- State machine: 'pending' -> 'claimed' (popped exactly once, mirroring the\n-- handoff 'open' -> 'accepted' compare-and-set) or 'pending' -> 'cancelled'\n-- (the sender retracts before it is popped). A claimed/cancelled row stays for\n-- audit rather than being deleted (supersession-not-destruction).\n--\n-- Access model: messages are addressed to a PROJECT, not an operator, so any\n-- session in the recipient project may pop (the inbox is shared knowledge, like\n-- pages; the pop is the claim-once baton). `from_owner_user`/`claimed_by_user`\n-- are attribution/audit only and are NEVER a read filter.\n--\n-- Security: `body`/`subject` are secret-scrubbed and size-capped at the MCP\n-- layer and re-bound here (the store is the last gate). A popped message is\n-- untrusted cross-project input — the recipient fences it as data, never\n-- instructions. `ON DELETE CASCADE` on both coordinate pairs means a purged\n-- workspace/project takes its mail with it.\n\nCREATE TABLE agent_messages (\n    id                 BLOB PRIMARY KEY NOT NULL,\n    from_workspace_id  BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    from_project_id    BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    from_agent         TEXT NOT NULL,\n    from_session_id    BLOB REFERENCES sessions(id) ON DELETE SET NULL,\n    from_owner_user    TEXT,                                   -- attribution only, never a read filter\n    to_workspace_id    BLOB NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,\n    to_project_id      BLOB NOT NULL REFERENCES projects(id)   ON DELETE CASCADE,\n    subject            TEXT,\n    body               TEXT NOT NULL,\n    state              TEXT NOT NULL DEFAULT 'pending'\n                         CHECK (state IN ('pending','claimed','cancelled')),\n    created_at         INTEGER NOT NULL,\n    claimed_at         INTEGER,\n    claimed_by_session BLOB REFERENCES sessions(id) ON DELETE SET NULL,\n    claimed_by_agent   TEXT,\n    claimed_by_user    TEXT,\n    FOREIGN KEY (from_session_id)    REFERENCES sessions(id) ON DELETE SET NULL,\n    FOREIGN KEY (claimed_by_session) REFERENCES sessions(id) ON DELETE SET NULL\n);\n\n-- Inbox read + pop-next: oldest pending addressed to a recipient project.\nCREATE INDEX idx_agent_messages_inbox\n    ON agent_messages(to_workspace_id, to_project_id, created_at)\n    WHERE state = 'pending';\n\n-- Outbox read + sender retract: pending mail a project has sent.\nCREATE INDEX idx_agent_messages_outbox\n    ON agent_messages(from_workspace_id, from_project_id, created_at)\n    WHERE state = 'pending';\n",
+                ),
+                applied_on: Some(
+                    2026-09-22 2:51:44.93257734 +00:00:00,
+                ),
+            },
+        ],
+    ),
+}
+2026-09-22T02:51:44.971206Z  INFO ai_memory_wiki::migrations::runner: running wiki migration migration="2026_09_01T18_00_okf_v02_conformance" description="conform wiki pages and index rows to OKF v0.2 (backup-gated, in place)"
+2026-09-22T02:51:44.971368Z  INFO ai_memory_wiki::migrations::runner: applied wiki migration migration="2026_09_01T18_00_okf_v02_conformance"
+2026-09-22T02:51:44.979383Z  INFO ai_memory_cli::commands::serve: AI_MEMORY_EMBEDDING_PROVIDER unset; vector search disabled (FTS5 + entity + graph active)
+2026-09-22T02:51:44.987291Z  INFO ai_memory_cli::commands::serve: wrote _meta.md scope manifests count=2
+2026-09-22T02:51:44.988651Z  INFO ai_memory_cli::commands::serve: created wiki upgrade baseline checkpoint checkpoint=7a689dd4ed84ccc345e3094f972ebf8cbbb9fa09
+2026-09-22T02:51:44.988664Z  INFO ai_memory_cli::commands::serve: watcher disabled by --no-watcher
+2026-09-22T02:51:44.988666Z  INFO ai_memory_cli::commands::serve: active-project isolation mode mode=PerActor session_ttl_secs=3600 max_entries=4096
+2026-09-22T02:51:44.991754Z  INFO ai_memory_cli::commands::serve: AI_MEMORY_LLM_PROVIDER unset; memory_consolidate disabled, PreCompact falls back to rule-based checkpoint, lint runs rule-based only
+2026-09-22T02:51:44.991789Z  INFO ai_memory_cli::commands::serve: auto-improve scheduler enabled but no LLM provider is configured; job not started
+2026-09-22T02:51:44.991791Z  INFO ai_memory_cli::commands::serve: scheduled maintenance started jobs=3
+2026-09-22T02:51:44.991929Z  INFO ai_memory_cli::commands::serve: HTTP Host-header allowlist allowed_hosts=["localhost", "127.0.0.1", "::1"]
+2026-09-22T02:51:44.991946Z  INFO ai_memory_cli::commands::serve: MCP Streamable HTTP transport mode stateful=false
+2026-09-22T02:51:44.993215Z  INFO ai_memory_cli::commands::serve: MCP HTTP server ready (POST /mcp, POST /hook, Ctrl-C to stop) local_addr=127.0.0.1:46141 auth=false body_limit_mb=10
+2026-09-22T02:51:45.259656Z  INFO ai_memory_mcp::admin: snapshotting SQLite for backup snapshot=/tmp/.tmpXdnbmr/memory.sqlite
+2026-09-22T02:51:45.276448Z  INFO ai_memory_cli::commands::serve: shutdown signal received; draining signal="SIGTERM"

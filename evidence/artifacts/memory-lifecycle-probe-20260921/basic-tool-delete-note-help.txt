@@ -1,0 +1,24 @@
+
+ Usage: bm tool delete-note [OPTIONS] {identifier}
+
+ Delete a note or directory from the knowledge base.
+
+ Examples:
+
+ bm tool delete-note notes/old-draft
+ bm tool delete-note docs/archive --is-directory
+
+╭─ Arguments ──────────────────────────────────────────────────────────────────╮
+│ *    identifier      <str>  [required]                                       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --is-directory               Delete a directory instead of a single note     │
+│ --project             <str>  The project to use. If not provided, the        │
+│                              default project will be used.                   │
+│ --project-id          <str>  Project external_id (UUID). Takes precedence    │
+│                              over --project; use to disambiguate same-named  │
+│                              projects across cloud workspaces.               │
+│ --local                      Force local API routing (ignore cloud mode)     │
+│ --cloud                      Force cloud API routing                         │
+│ --help                       Show this message and exit.                     │
+╰──────────────────────────────────────────────────────────────────────────────╯

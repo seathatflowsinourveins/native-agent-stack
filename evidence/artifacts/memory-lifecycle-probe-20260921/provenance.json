@@ -1,0 +1,506 @@
+{
+  "schema_version": 1,
+  "purpose": "Sanitized publication of previously executed synthetic lifecycle evidence; no memory commands rerun during sanitization",
+  "private_originals": "Exact pre-sanitization files retained outside the repository under an owner-only temporary directory; no private-original content or location with personal identifiers is published",
+  "executed_original_script_hashes": {
+    "corrected_probe": "256e6e0d2da78b8064ebddfed6ae375af7595059963d107bc8cbe341ec142478",
+    "failed_attempt_probe": "8a5cda9180f0a53cb675c60677feb63ced021dd3403b60eb92a4dca5eead2f85"
+  },
+  "hash_scope": "Per-file original/public pairs exclude SHA256SUMS and this newly generated provenance document to avoid self-reference. Public SHA256SUMS covers this document and all publication files.",
+  "transformation_rules": [
+    "Personal ai-memory executable paths replaced with named placeholders or explicit AI_MEMORY_BIN input",
+    "Publication text has literal line-ending spaces/tabs stripped and exactly one final LF; whitespace escaped within JSON strings is unchanged",
+    "Binary backups withheld privately; public inventories include original SHA-256 and member SHA-256 values",
+    "README publication disclosures updated; original benchmark and failed-download claims retained",
+    "Eight generated synthetic UUIDs in command results and backup inventory member paths replaced consistently with SYNTHETIC-ID-001 through SYNTHETIC-ID-008; facts, exit codes, timings and original archive/member hashes unchanged. Exact originals remain private."
+  ],
+  "publication_checks": {
+    "corpus_byte_identical": true,
+    "accepted_verification_byte_identical": true,
+    "failed_verification_byte_identical": true,
+    "public_python_sources_compile": true,
+    "native_commands_rerun": false,
+    "commands_unchanged_except_executable_paths_and_synthetic_identifiers": true
+  },
+  "files": [
+    {
+      "original_logical_path": "blueprints/memory-lifecycle-probe/README.md",
+      "original_sha256": "a4ae0bb1b022e94af6dc46346a909215c332be127f247d3bdbfcdc86479646f8",
+      "original_bytes": 7490,
+      "public_path": "blueprints/memory-lifecycle-probe/README.md",
+      "public_sha256": "c50ba6b05cba66095a357f1185429761b251462b9b91d1d23a51532b317bc042",
+      "public_bytes": 9126,
+      "transformations": [
+        "Updated publication/privacy and replay disclosures; lifecycle claims unchanged",
+        "Clarify 41 completed CLI calls plus 2 server lifecycles and current-search deletion scope",
+        "Disclose stable synthetic identifier substitution"
+      ]
+    },
+    {
+      "original_logical_path": "blueprints/memory-lifecycle-probe/corpus.json",
+      "original_sha256": "ae0625d292eb66a2d67de0e696b57830f9e621c75da41d60d97569d3901755f5",
+      "original_bytes": 1543,
+      "public_path": "blueprints/memory-lifecycle-probe/corpus.json",
+      "public_sha256": "ae0625d292eb66a2d67de0e696b57830f9e621c75da41d60d97569d3901755f5",
+      "public_bytes": 1543,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "blueprints/memory-lifecycle-probe/probe.py",
+      "original_sha256": "256e6e0d2da78b8064ebddfed6ae375af7595059963d107bc8cbe341ec142478",
+      "original_bytes": 7178,
+      "public_path": "blueprints/memory-lifecycle-probe/probe.py",
+      "public_sha256": "36e5cce42e4297b01dfaf7bd07cbfc283062b9fda9df3c7b5f9e9f934fa727e1",
+      "public_bytes": 7315,
+      "transformations": [
+        "Personal executable path replaced by explicit AI_MEMORY_BIN environment input",
+        "Added os import and sanitized-driver disclosure; public script was not executed",
+        "Removed literal trailing spaces/tabs and normalized final LF for publication"
+      ]
+    },
+    {
+      "original_logical_path": "blueprints/memory-lifecycle-probe/verify.py",
+      "original_sha256": "98372718acdc11c4236a54ccd47bfcd091386a2d91c2b737b4674584187e8cd4",
+      "original_bytes": 4172,
+      "public_path": "blueprints/memory-lifecycle-probe/verify.py",
+      "public_sha256": "98372718acdc11c4236a54ccd47bfcd091386a2d91c2b737b4674584187e8cd4",
+      "public_bytes": 4172,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-backup.tar.gz",
+      "original_sha256": "78a248fe402935023601e871b3fddef21c1f6c12f2abaa4bf30bd34affb7e239",
+      "original_bytes": 52306,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-backup.inventory.json",
+      "public_sha256": "4628d60ab8c636233400169d20036371d2c530cfe1f133e054376c01a35896f0",
+      "public_bytes": 29183,
+      "transformations": [
+        "Exact archive withheld privately; publication contains original archive hash, member inventory and bounded inspection summary only",
+        "Replaced generated UUIDs consistently with stable synthetic labels; original hashes retained"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-backup-help.txt",
+      "original_sha256": "3e24414ef1bda4026cb14b72882fe756262d3fcaad33297ad687359d4c19b3fb",
+      "original_bytes": 542,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-backup-help.txt",
+      "public_sha256": "76769634dd72ccd92171ee9b8ef71f4976f9951a7f6ed3f283823bf60639534a",
+      "public_bytes": 532,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-delete-page-help.txt",
+      "original_sha256": "ffe9dcf20b2f4113c802c3b860c10223948ec3ee01330ccee99f0738f1b80215",
+      "original_bytes": 1181,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-delete-page-help.txt",
+      "public_sha256": "1cff5e4f688ccbc03c642157c7bdc8984432acd457f6df486faa837062fda04e",
+      "public_bytes": 1171,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-init-help.txt",
+      "original_sha256": "14f2d9f07df7fd3645cee4d69464bafd782f25871a813eae390b567b86f5a9a5",
+      "original_bytes": 520,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-init-help.txt",
+      "public_sha256": "9e22683ed7894c665a07d77a34911781f6dbbe20793b9853fcfd262be0987074",
+      "public_bytes": 510,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-read-page-help.txt",
+      "original_sha256": "6d2179eaf25fae845f2166bb41cd58a1728559a4596ee2c74e4ba8f455ea3f48",
+      "original_bytes": 1122,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-read-page-help.txt",
+      "public_sha256": "988315f926bca26b70cc875bed8f195044d5a360de1732f5388b4192484b2e92",
+      "public_bytes": 1112,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-reindex-help.txt",
+      "original_sha256": "fed40ea4573744dc6f4af0fb56fd73ae0474fc6f06eda5e07945c63b63e19cf4",
+      "original_bytes": 678,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-reindex-help.txt",
+      "public_sha256": "3ad4f8f12033918133fd64720334449dc86dea4d9ebecd14f1c4e5d79c67ae50",
+      "public_bytes": 668,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-restore-help.txt",
+      "original_sha256": "17f4375bdbcfd079662f88b248de0b94ee056ab17ad8660e09373783ad90f874",
+      "original_bytes": 589,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-restore-help.txt",
+      "public_sha256": "44f2e1604246365ca30f419afb9f422fc10715ea74e1f62eb6caeb7197eddde1",
+      "public_bytes": 579,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-search-help.txt",
+      "original_sha256": "cb7e54a88117f0ee4f5fad06a1312fe0d6339e0cb769f3fac0f912e578fb575f",
+      "original_bytes": 935,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-search-help.txt",
+      "public_sha256": "c1053b4dcca1cf8e6e204e153fd70c69b69349b7c74fa2aee5bb7fcfb491dd0a",
+      "public_bytes": 915,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-serve-help.txt",
+      "original_sha256": "bafb8ae77b546a98545264bad873281b8b5f769ebc01350f2413f0500d624f58",
+      "original_bytes": 4283,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-serve-help.txt",
+      "public_sha256": "fb4761159a546a2b7eb51620b592baea81198559d95dc8fe292c81ff296079da",
+      "public_bytes": 4183,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-write-page-help.txt",
+      "original_sha256": "4db1c0faca9b623b08b4fdb9c3f7a791fcf797adc2f7a2e2606489425315c12f",
+      "original_bytes": 1495,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-memory-write-page-help.txt",
+      "public_sha256": "3c32fc608c971776685f3278c84e2d9154642682956afbf9db1091a62f462686",
+      "public_bytes": 1455,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-root-help.txt",
+      "original_sha256": "9c1e325ea47a7c7d3d18822bf25544ac465325e0ab7e2482e32fc2dcc2602de8",
+      "original_bytes": 8571,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-root-help.txt",
+      "public_sha256": "7e1b5129693dce01e91c9a2e915a9ba978fe899a36e010dfb727a06c1836b9e1",
+      "public_bytes": 8561,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-server-1.log",
+      "original_sha256": "b19947eb1058a75715389bb8d4362174418fa96f038e796c12d52c2946c741df",
+      "original_bytes": 165785,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-server-1.log",
+      "public_sha256": "b19947eb1058a75715389bb8d4362174418fa96f038e796c12d52c2946c741df",
+      "public_bytes": 165785,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-server-2.log",
+      "original_sha256": "29b127cb52f6ef643189e599681f49b47f7efc961be24a075a5ccea943a0314d",
+      "original_bytes": 2111,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/ai-server-2.log",
+      "public_sha256": "29b127cb52f6ef643189e599681f49b47f7efc961be24a075a5ccea943a0314d",
+      "public_bytes": 2111,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/ai-backup.tar.gz",
+      "original_sha256": "6314a2a330dda33e60c1dee0d4f0f557598d775f8e7398f6ca37e1d1d79ecf6f",
+      "original_bytes": 52417,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/ai-backup.inventory.json",
+      "public_sha256": "ed346a92792e4adf244d4c563a5cfbd092761bef21fb8236661ab50eb4007f0f",
+      "public_bytes": 29807,
+      "transformations": [
+        "Exact archive withheld privately; publication contains original archive hash, member inventory and bounded inspection summary only",
+        "Replaced generated UUIDs consistently with stable synthetic labels; original hashes retained"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/ai-server-1.log",
+      "original_sha256": "95ef8f46a23facb4ae7dd5a182b81b299a025e93d8bd356db50e41d6b191558e",
+      "original_bytes": 165972,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/ai-server-1.log",
+      "public_sha256": "95ef8f46a23facb4ae7dd5a182b81b299a025e93d8bd356db50e41d6b191558e",
+      "public_bytes": 165972,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/ai-server-2.log",
+      "original_sha256": "08ffd4599c538607ec14b847fc3c8edb4b0c57108b5b0f3144be79f6b64a79d2",
+      "original_bytes": 2298,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/ai-server-2.log",
+      "public_sha256": "08ffd4599c538607ec14b847fc3c8edb4b0c57108b5b0f3144be79f6b64a79d2",
+      "public_bytes": 2298,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/commands.json",
+      "original_sha256": "7de4b7ebb1fc25f3cd5ba276abb036a325f8b799cf3317c265e868ae22a34a6c",
+      "original_bytes": 46497,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/commands.json",
+      "public_sha256": "95f5852ea6d8bb3ad07f4155e526964585f89eaa09ea80223001870dc9a5adad",
+      "public_bytes": 45400,
+      "transformations": [
+        "Replaced personal executable path with <AI_MEMORY_BIN> only; all other JSON values unchanged",
+        "Replaced generated UUIDs consistently with stable synthetic labels; original hashes retained"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/probe.py",
+      "original_sha256": "8a5cda9180f0a53cb675c60677feb63ced021dd3403b60eb92a4dca5eead2f85",
+      "original_bytes": 6783,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/probe.py",
+      "public_sha256": "9f0309ad39ddb5416d5db4253b0a391ac9339edc543ff8136db9dd4c45f2b447",
+      "public_bytes": 6920,
+      "transformations": [
+        "Personal executable path replaced by explicit AI_MEMORY_BIN environment input",
+        "Added os import and sanitized-driver disclosure; public script was not executed",
+        "Removed literal trailing spaces/tabs and normalized final LF for publication"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/run.log",
+      "original_sha256": "a451890960d60e461a08d371631f7ca2c35ac8492ab555bac69e57c6e6f183b8",
+      "original_bytes": 883,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/run.log",
+      "public_sha256": "a451890960d60e461a08d371631f7ca2c35ac8492ab555bac69e57c6e6f183b8",
+      "public_bytes": 883,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/verification.json",
+      "original_sha256": "0215283a18b44151a7e5e065b84e51713861bbee2cea7021457119905045bd17",
+      "original_bytes": 3818,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/verification.json",
+      "public_sha256": "0215283a18b44151a7e5e065b84e51713861bbee2cea7021457119905045bd17",
+      "public_bytes": 3818,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-db-help.txt",
+      "original_sha256": "576abe5138e26b0d6504953fc61998237654bd058763d7036dac16cd8f8d5593",
+      "original_bytes": 617,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-db-help.txt",
+      "public_sha256": "576abe5138e26b0d6504953fc61998237654bd058763d7036dac16cd8f8d5593",
+      "public_bytes": 617,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-help.txt",
+      "original_sha256": "650b585c32c05eb1222acb7ad4cd4246db2ac00af1aacff7ffc115f9b7801a32",
+      "original_bytes": 4647,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-help.txt",
+      "public_sha256": "698ba3378b7d86aa0076e2a8d023b0b8a8b1bd59aa492734f9cfb6a693bf39b6",
+      "public_bytes": 4342,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately",
+        "Normalize final newline to exactly one LF"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-install.log",
+      "original_sha256": "872d01d124ceaad8170c3c9c2e68ce776a33c110ed55b05638f37c06061db60c",
+      "original_bytes": 4868,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-install.log",
+      "public_sha256": "872d01d124ceaad8170c3c9c2e68ce776a33c110ed55b05638f37c06061db60c",
+      "public_bytes": 4868,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-installed-packages.txt",
+      "original_sha256": "f194f6e2f0a4076ed5eb80c3014b46c9c84b6a8c8a559341799da29b4301f3cd",
+      "original_bytes": 3283,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-installed-packages.txt",
+      "public_sha256": "f194f6e2f0a4076ed5eb80c3014b46c9c84b6a8c8a559341799da29b4301f3cd",
+      "public_bytes": 3283,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-project-add-help.txt",
+      "original_sha256": "a66bc0d3ed264aa738ef7eaa36d6a07fdd60f97f18df405dc7fbd5f15b97a47c",
+      "original_bytes": 4302,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-project-add-help.txt",
+      "public_sha256": "b61752dbbdf3feb35a16d44fd393c3e76b33a8bc231b2767a15abded26867791",
+      "public_bytes": 2904,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately",
+        "Normalize final newline to exactly one LF"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-reindex-help.txt",
+      "original_sha256": "1c9f02cd10a62a0d655d1aa452ed72b2f04319942dd18b6ca1435203a2b40903",
+      "original_bytes": 2680,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-reindex-help.txt",
+      "public_sha256": "c830b906ce33c1442ab4005b58c0a22b090765adb2dc633f6998be84c15f2c81",
+      "public_bytes": 1865,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately",
+        "Normalize final newline to exactly one LF"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-search-notes-help.txt",
+      "original_sha256": "5ffa9874898aded9682af2964bd11a7e6ca69c3996ad7c01da37c7568dffc981",
+      "original_bytes": 5265,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-search-notes-help.txt",
+      "public_sha256": "446e4722d4c231d858256429ccea2ca795bc3b2c14d85c517a37875368de2e49",
+      "public_bytes": 4372,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately",
+        "Normalize final newline to exactly one LF"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-sync-help.txt",
+      "original_sha256": "97bbef78fc7e201ca069937618a4f122fe78b9695567fc92405c58d6ad639f7d",
+      "original_bytes": 617,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-sync-help.txt",
+      "public_sha256": "97bbef78fc7e201ca069937618a4f122fe78b9695567fc92405c58d6ad639f7d",
+      "public_bytes": 617,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-tool-delete-note-help.txt",
+      "original_sha256": "107198797e1fcb32d2622c2b06b8699120e8ca61bdec1cf25dbb51208ae2497e",
+      "original_bytes": 2585,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-tool-delete-note-help.txt",
+      "public_sha256": "ba7c652987fd1c6ce1379863eb83d935a261861577ae46abe2aaa10e721c7b91",
+      "public_bytes": 1980,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately",
+        "Normalize final newline to exactly one LF"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-tool-read-note-help.txt",
+      "original_sha256": "5e4148a5cc3467c22beda5137417187d7cb89093685c7db5197f79adc0962392",
+      "original_bytes": 5020,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-tool-read-note-help.txt",
+      "public_sha256": "35ea5cd7a7df0b1437e943060f715e0d49322cf288edb4e21f31365061c21774",
+      "public_bytes": 4163,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately",
+        "Normalize final newline to exactly one LF"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-version.txt",
+      "original_sha256": "77406aac039b94bd3b85566affb3c5aaa83abd825cc520cc810af929211ad8f0",
+      "original_bytes": 29,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-version.txt",
+      "public_sha256": "77406aac039b94bd3b85566affb3c5aaa83abd825cc520cc810af929211ad8f0",
+      "public_bytes": 29,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-write-note-help.txt",
+      "original_sha256": "4398cc7673d47382be36732007aa6408d7dd3c50a8d8d39120840685ba0bec93",
+      "original_bytes": 3295,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/basic-write-note-help.txt",
+      "public_sha256": "dfc94e06ebbc239fc13aaf663a2b8bebda3e940299540a97c843c5e3eab5d73e",
+      "public_bytes": 2584,
+      "transformations": [
+        "Removed literal trailing spaces/tabs and normalized final LF for publication; exact original retained privately",
+        "Normalize final newline to exactly one LF"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/commands.json",
+      "original_sha256": "27a23cbea18c6dc5d37c7f88d0f1faa1d776832572bc4d483aaa03752612fa9c",
+      "original_bytes": 48114,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/commands.json",
+      "public_sha256": "ff411c82720c71ce2bb1dcbcbde02cf2c852ca71a52984ee129ebb84d4ebdfb8",
+      "public_bytes": 47017,
+      "transformations": [
+        "Replaced personal executable path with <AI_MEMORY_BIN> only; all other JSON values unchanged",
+        "Replaced generated UUIDs consistently with stable synthetic labels; original hashes retained"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/frozen-corpus-sha256.txt",
+      "original_sha256": "2a6803ff4bb95f021e97095e73f1f86bb179c93e2773b6fe3ca861ab8f2034b7",
+      "original_bytes": 78,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/frozen-corpus-sha256.txt",
+      "public_sha256": "2a6803ff4bb95f021e97095e73f1f86bb179c93e2773b6fe3ca861ab8f2034b7",
+      "public_bytes": 78,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/identity.json",
+      "original_sha256": "1df1ad0945358992e689488749647bc8d0b1dc823cd29e1636b4cfb29313d5a7",
+      "original_bytes": 2412,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/identity.json",
+      "public_sha256": "43cf69b6c605a733fce5883d6d94be49e0b71d94dc4cd7c671e3069fcb7026c4",
+      "public_bytes": 2368,
+      "transformations": [
+        "Replaced personal installed-binary path with <AI_MEMORY_INSTALLED_BINARY> only"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/isolation-observations.json",
+      "original_sha256": "73b47fdd5e7deb64ac50d6af4a62db57599384e05be65a1b7932a470cf79b393",
+      "original_bytes": 820,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/isolation-observations.json",
+      "public_sha256": "73b47fdd5e7deb64ac50d6af4a62db57599384e05be65a1b7932a470cf79b393",
+      "public_bytes": 820,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/run.log",
+      "original_sha256": "3887b484abfa0f60005ce2b890c8bc5b8de3920dab101e20fff6526db0fa9892",
+      "original_bytes": 416,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/run.log",
+      "public_sha256": "3887b484abfa0f60005ce2b890c8bc5b8de3920dab101e20fff6526db0fa9892",
+      "public_bytes": 416,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    },
+    {
+      "original_logical_path": "evidence/artifacts/memory-lifecycle-probe-20260921/verification.json",
+      "original_sha256": "d827cc6baf134f9f1b3e6a4a5d3f4d675d8c1d563386d9a735b1bc7797504eea",
+      "original_bytes": 3915,
+      "public_path": "evidence/artifacts/memory-lifecycle-probe-20260921/verification.json",
+      "public_sha256": "d827cc6baf134f9f1b3e6a4a5d3f4d675d8c1d563386d9a735b1bc7797504eea",
+      "public_bytes": 3915,
+      "transformations": [
+        "Unchanged copy"
+      ]
+    }
+  ]
+}

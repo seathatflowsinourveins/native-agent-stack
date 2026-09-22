@@ -1,0 +1,53 @@
+
+ Usage: bm tool read-note [OPTIONS] {identifier}
+
+ Read a markdown note from the knowledge base.
+
+ Three output modes: Rich formatted Markdown (default in a terminal), plain
+ undecorated text (--plain), and raw JSON (--json, or automatically when
+ piped). The interactive default is set by the cli_output_style config option
+ (rich/plain). --json and --plain are mutually exclusive.
+
+ Examples:
+
+ bm tool read-note my-note
+ bm tool read-note my-note --frontmatter
+ bm tool read-note my-note --plain
+ bm tool read-note my-note --json
+ bm tool read-note my-note --start-line 120 --end-line 180 --plain
+
+╭─ Arguments ──────────────────────────────────────────────────────────────────╮
+│ *    identifier      <str>  [required]                                       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --start-line                    <int range> [x>=1]  First document line,     │
+│                                                     including frontmatter    │
+│                                                     (1-based)                │
+│ --end-line                      <int range> [x>=1]  Last document line,      │
+│                                                     inclusive; omitted reads │
+│                                                     to EOF                   │
+│ --frontmatter,--include…                            Include YAML frontmatter │
+│                                                     in output                │
+│                                                     (--include-frontmatter   │
+│                                                     is a deprecated alias)   │
+│ --json                                              Output raw JSON instead  │
+│                                                     of formatted display     │
+│ --plain                                             Output undecorated plain │
+│                                                     text (no colors/markup), │
+│                                                     even when piped          │
+│ --project                       <str>               The project to use. If   │
+│                                                     not provided, the        │
+│                                                     default project will be  │
+│                                                     used.                    │
+│ --project-id                    <str>               Project external_id      │
+│                                                     (UUID). Takes precedence │
+│                                                     over --project; use to   │
+│                                                     disambiguate same-named  │
+│                                                     projects across cloud    │
+│                                                     workspaces.              │
+│ --local                                             Force local API routing  │
+│                                                     (ignore cloud mode)      │
+│ --cloud                                             Force cloud API routing  │
+│ --help                                              Show this message and    │
+│                                                     exit.                    │
+╰──────────────────────────────────────────────────────────────────────────────╯

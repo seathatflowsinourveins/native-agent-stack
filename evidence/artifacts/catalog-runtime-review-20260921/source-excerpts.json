@@ -1,0 +1,400 @@
+[
+  {
+    "path": "catalogs/landscape/manifest.json",
+    "sha256": "35212896482dbbff457b7bdb271fa3056912cb44ffbe9768581bc4d6019226c8",
+    "exact_selected_fields": {
+      "status": "reviewed_baseline",
+      "universal_superiority": "not_established",
+      "new_pc_scope": "Documented Linux/WSL2 x86_64 adoption baseline. Each destination host must establish its own sign-in, scoped integrations and useful behavior. Cross-platform and complete second-physical-PC acceptance are not established.",
+      "rules": [
+        "Selected means the supported choice for the stated task and scope; it does not mean universal benchmark winner.",
+        "Only an actual retained execution result can support observed_failure. Unqualified, overlapping, conditional and out-of-scope candidates did not thereby fail a test.",
+        "Primary source review, actual native operation, local integration tests and comparative measurements are different evidence depths.",
+        "A current release or repository activity check does not supersede an accepted pin without a relevant compatibility or improvement result.",
+        "The current layer decision takes precedence over historical candidate-card recommendations. Historical dates, failures and original source pins remain visible.",
+        "Counts are derived from canonical records. Metadata coverage, receipt integrity and reviewer agreement do not prove performance superiority.",
+        "The canonical index public_star flag describes the historical baseline ledger; current membership and the HTML star filter use the dated freshness snapshot.",
+        "Reopen a selection when its stated overturning comparison meets the requirement; retain competitive alternatives until then."
+      ]
+    }
+  },
+  {
+    "path": "adoption/manifest.json",
+    "sha256": "adc0c6a3c58dc0daf8c1c29061b349ca0ffd62b17950b4d6c31a7e9f63c34a76",
+    "exact_selected_fields": {
+      "default_profile": "foundation-cpu",
+      "acceptance_target": {
+        "sdk_python": "3.13.15",
+        "scope": "Fresh prefix on existing Linux/WSL2 host; second-machine acceptance pending",
+        "other_platforms": "unverified"
+      },
+      "supported_platforms": [
+        {
+          "os": "linux",
+          "architecture": "x86_64",
+          "python": "3.13"
+        }
+      ],
+      "profiles": [
+        {
+          "id": "foundation-cpu",
+          "label": "Native clients, context and lexical memory foundation",
+          "required_commands": [
+            "git",
+            "python3",
+            "node",
+            "npm",
+            "uv",
+            "codex",
+            "claude",
+            "qmd",
+            "rtk",
+            "ai-memory",
+            "mcporter"
+          ],
+          "component_ids": [
+            "codex",
+            "claude-code",
+            "context-mode",
+            "qmd",
+            "rtk",
+            "ai-memory",
+            "mcporter"
+          ],
+          "recipe_paths": [
+            "recipes/README.md",
+            "recipes/claude-native-profile.md",
+            "adoption/README.md"
+          ]
+        },
+        {
+          "id": "research-runtime",
+          "label": "Historical LEAN/SDK research comparison and native workers",
+          "required_commands": [
+            "git",
+            "python3",
+            "uv",
+            "dagu",
+            "dotnet",
+            "bwrap",
+            "systemd-run",
+            "systemctl"
+          ],
+          "component_ids": [
+            "codex",
+            "claude-code",
+            "duckdb",
+            "dagu",
+            "lean",
+            "alpaca-py",
+            "pandas",
+            "systemd",
+            "skfolio",
+            "edgartools"
+          ],
+          "recipe_paths": [
+            "adoption/sdk/README.md",
+            "blueprints/us-equities/research-runtime/README.md",
+            "blueprints/us-equities/workers/README.md",
+            "blueprints/us-equities/engine/README.md",
+            "blueprints/us-equities/execution-realism/README.md",
+            "blueprints/us-equities/point-in-time/README.md",
+            "blueprints/us-equities/order-contract/README.md",
+            "blueprints/us-equities/nanosecond-replay/README.md",
+            "blueprints/us-equities/worker-supervision/README.md",
+            "blueprints/us-equities/historical-simulation/README.md",
+            "blueprints/us-equities/research-evaluation/README.md",
+            "blueprints/us-equities/catalyst-provenance/README.md",
+            "blueprints/us-equities/simulation-research/README.md",
+            "blueprints/us-equities/data-readiness/README.md",
+            "blueprints/us-equities/catalyst-dataset/README.md",
+            "blueprints/us-equities/corporate-action-readiness/README.md",
+            "blueprints/us-equities/alpaca-historical/README.md",
+            "blueprints/us-equities/authenticated-data/README.md",
+            "blueprints/us-equities/identity-readiness/README.md",
+            "blueprints/us-equities/security-identity/README.md"
+          ]
+        },
+        {
+          "id": "observability",
+          "label": "Local native telemetry backends",
+          "required_commands": [
+            "otelcol-contrib",
+            "prometheus",
+            "promtool",
+            "loki",
+            "grafana",
+            "alertmanager",
+            "amtool",
+            "ntfy"
+          ],
+          "component_ids": [
+            "opentelemetry-collector-contrib",
+            "prometheus",
+            "loki",
+            "grafana",
+            "alertmanager",
+            "ntfy"
+          ],
+          "recipe_paths": [
+            "observability/README.md",
+            "observability/backends/README.md",
+            "observability/grand-dashboard/README.md"
+          ]
+        },
+        {
+          "id": "semantic-rag",
+          "label": "Optional explicit project semantic RAG",
+          "required_commands": [
+            "hf",
+            "vllm",
+            "qdrant",
+            "socraticode"
+          ],
+          "component_ids": [
+            "huggingface-hub-native",
+            "vllm",
+            "qdrant",
+            "socraticode"
+          ],
+          "recipe_paths": [
+            "recipes/README.md",
+            "blueprints/us-equities/retrieval-evaluation/README.md"
+          ]
+        },
+        {
+          "id": "recovery",
+          "label": "Selected application-state recovery",
+          "required_commands": [
+            "restic"
+          ],
+          "component_ids": [
+            "restic",
+            "ai-memory",
+            "qdrant"
+          ],
+          "recipe_paths": [
+            "blueprints/us-equities/state-recovery/README.md",
+            "blueprints/us-equities/hosting/backup/README.md"
+          ]
+        },
+        {
+          "id": "trading-nautilus",
+          "label": "Selected north-star Nautilus engine with separate broker boundaries",
+          "required_commands": [
+            "python3",
+            "uv",
+            "bwrap"
+          ],
+          "component_ids": [
+            "nautilus-trader",
+            "alpaca-py"
+          ],
+          "recipe_paths": [
+            "blueprints/us-equities/engine-nautilus/README.md",
+            "catalogs/us-equities/runtime-target.json"
+          ]
+        }
+      ],
+      "policy": {
+        "historical_acceptance_transfers": false,
+        "authentication_transfer": "native_login_on_target_only",
+        "automatic_model_calls": false,
+        "automatic_service_enablement": false,
+        "automatic_installer_execution": false,
+        "automatic_broker_orders": false,
+        "automatic_catalog_loading": false,
+        "net_provider_savings": "unmeasured"
+      }
+    }
+  },
+  {
+    "path": "blueprints/us-equities/deerflow/research-receipt.json",
+    "sha256": "b34779394c4fbc2a8444075ea002627e2e6bc4ec187e2cfa436d5c646101e95f",
+    "exact_selected_fields": {
+      "claim": "The unmodified pinned DeerFlow invoke_acp_agent tool completed one native Astra evidence-review task through maintained Codex ACP; the task read two public receipts and returned correct counts.",
+      "limitations": [
+        "Embedded tool invocation, not a complete DeerFlow planner/UI/scheduler or hosted service.",
+        "ACP 1.12.0 mode ID read-only actually maps to workspaceWrite, networkAccess=false, approvalPolicy=on-request. This task performed only reads, but strict filesystem read-only enforcement is not established.",
+        "DeerFlow returns text and discards ACP completion/usage; completion and cumulative usage below were selected from private native adapter logs.",
+        "Reported native model/provider identity is not independent provider attestation. No reroute event was observed.",
+        "Input/cache/output counters are observed native usage, not net token savings, billed dollars or a comparison against an alternative workflow.",
+        "No broker connectivity, paper order, live data entitlement, profitability, durable recovery, memory/RAG integration or general inference-quality benchmark was exercised.",
+        "Configured native MCP servers can still be discovered. Local sandboxing does not remove remote-tool authority. No MCP tool call was observed in this task.",
+        "Raw adapter logs include local session/account metadata and remain private. The public selected fields are sanitized; a private log hash does not make that log independently public."
+      ],
+      "versions": {
+        "deerflow_commit": "42334f26d7025d905678f9075b079fc65f9beaf9",
+        "deerflow_backend": "2.1.0-rc0",
+        "codex_acp": "1.12.0",
+        "native_codex": "0.155.1"
+      }
+    }
+  },
+  {
+    "path": "blueprints/us-equities/workers/receipt.json",
+    "sha256": "4308f002936d354757ab819b1b537e26db41c76bf8201f58e0ce559750986afc",
+    "exact_selected_fields": {
+      "packages": {
+        "openai-codex": "0.154.0",
+        "native-codex": "0.155.1",
+        "openai": "3.16.2",
+        "alpaca-py": "0.44.0",
+        "duckdb": "1.5.5",
+        "exchange-calendars": "4.13.2"
+      },
+      "task": "Read the two public engine/DeerFlow receipts using focused Context Mode extraction and report the exact counts and unproved Alpaca scope.",
+      "result": {
+        "engine_data_points": 3943,
+        "engine_simulated_orders": 3,
+        "engine_failed_data_requests": 0,
+        "deerflow_skills": 23,
+        "acp_configured_model": "gpt-6-astra",
+        "deerflow_acp_prompt_calls": 0
+      },
+      "limitations": [
+        "Executed wrapper used --deadline-seconds; reviewed replay renames it --turn-deadline-seconds to make its scope explicit and labels unavailable failure usage. The SDK invocation is unchanged.",
+        "SDK configured model/provider are verified, not independent per-request provider attestation; model-reroute notifications were not collected.",
+        "Read-only filesystem mode does not restrict external MCP mutations; the recorded environment supplied no broker keys or broker tools.",
+        "One ctx_execute_file attempt failed the server project-root restriction; ctx_execute extraction completed. No global scope change was made.",
+        "No Alpaca account, order, paid API, DeerFlow inference or new hosting deployment was exercised.",
+        "Scoped native MCP override was accepted by discovery but requires normal tool approval; deny_all blocked it. No trust or permission bypass was attempted, and no further trial was launched."
+      ],
+      "all_three_native_turns": {
+        "usage": {
+          "inputTokens": 202164,
+          "cachedInputTokens": 176000,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 1927,
+          "reasoningOutputTokens": 117,
+          "totalTokens": 204091
+        },
+        "cached_input_share_percent": 87.06,
+        "successful_research_tasks": 1,
+        "blocked_file_extraction_tasks": 2,
+        "paired_net_provider_savings": null
+      }
+    }
+  },
+  {
+    "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
+    "sha256": "970de5c2170bb0b55384ada8876bacca46c679ac8bc48e2b2d851d56f27c2431",
+    "exact_selected_fields": {
+      "claim": "A disposable, network-isolated native ai-memory fixture passed 23 lifecycle/routing checks across 31 MCP calls; exact-path TTL behavior and explicit sweep limits retained.",
+      "status": "passed_scoped_acceptance",
+      "limitations": [
+        "No live store or client hooks were exercised; this does not certify all current Codex/Claude sessions.",
+        "Project routing is not authentication or tenant authorization. This fixture deliberately permits creating its two projects.",
+        "An already expired pinned page is hidden from default query, but exact-path read and include_expired can read it until explicit sweep; TTL alone is not immediate access revocation.",
+        "as_of selects ingestion-time versions; it is not real-world/market valid time and does not reproduce historical BM25 ranking.",
+        "Deletion removes current and as_of query results. Git checkpoints and backups can retain historical content; secure erasure was not tested.",
+        "31 calls are a small deterministic fixture, not a memory retrieval-quality benchmark or an application-level answer evaluation.",
+        "No provider inference, write-path LLM, semantic embedding, scheduler, secure multi-tenant access, restart durability, or net provider token saving was measured.",
+        "Tests cover an already-expired timestamp and a future timestamp, not passage of a short TTL across the wall-clock boundary.",
+        "Linux/WSL Bubblewrap recipe; macOS and Windows native execution require separately accepted isolation.",
+        "Isolated fixture, not the live memory store or all client hooks.",
+        "TTL is default-search visibility until sweep, not immediate access revocation.",
+        "Ingestion-time as_of is not market availability; no retrieval quality or net savings claim."
+      ]
+    }
+  },
+  {
+    "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
+    "sha256": "c5a07f622edea1ffc04de0be79dd54e7028d22dbcb215d9b183e6a9d984123f7",
+    "exact_selected_fields": {
+      "claim": "Activated upstream local semantic memory with verified model pins and isolated backup restore; corrected native code retrieval scope, regenerated the upstream graph, and observed current memory/RAG metadata through native Loki and Grafana.",
+      "limitations": [
+        "Dated installed/native qualification, not universal SOTA superiority or execution of every upstream test suite.",
+        "One semantic-memory query and one code-search relevance repair; no broad retrieval benchmark, provider-billed token savings or fresh Claude semantic run.",
+        "Browser wiki search remains FTS5. LLM consolidation remains disabled. 52 latest pages include one ordinary decision and 51 System pages, not 52 curated decisions.",
+        "Embedding rows can retain superseded versions: initial native status reported52, later observation54, while latest-page count52 and missing-vector count0 persisted.",
+        "Graph generation is explicit and its snapshot does not refresh with the index watcher. Search/layout/impact/PNG controls and Qdrant snapshot restore/ANN benchmarks were not functionally qualified here.",
+        "vLLM0.25.0 remains the verified WSL-compatible embedding runtime; current0.29.0 is not adopted after the retained GPU compatibility failure.",
+        "Local adapter regression tests and SQLite comparisons are integration evidence, separate from upstream project tests. Private raw pages, database files, identifiers and credentials are not published."
+      ],
+      "results": {
+        "ai_memory": {
+          "version": "2.3.2",
+          "model": "all-MiniLM-L6-v2",
+          "dimensions": 384,
+          "startup_embedded": 52,
+          "startup_failed": 0,
+          "idempotent_embedded": 0,
+          "idempotent_skipped": 52,
+          "latest_pages_missing_embeddings": 0,
+          "llm_status": "disabled",
+          "restore_latest_pages_equal_to_backup": 52
+        },
+        "code_rag": {
+          "before_points": 7431,
+          "after_points": 196,
+          "excluded_paths": 0,
+          "first_result_actual_source": true
+        },
+        "graph": {
+          "files": 26,
+          "file_edges": 3,
+          "symbols": 254,
+          "calls": 318,
+          "built_at": "2026-09-21T04:47:15.503Z"
+        },
+        "observation": {
+          "loki_http_status": 204,
+          "native_loki_query_status": "success",
+          "memory_rows": 3,
+          "existing_timer_reused": true
+        }
+      }
+    }
+  },
+  {
+    "path": "blueprints/us-equities/convergence-program/review-receipt.json",
+    "sha256": "d7b940fcd8433fb422ae2a24b2b735e0a9c00da7cab41a5991a17c83479eb77b",
+    "exact_selected_fields": {
+      "claim": "Native Dagu completed Astra SDK then tool-free Claude review with 37,151 reported tokens and matching exported Astra observation.",
+      "limitations": [
+        "Models checked packet/report consistency, not original sources or underlying native artifacts.",
+        "Both models overgeneralized memory ingestion-time as_of to the packet review date; see coordinator adjudication.",
+        "Prior accepted historical backtests remain valid within their scope; this engineering packet contains no new strategy validation.",
+        "No broker orders, provider cancellation, remote host, net savings or universally final SOTA selection established.",
+        "Models checked packet consistency; source acceptance and interpretive corrections were independently reviewed.",
+        "Usage belongs to this pair only; not whole-goal consumption or causal savings."
+      ],
+      "usage": {
+        "reported_total_tokens": 37151,
+        "astra_total_tokens": 21066,
+        "claude_total_tokens": 16085,
+        "net_tokens_saved": null,
+        "scope": "This paired run only. Cached input is included in native totals. Root/collaboration workers, research tools, retries elsewhere and prior waves are excluded; no whole-goal total or causal saving."
+      }
+    }
+  },
+  {
+    "path": "docs/native-memory-rag-lifecycle.md",
+    "sha256": "1b587d2415ca1812850b0bbaf53e3fd3e329cb70d8395b89f788ae1ac99a1747",
+    "first_line": 1,
+    "last_line": 95,
+    "exact_excerpt": "# Native memory and RAG: active use and lifecycle monitoring\n\nVerified September 21, 2026. The adopted project uses the existing native\nCodex/Claude integrations. No competing memory daemon or replacement agent\nharness was installed. The [memory landscape review](memory-landscape-maintenance.md)\nrecords nine repository sources and their selection rationale.\n\n## Installed selection\n\n| Layer | Accepted upstream | Current qualification |\n| --- | --- | --- |\n| Shared memory | ai-memory 2.3.2 | Scoped native MCP, allowlisted hooks, local MiniLM embeddings, native Codex consolidation, hourly learning configuration. |\n| Semantic code retrieval | SocratiCode 1.14.0 | Current stable release; both clients registered, direct project watcher active. |\n| Vector store | Qdrant 1.19.1 | Current stable release; existing native loopback service and persistent project collection. |\n| Local embedding inference | vLLM 0.25.0 with pinned NVIDIA Nemotron-3-Embed-1B-BF16 | Retained qualified version. Newer 0.29.0 has an actual host initialization failure; newer is not automatically usable. |\n| Exact source navigation | Serena 2.0.0.dev0 at c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | Current native symbol lookup returned the original scope-selection implementation. |\n| Documentation retrieval | QMD 2.8.3 | Current stable release; explicit project BM25 collection. Zero vectors is intentional for this lane. |\n\nExact accepted pins remain in [stack.json](../manifests/stack.json). The\n[vLLM compatibility receipt](../evidence/receipts/vllm-compatibility.json)\nretains the failed 0.29.0 attempt and recovery to 0.25.0. The observed eager,\nsingle-GPU BF16 path has no demonstrated need for the unrelated 0.25.1 fixes.\nTrack the unreleased SocratiCode [collection-creation race fix](https://github.com/giancarloerra/SocratiCode/pull/177)\nand [logging/shutdown changes](https://github.com/giancarloerra/SocratiCode/pull/179)\nwhen a stable release or observed problem merits qualification.\n\n## Actual native use\n\nThe running Codex task used native ai-memory retrieval, SocratiCode semantic\nsearch and Serena symbol lookup. Search returned the real\n`tools/ecosystem/linux-usage-report.cjs`; the returned source spans matched the\nfile on disk. This is useful retrieval on one real question, not a general recall\nbenchmark or measured provider-token saving.\n\nA fresh native Claude task discovered and called both `memory_read_page` and\n`codebase_search`. It returned the current memory setup decision and the same\nusage-report source, then exited successfully after four turns. Its exact\n764-byte final reply was independently read back from the stored Stop observation;\nall nine lifecycle observations were present, and consolidation generation 9\ncompleted on attempt 1. Provider input, cache creation, cache reads and output\nare recorded separately in the receipt.\n\nThe first local readback incorrectly compared a text UUID with an upstream\n16-byte SQLite BLOB, yielding an empty result. Correct typed lookup resolved\nthe apparent capture failure. Prefer native MCP/CLI readback; any direct database\nobservation must follow the pinned source schema. A zero-row query is not proof\nthat a hook failed.\n\nNative Codex discovery reports the three project MCP integrations enabled in\nboth homes; native Claude reports them connected. Executable targets and shared\nskills exist, and allowlisted capture admits the adopted project while rejecting\nan unrelated directory. Registration, connection, actual use and stored lifecycle\noutcomes remain separate evidence.\n\n## Monitoring already running\n\n| Cadence | Existing native path | What it proves |\n| --- | --- | --- |\n| Every two minutes | systemd native-data timer; upstream memory/QMD commands and Qdrant API; Loki publication | Fresh inventory and returned metadata. Actual timer invocations and HTTP 204 publication were observed. The oneshot service is normally inactive between successful runs. |\n| Continuous scrape | Existing Prometheus, Collector and Grafana | Configured service/transport alerts and native runtime counters; not retrieval correctness. |\n| Hourly | ai-memory native learning and embedding-backfill configuration | Prior actual scheduler admission is retained. A later hourly tick is still unproved in this receipt; no new learned-write quality claim. |\n| Daily, existing 09:00 schedule | Native Codex task follow-up | Updated to check scoped memory retrieval, real completed-session/learning outcomes, source agreement and selected RAG freshness. Updated configuration is verified; its next scheduler-triggered execution is not claimed. |\n\nThe daily follow-up reuses valid upstream tests and historical add/change/delete,\nclient-use and recovery evidence while their inputs match. A changed source,\nscope, model, configuration or observed failure calls for the affected check,\nnot another whole-stack startup audit. Native agent launches are repeated only\nwhen they resolve a concrete client-lifecycle uncertainty.\n\nThe existing progress publisher had been reading an older working checkout. A\nnative systemd service drop-in now selects the canonical catalog checkout; the\npublisher implementation is byte-identical, and the old checkout's uncommitted\nwork is preserved. Its existing 30-second timer and private cache remain in use.\nThe new checkpoint must be observed in Loki after publication before treating\nthe dashboard as current; a successful unit-file edit alone is insufficient.\n\nThe native project MCP profiles use `SOCRATICODE_WATCHER=auto`. The one-shot\nMCPorter reporting profile deliberately uses watcher and auto-resume **off** so\nbounded reads terminate. Its disabled-watcher message is not a broken native\nintegration. An active watcher and chunk count alone do not prove edits propagated;\ncompare a returned excerpt with its current source and preserve separate graph\nfreshness and recovery boundaries.\n\nThe task follow-up remains quiet for unchanged healthy state and reports meaningful\nfailures, changes or required action. It runs while the local app and computer\nare available; it is not off-host monitoring. See the [official scheduling guide](https://learn.chatgpt.com/docs/automations?surface=app).\n\n## Supported observation commands\n\nUse the project marker and registered native MCP tools for scoped memory and RAG:\n\n```text\nmemory_read_page(path=\"decisions/native-memory-learning-maintenance.md\",\n                 workspace=\"agent-lab\", project=\"agent-lab\")\ncodebase_status(projectPath=\"/absolute/adopted/project\")"
+  },
+  {
+    "path": "docs/portable-userspace-install-20260921.md",
+    "sha256": "2bab62c10c38469dfe5b7a44aedc9af92d8d12effebc7784d908a5c3df3f4771",
+    "first_line": 1,
+    "last_line": 90,
+    "exact_excerpt": "# Clean userspace installation qualification — September 21, 2026 UTC\n\nThe selected token tools, native clients and two ECC skills installed in a fresh\nofficial Ubuntu Base 24.04.5 amd64 filesystem. The unchanged existing token\nfixture runner passed 41 native commands and 14 semantic checks. Both native\nclients remained signed out. Repeated installation, overwrite protection and\nrollback checks passed within the scope below.\n\nThis is **fresh Linux userspace on the existing WSL kernel**. It is not a booted\nnew PC, independent kernel, physical-machine qualification, native signed-in\ninference test, provider-cost comparison or full-foundation deployment. The\nsource checkout was `3cabcdfd0c3b489867364d9582df8f356586d219`.\n\n## Isolation and provenance\n\nDocker and Podman were absent. The installed `bwrap` successfully created user,\nmount, PID, IPC and UTS namespaces. An owned temporary directory held the new\nroot filesystem; no host home, authentication stores, project directory, Windows\nmount, package cache or tool installation was mounted into it. `/source` came\nfrom `git archive` of the stated commit. Only the host resolver configuration\nwas mounted read-only, and an owned output directory was mounted at `/results`.\nNetworking remained shared for upstream downloads. This is an installation\ntest boundary, not a new security-isolation product.\n\nThe child environment was cleared, preserving only the existing `HOME` value\nand explicit PATH, locale and terminal settings. `HOME` was not redirected:\nits same pathname referred to an initially empty directory inside the new root\nfilesystem. `CODEX_HOME` and provider credentials were not forwarded. Published\nlogs normalize that pathname to `/home/example`; upstream hashes remain exact.\nRaw apt progress and the unchanged vendor installer retain original whitespace;\ntheir narrowly scoped Git attributes preserve those bytes. Authored documents\nand receipts use the normal whitespace checks.\n\nThe [official Ubuntu archive](https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/ubuntu-base-24.04.5-base-amd64.tar.gz)\nmatched SHA256 `e77b6f10c2590cef872b33ee9f635a0e3fd1f57fb074c0e52b5c7f56147a0c86`.\nIts SHA256SUMS signature verified against the installed Ubuntu archive keyring,\nusing fingerprint `843938DF228D22F7B3742BC0D94AA3F0EFE21092`.\nThe [Node 24.21.0 LTS archive](https://nodejs.org/en/download/archive/v24.21.0)\nmatched the publisher's SHA256 list:\n`fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6`.\nNode's detached signature was not separately verified.\n\n## What passed\n\n| Component | Exact selected source | Observed result |\n| --- | --- | --- |\n| RTK | 0.49.0, upstream Linux musl archive/checksum | Real Git fixture; both commit subjects preserved; raw proxy output exact; expected error retained; counter increased by three. |\n| QMD | `@tobilu/qmd@2.8.3` via npm | BM25 collection/search/get/update reproduced exact document content; no model files downloaded. |\n| Repomix | `repomix@1.18.0` via npm | Explicit selected source content retained; compressed structural output checked separately. |\n| TOON | `@toon-format/cli@4.1.1` via npm | JSON → TOON → JSON preserved exact values. No general savings claim. |\n| Codex | `@openai/codex@0.155.1` via npm | Exact CLI version, repeat installation, one top-level package entry, expected signed-out status; uninstall and repeated uninstall succeeded. |\n| Claude Code | Official native installer, target `2.1.278` | Exact version, repeated native installation kept identical binary hash, expected signed-out status; native binary rollback succeeded. |\n| ECC skills | `affaan-m/ECC@2b6e839771e53096d8451a213d40dc64ec8acac0` | Both selected skill files matched prior source hashes; repeated install refused existing destinations without changes; Claude symlinks resolved; rollback removed both skills and links. |\n\nThe token checks reused [the existing runner](../scripts/native_token_ci.py)\nunchanged, SHA256 `f1bb054a244160a4c8fc1674ff658aa67d6a3f9dc9e79b86b30e32794c5d0983`.\nIt invokes upstream installers and CLIs; its fixtures and assertions are local\nintegration checks, **not upstream projects' full test suites**. Its retained\n[successful receipt](../evidence/artifacts/portable-userspace-install-20260921/token-clean-install-unprivileged/receipt.json)\nincludes all 41 commands and outputs, 14 assertions and scratch-directory removal.\nTop-level npm versions are pinned; transitive dependencies resolved at install\ntime and are not a fully locked dependency graph.\n\nClaude's installed binary matched publisher SHA256\n`5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab`.\nThe retained manifest signature verified using the fingerprint documented by\n[Anthropic](https://code.claude.com/docs/en/setup#binary-integrity-and-code-signing),\n`31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE`. The public signing key was processed\nwith an owned temporary GPG directory, without changing the user's keyring.\n\nThe ECC installer was the unmodified official OpenAI skill-installer from\n[`openai/skills@49f948faa9258a0c61caceaf225e179651397431`](https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.system/skill-installer/scripts).\nThe existing-destination refusal is overwrite protection, not a successful\nidempotent installer run. Skill linkage is filesystem evidence; account-free\nchecks do not demonstrate model invocation or native initialization discovery.\n\n## Native commands and retained failures\n\nCommands executed inside the isolated root filesystem, using root-mapped UID 0\nonly for OS/bootstrap installation and ordinary UID 1000 for the passing token\nchecks, repeated client installation, skills and rollback:\n\n```sh\napt-get -o APT::Sandbox::User=root update\nDEBIAN_FRONTEND=noninteractive apt-get -o APT::Sandbox::User=root install -y \\\n  --no-install-recommends ca-certificates curl git python3 xz-utils libatomic1\nsha256sum --check --ignore-missing SHASUMS256.txt\ntar --no-same-owner -xJf node-v24.21.0-linux-x64.tar.xz \\\n  --strip-components=1 -C /usr/local\npython3 /source/scripts/native_token_ci.py --install \\"
+  },
+  {
+    "path": "adoption/update.md",
+    "sha256": "9116102ebb4df576139194178d8e901d2088d7fa0629af4f1b9bf455bf65dccd",
+    "first_line": 1,
+    "last_line": 90,
+    "exact_excerpt": "# Refresh and continue the stack\n\nUse [manifest.json](manifest.json) as a small reference map. Do not load every catalog, memory archive or repository into a worker. The accepted pins live in `manifests/stack.json`; dated research and open gates live in `catalogs/us-equities/convergence-review.json`; receipt claims and hashes live in `manifests/evidence.json`.\n\nFor context/tool selection and usage comparisons, read the current\n[token practice](../docs/token-practice.md). Retained-history counters, conversion\nheuristics, exact artifact counts and final provider usage are separate. Keep their\nscope and failures; do not sum snapshots or rerun model trials on ordinary resume.\n\n## Resume an existing checkout\n\n```sh\ngit status --short\ngit rev-parse HEAD\npython3 scripts/validate.py\npython3 scripts/validate_catalogs.py\n```\n\nPreserve uncommitted work. Fetch and review remote changes before selecting a new revision; never use a destructive reset to “refresh” a working machine. Read the relevant gate and native recipe, then inspect only its local prerequisites. A new host starts with unknown account, activation and acceptance state even when the checkout validates.\n\n## Refresh sources with native commands\n\nSet `STAR_OWNER` to the intended public account and `PRIVATE_RUN_DIR` to a new private directory outside Git. Native GitHub CLI uses its own login; do not export its tokens into scripts.\n\n```sh\ngh api --paginate --slurp \"users/$STAR_OWNER/starred?per_page=100\" \\\n  > \"$PRIVATE_RUN_DIR/public-stars.pages.json\"\ngh api repos/astral-sh/uv/releases/latest \\\n  > \"$PRIVATE_RUN_DIR/uv-release.json\"\ngh api repos/mksglu/context-mode/commits/main \\\n  > \"$PRIVATE_RUN_DIR/context-mode-main.json\"\nhf models info nvidia/Nemotron-3-Embed-1B-BF16\n```\n\nThese examples read changing metadata; they are **not** installers or automatic upgrades. Verify current native CLI help before applying a changed upstream command. The HF model identity is an example from the catalog; preserve exact publisher ID/revision/task/pooling/dimensions when selecting the actual model. For HF endpoints not supported by the installed CLI, use its documented Python Hub client rather than inventing flags.\n\nCompare repository identities against the full starred ledger, then inspect changes only for selected layers and plausible alternatives. For each candidate record repository identity, release/source revision, review timestamp, source URLs, license, concrete capability, omissions and a decision: adopt, retain, investigate or omit. Metadata review, source review, useful native CLI acceptance and model-mediated E2E are separate depths. Save failed access attempts; do not repeatedly retry unchanged entitlement, authentication or rate-limit failures.\n\nTwo bounded review waves can exhaust the **selected candidate set**, not the whole field. The September 19 portability review checked six environment managers and the full public-star identity delta. A newer release does not supersede an accepted pin until relevant compatibility passes; the recorded vLLM/WSL failure is a concrete reason to retain a working version.\n\n## Change only the selected layer\n\n1. Review upstream release/command documentation and dependency/architecture/license implications. Keep a rollback prefix and source reference.\n2. Install the candidate in an isolated target through native tools. For SDK changes update direct requirements and affected constraints, then regenerate the [hash lock](sdk/README.md).\n3. Run the smallest useful acceptance for that capability. Installation/version output alone is insufficient. Record exact native command, exit/status, useful result, skips, scope, inputs and limitations.\n4. For model workers, check native account/model readiness first. Use the current selected model and bounded evidence packet; preserve complete usage categories. Keep deterministic numeric/risk/order logic outside model decisions.\n5. If observability is selected, query the matching run's events and reconcile native usage once. Context Mode estimates, selected-text reductions, cache reuse and provider totals are different measurements; never add them into a claimed net saving.\n6. Update the component pin only after acceptance. Append a sanitized receipt with a reciprocal component/evidence link; keep old failures dated. Update the convergence gate only when its stated requirement is met.\n7. Refresh both evidence-integrity maps when their covered bytes change, run validation/tests in the appropriate environment, obtain independent review for substantive code, scan publication content for secrets, then publish. Inspect the exact commit's CI result.\n\nRepository verification:\n\n```sh\npython3 scripts/validate.py\npython3 scripts/validate_catalogs.py\n\"$SDK_ENV/bin/python\" -m unittest discover -s tests -v\ngit diff --check\ngitleaks dir . --redact --no-banner\n```\n\nCI validates public artifacts and code behavior. It does not log in, place broker orders, reproduce the GPU stack or consume model allowance. Local accepted runtime results retain their own receipts.\n\n## Refresh only adopted retrieval\n\nOn a host that already adopted the named index:\n\n```sh\nqmd --index native-agent-stack-catalog update\nqmd --index native-agent-stack-catalog search \"native worker\" \\\n  -c us-equities-foundation -n 3 --format json\n```\n\nUse `qmd get` on the exact returned document URI with a bounded range. [Native catalog setup](../catalogs/us-equities/native-workflows.md) records explicit collections; do not index the whole home or authentication directories. The frozen retrieval evaluation retains its original corpus and queries even when the live index grows. A generation-model upgrade does not automatically change embeddings or retrieval quality.\n\n## Current next moves\n\nThe current entry point is the [20-layer research queue](../catalogs/landscape/research-state.json)\nand its [continuation protocol](../docs/landscape-continuation.md). Choose one\nrecorded gap. For the north star, [runtime-target.json](../catalogs/us-equities/runtime-target.json)\ngoverns the selected Nautilus destination and separate IBKR/Alpaca acceptance.\nSPY/LEAN dividend/cash parity and native broker fault cases remain open. The\nolder catalyst plans below retain data/research context and do not override\nthese current engine and broker boundaries.\n\nContinue with the [September 20 catalyst-convergence plan](../blueprints/us-equities/catalyst-convergence/plan.json)\nand its [native results and next gates](../blueprints/us-equities/catalyst-convergence/README.md).\nReuse verified retained sources where available; a new machine must acquire its\nown permitted data and establish its own observations. A historical receipt is\nnot that host's first-received evidence or an authenticated provider result.\n"
+  },
+  {
+    "path": "docs/landscape-continuation.md",
+    "sha256": "535f1275cdee442758fac58173f78ce144ecb60d25709cd2826d02db4d740862",
+    "first_line": 1,
+    "last_line": 85,
+    "exact_excerpt": "# Continue the grand catalog on another PC or session\n\nOpen the generated [grand catalog](ecosystem/index.html#landscape). The source\ntemplate is a build input; use its recovery link if opened directly. The current\n[manifest](../catalogs/landscape/manifest.json) joins foundation and US-equities\nchoices. The [research queue](../catalogs/landscape/research-state.json) carries\none concrete next action for every layer. Read only the selected layer in a task.\n\n## What is definitive\n\nThe dated baseline is the current decision for the stated requirement: selected\nrepositories, source identity, evidence, alternatives, limits and the comparison\nthat could change it. An accepted native operation is stronger than installation\nor source review for that operation. It does not automatically prove superiority\non other tasks. Supporting tools and optional components retain those roles.\n\nThe full public-star snapshot is reconciled against the repository index.\nHistorical star flags retain their original date; current membership comes from\nthe [latest retained snapshot](../catalogs/landscape/upstream-snapshot.json).\nAwesome lists and community best practices are candidate discovery sources.\nTheir selected sections and pinned source reviews are recorded; every link inside\nevery list has not been independently tested. Stars, novelty and agreement do\nnot replace a task comparison.\n\n## Resume in six steps\n\n1. Record the checked-out commit and preserve uncommitted work. Read `AGENTS.md`,\n   [adoption/manifest.json](../adoption/manifest.json) and the small research queue.\n2. Choose one requirement and layer. Read its current choice, pinned upstream\n   source, actual receipts, remaining limitation and replacement criterion.\n3. On a new PC, use the [adoption guide](../adoption/README.md). Start with\n   `foundation-cpu`; add only profiles needed by the task. Verify native sign-in,\n   selected tool discovery and a useful task on that host. Old receipts are\n   reference evidence, never the new machine's passed status.\n4. Check current primary documentation and the named discovery inventories for\n   the demonstrated gap. Inspect original source before adopting a challenger.\n   Do not reinstall whole packs or change native models merely because they are new.\n5. Freeze a small representative input set, expected outcomes and failure cases\n   before comparing. Reuse supported upstream commands. Keep source recovery,\n   failed attempts, actual model identity when returned, complete usage categories\n   and an independent review. Missing metadata stays unknown.\n6. Update the affected canonical decision, research queue and dated task record.\n   Register new candidate arrays through the existing index command, regenerate\n   the HTML and hashes, run relevant checks and inspect the published commit's CI.\n\nUse [adoption/update.md](../adoption/update.md) for exact existing refresh and\nvalidation commands. Public task records belong in Git. Private host paths,\naccounts and scoped ai-memory remain private; transfer selected application data\nthrough an independently tested recovery path, never authentication stores.\n\n## Native Codex and Claude practice\n\nUse one coordinator and bounded independent workers with owned writing\nworktrees. Give each worker the task, relevant skills, source references and\nacceptance/effect boundary. Check actual returned results before integrating.\nThe [native skill recipe](../blueprints/native-skill-practice/README.md) keeps\nTypeSafe advice separate from deterministic permissions, risk and execution.\nIts 7/8 diagnostic, failed first Codex attempt and missing child-trace/model\nmetadata remain visible. Claude top-level role execution is not child dispatch.\n\nLoad `gh-fix-ci` when a real CI repair is requested; the clean-helper check does\nnot qualify failed-job recovery. Load security guidance for a matching requested\nsecurity task; installation is not a completed audit. Existing native worker,\nworkflow and recovery receipts keep their individual scope. A matched task result\nis needed before changing a runtime or model default.\n\n## Foundation and north-star priorities\n\nThe current north-star destination is\n[NautilusTrader with separate IBKR and Alpaca boundaries](../catalogs/us-equities/runtime-target.json).\nSelect the `trading-nautilus` adoption profile for that engine. The older\n`research-runtime` profile reproduces the LEAN/SDK comparison path; it does not\noverride the selected destination.\n\nThe highest-value research gates are causal data/identity/action provenance,\nNautilus SPY/LEAN dividend and cash parity, and broker-specific native in-flight\nfailure/reconciliation cases. A small successful Alpaca paper roundtrip does not\nqualify IBKR, continuous operation or a profitable strategy. Preserve the current\nuser's authorized scope when continuing; catalog inclusion grants no new authority.\n\nFor hosting, keep the accepted local native services until a requirement calls\nfor another deployment. Containers can package services or an optional gateway;\nthey do not supply source-quality evidence, keep a stopped WSL machine running,\nor establish host-loss recovery. Qualify networking, persistent state, rollback,\nresource limits and the actual workload on the selected target before adoption."
+  }
+]

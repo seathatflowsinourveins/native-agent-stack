@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "base_commit": "dac2d1a3f880c04f6afadebe8bf3a251a64ab605",
+  "scope": "Reproducible inputs for one successful native Claude supplied-excerpt review, with the earlier failed source-reading and HTTP500 attempts retained separately.",
+  "sanitization": {
+    "only_content_change": "Replace the absolute installed TypeSafe skill path with <INSTALLED_TYPESAFE_SKILL>; publication adds one terminal newline to the prompt and TypeSafe context.",
+    "example_paths": "The upstream documentation example /home/example is retained.",
+    "credentials": "Inputs contain repository source text and selected installed skill text; no account/authentication stores, API credentials, private conversations or native raw stream metadata were included.",
+    "hash_boundary": "The successful native run consumed original_sha256 bytes. Public sanitized inputs have distinct public_sha256 values. No model was rerun on these public copies."
+  },
+  "byte_preserving_copies": [
+    {
+      "public_file": "frozen-20-layer-packet.json",
+      "original_private_file_basename": "packet.json",
+      "original_sha256": "c87f0e8af6fbe81ab2a75783a9b6cfd2e82b004c0ccf8ab43a8f2ec8332b4aef",
+      "public_sha256": "569505abd5d8b4f02a8f5bfb63e8e980e27e80e272d9d49d65c633203d349cc7",
+      "original_bytes": 37703,
+      "public_bytes": 37682,
+      "installed_skill_path_replacements": 1,
+      "roundtrip_to_original_verified": true,
+      "executed_input": "original bytes; the public sanitized bytes were not submitted to any model"
+    },
+    {
+      "public_file": "completion-source-packet.json",
+      "original_private_file_basename": "claude-completion.packet.json",
+      "original_sha256": "3fcf8024cd2c7e7b91b91a610e232a1bd641c428efa290189d17d68f18b5eeaf",
+      "public_sha256": "c7ce3217126960c56ec5b9444a9ff3fa3d62d3cf7889c4a455ca02b504e3b9c6",
+      "original_bytes": 76283,
+      "public_bytes": 76262,
+      "installed_skill_path_replacements": 1,
+      "roundtrip_to_original_verified": true,
+      "executed_input": "original bytes; the public sanitized bytes were not submitted to any model"
+    },
+    {
+      "public_file": "successful-claude-prompt.txt",
+      "original_private_file_basename": "claude-completion.prompt.txt",
+      "original_sha256": "6b6610203632dbf4df3b20c9706a3d68a473fc78bb8ecfe3d6fcff533dc31f91",
+      "public_sha256": "5adfec8f0d547c563a9bfa96f6e5906a7be5058e59ab6bcd32dc8a4320546755",
+      "publication_added_terminal_newline": true,
+      "original_bytes": 78351,
+      "public_bytes": 78331,
+      "installed_skill_path_replacements": 1,
+      "roundtrip_to_original_verified": true,
+      "executed_input": "original bytes; the public sanitized bytes were not submitted to any model"
+    },
+    {
+      "public_file": "typesafe-context.md",
+      "original_private_file_basename": "typesafe-context.md",
+      "original_sha256": "f7c22f3e2786ea97abe66dae994249608515e13ac8a50c5484305da3c2ff988d",
+      "public_sha256": "4433f1b2954c4fefda5adfcb60cc2057aa0c2b074fe2dc871a58cb34f6125afe",
+      "publication_added_terminal_newline": true,
+      "original_bytes": 2157,
+      "public_bytes": 2158,
+      "installed_skill_path_replacements": 0,
+      "roundtrip_to_original_verified": true,
+      "executed_input": "original bytes; the public sanitized bytes were not submitted to any model"
+    },
+    {
+      "public_file": "original-input-hashes.json",
+      "original_private_file_basename": "input-manifest.json",
+      "original_sha256": "740c23e7263d43df71b2ac0d6dbe6e3a7b5a5ae44aef4896aa063edf5fb5de2a",
+      "public_sha256": "740c23e7263d43df71b2ac0d6dbe6e3a7b5a5ae44aef4896aa063edf5fb5de2a",
+      "original_bytes": 2782,
+      "public_bytes": 2782,
+      "installed_skill_path_replacements": 0,
+      "roundtrip_to_original_verified": true,
+      "executed_input": "original bytes; the public sanitized bytes were not submitted to any model"
+    }
+  ],
+  "derived_excerpt_view": {
+    "path": "source-excerpts.json",
+    "sha256": "de215ab62eed5e16872ee429f94713b463663a77f39b347458807ea0037c6cf7",
+    "bytes": 43918,
+    "derivation": "JSON values copied from exact_original_source_excerpts in original completion source packet; pretty-print serialization is new. Source text, selected values, paths, ranges and whole-source hashes are unchanged."
+  },
+  "source_verification": "Resolve relative source paths at the base commit; compare whole-source SHA256 and reproduce selected fields/line excerpts. Preserve the full frozen packet rather than querying mutable current catalogs.",
+  "limitations": [
+    "Successful report is advisory source-packet review, not new-PC runtime acceptance or a quality benchmark.",
+    "Codex produced no review verdict because of service capacity.",
+    "The first native Claude source-reading attempt exceeded its turn cap; the first supplied-excerpt attempt returned HTTP500; the successful attempt was a single retry of unchanged supplied input."
+  ]
+}

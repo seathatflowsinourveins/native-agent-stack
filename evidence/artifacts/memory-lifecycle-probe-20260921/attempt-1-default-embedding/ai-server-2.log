@@ -1,0 +1,20 @@
+2026-09-22T02:47:51.298940Z  INFO ai_memory_cli: ai-memory starting version="2.3.2" server_url=http://127.0.0.1:44743 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state bind=127.0.0.1:49374
+2026-09-22T02:47:51.299074Z  INFO ai_memory_cli::commands::serve: single-instance serve lock held lock=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state/.serve.lock
+2026-09-22T02:47:51.301903Z  INFO refinery_core::traits: current version: 64
+2026-09-22T02:47:51.301923Z  INFO refinery_core::traits::sync: no migrations to apply
+2026-09-22T02:47:51.301926Z  INFO refinery_core::traits::sync: preparing to apply 0 migrations: Map {
+    iter: Iter(
+        [],
+    ),
+}
+2026-09-22T02:47:51.309243Z  INFO ai_memory_cli::commands::serve: fetching the default local embedding model in the background (~87 MB, one time); hybrid search enables on the next start dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state/models
+2026-09-22T02:47:51.309662Z  INFO ai_memory_cli::commands::serve: watcher disabled by --no-watcher
+2026-09-22T02:47:51.309672Z  INFO ai_memory_cli::commands::serve: active-project isolation mode mode=PerActor session_ttl_secs=3600 max_entries=4096
+2026-09-22T02:47:51.311632Z  INFO ai_memory_llm::local: fetching local embedding model file file="model.safetensors"
+2026-09-22T02:47:51.313281Z  INFO ai_memory_cli::commands::serve: AI_MEMORY_LLM_PROVIDER unset; memory_consolidate disabled, PreCompact falls back to rule-based checkpoint, lint runs rule-based only
+2026-09-22T02:47:51.313355Z  INFO ai_memory_cli::commands::serve: auto-improve scheduler enabled but no LLM provider is configured; job not started
+2026-09-22T02:47:51.313361Z  INFO ai_memory_cli::commands::serve: scheduled maintenance started jobs=3
+2026-09-22T02:47:51.313685Z  INFO ai_memory_cli::commands::serve: HTTP Host-header allowlist allowed_hosts=["localhost", "127.0.0.1", "::1"]
+2026-09-22T02:47:51.313744Z  INFO ai_memory_cli::commands::serve: MCP Streamable HTTP transport mode stateful=false
+2026-09-22T02:47:51.315080Z  INFO ai_memory_cli::commands::serve: MCP HTTP server ready (POST /mcp, POST /hook, Ctrl-C to stop) local_addr=127.0.0.1:44743 auth=false body_limit_mb=10
+2026-09-22T02:47:51.432836Z  INFO ai_memory_cli::commands::serve: shutdown signal received; draining signal="SIGTERM"

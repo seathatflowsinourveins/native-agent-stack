@@ -4,6 +4,8 @@ import hashlib
 from html.parser import HTMLParser
 import json
 from pathlib import Path
+import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -20,11 +22,14 @@ class Page(HTMLParser):
         self.scripts = []
         self.external_assets = []
         self.data = ""
+        self.elements = {}
         self.reading_data = False
         self.feed(text)
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if "id" in attrs:
+            self.elements[attrs["id"]] = attrs
         if tag == "script":
             self.scripts.append(attrs)
             self.reading_data = attrs.get("id") == "ecosystem-data"
@@ -106,7 +111,7 @@ class EcosystemManifestTests(unittest.TestCase):
                      "tools/token-report/README.md"):
             self.write(path, "# Native recipe\n\n```sh\nsearch --native\n```\n")
         self.save()
-        self.write("docs/ecosystem/template.html", "<!doctype html><html><body>@@BODY@@"
+        self.write("docs/ecosystem/template.html", "<!doctype html><html><body><!--@@BODY@@-->"
                    '<script id="ecosystem-data" type="application/json">@@DATA@@</script>'
                    '<script>"use strict";</script></body></html>')
         self.write("evidence/history.json", {"recorded_at": "2026-09-18"})
@@ -153,6 +158,75 @@ class EcosystemManifestTests(unittest.TestCase):
         self.assertFalse(idea["source_reviewed"])
         self.assertEqual(idea["layers"], ["beyond"])
         self.assertEqual(data["counts"]["stars"], 1)
+
+    @unittest.skipUnless(shutil.which("node"), "JavaScript startup regression needs Node")
+    def test_research_summary_distinguishes_open_and_bounded_closed_review(self):
+        template = (ROOT / "docs/ecosystem/template.html").read_text()
+        script = re.search(r"function researchStatusText\(.*?^}", template, re.S | re.M).group(0)
+        script += '\nconsole.log(JSON.stringify(["not_established", "bounded_review_complete"].map(status => researchStatusText({saturation: {status}}, "2026-09-21"))));'
+        result = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        opened, closed = json.loads(result.stdout)
+        self.assertIn("remains open", opened)
+        self.assertIn("Bounded review complete", closed)
+        self.assertIn("2026-09-21", closed)
+        self.assertIn("reopening conditions", closed)
+        self.assertNotIn("remains open", closed)
+
+    @unittest.skipUnless(shutil.which("node"), "JavaScript startup regression needs Node")
+    def test_template_and_failed_generated_startup_offer_recovery_without_navigation(self):
+        """Execute the real startup script; native-browser checks cover complete rendering."""
+        template = (ROOT / "docs/ecosystem/template.html").read_text()
+        self.write("docs/ecosystem/template.html", template)
+        page, generated = self.build()
+        raw_page = Page(template)
+        self.assertIn("hidden", raw_page.elements["catalog-app"])
+        self.assertNotIn("hidden", raw_page.elements["catalog-recovery"])
+        self.assertIn("hidden", page.elements["catalog-app"])
+        harness = r'''
+const vm = require("node:vm");
+const input = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
+const nodes = {"catalog-app": {hidden: true}, "catalog-recovery": {hidden: false},
+  "catalog-recovery-title": {}, "catalog-recovery-message": {}};
+const errors = [];
+let renderAttempts = 0, navigations = 0;
+const document = {
+  getElementById(id) {
+    if(id === "ecosystem-data") return input.data === null ? null : {textContent: input.data};
+    if(nodes[id]) return nodes[id];
+    throw Error("Unexpected DOM lookup: " + id);
+  },
+  querySelectorAll() { renderAttempts++; throw Error("injected renderer failure"); }
+};
+const location = {set href(value) { navigations++; }, replace() { navigations++; },
+  assign() { navigations++; }, hash: "#overview"};
+vm.runInNewContext(input.script, {document, location, window: {location},
+  console: {error(message, error) { errors.push(error.message); }}});
+process.stdout.write(JSON.stringify({nodes, errors, renderAttempts, navigations}));
+'''
+        for label, html_text, payload, expected_errors, rendered in (
+            ("raw source", template, raw_page.data, [], 0),
+            ("missing data element", generated, None, [], 0),
+            ("empty embedded data", generated, "", [], 0),
+            ("corrupt embedded data", generated, "{broken", None, 0),
+            ("failure after parsing built data", generated, page.data,
+             ["injected renderer failure"], 1),
+        ):
+            with self.subTest(label=label):
+                script, = re.findall(r"<script>(.*?)</script>", html_text, re.S)
+                result = subprocess.run(["node", "-e", harness], input=json.dumps({
+                    "script": script, "data": payload}), capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                observed = json.loads(result.stdout)
+                self.assertTrue(observed["nodes"]["catalog-app"]["hidden"])
+                self.assertFalse(observed["nodes"]["catalog-recovery"]["hidden"])
+                self.assertIn("index.html", observed["nodes"]["catalog-recovery-message"]["textContent"])
+                self.assertEqual(observed["navigations"], 0)
+                self.assertEqual(observed["renderAttempts"], rendered)
+                if expected_errors is None:
+                    self.assertEqual(len(observed["errors"]), 1)
+                else:
+                    self.assertEqual(observed["errors"], expected_errors)
 
     def test_useful_execution_requires_a_linked_receipt_and_keeps_limits(self):
         self.evidence["receipts"][0].update(kind="native_cli_e2e", claim="Exact query returned",
@@ -246,6 +320,19 @@ class EcosystemManifestTests(unittest.TestCase):
         self.assertIn("bounded web search", integration["search"])
         self.assertIn("/blob/main/docs/ecosystem/search-receipt.json", integration["receipt_url"])
         self.assertEqual(integration["receipt"]["limits"], ["Fresh agent discovery pending"])
+        self.config["publication_ref"] = "codex/review-catalog"
+        self.save()
+        page, _ = self.build()
+        self.assertIn("/blob/codex/review-catalog/docs/ecosystem/search-receipt.json",
+                      json.loads(page.data)["integrations"][0]["receipt_url"])
+
+    def test_publication_ref_rejects_path_escape(self):
+        self.config["publication_ref"] = "../outside"
+        self.save()
+        result = subprocess.run([sys.executable, str(GENERATOR), "--root", str(self.root)],
+                                capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unsafe publication ref", result.stdout)
 
     def test_linked_curated_document_is_hashed_and_changes_invalidate_the_page(self):
         self.config["guides"] = [{"title": "Adoption", "body": "Read selected scope",

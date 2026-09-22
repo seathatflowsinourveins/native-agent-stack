@@ -1,0 +1,1 @@
+Basic Memory version: 0.23.2

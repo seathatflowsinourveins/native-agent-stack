@@ -28,6 +28,10 @@ class AdoptionContractTests(unittest.TestCase):
         gates = json.loads((ROOT / self.adoption['sources']['open_gates']).read_text())
         identifiers = {gate['id'] for gate in gates['open_gates']}
         self.assertTrue(set(self.adoption['continuation']['next_action_refs']) <= identifiers)
+        for reference in self.adoption['continuation']['research_refs']:
+            path = (ROOT / reference).resolve()
+            self.assertTrue(path.is_relative_to(ROOT))
+            self.assertTrue(path.is_file(), reference)
         self.assertNotIn('open_gates', self.adoption)
         self.assertFalse(self.adoption['policy']['historical_acceptance_transfers'])
 

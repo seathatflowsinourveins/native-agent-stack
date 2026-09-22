@@ -1,5 +1,11 @@
 # Two maintained catalogs
 
+For the dated reason behind each selection and the named alternatives, use the
+[current landscape ledger](landscape/README.md) or its
+[offline comparison view](../docs/ecosystem/index.html#landscape). It covers every
+foundation layer and all four domain research layers, with evidence limits and
+the comparison that would change each decision.
+
 | Catalog | Purpose | Start here |
 | --- | --- | --- |
 | Foundation | Native Codex/Claude runtimes, rules, skills, workers, isolation, retrieval, memory, research, efficiency, evaluation, CI, scheduling, hosting, recovery and observation | [Foundation guide](foundation/README.md) · [Layer manifest](foundation/manifest.json) · [Harness defaults](../docs/harness-defaults.md) |

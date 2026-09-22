@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "id": "memory-lifecycle-probe-20260921",
+  "kind": "native_cli_e2e",
+  "checked_at": "2026-09-21",
+  "timezone": "America/New_York",
+  "source_base": "648cb71c0df5956e1d48c8a7f5651b52f6cf3505",
+  "component_ids": ["ai-memory"],
+  "candidate_repository": "https://github.com/basicmachines-co/basic-memory",
+  "claim": "A frozen three-note lexical fixture passed 28 content checks across 41 completed CLI invocations and two owned server lifecycles. Both ai-memory 2.3.2 and Basic Memory 0.23.2 reflected writes, reads, updates and current-search deletion. ai-memory restart and native backup, and Basic Memory text-index rebuild, passed within their distinct scopes.",
+  "status": "bounded_synthetic_lifecycle_passed_after_preserved_failed_attempt",
+  "limitations": [
+    "First ai-memory attempt failed the no-model-download constraint. A corrected run explicitly set its documented none embedding provider. No completed model files were found after stopping; transferred network bytes were not measured.",
+    "The already passing Basic Memory lane was reused, not rerun. Its source was pinned but dependencies resolved during installation rather than from an upstream lock; resolved package versions are retained.",
+    "ai-memory restore/reindex were not executed because their process guard checks sibling processes. Earlier separate restore receipts retain their own scope. Basic Memory reindex is not a lost-database restore.",
+    "Deletion checks do not establish erasure from version history, Git, logs or backups. No semantic-quality, cross-project isolation, hooks, live-client E2E, concurrency, timing advantage or universal winner is established.",
+    "This is the existing WSL host using isolated synthetic stores. No new physical-PC or fresh-WSL acceptance is implied; installed ai-memory binary/source equivalence was not rebuilt.",
+    "Public artifacts replace personal executable paths, normalize publication whitespace and withhold backup archive bytes. Original/public hashes and safe backup inventories retain provenance."
+  ],
+  "commands": "evidence/artifacts/memory-lifecycle-probe-20260921/commands.json",
+  "verification": "evidence/artifacts/memory-lifecycle-probe-20260921/verification.json",
+  "provenance": "evidence/artifacts/memory-lifecycle-probe-20260921/provenance.json",
+  "isolation": "evidence/artifacts/memory-lifecycle-probe-20260921/isolation-observations.json",
+  "handbook": "blueprints/memory-lifecycle-probe/README.md"
+}

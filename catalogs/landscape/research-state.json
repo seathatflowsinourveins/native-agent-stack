@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-21",
+  "source_base": "66043ed0c147a397789381b0633dd899008e08c4",
+  "scope": "Portable continuation of the reviewed foundation and north-star catalog. This is a research queue over retained evidence, not an unattended runner or a new-host acceptance receipt.",
+  "guide": "docs/landscape-continuation.md",
+  "saturation": {
+    "status": "not_established",
+    "meaning": "A finite candidate set can be exhausted for a frozen requirement and date. This does not establish universal superiority or permanently exhaust an evolving field.",
+    "close_only_when": [
+      "Every required layer has a selected choice, named alternatives and recoverable primary evidence.",
+      "The frozen candidate/source set is recorded, including failed access and explicit omitted/out-of-scope reasons.",
+      "Required representative comparisons and target-host lifecycle checks meet preregistered acceptance; missing evidence remains open.",
+      "A second independent review identifies no unresolved material gap in that bounded set.",
+      "A dated closure record lists residual risks, untested boundaries and exact reopening triggers."
+    ],
+    "reopen_on": [
+      "Changed task, dataset, hardware, platform or deployment requirement",
+      "A maintained challenger with a demonstrated missing capability",
+      "A retained failure, incompatible release or materially changed source/license",
+      "A fresh representative comparison overturns a selection"
+    ]
+  },
+  "resume_order": [
+    "Read AGENTS.md, adoption/manifest.json and this small queue; preserve local changes and record the checkout commit.",
+    "Choose one layer and read its current comparison, source pins, actual receipts and this next action.",
+    "On a new PC establish the selected profile and scoped native discovery/task behavior before reusing any local acceptance claim.",
+    "Search current primary sources and the named starred/awesome-list inventories for that gap; inspect original upstream code/docs.",
+    "Use one bounded candidate comparison with frozen inputs/criteria and independent review; preserve failures, complete native metadata and raw recovery.",
+    "Update the affected canonical decision and queue; regenerate the existing index/HTML, verify integrity and inspect published checks."
+  ],
+  "source_inventory_refs": [
+    "catalogs/landscape/upstream-snapshot.json",
+    "catalogs/us-equities/star-audit.json",
+    "catalogs/convergence-practice/architecture-wave/README.md",
+    "catalogs/foundation/community-practice-20260920.json",
+    "docs/foundation-closure-20260921.md"
+  ],
+  "execution_policy": {
+    "automatic_installation": false,
+    "automatic_model_calls": false,
+    "automatic_paid_hosting": false,
+    "automatic_broker_orders": false,
+    "load_whole_catalog_into_workers": false,
+    "credential_transfer": "native sign-in on destination; never copy authentication stores",
+    "worker_context": "Only the task, owned paths, selected skill sections, source pins and acceptance/effect boundary.",
+    "memory": "Versioned public task records carry portable evidence; project-scoped ai-memory carries private continuity. Neither transfers runtime acceptance."
+  },
+  "layers": [
+    {
+      "catalog": "foundation",
+      "layer_id": "native-clients",
+      "status": "on_requirement_change",
+      "next_action": "Compare a native client and supported SDK only for a missing event, tool or recovery requirement; freeze identical task/account/effect checks.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/foundation-closure-20260921.md",
+        "docs/full-stack-convergence.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "instructions-skills",
+      "status": "on_requirement_change",
+      "next_action": "Use a selected pinned skill on its matching task; retain discovery, loaded sections, concrete findings and baseline conflict/effort before adding another pack.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/foundation-closure-20260921.md",
+        "catalogs/foundation/community-practice-20260920.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "workers",
+      "status": "comparison_required",
+      "next_action": "Freeze one representative coding/research task with output, cancellation and edit-ownership checks; compare native single-agent and selected worker graph with complete returned usage and independent acceptance.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/foundation-convergence-20260921.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "isolation",
+      "status": "on_requirement_change",
+      "next_action": "For the intended untrusted workload, compare the current sandbox with one OCI/VM candidate on filesystem/network/resource enforcement, state cleanup and host compatibility.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "catalogs/us-equities/hosting-source-review.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "code-navigation",
+      "status": "on_requirement_change",
+      "next_action": "Seal representative target-language questions with exact source/reference answers; include index build/update cost and known-source reads in the comparison.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/token-native-saturation.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "document-retrieval",
+      "status": "comparison_required",
+      "next_action": "Seal a representative document corpus and relevance judgments; repeat randomized lexical/hybrid retrieval plus selected difficult-layout ingestion before changing defaults.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/foundation-rd-readiness.md",
+        "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "semantic-rag",
+      "status": "on_requirement_change",
+      "next_action": "Freeze target-project questions and expected source spans; measure retrieval/watcher correctness, latency, memory and restore on the destination hardware.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/hf-memory-model-qualification.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "durable-memory",
+      "status": "comparison_required",
+      "next_action": "Run source-grounded recall and abstention cases with scoped capture, useful-write quality, deletion and isolated restore; compare complete usage without duplicating memory owners.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/memory-landscape-maintenance.md",
+        "docs/native-memory-rag-lifecycle.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "web-research",
+      "status": "on_requirement_change",
+      "next_action": "Freeze required primary-source coverage and citation checks; add a crawler or research service only if current native retrieval demonstrably misses the requirement.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/full-stack-convergence.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "token-efficiency",
+      "status": "comparison_required",
+      "next_action": "Repeat a matched task at equal quality with original-context recovery; include failed attempts and separate complete provider use from cache subsets and artifact estimates.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/token-native-saturation.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "quality-evaluation",
+      "status": "comparison_required",
+      "next_action": "Evaluate semantic advice on fresh independently labeled task cases, retain uncertain disagreements and a safe negative control; do not tune on the existing eight-case diagnostic.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/acceptance-evidence-policy.md",
+        "docs/promptfoo-upstream-retrieval.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "ci-supply-chain",
+      "status": "on_requirement_change",
+      "next_action": "Use the installed CI skill when a real Actions check fails; qualify log recovery and repair. Add vulnerability tooling only for a defined artifact/database gap.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "catalogs/foundation/automation.json",
+        "docs/github-automation.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "scheduling-supervision",
+      "status": "on_requirement_change",
+      "next_action": "If jobs must survive host loss or long waits, qualify one durable scheduler against explicit effect/retry/cancellation/recovery cases and operating cost.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/foundation-convergence-20260921.md",
+        "catalogs/foundation/decisions.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "hosting-services",
+      "status": "on_requirement_change",
+      "next_action": "Choose deployment requirements first: local development, remote service or GPU job. Qualify one host/container option on data, network, rollback, persistence and measured workload cost.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/foundation-closure-20260921.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "recovery-portability",
+      "status": "new_host_required",
+      "next_action": "On the destination PC, select a small profile; establish native sign-ins, scoped tool calls and useful tasks, then independently restore selected application state and keys.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "adoption/research.json",
+        "adoption/lifecycle.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "observation-inference",
+      "status": "on_requirement_change",
+      "next_action": "Reconcile one real task across native counters and telemetry; qualify any new model route on actual output, privacy, latency and recovery without duplicate capture.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/native-telemetry-resolution.md",
+        "docs/dashboard-gap-resolution.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "foundation-memory",
+      "status": "comparison_required",
+      "next_action": "Create held-out finance/document/code relevance judgments; compare fidelity, abstention and total task cost while preserving source timestamps, project isolation and original recovery.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/foundation-memory.json",
+        "evidence/receipts/foundation-native-20260920.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "agents-operations",
+      "status": "on_requirement_change",
+      "next_action": "Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "data-research",
+      "status": "comparison_required",
+      "next_action": "Freeze the intended universe/history and rights; obtain auditable delisting, ticker-reuse, action/currency and publication-revision evidence before accepting an as-known research dataset.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/data-research.json",
+        "catalogs/us-equities/runtime-target.json"
+      ],
+      "saturation": "not_established"
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "engines-strategies",
+      "status": "comparison_required",
+      "next_action": "Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.",
+      "decision_ref": "catalogs/landscape/us-equities.json",
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json"
+      ],
+      "saturation": "not_established"
+    }
+  ]
+}

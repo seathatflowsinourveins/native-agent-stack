@@ -1,8 +1,10 @@
 {
   "schema_version": 1,
+  "landscape_manifest": "catalogs/landscape/manifest.json",
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "b6af5ed98892ff86526654781e8353b393f84543",
+  "source_revision": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
+  "publication_ref": "codex/landscape-evidence-finalization-20260921",
   "layers": [
     {
       "id": "agents",
@@ -314,6 +316,12 @@
       "title": "Live Claude: upstream commands, returns and screenshots",
       "body": "38 rows distinguish 14 functional calls, 18 readiness checks and 6 version/help checks. Corrected native results, full-output provenance, bounded lifetime figures and three dashboard views.",
       "path": "docs/claude-upstream-checks.md",
+      "category": "evaluation"
+    },
+    {
+      "title": "Live Claude: every selected repository, commands, dashboards and selection evidence",
+      "body": "70 rows separate 47 asserted functional checks, 10 readiness, 3 version/help and 10 rows without local execution. 14 reviewed dashboard screenshots, non-additive lifetime figures, per-row selection evidence and the recorded review findings.",
+      "path": "docs/claude-repository-evidence.md",
       "category": "evaluation"
     },
     {

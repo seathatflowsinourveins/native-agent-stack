@@ -1,0 +1,19 @@
+2026-09-22T02:51:45.284943Z  INFO ai_memory_cli: ai-memory starting version="2.3.2" server_url=http://127.0.0.1:46141 data_dir=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state-no-embedding bind=127.0.0.1:49374
+2026-09-22T02:51:45.285070Z  INFO ai_memory_cli::commands::serve: single-instance serve lock held lock=/tmp/memory-lifecycle-probe-20260921-scratch/ai-state-no-embedding/.serve.lock
+2026-09-22T02:51:45.287537Z  INFO refinery_core::traits: current version: 64
+2026-09-22T02:51:45.287553Z  INFO refinery_core::traits::sync: no migrations to apply
+2026-09-22T02:51:45.287555Z  INFO refinery_core::traits::sync: preparing to apply 0 migrations: Map {
+    iter: Iter(
+        [],
+    ),
+}
+2026-09-22T02:51:45.294740Z  INFO ai_memory_cli::commands::serve: AI_MEMORY_EMBEDDING_PROVIDER unset; vector search disabled (FTS5 + entity + graph active)
+2026-09-22T02:51:45.295207Z  INFO ai_memory_cli::commands::serve: watcher disabled by --no-watcher
+2026-09-22T02:51:45.295224Z  INFO ai_memory_cli::commands::serve: active-project isolation mode mode=PerActor session_ttl_secs=3600 max_entries=4096
+2026-09-22T02:51:45.298476Z  INFO ai_memory_cli::commands::serve: AI_MEMORY_LLM_PROVIDER unset; memory_consolidate disabled, PreCompact falls back to rule-based checkpoint, lint runs rule-based only
+2026-09-22T02:51:45.298517Z  INFO ai_memory_cli::commands::serve: auto-improve scheduler enabled but no LLM provider is configured; job not started
+2026-09-22T02:51:45.298519Z  INFO ai_memory_cli::commands::serve: scheduled maintenance started jobs=3
+2026-09-22T02:51:45.298634Z  INFO ai_memory_cli::commands::serve: HTTP Host-header allowlist allowed_hosts=["localhost", "127.0.0.1", "::1"]
+2026-09-22T02:51:45.298645Z  INFO ai_memory_cli::commands::serve: MCP Streamable HTTP transport mode stateful=false
+2026-09-22T02:51:45.299728Z  INFO ai_memory_cli::commands::serve: MCP HTTP server ready (POST /mcp, POST /hook, Ctrl-C to stop) local_addr=127.0.0.1:46141 auth=false body_limit_mb=10
+2026-09-22T02:51:45.422565Z  INFO ai_memory_cli::commands::serve: shutdown signal received; draining signal="SIGTERM"

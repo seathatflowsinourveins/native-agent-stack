@@ -1,0 +1,777 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_native_catalog_review",
+  "base_commit": "dac2d1a3f880c04f6afadebe8bf3a251a64ab605",
+  "frozen_packet_sha256": "c87f0e8af6fbe81ab2a75783a9b6cfd2e82b004c0ccf8ab43a8f2ec8332b4aef",
+  "completion_packet_sha256": "3fcf8024cd2c7e7b91b91a610e232a1bd641c428efa290189d17d68f18b5eeaf",
+  "input_source_hashes": [
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "sha256": "196c8dcbc77272b1fcb91cb459e1124c4bc0ab0d15dee0e9c307c8a9712f5010"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "sha256": "bf212503dc1975935dbb12a82a92c8298a669c9de7b1c529e839402dfacf8a6e"
+    },
+    {
+      "path": "catalogs/landscape/manifest.json",
+      "sha256": "35212896482dbbff457b7bdb271fa3056912cb44ffbe9768581bc4d6019226c8"
+    },
+    {
+      "path": "adoption/manifest.json",
+      "sha256": "adc0c6a3c58dc0daf8c1c29061b349ca0ffd62b17950b4d6c31a7e9f63c34a76"
+    },
+    {
+      "path": "adoption/update.md",
+      "sha256": "9116102ebb4df576139194178d8e901d2088d7fa0629af4f1b9bf455bf65dccd"
+    },
+    {
+      "path": "docs/landscape-continuation.md",
+      "sha256": "535f1275cdee442758fac58173f78ce144ecb60d25709cd2826d02db4d740862"
+    },
+    {
+      "path": "docs/acceptance-evidence-policy.md",
+      "sha256": "f2b27f9fb431cbc91fcc399d9105c1ab6aac23767f2d617f319911360cdfa400"
+    },
+    {
+      "path": "blueprints/us-equities/workers/receipt.json",
+      "sha256": "4308f002936d354757ab819b1b537e26db41c76bf8201f58e0ce559750986afc"
+    },
+    {
+      "path": "blueprints/us-equities/deerflow/research-receipt.json",
+      "sha256": "b34779394c4fbc2a8444075ea002627e2e6bc4ec187e2cfa436d5c646101e95f"
+    },
+    {
+      "path": "blueprints/us-equities/convergence-program/review-receipt.json",
+      "sha256": "d7b940fcd8433fb422ae2a24b2b735e0a9c00da7cab41a5991a17c83479eb77b"
+    },
+    {
+      "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
+      "sha256": "970de5c2170bb0b55384ada8876bacca46c679ac8bc48e2b2d851d56f27c2431"
+    },
+    {
+      "path": "blueprints/us-equities/state-recovery/memory/receipt.json",
+      "sha256": "027c8e9c512ad0edb7a0c1c5ff5b2a98204082649d8520ff01d0c9cd41e22e59"
+    },
+    {
+      "path": "docs/native-skill-practice-20260921.md",
+      "sha256": "2acc1dc060996d3e2abd734053142ce7fce17ca9b604d8f8a8456058d01e6544"
+    },
+    {
+      "path": "docs/foundation-closure-20260921.md",
+      "sha256": "2b490d0bcfca6c7300079f36ced0e21ab708fb3f6517f4fc06076d5391b18164"
+    },
+    {
+      "path": "catalogs/foundation/community-practice-20260920.json",
+      "sha256": "3be2e20d06643032dccf9ce24fdaac369c21afdf705ee9e024ede1cb74c9d056"
+    }
+  ],
+  "completion_source_hashes": [
+    {
+      "path": "catalogs/landscape/manifest.json",
+      "sha256": "35212896482dbbff457b7bdb271fa3056912cb44ffbe9768581bc4d6019226c8"
+    },
+    {
+      "path": "adoption/manifest.json",
+      "sha256": "adc0c6a3c58dc0daf8c1c29061b349ca0ffd62b17950b4d6c31a7e9f63c34a76"
+    },
+    {
+      "path": "blueprints/us-equities/deerflow/research-receipt.json",
+      "sha256": "b34779394c4fbc2a8444075ea002627e2e6bc4ec187e2cfa436d5c646101e95f"
+    },
+    {
+      "path": "blueprints/us-equities/workers/receipt.json",
+      "sha256": "4308f002936d354757ab819b1b537e26db41c76bf8201f58e0ce559750986afc"
+    },
+    {
+      "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
+      "sha256": "970de5c2170bb0b55384ada8876bacca46c679ac8bc48e2b2d851d56f27c2431"
+    },
+    {
+      "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
+      "sha256": "c5a07f622edea1ffc04de0be79dd54e7028d22dbcb215d9b183e6a9d984123f7"
+    },
+    {
+      "path": "blueprints/us-equities/convergence-program/review-receipt.json",
+      "sha256": "d7b940fcd8433fb422ae2a24b2b735e0a9c00da7cab41a5991a17c83479eb77b"
+    },
+    {
+      "path": "docs/native-memory-rag-lifecycle.md",
+      "sha256": "1b587d2415ca1812850b0bbaf53e3fd3e329cb70d8395b89f788ae1ac99a1747"
+    },
+    {
+      "path": "docs/portable-userspace-install-20260921.md",
+      "sha256": "2bab62c10c38469dfe5b7a44aedc9af92d8d12effebc7784d908a5c3df3f4771"
+    },
+    {
+      "path": "adoption/update.md",
+      "sha256": "9116102ebb4df576139194178d8e901d2088d7fa0629af4f1b9bf455bf65dccd"
+    },
+    {
+      "path": "docs/landscape-continuation.md",
+      "sha256": "535f1275cdee442758fac58173f78ce144ecb60d25709cd2826d02db4d740862"
+    }
+  ],
+  "all_input_source_hashes_still_match": true,
+  "dagu": {
+    "version": "2.16.6",
+    "execution": "one_off_private_home",
+    "status": "failed",
+    "steps": {
+      "codex": "failed_capacity",
+      "claude": "failed_max_turns"
+    },
+    "shared_service_changed": false,
+    "standing_schedule_created": false
+  },
+  "codex": {
+    "status": "failed",
+    "process_exit_code": 1,
+    "process_elapsed_seconds": 70.563,
+    "model_inference_submitted": true,
+    "configured_model": "gpt-6-astra",
+    "configured_provider": "openai",
+    "usage": null,
+    "usage_status": "unavailable_after_failure",
+    "error_type": "RuntimeError",
+    "error": "Selected model is at capacity. Please try a different model."
+  },
+  "claude_attempts": [
+    {
+      "attempt": "claude",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 149.924,
+      "requested_model": "opus",
+      "requested_effort": "high",
+      "reported_model": "claude-opus-5",
+      "resolved_effort": null,
+      "subtype": "error_max_turns",
+      "is_error": true,
+      "num_turns": 19,
+      "usage": {
+        "input_tokens": 32,
+        "cache_creation_input_tokens": 66861,
+        "cache_read_input_tokens": 1090979,
+        "output_tokens": 5347,
+        "output_tokens_details": {
+          "thinking_tokens": 1847
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 66861,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 622,
+            "cache_read_input_tokens": 89620,
+            "cache_creation_input_tokens": 6137,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 6137
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard"
+      },
+      "reported_total_tokens": 1163219,
+      "tools_available": [
+        "Glob",
+        "Grep",
+        "Read"
+      ],
+      "prompt_sha256": "0d10d4638da7930ea3ba9d0e710dc0af719b5bd46967ce61f862c248ee51e85f",
+      "stdout_sha256": "b383f7e8093eedb1134bd5d76ca9e17f96f1fbb0e1d6cd1fc674a78b354b8692",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "complete_native_20_layer_report": false,
+      "returned_error": ""
+    },
+    {
+      "attempt": "claude-completion",
+      "exit_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 1.893,
+      "requested_model": "opus",
+      "requested_effort": "high",
+      "reported_model": "claude-opus-5",
+      "resolved_effort": null,
+      "subtype": "success",
+      "is_error": true,
+      "num_turns": 1,
+      "usage": {
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "output_tokens": 0,
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "",
+        "iterations": [],
+        "speed": "standard"
+      },
+      "reported_total_tokens": 0,
+      "tools_available": [],
+      "prompt_sha256": "6b6610203632dbf4df3b20c9706a3d68a473fc78bb8ecfe3d6fcff533dc31f91",
+      "stdout_sha256": "ed1896446c822788e84bcd76f6a5012c17445223f9119a908a8f09752efcf552",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "complete_native_20_layer_report": false,
+      "returned_error": "API Error: 500 Internal server error. This is a server-side issue, usually temporary — try again in a moment. If it persists, check https://status.claude.com."
+    },
+    {
+      "attempt": "claude-completion-retry",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 104.291,
+      "requested_model": "opus",
+      "requested_effort": "high",
+      "reported_model": "claude-opus-5",
+      "resolved_effort": null,
+      "subtype": "success",
+      "is_error": false,
+      "num_turns": 1,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 37981,
+        "cache_read_input_tokens": 531,
+        "output_tokens": 9715,
+        "output_tokens_details": {
+          "thinking_tokens": 4798
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 37981,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 9715,
+            "cache_read_input_tokens": 531,
+            "cache_creation_input_tokens": 37981,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 37981
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard"
+      },
+      "reported_total_tokens": 48229,
+      "tools_available": [],
+      "prompt_sha256": "6b6610203632dbf4df3b20c9706a3d68a473fc78bb8ecfe3d6fcff533dc31f91",
+      "stdout_sha256": "e9243b5b3a623d369fff7b462984c5b54fe256ae82bfa8bd05691da588d5c0e8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "complete_native_20_layer_report": true
+    }
+  ],
+  "claude_original_source_calls": [
+    {
+      "name": "Read",
+      "path": "<private-review>/packet.json",
+      "pattern": null
+    },
+    {
+      "name": "Read",
+      "path": "<private-review>/typesafe-context.md",
+      "pattern": null
+    },
+    {
+      "name": "Read",
+      "path": "catalogs/landscape/manifest.json",
+      "pattern": null
+    },
+    {
+      "name": "Read",
+      "path": "adoption/manifest.json",
+      "pattern": null
+    },
+    {
+      "name": "Read",
+      "path": "docs/landscape-continuation.md",
+      "pattern": null
+    },
+    {
+      "name": "Read",
+      "path": "adoption/update.md",
+      "pattern": null
+    },
+    {
+      "name": "Read",
+      "path": "docs/foundation-closure-20260921.md",
+      "pattern": null
+    },
+    {
+      "name": "Read",
+      "path": "blueprints/us-equities/state-recovery/memory/receipt.json",
+      "pattern": null
+    },
+    {
+      "name": "Read",
+      "path": "blueprints/us-equities/deerflow/research-receipt.json",
+      "pattern": null
+    },
+    {
+      "name": "Grep",
+      "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
+      "pattern": "\\b52\\b|\\b51\\b|System"
+    },
+    {
+      "name": "Grep",
+      "path": "<STACK_REPO>",
+      "pattern": "52 (restored )?pages|restored.{0,40}\\b52\\b|\\b52\\b.{0,40}page"
+    },
+    {
+      "name": "Read",
+      "path": "evidence/artifacts/native-memory-rag-alignment-20260921/selected-commands.json",
+      "pattern": null
+    },
+    {
+      "name": "Read",
+      "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
+      "pattern": null
+    },
+    {
+      "name": "Grep",
+      "path": "catalogs/landscape",
+      "pattern": "52|DeerFlow|deer-flow|Agents SDK|openai-agents|Codex Python SDK|codex-sdk|DeepAgents|deepagents|Agent Framework|agent-framework"
+    },
+    {
+      "name": "Read",
+      "path": "catalogs/landscape/us-equities.json",
+      "pattern": null
+    },
+    {
+      "name": "Grep",
+      "path": "blueprints/us-equities/workers/requirements.txt",
+      "pattern": "codex|sdk|openai"
+    },
+    {
+      "name": "Grep",
+      "path": "blueprints/us-equities/workers/receipt.json",
+      "pattern": "\"(claim|status|scope|kind|sdk|version|codex_sdk|package)[a-z_]*\"\\s*:"
+    },
+    {
+      "name": "Read",
+      "path": "blueprints/us-equities/workers/receipt.json",
+      "pattern": null
+    },
+    {
+      "name": "Grep",
+      "path": "<STACK_REPO>",
+      "pattern": "openai-codex|codex.sdk|Codex SDK"
+    },
+    {
+      "name": "Read",
+      "path": "catalogs/landscape/foundation.json",
+      "pattern": null
+    },
+    {
+      "name": "Grep",
+      "path": "blueprints/native-skill-practice/typesafe-result.json",
+      "pattern": "\"(status|matched|agreement|correct|labels|attempt|model|native_review|disagree)[a-z_]*\"\\s*:"
+    },
+    {
+      "name": "Read",
+      "path": "blueprints/native-skill-practice/typesafe-result.json",
+      "pattern": null
+    },
+    {
+      "name": "Read",
+      "path": "blueprints/native-skill-practice/typesafe-result.json",
+      "pattern": null
+    },
+    {
+      "name": "Read",
+      "path": "adoption/README.md",
+      "pattern": null
+    },
+    {
+      "name": "Grep",
+      "path": "manifests/stack.json",
+      "pattern": "\"id\": \"(qmd|rtk|ai-memory|mcporter|context-mode|codex|claude-code)\""
+    },
+    {
+      "name": "Grep",
+      "path": "<STACK_REPO>",
+      "pattern": "2\\.3\\.2"
+    },
+    {
+      "name": "Read",
+      "path": "docs/portable-userspace-install-20260921.md",
+      "pattern": null
+    },
+    {
+      "name": "Grep",
+      "path": "scripts/adoption_status.py",
+      "pattern": "version_info|3, 13|python|x86_64|platform"
+    },
+    {
+      "name": "Grep",
+      "path": "evidence/receipts/portable-userspace-install-20260921.json",
+      "pattern": "ai-memory|mcporter|context-mode|Context Mode"
+    }
+  ],
+  "completed_report": {
+    "verdict": "ready_as_recipe_baseline",
+    "all_20_layers_reviewed": true,
+    "layer_assessments": [
+      {
+        "layer_id": "native-clients",
+        "classification": "qualified_bounded",
+        "new_pc_action": "Install pinned Codex and Claude Code natively. Complete native sign-in on the target. Run one useful bounded task per client and record the returned model identity. Add an application SDK only for a demonstrated application requirement."
+      },
+      {
+        "layer_id": "instructions-skills",
+        "classification": "mixed",
+        "new_pc_action": "Install the two pinned ECC skills with the official skill-installer and verify their hashes. Confirm native discovery in both clients. Load TypeSafe, gh-fix-ci and security guidance only for matching tasks; installation is not activation or a completed audit."
+      },
+      {
+        "layer_id": "workers",
+        "classification": "keep_but_compare",
+        "new_pc_action": "Qualify one native worker in an owned Worktrunk worktree on the target. Keep Beads and cross-client review optional. Do not transfer the host's child-crash or resume receipts."
+      },
+      {
+        "layer_id": "isolation",
+        "classification": "qualified_bounded",
+        "new_pc_action": "Verify bwrap/sandbox-runtime namespaces and the selected access and network fixtures on the target kernel. Treat worktrees as edit ownership, not a security boundary. Skip Apple Container on WSL."
+      },
+      {
+        "layer_id": "code-navigation",
+        "classification": "qualified_bounded",
+        "new_pc_action": "Register Serena and ast-grep for the adopted project and confirm one exact symbol lookup against original source. Index scoped repositories only."
+      },
+      {
+        "layer_id": "document-retrieval",
+        "classification": "keep_but_compare",
+        "new_pc_action": "Create an explicit QMD BM25 collection and reproduce search/get on known documents. Qualify MarkItDown and Poppler only for the HTML/PDF scopes the task needs."
+      },
+      {
+        "layer_id": "semantic-rag",
+        "classification": "keep_but_compare",
+        "new_pc_action": "Optional profile. Install only if needed, after a GPU/driver compatibility check. The vLLM 0.25.0 pin is host-specific, so qualify it or another version on the target before running SocratiCode/Qdrant queries."
+      },
+      {
+        "layer_id": "durable-memory",
+        "classification": "keep_but_compare",
+        "new_pc_action": "Install ai-memory fresh with a scoped project and verify capture/query from both clients. Transfer selected data only through an independently tested restore that includes key recovery. Never copy authentication stores."
+      },
+      {
+        "layer_id": "web-research",
+        "classification": "mixed",
+        "new_pc_action": "Install agent-browser and Playwright CLI and run one bounded public retrieval. Tavily and hosted services need task-specific credentials and qualification on the target."
+      },
+      {
+        "layer_id": "token-efficiency",
+        "classification": "keep_but_compare",
+        "new_pc_action": "Rerun the unchanged token fixture runner (RTK/QMD/Repomix/TOON) after install and activate tools per artifact. Report counters, artifact reductions and provider usage separately without summing them."
+      },
+      {
+        "layer_id": "quality-evaluation",
+        "classification": "qualified_bounded",
+        "new_pc_action": "Run the repository validation commands and the project/upstream tests in the SDK environment. Treat Promptfoo and TypeSafe diagnostics as bounded, not held-out quality."
+      },
+      {
+        "layer_id": "ci-supply-chain",
+        "classification": "qualified_bounded",
+        "new_pc_action": "No host acceptance needed beyond local actionlint/zizmor/gitleaks availability. Inspect hosted CI for the exact published commit."
+      },
+      {
+        "layer_id": "scheduling-supervision",
+        "classification": "keep_but_compare",
+        "new_pc_action": "If needed, install Dagu and a systemd user unit, then qualify one owned run plus cancel/cleanup on the target. Guest-reboot evidence does not transfer."
+      },
+      {
+        "layer_id": "hosting-services",
+        "classification": "qualified_bounded",
+        "new_pc_action": "Reproduce the locked local fixture on loopback only when an application task needs it. Not production or paid-hosting acceptance."
+      },
+      {
+        "layer_id": "recovery-portability",
+        "classification": "keep_but_compare",
+        "new_pc_action": "Run the foundation-cpu recipe in a fresh prefix and verify rollback. Perform a Restic/application-native restore test on the target before relying on transferred state."
+      },
+      {
+        "layer_id": "observation-inference",
+        "classification": "keep_but_compare",
+        "new_pc_action": "Optional observability profile. Install the collector and backends only when selected. Verify a real scrape, dashboard render and Loki query. Qualify each gateway/inference route separately."
+      },
+      {
+        "layer_id": "foundation-memory",
+        "classification": "keep_but_compare",
+        "new_pc_action": "Compose the ai-memory, QMD, Serena and optional SocratiCode lanes per task. Re-establish scoped indexes and client rebinding on the target. Held-out financial retrieval remains unqualified."
+      },
+      {
+        "layer_id": "agents-operations",
+        "classification": "mixed",
+        "new_pc_action": "Qualify native worker tasks first. Treat DeerFlow/ACP as an embedded-tool research path with non-strict read-only mode. Gateways and frameworks stay task-specific."
+      },
+      {
+        "layer_id": "data-research",
+        "classification": "keep_but_compare",
+        "new_pc_action": "Acquire the target's own permitted Alpaca/SEC observations with local identities. DVC/Pandera remain source-reviewed candidates, not installed acceptance."
+      },
+      {
+        "layer_id": "engines-strategies",
+        "classification": "keep_but_compare",
+        "new_pc_action": "Select the trading-nautilus profile and install the 2.0.0rc5 prerelease with a replay check. IBKR acceptance, SPY/LEAN parity and broker fault cases remain open. Establish paper operation per broker separately."
+      }
+    ],
+    "findings": [
+      {
+        "severity": "medium",
+        "claim": "Branch and commit framing such as 'Finalize evidence-led landscape manifest' and 'Complete component decisions' can be read as a finalized or global-best catalog.",
+        "correction": "Describe the catalog as a dated reviewed baseline. 20/20 layers have recorded decisions: 8 retain, 1 adjust and 11 keep_but_compare, each with an open overturning comparison. Selections are scoped supported choices, not universal winners.",
+        "source_paths": [
+          "catalogs/landscape/manifest.json",
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "evidence": "status: \"reviewed_baseline\"; universal_superiority: \"not_established\"; \"Selected means the supported choice for the stated task and scope; it does not mean universal benchmark winner.\""
+      },
+      {
+        "severity": "medium",
+        "claim": "The durable-memory rationale cites 'recovery evidence' without its composition. A reader could take the 52-page restore as 52 curated memories restored, or as retrieval qualification.",
+        "correction": "State the restore precisely: 52 latest pages matched the backup (1 ordinary decision and 51 System pages), with 0 missing embeddings. Only one semantic-memory query ran, and restore was same-host. Browser wiki search is FTS5, and embedding rows can retain superseded versions (52 then 54). No comparative retrieval superiority is established.",
+        "source_paths": [
+          "evidence/receipts/native-memory-rag-alignment-20260921.json",
+          "catalogs/landscape/foundation.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "evidence": "\"52 latest pages include one ordinary decision and 51 System pages, not 52 curated decisions\"; \"One semantic-memory query ... no broad retrieval benchmark\"; restore_latest_pages_equal_to_backup: 52"
+      },
+      {
+        "severity": "low",
+        "claim": "'Consolidation' is used for two different mechanisms, which can conflict across memory documents.",
+        "correction": "Distinguish native Codex task consolidation (generation 9 completed on attempt 1) from ai-memory's internal LLM consolidation, which is disabled. Hourly learning has prior scheduler admission only; no learned-write quality is established.",
+        "source_paths": [
+          "docs/native-memory-rag-lifecycle.md",
+          "evidence/receipts/native-memory-rag-alignment-20260921.json",
+          "catalogs/landscape/foundation.json"
+        ],
+        "evidence": "Lifecycle doc: \"native Codex consolidation\", \"consolidation generation 9 completed on attempt 1\"; alignment receipt: \"LLM consolidation remains disabled\", llm_status: \"disabled\""
+      },
+      {
+        "severity": "medium",
+        "claim": "agents-operations cites 'ACP research acceptance' without the executed policy, so readers may assume read-only enforcement or full DeerFlow acceptance.",
+        "correction": "DeerFlow acceptance covers one embedded invoke_acp_agent task through Codex ACP 1.12.0. That ACP's 'read-only' mode maps to workspaceWrite with networkAccess=false and approvalPolicy=on-request, so strict filesystem read-only enforcement is not established. The planner, UI, scheduler, hosting and MCP tool calls were not exercised. Usage came from private adapter logs, not DeerFlow output.",
+        "source_paths": [
+          "blueprints/us-equities/deerflow/research-receipt.json",
+          "catalogs/landscape/us-equities.json"
+        ],
+        "evidence": "\"ACP 1.12.0 mode ID read-only actually maps to workspaceWrite, networkAccess=false, approvalPolicy=on-request\"; \"Embedded tool invocation, not a complete DeerFlow planner/UI/scheduler or hosted service.\""
+      },
+      {
+        "severity": "low",
+        "claim": "native-clients refers generically to 'application SDKs', which leaves unclear which SDK actually executed.",
+        "correction": "Name the Codex Python SDK (openai-codex 0.154.0 with openai 3.16.2) as the SDK actually invoked in the workers receipt. Its configured model/provider is verified, but it is not per-request attestation. The OpenAI Agents SDK has no execution evidence in this packet and should be labeled conditional or unexercised.",
+        "source_paths": [
+          "blueprints/us-equities/workers/receipt.json",
+          "catalogs/landscape/foundation.json"
+        ],
+        "evidence": "packages: {\"openai-codex\":\"0.154.0\",\"native-codex\":\"0.155.1\",\"openai\":\"3.16.2\",...}; \"The SDK invocation is unchanged.\"; no Agents SDK package listed"
+      },
+      {
+        "severity": "low",
+        "claim": "The recovery-portability rationale 'Retained clean-prefix installs ... support the native recipe approach' can be read as covering the whole foundation-cpu profile.",
+        "correction": "The clean userspace install covered RTK, QMD, Repomix, TOON, Codex, Claude Code and two ECC skills. It ran signed-out clients on the existing WSL kernel, did not verify Node's detached signature, and did not lock transitive npm dependencies. foundation-cpu also requires context-mode, ai-memory and mcporter, which that install did not qualify.",
+        "source_paths": [
+          "docs/portable-userspace-install-20260921.md",
+          "adoption/manifest.json",
+          "catalogs/landscape/foundation.json"
+        ],
+        "evidence": "\"fresh Linux userspace on the existing WSL kernel. It is not a booted new PC ... or full-foundation deployment\"; foundation-cpu component_ids include \"context-mode\",\"ai-memory\",\"mcporter\""
+      }
+    ],
+    "new_pc_readiness": "The catalog is usable as a reproducible recipe baseline for a new Linux/WSL2 x86_64 host, and no new-PC acceptance exists yet. The adoption manifest correctly sets historical_acceptance_transfers=false, native_login_on_target_only, no automatic installers, services, model calls or broker orders, and 'second-machine acceptance pending'. Remaining acceptance on the new PC: (1) install the foundation-cpu profile (git, python3, node, npm, uv, codex, claude, qmd, rtk, ai-memory, mcporter, context-mode) through the supported recipes in a fresh prefix, with rollback; (2) native sign-in and tool discovery in both clients; (3) one useful bounded task per client, including an ai-memory capture/query and a QMD search; (4) repository validation and tests. The optional profiles carry separate risks: semantic-rag has a host-specific vLLM pin and needs a GPU, observability starts services, recovery needs independent key recovery, and trading-nautilus is a prerelease that needs its own broker credentials. Each needs its own target qualification only when selected. Cross-platform and complete second-physical-PC acceptance remain unestablished.",
+    "limitations": [
+      "This is a tool-free review of the supplied packet. I did not read files, verify hashes against the repository, run validation or receipt checks, or observe any host. Nothing here is new-PC acceptance.",
+      "Layer summaries are condensed; most evidence_refs (decisions.json, stack.json, research-state.json, runtime-target.json, most receipts) were not supplied as original excerpts. Claims resting on them are assessed only for internal consistency.",
+      "DeepAgents, Microsoft Agent Framework and the 525-repository catalog coverage are not in the excerpts. I cannot confirm whether the base index includes them. Per the manifest rules, source-only candidates have neither failed nor been adopted.",
+      "The keep_but_compare count (11/20) comes from the supplied decision fields, not the canonical derived counts.",
+      "The convergence-program receipt records that earlier model reviewers checked packet consistency, not original sources. This review has the same limit, and its agreement with other reviewers would not prove quality.",
+      "TypeSafe was applied only as a principle: classifications here are advisory semantic judgments, and typed JSON output does not establish their truth."
+    ]
+  },
+  "checkout_clean": true,
+  "limitations": [
+    "Codex inference attempt failed at selected-model capacity; no Codex review verdict or usage returned; no retry/fallback.",
+    "Claude independently received frozen base packet and source paths, never another reviewer output.",
+    "Native source inspection is advisory review, not replay of all component acceptances or proof of global SOTA.",
+    "No new-PC setup or acceptance, broker action, TypeSafe API call, paid hosting or shared service change occurred.",
+    "Transient native tool restrictions are not proof that inherited hooks/account authority was removed.",
+    "Only this bounded run usage is reported; it does not establish total-goal usage, quality ranking or savings.",
+    "Current observed checkout/source identity applies to base dac2d1a; later integration changes require separate review.",
+    "The original source-reading Claude invocation exhausted its turn cap; the completed verdict, if present, comes from a separate tool-free supplied-excerpt pass.",
+    "The first tool-free pass received HTTP500 with is_error=true despite subtype=success; one final retry retained the same frozen input.",
+    "This run does not establish successful cross-family agreement: Codex produced no verdict.",
+    "Native reviewer findings require coordinator adjudication against original sources; agreement alone does not establish quality."
+  ],
+  "private_artifact_hashes": {
+    "input-manifest.json": "740c23e7263d43df71b2ac0d6dbe6e3a7b5a5ae44aef4896aa063edf5fb5de2a",
+    "codex.native.json": "df05b74d47ab64aef2ccbfa733885e27a561b883b2c142019ade40757523c30a",
+    "codex.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "finalize_results.py": "8d4ce84b8f8e1423c03c77808b7ca792ed5978d385c56d222954318667b6af5d",
+    "claude-completion.prompt.txt": "6b6610203632dbf4df3b20c9706a3d68a473fc78bb8ecfe3d6fcff533dc31f91",
+    "review.yaml": "238d8f41b90dfce6d935ee2ea4cbf8cf39f1b042dee0a38fd15ff5c420f37a4d",
+    "codex.command.json": "a9ed2d4ed8e701c32b793325434451616becdea2e7831680a809b844459964e9",
+    "claude.command.json": "0706744bdd2c3c8c83dc56088c3e655f8a3ac665aedb49c3daadc7f6ab4999a9",
+    "retry_claude.py": "4481fdeb642d10f0741128c465a250c6c1293e8c5c436c48248091cad2f9b38a",
+    "claude-completion.command.json": "5af42b9f7369df31dec19b625bfc1ec3e270fc161fb3a5efd5545a6a1dc2cf18",
+    "claude.report.json": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+    "codex.prompt.txt": "acf328e91aacb04028e7cc66c066109637728d09a6854d163b3b7875bb2b6878",
+    "claude-completion.stdout": "ed1896446c822788e84bcd76f6a5012c17445223f9119a908a8f09752efcf552",
+    "claude-completion.packet.json": "3fcf8024cd2c7e7b91b91a610e232a1bd641c428efa290189d17d68f18b5eeaf",
+    "claude.prompt.txt": "0d10d4638da7930ea3ba9d0e710dc0af719b5bd46967ce61f862c248ee51e85f",
+    "summarize_review.py": "39f97582db142dde66964f51eea81428abd50e75ffda284ace9c9be10eb368ef",
+    "claude.stdout": "b383f7e8093eedb1134bd5d76ca9e17f96f1fbb0e1d6cd1fc674a78b354b8692",
+    "codex.stdout": "fcbc521351ee8c82762613b1d62c28b9a98f817eb224da82da9a422ae1ca2e8d",
+    "claude-completion-retry.command.json": "838f7d3b3704dcf3956a40406c9d79e25556c1074874a26774bf69520328574e",
+    "finish_claude.py": "6f801d345d1578cd3fe5984fbb3c6d5cb3ba38939d76ecda9cd843de1518c177",
+    "claude-completion-retry.stdout": "e9243b5b3a623d369fff7b462984c5b54fe256ae82bfa8bd05691da588d5c0e8",
+    "sanitized-ready.json": "76901477699c598119fd088343c9aa7224f91fbb68fcfca08616b47e3d70a73b",
+    "claude.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "packet.json": "c87f0e8af6fbe81ab2a75783a9b6cfd2e82b004c0ccf8ab43a8f2ec8332b4aef",
+    "claude-completion.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "claude-completion-retry.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "codex-readiness.json": "b1df4b5290a0c4c21610a38b6a8a933e15b6b9a26a8c8eb9146beed617d0b9ff",
+    "run_review.py": "9ae8dd2cced4b0440e886b268214217014f63a023d806880467e02d2e61c1b6e"
+  },
+  "actual_commands_sanitized": {
+    "codex": [
+      "<SDK_PYTHON>",
+      "<STACK_REPO>/blueprints/us-equities/workers/native_worker.py",
+      "run",
+      "--codex-bin",
+      "<NATIVE_CODEX_BIN>",
+      "--codex-home",
+      "<NATIVE_CODEX_HOME>",
+      "--workspace",
+      "<STACK_REPO>",
+      "--prompt",
+      "<PRIVATE_REVIEW>/codex.prompt.txt",
+      "--receipt",
+      "<PRIVATE_REVIEW>/codex.native.json",
+      "--turn-deadline-seconds",
+      "420"
+    ],
+    "claude": [
+      "<NATIVE_CLAUDE_BIN>",
+      "-p",
+      "--model",
+      "opus",
+      "--effort",
+      "high",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--max-turns",
+      "18",
+      "--tools",
+      "Read,Grep,Glob",
+      "--allowedTools",
+      "Read",
+      "Grep",
+      "Glob",
+      "--permission-mode",
+      "dontAsk",
+      "--permission-prompts",
+      "none",
+      "--no-session-persistence",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}"
+    ],
+    "claude-completion": [
+      "<NATIVE_CLAUDE_BIN>",
+      "-p",
+      "--model",
+      "opus",
+      "--effort",
+      "high",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--max-turns",
+      "2",
+      "--tools",
+      "",
+      "--disallowedTools",
+      "*",
+      "--permission-mode",
+      "dontAsk",
+      "--permission-prompts",
+      "none",
+      "--no-session-persistence",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}"
+    ],
+    "claude-completion-retry": [
+      "<NATIVE_CLAUDE_BIN>",
+      "-p",
+      "--model",
+      "opus",
+      "--effort",
+      "high",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--max-turns",
+      "2",
+      "--tools",
+      "",
+      "--disallowedTools",
+      "*",
+      "--permission-mode",
+      "dontAsk",
+      "--permission-prompts",
+      "none",
+      "--no-session-persistence",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}"
+    ],
+    "dagu": [
+      "<DAGU_2.16.6>",
+      "start",
+      "--context",
+      "local",
+      "--dagu-home",
+      "<PRIVATE_REVIEW>/dagu-home",
+      "--run-id",
+      "catalog-native-independent-20260921",
+      "<PRIVATE_REVIEW>/review.yaml"
+    ]
+  },
+  "coordinator_observation": {
+    "exact_20_unique_layer_ids": true,
+    "source_hashes_verified": true,
+    "repository_unchanged": true,
+    "claims_not_promoted": "The six native findings identify wording and scope qualifications. Catalog policies already reject universal superiority and transferred new-host acceptance. Parent must adjudicate whether each requires a change in the current integrated revision.",
+    "requested_vs_resolved": "Claude requested opus/high and returned claude-opus-5; resolved effort was not exposed. Codex configured Astra/OpenAI but failed at capacity before a review result."
+  }
+}

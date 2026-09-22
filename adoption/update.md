@@ -74,6 +74,14 @@ Use `qmd get` on the exact returned document URI with a bounded range. [Native c
 
 ## Current next moves
 
+The current entry point is the [20-layer research queue](../catalogs/landscape/research-state.json)
+and its [continuation protocol](../docs/landscape-continuation.md). Choose one
+recorded gap. For the north star, [runtime-target.json](../catalogs/us-equities/runtime-target.json)
+governs the selected Nautilus destination and separate IBKR/Alpaca acceptance.
+SPY/LEAN dividend/cash parity and native broker fault cases remain open. The
+older catalyst plans below retain data/research context and do not override
+these current engine and broker boundaries.
+
 Continue with the [September 20 catalyst-convergence plan](../blueprints/us-equities/catalyst-convergence/plan.json)
 and its [native results and next gates](../blueprints/us-equities/catalyst-convergence/README.md).
 Reuse verified retained sources where available; a new machine must acquire its

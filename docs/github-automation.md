@@ -205,3 +205,36 @@ It preserves an existing declared baseline, source/quality rubric, elapsed time,
 available native usage and failures. Hosted fixtures, local runtime activation,
 provider consumption and artifact/token estimates remain distinct. Apply the
 [acceptance evidence policy](acceptance-evidence-policy.md) throughout.
+
+## Workflow review, 2026-09-21
+
+All nine workflows were rechecked with the upstream scanners and every action pin was
+compared with upstream. zizmor 1.30.1 (the latest release) reports no finding at the
+`regular` persona used by CI. actionlint 1.7.12 (the latest release) was downloaded
+task-locally by the procedure above: `gh attestation verify` and the checksum check
+returned 0, the archive SHA-256 equals the recorded
+`8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8`, and it returned 0
+with empty output across all workflows.
+
+Each of the seven pinned actions resolves to the commit of its named release, and each
+is at its latest release. Some release comments name only the moving major tag
+(`# v7`, `# v8`). In `native-service-reboot.yml` and `native-foundation-e2e.yml` they now
+name the exact release of the unchanged SHA (`# v7.0.1`) so a later pin update reads as a
+version change. The same edit was reverted in three files whose current bytes are
+hash-bound. `native-offhost-restore.yml` and `native-offhost-app-state.yml` are frozen
+sources of active recovery plans, and the repository's tests failed with "frozen source
+changed" and "frozen local source differs". `native-token-e2e.yml` is bound by no plan or
+test, but its current SHA-256 is recorded in four execution receipts and artifacts, so
+an edit would detach the file from its dated run evidence. A cosmetic comment does not
+justify re-freezing a plan or detaching a receipt, so those six comments wait for the
+next functional change. The
+publication job's two write permissions now carry explanatory comments. No SHA,
+permission, trigger or step changed.
+
+Findings that appear only at zizmor's stricter personas are retained with reasons in
+[github-automation-evidence.json](github-automation-evidence.json) under
+`workflow_review_20260921`: secrets outside deployment environments in the three
+manual off-host workflows (a repository settings decision for the automation
+maintainer), concurrency limits on stateful or manually dispatched workflows, and
+informational naming notes. Static checks execute no job; a pull request's own runs
+remain the execution evidence.

@@ -1,9 +1,13 @@
 # Selected native Claude workflows and agents
 
 These are project-authored saved scripts and agent definitions for the upstream
-Claude Workflow runtime. They are byte-identical copies of the deployed agent-lab
-files (`.claude/workflows/` and `.claude/agents/`), not upstream tests or a
-replacement orchestrator. Use [the native recipe](../../../recipes/claude-native-ultracode.md)
+Claude Workflow runtime. The saved workflow scripts and the three roles in the
+table below preserve the deployed agent-lab files from the retained portable
+qualification. These are local integration assets, not upstream tests. The
+separate `semantic-evidence-reviewer` example received a later explicit Opus/high
+declaration and reporting instruction to satisfy the combined portable contract;
+that change has local checks and no new native provider qualification.
+Use [the native recipe](../../../recipes/claude-native-ultracode.md)
 for settings, authoring, worker models and lifecycle boundaries, and
 [the cooperation lanes](../../../recipes/claude-codex-cooperation-lanes.md) for
 the Codex side.

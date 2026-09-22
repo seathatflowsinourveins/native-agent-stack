@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Resolve selection anchoring and omissions through sealed independent source discovery, peer coverage critique and a separately recorded later screening repair. Close supported publication defects while keeping quality and destination-PC gates explicit.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "99f580c187100d064853b977376697394decbefe"
+    },
+    {
+      "url": "https://github.com/kapillamba4/code-memory",
+      "revision": "5a8db166ca11a90c093ba4a9a54d266cde756f54"
+    },
+    {
+      "url": "https://github.com/nautechsystems/nautilus_trader",
+      "revision": "82b66fee382086c803e27b9fd5c06f94d24d2831"
+    }
+  ],
+  "discovery_provenance": [
+    "One Codex subagent, fork_turns=none, received only neutral-requirements.json as assigned local input. It reports residual ambient project/tool exposure and no catalog, memory or other-review artifact access.",
+    "Supported native Claude messaging preserved the live owner. WF2 discovery, WF3 coverage critique and WF4 screening repair returned sealed; the peer explicitly confirmed five material coordinator corrections. Native Lane C partial failure is retained, not relabeled successful.",
+    "Reports are frozen before conclusions are shared across reviewers. Original/public hash mapping preserves the one private-path substitution."
+  ],
+  "license_and_compatibility": "Source review only. Existing native accounts and installed pins unchanged; candidate repository/model/service licenses and destination Linux/WSL compatibility remain separately qualified.",
+  "baseline_and_candidate": {
+    "baseline": "Current 20-layer catalog at 99f580c with existing source and local execution evidence.",
+    "candidate": "Independent provisional discovery followed by coordinator and separate original-source adjudication; discovery candidates and conditional comparisons, not runtime replacements."
+  },
+  "frozen_inputs": {
+    "base_revision": "99f580c187100d064853b977376697394decbefe",
+    "tasks": [
+      "catalog-source-convergence"
+    ],
+    "roles": [
+      "coordinator-artifact-check"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+        "sha256": "24001f4bed3298909d4493a82501590dd5725d1df0445a666ffd81cbc318f84b"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+        "sha256": "e422f576df3f94b1d4f7202316f28d7a83cd1d6aafab8a0891ee1cf76495cf75"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-provenance.json",
+        "sha256": "8927c441a9c97d1f9a1ac017b155d0480f01541f81f33ebd00f4ef95be52a996"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf2-usage.json",
+        "sha256": "0cf1c372f8d5c9c9d3888a78131690716b789216803dc0bfd2ef84e309e5342a"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/closure-provenance.json",
+        "sha256": "e12c91de527ee15caef4616d1fe7f1d7f58ef85888f4a08a650dfaa3f1743940"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "sha256": "c1a6cad2d0b2dca4a1bb94a869e5b253b6d22c65905364e87af7e38ecd8383b2"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-screening-repair.json",
+        "sha256": "92668178d6245d10149f39a8004a00e48bcd20e7ce1f7d33f6fab7e1ebdc26a1"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "sha256": "5f989503c33774e3086287d6183ff10e51d5756958fe880d204be3fc0bf5b84e"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf3-usage.json",
+        "sha256": "c49b84ac81dfa6d07ad5b95591a14a028068845f485f760797f4fe867cd51b2b"
+      },
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf4-usage.json",
+        "sha256": "1ffd1e9c75779deead989a5ac03ce1140ce7b6a933516937716eaadb7cc3e864"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/blind-catalog-convergence/neutral-requirements.json",
+        "sha256": "923af7463aa21bdf69dec28137b89e6c5dd9ac37c4f917757ded8acb8377b443"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-provenance.json",
+        "sha256": "9ab2bdd7b8270c522ab9a0558b019f35435be3c101ff631e302797926c73bb51"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Neutral requirements request 20 layers, primary sources, strongest challengers, limitations and decision-changing comparisons. The recorded command below checks identity/reference consistency only; source truth and comparative quality are not certified.",
+    "usage_rule": "No savings claim. Per-child Codex provider usage was unavailable; native Claude workflow usage/failures must come from its actual returned record. Do not sum estimates or infer zero from missing values."
+  },
+  "runtime_and_platform": {
+    "platform": "Existing Linux/WSL x86_64 host",
+    "tools": [
+      {
+        "name": "Codex application subagent source reviewer",
+        "version": "Exact resolved model/effort not exposed; no override requested"
+      },
+      {
+        "name": "Claude native relay",
+        "version": "CLI 2.1.278; native account and permissions retained"
+      },
+      {
+        "name": "Repository offline validators",
+        "version": "648cb71 integration plus recorded owned source-review additions"
+      }
+    ],
+    "isolation": "Read-only discovery assignment and owned report paths; ambient project instructions remain visible. Coordinator owns an isolated Git worktree. No claim of OS-enforced blindness, active-store isolation testing or target-host acceptance."
+  },
+  "commands": [
+    "python3 scripts/catalog_decisions.py --write --supplement catalogs/landscape/independent-discovery.json#/candidates",
+    "python3 scripts/landscape.py --root .",
+    "python3 blueprints/blind-catalog-convergence/audit_reports.py --check"
+  ],
+  "observations": [
+    {
+      "id": "source-catalog-coverage",
+      "task": "catalog-source-convergence",
+      "role": "coordinator-artifact-check",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Independent source-discovery coverage and catalog integration; no comparative runtime, provider-savings or destination-PC qualification",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-provenance.json",
+          "sha256": "9ab2bdd7b8270c522ab9a0558b019f35435be3c101ff631e302797926c73bb51"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-source-publication-coverage",
+      "task": "catalog-source-convergence",
+      "role": "coordinator-artifact-check",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 1,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Exact sealed-report publication transform and discovery union; documentary findings only, no runtime-quality win. Explicit WF2 usage includes 65 started attempts, 63 completed children and two incomplete attempts.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-source-review.json",
+          "sha256": "e422f576df3f94b1d4f7202316f28d7a83cd1d6aafab8a0891ee1cf76495cf75"
+        },
+        {
+          "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-provenance.json",
+          "sha256": "8927c441a9c97d1f9a1ac017b155d0480f01541f81f33ebd00f4ef95be52a996"
+        },
+        {
+          "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-wf2-usage.json",
+          "sha256": "0cf1c372f8d5c9c9d3888a78131690716b789216803dc0bfd2ef84e309e5342a"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-final-coverage-reconciliation",
+      "task": "catalog-source-convergence",
+      "role": "coordinator-artifact-check",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 2,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Exact original/later screening accounting and all125 action identity joins; no runtime-quality or destination-host acceptance.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/blind-catalog-convergence-20260921/closure-provenance.json",
+          "sha256": "e12c91de527ee15caef4616d1fe7f1d7f58ef85888f4a08a650dfaa3f1743940"
+        },
+        {
+          "path": "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+          "sha256": "5f989503c33774e3086287d6183ff10e51d5756958fe880d204be3fc0bf5b84e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [],
+  "limitations": [
+    "Record assembled after the returned offline checks; it is not a prospective head-to-head benchmark.",
+    "Partial selection blinding: ambient instructions/tool identities were visible to both families.",
+    "Most evidence is documentation/interface inspection; only selected source assertions were inspected, with no upstream tests rerun.",
+    "A successful inventory check does not certify original-source truth, reviewer independence beyond disclosed boundaries or repository quality.",
+    "Claude top-12-by-stars screening omitted relevant smaller tools and its broad role groups do not independently qualify every layer. Its source scores and refuter outcomes are attributed, not accepted performance measurements.",
+    "WF3 originally reported final_list_ready=false. The original 159 missing decisions, later WF4 dispositions, contradictory drop annotations and independent corrections remain visible. Exact source accounting does not prove screening accuracy or comparative quality.",
+    "WF3 critic's six-binding-star-caps claim was corrected by independent audit; all ten shortlists match the top twelve recorded stars in residual sets with no recorded rule exclusion. These are not certified passers.",
+    "WF4 OctoBot no-backtesting rationale is rejected by its pinned upstream README; crypto versus US-equities suitability remains a separate question.",
+    "WF2 retains two incomplete historical judge attempts. The peer's separate Codex Lane C review failed with only a partial result; supported source corrections were independently checked.",
+    "WF3's original false readiness verdict and missing159screening decisions are retained; WF4laterrepaired thosepairs. Fresh source audit rejects WF4OctoBotno-backtesting rationale. No candidate runtime or quality gate was executed by these research workflows."
+  ],
+  "decision_and_scope": {
+    "decision": "retain",
+    "scope": "Independent source-discovery coverage and catalog integration; no comparative runtime, provider-savings or destination-PC qualification",
+    "qualification_run_ids": []
+  },
+  "rollback": "Installed defaults and services unchanged. Revert owned catalog changes if source findings are disproved; retain dated discovery and failure history.",
+  "next_decision_changing_test": "Use the dated reviewed baseline to qualify the destination PC. Reopen only relevant gates: matched memory recall/lifecycle; research runtime task quality and recovery; document/RAG quality; Nautilus/LEAN accounting and broker recovery. Do not adopt from reviewer votes or source freshness alone.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

@@ -66,6 +66,18 @@ work-list run through `pipeline()` with lean `agentType` stages. Never drop a
 verification stage to save tokens; save them with lean agents, deferred lanes and
 focused reads. Keep existing sign-in, permissions, plugins and caching.
 
+For another host, inspect its CPU count and supported runtime ceiling first.
+Start at eight only when it fits that ceiling and the available account/API
+allowance; otherwise use a lower cap. The current runtime ceiling is
+`min(16, CPUs - 2)` with platform/runtime minimum handling; inspect that runtime
+on a small or different host rather than writing a zero/negative setting.
+Raise toward 12–16 only after a complete run has no rate-limit errors, missing
+results or unintended model substitutions. Preserve verification stages and
+inspect `child-usage.mjs` results. This cap is per workflow: other workflows,
+direct agents and native clients can share the same account quotas. Changing
+concurrency does not request a different model/effort, but quality, wall time and
+total cost still need observation. Do not infer improvement from the setting.
+
 The dated trial explicitly used `--model fable --effort ultracode`; `fable`
 resolved to `claude-fable-5-1` on that account. Verify the actually returned model
 on another account/provider. The [subsequent native observations](../evidence/artifacts/native-claude-coop-20260921/persistent-profile.json)

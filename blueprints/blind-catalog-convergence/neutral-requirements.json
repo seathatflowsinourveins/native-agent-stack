@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-09-21",
+  "timezone": "America/New_York",
+  "review_kind": "independent_source_research_before_catalog_disclosure",
+  "task": "Independently identify the strongest defensible repository stacks for each functional layer and their strongest challengers. Establish useful distinctions, not a universal best ranking.",
+  "constraints": [
+    "Primary setup target is Linux/WSL2 x86_64; destination hardware and sign-ins are not yet accepted.",
+    "Preserve existing native Codex and Claude account/configuration boundaries. Other SDKs/runtimes may qualify when their function warrants them.",
+    "Local CPU-first setup; GPU, containers and paid hosting are conditional on actual requirements, cost and acceptance, not categorically excluded.",
+    "The long-term application is US-equity research and historical simulation followed by separately qualified IBKR/Alpaca paper operation; this review executes no orders.",
+    "Compare repository engineering quality and workload fit. Popularity, recency, vendor claims and model agreement alone do not establish a winner."
+  ],
+  "withheld": [
+    "Existing repository catalog, selected dispositions, prior reviewer conclusions, installed-version preferences and star counts."
+  ],
+  "allowed_evidence": [
+    "Current primary upstream documentation, pinned source, upstream tests and maintained examples.",
+    "Public discovery lists may discover candidates but do not prove their merit.",
+    "Local execution is untested unless you actually execute and retain a scoped result; do not run installations for this discovery task."
+  ],
+  "criteria": [
+    "capability and interface fit",
+    "upstream tests and independent measured evidence",
+    "maintenance, identifiable source and dependency compatibility",
+    "license/deployment/account fit",
+    "installation, scope, restart, export/restore, deletion and portability",
+    "complete measured quality, latency and cost; unknown is an allowed result"
+  ],
+  "layers": [
+    {
+      "layer_id": "native-clients",
+      "requirement": "Run coding and bounded research with existing native accounts, client tools, chosen models and resumable sessions."
+    },
+    {
+      "layer_id": "instructions-skills",
+      "requirement": "Supply concise task rules and reusable upstream procedures across coding clients; qualify discovery, invocation and conflicting guidance."
+    },
+    {
+      "layer_id": "workers",
+      "requirement": "Delegate independent work with owned edits, explicit effects, cancellation, returned results, failures and reviewable integration."
+    },
+    {
+      "layer_id": "isolation",
+      "requirement": "Enforce required filesystem/network restrictions and separate concurrent edits without conflating worktree ownership with sandboxing."
+    },
+    {
+      "layer_id": "code-navigation",
+      "requirement": "Find exact source, symbols and references across the needed languages, with verified originals and measured indexing overhead."
+    },
+    {
+      "layer_id": "document-retrieval",
+      "requirement": "Ingest and retrieve attributable Markdown and document content, preserving originals, structured data and scope."
+    },
+    {
+      "layer_id": "semantic-rag",
+      "requirement": "Answer conceptual code questions using scoped search and a compatible embedding service with recoverable indexing state."
+    },
+    {
+      "layer_id": "durable-memory",
+      "requirement": "Keep scoped decisions, handoffs and learning available across coding clients with inspectable capture, deletion and restoration."
+    },
+    {
+      "layer_id": "web-research",
+      "requirement": "Acquire attributable primary sources and perform reproducible browser/research tasks with bounded access, complete outputs and measurable operating cost."
+    },
+    {
+      "layer_id": "token-efficiency",
+      "requirement": "Supply useful task context with recoverable originals; distinguish representation size, provider usage, latency and answer quality."
+    },
+    {
+      "layer_id": "quality-evaluation",
+      "requirement": "Verify changed software and AI behavior with relevant upstream/project tests, independent observations and retained negative results."
+    },
+    {
+      "layer_id": "ci-supply-chain",
+      "requirement": "Publish reproducible software with scoped workflow permissions, identifiable dependencies, runtime inventory and attributable checks."
+    },
+    {
+      "layer_id": "scheduling-supervision",
+      "requirement": "Schedule and supervise local or distributed jobs with visible history, bounded process trees, cancellation and recoverable effects."
+    },
+    {
+      "layer_id": "hosting-services",
+      "requirement": "Reproduce typed application interfaces and supporting services on local WSL, with explicit ownership of state, accounts and deployment costs."
+    },
+    {
+      "layer_id": "recovery-portability",
+      "requirement": "Reproduce selected tools and restore application state on another PC without copying authentication stores or transferring old acceptance."
+    },
+    {
+      "layer_id": "observation-inference",
+      "requirement": "Inspect actual task, service and inference outcomes with scoped telemetry, privacy controls and workload-qualified model serving."
+    },
+    {
+      "layer_id": "foundation-memory",
+      "requirement": "Retrieve dated financial/document knowledge and exact code across clients, with source recovery, isolation and measurable retrieval quality."
+    },
+    {
+      "layer_id": "agents-operations",
+      "requirement": "Run and supervise bounded equity research with complete returned results and failures, scoped telemetry and recoverable state. Research workers cannot execute broker actions."
+    },
+    {
+      "layer_id": "data-research",
+      "requirement": "Acquire appropriately licensed US-equity observations with identity, timestamps, feed semantics, corporate actions and point-in-time eligibility preserved."
+    },
+    {
+      "layer_id": "engines-strategies",
+      "requirement": "Reproduce US-equity historical simulation and broker-specific paper workflows with deterministic numeric risk, accounting, causal data, costs and independent reconciliation."
+    }
+  ],
+  "return_contract": {
+    "for_each_layer": [
+      "layer_id",
+      "primary_stack (repository URLs, multiple complementary tools allowed)",
+      "strongest_challengers (repository URLs)",
+      "why_primary_for_requirement",
+      "strongest_case_for_challenger",
+      "primary_evidence_urls_actually_read",
+      "evidence_depth",
+      "unresolved_comparison",
+      "test_that_would_change_choice"
+    ],
+    "disclosure": [
+      "Was any current catalog/ranking/other review seen?",
+      "Which layers remain weakly researched or depend on prior model knowledge?",
+      "Observed model/effort if exposed, sources, failed fetches and unknown usage."
+    ],
+    "limits": "Do not force a unique winner for complementary tools or settle unknown comparisons by voting. Freeze your complete report before receiving other reviews."
+  }
+}

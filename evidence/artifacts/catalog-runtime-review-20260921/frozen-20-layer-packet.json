@@ -1,0 +1,490 @@
+{
+  "scope": "Frozen base catalog audit, not new-PC runtime or universal-best qualification",
+  "base_commit": "dac2d1a3f880c04f6afadebe8bf3a251a64ab605",
+  "source_manifest": [
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "sha256": "196c8dcbc77272b1fcb91cb459e1124c4bc0ab0d15dee0e9c307c8a9712f5010"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "sha256": "bf212503dc1975935dbb12a82a92c8298a669c9de7b1c529e839402dfacf8a6e"
+    },
+    {
+      "path": "catalogs/landscape/manifest.json",
+      "sha256": "35212896482dbbff457b7bdb271fa3056912cb44ffbe9768581bc4d6019226c8"
+    },
+    {
+      "path": "adoption/manifest.json",
+      "sha256": "adc0c6a3c58dc0daf8c1c29061b349ca0ffd62b17950b4d6c31a7e9f63c34a76"
+    },
+    {
+      "path": "adoption/update.md",
+      "sha256": "9116102ebb4df576139194178d8e901d2088d7fa0629af4f1b9bf455bf65dccd"
+    },
+    {
+      "path": "docs/landscape-continuation.md",
+      "sha256": "535f1275cdee442758fac58173f78ce144ecb60d25709cd2826d02db4d740862"
+    },
+    {
+      "path": "docs/acceptance-evidence-policy.md",
+      "sha256": "f2b27f9fb431cbc91fcc399d9105c1ab6aac23767f2d617f319911360cdfa400"
+    },
+    {
+      "path": "blueprints/us-equities/workers/receipt.json",
+      "sha256": "4308f002936d354757ab819b1b537e26db41c76bf8201f58e0ce559750986afc"
+    },
+    {
+      "path": "blueprints/us-equities/deerflow/research-receipt.json",
+      "sha256": "b34779394c4fbc2a8444075ea002627e2e6bc4ec187e2cfa436d5c646101e95f"
+    },
+    {
+      "path": "blueprints/us-equities/convergence-program/review-receipt.json",
+      "sha256": "d7b940fcd8433fb422ae2a24b2b735e0a9c00da7cab41a5991a17c83479eb77b"
+    },
+    {
+      "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
+      "sha256": "970de5c2170bb0b55384ada8876bacca46c679ac8bc48e2b2d851d56f27c2431"
+    },
+    {
+      "path": "blueprints/us-equities/state-recovery/memory/receipt.json",
+      "sha256": "027c8e9c512ad0edb7a0c1c5ff5b2a98204082649d8520ff01d0c9cd41e22e59"
+    },
+    {
+      "path": "docs/native-skill-practice-20260921.md",
+      "sha256": "2acc1dc060996d3e2abd734053142ce7fce17ca9b604d8f8a8456058d01e6544"
+    },
+    {
+      "path": "docs/foundation-closure-20260921.md",
+      "sha256": "2b490d0bcfca6c7300079f36ced0e21ab708fb3f6517f4fc06076d5391b18164"
+    },
+    {
+      "path": "catalogs/foundation/community-practice-20260920.json",
+      "sha256": "3be2e20d06643032dccf9ce24fdaac369c21afdf705ee9e024ede1cb74c9d056"
+    }
+  ],
+  "layer_count": 20,
+  "layers": [
+    {
+      "layer_id": "native-clients",
+      "title": "Native clients",
+      "current_choice": "Native Codex and Claude Code; application SDKs only for a demonstrated application requirement.",
+      "decision": "retain",
+      "rationale": "Both clients have returned native source-task and continuation evidence and preserve the existing account and tool surfaces. Replacing them with an API framework adds an application-owned runtime without a demonstrated gap in these bounded tasks.",
+      "evidence_refs": [
+        "docs/foundation-closure-20260921.md",
+        "docs/full-stack-convergence.md",
+        "catalogs/foundation/decisions.json"
+      ],
+      "limitations": [
+        "The recorded tasks do not establish a comparative model-quality ranking or causal provider savings.",
+        "Same-session continuation does not establish every crash, provider cancellation or cross-host recovery condition."
+      ],
+      "overturn_when": "A required structured-event, custom-tool or application state capability is unavailable through the native path and a supported SDK implementation passes the same task, account, effect and recovery checks.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "instructions-skills",
+      "title": "Instructions and skills",
+      "current_choice": "Selected ECC search-first/iterative-retrieval skills, native project instructions, on-demand references and the optional Agent Skills reference validator; task-selected TypeSafe, gh-fix-ci and security-best-practices for Codex/Claude.",
+      "decision": "adjust",
+      "rationale": "The two selected ECC skills have recorded matching hashes and native discovery. Their bounded roles fit existing practice; importing complete hooks, rules or agent packs creates overlapping policies without measured benefit. Selected upstream additions address semantic context propagation and focused CI/security guidance; installation, native use and comparative superiority remain separate.",
+      "evidence_refs": [
+        "docs/foundation-closure-20260921.md",
+        "catalogs/foundation/community-practice-20260920.json",
+        "catalogs/foundation/decisions.json",
+        "catalogs/landscape/native-practice.json",
+        "docs/native-skill-practice-20260921.md",
+        "blueprints/native-skill-practice/typesafe-result.json"
+      ],
+      "limitations": [
+        "The community-practice review records no measured task-quality improvement or provider-cost change.",
+        "Reference format validation does not establish support for every client extension or successful activation."
+      ],
+      "overturn_when": "A specific task exposes a missing procedure, and a pinned candidate works in native discovery and task execution with less conflict or better measured results than the current procedure.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "workers",
+      "title": "Workers and task ownership",
+      "current_choice": "Native Claude/Codex workers with owned Worktrunk worktrees; Beads for a real dependency queue, optional qualified cross-client review and an opt-in semantic-evidence-reviewer with explicit TypeSafe context.",
+      "decision": "keep_but_compare",
+      "rationale": "Native writing, review and selected-child recovery have returned evidence without another orchestration runtime. Worktrunk's actual old/new comparison corrected child working-directory behavior. Durable cross-host effects would require a different acceptance boundary.",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/foundation-convergence-20260921.md",
+        "docs/foundation-rd-readiness.md",
+        "catalogs/foundation/decisions.json",
+        "docs/native-skill-practice-20260921.md",
+        "examples/claude-native/agents/semantic-evidence-reviewer.md",
+        "examples/codex-native/agents/semantic-evidence-reviewer.toml"
+      ],
+      "limitations": [
+        "Graceful native Workflow resume is separate from the systemd child-crash fixture; neither transfers every hard-crash guarantee to the other.",
+        "The restricted reviewer tool profile is not the accepted inherited-tool lane. The older companion backend acceptance does not certify every outer plugin invocation.",
+        "Native model/effort settings are inherited and returned identities recorded. Skill propagation is not a universal runtime/model ranking; account scopes and failed read paths remain evidence."
+      ],
+      "overturn_when": "A real task needs durable multi-host state, approval waits or effect recovery beyond native workers, and one challenger passes frozen cancellation, replay, ownership and integration cases.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "isolation",
+      "title": "Isolation",
+      "current_choice": "Worktrunk/Git worktrees for edit ownership, sandbox-runtime for qualified Linux restrictions, and platform-specific Apple Container use only on an eligible host.",
+      "decision": "retain",
+      "rationale": "These mechanisms cover different requirements: worktrees separate changes, while accepted sandbox profiles enforce selected access rules. A managed VM or OCI platform adds a separate deployment boundary that the bounded native workload does not currently need.",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "catalogs/us-equities/hosting-source-review.json",
+        "docs/token-native-saturation.md"
+      ],
+      "limitations": [
+        "A worktree is not a security sandbox. Ordinary native or Dagu processes are not automatically sandboxed.",
+        "Selected access/network fixtures do not certify hostile workloads, resource limits or unsupported platforms."
+      ],
+      "overturn_when": "Untrusted code or a deployment target requires a stronger VM/OCI boundary, and the selected alternative passes workload, network, resource, cleanup and host compatibility checks.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "code-navigation",
+      "title": "Code navigation",
+      "current_choice": "Focused source reads, Serena symbols, ast-grep, scoped codebase-memory and jCodeMunch; SocratiCode handles conceptual search in the semantic layer.",
+      "decision": "retain",
+      "rationale": "The selected lanes have scoped exact-retrieval/native-client evidence and distinct roles. Another code graph is not preferred merely for advertised speed; known source can be cheaper than an indexed round trip.",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/token-native-saturation.md",
+        "catalogs/us-equities/foundation-memory.json"
+      ],
+      "limitations": [
+        "Compressed structure and symbol indexes omit implementation details; correctness still requires original source.",
+        "No representative cross-repository or cross-language benchmark establishes a global best code retriever."
+      ],
+      "overturn_when": "A sealed task set in the target languages shows a challenger returning more correct source/references at an acceptable total indexing, retrieval and maintenance cost.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "document-retrieval",
+      "title": "Documents and ingestion",
+      "current_choice": "Scoped QMD BM25; Context Hub for selected developer docs; MarkItDown HTML and Poppler PDF conversion in their accepted scopes.",
+      "decision": "keep_but_compare",
+      "rationale": "QMD's 12-query diagnostic gave BM25 and hybrid equal recall@3/5 with reported average latency of 5 ms versus 10,328 ms. This supports the simple default on that workload. Lightweight accepted conversion precedes a larger OCR/layout platform.",
+      "evidence_refs": [
+        "docs/foundation-rd-readiness.md",
+        "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+        "catalogs/foundation/decisions.json"
+      ],
+      "limitations": [
+        "The QMD diagnostic used one ordered run and an incompletely sealed expanded index; it is not a general retrieval ranking.",
+        "HTML/PDF fixtures do not qualify arbitrary Office documents, scans, tables or filing layouts. Context Hub's retained size comparison grew by 85 tokens."
+      ],
+      "overturn_when": "A sealed representative corpus/query set shows useful quality gains with acceptable repeated end-to-end latency, or layout/OCR failures justify a separately qualified parser.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "semantic-rag",
+      "title": "Semantic code retrieval",
+      "current_choice": "SocratiCode, Qdrant and the accepted vLLM/Nemotron embedding runtime; use exact source navigation after retrieval.",
+      "decision": "keep_but_compare",
+      "rationale": "The existing watcher, actual embedding inference, selected queries and restored state are qualified together. Replacing a working vector store or server has no demonstrated advantage on this project's workload.",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/hf-memory-model-qualification.md",
+        "docs/native-memory-rag-lifecycle.md",
+        "catalogs/us-equities/foundation-memory.json"
+      ],
+      "limitations": [
+        "Four paired upstream examples first-ranked correctly establish compatibility, not a held-out domain or cross-model benchmark.",
+        "The vLLM compatibility pin is host-specific; the retained newer-version initialization failure is not a failure of other serving repositories."
+      ],
+      "overturn_when": "A sealed project/domain retrieval set shows improved source-grounded quality and acceptable latency, memory and lifecycle costs, or a supported target model cannot run in the current service.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "durable-memory",
+      "title": "Durable memory",
+      "current_choice": "One ai-memory store as the cross-client memory of record; retain separate code, document and transient-context retrieval layers.",
+      "decision": "keep_but_compare",
+      "rationale": "ai-memory already contains adopted project knowledge and has actual cross-client capture/query, consolidation and recovery evidence. Candidate memory systems offer distinct capabilities, but published scores do not demonstrate better retrieval or learning on this project.",
+      "evidence_refs": [
+        "docs/memory-landscape-maintenance.md",
+        "docs/native-memory-rag-lifecycle.md",
+        "evidence/artifacts/memory-landscape-20260921/sources.json"
+      ],
+      "limitations": [
+        "Scheduler admission does not establish learned-write quality; the retained model review rejected insufficient evidence.",
+        "Bounded sanitized assistant excerpts are not complete transcripts, and exact lifetime memory token savings are unknown."
+      ],
+      "overturn_when": "An isolated representative corpus and question set shows better source-grounded recall/usefulness and acceptable complete provider use, latency, capture/deletion and restore behavior without ambiguous memory ownership.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "web-research",
+      "title": "Web research",
+      "current_choice": "agent-browser, selected Playwright CLI operations, OpenResearch literature retrieval and Tavily CLI search/extract skills.",
+      "decision": "retain",
+      "rationale": "The current browser and retrieval commands have actual bounded results. Alternatives may add bulk ingestion, hosted browser infrastructure or another autonomous research loop, but those capabilities are not currently needed to replace the accepted path.",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/full-stack-convergence.md",
+        "catalogs/us-equities/star-audit.json"
+      ],
+      "limitations": [
+        "Accepted public-source retrieval is not an exhaustive research-quality benchmark or a guarantee of citation correctness.",
+        "Optional hosted services, credentials and bulk crawling require task-specific qualification; source-screened alternatives were not runtime tested."
+      ],
+      "overturn_when": "A defined source-coverage or ingestion task exceeds the current commands and a candidate improves attributable retrieval completeness, accuracy and total runtime/cost on the same frozen source set.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "token-efficiency",
+      "title": "Context and usage efficiency",
+      "current_choice": "Focused reads and scoped retrieval first; RTK, Context Mode, guarded Headroom, explicit-file Repomix and TOON only for suitable artifacts; ccusage observes native usage.",
+      "decision": "keep_but_compare",
+      "rationale": "Scoped functional results and retained losing comparisons support selective activation. The older fixed-order provider trial reduced Codex usage 11.26% but increased Claude 25.83%; uncontrolled caching and plugin absence prevent causal savings claims.",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/token-native-saturation.md",
+        "docs/token-practice.md"
+      ],
+      "limitations": [
+        "The current native tasks have no matched baseline; counters, bytes avoided, artifact token counts and provider usage must not be summed.",
+        "TOON expands the full catalog relative to compact JSON; guarded compression must return originals on rejection. Exact whole-PC lifetime savings are unmeasured."
+      ],
+      "overturn_when": "A frozen task/artifact and repeated controlled comparison improves answer correctness or retrieval completeness while reducing complete provider use or latency, with successful raw-input recovery.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "quality-evaluation",
+      "title": "Quality and evaluation",
+      "current_choice": "Project/upstream tests, Playwright browser checks, bounded Promptfoo assertions, ShellCheck and Difftastic where applicable.",
+      "decision": "retain",
+      "rationale": "These tools have accepted deterministic or native-example use and address concrete behavior, shell and review questions. A second agent-evaluation or experiment platform is not needed solely for catalog coverage.",
+      "evidence_refs": [
+        "docs/acceptance-evidence-policy.md",
+        "docs/promptfoo-upstream-retrieval.md",
+        "catalogs/foundation/decisions.json",
+        "catalogs/landscape/native-practice.json",
+        "docs/native-skill-practice-20260921.md",
+        "blueprints/native-skill-practice/typesafe-result.json"
+      ],
+      "limitations": [
+        "Promptfoo's earlier echo fixture and later four-pair upstream example are not held-out model-quality evaluations.",
+        "Local test totals, structural validation and reviewer agreement cannot establish upstream end-to-end behavior.",
+        "TypeSafe matched 7/8 pre-inference labels versus 3/8 for weak literal containment. The disagreement, selected small corpus and unmatched native review prevent a universal quality, speed or cost ranking."
+      ],
+      "overturn_when": "A defined tool-use/extraction or experiment-tracking requirement cannot be expressed adequately in the current test lane and a challenger passes a representative frozen oracle with usable failure inspection.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "ci-supply-chain",
+      "title": "CI and supply chain",
+      "current_choice": "Native GitHub Actions/Dependabot/attestation interfaces with actionlint, zizmor, gitleaks and selected Syft inventory; automation.json owns exact pins and qualification.",
+      "decision": "retain",
+      "rationale": "Retained hosted runs, setup-action upstream verifiers, native workflow scanners and an actual 36-package inventory support the chosen roles. Additional vulnerability tools need database and fix-applicability policies rather than redundant blanket scanning.",
+      "evidence_refs": [
+        "catalogs/foundation/automation.json",
+        "docs/github-automation.md",
+        "docs/automation-upgrade-evidence.json",
+        "catalogs/us-equities/hosting-source-review.json"
+      ],
+      "limitations": [
+        "Syntax/security checks do not execute a workflow or prove model-task quality. Syft inventory is not a vulnerability verdict.",
+        "The recorded first Dependabot scans do not establish the scheduled weekly time or every grouped update. Existing automation sources are broader than the repository decision-index union."
+      ],
+      "overturn_when": "A specific dependency/update or vulnerability gap is demonstrated and one alternative covers it with pinned database/provenance, manageable findings and no duplicate ownership of the same dependency.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "scheduling-supervision",
+      "title": "Scheduling and supervision",
+      "current_choice": "Dagu for selected local workflows and systemd user-manager supervision; native client workflows remain their own qualified lane.",
+      "decision": "keep_but_compare",
+      "rationale": "Actual Dagu run history, selected resume/cancel cases and owned systemd cleanup provide useful same-host evidence. Temporal/Restate would add persistence and distributed semantics that the current bounded work has not required.",
+      "evidence_refs": [
+        "docs/foundation-convergence-20260921.md",
+        "catalogs/foundation/decisions.json",
+        "catalogs/us-equities/hosting-source-review.json"
+      ],
+      "limitations": [
+        "The selected guest reboot is not a physical-PC reboot and does not qualify every schedule or daemon policy.",
+        "Local process cancellation does not prove provider billing cessation, external exactly-once effects or durable cross-host orchestration."
+      ],
+      "overturn_when": "Real jobs require host-loss survival, days-long waits or durable cross-host effects, and one challenger passes the declared effect/retry/recovery cases with acceptable operational burden.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "hosting-services",
+      "title": "Application and service hosting",
+      "current_choice": "Locked Next.js/React/FastAPI/PostgreSQL local fixture and loopback services; platform-specific containers or gateway trials only when needed.",
+      "decision": "retain",
+      "rationale": "The four application components have accepted local integration evidence and explicit ownership. A new cloud or container development platform would change account, state, socket and GPU integration without a current deployment requirement.",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/foundation-closure-20260921.md",
+        "adoption/research.json"
+      ],
+      "limitations": [
+        "A local fixture and service UI are not production readiness, scalability or paid-hosting acceptance.",
+        "Gateway dashboard/lifecycle evidence is separate from a successful exact-model task; recorded route/provider refusals remain limits."
+      ],
+      "overturn_when": "A defined production, remote-team or GPU deployment requirement exceeds the local fixture, and one alternative passes its account, data, networking, rollback and workload-cost acceptance.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "recovery-portability",
+      "title": "Recovery and portability",
+      "current_choice": "Owned native install/rollback recipes, existing uv lock-based adoption, Restic and application-native backups, and qualified native session resume.",
+      "decision": "keep_but_compare",
+      "rationale": "Retained clean-prefix installs, independent restores and selected hosted/guest cases support the native recipe approach. A broader environment platform is not justified for reproducing an already locked bounded SDK/tool profile.",
+      "evidence_refs": [
+        "adoption/research.json",
+        "adoption/lifecycle.md",
+        "docs/portable-userspace-install-20260921.md",
+        "docs/foundation-convergence-20260921.md"
+      ],
+      "limitations": [
+        "Synthetic off-host/guest cases and a clean hosted runner do not certify the new physical PC, GPU, secrets or all application state.",
+        "Native sign-ins and host-specific acceptance remain necessary; rollback and hash checks alone do not prove a model task or service recovery."
+      ],
+      "overturn_when": "A real multi-language/system dependency or state-loss case exceeds the selected recipes, and the proposed environment/backup alternative passes install, restore, resume and cleanup on the target host.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "observation-inference",
+      "title": "Observation and optional inference",
+      "current_choice": "OTel Collector Contrib, Prometheus/Loki/Grafana, Alertmanager/ntfy, scoped AgentsView/otel-tui and the native Claude HUD; inference/gateway trials retain separate qualification.",
+      "decision": "keep_but_compare",
+      "rationale": "Real native histories, current telemetry, rendered dashboards and an observed HUD already answer the selected operational questions. Another hook/trace collection stack would duplicate data processing unless it answers a concrete missing trace or evaluation question.",
+      "evidence_refs": [
+        "docs/native-telemetry-resolution.md",
+        "docs/dashboard-gap-resolution.md",
+        "docs/foundation-closure-20260921.md",
+        "catalogs/us-equities/agents-operations.json"
+      ],
+      "limitations": [
+        "Source time differs from scrape time; usage differs from savings. The current interactive HUD evidence does not certify every statistic or automatic compaction.",
+        "Local generation and gateway acceptance are route/workload-specific; catalog presence is not a passed exact-model task."
+      ],
+      "overturn_when": "A required trace, evaluation or supported model/hardware workload is unanswerable by the current path, and one alternative passes privacy, fidelity, latency/cost and recovery comparisons without duplicate capture.",
+      "source_path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "layer_id": "foundation-memory",
+      "title": "Scoped memory and research retrieval",
+      "current_choice": "ai-memory as the shared memory of record; QMD BM25 for documents; Serena for exact symbols; SocratiCode with Qdrant for conceptual code search; Context Mode and RTK for selected large outputs. These are complementary lanes, not one benchmark winner.",
+      "decision": "keep_but_compare",
+      "rationale": "The selected lanes have native operation and recovery evidence on the existing host and avoid making every lookup depend on another extraction model or service. The measured QMD domain fixture returned the intended source in the first three results for 8 of 12 queries, so its low setup cost supports retention while the four misses require a representative comparison before claiming retrieval superiority. Memory recall and code search receipts do not qualify financial answer truth or historical market availability.",
+      "evidence_refs": [
+        "catalogs/us-equities/foundation-memory.json",
+        "evidence/receipts/foundation-native-20260920.json",
+        "blueprints/us-equities/retrieval-evaluation/receipt.json",
+        "blueprints/us-equities/state-recovery/memory/receipt.json",
+        "blueprints/us-equities/state-recovery/qdrant/receipt.json",
+        "blueprints/us-equities/research-efficiency/native-receipt.json",
+        "docs/foundation-rd-readiness.md"
+      ],
+      "limitations": [
+        "Twelve curated queries are a bounded diagnostic, not an independent holdout or a complete financial RAG evaluation. Exact-source recall at three was 8/12; misses remain recorded.",
+        "The eight native answer invocations form four within-provider task comparisons; two Claude full-context answers missed the word protocol and one focused Codex answer scored 9.5 versus 10. These are not general or causal savings results.",
+        "Same-host encrypted restore preserved application state, but independent key recovery, off-host durability and new-host client rebinding remain unqualified.",
+        "Alternative memory and RAG repositories below were generally source-reviewed, not run head-to-head. A source-only candidate has not failed."
+      ],
+      "overturn_when": "Run a preregistered, representative held-out financial/document and code retrieval set at the same context budget; replace or supplement a lane only if a candidate improves source/answer fidelity, abstention and measured task cost while preserving isolation, exact source recovery and native client behavior.",
+      "source_path": "catalogs/landscape/us-equities.json"
+    },
+    {
+      "layer_id": "agents-operations",
+      "title": "Native research workers and operations",
+      "current_choice": "Native Codex and Claude for bounded research and review; Dagu/systemd for selected local command workflows; one OpenTelemetry Collector with Prometheus/Loki/Grafana; native sandboxing and Restic for their separately qualified scopes. Optional gateways and agent frameworks remain task-specific.",
+      "decision": "retain",
+      "rationale": "The retained native lane has actual task results, process/usage observations and local command workflow history. Adding an agent framework or gateway by default would not close a demonstrated requirement and can alter account identity, tool behavior or retry ownership. Dagu's accepted local scope fits existing commands; larger workflow and data platforms become preferable only when their durability, partitioning or operational requirements are real.",
+      "evidence_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md",
+        "blueprints/us-equities/workers/receipt.json",
+        "adoption/paired/receipt.json",
+        "blueprints/us-equities/hosting/receipt.json",
+        "blueprints/us-equities/research-runtime/receipt.json",
+        "evidence/receipts/foundation-native-20260920.json"
+      ],
+      "limitations": [
+        "Native worker success and telemetry matching are bounded by the recorded task, process and account. They do not establish every native client/session, whole-task savings or unlimited allowance.",
+        "Dagu's older completed-history restart is not in-flight recovery. Later recovery receipts must be evaluated for their own process, host and workload rather than promoting all workflows.",
+        "Gateway transport health, routed text and ACP research acceptance do not establish native hook/tool parity or independent provider/model attestation.",
+        "Same-host recovery and configured restrictions do not establish off-host disaster recovery, a VM boundary, unattended broker operation or paid hosting."
+      ],
+      "overturn_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+      "source_path": "catalogs/landscape/us-equities.json"
+    },
+    {
+      "layer_id": "data-research",
+      "title": "Market data, filings and causal research datasets",
+      "current_choice": "Official alpaca-py for the bounded selected market-data path; EdgarTools for selected filing parsing/acquisition; DuckDB and Parquet for local analysis; exchange_calendars for explicit session semantics. Dataset manifests and schema checks are requirements, while DVC/Pandera remain source-reviewed implementation candidates.",
+      "decision": "keep_but_compare",
+      "rationale": "Native acquisition, parsing and analytical receipts support these concrete interfaces without a new lake, broker or distributed database. They do not close the actual research bottleneck: a complete point-in-time eligible universe with trustworthy availability, identity and corporate-action semantics. Source-review defaults for DVC/Pandera must not be mistaken for installed acceptance. Databento/Massive are credible conditional alternatives when required coverage or rights cannot be obtained through the selected path.",
+      "evidence_refs": [
+        "catalogs/us-equities/data-research.json",
+        "catalogs/us-equities/runtime-target.json",
+        "blueprints/us-equities/authenticated-data/native-receipt.json",
+        "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+        "blueprints/us-equities/identity-readiness/native-receipt.json",
+        "blueprints/us-equities/data/receipt.json",
+        "catalogs/us-equities/data-readiness-review.json",
+        "catalogs/us-equities/data-evaluation-followup.json"
+      ],
+      "limitations": [
+        "The authenticated Alpaca receipt covers 25 AAPL SIP/raw daily bars and two corporate actions over five successful pages, not a survivorship-free universe, complete history or real-time feed entitlement.",
+        "Numeric corporate-action values matched the frozen probe, but missing dividend currency prevented full cash-unit reconciliation. Original historical availability and complete action coverage remain open.",
+        "Three documentary lifecycle cases preserve observed cutoffs and source anchors; retrospective claims do not establish historical as-known eligibility or permanent security identity.",
+        "The prior SEC HTTP 403 remains a historical failure. Later corrected acquisition and parsing qualify their selected requests only; no general filing-completeness or strategy-validity claim follows.",
+        "SQL, schemas and content hashes cannot repair missing provenance, revised fundamentals, access rights or outcome-selected samples."
+      ],
+      "overturn_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+      "source_path": "catalogs/landscape/us-equities.json"
+    },
+    {
+      "layer_id": "engines-strategies",
+      "title": "Simulation, broker adapters and strategy qualification",
+      "current_choice": "NautilusTrader 2.0.0rc5 is the user-selected destination; LEAN remains the retained historical comparison engine. Nautilus native IBKR awaits broker acceptance; Alpaca uses official alpaca-py and a separately qualified deterministic paper path. No strategy is promoted as profitable.",
+      "decision": "keep_but_compare",
+      "rationale": "The current choice follows the explicit runtime target and supported native IBKR direction, with real installation/replay and bounded AAPL accounting evidence. LEAN has deeper retained SPY stress/dividend/cash evidence and is kept as the comparison oracle rather than relabeled a losing engine. The AAPL diagnostic and one Alpaca paper roundtrip do not prove SPY parity, realistic liquidity, IBKR operation, continuous paper service or a winning strategy. Existing research modules remain task-specific.",
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json",
+        "docs/foundation-rd-readiness.md",
+        "evidence/receipts/native-nautilus-v2-20260920.json",
+        "evidence/receipts/native-nautilus-ci-20260920.json",
+        "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json",
+        "blueprints/us-equities/historical-simulation/receipt.json",
+        "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
+        "blueprints/us-equities/research-evaluation/receipt.json"
+      ],
+      "limitations": [
+        "Nautilus 2.0.0rc5 is a prerelease. The old September 19 Nautilus alternative and LEAN default cards remain historical; runtime-target.json governs the current destination.",
+        "The retained AAPL replay has 15 bars and five roundtrips per baseline/stress scenario with reconciled cash; it excludes known action dates and uses retrospective synthetic close fills with unlimited modeled depth.",
+        "SPY/LEAN dividend/cash parity is still planned. LEAN's known-crash fixtures are engineering stresses, not untouched holdout results or calibrated broker execution.",
+        "The Alpaca trial observed two actual writes, a -0.08 USD cash-matched gross result, flat/idle reconciliation and completed-trial recovery with zero additional writes. In-flight native failure cases, IBKR, live operation and continuous paper operation remain open.",
+        "No accepted point-in-time universe, extreme-mover/catalyst strategy, financing-inclusive performance or deployable profitability follows from these receipts."
+      ],
+      "overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+      "source_path": "catalogs/landscape/us-equities.json"
+    }
+  ],
+  "audit_leads_to_verify_not_assume": [
+    "How many of 20 layers say keep_but_compare, and what does that permit us to call finalized?",
+    "Does ai-memory qualification establish comparative semantic retrieval superiority?",
+    "Does the 52 restored-page figure distinguish 1 ordinary page from 51 System pages?",
+    "Does DeerFlow establish full research/UI/hosting acceptance, and what ACP policy actually ran?",
+    "Distinguish actually used Codex Python SDK from conditional OpenAI Agents SDK.",
+    "DeepAgents overview discovery is not runtime acceptance; check catalog coverage without loading all 525 repositories.",
+    "Microsoft Agent Framework is a current source-only challenger identified separately; base index may omit it. No adoption inferred.",
+    "Existing-host evidence must not be represented as new-PC acceptance. Identify CPU baseline vs optional services/GPU/domain setup."
+  ],
+  "typesafe_skill": {
+    "path": "<INSTALLED_TYPESAFE_SKILL>",
+    "sha256": "71ea90d7906c6554c4f4c460ef7361b2d26f59116ccdae986dc6d997b9389f52",
+    "use": "Advisory semantic evidence verification only; no API call or credential access."
+  },
+  "independence": "Neither native reviewer receives the other reviewer output."
+}

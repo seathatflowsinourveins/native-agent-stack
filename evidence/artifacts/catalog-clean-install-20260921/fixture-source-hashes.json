@@ -1,0 +1,18 @@
+{
+  "blueprints/us-equities/catalyst-dataset/README.md": "0933fa810e52f2e9f002fae0a1bae65e67070b3d2125f00b97c7ea1d2b39b85d",
+  "blueprints/us-equities/catalyst-dataset/dataset.py": "d4ad517451b37e418a4b9a522952e9188c29e4b2cb260a7f27a041fd5a030d1b",
+  "blueprints/us-equities/catalyst-dataset/native-receipt.json": "ff9578bff25c7303a9b6820521ed8173285df8027079a5152ae5eb5874a25c43",
+  "blueprints/us-equities/financial-data/README.md": "4bc6c3bec788aad0f05e1eedc1887cf51e1856794c53c86a7b3b6e1510ef9aed",
+  "blueprints/us-equities/financial-data/receipt.json": "a51675473df874701a7a5a9cd3ebaede23f90155db17c2af1fe12211fffe6309",
+  "blueprints/us-equities/financial-data/sec_data.py": "0cf9a79b89cfb15f9cbb745e9a0c4bc4adec097c1118987a665a7ef5e4d589a4",
+  "blueprints/us-equities/nanosecond-replay/README.md": "de230378bc13af4ffd17d39a142ae8c8a624a80bcc95272487ae0f0693b63644",
+  "blueprints/us-equities/nanosecond-replay/fixture.json": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+  "blueprints/us-equities/nanosecond-replay/receipt.json": "8ca7ad473299d90473614de8556c7f87ef5838d7e7ba6a0346484e8b0c284d1f",
+  "blueprints/us-equities/nanosecond-replay/replay.py": "e8935d6971d49fdac1eca8ae69d64ea0d59871689f53fdb5c4c6094b844c8206",
+  "blueprints/us-equities/nanosecond-replay/select.sql": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af",
+  "blueprints/us-equities/point-in-time/README.md": "808dbcfb1d724539f98904325efd41b94139f98dca3006a7d917479bc025c937",
+  "blueprints/us-equities/point-in-time/fixture.json": "f5d0ebf62889db580fdfd5e2f774c1ada9d01434dcba904019247f23f8ac2f3a",
+  "blueprints/us-equities/point-in-time/receipt.json": "e2d184c7ab7ee4594d7a5b14914cacfd5d99ad14d85c380ee3cb0bdb9b6f5a47",
+  "blueprints/us-equities/point-in-time/select.sql": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+  "blueprints/us-equities/point-in-time/temporal_snapshot.py": "43f209840427124e6f447427ae00261b3360e2dc76826f4fede48093a8c55d26"
+}

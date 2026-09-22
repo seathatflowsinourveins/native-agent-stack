@@ -1,0 +1,33 @@
+Full-text search the wiki via FTS5
+
+Usage: ai-memory search [OPTIONS] <QUERY>
+
+Arguments:
+  <QUERY>
+          FTS5 query string (e.g. `"karpathy wiki"` or `quick OR slow`)
+
+Options:
+      --data-dir <DATA_DIR>
+          Override the data directory.
+
+          Defaults to a platform path under `dirs::data_local_dir()`. The config loader also honours `AI_MEMORY_DATA_DIR`.
+
+      --workspace <WORKSPACE>
+          Workspace name. Defaults to the nearest `.ai-memory.toml` marker's `workspace`, else `default`
+
+      --config <CONFIG>
+          Path to an explicit config file (defaults to `<data_dir>/config.toml`)
+
+      --project <PROJECT>
+          Project name. When omitted, auto-derived from the current project
+
+  -n, --limit <LIMIT>
+          Maximum number of hits to return
+
+          [default: 10]
+
+      --json
+          Emit results as JSON
+
+  -h, --help
+          Print help (see a summary with '-h')

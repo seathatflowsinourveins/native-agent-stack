@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Compare native memory lifecycle on frozen fictional notes in isolated stores; retain the initial unwanted default-model download attempt and corrected explicit-none embedding run.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/akitaonrails/ai-memory",
+      "revision": "353841d91618d20b110b208de284a74d0b960379"
+    },
+    {
+      "url": "https://github.com/basicmachines-co/basic-memory",
+      "revision": "3bf2d523c0a941f71cb144a5502e7557dd025d69"
+    }
+  ],
+  "discovery_provenance": [
+    "Basic Memory was a sealed independent source-review recommendation and already a current catalog challenger.",
+    "Owned worker used native help and pinned source to qualify isolated stores and provider controls. First unset-provider attempt violated the no-model-download rule; one corrected explicit-none run was retained."
+  ],
+  "license_and_compatibility": "ai-memory MIT code and Basic Memory AGPL-3.0; local synthetic existing-host trial only, no complete license audit. Basic Memory source was pinned, dependencies resolved at execution and retained; installed ai-memory binary hash/version are known, source equivalence not rebuilt.",
+  "baseline_and_candidate": {
+    "baseline": "Installed ai-memory 2.3.2 using an isolated synthetic store.",
+    "candidate": "Pinned Basic Memory 0.23.2 in its own environment and synthetic notes project."
+  },
+  "frozen_inputs": {
+    "base_revision": "648cb71c0df5956e1d48c8a7f5651b52f6cf3505",
+    "tasks": [
+      "lexical-memory-lifecycle"
+    ],
+    "roles": [
+      "ai-memory-cli",
+      "basic-memory-cli"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/memory-lifecycle-probe-20260921/identity.json",
+        "sha256": "43cf69b6c605a733fce5883d6d94be49e0b71d94dc4cd7c671e3069fcb7026c4"
+      },
+      {
+        "path": "evidence/artifacts/memory-lifecycle-probe-20260921/provenance.json",
+        "sha256": "90a01a182f1c00310049a749b5d04033cb3fa7166e001412de479751c51d7455"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/memory-lifecycle-probe/corpus.json",
+        "sha256": "ae0625d292eb66a2d67de0e696b57830f9e621c75da41d60d97569d3901755f5"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/memory-lifecycle-probe/verify.py",
+        "sha256": "98372718acdc11c4236a54ccd47bfcd091386a2d91c2b737b4674584187e8cd4"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Frozen three-note literal keywords/facts, one overwrite and one deletion. Native calls must return the expected current content; model downloads forbidden. No semantic recall benchmark.",
+    "usage_rule": "Preserve exact native outputs, failed attempt and measured individual process durations. No comparable latency or provider-savings claim; coordinator/worker usage unavailable."
+  },
+  "runtime_and_platform": {
+    "platform": "Existing Linux/WSL x86_64 host; owned temporary prefixes/stores",
+    "tools": [
+      {
+        "name": "ai-memory",
+        "version": "2.3.2 installed binary"
+      },
+      {
+        "name": "Basic Memory",
+        "version": "0.23.2 pinned source"
+      },
+      {
+        "name": "Python",
+        "version": "3.12.3 Basic Memory environment"
+      }
+    ],
+    "isolation": "Constructed child environments, explicit local project/store/server URL and owned loopback server PIDs. No active real-store content or credential load. First ai-memory attempt fetched default model background; no completed model files found, egress unmeasured. Corrected explicit-none lane retained. No OS-enforced network sandbox."
+  },
+  "commands": [
+    "Original initial driver: python3 <OWNED_PRIVATE_PROBE>/probe.py; native argv/env/results retained with disclosed publication substitutions in attempt-1-default-embedding/commands.json; executed script original hash is in provenance.json.",
+    "Corrected driver: python3 <OWNED_PRIVATE_PROBE>/probe.py; ai-memory explicit AI_MEMORY_EMBEDDING_PROVIDER=none, reuses original Basic Memory lane; native argv/env/results with disclosed publication substitutions in commands.json; executed script hash in provenance.json."
+  ],
+  "observations": [
+    {
+      "id": "ai-default-provider",
+      "task": "lexical-memory-lifecycle",
+      "role": "ai-memory-cli",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Three-note synthetic lexical lifecycle on the existing WSL host; unequal recovery checks, no semantic-quality or cost ranking",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/commands.json",
+          "sha256": "95f5852ea6d8bb3ad07f4155e526964585f89eaa09ea80223001870dc9a5adad"
+        },
+        {
+          "path": "evidence/artifacts/memory-lifecycle-probe-20260921/attempt-1-default-embedding/verification.json",
+          "sha256": "0215283a18b44151a7e5e065b84e51713861bbee2cea7021457119905045bd17"
+        },
+        {
+          "path": "evidence/artifacts/memory-lifecycle-probe-20260921/isolation-observations.json",
+          "sha256": "73b47fdd5e7deb64ac50d6af4a62db57599384e05be65a1b7932a470cf79b393"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "ai-explicit-none",
+      "task": "lexical-memory-lifecycle",
+      "role": "ai-memory-cli",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Three-note synthetic lexical lifecycle on the existing WSL host; unequal recovery checks, no semantic-quality or cost ranking",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-lifecycle-probe-20260921/commands.json",
+          "sha256": "ff411c82720c71ce2bb1dcbcbde02cf2c852ca71a52984ee129ebb84d4ebdfb8"
+        },
+        {
+          "path": "evidence/artifacts/memory-lifecycle-probe-20260921/verification.json",
+          "sha256": "d827cc6baf134f9f1b3e6a4a5d3f4d675d8c1d563386d9a735b1bc7797504eea"
+        },
+        {
+          "path": "evidence/artifacts/memory-lifecycle-probe-20260921/isolation-observations.json",
+          "sha256": "73b47fdd5e7deb64ac50d6af4a62db57599384e05be65a1b7932a470cf79b393"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "basic-text-only",
+      "task": "lexical-memory-lifecycle",
+      "role": "basic-memory-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Three-note synthetic lexical lifecycle on the existing WSL host; unequal recovery checks, no semantic-quality or cost ranking",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-lifecycle-probe-20260921/commands.json",
+          "sha256": "ff411c82720c71ce2bb1dcbcbde02cf2c852ca71a52984ee129ebb84d4ebdfb8"
+        },
+        {
+          "path": "evidence/artifacts/memory-lifecycle-probe-20260921/verification.json",
+          "sha256": "d827cc6baf134f9f1b3e6a4a5d3f4d675d8c1d563386d9a735b1bc7797504eea"
+        },
+        {
+          "path": "evidence/artifacts/memory-lifecycle-probe-20260921/isolation-observations.json",
+          "sha256": "73b47fdd5e7deb64ac50d6af4a62db57599384e05be65a1b7932a470cf79b393"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "ai-default-provider",
+      "reason": "Native content checks returned successfully, but unset embedding provider initiated background model download, violating the explicit trial condition. No completed model file found after stopping; network bytes unmeasured. Failed trial preserved."
+    }
+  ],
+  "limitations": [
+    "Record assembled after native execution from retained frozen input and command evidence.",
+    "Accepted evidence consists of 21 ai-memory CLI calls plus two servers and 20 reused Basic Memory CLI calls; original Basic evidence appears in both packets and must not be counted twice.",
+    "ai-memory restore/reindex not run because guard checks sibling processes; Basic Memory reindex is not lost-database restoration.",
+    "Deletion concerns current search results, not physical erasure of history/logs/backups.",
+    "No semantic quality, cross-project isolation, hook/client integration, real corpus, concurrent/crash recovery or clean destination-PC qualification.",
+    "Public copies sanitize personal executable paths and whitespace; private backup bytes are represented by hashes/inventories. Original/public mappings are preserved."
+  ],
+  "decision_and_scope": {
+    "decision": "retain",
+    "scope": "Three-note synthetic lexical lifecycle on the existing WSL host; unequal recovery checks, no semantic-quality or cost ranking",
+    "qualification_run_ids": []
+  },
+  "rollback": "Retire only owned disposable stores/environment when evidence retention permits. Both owned ai-memory server processes were stopped. Real memory service/configuration were unchanged.",
+  "next_decision_changing_test": "Use a preregistered representative memory corpus with Hindsight and Basic Memory against ai-memory, shared downstream model/context, grounded answers, abstention, supersession, isolation and actual clean-target restore; retain current store until required quality/lifecycle evidence supports change.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

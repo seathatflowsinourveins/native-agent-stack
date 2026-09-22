@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "catalog-runtime-review-20260921",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "dagu"
+  ],
+  "claim": "One native Claude Opus 5 catalog review completed for the frozen 20-layer baseline; original Dagu branches failed and Codex returned capacity failure. This is bounded advisory review, not comparative repository qualification.",
+  "limitations": [
+    "No completed Codex verdict or cross-family agreement; all failed attempts and separate usage categories retained.",
+    "Final Claude pass used native CLI separately after the Dagu attempt; no successful full DAG run is claimed.",
+    "Frozen base precedes the subsequent candidate-quality and HTML patch; review does not establish universal superiority or new-PC acceptance."
+  ],
+  "checked_at": "2026-09-21",
+  "timezone": "America/New_York",
+  "source_base": "dac2d1a3f880c04f6afadebe8bf3a251a64ab605",
+  "artifact": "evidence/artifacts/catalog-runtime-review-20260921/native-review.json",
+  "input_provenance": "evidence/artifacts/catalog-runtime-review-20260921/input-provenance.json",
+  "handbook": "blueprints/catalog-runtime-review/README.md",
+  "status": "completed_with_failed_attempts"
+}

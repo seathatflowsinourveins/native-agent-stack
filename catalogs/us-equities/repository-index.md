@@ -61,7 +61,7 @@ The [portable-adoption follow-up](../../adoption/research.md) adds six candidate
 | [alpacahq/alpaca-py](https://github.com/alpacahq/alpaca-py) | Beyond stars | [data-research: default](data-research.json); [engines-strategies: default](engines-strategies.json) | See linked core/earlier record |
 | [alphaxiv/openresearch](https://github.com/alphaxiv/openresearch) | Starred | [adopted baseline](../../manifests/stack.json) | prior_evidence_link · already_covered |
 | [amazon-science/chronos-forecasting](https://github.com/amazon-science/chronos-forecasting) | Beyond stars | [engines-strategies: conditional](engines-strategies.json) | See linked core/earlier record |
-| [anchore/grype](https://github.com/anchore/grype) | Beyond stars | [agents-operations: default](agents-operations.json) | See linked core/earlier record |
+| [anchore/grype](https://github.com/anchore/grype) | Beyond stars | [agents-operations: conditional](agents-operations.json) | Source-reviewed scanner; no execution established |
 | [anchore/syft](https://github.com/anchore/syft) | Beyond stars | [agents-operations: default](agents-operations.json) | See linked core/earlier record |
 | [andrewyng/context-hub](https://github.com/andrewyng/context-hub) | Starred | [adopted baseline](../../manifests/stack.json) | prior_evidence_link · already_covered |
 | [andyyyy64/whichllm](https://github.com/Andyyyy64/whichllm) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |

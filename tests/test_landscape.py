@@ -1,0 +1,328 @@
+"""Protect comparison coverage and evidence boundaries using local fixtures."""
+
+import copy
+import hashlib
+import json
+from pathlib import Path
+import tempfile
+import unittest
+
+from scripts.landscape import MANIFEST, build_landscape
+
+
+class LandscapeTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name).resolve()
+        self.manifest = {
+            "schema_version": 1, "checked_at": "2026-09-21", "source_base": "a" * 40,
+            "scope": "Fixture selection", "status": "reviewed_baseline",
+            "new_pc_scope": "New host acceptance required", "universal_superiority": "not_established",
+            "rules": ["Execution is not superiority"],
+            "catalogs": {"foundation": "foundation.json", "us-equities": "domain.json"},
+            "sources": {"foundation_manifest": "foundation-manifest.json",
+                        "foundation_decisions": "decisions.json", "domain_manifest": "domain-manifest.json",
+                        "repository_index": "index.json", "selected_manifest": "stack.json",
+                        "freshness_snapshot": "freshness.json"},
+        }
+        self.candidate = {
+            "name": "Native selected tool", "repository": "https://github.com/example/selected",
+            "disposition": "selected", "rationale": "Passed the required scoped operation",
+            "evidence_kind": "native_execution", "evidence_refs": ["receipt.json"],
+        }
+        self.layer = {
+            "catalog": "foundation", "layer_id": "retrieval", "title": "Retrieval",
+            "requirement": "Find the source", "current_choice": "Native selected tool",
+            "decision": "keep_but_compare", "rationale": "Useful retained operation",
+            "evidence_refs": ["guide.md"], "limitations": ["One input"],
+            "overturn_when": "A matched task improves quality",
+            "candidates": [self.candidate, {**self.candidate, "name": "Alternative",
+                "repository": "https://github.com/example/alternative", "disposition": "unqualified",
+                "evidence_kind": "source_review", "rationale": "Not tested on this host"}],
+        }
+        self.foundation = {"schema_version": 1, "checked_at": "2026-09-21", "scope": "General",
+                           "layers": [self.layer]}
+        self.domain = copy.deepcopy(self.foundation)
+        self.domain["layers"][0].update(catalog="us-equities", layer_id="data", title="Data")
+        self.write("foundation-manifest.json", {"layers": [{"id": "retrieval"}]})
+        self.write("domain-manifest.json", {"catalog_files": ["data.json"]})
+        self.write("data.json", {"layer": "data", "checked_at": "2026-09-19", "entries": [{
+            "id": "old", "repository": "https://github.com/example/alternative", "role": "Old source candidate",
+            "decision": "default", "rationale": "Historical reason", "evidence_level": "source_review",
+            "version_or_commit": "v1", "limitations": ["Historical only"], "evidence_refs": ["receipt.json"]}]})
+        self.write("index.json", {"aliases": {}, "records": [{"repository": row["repository"]}
+                   for row in self.layer["candidates"]]})
+        self.write("stack.json", {"components": [{"id": "selected", "version": "1",
+                   "repository": self.candidate["repository"], "source_pin": "a" * 40}]})
+        self.write("decisions.json", {"decisions": [{"review_status": "accepted_within_scope"}]})
+        self.freshness = {"schema_version": 1, "scope": "Metadata only",
+                          "components": [{"component_id": "selected", "selected_version": "1",
+                                          "selected_repository_url": self.candidate["repository"],
+                                          "selected_source_pin": "a" * 40}],
+                          "stars": {"status": "checked", "repository_snapshot_count": 1,
+                                    "repositories": [{"repository": self.candidate["repository"]}],
+                                    "observed_identity_set_sha256": hashlib.sha256(self.candidate["repository"].encode()).hexdigest()}}
+        self.write("freshness.json", self.freshness)
+        self.write("receipt.json", {"exit_code": 0, "scope": "A local fixture, not upstream E2E"})
+        (self.root / "guide.md").write_text("# Selection\n", encoding="utf-8")
+
+    def write(self, path, value):
+        target = self.root / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(value), encoding="utf-8")
+
+    def build(self, **kwargs):
+        self.write(MANIFEST, self.manifest)
+        self.write("foundation.json", self.foundation)
+        self.write("domain.json", self.domain)
+        return build_landscape(self.root, **kwargs)
+
+    def test_current_and_historical_choices_stay_separate_and_counts_are_derived(self):
+        self.domain["layers"][0]["candidates"][0]["repository"] = "https://github.com/Example/SELECTED"
+        data = self.build()
+        self.assertEqual(data["counts"]["layers"], 2)
+        self.assertEqual(data["counts"]["comparison_candidates"], 4)
+        self.assertEqual(data["counts"]["comparison_repositories"], 2)
+        self.assertEqual(data["counts"]["historical_candidate_cards"], 1)
+        domain = data["layers"][1]
+        self.assertEqual(domain["current_choice"], "Native selected tool")
+        self.assertEqual(domain["catalog_candidates"][0]["decision"], "default")
+        self.assertEqual(domain["catalog_candidates"][0]["checked_at"], "2026-09-19")
+        self.assertEqual(domain["candidates"][1]["disposition"], "unqualified")
+
+    def quality_fixture(self):
+        self.manifest["sources"]["quality_review"] = "quality.json"
+        self.manifest["handbook_guides"] = [{"path": "guide.md", "label": "Handbook"}]
+        self.quality_url = "https://raw.githubusercontent.com/example/selected/" + "a" * 40 + "/README.md"
+        self.write("quality-sources.json", {"scope": "Synthetic source record", "repositories": [{
+            "repository": self.candidate["repository"], "revision": "a" * 40,
+            "source_files": [{"url": self.quality_url, "bytes": 1, "sha256": "b" * 64}]}]})
+        return {"schema_version": 1, "checked_at": "2026-09-21",
+                "scope": "Source review, no execution claim", "no_universal_ranking": True,
+                "claim_limits": ["Not a benchmark"], "source_snapshot": "quality-sources.json",
+                "criteria": [{"id": "capability", "question": "Does it fit?"}],
+                "candidates": [{"name": "Selected source", "repository": self.candidate["repository"],
+                                "revision": "a" * 40, "disposition": "selected",
+                                "evidence_kind": "source_review", "requirement_fit": "Source fits",
+                                "source_findings": ["Documented capability"],
+                                "qualification_gap": "No matched comparison",
+                                "overturn_when": "An independently measured improvement",
+                                "evidence_refs": ["receipt.json", self.quality_url],
+                                "criteria": {"capability": {"finding": "Unknown on the new host",
+                                                            "evidence_refs": []}}}],
+                "layer_coverage": [{"catalog": c, "layer_id": l, "decision_ref": f + "#/layers/0",
+                                    "decision": "keep_but_compare", "requirement": self.layer["requirement"],
+                                    "current_choice": self.layer["current_choice"], "evidence_gap": "New host",
+                                    "challenger_repositories": ["https://github.com/example/alternative"],
+                                    "overturn_when": self.layer["overturn_when"]}
+                                   for c, l, f in [("foundation", "retrieval", "foundation.json"),
+                                                  ("us-equities", "data", "domain.json")]]}
+
+    def test_quality_review_joins_sources_without_promoting_unknowns(self):
+        quality = self.quality_fixture()
+        self.write("quality.json", quality)
+        tracked = []
+        data = self.build(track=tracked.append)
+        self.assertEqual(data["counts"]["quality_review_repositories"], 1)
+        attached = data["layers"][0]["candidates"][0]["quality_review"]
+        self.assertEqual(attached["criteria"]["capability"]["sources"], [])
+        self.assertEqual(attached["evidence_kind"], "source_review")
+        self.assertIn("quality-sources.json", tracked)
+        self.assertIn("guide.md", tracked)
+
+    def test_quality_review_rejects_false_execution_incomplete_coverage_and_unsafe_sources(self):
+        quality = self.quality_fixture()
+        cases = [
+            (lambda q: q.update(no_universal_ranking=False), "unestablished universal"),
+            (lambda q: q["candidates"][0].update(evidence_kind="native_execution"), "cannot certify execution"),
+            (lambda q: q["candidates"][0].update(disposition="observed_failure"), "observed failure"),
+            (lambda q: q["candidates"][0].update(revision="latest"), "full revision"),
+            (lambda q: q["candidates"][0].update(revision="f" * 40), "revision differs from source snapshot"),
+            (lambda q: q["candidates"][0].update(evidence_refs=[self.quality_url.replace("a" * 40, "f" * 40)]), "pinned sources differ"),
+            (lambda q: q["candidates"][0].update(evidence_refs=[self.quality_url, self.quality_url]), "contains duplicates"),
+            (lambda q: q["candidates"][0]["criteria"].clear(), "each declared criterion"),
+            (lambda q: q["layer_coverage"].pop(), "every layer"),
+            (lambda q: q["layer_coverage"][0].update(decision="retain"), "decision differs"),
+            (lambda q: q["layer_coverage"][0].update(current_choice="Unrelated engine"), "current_choice differs"),
+            (lambda q: q["layer_coverage"][0].update(requirement="Unrelated requirement"), "requirement differs"),
+            (lambda q: q["layer_coverage"][0].update(overturn_when="Unrelated trigger"), "overturn_when differs"),
+            (lambda q: q["layer_coverage"][0].update(challenger_repositories=["https://github.com/missing/repo"]), "absent from its layer"),
+            (lambda q: q["candidates"][0].update(evidence_refs=["https://user:password@example.com/source"]), "unsafe source"),
+        ]
+        for change, message in cases:
+            with self.subTest(message=message):
+                mutated = copy.deepcopy(quality)
+                change(mutated)
+                self.write("quality.json", mutated)
+                with self.assertRaisesRegex(ValueError, message):
+                    self.build()
+
+    def test_handbook_cannot_reference_files_outside_checkout(self):
+        self.manifest["handbook_guides"] = [{"label": "Unsafe", "path": "../outside.md"}]
+        with self.assertRaisesRegex(ValueError, "confined"):
+            self.build()
+
+    def test_missing_and_duplicate_layers_fail(self):
+        self.domain["layers"] = []
+        with self.assertRaisesRegex(ValueError, "exactly match"):
+            self.build()
+        self.foundation["layers"].append(copy.deepcopy(self.layer))
+        with self.assertRaisesRegex(ValueError, "duplicate comparison"):
+            self.build()
+
+    def test_each_selected_component_needs_a_current_role_explanation(self):
+        stack = json.loads((self.root / "stack.json").read_text())
+        stack["components"][0]["repository"] = "https://github.com/example/unexplained"
+        self.write("stack.json", stack)
+        with self.assertRaisesRegex(ValueError, "lacks a current role explanation"):
+            self.build()
+
+    def test_research_queue_requires_complete_layers_safe_evidence_and_supported_closure(self):
+        self.manifest["sources"]["research_state"] = "research.json"
+        queue = {"schema_version": 1, "checked_at": "2026-09-21", "scope": "Bounded research",
+                 "resume_order": ["Read one layer"], "guide": "guide.md",
+                 "source_inventory_refs": ["receipt.json"],
+                 "saturation": {"status": "not_established", "close_only_when": ["Frozen comparison"],
+                                "reopen_on": ["Changed requirement"]},
+                 "layers": [{"catalog": c, "layer_id": l, "status": "comparison_required",
+                             "saturation": "not_established", "next_action": "Run matched comparison",
+                             "decision_ref": path, "evidence_refs": ["receipt.json"]}
+                            for c, l, path in [("foundation", "retrieval", "foundation.json"),
+                                               ("us-equities", "data", "domain.json")]]}
+        self.write("research.json", queue)
+        data = self.build()
+        self.assertEqual(data["counts"]["research_queue_layers"], 2)
+        self.assertEqual(data["layers"][0]["research"]["next_action"], "Run matched comparison")
+        for mutation in (lambda q: q["layers"].pop(),
+                         lambda q: q["layers"].append(copy.deepcopy(q["layers"][0])),
+                         lambda q: q["layers"][0].update(decision_ref="other.json"),
+                         lambda q: q["layers"][0].update(evidence_refs=["../outside.json"]),
+                         lambda q: q["layers"][0].update(status="bounded_review_complete", saturation="bounded_review_complete"),
+                         lambda q: q["saturation"].update(status="bounded_review_complete", closure_refs=["receipt.json"])):
+            broken = copy.deepcopy(queue)
+            mutation(broken)
+            self.write("research.json", broken)
+            with self.assertRaises(ValueError):
+                self.build()
+        for item in queue["layers"]:
+            item.update(status="bounded_review_complete", saturation="bounded_review_complete",
+                        closure_refs=["receipt.json"], next_action="Monitor declared reopening trigger")
+        queue["saturation"].update(status="bounded_review_complete", closure_refs=["receipt.json"])
+        self.write("research.json", queue)
+        self.assertEqual(self.build()["research_state"]["saturation"]["status"], "bounded_review_complete")
+
+    def test_unknown_repository_and_duplicate_candidate_fail(self):
+        self.candidate["repository"] = "https://github.com/example/missing"
+        with self.assertRaisesRegex(ValueError, "absent from canonical index"):
+            self.build()
+        self.candidate["repository"] = "https://github.com/example/alternative"
+        with self.assertRaisesRegex(ValueError, "duplicate candidate"):
+            self.build()
+
+    def test_source_review_cannot_be_promoted_to_an_observed_failure(self):
+        alternative = self.layer["candidates"][1]
+        alternative["disposition"] = "observed_failure"
+        with self.assertRaisesRegex(ValueError, "needs execution evidence"):
+            self.build()
+        alternative["evidence_kind"] = "native_execution"
+        alternative["evidence_refs"] = ["https://github.com/example/alternative"]
+        with self.assertRaisesRegex(ValueError, "needs a retained local result"):
+            self.build()
+
+    def test_sources_are_confined_existing_and_safe(self):
+        for path, message in [("missing.md", "file missing"), ("../outside.json", "confined"),
+                              ("https://user:secret@example.com/file", "unsafe source URL"),
+                              ("javascript:alert(1)", "confined")]:
+            with self.subTest(path=path):
+                self.layer["evidence_refs"] = [path]
+                with self.assertRaisesRegex(ValueError, message):
+                    self.build()
+        (self.root / "alias.md").symlink_to(self.root / "guide.md")
+        self.layer["evidence_refs"] = ["alias.md"]
+        with self.assertRaisesRegex(ValueError, "symlinks"):
+            self.build()
+
+    def test_limits_alternatives_and_reopening_criteria_are_required(self):
+        for field, value, message in [("limitations", [], "nonempty"),
+                                      ("overturn_when", "", "nonempty"),
+                                      ("candidates", [self.candidate], "named alternative")]:
+            with self.subTest(field=field):
+                prior = self.layer[field]
+                self.layer[field] = value
+                with self.assertRaisesRegex(ValueError, message):
+                    self.build()
+                self.layer[field] = prior
+
+    def test_evidence_sources_are_added_to_explorer_hashes_and_links(self):
+        tracked = set()
+        data = self.build(track=tracked.add, file_url=lambda p: "https://example.com/" + p)
+        self.assertTrue({"guide.md", "receipt.json"} <= tracked)
+        self.assertEqual(data["layers"][0]["sources"][0]["url"], "https://example.com/guide.md")
+
+    def test_universal_claim_and_mismatched_dates_are_rejected(self):
+        self.manifest["universal_superiority"] = "proven"
+        with self.assertRaisesRegex(ValueError, "universal-superiority"):
+            self.build()
+        self.manifest["universal_superiority"] = "not_established"
+        self.foundation["checked_at"] = "2026-09-19"
+        with self.assertRaisesRegex(ValueError, "review date differs"):
+            self.build()
+
+    def test_freshness_cannot_omit_components_or_change_the_star_identity_set(self):
+        checked = self.freshness["components"]
+        self.freshness["components"] = []
+        self.write("freshness.json", self.freshness)
+        with self.assertRaisesRegex(ValueError, "every selected component"):
+            self.build()
+        self.freshness["components"] = checked
+        self.freshness["stars"]["observed_identity_set_sha256"] = "0" * 64
+        self.write("freshness.json", self.freshness)
+        with self.assertRaisesRegex(ValueError, "star identity hash"):
+            self.build()
+
+    def test_a_changed_source_pin_requires_fresh_corresponding_evidence(self):
+        self.freshness["components"][0]["selected_source_pin"] = "b" * 40
+        self.write("freshness.json", self.freshness)
+        with self.assertRaisesRegex(ValueError, "selected source pin differs"):
+            self.build()
+
+    def test_native_skills_keep_source_pins_limits_and_local_evidence(self):
+        self.manifest["sources"]["native_practice"] = "practice.json"
+        skill = {"name": "semantic-skill", "repository": self.candidate["repository"],
+                 "source_pin": "a" * 40, "skill_sha256": "b" * 64,
+                 "rationale": "Selected scoped skill", "limits": ["No universal ranking"],
+                 "evidence_refs": ["receipt.json"]}
+        practice = {"schema_version": 1, "checked_at": self.manifest["checked_at"], "skills": [skill]}
+        self.write("practice.json", practice)
+        data = self.build()
+        self.assertEqual(data["counts"]["applied_skills"], 1)
+        self.assertEqual(data["native_practice"]["skills"][0]["sources"][0]["path"], "receipt.json")
+        for key, value, message in [("source_pin", "main", "full source commit"),
+                                    ("skill_sha256", "unknown", "content hash"),
+                                    ("repository", "https://github.com/missing/skill", "absent from index"),
+                                    ("limits", [], "needs limits"),
+                                    ("evidence_refs", ["missing.json"], "file missing")]:
+            with self.subTest(key=key):
+                changed = copy.deepcopy(practice)
+                changed["skills"][0][key] = value
+                self.write("practice.json", changed)
+                with self.assertRaisesRegex(ValueError, message):
+                    self.build()
+        practice["skills"].append(copy.deepcopy(skill))
+        self.write("practice.json", practice)
+        with self.assertRaisesRegex(ValueError, "duplicate selected skill"):
+            self.build()
+
+    def test_repository_transfers_use_aliases_but_unrelated_substitutions_fail(self):
+        self.freshness["components"][0]["selected_repository_url"] = "https://github.com/previous/selected"
+        self.write("freshness.json", self.freshness)
+        with self.assertRaisesRegex(ValueError, "selected repository differs"):
+            self.build()
+        self.write("index.json", {"aliases": {"previous/selected": "example/selected"},
+                   "records": [{"repository": row["repository"]} for row in self.layer["candidates"]]})
+        self.assertEqual(self.build()["counts"]["selected_components"], 1)
+
+
+if __name__ == "__main__":
+    unittest.main()

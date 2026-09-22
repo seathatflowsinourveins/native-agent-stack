@@ -1,0 +1,715 @@
+[
+  {
+    "layer_id": "native-clients",
+    "decision": "retain",
+    "catalog_selected": [
+      "openai/codex",
+      "anthropics/claude-code",
+      "openclaw/mcporter"
+    ],
+    "blind_claude": [
+      "F-agents/eng: openai/codex > anomalyco/opencode > cline/cline",
+      "F-agents/res: OpenHands/OpenHands > google-gemini/gemini-cli > openai/codex"
+    ],
+    "blind_refuter_alternatives": [
+      "SWE-agent/mini-swe-agent",
+      "can1357/oh-my-pi",
+      "dagger/container-use",
+      "opensandbox-group/OpenSandbox",
+      "NVIDIA/OpenShell",
+      "microsoft/agent-framework"
+    ],
+    "codex_primary": [
+      "openai/codex",
+      "anthropics/claude-code"
+    ],
+    "codex_challengers": [
+      "Aider-AI/aider"
+    ],
+    "codex_primary_not_in_catalog": [],
+    "codex_unresolved": "Installed client versions, account readiness, model availability, emitted usage completeness and actual resumed-state fidelity remain unknown."
+  },
+  {
+    "layer_id": "instructions-skills",
+    "decision": "adjust",
+    "catalog_selected": [
+      "affaan-m/ECC",
+      "agentskills/agentskills",
+      "typesafe-ai/skills",
+      "openai/skills"
+    ],
+    "blind_claude": [
+      "F-agents/eng: openai/codex > anomalyco/opencode > cline/cline",
+      "F-agents/res: OpenHands/OpenHands > google-gemini/gemini-cli > openai/codex"
+    ],
+    "blind_refuter_alternatives": [
+      "SWE-agent/mini-swe-agent",
+      "can1357/oh-my-pi",
+      "dagger/container-use",
+      "opensandbox-group/OpenSandbox",
+      "NVIDIA/OpenShell",
+      "microsoft/agent-framework"
+    ],
+    "codex_primary": [
+      "agentskills/agentskills",
+      "anthropics/skills"
+    ],
+    "codex_challengers": [
+      "obra/superpowers"
+    ],
+    "codex_primary_not_in_catalog": [
+      "anthropics/skills"
+    ],
+    "codex_unresolved": "Format conformance does not prove discovery, instruction priority or tool enforcement. Experimental allowed-tools fields and different ancestor-file semantics need client-specific checks."
+  },
+  {
+    "layer_id": "workers",
+    "decision": "keep_but_compare",
+    "catalog_selected": [
+      "anthropics/claude-code",
+      "openai/codex",
+      "max-sixty/worktrunk"
+    ],
+    "blind_claude": [
+      "F-agents/eng: openai/codex > anomalyco/opencode > cline/cline",
+      "F-agents/res: OpenHands/OpenHands > google-gemini/gemini-cli > openai/codex"
+    ],
+    "blind_refuter_alternatives": [
+      "SWE-agent/mini-swe-agent",
+      "can1357/oh-my-pi",
+      "dagger/container-use",
+      "opensandbox-group/OpenSandbox",
+      "NVIDIA/OpenShell",
+      "microsoft/agent-framework"
+    ],
+    "codex_primary": [
+      "openai/codex",
+      "anthropics/claude-code"
+    ],
+    "codex_challengers": [
+      "anthropics/claude-agent-sdk-python",
+      "langchain-ai/langgraph"
+    ],
+    "codex_primary_not_in_catalog": [],
+    "codex_unresolved": "Claude workflows can return null for cancellation or unrecoverable errors; filtering such results discards evidence. Documented cancellation does not by itself prove all subprocesses stopped. Checkpointer presence alone does not guarantee durable external effects."
+  },
+  {
+    "layer_id": "isolation",
+    "decision": "retain",
+    "catalog_selected": [
+      "max-sixty/worktrunk",
+      "anthropics/sandbox-runtime"
+    ],
+    "blind_claude": [
+      "F-agents/eng: openai/codex > anomalyco/opencode > cline/cline",
+      "F-agents/res: OpenHands/OpenHands > google-gemini/gemini-cli > openai/codex"
+    ],
+    "blind_refuter_alternatives": [
+      "SWE-agent/mini-swe-agent",
+      "can1357/oh-my-pi",
+      "dagger/container-use",
+      "opensandbox-group/OpenSandbox",
+      "NVIDIA/OpenShell",
+      "microsoft/agent-framework"
+    ],
+    "codex_primary": [
+      "openai/codex",
+      "anthropics/sandbox-runtime",
+      "git/git"
+    ],
+    "codex_challengers": [
+      "podman-container-tools/podman"
+    ],
+    "codex_primary_not_in_catalog": [
+      "openai/codex",
+      "git/git"
+    ],
+    "codex_unresolved": "Native fallback to unsandboxed execution and shared allowed network destinations can weaken intended restrictions. WSL2 kernel support and installed Codex policy were not inspected. Bubblewrap is a mechanism, not a complete policy."
+  },
+  {
+    "layer_id": "code-navigation",
+    "decision": "retain",
+    "catalog_selected": [
+      "oraios/serena",
+      "ast-grep/ast-grep",
+      "DeusData/codebase-memory-mcp",
+      "jgravelle/jcodemunch-mcp"
+    ],
+    "blind_claude": [
+      "F-retrieval-memory/eng: docling-project/docling > qdrant/qdrant > facebookresearch/faiss",
+      "F-retrieval-memory/res: facebookresearch/faiss > qdrant/qdrant > docling-project/docling"
+    ],
+    "blind_refuter_alternatives": [
+      "lancedb/lancedb",
+      "huggingface/text-embeddings-inference",
+      "ast-grep/ast-grep",
+      "letta-ai/letta",
+      "opendatalab/mineru"
+    ],
+    "codex_primary": [
+      "BurntSushi/ripgrep",
+      "ast-grep/ast-grep",
+      "oraios/serena"
+    ],
+    "codex_challengers": [
+      "scip-code/scip"
+    ],
+    "codex_primary_not_in_catalog": [
+      "BurntSushi/ripgrep"
+    ],
+    "codex_unresolved": "Language support labels do not establish references across generated code, dynamic dispatch or external dependencies. Index freshness and total startup/index cost are unmeasured."
+  },
+  {
+    "layer_id": "document-retrieval",
+    "decision": "keep_but_compare",
+    "catalog_selected": [
+      "tobi/qmd",
+      "andrewyng/context-hub",
+      "microsoft/markitdown",
+      "tsdgeos/poppler_mirror"
+    ],
+    "blind_claude": [
+      "F-retrieval-memory/eng: docling-project/docling > qdrant/qdrant > facebookresearch/faiss",
+      "F-retrieval-memory/res: facebookresearch/faiss > qdrant/qdrant > docling-project/docling"
+    ],
+    "blind_refuter_alternatives": [
+      "lancedb/lancedb",
+      "huggingface/text-embeddings-inference",
+      "ast-grep/ast-grep",
+      "letta-ai/letta",
+      "opendatalab/mineru"
+    ],
+    "codex_primary": [
+      "tobi/qmd",
+      "docling-project/docling"
+    ],
+    "codex_challengers": [
+      "microsoft/markitdown"
+    ],
+    "codex_primary_not_in_catalog": [
+      "docling-project/docling"
+    ],
+    "codex_unresolved": "Extraction fidelity, OCR/model download costs and collection leakage are unknown. QMD's documented MCP interface ignores unknown fields, so misspelled scope parameters must not silently broaden retrieval."
+  },
+  {
+    "layer_id": "semantic-rag",
+    "decision": "keep_but_compare",
+    "catalog_selected": [
+      "giancarloerra/SocratiCode",
+      "qdrant/qdrant",
+      "vllm-project/vllm",
+      "huggingface/huggingface_hub"
+    ],
+    "blind_claude": [
+      "F-retrieval-memory/eng: docling-project/docling > qdrant/qdrant > facebookresearch/faiss",
+      "F-retrieval-memory/res: facebookresearch/faiss > qdrant/qdrant > docling-project/docling"
+    ],
+    "blind_refuter_alternatives": [
+      "lancedb/lancedb",
+      "huggingface/text-embeddings-inference",
+      "ast-grep/ast-grep",
+      "letta-ai/letta",
+      "opendatalab/mineru"
+    ],
+    "codex_primary": [
+      "kapillamba4/code-memory"
+    ],
+    "codex_challengers": [
+      "run-llama/llama_index",
+      "qdrant/qdrant",
+      "qdrant/fastembed",
+      "tobi/qmd"
+    ],
+    "codex_primary_not_in_catalog": [
+      "kapillamba4/code-memory"
+    ],
+    "codex_unresolved": "This is one of the weakest selections: no representative conceptual-code benchmark, no full index-update/deletion audit and no proof of compatibility with the destination embedding endpoint. No universal winner established."
+  },
+  {
+    "layer_id": "durable-memory",
+    "decision": "keep_but_compare",
+    "catalog_selected": [
+      "akitaonrails/ai-memory"
+    ],
+    "blind_claude": [
+      "F-retrieval-memory/eng: docling-project/docling > qdrant/qdrant > facebookresearch/faiss",
+      "F-retrieval-memory/res: facebookresearch/faiss > qdrant/qdrant > docling-project/docling"
+    ],
+    "blind_refuter_alternatives": [
+      "lancedb/lancedb",
+      "huggingface/text-embeddings-inference",
+      "ast-grep/ast-grep",
+      "letta-ai/letta",
+      "opendatalab/mineru"
+    ],
+    "codex_primary": [
+      "basicmachines-co/basic-memory"
+    ],
+    "codex_challengers": [
+      "mem0ai/mem0",
+      "tobi/qmd"
+    ],
+    "codex_primary_not_in_catalog": [
+      "basicmachines-co/basic-memory"
+    ],
+    "codex_unresolved": "Basic Memory currently advertises AGPL-3.0 and a FastMCP prerelease dependency path; both require acceptance. Mem0's advertised managed-service benchmark includes proprietary optimizations unavailable in the open-source SDK, so it cannot settle this comparison."
+  },
+  {
+    "layer_id": "web-research",
+    "decision": "retain",
+    "catalog_selected": [
+      "vercel-labs/agent-browser",
+      "microsoft/playwright-cli",
+      "alphaXiv/OpenResearch",
+      "tavily-ai/tavily-cli"
+    ],
+    "blind_claude": [
+      "F-research-efficiency/eng: microsoft/playwright > stanfordnlp/dspy > puppeteer/puppeteer",
+      "F-research-efficiency/res: microsoft/playwright > stanfordnlp/dspy > firecrawl/firecrawl"
+    ],
+    "blind_refuter_alternatives": [
+      "webrecorder/browsertrix-crawler",
+      "UKGovernmentBEIS/inspect_ai",
+      "unclecode/crawl4ai",
+      "microsoft/LLMLingua",
+      "browserbase/stagehand",
+      "gepa-ai/gepa"
+    ],
+    "codex_primary": [
+      "microsoft/playwright",
+      "tavily-ai/tavily-python"
+    ],
+    "codex_challengers": [
+      "vercel-labs/agent-browser",
+      "unclecode/crawl4ai"
+    ],
+    "codex_primary_not_in_catalog": [
+      "microsoft/playwright",
+      "tavily-ai/tavily-python"
+    ],
+    "codex_unresolved": "Source completeness, dynamic-page fidelity, browser binary cost, external data handling and actual API usage are unknown. Compact browser snapshots can omit evidence; SDK functionality does not prove trustworthy synthesis."
+  },
+  {
+    "layer_id": "token-efficiency",
+    "decision": "keep_but_compare",
+    "catalog_selected": [
+      "rtk-ai/rtk",
+      "mksglu/context-mode",
+      "yamadashy/repomix",
+      "ccusage/ccusage",
+      "chopratejas/headroom",
+      "toon-format/toon"
+    ],
+    "blind_claude": [
+      "F-research-efficiency/eng: microsoft/playwright > stanfordnlp/dspy > puppeteer/puppeteer",
+      "F-research-efficiency/res: microsoft/playwright > stanfordnlp/dspy > firecrawl/firecrawl"
+    ],
+    "blind_refuter_alternatives": [
+      "webrecorder/browsertrix-crawler",
+      "UKGovernmentBEIS/inspect_ai",
+      "unclecode/crawl4ai",
+      "microsoft/LLMLingua",
+      "browserbase/stagehand",
+      "gepa-ai/gepa"
+    ],
+    "codex_primary": [
+      "yamadashy/repomix",
+      "BurntSushi/ripgrep"
+    ],
+    "codex_challengers": [
+      "mksglu/context-mode",
+      "tobi/qmd"
+    ],
+    "codex_primary_not_in_catalog": [
+      "BurntSushi/ripgrep"
+    ],
+    "codex_unresolved": "Repomix compression drops implementation detail. Context Mode's percentage claims and counters are not billed-token savings, and its subprocess boundary is not a credential-isolating OS sandbox. Platform hook parity and failure/source recovery require testing."
+  },
+  {
+    "layer_id": "quality-evaluation",
+    "decision": "retain",
+    "catalog_selected": [
+      "microsoft/playwright",
+      "promptfoo/promptfoo",
+      "koalaman/shellcheck",
+      "Wilfred/difftastic",
+      "modelcontextprotocol/inspector",
+      "typesafe-ai/skills",
+      "openai/skills"
+    ],
+    "blind_claude": [
+      "F-research-efficiency/eng: microsoft/playwright > stanfordnlp/dspy > puppeteer/puppeteer",
+      "F-research-efficiency/res: microsoft/playwright > stanfordnlp/dspy > firecrawl/firecrawl"
+    ],
+    "blind_refuter_alternatives": [
+      "webrecorder/browsertrix-crawler",
+      "UKGovernmentBEIS/inspect_ai",
+      "unclecode/crawl4ai",
+      "microsoft/LLMLingua",
+      "browserbase/stagehand",
+      "gepa-ai/gepa"
+    ],
+    "codex_primary": [
+      "pytest-dev/pytest",
+      "HypothesisWorks/hypothesis",
+      "microsoft/playwright",
+      "promptfoo/promptfoo"
+    ],
+    "codex_challengers": [
+      "confident-ai/deepeval"
+    ],
+    "codex_primary_not_in_catalog": [
+      "pytest-dev/pytest",
+      "HypothesisWorks/hypothesis"
+    ],
+    "codex_unresolved": "Test presence is not passing evidence, and a green synthetic fixture is not an upstream or broker E2E result. LLM judges can agree on the same error; evaluator data leakage, nondeterminism and costs are unmeasured."
+  },
+  {
+    "layer_id": "ci-supply-chain",
+    "decision": "retain",
+    "catalog_selected": [
+      "rhysd/actionlint",
+      "actions/attest",
+      "zizmorcore/zizmor",
+      "gitleaks/gitleaks",
+      "anchore/syft",
+      "dependabot/dependabot-core"
+    ],
+    "blind_claude": [
+      "F-ops/eng: prometheus/prometheus > aquasecurity/trivy > rclone/rclone",
+      "F-ops/res: prometheus/prometheus > apache/airflow > grafana/grafana"
+    ],
+    "blind_refuter_alternatives": [
+      "anchore/grype",
+      "restic/restic",
+      "open-telemetry/opentelemetry-collector",
+      "zizmorcore/zizmor",
+      "sigstore/cosign"
+    ],
+    "codex_primary": [
+      "zizmorcore/zizmor",
+      "rhysd/actionlint",
+      "anchore/syft",
+      "sigstore/cosign"
+    ],
+    "codex_challengers": [
+      "aquasecurity/trivy"
+    ],
+    "codex_primary_not_in_catalog": [
+      "sigstore/cosign"
+    ],
+    "codex_unresolved": "Static findings do not prove reproducible builds. A lockfile or source SBOM need not match installed runtime packages. Signing without checking expected issuer/identity does not establish the intended producer."
+  },
+  {
+    "layer_id": "scheduling-supervision",
+    "decision": "keep_but_compare",
+    "catalog_selected": [
+      "dagucloud/dagu",
+      "systemd/systemd"
+    ],
+    "blind_claude": [
+      "F-ops/eng: prometheus/prometheus > aquasecurity/trivy > rclone/rclone",
+      "F-ops/res: prometheus/prometheus > apache/airflow > grafana/grafana"
+    ],
+    "blind_refuter_alternatives": [
+      "anchore/grype",
+      "restic/restic",
+      "open-telemetry/opentelemetry-collector",
+      "zizmorcore/zizmor",
+      "sigstore/cosign"
+    ],
+    "codex_primary": [
+      "systemd/systemd"
+    ],
+    "codex_challengers": [
+      "PrefectHQ/prefect",
+      "temporalio/temporal"
+    ],
+    "codex_primary_not_in_catalog": [],
+    "codex_unresolved": "WSL uptime and service-manager activation are unverified. Timer persistence handles missed activation but is not a guarantee that every missed interval runs. Durable workflow replay does not make external effects exactly once."
+  },
+  {
+    "layer_id": "hosting-services",
+    "decision": "retain",
+    "catalog_selected": [
+      "vercel/next.js",
+      "react/react",
+      "fastapi/fastapi",
+      "postgres/postgres"
+    ],
+    "blind_claude": [
+      "F-ops/eng: prometheus/prometheus > aquasecurity/trivy > rclone/rclone",
+      "F-ops/res: prometheus/prometheus > apache/airflow > grafana/grafana"
+    ],
+    "blind_refuter_alternatives": [
+      "anchore/grype",
+      "restic/restic",
+      "open-telemetry/opentelemetry-collector",
+      "zizmorcore/zizmor",
+      "sigstore/cosign"
+    ],
+    "codex_primary": [
+      "fastapi/fastapi",
+      "pydantic/pydantic",
+      "caddyserver/caddy"
+    ],
+    "codex_challengers": [
+      "honojs/hono",
+      "podman-container-tools/podman"
+    ],
+    "codex_primary_not_in_catalog": [
+      "pydantic/pydantic",
+      "caddyserver/caddy"
+    ],
+    "codex_unresolved": "Required product interfaces, state store, exposed ports, account requirements and hosting budget are unspecified. Pydantic's default coercion is not proof of strict financial validation. No cloud provider is selected."
+  },
+  {
+    "layer_id": "recovery-portability",
+    "decision": "keep_but_compare",
+    "catalog_selected": [
+      "restic/restic",
+      "astral-sh/uv"
+    ],
+    "blind_claude": [
+      "F-ops/eng: prometheus/prometheus > aquasecurity/trivy > rclone/rclone",
+      "F-ops/res: prometheus/prometheus > apache/airflow > grafana/grafana"
+    ],
+    "blind_refuter_alternatives": [
+      "anchore/grype",
+      "restic/restic",
+      "open-telemetry/opentelemetry-collector",
+      "zizmorcore/zizmor",
+      "sigstore/cosign"
+    ],
+    "codex_primary": [
+      "astral-sh/uv",
+      "jdx/mise",
+      "restic/restic"
+    ],
+    "codex_challengers": [
+      "NixOS/nix"
+    ],
+    "codex_primary_not_in_catalog": [
+      "jdx/mise"
+    ],
+    "codex_unresolved": "Exact platform packages, encryption-key custody, database export consistency and download availability remain unknown. Floating tool versions and missing native dependencies can defeat a lock-only recipe."
+  },
+  {
+    "layer_id": "observation-inference",
+    "decision": "keep_but_compare",
+    "catalog_selected": [
+      "open-telemetry/opentelemetry-collector-contrib",
+      "prometheus/prometheus",
+      "grafana/loki",
+      "grafana/grafana",
+      "prometheus/alertmanager",
+      "binwiederhier/ntfy",
+      "kenn-io/agentsview",
+      "ymtdzzz/otel-tui",
+      "jarrodwatts/claude-hud"
+    ],
+    "blind_claude": [
+      "F-ops/eng: prometheus/prometheus > aquasecurity/trivy > rclone/rclone",
+      "F-ops/res: prometheus/prometheus > apache/airflow > grafana/grafana"
+    ],
+    "blind_refuter_alternatives": [
+      "anchore/grype",
+      "restic/restic",
+      "open-telemetry/opentelemetry-collector",
+      "zizmorcore/zizmor",
+      "sigstore/cosign"
+    ],
+    "codex_primary": [
+      "open-telemetry/opentelemetry-collector",
+      "ymtdzzz/otel-tui",
+      "ggml-org/llama.cpp"
+    ],
+    "codex_challengers": [
+      "vllm-project/vllm"
+    ],
+    "codex_primary_not_in_catalog": [
+      "open-telemetry/opentelemetry-collector",
+      "ggml-org/llama.cpp"
+    ],
+    "codex_unresolved": "otel-tui documents a 0.0.0.0 default host: local intent therefore requires an explicit loopback bind. Model quality, quantization effects, RAM, startup, latency and capacity are unknown on the destination hardware."
+  },
+  {
+    "layer_id": "foundation-memory",
+    "decision": "keep_but_compare",
+    "catalog_selected": [
+      "akitaonrails/ai-memory",
+      "tobi/qmd",
+      "oraios/serena",
+      "giancarloerra/SocratiCode",
+      "qdrant/qdrant",
+      "mksglu/context-mode",
+      "rtk-ai/rtk"
+    ],
+    "blind_claude": [
+      "F-retrieval-memory/eng: docling-project/docling > qdrant/qdrant > facebookresearch/faiss",
+      "F-retrieval-memory/res: facebookresearch/faiss > qdrant/qdrant > docling-project/docling"
+    ],
+    "blind_refuter_alternatives": [
+      "lancedb/lancedb",
+      "huggingface/text-embeddings-inference",
+      "ast-grep/ast-grep",
+      "letta-ai/letta",
+      "opendatalab/mineru"
+    ],
+    "codex_primary": [
+      "dgunning/edgartools",
+      "docling-project/docling",
+      "tobi/qmd",
+      "oraios/serena",
+      "duckdb/duckdb"
+    ],
+    "codex_challengers": [
+      "run-llama/llama_index",
+      "qdrant/qdrant"
+    ],
+    "codex_primary_not_in_catalog": [
+      "dgunning/edgartools",
+      "docling-project/docling",
+      "duckdb/duckdb"
+    ],
+    "codex_unresolved": "Latest company facts or filings can contain later amendments. Filing time, observation period, ingestion time and first-available time must remain distinct. Proposed composition is an architectural hypothesis, not an already integrated stack."
+  },
+  {
+    "layer_id": "agents-operations",
+    "decision": "retain",
+    "catalog_selected": [
+      "openai/codex",
+      "anthropics/claude-code",
+      "dagucloud/dagu",
+      "open-telemetry/opentelemetry-collector-contrib",
+      "prometheus/prometheus",
+      "grafana/loki",
+      "grafana/grafana",
+      "restic/restic"
+    ],
+    "blind_claude": [
+      "T-runtimes/eng: nautechsystems/nautilus_trader > QuantConnect/Lean > brndnmtthws/thetagang",
+      "T-runtimes/res: QuantConnect/Lean > nautechsystems/nautilus_trader > vnpy/vnpy",
+      "F-ops/eng: prometheus/prometheus > aquasecurity/trivy > rclone/rclone",
+      "F-ops/res: prometheus/prometheus > apache/airflow > grafana/grafana"
+    ],
+    "blind_refuter_alternatives": [
+      "Lumiwealth/lumibot",
+      "StockSharp/StockSharp",
+      "anchore/grype",
+      "restic/restic",
+      "open-telemetry/opentelemetry-collector",
+      "zizmorcore/zizmor",
+      "sigstore/cosign"
+    ],
+    "codex_primary": [
+      "openai/codex",
+      "anthropics/claude-code",
+      "systemd/systemd",
+      "PrefectHQ/prefect"
+    ],
+    "codex_challengers": [
+      "langchain-ai/langgraph",
+      "temporalio/temporal"
+    ],
+    "codex_primary_not_in_catalog": [
+      "systemd/systemd",
+      "PrefectHQ/prefect"
+    ],
+    "codex_unresolved": "Research-only prompts do not prevent broker actions. Persistent state can preserve a mistaken plan; returned JSON alone does not establish all expected results were returned. Durable effect semantics remain workload-specific."
+  },
+  {
+    "layer_id": "data-research",
+    "decision": "keep_but_compare",
+    "catalog_selected": [
+      "alpacahq/alpaca-py",
+      "dgunning/edgartools",
+      "duckdb/duckdb",
+      "pandas-dev/pandas",
+      "gerrymanoim/exchange_calendars"
+    ],
+    "blind_claude": [
+      "T-data/eng: duckdb/duckdb > apache/arrow > nautechsystems/nautilus_trader",
+      "T-data/res: QuantConnect/Lean > nautechsystems/nautilus_trader > duckdb/duckdb",
+      "T-alpaca-org/eng: alpacahq/alpaca-py > alpacahq/alpaca-mcp-server > Lumiwealth/lumibot",
+      "T-alpaca-org/res: Lumiwealth/lumibot > alpacahq/alpaca-py > alpacahq/alpaca-skills"
+    ],
+    "blind_refuter_alternatives": [
+      "man-group/ArcticDB",
+      "dgunning/edgartools",
+      "gerrymanoim/exchange_calendars",
+      "microsoft/qlib",
+      "databento/databento-python",
+      "OpenByteInc/QuantDinger",
+      "StrateQueue/StrateQueue",
+      "QuantConnect/Lean.Brokerages.Alpaca"
+    ],
+    "codex_primary": [
+      "databento/databento-python",
+      "dgunning/edgartools",
+      "duckdb/duckdb",
+      "pola-rs/polars"
+    ],
+    "codex_challengers": [
+      "massive-com/client-python",
+      "alpacahq/alpaca-py"
+    ],
+    "codex_primary_not_in_catalog": [
+      "databento/databento-python",
+      "pola-rs/polars"
+    ],
+    "codex_unresolved": "Data entitlements, redistribution rights, historical membership, delisted coverage and correction semantics remain unaccepted. Databento documents pit=True for retained historical corporate-action records versus a latest view; Alpaca documents IEX and SIP as different feeds."
+  },
+  {
+    "layer_id": "engines-strategies",
+    "decision": "keep_but_compare",
+    "catalog_selected": [
+      "nautechsystems/nautilus_trader",
+      "QuantConnect/Lean",
+      "alpacahq/alpaca-py"
+    ],
+    "blind_claude": [
+      "T-engines/eng: nautechsystems/nautilus_trader > QuantConnect/Lean > freqtrade/freqtrade",
+      "T-engines/res: QuantConnect/Lean > nautechsystems/nautilus_trader > StockSharp/StockSharp",
+      "T-runtimes/eng: nautechsystems/nautilus_trader > QuantConnect/Lean > brndnmtthws/thetagang",
+      "T-runtimes/res: QuantConnect/Lean > nautechsystems/nautilus_trader > vnpy/vnpy",
+      "T-strategies/eng: stefan-jansen/machine-learning-for-trading > HKUDS/Vibe-Trading > microsoft/qlib",
+      "T-strategies/res: stefan-jansen/machine-learning-for-trading > microsoft/qlib > microsoft/RD-Agent",
+      "T-portfolio-risk/eng: skfolio/skfolio > pst-group/pysystemtrade > PyPortfolio/PyPortfolioOpt",
+      "T-portfolio-risk/res: skfolio/skfolio > dcajasn/Riskfolio-Lib > stefan-jansen/zipline-reloaded",
+      "T-alpaca-org/eng: alpacahq/alpaca-py > alpacahq/alpaca-mcp-server > Lumiwealth/lumibot",
+      "T-alpaca-org/res: Lumiwealth/lumibot > alpacahq/alpaca-py > alpacahq/alpaca-skills"
+    ],
+    "blind_refuter_alternatives": [
+      "stefan-jansen/zipline-reloaded",
+      "nkaz001/hftbacktest",
+      "edtechre/pybroker",
+      "Lumiwealth/lumibot",
+      "StockSharp/StockSharp",
+      "skfolio/skfolio",
+      "eslazarev/purged-cross-validation",
+      "AI4Finance-Foundation/FinRL",
+      "cvxgrp/cvxportfolio",
+      "pmorissette/ffn",
+      "pmorissette/bt",
+      "OpenByteInc/QuantDinger",
+      "StrateQueue/StrateQueue",
+      "QuantConnect/Lean.Brokerages.Alpaca"
+    ],
+    "codex_primary": [
+      "QuantConnect/Lean",
+      "QuantConnect/Lean.Brokerages.InteractiveBrokers",
+      "QuantConnect/Lean.Brokerages.Alpaca"
+    ],
+    "codex_challengers": [
+      "nautechsystems/nautilus_trader",
+      "stefan-jansen/zipline-reloaded",
+      "polakowo/vectorbt"
+    ],
+    "codex_primary_not_in_catalog": [
+      "QuantConnect/Lean.Brokerages.InteractiveBrokers",
+      "QuantConnect/Lean.Brokerages.Alpaca"
+    ],
+    "codex_unresolved": "LEAN CLI currently requires a paid organization and Docker, while the engine documents a direct .NET build route; that route's broker dependency/account setup remains untested. Nautilus currently documents v2 release-candidate status; an official Alpaca integration was not established. Neither candidate is accepted for both broker paper E2E."
+  }
+]

@@ -1,0 +1,262 @@
+{
+ "schema_version": 1,
+ "kind": "post-seal reconciliation (not blinded)",
+ "written_once_by": "claude agent-lab-24 <PRIVATE_SESSION>",
+ "written_at_utc": "2026-09-22T04:52:43.811Z",
+ "reviewed_revision": "9a88388d0db74aeb59d731dbbd699781d7d6a926 (confirmed via `git -C <PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921 rev-parse HEAD`; `git status --porcelain | wc -l` = 0, clean tree)",
+ "workflow_run": "wf_1b6d6e7e-3d1 (codex-reconciliation-review: source-scout sonnet/medium extract + evidence-reviewer opus/high judge; 129,553 subagent tokens, 26 tool uses)",
+ "verdict": "unsupported_promotion_found",
+ "files_reviewed": [
+  "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/catalogs/landscape/blind-convergence.json",
+  "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+  "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/evidence/artifacts/blind-catalog-convergence-20260921/closure-provenance.json",
+  "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+  "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/docs/claude-blind-adjudication-20260921.md",
+  "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/docs/blind-catalog-layer-findings-20260921.md",
+  "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/docs/blind-catalog-convergence-20260921.md",
+  "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/catalogs/landscape/foundation.json",
+  "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/catalogs/landscape/us-equities.json",
+  "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json",
+  "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+  "<PROJECTS_ROOT>/agent-lab/docs/tasks/2026-09-21-sota-catalog-independent-review.json"
+ ],
+ "correction_checks": [
+  {
+   "item": "(a) screening partition counts",
+   "verified": "verified",
+   "evidence": "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json .original_partition = {shortlisted:120, no_disposition:159, recorded_rule_exclusion:169, star_cap_excluded:65, eligible_annotation_only:1}; .rows|length = 514 (120+169+65+159+1=514). Also restated in docs/claude-blind-adjudication-20260921.md lines 94-101 table (Shortlisted 120, Recorded rule exclusion 169, Explicit star-cap exclusion 65, No recorded disposition 159, Eligible annotation only (ArcticDB) 1, Total 514)."
+  },
+  {
+   "item": "(b) all 10 shortlists top-12 by stars",
+   "verified": "not_verified",
+   "evidence": "docs/claude-blind-adjudication-20260921.md line 112 states 'All ten shortlists match the top 12 by recorded stars among candidates without a recorded rule exclusion. That residual set is not a certified set of rule-passers.' However the same document, quoting the coverage-review critic at evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:3046, gives a materially different, narrower figure: 'the star cut is binding in only 6 of 10 sub-layers ... Where it is binding it is severe: in 5 of those 6 the shortlist is exactly the top 12 by stars among passers.' That is 5 of 6 (not all 10) sub-layers matching top-12-by-stars exactly. The two named final records disagree on this specific count; the claim as phrased ('all 10') is asserted in the adjudication doc but contradicted in scope by the coverage-review record it draws on, so it cannot be verified as fully reconciled from the two sources alone."
+  },
+  {
+   "item": "(c) OctoBot backtesting pinned README reference",
+   "verified": "verified",
+   "evidence": "docs/claude-blind-adjudication-20260921.md lines 129-132: 'OctoBot: WF4 inferred no backtesting focus from a short description. Its [pinned README](https://github.com/Drakkar-Software/OctoBot/blob/85ae511a56dc3c782fcc528ba3a96d29eb6e5e03/README.md#L96) documents historical-data backtesting.'"
+  },
+  {
+   "item": "(d) DVC treeverse identity and Letta V1 retirement retained",
+   "verified": "verified",
+   "evidence": "docs/claude-blind-adjudication-20260921.md lines 136-146: 'DVC: treeverse/dvc is the verified canonical identity, not a mistaken substitution from lakeFS... current upstream (https://github.com/treeverse/dvc) confirms it.' and 'Letta: an active repository or old release does not refute retirement of a particular product generation. The pinned README ... explicitly puts retired V1 in the archive branch and active source in letta-code. Keep the historical-server exclusion...'"
+  },
+  {
+   "item": "(e) all-refuted counts as repository-group pairs",
+   "verified": "verified",
+   "evidence": "docs/claude-blind-adjudication-20260921.md line 115: 'Eighteen repository-group pairs had all their sampled superlative claims refuted; this does not invalidate their actual capabilities or separate native receipts.'"
+  },
+  {
+   "item": "(f) 125 recommendations / 96 identities / 843-identity union",
+   "verified": "verified",
+   "evidence": "docs/claude-blind-adjudication-20260921.md lines 118-124: '75 reported absent-catalog rows, 62 selected-but-unsurfaced rows, 75 disagreements and 125 recommendations. All 125 recommendations (96 distinct normalized identities) and all 75 reported absences already resolve in the current 843-identity index... The ledger explicitly routes all 125 recommendations to existing identity records or conditional comparison/source-review work.' The 843 total is derived earlier at line 22: '514 group entries...combined discovery set is 441. Joining this with the prior 540-identity catalog adds 303...giving 843.' The 125 figure is corroborated by evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json .parsed_coverage_counts.recommended_catalog_actions = 125 and .actions|length = 125."
+  },
+  {
+   "item": "(g) Grype has a conditional source-only card",
+   "verified": "verified",
+   "evidence": "docs/claude-blind-adjudication-20260921.md lines 172-173: \"Grype's domain card is corrected to conditional because its own record says it has not executed; the accepted Syft inventory does not qualify a scanner.\" Also docs/blind-catalog-layer-findings-20260921.md line 21 (ci-supply-chain row): 'Retain accepted analyzers, inventory and attestations. Grype/cosign/Trivy remain task-specific sources.'"
+  },
+  {
+   "item": "(h) critic readiness history preserved",
+   "verified": "verified",
+   "evidence": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:3045 'final_list_ready\": false,' (followed by the WF3 critic's full rationale at line 3046). docs/claude-blind-adjudication-20260921.md lines 78-79: 'The sealed WF3 coverage review returned 11/11 completed children and final_list_ready=false.' and line 185: 'It does not rewrite the original critic's false readiness result...'. evidence/artifacts/blind-catalog-convergence-20260921/closure-provenance.json line 194: '\"original_critic_ready\": false'."
+  }
+ ],
+ "layer_dispositions": [
+  {
+   "layer_id": "native-clients",
+   "coordinator_disposition": "retain",
+   "claude_final_disposition": "retain"
+  },
+  {
+   "layer_id": "instructions-skills",
+   "coordinator_disposition": "retain_targeted_practice",
+   "claude_final_disposition": "adjust"
+  },
+  {
+   "layer_id": "workers",
+   "coordinator_disposition": "retain",
+   "claude_final_disposition": "keep_but_compare"
+  },
+  {
+   "layer_id": "isolation",
+   "coordinator_disposition": "retain",
+   "claude_final_disposition": "retain"
+  },
+  {
+   "layer_id": "code-navigation",
+   "coordinator_disposition": "retain_expand_discovery",
+   "claude_final_disposition": "retain"
+  },
+  {
+   "layer_id": "document-retrieval",
+   "coordinator_disposition": "keep_but_compare",
+   "claude_final_disposition": "keep_but_compare"
+  },
+  {
+   "layer_id": "semantic-rag",
+   "coordinator_disposition": "keep_but_compare",
+   "claude_final_disposition": "keep_but_compare"
+  },
+  {
+   "layer_id": "durable-memory",
+   "coordinator_disposition": "keep_but_compare",
+   "claude_final_disposition": "keep_but_compare"
+  },
+  {
+   "layer_id": "web-research",
+   "coordinator_disposition": "retain_complementary_tools",
+   "claude_final_disposition": "retain"
+  },
+  {
+   "layer_id": "token-efficiency",
+   "coordinator_disposition": "retain",
+   "claude_final_disposition": "keep_but_compare"
+  },
+  {
+   "layer_id": "quality-evaluation",
+   "coordinator_disposition": "retain_expand_discovery",
+   "claude_final_disposition": "retain"
+  },
+  {
+   "layer_id": "ci-supply-chain",
+   "coordinator_disposition": "retain",
+   "claude_final_disposition": "retain"
+  },
+  {
+   "layer_id": "scheduling-supervision",
+   "coordinator_disposition": "keep_but_compare",
+   "claude_final_disposition": "keep_but_compare"
+  },
+  {
+   "layer_id": "hosting-services",
+   "coordinator_disposition": "retain_complementary_tools",
+   "claude_final_disposition": "retain"
+  },
+  {
+   "layer_id": "recovery-portability",
+   "coordinator_disposition": "keep_but_compare",
+   "claude_final_disposition": "keep_but_compare"
+  },
+  {
+   "layer_id": "observation-inference",
+   "coordinator_disposition": "retain_complementary_tools",
+   "claude_final_disposition": "keep_but_compare"
+  },
+  {
+   "layer_id": "foundation-memory",
+   "coordinator_disposition": "keep_but_compare",
+   "claude_final_disposition": "keep_but_compare"
+  },
+  {
+   "layer_id": "agents-operations",
+   "coordinator_disposition": "retain_keep_comparisons",
+   "claude_final_disposition": "retain"
+  },
+  {
+   "layer_id": "data-research",
+   "coordinator_disposition": "keep_but_compare",
+   "claude_final_disposition": "keep_but_compare"
+  },
+  {
+   "layer_id": "engines-strategies",
+   "coordinator_disposition": "keep_but_compare",
+   "claude_final_disposition": "keep_but_compare"
+  }
+ ],
+ "findings": [
+  {
+   "layer_id": "token-efficiency",
+   "claim": "blind-convergence.json sets coordinator_disposition = \"retain\" for token-efficiency, closing the layer while both authorities it claims to summarize keep it open at \"keep_but_compare\". Its own rationale concedes the supporting measurement does not exist (\"No report measured causal provider savings\"), and the layer's selected set contains chopratejas/headroom (landscape_disposition \"conditional\") and toon-format/toon (\"measured_tradeoff\"). A flat layer-level \"retain\" promotes those two conditional/tradeoff roles to settled retention on source review alone.",
+   "evidence": "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/catalogs/landscape/blind-convergence.json:209 (\"coordinator_disposition\": \"retain\") and :210 (rationale \"No report measured causal provider savings\") vs :222 (\"claude_final_disposition\": \"keep_but_compare\"). Canonical: <PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/catalogs/landscape/foundation.json:288-296 (layer_id token-efficiency, \"decision\": \"keep_but_compare\", overturn_when requires \"A frozen task/artifact and repeated controlled comparison ... with successful raw-input recovery\"). Sealed WF4 return: <PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json:447-449 (\"decision\": \"keep_but_compare\"), and its next_action records status comparison_required, saturation not_established (<PROJECTS_ROOT>/agent-lab/docs/tasks/2026-09-21-sota-catalog-independent-review.json:512); headroom/toon roles at the same file lines 486-500.",
+   "proposed_correction": "Set coordinator_disposition for token-efficiency to \"keep_but_compare\" (or an explicitly qualified \"retain_pending_measured_comparison\"), matching foundation.json:292 and claude-final-layers.json:449, and keep the conditional (headroom) and measured_tradeoff (toon) roles named in the rationale so the label cannot be read as blanket retention.",
+   "setup_affected": true
+  },
+  {
+   "layer_id": "workers",
+   "claim": "coordinator_disposition = \"retain\" for the workers layer, while the canonical catalog decision and the sealed WF4 final return are both \"keep_but_compare\" with an open, comparison_required next_action. No executed cancellation/replay/ownership trial is cited anywhere in the layer's evidence_refs; the rationale rests on source-review agreement (\"Both views favor native Codex/Claude\") plus Claude's portable roles/workflow evidence, which the record itself scopes as \"Returned source comparison only\".",
+   "evidence": "blind-convergence.json:83 (\"coordinator_disposition\": \"retain\"), :84 rationale, :96 (\"claude_final_disposition\": \"keep_but_compare\"). Canonical foundation.json:34-42 (workers, \"decision\": \"keep_but_compare\"; overturn_when \"...one challenger passes frozen cancellation, replay, ownership and integration cases.\"). Sealed return claude-final-layers.json:104-106 (\"decision\": \"keep_but_compare\"); next_action \"status: comparison_required\" at <PROJECTS_ROOT>/agent-lab/docs/tasks/2026-09-21-sota-catalog-independent-review.json:144.",
+   "proposed_correction": "Restore coordinator_disposition = \"keep_but_compare\" for workers so it agrees with foundation.json:38 and claude-final-layers.json:106, and leave the frozen cancellation/replay/ownership comparison recorded as owed.",
+   "setup_affected": true
+  },
+  {
+   "layer_id": "observation-inference",
+   "claim": "coordinator_disposition = \"retain_complementary_tools\" is a retain-class label on a layer whose canonical decision and sealed WF4 decision are both \"keep_but_compare\" (saturation not_established). The rationale itself defers qualification (\"Retain the accepted inference pin until target-hardware/model acceptance\"), so the label overstates the recorded state; the layer also carries an open freshness flag (agentsview 0.43.0 vs v0.44.0) and an unresolved otel-tui 0.0.0.0 default-bind caveat.",
+   "evidence": "blind-convergence.json:317 (\"coordinator_disposition\": \"retain_complementary_tools\"), :318 rationale, :330 (\"claude_final_disposition\": \"keep_but_compare\"). Canonical foundation.json:398-406 (observation-inference, \"decision\": \"keep_but_compare\"). Sealed return claude-final-layers.json:809-811. Open items at <PROJECTS_ROOT>/agent-lab/docs/tasks/2026-09-21-sota-catalog-independent-review.json:900 (agentsview newer_stable_release_review_pending) and :903 (otel-tui 0.0.0.0 default host).",
+   "proposed_correction": "Relabel to \"keep_but_compare_complementary_tools\" or \"keep_but_compare\" to match foundation.json:402 and claude-final-layers.json:811; keep the complementary-tool observation in the rationale rather than in the disposition label.",
+   "setup_affected": true
+  },
+  {
+   "layer_id": "instructions-skills",
+   "claim": "coordinator_disposition = \"retain_targeted_practice\" contradicts the canonical layer decision \"adjust\" and the sealed WF4 decision \"adjust\" for the same layer. This is the one layer whose verdict is \"confirmed\" rather than \"corrected\", so the label divergence is not explained by a later correction, and blind-convergence.json records no precedence note saying which of the two dispositions governs.",
+   "evidence": "blind-convergence.json:65 (\"coordinator_disposition\": \"retain_targeted_practice\") vs :78 (\"claude_final_disposition\": \"adjust\"). Canonical foundation.json:21-29 (instructions-skills, \"decision\": \"adjust\"). Sealed return claude-final-layers.json:47-50 (\"decision\": \"adjust\", \"verdict\": \"confirmed\").",
+   "proposed_correction": "Set coordinator_disposition to \"adjust\" (targeted practice) to match foundation.json:25 and claude-final-layers.json:49, or add an explicit precedence field stating that the canonical catalog decision governs wherever coordinator_disposition and claude_final_disposition differ (they differ in 9 of 20 layers).",
+   "setup_affected": true
+  },
+  {
+   "layer_id": "(cross-layer) blind-convergence.json record structure",
+   "claim": "blind-convergence.json carries two disposition fields per layer that disagree in 9 of 20 layers (instructions-skills, workers, code-navigation, web-research, token-efficiency, quality-evaluation, hosting-services, observation-inference, agents-operations) with no field recording the divergence or its precedence. The only guard is the per-layer claude_final_scope sentence (\"current landscape disposition and per-host receipts govern\"), which is easy to miss and is not attached to coordinator_disposition.",
+   "evidence": "blind-convergence.json coordinator_disposition/claude_final_disposition pairs at lines 65/78, 83/96, 119/132, 191/204, 209/222, 227/240, 281/294, 317/330, 353/366; guard sentence repeated at :61, :79, :97 etc. All 20 claude_final_disposition values equal the sealed decisions in claude-final-layers.json (lines 5,49,106,151,189,244,300,359,391,449,523,606,679,719,774,811,908,992,1083,1149) and the canonical decisions in foundation.json (12,25,38,51,64,83,103,118,270,292,313,326,348,368,381,402) and us-equities.json (12,298,570,598); only coordinator_disposition deviates.",
+   "proposed_correction": "Add an explicit top-level precedence statement (canonical catalog decision governs; coordinator_disposition is a summary label, never an adoption gate) and a per-layer divergence flag listing the 9 differing layers, so no downstream setup step reads a retain-class coordinator label as a closed comparison.",
+   "setup_affected": true
+  },
+  {
+   "layer_id": "(correction item b) screening shortlist / star-cut counts",
+   "claim": "EXTRACTED reports item (b) as not_verified because the adjudication doc (\"All ten shortlists match the top 12 by recorded stars\") supposedly contradicts the WF3 critic (\"binding in only 6 of 10 sub-layers ... in 5 of those 6 the shortlist is exactly the top 12\"). The two figures are computed over different candidate pools and the named record explicitly reconciles them, so this is not an unresolved inter-record disagreement. The critic's own sentence names the reason (three sub-layers where the rule-passing set was already exactly 12), and the ledger keeps recorded_rule_exclusion (169) and star_cap_excluded (65) as distinct buckets, which is exactly the denominator difference the adjudication doc identifies.",
+   "evidence": "<PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/docs/claude-blind-adjudication-20260921.md:110-113 \"The independent artifact audit also corrected the final critic: its “only six binding star caps” calculation counted cap-exclusion entries as failed rules. All ten shortlists match the top 12 by recorded stars among candidates without a recorded rule exclusion. That residual set is not a certified set of rule-passers.\" vs <PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921/evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:3046 \"the star cut is binding in only 6 of 10 sub-layers - in T-runtimes, T-alpaca-org and F-agents the rule-passing set was already exactly 12\" (same line: \"514 merged candidates ... 240 dropped with a recorded reason; 274 rule-passing\"). Ledger partition 169 vs 65 as separate buckets is restated at claude-blind-adjudication-20260921.md:96-101.",
+   "proposed_correction": "Reclassify item (b) from \"not_verified / records disagree\" to \"reconciled in the named record, arithmetic not independently re-executed\": state both pools explicitly (345 rows without a recorded rule exclusion vs the critic's 274 rule-passing rows), keep the critic's 6-of-10 figure as attributed history, and record that the reconciliation is reproducible only by running `python3 blueprints/blind-catalog-convergence/audit_reports.py --check` (claude-blind-adjudication-20260921.md:92), which was not executed in this read-only pass.",
+   "setup_affected": false
+  }
+ ],
+ "remaining_comparisons": [
+  "native-clients: on_requirement_change - compare a native client against a supported SDK only when a structured-event/custom-tool/recovery requirement is missing, with frozen task/account/effect checks (foundation.json:16; final-layers next_action).",
+  "instructions-skills: on_requirement_change - run one selected pinned skill on its matching task under a competing ancestor/project-instruction fixture; record discovery, loaded sections and baseline conflict/effort before adding another pack.",
+  "workers: comparison_required - three-worker trial (successful edit, deliberate failure, long-running child): cancel/restart the coordinator, require one terminal record per worker, stopped descendants, surviving artifacts, conflict-free integration.",
+  "isolation: on_requirement_change - in disposable fixtures attempt prohibited read/write, outbound requests and descendant escape; verify termination on cancel; test worktree cross-write denial separately.",
+  "code-navigation: on_requirement_change - held-out exact symbols/callers/renames/external references in the real languages; score location accuracy, stale results after edits, cold/warm latency and memory.",
+  "document-retrieval: comparison_required - sealed document corpus and relevance judgments; repeated lexical/hybrid retrieval plus difficult-layout ingestion against page/row ground truth, including total conversion cost.",
+  "semantic-rag: on_requirement_change - blinded conceptual questions with independently identified supporting locations; recall, cross-project leakage, edit/rename/delete freshness, cold index time, RAM and restore on destination hardware.",
+  "durable-memory: comparison_required - matched source-grounded recall and abstention with scoped capture, deletion and isolated restore across both clients; compare complete provider usage without duplicate memory owners.",
+  "web-research: on_requirement_change - fixed primary-page set with dynamic tables, redirects, failed fetches and pagination; attributable facts, failure accounting, artifact recovery, allowed-domain enforcement, latency and billable usage.",
+  "token-efficiency: comparison_required - replay matched tasks at equal quality with original-context recovery; separate complete provider input/output/cache usage and retries from projected text-size reductions; include failed attempts.",
+  "quality-evaluation: comparison_required - seeded defects and blinded human/oracle labels; measure false positives/negatives, variance and cost before selecting judge metrics; do not tune on the existing eight-case diagnostic.",
+  "ci-supply-chain: on_requirement_change - disposable workflow with known expression injection and excess permissions; double build of pinned sources, runtime inventory, provenance verification and deliberate rejection of a wrong signer/modified artifact. Grype remains conditional/unexecuted.",
+  "scheduling-supervision: on_requirement_change - fixture with child processes and a recorded side effect; cancel/crash/restart in each phase, require no surviving descendants and no duplicated committed effect before considering Prefect/Temporal.",
+  "hosting-services: on_requirement_change - reproduce a minimal required API from a clean environment, validate malformed/boundary requests, bind locally, kill/restart during a write and restore state.",
+  "recovery-portability: new_host_required - restore approved application exports into a clean Linux/WSL host with fresh native sign-in; verify checksums, index rebuild, deletion policy and functional acceptance.",
+  "observation-inference: on_requirement_change - trace a failing and a successful job, verify parent/child outcome linkage and redaction, replay sanitized telemetry; qualify any serving candidate on the same model/task suite (correctness, p50/p95, RAM, cancellation, cost).",
+  "foundation-memory: comparison_required - held-out finance/document/code relevance judgments at historical cutoffs; require then-available sources only, accession/page/row recovery, deterministic structured values, canaries and deleted records.",
+  "agents-operations: on_requirement_change - bounded research fixtures with success, timeout, invalid data and worker cancellation; terminal records for every unit, recoverable source artifacts, denied broker secret/endpoint access, crash-and-resume without duplicate outputs.",
+  "data-research: comparison_required - identical instruments/dates including delistings, splits, dividends, symbol changes, late corrections and halts; rebuild an as-of eligible universe and reconcile adjusted/unadjusted prices, plus actual license and retrieval expense.",
+  "engines-strategies: comparison_required - same causal data and deterministic risk/accounting fixture in each engine reconciled against an independent ledger; then IBKR paper and Alpaca paper qualified separately (stale data, rejected/partial/duplicate fills, disconnect-before-ack, restart, reconciliation)."
+ ],
+ "unmeasured": [
+  "No executed comparison exists for any of the 20 layers: every layer's next_action carries saturation not_established, and claude-coverage-review.json:3043 records that \"Both sides are documentary. No judge and no catalog card in this diff rests on executed code, a reproduced benchmark or a measured numeric result\" (only exceptions named there: OpenSSF Scorecard values, the TOON measured_comparison and the skfolio native_proven receipt).",
+  "The reproduction command for the screening arithmetic, `python3 blueprints/blind-catalog-convergence/audit_reports.py --check` (claude-blind-adjudication-20260921.md:92), was not run in this read-only pass; items (a), (b) and (f) therefore rest on the stored ledger fields and prose rather than a re-derived count. Ask the coordinator to supply its output if the counts must be machine-confirmed.",
+  "The WF3 critic's own gap is unclosed: the diff results were supplied only as inline task text and the generator's output was never written to disk, so absent_from_catalog_total=75, catalog_selected_unsurfaced_total=62, the 75 disagreements and the 12 single-sided evidence fields are a read-based enumeration, not a parse (claude-coverage-review.json:3046).",
+  "WF3's final_list_ready=false is retained and never superseded by an executed re-run; the later repair is documentary relabelling of 157 previously silent rows plus 2 irrelevant, explicitly \"not evidence that the original screen recorded them or that the repositories failed a test\" (claude-blind-adjudication-20260921.md:103-105).",
+  "Open freshness items with no measured impact test: agentsview 0.43.0 vs v0.44.0, markitdown 0.1.7 vs v0.1.8, dagu 2.16.6 vs v2.17.0, vllm 0.25.0 vs v0.29.0 (with the retained v0.29.0 initialization failure), skfolio 1.2.9 vs v1.3.0; the adjudication doc states the source comparison did not test newer skfolio, Headroom or llama.cpp releases on this workload (claude-blind-adjudication-20260921.md:167-170).",
+  "Components with no upstream-snapshot.json entry, so no release/license/archive evidence in that snapshot: typesafe-ai/skills, openai/skills, actionlint, actions/attest, Dependabot, gerrymanoim/exchange_calendars (pins recorded elsewhere per claude-blind-adjudication-20260921.md:152-162, but freshness is unchecked).",
+  "Per-host acceptance: nothing in this reconciliation establishes destination-PC behavior; claude-blind-adjudication-20260921.md:187 states \"the destination PC earns its own acceptance\"."
+ ],
+ "limits": [
+  "screening-ledger.json is 576.4KB, exceeding the Read tool's 256KB limit; it was inspected via `jq` queries (keys, .original_partition, .later_repair_counts, .parsed_coverage_counts, .actions_by_type, array lengths) rather than a full line-by-line read. All figures needed for items (a) and (f) were obtainable this way and cross-checked against the prose docs.",
+  "docs/blind-catalog-layer-findings-20260921.md and docs/blind-catalog-convergence-20260921.md were reviewed for headings and targeted grep hits (843, top-12, OctoBot, treeverse, Letta, refuted, Grype, final_list_ready) rather than read in full line-by-line; the layer-findings doc's per-layer table (22 pipe-lines incl. header) was spot-checked at the ci-supply-chain row against the JSON catalog and matched verbatim.",
+  "Item (b) could not be confirmed as stated: the adjudication doc's own summary text ('All ten shortlists match the top 12 by recorded stars') is inconsistent with the more granular WF3 critic figure it is built on ('the star cut is binding in only 6 of 10 sub-layers... in 5 of those 6 the shortlist is exactly the top 12 by stars among passers'), found in claude-coverage-review.json. Reported as not_verified rather than resolved, per the read-only fact-extraction mandate; reconciling which of the two named records is authoritative is a judgment call left to the requesting role.",
+  "No files under <PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921 or <PROJECTS_ROOT>/native-stack-blind-convergence-20260921 were edited, created, or deleted, per the read-only constraint.",
+  "codex-source-review.json, claude-source-review.json, claude-final-layers.json, claude-screening-repair.json and other named-but-not-explicitly-required large artifacts were not opened in full; only the specific counts requested by the task were sourced from screening-ledger.json, closure-provenance.json, claude-coverage-review.json and the three docs.",
+  "Read-only pass: no file under <PROJECTS_ROOT>/native-agent-stack-landscape-finalization-20260921 or <PROJECTS_ROOT>/agent-lab was created, modified or deleted, and no acceptance command, git command or audit script was executed. All counts quoted are transcribed from stored fields or prose, never derived by eye.",
+  "foundation.json, us-equities.json and codex-source-review.json were inspected by targeted grep on layer_id/decision/overturn_when/test_that_would_change_choice lines rather than read in full; candidate arrays, rationales and evidence_refs inside those catalogs were not read, so a promotion expressed only inside a candidate entry's disposition (rather than in the layer decision) would not have been seen.",
+  "All 20 overturn_when strings in claude-final-layers.json / the agent-lab JSON were matched against foundation.json (lines 16,29,42,55,68,87,107,122,274,296,317,330,352,372,385,406) and us-equities.json (lines 32,317,589,619) and agree verbatim; four of the agent-lab copies append a bracketed provenance note but no altered text. The per-layer comparison_rule in blind-convergence.json is byte-identical across all 20 layers and defers to the canonical overturn_when, so no comparison_rule contradicts an overturn_when.",
+  "claude-coverage-review.json was read only at lines 3040-3048 (the critic's blocking-findings and summary block); the per-sub-layer diff bodies above line 3040 were not read, so an additional coordinator/critic disagreement recorded there would not have been surfaced.",
+  "screening-ledger.json (576KB) was not opened at all in this pass; items (a) and (f) were adjudicated against the prose restatements in claude-blind-adjudication-20260921.md:94-101 and 118-125 plus the ledger figures quoted in EXTRACTED, not against the ledger itself.",
+  "codex-source-review.json was sampled only for the 20 test_that_would_change_choice strings; each is at least as demanding as its layer's overturn_when (all require executed trials), so the comparison_rule's use of the independent report's test does not lower any bar. Its remaining fields, and claude-source-review.json, claude-screening-repair.json, closure-provenance.json, docs/blind-catalog-layer-findings-20260921.md and docs/blind-catalog-convergence-20260921.md, were not opened here.",
+  "The reviewed revision claim (9a88388d..., clean tree) was carried from EXTRACTED and not independently re-checked, since no Bash tool is available to this role."
+ ],
+ "final_correction_message_incorporated": {
+  "status": "yes",
+  "where": "agent-lab docs/tasks/2026-09-21-sota-catalog-independent-review.md section \"Codex final coverage corrections (relay, 2026-09-22)\" and the approved plan <OPERATOR_HOME>/.claude/plans/continue-the-sota-workflow-jaunty-melody.md (Context)"
+ },
+ "residual_name_exposure": "preserved as recorded in the original independent reports; this reconciliation read the named final records and Claude's own sealed return only",
+ "no_new_research": "no discovery, ranking, install, account or settings change performed"
+}
