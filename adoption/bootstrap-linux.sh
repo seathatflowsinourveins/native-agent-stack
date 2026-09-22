@@ -103,6 +103,9 @@ ecosystem_root="$(realpath "$ecosystem_root")"
 bin_dir="$ecosystem_root/bin"
 cache_dir="$ecosystem_root/downloads"
 mkdir -p "$bin_dir" "$cache_dir" "$ecosystem_root/tools"
+# Exported before any install so npm-kind and uv-tool-kind pins resolve the
+# node/npm and uv symlinked here, not a pre-existing host copy (or none).
+export PATH="$bin_dir:$PATH"
 exec 9>"$ecosystem_root/bootstrap.lock"
 flock -n 9 || { printf 'Another ecosystem bootstrap is running.\n' >&2; exit 1; }
 stage_dir="$(mktemp -d "$ecosystem_root/staging.XXXXXXXX")"
@@ -269,15 +272,19 @@ for id in "${component_ids[@]}"; do
   install_pin "$id"
 done
 
-export PATH="$bin_dir:$PATH"
-
 {
   printf 'Verified executable versions at %s for profile %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$profile_id"
   git --version
-  command -v node >/dev/null && node --version
-  command -v npm >/dev/null && npm --version
-  command -v uv >/dev/null && uv --version
-  command -v gh >/dev/null && gh --version
+  # Every symlink actually placed in bin_dir gets its own --version run, not a
+  # fixed subset: this covers all installed pins (node/npm/npx/corepack, uv/uvx,
+  # gh, and each npm- or tarball-kind CLI), so the retained log matches what
+  # was really executed.
+  for installed_executable in "$bin_dir"/*; do
+    [[ -e "$installed_executable" ]] || continue
+    installed_name="$(basename "$installed_executable")"
+    printf -- '-- %s --\n' "$installed_name"
+    "$installed_executable" --version 2>&1 || printf '%s --version exited %s\n' "$installed_name" "$?"
+  done
 } | tee "$ecosystem_root/installed-versions.txt"
 
 printf '\nInstallation finished. Add %q to PATH to use it in this shell.\n' "$bin_dir"

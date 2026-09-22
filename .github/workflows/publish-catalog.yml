@@ -78,7 +78,8 @@ jobs:
           set -euo pipefail
           sbom="$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.spdx.json"
           "$RUNNER_TEMP/syft" scan "dir:." --output "spdx-json=$sbom"
-          sha256sum "$(basename "$sbom")" | tee -a "$PUBLICATION_DIR/archive.sha256"
+          cd "$PUBLICATION_DIR"
+          sha256sum "$(basename "$sbom")" | tee -a archive.sha256
         working-directory: ${{ github.workspace }}
       - name: Attest the catalog archive
         id: attest
@@ -109,6 +110,7 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/publish-catalog.yml" \
             --source-digest "$GITHUB_SHA" \
+            --predicate-type https://spdx.dev/Document \
             --deny-self-hosted-runners --format json \
             > "$PUBLICATION_DIR/verify-sbom.json" 2> "$PUBLICATION_DIR/verify-sbom.log"
       - name: Verify provenance and reject modified archive bytes
@@ -153,6 +155,7 @@ jobs:
         id: archive
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
+          name: native-agent-stack-${{ github.sha }}-archive
           path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.tar.gz
           archive: false
           if-no-files-found: error
@@ -173,6 +176,7 @@ jobs:
         id: sbom-upload
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
+          name: native-agent-stack-${{ github.sha }}-sbom
           path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.spdx.json
           archive: false
           if-no-files-found: error

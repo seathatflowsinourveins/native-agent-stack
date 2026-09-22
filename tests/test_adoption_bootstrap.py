@@ -17,6 +17,8 @@ PINS_PATH = ROOT / "adoption/pins-linux-x86_64.json"
 SCRIPT_PATH = ROOT / "adoption/bootstrap-linux.sh"
 MANIFEST_PATH = ROOT / "adoption/manifest.json"
 WORKFLOW_PATH = ROOT / ".github/workflows/adoption-bootstrap.yml"
+PUBLISH_WORKFLOW_PATH = ROOT / ".github/workflows/publish-catalog.yml"
+GITHUB_AUTOMATION_DOC_PATH = ROOT / "docs/github-automation.md"
 
 SHA256_HEX = re.compile(r"[0-9a-f]{64}\Z")
 VALID_KINDS = {"tarball", "npm", "pip", "uv-tool"}
@@ -157,6 +159,95 @@ class ScriptBehaviorTests(unittest.TestCase):
             self.assertIn("no verified sha256", result.stderr)
             self.assertFalse(eco_root.exists() and any(eco_root.glob("tools/*/*")),
                               "no tool files should have been installed before the refusal")
+
+    def test_bin_dir_is_on_path_before_any_pin_is_installed(self):
+        # Regression: npm-kind and uv-tool-kind installers call `command -v
+        # npm`/`command -v uv` to find the just-installed node/uv symlinks in
+        # bin_dir. If PATH is exported only after every pin installs, those
+        # lookups silently fall back to (or miss) a pre-existing host copy on
+        # a fresh machine. Assert the export precedes the core install loop.
+        text = SCRIPT_PATH.read_text()
+        path_export_index = text.index('export PATH="$bin_dir:$PATH"')
+        core_loop_index = text.index('for core_id in node uv gh')
+        self.assertLess(
+            path_export_index, core_loop_index,
+            "PATH must include bin_dir before node/uv/gh (and any npm- or "
+            "uv-tool-kind pin) are installed",
+        )
+        # The export must not be duplicated after the install loops, which
+        # would mask the bug by only working once every pin has already
+        # tried (and possibly failed) to resolve command -v npm/uv.
+        self.assertEqual(text.count('export PATH="$bin_dir:$PATH"'), 1)
+
+    def test_version_report_covers_every_symlinked_executable(self):
+        # Regression: the retained installed-versions.txt evidence log
+        # previously hardcoded five tools (git/node/npm/uv/gh) even though
+        # ten-plus pins are installed. Assert the report now iterates every
+        # actual symlink under bin_dir instead of a fixed subset.
+        text = SCRIPT_PATH.read_text()
+        self.assertIn('for installed_executable in "$bin_dir"/*', text)
+        self.assertIn('"$installed_executable" --version', text)
+
+
+class PublishWorkflowTests(unittest.TestCase):
+    """Regression tests for the SBOM publication fixes in publish-catalog.yml."""
+
+    def setUp(self):
+        self.text = PUBLISH_WORKFLOW_PATH.read_text()
+
+    def test_sbom_sha256sum_runs_from_the_publication_dir(self):
+        # Regression: `sha256sum "$(basename "$sbom")"` under
+        # working-directory: github.workspace looked for the SBOM in the
+        # checked-out repo, not $PUBLICATION_DIR where syft wrote it.
+        sbom_step = self.text.split("Generate the SPDX SBOM", 1)[1].split("- name:", 1)[0]
+        self.assertIn('cd "$PUBLICATION_DIR"', sbom_step)
+        cd_index = sbom_step.index('cd "$PUBLICATION_DIR"')
+        sha_index = sbom_step.index('sha256sum "$(basename "$sbom")"')
+        self.assertLess(cd_index, sha_index)
+
+    def test_sbom_attestation_verify_pins_its_predicate_type(self):
+        # Regression: gh attestation verify defaults --predicate-type to the
+        # SLSA provenance predicate; without an explicit override it cannot
+        # verify an https://spdx.dev/Document attestation.
+        verify_step = self.text.split("Verify SBOM attestation provenance", 1)[1]
+        verify_step = verify_step.split("- name:", 1)[0]
+        self.assertIn("--predicate-type https://spdx.dev/Document", verify_step)
+
+    def test_archive_and_sbom_uploads_have_distinct_explicit_names(self):
+        # Regression: both upload-artifact steps omitted `name:`, so both
+        # used the action's default "artifact" name and the second upload
+        # would 409-conflict with the first in the same run.
+        names = re.findall(r"^\s+name:\s+(\S.*)$", self.text, flags=re.MULTILINE)
+        upload_names = [n for n in names if "native-agent-stack-${{ github.sha }}" in n]
+        self.assertGreaterEqual(len(upload_names), 2)
+        self.assertEqual(len(upload_names), len(set(upload_names)),
+                          f"upload-artifact names collide: {upload_names}")
+
+
+class GithubAutomationDocTests(unittest.TestCase):
+    def test_operator_verify_snippet_pins_predicate_type(self):
+        text = GITHUB_AUTOMATION_DOC_PATH.read_text()
+        snippet = text.split("gh attestation verify native-agent-stack-<sha>.spdx.json", 1)[1]
+        snippet = snippet.split("```", 1)[0]
+        self.assertIn("--predicate-type https://spdx.dev/Document", snippet)
+
+
+class AdoptionWorkflowPythonVersionTests(unittest.TestCase):
+    def test_workflow_installs_the_manifest_supported_python_before_status(self):
+        # Regression: scripts/adoption_status.py's overall status requires
+        # the host's python3 major.minor to match adoption/manifest.json's
+        # supported_platforms; ubuntu-24.04's default python3 is 3.12 while
+        # the manifest declares 3.13, so the status step exited 2 on every
+        # run. Assert a Python 3.13 setup step precedes the status step.
+        text = WORKFLOW_PATH.read_text()
+        setup_index = text.index("actions/setup-python@")
+        status_index = text.index("scripts/adoption_status.py")
+        self.assertLess(setup_index, status_index)
+        setup_step = text[setup_index:status_index]
+        self.assertIn("python-version: '3.13'", setup_step)
+        manifest = json.loads(MANIFEST_PATH.read_text())
+        supported_pythons = {p["python"] for p in manifest["supported_platforms"]}
+        self.assertIn("3.13", supported_pythons)
 
 
 class WorkflowReferenceTests(unittest.TestCase):

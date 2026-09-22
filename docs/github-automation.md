@@ -274,8 +274,14 @@ operator can reuse after download:
 gh attestation verify native-agent-stack-<sha>.spdx.json \
   --repo seathatflowsinourveins/native-agent-stack \
   --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml \
-  --source-digest <sha>
+  --source-digest <sha> \
+  --predicate-type https://spdx.dev/Document
 ```
+
+`gh attestation verify` defaults `--predicate-type` to
+`https://slsa.dev/provenance/v1`; the SBOM attestation's predicate is
+`https://spdx.dev/Document`, so the flag above is required or verification
+fails.
 
 `adoption-bootstrap.yml` is a separate, lower-stakes job
 (`bootstrap-linux`, 20-minute timeout, plain `ubuntu-24.04`, no elevated
