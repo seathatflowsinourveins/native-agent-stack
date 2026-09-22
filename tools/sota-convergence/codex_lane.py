@@ -55,16 +55,30 @@ DEFAULT_SCHEMA = HERE / "lane-return.schema.json"
 # 'uniqueItems' is not permitted", HTTP 400 invalid_json_schema). The strict copy drops
 # them; record_verdicts.py still enforces every dropped rule when it validates a return.
 STRICT_UNSUPPORTED_KEYWORDS = frozenset({"uniqueItems", "$schema", "$id", "title", "description"})
+# Keywords whose value maps names to subschemas: the names are data (a property may be
+# called "title"), so only the subschemas are filtered.
+SCHEMA_MAP_KEYWORDS = frozenset({"properties", "patternProperties", "$defs", "definitions", "dependentSchemas"})
+# Keywords whose value is instance data, never a schema, so it is kept verbatim.
+DATA_KEYWORDS = frozenset({"const", "enum", "default", "examples"})
 
 
 def strict_output_schema(schema):
     """Return a copy of ``schema`` without keywords Codex strict output rejects."""
-    if isinstance(schema, dict):
-        return {key: strict_output_schema(value) for key, value in schema.items()
-                if key not in STRICT_UNSUPPORTED_KEYWORDS}
     if isinstance(schema, list):
         return [strict_output_schema(value) for value in schema]
-    return schema
+    if not isinstance(schema, dict):
+        return schema
+    strict = {}
+    for key, value in schema.items():
+        if key in STRICT_UNSUPPORTED_KEYWORDS:
+            continue
+        if key in DATA_KEYWORDS:
+            strict[key] = value
+        elif key in SCHEMA_MAP_KEYWORDS and isinstance(value, dict):
+            strict[key] = {name: strict_output_schema(subschema) for name, subschema in value.items()}
+        else:
+            strict[key] = strict_output_schema(value)
+    return strict
 
 
 def write_strict_schema(schema_path: Path, codex_dir: Path) -> Path:
@@ -334,6 +348,7 @@ def main(argv=None) -> int:
 
     if args.dry_run:
         strict_display = codex_dir / "lane-return.codex-strict.schema.json"
+        print(f"# --dry-run writes nothing; a real run first writes {strict_display}", file=sys.stderr)
         for catalog, layer_id, packet_path, packet_sha256, out_path in pending:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"

@@ -397,8 +397,27 @@ class StrictSchemaTests(CodexLaneFixture):
         self.assertTrue(schema_arg.endswith("lane-return.codex-strict.schema.json"))
         self.assertTrue(Path(schema_arg).exists())
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_property_names_that_match_dropped_keywords_are_kept(self):
+        schema = {"type": "object", "additionalProperties": False, "required": ["title", "description"],
+                  "properties": {"title": {"type": "string", "description": "dropped"},
+                                 "description": {"type": "string", "title": "dropped"}},
+                  "$defs": {"$id": {"type": "string", "uniqueItems": True}}}
+        strict = codex_lane.strict_output_schema(schema)
+        self.assertEqual(strict["properties"], {"title": {"type": "string"}, "description": {"type": "string"}})
+        self.assertEqual(strict["required"], ["title", "description"])
+        self.assertEqual(strict["$defs"], {"$id": {"type": "string"}})
+
+    def test_instance_data_keywords_are_kept_verbatim(self):
+        schema = {"type": "object", "const": {"title": "x"}, "default": {"description": "y"},
+                  "enum": [{"$id": "z"}], "examples": [{"uniqueItems": True}]}
+        strict = codex_lane.strict_output_schema(schema)
+        for keyword in ("const", "default", "enum", "examples"):
+            self.assertEqual(strict[keyword], schema[keyword])
+
+    def test_dry_run_writes_no_strict_schema(self):
+        self.write_packet("foundation", "native-clients")
+        self.assertEqual(self.run_lane(["--dry-run"]), 0)
+        self.assertFalse(any(self.work_dir.rglob("lane-return.codex-strict.schema.json")))
 
 
 class PromptFillTests(CodexLaneFixture):
@@ -416,3 +435,7 @@ class PromptFillTests(CodexLaneFixture):
         self.assertIn("You are the codex lane", prompt, "LANE must be filled with codex")
         for marker in ("{PACKET_PATH}", "{REPO_ROOT}", "{LANE}"):
             self.assertNotIn(marker, prompt)
+
+
+if __name__ == "__main__":
+    unittest.main()

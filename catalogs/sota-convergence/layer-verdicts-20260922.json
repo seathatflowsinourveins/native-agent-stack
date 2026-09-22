@@ -6005,7 +6005,7 @@
     },
     "layer_id": "execution-broker",
     "open_gaps": [
-     "lanes disagreed: claude=adaptive-paper-alpaca-adapter,alpaca-py; codex=adaptive-paper-alpaca-adapter,alpaca-py,nautilus-ibkr-adapter; adjudication pending"
+     "lanes disagreed: claude=adaptive-paper-alpaca-adapter,alpaca-py; codex=adaptive-paper-alpaca-adapter,alpaca-py,nautilus-ibkr-adapter; the counterbalanced adjudication did not agree (claude 2, codex 2, 0 refuted; evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json); an executed comparison must decide it"
     ],
     "overturn_protocol": {
      "arms": [
@@ -6752,7 +6752,7 @@
     },
     "layer_id": "observability-hosting",
     "open_gaps": [
-     "lanes disagreed: claude=loki,opentelemetry-collector-contrib,prometheus; codex=opentelemetry-collector-contrib,restic,sandbox-runtime; adjudication pending"
+     "lanes disagreed: claude=loki,opentelemetry-collector-contrib,prometheus; codex=opentelemetry-collector-contrib,restic,sandbox-runtime; the counterbalanced adjudication did not agree (claude 2, codex 2, 0 refuted; evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json); an executed comparison must decide it"
     ],
     "overturn_protocol": {
      "arms": [

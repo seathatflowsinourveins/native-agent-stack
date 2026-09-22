@@ -1,5 +1,4 @@
 {
- "counterbalanced_refuting_votes": 0,
  "differing_components": [
   {
    "belongs_in_winner_set": false,
@@ -18,7 +17,43 @@
   "evidence/receipts/foundation-native-20260920.json",
   "evidence/receipts/native-cli-gaps.json"
  ],
- "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high); lane identities scrubbed from the returns; workflow wf_3e94965e-141; confirmed by a counterbalanced re-judge with A and B swapped (wf_53dd768b-bff), same lane chosen",
+ "judgments": [
+  {
+   "claude_position": "B",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "evidence/receipts/foundation-native-20260920.json",
+    "evidence/receipts/native-cli-gaps.json",
+    "docs/token-native-saturation.md"
+   ],
+   "packet_order": "original",
+   "preferred_lane": "codex",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "The layer requires exact source and references, with an index used only when it answers the question. Only Serena (c5) has retained evidence of both. evidence/receipts/foundation-native-20260920.json (serena.result, line 80) records \"Eight symbol/source/reference checks passed across fresh codex and claude-code MCP server contexts; exact Python parse_codex and CJS collect[0] source matched.\" catalogs/foundation/decisions.json#language-symbols (lines 565-603) makes Serena the \"default\" selection.\n\nBoth components B adds are \"conditional\" there, not default: structural-code-lane (line 613) and scoped-symbol-index (line 664). Their evidence also does not show them matching Serena on this requirement:\n- codebase-memory-mcp (c3): evidence/receipts/native-cli-gaps.json (lines 77-110) records one search_graph plus one trace_path with \"direction\":\"outbound\", depth 1. It returned a line span [91,127] and 4 direct callees. That is not exact source text and not the incoming references a change needs. It also used an \"Existing selected source index\" (line 110).\n- jCodeMunch (c2): decisions.json lines 677-685 record exact function retrieval, but the search/source sequence was \"larger than a known focused read\", and symbol updates and recovery are not established. docs/token-native-saturation.md (lines 6 and 18) records exact function retrieval and client acceptance, but no reference retrieval.\n\nB says c3 is \"the only reference retrieval I observed in a receipt\", but B says it did not open the Serena receipts, and the Serena receipt records reference checks. B therefore adds two conditional lanes without evidence that they meet the requirement as well as Serena. A keeps them as conditional alternatives, which matches the retained decisions.",
+   "workflow": "wf_3e94965e-141"
+  },
+  {
+   "claude_position": "A",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "evidence/receipts/foundation-native-20260920.json",
+    "evidence/receipts/native-context-memory.json",
+    "evidence/receipts/native-cli-gaps.json",
+    "evidence/receipts/desktop-cli-workflows.json",
+    "evidence/receipts/native-jcodemunch-20260920.json"
+   ],
+   "packet_order": "swapped",
+   "preferred_lane": "codex",
+   "preferred_position": "B",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "Return B's winner set, Serena (c5) alone, is better supported than A's set of c5 plus codebase-memory-mcp (c3) and jCodeMunch (c2). The requirement is exact source and references, with an index used only when it answers the question.\n\nSerena meets both parts in the retained evidence:\n- evidence/receipts/foundation-native-20260920.json line 80: \"Eight symbol/source/reference checks passed ... exact Python parse_codex and CJS collect[0] source matched\".\n- evidence/receipts/native-context-memory.json lines 43-51: completed find_referencing_symbols and find_symbol calls.\n- catalogs/foundation/decisions.json line 572: language-symbols has selection \"default\".\n\nc3 and c2 fall short of Serena on this requirement:\n- catalogs/foundation/decisions.json marks both as selection \"conditional\" (lines 613 and 664). The activation text limits them to cases where they answer the actual question or replace broad reads (lines 615 and 666).\n- c3's receipts, evidence/receipts/native-cli-gaps.json lines 77-110 and evidence/receipts/desktop-cli-workflows.json lines 25-40, show a line span (91-127) and 4 outbound callees at depth 1. They show neither returned source text nor incoming references.\n- A's ranking is inconsistent: it drops ast-grep (c1) but keeps c3, although both share the same conditional structural-code-lane decision (decisions.json lines 606-619).\n- c2's receipt, evidence/receipts/native-jcodemunch-20260920.json lines 41-50, returned an exact function. But its full search-plus-source sequence cost 861 tokens against 601 for a focused read, and it has no reference retrieval.\n\nSo A adds two components without evidence that they match Serena. B keeps them as conditional alternatives, which matches the decision record. A's individual factual claims are accurate, so \"neither\" does not apply.",
+   "workflow": "wf_53dd768b-bff"
+  }
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high) per presentation order, lane identities scrubbed from the returns; judgments lists each order's pick (workflows wf_3e94965e-141 and wf_53dd768b-bff)",
  "refuting_votes": 0,
  "votes": 2,
  "why": "The layer requires exact source and references, with an index used only when it answers the question. Only Serena (c5) has retained evidence of both. evidence/receipts/foundation-native-20260920.json (serena.result, line 80) records \"Eight symbol/source/reference checks passed across fresh codex and claude-code MCP server contexts; exact Python parse_codex and CJS collect[0] source matched.\" catalogs/foundation/decisions.json#language-symbols (lines 565-603) makes Serena the \"default\" selection.\n\nBoth components B adds are \"conditional\" there, not default: structural-code-lane (line 613) and scoped-symbol-index (line 664). Their evidence also does not show them matching Serena on this requirement:\n- codebase-memory-mcp (c3): evidence/receipts/native-cli-gaps.json (lines 77-110) records one search_graph plus one trace_path with \"direction\":\"outbound\", depth 1. It returned a line span [91,127] and 4 direct callees. That is not exact source text and not the incoming references a change needs. It also used an \"Existing selected source index\" (line 110).\n- jCodeMunch (c2): decisions.json lines 677-685 record exact function retrieval, but the search/source sequence was \"larger than a known focused read\", and symbol updates and recovery are not established. docs/token-native-saturation.md (lines 6 and 18) records exact function retrieval and client acceptance, but no reference retrieval.\n\nB says c3 is \"the only reference retrieval I observed in a receipt\", but B says it did not open the Serena receipts, and the Serena receipt records reference checks. B therefore adds two conditional lanes without evidence that they meet the requirement as well as Serena. A keeps them as conditional alternatives, which matches the retained decisions.",

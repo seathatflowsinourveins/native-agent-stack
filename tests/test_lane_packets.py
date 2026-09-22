@@ -576,6 +576,20 @@ class WithholdLabelsTests(LanePacketsFixture):
                             for d in c["decisions"]), "the fixture must exercise a decision with a selection")
 
 
+class WithholdLabelsUnitTests(unittest.TestCase):
+    def test_sota_components_outside_the_candidates_lose_their_review_status(self):
+        packet = {"candidates": [{"review_status": "confirmed_default",
+                                  "decisions": [{"id": "d1", "selection": "default", "review_status": "accepted"}]}],
+                  "sota_components_not_in_candidates": [{"component_id": "x", "review_status": "confirmed_default"}],
+                  "withheld": ["rationale"]}
+        withheld = lane_packets.withhold_labels(packet)
+        self.assertIsNone(withheld["sota_components_not_in_candidates"][0]["review_status"])
+        self.assertEqual(withheld["sota_components_not_in_candidates"][0]["component_id"], "x")
+        self.assertEqual(withheld["candidates"][0]["decisions"], [{"id": "d1"}])
+        self.assertEqual(withheld["withheld"][0], "rationale")
+        self.assertIn("sota_components_not_in_candidates[].review_status", withheld["withheld"])
+
+
 class WithholdWithManifestModeTests(ManifestTradingCandidatesTests):
     def test_manifest_mode_trading_packets_are_unchanged_by_withholding(self):
         plain = self.build(trading_candidates="manifest")

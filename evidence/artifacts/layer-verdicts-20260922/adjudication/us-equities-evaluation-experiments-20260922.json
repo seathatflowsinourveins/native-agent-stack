@@ -1,5 +1,4 @@
 {
- "counterbalanced_refuting_votes": 0,
  "differing_components": [
   {
    "belongs_in_winner_set": true,
@@ -14,7 +13,40 @@
   "catalogs/us-equities/data-research.json",
   "catalogs/us-equities/foundation-memory.md"
  ],
- "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high); lane identities scrubbed from the returns; workflow wf_3e94965e-141; confirmed by a counterbalanced re-judge with A and B swapped (wf_53dd768b-bff), same lane chosen",
+ "judgments": [
+  {
+   "claude_position": "A",
+   "evidence_refs": [
+    "blueprints/convergence-practice/arb-trace2code/receipt.json",
+    "blueprints/convergence-practice/local-fixture/evaluation-receipt.json",
+    "catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json",
+    "catalogs/us-equities/data-research.json",
+    "catalogs/us-equities/foundation-memory.md"
+   ],
+   "packet_order": "original",
+   "preferred_lane": "claude",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "A and B differ on one component only: c7 (foundation-agent-retrieval-bench). A includes it and B leaves it out. B's stated reason for dropping it, that the upstream results \"are not a locally observed benchmark run\", is contradicted by retained evidence.\n\n- **Upstream run of c7:** blueprints/convergence-practice/arb-trace2code/receipt.json has kind \"actual_upstream_offline_retrieval_evaluation\" at the unmodified v0.2.1 tag (commit b487f3866cc13dd971819cb902517a6a50282404, \"modified\": false).\n  - Pinned upstream tests: exit_code 0, \"15 passed in 0.15s\".\n  - Schema validation: 101 samples, 0 invalid.\n  - The lexical and bm25 runs each evaluated 101 samples with exit_code 0.\n- **Local fixture run:** blueprints/convergence-practice/local-fixture/evaluation-receipt.json records a frozen 24-query fixture (20 positive, 4 no-gold) scored with native ARB APIs, execution_exit_code 0 and 0 provider calls.\n  - bm25: MRR 0.9666666666666666, Recall@1 0.95.\n  - lexical: MRR 0.9, Recall@1 0.8.\n\nThat makes c7 the only packet candidate with executed evaluation evidence for the layer's \"evaluation\" scope term. The other candidates have source review only.\n\nThe two shared winners check out:\n- **c2 (inspect-ai):** catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json lines 124-125 show installation_performed false and model_calls 0.\n- **c1 (data-mlflow):** catalogs/us-equities/data-research.json lines 798-808 mark the workflow \"Prospective and UNEXECUTED\".\n\nA correctly labels both as source review and states c7's limits accurately: code retrieval on Darwin arm64, gin and click are 82 of the 101 samples, and the fixture is source-authored. I found nothing in A's claims that the evidence contradicts. B drops a component the evidence supports, so B's set is worse.",
+   "workflow": "wf_3e94965e-141"
+  },
+  {
+   "claude_position": "B",
+   "evidence_refs": [
+    "blueprints/convergence-practice/arb-trace2code/receipt.json",
+    "blueprints/convergence-practice/local-fixture/evaluation-receipt.json"
+   ],
+   "packet_order": "swapped",
+   "preferred_lane": "claude",
+   "preferred_position": "B",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "Both returns select c1 (data-mlflow) and c2 (inspect-ai), with source review only for each. The only difference is c7 (foundation-agent-retrieval-bench): B includes it and A leaves it out. A says c7 has no locally observed benchmark run. The retained evidence contradicts that. blueprints/convergence-practice/arb-trace2code/receipt.json records kind \"actual_upstream_offline_retrieval_evaluation\" with status \"completed\". It ran the unmodified v0.2.1 release at commit b487f386. The upstream tests report \"15 passed in 0.15s\". The lexical and bm25 runs each evaluated 101 samples with exit_code 0, and their metrics were checked by independent arithmetic. blueprints/convergence-practice/local-fixture/evaluation-receipt.json records a frozen fixture of 24 queries (20 positive, 4 without gold answers) with zero model or provider calls. bm25 scored MRR 0.9666666666666666 and Recall@1 0.95; lexical scored MRR 0.9 and Recall@1 0.8. These are the only executed results for any candidate in this packet. They meet the layer's \"evaluation\" scope term at least as well as the alternatives, which include MTEB, the overlapping retrieval-evaluation candidate with source review only. So by the adjudication rule, A leaves out a component the evidence supports. B's stated limits match the receipts: the run was on Darwin arm64, gin plus click account for 82 of the 101 samples, the task is code retrieval rather than financial retrieval, and the fixture is source-authored. These limits narrow what c7 shows, but nothing better-evidenced replaces it. Neither return claims that c1 or c2 was executed, so the shared winners are not in dispute.",
+   "workflow": "wf_53dd768b-bff"
+  }
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high) per presentation order, lane identities scrubbed from the returns; judgments lists each order's pick (workflows wf_3e94965e-141 and wf_53dd768b-bff)",
  "refuting_votes": 0,
  "votes": 2,
  "why": "A and B differ on one component only: c7 (foundation-agent-retrieval-bench). A includes it and B leaves it out. B's stated reason for dropping it, that the upstream results \"are not a locally observed benchmark run\", is contradicted by retained evidence.\n\n- **Upstream run of c7:** blueprints/convergence-practice/arb-trace2code/receipt.json has kind \"actual_upstream_offline_retrieval_evaluation\" at the unmodified v0.2.1 tag (commit b487f3866cc13dd971819cb902517a6a50282404, \"modified\": false).\n  - Pinned upstream tests: exit_code 0, \"15 passed in 0.15s\".\n  - Schema validation: 101 samples, 0 invalid.\n  - The lexical and bm25 runs each evaluated 101 samples with exit_code 0.\n- **Local fixture run:** blueprints/convergence-practice/local-fixture/evaluation-receipt.json records a frozen 24-query fixture (20 positive, 4 no-gold) scored with native ARB APIs, execution_exit_code 0 and 0 provider calls.\n  - bm25: MRR 0.9666666666666666, Recall@1 0.95.\n  - lexical: MRR 0.9, Recall@1 0.8.\n\nThat makes c7 the only packet candidate with executed evaluation evidence for the layer's \"evaluation\" scope term. The other candidates have source review only.\n\nThe two shared winners check out:\n- **c2 (inspect-ai):** catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json lines 124-125 show installation_performed false and model_calls 0.\n- **c1 (data-mlflow):** catalogs/us-equities/data-research.json lines 798-808 mark the workflow \"Prospective and UNEXECUTED\".\n\nA correctly labels both as source review and states c7's limits accurately: code retrieval on Darwin arm64, gin and click are 82 of the 101 samples, and the fixture is source-authored. I found nothing in A's claims that the evidence contradicts. B drops a component the evidence supports, so B's set is worse.",

@@ -1,5 +1,4 @@
 {
- "counterbalanced_refuting_votes": 0,
  "differing_components": [
   {
    "belongs_in_winner_set": true,
@@ -13,7 +12,42 @@
   "evidence/receipts/portable-cli-artifacts.json",
   "manifests/evidence.json"
  ],
- "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high); lane identities scrubbed from the returns; workflow wf_3e94965e-141; confirmed by a counterbalanced re-judge with A and B swapped (wf_53dd768b-bff), same lane chosen",
+ "judgments": [
+  {
+   "claude_position": "B",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "evidence/receipts/portable-cli-artifacts.json",
+    "manifests/evidence.json",
+    "blueprints/convergence-practice/document-ingestion/accepted/receipt.json"
+   ],
+   "packet_order": "original",
+   "preferred_lane": "codex",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "Return A is better supported. The only difference between the returns is MarkItDown (c1): A includes it and B leaves it out. In catalogs/foundation/decisions.json (lines 767-815), the source-document-conversion decision is tied to document-retrieval and covers both markitdown and poppler. The whole decision carries one status: selection \"conditional\" with review_status accepted_within_scope. It also records the \"use\" stage as accepted_within_scope for each component. Its evidence is portable-cli-artifacts. In evidence/receipts/portable-cli-artifacts.json (lines 44-51 and 143), native `markitdown fixtures/greeting.html` exited 0 as expected, and markitdown_contains_heading is true. B leaves MarkItDown out but keeps Poppler, even though both sit under that same conditional decision. B also says it did not open the HTML receipt. Neither Poppler nor any unexecuted alternative (Docling, LlamaIndex) has HTML-ingestion evidence, so MarkItDown meets the requirement for HTML at least as well as any alternative. Dropping a component the evidence supports makes B's set worse. Both returns share the QMD BM25 and Poppler winners. For Poppler, blueprints/convergence-practice/document-ingestion/accepted/receipt.json records status passed, 3 pages and 8 positive queries. A correctly limits MarkItDown to HTML and leaves the PDF/Office extras unqualified.",
+   "workflow": "wf_3e94965e-141"
+  },
+  {
+   "claude_position": "A",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "evidence/receipts/portable-cli-artifacts.json",
+    "manifests/evidence.json",
+    "blueprints/convergence-practice/document-ingestion/README.md",
+    "blueprints/convergence-practice/wsl-document-ingestion/receipt.json"
+   ],
+   "packet_order": "swapped",
+   "preferred_lane": "codex",
+   "preferred_position": "B",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "A and B agree on QMD BM25 (c5) and Poppler (c2). The one difference is MarkItDown (c1), which B includes and A leaves out. The retained evidence supports including it. In catalogs/foundation/decisions.json (lines 766-815), the source-document-conversion decision is tagged with layer_ids [\"document-retrieval\"] and lists both component_ids [\"markitdown\",\"poppler\"] under the same selection, \"conditional\", and the same review_status, \"accepted_within_scope\". Its lifecycle stage_refs mark the \"use\" stage accepted_within_scope for both components. A excluded MarkItDown because this decision is \"conditional\", but Poppler, which A kept, sits under that same conditional decision, so A applied the rule to only one of the two. The decision cites evidence id portable-cli-artifacts. In evidence/receipts/portable-cli-artifacts.json (lines 44-51 and 143), native `markitdown fixtures/greeting.html` exited 0 as expected, with markitdown_contains_heading true and final_all_expected_results true. A says it did not open that receipt. That is thin fixture evidence, only a heading check with no answer oracle. Still, it is native execution for HTML conversion, and no other candidate has any executed evidence for HTML. Poppler covers PDFs only. Docling and LlamaIndex have source review only. Context Hub has a different scope. On HTML, then, MarkItDown meets the controlled-ingestion requirement at least as well as every alternative. B also limits the claim correctly: in its open_gaps it says the PDF and Office extras are unqualified, and decisions.json line 789 says the same. B makes no claim the evidence contradicts. A drops a component that the evidence supports for this layer.",
+   "workflow": "wf_53dd768b-bff"
+  }
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high) per presentation order, lane identities scrubbed from the returns; judgments lists each order's pick (workflows wf_3e94965e-141 and wf_53dd768b-bff)",
  "refuting_votes": 0,
  "votes": 2,
  "why": "Return A is better supported. The only difference between the returns is MarkItDown (c1): A includes it and B leaves it out. In catalogs/foundation/decisions.json (lines 767-815), the source-document-conversion decision is tied to document-retrieval and covers both markitdown and poppler. The whole decision carries one status: selection \"conditional\" with review_status accepted_within_scope. It also records the \"use\" stage as accepted_within_scope for each component. Its evidence is portable-cli-artifacts. In evidence/receipts/portable-cli-artifacts.json (lines 44-51 and 143), native `markitdown fixtures/greeting.html` exited 0 as expected, and markitdown_contains_heading is true. B leaves MarkItDown out but keeps Poppler, even though both sit under that same conditional decision. B also says it did not open the HTML receipt. Neither Poppler nor any unexecuted alternative (Docling, LlamaIndex) has HTML-ingestion evidence, so MarkItDown meets the requirement for HTML at least as well as any alternative. Dropping a component the evidence supports makes B's set worse. Both returns share the QMD BM25 and Poppler winners. For Poppler, blueprints/convergence-practice/document-ingestion/accepted/receipt.json records status passed, 3 pages and 8 positive queries. A correctly limits MarkItDown to HTML and leaves the PDF/Office extras unqualified.",

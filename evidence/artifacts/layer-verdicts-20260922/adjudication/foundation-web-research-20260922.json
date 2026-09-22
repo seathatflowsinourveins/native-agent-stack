@@ -1,5 +1,4 @@
 {
- "counterbalanced_refuting_votes": 0,
  "differing_components": [
   {
    "belongs_in_winner_set": true,
@@ -12,7 +11,39 @@
   "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
   "evidence/receipts/token-practice-gap-followup-20260920.json"
  ],
- "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high); lane identities scrubbed from the returns; workflow wf_3e94965e-141; confirmed by a counterbalanced re-judge with A and B swapped (wf_53dd768b-bff), same lane chosen",
+ "judgments": [
+  {
+   "claude_position": "A",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
+    "evidence/receipts/token-practice-gap-followup-20260920.json"
+   ],
+   "packet_order": "original",
+   "preferred_lane": "claude",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "Both returns select Tavily CLI (c8) and agent-browser (c1). The only difference is OpenResearch (c7): A includes it and B leaves it out. The retained evidence supports including it.\n\ncatalogs/foundation/decisions.json lines 1098-1137 put the OpenResearch decision public-literature-retrieval in layer web-research. Its selection is \"conditional\" and its review_status is \"accepted_within_scope\". That is the same status as tavily-native-search-extract (lines 2279-2288) and bounded-browser-operations (lines 1049-1057). So B's implied reason for leaving OpenResearch out would apply equally to its own two winners.\n\nOpenResearch also has native execution evidence for retrieving attributable primary sources through bounded CLI commands with no agent stack:\n- evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json lines 9-58 record OpenResearch 0.2.7. `orx --no-telemetry discover keyword ... --limit 3` exited 0 with result_count 3. `orx --no-telemetry paper 2609.05760 --full` exited 0 and returned 69752 UTF-8 bytes. 7 of 7 unchanged upstream Markdown tests passed. The file also states \"No ... research experiment executed or model run triggered\".\n- evidence/receipts/token-practice-gap-followup-20260920.json lines 66-71 and 195-200 record `orx --no-telemetry paper 2608.02583 --full` returning 63560 bytes, described as \"no model, research-agent or compute job\".\n\nB argues that no incremental coverage comparison shows OpenResearch is needed. But nothing retained shows Tavily covering discovery and full-text retrieval of papers. OpenResearch holds a separate accepted capability in this layer, and no alternative has better evidence for that capability. Leaving out an evidence-supported component makes B's set weaker.\n\nA's caveats match the files:\n- The 0.2.7 pin is behind upstream v0.2.8.\n- The Rust suite was not run because cargo was unavailable (limits, lines 62-67).\n- The evidence is a narrow literature scope, not a quality benchmark.\n\nA makes no claim that the files I opened contradict. The shared winners were not re-verified, because both returns agree on them.",
+   "workflow": "wf_3e94965e-141"
+  },
+  {
+   "claude_position": "B",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "evidence/receipts/token-practice-gap-followup-20260920.json",
+    "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json"
+   ],
+   "packet_order": "swapped",
+   "preferred_lane": "claude",
+   "preferred_position": "B",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "The two returns differ on one component only: OpenResearch (c7). B includes it and A leaves it out. In catalogs/foundation/decisions.json, all three of B's winners have decisions assigned to the web-research layer, and all three decisions have selection \"conditional\" and review_status \"accepted_within_scope\": tavily-native-search-extract (lines 2279-2288), bounded-browser-operations (lines 1049-1057) and public-literature-retrieval for openresearch (lines 1098-1109). The OpenResearch decision is backed by retained native runs. In evidence/receipts/token-practice-gap-followup-20260920.json, `orx --no-telemetry paper 2608.02583 --full` returned 63560 bytes (lines 196-198). In evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json, the 0.2.7 `orx --no-telemetry discover keyword ... --limit 3` exited 0 with result_count 3 (lines 21-23), `orx paper 2609.05760 --full` exited 0 (lines 32-33), and 7 unchanged upstream Markdown tests passed (lines 54-55). This shows attributable primary-source (paper) retrieval through a bounded native command with no agent stack, which is part of the requirement. No retained Tavily evidence covers paper retrieval. A drops c7 because no incremental coverage comparison exists, but the same standard would also remove agent-browser and Tavily, which have no comparison either. Leaving out a component the evidence supports makes A's set worse. The two returns agree on the other components (Tavily, agent-browser, and the exclusion of Playwright CLI, Cua Driver, Crawl4AI, Firecrawl MCP and Browser Use), and neither makes a claim that the evidence contradicts.",
+   "workflow": "wf_53dd768b-bff"
+  }
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high) per presentation order, lane identities scrubbed from the returns; judgments lists each order's pick (workflows wf_3e94965e-141 and wf_53dd768b-bff)",
  "refuting_votes": 0,
  "votes": 2,
  "why": "Both returns select Tavily CLI (c8) and agent-browser (c1). The only difference is OpenResearch (c7): A includes it and B leaves it out. The retained evidence supports including it.\n\ncatalogs/foundation/decisions.json lines 1098-1137 put the OpenResearch decision public-literature-retrieval in layer web-research. Its selection is \"conditional\" and its review_status is \"accepted_within_scope\". That is the same status as tavily-native-search-extract (lines 2279-2288) and bounded-browser-operations (lines 1049-1057). So B's implied reason for leaving OpenResearch out would apply equally to its own two winners.\n\nOpenResearch also has native execution evidence for retrieving attributable primary sources through bounded CLI commands with no agent stack:\n- evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json lines 9-58 record OpenResearch 0.2.7. `orx --no-telemetry discover keyword ... --limit 3` exited 0 with result_count 3. `orx --no-telemetry paper 2609.05760 --full` exited 0 and returned 69752 UTF-8 bytes. 7 of 7 unchanged upstream Markdown tests passed. The file also states \"No ... research experiment executed or model run triggered\".\n- evidence/receipts/token-practice-gap-followup-20260920.json lines 66-71 and 195-200 record `orx --no-telemetry paper 2608.02583 --full` returning 63560 bytes, described as \"no model, research-agent or compute job\".\n\nB argues that no incremental coverage comparison shows OpenResearch is needed. But nothing retained shows Tavily covering discovery and full-text retrieval of papers. OpenResearch holds a separate accepted capability in this layer, and no alternative has better evidence for that capability. Leaving out an evidence-supported component makes B's set weaker.\n\nA's caveats match the files:\n- The 0.2.7 pin is behind upstream v0.2.8.\n- The Rust suite was not run because cargo was unavailable (limits, lines 62-67).\n- The evidence is a narrow literature scope, not a quality benchmark.\n\nA makes no claim that the files I opened contradict. The shared winners were not re-verified, because both returns agree on them.",

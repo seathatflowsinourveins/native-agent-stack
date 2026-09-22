@@ -1,5 +1,4 @@
 {
- "counterbalanced_refuting_votes": 0,
  "differing_components": [
   {
    "belongs_in_winner_set": true,
@@ -19,7 +18,42 @@
   "catalogs/landscape/native-practice.json",
   "docs/foundation-closure-20260921.md"
  ],
- "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high); lane identities scrubbed from the returns; workflow wf_3e94965e-141; confirmed by a counterbalanced re-judge with A and B swapped (wf_53dd768b-bff), same lane chosen",
+ "judgments": [
+  {
+   "claude_position": "B",
+   "evidence_refs": [
+    "catalogs/landscape/native-practice.json",
+    "catalogs/foundation/decisions.json",
+    "blueprints/native-skill-practice/native-receipt.json",
+    "blueprints/native-skill-practice/typesafe-result.json",
+    "docs/foundation-closure-20260921.md"
+   ],
+   "packet_order": "original",
+   "preferred_lane": "claude",
+   "preferred_position": "B",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "A and B share c4 (ECC) and c3 (OpenAI skills). They differ only in that A picks c9 (skills-ref) and B picks c8 (TypeSafe). The requirement asks for useful upstream procedures delivered per task.\n\nc8 has the stronger retained evidence as an on-demand procedure:\n- catalogs/landscape/native-practice.json lines 32-36 pin it at 65a39f39 with a SKILL.md sha256. It was installed with the recorded npx skills commands at lines 21-27, and all hashes matched.\n- Its activation is limited to semantic-judgment tasks (line 49).\n- Claude's initialization listed it, and the corrected Codex run completed eight cases (lines 60-61).\n- blueprints/native-skill-practice/typesafe-result.json records service_errors 0 and promptfoo_exit_code 100. Line 53 of native-practice.json records 7/8 frozen labels against 3/8 for weak literal containment.\n\nThat is more evidence than the shared winner c3's security-best-practices has, which is installed_discovery_only (native-practice.json line 152). A excludes c8 because it lacks a general task-improvement result. c3 and c4 lack one as well, so A applies an inconsistent standard.\n\nc9 is a format validator, not a source of procedures:\n- native-practice.json lines 216-227 say its repository has \"no SKILL.md additions to install\", with decision retain_existing_reference. The same record says reference validation \"does not establish Claude/Codex extension support or native discovery\".\n- catalogs/foundation/decisions.json lines 296-316 limit it to accepted_within_scope for validating one portable skill.\n- blueprints/native-skill-practice/native-receipt.json lines 29-38 show skills-ref exited 0 on the three installed skills. That supports the winners without delivering procedures itself.\n\ndocs/foundation-closure-20260921.md line 53 does name Agent Skills in this layer's row. B lists c9 as a conditional supporting tool and discloses that record conflict. Neither return makes a claim the evidence contradicts.",
+   "workflow": "wf_3e94965e-141"
+  },
+  {
+   "claude_position": "A",
+   "evidence_refs": [
+    "catalogs/landscape/native-practice.json",
+    "blueprints/native-skill-practice/native-receipt.json",
+    "catalogs/foundation/decisions.json",
+    "docs/foundation-closure-20260921.md"
+   ],
+   "packet_order": "swapped",
+   "preferred_lane": "claude",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "Both returns choose c4 (ECC) and c3 (OpenAI skills). The only difference is that A includes c8 (TypeSafe) and B includes c9 (skills-ref). The evidence supports A. catalogs/landscape/native-practice.json lines 32-69 record TypeSafe with a pin (65a39f39) and a SKILL.md sha256. It was installed through the supported npx skills commands (lines 21-27), and its activation is limited to semantic tasks (line 49). blueprints/native-skill-practice/native-receipt.json shows Claude's client discovery listing typesafe-ai (lines 199-203) and the corrected Codex run loading the project copy and completing 8 cases (lines 76-109). The failed first attempt is also retained (lines 43-57). So c8 is an upstream procedure, delivered selectively, with evidence at least as strong as c3's security-best-practices, which is only 'installed_discovery_only' (native-practice.json lines 151-158). B leaves c8 out because it does not improve 'general instruction delivery'. B does not apply that standard to c3, which also has no measured task improvement. c9 adds no procedure. catalogs/foundation/decisions.json lines 296-335 record it as 'conditional', a format validator whose evidence is that it 'accepted and rendered one selected skill'. native-practice.json lines 216-227 say the repository has 'no SKILL.md additions to install' and that validation 'does not establish Claude/Codex extension support or native discovery'. c9 does support the winners: skills-ref exited 0 for all three skills (native-receipt.json lines 29-38). B's strongest point is that docs/foundation-closure-20260921.md line 53 names Agent Skills in this layer's row. A discloses that record conflict openly. Neither set makes a claim the evidence contradicts.",
+   "workflow": "wf_53dd768b-bff"
+  }
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high) per presentation order, lane identities scrubbed from the returns; judgments lists each order's pick (workflows wf_3e94965e-141 and wf_53dd768b-bff)",
  "refuting_votes": 0,
  "votes": 2,
  "why": "A and B share c4 (ECC) and c3 (OpenAI skills). They differ only in that A picks c9 (skills-ref) and B picks c8 (TypeSafe). The requirement asks for useful upstream procedures delivered per task.\n\nc8 has the stronger retained evidence as an on-demand procedure:\n- catalogs/landscape/native-practice.json lines 32-36 pin it at 65a39f39 with a SKILL.md sha256. It was installed with the recorded npx skills commands at lines 21-27, and all hashes matched.\n- Its activation is limited to semantic-judgment tasks (line 49).\n- Claude's initialization listed it, and the corrected Codex run completed eight cases (lines 60-61).\n- blueprints/native-skill-practice/typesafe-result.json records service_errors 0 and promptfoo_exit_code 100. Line 53 of native-practice.json records 7/8 frozen labels against 3/8 for weak literal containment.\n\nThat is more evidence than the shared winner c3's security-best-practices has, which is installed_discovery_only (native-practice.json line 152). A excludes c8 because it lacks a general task-improvement result. c3 and c4 lack one as well, so A applies an inconsistent standard.\n\nc9 is a format validator, not a source of procedures:\n- native-practice.json lines 216-227 say its repository has \"no SKILL.md additions to install\", with decision retain_existing_reference. The same record says reference validation \"does not establish Claude/Codex extension support or native discovery\".\n- catalogs/foundation/decisions.json lines 296-316 limit it to accepted_within_scope for validating one portable skill.\n- blueprints/native-skill-practice/native-receipt.json lines 29-38 show skills-ref exited 0 on the three installed skills. That supports the winners without delivering procedures itself.\n\ndocs/foundation-closure-20260921.md line 53 does name Agent Skills in this layer's row. B lists c9 as a conditional supporting tool and discloses that record conflict. Neither return makes a claim the evidence contradicts.",

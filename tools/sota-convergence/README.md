@@ -657,10 +657,19 @@ mode.
   `open_gaps` gets "codex lane absent for this layer"); both valid but
   disagreeing -> `disagree`: recorded from the lane an optional
   `--adjudications/<catalog>__<layer_id>.json`
-  (`{"winner_lane": "claude"|"codex", "why", "evidence_refs": [...]}`) names
-  (the file itself is retained at
-  `evidence/artifacts/layer-verdicts-20260922/adjudication/<run_id>.json`),
-  else the row stays `pending_lanes` with the open disagreement recorded
+  (`{"winner_lane": "claude"|"codex"|null, "why", "evidence_refs": [...],
+  "judgments": [{"claude_position": "A"|"B", "preferred_position": "A"|"B",
+  "preferred_lane", "refuting_votes"}, ...]}`) names (the file itself is
+  retained at
+  `evidence/artifacts/layer-verdicts-20260922/adjudication/<run_id>.json`).
+  The tool enforces the counterbalanced rule: the judgments must include
+  both presentation orders (Claude's return shown as A and as B), each
+  `preferred_lane` must follow from its positions, and `winner_lane` must be
+  the lane every judgment chose with no refuting vote. When the judgments
+  split or any was refuted, `winner_lane` must be `null`; the file is still
+  sealed and the row stays `pending_lanes` with the tally in `open_gaps`.
+  Without an adjudication file the row stays `pending_lanes` with the open
+  disagreement recorded
   (`open_gaps` names the two lanes' winner *component_ids* -- the same
   identity the agreement check itself compares -- never the packet-local
   candidate keys, which are opaque outside the packet). Codex-only (no

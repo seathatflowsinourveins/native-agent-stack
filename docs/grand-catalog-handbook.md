@@ -3,9 +3,11 @@
 This is the handbook for the catalog as frozen on **September 22, 2026**. It covers
 two catalogs: the **foundation** that every native Claude and Codex session runs
 on (20 layers), and the **US-equities north star** that builds simulation, paper
-and live trading on that foundation (12 layers). Every layer records its winning
+and live trading on that foundation (12 layers). Thirty layers record their winning
 repositories, the named alternatives, why the winners were chosen, the evidence
-class behind that choice and the comparison that would overturn it. The
+class behind that choice and the comparison that would overturn it. Two trading
+layers stay `pending_lanes`: both lanes' sets and the comparison that would decide
+them are recorded instead. The
 generated section at the end of this page holds those per-layer verdicts; this
 prose explains how to read them, what they do not establish and how to rerun
 them against a later landscape.
@@ -18,7 +20,7 @@ the [landscape manifest](../catalogs/landscape/manifest.json).
 | Measure (2026-09-22) | Value |
 | --- | --- |
 | Foundation layers / trading layers | 20 / 12 |
-| Layers with a recorded verdict | 32 of 32 |
+| Layers with a recorded verdict | 30 of 32 (2 `pending_lanes`) |
 | Selected, versioned components | 69 |
 | Foundation capability decisions | 54 |
 | Repository identities in the discovery index | 844 |
@@ -40,10 +42,8 @@ The trading catalog keeps 12 layers; its four older domain rows (research memory
 workers and operations, market data, simulation and execution) survive as the
 `group` of each trading row.
 
-Each layer was given a stripped evidence packet. An Opus proposer selected the
-winner set from retained evidence, and two Opus refuters attacked it from the
-evidence and challenger angles, with one revision round after any refutation or
-major finding.
+Each layer was given a stripped evidence packet, and two independent lanes each
+chose a winner set from the retained evidence (see the cross-family run below).
 The record tool then applied the rules in code: every recorded winner must name
 its evidence class and the reason it beats the alternatives, and the tool derives
 its platform status from that evidence class and supplies its install anchor. The dated
@@ -59,10 +59,13 @@ packets (`lane_packets.py --trading-candidates manifest --withhold-labels`):
 - **Trading packets** hold the convergence manifest's own entries for the layer, with
   evidence from their domain cards and the layer's taxonomy scope terms.
 - **Foundation packets** drop the labels that revealed the incumbent (candidate review
-  status, decision selection and decision review status).
-- **Both lanes ran blind**, against a checkout of catalog main with every earlier
-  verdict removed (ledger verdict fields, sealed returns, this handbook and the
-  explorer). Each saw neither the other lane's returns nor earlier verdicts.
+  status, decision selection and decision review status). The repository the lanes
+  read did not: see the label-exposure limit below.
+- **Both lanes ran against a checkout** of catalog main with the September 22 v2
+  verdicts removed (ledger verdict fields, sealed returns, this handbook and the
+  explorer). Each saw neither the other lane's returns nor those verdicts. The
+  checkout kept the older v1 decision fields and the foundation decision records'
+  selection labels.
 - **The Claude lane** used an Opus 5.5 proposer, two refuters and one revision per
   layer. **The Codex lane** ran `codex_lane.py` on GPT-6 Astra at high effort, one
   read-only call per layer. Both received the same record-step notes.
@@ -75,17 +78,20 @@ entries more often carry native evidence and an install recipe, and some card ro
 text says "optional" or "fallback".
 
 **Cross-family result.** The two lanes named the same winner set in 20 of 32 layers
-(`same_winner`). In the other 12 the sets overlapped and differed by one or two
-components. An anonymous adjudication decided 10 of them: returns A and B had host
-paths and model names scrubbed, an Opus evidence reviewer chose the set the evidence
-better supports, and two reviewers tried to refute the pick. It was then run again
-with A and B swapped, and a layer counts as adjudicated only when both orders chose
-the same lane with no refutation. Claude's set won 7 and Codex's 3. In
-`execution-broker` and `observability-hosting` every judgment followed the
-presentation order (2-2 over four judgments), so the evidence does not separate the
-sets. Those two rows stay `pending_lanes` with both sets recorded. The adjudicators
-are the same model family as one lane, which the scrubbing and the order swap
-mitigate but do not remove.
+(`same_winner`). In the other 12 the sets overlapped. Eleven differed by one or two
+components; `observability-hosting` differed by four, two unique to each lane. An
+anonymous adjudication decided 10 of them: returns A and B had host paths and model
+names scrubbed, an Opus evidence reviewer chose the set the evidence better
+supports, and two reviewers tried to refute the pick. It was then run again with A
+and B swapped. `record_verdicts.py` accepts an adjudicated winner only when its
+judgments cover both presentation orders and all chose the same lane with no
+refuting vote, and each sealed adjudication record lists every judgment's order and
+pick. Claude's set won 7 and Codex's 3. In `execution-broker` and
+`observability-hosting` every judgment chose whichever return was shown as A (2-2
+over four judgments, two per order), so the evidence does not separate the sets.
+Those two rows stay `pending_lanes` with both sets recorded, and their split
+adjudications are sealed with the others. The adjudicators are the same model family
+as one lane, which the scrubbing and the order swap mitigate but do not remove.
 
 Earlier records remain linked for their own findings: the
 [independent Claude adjudication](claude-blind-adjudication-20260921.md), the
@@ -156,10 +162,10 @@ owns versions, and this table does not create a second package lock.
 | --- | --- | --- |
 | Native clients | Claude Code, Codex (retain) | Native sign-in, discovery, useful task and continuation per client |
 | Instructions and skills | ECC selection, TypeSafe and OpenAI skills (adjust) | Relevant task use with source pins and explicit worker context |
-| Workers | Claude Code, Codex, Worktrunk (keep but compare) | Owned writing worktrees, integration and independent evidence review |
+| Workers | Claude Code, Worktrunk (keep but compare) | Owned writing worktrees, integration and independent evidence review |
 | Isolation | Worktrunk, sandbox-runtime (retain) | Exercise the required restriction; worktrees do not enforce it |
-| Code navigation | Serena, jCodeMunch, codebase-memory-mcp (retain) | Exact source retrieval and original-code confirmation |
-| Document retrieval | QMD, Poppler (keep but compare) | Corpus- and format-specific retrieval and conversion checks |
+| Code navigation | Serena (retain) | Exact source retrieval and original-code confirmation |
+| Document retrieval | QMD, MarkItDown, Poppler (keep but compare) | Corpus- and format-specific retrieval and conversion checks |
 | Semantic RAG | SocratiCode, Qdrant, vLLM (keep but compare) | Hardware-compatible embeddings, scoped indexing and real retrieval |
 | Durable memory | ai-memory (keep but compare) | Scoped cross-client recall and restore; matched quality comparison still owed |
 | Web research | Tavily CLI, agent-browser, OpenResearch (retain) | Actual source acquisition, attribution and task-specific completeness |
@@ -168,8 +174,8 @@ owns versions, and this table does not create a second package lock.
 | CI and supply chain | zizmor, Syft, GitHub attestations (retain) | Actual scoped runs; an inventory is not a vulnerability verdict |
 | Scheduling and supervision | systemd, Dagu (keep but compare) | Failure, cancellation and in-flight restart behavior |
 | Hosting and services | FastAPI, PostgreSQL, Next.js (retain) | Reproduce the scoped application; production hosting is separate |
-| Recovery and portability | Restic (keep but compare) | Empty-target install and off-host restore, then consumer verification |
-| Observation and inference | OpenTelemetry Collector, Prometheus, Grafana (keep but compare) | Actual task/event delivery and recovery on the destination host |
+| Recovery and portability | Restic, uv (keep but compare) | Empty-target install and off-host restore, then consumer verification |
+| Observation and inference | OpenTelemetry Collector, Prometheus, Loki (keep but compare) | Actual task/event delivery and recovery on the destination host |
 | Agent SDKs and runtime workers | Codex SDK (retain) | A rerun of the matched three-arm worker comparison |
 | MCP servers and client surfaces | MCPorter, MCP Inspector (retain) | Scoped server discovery and contract checks per client |
 | Secrets and credentials | Gitleaks (keep but compare) | Full-coverage scanning and a credential-store decision per host |
@@ -378,7 +384,9 @@ To rerun the verdicts against a later landscape, follow the
    manifest --withhold-labels`, so each trading packet carries that layer's own
    manifest entries and no packet carries a decision-bearing label (the defaults
    reproduce the first run's packets). Build a blind checkout with every recorded
-   verdict removed, and point both lanes at it. Then run the Claude lane through the saved
+   verdict removed, including the v1 decision fields and the foundation decision
+   records' `selection` and `review_status` labels (the September 22 checkout kept
+   those), and point both lanes at it. Then run the Claude lane through the saved
    `layer-verdict-lane` workflow, which lives in the agent-lab repository's
    `.claude/workflows/`, not in this catalog.
 4. Run the independent Codex lane (`codex_lane.py`) on the same packets without
@@ -387,7 +395,9 @@ To rerun the verdicts against a later landscape, follow the
 5. Record both lanes with `record_verdicts.py`. A row is `same_winner` when both
    lanes name the same set of winner components. When they disagree, the row
    stays `pending_lanes` until an adjudication file is supplied. Adjudicate from
-   anonymized returns, and accept a lane only when an order-swapped re-judge agrees.
+   anonymized returns in both presentation orders and record every judgment in the
+   file's `judgments`; the tool rejects a winner that any order or refuter
+   contradicts, and seals a split with the row left `pending_lanes`.
 6. Regenerate this page's tables with `build_verdicts.py --write` and check with
    `--check`.
 
@@ -402,13 +412,29 @@ their dates and superseding links.
   `pending_lanes`. Both lanes agree on a core: the Alpaca paper adapter with
   alpaca-py, and the OpenTelemetry Collector contrib distribution. They disagree on
   the rest: the Nautilus IBKR adapter; Loki and Prometheus against Restic and
-  sandbox-runtime. Order-swapped adjudication split 2-2. The comparison that would
-  decide them is an executed one, such as IBKR adapter acceptance or a retention
-  and recovery test of the observability backends.
+  sandbox-runtime. Order-swapped adjudication split 2-2; the sealed records under
+  `evidence/artifacts/layer-verdicts-20260922/adjudication/` hold every judgment.
+  The comparison that would decide them is an executed one, such as IBKR adapter
+  acceptance or a retention and recovery test of the observability backends.
+- **The foundation lanes could read the incumbent's labels.** The packets withheld
+  them, but the checkout both lanes read kept `catalogs/foundation/decisions.json`
+  with each decision's `selection` (8 `default`, 37 `conditional`) and the landscape
+  ledger's v1 `current_choice`, `decision`, `rationale` and candidate `disposition`
+  fields. In each lane, 19 of the 20 foundation returns list `decisions.json` among
+  the sources they read, and some returns and adjudications cite a `selection`
+  label as evidence (the Claude `agent-sdks` return and the `workers` and
+  `code-navigation` adjudications, for example). No return lists a landscape ledger
+  among its sources, and no trading return read `decisions.json`. The foundation
+  verdicts are therefore not independent of the prior selection. A rerun on a
+  checkout that also removes those labels and fields would test how much they
+  steered the result.
 - **Adjudication is not independent of one lane's family.** The adjudicators are
   Opus 5.5, the same family as the Claude lane. Scrubbed returns and the order swap
-  reduce that influence but do not remove it; a Codex-side adjudication of the 10
-  decided layers would test it.
+  reduce that influence but do not remove it. Scrubbing removed host paths and model
+  names but not process wording: three Claude returns still say they were revised
+  after refuter findings, a cue only that lane's pipeline produces (those layers
+  went once to each lane and once to neither). A Codex-side adjudication of the 10
+  decided layers would test both.
 - **Trading candidates are layer-specific; trading requirements are not.** Each
   trading packet held that layer's own manifest entries and scope terms. The four rows
   the first run had flagged for naming other layers' tools now name their own:
@@ -1808,7 +1834,7 @@ Open gaps:
 
 Lanes: disagree (claude: us-equities-evaluation-experiments-20260922; codex: us-equities-evaluation-experiments-20260922)
 
-- **Execution and broker adapters** (execution-broker): pending — lanes disagreed: claude=adaptive-paper-alpaca-adapter,alpaca-py; codex=adaptive-paper-alpaca-adapter,alpaca-py,nautilus-ibkr-adapter; adjudication pending
+- **Execution and broker adapters** (execution-broker): pending — lanes disagreed: claude=adaptive-paper-alpaca-adapter,alpaca-py; codex=adaptive-paper-alpaca-adapter,alpaca-py,nautilus-ibkr-adapter; the counterbalanced adjudication did not agree (claude 2, codex 2, 0 refuted; evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json); an executed comparison must decide it
 
 #### Identity, provenance and lineage (identity-provenance)
 
@@ -1909,7 +1935,7 @@ Open gaps:
 
 Lanes: same_winner (claude: us-equities-market-data-reference-20260922; codex: us-equities-market-data-reference-20260922)
 
-- **Observability and hosting** (observability-hosting): pending — lanes disagreed: claude=loki,opentelemetry-collector-contrib,prometheus; codex=opentelemetry-collector-contrib,restic,sandbox-runtime; adjudication pending
+- **Observability and hosting** (observability-hosting): pending — lanes disagreed: claude=loki,opentelemetry-collector-contrib,prometheus; codex=opentelemetry-collector-contrib,restic,sandbox-runtime; the counterbalanced adjudication did not agree (claude 2, codex 2, 0 refuted; evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json); an executed comparison must decide it
 
 #### Portfolio and risk (portfolio-risk)
 

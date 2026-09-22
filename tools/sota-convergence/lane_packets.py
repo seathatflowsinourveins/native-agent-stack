@@ -431,8 +431,10 @@ def parse_args(argv=None):
                          help="Build packets for one catalog only; default builds both.")
     parser.add_argument("--checked-at", default=DEFAULT_CHECKED_AT)
     parser.add_argument("--withhold-labels", action="store_true",
-                        help="Drop decision-bearing labels (candidate review_status, decision selection and "
-                             "review_status) from every packet; off by default so the 2026-09-22 packets reproduce.")
+                        help="Drop decision-bearing labels (candidate and SOTA-component review_status, decision "
+                             "selection and review_status) from every ledger-built packet; manifest-built trading "
+                             "packets (--trading-candidates manifest) carry none and stay byte-identical. Off by "
+                             "default so the 2026-09-22 packets reproduce.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
                         help="Candidate source for us-equities packets: the ledger row's group-wide list "
                              "(default; reproduces the 2026-09-22 packets) or the sota manifest's own entries "

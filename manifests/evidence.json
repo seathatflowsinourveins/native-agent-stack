@@ -7164,8 +7164,8 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "202241c4d43328af1697a232a17ef05e545a7cf88b7319695195a6643846d147",
-      "bytes": 444902
+      "sha256": "cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618",
+      "bytes": 445299
     },
     {
       "path": "catalogs/sota-convergence/README.md",
@@ -7174,8 +7174,8 @@
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
-      "sha256": "14c45ac07afc6ccc8e4c34ccc7023ada4043a562e58132290c1e818d456dd67e",
-      "bytes": 608082
+      "sha256": "5d96619e29c6f024e8e5e482e1cdd22d625189619b5435a9bcf3d6c35fd4c62b",
+      "bytes": 608479
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260922.json",
@@ -7624,8 +7624,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "7bcb1460cf566bd0ad452c2e6d68b6355bc1d1003f3779d480ed8411237b2b4e",
-      "bytes": 12913783
+      "sha256": "81ef743fb0b0a5a9379d2b9fdc011797d14dc3758e0ab7cb5f9038a2ce5a5434",
+      "bytes": 12916666
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7699,8 +7699,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "6b6cb2e7e12b910a83bf6cb35061d3b903086a87c958ae6712a31cdffff69225",
-      "bytes": 414395
+      "sha256": "3cb6da8b97b9565e9f398ec7eb181945d4ae2cc89a96ad579d971027447066b2",
+      "bytes": 416855
     },
     {
       "path": "docs/harness-defaults.md",
@@ -11854,8 +11854,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "6a47e9ae6a754964d218af854ee612831458b23946d0a65df0cc94be06f5e3b1",
-      "bytes": 51863
+      "sha256": "9f0000fa357dc82dc24fb7db9737a247e7eadb921a0573cd329519dc245bde06",
+      "bytes": 52460
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
@@ -12114,53 +12114,53 @@
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-identity-provenance-20260922.json",
-      "sha256": "7d41555416d5cf0074d9ae070ef7e54c9fa9b4755b9d96505250a2fca1d481f0",
-      "bytes": 2931
+      "sha256": "f517d516fc7f6c5f12ea2aafbfceefd523a4d180b1b4ed19565fe29f25d6057d",
+      "bytes": 6981
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-evaluation-experiments-20260922.json",
-      "sha256": "ed8d9605461f9f8272e064c457775ceaa767c3135c92526a11795e61b0009b8b",
-      "bytes": 3309
+      "sha256": "258368007cbffdd166e281e99568a660f7c49622c1072c61b71ece33766973cd",
+      "bytes": 7698
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-code-navigation-20260922.json",
-      "sha256": "92e430a02ebc004c46312f23acc78ecef9098419a213859069a35c85a77d3429",
-      "bytes": 3327
+      "sha256": "6b6f28b6b9e9ebaed145b8a954a4283d6ff2af0bf08cce340ceb61914a7c6c7b",
+      "bytes": 7867
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-web-research-20260922.json",
-      "sha256": "f1be9eac6bdca03020ffbc2d5a4eefa67d1bffb28c79ebbcff5cc110270696bf",
-      "bytes": 3499
+      "sha256": "ea4202c13a72477e02ae9f0101f2b57b90a71ac5fd4269ccd916bd265ebee530",
+      "bytes": 8095
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-data-quality-orchestration-20260922.json",
-      "sha256": "f3c84c63c27af126fb45167a4335a0c5e3ede6f9ea9ffb18a4e9deac2edf169b",
-      "bytes": 3369
+      "sha256": "576502af80bf28355bff483eb372623d03df1bb7ab7116ff8b9f0756c151c5ac",
+      "bytes": 7866
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-observation-inference-20260922.json",
-      "sha256": "dc2a12812fa526f3fd2b626bc79d9ccde877ace1ce6aa7fd584322cfb926dd20",
-      "bytes": 3941
+      "sha256": "cf40e53a81ac24f912681b8e163d0e78594591ee5ad944aa621c166878b0a989",
+      "bytes": 8766
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-token-efficiency-20260922.json",
-      "sha256": "1f0139b56d67645933974513eab1f893e6e0f6bad427142157258e692126b928",
-      "bytes": 3973
+      "sha256": "8dba265d88f12e5e3673cdb0a914e55a3d8fe9afcbc4d90a7ff703eb03966c7a",
+      "bytes": 8809
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-workers-20260922.json",
-      "sha256": "4d921ee88b0b965a5758ef25c5f71f46db0e362ba4cea6ffd33fa6f5d425c66b",
-      "bytes": 3245
+      "sha256": "87e5e823efa81870bfea7b9594f637f777427e6a633fc714936d3a3d3060c253",
+      "bytes": 7938
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-instructions-skills-20260922.json",
-      "sha256": "0ff38da3d2793df468cdb793895c35f931b492dff0572c9b36a60eb2d770656e",
-      "bytes": 3709
+      "sha256": "7f5bf390f10197cdd55cdc4b4f7c5ce9c7399523bd608cedb03733cd086a8a5e",
+      "bytes": 8286
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-document-retrieval-20260922.json",
-      "sha256": "af63112ebf799feef431d892257d0ada9ae99472c43b6747d5fe36f85c126ade",
-      "bytes": 2591
+      "sha256": "3fa8f2e48f935f65c3f0e26b516b04cf07b9de1933d6c43a1b464f50129d53c7",
+      "bytes": 6568
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/codex/foundation-quality-evaluation-20260922.json",
@@ -12321,6 +12321,16 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/codex/us-equities-agents-models-workers-20260922.json",
       "sha256": "e88df174754967282d5138c021cf60e7947a18285c24b22c6e2589879989559b",
       "bytes": 16797
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json",
+      "sha256": "7999f224e199e3cba5f3bd23ddd013556c3204f154a5a3abcc0b0d1b8b0453b7",
+      "bytes": 10128
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json",
+      "sha256": "55abedca7d7eeae00a66c8958db98015f3cf3092c8a3992b09c390974295b694",
+      "bytes": 11256
     }
   ],
   "convergence_records": [
