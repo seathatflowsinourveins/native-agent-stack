@@ -7167,8 +7167,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "6a625b3a58c0a270171e59e563cb4d703335ad65bc4a5f3198430a467abf8c42",
-      "bytes": 17810
+      "sha256": "bcc8971718457cce3d787ddd75314e85f160487e9c193e537277374a0c91a44c",
+      "bytes": 18592
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",

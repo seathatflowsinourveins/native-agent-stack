@@ -1,0 +1,376 @@
+{
+  "attribution_evidence": {
+    "converted_rows_sha256": "6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc",
+    "file": "converted-rows.private.json",
+    "note": "compare.py refuses a --bars file whose digest differs, and re-hashes its own re-derivation under --lean-data against this value.",
+    "serialization": "json.dumps(rows, indent=2, sort_keys=True, default=str) + newline"
+  },
+  "buying_power_and_latch_note": "one_zero requests 1x with no leverage and no adaptive rule, so empty lists are the expected observation, not evidence of margin-model equivalence.",
+  "buying_power_events": [],
+  "case": "one_zero",
+  "case_configuration": {
+    "account_type": "CASH",
+    "currency": "USD",
+    "determinism_note": "one_zero configures no stochastic fill, fee or latency model; the seed is recorded and applied but no sampled component is exercised.",
+    "entry_decision_date": "2019-12-31",
+    "exit_decision_date": "2020-04-29",
+    "fee_model": null,
+    "fee_usd": "0",
+    "fill_model": null,
+    "id": "one_zero",
+    "initial_cash_usd": "100000",
+    "instrument": {
+      "bar_type": "SPY.SIM-1-HOUR-LAST-EXTERNAL",
+      "currency": "USD",
+      "instrument_id": "SPY.SIM",
+      "lot_size": 1,
+      "price_increment": "0.0001",
+      "price_precision": 4,
+      "size_precision": 0,
+      "symbol": "SPY",
+      "venue": "SIM"
+    },
+    "seed": 20260922,
+    "sizing_buffer": "0.98",
+    "slippage": "0",
+    "target": "1",
+    "use_random_ids": false,
+    "window": {
+      "end": "2020-04-30",
+      "start": "2019-12-02",
+      "symbol": "SPY"
+    }
+  },
+  "cash_ledger": [
+    {
+      "cash": "100000.00",
+      "delta": "0.00",
+      "kind": "distribution",
+      "utc_seconds": 1576818000
+    },
+    {
+      "cash": "1543.5200",
+      "delta": "-98456.4800",
+      "kind": "fill",
+      "utc_seconds": 1577977200
+    },
+    {
+      "cash": "1972.1600",
+      "delta": "428.64",
+      "kind": "distribution",
+      "utc_seconds": 1584676800
+    },
+    {
+      "cash": "90507.6000",
+      "delta": "88535.4400",
+      "kind": "fill",
+      "utc_seconds": 1588255200
+    }
+  ],
+  "classification": "local historical replay on retained bundled sample data; not an unchanged upstream test, a point-in-time dataset or any broker execution",
+  "conversion": {
+    "declared_short_sessions": {
+      "2019-12-24": 4
+    },
+    "extra_session_dates": [],
+    "full_session_rows": 7,
+    "hour_rows": 725,
+    "missing_session_dates": [],
+    "partial_sessions": {
+      "2019-12-24": 4
+    },
+    "sessions": 104
+  },
+  "derived_distributions": [
+    {
+      "ex_date": "2019-12-20",
+      "per_share": "1.57",
+      "utc_seconds": 1576818000
+    },
+    {
+      "ex_date": "2020-03-20",
+      "per_share": "1.41",
+      "utc_seconds": 1584676800
+    }
+  ],
+  "distribution_ledger": [
+    {
+      "amount": "0.00",
+      "engine_posted": false,
+      "ex_date": "2019-12-20",
+      "per_share": "1.57",
+      "quantity": "0",
+      "utc_seconds": 1576818000
+    },
+    {
+      "amount": "428.64",
+      "engine_posted": false,
+      "ex_date": "2020-03-20",
+      "per_share": "1.41",
+      "quantity": "304",
+      "utc_seconds": 1584676800
+    }
+  ],
+  "dividend_cash_usd": "428.64",
+  "engine": {
+    "package": "nautilus_trader",
+    "python": "3.12.3",
+    "upstream_commit_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "version": "2.0.0rc5"
+  },
+  "evidence_class": "HIST",
+  "fees_usd": "0.00",
+  "fills": [
+    {
+      "currency": "USD",
+      "fee": "0.00",
+      "fill_source": "next_session_first_bar_close",
+      "instrument_id": "SPY.SIM",
+      "market_on_open_proxy": "unsupported",
+      "order_ref": 1,
+      "price": "323.8700",
+      "quantity": 304,
+      "side": "BUY",
+      "submitted_session": "2020-01-02",
+      "ts_event_ns": 1577977200000000000,
+      "utc_seconds": 1577977200,
+      "venue_order_id": "SIM-1-1"
+    },
+    {
+      "currency": "USD",
+      "fee": "0.00",
+      "fill_source": "next_session_first_bar_close",
+      "instrument_id": "SPY.SIM",
+      "market_on_open_proxy": "unsupported",
+      "order_ref": 2,
+      "price": "291.2350",
+      "quantity": -304,
+      "side": "SELL",
+      "submitted_session": "2020-04-30",
+      "ts_event_ns": 1588255200000000000,
+      "utc_seconds": 1588255200,
+      "venue_order_id": "SIM-1-2"
+    }
+  ],
+  "final_quantity": "0",
+  "frozen_plan": {
+    "case": {
+      "adaptive": false,
+      "fee_usd": "0",
+      "id": "one_zero",
+      "reject": false,
+      "slippage": "0",
+      "target": "1"
+    },
+    "path": "blueprints/us-equities/historical-simulation/plan.json",
+    "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"
+  },
+  "gate": "G-a",
+  "id": "spy-parity-one-zero-20260922",
+  "inputs": {
+    "data_root": "/data",
+    "decoded": [
+      "equity/usa/hour/spy.zip",
+      "equity/usa/daily/spy.zip",
+      "equity/usa/map_files/spy.csv",
+      "equity/usa/factor_files/spy.csv"
+    ],
+    "forward_filled_rows": 0,
+    "map_rows": [
+      {
+        "date": "1998-01-02",
+        "exchange": "P",
+        "ticker": "spy"
+      },
+      {
+        "date": "2050-12-31",
+        "exchange": "P",
+        "ticker": "spy"
+      }
+    ],
+    "price_encoding": "integer deci-cents / 10000, raw normalization",
+    "session_source": "retained LEAN daily spy.zip rows in window",
+    "sha256": {
+      "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899",
+      "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+      "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+      "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+      "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf"
+    },
+    "volume_encoding": "integer shares"
+  },
+  "intents": [
+    {
+      "decision_equity": "100000.0000",
+      "decision_price": "321.8600",
+      "kind": "intent",
+      "order_ref": 1,
+      "quantity": 304,
+      "reason": "entry",
+      "session_date": "2019-12-31",
+      "target": "1",
+      "ts_event_ns": 1577826000000000000,
+      "utc_seconds": 1577826000
+    },
+    {
+      "decision_equity": "90679.3600",
+      "decision_price": "293.2100",
+      "kind": "intent",
+      "order_ref": 2,
+      "quantity": -304,
+      "reason": "exit",
+      "session_date": "2020-04-29",
+      "target": "0",
+      "ts_event_ns": 1588190400000000000,
+      "utc_seconds": 1588190400
+    }
+  ],
+  "isolation": {
+    "argv": [
+      "/repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py",
+      "--lean-data",
+      "/data",
+      "--out",
+      "/out/native"
+    ],
+    "cwd": "/repo",
+    "environment_names": [
+      "LANG",
+      "OMP_NUM_THREADS",
+      "OPENBLAS_NUM_THREADS",
+      "PATH",
+      "PWD",
+      "PYTHONDONTWRITEBYTECODE"
+    ],
+    "network_interfaces": [
+      [
+        1,
+        "lo"
+      ]
+    ]
+  },
+  "latch_events": [],
+  "limitations": [
+    "Distribution cash is an external Decimal ledger: the pinned engine posts none of it.",
+    "Fill prices use the next session's first-bar close because market-on-open is unsupported.",
+    "Bundled sample bytes are not an entitled, point-in-time or market-wide dataset."
+  ],
+  "local_source_sha256": {
+    "compare.py": "fc0ed6836add5e2bb9a612b15ca6c57eb3e2d8825af3cad6a39a46f82c441a2e",
+    "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+    "fixture_strategy.py": "5c035ba3923e2febcd70ef88a354ce045a4ff45301d19a521f8d41571dd84502",
+    "mapping-manifest.json": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+    "run.py": "299b81b230195b6bf9f9a1cebcad2629cc121e4078abe96de8b6f4486c861951",
+    "tolerances.json": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a"
+  },
+  "mapping_manifest": {
+    "path": "mapping-manifest.json",
+    "sha256": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909"
+  },
+  "native_end_cash_usd": "90078.96",
+  "observed_utc": "2026-09-22T20:00:37.644804+00:00",
+  "reconciled_end_cash_usd": "90507.6000",
+  "runs": [
+    {
+      "bars_seen": 725,
+      "buying_power_events": [],
+      "dividend_cash_usd": "428.64",
+      "fees_usd": "0.00",
+      "final_quantity": "0",
+      "final_state_checked": true,
+      "label": "run-1",
+      "latch_events": [],
+      "native_account_events": 3,
+      "native_end_cash_usd": "90078.96",
+      "normalized_economic_sha256": "6ba7c328224dadd8b5d3d89819a9e6c281927b96f2c2ad832a00ce430a51393c",
+      "open_orders": 0,
+      "open_positions": 0,
+      "pending_intent": null,
+      "processed_bars": 725,
+      "raw_report_sha256": {
+        "account": "fd79c1957c0e332913138132e08f7d8dc1c11aa4db6e83a16ff38656f5bbff39",
+        "fills": "c6fa7c969585f88a04648704ca742ecd473ab8188c5db9e395e432b0f7dbc4bd",
+        "positions": "877cf66b43643a97830269b63f06260cea5143e98518f12d481385b0612202e4"
+      },
+      "reconciled_end_cash_usd": "90507.6000",
+      "run_integrity_checked": true,
+      "strategy_callback_errors": []
+    },
+    {
+      "bars_seen": 725,
+      "buying_power_events": [],
+      "dividend_cash_usd": "428.64",
+      "fees_usd": "0.00",
+      "final_quantity": "0",
+      "final_state_checked": true,
+      "label": "run-2",
+      "latch_events": [],
+      "native_account_events": 3,
+      "native_end_cash_usd": "90078.96",
+      "normalized_economic_sha256": "6ba7c328224dadd8b5d3d89819a9e6c281927b96f2c2ad832a00ce430a51393c",
+      "open_orders": 0,
+      "open_positions": 0,
+      "pending_intent": null,
+      "processed_bars": 725,
+      "raw_report_sha256": {
+        "account": "fd79c1957c0e332913138132e08f7d8dc1c11aa4db6e83a16ff38656f5bbff39",
+        "fills": "a3db2542b04df06c6b476e932ac3d1de682d39ec0d3e30481ad126446351e43a",
+        "positions": "547123b33d21545d89991269dfa5ed1f1ba29ec51eb431d9df7d80dd598815ba"
+      },
+      "reconciled_end_cash_usd": "90507.6000",
+      "run_integrity_checked": true,
+      "strategy_callback_errors": []
+    }
+  ],
+  "schema_version": 1,
+  "tolerances": {
+    "limits": {
+      "cash_usd_abs": "0.01",
+      "dividend_usd_abs": "0",
+      "end_cash_usd_abs": "0.01",
+      "event_seconds_abs": "0",
+      "fees_usd_abs": "0",
+      "fill_price_usd_abs": "0",
+      "fill_quantity_abs": "0",
+      "final_quantity_abs": "0"
+    },
+    "path": "tolerances.json",
+    "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+    "status": "default"
+  },
+  "two_run_determinism": {
+    "applied_id_fields": [
+      "init_id",
+      "event_id"
+    ],
+    "declared_id_fields": [
+      "client_order_id",
+      "venue_order_id",
+      "init_id",
+      "event_id",
+      "last_trade_id",
+      "trade_id",
+      "position_id",
+      "account_id",
+      "trader_id",
+      "strategy_id",
+      "order_list_id",
+      "exec_spawn_id"
+    ],
+    "normalization_rule": "Only freshly generated UUID4 identities are replaced by their ordinal, after format validation. Timing, prices, quantities, fees, distributions, transitions and decision order are never normalized.",
+    "normalized_economic_sha256_equal": true,
+    "raw_field_paths_differing": [
+      "fills[0].init_id",
+      "fills[1].init_id",
+      "positions[0].events[0].event_id",
+      "positions[0].events[1].event_id"
+    ],
+    "raw_report_sha256_equal": false,
+    "undeclared_differing_fields": []
+  },
+  "two_run_records_equal": true,
+  "unsupported_mappings": [
+    "distributions_and_cash",
+    "market_on_open_proxy"
+  ]
+}
