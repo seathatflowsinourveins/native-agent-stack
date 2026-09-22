@@ -198,7 +198,12 @@ def build_document(results: dict, slug_aliases: dict | None = None, fetched_this
         for record in results.values():
             if not isinstance(record, dict):
                 continue
-            aliases = slug_aliases.get(record.get("slug"))
+            # Retained records from older snapshots may carry mixed-case slugs;
+            # normalize so alias enrichment still attaches current-input aliases.
+            slug = str(record.get("slug") or "").lower()
+            if slug:
+                record["slug"] = slug
+            aliases = slug_aliases.get(slug)
             if aliases:
                 record["aliases"] = sorted(aliases)
     observed_dates = sorted(

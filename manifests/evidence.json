@@ -10401,8 +10401,8 @@
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",
-      "bytes": 14159,
-      "sha256": "083be7b05c84314320a96ec5d0a1c14f1a38b39dc9467cbaff8322d9e36c8465"
+      "bytes": 14423,
+      "sha256": "1451cb4ffdc7465a52230976d8f8bdff689f358e48e110199cedbed17261f3f1"
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
@@ -10416,8 +10416,8 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "bytes": 53490,
-      "sha256": "596631bd57eb3cd7bd81389a3f4c663a7ef056f31fe7c365da208b716cabbfa2"
+      "bytes": 54265,
+      "sha256": "797fd5d1a90a3d82b1d2f43004e9debc33b53588f4052413aaf1b9b2efd1447a"
     }
   ],
   "convergence_records": [

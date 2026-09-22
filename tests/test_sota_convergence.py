@@ -972,5 +972,16 @@ class CodexSecondPassRegressionTests(unittest.TestCase):
         self.assertIn(github_freshness.github_slug("https://github.com/quantconnect/lean"), covered)
 
 
+    def test_retained_mixed_case_slug_still_receives_current_aliases(self):
+        saved = {"https://github.com/QuantConnect/Lean": {"slug": "QuantConnect/Lean", "stargazers_count": 1,
+                                                          "observed_at": "2026-08-01T00:00:00+00:00"}}
+        aliases = github_freshness.build_slug_aliases(["https://github.com/QuantConnect/Lean",
+                                                       "https://github.com/quantconnect/lean/releases/tag/v1"])
+        doc = github_freshness.build_document(saved, slug_aliases=aliases, fetched_this_run=0)
+        rec = doc["repositories"]["https://github.com/QuantConnect/Lean"]
+        self.assertEqual(rec["slug"], "quantconnect/lean")
+        self.assertEqual(len(rec["aliases"]), 2)
+
+
 if __name__ == "__main__":
     unittest.main()
