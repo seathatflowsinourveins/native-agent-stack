@@ -12481,6 +12481,11 @@
       "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/headroom-live-store-cleanup.json",
       "bytes": 1946,
       "sha256": "51ffcfcb71945a7c2698ab290737c53f24a5a9dc60441a97a8515d6ac5e0e820"
+    },
+    {
+      "path": "tests/test_gap_resolution_ledger.py",
+      "bytes": 2912,
+      "sha256": "9d1b066dc41703ed02296aa003bb227d9fae1f4d067f47cdd86ce5e4b1975e41"
     }
   ],
   "convergence_records": [
