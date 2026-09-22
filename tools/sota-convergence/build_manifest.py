@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
 """Merge the working files, GitHub freshness, and a review-lanes record into a
 dated SOTA-convergence manifest with the exact key layout of
-``catalogs/sota-convergence/manifest-20260922.json``.
+``catalogs/sota-convergence/manifest-20260922.json`` (``schema_version, id,
+checked_at, scope, method, taxonomy, foundation, trading, lane_groupings,
+citation_review, critic, lane_calls, lane_limits, reconciliations, counts``).
+``citation_review`` (G6) is an optional overlay of an independent citation
+review's findings onto the rows they name -- see ``apply_citation_review``;
+always present, ``{"general": []}`` when ``--citation-review`` is not given.
+``trading[]``
+rows are exactly the taxonomy layer ids from
+``trading-by-layer.json#/taxonomy``, in taxonomy order; a review-lane layer id
+outside the foundation/taxonomy baseline (e.g. a "beyond" lane's own grouping
+like ``awesome-list-convergence``) is never folded into ``trading[]`` -- it is
+carried verbatim into ``lane_groupings`` instead, see ``build_manifest``.
 
-No network access. All host-path fragments are removed from the manifest's
-decoded string values (``sanitize_value``, walking dict/list/str, applied
-*before* JSON serialization -- see its docstring for why sanitizing already-
-serialized JSON text is unsafe) before the object is dumped, re-parsed with
-``json.loads`` to prove the result is valid JSON, and leak-checked
-(``assert_no_leak``); the writer refuses to write if a leak survives.
+No network access. All host-path fragments, and any bare session UUID, are
+removed from the manifest's decoded string values (``sanitize_value``,
+walking dict/list/str, applied *before* JSON serialization -- see its
+docstring for why sanitizing already-serialized JSON text is unsafe) before
+the object is dumped, re-parsed with ``json.loads`` to prove the result is
+valid JSON, and leak-checked (``assert_no_leak``); the writer refuses to
+write if a leak survives.
 
 Baseline (pins vs. upstream) is computed here, directly from
 ``foundation-layers.json``, ``trading-by-layer.json`` and the freshness
@@ -213,11 +225,46 @@ def build_baseline_trading(trading_by_layer: dict, repositories: dict,
     selected baseline; 'alternative', 'watch' and 'excluded' entries stay
     discoverable in trading-by-layer.json but are not promoted into the
     manifest's rows -- a newcomer earns a place only through the lane
-    candidate/alternative mechanism, never by being catalogued."""
+    candidate/alternative mechanism, never by being catalogued.
+
+    Rows are built from ``taxonomy`` (in its own key order, i.e. the order
+    ``trading-by-layer.json#/taxonomy`` lists its layers in), not from
+    ``layers`` (whose key set is normally identical but is not the
+    authoritative one): this guarantees ``trading[]`` rows are exactly the
+    12 taxonomy layer ids, one row per id even when a layer happens to have
+    zero selected entries, so scripts/landscape.py's exact-coverage check
+    over trading[].layer never sees an extra or a missing id.
+
+    ``layers`` and ``taxonomy`` key sets are only "normally identical", not
+    guaranteed identical, so a layer id present in ``layers`` but absent
+    from ``taxonomy`` is checked explicitly: if any such orphan id holds a
+    selected ("default" or "conditional") entry, that entry would silently
+    vanish -- it is not a lane-named id, so lane_groupings (sourced from the
+    lanes document, not from trading_by_layer) cannot recover it either.
+    Raises ``ValueError`` naming the offending layer/entry ids rather than
+    dropping them; an orphan layer holding only non-selected decisions
+    (never promoted into a manifest row from any layer) does not raise."""
+    layers = trading_by_layer.get("layers", {})
+    taxonomy_ids = set(trading_by_layer.get("taxonomy", {}))
+    orphan_selected = [
+        (layer_id, entry.get("id"))
+        for layer_id in set(layers) - taxonomy_ids
+        for entry in layers.get(layer_id, [])
+        if entry.get("decision") in SELECTED_TRADING_DECISIONS
+    ]
+    if orphan_selected:
+        raise ValueError(
+            "trading_by_layer['layers'] has selected (default/conditional) "
+            "entries under layer id(s) absent from trading_by_layer['taxonomy'], "
+            "which build_baseline_trading only iterates: "
+            f"{sorted(orphan_selected)}. These are not lane-named, so "
+            "lane_groupings cannot recover them either -- add the layer id to "
+            "taxonomy, or change/relabel the entries, before rebuilding."
+        )
     rows = []
-    for layer_id in sorted(trading_by_layer.get("layers", {})):
+    for layer_id in trading_by_layer.get("taxonomy", {}):
         entries = []
-        for entry in trading_by_layer["layers"][layer_id]:
+        for entry in layers.get(layer_id, []):
             if entry.get("decision") not in SELECTED_TRADING_DECISIONS:
                 continue
             repository = entry.get("repository")
@@ -279,6 +326,25 @@ def disposition(label, survives):
 # exemption, since this sanitizer's own contract -- see
 # test_sanitize_removes_host_paths below -- redacts every /home/ occurrence,
 # including any that happen to say "example").
+# Bare session-id detector: duplicated (not imported -- this module is
+# loaded standalone by file path in tests/test_sota_convergence.py's
+# load_module, with no import-time dependency on scripts/) from
+# scripts/validate.py's PRIVATE_CONTENT "local session identifier" pattern
+# (scripts/validate.py line 27). A UUID's dash-grouped 8-4-4-4-12 hex shape
+# never matches a 40-hex git SHA, a 64-hex sha256 digest, or a short hex id
+# (e.g. a 7-char commit abbreviation) -- none of those carry the dashes.
+SESSION_UUID_RE = re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.IGNORECASE)
+
+# A /tmp/<anything> path chain that contains a session-scoped directory -- a
+# UUID segment, a "claude-<uid>" segment (Claude Code's per-session scratch
+# directory naming), or a "...scratchpad..." segment -- is redacted the same
+# way a /home or /Users path already is. A bare /tmp path with none of those
+# markers is not inherently private and is left alone.
+TMP_SESSION_PATH_RE = re.compile(
+    r"/tmp/[^\s\"']*(?:" + SESSION_UUID_RE.pattern + r"|claude-\d+|scratchpad)[^\s\"']*",
+    re.IGNORECASE,
+)
+
 HOST_PATH_PATTERNS = (
     re.compile(r"/home/[^\s\"']+"),
     re.compile(r"/Users/[^\s\"']+", re.IGNORECASE),
@@ -287,13 +353,72 @@ HOST_PATH_PATTERNS = (
 LEAK_MARKERS = ("/home/", "APCA")
 
 
-def sanitize(text: str) -> str:
+def _path_basename(path_part: str) -> str:
+    """Last non-empty '/'- or '\\'-separated segment of ``path_part``, so a
+    redacted host path still names the file/pointer target a citation
+    refers to, instead of losing it entirely (see G5 -- a bare
+    ``<host-path>`` token made 223 evidence citations in a real manifest
+    unresolvable: the reader can no longer tell which of hundreds of files
+    under the redacted directory a citation named)."""
+    normalized = path_part.replace("\\", "/")
+    segments = [segment for segment in normalized.split("/") if segment]
+    return segments[-1] if segments else path_part
+
+
+def _host_path_sub(work_dir: str | None):
+    """Return a ``re.sub`` replacement callable that redacts the directory
+    portion of a matched host path but keeps its basename and any trailing
+    ``#/json/pointer`` verbatim -- ``<work-dir>/basename[#pointer]`` when the
+    match falls inside the private ``--work-dir`` (or the shared parent of
+    the individually-provided foundation/trading/freshness paths), else the
+    generic ``<host-path>/basename[#pointer]``. /tmp session-scratch paths
+    and bare session UUIDs are redacted separately, in full, by
+    ``sanitize`` -- unaffected by this (see its docstring)."""
+    normalized_work_dir = work_dir.replace("\\", "/").rstrip("/") if work_dir else None
+
+    def _replace(match: re.Match) -> str:
+        full = match.group(0)
+        path_part, has_pointer, pointer = full.partition("#")
+        normalized_path = path_part.replace("\\", "/")
+        segments = [segment for segment in normalized_path.split("/") if segment]
+        # A home-directory root ("/home/<user>", "/Users/<user>") has no file
+        # basename worth keeping: its last segment IS the username, which the
+        # redaction exists to remove, so it collapses to the bare token.
+        if len(segments) <= 2 and segments[:1] in (["home"], ["Users"]):
+            return "<host-path>" + (f"#{pointer}" if has_pointer else "")
+        basename = _path_basename(path_part)
+        token = "<host-path>"
+        if normalized_work_dir:
+            if normalized_path == normalized_work_dir or normalized_path.startswith(normalized_work_dir + "/"):
+                token = "<work-dir>"
+        return f"{token}/{basename}" + (f"#{pointer}" if has_pointer else "")
+
+    return _replace
+
+
+def sanitize(text: str, work_dir: str | None = None) -> str:
+    """Redact host-path fragments from ``text``.
+
+    A ``/tmp`` session-scratch path (a UUID, ``claude-<uid>`` or
+    ``scratchpad`` segment -- see ``TMP_SESSION_PATH_RE``) is scrubbed to a
+    bare ``<host-path>`` token, unchanged from before this function grew
+    basename-preservation (G5): a session-scoped scratch path is not a
+    stable citation target the way a file under the review's own working
+    directory is, so there is no basename worth keeping. A Linux/macOS/
+    Windows *user* host path (``HOST_PATH_PATTERNS``) instead keeps its
+    basename and any ``#/json/pointer`` suffix via ``_host_path_sub``, using
+    ``<work-dir>`` when ``work_dir`` is given and the path falls inside it.
+    A bare session UUID left over outside any path (e.g. quoted directly in
+    lane prose) is scrubbed last, to a distinct ``<session-id>`` token."""
+    text = TMP_SESSION_PATH_RE.sub("<host-path>", text)
+    replace = _host_path_sub(work_dir)
     for pattern in HOST_PATH_PATTERNS:
-        text = pattern.sub("<host-path>", text)
+        text = pattern.sub(replace, text)
+    text = SESSION_UUID_RE.sub("<session-id>", text)
     return text
 
 
-def sanitize_value(value):
+def sanitize_value(value, work_dir: str | None = None):
     """Recursively redact host paths from decoded values -- dict/list/str --
     walking the Python object *before* it is JSON-serialized. Applying
     ``sanitize`` to the already-serialized JSON text instead (the previous
@@ -306,11 +431,11 @@ def sanitize_value(value):
     would not catch. Sanitizing the raw Python string first means there are
     no JSON escape sequences to misread."""
     if isinstance(value, str):
-        return sanitize(value)
+        return sanitize(value, work_dir=work_dir)
     if isinstance(value, dict):
-        return {key: sanitize_value(item) for key, item in value.items()}
+        return {key: sanitize_value(item, work_dir=work_dir) for key, item in value.items()}
     if isinstance(value, list):
-        return [sanitize_value(item) for item in value]
+        return [sanitize_value(item, work_dir=work_dir) for item in value]
     return value
 
 
@@ -318,15 +443,89 @@ def assert_no_leak(text: str) -> None:
     for marker in LEAK_MARKERS:
         if marker in text:
             raise LeakDetected(f"sanitized manifest still contains {marker!r}")
+    # Defense in depth for the same pattern scripts/validate.py line 27
+    # rejects a publication on: refuse if any bare session UUID survived
+    # sanitize()'s scrub, whatever text carried it in.
+    if SESSION_UUID_RE.search(text):
+        raise LeakDetected("sanitized manifest still contains a bare session UUID")
+    # Defense in depth, symmetric with the UUID check above: sanitize()
+    # redacts a /tmp session-scoped path on any of TMP_SESSION_PATH_RE's
+    # three markers (a UUID segment, a "claude-<uid>" segment, or a
+    # "...scratchpad..." segment), but only the UUID marker was re-checked
+    # here -- so a claude-<uid>/scratchpad path carrying no UUID would pass
+    # this refusal gate even if sanitize() were bypassed or narrowed. Refuse
+    # on the same pattern sanitize() itself scrubs.
+    if TMP_SESSION_PATH_RE.search(text):
+        raise LeakDetected("sanitized manifest still contains a session-scoped /tmp path")
 
 
 # ---------------------------------------------------------------------------
 # Lane merge
 # ---------------------------------------------------------------------------
 
+# A lane's selected[] item is split in merge_lanes into the merged status
+# fields (repository/status/evidence/note, which this tool reconciles with the
+# adversarial verdicts) and ``lane_item``: every other field the lane set,
+# copied verbatim and never invented (why_selected,
+# comparison_that_would_overturn, role, catalog_id, catalog_pin, upstream_now,
+# and any future field). Where it lands depends on the row:
+#   - a foundation components[] or trading entries[] row already carries the
+#     baseline pin/upstream computed from manifests/stack.json and
+#     github-freshness.json, so it takes only ROW_LANE_FIELDS -- a second,
+#     lane-copied pin/upstream representation next to the baseline one would
+#     be a conflicting duplicate;
+#   - a lane_groupings[] selected row has no baseline to fall back on (the
+#     grouping id is a lane's own, e.g. the "beyond" lane's
+#     unmaintained-reference-material), so it takes the whole lane_item.
+MERGED_SELECTED_KEYS = ("repository", "status", "evidence", "note")
+ROW_LANE_FIELDS = ("why_selected", "comparison_that_would_overturn")
+
+
+# A refuted "demotion_proposed"/"unmaintained_signal" proposal must not be
+# resolved to a hardcoded "confirmed_default" -- that promotes a component
+# past its own governing baseline decision (G2; a conditional-selection
+# component like agentskills was observed promoted this way). merge_lanes
+# has no baseline (foundation-layers.json decisions / trading entry.decision)
+# to resolve the real class from, so it emits this marker with the original
+# proposed status recorded in the entry's own note/evidence; build_manifest()
+# resolves it per row kind, see resolve_refuted_marker.
+REFUTED_TO_CONFIRMED_MARKER = "refuted_to_confirmed"
+
+
+def _entry_verified(verdict) -> bool:
+    """True only for "a matching proposal with survives true or false"
+    (G1's own phrasing) -- a proposal record with an unknown outcome
+    (``survives: null``, e.g. no refuter voted) exists but did not verify
+    anything, so it must not outrank an entry with no proposal at all."""
+    return verdict is not None and verdict.get("survives") is not None
+
+
 def merge_lanes(lanes_doc: dict, repositories: dict):
     """Returns (status, notes, alts, cands, gaps, calls, limits) indexed as in
-    the original prototype: status/notes by (layer, repository), the rest by layer."""
+    the original prototype: status/notes by (layer, repository), the rest by
+    layer.
+
+    ``status[(layer_id, repository)]`` keeps every lane's contribution for
+    that key (G1: two lanes independently selecting the same layer/repository
+    -- e.g. a "foundation" lane's and a "beyond" lane's own headroom row --
+    is a real observed shape, not an error) under ``status[key]["entries"]``,
+    one dict per contributing lane:
+    ``{lane, catalog_id, status, verified, evidence, note, lane_item}``.
+    ``build_manifest()`` picks the entry that lands on a foundation/trading/
+    lane_groupings row by a documented deterministic precedence
+    (``select_row_review``) and preserves every other lane's entry verbatim
+    under that row's ``other_lane_reviews``; nothing here decides a winner
+    or drops an entry -- that needs row-kind context (foundation vs. trading
+    vs. lane_groupings) this function does not have.
+
+    ``status[key]`` also still carries the flat ``status``/``evidence``/
+    ``note``/``lane``/``lane_item`` fields the previous single-entry
+    prototype returned (mirroring the *first* recorded entry for that key):
+    every existing lanes.json fixture has at most one lane per
+    (layer, repository), so this is exactly the old behaviour in every case
+    that previously worked; it exists only so direct callers of this
+    function (as opposed to build_manifest(), which reads ``entries``) keep
+    working unchanged on a single-lane key."""
     status = {}
     notes = defaultdict(list)
     alts = defaultdict(list)
@@ -335,27 +534,57 @@ def merge_lanes(lanes_doc: dict, repositories: dict):
     calls = {}
     limits = {}
     for lane in lanes_doc.get("lanes", []):
+        lane_name = lane["lane"]
         result = lane["result"]
-        calls[lane["lane"]] = result.get("calls")
-        limits[lane["lane"]] = result.get("limits")
-        verdicts = {(p["layer"], p["repository"], p["kind"]): p for p in lane.get("proposals", [])}
+        calls[lane_name] = result.get("calls")
+        limits[lane_name] = result.get("limits")
+        proposals = lane.get("proposals", [])
+        # Exact (layer, repository, kind) match, as before, plus a
+        # (repository, kind) index (G3): a lane's adversarial verdict is
+        # itself about the repository and the proposed status, not about a
+        # particular layer -- when the *same* lane proposes the *same*
+        # status for the *same* repository in a second layer with no
+        # layer-specific verdict of its own, the first verdict applies
+        # there too (sorted by layer id, so a rerun is deterministic even if
+        # more than one other layer happens to carry a verdict).
+        verdicts_exact = {(p["layer"], p["repository"], p["kind"]): p for p in proposals}
+        verdicts_by_repo_kind = defaultdict(list)
+        for p in proposals:
+            verdicts_by_repo_kind[(p["repository"], p["kind"])].append((p["layer"], p))
         for layer in result.get("layers", []):
             layer_id = layer["layer_id"]
             for selected in layer.get("selected", []):
-                key = (layer_id, selected["repository"])
-                verdict = verdicts.get((layer_id, selected["repository"], selected["status"]))
-                status_value = selected["status"]
+                repository = selected["repository"]
+                key = (layer_id, repository)
+                status_orig = selected["status"]
+                verdict = verdicts_exact.get((layer_id, repository, status_orig))
+                shared_from = None
+                if verdict is None:
+                    shared = sorted(verdicts_by_repo_kind.get((repository, status_orig), []),
+                                     key=lambda pair: pair[0])
+                    if shared:
+                        shared_from, verdict = shared[0]
+                status_value = status_orig
                 evidence = list(selected.get("evidence", []))
                 if verdict is not None:
                     survives = verdict.get("survives")
                     vote_count = len(verdict.get("votes") or [])
                     if survives is False:
                         # The lane's proposed status change was refuted: the
-                        # original selection/pin is confirmed as-is.
-                        status_value = ("confirmed_default" if status_value in ("demotion_proposed", "unmaintained_signal")
+                        # original selection/pin is confirmed as-is. A
+                        # demotion/unmaintained-signal refutation cannot be
+                        # resolved to a concrete confirmed_* class here (see
+                        # REFUTED_TO_CONFIRMED_MARKER) -- everything else
+                        # (e.g. a refuted pin_behind_upstream dismissal)
+                        # keeps the previous "confirmed_pin" resolution,
+                        # which needs no baseline to be correct.
+                        status_value = (REFUTED_TO_CONFIRMED_MARKER
+                                         if status_value in ("demotion_proposed", "unmaintained_signal")
                                          else "confirmed_pin")
-                        notes[key].append(f"{selected['status']} proposed by {lane['lane']} lane, "
-                                           "refuted by adversarial verification")
+                        refuted_note = (f"{status_orig} proposed by {lane_name} lane, "
+                                        "refuted by adversarial verification")
+                        notes[key].append(refuted_note)
+                        evidence.append(refuted_note)
                     elif survives is None:
                         # Unknown verdict (no refuter vote, or a null in the
                         # lanes.json record): never treat this as a
@@ -364,28 +593,49 @@ def merge_lanes(lanes_doc: dict, repositories: dict):
                         # to "confirmed_default". Keep it unverified instead.
                         status_value = f"{status_value}_unverified"
                         evidence.append(
-                            f"{vote_count} adversarial vote(s) returned for {lane['lane']} lane's "
-                            f"{selected['status']} proposal; verification outcome unknown (survives=null)"
+                            f"{vote_count} adversarial vote(s) returned for {lane_name} lane's "
+                            f"{status_orig} proposal; verification outcome unknown (survives=null)"
                         )
                     # survives is True: the lane's proposed status change
                     # itself survived verification -- keep status_value as
                     # the lane proposed it (no note; this never upgrades
                     # beyond what the lane itself proposed).
-                status[key] = {"status": status_value, "evidence": evidence,
-                                "note": selected.get("note"), "lane": lane["lane"]}
-                # Optional lane fields, carried through only when the lane's
-                # selected item actually sets them -- never invented here.
-                # build_manifest() copies these from ``status[key]`` onto the
-                # merged components[]/entries[] the same way it already
-                # copies "note"/"evidence".
-                if "why_selected" in selected:
-                    status[key]["why_selected"] = selected["why_selected"]
-                if "comparison_that_would_overturn" in selected:
-                    status[key]["comparison_that_would_overturn"] = selected["comparison_that_would_overturn"]
+                    if shared_from is not None:
+                        evidence.append(f"verdict shared from layer {shared_from}")
+                entry = {
+                    "lane": lane_name,
+                    # G4: the lane's own card identity, when it set one --
+                    # distinguishes two components/entries that share one
+                    # repository in one layer (e.g. an execution-broker
+                    # "alpaca-py" card and its sibling "data-alpaca-py"
+                    # card). Also still carried through generically inside
+                    # lane_item below, since it is not one of
+                    # MERGED_SELECTED_KEYS.
+                    "catalog_id": selected.get("catalog_id"),
+                    "status": status_value,
+                    "verified": _entry_verified(verdict),
+                    "evidence": evidence,
+                    "note": selected.get("note"),
+                    # Every other field the lane set on this selected item,
+                    # verbatim and never invented; build_manifest() decides
+                    # per row kind which of them land (ROW_LANE_FIELDS on
+                    # taxonomy rows, all of them on lane_groupings rows).
+                    "lane_item": {
+                        field: value for field, value in selected.items() if field not in MERGED_SELECTED_KEYS
+                    },
+                }
+                bucket = status.setdefault(key, {"entries": []})
+                bucket["entries"].append(entry)
+                if "status" not in bucket:
+                    bucket["status"] = entry["status"]
+                    bucket["evidence"] = entry["evidence"]
+                    bucket["note"] = entry["note"]
+                    bucket["lane"] = entry["lane"]
+                    bucket["lane_item"] = entry["lane_item"]
             for alt in layer.get("alternatives_keep_but_compare", []):
-                alts[layer_id].append({**alt, "lane": lane["lane"]})
+                alts[layer_id].append({**alt, "lane": lane_name})
             for candidate in layer.get("new_candidates", []):
-                verdict = verdicts.get((layer_id, candidate["repository"], "new_candidate"))
+                verdict = verdicts_exact.get((layer_id, candidate["repository"], "new_candidate"))
                 survives = verdict["survives"] if verdict else None
                 upstream_now = (compute_upstream(candidate["repository"], repositories)
                                  if repository_known(candidate["repository"], repositories)
@@ -401,11 +651,93 @@ def merge_lanes(lanes_doc: dict, repositories: dict):
                     "evidence": candidate.get("evidence", []), "upstream_now": upstream_now,
                     "adversarial_verification": {"survives": survives, "votes": votes},
                     "disposition": disposition(candidate.get("proposed_label"), survives),
-                    "lane": lane["lane"],
+                    "lane": lane_name,
                 })
             for gap in layer.get("open_gaps", []):
                 gaps[layer_id].append(gap)
     return status, notes, alts, cands, gaps, calls, limits
+
+
+# ---------------------------------------------------------------------------
+# Row-level lane precedence (G1), catalog-id matching (G4) and the
+# refuted-to-confirmed marker resolution (G2)
+# ---------------------------------------------------------------------------
+
+def resolve_refuted_marker(status_value, *, row_kind, selection=None, decision=None):
+    """Resolve ``REFUTED_TO_CONFIRMED_MARKER`` to the concrete class the row
+    would carry absent the (refuted) demotion/unmaintained-signal proposal --
+    the component/entry's own governing baseline decision, never upgraded
+    past it (G2). Any other status value passes through unchanged.
+
+    - ``row_kind="foundation"``: ``selection`` is the governing
+      foundation-layers.json decision's ``selection`` for this component
+      (``default`` -> ``confirmed_default``, ``conditional`` ->
+      ``confirmed_conditional``, anything else, e.g. ``optional`` ->
+      ``confirmed_selected``).
+    - ``row_kind="trading"``: ``decision`` is the entry's own
+      trading-by-layer.json ``decision``, mapped the same way.
+    - ``row_kind="lane_groupings"`` (or anything else): there is no baseline
+      to resolve from -- a lane_groupings row is the lane's own grouping,
+      not a catalog selection -- so it always resolves to
+      ``confirmed_as_selected``.
+    """
+    if status_value != REFUTED_TO_CONFIRMED_MARKER:
+        return status_value
+    if row_kind == "foundation":
+        return {"default": "confirmed_default", "conditional": "confirmed_conditional"}.get(
+            selection, "confirmed_selected")
+    if row_kind == "trading":
+        return {"default": "confirmed_default", "conditional": "confirmed_conditional"}.get(
+            decision, "confirmed_selected")
+    return "confirmed_as_selected"
+
+
+def select_row_review(entries, *, owning_lane=None):
+    """Pick the one entry (of possibly several lanes' entries matched to the
+    same row) that supplies a row's review_status/review_note/evidence/
+    lane_item, by G1's documented, deterministic precedence:
+
+    (a) an entry that was adversarially verified (``entry["verified"]``,
+        i.e. a matching proposal with ``survives`` true or false) beats an
+        unverified one;
+    (b) among equals, the lane that owns the catalog (``owning_lane`` --
+        the foundation lane for a foundation row, the trading lane for a
+        trading row, ``None``/no owner for a lane_groupings row) beats any
+        other lane;
+    (c) tie -> lexical lane name.
+
+    Returns ``(chosen, others)``; ``others`` is every other entry, in the
+    same precedence order, for the row's ``other_lane_reviews``. Nothing is
+    dropped -- every entry passed in is chosen or returned in ``others``."""
+    def sort_key(entry):
+        verified_rank = 0 if entry["verified"] else 1
+        owner_rank = 0 if owning_lane and entry["lane"] == owning_lane else 1
+        return (verified_rank, owner_rank, entry["lane"])
+
+    ordered = sorted(entries, key=sort_key)
+    return ordered[0], ordered[1:]
+
+
+def match_lane_entries(entries, *, card_id):
+    """G4: match a card's lane entries by ``catalog_id`` first, falling back
+    to every entry with no ``catalog_id`` set (which applies to every card
+    sharing that repository/layer, since it named none of them specifically).
+    Returns ``(matched, matched_by_repository_only)``."""
+    by_id = [entry for entry in entries if entry["catalog_id"] == card_id]
+    if by_id:
+        return by_id, False
+    by_repository = [entry for entry in entries if entry["catalog_id"] is None]
+    return by_repository, bool(by_repository)
+
+
+def other_lane_review(entry, *, row_kind, selection=None, decision=None):
+    return {
+        "lane": entry["lane"],
+        "status": resolve_refuted_marker(entry["status"], row_kind=row_kind, selection=selection, decision=decision),
+        "evidence": entry["evidence"],
+        "note": entry["note"],
+        "lane_item": entry["lane_item"],
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -485,13 +817,235 @@ def format_observation_window(freshness_doc: dict) -> str:
     return f"observed {min_at[:19]}Z to {max_at[:19]}Z"
 
 
+# Restrictiveness rank used only to resolve foundation_decision_selection_map
+# when more than one decision in a layer names the same component (see its
+# docstring) -- lower rank wins, i.e. the *weakest* confirmed_* class
+# resolve_refuted_marker would map it to. A selection outside this map
+# (typo, or a future label) ranks the same as "optional": resolve_refuted_
+# marker's own "anything else" branch already maps both to the same
+# confirmed_selected class, so treating them identically here changes
+# nothing about the resolved output.
+SELECTION_RESTRICTIVENESS_RANK = {"optional": 0, "conditional": 1, "default": 2}
+
+
+def foundation_decision_selection_map(foundation_layers: dict) -> dict:
+    """``(layer_id, component_id) -> selection`` from every
+    foundation-layers.json decision (``default``/``conditional``/``optional``/
+    ...). Used only to resolve ``REFUTED_TO_CONFIRMED_MARKER`` (G2) to a
+    component's own governing baseline class, never past it.
+
+    A component named by more than one decision in the same layer resolves
+    to the MOST RESTRICTIVE selection among all decisions naming it
+    (``SELECTION_RESTRICTIVENESS_RANK``: ``optional`` < ``conditional`` <
+    ``default``), never simply the first one listed in ``decisions[]``
+    order -- the previous first-listed-wins rule (via ``dict.setdefault``)
+    could silently resolve a refuted demotion to ``confirmed_default`` when
+    a stricter co-occurring ``conditional`` decision also named the same
+    component, purely because that decision happened to be listed second.
+    No foundation-layers.json decision set observed so far actually
+    disagrees this way (every set checked so far names a component from
+    only one decision, or from decisions that already agree), so this was a
+    latent defect, not one triggered by the current data -- but the rule is
+    still wrong on its own terms and must not depend on decisions[] order."""
+    selection_map = {}
+    ranks = {}
+    for layer in foundation_layers.get("layers", []):
+        layer_id = layer.get("layer_id")
+        for decision in layer.get("decisions", []):
+            selection = decision.get("selection")
+            rank = SELECTION_RESTRICTIVENESS_RANK.get(selection, 0)
+            for component_id in decision.get("component_ids", []):
+                key = (layer_id, component_id)
+                if key not in ranks or rank < ranks[key]:
+                    ranks[key] = rank
+                    selection_map[key] = selection
+    return selection_map
+
+
+def _repository_share_counts(cards) -> Counter:
+    return Counter(card["repository"] for card in cards)
+
+
+def _build_card_row(card, *, layer_id, status, row_kind, repo_counts, selection=None, decision=None,
+                     base_fields):
+    """Shared foundation-components[]/trading-entries[] row assembly: match
+    this card's lane entries (G4), pick the row's own entry by G1 precedence
+    (``select_row_review``), resolve a refuted-to-confirmed marker (G2)
+    against this card's own baseline class, and preserve every other lane's
+    entry verbatim under ``other_lane_reviews``."""
+    bucket = status.get((layer_id, card["repository"]))
+    entries = bucket["entries"] if bucket else []
+    matched, by_repository_only = match_lane_entries(entries, card_id=card["id"])
+    row = dict(base_fields)
+    if not matched:
+        row["review_status"] = "not_individually_reviewed"
+        row["review_note"] = None
+        row["evidence"] = []
+        return row
+    owning_lane = "foundation" if row_kind == "foundation" else "trading"
+    chosen, others_within_matched = select_row_review(matched, owning_lane=owning_lane)
+    # G1: `matched` only ever holds entries selected by match_lane_entries
+    # (the by-id match, or the by-repository-only fallback when no entry
+    # named this card's id). A card-less entry (catalog_id None) from another
+    # lane that sits alongside a by-id match never triggers the fallback, so
+    # it is preserved here rather than dropped: it applies to this card too.
+    # An entry whose catalog_id names a DIFFERENT card in this layer belongs
+    # to that card's own row (where match_lane_entries selects it by id) and
+    # is not folded in here -- folding it would publish one card's lane
+    # review under another card. Nothing at this (layer, repository) key is
+    # lost: every entry lands on the card(s) it names or, card-less, on all.
+    matched_ids = {id(entry) for entry in matched}
+    others = others_within_matched + [
+        entry for entry in entries
+        if id(entry) not in matched_ids and entry["catalog_id"] in (None, card["id"])
+    ]
+    evidence = list(chosen["evidence"])
+    if by_repository_only:
+        sharing = repo_counts[card["repository"]]
+        if sharing > 1:
+            evidence.append(f"lane entry matched by repository only; {sharing} cards share it")
+    row["review_status"] = resolve_refuted_marker(chosen["status"], row_kind=row_kind,
+                                                    selection=selection, decision=decision)
+    row["review_note"] = chosen["note"]
+    row["evidence"] = evidence
+    row["review_lane"] = chosen["lane"]
+    if others:
+        row["other_lane_reviews"] = [
+            other_lane_review(o, row_kind=row_kind, selection=selection, decision=decision) for o in others
+        ]
+    for field in ROW_LANE_FIELDS:
+        if field in chosen["lane_item"]:
+            row[field] = chosen["lane_item"][field]
+    return row
+
+
+# A plain ``\bID\b`` regex boundary treats a hyphen as a non-word character,
+# so it does NOT protect against a hyphen-adjacent substring collision (e.g.
+# "alpaca-py" inside "data-alpaca-py", or "card-one" inside "data-card-one"
+# from either direction) -- re.search(r"\balpaca-py\b", "data-alpaca-py")
+# matches, because the '-' right before "alpaca-py" is itself a word
+# boundary. ``_id_named_in`` instead excludes a preceding/following
+# word-or-hyphen character, so a card id only matches when it appears as a
+# hyphen-delimited whole segment, not as part of a longer sibling id.
+def _id_named_in(id_lower: str, haystack: str) -> bool:
+    pattern = r"(?<![\w-])" + re.escape(id_lower) + r"(?![\w-])"
+    return re.search(pattern, haystack) is not None
+
+
+def apply_citation_review(manifest: dict, citation_review_doc) -> None:
+    """G6: overlay an independent citation review's findings onto the
+    manifest rows they name, at ``manifest["citation_review"]``. Data only --
+    never edits a row's own ``why_selected``/``review_status``/etc.
+
+    Each finding with ``catalog`` in ``{"foundation", "trading"}`` (a
+    ``reviewer: "tooling"`` finding always has ``catalog: "tooling"`` in this
+    artifact's schema and is ignored here -- it reviews this tool's own
+    code/docs/tests, not a manifest row) is resolved to at most one row:
+    ``layer`` (splitting a free-text ``"layer/component"`` or
+    ``"multiple/..."`` value on ``"/"`` and taking the first segment as a
+    candidate layer id) must name a real foundation/trading layer; within
+    that layer, a card is matched first by its own id appearing as a
+    hyphen-delimited whole segment in the finding's ``repository``/``claim``
+    text (``_id_named_in`` -- a plain ``\\bID\\b`` regex boundary does NOT
+    suffice here, since a hyphen is a non-word character and a plain
+    boundary still fires inside a longer sibling id from either direction,
+    e.g. ``alpaca-py`` inside ``data-alpaca-py`` or ``card-one`` inside
+    ``data-card-one``; ``_id_named_in`` instead excludes a preceding/
+    following word-or-hyphen character, so a substring collision like that
+    cannot cross-match the wrong card), and only when no id matches at all,
+    by the card's repository slug appearing, with the same
+    ``_id_named_in`` boundary protection, in that same text (a plain
+    substring check here has the identical collision, e.g.
+    ``example/alpha`` inside ``example/alpha-extended``). A finding that
+    resolves to zero or more than one card is not silently dropped: it is
+    appended, unchanged, to ``manifest["citation_review"]["general"]``
+    instead."""
+    manifest["citation_review"] = {"general": []}
+    findings = list((citation_review_doc or {}).get("findings", []))
+    considered = [f for f in findings if f.get("catalog") in ("foundation", "trading")]
+    rows_flagged = set()
+    attached = 0
+    general = []
+    for finding in considered:
+        rows = manifest["foundation"] if finding["catalog"] == "foundation" else manifest["trading"]
+        layer_field = str(finding.get("layer") or "")
+        candidate_layer_id = layer_field.split("/", 1)[0].strip()
+        layer_row = next((r for r in rows if r["layer"] == candidate_layer_id), None)
+        card = None
+        if layer_row is not None:
+            haystack = " ".join(str(finding.get(f) or "") for f in ("repository", "claim")).lower()
+            cards = layer_row.get("components", layer_row.get("entries", []))
+            id_matches = [
+                c for c in cards
+                if c.get("id") and _id_named_in(str(c["id"]).lower(), haystack)
+            ]
+            if len(id_matches) == 1:
+                card = id_matches[0]
+            elif not id_matches:
+                # Same collision class as the id branch above, and the
+                # same fix: a plain substring `in` check has no boundary
+                # protection at all, so a shorter sibling's slug (e.g.
+                # "example/alpha") spuriously matches inside a longer
+                # sibling's slug substring (e.g. "example/alpha-extended")
+                # naming only the longer one. Reuse ``_id_named_in`` --
+                # "/" is not a word-or-hyphen character, so it is already
+                # a valid boundary on either side of a slug.
+                slug_matches = [
+                    c for c in cards
+                    if github_repo_slug(c.get("repository"))
+                    and _id_named_in(github_repo_slug(c.get("repository")), haystack)
+                ]
+                if len(slug_matches) == 1:
+                    card = slug_matches[0]
+        if card is None:
+            general.append(dict(finding))
+            continue
+        card.setdefault("citation_review", []).append({
+            "reviewer": finding.get("reviewer"), "severity": finding.get("severity"),
+            "claim": finding.get("claim"), "fix": finding.get("fix"),
+            # G6 asymmetry fix: carry the exact citation locators too (this
+            # review round exists to preserve them) -- without these, a
+            # row-attached finding was not traceable back to its cited
+            # line the way a citation_review.general entry already was.
+            "file": finding.get("file"), "line": finding.get("line"), "evidence": finding.get("evidence"),
+        })
+        rows_flagged.add((finding["catalog"], layer_row["layer"], card.get("id")))
+        attached += 1
+    for rows in (manifest["foundation"], manifest["trading"]):
+        for row in rows:
+            for card in row.get("components", row.get("entries", [])):
+                if "citation_review" in card:
+                    card["citation_review"].sort(key=lambda f: (f["reviewer"] or "", f["severity"] or "", f["claim"] or ""))
+    general.sort(key=lambda f: (f.get("reviewer") or "", f.get("layer") or "", f.get("line") or 0, f.get("claim") or ""))
+    manifest["citation_review"]["general"] = general
+    manifest["counts"]["citation_review"] = {
+        # findings_in_artifact/out_of_scope make the in-scope subset
+        # reconcilable against the artifact alone (a reviewer="tooling"
+        # finding, catalog="tooling", reviews this tool's own code/docs/
+        # tests, not a manifest row, and is out of scope here by design --
+        # but was previously dropped with no trace in counts at all).
+        "findings_in_artifact": len(findings),
+        "findings": len(considered),
+        "out_of_scope": len(findings) - len(considered),
+        # attached (total findings actually attached to a row) can exceed
+        # rows_flagged (distinct rows touched) whenever more than one
+        # finding names the same row -- both are needed so
+        # findings == attached + general is checkable from the manifest
+        # alone, without walking every card's citation_review[].
+        "attached": attached,
+        "rows_flagged": len(rows_flagged),
+        "general": len(general),
+    }
+
+
 def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading_by_layer,
                     freshness_doc, lanes_doc, reconciliations, taxonomy,
-                    os_package_ids=DEFAULT_OS_PACKAGE_IDS) -> dict:
+                    os_package_ids=DEFAULT_OS_PACKAGE_IDS, citation_review=None) -> dict:
     repositories = freshness_doc.get("repositories", {})
     baseline_foundation = build_baseline_foundation(foundation_layers, repositories, os_package_ids=os_package_ids)
     baseline_trading = build_baseline_trading(trading_by_layer, repositories, os_package_ids=os_package_ids)
     status, notes, alts, cands, gaps, calls, limits = merge_lanes(lanes_doc, repositories)
+    foundation_selection = foundation_decision_selection_map(foundation_layers)
 
     # Fall back to deriving retained_from_prior_runs from count - fetched_this_run
     # for an older-format freshness file that predates these top-level fields
@@ -520,28 +1074,29 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
             "rule": "evidence, not agreement or recency; a newer release is information, "
                     "not a reason to upgrade",
         },
-        "taxonomy": taxonomy, "foundation": [], "trading": [],
+        "taxonomy": taxonomy, "foundation": [], "trading": [], "lane_groupings": [],
+        # Placeholder; filled in by apply_citation_review() below (G6). Set
+        # here, in position, so the key stays "... lane_groupings,
+        # citation_review, critic ..." even before that call runs --
+        # reassigning a dict key in place never moves its position.
+        "citation_review": {"general": []},
         "critic": lanes_doc.get("critic"), "lane_calls": calls, "lane_limits": limits,
     }
 
     for row in baseline_foundation:
         layer_id = row["layer"]
+        repo_counts = _repository_share_counts(row["components"])
         components = []
         for component in row["components"]:
-            lane_status = status.get((layer_id, component["repository"]), {})
-            component_row = {
+            base_fields = {
                 "id": component["id"], "repository": component["repository"], "pin": component["pin"],
                 "upstream": component["upstream"], "pin_behind_upstream": component["behind"],
-                "review_status": lane_status.get("status", "not_individually_reviewed"),
-                "review_note": lane_status.get("note"),
-                "evidence": lane_status.get("evidence", []) + notes.get((layer_id, component["repository"]), []),
             }
-            # Optional lane fields: carried through only when the lane's
-            # selected item actually set them on status[key] -- never invented.
-            for field in ("why_selected", "comparison_that_would_overturn"):
-                if field in lane_status:
-                    component_row[field] = lane_status[field]
-            components.append(component_row)
+            selection = foundation_selection.get((layer_id, component["id"]))
+            components.append(_build_card_row(
+                component, layer_id=layer_id, status=status, row_kind="foundation",
+                repo_counts=repo_counts, selection=selection, base_fields=base_fields,
+            ))
         components.sort(key=row_item_sort_key)
         manifest["foundation"].append({
             "layer": layer_id, "title": row["title"], "components": components,
@@ -552,24 +1107,19 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
 
     for row in baseline_trading:
         layer_id = row["layer"]
+        repo_counts = _repository_share_counts(row["entries"])
         entries = []
         for entry in row["entries"]:
-            lane_status = status.get((layer_id, entry["repository"]), {})
-            row_entry = {
+            base_fields = {
                 "id": entry["id"], "repository": entry["repository"], "decision": entry["decision"],
                 "pin": entry["pin"], "upstream": entry["upstream"], "pin_behind_upstream": entry["behind"],
-                "review_status": lane_status.get("status", "not_individually_reviewed"),
-                "review_note": lane_status.get("note"),
-                "evidence": lane_status.get("evidence", []) + notes.get((layer_id, entry["repository"]), []),
             }
             if "evidence_level" in entry:
-                row_entry["evidence_level"] = entry["evidence_level"]
-            # Optional lane fields: carried through only when the lane's
-            # selected item actually set them on status[key] -- never invented.
-            for field in ("why_selected", "comparison_that_would_overturn"):
-                if field in lane_status:
-                    row_entry[field] = lane_status[field]
-            entries.append(row_entry)
+                base_fields["evidence_level"] = entry["evidence_level"]
+            entries.append(_build_card_row(
+                entry, layer_id=layer_id, status=status, row_kind="trading",
+                repo_counts=repo_counts, decision=entry.get("decision"), base_fields=base_fields,
+            ))
         entries.sort(key=row_item_sort_key)
         manifest["trading"].append({
             "layer": layer_id, "entries": entries,
@@ -578,16 +1128,85 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
             "open_gaps": sorted(set(gaps.get(layer_id, []))),
         })
 
+    # trading[] rows are now exactly the taxonomy layer ids (build_baseline_trading
+    # above), so a review lane's own grouping id (e.g. the "beyond" lane's
+    # "awesome-list-convergence") is never a foundation or taxonomy layer id.
+    # Appending it as a fake trading row (the previous behaviour) is what made
+    # scripts/landscape.py's `require(seen == expected, "comparison coverage
+    # must exactly match all foundation and domain layers")` fail: trading[]
+    # gained rows outside the 12-layer taxonomy it is defined to mirror
+    # exactly. Such an id, and everything a lane reported under it, is carried
+    # verbatim into its own "lane_groupings" row instead -- nothing is
+    # dropped, it just stops masquerading as a taxonomy layer.
     known_layers = {row["layer"] for row in manifest["foundation"]} | {row["layer"] for row in manifest["trading"]}
-    for layer_id in sorted(set(cands) | set(gaps) | set(alts)):
-        if layer_id not in known_layers:
-            manifest["trading"].append({
-                "layer": layer_id, "entries": [],
-                "alternatives_keep_but_compare": alts.get(layer_id, []),
-                "candidates": sorted_candidates(cands, layer_id),
-                "open_gaps": sorted(set(gaps.get(layer_id, []))),
-                "note": "layer id named by a review lane outside the baseline taxonomy",
-            })
+    # A lane_groupings row has no baseline card list to match a lane entry's
+    # catalog_id against (see match_lane_entries for foundation/trading), so
+    # every distinct catalog_id an entry set (None included) at a given
+    # (layer, repository) becomes its own selected[] row here -- the same
+    # G4 card-disambiguation principle, applied without a baseline.
+    status_by_layer = defaultdict(list)
+    for (status_layer_id, repository), bucket in status.items():
+        by_catalog_id = defaultdict(list)
+        for entry in bucket["entries"]:
+            by_catalog_id[entry["catalog_id"]].append(entry)
+        for catalog_id, entries in by_catalog_id.items():
+            status_by_layer[status_layer_id].append((repository, catalog_id, entries))
+
+    lane_grouping_layer_ids = sorted(
+        (set(cands) | set(gaps) | set(alts) | set(status_by_layer)) - known_layers
+    )
+    for layer_id in lane_grouping_layer_ids:
+        selected = []
+        lane_names = set()
+        groups = sorted(status_by_layer.get(layer_id, []), key=lambda g: (g[0], g[1] or ""))
+        for repository, catalog_id, entries in groups:
+            # No foundation/trading owning lane applies to a lane's own
+            # grouping (G1 rule (b) is moot here); ties fall straight to
+            # rule (c), the lexical lane name.
+            chosen, others = select_row_review(entries, owning_lane=None)
+            selected_row = {
+                "repository": repository,
+                "status": resolve_refuted_marker(chosen["status"], row_kind="lane_groupings"),
+                "evidence": chosen["evidence"], "note": chosen["note"],
+                "review_lane": chosen["lane"],
+            }
+            # A lane_groupings row has no baseline pin/upstream field to fall
+            # back on the way a foundation/trading row does, so every field
+            # the lane set (role, catalog_id, catalog_pin, upstream_now,
+            # why_selected, comparison_that_would_overturn, ...) is the
+            # evidence a grouping like "unmaintained-reference-material"
+            # exists to record -- carried through verbatim, never invented,
+            # and never overriding the merged status fields.
+            for field, value in sorted(chosen.get("lane_item", {}).items()):
+                if field not in selected_row:
+                    selected_row[field] = value
+            if others:
+                selected_row["other_lane_reviews"] = [
+                    other_lane_review(o, row_kind="lane_groupings") for o in others
+                ]
+            selected.append(selected_row)
+            for entry in entries:
+                if entry.get("lane"):
+                    lane_names.add(entry["lane"])
+        layer_alts = alts.get(layer_id, [])
+        layer_candidates = sorted_candidates(cands, layer_id)
+        for source in (layer_alts, layer_candidates):
+            for item in source:
+                if item.get("lane"):
+                    lane_names.add(item["lane"])
+        manifest["lane_groupings"].append({
+            "layer": layer_id,
+            # A single contributing lane is the observed case (see
+            # tests/test_sota_convergence.py); a joined, sorted string is
+            # used instead of erroring if more than one lane ever reports
+            # the same non-taxonomy grouping id, so a rerun still diffs
+            # cleanly rather than raising.
+            "lane": ", ".join(sorted(lane_names)) if lane_names else None,
+            "selected": selected,
+            "alternatives_keep_but_compare": layer_alts,
+            "candidates": layer_candidates,
+            "open_gaps": sorted(set(gaps.get(layer_id, []))),
+        })
 
     manifest["reconciliations"] = []
     for item in reconciliations:
@@ -608,6 +1227,11 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
     manifest["counts"] = {
         "foundation_layers": len(manifest["foundation"]),
         "trading_layers": len([r for r in manifest["trading"] if r.get("entries")]),
+        "trading_layers_note": "trading_layers counts only taxonomy layers with at least one "
+                                "selected entry, unlike foundation_layers (which counts every row); "
+                                "trading[] itself always has one row per taxonomy id, so "
+                                "len(manifest[\"trading\"]) can exceed trading_layers whenever a "
+                                "taxonomy layer happens to have zero selected entries",
         "components_confirmed": sum(
             1 for row in all_rows for component in all_components(row)
             if str(component["review_status"]).startswith("confirmed")
@@ -626,7 +1250,22 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
         "candidates_by_disposition": dict(Counter(
             candidate["disposition"] for row in all_rows for candidate in row["candidates"]
         )),
+        "lane_groupings": len(manifest["lane_groupings"]),
+        "lane_grouping_candidates": sum(len(g["candidates"]) for g in manifest["lane_groupings"]),
+        "lane_groupings_note": "every foundation/trading-scoped count above (candidates_total, "
+                                "candidates_by_disposition, components_confirmed, pins_behind_upstream, "
+                                "pins_behind_upstream_unique_components) is computed from all_rows = "
+                                "manifest['foundation'] + manifest['trading'] only, and so excludes "
+                                "lane_groupings[].selected rows the same way it excludes "
+                                "lane_groupings[].candidates; candidates inside lane_groupings (a "
+                                "review-lane grouping id outside the foundation/taxonomy baseline, e.g. "
+                                "an awesome-list survey) are counted only in lane_grouping_candidates; "
+                                "counts.citation_review (computed below, by apply_citation_review) is the "
+                                "same way scoped -- its rows_flagged/attached only ever count a foundation/"
+                                "trading row, never a lane_groupings[].selected row, since apply_citation_review "
+                                "only walks manifest['foundation'] and manifest['trading']",
     }
+    apply_citation_review(manifest, citation_review)
     return manifest
 
 
@@ -644,6 +1283,12 @@ def parse_args(argv=None):
     parser.add_argument("--freshness", type=Path, default=None)
     parser.add_argument("--lanes", type=Path, required=True)
     parser.add_argument("--reconciliations", type=Path, default=HERE / "reconciliations-20260922.json")
+    parser.add_argument("--citation-review", type=Path, default=None,
+                         help="Optional independent citation-review artifact (schema: "
+                              "{findings: [{reviewer, catalog, severity, layer, repository, "
+                              "file, line, claim, evidence, fix}, ...]}); overlaid onto the "
+                              "matching foundation/trading rows at manifest['citation_review'] "
+                              "(G6) -- data only, never edits a row's own fields.")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--checked-at", required=True)
     parser.add_argument("--id", dest="manifest_id", required=True)
@@ -668,6 +1313,7 @@ def main(argv=None) -> int:
     freshness_doc = load_json(freshness_path)
     lanes_doc = load_json(args.lanes)
     reconciliations = load_json(args.reconciliations).get("reconciliations", [])
+    citation_review = load_json(args.citation_review) if args.citation_review else None
     taxonomy = trading_by_layer.get("taxonomy", {})
 
     scope = args.scope or (
@@ -684,13 +1330,25 @@ def main(argv=None) -> int:
         foundation_layers=foundation_layers, trading_by_layer=trading_by_layer,
         freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=reconciliations,
         taxonomy=taxonomy, os_package_ids=tuple(args.os_package_ids),
+        citation_review=citation_review,
     )
+
+    # A host path under the private --work-dir (or, when the three inputs
+    # were instead given individually, their shared parent directory) is
+    # redacted to "<work-dir>/<basename>" rather than the generic
+    # "<host-path>/<basename>" (G5) -- both keep the basename and any JSON
+    # pointer suffix; see sanitize()'s docstring.
+    if work_dir:
+        work_dir_for_sanitize = str(work_dir.resolve())
+    else:
+        parents = {p.resolve().parent for p in (foundation_layers_path, trading_by_layer_path, freshness_path)}
+        work_dir_for_sanitize = str(parents.pop()) if len(parents) == 1 else None
 
     # Sanitize the decoded object *before* serialization (see sanitize_value's
     # docstring for why sanitizing the serialized text instead can produce
     # invalid JSON), then prove the serialized result is valid JSON before
     # the leak check and the write.
-    text = json.dumps(sanitize_value(manifest), indent=1)
+    text = json.dumps(sanitize_value(manifest, work_dir=work_dir_for_sanitize), indent=1)
     json.loads(text)
     assert_no_leak(text)
     args.out.parent.mkdir(parents=True, exist_ok=True)
