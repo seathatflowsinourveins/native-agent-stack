@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "checked_at": "2026-09-21",
-  "scope": "Current foundation choices across all 16 canonical layers. Reasons describe fit for the accepted native workload, not universal superiority. This is a reconciliation of pinned source reviews and retained executions at base fb04bf702ea67b14163405f0ebe132e393ebbd8a; it performs no new installation, model run or comparative benchmark. Selected means retained for its stated role, not mandatory activation in every task. Unqualified and conditional alternatives have not failed a test merely because they are not adopted.",
+  "scope": "Current foundation choices across all 16 canonical layers. Reasons describe fit for the accepted native workload, not universal superiority. This is a reconciliation of pinned source reviews and retained executions at base fb04bf702ea67b14163405f0ebe132e393ebbd8a; it performs no new installation, model run or comparative benchmark. Selected means retained for its stated role, not mandatory activation in every task. Unqualified and conditional alternatives have not failed a test merely because they are not adopted. A bounded primary-source quality refresh on September 21 America/New_York (September 22 UTC) expands runtime/memory challengers without replacing installed pins or historical acceptance.",
   "layers": [
     {
       "catalog": "foundation",
@@ -14,7 +14,7 @@
       "evidence_refs": ["docs/foundation-closure-20260921.md", "docs/full-stack-convergence.md", "catalogs/foundation/decisions.json"],
       "limitations": ["The recorded tasks do not establish a comparative model-quality ranking or causal provider savings.", "Same-session continuation does not establish every crash, provider cancellation or cross-host recovery condition."],
       "overturn_when": "A required structured-event, custom-tool or application state capability is unavailable through the native path and a supported SDK implementation passes the same task, account, effect and recovery checks.",
-      "candidates": [{"name":"Codex","repository":"https://github.com/openai/codex","disposition":"selected","rationale":"Actual native tasks and session recovery exist; retain native account, tools and model selection.","evidence_kind":"native_execution","evidence_refs":["docs/full-stack-convergence.md","catalogs/foundation/decisions.json"]},{"name":"Claude Code","repository":"https://github.com/anthropics/claude-code","disposition":"selected","rationale":"Native task, interactive usage/HUD and manual compaction observations qualify the current client path within their recorded scope.","evidence_kind":"native_execution","evidence_refs":["docs/foundation-closure-20260921.md"]},{"name":"OpenAI Agents SDK","repository":"https://github.com/openai/openai-agents-python","disposition":"conditional","rationale":"Fits an application-owned API agent; it is not a substitute for the established subscription-backed native Codex account and behavior.","evidence_kind":"source_review","evidence_refs":["docs/foundation-closure-20260921.md","catalogs/us-equities/agents-operations.json"]},{"name":"Claude Agent SDK","repository":"https://github.com/anthropics/claude-agent-sdk-python","disposition":"conditional","rationale":"Use when application orchestration specifically needs its supported structured interface and authentication route; no current bounded-task replacement need was demonstrated.","evidence_kind":"source_review","evidence_refs":["docs/foundation-closure-20260921.md"]},{"name":"Letta Code","repository":"https://github.com/letta-ai/letta-code","disposition":"unqualified","rationale":"A separate memory-aware coding architecture is credible, but its task quality and migration costs have not been compared against these native clients.","evidence_kind":"source_review","evidence_refs":["docs/memory-landscape-maintenance.md"]},{"name":"MCPorter native bridge","repository":"https://github.com/openclaw/mcporter","disposition":"selected","rationale":"Supporting CLI bridge for scoped native MCP calls and retained daemon connections; it does not replace client accounts, hooks or the agent loop.","evidence_kind":"native_execution","evidence_refs":["evidence/receipts/claude-upstream-checks-20260921.json"]}]
+      "candidates": [{"name":"Codex","repository":"https://github.com/openai/codex","disposition":"selected","rationale":"Actual native tasks and session recovery exist; retain native account, tools and model selection.","evidence_kind":"native_execution","evidence_refs":["docs/full-stack-convergence.md","catalogs/foundation/decisions.json"]},{"name":"Claude Code","repository":"https://github.com/anthropics/claude-code","disposition":"selected","rationale":"Native task, interactive usage/HUD and manual compaction observations qualify the current client path within their recorded scope.","evidence_kind":"native_execution","evidence_refs":["docs/foundation-closure-20260921.md"]},{"name":"OpenAI Agents SDK","repository":"https://github.com/openai/openai-agents-python","disposition":"conditional","rationale":"Fits an application-owned API agent; it is not a substitute for the established subscription-backed native Codex account and behavior.","evidence_kind":"source_review","evidence_refs":["docs/foundation-closure-20260921.md","catalogs/us-equities/agents-operations.json"]},{"name":"Claude Agent SDK","repository":"https://github.com/anthropics/claude-agent-sdk-python","disposition":"conditional","rationale":"Use when application orchestration specifically needs its supported structured interface and authentication route; no current bounded-task replacement need was demonstrated.","evidence_kind":"source_review","evidence_refs":["docs/foundation-closure-20260921.md"]},{"name":"Letta Code","repository":"https://github.com/letta-ai/letta-code","disposition":"unqualified","rationale":"Active stateful agent harness with persistent memory/skills and documented local/cloud backends. It is a broader runtime-and-memory architecture, not only a drop-in store. The legacy Letta repository redirects to it while V1 remains on an archive branch; compare native-account behavior, recall, lifecycle and migration before replacement.","evidence_kind":"source_review","evidence_refs":["docs/memory-landscape-maintenance.md","catalogs/landscape/candidate-quality-review.json","docs/candidate-quality-review-20260921.md","evidence/artifacts/catalog-quality-review-20260921/sources.json","https://raw.githubusercontent.com/letta-ai/letta-code/dfb5639a4db2d97828e7ca07b808e93be85e05e7/README.md"]},{"name":"MCPorter native bridge","repository":"https://github.com/openclaw/mcporter","disposition":"selected","rationale":"Supporting CLI bridge for scoped native MCP calls and retained daemon connections; it does not replace client accounts, hooks or the agent loop.","evidence_kind":"native_execution","evidence_refs":["evidence/receipts/claude-upstream-checks-20260921.json"]},{"name":"Letta V1 legacy server","repository":"https://github.com/letta-ai/letta","disposition":"out_of_scope","rationale":"The pinned current README redirects active development to Letta Code; the retired V1 API server is preserved on the archive branch. The repository itself is not GitHub-archived. Do not choose the old server for a new clean installation unless reproducing an explicitly pinned historical dependency.","evidence_kind":"source_review","evidence_refs":["catalogs/landscape/candidate-quality-review.json","docs/candidate-quality-review-20260921.md","evidence/artifacts/catalog-quality-review-20260921/sources.json","https://raw.githubusercontent.com/letta-ai/letta/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md"]}]
     },
     {
       "catalog": "foundation",
@@ -37,10 +37,10 @@
       "current_choice": "Native Claude/Codex workers with owned Worktrunk worktrees; Beads for a real dependency queue, optional qualified cross-client review and an opt-in semantic-evidence-reviewer with explicit TypeSafe context.",
       "decision": "keep_but_compare",
       "rationale": "Native writing, review and selected-child recovery have returned evidence without another orchestration runtime. Worktrunk's actual old/new comparison corrected child working-directory behavior. Durable cross-host effects would require a different acceptance boundary.",
-      "evidence_refs": ["docs/full-stack-convergence.md", "docs/foundation-convergence-20260921.md", "docs/foundation-rd-readiness.md", "catalogs/foundation/decisions.json", "docs/native-skill-practice-20260921.md", "examples/claude-native/agents/semantic-evidence-reviewer.md", "examples/codex-native/agents/semantic-evidence-reviewer.toml"],
-      "limitations": ["Graceful native Workflow resume is separate from the systemd child-crash fixture; neither transfers every hard-crash guarantee to the other.", "The restricted reviewer tool profile is not the accepted inherited-tool lane. The older companion backend acceptance does not certify every outer plugin invocation.", "Native model/effort settings are inherited and returned identities recorded. Skill propagation is not a universal runtime/model ranking; account scopes and failed read paths remain evidence."],
+      "evidence_refs": ["docs/full-stack-convergence.md","docs/foundation-convergence-20260921.md","docs/foundation-rd-readiness.md","catalogs/foundation/decisions.json","docs/native-skill-practice-20260921.md","examples/claude-native/agents/semantic-evidence-reviewer.md","examples/codex-native/agents/semantic-evidence-reviewer.toml","catalogs/landscape/candidate-quality-review.json","docs/candidate-quality-review-20260921.md"],
+      "limitations": ["Graceful native Workflow resume is separate from the systemd child-crash fixture; neither transfers every hard-crash guarantee to the other.","The restricted reviewer tool profile is not the accepted inherited-tool lane. The older companion backend acceptance does not certify every outer plugin invocation.","Native model/effort settings are inherited and returned identities recorded. Skill propagation is not a universal runtime/model ranking; account scopes and failed read paths remain evidence.","The September 21 New York / September 22 UTC source refresh adds Deep Agents, OpenHands SDK/Agent Canvas, Microsoft Agent Framework and DeerFlow comparisons. It does not install them or establish a head-to-head worker winner; historical DeerFlow adapter evidence applies only to its recorded revision."],
       "overturn_when": "A real task needs durable multi-host state, approval waits or effect recovery beyond native workers, and one challenger passes frozen cancellation, replay, ownership and integration cases.",
-      "candidates": [{"name":"Claude native workers","repository":"https://github.com/anthropics/claude-code","disposition":"selected","rationale":"Owned native children and graceful workflow recovery have actual retained results; use the qualified role/tool configuration.","evidence_kind":"native_execution","evidence_refs":["docs/foundation-convergence-20260921.md","catalogs/foundation/decisions.json"]},{"name":"Codex native workers","repository":"https://github.com/openai/codex","disposition":"selected","rationale":"Preserves the proven native worker/account path and independent review without adding a router.","evidence_kind":"native_execution","evidence_refs":["docs/full-stack-convergence.md","docs/foundation-rd-readiness.md"]},{"name":"Worktrunk","repository":"https://github.com/max-sixty/worktrunk","disposition":"selected","rationale":"Accepted disposable worktree lifecycle and a native old/new working-directory fix support owned writing checkouts; the Rust suite was not run in that upgrade wave.","evidence_kind":"measured_comparison","evidence_refs":["docs/full-stack-convergence.md","docs/token-native-saturation.md"]},{"name":"Beads","repository":"https://github.com/gastownhall/beads","disposition":"conditional","rationale":"The accepted scoped queue helps dependency-aware work; simple tasks do not require a new queue or database.","evidence_kind":"native_execution","evidence_refs":["catalogs/foundation/decisions.json"]},{"name":"LangGraph","repository":"https://github.com/langchain-ai/langgraph","disposition":"conditional","rationale":"Explicit application state/checkpoints are valuable when a real branch/review/resume requirement exceeds the bounded native path; that need has not displaced it.","evidence_kind":"source_review","evidence_refs":["docs/foundation-closure-20260921.md","docs/foundation-rd-readiness.md"]},{"name":"Temporal","repository":"https://github.com/temporalio/temporal","disposition":"unqualified","rationale":"A credible durable multi-host escalation, but no corresponding local task/effect comparison establishes that its operational cost is warranted here.","evidence_kind":"source_review","evidence_refs":["catalogs/us-equities/hosting-source-review.json","docs/foundation-rd-readiness.md"]},{"name":"Codex for Claude companion","repository":"https://github.com/openai/codex-plugin-cc","disposition":"conditional","rationale":"Retain the optional official companion for a matching cross-client review. Backend evidence does not qualify every outer plugin/tool profile, so native independent review remains the default.","evidence_kind":"mixed","evidence_refs":["evidence/receipts/foundation-rd-20260921.json","recipes/claude-codex-foreground-review.md"]}]
+      "candidates": [{"name":"Claude native workers","repository":"https://github.com/anthropics/claude-code","disposition":"selected","rationale":"Owned native children and graceful workflow recovery have actual retained results; use the qualified role/tool configuration.","evidence_kind":"native_execution","evidence_refs":["docs/foundation-convergence-20260921.md","catalogs/foundation/decisions.json"]},{"name":"Codex native workers","repository":"https://github.com/openai/codex","disposition":"selected","rationale":"Preserves the proven native worker/account path and independent review without adding a router.","evidence_kind":"native_execution","evidence_refs":["docs/full-stack-convergence.md","docs/foundation-rd-readiness.md"]},{"name":"Worktrunk","repository":"https://github.com/max-sixty/worktrunk","disposition":"selected","rationale":"Accepted disposable worktree lifecycle and a native old/new working-directory fix support owned writing checkouts; the Rust suite was not run in that upgrade wave.","evidence_kind":"measured_comparison","evidence_refs":["docs/full-stack-convergence.md","docs/token-native-saturation.md"]},{"name":"Beads","repository":"https://github.com/gastownhall/beads","disposition":"conditional","rationale":"The accepted scoped queue helps dependency-aware work; simple tasks do not require a new queue or database.","evidence_kind":"native_execution","evidence_refs":["catalogs/foundation/decisions.json"]},{"name":"LangGraph","repository":"https://github.com/langchain-ai/langgraph","disposition":"conditional","rationale":"Explicit application state/checkpoints are valuable when a real branch/review/resume requirement exceeds the bounded native path; that need has not displaced it.","evidence_kind":"source_review","evidence_refs":["docs/foundation-closure-20260921.md","docs/foundation-rd-readiness.md"]},{"name":"Temporal","repository":"https://github.com/temporalio/temporal","disposition":"unqualified","rationale":"A credible durable multi-host escalation, but no corresponding local task/effect comparison establishes that its operational cost is warranted here.","evidence_kind":"source_review","evidence_refs":["catalogs/us-equities/hosting-source-review.json","docs/foundation-rd-readiness.md"]},{"name":"Codex for Claude companion","repository":"https://github.com/openai/codex-plugin-cc","disposition":"conditional","rationale":"Retain the optional official companion for a matching cross-client review. Backend evidence does not qualify every outer plugin/tool profile, so native independent review remains the default.","evidence_kind":"mixed","evidence_refs":["evidence/receipts/foundation-rd-20260921.json","recipes/claude-codex-foreground-review.md"]},{"name":"Deep Agents","repository":"https://github.com/langchain-ai/deepagents","disposition":"conditional","rationale":"The reviewed harness combines planning, delegated context, filesystem backends and LangGraph persistence. It is a credible prebuilt application-owned worker alternative, including local model routes; neither its README nor the available upstream tests establish better catalog-review accuracy, native-account compatibility or total cost on our tasks.","evidence_kind":"source_review","evidence_refs":["catalogs/landscape/candidate-quality-review.json","docs/candidate-quality-review-20260921.md","evidence/artifacts/catalog-quality-review-20260921/sources.json","https://raw.githubusercontent.com/langchain-ai/deepagents/c9926b1a96d204309d0b211701b288ce3bb4244b/README.md"]},{"name":"OpenHands SDK","repository":"https://github.com/OpenHands/software-agent-sdk","disposition":"conditional","rationale":"The maintained SDK/Agent Server owns agents, tools, conversations, events and local or ephemeral workspaces; it is a credible isolated/remote-worker implementation. No matched native research, interruption/recovery or complete operating-cost comparison has displaced the accepted worker path.","evidence_kind":"source_review","evidence_refs":["catalogs/landscape/candidate-quality-review.json","docs/candidate-quality-review-20260921.md","evidence/artifacts/catalog-quality-review-20260921/sources.json","https://raw.githubusercontent.com/OpenHands/software-agent-sdk/9bc452ebf6b0093c531f25394c5ba5e9817ff910/README.md"]},{"name":"OpenHands Agent Canvas","repository":"https://github.com/OpenHands/OpenHands","disposition":"conditional","rationale":"The current repository is Agent Canvas, a control center able to host OpenHands, Claude Code, Codex and other ACP agents across backends. Treat it as a prospective host for existing native workers, not merely a competing coding model. Its hosting, account boundaries, persistence and migration remain unqualified here.","evidence_kind":"source_review","evidence_refs":["catalogs/landscape/candidate-quality-review.json","docs/candidate-quality-review-20260921.md","evidence/artifacts/catalog-quality-review-20260921/sources.json","https://raw.githubusercontent.com/OpenHands/OpenHands/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/README.md"]},{"name":"Microsoft Agent Framework","repository":"https://github.com/microsoft/agent-framework","disposition":"conditional","rationale":"The primary source provides .NET/Python agent applications, provider integrations and graph workflows with checkpoints and handoffs. It closes a source-review coverage gap, not a demonstrated runtime gap; qualify a required application workflow and deployment before adoption.","evidence_kind":"source_review","evidence_refs":["catalogs/landscape/candidate-quality-review.json","docs/candidate-quality-review-20260921.md","evidence/artifacts/catalog-quality-review-20260921/sources.json","https://raw.githubusercontent.com/microsoft/agent-framework/98a982a147212424d766ed993e6ecda13abe5faf/README.md"]},{"name":"DeerFlow","repository":"https://github.com/bytedance/deer-flow","disposition":"conditional","rationale":"One retained embedded DeerFlow ACP research prompt completed; current source also documents embedded Python, terminal, sandbox and Claude/native-provider integrations. These are substantial prebuilt capabilities, but the full planner/UI service and current revision have not been locally qualified. The tested adapter's read-only label mapped to workspaceWrite/on-request, so preserve that historical restriction finding rather than assuming the outer harness fixes it.","evidence_kind":"mixed","evidence_refs":["catalogs/landscape/candidate-quality-review.json","docs/candidate-quality-review-20260921.md","evidence/artifacts/catalog-quality-review-20260921/sources.json","https://raw.githubusercontent.com/bytedance/deer-flow/656db1223dda8883a09e7fde23f89da3a1a7a7dc/README.md","catalogs/us-equities/agents-operations.json","blueprints/us-equities/deerflow/native-receipt.json","blueprints/us-equities/deerflow/research-receipt.json"]}]
     },
     {
       "catalog": "foundation",
@@ -115,16 +115,148 @@
       "current_choice": "One ai-memory store as the cross-client memory of record; retain separate code, document and transient-context retrieval layers.",
       "decision": "keep_but_compare",
       "rationale": "ai-memory already contains adopted project knowledge and has actual cross-client capture/query, consolidation and recovery evidence. Candidate memory systems offer distinct capabilities, but published scores do not demonstrate better retrieval or learning on this project.",
-      "evidence_refs": ["docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md", "evidence/artifacts/memory-landscape-20260921/sources.json"],
-      "limitations": ["Scheduler admission does not establish learned-write quality; the retained model review rejected insufficient evidence.", "Bounded sanitized assistant excerpts are not complete transcripts, and exact lifetime memory token savings are unknown."],
+      "evidence_refs": ["docs/memory-landscape-maintenance.md","docs/native-memory-rag-lifecycle.md","evidence/artifacts/memory-landscape-20260921/sources.json","catalogs/landscape/candidate-quality-review.json","docs/candidate-quality-review-20260921.md"],
+      "limitations": ["Scheduler admission does not establish learned-write quality; the retained model review rejected insufficient evidence.","Bounded sanitized assistant excerpts are not complete transcripts, and exact lifetime memory token savings are unknown.","Current primary-source review corrects manual-only, Claude-only and cloud-only exclusions. No matched memory benchmark or new installation was run; automatic capture, local providers and published scores remain source claims until exercised on the selected profile."],
       "overturn_when": "An isolated representative corpus and question set shows better source-grounded recall/usefulness and acceptable complete provider use, latency, capture/deletion and restore behavior without ambiguous memory ownership.",
       "candidates": [
-        {"name": "ai-memory", "repository": "https://github.com/akitaonrails/ai-memory", "disposition": "selected", "rationale": "Retain the adopted shared native lifecycle/store and its qualified maintenance path; do not confuse a successful scheduler launch with useful learned content.", "evidence_kind": "native_execution", "evidence_refs": ["docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md"]},
-        {"name": "Hindsight", "repository": "https://github.com/vectorize-io/hindsight", "disposition": "unqualified", "rationale": "Priority comparison candidate for reflective memory and richer inspection, but its published benchmarks do not measure this project's workload.", "evidence_kind": "source_review", "evidence_refs": ["docs/memory-landscape-maintenance.md", "evidence/artifacts/memory-landscape-20260921/sources.json"]},
-        {"name": "Basic Memory", "repository": "https://github.com/basicmachines-co/basic-memory", "disposition": "conditional", "rationale": "Human-editable collaborative Markdown knowledge may justify this alternative when note editing becomes the main requirement; no current migration need is established.", "evidence_kind": "source_review", "evidence_refs": ["docs/memory-landscape-maintenance.md"]},
-        {"name": "Mem0", "repository": "https://github.com/mem0ai/mem0", "disposition": "conditional", "rationale": "Application personalization APIs are a distinct requirement; qualify identity/provider/storage behavior rather than adding a second coding memory store by default.", "evidence_kind": "source_review", "evidence_refs": ["docs/memory-landscape-maintenance.md"]},
-        {"name": "Graphiti", "repository": "https://github.com/getzep/graphiti", "disposition": "conditional", "rationale": "Temporal entity relationships can justify an application graph; that capability is not evidence that the existing scoped project wiki is inadequate.", "evidence_kind": "source_review", "evidence_refs": ["docs/memory-landscape-maintenance.md"]},
-        {"name": "Claude-mem", "repository": "https://github.com/thedotmack/claude-mem", "disposition": "overlap", "rationale": "Capture/compaction and a worker viewer overlap the current cross-client store; it remains an alternative capture system requiring its own plugin activation and comparison.", "evidence_kind": "source_review", "evidence_refs": ["docs/memory-landscape-maintenance.md"]}
+        {
+          "name": "ai-memory",
+          "repository": "https://github.com/akitaonrails/ai-memory",
+          "disposition": "selected",
+          "rationale": "Retain one shared project-scoped memory system because native capture/retrieval, maintenance and restoration have direct historical evidence. The fresh upstream source pin is review-only and does not replace the installed pin. This is the best-supported current operational fit, not a demonstrated recall, learning or cost winner.",
+          "evidence_kind": "native_execution",
+          "evidence_refs": [
+            "docs/memory-landscape-maintenance.md",
+            "docs/native-memory-rag-lifecycle.md",
+            "catalogs/landscape/candidate-quality-review.json",
+            "docs/candidate-quality-review-20260921.md",
+            "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+            "https://raw.githubusercontent.com/akitaonrails/ai-memory/5157c6be10b5830d7adc7e29b0a4358c3ecbe6a2/README.md"
+          ]
+        },
+        {
+          "name": "Hindsight",
+          "repository": "https://github.com/vectorize-io/hindsight",
+          "disposition": "unqualified",
+          "rationale": "Priority comparison for retain/recall/reflect and temporal or experiential memory. Current upstream explicitly documents local providers and native Codex/Claude subscription providers, so missing API credentials alone is not a valid exclusion. Published benchmarks are not a matched test of our project recall, source fidelity, boundaries or operating cost.",
+          "evidence_kind": "source_review",
+          "evidence_refs": [
+            "docs/memory-landscape-maintenance.md",
+            "evidence/artifacts/memory-landscape-20260921/sources.json",
+            "catalogs/landscape/candidate-quality-review.json",
+            "docs/candidate-quality-review-20260921.md",
+            "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+            "https://raw.githubusercontent.com/vectorize-io/hindsight/680406b3dd9cca2108c7f0e204820a09b4e30906/README.md"
+          ]
+        },
+        {
+          "name": "Basic Memory",
+          "repository": "https://github.com/basicmachines-co/basic-memory",
+          "disposition": "conditional",
+          "rationale": "Priority comparison for human-editable Markdown knowledge and cross-client MCP. The current Claude plugin documents session-start briefings, pre-compaction checkpoints and opt-in capture; it is not only manual notes. Qualify its AGPL deployment fit, actual capture, project isolation and restored state before migrating the authoritative store.",
+          "evidence_kind": "source_review",
+          "evidence_refs": [
+            "docs/memory-landscape-maintenance.md",
+            "catalogs/landscape/candidate-quality-review.json",
+            "docs/candidate-quality-review-20260921.md",
+            "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+            "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/README.md"
+          ]
+        },
+        {
+          "name": "Mem0",
+          "repository": "https://github.com/mem0ai/mem0",
+          "disposition": "conditional",
+          "rationale": "The current project provides application user/session/agent memory and temporal retrieval with published reproducible evaluation references. It is a serious application-memory candidate; a same-task project-continuity and cost comparison remains absent, and benchmark claims do not transfer automatically.",
+          "evidence_kind": "source_review",
+          "evidence_refs": [
+            "docs/memory-landscape-maintenance.md",
+            "catalogs/landscape/candidate-quality-review.json",
+            "docs/candidate-quality-review-20260921.md",
+            "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+            "https://raw.githubusercontent.com/mem0ai/mem0/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/README.md"
+          ]
+        },
+        {
+          "name": "Graphiti",
+          "repository": "https://github.com/getzep/graphiti",
+          "disposition": "conditional",
+          "rationale": "Temporal entity relationships are relevant to dated issuer/security research. This is a potential complementary graph or memory challenger, not evidence that a graph supplies missing source availability or improves the existing project wiki; qualify extraction provenance, updates, isolation and restore on the intended corpus.",
+          "evidence_kind": "source_review",
+          "evidence_refs": [
+            "docs/memory-landscape-maintenance.md",
+            "catalogs/landscape/candidate-quality-review.json",
+            "docs/candidate-quality-review-20260921.md",
+            "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+            "https://raw.githubusercontent.com/getzep/graphiti/16cdf7045378c8d53ae01f94e2fa60d238cb0f68/README.md"
+          ]
+        },
+        {
+          "name": "Claude-mem",
+          "repository": "https://github.com/thedotmack/claude-mem",
+          "disposition": "overlap",
+          "rationale": "Persistent capture, compression and retrieval are a direct comparison candidate. The pinned README includes OpenCode and other integrations beyond Claude, plus distinct hosted/local observer choices; do not dismiss it as Claude-only. Compare capture fidelity, identity boundaries, provider behavior and migration before running overlapping capture stores.",
+          "evidence_kind": "source_review",
+          "evidence_refs": [
+            "docs/memory-landscape-maintenance.md",
+            "catalogs/landscape/candidate-quality-review.json",
+            "docs/candidate-quality-review-20260921.md",
+            "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+            "https://raw.githubusercontent.com/thedotmack/claude-mem/4520de9e0f8d6cdc20597520e383d8b51d93137f/README.md"
+          ]
+        },
+        {
+          "name": "Letta Code",
+          "repository": "https://github.com/letta-ai/letta-code",
+          "disposition": "conditional",
+          "rationale": "Active stateful agent harness with persistent memory/skills and documented local/cloud backends. It is a broader runtime-and-memory architecture, not only a drop-in store. The legacy Letta repository redirects to it while V1 remains on an archive branch; compare native-account behavior, recall, lifecycle and migration before replacement.",
+          "evidence_kind": "source_review",
+          "evidence_refs": [
+            "catalogs/landscape/candidate-quality-review.json",
+            "docs/candidate-quality-review-20260921.md",
+            "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+            "https://raw.githubusercontent.com/letta-ai/letta-code/dfb5639a4db2d97828e7ca07b808e93be85e05e7/README.md"
+          ]
+        },
+        {
+          "name": "Cognee",
+          "repository": "https://github.com/topoteretes/cognee",
+          "disposition": "conditional",
+          "rationale": "Source-reviewed graph/context candidate for documents, code and conversations. The upstream explicitly offers local extraction and embeddings without a cloud API key, while its default LLM recipe uses OpenAI; choose and qualify the actual profile rather than treating the product as cloud-only or automatically offline.",
+          "evidence_kind": "source_review",
+          "evidence_refs": [
+            "catalogs/landscape/candidate-quality-review.json",
+            "docs/candidate-quality-review-20260921.md",
+            "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+            "https://raw.githubusercontent.com/topoteretes/cognee/663a2dc15d04bc0d7ec2733a2dd604b7ed1b8c8e/README.md"
+          ]
+        },
+        {
+          "name": "OpenViking",
+          "repository": "https://github.com/volcengine/OpenViking",
+          "disposition": "conditional",
+          "rationale": "Hierarchical context filesystem unifies resources, memory and skills with scoped retrieval and inspectable session-derived Markdown. Consider it if fragmented context becomes a measured obstacle; published benchmarks and the AGPL deployment model need workload-specific evaluation before replacing current scoped lanes.",
+          "evidence_kind": "source_review",
+          "evidence_refs": [
+            "catalogs/landscape/candidate-quality-review.json",
+            "docs/candidate-quality-review-20260921.md",
+            "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+            "https://raw.githubusercontent.com/volcengine/OpenViking/172c1050716f63339f4001292d58c830e6b7a315/README.md"
+          ]
+        },
+        {
+          "name": "Supermemory",
+          "repository": "https://github.com/supermemoryai/supermemory",
+          "disposition": "conditional",
+          "rationale": "Application memory/profile/search candidate with documented local server, local embeddings and an Ollama offline route. Cloud-only exclusion is stale. Confirm the selected implementation's provider calls, licensing/dependencies, export/restore, isolation and representative retrieval before adopting another authoritative memory service.",
+          "evidence_kind": "source_review",
+          "evidence_refs": [
+            "catalogs/landscape/candidate-quality-review.json",
+            "docs/candidate-quality-review-20260921.md",
+            "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+            "https://raw.githubusercontent.com/supermemoryai/supermemory/57b430b5b6a19106a989651f4cde853c05147682/README.md"
+          ]
+        }
       ]
     },
     {

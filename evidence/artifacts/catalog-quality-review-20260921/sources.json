@@ -1,0 +1,662 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-21",
+  "observed_at_utc": "2026-09-22T01:32:13Z",
+  "timezone": "America/New_York",
+  "evidence_class": "primary-source review metadata; no install or benchmark",
+  "capture_method": "Authenticated GitHub CLI public-repository metadata/commit/tree/latest-release endpoints; public raw.githubusercontent.com immutable source files; SHA-256 over fetched bytes. No credential or private repository data retained.",
+  "limitations": [
+    "Source bytes were inspected but are not redistributed here; immutable URLs, byte counts and SHA-256 support refetch verification.",
+    "The GitHub latest-release endpoint is repository-level and may identify a subpackage; source commits, accepted pins and release versions are distinct.",
+    "License API identifiers are metadata; pinned LICENSE/package declarations retain the actual source for a profile-specific licensing review.",
+    "Upstream test paths show discoverable files only; they are not claims of passed or adequate upstream tests."
+  ],
+  "repositories": [
+    {
+      "repository": "https://github.com/bytedance/deer-flow",
+      "revision": "656db1223dda8883a09e7fde23f89da3a1a7a7dc",
+      "committed_at": "2026-09-21T14:06:41Z",
+      "archived": false,
+      "license_id": "MIT",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/656db1223dda8883a09e7fde23f89da3a1a7a7dc/README.md",
+          "bytes": 182755,
+          "sha256": "9531f3ae33444f3a9ceef57db4e8f9a33e290e94ff5456be7ae20587d9421def"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/656db1223dda8883a09e7fde23f89da3a1a7a7dc/LICENSE",
+          "bytes": 1134,
+          "sha256": "b23dff4d4bac8d17b6efaaa7e88c2b730149c4dda45699ce676b719cfdffe7e1"
+        },
+        {
+          "path": ".github/workflows/backend-blocking-io-tests.yml",
+          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/656db1223dda8883a09e7fde23f89da3a1a7a7dc/.github/workflows/backend-blocking-io-tests.yml",
+          "bytes": 1273,
+          "sha256": "93ce651c60a27abdc0cb0db3a4ab7a85bc2102dede79d3013eb3574dda8257d0"
+        }
+      ],
+      "upstream_test_paths": [
+        "backend/.test_durations",
+        "backend/extension_test_fixtures/__init__.py",
+        "backend/extension_test_fixtures/demo_extensions.py"
+      ],
+      "latest_release": {
+        "tag": "v2.0.0",
+        "published_at": "2026-06-25T16:23:22Z",
+        "url": "https://github.com/bytedance/deer-flow/releases/tag/v2.0.0"
+      }
+    },
+    {
+      "repository": "https://github.com/langchain-ai/deepagents",
+      "revision": "c9926b1a96d204309d0b211701b288ce3bb4244b",
+      "committed_at": "2026-09-22T00:52:13Z",
+      "archived": false,
+      "license_id": "MIT",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/langchain-ai/deepagents/c9926b1a96d204309d0b211701b288ce3bb4244b/README.md",
+          "bytes": 6984,
+          "sha256": "569c79f865abd0d677a71e83ba5c3b971318146a4421e3851a0e25ee2d3b1146"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/langchain-ai/deepagents/c9926b1a96d204309d0b211701b288ce3bb4244b/LICENSE",
+          "bytes": 1067,
+          "sha256": "4ec67e4ca6e6721dba849b2ca82261597c86a61ee214bbf21416006b7b2d0478"
+        },
+        {
+          "path": ".github/workflows/_test.yml",
+          "url": "https://raw.githubusercontent.com/langchain-ai/deepagents/c9926b1a96d204309d0b211701b288ce3bb4244b/.github/workflows/_test.yml",
+          "bytes": 18348,
+          "sha256": "f7ab3552746418008ddadf22bfa153548dac2e0eb59cf5f61b0d2a084547c83d"
+        }
+      ],
+      "upstream_test_paths": [
+        ".github/scripts/test_prepare_local_dataset.py",
+        ".github/scripts/tests/checks/markdown_file_check.test.js",
+        ".github/scripts/tests/checks/readme-gate.test.js"
+      ],
+      "latest_release": {
+        "tag": "deepagents==0.7.16",
+        "published_at": "2026-09-21T13:30:09Z",
+        "url": "https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.16"
+      }
+    },
+    {
+      "repository": "https://github.com/OpenHands/software-agent-sdk",
+      "revision": "9bc452ebf6b0093c531f25394c5ba5e9817ff910",
+      "committed_at": "2026-09-22T00:58:34Z",
+      "archived": false,
+      "license_id": "MIT",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/9bc452ebf6b0093c531f25394c5ba5e9817ff910/README.md",
+          "bytes": 10835,
+          "sha256": "95094c9745c7cc58136d4eaa1688fb6038aafefec2be05344293f6df7e55dbf8"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/9bc452ebf6b0093c531f25394c5ba5e9817ff910/LICENSE",
+          "bytes": 1079,
+          "sha256": "14a9b631c658eee682c6c2973525fbdf808c3457176bc47513052c559cc5ce86"
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/9bc452ebf6b0093c531f25394c5ba5e9817ff910/pyproject.toml",
+          "bytes": 4138,
+          "sha256": "0ae2f96342f14a2ac65afaf0b60c41378f10e6503a25716e2a8b271a0b067bc0"
+        },
+        {
+          "path": ".github/workflows/tests.yml",
+          "url": "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/9bc452ebf6b0093c531f25394c5ba5e9817ff910/.github/workflows/tests.yml",
+          "bytes": 25070,
+          "sha256": "c3339b48d1e16883344898cfaaca25ac5b166025efb8f6f533c311886904b2c8"
+        }
+      ],
+      "upstream_test_paths": [
+        "clients/typescript/src/__tests__/acp-providers.test.ts",
+        "clients/typescript/src/__tests__/agent-server-contract-types.test.ts",
+        "clients/typescript/src/__tests__/api-clients.test.ts"
+      ],
+      "latest_release": {
+        "tag": "v1.49.3",
+        "published_at": "2026-09-21T20:20:34Z",
+        "url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.49.3"
+      }
+    },
+    {
+      "repository": "https://github.com/OpenHands/OpenHands",
+      "revision": "2f8539de2fafbde5226c7e41c0d0aa7bea2533fa",
+      "committed_at": "2026-09-22T01:07:54Z",
+      "archived": false,
+      "license_id": "MIT",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/OpenHands/OpenHands/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/README.md",
+          "bytes": 10126,
+          "sha256": "1b783460b1ec68ee4eb0a9de28b97b97cb2a128bcc524d2ab0340ba32143659c"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/OpenHands/OpenHands/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/LICENSE",
+          "bytes": 1096,
+          "sha256": "e1d1fa9f3a8d7bef24449d488fcd8f00f8f272cac297bb9bed161eb6175b876a"
+        },
+        {
+          "path": "package.json",
+          "url": "https://raw.githubusercontent.com/OpenHands/OpenHands/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/package.json",
+          "bytes": 9523,
+          "sha256": "9cc0835480c640f4935a430e3671032b84897e9d5631933fcca85cc52f4eee23"
+        },
+        {
+          "path": ".github/workflows/ci-script-tests.yml",
+          "url": "https://raw.githubusercontent.com/OpenHands/OpenHands/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/.github/workflows/ci-script-tests.yml",
+          "bytes": 949,
+          "sha256": "c89f39cf046a87c7a4340e54b4aec927ad35403fa7abafbf377de8d0870b582a"
+        }
+      ],
+      "upstream_test_paths": [
+        ".github/scripts/tests/test_issue_readiness.py",
+        ".github/scripts/tests/test_markdown_sections.py",
+        ".github/scripts/tests/test_pr_description.py"
+      ],
+      "latest_release": {
+        "tag": "v1.20.0",
+        "published_at": "2026-09-17T07:15:18Z",
+        "url": "https://github.com/OpenHands/OpenHands/releases/tag/v1.20.0"
+      }
+    },
+    {
+      "repository": "https://github.com/microsoft/agent-framework",
+      "revision": "98a982a147212424d766ed993e6ecda13abe5faf",
+      "committed_at": "2026-09-21T17:27:48Z",
+      "archived": false,
+      "license_id": "MIT",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/microsoft/agent-framework/98a982a147212424d766ed993e6ecda13abe5faf/README.md",
+          "bytes": 13336,
+          "sha256": "4a628aa224c014ff326587cc543a4991e483e11723a226f6fcdb22664224c58a"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/microsoft/agent-framework/98a982a147212424d766ed993e6ecda13abe5faf/LICENSE",
+          "bytes": 1141,
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        },
+        {
+          "path": ".github/workflows/dotnet-build-and-test.yml",
+          "url": "https://raw.githubusercontent.com/microsoft/agent-framework/98a982a147212424d766ed993e6ecda13abe5faf/.github/workflows/dotnet-build-and-test.yml",
+          "bytes": 32544,
+          "sha256": "a395d960db546cca96b3a3de8a449c359bfa32469c766352d946363e90954734"
+        }
+      ],
+      "upstream_test_paths": [
+        ".github/scripts/resolve_integration_test_target.js",
+        ".github/tests/test_check_team_membership.js",
+        ".github/tests/test_create_github_app_token.js"
+      ],
+      "latest_release": {
+        "tag": "dotnet-1.22.0",
+        "published_at": "2026-09-18T18:12:17Z",
+        "url": "https://github.com/microsoft/agent-framework/releases/tag/dotnet-1.22.0"
+      }
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "revision": "5157c6be10b5830d7adc7e29b0a4358c3ecbe6a2",
+      "committed_at": "2026-09-21T21:56:44Z",
+      "archived": false,
+      "license_id": "MIT",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/5157c6be10b5830d7adc7e29b0a4358c3ecbe6a2/README.md",
+          "bytes": 23159,
+          "sha256": "1d0a918f3dc0c8234aff97b75e78d6ac4143cac9ad9127e77fb0fca2077b8eda"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/5157c6be10b5830d7adc7e29b0a4358c3ecbe6a2/LICENSE",
+          "bytes": 1068,
+          "sha256": "18332c61780ce8e694d4fa330770cd4d8c85e33f47ac13a80d72d70bb032ae72"
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/5157c6be10b5830d7adc7e29b0a4358c3ecbe6a2/.github/workflows/ci.yml",
+          "bytes": 13903,
+          "sha256": "d5f6bbd68ab8655f0f23d0b2dca03910fbaf5ce620ba8957abf68fc7091962de"
+        }
+      ],
+      "upstream_test_paths": [
+        "tests/hooks/test_lib.sh"
+      ],
+      "latest_release": {
+        "tag": "v2.4.0",
+        "published_at": "2026-09-21T23:45:13Z",
+        "url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.0"
+      }
+    },
+    {
+      "repository": "https://github.com/basicmachines-co/basic-memory",
+      "revision": "3bf2d523c0a941f71cb144a5502e7557dd025d69",
+      "committed_at": "2026-09-16T03:43:59Z",
+      "archived": false,
+      "license_id": "AGPL-3.0",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/README.md",
+          "bytes": 24495,
+          "sha256": "f17c69dbb796108638d4da27fc7929aef8f6cd99d2c66ec4b22b01a8ca40dc52"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/LICENSE",
+          "bytes": 34523,
+          "sha256": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef"
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/pyproject.toml",
+          "bytes": 8979,
+          "sha256": "4e694e6591de3d3e3ca8c6e0437a3cbe4b0cbd030bca9982e0939fa88c32ffdc"
+        },
+        {
+          "path": ".github/workflows/test.yml",
+          "url": "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/.github/workflows/test.yml",
+          "bytes": 15060,
+          "sha256": "d30fa7504a9460f36ef0bb84739e3bad4175812a142f00deb83d2b5e3a41c0a4"
+        }
+      ],
+      "upstream_test_paths": [
+        ".agents/skills/pythonic-code/evals/files/test_accepted_preparation.py",
+        ".agents/skills/pythonic-code/evals/files/test_accepted_snapshot.py",
+        "benchmarks/test-int/test_compare_regression.py"
+      ],
+      "latest_release": {
+        "tag": "v0.23.2",
+        "published_at": "2026-08-25T20:44:29Z",
+        "url": "https://github.com/basicmachines-co/basic-memory/releases/tag/v0.23.2"
+      }
+    },
+    {
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "revision": "680406b3dd9cca2108c7f0e204820a09b4e30906",
+      "committed_at": "2026-09-21T19:27:52Z",
+      "archived": false,
+      "license_id": "MIT",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/vectorize-io/hindsight/680406b3dd9cca2108c7f0e204820a09b4e30906/README.md",
+          "bytes": 24869,
+          "sha256": "ae770ac0fe98464ec5360e588b5e29bef6e17877833e4aba9e9ee2323fae4111"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/vectorize-io/hindsight/680406b3dd9cca2108c7f0e204820a09b4e30906/LICENSE",
+          "bytes": 1075,
+          "sha256": "01fde0bedf83bdc185065d7af524a61690efe576a67f922eaff3a1280c17b63a"
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://raw.githubusercontent.com/vectorize-io/hindsight/680406b3dd9cca2108c7f0e204820a09b4e30906/pyproject.toml",
+          "bytes": 427,
+          "sha256": "4310866acf638e7e4917bf1a98a5593b3a3e60de30b0ca0bd23ff7174e25c71c"
+        },
+        {
+          "path": ".github/workflows/perf-test.yml",
+          "url": "https://raw.githubusercontent.com/vectorize-io/hindsight/680406b3dd9cca2108c7f0e204820a09b4e30906/.github/workflows/perf-test.yml",
+          "bytes": 15949,
+          "sha256": "34bdce36482d2b526dbc54ca983dfb057b26b4d498053ae4273e1e26a640d545"
+        }
+      ],
+      "upstream_test_paths": [
+        "hindsight-all-npm/src/command.test.ts",
+        "hindsight-all-npm/src/server.test.ts",
+        "hindsight-all/tests/test_cleanup_timeout.py"
+      ],
+      "latest_release": {
+        "tag": "v0.10.1",
+        "published_at": "2026-09-21T15:24:30Z",
+        "url": "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.1"
+      }
+    },
+    {
+      "repository": "https://github.com/mem0ai/mem0",
+      "revision": "a39a802bbc93e85b820078cd3c4dbaf53af25dbe",
+      "committed_at": "2026-09-18T17:49:15Z",
+      "archived": false,
+      "license_id": "Apache-2.0",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/mem0ai/mem0/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/README.md",
+          "bytes": 11914,
+          "sha256": "7509347d34a767a2ef37ceb6cf6c714de9e8d84fe66ad5eea92bbae824a8fbeb"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/mem0ai/mem0/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/LICENSE",
+          "bytes": 11349,
+          "sha256": "0bbcbe931c353293a2fafce08326181dfeea0e568c566afd4ce8337a70f5e219"
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://raw.githubusercontent.com/mem0ai/mem0/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/pyproject.toml",
+          "bytes": 3312,
+          "sha256": "1662b662cf75295be5d78fa9c8be48166b7f09ab3985ff20891201cb9ceb708d"
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "url": "https://raw.githubusercontent.com/mem0ai/mem0/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/.github/workflows/ci.yml",
+          "bytes": 4370,
+          "sha256": "f994019cee96647f650405a95259b72fa70bad66241fa5781f504b774fa3145d"
+        }
+      ],
+      "upstream_test_paths": [
+        ".github/scripts/infer-component-labels.test.js",
+        ".github/scripts/pr-gate-docs-exemption.test.js",
+        ".github/scripts/vouch-decision.test.js"
+      ],
+      "latest_release": {
+        "tag": "openclaw-v1.2.0",
+        "published_at": "2026-09-18T11:25:47Z",
+        "url": "https://github.com/mem0ai/mem0/releases/tag/openclaw-v1.2.0"
+      }
+    },
+    {
+      "repository": "https://github.com/getzep/graphiti",
+      "revision": "16cdf7045378c8d53ae01f94e2fa60d238cb0f68",
+      "committed_at": "2026-09-21T19:48:51Z",
+      "archived": false,
+      "license_id": "Apache-2.0",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/getzep/graphiti/16cdf7045378c8d53ae01f94e2fa60d238cb0f68/README.md",
+          "bytes": 28280,
+          "sha256": "ce1628c02b3c6fd5b59e3e48dc61c958f07824033b4d0b989bb8d433932b6b3f"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/getzep/graphiti/16cdf7045378c8d53ae01f94e2fa60d238cb0f68/LICENSE",
+          "bytes": 11325,
+          "sha256": "2825300b20d7b951209835a4a331f29e24725a39d65168e4b831df53aa372650"
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://raw.githubusercontent.com/getzep/graphiti/16cdf7045378c8d53ae01f94e2fa60d238cb0f68/pyproject.toml",
+          "bytes": 2847,
+          "sha256": "52b58f16f325fe923ec1d05e35f3157df458e36b5a460ccf4fc34b2623fba0ac"
+        },
+        {
+          "path": ".github/workflows/mcp-server-tests.yml",
+          "url": "https://raw.githubusercontent.com/getzep/graphiti/16cdf7045378c8d53ae01f94e2fa60d238cb0f68/.github/workflows/mcp-server-tests.yml",
+          "bytes": 4442,
+          "sha256": "9fbdd0d6713109b7bf1bb284ee20f31deae713d2bc42b39d5eb136c44ec8c0d6"
+        }
+      ],
+      "upstream_test_paths": [
+        "docker-compose.test.yml",
+        "mcp_server/tests/test_async_operations.py",
+        "mcp_server/tests/test_comprehensive_integration.py"
+      ],
+      "latest_release": {
+        "tag": "v0.30.2",
+        "published_at": "2026-09-08T20:38:41Z",
+        "url": "https://github.com/getzep/graphiti/releases/tag/v0.30.2"
+      }
+    },
+    {
+      "repository": "https://github.com/thedotmack/claude-mem",
+      "revision": "4520de9e0f8d6cdc20597520e383d8b51d93137f",
+      "committed_at": "2026-09-21T23:27:32Z",
+      "archived": false,
+      "license_id": "Apache-2.0",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/thedotmack/claude-mem/4520de9e0f8d6cdc20597520e383d8b51d93137f/README.md",
+          "bytes": 18621,
+          "sha256": "4e365c56f8eb4bdf4357f74d18708714abc46a77c73555912c7a93fdfa8c1a49"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/thedotmack/claude-mem/4520de9e0f8d6cdc20597520e383d8b51d93137f/LICENSE",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        {
+          "path": "package.json",
+          "url": "https://raw.githubusercontent.com/thedotmack/claude-mem/4520de9e0f8d6cdc20597520e383d8b51d93137f/package.json",
+          "bytes": 8139,
+          "sha256": "9841725a8dcd3997d14822fac1a27c646b3d73414e4aca6658ef4b87abec02c9"
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "url": "https://raw.githubusercontent.com/thedotmack/claude-mem/4520de9e0f8d6cdc20597520e383d8b51d93137f/.github/workflows/ci.yml",
+          "bytes": 10710,
+          "sha256": "673e71a6fa3735a7a04d1ebd566aa1a23093d9aaa3a9456e7338d4e261008332"
+        }
+      ],
+      "upstream_test_paths": [
+        "openclaw/src/index.test.ts",
+        "tests/antigravity-cli-compat.test.ts",
+        "tests/bmp-safe.test.ts"
+      ],
+      "latest_release": {
+        "tag": "v13.25.3",
+        "published_at": "2026-09-21T23:28:05Z",
+        "url": "https://github.com/thedotmack/claude-mem/releases/tag/v13.25.3"
+      }
+    },
+    {
+      "repository": "https://github.com/letta-ai/letta-code",
+      "revision": "dfb5639a4db2d97828e7ca07b808e93be85e05e7",
+      "committed_at": "2026-09-22T01:26:52Z",
+      "archived": false,
+      "license_id": "Apache-2.0",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/letta-ai/letta-code/dfb5639a4db2d97828e7ca07b808e93be85e05e7/README.md",
+          "bytes": 9237,
+          "sha256": "160318fdde6a02ab9858cfd443c8216fa61f621a143c0c84141a3678fb1c5136"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/letta-ai/letta-code/dfb5639a4db2d97828e7ca07b808e93be85e05e7/LICENSE",
+          "bytes": 11092,
+          "sha256": "036e78b9d7dd33ae5b378fdda973b4aad7901c8d8371a0ae40fae1f6659a89d0"
+        },
+        {
+          "path": "package.json",
+          "url": "https://raw.githubusercontent.com/letta-ai/letta-code/dfb5639a4db2d97828e7ca07b808e93be85e05e7/package.json",
+          "bytes": 8160,
+          "sha256": "fb376399b10b3b320c6cca724260167cacb4469b3138d6cf4b0691e3ccb3f3e8"
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "url": "https://raw.githubusercontent.com/letta-ai/letta-code/dfb5639a4db2d97828e7ca07b808e93be85e05e7/.github/workflows/ci.yml",
+          "bytes": 18354,
+          "sha256": "c1da11883f75f3481e8cb94cc92779836d75e0c5a1dfe7df807172eb6baca296"
+        }
+      ],
+      "upstream_test_paths": [
+        ".github/scripts/contribution-guard.test.cjs",
+        "scripts/agent-watch/verify-pr-identity.test.ts",
+        "scripts/builtin-skills-watch/agent-watch.test.ts"
+      ],
+      "latest_release": {
+        "tag": "v0.32.16",
+        "published_at": "2026-09-22T00:15:31Z",
+        "url": "https://github.com/letta-ai/letta-code/releases/tag/v0.32.16"
+      }
+    },
+    {
+      "repository": "https://github.com/letta-ai/letta",
+      "revision": "5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a",
+      "committed_at": "2026-09-10T17:59:06Z",
+      "archived": false,
+      "license_id": "Apache-2.0",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/letta-ai/letta/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md",
+          "bytes": 1574,
+          "sha256": "1d624e8fd383c1198c8d42da87b055d591a5760e19607692eb46bbbfe2a58f03"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/letta-ai/letta/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/LICENSE",
+          "bytes": 10759,
+          "sha256": "984c6db99fc6609803108dfc196762118662cd94b82a456dd9217583f18f3612"
+        }
+      ],
+      "upstream_test_paths": [],
+      "latest_release": {
+        "tag": "0.16.8",
+        "published_at": "2026-05-14T17:14:24Z",
+        "url": "https://github.com/letta-ai/letta/releases/tag/0.16.8"
+      }
+    },
+    {
+      "repository": "https://github.com/topoteretes/cognee",
+      "revision": "663a2dc15d04bc0d7ec2733a2dd604b7ed1b8c8e",
+      "committed_at": "2026-09-19T10:54:07Z",
+      "archived": false,
+      "license_id": "Apache-2.0",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/topoteretes/cognee/663a2dc15d04bc0d7ec2733a2dd604b7ed1b8c8e/README.md",
+          "bytes": 16313,
+          "sha256": "f89ea9f58197ea8e26a1217815b9849108820e4b5253c24d17198acf96d7ec72"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/topoteretes/cognee/663a2dc15d04bc0d7ec2733a2dd604b7ed1b8c8e/LICENSE",
+          "bytes": 11344,
+          "sha256": "a471e34908f50c3f120e9a56f3c30cb34e133e4ede01a9cbd5ce718fc358ecd4"
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://raw.githubusercontent.com/topoteretes/cognee/663a2dc15d04bc0d7ec2733a2dd604b7ed1b8c8e/pyproject.toml",
+          "bytes": 16354,
+          "sha256": "cf604f5fab98db4f53275284950882c259c36f1fc9e843f7daf28524fa017461"
+        },
+        {
+          "path": ".github/workflows/adapter_caching_tests.yml",
+          "url": "https://raw.githubusercontent.com/topoteretes/cognee/663a2dc15d04bc0d7ec2733a2dd604b7ed1b8c8e/.github/workflows/adapter_caching_tests.yml",
+          "bytes": 11090,
+          "sha256": "231cef9073fb21ea07abfee127fc19602a692ea02221814f7d09b4ccf4ef44ba"
+        }
+      ],
+      "upstream_test_paths": [
+        ".github/workflows/test_deployment_mcp.yml",
+        ".github/workflows/test_different_operating_systems.yml",
+        ".github/workflows/test_llamacpp.yml"
+      ],
+      "latest_release": {
+        "tag": "v1.6.0",
+        "published_at": "2026-09-18T21:53:00Z",
+        "url": "https://github.com/topoteretes/cognee/releases/tag/v1.6.0"
+      }
+    },
+    {
+      "repository": "https://github.com/volcengine/OpenViking",
+      "revision": "172c1050716f63339f4001292d58c830e6b7a315",
+      "committed_at": "2026-09-21T11:28:13Z",
+      "archived": false,
+      "license_id": "AGPL-3.0",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/volcengine/OpenViking/172c1050716f63339f4001292d58c830e6b7a315/README.md",
+          "bytes": 22127,
+          "sha256": "0bda3106022ab40452d0f356904e2d7c5dc51df770e80b0a2bb26b5da16b13c0"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/volcengine/OpenViking/172c1050716f63339f4001292d58c830e6b7a315/LICENSE",
+          "bytes": 34568,
+          "sha256": "1bd87fa6d9a5c79daf0c2af042b6725c9773bf095cc3d1bdf3656e66d1c3e5b1"
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://raw.githubusercontent.com/volcengine/OpenViking/172c1050716f63339f4001292d58c830e6b7a315/pyproject.toml",
+          "bytes": 7672,
+          "sha256": "420792e189f2f59f8610a83196462680a01e02eb8014a3fcccad26d639455e6a"
+        },
+        {
+          "path": ".github/workflows/_test_full.yml",
+          "url": "https://raw.githubusercontent.com/volcengine/OpenViking/172c1050716f63339f4001292d58c830e6b7a315/.github/workflows/_test_full.yml",
+          "bytes": 2415,
+          "sha256": "0aeb77ff25b83518112e598eaf41143664c00564237ef652f06cb65fafe2db5e"
+        }
+      ],
+      "upstream_test_paths": [
+        ".github/scripts/opencode-release-version.test.mjs",
+        ".github/workflows/_test_full.yml",
+        ".github/workflows/_test_lite.yml"
+      ],
+      "latest_release": {
+        "tag": "v0.4.21",
+        "published_at": "2026-09-20T08:45:08Z",
+        "url": "https://github.com/volcengine/OpenViking/releases/tag/v0.4.21"
+      }
+    },
+    {
+      "repository": "https://github.com/supermemoryai/supermemory",
+      "revision": "57b430b5b6a19106a989651f4cde853c05147682",
+      "committed_at": "2026-09-18T22:01:05Z",
+      "archived": false,
+      "license_id": "MIT",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/supermemoryai/supermemory/57b430b5b6a19106a989651f4cde853c05147682/README.md",
+          "bytes": 16049,
+          "sha256": "7a8b801a3bc586b5ef494f0cadf682caa6a0a1f84f6850937e33afe9da07ee91"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/supermemoryai/supermemory/57b430b5b6a19106a989651f4cde853c05147682/LICENSE",
+          "bytes": 1068,
+          "sha256": "9ce388a89cce6a2dc109579d044f7f16e1397d8ee6fdb1f3bd3b980d365a07ae"
+        },
+        {
+          "path": "package.json",
+          "url": "https://raw.githubusercontent.com/supermemoryai/supermemory/57b430b5b6a19106a989651f4cde853c05147682/package.json",
+          "bytes": 2226,
+          "sha256": "276aee161369dd6827477694806b948fad1fb01d0408ee2a4ee8f9ec8bca251e"
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "url": "https://raw.githubusercontent.com/supermemoryai/supermemory/57b430b5b6a19106a989651f4cde853c05147682/.github/workflows/ci.yml",
+          "bytes": 3959,
+          "sha256": "653f79b30c4693993b635674989a53efeee3e7a8b9025918620780fc3bff8aeb"
+        }
+      ],
+      "upstream_test_paths": [
+        "apps/mcp/e2e/auth.test.ts",
+        "apps/mcp/e2e/discovery.test.ts",
+        "apps/mcp/e2e/graph.test.ts"
+      ],
+      "latest_release": {
+        "tag": "server-v0.0.8",
+        "published_at": "2026-08-17T18:39:22Z",
+        "url": "https://github.com/supermemoryai/supermemory/releases/tag/server-v0.0.8"
+      }
+    }
+  ]
+}
