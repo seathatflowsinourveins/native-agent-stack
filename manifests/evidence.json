@@ -7759,8 +7759,8 @@
     },
     {
       "path": "docs/tasks/2026-09-22-new-machine-install.md",
-      "sha256": "bd98458ab89d7def8511fdccd88e2ae862005a0868f37f34b44e79f9ca727ba2",
-      "bytes": 18665
+      "sha256": "64d7e5f1b7464ef502908d454104a45cc6ea36f9a9dcc31f621ffb89b26e214c",
+      "bytes": 18721
     },
     {
       "path": "docs/token-efficiency-stack.json",

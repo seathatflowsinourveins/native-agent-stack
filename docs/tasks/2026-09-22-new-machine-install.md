@@ -251,8 +251,8 @@ retried into a green receipt.
 - `jq` and `gh` are assumed present on the `macos-15` image (both are
   documented preinstalled tools). If a future image drops either, the
   assertion and version steps fail loudly rather than silently skipping. The
-  recorded run read `gh` 2.101.0 off the image, which is the image's copy, not
-  a pinned install.
+  recorded run's `gh` 2.101.0 is the bootstrap's pinned install (first on PATH);
+  the image's own brew copy is `gh` 2.100.0, and the artifact lists both.
 - `socraticode` is the `macos-arm64-foundation` profile's documented unpinned
   skip (`documented_unpinned_ids=(socraticode)` in the script): the hosted run
   did not install it, and no darwin-arm64 pin for it has been reviewed.
