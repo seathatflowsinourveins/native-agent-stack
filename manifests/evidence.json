@@ -12089,18 +12089,18 @@
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/research-factors-ml/repo-local-full-test-rerun.json",
-      "sha256": "6cd89e845b3836a1a011cfc77b9dec3a50ede8e74979ff5e3fc5e57bf44af95b",
-      "bytes": 7700
+      "sha256": "5292c4d327cf0c1c47d2d3098ecf9cd26fbe79957a2af548c435519f1c4f2b6c",
+      "bytes": 9597
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/research-factors-ml/sklearn-timeseriessplit-matched-arm.json",
-      "sha256": "8156011c0ecbd8f127b008b5f0d8b52d85f113863dfc2ae89d464cdc47359a45",
-      "bytes": 7373
+      "sha256": "851aeab9791e52e8406e225287fb3d83b11643db28d48a104586e0ffa2a52c07",
+      "bytes": 9676
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/portfolio-risk/skf_walkforward_optimizer.json",
-      "sha256": "e5e597d7962cf044dc62bd6fe797e2b7f8758293d96351f6d64b91d14041e750",
-      "bytes": 7233
+      "sha256": "b8b751f9708156162c3f77e1b95b2a143c76b4c1fb062617d4c1d76cc9d98e4d",
+      "bytes": 7701
     },
     {
       "path": "blueprints/gap-resolution-20260922/sklearn-timeseriessplit/run_c22.py",

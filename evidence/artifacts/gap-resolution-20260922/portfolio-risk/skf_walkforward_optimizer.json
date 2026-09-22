@@ -41,8 +41,8 @@
   "settles_gap": true,
   "verdict_impact": {
     "could_change_verdict": true,
-    "direction": "refutes_incumbent",
-    "explanation": "The prior verdict stated 'no skfolio optimizer, risk measure or portfolio weight output has been executed' for this layer (gap 0); this receipt directly refutes that specific claim with a native, reproducible execution of two real skfolio optimizers (MeanRisk and HierarchicalRiskParity) producing actual portfolio weights and cross-validated out-of-sample returns on the layer's own frozen inputs. It does not establish that either optimizer is superior to a competing library (cvxportfolio, empyrical-reloaded, quantstats remain uncached and uninstallable offline, per gap 5/6), nor does it perform cash/fee/dividend reconciliation or feed into the NautilusTrader execution layer (gaps 1 and 3 remain open)."
+    "direction": "supports_incumbent",
+    "explanation": "The incumbent for portfolio-risk (catalogs/landscape/us-equities.json portfolio-risk winners[0].component_id = 'skfolio', decision keep_but_compare) is strengthened, not refuted, by this receipt: a native, reproducible execution of two real skfolio optimizers (MeanRisk and HierarchicalRiskParity) producing actual portfolio weights and cross-validated out-of-sample returns on the layer's own frozen inputs. What this receipt refutes is the layer verdict's negative open_gaps[0] statement ('no skfolio optimizer, risk measure or portfolio weight output has been executed'), which is a claim about missing evidence, not a claim in skfolio's favor -- closing that gap is evidence for the incumbent, so direction is recorded as supports_incumbent (correcting an earlier refutes_incumbent label that conflated 'refutes the negative gap statement' with 'refutes the incumbent'). It does not establish that skfolio is superior to a competing library (cvxportfolio, empyrical-reloaded, quantstats remain uncached and uninstallable offline, per gap 5/6), nor does it perform cash/fee/dividend reconciliation or feed into the NautilusTrader execution layer (gaps 1 and 3 remain open)."
   },
   "evidence_class": "native_proven",
   "limitations": [
