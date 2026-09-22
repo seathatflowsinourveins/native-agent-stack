@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-09-22",
+  "status": "reported_classifier_defect_resolved_comparison_unresolved",
+  "supersedes": "worker-receipts-followup.json#/classifier_residual_finding",
+  "source": {
+    "return": "claude-return-5.md",
+    "return_sha256": "8fd44e80f1fac1e4d8b034deca1cb1d31f6be2a38df90f72d76f7e9203ede494",
+    "phase": "workers-classifier-r4",
+    "new_phase_files_verified": 5,
+    "corrected_classifier_sha256": "a4863e3475aa088bd67bf4e71d187e61a11f2926f5e9a39d63f1ec1ad1cf34b4",
+    "classifier_tests_sha256": "7b4afd6016c97f17f9178c4aa2646749cbdd2bba9cdab2dff503692308c98757",
+    "correction_record_sha256": "111fe78684baf81a37155c9489e5ace8c8617a342ce68e1a60b0398c833116db"
+  },
+  "finding": {
+    "input": {
+      "arm": "B",
+      "exitCode": 1,
+      "receipt": {
+        "status": "blocked_model_or_provider_mismatch"
+      }
+    },
+    "previous_cancelled_true": {
+      "blocked": false,
+      "kind": null
+    },
+    "corrected_cancelled_false": {
+      "blocked": true,
+      "kind": "provider_other"
+    },
+    "corrected_cancelled_true": {
+      "blocked": true,
+      "kind": "provider_other"
+    },
+    "explanation": "The cancellation shortcut now preserves the explicit model/provider-mismatch block. Earlier source and failed reproductions remain historical evidence."
+  },
+  "verification": {
+    "independent_review": true,
+    "new_seal_hashes_checked": 5,
+    "mismatches": 0,
+    "selected_local_classifier_tests": {
+      "passed": 13,
+      "failed": 0,
+      "scope": "Nine existing classifier cases and four regressions. Unrelated skill tests excluded; original-layout reconstruction required."
+    },
+    "receipt_content_comparisons": 9,
+    "receipt_content_changes_excluding_rescored_at_utc": 0,
+    "broader_77_test_claim": "Owner-reported; not independently rerun for this correction.",
+    "direct_flat_seal_invocation": "ERR_MODULE_NOT_FOUND remains a packaging limitation.",
+    "new_provider_submissions": 0
+  },
+  "limits": [
+    "Observed submission outcomes are unchanged; this fixes a classifier edge case, not the comparison.",
+    "Recovery remains unrun; artifact acceptance and refuted judgments remain unqualified.",
+    "No runtime or SDK adoption, memory replacement, selected version or canonical layer decision changes.",
+    "Foundation scoped completion still requires the coordinated publication and tooling handoff; no new-host acceptance follows from this correction."
+  ]
+}
