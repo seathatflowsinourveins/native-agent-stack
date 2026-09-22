@@ -445,10 +445,9 @@ def dedupe_identity(con, rename_pairs, active_symbols=frozenset(), rename_stats=
         for drop, entry in entries.items():
             days = doomed.get(drop, [])
             if days:
-                con.execute("CREATE OR REPLACE TEMP TABLE doomed_days (session_date DATE)")
-                con.executemany("INSERT INTO doomed_days VALUES (?)", [(d,) for d in days])
+                # One bulk parameter: a per-session INSERT made multi-year duplicates ~20x slower.
                 con.execute("DELETE FROM joined WHERE symbol = ? AND session_date IN "
-                            "(SELECT session_date FROM doomed_days)", [drop])
+                            "(SELECT unnest(CAST(? AS DATE[])))", [drop, days])
             entry["rows_removed"] = len(days)
             # Zero-volume halts and all-series-only rows are never byte-identical; count them
             # among the rows ACTUALLY removed, not across the whole component span.
