@@ -7569,8 +7569,8 @@
     },
     {
       "path": "docs/comparison-progress-20260922.md",
-      "sha256": "fb71b39497ff91540e555c3b25c4fa9c4ef760a3c767366c8d27c6524e2eecaf",
-      "bytes": 7392
+      "sha256": "99dfe752fb9ecdc5664e39beca5637012ce89ccf4f680dd86ade0c92d9abe4b7",
+      "bytes": 10012
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -7624,8 +7624,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "6e99dc5ddd33a74b86dd51209cfd8ac3a70a897f6370cb625e04765356aaa796",
-      "bytes": 13036732
+      "sha256": "64e0acbad79144238e594bb7579a690652b78e97a58151e79745bab412a17657",
+      "bytes": 12918514
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7634,8 +7634,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "d007e917a92d2901362433924ba4fab7989ba9461ca46db964e96dc5aff77879",
-      "bytes": 40899
+      "sha256": "0db04ef8bb14b8ed8d2d37c2fad7b0753c730df09d5b284b1947bc16b3fc9935",
+      "bytes": 40857
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",

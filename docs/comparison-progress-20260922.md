@@ -99,16 +99,53 @@ decisions. Reopen a selection with a relevant measured comparison; preserve
 failed attempts, missing metrics and source provenance. Stars, newer releases
 and reviewer agreement do not close these gates.
 
-The owner has now returned a foundation/runtime/memory scope status, separate
-from trading. The executed comparisons are complete within their reported
-limits; unresolved research rows and the unrun Hindsight arm do not themselves
-block a foundation handoff. Joint landing still requires canonical publication
-of the reviewed progress and a reviewed commit of the foundation tooling in its
-owning repository. The WSL runbook is written but remains under review; a file's
-existence does not qualify its setup commands.
+The reviewed foundation handoff has landed. Canonical comparison progress was
+published by [PR60](https://github.com/seathatflowsinourveins/native-agent-stack/pull/60).
+The owning repository published its tooling in
+[agent-lab PR1](https://github.com/seathatflowsinourveins/agent-lab/pull/1), corrected
+the transfer package in [PR6](https://github.com/seathatflowsinourveins/agent-lab/pull/6)
+(`384caf202a61460e2f4460a94eba8291b4707421`), and corrected portable acceptance in
+[PR7](https://github.com/seathatflowsinourveins/agent-lab/pull/7). Use the exact
+transfer revision **`951cf0c9bef116ae6e7e392ed22cacf249b027c3`**:
 
-Prepare the new WSL workstation after the joint handoff and the user's connection,
-then collect its own installation, useful-operation and recovery evidence.
+- [WSL-first runbook](https://github.com/seathatflowsinourveins/agent-lab/blob/951cf0c9bef116ae6e7e392ed22cacf249b027c3/docs/wsl-first-foundation-handoff-20260922.md),
+  SHA-256 `e00986693ec040eb91b01aefc8c1b62e28179ee267b937b713be15d0d892e5f1`
+  (19,909 bytes).
+- [Foundation transfer inventory v2](https://github.com/seathatflowsinourveins/agent-lab/blob/951cf0c9bef116ae6e7e392ed22cacf249b027c3/docs/foundation-transfer-inventory-20260922.json),
+  SHA-256 `9f79dfd3493e7838598bfd25faac70b60f3a2549cb69db82a5d787d651134e86`
+  (11,641 bytes; 56 paths).
+
+Independent review verified all 56 inventory hashes and byte counts, the
+transferred Claude Agent SDK lock, bootstrap prerequisites, and exclusion of the
+separately owned trading decision. The historical PR1 manifest stays unchanged;
+at the published correction base only the runbook differed from it. An earlier
+four-path difference count included unpublished working-copy changes. PR7's
+reviewed head and published merge have the same Git tree; all five recorded
+checks passed. Claude's explicit scoped return and Codex's independent review
+close the source handoff. The optional SDK remains measured, not adopted.
+
+Codex independently reproduced the portable comparison suite at the reviewed
+head, with source-host catalog/skill paths hidden and networking disabled:
+**219 tests, 216 passed, 0 failed, 3 skipped**. The command is
+`WORKERS_SKIP_HOST_FIXTURES=1 node --test 'tests/compare/*.test.mjs'`.
+The three skipped source-host fixtures check the sealed semantic corpus and the
+two skills-rider cases; they are never counted as passes. The runbook separately
+requires destination skill-pin verification that rejects missing names, files
+or mismatched hashes. These are local integration tests, not new upstream or
+provider acceptance.
+
+The first independent isolation attempt failed because it inherited a temporary
+directory hidden by the sandbox. Repeating with `TMPDIR=/tmp` inside the sandbox
+passed without a source change; the failed attempt remains recorded. The owner
+also retained a PR6 pre-push secret-scan refusal that a shell pipeline masked,
+followed by a successful guarded scan. Later commits used an explicit exit-code
+check. Neither failure is erased by subsequent passing evidence.
+
+The handoff is ready for the connected WSL workstation to run its own acceptance.
+Unresolved research rows, unrun Hindsight, and worker recovery/artifact-acceptance
+limits remain open and do not themselves block this source handoff. No repository
+ranking, default or component pin changed. Wait for the user's target connection,
+then collect its installation, useful-operation, skill-pin and recovery evidence.
 macOS is a later, separately qualified target. Trading implementation and broker
 acceptance remain separately owned; no account or order action follows from this
 catalog progress record.
