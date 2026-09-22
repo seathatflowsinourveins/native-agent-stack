@@ -12111,6 +12111,26 @@
       "path": "tests/test_pit_availability.py",
       "sha256": "4f9cb899edcd84950a71014d4efe588a4d9d70e5ee74f91ecf0c3a40f860c40b",
       "bytes": 20615
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/dagu-inflight-resume-after-kill/fixture.py",
+      "sha256": "7d4e6785208b557c0e26d1c421eaab5c283f8e9082581bc8a5eb3bd650da3148",
+      "bytes": 6711
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/dagu-2170-checkpoint-parity/run_parity.py",
+      "sha256": "343acaa341c24d47a09f27b980516ca6a07b5b300a61491d292b7e1e6bb586e7",
+      "bytes": 10180
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/data-quality-orchestration/dagu-inflight-resume-after-kill.json",
+      "sha256": "7697ac785c597405bb7581f27cd8986838a189f0520c5a42de4be72b3d633609",
+      "bytes": 10981
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/scheduling-supervision/dagu-2170-checkpoint-parity.json",
+      "sha256": "b3fc003616ac6d8358b769af05ec1a646a5b969df3e62429d007df4c12f7df90",
+      "bytes": 7792
     }
   ],
   "convergence_records": [
