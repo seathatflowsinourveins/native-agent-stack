@@ -2902,6 +2902,22 @@
         "Superseded observations, including the author's own probe and invocation errors, remain recorded."
       ],
       "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+      "id": "exchange-calendars-native-check-20260922",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "exchange-calendars"
+      ],
+      "claim": "exchange_calendars 4.13.2 was installed in an isolated venv from PyPI and its XNYS calendar was queried natively for the 2013-10-07 session: session_open/session_close returned 2013-10-07T13:30:00+00:00 and 2013-10-07T20:00:00+00:00, matching the session_open_utc/session_close_utc values already recorded in blueprints/us-equities/data/receipt.json. Independent GitHub API checks (repos/gerrymanoim/exchange_calendars, its releases/latest, and commits for both the recorded source_pin dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a and the 4.13.2 tag) confirm the pin resolves to a real public commit and that tag 4.13.2 resolves to the identical commit.",
+      "limitations": [
+        "This is a single-session, single-calendar (XNYS) check, not a survey of holidays, breaks, other calendars or the package's full test suite.",
+        "It does not establish that blueprints/us-equities/data/receipt.json or blueprints/us-equities/historical-simulation/receipt.json themselves invoked exchange_calendars internally; it independently reproduces the same published session boundary values using the pinned package version.",
+        "No paper/live trading, broker calendar reconciliation or holiday-schedule regression was performed.",
+        "The PyPI install and GitHub API calls used live network access on 2026-09-22; they are not offline-attested or independently mirrored.",
+        "This receipt does not extend, retro-label or otherwise change the scope of native-historical-leverage-stress-20260919 (lean), which remains scoped to its own six LEAN simulations only."
+      ],
+      "path": "evidence/receipts/exchange-calendars-native-check-20260922.json"
     }
   ],
   "files": [
@@ -3742,8 +3758,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "bytes": 15925,
-      "sha256": "adc0c6a3c58dc0daf8c1c29061b349ca0ffd62b17950b4d6c31a7e9f63c34a76"
+      "bytes": 16071,
+      "sha256": "b600c372e329eab8f6e28a09c8978b99d82a542ad0a78c59467149e80bdcb719"
     },
     {
       "path": "adoption/paired/README.md",
@@ -5173,8 +5189,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "bytes": 474399,
-      "sha256": "4ef9fcf4a9e864437a3fdc972ea67e5ac349f269044d31639ee0c6631f58fa48"
+      "bytes": 479422,
+      "sha256": "0c4b386ca4939ea73f240d2c255f89fd7b0605b1118d888752a85f7f39f9c4c0"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -7288,8 +7304,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 87569,
-      "sha256": "f8674e5f29d51b0fc1e1197ab58cd140ffabf02b1766368e9770a95e37defa91"
+      "bytes": 87705,
+      "sha256": "01844b9d85491a09e5b002acfcb93ec3ba1b2a2edb93bd88bccaeb9c409c4163"
     },
     {
       "path": "observability/README.md",
@@ -7703,8 +7719,8 @@
     },
     {
       "path": "tests/test_stack_lifecycle.py",
-      "sha256": "67b71704382baa14089250e5c44feda3a5a44780e4819831e8b872d7634ce251",
-      "bytes": 7477
+      "sha256": "82d85e465b877e04f3eb746aa2c71ae398f2e9659c2fb2a2f1d07e6f49494e43",
+      "bytes": 6421
     },
     {
       "path": "tests/test_validate.py",
@@ -10788,8 +10804,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "bdcad1ce01b6093f6be5e9f72f491d61f9428ed68219d742a3e721b91da366f7",
-      "bytes": 245202
+      "sha256": "09bbf962f6bc5faafad27b4aea570b883950c2e300d2d6e16265d216f77fb539",
+      "bytes": 248568
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -11360,6 +11376,11 @@
       "path": "tests/test_blind_layer_decisions.py",
       "sha256": "0512e58b967baed9fdc95323cd6867dbb1981785bb3d20e51d6a1df1bcb4fbc1",
       "bytes": 2827
+    },
+    {
+      "path": "evidence/receipts/exchange-calendars-native-check-20260922.json",
+      "sha256": "ee5ec2a85edf415b1c440c2704b3252c348fe3da9ff01d83a9266b711c2b9efe",
+      "bytes": 3320
     }
   ],
   "convergence_records": [

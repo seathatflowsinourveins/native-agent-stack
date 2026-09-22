@@ -1535,14 +1535,14 @@
         "python - <<'PY'\nimport exchange_calendars as xcals\ncalendar = xcals.get_calendar('XNYS')\nprint(calendar.session_open('2013-10-07'))\nprint(calendar.session_close('2013-10-07'))\nPY"
       ],
       "evidence_ids": [
-        "native-historical-leverage-stress-20260919"
+        "exchange-calendars-native-check-20260922"
       ],
       "profile": "supporting",
       "upstream_sources": [
         "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md",
         "https://pypi.org/pypi/exchange_calendars/4.13.2/json"
       ],
-      "freshness": "Pinned in catalogs/us-equities/data-research.json (decision default, evidence_level native_proven) and catalogs/us-equities/architecture/trading-sources.json (source fetch commit bbda29fed902374bdb75acab008f421fbd567823); newly added as a selected stack component. The XNYS session-date check in blueprints/us-equities/historical-simulation/receipt.json is the only currently registered evidence.json receipt that names this package by function; that receipt's own component_ids array does not yet list exchange-calendars, so scripts/validate.py is expected to flag the cross-reference until a coordinator-owned edit to manifests/evidence.json adds it."
+      "freshness": "Pinned in catalogs/us-equities/data-research.json (decision default, evidence_level native_proven) and catalogs/us-equities/architecture/trading-sources.json (source fetch commit bbda29fed902374bdb75acab008f421fbd567823); newly added as a selected stack component. exchange-calendars-native-check-20260922 is a dedicated component_ids=[\"exchange-calendars\"] receipt: an isolated venv install of 4.13.2 that reproduced the XNYS 2013-10-07 session_open/session_close values already recorded in blueprints/us-equities/data/receipt.json, plus GitHub API confirmation that the recorded source_pin and the 4.13.2 tag resolve to the identical commit. It intentionally does not reuse or retro-label native-historical-leverage-stress-20260919, whose component_ids remain scoped to [\"lean\"] only."
     },
     {
       "id": "zizmor",
