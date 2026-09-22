@@ -972,9 +972,10 @@ def trial_phase_and_exit_code(result):
     outcome dict, or the synthetic ``{"status": "needs_attention", ...}``
     result built when run_native itself raised). ``result["status"]`` is
     itself already the single authority for whether a non-flat end is a
-    genuine "held_overnight" (see run_native's own use of
-    ``_honest_overnight_hold`` above and ``is_final_boundary`` below, which
-    both consult the same function) -- this helper only turns that already-
+    genuine "held_overnight" (run_native decides it once via
+    ``_honest_overnight_hold`` and main() reuses that decision through
+    ``_final_boundary_from_run_status`` rather than re-reading the clock) --
+    this helper only turns that already-
     honest status into the two durable/observable outputs, so there is
     exactly one place either can diverge from ``result["status"]``.
 

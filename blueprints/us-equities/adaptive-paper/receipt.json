@@ -358,17 +358,17 @@
       "blueprints/us-equities/adaptive-paper/receipts/adaptive_policy_v1.golden.json": "5cb4b21c7d2159e496093c67b3b358810db4e225d9c5ee1c633258050973556e",
       "blueprints/us-equities/adaptive-paper/recovery.py": "52a4c428bde16bd8f7ab758dc5f868cfd25b2ba482e8c1f26176f30d016036bc",
       "blueprints/us-equities/adaptive-paper/registry.json": "60da73b985e718bd1dece7a3350f34636bda0fb38e766a44ae71c5a8c532282a",
-      "blueprints/us-equities/adaptive-paper/runner.py": "3a40c5a92a82a7fac97c5d660dcb18f632cff3a5058e9b392d350fa3fe133fae",
+      "blueprints/us-equities/adaptive-paper/runner.py": "583698ecdc5d7b8b4f1f0480b049f50554e5870be6feb90215cc11677b96b457",
       "blueprints/us-equities/adaptive-paper/safety.py": "e521cbf18f44e24cb3bd67a2eab7481fe39680c1bf748fe12374f63c926657e8",
       "blueprints/us-equities/adaptive-paper/selector.py": "28de8ebf66b6e7135979554f73692ede772167682007d8c6ba41da6fb6fb39b3",
       "blueprints/us-equities/adaptive-paper/sessions.py": "1920952ac8219caf09e622fe517179e2766652fc7f987f7a11258481aa881998",
-      "blueprints/us-equities/adaptive-paper/source-hashes.json": "5d389c0652fc73d5d33e8cae433bb4501badf28c4fce2e5fc3aad6d63d061121",
+      "blueprints/us-equities/adaptive-paper/source-hashes.json": "43a80c0cd2f564ab4272e91fb0312e96f0b3f2016678fb64a797f0f9b4a5bce5",
       "blueprints/us-equities/adaptive-paper/strategies.py": "56e9f639f61111282de3d0795908ea11719a22058899cc59f8839e10529f86cf",
       "blueprints/us-equities/adaptive-paper/strategies_v1.py": "5721d077d321347d769ad0b35ccd75ffb805076f3d6fc11d9a59168334e98a8c",
       "blueprints/us-equities/adaptive-paper/transport.py": "7287de7b96ecfb4b87776c63d7cf1de247065c751ee23646d441fdb651193b9a",
       "tests/test_adaptive_paper_exits.py": "13a82d65ad1b2e72a8ca0fbb8bbb178a01ded1301399604c9e304ae213456764",
       "tests/test_adaptive_paper_recovery.py": "d10af6928bf3ba946c82e632e545ee9eb53a1feea275b2e20a818c283eb1b6aa",
-      "tests/test_adaptive_paper_runner.py": "d20e32e5d40a5e061ce834d109fbde01747f9f485bb19b91fbd782e5951f22f7",
+      "tests/test_adaptive_paper_runner.py": "7b5cdbfbcbddfec021c76c4812ff3f7702c91828b2ed1fcdd295ed068af046eb",
       "tests/test_adaptive_paper_safety.py": "4bb1c10347b21fc08f27a3f33e02172f5d570ae9bdced2dd8c16e1eb06b92555",
       "tests/test_adaptive_paper_selector.py": "27b431ac7911372d050f25d32ac24a3df9d2cf3c5e7dafdebfe51db6cab55936",
       "tests/test_adaptive_paper_sessions.py": "6fb5f03cdbdb7fd4cf0105cfd4002a41ae0adb1ef18770f0bdaaae054661e92b",
@@ -386,6 +386,7 @@
     "review_fixes": [
       "rebase review D1: overnight_holds relaxes the flat-account/no-open-orders preflight gate only when the prior trial phase is held_overnight (read before preflight, re-checked under the account lock: trial_state_changed_during_preflight); a first trial with foreign positions is refused (clean_native_start_requires_flat_account)",
       "rebase review D2: main() reuses run_native's hold decision (_final_boundary_from_run_status) instead of re-reading the clock"
-    ]
+    ],
+    "files_note": "hashes recorded after the rebase-review fix commit; source-hashes.json does not pin receipt.json, so this map and source-hashes.json agree for every shared path"
   }
 }
