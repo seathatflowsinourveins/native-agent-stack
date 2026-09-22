@@ -7717,6 +7717,11 @@
       "bytes": 2582
     },
     {
+      "path": "tests/test_workflow_security_coverage.py",
+      "sha256": "7b8574fdf46a42258d43652b377edb67612fb7eeae7a5298a8b6b8465e887bef",
+      "bytes": 3378
+    },
+    {
       "path": "tests/test_wsl_memory_maintenance.py",
       "sha256": "b66309e74fcd3b5e25cc1ffca585eaf12e0d4094db4efa4313a880e423212871",
       "bytes": 4729
@@ -9033,13 +9038,13 @@
     },
     {
       "path": "docs/github-automation-evidence.json",
-      "sha256": "5f827a4302487ee863d8b9d1e1e7665f0b1baa26cc9d1ba81f90a42ed0d68fc6",
-      "bytes": 12324
+      "sha256": "7bb47481be9904ca1fcbc633ccc4438fcbc53fa9aae2c8f0369ade8c422de5fa",
+      "bytes": 12863
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "19f0d0a848599b4d619ca0c9a99e3bd9df26ab772285910d919ff657bd80a24e",
-      "bytes": 24913
+      "sha256": "974aec831f5a81f7f7237701cde12afdfd7259ec99d9d13c50764b6371d76041",
+      "bytes": 25289
     },
     {
       "path": "docs/research-task-acceptance.md",

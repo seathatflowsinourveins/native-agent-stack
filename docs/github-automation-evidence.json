@@ -53,8 +53,9 @@
     ],
     "observed_integration_id": 15368,
     "observed_strict_required_status_checks_policy": false,
-    "independent_configuration_comparison": "GET rulesets/23739774 fields matched every field of reviewed main-ruleset.json",
-    "blocked_merge_experiment": "not performed"
+    "independent_configuration_comparison": "GET rulesets/23739774 fields matched every field of reviewed main-ruleset.json, as reviewed at the time of this historical application",
+    "blocked_merge_experiment": "not performed",
+    "note_20260922": "main-ruleset.json was edited after this historical application (see docs/github-automation.md, 'Ruleset upgrade, 2026-09-22') to add deletion/non_fast_forward/required_linear_history, a pull_request review rule and secret-scan as a required status check. This settings_after block records the prior applied state only; it is not a claim that the current committed main-ruleset.json matches the live ruleset. That edit is coordinator-only and not yet applied."
   },
   "local_static_checks": {
     "actionlint_source": "https://github.com/rhysd/actionlint/tree/914e7df21a07ef503a81201c76d2b11c789d3fca",

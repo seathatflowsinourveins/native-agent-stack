@@ -163,13 +163,19 @@ do not transfer a native client's credential store.
 
 ## Publication and practical acceptance
 
-The active [main ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
+As of this writing, the active [main ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
 requires the always-running `validate` and `token-report` jobs from GitHub Actions
-(app ID 15368). Its reviewed configuration is [main-ruleset.json](../.github/main-ruleset.json).
-It adds no human approval count, strict up-to-date requirement or bypass actor.
-Native path-filtered and manually dispatched checks are not global requirements.
-Require native acceptance separately when its capability changes. No merge queue
-is enabled; add `merge_group` support before adopting one.
+(app ID 15368). It adds no human approval count, strict up-to-date requirement or
+bypass actor. Native path-filtered and manually dispatched checks are not global
+requirements. Require native acceptance separately when its capability changes.
+No merge queue is enabled; add `merge_group` support before adopting one.
+
+The committed [main-ruleset.json](../.github/main-ruleset.json) no longer
+describes this applied state: it has been edited ahead of application to add
+`secret-scan` and the other rules described in "Ruleset upgrade, 2026-09-22"
+below. Until the coordinator applies it, treat `main-ruleset.json` as the
+*reviewed, not-yet-applied* configuration, and the "active ruleset" GET below
+as the ground truth for what GitHub currently enforces.
 
 The prior state had no rulesets and returned `Branch not protected` for main.
 After applying the configuration, a separate `GET /repos/OWNER/REPO/rules/branches/main`
