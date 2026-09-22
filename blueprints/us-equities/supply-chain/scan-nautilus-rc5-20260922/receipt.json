@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "id": "supply-chain-scan-nautilus-rc5-20260922",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "syft",
+    "grype",
+    "nautilus-trader",
+    "alpaca-py"
+  ],
+  "observed_at_utc": "2026-09-22T07:43:37Z",
+  "status": "passed_scoped_scan_zero_findings",
+  "claim": "Native Syft 1.52.0 and native Grype 0.119.0, run against the pinned NautilusTrader 2.0.0rc5 paper runtime's installed Python site-packages (21 packages) and the local Alpaca adapter blueprint's requirements.txt pin set (2 packages: nautilus-trader, alpaca-py), returned zero vulnerability matches against a Grype database built 2026-09-22T06:30:41Z. This is evidence that no vulnerability currently known to that database maps to the exact installed versions scanned; it is not a statement about runtime safety, supply-chain authenticity, unpublished vulnerabilities, or coverage of code paths outside the scanned distributions.",
+  "evidence_class": "native_proven",
+  "scope": {
+    "statement": "Two directory scans: (1) the site-packages directory of the pinned uv-managed Python 3.12 runtime venv used for adaptive-paper NautilusTrader 2.0.0rc5 + Alpaca paper operation, and (2) the blueprints/us-equities/adaptive-paper directory in this worktree, whose only two version pins are read from requirements.txt (nautilus-trader==2.0.0rc5, alpaca-py==0.44.0). Grype then matched both generated SBOMs against its vulnerability database. This scan covers installed Python package metadata only: it does not cover the Rust/Cython extension modules bundled inside those wheels line-by-line, the host OS packages, unpinned transitive C libraries loaded at runtime (e.g. via numpy.libs, duckdb's bundled shared object), IBKR-side software, or any code executed outside this venv.",
+    "runtime_venv_path_variable": "$RUNTIME_VENV",
+    "runtime_venv_description": "uv-managed virtualenv, Python 3.12, dependencies installed via uv (no pip present in the venv); path kept as a variable here because it is a personal-machine path excluded from publication scanning.",
+    "adapter_directory": "blueprints/us-equities/adaptive-paper (this worktree, relative path, no personal path)",
+    "source_unchanged": "The runtime venv and adapter directory were read-only scan targets; neither was modified by these commands."
+  },
+  "tooling": {
+    "syft": {
+      "repository": "https://github.com/anchore/syft",
+      "release_tag": "v1.52.0",
+      "version": "1.52.0",
+      "install_source": "pre-existing pinned install from the syft-sdk-inventory-20260919 receipt (../receipt.json); reused unchanged for this scan",
+      "installed_binary_path_variable": "$SYFT_BIN"
+    },
+    "grype": {
+      "repository": "https://github.com/anchore/grype",
+      "release_tag": "v0.119.0",
+      "release_published_at": "2026-09-17T16:45:23Z",
+      "version": {
+        "application": "grype",
+        "buildDate": "2026-09-17T16:17:07Z",
+        "compiler": "gc",
+        "gitCommit": "b6f5194537747ee7f705f4113069ac9eb269919f",
+        "gitDescription": "v0.119.0",
+        "goVersion": "go1.26.3",
+        "platform": "linux/amd64",
+        "supportedDbSchema": 6,
+        "syftVersion": "v1.52.0"
+      },
+      "license": "Apache-2.0",
+      "archive_name": "grype_0.119.0_linux_amd64.tar.gz",
+      "archive_sha256": "3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b",
+      "publisher_checksum_list_sha256": "9cb7f68e8fa2b039e67f33d1fda29e7224946167f3b8abb43c51a6fff0c0de78",
+      "github_asset_digest": "sha256:3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b",
+      "publisher_checksum_matched": true,
+      "github_asset_digest_matched": true,
+      "signature_verified": false,
+      "installed_binary_path_variable": "$GRYPE_BIN",
+      "install_layout": "mirrors the existing syft install: pinned versioned directory under the local tools prefix plus a symlink named grype in the local bin prefix; no existing executable was replaced"
+    },
+    "vulnerability_db": {
+      "schema_version": "v6.1.9",
+      "source_url_no_query": "https://grype.anchore.io/databases/v6/vulnerability-db_v6.1.9_2026-09-22T00:33:02Z_1790058641.tar.zst",
+      "built_utc": "2026-09-22T06:30:41Z",
+      "valid": true,
+      "update_command": "grype db update",
+      "status_command": "grype db status -o json",
+      "provider_count": 26
+    }
+  },
+  "commands": [
+    {
+      "command": "grype db update",
+      "exit_code": 0,
+      "stdout_excerpt": "Vulnerability database updated to latest version!"
+    },
+    {
+      "command": "grype db status -o json",
+      "exit_code": 0,
+      "note": "schemaVersion v6.1.9, built 2026-09-22T06:30:41Z, valid true"
+    },
+    {
+      "command": "syft scan dir:$RUNTIME_VENV/lib/python3.12/site-packages -o syft-json=runtime.syft.json -o cyclonedx-json=runtime.cdx.json",
+      "exit_code": 0,
+      "elapsed_seconds_approx": 3.4,
+      "stderr_excerpt": "WARN no explicit name and version provided for directory source, deriving artifact ID from the given path (which is not ideal)"
+    },
+    {
+      "command": "syft scan dir:$WORKTREE/blueprints/us-equities/adaptive-paper -o syft-json=adapter.syft.json",
+      "exit_code": 0,
+      "elapsed_seconds_approx": 0.8,
+      "stderr_excerpt": "WARN no explicit name and version provided for directory source, deriving artifact ID from the given path (which is not ideal)"
+    },
+    {
+      "command": "grype sbom:runtime.syft.json -o json > runtime.grype.json",
+      "exit_code": 0,
+      "elapsed_seconds_approx": 0.78,
+      "stderr_bytes": 0
+    },
+    {
+      "command": "grype sbom:adapter.syft.json -o json > adapter.grype.json",
+      "exit_code": 0,
+      "elapsed_seconds_approx": 0.75,
+      "stderr_bytes": 0
+    }
+  ],
+  "inventory": {
+    "runtime_scan": {
+      "syft_packages": 21,
+      "package_type": "python",
+      "cataloger": "python-installed-package-cataloger",
+      "cyclonedx_spec_version": "1.7",
+      "packages": [
+        {"name": "alpaca-py", "version": "0.44.0", "purl": "pkg:pypi/alpaca-py@0.44.0", "licenses": ["Apache-2.0"]},
+        {"name": "annotated-types", "version": "0.8.0", "purl": "pkg:pypi/annotated-types@0.8.0", "licenses": ["MIT"]},
+        {"name": "certifi", "version": "2026.7.22", "purl": "pkg:pypi/certifi@2026.7.22", "licenses": ["MPL-2.0"]},
+        {"name": "charset-normalizer", "version": "3.5.1", "purl": "pkg:pypi/charset-normalizer@3.5.1", "licenses": ["MIT"]},
+        {"name": "duckdb", "version": "1.5.5", "purl": "pkg:pypi/duckdb@1.5.5", "licenses": []},
+        {"name": "idna", "version": "3.20", "purl": "pkg:pypi/idna@3.20", "licenses": ["BSD-3-Clause"]},
+        {"name": "msgpack", "version": "1.2.2", "purl": "pkg:pypi/msgpack@1.2.2", "licenses": ["Apache-2.0"]},
+        {"name": "nautilus-trader", "version": "2.0.0rc5", "purl": "pkg:pypi/nautilus-trader@2.0.0rc5", "licenses": ["LGPL-3.0-only"]},
+        {"name": "numpy", "version": "2.5.3", "purl": "pkg:pypi/numpy@2.5.3", "licenses": ["BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0"]},
+        {"name": "pandas", "version": "3.0.6", "purl": "pkg:pypi/pandas@3.0.6", "licenses": ["unparsed (syft reported a file digest string, not a license expression, for this package's declared license metadata)"]},
+        {"name": "pydantic", "version": "2.13.5", "purl": "pkg:pypi/pydantic@2.13.5", "licenses": ["MIT"]},
+        {"name": "pydantic-core", "version": "2.46.5", "purl": "pkg:pypi/pydantic-core@2.46.5", "licenses": ["MIT"]},
+        {"name": "python-dateutil", "version": "2.9.0.post0", "purl": "pkg:pypi/python-dateutil@2.9.0.post0", "licenses": ["Dual License"]},
+        {"name": "pytz", "version": "2026.3.post1", "purl": "pkg:pypi/pytz@2026.3.post1", "licenses": ["MIT"]},
+        {"name": "requests", "version": "2.34.2", "purl": "pkg:pypi/requests@2.34.2", "licenses": ["Apache-2.0"]},
+        {"name": "six", "version": "1.17.0", "purl": "pkg:pypi/six@1.17.0", "licenses": ["MIT"]},
+        {"name": "sseclient-py", "version": "1.9.0", "purl": "pkg:pypi/sseclient-py@1.9.0", "licenses": ["Apache Software License v2"]},
+        {"name": "typing-extensions", "version": "4.16.0", "purl": "pkg:pypi/typing-extensions@4.16.0", "licenses": ["PSF-2.0"]},
+        {"name": "typing-inspection", "version": "0.4.4", "purl": "pkg:pypi/typing-inspection@0.4.4", "licenses": ["MIT"]},
+        {"name": "urllib3", "version": "2.8.0", "purl": "pkg:pypi/urllib3@2.8.0", "licenses": ["MIT"]},
+        {"name": "websockets", "version": "17.1", "purl": "pkg:pypi/websockets@17.1", "licenses": ["BSD-3-Clause"]}
+      ]
+    },
+    "adapter_scan": {
+      "syft_packages": 2,
+      "cataloger": "python-package-cataloger",
+      "source_location": "requirements.txt (unresolved/declared pin, not an installed distribution)",
+      "packages": [
+        {"name": "alpaca-py", "version": "0.44.0", "purl": "pkg:pypi/alpaca-py@0.44.0"},
+        {"name": "nautilus-trader", "version": "2.0.0rc5", "purl": "pkg:pypi/nautilus-trader@2.0.0rc5"}
+      ]
+    }
+  },
+  "findings": {
+    "runtime_grype_matches": 0,
+    "adapter_grype_matches": 0,
+    "total_matches": 0,
+    "by_severity": {
+      "Critical": 0,
+      "High": 0,
+      "Medium": 0,
+      "Low": 0,
+      "Negligible": 0,
+      "Unknown": 0
+    },
+    "disposition_table": [],
+    "disposition_table_note": "Empty by construction: Grype returned zero matches for both SBOMs against the 2026-09-22T06:30:41Z database, so there is no package/version/advisory row requiring a disposition. Kept as an explicit empty list (not omitted) so the test suite can assert findings count equals disposition-row count."
+  },
+  "raw_artifacts": {
+    "storage_note": "Raw Syft/Grype JSON outputs total 3.70 MB combined and contain personal filesystem paths (source directory metadata, Grype DB cache path) that the publication scanner (scripts/validate.py PRIVATE_CONTENT check) forbids in tracked files. They are therefore kept out of this repository under a local state directory and referenced here by path variable and sha256 only, not committed.",
+    "state_dir_path_variable": "$SCAN_STATE_DIR",
+    "state_dir_description": "local codex-ecosystem state directory, supply-chain-scan-20260922 subdirectory, outside this repository",
+    "files": [
+      {"name": "runtime.syft.json", "bytes": 2334868, "sha256": "9e647b38a0b6b38ed784771289600306c436feef50c1c35c3ea0147aed620b44"},
+      {"name": "runtime.cdx.json", "bytes": 1422503, "sha256": "7cc2a184ca1f85e8bea6861aa7cb3b4d96ef9c86d4de45eaa95eca04af948d94"},
+      {"name": "adapter.syft.json", "bytes": 13284, "sha256": "0b3f0ccbccc72388cd96f1c87bbd2d689e900ae86462ffa78b643dc273d86999"},
+      {"name": "runtime.grype.json", "bytes": 5763, "sha256": "d2f8ec0037b3dcae71af11722719e8d8b8a8982f3033fa2baab92b920f394d22"},
+      {"name": "adapter.grype.json", "bytes": 5734, "sha256": "c80311fb5eb0348c4e83ba286d57edf98c2ef889550880402c74046ee10f1de3"}
+    ],
+    "total_bytes": 3782152
+  },
+  "model_calls": 0,
+  "net_provider_tokens_saved": 0,
+  "limitations": [
+    "Zero Grype matches means no vulnerability in this database's 2026-09-22T06:30:41Z snapshot maps to these exact package versions today; it is not a guarantee of future safety and does not cover vulnerabilities disclosed after this build.",
+    "The scan covers installed Python metadata only (python-installed-package-cataloger / python-package-cataloger). It does not independently verify bundled native extensions, transitive shared libraries, or supply-chain provenance beyond what pip/uv installed.",
+    "This receipt establishes that the pinned NautilusTrader 2.0.0rc5 runtime and the Alpaca adapter's two pinned packages currently carry no known vulnerability per Grype's database; it does not certify runtime correctness, execution safety, or broker-side behavior.",
+    "Signature verification of the Grype release archive was not performed (matches the existing Syft receipt's disclosed limitation); only checksum matching against the publisher's checksum list and GitHub's release-asset digest was performed.",
+    "requirements.txt-derived adapter packages are declared pins, not installed-distribution metadata; they were cross-checked to match the runtime scan's installed versions for nautilus-trader and alpaca-py (2.0.0rc5 / 0.44.0 in both)."
+  ]
+}

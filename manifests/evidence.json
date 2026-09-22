@@ -6318,8 +6318,8 @@
     },
     {
       "path": "blueprints/us-equities/supply-chain/README.md",
-      "sha256": "7b3e68f52618e8b24fa6e42a3ffeba6fc6082084277db496e29d6756fd36cde3",
-      "bytes": 6536
+      "sha256": "ba6057997ca6da0973878497cbec49cd05816e6cbdd3f58c275e07bdf81e1402",
+      "bytes": 9628
     },
     {
       "path": "blueprints/us-equities/supply-chain/receipt.json",
@@ -11360,6 +11360,16 @@
       "path": "tests/test_blind_layer_decisions.py",
       "sha256": "0512e58b967baed9fdc95323cd6867dbb1981785bb3d20e51d6a1df1bcb4fbc1",
       "bytes": 2827
+    },
+    {
+      "path": "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+      "sha256": "8528de8a70148495f14c175ee073790afd28a3fc6eba3e54bc6ece74bac27353",
+      "bytes": 12269
+    },
+    {
+      "path": "tests/test_supply_chain_scan.py",
+      "sha256": "a4e3e5a6f40a7f3b4e679b21dc56f443a27ccdd9f097423bdf64d9e41eef19f8",
+      "bytes": 6838
     }
   ],
   "convergence_records": [

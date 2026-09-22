@@ -135,3 +135,60 @@ not a security verdict.
 - [Pinned upstream README](https://github.com/anchore/syft/blob/v1.52.0/README.md): directory scans and multiple native output formats.
 - [Supported scan targets](https://oss.anchore.com/docs/guides/sbom/scan-targets/).
 - [Upstream CLI reference](https://oss.anchore.com/docs/reference/syft/cli/): explicit source and path-boundary options; installed `syft scan --help` confirmed the accepted flags.
+
+## Vulnerability scan — pinned NautilusTrader 2.0.0rc5 runtime and Alpaca adapter, September 22, 2026
+
+This closes the previously missing vulnerability scan of the SDK inventoried
+above. Upstream **Syft 1.52.0** (already installed for the inventory above)
+generated SBOMs for two targets, and newly installed upstream **Grype 0.119.0**
+matched both against its vulnerability database:
+
+1. The installed Python `site-packages` of the pinned uv-managed runtime venv
+   used for `adaptive-paper` NautilusTrader 2.0.0rc5 + Alpaca paper operation
+   (21 Python packages, including `nautilus-trader 2.0.0rc5` and
+   `alpaca-py 0.44.0`).
+2. This repository's `blueprints/us-equities/adaptive-paper` directory, whose
+   only version pins are its `requirements.txt` (`nautilus-trader==2.0.0rc5`,
+   `alpaca-py==0.44.0`).
+
+| Native result | Observed value |
+| --- | ---: |
+| Grype version | 0.119.0 |
+| Vulnerability database schema / built | v6.1.9 / 2026-09-22T06:30:41Z |
+| Runtime SBOM packages scanned | 21 |
+| Adapter SBOM packages scanned | 2 |
+| Runtime `grype` matches | 0 |
+| Adapter `grype` matches | 0 |
+| `syft`/`grype` command exit codes | all 0 |
+
+**Zero matches against today's database is not a safety guarantee.** It means
+no vulnerability currently published to this database's 2026-09-22 snapshot
+maps to the exact package versions scanned; future disclosures, native
+extension code inside these wheels, and anything outside Python package
+metadata are out of scope. The
+[full receipt](scan-nautilus-rc5-20260922/receipt.json) records both tool
+versions, the Grype release archive's verified checksum (matching both the
+publisher's checksum list and GitHub's release-asset digest), the complete
+scanned-package list with license metadata, an explicit (empty, by
+construction) per-finding disposition table, and the exact commands run with
+their exit codes.
+
+Grype's own installation mirrors the existing Syft install above: the pinned
+release archive was downloaded from the official GitHub release, verified
+against both the publisher's checksum list and GitHub's release-asset digest,
+and extracted into a new versioned directory with a symlink in the same local
+tools layout Syft already uses. No existing executable was replaced.
+
+Raw Syft/Grype JSON outputs (about 3.7 MB combined) are **not** committed to
+this repository: they embed this machine's personal filesystem paths (scan
+source directory, vulnerability database cache path) in tool metadata fields,
+which the publication scanner forbids in tracked files. They are retained
+outside this repository in a local state directory, and the receipt records
+each raw file's exact byte count and SHA-256 so the recorded package and
+finding counts in the receipt can be checked against them.
+
+This scan result establishes only what its evidence class states
+(`native_proven`, for the scan itself): that a fresh, verified-checksum
+Grype run against a fresh database build found no known match for these
+exact package versions on this date. It says nothing about NautilusTrader,
+Alpaca adapter, or broker-side runtime safety.

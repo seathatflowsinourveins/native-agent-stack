@@ -118,7 +118,7 @@ The following decisions refer to architecture selection, not installation status
 | [promptfoo](https://github.com/promptfoo/promptfoo) | alternative | source review | Declarative prompt regression and adversarial testing |
 | [gitleaks](https://github.com/gitleaks/gitleaks) | default | bounded native receipt | Redacted secret scanning of code and history |
 | [syft](https://github.com/anchore/syft) | default | bounded native receipt | Native artifact dependency inventory |
-| [grype](https://github.com/anchore/grype) | conditional | source review | Scan a recorded SBOM against vulnerability data; execution remains unqualified. rc5 dependency tree and local Alpaca adapter unscanned until the 2026-09-22 scan receipt lands (sibling worker output; not claimed here). |
+| [grype](https://github.com/anchore/grype) | conditional | bounded native receipt | Scanned the pinned NautilusTrader 2.0.0rc5 runtime and Alpaca adapter SBOMs against a 2026-09-22 database with zero matches ([receipt](../../blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json)) |
 | [trivy](https://github.com/aquasecurity/trivy) | alternative | source review | Alternative integrated vulnerability/IaC/secret scanner |
 | [cosign](https://github.com/sigstore/cosign) | conditional | source review | Artifact signature and identity verification |
 | [openbao](https://github.com/openbao/openbao) | conditional | source review | Separate service identity and secret lifecycle |
