@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "id": "gitleaks-repo-history-scan-20260922",
+  "date": "2026-09-22",
+  "layer_ids": [
+    "secrets-credentials"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "secrets-credentials",
+      "gap_index": 0
+    },
+    {
+      "layer_id": "secrets-credentials",
+      "gap_index": 1
+    }
+  ],
+  "purpose": "Extend gitleaks secret-scanning evidence beyond the one synthetic github-pat fixture (directory-mode only) to (a) this repository's actual commit history via `gitleaks git` and (b) a fresh `gitleaks dir` pass over the live worktree, per the critic's correction that gap 0 (credentials off the live checkout) needs a working-tree scan and gap 1 needs git-history coverage. Guarded gitleaks on PATH only; the unskipped full-history scan is explicitly avoided per AGENTS.md (it exhausted host memory earlier).",
+  "preregistered": "Expected: `gitleaks git . --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner --report-format json` over this worktree's reachable commit history, and `gitleaks dir .` over the current working tree, each bounded to 2MB per target file via --max-target-megabytes and run once under the guarded wrapper's memory/time caps (4G/6G, 600s). A clean result on both would extend gap 1's git-history coverage without closing gap 2 (scanning is not proof of no secret anywhere) or gap 0 (which is a login-policy claim, not a fully scannable artifact). Any finding would be recorded verbatim with its rule id and location, not re-run to seek a different outcome; any file skipped for size would be recorded as incomplete coverage per AGENTS.md.",
+  "commands": [
+    {
+      "cmd": "gitleaks git . --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner --report-format json --report-path ${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/git-history.json",
+      "exit": 1,
+      "duration_s": 45.6,
+      "output_excerpt": "615 commits scanned.\nscanned ~1270179530 bytes (1.27 GB) in 45.3s\nleaks found: 1\n\nReport finding: RuleID=generic-api-key File=tests/test_lane_packets.py Line=255 Commit=34fc51beaf24114fe266f73b2e36ae8176c8a521 Match='Key leaked: REDACTED\"' Entropy=3.9841838. Commit message: \"PR-5 packets unit: build layer-verdict lane packets, return schema, prompt\" -- the matched literal is the string content of a synthetic unit-test fixture asserting tools/sota-convergence/lane_packets.py's own leak-redaction behavior, not a real credential.",
+      "output_sha256": "dac6f79ab1e464476b7d0c14d79a76d71b1b5e8a812e69ac2b6ced2a80eb5478"
+    },
+    {
+      "cmd": "gitleaks dir . --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner --report-format json --report-path ${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/dir-worktree.json",
+      "exit": 0,
+      "duration_s": 1.98,
+      "output_excerpt": "skipping file: too large max_size=2MB, size=13MB path=docs/ecosystem/index.html\nscanned ~34008753 bytes (34.01 MB) in 1.61s\nno leaks found",
+      "output_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    }
+  ],
+  "tool_versions": {
+    "gitleaks": "8.30.1",
+    "git": "2.43.0"
+  },
+  "installs": [],
+  "result": "git-history mode: 615 commits scanned (~1.27GB), duration 45.60s, exit 1 (leaks found: 1). The one finding is a synthetic 'Key leaked: REDACTED' literal string inside tests/test_lane_packets.py (a unit test for the repo's own lane_packets.py redaction logic), not a real secret. dir mode (live worktree): 0 findings, exit 0, duration 1.98s, but 1 file (docs/ecosystem/index.html, 13MB) was skipped for exceeding the 2MB --max-target-megabytes cap. git rev-list --count HEAD is 491 and --all is 738; gitleaks reported 615 commits scanned, a discrepancy not independently reconciled here (gitleaks git's default ref/log-opts traversal was not audited against git rev-list's exact ref set).",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Extending gitleaks coverage to this repository's actual commit history and live worktree found no genuine leaked secret, consistent with the existing secrets-credentials decision. It advances gap 1 (git-history scanning was previously entirely unmeasured) without closing it: other secret types, Mac acceptance, and a general false-positive rate remain untested, and gap 2 (scanning is not proof of no secret anywhere) is unaffected by design."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Both scans used --max-target-megabytes 2 per AGENTS.md; dir mode explicitly skipped docs/ecosystem/index.html (13MB) -- recorded as incomplete coverage of that file's content.",
+    "git mode printed no explicit per-blob skip messages, so whether any historical blob exceeded the 2MB cap and was silently skipped is not directly observable from this run's output.",
+    "Only this WSL host was scanned; Mac acceptance remains excluded, matching the existing gap text.",
+    "Only the generic-api-key and (from the prior fixture) github-pat rule classes have any positive-detection evidence; the broader gitleaks ruleset's false-positive/false-negative rate on this repository is unmeasured.",
+    "The one finding is judged benign by source inspection of the matched line and its file's purpose, not by an independent second reviewer.",
+    "615 commits scanned (gitleaks git) vs. 491 (git rev-list --count HEAD) vs. 738 (git rev-list --all --count) were not reconciled; the exact ref set gitleaks traversed is unconfirmed."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/git-history.json",
+      "sha256": "dac6f79ab1e464476b7d0c14d79a76d71b1b5e8a812e69ac2b6ced2a80eb5478"
+    },
+    {
+      "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/git-history.stderr.log",
+      "sha256": "f2523dd9b6d5a04fd3edd47e82d04c6f88458c32627aa7cc38f3120d24c5ac15"
+    },
+    {
+      "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/dir-worktree.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/dir-worktree.stderr.log",
+      "sha256": "f2523dd9b6d5a04fd3edd47e82d04c6f88458c32627aa7cc38f3120d24c5ac15"
+    }
+  ]
+}
