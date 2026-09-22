@@ -10,6 +10,9 @@ import unittest
 from scripts.landscape import MANIFEST, build_landscape
 
 
+# Bytes the fixture writes for the sealed Claude run (self.write serializes with json.dumps).
+SEALED_RUN_1_SHA256 = hashlib.sha256(json.dumps({"run_id": "run-1", "lane": "claude"}).encode("utf-8")).hexdigest()
+
 class LandscapeTests(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
@@ -368,7 +371,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                 "evidence_class": "source_review", "evidence_refs": [], "source": "discovery_index",
             }],
             "verdict_overturn_when": "python3 tests/test_landscape.py replays the comparison",
-            "lanes": {"claude": {"run_id": "run-1", "sealed_sha256": "a" * 64},
+            "lanes": {"claude": {"run_id": "run-1", "sealed_sha256": SEALED_RUN_1_SHA256},
                       "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "codex_absent"},
         }
         fields.update(overrides)

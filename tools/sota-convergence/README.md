@@ -506,6 +506,16 @@ evidence rather than copying the existing selection, and writes one packet
 per `(catalog, layer_id)` to `<work_dir>/packets/<catalog>__<layer_id>.json`
 plus a `<work_dir>/packets/SHA256SUMS` (`sha256sum` format).
 
+Known limit of the withholding (2026-09-22 independent review): each
+candidate keeps its `adopted` flag, which the never-promote rule needs, and
+foundation packets attach the matched decisions' `selection` value
+(`default`/`conditional`/`optional`); the layer's `limitations` and
+`existing_overturn_when` can also name the current choice. A lane therefore
+sees which adopted candidate is the incumbent default. The 2026-09-22 run used
+these packets unchanged so they stay reproducible from this tool; the
+comparison that would change this is a rerun with `selection` stripped from
+the attached decisions and the two runs' winner sets compared layer by layer.
+
 ```sh
 python3 tools/sota-convergence/lane_packets.py --root . --out /path/to/work-dir
 python3 tools/sota-convergence/lane_packets.py --root . --out /path/to/work-dir --catalog us-equities --seed 20260922
@@ -584,11 +594,28 @@ mode.
   `winner_keys` entry an adopted packet candidate, every adopted non-winner
   candidate present in `alternatives`, `why_selected` distinct from every
   `why_not_default`, `overturn_when` naming a `fixtures/`, `blueprints/`,
-  `tests/` path or a runnable `python3`/`node` command). A file that fails
-  any rule is reported (catalog, layer id, lane, the failing rule) and
-  treated as absent for that layer -- this never aborts the run, but the
-  process exits 1 at the end if any lane file was rejected, in both
-  `--write` and `--check`.
+  `tests/` path or a runnable `python3`/`node` command, no property outside
+  `lane-return.schema.json` at any level, an https `challenger_preferred`
+  repository, and a `why_selected` that names at least one of its own
+  `winner_evidence_refs` paths). The packet file itself must hash to its
+  `SHA256SUMS` entry. A lane whose sealed text would still carry a leak
+  marker after sanitization is rejected the same way, and a malformed
+  adjudication file is reported (lane `adjudication`) instead of ignored.
+  A file that fails any rule is reported (catalog, layer id, lane, the
+  failing rule) and treated as absent for that layer -- this never aborts
+  the run, but the process exits 1 at the end if any lane file was rejected,
+  in both `--write` and `--check`.
+- **Sources read.** A lane records the absolute paths it opened. Before
+  sealing, each is rewritten to its longest suffix that names a file in this
+  repository (a trailing note is kept); paths outside the repository are
+  left for `sanitize_value` to redact.
+- **Winner never an alternative.** When a losing lane (or a lane's own list)
+  names a winner as an alternative, that entry is dropped from the recorded
+  row; if no indexed alternative remains, the row stays `pending_lanes` with
+  that gap, matching `scripts/landscape.py`'s recorded-verdict rule.
+- **Integrity.** `--check` also compares every recomputed sealed file with
+  the file on disk, and `scripts/landscape.py` verifies each
+  `lanes.<lane>.sealed_sha256` against the sealed file's bytes.
 - **Sealing.** Every accepted lane return is reserialized deterministically
   (`sort_keys=True, indent=1` + newline -- the same convention every
   generator here uses, subject to the same `build_manifest.py`

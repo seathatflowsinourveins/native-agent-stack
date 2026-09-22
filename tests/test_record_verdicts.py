@@ -8,8 +8,10 @@ consumes are built here directly (no network, no real catalogs, no
 dependency on the sibling lane_packets.py unit) matching the packet/
 lane-return shapes documented in the PR-5 lane contract.
 """
+import contextlib
 import hashlib
 import importlib.util
+import io
 import json
 import tempfile
 import unittest
@@ -114,9 +116,10 @@ def make_lane_return(lane, catalog, layer_id, packet_sha256, winner_keys, altern
         "packet_sha256": packet_sha256,
         "model": {"name": "test-model", "effort": "high"},
         "winner_keys": winner_keys,
-        "why_selected": long_text(f"{lane} selected this using native execution evidence for {layer_id}.", 60),
+        "why_selected": long_text(f"{lane} selected this using native execution evidence in receipt.json "
+                                  f"for {layer_id}.", 60),
         "winner_evidence_class": "native_proven",
-        "winner_evidence_refs": [],
+        "winner_evidence_refs": ["receipt.json"],
         "alternatives": alternatives,
         "challenger_preferred": None,
         "overturn_when": f"See tests/test_record_verdicts.py for {layer_id}.",
@@ -175,7 +178,9 @@ FOUNDATION_LAYERS = [
     "challenger-layer", "protocol-layer", "codex-only-layer",
     "rejection-winnerkey-layer", "rejection-altmissing-layer", "rejection-whyequal-layer",
     "rejection-overturn-layer", "rejection-nonhttps-layer", "rejection-challenger-layer",
-    "citation-layer",
+    "citation-layer", "review-adjudicated-layer", "review-badadj-layer", "review-sealed-layer",
+    "review-packet-layer", "review-nosum-layer", "review-leak-layer", "review-sources-layer",
+    "review-explorer-layer",
 ]
 US_EQUITIES_LAYERS = ["unindexed-alt-layer", "unindexed-pending-layer"]
 
@@ -724,7 +729,8 @@ class ValidateLaneReturnRuleTests(unittest.TestCase):
         # why_selected requires >= 60 chars on its own; pad both alt and
         # override text identically so the equality check is what fails,
         # not the separate minimum-length rule.
-        alt["why_not_default"] = long_text(alt["why_not_default"], 60)
+        # It also cites receipt.json so the separate "names a cited path" rule passes.
+        alt["why_not_default"] = long_text(alt["why_not_default"] + " See receipt.json.", 60)
         data = self.base_return(alternatives=[alt], why_selected=alt["why_not_default"])
         with self.assertRaises(record_verdicts.LaneRejected) as ctx:
             self.validate(data)
@@ -751,10 +757,6 @@ class ValidateLaneReturnRuleTests(unittest.TestCase):
         with self.assertRaises(record_verdicts.LaneRejected) as ctx:
             self.validate(data)
         self.assertIn("challenger_preferred required_comparison must name", str(ctx.exception))
-
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class CitationNormalizationTests(RecordVerdictsFixture):
@@ -796,3 +798,148 @@ class CitationNormalizationTests(RecordVerdictsFixture):
                              / f"{catalog}-{layer_id}-20260922.json").read_text(encoding="utf-8"))
         self.assertEqual(sealed["winner_evidence_refs"], citations)
         build_landscape(self.root)
+
+
+class ReviewFindingTests(RecordVerdictsFixture):
+    """Regression tests for the independent review of the PR-5 tooling."""
+
+    def recorded(self, layer_id, **lane_overrides):
+        c1, c2, digest = self.build_packet_pair("foundation", layer_id)
+        write_lane(self.work_dir, "claude", "foundation", layer_id,
+                   make_lane_return("claude", "foundation", layer_id, digest, ["c1"], [make_alternative(c2)],
+                                    **lane_overrides))
+        return c1, c2, digest
+
+    def sealed_path(self, lane, layer_id):
+        return (self.root / "evidence/artifacts/layer-verdicts-20260922" / lane
+                / f"foundation-{layer_id}-20260922.json")
+
+    def test_adjudicated_row_never_lists_its_winner_as_an_alternative(self):
+        layer_id = "review-adjudicated-layer"
+        c1, c2, digest = self.build_packet_pair("foundation", layer_id)
+        write_lane(self.work_dir, "claude", "foundation", layer_id,
+                   make_lane_return("claude", "foundation", layer_id, digest, ["c1"], [make_alternative(c2)]))
+        write_lane(self.work_dir, "codex", "foundation", layer_id,
+                   make_lane_return("codex", "foundation", layer_id, digest, ["c2"], [make_alternative(c1)]))
+        adjudications = self.work_dir / "adjudications"
+        adjudications.mkdir()
+        (adjudications / f"foundation__{layer_id}.json").write_text(json.dumps(
+            {"winner_lane": "claude", "why": "Claude cites the executed receipt.", "evidence_refs": ["receipt.json"]}),
+            encoding="utf-8")
+        self.assertEqual(self.run_main(write=True, adjudications=adjudications), 0)
+        row = self.load_row("foundation", layer_id)
+        self.assertEqual(row["verdict_status"], "recorded")
+        self.assertEqual([w["repository"] for w in row["winners"]], [c1["repository"]])
+        self.assertNotIn(c1["repository"], [a["repository"] for a in row["alternatives"]])
+        build_landscape(self.root)
+
+    def test_malformed_adjudication_is_reported_not_ignored(self):
+        layer_id = "review-badadj-layer"
+        c1, c2, digest = self.build_packet_pair("foundation", layer_id)
+        write_lane(self.work_dir, "claude", "foundation", layer_id,
+                   make_lane_return("claude", "foundation", layer_id, digest, ["c1"], [make_alternative(c2)]))
+        write_lane(self.work_dir, "codex", "foundation", layer_id,
+                   make_lane_return("codex", "foundation", layer_id, digest, ["c2"], [make_alternative(c1)]))
+        adjudications = self.work_dir / "adjudications"
+        adjudications.mkdir()
+        (adjudications / f"foundation__{layer_id}.json").write_text('{"winner_lane": "nobody"}', encoding="utf-8")
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.assertEqual(self.run_main(write=True, adjudications=adjudications), 1)
+        self.assertIn(f"foundation__{layer_id} [adjudication]", output.getvalue())
+        self.assertEqual(self.load_row("foundation", layer_id)["verdict_status"], "pending_lanes")
+
+    def test_check_detects_a_tampered_sealed_file_and_landscape_rejects_it(self):
+        layer_id = "review-sealed-layer"
+        self.recorded(layer_id)
+        self.assertEqual(self.run_main(write=True), 0)
+        self.assertEqual(self.run_main(write=False), 0)
+        sealed = self.sealed_path("claude", layer_id)
+        sealed.write_text(sealed.read_text(encoding="utf-8").replace("receipt.json", "receipt.jsonX", 1),
+                          encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main(write=False), 1)
+        with self.assertRaisesRegex(ValueError, "sealed_sha256 does not match"):
+            build_landscape(self.root)
+
+    def test_tampered_packet_file_rejects_the_lane(self):
+        layer_id = "review-packet-layer"
+        self.recorded(layer_id)
+        packet = self.work_dir / "packets" / f"foundation__{layer_id}.json"
+        packet.write_text(packet.read_text(encoding="utf-8") + " ", encoding="utf-8")
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.assertEqual(self.run_main(write=True), 1)
+        self.assertIn("does not match packets/SHA256SUMS", output.getvalue())
+
+    def test_missing_sha256sums_entry_rejects_the_lane(self):
+        layer_id = "review-nosum-layer"
+        self.recorded(layer_id)
+        sums = self.work_dir / "packets" / "SHA256SUMS"
+        sums.write_text("".join(line + "\n" for line in sums.read_text(encoding="utf-8").splitlines()
+                                if not line.endswith(f"foundation__{layer_id}.json")), encoding="utf-8")
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.assertEqual(self.run_main(write=True), 1)
+        self.assertIn(f"packets/SHA256SUMS has no entry for foundation__{layer_id}.json", output.getvalue())
+
+    def test_leak_marker_in_lane_prose_rejects_that_lane_without_aborting(self):
+        layer_id = "review-leak-layer"
+        self.recorded(layer_id, limits=["The APCA credential names were not read."])
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.assertEqual(self.run_main(write=True), 1)
+        self.assertIn("sealing refused", output.getvalue())
+        self.assertEqual(self.load_row("foundation", layer_id)["verdict_status"], "pending_lanes")
+
+    def test_sources_read_are_made_repository_relative_before_sealing(self):
+        layer_id = "review-sources-layer"
+        self.recorded(layer_id, sources_read=["/home/example/checkout/receipt.json (lines 1-2)",
+                                              "/home/example/.claude/skills/x/SKILL.md"])
+        self.assertEqual(self.run_main(write=True), 0)
+        sealed = json.loads(self.sealed_path("claude", layer_id).read_text(encoding="utf-8"))
+        self.assertEqual(sealed["sources_read"][0], "receipt.json (lines 1-2)")
+        self.assertNotIn("/home/", json.dumps(sealed))
+
+    def test_generated_explorer_citation_is_excluded(self):
+        layer_id = "review-explorer-layer"
+        (self.root / "docs/ecosystem").mkdir(parents=True, exist_ok=True)
+        (self.root / "docs/ecosystem/index.html").write_text("<html></html>", encoding="utf-8")
+        self.recorded(layer_id, winner_evidence_refs=["receipt.json", "docs/ecosystem/index.html#layers"])
+        self.assertEqual(self.run_main(write=True), 0)
+        row = self.load_row("foundation", layer_id)
+        self.assertEqual(row["winners"][0]["evidence_refs"], ["receipt.json"])
+        self.assertTrue(any("generated index" in gap for gap in row["open_gaps"]))
+
+
+class LaneSchemaRuleTests(unittest.TestCase):
+    # Reuse the rule-test fixture without re-running its inherited tests.
+    setUp = ValidateLaneReturnRuleTests.setUp
+    validate = ValidateLaneReturnRuleTests.validate
+    base_return = ValidateLaneReturnRuleTests.base_return
+
+    def test_extra_top_level_property_is_rejected(self):
+        with self.assertRaisesRegex(record_verdicts.LaneRejected, "outside the lane-return schema: surprise"):
+            self.validate(self.base_return(surprise=True))
+
+    def test_extra_alternative_property_is_rejected(self):
+        alt = make_alternative(self.c2)
+        alt["score"] = 9
+        with self.assertRaisesRegex(record_verdicts.LaneRejected, "alternative has properties outside"):
+            self.validate(self.base_return(alternatives=[alt]))
+
+    def test_non_https_challenger_repository_is_rejected(self):
+        data = self.base_return(challenger_preferred={
+            "key": None, "name": "Challenger", "repository": "example/challenger",
+            "why": "Might be better", "required_comparison": "python3 tests/test_x.py"})
+        with self.assertRaisesRegex(record_verdicts.LaneRejected, "challenger_preferred repository must be an https"):
+            self.validate(data)
+
+    def test_why_selected_must_name_a_cited_evidence_path(self):
+        data = self.base_return(why_selected="x" * 80)
+        with self.assertRaisesRegex(record_verdicts.LaneRejected, "why_selected must name at least one"):
+            self.validate(data)
+
+
+if __name__ == "__main__":
+    unittest.main()

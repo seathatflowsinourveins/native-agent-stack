@@ -224,7 +224,8 @@ def render_row_narrative(row: dict) -> str:
     since there is nothing yet to narrate beyond why it is still open."""
     if row["verdict_status"] != "recorded":
         gaps = "; ".join(row.get("open_gaps") or []) or "no lane has run"
-        return f"- **{row.get('title') or row['layer_id']}** ({row['layer_id']}): pending — {gaps}"
+        label = "no selection" if row["verdict_status"] == "no_selection" else "pending"
+        return f"- **{row.get('title') or row['layer_id']}** ({row['layer_id']}): {label} — {gaps}"
     lines = [f"#### {row.get('title') or row['layer_id']} ({row['layer_id']})", ""]
     lines.extend(render_winner_line(winner) for winner in row["winners"])
     lines.append("")
