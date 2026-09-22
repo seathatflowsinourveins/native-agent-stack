@@ -2660,7 +2660,8 @@
         "Haiku is not routed on one packet and one Opus verifier (Sonnet 14/14 lane rows, Haiku 9/14 with a misattributed quote).",
         "The review workflow's strict accepted status was never returned during the deployment; the gate was fix-and-commit after independent review.",
         "Local suites are stubbed or synthetic; only the native runs and the Prometheus deltas are provider evidence. Per-session scoping of the exported metric is unavailable by design (the collector keeps no session id on metrics), so observational deltas are host-wide time windows with concurrent activity declared.",
-        "Codex agent examples inherit model and effort and have no end-to-end run of their own."
+        "Codex agent examples inherit model and effort and have no end-to-end run of their own.",
+        "The project-only settings profile is not qualified: three provider errors and, with the coordinator model pinned, a permission-layer refusal of the Workflow tool; headless runs need a loaded settings source whose permission mode or allow rule covers the Workflow tool."
       ],
       "source_paths": [
         "docs/ultracode-token-routing-20260921.md",

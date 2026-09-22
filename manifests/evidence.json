@@ -6334,8 +6334,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 8093263,
-      "sha256": "4697c0905598f370a6c116789403ced4bf94c76792722bce9758ad33ac0fc5c8"
+      "bytes": 8096789,
+      "sha256": "3d45139ffe63294341f51ca0332d094636d64c53fda18a82026ca7a398515f71"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7339,8 +7339,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "bytes": 120741,
-      "sha256": "bc208d98b23f2e87287afc0462b889a61919a9ed37f8f74326a16a3b7e1ec29c"
+      "bytes": 121021,
+      "sha256": "ad76272df1497ecca2d78d08d3beca63fed4d8ebf484bff8262e0c49a28fc8bc"
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -9084,8 +9084,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "acd33e839c5f884e51641b13bb75ca809c29b40aec4756aabdade0c7cabbdce6",
-      "bytes": 11617
+      "sha256": "043195efd6686ada4be63138f6af8862a150a83794b6d2a11c8a18a5e42a45b6",
+      "bytes": 11661
     },
     {
       "path": "docs/native-ultracode-20260921.md",
@@ -9804,8 +9804,8 @@
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
-      "sha256": "b8a7b139cd24e1968d042814d7e1fe51de3a36908d6364edb120bae5463c80f4",
-      "bytes": 28479
+      "sha256": "bfe12bdb582ea15ab4ce704edab70b7c2bc2ce2cb872938469900871dae3e430",
+      "bytes": 31688
     },
     {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
@@ -10036,6 +10036,11 @@
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/codex-pr-review.json",
       "sha256": "6821eeae58c350ea3bc79dfb099c7ef7944c1a377ba330a97b821e411c6bb07d",
       "bytes": 5004
+    },
+    {
+      "path": "evidence/artifacts/portable-claude-native-qualification-20260921/claude-pr-review.json",
+      "sha256": "e412e3abc2d63867c8ba16f304bc4c7578c3ea0a196d7fc08590defbccd2592c",
+      "bytes": 9539
     }
   ],
   "convergence_records": [
