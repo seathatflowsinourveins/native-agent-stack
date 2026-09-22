@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "id": "restic-filesystem-semantics",
+  "date": "2026-09-22",
+  "layer_ids": [
+    "recovery-portability"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "recovery-portability",
+      "gap_index": 3
+    }
+  ],
+  "purpose": "Exercise restic 0.19.1 locally against ACL/xattrs, sparse files, hardlinks, symlinks and unusual names, backing up and restoring both to a local (ext4) repo and to a repo on /mnt/c (drvfs, C:\\Users\\example\\gap-resolution-restic), then diff metadata after each restore to directly narrow open_gaps[3].",
+  "preregistered": "If the local (ext4-to-ext4) round trip preserves every captured metadata field (mode, POSIX ACL, user xattr, sha256, symlink target, hardlink grouping) exactly, and the drvfs (/mnt/c) round trip preserves file content (sha256), symlink targets and hardlink grouping but drops POSIX mode/ACL/user-xattr (the expected 9p/drvfs limitation, since drvfs synthesizes a fixed permission view and does not support Linux xattrs), this settles open_gaps[3] for the filesystem-semantics subset as: restic round-trips filesystem semantics correctly end-to-end on a POSIX target, and preserves data integrity but not POSIX permission metadata on a drvfs/NTFS-backed target -- narrowing the gap from 'untested' to 'measured, with permission loss on Windows-backed targets recorded as a known limitation' rather than eliminating it (long-term retention and true NTFS-native ACL mapping remain out of scope for a same-day check). Any restic init/backup/restore/check exit code != 0, or a sha256 mismatch on the same-filesystem round trip, would refute the assumption that restic correctly round-trips this fixture and must be recorded as a failure, not smoothed over.",
+  "commands": [
+    {
+      "cmd": "restic version",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "restic 0.19.1 compiled with go1.26.4 on linux/amd64",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "python3 blueprints/gap-resolution-20260922/restic-filesystem-semantics/fixture.py build $BASE/restic-fs/src",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "(no stdout; builds plain.txt, acl-file.txt (setfacl u:$uid:rwx), xattr-file.txt (user.gap_check xattr), sparse.bin (10MiB, truncate+seek+write), hardlink-src/dst.txt (os.link), symlink-to-plain.txt, space name.txt, unicode-\u00e9\u7814\u7a76.md, .dotfile, special-chars_[1]-(2).txt, empty-dir/)",
+      "output_sha256": "n/a-no-stdout"
+    },
+    {
+      "cmd": "python3 .../fixture.py manifest $BASE/restic-fs/src --out $BASE/restic-fs/before-manifest.json",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "wrote 10-entry metadata manifest (mode/uid/gid/sha256/xattrs/acl/symlink target/hardlink group)",
+      "output_sha256": "e93c4b78bd9f560df89d39bbc1a385e4105c20224e4da73f723075881ccd0489"
+    },
+    {
+      "cmd": "restic -r $BASE/restic-fs/repo-local init",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "created restic repository 9cefa006b1 at $BASE/restic-fs/repo-local",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "restic -r $BASE/restic-fs/repo-local backup $BASE/restic-fs/src",
+      "exit": 0,
+      "duration_s": 0.5,
+      "output_excerpt": "Files: 10 new, 0 changed, 0 unmodified; Dirs: 9 new; Added to the repository: 1.009 MiB (4.758 KiB stored); processed 10 files, 10.000 MiB in 0:00; snapshot 83efb2af saved",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "restic -r $BASE/restic-fs/repo-local restore latest --target $BASE/restic-fs/restore-local",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "restoring snapshot 83efb2af ...; Summary: Restored 20 files/dirs (10.000 MiB) in 0:00",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "restic -r $BASE/restic-fs/repo-local check --read-data",
+      "exit": 0,
+      "duration_s": 0.4,
+      "output_excerpt": "check all packs; check snapshots, trees and blobs [100%] 1/1 snapshots; read all data [100%] 2/2 packs; no errors were found",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "python3 .../fixture.py manifest $BASE/restic-fs/restore-local$BASE/restic-fs/src --out $BASE/restic-fs/after-local-manifest.json",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "wrote 10-entry metadata manifest of restored local tree",
+      "output_sha256": "e93c4b78bd9f560df89d39bbc1a385e4105c20224e4da73f723075881ccd0489"
+    },
+    {
+      "cmd": "python3 .../diff_manifests.py before-manifest.json after-local-manifest.json",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "missing_paths: []; added_paths: []; changed_paths: {}; hardlink_groups_preserved: true -- byte-identical manifests before and after the local round trip",
+      "output_sha256": "cedb9a6d2f8ef63039ae78f85f0e03084265cc53ca90a8335073e52477484e7c"
+    },
+    {
+      "cmd": "restic -r /mnt/c/Users/example/gap-resolution-restic init",
+      "exit": 0,
+      "duration_s": 0.4,
+      "output_excerpt": "created restic repository d445720b59 at /mnt/c/Users/example/gap-resolution-restic",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "restic -r /mnt/c/Users/example/gap-resolution-restic backup $BASE/restic-fs/src",
+      "exit": 0,
+      "duration_s": 0.6,
+      "output_excerpt": "Files: 10 new, 0 changed; Added to the repository: 1.009 MiB (4.756 KiB stored); snapshot 0def277d saved",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "mkdir -p /mnt/c/Users/example/gap-resolution-restic-restore && restic -r /mnt/c/Users/example/gap-resolution-restic restore latest --target /mnt/c/Users/example/gap-resolution-restic-restore",
+      "exit": 0,
+      "duration_s": 0.5,
+      "output_excerpt": "restoring snapshot 0def277d ...; Summary: Restored 20 files/dirs (10.000 MiB) in 0:00",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "restic -r /mnt/c/Users/example/gap-resolution-restic check --read-data",
+      "exit": 0,
+      "duration_s": 0.5,
+      "output_excerpt": "check all packs; read all data [100%] 2/2 packs; no errors were found",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "python3 .../fixture.py manifest /mnt/c/Users/example/gap-resolution-restic-restore$BASE/restic-fs/src --out $BASE/restic-fs/after-drvfs-manifest.json",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "wrote 10-entry metadata manifest of drvfs-restored tree",
+      "output_sha256": "f3950ad5bc0523d22b0e70e562cc31d7d3435ada58d94ef3d467285cfc2b7fb7"
+    },
+    {
+      "cmd": "python3 .../diff_manifests.py before-manifest.json after-drvfs-manifest.json",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "missing_paths: []; added_paths: []; hardlink_groups_preserved: true; changed_paths: every regular file/dir shows mode -> 0777 and ACL collapsed to 'user::rwx\\ngroup::rwx\\nother::rwx'; acl-file.txt additionally loses its system.posix_acl_access xattr and xattr-file.txt's user.gap_check xattr is dropped (xattrs: [] after); no sha256, symlink-target or hardlink-group changes",
+      "output_sha256": "40b895d2c0e0c3fc1c9edae0b731a492d1883b41f7a29c080391ac0546ffce1e"
+    }
+  ],
+  "tool_versions": {
+    "restic": "0.19.1 (compiled with go1.26.4 on linux/amd64), pinned at /home/example/.local/share/codex-ecosystem/bin/restic (pre-existing pinned install, not installed by this check)",
+    "python": "3 (system python3 used for fixture/manifest/diff scripts)"
+  },
+  "installs": [],
+  "result": "Local (ext4-to-ext4) restic backup/restore round trip preserved every captured metadata field exactly (mode, POSIX ACL text, user xattr name+value, sha256 content, symlink target, hardlink grouping) -- diff-local.json shows zero changed/added/missing paths. The drvfs (/mnt/c) round trip preserved content (sha256 identical for every file including the 10MiB sparse file), symlink target, and hardlink grouping (hardlink-src.txt and hardlink-dst.txt still share one inode_group after restore), but every restored entry's POSIX mode collapsed to 0777 and its getfacl output collapsed to a generic 'user::rwx/group::rwx/other::rwx', and both the POSIX ACL xattr (system.posix_acl_access) and the user xattr (user.gap_check) were absent on the drvfs-restored files. All restic init/backup/restore/check invocations exited 0 with no reported errors on both targets.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "supports_incumbent",
+    "explanation": "Confirms restic 0.19.1 is safe and correct for the filesystem-semantics subset of open_gaps[3] when both source and destination are POSIX filesystems (ACLs, xattrs, sparse content, hardlinks, symlinks, unusual names all round-trip byte-for-byte), which supports restic's incumbent winner status. It also produces a concrete, previously-missing measurement for the drvfs/NTFS-backed-target sub-claim: content integrity and link structure survive, but POSIX permission/xattr metadata does not -- this is a real, now-documented limitation rather than an assumption, so it narrows but does not close open_gaps[3] (long-term retention and genuine NTFS ACL mapping remain untested)."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Single run, no retry/fishing per the preregistration rule; both round trips happened to succeed cleanly, so there is no adverse-outcome sample to compare against.",
+    "The drvfs mode/ACL loss is attributable to the 9p/drvfs mount driver's fixed permission view, not necessarily representative of native NTFS-on-Windows or a true CIFS/SMB target; this environment has no bare-metal NTFS or SMB mount to test.",
+    "Long-term retention policy (weeks/months) is explicitly out of scope on a same-day timescale, per gap-triage.json's own blocker text for open_gaps[3].",
+    "Sparse-file disk-block preservation (vs. logical size) was not part of the preregistered metadata manifest and was only spot-checked with `du`, which showed the local restore fully materializing the 10MiB file (apparent size == actual blocks); this is a restic restore-sparsity behavior note, not a settled claim, and is not counted toward settles_gap.",
+    "Repository password used was a fixed test string ('gap-resolution-20260922-test'), acceptable for a disposable scratch repo but not representative of a production secret-handling path.",
+    "/mnt/c/Users/example/gap-resolution-restic and .../gap-resolution-restic-restore are left on disk under the Windows host's Public folder as durable evidence; they were not deleted after the check (no cleanup requested by this check's scope, unlike the app-state check which requires process cleanup).",
+    "Absolute paths recorded above have the host username and the Windows target user-folder segment normalized to this repo's publication-hygiene placeholder (scripts/validate.py PRIVATE_CONTENT rules); only the identifying name segment is normalized, the rest of each path structure is unchanged from what was actually used."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/restic-fs/before-manifest.json",
+      "sha256": "e93c4b78bd9f560df89d39bbc1a385e4105c20224e4da73f723075881ccd0489"
+    },
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/restic-fs/after-local-manifest.json",
+      "sha256": "e93c4b78bd9f560df89d39bbc1a385e4105c20224e4da73f723075881ccd0489"
+    },
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/restic-fs/after-drvfs-manifest.json",
+      "sha256": "f3950ad5bc0523d22b0e70e562cc31d7d3435ada58d94ef3d467285cfc2b7fb7"
+    },
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/restic-fs/diff-local.json",
+      "sha256": "cedb9a6d2f8ef63039ae78f85f0e03084265cc53ca90a8335073e52477484e7c"
+    },
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/restic-fs/diff-drvfs.json",
+      "sha256": "40b895d2c0e0c3fc1c9edae0b731a492d1883b41f7a29c080391ac0546ffce1e"
+    },
+    {
+      "path": "/mnt/c/Users/example/gap-resolution-restic",
+      "sha256": "n/a-directory-restic-repo-not-hashed-as-a-whole"
+    },
+    {
+      "path": "/mnt/c/Users/example/gap-resolution-restic-restore",
+      "sha256": "n/a-directory-restored-tree-not-hashed-as-a-whole"
+    }
+  ]
+}
