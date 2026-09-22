@@ -12476,6 +12476,51 @@
       "path": "evidence/artifacts/gap-resolution-20260922/agents-models-workers/ai-memory-local-scope-reread.json",
       "sha256": "4e846bac96536d6da45ffff943060aa8b02576b01646ca6c526623db098130bb",
       "bytes": 13022
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/storage-compute/duckdb-regression.json",
+      "sha256": "921103e77ffa270a45de2a476278b241553c9f64df31fe11c9918c1be80f48ca",
+      "bytes": 4141
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/storage-compute/financial-data-offline-regression.json",
+      "sha256": "a7c54ad9db72c27da6b3b692f8cfe170666b434e22385f43d296220d86bab682",
+      "bytes": 3614
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/storage-compute/sec-edgar-acquisition-deferred.json",
+      "sha256": "93af09168d605643e671a8996eed18b54add249c4a654c081c96f73dfeaabe19",
+      "bytes": 3256
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/market-data-reference/xnys-multiyear-holiday-check.json",
+      "sha256": "d0b66826c0fbc761f29ce535c81c72a3f7fe4108efd4f69d82a28c13efa5a9ca",
+      "bytes": 6276
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/market-data-reference/xnys-multiyear-holiday-check.raw.json",
+      "sha256": "38924245988479b60c96237d8c0009c6b36d0c594a6dadb6486f4b7a832068a8",
+      "bytes": 10185
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/identity-provenance/sdk-env-baseline.json",
+      "sha256": "d3757f7caae105a71240839538aa0c397cc5ecb9579e0309ddc85b9bfb9e5405",
+      "bytes": 5182
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/identity-provenance/dvc-arm-restore-compare.json",
+      "sha256": "cf9b3c1c30fdeaa995bcb0071b6363022d514441e11f02a03ea80601f36cd54c",
+      "bytes": 13030
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/identity-provenance/delta-rs-header-run.json",
+      "sha256": "6fccd535270fe9db0bd4d9a111008fa641d3a9a73a2829962f7248cc0743e09d",
+      "bytes": 6466
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/xnys-multiyear-holiday-check/compute.py",
+      "sha256": "70a4b238208e125e48784f238b11ec490e80464d49cfc933572e72b19e239ab0",
+      "bytes": 4903
     }
   ],
   "convergence_records": [

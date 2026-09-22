@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "delta-rs-header-run",
+  "date": "2026-09-22",
+  "layer_ids": ["identity-provenance"],
+  "gap_refs": [{"layer_id": "identity-provenance", "gap_index": 6}],
+  "purpose": "Install deltalake==1.6.4 and pyarrow==25.0.1 into a new isolated venv (per the critic's correction: `uv pip install --python <venv>/bin/python`, not `uv venv --seed` + pip, which fails because a non-seeded uv venv has no pip) and run delta-rs's own catalogs/us-equities/data-research.json native_workflow write/read snippet verbatim, to move the data-delta-rs entry from source_review (header-lines-only) to executed evidence.",
+  "preregistered": "If the upstream snippet (write_deltalake then DeltaTable(...).version()/.to_pyarrow_table().num_rows) runs without error and reports version 0 and 1 row (matching the single write), that confirms the documented native_workflow is executable as written in a pinned, offline-after-install environment. A failure or a different row/version count would mean the catalog's native_workflow snippet is stale or the pinned versions are incompatible.",
+  "commands": [
+    {
+      "cmd": "uv venv --python /home/example/.local/share/codex-ecosystem/bin/python3.13 --no-python-downloads /home/example/.local/share/codex-ecosystem/tools/delta-rs-1.6.4-20260922",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "Creating virtual environment at: .../tools/delta-rs-1.6.4-20260922",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "uv pip install --python /home/example/.local/share/codex-ecosystem/tools/delta-rs-1.6.4-20260922/bin/python3.13 'deltalake==1.6.4' 'pyarrow==25.0.1'",
+      "exit": 0,
+      "duration_s": 1.658,
+      "output_excerpt": "Resolved 5 packages in 222ms\nDownloading deltalake (49.7MiB)\nInstalled 5 packages in 16ms\n + arro3-core==0.8.3\n + deltalake==1.6.4\n + deprecated==1.3.1\n + pyarrow==25.0.1\n + wrapt==2.4.1",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "/home/example/.local/share/codex-ecosystem/tools/delta-rs-1.6.4-20260922/bin/python3.13 - <<'PY'\nimport tempfile\nimport pyarrow as pa\nfrom deltalake import DeltaTable, write_deltalake\nwith tempfile.TemporaryDirectory() as directory:\n    write_deltalake(directory + '/events', pa.table({'instrument_id': [1], 'sequence': [1]}))\n    table = DeltaTable(directory + '/events')\n    print(table.version(), table.to_pyarrow_table().num_rows)\nPY",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "0 1",
+      "output_sha256": "a79122992d53d358e6bbbbb98883d64fa0c15df3bcb08ff7b65a0580870af424"
+    }
+  ],
+  "tool_versions": {
+    "uv": "0.12.17",
+    "python": "3.13.15",
+    "deltalake": "1.6.4",
+    "pyarrow": "25.0.1"
+  },
+  "installs": [
+    {"name": "deltalake", "version": "1.6.4", "prefix": "/home/example/.local/share/codex-ecosystem/tools/delta-rs-1.6.4-20260922", "source_url": "PyPI https://pypi.org/pypi/deltalake/1.6.4/json (per the catalog's own cited source)", "sha256": "not independently recorded here; version pin verified via `import deltalake; deltalake.__version__` == 1.6.4 post-install"},
+    {"name": "pyarrow", "version": "25.0.1", "prefix": "/home/example/.local/share/codex-ecosystem/tools/delta-rs-1.6.4-20260922", "source_url": "PyPI (uv default index)", "sha256": "not independently recorded here; version pin verified via `import pyarrow; pyarrow.__version__` == 25.0.1 post-install"}
+  ],
+  "result": "Both packages installed cleanly into a brand-new prefix (did not exist before this run). The upstream catalog's own native_workflow snippet (write_deltalake + DeltaTable read) ran without error and printed `0 1`: table version 0 (the single commit) and 1 row, exactly matching the single-row table written. The data-delta-rs entry's native_workflow is confirmed executable as documented, offline after install (no network call during the write/read itself).",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "not_applicable",
+    "explanation": "Moves data-delta-rs from evidence_level source_review (header lines only, 'Prospective and UNEXECUTED') to an executed local write/read of its own documented snippet. This is a single-row smoke test of a non-incumbent alternative, not a comparison against the incumbent: it does not run any DuckDB/Parquet or hash-manifest arm, and it does not measure delta-rs against the incumbent on any shared metric (throughput, byte-identical restore, availability-rejection, etc.), so direction is recorded as not_applicable rather than supports_incumbent -- confirming that an alternative candidate's own entrypoint executes does not, by itself, support or refute the currently selected stack. It only partially settles gap 6 (delta-rs 'was not evaluated beyond its header lines'): the documented entrypoint is now confirmed to execute as written, but delta-rs has still not been evaluated against the layer's actual requirement (exact reproducible snapshots, fail-closed availability rejection) or against any other candidate, so gap 6 is not closed, only partially addressed."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Single-row, single-write smoke test only, matching the catalog's own illustrative snippet; does not exercise versioned/append reads at scale, concurrent writers, vacuum/retention, or Delta protocol compatibility across engines (all named as limitations in the catalog entry itself).",
+    "Does not compare delta-rs against the incumbent DuckDB/Parquet arm on any metric (throughput, byte-identical restore, etc.); it only confirms the alternative's own documented workflow executes. This receipt was previously mis-recorded with settles_gap: true and direction: supports_incumbent, which overclaimed settlement for a non-comparative smoke test of a cataloged 'alternative' (not the current_choice); corrected here to settles_gap: \"partially\" and direction: \"not_applicable\".",
+    "The `preregistered` field above was written after these commands had already been run and their results (`0 1`) were known, so it is a post-hoc restatement of the expected outcome rather than a true blind prediction recorded before execution."
+  ],
+  "raw_artifacts": [
+    {"path": "/tmp/claude-1000/-home-seath-code-agent-lab/redacted-session-scratchpad/scratchpad/delta-rs-header-run.out", "sha256": "a79122992d53d358e6bbbbb98883d64fa0c15df3bcb08ff7b65a0580870af424"}
+  ]
+}
