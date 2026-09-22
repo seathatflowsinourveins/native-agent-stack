@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-22T07:48:54Z",
+  "kind": "native_cli_e2e",
+  "evidence_class": "synthetic",
+  "scope": "equities-broker-path-alerts",
+  "claim": "The rendered Prometheus rules, Prometheus scrape config, and Alertmanager config, including the new equities-broker-path alert group and adaptive-paper scrape job, pass the pinned promtool/amtool checks. No broker connection, credentials, or live paper trial were used; only a fixture ledger built from safety.Ledger's own serialisation.",
+  "components": {
+    "prometheus": "3.14.0",
+    "alertmanager": "0.34.1"
+  },
+  "version_commands": {
+    "promtool --version": "promtool, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610)",
+    "amtool --version": "amtool, version 0.34.1 (branch: HEAD, revision: 73c6bfe7393929211294c1954f30d8ed78e4d0ad)"
+  },
+  "render_command": "python3 observability/backends/configure.py --tools-root <tmp>/tools --config-root <tmp>/config --data-root <tmp>/data --unit-root <tmp>/unit",
+  "rendered_into": "temporary directory only; not a persistent installation prefix, not started as a service",
+  "rule_counts": {
+    "original_alert_count_at_base_commit_5cfed34": 8,
+    "final_alert_count_after_equities_broker_path_group": 13,
+    "new_alerts_added": 5,
+    "new_group": "equities-broker-path",
+    "new_alert_names": [
+      "EquitiesOrderStateDivergence",
+      "EquitiesReconciliationFailed",
+      "EquitiesRequestBudgetExhausted",
+      "EquitiesLedgerFrozen",
+      "EquitiesPaperMetricsMissing"
+    ]
+  },
+  "scrape_target_added": {
+    "job_name": "adaptive-paper",
+    "target": "127.0.0.1:18890",
+    "exporter": "blueprints/us-equities/adaptive-paper/metrics.py"
+  },
+  "alertmanager_route_added": {
+    "match": {
+      "scope": "equities-broker"
+    },
+    "receiver": "local-ntfy",
+    "note": "The default (unmatched) route already sends everything to local-ntfy; this sub-route makes the equities-broker scope explicit and independently testable rather than changing delivery."
+  },
+  "commands": [
+    {
+      "cmd": "promtool check rules <rendered>/ecosystem-prometheus-rules.yml",
+      "exit_code": 0,
+      "output_summary": "SUCCESS: 13 rules found"
+    },
+    {
+      "cmd": "promtool check config <rendered>/ecosystem-prometheus.yml",
+      "exit_code": 0,
+      "output_summary": "SUCCESS: 1 rule files found; SUCCESS: valid prometheus config file syntax; SUCCESS: 13 rules found"
+    },
+    {
+      "cmd": "amtool check-config <rendered>/ecosystem-alertmanager.yml",
+      "exit_code": 0,
+      "output_summary": "SUCCESS; global config, route, 0 inhibit rules, 1 receivers, 0 templates"
+    }
+  ],
+  "metrics_exporter_tests": {
+    "path": "tests/test_adaptive_paper_metrics.py",
+    "fixture_source": "safety.Ledger + safety.RiskLimits (real durable ledger writes), no hand-built SQLite rows",
+    "scenarios": [
+      "missing ledger/trial.json (always-on gauges still exported)",
+      "healthy active trial (paper_trial_active=1, full request budget)",
+      "diverged ledger via ledger.freeze(\"external_order_detected\") (paper_order_state_divergence_total=1, paper_ledger_frozen{reason=\"external_order_detected\"}=1)",
+      "frozen ledger via a risk-cap reason (paper_ledger_frozen set, divergence stays 0)",
+      "idempotent second freeze() call (divergence counter stays 1)",
+      "real loopback HTTP server serving /metrics on an ephemeral port",
+      "credentials-canary isolation: 0000-permission env file is never opened by render_metrics()"
+    ]
+  },
+  "limitations": [
+    "Synthetic fixture ledger only; no live NautilusTrader/Alpaca paper session, broker connection, or credentials were exercised in producing this receipt.",
+    "paper_reconciliation_last_success_timestamp_seconds and paper_request_budget_wait_exceeded_total are not exported by metrics.py because they are not durably recorded by the current safety.py/runner.py ledger schema; the corresponding clauses in EquitiesReconciliationFailed and EquitiesRequestBudgetExhausted are syntactically valid but currently dormant (see metrics.py module docstring for the exact gap).",
+    "paper_order_state_divergence_total only counts risk_halt events with reason=external_order_detected; runner.reconcile()'s position/cash/intent mismatches raise SafetyError without writing a ledger event and are not counted.",
+    "promtool/amtool were run against a temporary rendered config directory, not the operator's live $STACK_CONFIG_ROOT; no running Prometheus/Alertmanager instance evaluated these rules against real time-series data.",
+    "The alertmanager scope=equities-broker sub-route was checked with amtool check-config only; amtool's interactive route-matching simulation was not separately exercised in this receipt."
+  ]
+}

@@ -77,3 +77,53 @@ groups:
         annotations:
           summary: 'WSL root filesystem observations are missing'
           description: 'Missing data is unknown, not proof of available space.'
+  - name: equities-broker-path
+    rules:
+      - alert: EquitiesOrderStateDivergence
+        expr: 'increase(paper_order_state_divergence_total[5m]) > 0'
+        for: 1m
+        labels:
+          severity: critical
+          scope: equities-broker
+        annotations:
+          summary: 'Adaptive-paper ledger recorded a broker order-state divergence'
+          description: 'paper_order_state_divergence_total increased in the last 5 minutes: the durable ledger observed a broker order it never reserved (reason=external_order_detected). The runner freezes entries on this; treat as an unowned position/order until an explicit recovery run reconciles it.'
+      - alert: EquitiesReconciliationFailed
+        expr: |
+          paper_needs_attention == 1
+          or
+          ((time() - paper_reconciliation_last_success_timestamp_seconds) > 120 and paper_trial_active == 1)
+        for: 1m
+        labels:
+          severity: critical
+          scope: equities-broker
+        annotations:
+          summary: 'Adaptive-paper trial needs attention or has not reconciled recently'
+          description: 'Either the durable trial.json phase is needs_attention (the last bounded run did not end flat/clean), or an active trial has gone over 120 seconds since its last successful reconciliation. paper_reconciliation_last_success_timestamp_seconds is not currently exported by metrics.py (documented schema gap); this clause is dormant until that changes, so this alert currently fires from paper_needs_attention alone.'
+      - alert: EquitiesRequestBudgetExhausted
+        expr: 'paper_request_budget_remaining <= 0 or increase(paper_request_budget_wait_exceeded_total[5m]) > 0'
+        for: 2m
+        labels:
+          severity: warning
+          scope: equities-broker
+        annotations:
+          summary: 'Adaptive-paper Alpaca request budget is exhausted or waits are being denied'
+          description: 'The rolling one-minute request budget (paper_request_budget_remaining, by kind=rest|submit) reached zero, or paper_request_budget_wait_exceeded_total increased. paper_request_budget_wait_exceeded_total is not currently exported by metrics.py (documented schema gap: it is raised only in the runner process, not recorded in the ledger); this clause is dormant until that changes, so this alert currently fires from paper_request_budget_remaining alone.'
+      - alert: EquitiesLedgerFrozen
+        expr: 'max by (reason) (paper_ledger_frozen) == 1'
+        for: 1m
+        labels:
+          severity: critical
+          scope: equities-broker
+        annotations:
+          summary: 'Adaptive-paper ledger {{ $labels.reason }} is frozen'
+          description: 'The durable ledger persisted a halted_reason ({{ $labels.reason }}); safety.Ledger blocks new buy entries until an explicit recovery run or a fresh qualified next trial clears it. This does not stop confirmed owned exits.'
+      - alert: EquitiesPaperMetricsMissing
+        expr: 'absent(paper_trial_active)'
+        for: 2m
+        labels:
+          severity: warning
+          scope: equities-broker
+        annotations:
+          summary: 'Adaptive-paper metrics exporter is not being scraped'
+          description: 'paper_trial_active has been absent from Prometheus for two minutes: the read-only exporter (metrics.py, loopback 127.0.0.1:18890) is down, misconfigured, or cannot read its ledger path. Missing data is unknown state, not proof of no active trial.'

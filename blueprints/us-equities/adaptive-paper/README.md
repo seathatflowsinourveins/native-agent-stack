@@ -123,3 +123,40 @@ The old `example-hftish` submit/cancel loop doubles request use per attempt and
 does not close this native engine gap. Smart Router TWAP/VWAP paper acceptance
 does not simulate the algorithms, so neither is adopted into this paper lane.
 No new engine replacement is justified by repository popularity alone.
+
+## Broker-path metrics and alerts
+
+`metrics.py` is a separate, read-only Prometheus exporter for the durable
+ledger this lane already writes (`ledger.sqlite3`, plus the sibling
+`trial.json`). It never imports `safety.Ledger` (which opens the database for
+writes), never reads an env file or broker credentials, and never talks to
+Alpaca. It binds loopback-only and serves `/metrics`:
+
+```sh
+python metrics.py --ledger "$STATE_ROOT/<account-fingerprint>/adaptive/ledger.sqlite3"
+```
+
+`--port` overrides the default `18890`; the host is always `127.0.0.1`.
+`--trial-json` overrides the default sibling `trial.json` path if state is
+laid out differently. See the module docstring for the exact source of every
+metric and the two gaps documented below.
+
+Exported: `paper_trial_active`, `paper_needs_attention`,
+`paper_reconciliation_status{result}`, `paper_order_state_divergence_total`,
+`paper_ledger_frozen{reason}`, `paper_request_budget_remaining{kind}`, and
+`paper_request_budget_limit{kind}`. **Not exported** (not durably recorded by
+the current ledger/`trial.json` schema; see `metrics.py`'s module docstring
+for why, rather than inventing new `safety.py` fields to support them):
+`paper_reconciliation_last_success_timestamp_seconds` and
+`paper_request_budget_wait_exceeded_total`.
+
+The observability backend profile's Prometheus scrapes `127.0.0.1:18890` as
+job `adaptive-paper`, and its rules add the `equities-broker-path` alert
+group (`EquitiesOrderStateDivergence`, `EquitiesReconciliationFailed`,
+`EquitiesRequestBudgetExhausted`, `EquitiesLedgerFrozen`,
+`EquitiesPaperMetricsMissing`), routed to the existing local ntfy receiver by
+`scope: equities-broker`. See
+[`observability/backends/README.md`](../../../observability/backends/README.md#adaptive-paper-broker-path-alerts)
+and the templates under `observability/backends/templates/`. Run `metrics.py`
+as its own process alongside a trial; it is not started by `runner.py` and
+does not affect the trial's risk decisions or request budget.

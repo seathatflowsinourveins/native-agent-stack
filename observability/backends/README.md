@@ -195,3 +195,35 @@ the selected range; empty unreported-usage results remain â€œNo matching data.â€
 Two native root-filesystem rules bring the rule count to 8. Their configuration
 and live inputs were checked without inducing disk exhaustion. The original
 six backend restart checks retain their earlier scope.
+
+## Adaptive-paper broker-path alerts
+
+`ecosystem-prometheus.yml.example` adds scrape job `adaptive-paper` at
+`127.0.0.1:18890`, the loopback address of the separate, read-only
+[`blueprints/us-equities/adaptive-paper/metrics.py`](../../blueprints/us-equities/adaptive-paper/metrics.py#L1)
+exporter for that lane's durable ledger. That exporter is a distinct process
+from this profile; it is not installed or started by `install.py`/`configure.py`
+and must be run explicitly alongside a paper trial.
+
+`ecosystem-prometheus-rules.yml.example` adds an `equities-broker-path` group
+(bringing the rendered total from 8 to 13 rules): `EquitiesOrderStateDivergence`,
+`EquitiesReconciliationFailed`, `EquitiesRequestBudgetExhausted`,
+`EquitiesLedgerFrozen`, and `EquitiesPaperMetricsMissing`, each labelled
+`scope: equities-broker`. `ecosystem-alertmanager.yml.example` adds an explicit
+`routes:` entry matching `scope: equities-broker` to the same `local-ntfy`
+receiver the default route already used, so equities-broker alerts are
+independently identifiable rather than depending on the unmatched default.
+
+[`broker-path-rules-receipt.json`](broker-path-rules-receipt.json) records the
+`promtool check rules`/`promtool check config`/`amtool check-config` runs
+against these templates rendered into a temporary directory by this profile's
+own `configure.py`, plus the fixture-ledger scenarios `tests/test_adaptive_paper_metrics.py`
+exercises. `evidence_class: synthetic` there: only a fixture ledger built from
+`safety.Ledger`'s own serialisation was used, never a live broker connection
+or credentials. `paper_reconciliation_last_success_timestamp_seconds` and
+`paper_request_budget_wait_exceeded_total` are not exported by `metrics.py` --
+see its module docstring for the exact schema gap -- so the corresponding
+`or` clauses in `EquitiesReconciliationFailed` and
+`EquitiesRequestBudgetExhausted` are syntactically valid but currently
+dormant; each alert still fires from its other clause
+(`paper_needs_attention` / `paper_request_budget_remaining`).
