@@ -5174,7 +5174,7 @@
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
       "bytes": 474399,
-      "sha256": "4ef9fcf4a9e864437a3fdc972ea67e5ac349f269044d31639ee0c6631f58fa48"
+      "sha256": "f05e0e1a994154ac49dba0c68d84772ec510704b012faadfb7e68fa633bc1db4"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -6468,13 +6468,13 @@
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
-      "sha256": "9c5bc46b3d058147c39d5d1a3ddfc44c4f9eb8a497c8e6d80bfeeff5eb0e77b5",
-      "bytes": 97980
+      "sha256": "9cea93b56e5011d50f4519efc9c9cb73353dc20752e70930491f52a4ae8f264f",
+      "bytes": 98096
     },
     {
       "path": "catalogs/us-equities/agents-operations.md",
-      "sha256": "0ee118e8db1c211141655af45ae832491b91dd374300f240cb0d1e459e43f841",
-      "bytes": 26837
+      "sha256": "b2b4ce8f86959c37d051bc69c28f21a88c67aab9f9938bbc51a4431b15a2d9ab",
+      "bytes": 26982
     },
     {
       "path": "catalogs/us-equities/architecture/README.md",
@@ -6578,8 +6578,8 @@
     },
     {
       "path": "catalogs/us-equities/coverage.json",
-      "sha256": "8ea11d0f58d809f8358a68057b69eb28c71f58ab97a88fe6a7b4e1b522a6954f",
-      "bytes": 82420
+      "sha256": "95aba0ec682fd0f51da6f8dce30d8f8893cccf9b4d871e0b18014ac4abb0c990",
+      "bytes": 82627
     },
     {
       "path": "catalogs/us-equities/data-evaluation-followup.json",
@@ -6613,13 +6613,13 @@
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
-      "bytes": 104711,
-      "sha256": "0d05d1fb99e62dbc95c54a331e504392b9448d7c6c529f44f41b97479f75a1aa"
+      "bytes": 104885,
+      "sha256": "e1ff4a6ead11ca6b14626d5c5cf8bac336644278e4db82df8457bed61b27ef55"
     },
     {
       "path": "catalogs/us-equities/engines-strategies.md",
-      "bytes": 24636,
-      "sha256": "a04a3299fc91e46203c9c3fb9c06ad235253340a8f1945c0b0f95bee7c56c3f0"
+      "bytes": 24698,
+      "sha256": "e1d6c94450ea0d8eb49f6cc1208c302148666ae6f34bfd7f1b326c6bc4faa53b"
     },
     {
       "path": "catalogs/us-equities/foundation-memory.json",
@@ -6653,7 +6653,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "43086c77397f4bab96adff5f06c3394ce210c415fb44399188ee3708902b9051",
+      "sha256": "7013a99dee5f6f2916eef03cc60c2fd96ad268885f073d5394e126b833083cc4",
       "bytes": 3112
     },
     {
@@ -6728,8 +6728,8 @@
     },
     {
       "path": "catalogs/us-equities/star-audit.json",
-      "sha256": "bb07a94277ba72dc493801b3bfbf6a7974f30f29c650dde138e6df12a56ef1a1",
-      "bytes": 561633
+      "sha256": "5995022fb7f53e8bc10e1069a1ce5f9e1fff859dcdfd69f165c89300742c4e5f",
+      "bytes": 561666
     },
     {
       "path": "catalogs/us-equities/star-audit.md",
@@ -10738,8 +10738,8 @@
     },
     {
       "path": "tools/sota-convergence/reconciliations-20260922.json",
-      "bytes": 6720,
-      "sha256": "89f2a84d07fa8be6f3cd9a20c21bf0a4b5267d127aded473c69e0c10ae137083"
+      "bytes": 6739,
+      "sha256": "aae498c62af1a83267d0f6a9159b34f9909202d8984b55c051fb0377d8061ecf"
     },
     {
       "path": "tests/test_sota_convergence.py",

@@ -466,10 +466,10 @@ class Pr4CardsReconciliationTests(unittest.TestCase):
         self.assertIn("2.0.0rc5", nautilustrader["version_or_commit"])
         self.assertEqual(nautilustrader.get("source_commit"), "1b0a49d2792a9432a3aca3fcb617ce7a630d905e")
         joined_limitations = " ".join(nautilustrader["limitations"])
-        self.assertIn("25 pass / 4 fail", joined_limitations)
-        self.assertIn("market_on_open_proxy", joined_limitations)
-        self.assertIn("distributions_and_cash", joined_limitations)
+        self.assertIn("planned_not_executed", joined_limitations)
+        self.assertIn("no pass/fail counts", joined_limitations.lower())
         self.assertIn("parity worktree", joined_limitations)
+        self.assertNotIn("25 pass / 4 fail", joined_limitations)
 
         lean = self.entry(data, "lean")
         self.assertEqual(lean["decision"], "default")
@@ -506,6 +506,64 @@ class Pr4CardsReconciliationTests(unittest.TestCase):
         self.assertTrue(any("2026-09-22 scan receipt" in item for item in grype["limitations"]))
         openbao = self.entry(data, "openbao")
         self.assertTrue(any("selected live-primary, unaccepted" in item for item in openbao["limitations"]))
+        # Regression (fix round pr4-cards): "live-primary" is this catalog's own
+        # designation, not something runtime-target.json declares. Any mention
+        # of runtime-target.json alongside "live-primary" must say what the
+        # file actually records instead of implying it names IBKR live-primary.
+        for item in openbao["limitations"]:
+            if "live-primary" in item and "runtime-target.json" in item:
+                self.assertIn("not a 'live-primary' designation", item)
+
+    def test_ibkr_live_primary_claim_does_not_misattribute_runtime_target(self):
+        # Regression (fix round pr4-cards): runtime-target.json broker_boundaries
+        # only records selected_path/local_broker_acceptance for IBKR; it never
+        # uses the phrase "live-primary". Any card text combining both terms
+        # must say so explicitly rather than implying runtime-target.json makes
+        # that designation.
+        runtime_target = self.load(f"{BASE}/runtime-target.json")
+        self.assertNotIn("live-primary", json.dumps(runtime_target))
+        data = self.load(f"{BASE}/engines-strategies.json")
+        ibkr = self.entry(data, "nautilus-ibkr-adapter")
+        if "live-primary" in ibkr["rationale"] and "runtime-target.json" in ibkr["rationale"]:
+            self.assertIn("not a 'live-primary' designation", ibkr["rationale"])
+
+    def test_nautilus_repository_cards_are_reflected_in_coverage_and_star_audit(self):
+        # Regression (fix round pr4-cards): the coverage/star-audit records for
+        # nautechsystems/nautilus_trader must list every catalog card id sharing
+        # that repository (nautilustrader and nautilus-ibkr-adapter), and the new
+        # adaptive-paper-alpaca-adapter repository must appear in coverage.
+        coverage = self.load(f"{BASE}/coverage.json")
+        star_audit = self.load(f"{BASE}/star-audit.json")
+        nautilus_star = next(
+            s for s in coverage["stars"]
+            if s["repository"] == "https://github.com/nautechsystems/nautilus_trader"
+        )
+        self.assertEqual(
+            set(nautilus_star["catalog_entry_ids"]),
+            {"nautilustrader", "nautilus-ibkr-adapter"},
+        )
+        nautilus_audit_entry = next(
+            e for e in star_audit["entries"]
+            if e["repository"] == "https://github.com/nautechsystems/nautilus_trader"
+        )
+        self.assertEqual(
+            set(nautilus_audit_entry["catalog_entry_ids"]),
+            {"nautilustrader", "nautilus-ibkr-adapter"},
+        )
+        alpaca_adapter_repos = {
+            entry["repository"]
+            for entry in coverage.get("stars", []) + coverage.get("beyond_stars", [])
+            if "adaptive-paper-alpaca-adapter" in entry.get("catalog_entry_ids", [])
+        }
+        self.assertEqual(
+            alpaca_adapter_repos,
+            {"https://github.com/seathatflowsinourveins/native-agent-stack"},
+        )
+        manifest = self.load(f"{BASE}/manifest.json")
+        self.assertEqual(
+            manifest["counts"]["beyond_star_catalog_repositories"],
+            len(coverage["beyond_stars"]),
+        )
 
     def test_manifest_repository_entry_counts_match_recomputation(self):
         manifest = self.load(f"{BASE}/manifest.json")

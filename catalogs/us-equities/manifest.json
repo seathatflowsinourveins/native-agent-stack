@@ -15,7 +15,7 @@
     "models": 20,
     "public_stars": 342,
     "starred_catalog_repositories": 42,
-    "beyond_star_catalog_repositories": 105
+    "beyond_star_catalog_repositories": 106
   },
   "scope": "Decisions and source review are not installation or E2E. native_proven is bounded by referenced receipts; defaults can still require implementation.",
   "evidence_files": [

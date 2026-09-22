@@ -8714,7 +8714,8 @@
         "https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/README.md"
       ],
       "catalog_entry_ids": [
-        "nautilustrader"
+        "nautilustrader",
+        "nautilus-ibkr-adapter"
       ],
       "reviewed_files": [],
       "archived": false,

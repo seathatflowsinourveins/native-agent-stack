@@ -187,7 +187,7 @@
       ],
       "limitations": [
         "Prerelease: 2.0.0 final has not shipped; GitHub's latest non-prerelease is still v1.231.0.",
-        "SPY/LEAN parity gate G-a is BLOCKED: 25 pass / 4 fail, confined to the unsupported market_on_open_proxy and distributions_and_cash mappings.",
+        "SPY/LEAN parity gate G-a (retained-equity-replay) is planned_not_executed per runtime-target.json next_acceptance; no pass/fail counts are recorded by any retained receipt.",
         "The dividend SimulationModule needed to close the parity gate is owned by the separate parity worktree, not this card.",
         "No local simulation, broker session or latency benchmark beyond the synthetic FX quickstart and the September21 AAPL diagnostic was performed.",
         "Event semantics shared by backtest/live still require a calibrated data/fill model and recovery tests."
@@ -1673,7 +1673,7 @@
       ],
       "role": "Native Interactive Brokers socket adapter for the selected destination runtime",
       "decision": "default",
-      "rationale": "Reuse the in-tree IBKR adapter shipped at the same selected engine pin rather than a community client; IBKR is the selected live-primary broker path in runtime-target.json.",
+      "rationale": "Reuse the in-tree IBKR adapter shipped at the same selected engine pin rather than a community client; IBKR is this catalog's selected live-primary broker path. runtime-target.json broker_boundaries records only selected_path and local_broker_acceptance: not_established for IBKR, not a 'live-primary' designation.",
       "version_or_commit": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
       "release_date": "2026-09-15T06:17:23Z",
       "source_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",

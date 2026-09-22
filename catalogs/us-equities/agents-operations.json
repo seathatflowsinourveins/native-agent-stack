@@ -1590,7 +1590,7 @@
         "Server config is not supplied and no service starts in this task.",
         "Development mode is unsuitable for persistent secrets; no dev-mode recipe offered.",
         "Secret management does not reduce a token’s authority by itself.",
-        "IBKR is the selected live-primary broker path (runtime-target.json broker_boundaries); its credential handling here remains selected live-primary, unaccepted."
+        "IBKR is this catalog's selected live-primary broker path; runtime-target.json broker_boundaries records only selected_path and local_broker_acceptance: not_established, not a 'live-primary' designation. Its credential handling here remains selected live-primary, unaccepted."
       ],
       "sources": [
         "https://github.com/openbao/openbao",

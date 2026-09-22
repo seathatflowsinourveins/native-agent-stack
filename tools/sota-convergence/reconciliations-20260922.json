@@ -32,7 +32,7 @@
    "repository": "https://github.com/nautechsystems/nautilus_trader",
    "pin": "2.0.0rc5 (tag v2.0.0rc5, source 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
    "source": "catalogs/us-equities/engines-strategies.json#/entries (id nautilustrader)",
-   "note": "Closes the gap the first entry recorded: engines-strategies.json now sets nautilustrader=default at 2.0.0rc5 with role 'selected destination runtime (runtime-target.json)'. lean stays default with role reframed to 'frozen historical comparator (oracle), not the runtime'. SPY/LEAN parity gate G-a remains BLOCKED (25 pass / 4 fail, confined to the unsupported market_on_open_proxy and distributions_and_cash mappings); the dividend SimulationModule needed to close it is owned by the separate parity worktree, not this card."
+   "note": "Closes the gap the first entry recorded: engines-strategies.json now sets nautilustrader=default at 2.0.0rc5 with role 'selected destination runtime (runtime-target.json)'. lean stays default with role reframed to 'frozen historical comparator (oracle), not the runtime'. SPY/LEAN parity gate G-a (retained-equity-replay) remains planned_not_executed per runtime-target.json next_acceptance; no retained receipt records pass/fail counts. The dividend SimulationModule needed to close it is owned by the separate parity worktree, not this card."
   },
   {
    "layer": "execution-broker",
