@@ -1,0 +1,27 @@
+{
+ "counterbalanced_refuting_votes": 0,
+ "differing_components": [
+  {
+   "belongs_in_winner_set": true,
+   "component": "c8 TypeSafe semantic skill",
+   "why": "native-practice.json lines 32-69 record a pinned, hash-matched skill installed with the recorded method. Claude discovered it, Codex loaded it, and a bounded provider run returned 0 service errors and 7/8 labels (typesafe-result.json lines 7-8). Activation is scoped to the task (line 49). Its evidence is at least as strong as the shared winner c3's security skill, which is discovery only (line 152)."
+  },
+  {
+   "belongs_in_winner_set": false,
+   "component": "c9 Agent Skills reference tools",
+   "why": "native-practice.json lines 216-227 record no SKILL.md to install, and validation that does not establish discovery or extension support. decisions.json lines 296-316 scope it to validating one portable skill. It checks the winners' format (native-receipt.json lines 29-38) but supplies no task procedures. foundation-closure line 53 names it in the layer row, which makes it a supporting tool rather than a better procedure source."
+  }
+ ],
+ "evidence_refs": [
+  "blueprints/native-skill-practice/native-receipt.json",
+  "blueprints/native-skill-practice/typesafe-result.json",
+  "catalogs/foundation/decisions.json",
+  "catalogs/landscape/native-practice.json",
+  "docs/foundation-closure-20260921.md"
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high); lane identities scrubbed from the returns; workflow wf_3e94965e-141; confirmed by a counterbalanced re-judge with A and B swapped (wf_53dd768b-bff), same lane chosen",
+ "refuting_votes": 0,
+ "votes": 2,
+ "why": "A and B share c4 (ECC) and c3 (OpenAI skills). They differ only in that A picks c9 (skills-ref) and B picks c8 (TypeSafe). The requirement asks for useful upstream procedures delivered per task.\n\nc8 has the stronger retained evidence as an on-demand procedure:\n- catalogs/landscape/native-practice.json lines 32-36 pin it at 65a39f39 with a SKILL.md sha256. It was installed with the recorded npx skills commands at lines 21-27, and all hashes matched.\n- Its activation is limited to semantic-judgment tasks (line 49).\n- Claude's initialization listed it, and the corrected Codex run completed eight cases (lines 60-61).\n- blueprints/native-skill-practice/typesafe-result.json records service_errors 0 and promptfoo_exit_code 100. Line 53 of native-practice.json records 7/8 frozen labels against 3/8 for weak literal containment.\n\nThat is more evidence than the shared winner c3's security-best-practices has, which is installed_discovery_only (native-practice.json line 152). A excludes c8 because it lacks a general task-improvement result. c3 and c4 lack one as well, so A applies an inconsistent standard.\n\nc9 is a format validator, not a source of procedures:\n- native-practice.json lines 216-227 say its repository has \"no SKILL.md additions to install\", with decision retain_existing_reference. The same record says reference validation \"does not establish Claude/Codex extension support or native discovery\".\n- catalogs/foundation/decisions.json lines 296-316 limit it to accepted_within_scope for validating one portable skill.\n- blueprints/native-skill-practice/native-receipt.json lines 29-38 show skills-ref exited 0 on the three installed skills. That supports the winners without delivering procedures itself.\n\ndocs/foundation-closure-20260921.md line 53 does name Agent Skills in this layer's row. B lists c9 as a conditional supporting tool and discloses that record conflict. Neither return makes a claim the evidence contradicts.",
+ "winner_lane": "claude"
+}

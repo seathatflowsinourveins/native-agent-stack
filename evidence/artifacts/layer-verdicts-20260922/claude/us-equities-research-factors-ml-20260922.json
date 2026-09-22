@@ -2,15 +2,27 @@
  "alternatives": [
   {
    "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-cli-gaps.json",
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/desktop-cli-workflows.json"
+   ],
+   "key": "c1",
+   "name": "foundation-qmd",
+   "repository": "https://github.com/tobi/qmd",
+   "why_not_default": "Native Claude workflow ran a BM25 search over agent-lab docs (native-cli-gaps.json: result docs/native-rag-runtime.md, score 0.86, BM25 mode). It covers retrieval of project documents only: there is no financial corpus and the semantic models are not downloaded. component-history.json still records native_claude as 'not independently demonstrated' for qmd, which is a dated inconsistency with native-cli-gaps.json."
+  },
+  {
+   "disposition": "unqualified",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "https://github.com/scikit-learn/scikit-learn/blob/1.9.1/README.rst",
-    "blueprints/us-equities/research-evaluation/receipt.json"
+    "https://github.com/man-group/ArcticDB/blob/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md"
    ],
-   "key": "c22",
-   "name": "scikit-learn",
-   "repository": "https://github.com/scikit-learn/scikit-learn",
-   "why_not_default": "The packet evidence is only the upstream README at 1.9.1, which I did not open. The research-evaluation receipt shows scikit-learn 1.9.1 installed as a locked dependency of the native skfolio run. No scikit-learn baseline model or TimeSeriesSplit was exercised on its own. It should be retained as the foundation skfolio builds on, but it is not established as a separate winner."
+   "key": "c2",
+   "name": "data-arcticdb",
+   "repository": "https://github.com/man-group/ArcticDB",
+   "why_not_default": "Corrected from out_of_scope. The packet also tags data-research entries into this layer (packet limitations line 827), so a storage component is not excluded on scope alone. The evidence is a source-review README only, which this lane could not open, and no research-scope execution was retained. The BSL-1.1 licence caveat remains, as does the gap between storage version time and information-availability time."
   },
   {
    "disposition": "unqualified",
@@ -21,7 +33,7 @@
    "key": "c3",
    "name": "data-sktime",
    "repository": "https://github.com/sktime/sktime",
-   "why_not_default": "It overlaps with skfolio on temporal splits and evaluation. The only evidence is an upstream README, which I did not open, and there is no native run on the frozen research-evaluation plan."
+   "why_not_default": "Its temporal splits and baselines overlap the natively executed skfolio WalkForward. The only evidence is a source-review README, which this lane did not open, and no execution was retained."
   },
   {
    "disposition": "unqualified",
@@ -32,73 +44,7 @@
    "key": "c4",
    "name": "alphalens-reloaded",
    "repository": "https://github.com/stefan-jansen/alphalens-reloaded",
-   "why_not_default": "It is the closest role match for cross-sectional factor IC and turnover, but the evidence is source review only. The packet card says the prospective workflow is unexecuted. The PyPI 0.4.6 pin differs from the GitHub 0.4.5 latest tag, and IC excludes all costs."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/microsoft/qlib/blob/v0.9.7/README.md"
-   ],
-   "key": "c24",
-   "name": "Qlib",
-   "repository": "https://github.com/microsoft/qlib",
-   "why_not_default": "The evidence is source review only. The bundled workflow targets CSI300 with China-style costs and limits, and US compatibility is not proven. The upstream data download is unverified, and the prospective workflow is unexecuted."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/statsmodels/statsmodels/blob/v0.15.0/README.md"
-   ],
-   "key": "c20",
-   "name": "statsmodels",
-   "repository": "https://github.com/statsmodels/statsmodels",
-   "why_not_default": "The evidence is source review only, and the prospective workflow is unexecuted. Statistical significance does not establish economic profitability."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/bashtage/arch/blob/v8.0.0/README.md"
-   ],
-   "key": "c15",
-   "name": "arch",
-   "repository": "https://github.com/bashtage/arch",
-   "why_not_default": "It adds volatility, bootstrap, SPA and MCS tools, but the evidence is source review only and the workflow is unexecuted. The license label is ambiguous (NCSA vs Other)."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/blue-yonder/tsfresh/blob/6aa24fdef7e3c3f48b19482535693f5796f2b598/README.md"
-   ],
-   "key": "c6",
-   "name": "data-tsfresh",
-   "repository": "https://github.com/blue-yonder/tsfresh",
-   "why_not_default": "The evidence is source review only. Feature searches carry leakage and multiple-testing risk, and no fold-local run was observed."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md"
-   ],
-   "key": "c10",
-   "name": "data-river",
-   "repository": "https://github.com/online-ml/river",
-   "why_not_default": "The evidence is source review only. The card notes that progressive validation with immediate labels is invalid for delayed financial outcomes, and no run was observed."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/Nixtla/statsforecast/blob/264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc/README.md"
-   ],
-   "key": "c12",
-   "name": "data-statsforecast",
-   "repository": "https://github.com/Nixtla/statsforecast",
-   "why_not_default": "The evidence is source review only. The bundled airline data is a method demo, and no financial forecast was evaluated."
+   "why_not_default": "It is the most directly on-scope factor IC and turnover diagnostic, but its prospective workflow is unexecuted. The evidence is a source-review README only, not opened here. PyPI (0.4.6) and GitHub (0.4.5) versions differ, and IC omits borrow and execution costs."
   },
   {
    "disposition": "unqualified",
@@ -109,41 +55,18 @@
    "key": "c5",
    "name": "chronos",
    "repository": "https://github.com/amazon-science/chronos-forecasting",
-   "why_not_default": "The evidence is source review only. The card records that no inference or GPU compatibility check was performed, and generic benchmarks do not establish US-equity alpha."
+   "why_not_default": "No inference, GPU or hosted check was performed; the evidence is a source-review README only. Generic forecasting benchmarks do not establish US-equity alpha."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "https://github.com/google-research/timesfm/blob/v3.0.0/README.md"
+    "https://github.com/blue-yonder/tsfresh/blob/6aa24fdef7e3c3f48b19482535693f5796f2b598/README.md"
    ],
-   "key": "c18",
-   "name": "timesfm",
-   "repository": "https://github.com/google-research/timesfm",
-   "why_not_default": "The evidence is source review only. The 3.0 weights carry a non-commercial license, and the card describes only a synthetic API example with no finance evaluation."
-  },
-  {
-   "disposition": "out_of_scope",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "https://github.com/man-group/ArcticDB/blob/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md"
-   ],
-   "key": "c2",
-   "name": "data-arcticdb",
-   "repository": "https://github.com/man-group/ArcticDB",
-   "why_not_default": "It is versioned dataframe storage. None of the packet's layer_scope_terms (packet lines 777-819) names storage, so it is a data-layer dependency rather than a factor, ML, research or document method. The evidence is source review only, and it carries BSL-1.1 licensing restrictions."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/catalyst-provenance/receipt.json",
-    "blueprints/us-equities/catalyst-provenance/access-resolution.json"
-   ],
-   "key": "c11",
-   "name": "data-edgartools",
-   "repository": "https://github.com/dgunning/edgartools",
-   "why_not_default": "Its native-proven SEC filing acquisition fits the layer's document-research scope term as an input. access-resolution.json (native_cli_e2e) records 371 index entries (360 unique accessions) and five headers rejected at the historical cutoff, and receipt.json records an earlier SEC 403. It supports causal-data provenance for catalyst research but performs no factor or model evaluation and does not meet the cost-aware chronological validation leg."
+   "key": "c6",
+   "name": "data-tsfresh",
+   "repository": "https://github.com/blue-yonder/tsfresh",
+   "why_not_default": "Feature extraction has source-review evidence only and no fold-local execution. No retained run addresses its leakage or multiple-testing risk."
   },
   {
    "disposition": "conditional",
@@ -155,32 +78,7 @@
    "key": "c7",
    "name": "deerflow",
    "repository": "https://github.com/bytedance/deer-flow",
-   "why_not_default": "It is an optional research-orchestration host, which is in the layer's scope terms. research-receipt.json (native_model_e2e) shows one embedded ACP evidence-review task completed with correct counts. There is no planner, UI or persistent service, and ACP 'read-only' maps to workspaceWrite. It hosts research but performs no factor or ML evaluation."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "evidence/receipts/native-cli-gaps.json",
-    "evidence/receipts/desktop-cli-workflows.json",
-    "evidence/receipts/component-history.json"
-   ],
-   "key": "c1",
-   "name": "foundation-qmd",
-   "repository": "https://github.com/tobi/qmd",
-   "why_not_default": "It is in scope under the document-retrieval scope term. native-cli-gaps.json shows the Claude qmd workflow passed (BM25, score 0.86), while the Codex attempt was quota-blocked and not exercised. That proves Markdown document retrieval for research notes, but it performs no causal or cost-aware factor or model evaluation, so it supports the research workflow rather than qualifying a strategy."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "evidence/receipts/component-history.json",
-    "evidence/receipts/portable-cli-artifacts.json"
-   ],
-   "key": "c19",
-   "name": "foundation-markitdown",
-   "repository": "https://github.com/microsoft/markitdown",
-   "why_not_default": "It is in scope under the document-ingestion scope term. portable-cli-artifacts.json shows only a local HTML conversion (markitdown_contains_heading true), and the PDF and Office extras are unproven. It performs no factor or model evaluation."
+   "why_not_default": "Native discovery returned health 200 with 23 upstream skills and 0 configured models, and one embedded ACP prompt completed (research-receipt.json: status completed, native_turn_duration_ms 31027). That prompt only read two receipts and returned counts; no factor or ML work was done. The planner, UI and service were not accepted, and ACP read-only mode maps to workspaceWrite."
   },
   {
    "disposition": "conditional",
@@ -192,7 +90,7 @@
    "key": "c8",
    "name": "vllm",
    "repository": "https://github.com/vllm-project/vllm",
-   "why_not_default": "It is in scope under the model-serving scope term. vllm-compatibility.json (kind compatibility_attempt, not an E2E acceptance) records that 0.29.0 installed but GPU startup failed on WSL with \"RuntimeError: UVA is not available\". The receipt limits this to \"a host-specific failure\", not a general unusability claim. Active 0.25.0 was restored, and direct retrieval passed (desktop-direct-rag.json). The native pass covers only 0.25.0 embedding and retrieval serving. The runtime is behind upstream, and there is no research inference or serving benchmark."
+   "why_not_default": "vLLM is a model-serving runtime, which is a scope term here, not a research method. Upstream 0.29.0 failed GPU startup on this WSL host with 'RuntimeError: UVA is not available', and 0.25.0 was restored (vllm-compatibility.json). The packet lists upstream at v0.30.0. No research-model inference or serving benchmark exists for this layer."
   },
   {
    "disposition": "unqualified",
@@ -204,7 +102,29 @@
    "key": "c9",
    "name": "foundation-haystack",
    "repository": "https://github.com/deepset-ai/haystack",
-   "why_not_default": "It is in scope under the rag-pipeline scope term, but the evidence is source review only (not opened by this lane). There is no financial corpus pipeline, no native run and no performance proof."
+   "why_not_default": "The evidence is source review only, with no financial-corpus pipeline and no proof of performance."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md"
+   ],
+   "key": "c10",
+   "name": "data-river",
+   "repository": "https://github.com/online-ml/river",
+   "why_not_default": "The evidence is source review only. Progressive validation with delayed financial labels was not executed."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/Nixtla/statsforecast/blob/264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc/README.md"
+   ],
+   "key": "c12",
+   "name": "data-statsforecast",
+   "repository": "https://github.com/Nixtla/statsforecast",
+   "why_not_default": "The evidence is source review only. The bundled airline dataset is a method demo, and no financial rolling evaluation was retained."
   },
   {
    "disposition": "unqualified",
@@ -216,7 +136,63 @@
    "key": "c14",
    "name": "foundation-docling",
    "repository": "https://github.com/docling-project/docling",
-   "why_not_default": "It is in scope under the document-ingestion scope term, but the evidence is source review only (not opened by this lane). PDF, table and unit extraction quality is unmeasured, and there is no native run."
+   "why_not_default": "The evidence is source review only. Table and unit extraction quality is unmeasured, and the model weights carry separate licences. For filings, the natively executed EdgarTools document parser already covers ingestion."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/bashtage/arch/blob/v8.0.0/README.md"
+   ],
+   "key": "c15",
+   "name": "arch",
+   "repository": "https://github.com/bashtage/arch",
+   "why_not_default": "Its volatility, bootstrap, SPA and MCS tools have source review only, and the prospective workflow is unexecuted. They would address the multiple-comparison gap, but no run exists."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/ray-project/ray/blob/ray-2.58.0/README.rst"
+   ],
+   "key": "c17",
+   "name": "ray-serve",
+   "repository": "https://github.com/ray-project/ray",
+   "why_not_default": "The evidence is source review only. No distributed performance or failover acceptance was done, and no research workload here needs it."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/google-research/timesfm/blob/v3.0.0/README.md"
+   ],
+   "key": "c18",
+   "name": "timesfm",
+   "repository": "https://github.com/google-research/timesfm",
+   "why_not_default": "The evidence is source review only, with a synthetic API example. The TimesFM 3.0 weights are non-commercial, and there is no finance benchmark."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/portable-cli-artifacts.json"
+   ],
+   "key": "c19",
+   "name": "foundation-markitdown",
+   "repository": "https://github.com/microsoft/markitdown",
+   "why_not_default": "Native evidence is limited to converting a local HTML fixture (portable-cli-artifacts.json: markitdown fixtures/greeting.html, exit 0) and one worker conversion from 389920 to 26322 bytes (component-history.json). PDF and Office extras are not proven. The pin 0.1.7 is behind upstream 0.1.8, and filing HTML-to-Markdown conversion overlaps the natively executed EdgarTools document parser."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/statsmodels/statsmodels/blob/v0.15.0/README.md"
+   ],
+   "key": "c20",
+   "name": "statsmodels",
+   "repository": "https://github.com/statsmodels/statsmodels",
+   "why_not_default": "The evidence is source review only, and the prospective workflow is unexecuted."
   },
   {
    "disposition": "unqualified",
@@ -228,40 +204,30 @@
    "key": "c21",
    "name": "foundation-sentence-transformers",
    "repository": "https://github.com/huggingface/sentence-transformers",
-   "why_not_default": "It is in scope under the model-sdk scope term, but the evidence is source review only (not opened by this lane). Compatibility with the current vLLM service is not established, and there is no native run."
+   "why_not_default": "The evidence is source review only. Neither compatibility with the active vLLM service nor a financial embedding workload is established."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/scikit-learn/scikit-learn/blob/1.9.1/README.rst",
+    "blueprints/us-equities/research-evaluation/receipt.json"
+   ],
+   "key": "c22",
+   "name": "scikit-learn",
+   "repository": "https://github.com/scikit-learn/scikit-learn",
+   "why_not_default": "scikit-learn 1.9.1 is in the hash-locked runtime of the native skfolio run (research-evaluation/receipt.json, runtime block around line 1461), but only as a dependency. Its own predictive-baseline and fold-local preprocessing workflow was not exercised, and its card evidence is a README only."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "https://github.com/ray-project/ray/blob/ray-2.58.0/README.rst"
+    "https://github.com/microsoft/qlib/blob/v0.9.7/README.md"
    ],
-   "key": "c17",
-   "name": "ray-serve",
-   "repository": "https://github.com/ray-project/ray",
-   "why_not_default": "It is in scope under the model-serving scope term, but the evidence is source review only (not opened by this lane). There is no distributed performance or failover acceptance, and no demonstrated need at the current single-host research scale."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/star-audit.json"
-   ],
-   "key": "c16",
-   "name": "shiyu-coder/kronos",
-   "repository": "https://github.com/shiyu-coder/Kronos",
-   "why_not_default": "It is not adopted, and its packet evidence_refs are empty. A retained source review exists in catalogs/us-equities/star-audit.json (lines 10832-10869: targeted_candidate, source commit 67b630e6, review_level source_review). That review states \"No installation, model inference, broker call or native acceptance was performed\". It also says the fine-tuning config defaults to Qlib cn_data/csi300 with overlapping lookback ranges, which is \"not a turnkey US-equity validation or broker path\". No chronological cost-adjusted evaluation was executed."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/star-audit.json"
-   ],
-   "key": "c13",
-   "name": "tradermonty/claude-trading-skills",
-   "repository": "https://github.com/tradermonty/claude-trading-skills",
-   "why_not_default": "It is not adopted, and its packet evidence_refs are empty. A retained source review exists in catalogs/us-equities/star-audit.json (lines 4459-4494: targeted_candidate, source commit 8f787ab2, selected files including skills/backtest-expert/SKILL.md). That review states \"No installation, model inference, broker call or native acceptance was performed\" and that scripts and data sources still require independent evaluation. It is a financial-research-skills review aid, not a factor or ML evaluator. No retained receipt shows its checklist catching a defect."
+   "key": "c24",
+   "name": "Qlib",
+   "repository": "https://github.com/microsoft/qlib",
+   "why_not_default": "The evidence is source review only. The bundled workflow is China CSI300 with China-style costs, upstream data availability is unverified, and the prospective workflow is unexecuted."
   }
  ],
  "catalog": "us-equities",
@@ -269,74 +235,83 @@
  "lane": "claude",
  "layer_id": "research-factors-ml",
  "limits": [
-  "This lane opened none of the upstream GitHub README or release URLs in the packet evidence_refs (c2-c6, c9, c10, c12, c14, c15, c17, c18, c20-c24, and the skfolio v1.2.8 README). No network calls were possible, so those candidates' source-review claims are unverified here.",
-  "Receipts other than the research-evaluation receipt, its README and vllm-compatibility.json were read only in bounded grep or partial sections.",
-  "No commands could be run. The 12 focused tests and the 214-test local suite are documented as done in the receipt and README, not observed now.",
-  "No TypeSafe inference results were supplied. All judgments are this lane's own source review of the retained files. The two refuter reports were treated as data and re-verified against receipt.json lines 1562-1589 and 1770-1791, README.md lines 66-81, packet lines 777-830, vllm-compatibility.json and star-audit.json. Their major findings (the 'upstream' mislabel and the out_of_scope dispositions contradicting layer_scope_terms) were confirmed and corrected, as were their minor findings (the unmet reconciliation leg, the c8 disposition and the c13/c16 retained reviews).",
-  "Skill path: <host-path>/typesafe-ai (preloaded). The actual executing model exposed by the client is claude-opus-5-5[1m]. The record uses the fixed values opus/high."
+  "I could not open the upstream README and release URLs cited as evidence for c2, c3, c4, c5, c6, c9, c10, c12, c14, c15, c17, c18, c20, c21, c22 and c24, or the README parts of c11 and c23. Reads were restricted to the repository and no network was used, so these remain unverified source-review claims taken from the packet.",
+  "The following were read only in part:\n- evaluate.py through a focused grep (lines 175-243).\n- The test files through their first 30-40 lines.\n- broad-universe/evaluation-results.json around the promotion block.\n- desktop-cli-workflows.json and desktop-direct-rag.json through focused grep matches only in the prior round.\n- component-history.json and portable-cli-artifacts.json in relevant sections only.\n\nI did not open blueprints/us-equities/broad-universe/protocol.json or catalogs/sota-convergence/manifest-20260922.json. I confirmed that protocol.json exists only through Glob, and I took the Kronos protocol bar from packet line 486 and broad-universe/README.md lines 88-98.",
+  "I could not run commands, so no test, fixture or native command was re-executed. All results are documented-as-done in receipts, not observed now. The paths named in overturn_when were confirmed to exist by Glob only. Whether the evaluate.py and native_edgar.py arguments reproduce the run also depends on private runtime variables (LEAN source, acquisition run directory) that I could not inspect.",
+  "The refuter findings were verified against the cited lines, and the major findings were accepted and corrected: the overturn checks now name the native commands rather than the synthetic unit tests, and the five-header temporal gate is re-attributed to catalyst.py. I did not verify the refuter's claim about the broad-universe evaluate.py imports, and it is not relied on here.",
+  "The TypeSafe skill body was in context from <host-path>/SKILL.md. The coordinator supplied no TypeSafe inference results and none were called. The model is reported with the inherited fixed values opus/high; the client exposes the resolved model as claude-opus-5-5[1m].",
+  "The packet withholds current_choice, decision and rationale, so this verdict could not be compared with the recorded catalog choice."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "The requirement's independent-reconciliation leg is unmet for this layer. The skfolio receipt states \"No cash/position/fee/dividend reconciliation or new LEAN engine execution\" (receipt.json line 1773). Its independent_review was a read-only code and hash review with no scoring rerun.",
-  "No factor, model or feature library other than skfolio's WalkForward splitter was executed. alphalens, sktime, statsmodels, arch, tsfresh, river, statsforecast, chronos, timesfm and Qlib all rest on source review only.",
-  "The skfolio receipt covers a three-ETF raw-price label control (SPY, QQQ, IWM). It does not cover a point-in-time equity universe, total returns, portfolio P&L or fills.",
-  "The 214-test result is this repository's local suite run under the SDK interpreter (receipt lines 1578-1589). It is not an upstream skfolio test run, so skfolio's own upstream tests were not exercised in the retained evidence.",
-  "WalkForward's six-row gap is not an event-interval purge engine. The receipt states that a six-row gap plus interval assertions does not prove independent samples (line 1776).",
-  "The reserved 2021Q1 segment has been inspected and can no longer be called untouched. With 11 completed episodes per candidate there is no statistical alpha claim, and the selected momentum20 underperformed the equal-weight control after the cost proxy.",
-  "No executed comparison exists between skfolio and any other candidate, so this is a single native proof, not a measured winner.",
-  "In-scope document, RAG, serving and SDK candidates (c9, c14, c17, c21) have no native run. c1 and c19 are native-proven only for narrow retrieval and HTML-conversion cases. c8 is native-proven only for 0.25.0 retrieval serving.",
-  "Kronos (c16) and claude-trading-skills (c13) have only star-audit source reviews with no installation or execution.",
-  "The pin is inconsistent. The card pin and receipt say 1.2.9, the packet evidence_ref README is v1.2.8, and the upstream latest is v1.3.0."
+  "The skfolio receipt covers a selected ETF sample (SPY, QQQ, IWM), not a point-in-time equity universe. Labels are raw-price, not total-return, and each candidate has only 11 complete reserved episodes. It records no alpha, P&L, fill, dividend or cash reconciliation, and no new LEAN or Nautilus engine execution.",
+  "WalkForward purge and embargo default to zero (packet card limitation). The 6-row gap plus the interval assertions does not establish independent samples, and development labels can cross fold boundaries.",
+  "The chronology audit fields and the catalyst temporal gate are produced by project-local wrappers (evaluate.py, catalyst.py), not by the upstream libraries. The upstream native part is the WalkForward split, the get_filings index acquisition and document parsing.",
+  "The EdgarTools acquisition is a bounded 5-header sample from one day (2020-03-02). It does not establish a historical as-known filing corpus, dissemination lag or a catalyst strategy.",
+  "A retained broad-universe chronological study is layer-relevant research validation but credits no layer candidate. evidence/receipts/broad-universe-research-20260921.json lists component_ids alpaca-py, duckdb, claude-code and codex; its README 'Result: no signal is established' says all 15 signal x horizon promotion checks returned not_established, with no Bonferroni interval above zero. Together with the skfolio control, it means no in-scope signal has been established.",
+  "None of the factor IC, forecasting, feature-extraction, online-learning, econometrics, volatility or RAG candidates (c2, c3, c4, c5, c6, c9, c10, c12, c14, c15, c17, c18, c20, c21, c24) has a retained execution. Untested is not failed.",
+  "No measured comparison between any two candidates in this layer exists. The winner set reflects evidence strength, not a demonstrated performance ranking.",
+  "Non-adopted c13 (tradermonty/claude-trading-skills) and c16 (shiyu-coder/Kronos) have no evidence_refs in the packet. The c16 note (packet line 486) is a hypothetical overturn condition, not a result, so challenger_preferred stays null.",
+  "The packet card for c23 cites the skfolio README at v1.2.8, while the executed pin is 1.2.9 and upstream latest is v1.3.0 (pin_behind_upstream true)."
  ],
  "overturn_protocol": {
   "arms": [
-   "c23 skfolio WalkForward (current native receipt)",
-   "c3 sktime temporal splitter",
-   "c22 scikit-learn TimeSeriesSplit with gap",
-   "c4 alphalens-reloaded factor IC/turnover on broad-universe signals",
-   "c24 Qlib workflow adapted to US inputs"
+   "skfolio WalkForward via evaluate.py in the hash-locked venv (current native receipt)",
+   "alphalens-reloaded factor IC/turnover on the same frozen plan.json and inputs",
+   "arch SPA/MCS applied to the same candidate ledger",
+   "sktime temporal splitter on the same sessions",
+   "EdgarTools native_edgar.py/native_document.py versus docling/markitdown on the same pinned filing fixture",
+   "Kronos (non-adopted) forecasts on the broad-universe protocol versus C0"
   ],
   "fixture_paths": [
    "blueprints/us-equities/research-evaluation/plan.json",
+   "blueprints/us-equities/research-evaluation/requirements.lock",
    "blueprints/us-equities/research-evaluation/evaluate.py",
-   "tests/test_research_evaluation.py",
+   "blueprints/us-equities/catalyst-provenance/fixture.idx",
+   "blueprints/us-equities/catalyst-provenance/requirements.lock",
+   "blueprints/us-equities/catalyst-provenance/native_edgar.py",
    "blueprints/us-equities/broad-universe/protocol.json",
-   "tests/test_broad_universe_evaluate.py"
+   "tests/test_research_evaluation.py",
+   "tests/test_catalyst_provenance.py"
   ],
-  "metric": "The comparison has three measures on identical frozen inputs: (1) pass/fail of the boundary audit, meaning every training label exit precedes its evaluation cutoff and selections are hash-frozen before labels are materialized; (2) whether an event-interval purge/embargo mapped to label overlap is supported; (3) the reserved-segment mean after the cost proxy against the equal-weight control."
+  "metric": "The metrics are chronological integrity and cost-adjusted performance. From the native evaluate.py run: all_training_exits_before_evaluation_cutoff and all_observed_decision_before_entry_before_exit, and plan_sha256 matching plan.json. Reserved-period mean_net_cost_proxy_label against the equalweight and cash controls, under the frozen plan's fixed 20bp round-trip proxy. EdgarTools native fixture parse exit status, and the historical-cutoff eligibility count from catalyst.py packet. For the broad-universe forecasters: date-clustered mean net excess over C0 at 5/10/20 bps per side, with a Bonferroni interval, in the reserved segment."
  },
- "overturn_when": "Reopen the verdict in either of two cases. First, if `python3 -m unittest discover -s tests -p test_research_evaluation.py -v` (tests/test_research_evaluation.py) fails against blueprints/us-equities/research-evaluation/evaluate.py. Second, if a competing splitter or evaluator is executed on the same frozen blueprints/us-equities/research-evaluation/plan.json inputs, or on the broad-universe protocol (blueprints/us-equities/broad-universe/protocol.json with tests/test_broad_universe_evaluate.py), and it matches skfolio's boundary audit while adding event-interval purge/embargo or cost-aware factor diagnostics that skfolio lacks. Candidate competitors are sktime (c3), scikit-learn TimeSeriesSplit (c22), alphalens-reloaded IC/turnover (c4) and Qlib (c24).",
+ "overturn_when": "Revisit this verdict in any of the following cases. Checks (1) and (2) re-run the evidence behind the winners. Checks (3) and (4) are comparisons against alternatives.\n\n(1) skfolio chronology. In a venv synced with `--require-hashes blueprints/us-equities/research-evaluation/requirements.lock`, re-run `python3 blueprints/us-equities/research-evaluation/evaluate.py --lean-source <LEAN source> --out <new dir>`, using that venv's python3 as receipt command run-1 does. The verdict changes if the command fails, if the plan_sha256 recorded in results.json does not match blueprints/us-equities/research-evaluation/plan.json, or if the audit reports all_training_exits_before_evaluation_cutoff or all_observed_decision_before_entry_before_exit as false.\n\n`python3 -m unittest discover -s tests -p test_research_evaluation.py -q` exercises only evaluate.py helper functions on synthetic data. A failure there invalidates the local integration code, not the WalkForward result.\n\n(2) EdgarTools. In the edgartools==5.58.0 environment (blueprints/us-equities/catalyst-provenance/requirements.lock), `python3 blueprints/us-equities/catalyst-provenance/native_edgar.py --fixture blueprints/us-equities/catalyst-provenance/fixture.idx --out <path>` fails. For the custom temporal gate, `python3 blueprints/us-equities/catalyst-provenance/catalyst.py packet --run <acquisition run> --as-of 2020-03-03T00:00:00Z --out <path>` returns eligible_count above 0 for headers first observed later. That second check is local integration; `python3 -m unittest tests.test_catalyst_provenance` covers only catalyst.py on inline synthetic bytes.\n\n(3) An adopted source-review candidate beats the winners when executed on the same frozen plan.json, inputs and 20bp round-trip cost-proxy contract. The most likely are alphalens-reloaded IC/turnover, arch SPA/MCS on the same candidate ledger, and the sktime temporal splitter.\n\n(4) A forecaster such as non-adopted Kronos beats the C0 all-eligible control, net of 5/10/20 bps per side, under the separate broad-universe protocol (blueprints/us-equities/broad-universe/protocol.json; development 2017-2021, validation 2022-2023, reserved 2024-01-01..2026-08-14). That is the bar the five predeclared signals failed.",
  "packet_sha256": "1a8113b9db33a65c1d227250e4715b3fa60adf4d54f7c9142ac8d340d0bce312",
  "schema_version": 1,
  "sources_read": [
-  "<host-path>/us-equities__research-factors-ml.json (full in round 1; lines 770-839 re-read in revision)",
-  "blueprints/us-equities/research-evaluation/receipt.json (round 1; lines 1500-1793 re-read in revision)",
-  "blueprints/us-equities/research-evaluation/README.md (round 1; lines 60-84 re-read in revision)",
-  "evidence/receipts/vllm-compatibility.json (full, revision)",
-  "catalogs/us-equities/star-audit.json (lines 4455-4496 and 10828-10871, revision)",
-  "blueprints/us-equities/deerflow/native-receipt.json (grep of claim/status lines, round 1)",
-  "blueprints/us-equities/deerflow/research-receipt.json (lines 1-40, round 1)",
-  "blueprints/us-equities/catalyst-provenance/receipt.json (grep of claim/status lines, round 1)",
-  "blueprints/us-equities/catalyst-provenance/access-resolution.json (grep of claim/status lines, round 1)",
-  "evidence/receipts/native-cli-gaps.json (lines 1-75, round 1)",
-  "evidence/receipts/desktop-cli-workflows.json (grep for qmd, round 1)",
-  "evidence/receipts/component-history.json (grep for qmd/markitdown/vllm, round 1)",
-  "evidence/receipts/desktop-direct-rag.json (grep for vllm, round 1)",
-  "evidence/receipts/portable-cli-artifacts.json (grep for markitdown, round 1)",
-  "<host-path>/{receipt.json,README.md,protocol.json} (grep only, round 1)",
-  "tests/test_research_evaluation.py (existence via Glob, round 1)",
-  "<host-path>/SKILL.md (skill body preloaded in context)"
+  "<host-path>/us-equities__research-factors-ml.json",
+  "blueprints/us-equities/research-evaluation/receipt.json",
+  "blueprints/us-equities/research-evaluation/evaluate.py",
+  "tests/test_research_evaluation.py",
+  "blueprints/us-equities/catalyst-provenance/receipt.json",
+  "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+  "tests/test_catalyst_provenance.py",
+  "evidence/receipts/broad-universe-research-20260921.json",
+  "blueprints/us-equities/broad-universe/README.md",
+  "blueprints/us-equities/broad-universe/evaluation-results.json",
+  "blueprints/us-equities/deerflow/native-receipt.json",
+  "blueprints/us-equities/deerflow/research-receipt.json",
+  "evidence/receipts/native-cli-gaps.json",
+  "evidence/receipts/vllm-compatibility.json",
+  "evidence/receipts/component-history.json",
+  "evidence/receipts/portable-cli-artifacts.json",
+  "evidence/receipts/desktop-cli-workflows.json",
+  "evidence/receipts/desktop-direct-rag.json",
+  "<host-path>/SKILL.md"
  ],
- "why_selected": "c23 (skfolio) is the only candidate in this layer with an executed research-evaluation receipt. blueprints/us-equities/research-evaluation/receipt.json (kind native_cli_e2e, observed 2026-09-19T22:59:04Z, status \"accepted_for_causal_raw_price_label_control_only\") records a native run of skfolio 1.2.9 WalkForward (252/63/6, reduce_test=True) on bundled LEAN SPY/QQQ/IWM daily data. The run, command run-1 in the separate skfolio venv, exited 0. It produced 20 chronological development folds, 21 frozen selections and 6605 candidate records. The plan was frozen before prices were parsed (plan sha256 b8d1beba...), and every training label exit preceded its evaluation cutoff. The receipt's independent_review (lines 1780-1791) is \"accepted\". It verified 42 artifact hashes with 0 mismatches, 21 selection hashes, 21 training-exit boundaries and 6605 ledger records, and recorded 12 focused tests passed with no blocking findings. Its scope was a read-only code and evidence review with no scoring rerun. The receipt also records a full-tests command, `$SDK_PYTHON -m unittest discover -s tests -q`, with result \"214 passed, 0 skipped\" (receipt lines 1578-1589; README lines 66-67). That run is this repository's own local test suite under the working SDK interpreter. It is not skfolio's upstream test suite, so it is local-integration evidence. This is the causal, cost-aware chronological validation leg of the requirement, within a narrow scope. The labels are raw-price labels under a fixed 20bp round-trip cost proxy, not portfolio P&L, and there are only 11 reserved episodes per candidate. The reserved momentum20 selection (0.118407% after the cost proxy) came in below the equal-weight control (0.162293%), so no alpha is claimed. The requirement's independent-reconciliation leg is not met. The receipt states \"No cash/position/fee/dividend reconciliation or new LEAN engine execution\" (line 1773). The evidence consists of one native execution plus an independent review of one control study, and it does not show that skfolio outperforms the other libraries.",
+ "why_selected": "These are the only adopted candidates whose own upstream code was run natively on work in this layer's scope (research-validation, model-selection, time-series-evaluation, financial-nlp, document-ingestion). The receipts show which parts are native and which are local integration.\n\nc23 skfolio. Native part: blueprints/us-equities/research-evaluation/receipt.json (kind native_cli_e2e) records the installed upstream WalkForward called with 252/63/6 and reduce_test=True. Command run-1 (lines 1541-1560) ran `$WAVE_DIR/venv/bin/python blueprints/us-equities/research-evaluation/evaluate.py --lean-source ... --out ...` with exit 0. That interpreter came from a venv synced with `--require-hashes` from requirements.lock (lines 1505-1517), with skfolio 1.2.9 and scikit-learn 1.9.1. On SPY/QQQ/IWM sessions it produced 20 chronological development folds, 1 reserved 2021Q1 evaluation, 21 frozen selections and 6605 candidate records.\n\nc23 local-integration part: the chronology audit comes from the project's evaluate.py wrapper, not from skfolio. The audit block (lines 1465-1476) reports 5290 training records, 1300 evaluation records and 15 censored records. Both all_observed_decision_before_entry_before_exit and all_training_exits_before_evaluation_cutoff are true. The 12 focused tests (lines 1561-1576) ran under system python3 against evaluate.py helper functions on synthetic 2018 data (tests/test_research_evaluation.py:10,27-29). They do not run WalkForward or read plan.json, which only main() does (evaluate.py:175,181,189,210). The receipt shows no edge. The reserved-period choice, momentum20, had mean_net_cost_proxy_label 0.001184071666615635470939591764, below equalweight (0.001622928696130345656850000132) and momentum120 (0.004403128517506842397527919636). This is a raw-price label control, not P&L.\n\nc11 EdgarTools. Native parts:\n- blueprints/us-equities/catalyst-provenance/receipt.json records EdgarTools 5.58.0 installed with 42 packages (lines 25-27).\n- Its offline index run `native_edgar.py --fixture blueprints/us-equities/catalyst-provenance/fixture.idx` exited 0 (line 42), and native_document.py exited 0 (line 47). The document parse gave 5325 markdown bytes from a pinned upstream 8-K, which stayed quarantined.\n- The first network runs exited 1, and the later metadata request returned 403.\n- access-resolution.json native_upstream (lines 31-56) records `edgar.get_filings(2020,1,form='8-K',amendments=True,filing_date='2020-03-02')` with exit 0 and HTTP 200: 371 cohort rows, 360 unique accessions (8-K 362, 8-K/A 9) and 5 selected context rows.\n\nc11 local-integration part (correcting the earlier draft): the five-header acquisition and the temporal gate came from the separate custom catalyst.py adapter, not from EdgarTools (access-resolution.json lines 8, 15, 57-112). `catalyst.py packet --as-of 2020-03-03T00:00:00Z` gave eligible_count 0 with before_first_availability 5. At the local observation time it gave eligible_count 5. The 13 unittest cases in tests/test_catalyst_provenance.py exercise catalyst.py on inline synthetic bytes (lines 9, 21-25), not fixture.idx.\n\nEvidence class: I report native_proven because each winner's upstream library has retained native execution. Its causal properties, however, rest on local integration code. Neither winner is a measured comparison against the alternatives.\n\nProvenance: this verdict is my own source review. No provider or TypeSafe inference judgment was supplied or used, and the two refuter reports were treated as claims that I re-checked against the cited lines.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
   "blueprints/us-equities/research-evaluation/receipt.json",
-  "blueprints/us-equities/research-evaluation/README.md"
+  "blueprints/us-equities/catalyst-provenance/receipt.json",
+  "blueprints/us-equities/catalyst-provenance/access-resolution.json"
  ],
  "winner_keys": [
-  "c23"
+  "c23",
+  "c11"
  ]
 }

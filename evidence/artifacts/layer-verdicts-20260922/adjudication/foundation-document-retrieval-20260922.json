@@ -1,0 +1,21 @@
+{
+ "counterbalanced_refuting_votes": 0,
+ "differing_components": [
+  {
+   "belongs_in_winner_set": true,
+   "component": "c1 MarkItDown",
+   "why": "In catalogs/foundation/decisions.json (lines 767-815), the document-retrieval source-document-conversion decision puts markitdown under the same conditional, accepted_within_scope status as poppler. In evidence/receipts/portable-cli-artifacts.json (lines 44-51 and 143), native markitdown converted fixtures/greeting.html with exit 0, and markitdown_contains_heading is true. No alternative has HTML-ingestion evidence. The scope is HTML only: the PDF and Office extras are unqualified."
+  }
+ ],
+ "evidence_refs": [
+  "blueprints/convergence-practice/document-ingestion/accepted/receipt.json",
+  "catalogs/foundation/decisions.json",
+  "evidence/receipts/portable-cli-artifacts.json",
+  "manifests/evidence.json"
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high); lane identities scrubbed from the returns; workflow wf_3e94965e-141; confirmed by a counterbalanced re-judge with A and B swapped (wf_53dd768b-bff), same lane chosen",
+ "refuting_votes": 0,
+ "votes": 2,
+ "why": "Return A is better supported. The only difference between the returns is MarkItDown (c1): A includes it and B leaves it out. In catalogs/foundation/decisions.json (lines 767-815), the source-document-conversion decision is tied to document-retrieval and covers both markitdown and poppler. The whole decision carries one status: selection \"conditional\" with review_status accepted_within_scope. It also records the \"use\" stage as accepted_within_scope for each component. Its evidence is portable-cli-artifacts. In evidence/receipts/portable-cli-artifacts.json (lines 44-51 and 143), native `markitdown fixtures/greeting.html` exited 0 as expected, and markitdown_contains_heading is true. B leaves MarkItDown out but keeps Poppler, even though both sit under that same conditional decision. B also says it did not open the HTML receipt. Neither Poppler nor any unexecuted alternative (Docling, LlamaIndex) has HTML-ingestion evidence, so MarkItDown meets the requirement for HTML at least as well as any alternative. Dropping a component the evidence supports makes B's set worse. Both returns share the QMD BM25 and Poppler winners. For Poppler, blueprints/convergence-practice/document-ingestion/accepted/receipt.json records status passed, 3 pages and 8 positive queries. A correctly limits MarkItDown to HTML and leaves the PDF/Office extras unqualified.",
+ "winner_lane": "codex"
+}

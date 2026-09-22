@@ -1,0 +1,287 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/portable-cli-artifacts.json"
+   ],
+   "key": "c1",
+   "name": "foundation-toon",
+   "repository": "https://github.com/toon-format/toon",
+   "why_not_default": "Native encode/decode preserved the selected fixture, but the inventory also records expansion on nested data. Serialization does not provide durable memory, retrieval or worker orchestration."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/VectifyAI/PageIndex/blob/9a8dd6658278fec90347e8ac3388a205305667a3/README.md",
+    "https://github.com/VectifyAI/PageIndex/releases/tag/v0.2.18"
+   ],
+   "key": "c2",
+   "name": "foundation-pageindex",
+   "repository": "https://github.com/VectifyAI/PageIndex",
+   "why_not_default": "Reviewed sources describe local document-tree retrieval, including model-generated summaries. No retained execution establishes financial-source fidelity, native-client integration or comparative retrieval cost."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/langchain-ai/langgraph/blob/sdk==0.4.4/README.md"
+   ],
+   "key": "c3",
+   "name": "langgraph",
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "why_not_default": "The referenced README describes stateful orchestration and persistence, but supplies no executed project workflow, restart recovery or native-client fidelity comparison."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/vllm-compatibility.json",
+    "evidence/receipts/desktop-direct-rag.json"
+   ],
+   "key": "c4",
+   "name": "vllm",
+   "repository": "https://github.com/vllm-project/vllm",
+   "why_not_default": "The restored 0.25.0 service supported successful retrieval, while 0.29.0 failed GPU startup on the recorded WSL host. It is a serving dependency rather than a complete retrieval or worker interface; the host-specific failure does not disqualify other environments."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/routing/health-receipt.json",
+    "blueprints/us-equities/routing/README.md",
+    "blueprints/us-equities/routing/astra-receipt.json"
+   ],
+   "key": "c6",
+   "name": "omniroute",
+   "repository": "https://github.com/diegosouzapw/OmniRoute",
+   "why_not_default": "A bounded Astra text response completed after recovery, but native hooks, MCP, memory, compaction and worker parity were not exercised. Failed-attempt usage remains unknown, and the gateway strips the requested output-token cap."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/portable-cli-artifacts.json"
+   ],
+   "key": "c8",
+   "name": "foundation-repomix",
+   "repository": "https://github.com/yamadashy/repomix",
+   "why_not_default": "Native packing retained selected paths and a source-to-outline comparison was recorded. Compressed outlines omit implementation details and do not establish persistent retrieval, source freshness or cross-client memory."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-context-memory.json",
+    "evidence/receipts/component-history.json"
+   ],
+   "key": "c9",
+   "name": "Serena",
+   "repository": "https://github.com/oraios/serena",
+   "why_not_default": "Both native clients retrieved a symbol and references. This supports an exact-symbol lane, but no retained comparison establishes broader conceptual retrieval or durable financial-document memory; the executed development revision also differs from the catalog's stable pin."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/pgvector/pgvector/blob/efa08fda9ec485d80292d0487a77939c087dedcc/README.md"
+   ],
+   "key": "c10",
+   "name": "foundation-pgvector",
+   "repository": "https://github.com/pgvector/pgvector",
+   "why_not_default": "The source documents PostgreSQL vector storage and querying, but no retained database activation or matched retrieval comparison establishes an advantage over the exercised Qdrant-backed integration."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-context-memory.json",
+    "evidence/receipts/artifact-reductions.json",
+    "evidence/receipts/component-history.json",
+    "blueprints/us-equities/workers/receipt.json",
+    "observability/restart-receipt.json"
+   ],
+   "key": "c11",
+   "name": "Context Mode",
+   "repository": "https://github.com/mksglu/context-mode",
+   "why_not_default": "Native processing and direct Desktop tools succeeded, making this a useful worker adjunct. Ephemeral SDK file extraction nevertheless encountered project-root and approval failures. Output reduction does not establish durable financial-source retrieval or net provider savings."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-context-memory.json",
+    "evidence/receipts/artifact-reductions.json",
+    "evidence/receipts/component-history.json"
+   ],
+   "key": "c13",
+   "name": "RTK",
+   "repository": "https://github.com/rtk-ai/rtk",
+   "why_not_default": "Explicit native CLI filtering and a matched output-artifact reduction were observed. Those results do not establish memory continuity, retrieval quality or whole-task provider savings; automatic Codex rewriting was not established."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-cli-gaps.json",
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/desktop-cli-workflows.json"
+   ],
+   "key": "c14",
+   "name": "foundation-codebase-memory-mcp",
+   "repository": "https://github.com/DeusData/codebase-memory-mcp",
+   "why_not_default": "Claude and Desktop workflows recovered a function and four static callees. The additional native Codex attempt was quota-blocked before tools, and static edges do not establish runtime dependencies or durable research memory."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/getzep/graphiti/blob/de8eb5b896c05ed1b5b329d4cb52015446d65e21/README.md",
+    "https://github.com/getzep/graphiti/releases/tag/v0.30.2"
+   ],
+   "key": "c15",
+   "name": "Graphiti",
+   "repository": "https://github.com/getzep/graphiti",
+   "why_not_default": "Reviewed sources describe temporal relationships and fact invalidation, but no retained deployment or task-specific extraction test establishes accurate financial timestamps, correction handling or source recovery."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-rag.json"
+   ],
+   "key": "c16",
+   "name": "Qdrant",
+   "repository": "https://github.com/qdrant/qdrant",
+   "why_not_default": "The retained integration exercised persisted vectors and automatic code-index mutations. Qdrant remains a dependency of the selected SocratiCode lane; selecting it separately would duplicate that evidence without adding a native worker or memory interface."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "blueprints/us-equities/deerflow/research-receipt.json"
+   ],
+   "key": "c19",
+   "name": "codex-acp",
+   "repository": "https://github.com/agentclientprotocol/codex-acp",
+   "why_not_default": "One embedded research prompt returned correct receipt facts, but the adapter's read-only mode mapped to workspaceWrite/on-request. Strict filesystem read-only enforcement and memory/RAG integration were not established."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "blueprints/us-equities/deerflow/research-receipt.json"
+   ],
+   "key": "c21",
+   "name": "deerflow",
+   "repository": "https://github.com/bytedance/deer-flow",
+   "why_not_default": "The pinned embedded ACP tool completed one evidence-review task. Full planner/UI behavior, persistent scheduling, durable recovery and memory integration were untested; the invocation also inherited the ACP sandbox mismatch."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+    "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1"
+   ],
+   "key": "c22",
+   "name": "foundation-agent-retrieval-bench",
+   "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+   "why_not_default": "The reviewed benchmark includes file retrieval and abstention tasks, but no retained execution qualifies this stack. It is an evaluation aid rather than a worker or memory implementation, and its code tasks do not establish financial-document fidelity."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "agents-models-workers",
+ "limits": [
+  "This verdict reviews retained receipts and referenced upstream sources; no fresh model, broker, GPU, recovery or head-to-head comparison was executed.",
+  "Private raw logs, account state and hash-bound originals were not accessed; public receipts provide bounded observations rather than independent access to all underlying events.",
+  "Historical execution does not establish current host readiness, quota or exact behavior of newer releases.",
+  "All adopted candidates' referenced files or relevant sections were accessible. Additional reads of retrieval and lifecycle documentation were bounded to the verdict's scope."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "The three selected components have separate native receipts; a single composed SDK worker using both ai-memory and SocratiCode through restart and handoff is not established.",
+  "No selected candidate has demonstrated a representative, independently held-out dated financial-source corpus with revision-aware retrieval, historical availability and calibrated abstention.",
+  "The twelve-query lexical diagnostic measures a separate QMD lane; its results cannot be attributed to SocratiCode or ai-memory.",
+  "Exact source locations were returned in bounded code tasks, but broad source-recovery completeness and semantic retrieval quality remain unqualified.",
+  "The disposable memory lifecycle checks establish project routing and ingestion-time behavior, not tenant authorization, market valid-time semantics, secure erasure or off-host recovery.",
+  "SDK filesystem restrictions do not remove external MCP mutation authority; full process cancellation and provider spending caps remain separate requirements.",
+  "Selected-artifact reductions and cache counters do not establish matched whole-task savings, including failures and retries.",
+  "No non-adopted candidate in this packet has retained comparative evidence sufficient to prefer it."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Baseline: native Codex SDK worker with explicitly scoped ai-memory and SocratiCode, retaining exact source reads and all failed-turn usage.",
+   "Retrieval challenger: the same worker and frozen task budget with PageIndex or Graphiti replacing only the relevant document or temporal-memory lane.",
+   "Orchestration challenger: DeerFlow through codex-acp versus the native SDK on the same bounded evidence-review task, checking actual permissions, output correctness, usage reporting and process cleanup."
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/retrieval-evaluation/fixture.json",
+   "blueprints/us-equities/workers/research-task.md",
+   "blueprints/us-equities/memory-lifecycle/run.py"
+  ],
+  "metric": "Compare exact-source recall and citation fidelity, dated-source correctness, abstention, cross-project leakage, restart/handoff recovery, output-contract compliance, actual sandbox permissions, latency and complete returned provider usage. Keep the existing curated retrieval fixture as a regression diagnostic and add independently frozen held-out financial/code questions before claiming general superiority."
+ },
+ "overturn_when": "Change the verdict after an executed comparison using blueprints/us-equities/retrieval-evaluation/fixture.json and blueprints/us-equities/workers/research-task.md, with lifecycle checks grounded in blueprints/us-equities/memory-lifecycle/run.py, shows a challenger improves source and answer fidelity or complete task cost without degrading project isolation, source recovery, native-client behavior or output compliance. General promotion also requires independently frozen held-out financial/code questions; replaying the existing curated fixture alone is insufficient.",
+ "packet_sha256": "0594bcc49721f0e023de97be5e7e07e5ab06a7d1040709102720e8beb8009108",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/us-equities__agents-models-workers.json",
+  "<host-path>/SKILL.md",
+  "blueprints/us-equities/deerflow/native-receipt.json",
+  "blueprints/us-equities/deerflow/research-receipt.json",
+  "blueprints/us-equities/routing/README.md",
+  "blueprints/us-equities/routing/astra-receipt.json",
+  "blueprints/us-equities/routing/health-receipt.json",
+  "blueprints/us-equities/workers/policy.md",
+  "blueprints/us-equities/workers/receipt.json",
+  "evidence/receipts/artifact-reductions.json",
+  "evidence/receipts/component-history.json",
+  "evidence/receipts/desktop-cli-workflows.json",
+  "evidence/receipts/desktop-direct-rag.json",
+  "evidence/receipts/native-cli-gaps.json",
+  "evidence/receipts/native-context-memory.json",
+  "evidence/receipts/native-memory.json",
+  "evidence/receipts/native-rag.json",
+  "evidence/receipts/portable-cli-artifacts.json",
+  "evidence/receipts/vllm-compatibility.json",
+  "observability/restart-receipt.json",
+  "blueprints/us-equities/retrieval-evaluation/README.md",
+  "blueprints/us-equities/retrieval-evaluation/fixture.json",
+  "blueprints/us-equities/memory-lifecycle/README.md",
+  "blueprints/us-equities/workers/research-task.md",
+  "https://github.com/VectifyAI/PageIndex/blob/9a8dd6658278fec90347e8ac3388a205305667a3/README.md",
+  "https://github.com/VectifyAI/PageIndex/releases/tag/v0.2.18",
+  "https://github.com/langchain-ai/langgraph/blob/sdk==0.4.4/README.md",
+  "https://github.com/pgvector/pgvector/blob/efa08fda9ec485d80292d0487a77939c087dedcc/README.md",
+  "https://github.com/getzep/graphiti/blob/de8eb5b896c05ed1b5b329d4cb52015446d65e21/README.md",
+  "https://github.com/getzep/graphiti/releases/tag/v0.30.2",
+  "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+  "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1"
+ ],
+ "why_selected": "Select ai-memory, SocratiCode and the native Codex SDK as complementary defaults spanning the layer's durable-memory, code-retrieval and native-worker scope. evidence/receipts/native-memory.json records actual native Codex and Claude retrieval of the same scoped durable page and receipt of a cross-client handoff. evidence/receipts/native-rag.json records both clients retrieving the correct code path and lines, real local embeddings, and observed automatic add/update/delete propagation; evidence/receipts/desktop-direct-rag.json separately records direct Desktop retrieval. blueprints/us-equities/workers/receipt.json records a completed native SDK research task returning correct receipt facts through focused extraction, while preserving failed file-extraction attempts and their usage. These are bounded native executions, not a measured superiority comparison or acceptance of the combined stack. The project-local worker policy supplies explicit scope and source-reporting rules; dated financial-source retrieval remains an open qualification gap.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "evidence/receipts/native-memory.json",
+  "evidence/receipts/native-rag.json",
+  "evidence/receipts/desktop-direct-rag.json",
+  "blueprints/us-equities/workers/receipt.json",
+  "blueprints/us-equities/workers/policy.md"
+ ],
+ "winner_keys": [
+  "c7",
+  "c12",
+  "c20"
+ ]
+}

@@ -1,0 +1,21 @@
+{
+ "counterbalanced_refuting_votes": 0,
+ "differing_components": [
+  {
+   "belongs_in_winner_set": false,
+   "component": "c11 Codex native workers",
+   "why": "No retained record shows a Codex-owned bounded writing child that keeps its failed results. catalogs/foundation/decisions.json line 2678 says 'Codex agent examples inherit model and effort and have no end-to-end run of their own'. agent-sdk-runtime-selection (lines 2831-2841) is conditional and source_review, with 'no new execution was run'. The Codex execution that B cites, evidence/artifacts/foundation-rd-20260921/native-review.json, is the companion /codex:review path, which is candidate c8, not c11. It is review-only and records codex_model, codex_effort and codex_usage as null. By comparison, c12 has an executed owned-edit child: blueprints/convergence-practice/native-worker/README.md lines 8-14 records a repair to planner.py in the child's native worktree that passed 12 of 12 tests with the primary checkout clean. c11 therefore meets the requirement less well than c12."
+  }
+ ],
+ "evidence_refs": [
+  "blueprints/convergence-practice/native-worker/README.md",
+  "catalogs/foundation/decisions.json",
+  "docs/foundation-rd-readiness.md",
+  "evidence/artifacts/foundation-rd-20260921/native-review.json"
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high); lane identities scrubbed from the returns; workflow wf_3e94965e-141; confirmed by a counterbalanced re-judge with A and B swapped (wf_53dd768b-bff), same lane chosen",
+ "refuting_votes": 0,
+ "votes": 2,
+ "why": "Return A's winner set {c12, c7} is better supported than Return B's {c12, c7, c11}. Both sets share c12 and c7, and the evidence supports both.\n\n- c12: blueprints/convergence-practice/native-worker/README.md lines 8-14 shows a native child that repaired only planner.py in its own worktree. All 12 unchanged tests passed and the primary checkout stayed clean.\n- c7: catalogs/foundation/decisions.json lines 478-499 records owned-worktrees as selection 'default' with status accepted_within_scope. Create/list/remove passed, and a dirty removal was refused without losing work.\n\nB's only extra component is c11 (Codex native workers), and nothing retained shows it delegating owned edits.\n- decisions.json line 2678 says 'Codex agent examples inherit model and effort and have no end-to-end run of their own'.\n- agent-sdk-runtime-selection (decisions.json lines 2831-2841) is conditional and source_review, and 'no new execution was run'.\n- B's Codex execution evidence, evidence/artifacts/foundation-rd-20260921/native-review.json, is a companion /codex:review run. That is the c8 plugin path, and it only reviews. It returned 'No actionable regressions were found' with codex_model, codex_effort and codex_usage all null.\n- docs/foundation-rd-readiness.md lines 53-55 likewise shows Codex only as an independent reviewer.\n\nSo Codex covers the review part of the requirement but not bounded delegation or preservation of owned edits and failed results. B adds a component the evidence does not support. Neither return makes a claim the evidence contradicts, so 'neither' does not apply.",
+ "winner_lane": "claude"
+}

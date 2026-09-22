@@ -7,40 +7,38 @@
     "blueprints/memory-lifecycle-probe/README.md",
     "blueprints/blind-catalog-convergence/memory-experiment.json",
     "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md",
-    "docs/memory-landscape-maintenance.md"
+    "docs/candidate-quality-review-20260921.md"
    ],
    "key": "c10",
    "name": "Basic Memory",
    "repository": "https://github.com/basicmachines-co/basic-memory",
-   "why_not_default": "It is the only challenger with executed evidence, and that evidence is narrow. Pinned 0.23.2 passed the same three-note synthetic lexical write, overwrite and delete lifecycle, plus a text-only reindex (blueprints/memory-lifecycle-probe/README.md table, lines 13-19). That probe tested no hooks, no native Codex/Claude client integration, no cross-project isolation and no semantic recall. Its reindex 'is not a demonstration of restoring a lost database', and the recovery checks were unequal. AGPL-3.0 deployment fit is unreviewed (candidate-quality-review.json lines 466, 437). Its Claude session briefings and capture are source claims only."
+   "why_not_default": "It matched ai-memory only on a tiny synthetic three-note lexical lifecycle (write, overwrite, delete, reindex), with 28/28 content checks across both tools. The probe explicitly says it ranks neither semantic quality nor recovery. Basic Memory reindex is not a lost-database restore, and the two tools had unequal recovery checks (blueprints/memory-lifecycle-probe/README.md lines 3-19 and 40-45). There is no native Codex/Claude hook capture, cross-project isolation or restore evidence. AGPL-3.0 deployment fit is unreviewed (candidate-quality-review.json lines 437 and 466)."
   },
   {
    "disposition": "conditional",
    "evidence_class": "source_review",
    "evidence_refs": [
     "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md",
     "docs/memory-landscape-maintenance.md",
-    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+    "docs/candidate-quality-review-20260921.md"
    ],
    "key": "c1",
    "name": "Mem0",
    "repository": "https://github.com/mem0ai/mem0",
-   "why_not_default": "The evidence is pinned source review only: no install, no upstream test run, no native operation, no matched answer-quality comparison and no recovery acceptance (candidate-quality-review.json line 564). It is documented as application user/session/agent memory. Its published evaluations do not transfer to this project's continuity task. It would be a second authoritative store without a demonstrated gap (docs/memory-landscape-maintenance.md line 42)."
+   "why_not_default": "Only the pinned source (a39a802) was reviewed: no install, upstream test run, native model operation, matched answer-quality comparison or recovery acceptance (candidate-quality-review.json lines 559-564). It is an application-memory SDK. Its published benchmark claims do not carry over to project continuity across native Codex and Claude. A second agent-memory database is not an automatic improvement (docs/memory-landscape-maintenance.md line 42)."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
    "evidence_refs": [
     "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md",
-    "docs/memory-landscape-maintenance.md"
+    "docs/memory-landscape-maintenance.md",
+    "docs/candidate-quality-review-20260921.md"
    ],
    "key": "c2",
    "name": "Letta Code",
    "repository": "https://github.com/letta-ai/letta-code",
-   "why_not_default": "It is a stateful runtime-and-memory harness, not a drop-in store. Adopting it would replace native Codex/Claude, which is outside this layer (docs/memory-landscape-maintenance.md line 45). Its evidence is pinned source review only (candidate-quality-review.json lines 739, 744)."
+   "why_not_default": "Letta Code is a stateful agent runtime, not a drop-in memory store. Adopting it means replacing the native Codex/Claude worker architecture, which is outside this layer (docs/memory-landscape-maintenance.md line 45; candidate-quality-review.json line 739). Only the pinned source (dfb5639) was reviewed, with no execution evidence (line 744)."
   },
   {
    "disposition": "conditional",
@@ -52,7 +50,7 @@
    "key": "c4",
    "name": "OpenViking",
    "repository": "https://github.com/volcengine/OpenViking",
-   "why_not_default": "It is a hierarchical context-filesystem unification candidate with pinned source review only. Benchmark transfer, migration and AGPL-3.0 deployment fit remain open (candidate-quality-review.json lines 909, 938). No executed capture, deletion or restore evidence was found."
+   "why_not_default": "OpenViking is a hierarchical context filesystem that would unify resources, memory and skills. It is worth considering only if fragmented context becomes a measured obstacle. Its benchmark carry-over, migration and AGPL deployment fit are unevaluated, and only the pinned source (172c105) was reviewed (candidate-quality-review.json lines 909-914; docs/candidate-quality-review-20260921.md line 72)."
   },
   {
    "disposition": "conditional",
@@ -65,7 +63,7 @@
    "key": "c7",
    "name": "Graphiti",
    "repository": "https://github.com/getzep/graphiti",
-   "why_not_default": "It is a complementary temporal entity graph for entity/time queries, not a Codex/Claude project-memory lifecycle (docs/memory-landscape-maintenance.md line 41). It has pinned source review only. Extraction provenance, isolation and restore are unqualified (candidate-quality-review.json line 619)."
+   "why_not_default": "Graphiti is a temporal entity-relationship graph that could complement project memory for entity or time questions. There is no evidence that it improves the project wiki or supplies inspectable native-client capture, deletion or restore (candidate-quality-review.json lines 619-624; docs/memory-landscape-maintenance.md line 41). Only the pinned source was reviewed."
   },
   {
    "disposition": "conditional",
@@ -77,45 +75,46 @@
    "key": "c8",
    "name": "Cognee",
    "repository": "https://github.com/topoteretes/cognee",
-   "why_not_default": "It is a graph/context research-corpus candidate. Its default LLM recipe uses OpenAI, and no local profile was qualified. Evidence is pinned source review only (candidate-quality-review.json lines 851, 856)."
+   "why_not_default": "Cognee is a graph and context candidate for research corpora. Its default LLM recipe uses OpenAI, so the local profile would need qualifying. Only the pinned source (663a2dc) was reviewed, with no capture, deletion or restore evidence for native Codex/Claude (candidate-quality-review.json lines 851-856; docs/candidate-quality-review-20260921.md line 71)."
   },
   {
    "disposition": "conditional",
    "evidence_class": "source_review",
    "evidence_refs": [
     "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md",
-    "docs/memory-landscape-maintenance.md"
+    "docs/memory-landscape-maintenance.md",
+    "docs/candidate-quality-review-20260921.md"
    ],
    "key": "c9",
    "name": "Supermemory",
    "repository": "https://github.com/supermemoryai/supermemory",
-   "why_not_default": "It is an application memory/profile/search API with pinned source review only. The cloud-only exclusion is stale. However, provider calls, export/restore, isolation and representative retrieval remain unqualified (candidate-quality-review.json lines 967, 972). Its published savings belong to its own benchmark (docs/memory-landscape-maintenance.md line 46)."
+   "why_not_default": "The cloud-only exclusion is stale; a local server and an Ollama route are documented. However, its provider calls, licensing, export/restore, isolation and representative retrieval are unqualified, and only the pinned source (57b430b) was reviewed (candidate-quality-review.json lines 967-972)."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
    "evidence_refs": [
     "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md",
-    "blueprints/blind-catalog-convergence/memory-experiment.json"
+    "docs/memory-landscape-maintenance.md",
+    "docs/candidate-quality-review-20260921.md"
    ],
    "key": "c3",
    "name": "Hindsight",
    "repository": "https://github.com/vectorize-io/hindsight",
-   "why_not_default": "Not adopted. It is the priority challenger for retain/recall/reflect, with documented native Codex/Claude subscription providers. Its evidence is source review only, and published benchmarks are not a matched test of this project (candidate-quality-review.json line 497; docs/candidate-quality-review-20260921.md line 65). It is named in the next decision-changing test in memory-experiment.json, which has not been run."
+   "why_not_default": "Not adopted in the packet. It is named a priority challenger for retain/recall/reflect memory, and its documented native Codex/Claude subscription providers remove the API-key exclusion. Still, only the pinned source (680406b) was reviewed. Its published benchmarks do not measure this project's recall, isolation or cost (candidate-quality-review.json lines 497-502), so the evidence does not show it satisfies the requirement better."
   },
   {
    "disposition": "overlap",
    "evidence_class": "source_review",
    "evidence_refs": [
     "catalogs/landscape/candidate-quality-review.json",
-    "docs/memory-landscape-maintenance.md"
+    "docs/memory-landscape-maintenance.md",
+    "docs/candidate-quality-review-20260921.md"
    ],
    "key": "c6",
    "name": "Claude-mem",
    "repository": "https://github.com/thedotmack/claude-mem",
-   "why_not_default": "Not adopted. It is an overlapping capture/compression store with source review only. Running it beside ai-memory would duplicate automatic capture, and its scoped-capture fidelity and provider behavior are uncompared (candidate-quality-review.json line 679; docs/memory-landscape-maintenance.md line 44)."
+   "why_not_default": "Not adopted in the packet. Its automatic capture, compression and retrieval overlap ai-memory's capture role. The review rules out running overlapping capture stores by default, and only the pinned source was reviewed (candidate-quality-review.json lines 679-684; docs/memory-landscape-maintenance.md line 44)."
   }
  ],
  "catalog": "foundation",
@@ -123,64 +122,67 @@
  "lane": "claude",
  "layer_id": "durable-memory",
  "limits": [
-  "The upstream README URLs in evidence_refs (raw.githubusercontent.com) were not fetched, because this lane has no network access and was restricted to the repository. Capability statements for candidates are the retained source-review findings, not my own reading of the upstream READMEs.",
-  "I did not open the retained receipts evidence/receipts/memory-landscape-20260921.json and memory-landscape-lifecycle-20260921.json, the off-host restore receipts, or the packet's c5 recipe_ref recipes/README.md. The restore and off-host claims in the packet's c5 decisions are retained provider judgments that I have not verified.",
-  "I did not open evidence/artifacts/memory-landscape-20260921/sources.json, which is referenced only by non-adopted Hindsight.",
-  "I read only the test names in tests/test_memory_lifecycle.py and ran nothing: no commands, verify.py, tests or TypeSafe inference. No TypeSafe inference results were supplied by the coordinator.",
-  "The typesafe-ai skill body was preloaded from <host-path>/SKILL.md. The actual model reported by the client is claude-opus-5-5[1m]. The schema's fixed model value, claude-opus-5/high, was copied as instructed.",
-  "The candidate-quality-review.json entry for c5 labels ai-memory as source_review at the newer pin. My native_proven class applies only to the installed 2.3.2 native receipts described in docs/native-memory-rag-lifecycle.md and docs/memory-landscape-maintenance.md."
+  "The external upstream README URLs in the packet evidence_refs were not fetched, because the lane reads only local files. Upstream capability statements are taken from the local quality-review summaries.",
+  "The native artifacts under evidence/artifacts/memory-rag-lifecycle-20260921/ (native-client.json, native-commands.json) were not opened. The native Claude/Codex outcome is judged from the receipt header and the lifecycle document, not raw outputs.",
+  "The synthetic off-host restore receipt described in the packet's c5 decisions was not located or opened. That claim, including the 10 ai-memory and 4 Qdrant upstream tests, is retained packet text, not verified by me.",
+  "evidence/artifacts/memory-landscape-20260921/sources.json and the per-candidate sections of candidate-quality-review.json for Graphiti, Claude-mem, Letta Code, Cognee, OpenViking and Supermemory were read only through grep of their disposition, requirement_fit and qualification_gap lines.",
+  "The packet withholds candidate dispositions, but evidence_ref catalogs/landscape/candidate-quality-review.json exposes the prior dispositions (for example ai-memory \"selected\") and the layer decision keep_but_compare. This lane's verdict is therefore not blind to the prior decision.",
+  "No commands were run. blueprints/memory-lifecycle-probe/verify.py and tests/test_memory_lifecycle.py were confirmed to exist by opening or globbing them, not executed here.",
+  "No TypeSafe inference results were supplied. All dispositions are my own source review; the prior dispositions and packet decisions are retained project judgments, not re-verified provider output.",
+  "Skill: <host-path>/SKILL.md (preloaded). The runtime model reported by the client is claude-opus-5-5[1m]; the model field copies the fixed value opus/high."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "No matched semantic recall or usefulness benchmark has been run for any candidate, ai-memory included. The winner is the best-supported operational fit, not a quality winner.",
-  "Learned-write quality is unestablished. Scheduler admission failed both real ticks, and the one model review rejected its proposal for insufficient evidence.",
-  "Assistant capture keeps sanitized excerpts capped at 2,000 bytes, not full transcripts. Claude prompt capture remains opted out.",
-  "Exact session and lifetime token savings from memory are unknown.",
-  "Installed ai-memory 2.3.2 (353841d) lags upstream v2.4.0 and the reviewed head 5157c6b. The native evidence does not qualify the newer revision.",
-  "ai-memory's native restore and reindex were not run in the synthetic probe because of its process guard. Restore evidence comes from the separately recorded same-host and synthetic off-host acceptances. Lost-key, lost-account, physical-host and whole-stack recovery remain unqualified.",
-  "Deletion evidence covers current search results only, not erasure from history, logs or backups.",
-  "The scheduler covers every database project, while the current deployment has one adopted scope. Multi-project scope behavior is unqualified.",
-  "No new-host (clean WSL or macOS) activation evidence exists for this layer."
+  "No matched semantic-recall or usefulness benchmark between ai-memory and any alternative exists. The only comparative run is a three-note lexical probe that ranks nothing (blueprints/memory-lifecycle-probe/README.md lines 8-9 and 129-132).",
+  "The quality of learned writes is unestablished. The scheduler admitted sessions, but the single model review rejected its proposal for insufficient durable evidence (docs/memory-landscape-maintenance.md lines 135-136 and 161-164).",
+  "In the synthetic probe, ai-memory's native restore/reindex was not run because the process guard enumerates all same-name processes. Deletion covered only current search results, not erasure from history, logs or backups (blueprints/memory-lifecycle-probe/README.md lines 40-45 and 133-134).",
+  "Captured assistant excerpts are sanitized and capped at 2,000 bytes, so they are not complete transcripts. Claude prompt capture remains opted out (docs/memory-landscape-maintenance.md lines 113-116).",
+  "Recovery beyond the synthetic hosted restore is unqualified: independent physical host, lost-key/account recovery, native-client rebinding and whole-stack recovery (packet decision synthetic-offhost-application-restore limitations).",
+  "Native evidence applies to installed 2.3.2 (353841d). The reviewed revision 5157c6b and upstream v2.4.0 are not installed or qualified (packet pin_behind_upstream true; candidate-quality-review.json line 382).",
+  "Exact session and lifetime memory token savings are null or unknown (evidence/receipts/memory-landscape-lifecycle-20260921.json lines 69-72).",
+  "The scheduler covers all store scopes with a per-project limit, and only one project is adopted. Isolation with multiple projects in production is unobserved (docs/memory-landscape-maintenance.md lines 148-150)."
  ],
  "overturn_protocol": {
   "arms": [
-   "ai-memory 2.3.2 (installed baseline)",
-   "Basic Memory 0.23.2 at 3bf2d523c0a941f71cb144a5502e7557dd025d69",
-   "Hindsight at 680406b3dd9cca2108c7f0e204820a09b4e30906"
+   "ai-memory 2.3.2 (installed baseline, source 353841d91618d20b110b208de284a74d0b960379)",
+   "Basic Memory 0.23.2 (3bf2d523c0a941f71cb144a5502e7557dd025d69)",
+   "Hindsight (680406b3dd9cca2108c7f0e204820a09b4e30906)"
   ],
   "fixture_paths": [
-   "blueprints/blind-catalog-convergence/memory-experiment.json",
    "blueprints/memory-lifecycle-probe/corpus.json",
    "blueprints/memory-lifecycle-probe/verify.py",
+   "blueprints/blind-catalog-convergence/memory-experiment.json",
    "tests/test_memory_lifecycle.py"
   ],
-  "metric": "Source-grounded answer accuracy and abstention on a held-out representative question set, supersession/stale-fact handling, cross-project isolation, deletion from current retrieval, clean-target restore equality, and complete provider usage and latency per arm"
+  "metric": "Two metric groups on the same frozen corpus and a shared downstream model and context. Quality: source-grounded recall/usefulness on held-out questions, with abstention and supersession correctness. Lifecycle pass rates: capture, deletion, project isolation and clean-target restore. Complete provider usage and latency are recorded separately. No token-savings claim."
  },
- "overturn_when": "The comparison named in blueprints/blind-catalog-convergence/memory-experiment.json (next_decision_changing_test) is executed. It uses a preregistered representative memory corpus to compare Hindsight and Basic Memory against ai-memory, with a shared downstream model and context. It checks grounded answers, abstention, supersession, cross-project isolation and an actual clean-target restore. The verdict changes if it shows better source-grounded recall and usefulness with acceptable complete provider use, latency and capture/deletion/restore behavior. The existing blueprints/memory-lifecycle-probe (corpus.json and verify.py, re-checkable with `python3 blueprints/memory-lifecycle-probe/verify.py`) is only a three-note lexical baseline. It cannot overturn the verdict on its own.",
- "packet_sha256": "8d9dc652a696a938610801127ffc3bfc20efc91707257639e806637e59b35709",
+ "overturn_when": "Change the verdict only on the result of an executed comparison. It must be a preregistered representative comparison, built on the frozen-input structure of blueprints/memory-lifecycle-probe/corpus.json. It must be rechecked by python3 blueprints/memory-lifecycle-probe/verify.py and extended as recorded in the next_decision_changing_test of blueprints/blind-catalog-convergence/memory-experiment.json. That test covers held-out grounded questions, abstention, supersession, project isolation (as asserted by tests/test_memory_lifecycle.py) and an actual clean-target restore. The verdict changes if that run shows a candidate such as Basic Memory or Hindsight with better source-grounded recall/usefulness than ai-memory 2.3.2, with at least equal capture, deletion and restore behavior and acceptable complete provider usage and latency. A native restore failure or an ai-memory isolation regression in that suite would also change it.",
+ "packet_sha256": "22f71424e8377d2c83aeae5ed357f0d8935df32b190c7d9e9d4dc0aedabf62e2",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/foundation__durable-memory.json",
   "docs/memory-landscape-maintenance.md",
+  "docs/candidate-quality-review-20260921.md",
   "docs/native-memory-rag-lifecycle.md",
-  "docs/candidate-quality-review-20260921.md (lines 50-119)",
-  "catalogs/landscape/candidate-quality-review.json (lines 360-1019, 1170-1209)",
-  "evidence/artifacts/catalog-quality-review-20260921/sources.json (grep for ai-memory, Basic Memory and Mem0 source pins)",
+  "catalogs/landscape/candidate-quality-review.json (lines 360-619, 1175-1214, plus disposition/requirement_fit/qualification_gap grep across the file)",
+  "evidence/artifacts/catalog-quality-review-20260921/sources.json (ai-memory entry, lines 210-247, via grep)",
+  "evidence/receipts/memory-landscape-lifecycle-20260921.json",
   "blueprints/blind-catalog-convergence/memory-experiment.json",
   "blueprints/memory-lifecycle-probe/README.md",
-  "tests/test_memory_lifecycle.py (test names only via grep)"
+  "tests/test_memory_lifecycle.py (lines 1-40)"
  ],
- "why_selected": "ai-memory (c5) is the only candidate whose retained evidence shows native execution against this requirement. Retained observations from my source review: (1) docs/native-memory-rag-lifecycle.md 'Actual native use' (lines 29-41). A fresh native Claude task called memory_read_page and codebase_search and returned the current memory decision. Its exact 764-byte final reply was read back from the stored Stop observation, all nine lifecycle observations were present, and consolidation generation 9 completed on attempt 1. A running Codex task also used native ai-memory retrieval. This covers both clients. (2) docs/memory-landscape-maintenance.md 'Commands and observed results' (lines 129-139). The upstream installers were applied for both Claude and Codex hooks. `ai-memory doctor` reported captured sessions for both clients with `uncaptured: []`. There were two real scheduler admission ticks, both failing admission with no model call. Unchanged upstream tests passed: 4 auto_improve_schedule tests and 18 assistant_capture tests. The retained failures are an initial filter that selected zero tests and one rejected auto-improve proposal. (3) The packet's c5 decisions list same-host restore and synthetic off-host restore as accepted_within_scope, with 10 ai-memory and 4 Qdrant unchanged upstream tests. I did not open the restore receipts themselves, so that part is retained provider judgment. (4) blueprints/blind-catalog-convergence/memory-experiment.json and blueprints/memory-lifecycle-probe/README.md record a local synthetic lexical lifecycle. After an explicit-none embedding correction, ai-memory 2.3.2 passed write, overwrite, delete and restart. The first attempt failed because it started an unwanted model download. The decision was 'retain', scoped to three synthetic notes. Every other adopted candidate has pinned source review only (catalogs/landscape/candidate-quality-review.json: 'no new install, upstream test execution, native model operation, matched answer-quality comparison or recovery acceptance'), except Basic Memory's synthetic probe. Scope limit: this makes ai-memory the best-supported operational fit, not a demonstrated recall, learning or cost winner (candidate-quality-review.json lines 377, 382). The native evidence applies to installed 2.3.2 (source 353841d), not to the reviewed upstream head 5157c6b or to v2.4.0.",
+ "why_selected": "ai-memory (c5) is the only adopted candidate with retained native execution evidence for this requirement. That evidence applies to the installed 2.3.2 pin (source 353841d91618d20b110b208de284a74d0b960379), not to the newer reviewed revision 5157c6b or upstream v2.4.0. The evidence shows:\n(1) The receipt evidence/receipts/memory-landscape-lifecycle-20260921.json (kind \"native_cli_e2e\", lines 1-16) records native memory and RAG use across Codex and Claude. docs/native-memory-rag-lifecycle.md lines 29-41 describe the Codex use. They also describe a fresh native Claude task that called memory_read_page and exited after four turns. Its 764-byte final reply was read back from the stored Stop observation, all nine lifecycle observations were present, and consolidation generation 9 completed on attempt 1.\n(2) The native maintenance commands in docs/memory-landscape-maintenance.md lines 127-139 cover doctor, status, curator, lint, auto-improve and two scheduler ticks. Two unchanged upstream test filters also passed there: 4 scheduler tests and 18 assistant-capture tests.\n(3) Allowlisted lifecycle capture is installed for both native Claude and native Codex through the upstream installer (docs/memory-landscape-maintenance.md lines 104-125). This gives capture that can be inspected.\n(4) The synthetic lexical probe (blueprints/memory-lifecycle-probe/README.md lines 3-19) passed write, overwrite, delete and restart checks for ai-memory with 28/28 content checks. Its first attempt failed the no-model-download rule, and that failure was preserved.\nEvery other adopted candidate has pinned source review only (catalogs/landscape/candidate-quality-review.json, qualification_gap at lines 442, 564, 624, 744, 856, 914, 972). The exception is Basic Memory, which has the same small synthetic probe. None of the others has native Codex/Claude capture, deletion or recovery evidence. This is the best-supported operational fit. It is not a demonstrated recall, learning-quality or cost winner (candidate-quality-review.json line 377).",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
+  "evidence/receipts/memory-landscape-lifecycle-20260921.json",
   "docs/native-memory-rag-lifecycle.md",
   "docs/memory-landscape-maintenance.md",
+  "blueprints/memory-lifecycle-probe/README.md",
   "catalogs/landscape/candidate-quality-review.json",
-  "blueprints/blind-catalog-convergence/memory-experiment.json",
-  "blueprints/memory-lifecycle-probe/README.md"
+  "docs/candidate-quality-review-20260921.md"
  ],
  "winner_keys": [
   "c5"

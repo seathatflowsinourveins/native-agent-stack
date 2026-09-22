@@ -1,0 +1,23 @@
+{
+ "counterbalanced_refuting_votes": 0,
+ "differing_components": [
+  {
+   "belongs_in_winner_set": true,
+   "component": "c4 data-pandera",
+   "why": "The retained local integration evidence shows the pandera 0.33.1 promotion gate working. It accepts the good synthetic snapshot (good-gate-result.json: status pass, row_count 4). It rejects the bad one (bad-gate-result.json: status fail, five named checks failed). promotion_gate.py builds a pa.DataFrameSchema, and data/README.md documents the fail-closed behavior. This covers the data-quality scope term, which no other candidate addresses. B says no evidence shows rejection of an invalid snapshot, but the retained results show exactly that. The limit is that the fixtures are synthetic, not a real market-data ingest, and tests/test_promotion_gate.py is skipped without the gate venv."
+  }
+ ],
+ "evidence_refs": [
+  "blueprints/us-equities/data/README.md",
+  "blueprints/us-equities/data/fixtures/bad-gate-result.json",
+  "blueprints/us-equities/data/fixtures/good-gate-result.json",
+  "blueprints/us-equities/data/promotion_gate.py",
+  "blueprints/us-equities/hosting/receipt.json",
+  "tests/test_promotion_gate.py"
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high); lane identities scrubbed from the returns; workflow wf_3e94965e-141; confirmed by a counterbalanced re-judge with A and B swapped (wf_53dd768b-bff), same lane chosen",
+ "refuting_votes": 0,
+ "votes": 2,
+ "why": "Both returns choose Dagu (c3). blueprints/us-equities/hosting/receipt.json supports that choice: kind native_cli_e2e, a final run with exit_code 0 and all steps succeeded, retained failed and aborted runs, prior_history_rows_preserved true and broker_calls 0. The returns differ only on pandera (c4). B leaves pandera out, saying no evidence shows executed market-data validation or rejection of an invalid snapshot promotion. It also sets that exact test as the condition for adding pandera. The retained repository evidence contradicts B on this point. blueprints/us-equities/data/README.md documents a fail-closed promotion_gate.py that installs pandera==0.33.1 in an isolated venv. It lists the resolved versions from the actual install. blueprints/us-equities/data/promotion_gate.py builds a pandera DataFrameSchema: import pandera.pandas as pa, a pa.DataFrameSchema, and named pa.Check rules such as high_ge_max_open_close. The retained output blueprints/us-equities/data/fixtures/good-gate-result.json shows status pass, row_count 4 and 12 named checks passing. The retained blueprints/us-equities/data/fixtures/bad-gate-result.json shows status fail, with valid_trading_session, volume_integral_non_negative, observed_at_not_future, high_ge_max_open_close and unique_symbol_session failing. Both files record pandera 0.33.1. tests/test_promotion_gate.py reruns the fixtures, but it is skipUnless the gate venv exists. The evidence is synthetic OHLCV-shaped CSV fixtures, not a real ingest. A labels it that way and marks the set synthetic. Pandera is the only candidate covering the data-quality scope term, and no alternative has better evidence for it. The evidence therefore supports pandera, and B's set wrongly drops a component the evidence supports. Neither of A's claims is contradicted by the evidence I opened.",
+ "winner_lane": "claude"
+}

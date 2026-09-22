@@ -2,26 +2,18 @@
  "alternatives": [
   {
    "disposition": "conditional",
-   "evidence_class": "local_integration",
+   "evidence_class": "native_proven",
    "evidence_refs": [
-    "catalogs/foundation/decisions.json",
-    "manifests/evidence.json"
+    "evidence/receipts/foundation-rd-20260921.json",
+    "evidence/artifacts/foundation-rd-20260921/native-review.json",
+    "evidence/receipts/token-practice-gap-followup-20260920.json",
+    "blueprints/token-native-focus/saturation-audit.json",
+    "catalogs/foundation/decisions.json"
    ],
    "key": "c3",
    "name": "Codex for Claude review bridge",
    "repository": "https://github.com/openai/codex-plugin-cc",
-   "why_not_default": "Its only use stage is partial_acceptance. In catalogs/foundation/decisions.json, lines 386-387 give selection \"optional\" and review_status partial_acceptance, and lines 397 and 405 give the scope \"One read-only native bridge backend task passed\" and the next gap. manifests/evidence.json line 1464 says the bridge trial \"used one backend task without an outer Claude interaction or matched baseline\". The packet's own evidence_kind for c3 is \"mixed\". It is the only candidate with a review-oriented run, but that run is narrower than plugin integration and has no PR, ruleset or GitHub-operation evidence. Line 2960 limits it to \"a concrete cross-client review task\". Keep it conditional until an outer plugin invocation is qualified against a baseline."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "docs/github-automation.md"
-   ],
-   "key": null,
-   "name": "GitHub Agentic Workflows (gh-aw)",
-   "repository": "https://github.com/github/gh-aw",
-   "why_not_default": "It is not a packet candidate. docs/github-automation.md lines 148-157 say that, as checked on 2026-09-20, it is public preview and no agentic workflow is activated. The daily Codex maintenance task keeps the reasoning-over-changes responsibility. There is no execution or comparison evidence."
+   "why_not_default": "Correction from the prior round: the outer Claude delegation has been exercised once, natively. evidence/receipts/foundation-rd-20260921.json (line 10) records \"Literal native Claude-to-Codex foreground review returned successfully\". Its artifact, evidence/artifacts/foundation-rd-20260921/native-review.json, records command `claude -p \"/codex:review --wait --scope branch --base 9074852... --json\"` (lines 6-15), official_companion 1.0.6 at source pin db52e28f (lines 19-27, matching the c3 pin), codex status 0 (line 44), claude_result subtype success / terminal_reason completed (lines 50-53) and process_exit_code 0 (line 109). The catalog's partial_acceptance use stage and its 'outer delegation unexercised' text are stale against this receipt: saturation-audit.json lines 2240 and 2256-2261 cite only token-practice-gap-followup-20260920.json, decisions.json lines 2973 and 2997 still say partial_acceptance, and decisions.json contains no reference to foundation-rd-20260921. c3 still stays conditional rather than default, for three reasons. First, the evidence is one foreground review of a local branch diff covering three files (receipt line 12; artifact line 39), not a GitHub PR review. Second, it does not cover worktrees, GitHub API/ruleset operations or structural diffs. Third, the artifact's own limits (lines 136-142) leave Workflow background polling, same-workspace concurrency, the cause of an earlier aborted attempt and durable Codex threads unqualified. Codex usage, model and effort are not exposed (lines 111-114). decisions.json line 2960 scopes it to a concrete cross-client review task."
   }
  ],
  "catalog": "foundation",
@@ -29,68 +21,68 @@
  "lane": "claude",
  "layer_id": "git-github-automation",
  "limits": [
-  "Source review only; I ran no commands. Every native-execution result is an earlier documented receipt, not something observed now.",
-  "I read only parts of the receipts. I did not open evidence/receipts/worktrunk-list.json or the token-practice-gap-followup-20260920 receipt. I did not open fixtures/after.py; I confirmed it exists from the Glob and the receipt reference.",
-  "I did not open recipes/README.md, adoption/lifecycle.md, docs/convergence-architecture.md or blueprints/token-native-focus/saturation-audit.json.",
-  "The packet withheld current_choice, decision, rationale and the per-candidate disposition, so I could not check this verdict against them.",
-  "No TypeSafe inference results were supplied. All judgments are my own source review. The only retained provider or catalog judgments are the review_status/selection values, which I report as they appear. The refuter findings (evidence and challenger lenses) were checked against the cited lines and accepted where they held: c3 evidence class downgraded, the 'default' wording corrected, the review/PR gap added, the version gap added, overturn fixtures replaced with deciding paths, and the evidence.json line citation corrected to 640-641.",
-  "Skill path: <host-path>/typesafe-ai (body preloaded). The client reports the executing model as claude-opus-5-5[1m]. The model field copies the fixed packet value claude-opus-5/high as instructed."
+  "I could not run any command. The difft, wt, gh and claude /codex:review operations and `python3 -m unittest tests.test_catalog_decisions` are cited from the retained records, not re-executed.",
+  "Receipts I did not open: evidence/receipts/portable-cli-artifacts.json (a refuter reports that line 138 says difft returns 0 without --exit-code and 1 with it; I have not verified this), token-native-retained-functional-20260920.json (worktrunk create/remove and dirty-refusal operation outcomes, not verified by me), velanext-native-quality-tools-20260920.json and component-history.json. I read token-practice-gap-followup-20260920.json only through grep.",
+  "The contents of fixtures/before.py, fixtures/after.py and tests/test_catalog_decisions.py were not read. Only their existence was confirmed.",
+  "The native-review.json artifact is a structured projection. The original stdout.jsonl, stderr.txt and invocation.json are retained privately (lines 121-135) and were not available to verify.",
+  "decisions.json exposes the selection and review_status fields that the packet withheld. I judged fit from the evidence_scope, limitations and receipts, not from those labels.",
+  "Revision-round changes. Both major challenger findings were accepted after re-reading foundation-rd-20260921.json and native-review.json: the c3 rationale was corrected and the stale catalog state flagged. The minor findings were also accepted: c2 now claims only the gh-attributed attestation result, with the ruleset GET/comparison labelled client-unattributed and no PR claim, and the c3 overturn arm no longer depends on an unevidenced gh review path.",
+  "Skill path: <host-path>/SKILL.md (preloaded in context). No TypeSafe inference was supplied or used. All judgments here are my own source review. The refuter findings were treated as data and checked against the original files. Actual model: claude-opus-5-5[1m], recorded as the fixed value opus/high."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "No winner has retained execution evidence for GitHub review/PR automation (PR creation, review or merge gating). gh's recorded runs are release download/attestation verify (docs/github-automation.md lines 100-106, 128-135) and a settings GET (lines 180-183). Only c3, a non-winner, has a review-oriented run, and it is partial.",
-  "gh CLI has no decision record, lifecycle stage, pin or manifests/stack.json entry (packet lines 54-68; decisions.json lines 2971-2982).",
-  "The worktrunk acceptance was observed on 0.78.0 in disposable synthetic repositories with hooks disabled (evidence.json lines 1886, 1888). The current pin 0.79.0 has not been re-qualified here.",
-  "worktrunk crash cleanup without deleting unrelated or dirty state is not established (owned-worktrees next_gap).",
-  "difftastic is selection conditional. Its acceptance is a single fixture pair (fixtures/before.py and after.py) and is recorded as 'not an LLM invocation or general quality benchmark' (evidence.json line 652).",
-  "The layer decision git-github-automation-practice is selection conditional and source_review, and records no new execution for this freeze.",
-  "The committed main-ruleset.json is documented as not yet applied (docs/github-automation.md lines 173-178, 357-360). The ruleset check verified settings, not an attempted blocked merge.",
-  "There is no matched comparison between any winner and any challenger, and no review/PR comparison fixture exists. Stars and release recency are not quality evidence."
+  "gh CLI has no manifests/stack.json inventory entry and no lifecycle stage (decisions.json lines 2971-2982). The only gh-attributed dated result is `gh attestation verify` exit 0 on 2026-09-20 (docs/github-automation.md lines 128-132). The ruleset GET (lines 180-183) is undated. The 2026-09-22 comparison (lines 359-366) is recorded as 'through the GitHub API', with no client named.",
+  "No gh PR operation (create/review/merge) result is recorded. PR automation is therefore unestablished for every candidate. The gh-aw agentic workflow candidate is public preview and not activated (docs/github-automation.md lines 138-157).",
+  "The catalog lifecycle for codex-for-claude is stale. saturation-audit.json lines 2240 and 2256-2261 and decisions.json lines 2973 and 2997 still say the outer delegation is unexercised / partial_acceptance, but evidence/receipts/foundation-rd-20260921.json records a successful outer foreground review, and decisions.json does not reference that receipt.",
+  "c3's outer review evidence is one foreground review of a local branch diff covering three files. Workflow background polling, same-workspace concurrency, the earlier aborted attempt's cause and Codex usage/model/effort remain unqualified (native-review.json lines 111-114 and 136-142).",
+  "No new execution was run to freeze this layer (decisions.json line 2970). Winner evidence is dated 2026-09-20/21 and was not recertified on the current host (saturation-audit.json current_host_recertified_by_this_audit false for worktrunk and difftastic).",
+  "Worktrunk crash cleanup without deleting unrelated or dirty state is not established (decisions.json line 507).",
+  "No matched comparison of any winner against a challenger exists for this layer. Selection rests on scoped acceptance, not on a measured comparison."
  ],
  "overturn_protocol": {
   "arms": [
-   "worktrunk 0.79.0 (packet pin; earlier acceptance was 0.78.0) vs native git worktree vs any challenger manager",
-   "difftastic 0.71.0 vs challenger structural diff",
-   "gh CLI direct vs codex-for-claude 1.0.6 outer plugin invocation vs gh-aw manual read-only pilot"
+   "c1 difftastic 0.71.0 on fixtures/before.py vs fixtures/after.py",
+   "challenger structural-diff tool on the same fixture pair",
+   "c2 gh CLI on the ruleset GET, attestation-verify and one PR operation",
+   "c3 codex-for-claude /codex:review in Workflow-background or same-workspace mode on a gh-fetched PR",
+   "c4 worktrunk create/list/remove with a dirty-worktree refusal case"
   ],
   "fixture_paths": [
-   "blueprints/convergence-practice/wsl-native-tools/run.py",
-   "tests/test_wsl_native_tools.py",
    "fixtures/before.py",
-   "fixtures/after.py"
+   "fixtures/after.py",
+   "tests/test_catalog_decisions.py"
   ],
-  "metric": "Worktree part: pass/fail on the run.py assertions (2 created, 2 removed without force, dirty removal refused with the modified and untracked bytes preserved, no hook ran, only the primary worktree and main branch remain), plus crash cleanup. Structural-diff part: correctness of the reported changes and exit codes on the before/after pair and a larger changed-code set. Review/PR part: useful findings, false positives, elapsed time and provider usage on one matched change set. No fixture exists for this part yet."
+  "metric": "Structural diff: exit code and count of correct versus spurious changed syntax nodes on the fixture pair. GitHub operations: pass or fail of the same gh ruleset GET, attestation-verify and a PR operation, with the returned output retained. Review bridge: completion (process exit 0, companion status 0) of a background-polled or same-workspace /codex:review run on a gh-fetched PR, with its findings checked against source."
  },
- "overturn_when": "Owned worktrees: rerun blueprints/convergence-practice/wsl-native-tools/run.py, with tests/test_wsl_native_tools.py as its offline guard. If the current worktrunk pin 0.79.0 fails its create/list/dirty-refusal/cleanup assertions, the verdict changes. It also changes if another worktree manager or plain `git worktree` passes the same assertions and adds crash cleanup without losing unrelated state. Structural diffs: a challenger diff tool beating difftastic on fixtures/before.py and fixtures/after.py (plus a larger changed-code set) overturns c1. Review/PR automation: no fixture exists. The verdict for that part stays open until someone creates and runs a matched PR-review comparison: gh direct, a qualified outer codex-for-claude invocation and a gh-aw read-only pilot, on the same change set. The workflow-security tests and `python3 scripts/validate.py` are regression gates only. They do not decide any overturn.",
- "packet_sha256": "0b01208243eefc619695a3ff3ff0db902e112406ce76c2a51488d3f43a0246ad",
+ "overturn_when": "Any of these results would change the verdict.\n(a) A challenger structural-diff tool runs on fixtures/before.py and fixtures/after.py and produces more correct syntax-aware hunks, with fewer spurious changes and a correct exit code, than `difft --exit-code --color never fixtures/before.py fixtures/after.py`.\n(b) A gh lifecycle receipt, or a failed gh PR/ruleset/attestation operation, is recorded. A failure would demote c2. A matched challenger passing that same operation would replace it.\n(c) c3 would be promoted from conditional to a default review lane if a retained native-review artifact shows /codex:review completing a Workflow-background (polled) or same-workspace concurrent review, or a review of an actual GitHub PR fetched through gh, with its findings checked against source.\nAfter any catalog change, including the correction that records foundation-rd-20260921 as c3 use-stage evidence, re-run the decision-consistency check with `python3 -m unittest tests.test_catalog_decisions`.",
+ "packet_sha256": "c459066115c3c4c19fe91aae102376e64a4a4ab9d007f6e41fd3527978164eec",
  "schema_version": 1,
  "sources_read": [
-  "<host-path>/foundation__git-github-automation.json",
-  "catalogs/foundation/decisions.json (lines 360-539, 1340-1429, 2940-3004)",
-  "docs/github-automation.md (full; grep for gh/review/pull_request)",
-  "manifests/evidence.json (lines 582-590, 638-656, 1341-1349, 1444-1468, 1880-1893)",
-  "blueprints/convergence-practice/wsl-native-tools/run.py (lines 195-234, grep hits)",
-  "blueprints/convergence-practice/wsl-native-tools/pins.json (grep hits lines 29-45)",
-  "tests/test_wsl_native_tools.py (grep hits lines 151-207)",
-  "fixtures/before.py",
-  "evidence/receipts/portable-cli-artifacts.json (grep hits lines 36-37, 133-134)",
-  "<host-path>/SKILL.md (skill body preloaded in context)"
+  "<host-path>/foundation__git-github-automation.json (full)",
+  "catalogs/foundation/decisions.json (lines 370-519, 1345-1414, 2940-3004; grep for foundation-rd-20260921 and 'outer Claude' returned no matches)",
+  "docs/github-automation.md (full in prior round; re-read lines 95-194 and 355-379)",
+  "blueprints/token-native-focus/saturation-audit.json (lines 2176-2265, 2886-2935; grep hits for worktrunk at 8876-8965 and codex-for-claude at 9429-9432)",
+  "evidence/receipts/worktrunk-list.json (full)",
+  "evidence/receipts/token-practice-gap-followup-20260920.json (grep for bridge/codex-for-claude lines only)",
+  "evidence/receipts/foundation-rd-20260921.json (full)",
+  "evidence/artifacts/foundation-rd-20260921/native-review.json (full)",
+  "fixtures/before.py and fixtures/after.py (existence confirmed by Glob only)",
+  "tests/test_catalog_decisions.py (existence confirmed by Glob only)"
  ],
- "why_selected": "The requirement has three parts: owned worktrees, GitHub review/PR automation and structural diffs for changed code. Each winner covers a different part, but the evidence strength is uneven. I only reviewed sources; nothing here was executed now.\n\nc4 (worktrunk) is the only winner with a \"default\" selection. catalogs/foundation/decisions.json lines 477-521 (owned-worktrees, selection \"default\" at line 487) record it as accepted_within_scope. manifests/evidence.json lines 582-590 (worktrunk-list, kind native_cli_e2e) and lines 1880-1893 (velanext-native-quality-tools-20260920, native_cli_e2e) record the earlier result: \"Worktrunk0.78.0 created/listed/removed owned worktrees while refusing dirty removal without loss\". That run used isolated synthetic Linux/WSL fixtures. The runner, blueprints/convergence-practice/wsl-native-tools/run.py lines 195-231, creates two worktrees with --no-hooks, removes the clean one, requires the dirty removal to fail (expected=1) with bytes preserved, and then checks that git keeps only the primary worktree.\n\nc1 (difftastic) is selection \"conditional\" (decisions.json line 1360, deterministic-quality-tools lines 1351-1411), with a use stage accepted within the scope \"native shell/structural comparison\". Its backing evidence is portable-cli-artifacts (manifests/evidence.json lines 640-641, kind native_cli_e2e). That run was fixture-specific on fixtures/before.py and fixtures/after.py, which the receipt names at lines 36-37. It records normal difft exit 0 and --exit-code exit 1.\n\nc2 (gh CLI) has no decision record and no pin (packet lines 54-68). Its evidence is dated local observations in docs/github-automation.md: native `gh attestation verify` exit 0 on 2026-09-20 (lines 128-135), a `gh api` GET of branch rules that verified settings only (lines 180-183), and documented ruleset maintenance commands (lines 187-200). The layer routing at decisions.json line 2960 assigns worktree lifecycle to worktrunk, GitHub operations to gh and structural diffs to difftastic. That layer record is selection \"conditional\" (line 2958) and source_review only, and it says no new execution was run.\n\nCorrection to my earlier proposal: no winner has retained execution evidence for PR creation, review or merge automation. gh's recorded runs cover supply-chain integrity and reading settings.",
+ "why_selected": "The requirement (packet line 186) names three functions: worktree ownership, GitHub review/PR automation and structural diffs. Each winner covers one of them, and nothing else in the evidence covers that function better.\n\n(1) c4 worktrunk 0.79.0, for worktrees. catalogs/foundation/decisions.json#owned-worktrees (lines 477-519, scope at line 499) records \"Native listing and disposable create/list/remove passed; dirty removal was refused without loss\", with use stage accepted_within_scope. I opened evidence/receipts/worktrunk-list.json. It records the native command `wt list --format json` with exit_code 0 and worktree_count 3, which is native execution.\n\n(2) c2 GitHub CLI, for the GitHub-side operations. It is the only candidate that operates on GitHub at all. Its only evidence ref is docs/github-automation.md, and I reviewed it as source. Only one dated result there is explicitly attributed to gh. Lines 128-132 record that on 2026-09-20 \"`gh attestation verify` returned exit 0\" for actionlint 1.7.12, and that the attestation named the expected source, tag and release workflow. The rules check is recorded with no date and no named client: lines 180-183 say \"a separate `GET /repos/OWNER/REPO/rules/branches/main` confirmed both required contexts\". Lines 359-366 record that the 2026-09-22 ruleset application was compared field by field \"through the GitHub API\". gh api is documented as the maintenance/apply command (lines 187-192 and 368-376), but the doc does not say which client produced those results. No gh PR command (create/review/merge) result is recorded anywhere. decisions.json lines 2971-2982 state that gh has no inventory entry and \"no lifecycle stage at all\". c2 is therefore selected on source review for GitHub API, ruleset and attestation operations, not on proven PR automation.\n\n(3) c1 difftastic 0.71.0, for structural diffs. decisions.json#deterministic-quality-tools (lines 1351-1411) records difftastic use as accepted_within_scope for \"native shell/structural comparison\". blueprints/token-native-focus/saturation-audit.json lines 2886-2933 record the command `difft --exit-code --color never fixtures/before.py fixtures/after.py`, native_cli_e2e receipts and retained operation fresh-difftastic.\n\nThe combined decision git-github-automation-practice (decisions.json lines 2950-3002, line 2970) says that no new execution was run to freeze this layer. c2 has no lifecycle evidence, so the weakest class across the set is source_review.",
  "winner_evidence_class": "source_review",
  "winner_evidence_refs": [
   "catalogs/foundation/decisions.json",
-  "manifests/evidence.json",
   "docs/github-automation.md",
-  "blueprints/convergence-practice/wsl-native-tools/run.py",
-  "evidence/receipts/portable-cli-artifacts.json"
+  "evidence/receipts/worktrunk-list.json",
+  "blueprints/token-native-focus/saturation-audit.json"
  ],
  "winner_keys": [
   "c4",
-  "c1",
-  "c2"
+  "c2",
+  "c1"
  ]
 }

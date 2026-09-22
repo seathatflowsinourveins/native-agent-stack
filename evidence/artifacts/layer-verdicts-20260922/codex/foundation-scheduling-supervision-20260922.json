@@ -1,0 +1,114 @@
+{
+ "alternatives": [
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c2",
+   "name": "Prefect",
+   "repository": "https://github.com/PrefectHQ/prefect",
+   "why_not_default": "No supplied or scheduled flow was executed in the retained review. Process containment, cancellation and checkpoint recovery remain unqualified; adoption also requires a persistent server/database and worker lifecycle."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c4",
+   "name": "Dagster",
+   "repository": "https://github.com/dagster-io/dagster",
+   "why_not_default": "Partitioned assets and backfill lineage could justify adoption, but application definitions are absent and no execution establishes this layer's cancellation, containment or recovery contract."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c5",
+   "name": "Restate",
+   "repository": "https://github.com/restatedev/restate",
+   "why_not_default": "Retained evidence is source review, with no executed workload recovery comparison. Adding persistence, authentication and SDK operations has no demonstrated benefit for the selected local workflows."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json",
+    "docs/foundation-rd-readiness.md"
+   ],
+   "key": "c6",
+   "name": "Temporal",
+   "repository": "https://github.com/temporalio/temporal",
+   "why_not_default": "Cross-host durability could justify escalation, but no retained executed comparison establishes better recovery for this workload. Production persistence, visibility, authentication and upgrade operations add unmeasured burden."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "scheduling-supervision",
+ "limits": [
+  "This review inspected retained local records; it did not rerun native workloads or independently inspect the complete hosted guest archive.",
+  "Current upstream releases and behavior beyond the retained revisions were not verified.",
+  "No executed head-to-head scheduler comparison was present in the reviewed evidence."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "Physical-host failure, power loss, independent-host recovery and arbitrary production effects remain unqualified.",
+  "Local process termination does not establish remote provider cancellation, billing cessation or distributed exactly-once effects.",
+  "The orderly reboot experiment uses a synthetic workload; its project oracle is separate from the selected unchanged upstream Dagu retry tests.",
+  "Persistent manual history and one guest timer do not establish every production schedule or daemon policy.",
+  "The retained foundation review leaves the next genuine daily maintenance trigger and restart persistence unobserved."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Dagu plus systemd using the retained cancellation, checkpoint, history and containment protocols",
+   "One of Prefect, Dagster, Restate or Temporal implementing the same workload and effect contract, with process supervision where needed"
+  ],
+  "fixture_paths": [
+   "blueprints/convergence-practice/job-recovery/plan.json",
+   "blueprints/convergence-practice/service-reboot/plan.json",
+   "blueprints/us-equities/worker-supervision/fixture.py"
+  ],
+  "metric": "Preserved run history; cancellation and process-tree cleanup within declared bounds; unchanged checkpoint with one execution; same-run successful recovery and one completed local effect; independent recovery observation; deployment and operating burden."
+ },
+ "overturn_when": "Reopen if the selected deployment fails the acceptance in blueprints/convergence-practice/job-recovery/plan.json, blueprints/convergence-practice/service-reboot/plan.json or the supervised blueprints/us-equities/worker-supervision/fixture.py, and an executed challenger comparison passes the same contract with acceptable operating burden. Freeze any additional host-loss or external-effect acceptance before comparing it.",
+ "packet_sha256": "1d7de5163e018054ba538bb4f190fbadbda7635e0a21612e0d4ea6dcccaa2d62",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/SKILL.md",
+  "<host-path>/foundation__scheduling-supervision.json",
+  "catalogs/foundation/decisions.json",
+  "catalogs/us-equities/agents-operations.json",
+  "catalogs/us-equities/hosting-source-review.json",
+  "docs/foundation-convergence-20260921.md",
+  "docs/foundation-rd-readiness.md",
+  "blueprints/convergence-practice/service-reboot/README.md",
+  "blueprints/convergence-practice/job-recovery/README.md",
+  "blueprints/us-equities/worker-supervision/README.md",
+  "blueprints/us-equities/hosting/receipt.json",
+  "evidence/receipts/native-service-reboot-20260920.json",
+  "blueprints/us-equities/worker-supervision/fixture.py",
+  "blueprints/convergence-practice/service-reboot/plan.json",
+  "blueprints/convergence-practice/job-recovery/plan.json"
+ ],
+ "why_selected": "Dagu and systemd provide complementary, retained native execution evidence. blueprints/us-equities/hosting/receipt.json records failed and cancelled Dagu runs and preserved history after service restart. blueprints/us-equities/worker-supervision/README.md records deadline termination of a TERM-ignoring parent and descendants, verified absent by PID/starttime, followed by a successful fresh run. blueprints/convergence-practice/job-recovery/README.md records cancellation and selected-step retry with an unchanged checkpoint on Mac and WSL. evidence/receipts/native-service-reboot-20260920.json records independently observed same-run recovery after one orderly guest reboot with one local effect. These establish bounded native behavior through local integration workloads, including synthetic fixtures, rather than general disaster recovery.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "blueprints/us-equities/hosting/receipt.json",
+  "blueprints/us-equities/worker-supervision/README.md",
+  "blueprints/convergence-practice/job-recovery/README.md",
+  "evidence/receipts/native-service-reboot-20260920.json",
+  "catalogs/foundation/decisions.json"
+ ],
+ "winner_keys": [
+  "c1",
+  "c3"
+ ]
+}

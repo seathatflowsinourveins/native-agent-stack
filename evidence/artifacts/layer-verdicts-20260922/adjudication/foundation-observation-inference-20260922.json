@@ -1,0 +1,27 @@
+{
+ "counterbalanced_refuting_votes": 0,
+ "differing_components": [
+  {
+   "belongs_in_winner_set": true,
+   "component": "c12 Loki",
+   "why": "observability/receipt.json lines 122-127 and 251-252 show a native Loki query returning 80770 tokens, before and after a Collector restart. Line 256 says the corrected Loki records held only allowed metadata. Line 318 records loki_records 1 in the privacy canary. Line 861 of catalogs/us-equities/agents-operations.json says the Collector delivers to Loki. Together these link Loki to both privacy filtering and usage reconciliation. Its packet reference, docs/native-telemetry-resolution.md, does not mention Loki, so the support comes from the receipt."
+  },
+  {
+   "belongs_in_winner_set": false,
+   "component": "c5 Grafana",
+   "why": "The evidence is natively observed but limited to display. docs/native-telemetry-resolution.md line 45 and docs/dashboard-gap-resolution.md line 13 show the rendered panel. docs/dashboard-rendered-acceptance.md line 29 shows panel queries matching and describes them as integration panels. Line 944 of catalogs/us-equities/agents-operations.json says the dashboards query the Prometheus and Loki stores. None of this shows privacy filtering or an independent usage reconciliation, so the evidence ranks Grafana below Loki for this requirement."
+  }
+ ],
+ "evidence_refs": [
+  "catalogs/us-equities/agents-operations.json",
+  "docs/dashboard-gap-resolution.md",
+  "docs/dashboard-rendered-acceptance.md",
+  "docs/native-telemetry-resolution.md",
+  "observability/receipt.json"
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high); lane identities scrubbed from the returns; workflow wf_3e94965e-141; confirmed by a counterbalanced re-judge with A and B swapped (wf_53dd768b-bff), same lane chosen",
+ "refuting_votes": 0,
+ "votes": 2,
+ "why": "Both returns pick the Collector (c8) and Prometheus (c9). They differ only on the third winner: A picks Grafana (c5) and B picks Loki (c12). The requirement is to observe real native usage through one privacy-filtered local pipeline, and the retained evidence ties Loki to both the privacy filtering and the usage reconciliation.\n\nEvidence observed for Loki in observability/receipt.json:\n- Lines 122-127: a native Loki query returned total_tokens 80770.\n- Lines 251-252: the same 80770 was returned after a Collector restart.\n- Line 256: \"Corrected Loki records contained only allowed metadata and omitted bodies.\"\n- Line 318: the privacy canary recorded loki_records 1, with forbidden_marker_absent true.\n- Line 201: Claude's collected_request_logs_and_metrics_match is true.\n- Line 861 of catalogs/us-equities/agents-operations.json: the Collector supplies the privacy transform and OTLP delivery to Loki.\n- Line 944 of the same file: the dashboards query \"the accepted Prometheus and Loki stores\".\n\nEvidence observed for Grafana:\n- docs/native-telemetry-resolution.md line 45 and docs/dashboard-gap-resolution.md line 13 record that the four usage categories appeared in the rendered panel.\n- docs/dashboard-rendered-acceptance.md line 29 records that the panel queries matched memory, Qdrant and QMD results. The same row calls these \"our integration panels\" and says Claude had no current series at the time.\n\nSo Grafana's rows show display and query agreement. None of them shows privacy filtering or an independent usage reconciliation, so dropping Loki in its favour leaves out the component with the stronger requirement evidence.\n\nTwo caveats do not change the result. B labels its winner class \"synthetic\" because the privacy canary is synthetic (receipt line 314). That is conservative, not contradicted by the evidence. B is also correct that Loki's packet reference, docs/native-telemetry-resolution.md, never mentions Loki; its support comes from observability/receipt.json.",
+ "winner_lane": "claude"
+}

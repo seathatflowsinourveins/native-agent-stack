@@ -1,0 +1,131 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c2",
+   "name": "Haystack",
+   "repository": "https://github.com/deepset-ai/haystack",
+   "why_not_default": "The retained entry explicitly records prospective, unexecuted commands. No scoped code retrieval, embedding compatibility or recovery execution establishes an advantage over the selected stack."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "docs/hf-memory-model-qualification.md",
+    "evidence/receipts/hf-memory-models-20260921.json"
+   ],
+   "key": "c3",
+   "name": "Hugging Face Hub native CLI",
+   "repository": "https://github.com/huggingface/huggingface_hub",
+   "why_not_default": "Native verification checked 15 pinned Nemotron files. This remains a useful provisioning dependency, but does not itself provide the scoped index, embedding server or recoverable vector store covered by the three winners."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c4",
+   "name": "pgvector",
+   "repository": "https://github.com/pgvector/pgvector",
+   "why_not_default": "Only pinned source review is retained; extension activation and retrieval/recovery were not executed. PostgreSQL metadata joins could justify adoption, but that requirement and an advantage over the current Qdrant index are unestablished."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/blind-catalog-source-adjudication-20260921.md",
+    "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json"
+   ],
+   "key": "c5",
+   "name": "code-memory",
+   "repository": "https://github.com/kapillamba4/code-memory",
+   "why_not_default": "SQLite deployment simplicity is unmeasured. Reviewed tests establish response shape rather than retrieval relevance; embedding compatibility and recovery remain unexecuted. Source review identifies possible stale results after new exclusions or removal of all indexable files, but these are not observed runtime failures."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c6",
+   "name": "LanceDB",
+   "repository": "https://github.com/lancedb/lancedb",
+   "why_not_default": "Embedded storage could remove a service, but the retained commands are prospective. No executed code-retrieval, freshness, embedding or restore comparison establishes superiority."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "semantic-rag",
+ "limits": [
+  "This verdict reviews retained public evidence; no native client, GPU service or recovery execution was repeated.",
+  "Private raw command streams and model outputs were not inspected; public receipts retain selected results and provenance hashes.",
+  "Context-mode rejected the packet path because of its configured project root; native read-only commands successfully read the packet and all adopted-candidate evidence references.",
+  "Upstream metadata is the packet's dated snapshot and was not independently refreshed."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "No sealed representative conceptual-code benchmark establishes comparative recall, grounded answer accuracy, cross-project isolation, latency or resource superiority.",
+  "Four paired upstream retrieval examples establish embedding compatibility, not cross-model or domain quality.",
+  "SocratiCode full-service restart/recovery and native-client rebinding remain unestablished; Qdrant recovery does not qualify the entire retrieval stack.",
+  "Hosted recovery used synthetic state within one administrative domain; production recovery, atomic cross-application snapshots and lost-account/key recovery remain unqualified.",
+  "The vLLM 0.29.0 failure is host-specific. The packet's newer 0.30.0 release has no retained runtime acceptance here.",
+  "code-memory's deployment advantage and source-level freshness concerns require executed comparisons.",
+  "fixtures/rag-note.md is a small seed fixture, not a held-out conceptual-code evaluation set."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "SocratiCode 1.14.0 with Qdrant 1.19.1 and vLLM 0.25.0 using the retained pinned Nemotron model",
+   "code-memory at reviewed commit 5a8db166ca11a90c093ba4a9a54d266cde756f54 with an explicitly pinned, permitted embedding model",
+   "Lexical retrieval baseline on identical frozen project sources"
+  ],
+  "fixture_paths": [
+   "fixtures/rag-note.md",
+   "blueprints/convergence-practice/offhost-app-state/README.md"
+  ],
+  "metric": "Compare independently grounded retrieval accuracy, complete returned context, cold/warm latency, memory and indexing cost. Require no stale or excluded results after edits, renames, deletions, new exclusions and empty-corpus transitions; verify scope isolation and restored state/query equality. Existing fixtures supply bounded smoke and recovery checks; representative sealed questions still need to be established."
+ },
+ "overturn_when": "Reconsider if an executed comparison using fixtures/rag-note.md for mutation/retrieval smoke checks and blueprints/convergence-practice/offhost-app-state/README.md for state/query recovery checks demonstrates a challenger preserves required quality and lifecycle behavior with a material deployment or resource advantage. Require additional frozen conceptual-code questions with independent source locations before claiming quality superiority; fixture replay alone cannot overturn the selection.",
+ "packet_sha256": "fd3ac89764fefc0e140c662e45e9d16150672af03d278912a7895f19bf1c80a7",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/SKILL.md",
+  "<host-path>/foundation__semantic-rag.json",
+  "docs/native-memory-rag-lifecycle.md",
+  "catalogs/foundation/decisions.json",
+  "catalogs/us-equities/foundation-memory.json",
+  "evidence/receipts/native-rag.json",
+  "docs/hf-memory-model-qualification.md",
+  "evidence/receipts/hf-memory-models-20260921.json",
+  "docs/blind-catalog-source-adjudication-20260921.md",
+  "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json",
+  "docs/full-stack-convergence.md",
+  "docs/token-native-saturation.md",
+  "fixtures/rag-note.md",
+  "blueprints/convergence-practice/offhost-app-state/README.md",
+  "evidence/receipts/vllm-compatibility.json"
+ ],
+ "why_selected": "Select SocratiCode, Qdrant and the qualified vLLM 0.25.0 runtime as the complementary retrieval stack. evidence/receipts/native-rag.json records native execution: both clients retrieved the same correct project source span, real embeddings returned 2,048 finite dimensions, and automatic add/update/delete propagated into the vector store. docs/native-memory-rag-lifecycle.md records subsequent source agreement on a real question. evidence/receipts/hf-memory-models-20260921.json records execution of the upstream embedding example and compatible route, with all four intended documents ranked first. catalogs/foundation/decisions.json records same-host Qdrant snapshot/query recovery; blueprints/convergence-practice/offhost-app-state/README.md separately records synthetic hosted restoration with complete state/query equality, distinguishing unchanged upstream tests from local integration checks. This is bounded native functionality with partial recovery coverage, not measured superiority over alternatives.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "evidence/receipts/native-rag.json",
+  "docs/native-memory-rag-lifecycle.md",
+  "catalogs/foundation/decisions.json",
+  "evidence/receipts/hf-memory-models-20260921.json",
+  "evidence/receipts/vllm-compatibility.json",
+  "blueprints/convergence-practice/offhost-app-state/README.md"
+ ],
+ "winner_keys": [
+  "c7",
+  "c1",
+  "c8"
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "counterbalanced_refuting_votes": 0,
+ "differing_components": [
+  {
+   "belongs_in_winner_set": true,
+   "component": "c4 RTK",
+   "why": "RTK has an exact artifact reduction pair of 537 -> 178 tokens (docs/token-practice.md line 107). Its clean-token-tool-ci decision passed 41 command expectations and 14 fidelity/recovery checks with matching hashes (catalogs/foundation/decisions.json lines 1472-1502; docs/full-stack-convergence.md lines 132-137). It is core with an accepted use stage (docs/token-native-saturation.md line 109). B excludes it over the failed gateway previews, but that limitation (decisions.json line 1166) is in the selected-context-processing decision, which lists both context-mode and rtk as components (lines 1150-1153), so it applies to Context Mode as well."
+  },
+  {
+   "belongs_in_winner_set": false,
+   "component": "c3 Context Mode",
+   "why": "Context Mode has native use and restart evidence (docs/token-native-saturation.md lines 18 and 73) and a real extraction (native-client-results.json lines 166-181). It has 0 retained artifact pairs, and its fixed-order paired trials conflict: Codex 11.26% lower, Claude 25.83% higher (docs/token-practice.md lines 85-86). Its stats mix unrelated scopes (native-client-results.json line 12; docs/full-stack-convergence.md lines 140-141). The evidence does not show it meets the recoverable-original and separate-measurement requirement as well as RTK."
+  }
+ ],
+ "evidence_refs": [
+  "catalogs/foundation/decisions.json",
+  "docs/full-stack-convergence.md",
+  "docs/token-native-saturation.md",
+  "docs/token-practice.md",
+  "evidence/artifacts/full-stack-convergence-20260921/native-client-results.json"
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high); lane identities scrubbed from the returns; workflow wf_3e94965e-141; confirmed by a counterbalanced re-judge with A and B swapped (wf_53dd768b-bff), same lane chosen",
+ "refuting_votes": 0,
+ "votes": 2,
+ "why": "The two sets share Headroom (c5) and ccusage (c1). They differ only on RTK (c4, which only A picks) and Context Mode (c3, which only B picks). The requirement is useful context with recoverable originals, plus artifact reductions measured separately from provider usage.\n\nRTK has direct retained evidence for both parts:\n- An exact o200k_base artifact pair of 537 -> 178 tokens (docs/token-practice.md line 107).\n- Clean local and GitHub installs that passed 41 command expectations and 14 fidelity/recovery checks (catalogs/foundation/decisions.json lines 1472-1502; docs/full-stack-convergence.md lines 132-137, \"41 native commands, 14 checks\").\n\nContext Mode's evidence is weaker on both parts:\n- It has 0 retained artifact pairs (docs/token-native-saturation.md line 73).\n- Its only measured usage pairs point in opposite directions: Codex -11.26% and Claude +25.83% (docs/token-practice.md lines 85-86).\n- Its ctx_stats \"contain inconsistent session narratives and include cumulative unrelated scopes\" (evidence/artifacts/full-stack-convergence-20260921/native-client-results.json line 12; docs/full-stack-convergence.md lines 140-141). That makes separate measurement harder.\n\nB's native-client extraction is real: the ctx_execute_file result at lines 166-181 found \"Application checks | Not configured\". But it is only a use-stage observation.\n\nB's reason for leaving out RTK is that the gateway RTK/lite previews failed. That limitation sits in the selected-context-processing decision, which lists both context-mode and rtk as components (decisions.json lines 1150-1153 and 1166). So the same reason applies equally to the Context Mode component B selected.\n\nA's set therefore drops nothing the evidence better supports. B swaps a component with measured artifact and fidelity evidence for one without it. Neither set contains a claim the evidence contradicts, so \"neither\" does not apply.",
+ "winner_lane": "claude"
+}

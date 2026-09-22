@@ -1,0 +1,74 @@
+{
+ "alternatives": [
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "recipes/README.md"
+   ],
+   "key": "c2",
+   "name": "Awesome MCP servers registry",
+   "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+   "why_not_default": "The retained decision identifies this registry as unexamined. No specific entry has demonstrated bridge, inspection or configuration acceptance; registry inclusion alone supplies no operational evidence."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "mcp-surfaces",
+ "limits": [
+  "Reviewed retained evidence only; no new native execution or current-host qualification was performed.",
+  "Inspector's private raw operation captures were not available in the reviewed public receipt; its recorded checks were inspected.",
+  "Upstream release metadata was taken from the packet and was not independently refreshed."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "Inspector's arithmetic execution does not establish complete client plugin behavior, hooks, project-file scope or current Desktop connectivity.",
+  "mcporter recovery required intervention after stale metadata refusal and a startup timeout; automatic recovery was not established.",
+  "Shared-daemon isolation, persistence, scoped registration cleanup and changed-process-root recovery lack complete lifecycle acceptance.",
+  "Project configuration policy is documented source evidence; it does not certify every server or client configuration.",
+  "No executed comparison establishes superiority over a reviewed registry candidate or qualifies mcporter v0.14.0 against retained v0.13.13 behavior."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Retained mcporter 0.13.13 bridge plus MCP Inspector 2.7.0 direct inspection",
+   "A specifically reviewed challenger providing the same scoped bridge, inspection and configuration operations"
+  ],
+  "fixture_paths": [
+   "fixtures/before.py",
+   "blueprints/token-native-focus/saturation-audit.json"
+  ],
+  "metric": "Execute the same source-grounded symbol request against fixtures/before.py and verify greeting is returned; compare discovery and call correctness, project-root isolation, restart recovery and scoped cleanup. Apply the lifecycle boundaries recorded in the saturation audit and retain failures and actual outputs."
+ },
+ "overturn_when": "Change the verdict when an executed comparison using fixtures/before.py returns the expected greeting symbol through both arms and demonstrates that a reviewed challenger preserves inspection and configuration correctness while resolving the incumbent recovery or isolation gaps recorded in blueprints/token-native-focus/saturation-audit.json. Catalog agreement or static receipt validation alone is insufficient.",
+ "packet_sha256": "e3bd8deb88d369dfb96a2d04774cfc5cebf44697ac4e315b9a11e98d1a2e884f",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__mcp-surfaces.json",
+  "<host-path>/SKILL.md",
+  "<host-path>/RTK.md",
+  "catalogs/foundation/decisions.json",
+  "recipes/README.md",
+  "blueprints/token-native-focus/saturation-audit.json",
+  "evidence/receipts/token-native-retained-functional-20260920.json",
+  "observability/restart-receipt.json",
+  "fixtures/before.py"
+ ],
+ "why_selected": "Select c3 and c1 for complementary, bounded native operations. observability/restart-receipt.json records mcporter 0.13.13 starting after guarded stale-metadata recovery, discovering 11 tools and returning bridge-recovered from native execution. evidence/receipts/token-native-retained-functional-20260920.json records MCP Inspector invoking Context Mode over stdio, exiting successfully and passing the 42-computed check. These are retained native executions, with Inspector limited to an arithmetic fixture. recipes/README.md supplies source-reviewed project configuration procedures and distinguishes tool discovery from functional calls. Together they cover the demonstrated bridge and inspection needs under the project policy without promoting an unexamined registry entry.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "catalogs/foundation/decisions.json",
+  "observability/restart-receipt.json",
+  "evidence/receipts/token-native-retained-functional-20260920.json",
+  "recipes/README.md",
+  "blueprints/token-native-focus/saturation-audit.json"
+ ],
+ "winner_keys": [
+  "c3",
+  "c1"
+ ]
+}

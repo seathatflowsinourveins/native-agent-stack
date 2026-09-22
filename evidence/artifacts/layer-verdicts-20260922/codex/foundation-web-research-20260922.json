@@ -1,0 +1,140 @@
+{
+ "alternatives": [
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/upstream-snapshot.json",
+    "https://github.com/trycua/cua/blob/9bbfa7dd3e27ca7f1861ede70aaca390174493f9/libs/cua-driver/README.md"
+   ],
+   "key": "c3",
+   "name": "Cua Driver",
+   "repository": "https://github.com/trycua/cua",
+   "why_not_default": "The retained review contains no executed Cua task, permission-lifecycle check, recovery test or same-task advantage. Its documented CLI/MCP integration is relevant, but broader desktop operation does not establish better web retrieval or page interaction. See the pinned [Driver README](https://github.com/trycua/cua/blob/9bbfa7dd3e27ca7f1861ede70aaca390174493f9/libs/cua-driver/README.md)."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "evidence/receipts/token-practice-gap-followup-20260920.json"
+   ],
+   "key": "c4",
+   "name": "Playwright CLI",
+   "repository": "https://github.com/microsoft/playwright-cli",
+   "why_not_default": "Native Linux HTTP navigation, snapshots, fill, click, greeting verification and close passed after a retained file-protocol rejection. This establishes a viable alternate browser command path, but no comparative correctness, coverage or cost advantage over agent-browser."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c5",
+   "name": "Crawl4AI",
+   "repository": "https://github.com/unclecode/crawl4ai",
+   "why_not_default": "The audit inspected README/license material only; it performed no installation or native acceptance. Attributable extraction quality and an ingestion advantage over the accepted commands remain unmeasured."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "docs/full-stack-convergence.md",
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c7",
+   "name": "OpenResearch",
+   "repository": "https://github.com/alphaXiv/OpenResearch",
+   "why_not_default": "Retained public-paper retrieval supports a bounded literature task. It does not establish general primary-web-source coverage or page interaction, and no incremental coverage comparison establishes a need to add it to this default pair."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c2",
+   "name": "Firecrawl MCP",
+   "repository": "https://github.com/firecrawl/firecrawl-mcp-server",
+   "why_not_default": "README/license review establishes a possible retrieval integration; no retained installation, native retrieval acceptance or same-source quality/cost comparison establishes superiority."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c6",
+   "name": "Browser Use",
+   "repository": "https://github.com/browser-use/browser-use",
+   "why_not_default": "The source audit performed no browser execution or model inference. No demonstrated page-interaction gap justifies adding its browser-agent machinery to the bounded native command workflow."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "web-research",
+ "limits": [
+  "This verdict reviews retained historical observations; no candidate runtime or comparative benchmark was rerun on this host.",
+  "Context-mode file access was blocked by its configured project root; authorized native filesystem reads recovered the packet and local evidence.",
+  "Large references were inspected in relevant sections. Private raw outputs and their hashes were not independently revalidated."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "No frozen same-task comparison establishes superiority in retrieval completeness, citation accuracy, total latency or cost.",
+  "The later Tavily search missed the intended adapter guide; successful direct extraction depended on knowing its URL.",
+  "Tavily Map, Crawl and Research remain unqualified; skill discovery does not prove execution of every skill.",
+  "Browser evidence covers local fixtures and selected dashboard interactions, not arbitrary websites, session persistence or recovery.",
+  "Cua and Crawl4AI are marked adopted in the packet, but their referenced evidence establishes source review only.",
+  "Research exhaustiveness, source-claim correctness and causal provider-token savings remain unestablished."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "agent-browser versus Playwright CLI on the same HTTP-served fixtures/greeting.html, with isolated owned sessions and identical actions",
+   "Tavily Search/Extract versus a qualified retrieval challenger using the exact queries and source URLs retained in the two native Tavily receipts"
+  ],
+  "fixture_paths": [
+   "fixtures/greeting.html",
+   "fixtures/native-gap-prompt.txt"
+  ],
+  "metric": "Require correct element targeting, exact Hello, Native! output and owned-session cleanup; for retrieval require relevant primary-source discovery, attributable extracted content and retained failures. Compare complete elapsed time, service/model cost and recovery under identical inputs; missing cost data cannot establish a cost advantage."
+ },
+ "overturn_when": "Replace the browser default if an executed comparison on fixtures/greeting.html, following the browser task in fixtures/native-gap-prompt.txt with a common HTTP transport, shows another candidate preserves exact output and cleanup while improving correctness, recovery or measured total cost. Replace the retrieval default only after executing the retained Tavily queries and URLs against both arms and demonstrating improved relevant-source coverage and attribution without an unmeasured operational trade-off.",
+ "packet_sha256": "9b40b995a5408221913a5aeded32ede86424d11a30d8fccf82def184985c470c",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__web-research.json",
+  "<host-path>/SKILL.md",
+  "catalogs/foundation/decisions.json",
+  "docs/dashboard-rendered-acceptance.md",
+  "catalogs/landscape/upstream-snapshot.json",
+  "https://github.com/trycua/cua/blob/9bbfa7dd3e27ca7f1861ede70aaca390174493f9/libs/cua-driver/README.md",
+  "catalogs/us-equities/star-audit.json",
+  "docs/full-stack-convergence.md",
+  "docs/ecosystem/tavily-receipt.json",
+  "evidence/receipts/native-tavily-cli-20260920.json",
+  "evidence/receipts/native-tavily-session-20260920.json",
+  "blueprints/token-native-focus/saturation-audit.json",
+  "recipes/native-upgrades-20260921.md",
+  "fixtures/greeting.html",
+  "fixtures/native-gap-prompt.txt",
+  "evidence/receipts/token-practice-gap-followup-20260920.json"
+ ],
+ "why_selected": "Select Tavily CLI for attributable source retrieval and agent-browser for bounded page interaction. evidence/receipts/native-tavily-cli-20260920.json records actual native Search returning four official sources and Extract returning one result with zero failures. The earlier docs/ecosystem/tavily-receipt.json separately records a three-result search; these are different runs. evidence/receipts/native-tavily-session-20260920.json preserves a later search miss and successful known-URL extraction. catalogs/foundation/decisions.json and blueprints/token-native-focus/saturation-audit.json record agent-browser's native open/fill/click/result/close integration on a local fixture; docs/dashboard-rendered-acceptance.md additionally records independent observation of a real Dagu browser stream and matching session metadata. Together these cover the requirement through bounded commands without another standing research-agent stack. The whole-set evidence class is conservatively local_integration because the browser acceptance is scoped to project fixtures and selected dashboard integration.",
+ "winner_evidence_class": "local_integration",
+ "winner_evidence_refs": [
+  "catalogs/foundation/decisions.json",
+  "docs/dashboard-rendered-acceptance.md",
+  "blueprints/token-native-focus/saturation-audit.json",
+  "docs/ecosystem/tavily-receipt.json",
+  "evidence/receipts/native-tavily-cli-20260920.json",
+  "evidence/receipts/native-tavily-session-20260920.json"
+ ],
+ "winner_keys": [
+  "c8",
+  "c1"
+ ]
+}
