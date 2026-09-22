@@ -3692,8 +3692,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "cd9e3e61630c06c5e54337de345c8f715c5eaafdb6f7848f0ec6a139b4a9bce4",
-      "bytes": 2997
+      "sha256": "93f8af561256a99e4a10595b44dcee66d54f45ba41b4232329c84dc559465488",
+      "bytes": 5095
     },
     {
       "path": ".gitignore",
@@ -7717,6 +7717,11 @@
       "bytes": 2582
     },
     {
+      "path": "tests/test_workflow_security_coverage.py",
+      "sha256": "7b8574fdf46a42258d43652b377edb67612fb7eeae7a5298a8b6b8465e887bef",
+      "bytes": 3378
+    },
+    {
       "path": "tests/test_wsl_memory_maintenance.py",
       "sha256": "b66309e74fcd3b5e25cc1ffca585eaf12e0d4094db4efa4313a880e423212871",
       "bytes": 4729
@@ -9028,18 +9033,18 @@
     },
     {
       "path": ".github/main-ruleset.json",
-      "sha256": "e466d3a4f52f6c4b2e0dcb6e73b10875b9a9a3c2bd65a2651db4ef458d47e1cd",
-      "bytes": 594
+      "sha256": "835f09f7043193afd2f4c77a0758235a1622fa8ea49ed11b6d2f53ed2fff6880",
+      "bytes": 1118
     },
     {
       "path": "docs/github-automation-evidence.json",
-      "sha256": "5f827a4302487ee863d8b9d1e1e7665f0b1baa26cc9d1ba81f90a42ed0d68fc6",
-      "bytes": 12324
+      "sha256": "7bb47481be9904ca1fcbc633ccc4438fcbc53fa9aae2c8f0369ade8c422de5fa",
+      "bytes": 12863
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "43284b9f3addbb94d56938649415f99b62618517ca8e7492b8d44b4be9fbb5a9",
-      "bytes": 15521
+      "sha256": "974aec831f5a81f7f7237701cde12afdfd7259ec99d9d13c50764b6371d76041",
+      "bytes": 25289
     },
     {
       "path": "docs/research-task-acceptance.md",
@@ -9458,8 +9463,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "810120df9ec901fc0e8247fda6559ab46a352d469457524aa0798472cde9f8b4",
-      "bytes": 12635
+      "sha256": "3008206e8dc19ceda53f091a683ef153449fd994d2f06494cb9fabc39fbd293d",
+      "bytes": 17083
     },
     {
       "path": "docs/tasks/2026-09-20-automation-resolution.md",
@@ -10218,8 +10223,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "0d96a8adfddf2d913015080770fff5b34948a65de294ca59c2c9a8f6aeb465a5",
-      "bytes": 16142
+      "sha256": "79ff220b68c581a318645096f967d03d126771d5774566c06613e6eac36fafd7",
+      "bytes": 16751
     },
     {
       "path": "examples/claude-native/workflows/check-syntax.mjs",
@@ -11360,6 +11365,41 @@
       "path": "tests/test_blind_layer_decisions.py",
       "sha256": "0512e58b967baed9fdc95323cd6867dbb1981785bb3d20e51d6a1df1bcb4fbc1",
       "bytes": 2827
+    },
+    {
+      "path": ".github/workflows/catalog-freshness.yml",
+      "sha256": "1cc305b69e6b4c11db4f1bb1ff3fcf30b88b31c2123ea9e31dedc4ab2570cd00",
+      "bytes": 7591
+    },
+    {
+      "path": ".github/workflows/supply-chain.yml",
+      "sha256": "55abfe5a75a4d10ea4ad6da4209145823a06a0e28d445e42fed666f8a92323d8",
+      "bytes": 6688
+    },
+    {
+      "path": ".github/CODEOWNERS",
+      "sha256": "944beb38f10b602866c10489a3cee77325f6ef1716a37d3ef57fbd6d1ed18506",
+      "bytes": 95
+    },
+    {
+      "path": "SECURITY.md",
+      "sha256": "37f1550108a21272953972ded3daba8d725218c323ab94b6d9368159e4d170d4",
+      "bytes": 1780
+    },
+    {
+      "path": ".github/pull_request_template.md",
+      "sha256": "b3196c10719125959ffa1decf5c2924a3e7d938db5ab1f7373a192e62557fcce",
+      "bytes": 1293
+    },
+    {
+      "path": ".github/tag-ruleset.json",
+      "sha256": "615df034db59a9a297d20d92c7277bb36afc191f5ab2a5677a30385c3dbeda88",
+      "bytes": 296
+    },
+    {
+      "path": "examples/claude-native/workflows/SHA256SUMS",
+      "sha256": "ab4b14a99f3bab5ce7ba3a6a5389a8caec7f6961c88e04999e79f5aa9e360174",
+      "bytes": 955
     }
   ],
   "convergence_records": [

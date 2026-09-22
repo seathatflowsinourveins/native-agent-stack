@@ -7,6 +7,17 @@ qualification. These are local integration assets, not upstream tests. The
 separate `semantic-evidence-reviewer` example received a later explicit Opus/high
 declaration and reporting instruction to satisfy the combined portable contract;
 that change has local checks and no new native provider qualification.
+## Byte-identity check
+
+`SHA256SUMS` in this directory (`sha256sum -- *.mjs *.js *.json`, excluding
+`README.md` and `SHA256SUMS` itself) is checked byte-for-byte by the
+`validate` workflow's "Check example workflow byte identity" step
+(`.github/workflows/validate.yml`) on every push and pull request. It is
+refreshed on purpose whenever one of these example files changes: regenerate
+it with the same command from this directory and commit the new file in the
+same change as the edited example. An unexplained mismatch on an unrelated PR
+means one of these files changed without an intentional update here.
+
 Use [the native recipe](../../../recipes/claude-native-ultracode.md)
 for settings, authoring, worker models and lifecycle boundaries, and
 [the cooperation lanes](../../../recipes/claude-codex-cooperation-lanes.md) for

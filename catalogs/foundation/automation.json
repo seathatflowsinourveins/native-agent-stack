@@ -80,6 +80,49 @@
       "source": "https://github.com/actions/attest/tree/1e69f48acb82d1966a394da916b4c1698aa569d6",
       "selection": "Native explicit-subject provenance; current maintained interface replaces the attest-build-provenance compatibility wrapper. No registry push, storage record or content write.",
       "acceptance": "docs/catalog-provenance.md: native gh attestation verify with expected repository, signer workflow, source ref/digest and hosted runner policy, then detached original/altered/original verification."
+    },
+    {
+      "repository": "gitleaks/gitleaks",
+      "version": "8.30.1",
+      "pin_record": "blueprints/convergence-practice/wsl-native-tools/pins.json",
+      "source": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+      "command": "gitleaks git . --redact --no-banner --report-format json; gitleaks dir . --redact --no-banner",
+      "selection": "Reused already-pinned secret scanner (same pins.json entry the WSL native-tools profile uses). Added as validate.yml's secret-scan job: git-history and working-tree modes, redacted JSON report uploaded always(), no fail threshold decided yet.",
+      "workflow": ".github/workflows/validate.yml#secret-scan"
+    },
+    {
+      "repository": "anchore/syft",
+      "version": "1.52.0",
+      "archive_sha256": "caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d",
+      "source": "https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_checksums.txt",
+      "command": "syft scan dir:<venv> -o spdx-json=... -o cyclonedx-json=...",
+      "selection": "SBOM generator for supply-chain.yml's sbom-vuln job; SPDX and CycloneDX outputs for the reproduced nautilus_trader install venv. Report-only, 90-day artifact retention.",
+      "workflow": ".github/workflows/supply-chain.yml#sbom-vuln"
+    },
+    {
+      "repository": "anchore/grype",
+      "version": "0.119.0",
+      "archive_sha256": "3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b",
+      "source": "https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_checksums.txt",
+      "command": "grype sbom:<spdx-json> -o json; grype db status",
+      "selection": "Vulnerability scanner for supply-chain.yml's sbom-vuln job, run against syft's SBOM output. Tracks upstream's latest release rather than a fixed version because it ships its own matching logic, not just a data feed; re-checked whenever the workflow's own path changes. No --fail-on threshold; report-only.",
+      "workflow": ".github/workflows/supply-chain.yml#sbom-vuln"
+    }
+  ],
+  "scheduled_report_only_lanes": [
+    {
+      "workflow": ".github/workflows/catalog-freshness.yml",
+      "job": "freshness",
+      "schedule": "17 6 * * 1",
+      "purpose": "Reruns extract_layers.py + github_freshness.py, rebuilds a manifest with build_manifest.py against an empty lanes.json (skips interactive lane review, still recomputes the real pin/upstream baseline), diffs it against catalogs/sota-convergence/manifest-20260922.json, and appends a fixed-tool pin-drift table to the job summary. Writes and commits nothing; uploads a 30-day artifact.",
+      "required_check": false
+    },
+    {
+      "workflow": ".github/workflows/supply-chain.yml",
+      "job": "sbom-vuln",
+      "schedule": "29 7 * * 1",
+      "purpose": "SBOM (syft) + vulnerability scan (grype) of the reproduced native-foundation-e2e.yml nautilus_trader install venv. Report-only, no fail threshold; 90-day artifact retention.",
+      "required_check": false
     }
   ],
   "selected_upgrade_qualification": {
@@ -140,6 +183,17 @@
       "revision": "6a1a69c3efdfb3dbb534b970f08b7f49524cec8b",
       "source": "https://github.com/renovatebot/renovate/tree/6a1a69c3efdfb3dbb534b970f08b7f49524cec8b",
       "decision": "Custom catalog managers are a future option; no demonstrated independent gap beyond the existing catalog owner. Dependabot alone owns Action pin proposals."
+    },
+    {
+      "repository": "dependabot/dependabot-core",
+      "ecosystem": "pip",
+      "source": "https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference",
+      "decision": "Not activated for this repository's Python pins. Dependabot's pip ecosystem discovers ordinary requirements/lock files by name; the checksum lock actually used is .github/requirements-ci.lock, a name it does not recognize, and four of five pinned CI binaries (actionlint, gitleaks, syft, grype) are curl-downloaded release tarballs with no manifest it parses at all. catalog-freshness.yml's new pin-drift table already covers all five (plus nautilus_trader) against each tool's latest upstream release. Precondition to revisit: rename .github/requirements-ci.lock to a Dependabot-discoverable name."
+    },
+    {
+      "repository": "github/codeql-action",
+      "source": "https://docs.github.com/en/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning-with-codeql",
+      "decision": "Not activated. Default CodeQL setup needs security-events: write (every workflow here is contents: read only) and pins no exact CodeQL bundle version by default, violating this repository's no-floating-pin practice. The scannable surface is stdlib-only Python and a handful of .mjs files with no served application, input boundary or authentication code. Re-evaluate on a served application path (e.g. a hosted dashboard)."
     }
   ],
   "research_acceptance": {
