@@ -1524,6 +1524,27 @@
       "freshness": "Contact-corrected native request returned HTTP200 on2026-09-19 and selected371indexrows. Separate42-package Linux/WSL environment; dependency wheels are not hash-locked. See follow-up receipt for raw-source and temporal-gate scope."
     },
     {
+      "id": "exchange-calendars",
+      "repository": "https://github.com/gerrymanoim/exchange_calendars",
+      "version": "4.13.2",
+      "license": "Apache-2.0",
+      "role": "Trading sessions, holidays, breaks and UTC boundaries for the native XNYS calendar used by the local historical-simulation session-date check",
+      "source_pin": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+      "commands": [
+        "python -m pip install 'exchange-calendars==4.13.2'",
+        "python - <<'PY'\nimport exchange_calendars as xcals\ncalendar = xcals.get_calendar('XNYS')\nprint(calendar.session_open('2013-10-07'))\nprint(calendar.session_close('2013-10-07'))\nPY"
+      ],
+      "evidence_ids": [
+        "native-historical-leverage-stress-20260919"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md",
+        "https://pypi.org/pypi/exchange_calendars/4.13.2/json"
+      ],
+      "freshness": "Pinned in catalogs/us-equities/data-research.json (decision default, evidence_level native_proven) and catalogs/us-equities/architecture/trading-sources.json (source fetch commit bbda29fed902374bdb75acab008f421fbd567823); newly added as a selected stack component. The XNYS session-date check in blueprints/us-equities/historical-simulation/receipt.json is the only currently registered evidence.json receipt that names this package by function; that receipt's own component_ids array does not yet list exchange-calendars, so scripts/validate.py is expected to flag the cross-reference until a coordinator-owned edit to manifests/evidence.json adds it."
+    },
+    {
       "id": "zizmor",
       "repository": "https://github.com/zizmorcore/zizmor",
       "version": "1.30.1",
@@ -1965,6 +1986,7 @@
         "pandas",
         "skfolio",
         "edgartools",
+        "exchange-calendars",
         "zizmor",
         "beads",
         "skills-ref",

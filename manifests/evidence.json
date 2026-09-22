@@ -6598,18 +6598,18 @@
     },
     {
       "path": "catalogs/us-equities/data-research.json",
-      "sha256": "e5bc8f8179605af68aa918c034c69d071f2a89adb6fe7596cccbebf8b776e6e5",
-      "bytes": 96448
+      "sha256": "8f98640eda71fc8b0fe0c4edeb62e87c09c3c84fc1bc3fb1208b3aa36f28765f",
+      "bytes": 96549
     },
     {
       "path": "catalogs/us-equities/data-research.md",
-      "sha256": "a3c5be071059f5452694549acb21fdd911b6728e4e78bb5d92a3c1754847c831",
-      "bytes": 22880
+      "sha256": "9948f2ad3d789ca2a3b19010077320f36c5f20fbbe4b020e2b79f5ccc1711876",
+      "bytes": 23226
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "273191fbc46d24a337e52d7eba6ddc8a763d0ce37878f868710029b176b7ec5f",
-      "bytes": 688158
+      "sha256": "43d6f70ac5091a87cc0819aaed717e55478cdfc1a9e7c9ced39123a0b415bffb",
+      "bytes": 688363
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -7288,8 +7288,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 85845,
-      "sha256": "730090911dd8b341cc4e2cda048a81220e9713493f1c6a18384911f322dbe5f1"
+      "bytes": 87569,
+      "sha256": "f8674e5f29d51b0fc1e1197ab58cd140ffabf02b1766368e9770a95e37defa91"
     },
     {
       "path": "observability/README.md",
@@ -7588,8 +7588,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "3e8aa3ef33dc2948041f9a213046d0e010fafe1408ecc9def089a18411eb420d",
-      "bytes": 52318
+      "sha256": "b05dcc235d4e668b9993368f8df06979b70e4224c4dd09cc54705cf9cdefb2cb",
+      "bytes": 53685
     },
     {
       "path": "tests/test_execution_realism.py",
@@ -7703,8 +7703,8 @@
     },
     {
       "path": "tests/test_stack_lifecycle.py",
-      "sha256": "fac17fc2fd2288c90e32cd1d93301dcc1f78619fc5366b6da2c2e2aafa5b2812",
-      "bytes": 4667
+      "sha256": "67b71704382baa14089250e5c44feda3a5a44780e4819831e8b872d7634ce251",
+      "bytes": 7477
     },
     {
       "path": "tests/test_validate.py",

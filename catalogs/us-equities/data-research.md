@@ -93,7 +93,7 @@ Add tools when an observed need justifies them:
 | [Feast](https://github.com/feast-dev/feast) | 0.66.0 | Conditional | Historical/online feature definitions. |
 | [Pandera](https://github.com/unionai-oss/pandera) | 0.33.1 | Default | Explicit dataframe contracts. |
 | [Great Expectations](https://github.com/fivetran/great_expectations) | 1.23.1 | Alternative | Validation suites and reporting. |
-| [exchange_calendars](https://github.com/gerrymanoim/exchange_calendars) | 4.13.2 | Default; native evidence | Versioned exchange sessions. |
+| [exchange_calendars](https://github.com/gerrymanoim/exchange_calendars) | 4.13.2 | Default; native evidence | Versioned exchange sessions. Selected as `exchange-calendars` in [`manifests/stack.json`](../../manifests/stack.json) (supporting profile); cited evidence is the XNYS session-date check in [`blueprints/us-equities/historical-simulation/receipt.json`](../../blueprints/us-equities/historical-simulation/receipt.json), whose own `component_ids` do not yet list this component. |
 | [pandas_market_calendars](https://github.com/rsheftel/pandas_market_calendars) | 5.4.0 | Alternative | Pandas schedules/interruptions. |
 
 The proposed data contract is more important than adding another database. These are **requirements for future implementation**, not claims that this repository has already enforced them:

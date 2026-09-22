@@ -332,10 +332,10 @@
     "repositories": 843,
     "public_star_repositories": 342,
     "beyond_public_stars": 501,
-    "references": 1815,
+    "references": 1816,
     "repositories_by_record_type": {
       "catalog_card": 147,
-      "component_record": 68,
+      "component_record": 69,
       "legacy_candidate": 20,
       "public_star": 342,
       "research_supplement": 567,
@@ -739,7 +739,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/54",
+          "pointer": "/components/55",
           "id": "skills-ref"
         }
       ]
@@ -2754,7 +2754,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/63",
+          "pointer": "/components/64",
           "id": "apple-container"
         }
       ]
@@ -6008,7 +6008,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/65",
+          "pointer": "/components/66",
           "id": "omniroute"
         }
       ]
@@ -6926,7 +6926,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/60",
+          "pointer": "/components/61",
           "id": "fastapi"
         }
       ]
@@ -7419,7 +7419,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/53",
+          "pointer": "/components/54",
           "id": "beads"
         }
       ]
@@ -7498,6 +7498,7 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
+        "component_record",
         "research_supplement"
       ],
       "references": [
@@ -7528,6 +7529,12 @@
           "id": "data-exchange-calendars",
           "decision": "default",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/52",
+          "id": "exchange-calendars"
         }
       ]
     },
@@ -7700,7 +7707,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/56",
+          "pointer": "/components/57",
           "id": "llama-cpp"
         }
       ]
@@ -9714,7 +9721,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/57",
+          "pointer": "/components/58",
           "id": "jcodemunch-mcp"
         }
       ]
@@ -11783,7 +11790,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/64",
+          "pointer": "/components/65",
           "id": "playwright-test"
         }
       ]
@@ -12742,7 +12749,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/67",
+          "pointer": "/components/68",
           "id": "nautilus-trader"
         }
       ]
@@ -15044,7 +15051,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/61",
+          "pointer": "/components/62",
           "id": "postgresql"
         }
       ]
@@ -16287,7 +16294,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/59",
+          "pointer": "/components/60",
           "id": "react"
         }
       ]
@@ -18508,7 +18515,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/66",
+          "pointer": "/components/67",
           "id": "tavily-cli"
         }
       ]
@@ -19626,7 +19633,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/62",
+          "pointer": "/components/63",
           "id": "poppler"
         }
       ]
@@ -20494,7 +20501,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/58",
+          "pointer": "/components/59",
           "id": "nextjs"
         }
       ]
@@ -21695,7 +21702,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/55",
+          "pointer": "/components/56",
           "id": "otel-tui"
         }
       ]
@@ -21920,7 +21927,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/52",
+          "pointer": "/components/53",
           "id": "zizmor"
         }
       ]
