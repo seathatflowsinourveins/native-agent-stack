@@ -1,7 +1,11 @@
 """Fail-closed data-snapshot promotion gate: pure-Python parsing tests always
 run; fixture tests that execute pandera/exchange_calendars validation run
 through the gate's own isolated venv (never the ambient test interpreter) and
-are skipped when that venv is not present on this host.
+are skipped when that venv is not present on this host. When
+REQUIRE_PROMOTION_GATE_VENV=1 (set by the CI validate workflow after it
+provisions the venv), a missing venv fails this module at import time instead
+of silently skipping, so a broken provisioning step cannot pass CI as a
+silent skip.
 """
 import hashlib
 import importlib.util
@@ -36,6 +40,19 @@ def _find_gate_python():
 
 
 GATE_PYTHON = _find_gate_python()
+
+if os.environ.get("REQUIRE_PROMOTION_GATE_VENV") == "1" and not GATE_PYTHON:
+    # The CI validate workflow sets this after it provisions the gate venv
+    # from blueprints/us-equities/data/requirements.lock; a missing venv here
+    # means that provisioning step did not run or did not produce a working
+    # interpreter. Fail loudly at import time instead of letting
+    # FixtureGateRuns silently skip, so CI cannot go green without actually
+    # classifying the fixtures. Local developer runs are unaffected: this
+    # variable is unset by default and GATE_PYTHON absence still just skips.
+    raise RuntimeError(
+        "REQUIRE_PROMOTION_GATE_VENV=1 but no promotion-gate venv was found "
+        "(checked PROMOTION_GATE_PYTHON and the documented ecosystem tool "
+        "location); the fixture gate tests cannot run.")
 
 
 class PurePythonParsing(unittest.TestCase):
