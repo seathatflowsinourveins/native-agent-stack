@@ -179,3 +179,24 @@ residue those deltas do not explain exactly stays an unattributed `FAIL`.
 Implementing a dividend `SimulationModule` or an open-tick fill path is a
 separate follow-up, deliberately not attempted until the tolerance sheet is
 sealed.
+
+## Review findings carried (2026-09-22)
+
+An independent review of this harness confirmed 21 of 24 claims and recorded
+six non-blocking items. None changes the BLOCKED verdict; they are carried
+into the dividend-module follow-up round:
+
+1. `fixture_strategy.py` substitutes a zero commission when a native fill
+   event carries none, instead of refusing; the published run did not hit
+   this branch (its fills record fee `0.00 USD`).
+2. `convert.py` validates price decoding, integral volume and OHLC
+   consistency only on in-window rows; out-of-window rows get the whole-file
+   field-count, duplicate and monotonicity checks only (all five inputs are
+   hash-pinned).
+3. `fixture_strategy.check_run_integrity` checks engine iterations only when
+   the engine reports a value.
+4. `convert.py` drops a nonpositive derived distribution silently instead of
+   refusing or recording it.
+5. The comparator mode table documents the `--bars` and no-evidence modes as
+   observed; the acceptance set exercises only the `--lean-data` mode.
+6. The review inventory miscounted the test classes (17, not 13).
