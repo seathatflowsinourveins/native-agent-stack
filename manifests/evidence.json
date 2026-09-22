@@ -3028,8 +3028,8 @@
     },
     {
       "path": ".github/workflows/native-service-reboot.yml",
-      "sha256": "6aa1b1b93002ff7e5fdb63d9b12464ba036cfe2c1b3de29107f8cc1357e3f736",
-      "bytes": 2816
+      "sha256": "9f8366e587b769eb12648765f9e45d08172c97a87163efd24d1deae8530a0cda",
+      "bytes": 3014
     },
     {
       "path": ".github/workflows/native-token-e2e.yml",
@@ -3053,8 +3053,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "423e8096b54a1df32f3e446c42649cfbbe95686fbbf7cd81bf4f110b92926f14",
-      "bytes": 5990
+      "sha256": "a376703bdb6e31ebe30f38e57f56e14f3250e286824b7d4525b7b2be7e8b0987",
+      "bytes": 7244
     },
     {
       "path": ".gitignore",
@@ -7369,8 +7369,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "393cd81a07e4b4a61bf62fa716e59335c1cff87af9e4573a94e160f5584a7897",
-      "bytes": 20661
+      "sha256": "e319bd21e8aa63cd6a147fa0c16e88309c09f9df1ef27b8fd5a5e9971f1c2863",
+      "bytes": 23100
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -7624,7 +7624,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "3993a81dac86a62bfdaf6f52339b10c6ba8ca577c0b1e0961395f8669d3d0fdd",
+      "sha256": "e6edb08f3ddb3a4f4334cc97fe9f7d6d43c93542dae534903e5ab5b604a8a18d",
       "bytes": 12918514
     },
     {
@@ -7694,8 +7694,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "53901639629a081ed0be63538bae932c0e02dc4dbbee5feecebff0148b1ba4b1",
-      "bytes": 35715
+      "sha256": "63df90cf9d6181fd253a9646b3649d02796adcb59d9da97f196d77f78acba93e",
+      "bytes": 36516
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -11419,8 +11419,8 @@
     },
     {
       "path": "scripts/trading_gates.py",
-      "sha256": "d8c00fff45b5094d0558c62b597bfe5e0f0f0cb3540f74e3e52cbd59b8113f94",
-      "bytes": 9701
+      "sha256": "12b4d1442ef05617366274c99917784c883609a290f897d3009b3df63e9c7dc6",
+      "bytes": 10010
     },
     {
       "path": "scripts/validate.py",
@@ -11759,8 +11759,8 @@
     },
     {
       "path": "tests/test_promotion_gate.py",
-      "sha256": "783348c2dda3f8a78cd730505d81e59337037ac9dc9812c2dfa8dba0f00c4106",
-      "bytes": 13552
+      "sha256": "b88d129969dbb77d6990447cb33938f93fcce09a7be3991faa58d85444b2c262",
+      "bytes": 19026
     },
     {
       "path": "tests/test_render_config.py",
@@ -11809,8 +11809,8 @@
     },
     {
       "path": "tests/test_trading_gates.py",
-      "sha256": "ac11ef14d7576a9c5b52b750755d47f2fb2aa1b03fd6daaebef265b49a864825",
-      "bytes": 7057
+      "sha256": "02c0b947dfad2df175406780471728234fd60289d042b0395fd9401de2a8bde2",
+      "bytes": 15953
     },
     {
       "path": "tests/test_validate.py",
@@ -11829,8 +11829,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "33b357c30449f78754b94fe10329d74eb057ebb1e17c06ab4bcf834e0f9eda4a",
-      "bytes": 3416
+      "sha256": "a99c55ea13b955fbde3caf00c70ed82067bfbefdb3d490044e091accb5bbb3f6",
+      "bytes": 3482
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
