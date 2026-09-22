@@ -5957,8 +5957,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
-      "sha256": "bf55086246038750ff439bf705ccdc1c923f1ba48dff8ef42693b678c6ed52ff",
-      "bytes": 10152
+      "sha256": "b1d3885083e15b67b2c2e4711a32e6259fae72c1df0e683b347fcf16d1b20978",
+      "bytes": 10297
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
@@ -7222,13 +7222,13 @@
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
-      "sha256": "ee6b820d6f27f0c886d900ccf550363dad8f53ed3ef2f438e1ca62a22a3ced15",
-      "bytes": 105245
+      "sha256": "df7ca25f3df2d2a08d12fb47f869706a11209b00798cd05ed3d56ea38916d8f0",
+      "bytes": 105331
     },
     {
       "path": "catalogs/us-equities/engines-strategies.md",
-      "sha256": "f4c00b04ed3929b4223f76ca8d612830c23cdc97614bd0095041b3648a6f727d",
-      "bytes": 25019
+      "sha256": "4452709796abb64c66064c8e733ab29843ef271b1e8c8bb09777364f48ff415c",
+      "bytes": 25190
     },
     {
       "path": "catalogs/us-equities/foundation-memory.json",
@@ -7247,8 +7247,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "62ce4da28e5641115ab0f09374b02fe087af705532d69c5c99661633eb2877f8",
-      "bytes": 19058
+      "sha256": "66986e9b0b38edbc05674b6162da27d47b257b040c1b8df09b66eb6550d28431",
+      "bytes": 19130
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -7502,8 +7502,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "9d6446fe2002cf03c56d46bf7b59d156c9655bbfb0f60d21f46c1b786f7fb0fb",
-      "bytes": 12139743
+      "sha256": "e1ffe1ee87b6d004b762d2bc08acbd650812815390007cef1670a1f286832fd4",
+      "bytes": 12140173
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -11387,8 +11387,8 @@
     },
     {
       "path": "tests/test_catalogs.py",
-      "sha256": "0f3e47f75cb277f0bdf37c4d66eb7c9036d2a452d29e1f958164486420693c4c",
-      "bytes": 31682
+      "sha256": "9508a99fb8ccc157aaab16788b90d3b05b85c36cfa0afa8de53a39bebaacd075",
+      "bytes": 31942
     },
     {
       "path": "tests/test_catalyst_dataset.py",

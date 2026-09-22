@@ -177,14 +177,16 @@ session's first-bar close while the oracle equals that bar's open, and any cash
 residue those deltas do not explain exactly stays an unattributed `FAIL`.
 
 Closing either mapping needs a mechanism the pinned engine supports natively,
-or a newly preregistered mapping manifest. The current manifest refuses an
-injected balancing cash entry and synthetic open-priced data (both would
-fabricate the mapping), so neither is attempted here.
+or a newly preregistered mapping manifest. The manifest injects no balancing
+cash entry (the acceptance plan forbids an invented one) and states that
+synthetic open-priced data would fabricate the mapping, so neither is
+attempted here.
 
 ## Review findings carried (2026-09-22)
 
-An independent review of this harness confirmed 21 of 24 claims and recorded
-six non-blocking items. None changes the BLOCKED verdict; they are carried
+An independent review of this harness (recorded in the agent-lab task record
+`docs/tasks/2026-09-22-executed-comparisons.md`, "Parity final review")
+confirmed 21 of 24 claims and recorded six non-blocking items. None changes the BLOCKED verdict; they are carried
 into the next harness round:
 
 1. `fixture_strategy.py` substitutes a zero commission when a native fill
