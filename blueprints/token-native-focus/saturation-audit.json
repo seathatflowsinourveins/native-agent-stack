@@ -106,6 +106,11 @@
             "id": "foundation-closure-20260921",
             "path": "evidence/receipts/foundation-closure-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -254,6 +259,11 @@
             "id": "claude-foundation-finalization-20260921",
             "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -399,6 +409,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -578,6 +593,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -698,6 +718,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -808,6 +833,11 @@
           {
             "id": "alpaca-paper-e2e-20260921",
             "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -1017,6 +1047,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1125,6 +1160,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -1238,6 +1278,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -1477,6 +1522,11 @@
             "id": "claude-foundation-finalization-20260921",
             "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1618,6 +1668,11 @@
           {
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -1959,6 +2014,11 @@
             "id": "claude-foundation-finalization-20260921",
             "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -2106,6 +2166,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -2201,6 +2266,11 @@
           {
             "id": "token-native-retained-functional-20260920",
             "path": "evidence/receipts/token-native-retained-functional-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -2393,6 +2463,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2549,6 +2624,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2667,6 +2747,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -2779,6 +2864,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -2921,6 +3011,11 @@
             "id": "synthetic-catalyst-contract-20260920",
             "path": "blueprints/us-equities/catalyst-experiment/receipt.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3052,6 +3147,11 @@
           {
             "id": "native-lifecycle-sample-20260920",
             "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -3284,6 +3384,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3436,6 +3541,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -3597,6 +3707,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -3829,6 +3944,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3975,6 +4095,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4148,6 +4273,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4425,6 +4555,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4548,6 +4683,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4661,6 +4801,11 @@
             "id": "token-native-retained-functional-20260920",
             "path": "evidence/receipts/token-native-retained-functional-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4770,6 +4915,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4982,6 +5132,11 @@
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5083,6 +5238,11 @@
           {
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -5201,6 +5361,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -5350,6 +5515,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5454,6 +5624,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -5550,6 +5725,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5651,6 +5831,11 @@
           {
             "id": "token-practice-gap-followup-20260920",
             "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -6118,6 +6303,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6243,6 +6433,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -6386,6 +6581,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -6561,6 +6761,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -6809,6 +7014,11 @@
             "id": "claude-foundation-finalization-20260921",
             "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6945,6 +7155,11 @@
           {
             "id": "native-offhost-app-state-20260920",
             "path": "evidence/receipts/native-offhost-app-state-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -7119,6 +7334,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -7238,6 +7458,11 @@
           {
             "id": "native-sandbox-network-20260920",
             "path": "evidence/receipts/native-sandbox-network-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -7378,6 +7603,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -7595,6 +7825,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -7691,6 +7926,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -7781,6 +8021,11 @@
           {
             "id": "upstream-native-tools-20260920",
             "path": "evidence/receipts/upstream-native-tools-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -7944,6 +8189,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -8050,6 +8300,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -8173,6 +8428,11 @@
           {
             "id": "native-dashboard-data-20260921",
             "path": "evidence/receipts/native-dashboard-data-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -8316,6 +8576,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -8470,6 +8735,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -8590,6 +8860,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -8699,6 +8974,11 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -8798,6 +9078,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -8903,6 +9188,11 @@
           {
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],

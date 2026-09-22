@@ -129,7 +129,7 @@ jobs:
         run: python3 scripts/verify_nautilus_ci.py --output "$NATIVE_FOUNDATION_ROOT/reports"
       - name: Retain original commands, outputs and verification failures
         if: ${{ !cancelled() && env.NATIVE_FOUNDATION_ROOT != '' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: native-foundation-e2e-results
           path: ${{ env.NATIVE_FOUNDATION_ROOT }}/reports/

@@ -13,8 +13,8 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-      id-token: write
-      attestations: write
+      id-token: write # OIDC token for keyless signing of the archive attestation; this job only
+      attestations: write # store the build-provenance attestation for the published archive
     steps:
       - name: Prepare publication evidence
         run: |

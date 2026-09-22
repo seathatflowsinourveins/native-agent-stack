@@ -52,6 +52,7 @@ RETURNED_RECEIPT_FAMILIES = {
     "dashboard-render-e2e", "dashboard-gap-resolution", "memory-landscape", "memory-landscape-lifecycle", "foundation-convergence",
     "foundation-rd",
     "claude-upstream-checks",
+    "claude-repository-evidence",
 }
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
@@ -66,6 +67,13 @@ NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-c
                     "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-6h-20260921.png",
                     "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-72h-20260921.png",
                     "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
+                    "docs/claude-repository-evidence.md",
+                    "docs/ecosystem/claude-repository-evidence.html",
+                    "evidence/artifacts/claude-repository-evidence-20260921/summary.json",
+                    "evidence/artifacts/claude-repository-evidence-20260921/provenance.json",
+                    "evidence/artifacts/claude-repository-evidence-20260921/shots/prometheus-targets.png",
+                    "evidence/artifacts/claude-repository-evidence-20260921/shots/qdrant-collections.png",
+                    "evidence/artifacts/claude-repository-evidence-20260921/shots/dagu-dag-latest-run.png",
                     "docs/claude-foundation-finalization-20260921.md", "examples/claude-native/workflows/README.md",
                     "docs/foundation-rd-readiness.md", "recipes/claude-codex-foreground-review.md",
                     "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
@@ -498,7 +506,8 @@ def build_data(root):
                  "docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md",
                  "docs/community-native-practice.md", "examples/claude-native/CLAUDE.md",
                  "recipes/claude-native-ultracode.md", "docs/foundation-rd-readiness.md",
-                 "recipes/claude-codex-foreground-review.md", "docs/claude-upstream-checks.md"):
+                 "recipes/claude-codex-foreground-review.md", "docs/claude-upstream-checks.md",
+                 "docs/claude-repository-evidence.md"):
         if (root / path).exists():
             guide_paths.append(path)
     if config.get("landscape_manifest"):

@@ -22,7 +22,8 @@
       "evidence_ids": [
         "component-history",
         "token-practice-coverage-20260920",
-        "foundation-closure-20260921"
+        "foundation-closure-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/affaan-m/ECC"
@@ -52,7 +53,8 @@
         "token-practice-coverage-20260920",
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1"
@@ -78,7 +80,8 @@
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0"
@@ -118,7 +121,8 @@
         "native-memory-rag-alignment-20260921",
         "hf-memory-models-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",
@@ -142,7 +146,8 @@
         "portable-cli-artifacts",
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
@@ -166,7 +171,8 @@
         "token-practice-gap-followup-20260920",
         "current-session-observation-20260920",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/ccusage/ccusage",
@@ -217,7 +223,8 @@
         "full-stack-convergence-20260921",
         "alpaca-paper-e2e-20260921",
         "foundation-rd-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -243,7 +250,8 @@
         "token-practice-coverage-20260920",
         "token-practice-gap-followup-20260920",
         "native-claude-hud-interactive-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0"
@@ -313,7 +321,8 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "foundation-rd-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -341,7 +350,8 @@
         "token-practice-coverage-20260920",
         "token-practice-gap-followup-20260920",
         "foundation-rd-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex-plugin-cc/tree/v1.0.6"
@@ -363,7 +373,8 @@
       "evidence_ids": [
         "component-history",
         "token-practice-coverage-20260920",
-        "token-native-retained-functional-20260920"
+        "token-native-retained-functional-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/andrewyng/context-hub"
@@ -400,7 +411,8 @@
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"
@@ -425,7 +437,8 @@
       ],
       "evidence_ids": [
         "component-history",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/davila7/claude-code-templates"
@@ -448,7 +461,8 @@
         "component-history",
         "portable-cli-artifacts",
         "token-practice-coverage-20260920",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/Wilfred/difftastic/releases/tag/0.71.0"
@@ -471,7 +485,8 @@
         "component-history",
         "token-practice-coverage-20260920",
         "velanext-native-quality-tools-20260920",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/gitleaks/gitleaks"
@@ -504,7 +519,8 @@
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/headroomlabs-ai/headroom",
@@ -529,7 +545,8 @@
         "component-history",
         "native-rag",
         "token-practice-coverage-20260920",
-        "full-stack-convergence-20260921"
+        "full-stack-convergence-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/huggingface/huggingface_hub"
@@ -552,7 +569,8 @@
         "portable-cli-artifacts",
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/microsoft/markitdown/releases/tag/v0.1.7"
@@ -573,7 +591,8 @@
       "evidence_ids": [
         "component-history",
         "token-practice-coverage-20260920",
-        "token-native-retained-functional-20260920"
+        "token-native-retained-functional-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/modelcontextprotocol/inspector"
@@ -597,7 +616,8 @@
         "desktop-restart-acceptance",
         "token-practice-coverage-20260920",
         "current-session-observation-20260920",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/openclaw/mcporter/tree/v0.13.13"
@@ -622,7 +642,8 @@
         "token-practice-coverage-20260920",
         "token-practice-gap-followup-20260920",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/alphaXiv/OpenResearch",
@@ -645,7 +666,8 @@
       "evidence_ids": [
         "component-history",
         "token-practice-coverage-20260920",
-        "token-practice-gap-followup-20260920"
+        "token-practice-gap-followup-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/microsoft/playwright-cli"
@@ -670,7 +692,8 @@
         "token-native-retained-functional-20260920",
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/promptfoo/promptfoo"
@@ -701,7 +724,8 @@
         "native-returned-results-20260921",
         "native-memory-rag-alignment-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/qdrant/qdrant"
@@ -735,7 +759,8 @@
         "native-memory-rag-alignment-20260921",
         "full-stack-convergence-20260921",
         "foundation-rd-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"
@@ -762,7 +787,8 @@
         "token-practice-coverage-20260920",
         "foundation-native-20260920",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/yamadashy/repomix/releases/tag/v1.18.0",
@@ -796,7 +822,8 @@
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
@@ -818,7 +845,8 @@
         "runtime-tools",
         "component-history",
         "token-practice-coverage-20260920",
-        "native-sandbox-network-20260920"
+        "native-sandbox-network-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/sandbox-runtime"
@@ -852,7 +880,8 @@
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/oraios/serena"
@@ -898,7 +927,8 @@
       "evidence_ids": [
         "component-history",
         "portable-cli-artifacts",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0"
@@ -933,7 +963,8 @@
         "native-memory-rag-alignment-20260921",
         "hf-memory-models-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/giancarloerra/SocratiCode"
@@ -962,7 +993,8 @@
         "token-practice-native-counters-20260920",
         "foundation-native-20260920",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/toon-format/toon/releases/tag/v4.1.1"
@@ -990,7 +1022,8 @@
         "native-memory-rag-alignment-20260921",
         "hf-memory-models-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/vllm-project/vllm"
@@ -1015,7 +1048,8 @@
         "token-native-retained-functional-20260920",
         "velanext-native-quality-tools-20260920",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/max-sixty/worktrunk",
@@ -1047,7 +1081,8 @@
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "source_pin": null,
       "upstream_sources": [
@@ -1081,7 +1116,8 @@
         "foundation-native-20260920",
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [
@@ -1117,7 +1153,8 @@
         "native-returned-results-20260921",
         "native-memory-rag-alignment-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -1149,7 +1186,8 @@
         "native-memory-rag-alignment-20260921",
         "hf-memory-models-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
       "upstream_sources": [
@@ -1172,7 +1210,8 @@
         "desktop-restart-acceptance",
         "token-practice-coverage-20260920",
         "current-session-observation-20260920",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "source_pin": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
       "upstream_sources": [
@@ -1196,7 +1235,8 @@
         "desktop-restart-acceptance",
         "token-practice-coverage-20260920",
         "current-session-observation-20260920",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "source_pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
       "upstream_sources": [
@@ -1226,7 +1266,8 @@
         "native-security-identity-20260920",
         "token-practice-coverage-20260920",
         "native-lifecycle-sample-20260920",
-        "synthetic-catalyst-contract-20260920"
+        "synthetic-catalyst-contract-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1253,7 +1294,8 @@
         "token-practice-coverage-20260920",
         "native-wsl-restic-synthetic-20260920",
         "native-offhost-restic-20260920",
-        "native-offhost-app-state-20260920"
+        "native-offhost-app-state-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1285,7 +1327,8 @@
         "native-service-reboot-20260920",
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1312,7 +1355,8 @@
         "native-corporate-actions-20260920",
         "native-alpaca-historical-20260920",
         "token-practice-coverage-20260920",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1334,7 +1378,8 @@
       "evidence_ids": [
         "syft-sdk-inventory-20260919",
         "token-practice-artifacts-20260920",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1359,7 +1404,8 @@
         "native-alpaca-historical-20260920",
         "native-security-identity-20260920",
         "token-practice-coverage-20260920",
-        "alpaca-paper-e2e-20260921"
+        "alpaca-paper-e2e-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/alpacahq/alpaca-py/tree/v0.44.0",
@@ -1383,7 +1429,8 @@
         "token-practice-coverage-20260920",
         "native-worker-cgroup-20260920",
         "native-service-reboot-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1403,7 +1450,8 @@
       "evidence_ids": [
         "native-exact-nanosecond-replay-20260919",
         "native-chronological-controls-20260919",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1424,7 +1472,8 @@
       ],
       "evidence_ids": [
         "native-chronological-controls-20260919",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1451,7 +1500,8 @@
         "sec-catalyst-dataset-native-20260920",
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
-        "native-lifecycle-sample-20260920"
+        "native-lifecycle-sample-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1474,7 +1524,8 @@
       "evidence_ids": [
         "native-ci-security-20260920",
         "native-linux-zizmor-20260920",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1",
@@ -1501,7 +1552,8 @@
       ],
       "evidence_ids": [
         "upstream-native-tools-20260920",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
     },
@@ -1523,7 +1575,8 @@
       ],
       "command_scope": "Reference/demo validation of selected portable skill metadata; not production native-client extension semantics.",
       "evidence_ids": [
-        "upstream-native-tools-20260920"
+        "upstream-native-tools-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
     },
@@ -1544,7 +1597,8 @@
       "command_scope": "Choose unused loopback ports for an owned diagnostic session and close it afterward; synthetic trace acceptance only.",
       "evidence_ids": [
         "upstream-native-tools-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "claude-repository-evidence-20260921"
       ],
       "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
     },
@@ -1596,7 +1650,8 @@
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
@@ -1782,7 +1837,8 @@
       "evidence_ids": [
         "foundation-native-20260920",
         "native-returned-results-20260921",
-        "full-stack-convergence-20260921"
+        "full-stack-convergence-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
@@ -1809,7 +1865,8 @@
       "evidence_ids": [
         "native-tavily-cli-20260920",
         "native-tavily-session-20260920",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "source_pin": null,
       "upstream_sources": [
@@ -1834,7 +1891,8 @@
         "native-nautilus-v2-20260920",
         "native-nautilus-ci-20260920",
         "nautilus-equity-replay-20260921",
-        "claude-upstream-checks-20260921"
+        "claude-upstream-checks-20260921",
+        "claude-repository-evidence-20260921"
       ],
       "source_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
       "upstream_sources": [

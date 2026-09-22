@@ -91,6 +91,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <div id="setup-summary" class="setup-summary scope-note"></div>
 <div id="setup-guides" class="setup-guides"></div>
 <p><a class="button secondary small" href="claude-upstream-checks.html">Live Claude: per-repository commands, returns and screenshots</a></p>
+<p><a class="button secondary small" href="claude-repository-evidence.html">Live Claude: all selected repositories, asserted commands, dashboards and selection evidence</a></p>
 <div id="setup-profiles" class="guide-grid"></div>
 <div class="section-head"><div><div class="eyebrow">Installation · native use · lifecycle · baseline</div><h2>The complete selected manifest.</h2></div><p>Expand a component for its native commands, recipe text and dated acceptance. Missing or older audit coverage stays explicit.</p></div>
 <div class="controls"><div class="control"><label for="stack-search">Find a selected component</label><input id="stack-search" type="search" placeholder="Try RTK, PostgreSQL, native memory…" autocomplete="off"></div><div class="control"><label for="stack-layer">Layer</label><select id="stack-layer"><option value="">All layers</option></select></div><div class="control"><label for="stack-profile">Adoption profile</label><select id="stack-profile"><option value="">All selected components</option><option value="unassigned">Outside the named profiles</option></select></div></div>
@@ -547,6 +548,7 @@ if(recipeMap.has("docs/foundation-convergence-20260921.md")) add($("setup-guides
 if(recipeMap.has("docs/foundation-rd-readiness.md")) add($("setup-guides"), recipeButton("docs/foundation-rd-readiness.md", "Foundation ready: next north-star R&D acceptance"));
 if(recipeMap.has("recipes/claude-codex-foreground-review.md")) add($("setup-guides"), recipeButton("recipes/claude-codex-foreground-review.md", "Claude-to-Codex review: actual native return"));
 if(recipeMap.has("docs/claude-upstream-checks.md")) add($("setup-guides"), recipeButton("docs/claude-upstream-checks.md", "Live Claude report: evidence classes and corrections"));
+if(recipeMap.has("docs/claude-repository-evidence.md")) add($("setup-guides"), recipeButton("docs/claude-repository-evidence.md", "Live Claude report: every selected repository"));
 data.layers.forEach(layer => { const option = make("option", "", layer.name); option.value = layer.id; add($("stack-layer"), option); });
 setup.profiles.forEach(profile => {
   const option = make("option", "", profile.label); option.value = profile.id; add($("stack-profile"), option);

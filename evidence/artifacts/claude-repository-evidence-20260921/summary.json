@@ -1,0 +1,1247 @@
+{
+  "schema_version": 1,
+  "id": "claude-repository-evidence-20260921",
+  "generated_at_utc": "2026-09-21T23:00:44.085012+00:00",
+  "run_generated_at_utc": "2026-09-21T21:42:28.173164+00:00",
+  "rule": "A row is functional only when a functional-class upstream command exited 0 and its declared assertion passed. Exit 0 alone is not a functional E2E.",
+  "evidence_classes": {
+    "readiness": 10,
+    "functional": 47,
+    "version-help": 3,
+    "none": 10
+  },
+  "sota_tiers": {
+    "none": 24,
+    "recorded": 14,
+    "measured": 3,
+    "not-contestable": 4,
+    "not-audited": 25
+  },
+  "lifetime": {
+    "scopes": 7,
+    "comparisons": 46,
+    "losses": 13,
+    "combined_figure": null,
+    "provider_tokens_saved": null,
+    "note": "Artifact pairs and shared-stack effects overlap. Do not sum them or multiply by repository counts."
+  },
+  "rows": [
+    {
+      "id": "claude-code",
+      "catalog_id": "claude-code",
+      "status": "installed",
+      "evidence_class": "readiness",
+      "declared_class": "readiness",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "none",
+      "dashboards": [
+        "grafana-ecosystem-native",
+        "report-foundation-explorer"
+      ]
+    },
+    {
+      "id": "codex-cli",
+      "catalog_id": "codex",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 3,
+      "failing_commands": 0,
+      "superseded_observations": 1,
+      "functional_capability": "the sandbox executor runs a child under policy and denies a write outside the workspace; no model call",
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "none",
+      "dashboards": [
+        "grafana-ecosystem-native",
+        "report-foundation-explorer"
+      ]
+    },
+    {
+      "id": "codex-plugin-cc",
+      "catalog_id": "codex-for-claude",
+      "status": "installed",
+      "evidence_class": "readiness",
+      "declared_class": "readiness",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "recorded",
+      "dashboards": []
+    },
+    {
+      "id": "rtk",
+      "catalog_id": "rtk",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the retained-history ledger returns command and token totals",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": [
+        "grafana-native-foundation",
+        "report-token-savings"
+      ]
+    },
+    {
+      "id": "context-mode",
+      "catalog_id": "context-mode",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "ctx_execute runs code in its sandbox and returns only the derived output",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "recorded",
+      "dashboards": [
+        "grafana-native-foundation",
+        "report-token-savings"
+      ]
+    },
+    {
+      "id": "headroom",
+      "catalog_id": "headroom",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the savings ledger returns its lifetime and 30-day window objects",
+      "sota_verdict": "keep",
+      "comparison_tier": "recorded",
+      "dashboards": [
+        "report-token-savings"
+      ]
+    },
+    {
+      "id": "toon",
+      "catalog_id": "toon",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "lossless JSON round trip through the upstream encoder and decoder",
+      "sota_verdict": "replace-candidate",
+      "comparison_tier": "measured",
+      "dashboards": [
+        "report-token-savings"
+      ]
+    },
+    {
+      "id": "jcodemunch",
+      "catalog_id": "jcodemunch-mcp",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 3,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "indexed symbol retrieval returns the requested symbol",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "measured",
+      "dashboards": [
+        "report-token-savings"
+      ]
+    },
+    {
+      "id": "repomix",
+      "catalog_id": "repomix",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "selected-source packing writes a bounded pack",
+      "sota_verdict": "keep",
+      "comparison_tier": "recorded",
+      "dashboards": []
+    },
+    {
+      "id": "ccusage",
+      "catalog_id": "ccusage",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "offline parser reads native usage logs and returns daily rows; consumption, not savings",
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "recorded",
+      "dashboards": [
+        "report-token-savings"
+      ]
+    },
+    {
+      "id": "qmd",
+      "catalog_id": "qmd",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "scoped lexical retrieval returns ranked documents",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "measured",
+      "dashboards": [
+        "grafana-native-foundation"
+      ]
+    },
+    {
+      "id": "serena",
+      "catalog_id": "serena",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "language-server symbol extraction returns the declared function and class (disposable project; nothing written in any repository)",
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "none",
+      "dashboards": []
+    },
+    {
+      "id": "socraticode",
+      "catalog_id": "socraticode",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "embedding-backed semantic search returns matching code chunks",
+      "sota_verdict": "keep",
+      "comparison_tier": "recorded",
+      "dashboards": [
+        "qdrant-collections",
+        "report-socraticode-graph"
+      ]
+    },
+    {
+      "id": "qdrant",
+      "catalog_id": "qdrant",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 1,
+      "functional_capability": "the vector store answers an exact count over the indexed collection",
+      "sota_verdict": "keep (determined by consumer)",
+      "comparison_tier": "not-contestable",
+      "dashboards": [
+        "prometheus-targets",
+        "qdrant-collections"
+      ]
+    },
+    {
+      "id": "vllm-nemotron-embed",
+      "catalog_id": "vllm",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the local GPU endpoint returns a normalized 2048-dimension vector",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "recorded",
+      "dashboards": [
+        "prometheus-targets",
+        "vllm-swagger"
+      ]
+    },
+    {
+      "id": "ai-memory",
+      "catalog_id": "ai-memory",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 3,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "scoped FTS retrieval returns ranked wiki pages",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": [
+        "grafana-native-foundation"
+      ]
+    },
+    {
+      "id": "dagu",
+      "catalog_id": "dagu",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 5,
+      "failing_commands": 1,
+      "superseded_observations": 2,
+      "functional_capability": "the engine resolves step dependencies and simulates the whole run without executing commands",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "recorded",
+      "dashboards": [
+        "grafana-research-grand",
+        "dagu-runs",
+        "dagu-dag-latest-run"
+      ]
+    },
+    {
+      "id": "grafana",
+      "catalog_id": "grafana",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "Grafana proxies a LogQL query to its Loki data source and returns frames",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": [
+        "grafana-research-grand",
+        "grafana-ecosystem-native",
+        "grafana-native-foundation"
+      ]
+    },
+    {
+      "id": "prometheus",
+      "catalog_id": "prometheus",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the upstream client queries the live server and returns the count of healthy scrape targets",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": [
+        "grafana-research-grand",
+        "grafana-ecosystem-native",
+        "prometheus-targets"
+      ]
+    },
+    {
+      "id": "loki",
+      "catalog_id": "loki",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "log aggregation over a real ingested stream",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": [
+        "grafana-research-grand",
+        "grafana-ecosystem-native",
+        "prometheus-targets"
+      ]
+    },
+    {
+      "id": "alertmanager",
+      "catalog_id": "alertmanager",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 3,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the routing tree resolves a label set to a receiver",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": [
+        "prometheus-targets",
+        "alertmanager-alerts",
+        "alertmanager-status"
+      ]
+    },
+    {
+      "id": "otelcol-contrib",
+      "catalog_id": "opentelemetry-collector-contrib",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 3,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the collector has accepted log records, observed through its own exported metrics",
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "none",
+      "dashboards": [
+        "grafana-research-grand",
+        "grafana-ecosystem-native",
+        "prometheus-targets"
+      ]
+    },
+    {
+      "id": "ntfy",
+      "catalog_id": "ntfy",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the local inbox retains real Alertmanager deliveries",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": [
+        "alertmanager-status"
+      ]
+    },
+    {
+      "id": "agentsview",
+      "catalog_id": "agentsview",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "FTS search over archived sessions returns message hits",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "recorded",
+      "dashboards": []
+    },
+    {
+      "id": "mcporter",
+      "catalog_id": "mcporter",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "opens an MCP connection, invokes a named tool with typed arguments and returns the structured result",
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "none",
+      "dashboards": []
+    },
+    {
+      "id": "markitdown",
+      "catalog_id": "markitdown",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "document conversion returns Markdown text",
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "none",
+      "dashboards": []
+    },
+    {
+      "id": "openresearch",
+      "catalog_id": "openresearch",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "literature discovery returns structured paper records",
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "none",
+      "dashboards": []
+    },
+    {
+      "id": "tavily-cli",
+      "catalog_id": "tavily-cli",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 1,
+      "functional_capability": "search round trip returns results with the domain filter honoured",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "recorded",
+      "dashboards": []
+    },
+    {
+      "id": "worktrunk",
+      "catalog_id": "worktrunk",
+      "status": "installed",
+      "evidence_class": "readiness",
+      "declared_class": "readiness",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": []
+    },
+    {
+      "id": "difftastic",
+      "catalog_id": "difftastic",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "syntax-aware diff of two source files",
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "none",
+      "dashboards": []
+    },
+    {
+      "id": "ast-grep",
+      "catalog_id": "ast-grep",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "tree-sitter pattern search returns structural matches",
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "recorded",
+      "dashboards": []
+    },
+    {
+      "id": "gitleaks",
+      "catalog_id": "gitleaks",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the scanner detects a planted secret-shaped token and exits non-zero",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": []
+    },
+    {
+      "id": "zizmor",
+      "catalog_id": "zizmor",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 3,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the auditor reports findings on an unsafe pull_request_target workflow",
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "none",
+      "dashboards": []
+    },
+    {
+      "id": "promptfoo",
+      "catalog_id": "promptfoo",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "prompt load, provider invocation, grading and summary run end to end",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": [
+        "grafana-native-foundation",
+        "report-promptfoo"
+      ]
+    },
+    {
+      "id": "agent-browser",
+      "catalog_id": "agent-browser",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "navigation, DOM input, event dispatch and text extraction in Chromium",
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "recorded",
+      "dashboards": []
+    },
+    {
+      "id": "beads",
+      "catalog_id": "beads",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "tracker creation, issue creation and dependency-aware ready-queue computation",
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": []
+    },
+    {
+      "id": "nautilus-trader",
+      "catalog_id": "nautilus-trader",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 1,
+      "functional_capability": "the v2 engine runs a real backtest with fills, positions and account reports (diagnostic, not strategy or broker acceptance)",
+      "sota_verdict": "keep (user-selected destination)",
+      "comparison_tier": "not-contestable",
+      "dashboards": [
+        "grafana-research-grand"
+      ]
+    },
+    {
+      "id": "lean",
+      "catalog_id": "lean",
+      "status": "installed",
+      "evidence_class": "readiness",
+      "declared_class": "readiness",
+      "commands": 3,
+      "failing_commands": 0,
+      "superseded_observations": 1,
+      "functional_capability": null,
+      "sota_verdict": "keep (oracle)",
+      "comparison_tier": "not-contestable",
+      "dashboards": [
+        "grafana-research-grand"
+      ]
+    },
+    {
+      "id": "uv",
+      "catalog_id": null,
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "pinned resolution and ephemeral execution",
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-contestable",
+      "dashboards": []
+    },
+    {
+      "id": "shellcheck",
+      "catalog_id": "shellcheck",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the analyser reports SC2086 on an unquoted expansion",
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "context-hub",
+      "catalog_id": "context-hub",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "curated documentation search returns addressable document ids",
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "mcp-inspector",
+      "catalog_id": "mcp-inspector",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "stdio tool inspection returns the server's tool list",
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "duckdb",
+      "catalog_id": "duckdb",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the engine executes SQL and returns exact aggregates",
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "pandas",
+      "catalog_id": "pandas",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "exact nanosecond timestamp parsing",
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "alpaca-py",
+      "catalog_id": "alpaca-py",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 1,
+      "functional_capability": "alpaca-py's request model accepts a valid limit order and rejects one without a quantity; no client is created and no broker is called",
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "skfolio",
+      "catalog_id": "skfolio",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the chronological splitter yields ordered train/test folds",
+      "sota_verdict": "keep (scoped)",
+      "comparison_tier": "recorded",
+      "dashboards": []
+    },
+    {
+      "id": "edgartools",
+      "catalog_id": "edgartools",
+      "status": "installed",
+      "evidence_class": "readiness",
+      "declared_class": "readiness",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "syft",
+      "catalog_id": "syft",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "dependency inventory returns artifacts (no vulnerability verdict)",
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "skills-ref",
+      "catalog_id": "skills-ref",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "reference validation accepts the skill and returns its properties",
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "systemd",
+      "catalog_id": "systemd",
+      "status": "installed",
+      "evidence_class": "readiness",
+      "declared_class": "readiness",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "claude-hud",
+      "catalog_id": "claude-hud",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "the renderer turns statusline JSON into the HUD line (live interactive UI not exercised)",
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "huggingface-hub-native",
+      "catalog_id": "huggingface-hub-native",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "revision-pinned retrieval of a model file",
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "sandbox-runtime",
+      "catalog_id": "sandbox-runtime",
+      "status": "installed",
+      "evidence_class": "functional",
+      "declared_class": "functional",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": "OS-level isolation allows the permitted write and blocks the denied read and the protected write, leaving host bytes unchanged",
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "playwright-cli",
+      "catalog_id": "playwright-cli",
+      "status": "installed",
+      "evidence_class": "version-help",
+      "declared_class": "version-help",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "recorded",
+      "dashboards": []
+    },
+    {
+      "id": "restic",
+      "catalog_id": "restic",
+      "status": "installed",
+      "evidence_class": "version-help",
+      "declared_class": "version-help",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "otel-tui",
+      "catalog_id": "otel-tui",
+      "status": "installed",
+      "evidence_class": "version-help",
+      "declared_class": "version-help",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": []
+    },
+    {
+      "id": "omniroute",
+      "catalog_id": "omniroute",
+      "status": "installed",
+      "evidence_class": "readiness",
+      "declared_class": "readiness",
+      "commands": 2,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "keep-but-compare",
+      "comparison_tier": "none",
+      "dashboards": []
+    },
+    {
+      "id": "nextjs",
+      "catalog_id": "nextjs",
+      "status": "not-installed",
+      "evidence_class": "none",
+      "declared_class": "none",
+      "commands": 0,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "react",
+      "catalog_id": "react",
+      "status": "not-installed",
+      "evidence_class": "none",
+      "declared_class": "none",
+      "commands": 0,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "fastapi",
+      "catalog_id": "fastapi",
+      "status": "not-installed",
+      "evidence_class": "none",
+      "declared_class": "none",
+      "commands": 0,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "postgresql",
+      "catalog_id": "postgresql",
+      "status": "not-installed",
+      "evidence_class": "none",
+      "declared_class": "none",
+      "commands": 0,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "poppler",
+      "catalog_id": "poppler",
+      "status": "not-installed",
+      "evidence_class": "none",
+      "declared_class": "none",
+      "commands": 0,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "playwright-test",
+      "catalog_id": "playwright-test",
+      "status": "not-installed",
+      "evidence_class": "none",
+      "declared_class": "none",
+      "commands": 0,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "llama-cpp",
+      "catalog_id": "llama-cpp",
+      "status": "not-installed",
+      "evidence_class": "none",
+      "declared_class": "none",
+      "commands": 0,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "apple-container",
+      "catalog_id": "apple-container",
+      "status": "not-applicable",
+      "evidence_class": "none",
+      "declared_class": "none",
+      "commands": 0,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "codebase-memory-mcp",
+      "catalog_id": "codebase-memory-mcp",
+      "status": "removed",
+      "evidence_class": "none",
+      "declared_class": "none",
+      "commands": 0,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "removed (was replace-candidate)",
+      "comparison_tier": "none",
+      "dashboards": []
+    },
+    {
+      "id": "affaan-m/ECC",
+      "catalog_id": "affaan-m/ECC",
+      "status": "guidance-only",
+      "evidence_class": "readiness",
+      "declared_class": "readiness",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "davila7/claude-code-templates",
+      "catalog_id": "davila7/claude-code-templates",
+      "status": "guidance-only",
+      "evidence_class": "readiness",
+      "declared_class": "readiness",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "shanraisshan/claude-code-best-practice",
+      "catalog_id": "shanraisshan/claude-code-best-practice",
+      "status": "guidance-only",
+      "evidence_class": "none",
+      "declared_class": "none",
+      "commands": 0,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "not audited",
+      "comparison_tier": "not-audited",
+      "dashboards": []
+    },
+    {
+      "id": "typesafe-ai-skill",
+      "catalog_id": null,
+      "status": "guidance-only",
+      "evidence_class": "readiness",
+      "declared_class": "readiness",
+      "commands": 1,
+      "failing_commands": 0,
+      "superseded_observations": 0,
+      "functional_capability": null,
+      "sota_verdict": "add-candidate",
+      "comparison_tier": "none",
+      "dashboards": []
+    }
+  ],
+  "dashboards": [
+    {
+      "id": "grafana-research-grand",
+      "components": [
+        "grafana",
+        "loki",
+        "prometheus",
+        "otelcol-contrib",
+        "dagu",
+        "nautilus-trader",
+        "lean"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": true,
+      "anomalies": 1,
+      "image_sha256": "82de0e9fad5f158569ea9eea175e0415d73e66f0d0fb495ad97853fc604952b7"
+    },
+    {
+      "id": "grafana-ecosystem-native",
+      "components": [
+        "grafana",
+        "prometheus",
+        "loki",
+        "otelcol-contrib",
+        "claude-code",
+        "codex-cli"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": true,
+      "anomalies": 1,
+      "image_sha256": "2593ce059e5826f5c0e1668bb2a7b930518f439c86bed8f9d6f119153000c21a"
+    },
+    {
+      "id": "grafana-native-foundation",
+      "components": [
+        "grafana",
+        "ai-memory",
+        "qmd",
+        "rtk",
+        "context-mode",
+        "promptfoo"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": true,
+      "anomalies": 2,
+      "image_sha256": "80d0eb7cdd288be60013370075cf9fd8d34103049e84944005b312536157b078"
+    },
+    {
+      "id": "prometheus-targets",
+      "components": [
+        "prometheus",
+        "alertmanager",
+        "loki",
+        "qdrant",
+        "vllm-nemotron-embed",
+        "otelcol-contrib"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": true,
+      "anomalies": 1,
+      "image_sha256": "f26c8a7a6acad69582b0ab3d5420026828d3fc31cc167d1008a4521bc585a1b8"
+    },
+    {
+      "id": "alertmanager-alerts",
+      "components": [
+        "alertmanager"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": true,
+      "anomalies": 0,
+      "image_sha256": "519cc7651af97ba346b15f579f85e0fa1eea5fe1becef8b7577c9e3dd5b993d2"
+    },
+    {
+      "id": "alertmanager-status",
+      "components": [
+        "alertmanager",
+        "ntfy"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": true,
+      "anomalies": 0,
+      "image_sha256": "848910e5d4bfaa43ad20d7f67e7b2bdbe69b872cc14f60f8917b1b89acc8a1dd"
+    },
+    {
+      "id": "dagu-runs",
+      "components": [
+        "dagu"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": false,
+      "anomalies": 2,
+      "image_sha256": "fc102550dcea9cd1774a419501a5f79edc9f318f815287c8a4e90fc19d21fb15"
+    },
+    {
+      "id": "qdrant-collections",
+      "components": [
+        "qdrant",
+        "socraticode"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": true,
+      "anomalies": 1,
+      "image_sha256": "d7cf28145f6baf05c0331ce5cc3c365a5de6a4c13a425b2910e68b66d02d5e90"
+    },
+    {
+      "id": "vllm-swagger",
+      "components": [
+        "vllm-nemotron-embed"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": true,
+      "anomalies": 1,
+      "image_sha256": "a9ec7cdb01695308fd9a5930eb8077690d12d941399de34e5bee924157a3efc2"
+    },
+    {
+      "id": "report-token-savings",
+      "components": [
+        "rtk",
+        "context-mode",
+        "headroom",
+        "jcodemunch",
+        "toon",
+        "ccusage"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": true,
+      "anomalies": 1,
+      "image_sha256": "d059c024f45abc0e851b34d7eb6b7c456f335c6d04f7fe76a3b26887a0867c0a"
+    },
+    {
+      "id": "report-socraticode-graph",
+      "components": [
+        "socraticode"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": false,
+      "anomalies": 1,
+      "image_sha256": "3349bde4712bad39aa368f23249f971340e42e6047da03ae1787b5db04cf36d6"
+    },
+    {
+      "id": "report-promptfoo",
+      "components": [
+        "promptfoo"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": true,
+      "anomalies": 1,
+      "image_sha256": "4d09c60162c47b292d53db4fa925c5485ff34238ee293a261436f66958d394e0"
+    },
+    {
+      "id": "report-foundation-explorer",
+      "components": [
+        "claude-code",
+        "codex-cli"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": true,
+      "anomalies": 1,
+      "image_sha256": "8d667fdf6f0143a2195232622c087ab9b9f759cfe437aaef5abed272dbfc892d"
+    },
+    {
+      "id": "dagu-dag-latest-run",
+      "components": [
+        "dagu"
+      ],
+      "review_state": "reviewed",
+      "matches_expected": true,
+      "anomalies": 0,
+      "image_sha256": "219e3fd1de4127df8ddf282a3d1d8edc1d858d273030276334fdbd3b44b377a1"
+    }
+  ]
+}
