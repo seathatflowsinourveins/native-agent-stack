@@ -114,8 +114,11 @@ class DependencyReviewTests(unittest.TestCase):
         trigger = self.text.split("\non:\n", 1)[1].split("\n\n", 1)[0]
         self.assertEqual([line.strip() for line in trigger.splitlines() if line.strip()], ["pull_request:"])
         self.assertIn("warn-only: true", self.text)
-        for block in permission_blocks(self.text):
+        blocks = permission_blocks(self.text)
+        self.assertGreaterEqual(len(blocks), 1)
+        for block in blocks:
             self.assertEqual(block, {"contents": "read"})
+        self.assertNotRegex(self.text, r"(?m)permissions:[ \t]*[^\s#]", "no inline read-all/write-all form")
 
 
 class PinningTests(unittest.TestCase):

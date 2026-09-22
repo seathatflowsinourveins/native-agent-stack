@@ -225,8 +225,9 @@ hosted workflow run; no `scorecard.yml`, `dependency-review.yml`, or
 `harden-runner`-added step has executed on GitHub Actions yet, so their
 actual hosted behavior (Scorecard's computed score, harden-runner's audit
 log contents, dependency-review's PR comment) remains unobserved until the
-first hosted run after integration. Update: on PR #78 every pull-request
-check passed, including the hardened jobs and dependency review (after the
-correction above); Scorecard runs on push to `main` and weekly, so its first
+first hosted run after integration. Update: on PR #78 the pull-request
+checks passed with the hardened jobs, including `token-report` and
+`dependency-review` on the head that added their step (`4cc24f8`) and
+dependency review after the correction above; Scorecard runs on push to `main` and weekly, so its first
 hosted run follows the merge, and `native-service-reboot.yml` runs only on
 `workflow_dispatch`.

@@ -7624,7 +7624,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "e1ff5954be10bd19f7b48a129abe389d4c94a05ddbc231dbdcc3552b492b0cb5",
+      "sha256": "2a6392ca181a6637398ca4bd6f116c43d07bedee232aa07c2fb3ad4d6868f0f3",
       "bytes": 12918514
     },
     {
@@ -7694,8 +7694,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "3a36438408cfb9855e6494064c8d8e3b04a1c714a213be8c426315ba33141d5e",
-      "bytes": 36065
+      "sha256": "e56528af1cac64439b63e360614af80dc10032db758b98e9b0b803c0109bd28f",
+      "bytes": 36076
     },
     {
       "path": "docs/grand-catalog-handbook.md",

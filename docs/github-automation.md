@@ -537,7 +537,7 @@ the full commit SHA of its latest release `v2.21.1`
 (`e14015d583714f6e62063499dc959a02595150a1`, from
 `gh api repos/step-security/harden-runner/releases/latest`), runs as the
 *first* step, before checkout, with `egress-policy: audit` (never `block`),
-on every `ubuntu-24.04` job (14 of them) except the four whose
+on 14 of the 18 `ubuntu-24.04` jobs. The four exempt jobs are those whose
 workflows are byte-pinned by retained evidence: `source` and `destination`
 (`native-offhost-app-state.yml`, pinned in
 `blueprints/convergence-practice/offhost-app-state/plan.json`'s
