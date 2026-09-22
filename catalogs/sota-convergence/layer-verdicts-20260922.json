@@ -26,7 +26,24 @@
     "overturn_when": "A concrete application needs durable multi-host state/replay (Temporal), explicit graph checkpoints (LangGraph), a remote/container worker (OpenHands SDK) or programmatic Claude session control (Claude Agent SDK), and a matched comparison passes.",
     "platform_status_summary": {},
     "recipe_refs": [],
-    "sota_components": [],
+    "sota_components": [
+     {
+      "id": "codex",
+      "pin": "0.155.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "rust-v0.155.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 125923
+      }
+     }
+    ],
     "title": "Agent SDKs and runtime workers",
     "verdict_status": "pending_lanes",
     "winners": []
@@ -70,7 +87,7 @@
        "pushed_at": "2026-09-09",
        "released_at": "2026-03-21",
        "renamed_to": null,
-       "stars": 29419
+       "stars": 29427
       }
      },
      {
@@ -86,7 +103,7 @@
        "pushed_at": "2026-09-09",
        "released_at": "2026-08-16",
        "renamed_to": null,
-       "stars": 29935
+       "stars": 29952
       }
      },
      {
@@ -102,14 +119,14 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 28448
+       "stars": 28461
       }
      },
      {
       "id": "rtk",
       "pin": "0.49.0",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v0.49.0",
@@ -118,7 +135,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-11",
        "renamed_to": null,
-       "stars": 81338
+       "stars": 81419
       }
      },
      {
@@ -134,7 +151,7 @@
        "pushed_at": "2026-09-18",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 9595
+       "stars": 9598
       }
      },
      {
@@ -143,14 +160,14 @@
       "pin_behind_upstream": false,
       "review_status": "not_individually_reviewed",
       "upstream": {
-       "archived": null,
-       "latest": null,
-       "license": null,
-       "prerelease": null,
-       "pushed_at": null,
-       "released_at": null,
+       "archived": false,
+       "latest": "v4.1.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-03",
+       "released_at": "2026-08-05",
        "renamed_to": null,
-       "stars": null
+       "stars": 25409
       }
      },
      {
@@ -166,7 +183,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-09",
        "renamed_to": null,
-       "stars": 6551
+       "stars": 6555
       }
      }
     ],
@@ -204,7 +221,7 @@
       "id": "ast-grep",
       "pin": "0.45.3",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "0.45.3",
@@ -213,14 +230,14 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-08-31",
        "renamed_to": null,
-       "stars": 15991
+       "stars": 16001
       }
      },
      {
       "id": "codebase-memory-mcp",
       "pin": "0.11.0",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v0.11.0",
@@ -229,7 +246,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-15",
        "renamed_to": null,
-       "stars": 44047
+       "stars": 44144
       }
      },
      {
@@ -242,7 +259,7 @@
        "latest": "v1.108.319",
        "license": "NOASSERTION",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-16",
        "renamed_to": null,
        "stars": 2708
@@ -252,7 +269,7 @@
       "id": "mcp-inspector",
       "pin": "2.7.0",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "2.7.0",
@@ -261,23 +278,23 @@
        "pushed_at": "2026-09-19",
        "released_at": "2026-09-16",
        "renamed_to": null,
-       "stars": 10918
+       "stars": 10921
       }
      },
      {
       "id": "mcporter",
       "pin": "0.13.13",
-      "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
       "upstream": {
        "archived": false,
-       "latest": "v0.13.13",
+       "latest": "v0.14.0",
        "license": "MIT",
        "prerelease": false,
-       "pushed_at": "2026-09-15",
-       "released_at": "2026-09-14",
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 5019
+       "stars": 5022
       }
      },
      {
@@ -293,14 +310,14 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-04",
        "renamed_to": null,
-       "stars": 34741
+       "stars": 34752
       }
      },
      {
       "id": "repomix",
       "pin": "1.18.1",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_default",
       "upstream": {
        "archived": false,
        "latest": "v1.18.1",
@@ -309,39 +326,39 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 28448
+       "stars": 28461
       }
      },
      {
       "id": "serena",
       "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
-      "pin_behind_upstream": true,
+      "pin_behind_upstream": false,
       "review_status": "confirmed_default",
       "upstream": {
        "archived": false,
        "latest": "v1.7.0",
        "license": "NOASSERTION",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-08-09",
        "renamed_to": null,
-       "stars": 29684
+       "stars": 29712
       }
      },
      {
       "id": "socraticode",
       "pin": "1.14.0",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v1.14.0",
        "license": "AGPL-3.0",
        "prerelease": false,
-       "pushed_at": "2026-09-20",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-16",
        "renamed_to": null,
-       "stars": 3319
+       "stars": 3318
       }
      },
      {
@@ -350,14 +367,14 @@
       "pin_behind_upstream": false,
       "review_status": "not_individually_reviewed",
       "upstream": {
-       "archived": null,
-       "latest": null,
-       "license": null,
-       "prerelease": null,
-       "pushed_at": null,
-       "released_at": null,
+       "archived": false,
+       "latest": "v4.1.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-03",
+       "released_at": "2026-08-05",
        "renamed_to": null,
-       "stars": null
+       "stars": 25409
       }
      }
     ],
@@ -395,7 +412,7 @@
       "id": "context-hub",
       "pin": "0.1.4",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
+      "review_status": "unmaintained_signal",
       "upstream": {
        "archived": false,
        "latest": "v0.1.4",
@@ -404,14 +421,14 @@
        "pushed_at": "2026-05-31",
        "released_at": "2026-04-27",
        "renamed_to": null,
-       "stars": 13977
+       "stars": 13981
       }
      },
      {
       "id": "markitdown",
       "pin": "0.1.7",
       "pin_behind_upstream": true,
-      "review_status": "not_individually_reviewed",
+      "review_status": "pin_behind_upstream",
       "upstream": {
        "archived": false,
        "latest": "v0.1.8",
@@ -420,7 +437,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 186244
+       "stars": 186376
       }
      },
      {
@@ -443,7 +460,7 @@
       "id": "qmd",
       "pin": "2.8.3",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_default",
       "upstream": {
        "archived": false,
        "latest": "v2.8.3",
@@ -452,7 +469,7 @@
        "pushed_at": "2026-09-09",
        "released_at": "2026-08-16",
        "renamed_to": null,
-       "stars": 29935
+       "stars": 29952
       }
      }
     ],
@@ -499,7 +516,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 7788
+       "stars": 8014
       }
      },
      {
@@ -515,7 +532,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-19",
        "renamed_to": null,
-       "stars": 147495
+       "stars": 147597
       }
      },
      {
@@ -531,14 +548,14 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 125797
+       "stars": 125923
       }
      },
      {
       "id": "qdrant",
       "pin": "1.19.1",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v1.19.1",
@@ -547,7 +564,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-04",
        "renamed_to": null,
-       "stars": 34741
+       "stars": 34752
       }
      },
      {
@@ -563,7 +580,7 @@
        "pushed_at": "2026-09-20",
        "released_at": "2026-07-05",
        "renamed_to": null,
-       "stars": 36173
+       "stars": 36182
       }
      }
     ],
@@ -596,7 +613,120 @@
     "overturn_when": "A concrete cross-repository or multi-host Git/GitHub workflow needs capabilities beyond gh/worktrunk/difftastic, and a challenger passes a matched comparison.",
     "platform_status_summary": {},
     "recipe_refs": [],
-    "sota_components": [],
+    "sota_components": [
+     {
+      "id": "codex",
+      "pin": "0.155.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "rust-v0.155.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 125923
+      }
+     },
+     {
+      "id": "codex-for-claude",
+      "pin": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_selected",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.0.6",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-07-08",
+       "released_at": "2026-07-08",
+       "renamed_to": null,
+       "stars": 33467
+      }
+     },
+     {
+      "id": "difftastic",
+      "pin": "0.71.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "0.71.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 25920
+      }
+     },
+     {
+      "id": "playwright-test",
+      "pin": "1.63.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.63.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-04",
+       "renamed_to": null,
+       "stars": 96504
+      }
+     },
+     {
+      "id": "promptfoo",
+      "pin": "0.123.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "0.123.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 25371
+      }
+     },
+     {
+      "id": "shellcheck",
+      "pin": "0.11.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.11.0",
+       "license": "GPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2025-08-04",
+       "renamed_to": null,
+       "stars": 40067
+      }
+     },
+     {
+      "id": "worktrunk",
+      "pin": "0.79.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.79.0",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 8334
+      }
+     }
+    ],
     "title": "Git practice and GitHub automation",
     "verdict_status": "pending_lanes",
     "winners": []
@@ -631,7 +761,7 @@
       "id": "apple-container",
       "pin": "1.4.1",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "1.4.1",
@@ -640,7 +770,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-09",
        "renamed_to": null,
-       "stars": 50102
+       "stars": 50112
       }
      },
      {
@@ -656,7 +786,7 @@
        "pushed_at": "2026-09-18",
        "released_at": "2026-07-29",
        "renamed_to": null,
-       "stars": 102516
+       "stars": 102531
       }
      },
      {
@@ -672,30 +802,30 @@
        "pushed_at": "2026-09-19",
        "released_at": "2026-09-16",
        "renamed_to": null,
-       "stars": 10918
+       "stars": 10921
       }
      },
      {
       "id": "mcporter",
       "pin": "0.13.13",
-      "pin_behind_upstream": false,
+      "pin_behind_upstream": true,
       "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
-       "latest": "v0.13.13",
+       "latest": "v0.14.0",
        "license": "MIT",
        "prerelease": false,
-       "pushed_at": "2026-09-15",
-       "released_at": "2026-09-14",
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 5019
+       "stars": 5022
       }
      },
      {
       "id": "nextjs",
       "pin": "16.3.5",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v16.3.5",
@@ -704,14 +834,14 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-11",
        "renamed_to": null,
-       "stars": 142393
+       "stars": 142399
       }
      },
      {
       "id": "omniroute",
       "pin": "3.8.50",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "keep_but_compare",
       "upstream": {
        "archived": false,
        "latest": "v3.8.50",
@@ -720,23 +850,23 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-08-26",
        "renamed_to": null,
-       "stars": 69012
+       "stars": 69169
       }
      },
      {
       "id": "postgresql",
       "pin": "18.6",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "release-6-3",
        "license": "NOASSERTION",
        "prerelease": null,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": null,
        "renamed_to": null,
-       "stars": 22180
+       "stars": 22179
       }
      },
      {
@@ -752,7 +882,7 @@
        "pushed_at": "2026-09-18",
        "released_at": "2026-09-09",
        "renamed_to": null,
-       "stars": 250642
+       "stars": 250650
       }
      }
     ],
@@ -790,7 +920,7 @@
       "id": "affaan-m/ECC",
       "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "keep_but_compare",
       "upstream": {
        "archived": false,
        "latest": "v2.2.1",
@@ -799,14 +929,14 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-08",
        "renamed_to": null,
-       "stars": 264820
+       "stars": 265127
       }
      },
      {
       "id": "ai-memory",
       "pin": "2.3.2",
       "pin_behind_upstream": true,
-      "review_status": "pin_behind_upstream",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v2.4.0",
@@ -815,7 +945,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 7788
+       "stars": 8014
       }
      },
      {
@@ -831,7 +961,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-19",
        "renamed_to": null,
-       "stars": 147495
+       "stars": 147597
       }
      },
      {
@@ -847,7 +977,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 125797
+       "stars": 125923
       }
      },
      {
@@ -860,17 +990,17 @@
        "latest": "v1.0.169",
        "license": "NOASSERTION",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-06-29",
        "renamed_to": null,
-       "stars": 23897
+       "stars": 23936
       }
      },
      {
       "id": "davila7/claude-code-templates",
       "pin": "c840d6f626be7ba418da60aeb0f2080413562451",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "keep_but_compare",
       "upstream": {
        "archived": false,
        "latest": "v1.29.6",
@@ -879,7 +1009,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 30897
+       "stars": 30975
       }
      },
      {
@@ -895,7 +1025,7 @@
        "pushed_at": "2026-09-09",
        "released_at": "2026-08-16",
        "renamed_to": null,
-       "stars": 29935
+       "stars": 29952
       }
      },
      {
@@ -911,14 +1041,14 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-11",
        "renamed_to": null,
-       "stars": 81338
+       "stars": 81419
       }
      },
      {
       "id": "shanraisshan/claude-code-best-practice",
       "pin": "15969ed2471a177d938c889255d2f23f07e4742a",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "keep_but_compare",
       "upstream": {
        "archived": false,
        "latest": null,
@@ -927,7 +1057,7 @@
        "pushed_at": "2026-09-22",
        "released_at": null,
        "renamed_to": null,
-       "stars": 66199
+       "stars": 66230
       }
      },
      {
@@ -943,7 +1073,7 @@
        "pushed_at": "2026-08-09",
        "released_at": null,
        "renamed_to": null,
-       "stars": 25578
+       "stars": 25592
       }
      },
      {
@@ -1006,7 +1136,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-09",
        "renamed_to": null,
-       "stars": 50102
+       "stars": 50112
       }
      },
      {
@@ -1022,7 +1152,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 5300
+       "stars": 5302
       }
      },
      {
@@ -1038,7 +1168,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 8306
+       "stars": 8334
       }
      }
     ],
@@ -1071,7 +1201,40 @@
     "overturn_when": "A concrete MCP surface gap needs a new server, and a reviewed registry entry passes the same bridge/inspection acceptance as mcporter/mcp-inspector.",
     "platform_status_summary": {},
     "recipe_refs": [],
-    "sota_components": [],
+    "sota_components": [
+     {
+      "id": "mcp-inspector",
+      "pin": "2.7.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "2.7.0",
+       "license": null,
+       "prerelease": false,
+       "pushed_at": "2026-09-19",
+       "released_at": "2026-09-16",
+       "renamed_to": null,
+       "stars": 10921
+      }
+     },
+     {
+      "id": "mcporter",
+      "pin": "0.13.13",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.14.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-22",
+       "renamed_to": null,
+       "stars": 5022
+      }
+     }
+    ],
     "title": "MCP servers and client surfaces",
     "verdict_status": "pending_lanes",
     "winners": []
@@ -1115,7 +1278,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 7788
+       "stars": 8014
       }
      },
      {
@@ -1131,7 +1294,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-19",
        "renamed_to": null,
-       "stars": 147495
+       "stars": 147597
       }
      },
      {
@@ -1147,7 +1310,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 125797
+       "stars": 125923
       }
      },
      {
@@ -1160,17 +1323,17 @@
        "latest": "v1.0.169",
        "license": "NOASSERTION",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-06-29",
        "renamed_to": null,
-       "stars": 23897
+       "stars": 23936
       }
      },
      {
       "id": "qmd",
       "pin": "2.8.3",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_default",
       "upstream": {
        "archived": false,
        "latest": "v2.8.3",
@@ -1179,14 +1342,14 @@
        "pushed_at": "2026-09-09",
        "released_at": "2026-08-16",
        "renamed_to": null,
-       "stars": 29935
+       "stars": 29952
       }
      },
      {
       "id": "rtk",
       "pin": "0.49.0",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_default",
       "upstream": {
        "archived": false,
        "latest": "v0.49.0",
@@ -1195,7 +1358,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-11",
        "renamed_to": null,
-       "stars": 81338
+       "stars": 81419
       }
      }
     ],
@@ -1233,7 +1396,7 @@
       "id": "agentsview",
       "pin": "0.43.0",
       "pin_behind_upstream": true,
-      "review_status": "not_individually_reviewed",
+      "review_status": "pin_behind_upstream",
       "upstream": {
        "archived": false,
        "latest": "v0.44.0",
@@ -1242,7 +1405,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 5961
+       "stars": 5965
       }
      },
      {
@@ -1255,17 +1418,17 @@
        "latest": "v0.34.1",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 8625
+       "stars": 8626
       }
      },
      {
       "id": "ccusage",
       "pin": "20.0.24",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v20.0.24",
@@ -1274,14 +1437,30 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 18677
+       "stars": 18686
+      }
+     },
+     {
+      "id": "claude-code",
+      "pin": "2.1.278",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.1.278",
+       "license": null,
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-19",
+       "renamed_to": null,
+       "stars": 147597
       }
      },
      {
       "id": "claude-hud",
       "pin": "0.8.0",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v0.8.0",
@@ -1290,7 +1469,7 @@
        "pushed_at": "2026-09-19",
        "released_at": "2026-08-18",
        "renamed_to": null,
-       "stars": 28091
+       "stars": 28103
       }
      },
      {
@@ -1306,7 +1485,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-15",
        "renamed_to": null,
-       "stars": 76846
+       "stars": 76856
       }
      },
      {
@@ -1322,14 +1501,14 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 3921
+       "stars": 3922
       }
      },
      {
       "id": "llama-cpp",
       "pin": "b11057 (0.4.1-dev)",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "keep_but_compare",
       "upstream": {
        "archived": false,
        "latest": "v0.4.1",
@@ -1338,7 +1517,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-14",
        "renamed_to": null,
-       "stars": 129118
+       "stars": 129188
       }
      },
      {
@@ -1354,7 +1533,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 28930
+       "stars": 28932
       }
      },
      {
@@ -1370,14 +1549,14 @@
        "pushed_at": "2026-09-15",
        "released_at": "2026-08-27",
        "renamed_to": null,
-       "stars": 34360
+       "stars": 34370
       }
      },
      {
       "id": "omniroute",
       "pin": "3.8.50",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v3.8.50",
@@ -1386,14 +1565,14 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-08-26",
        "renamed_to": null,
-       "stars": 69012
+       "stars": 69169
       }
      },
      {
       "id": "opentelemetry-collector-contrib",
       "pin": "0.161.0",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v0.161.0",
@@ -1402,7 +1581,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-15",
        "renamed_to": null,
-       "stars": 4945
+       "stars": 4947
       }
      },
      {
@@ -1434,23 +1613,23 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-08-18",
        "renamed_to": null,
-       "stars": 66165
+       "stars": 66176
       }
      },
      {
       "id": "vllm",
       "pin": "0.25.0",
       "pin_behind_upstream": true,
-      "review_status": "confirmed_pin",
+      "review_status": "pin_behind_upstream",
       "upstream": {
        "archived": false,
-       "latest": "v0.29.0",
+       "latest": "v0.30.0",
        "license": "Apache-2.0",
        "prerelease": false,
        "pushed_at": "2026-09-22",
-       "released_at": "2026-09-09",
+       "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 92378
+       "stars": 92429
       }
      }
     ],
@@ -1488,16 +1667,16 @@
       "id": "difftastic",
       "pin": "0.71.0",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "0.71.0",
        "license": "MIT",
        "prerelease": false,
-       "pushed_at": "2026-09-18",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 25919
+       "stars": 25920
       }
      },
      {
@@ -1513,14 +1692,14 @@
        "pushed_at": "2026-09-18",
        "released_at": "2026-07-29",
        "renamed_to": null,
-       "stars": 102516
+       "stars": 102531
       }
      },
      {
       "id": "gitleaks",
       "pin": "8.30.1",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v8.30.1",
@@ -1529,7 +1708,7 @@
        "pushed_at": "2026-09-09",
        "released_at": "2026-03-21",
        "renamed_to": null,
-       "stars": 29419
+       "stars": 29427
       }
      },
      {
@@ -1545,7 +1724,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-11",
        "renamed_to": null,
-       "stars": 142393
+       "stars": 142399
       }
      },
      {
@@ -1561,7 +1740,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-04",
        "renamed_to": null,
-       "stars": 96480
+       "stars": 96504
       }
      },
      {
@@ -1574,10 +1753,10 @@
        "latest": "release-6-3",
        "license": "NOASSERTION",
        "prerelease": null,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": null,
        "renamed_to": null,
-       "stars": 22180
+       "stars": 22179
       }
      },
      {
@@ -1593,14 +1772,14 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 25350
+       "stars": 25371
       }
      },
      {
       "id": "react",
       "pin": "19.3.0",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v19.3.0",
@@ -1609,14 +1788,14 @@
        "pushed_at": "2026-09-18",
        "released_at": "2026-09-09",
        "renamed_to": null,
-       "stars": 250642
+       "stars": 250650
       }
      },
      {
       "id": "shellcheck",
       "pin": "0.11.0",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v0.11.0",
@@ -1625,14 +1804,14 @@
        "pushed_at": "2026-09-21",
        "released_at": "2025-08-04",
        "renamed_to": null,
-       "stars": 40063
+       "stars": 40067
       }
      },
      {
       "id": "skills-ref",
       "pin": "0.1.0",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": null,
@@ -1641,14 +1820,14 @@
        "pushed_at": "2026-08-09",
        "released_at": null,
        "renamed_to": null,
-       "stars": 25578
+       "stars": 25592
       }
      },
      {
       "id": "syft",
       "pin": "1.52.0",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v1.52.0",
@@ -1657,7 +1836,7 @@
        "pushed_at": "2026-09-18",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 9595
+       "stars": 9598
       }
      },
      {
@@ -1673,7 +1852,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-09",
        "renamed_to": null,
-       "stars": 6551
+       "stars": 6555
       }
      }
     ],
@@ -1711,7 +1890,7 @@
       "id": "ai-memory",
       "pin": "2.3.2",
       "pin_behind_upstream": true,
-      "review_status": "confirmed_pin",
+      "review_status": "pin_behind_upstream",
       "upstream": {
        "archived": false,
        "latest": "v2.4.0",
@@ -1720,7 +1899,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 7788
+       "stars": 8014
       }
      },
      {
@@ -1736,7 +1915,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-19",
        "renamed_to": null,
-       "stars": 147495
+       "stars": 147597
       }
      },
      {
@@ -1752,7 +1931,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 125797
+       "stars": 125923
       }
      },
      {
@@ -1768,14 +1947,14 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 4055
+       "stars": 4058
       }
      },
      {
       "id": "qdrant",
       "pin": "1.19.1",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v1.19.1",
@@ -1784,14 +1963,14 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-04",
        "renamed_to": null,
-       "stars": 34741
+       "stars": 34752
       }
      },
      {
       "id": "restic",
       "pin": "0.19.1",
       "pin_behind_upstream": false,
-      "review_status": "keep_but_compare",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v0.19.1",
@@ -1800,23 +1979,23 @@
        "pushed_at": "2026-09-20",
        "released_at": "2026-07-05",
        "renamed_to": null,
-       "stars": 36173
+       "stars": 36182
       }
      },
      {
       "id": "systemd",
       "pin": "255.4-1ubuntu8.17",
-      "pin_behind_upstream": true,
-      "review_status": "confirmed_conditional",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
-       "latest": "v261.3",
+       "latest": "v262",
        "license": "GPL-2.0",
        "prerelease": false,
        "pushed_at": "2026-09-22",
-       "released_at": "2026-09-10",
+       "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 16714
+       "stars": 16713
       }
      }
     ],
@@ -1854,7 +2033,7 @@
       "id": "beads",
       "pin": "1.3.0",
       "pin_behind_upstream": false,
-      "review_status": "keep_but_compare",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v1.3.0",
@@ -1863,14 +2042,14 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-15",
        "renamed_to": null,
-       "stars": 27345
+       "stars": 27362
       }
      },
      {
       "id": "claude-code",
       "pin": "2.1.278",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v2.1.278",
@@ -1879,7 +2058,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-19",
        "renamed_to": null,
-       "stars": 147495
+       "stars": 147597
       }
      },
      {
@@ -1895,7 +2074,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 125797
+       "stars": 125923
       }
      },
      {
@@ -1911,23 +2090,23 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 4055
+       "stars": 4058
       }
      },
      {
       "id": "systemd",
       "pin": "255.4-1ubuntu8.17",
-      "pin_behind_upstream": true,
+      "pin_behind_upstream": false,
       "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
-       "latest": "v261.3",
+       "latest": "v262",
        "license": "GPL-2.0",
        "prerelease": false,
        "pushed_at": "2026-09-22",
-       "released_at": "2026-09-10",
+       "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 16714
+       "stars": 16713
       }
      }
     ],
@@ -1960,7 +2139,56 @@
     "overturn_when": "A concrete multi-host or multi-operator secret-sharing need appears, and openbao (or a comparable secret manager) passes an actual installed/queried comparison against the native-login-only policy.",
     "platform_status_summary": {},
     "recipe_refs": [],
-    "sota_components": [],
+    "sota_components": [
+     {
+      "id": "gitleaks",
+      "pin": "8.30.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v8.30.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-09",
+       "released_at": "2026-03-21",
+       "renamed_to": null,
+       "stars": 29427
+      }
+     },
+     {
+      "id": "syft",
+      "pin": "1.52.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.52.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 9598
+      }
+     },
+     {
+      "id": "zizmor",
+      "pin": "1.30.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.30.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-09",
+       "renamed_to": null,
+       "stars": 6555
+      }
+     }
+    ],
     "title": "Secrets and credentials",
     "verdict_status": "pending_lanes",
     "winners": []
@@ -1995,7 +2223,7 @@
       "id": "ai-memory",
       "pin": "2.3.2",
       "pin_behind_upstream": true,
-      "review_status": "confirmed_pin",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v2.4.0",
@@ -2004,14 +2232,14 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 7788
+       "stars": 8014
       }
      },
      {
       "id": "huggingface-hub-native",
       "pin": "1.32.0",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v1.32.0",
@@ -2020,14 +2248,14 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 3921
+       "stars": 3922
       }
      },
      {
       "id": "qdrant",
       "pin": "1.19.1",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v1.19.1",
@@ -2036,7 +2264,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-04",
        "renamed_to": null,
-       "stars": 34741
+       "stars": 34752
       }
      },
      {
@@ -2052,39 +2280,39 @@
        "pushed_at": "2026-09-20",
        "released_at": "2026-07-05",
        "renamed_to": null,
-       "stars": 36173
+       "stars": 36182
       }
      },
      {
       "id": "socraticode",
       "pin": "1.14.0",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v1.14.0",
        "license": "AGPL-3.0",
        "prerelease": false,
-       "pushed_at": "2026-09-20",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-16",
        "renamed_to": null,
-       "stars": 3319
+       "stars": 3318
       }
      },
      {
       "id": "vllm",
       "pin": "0.25.0",
       "pin_behind_upstream": true,
-      "review_status": "confirmed_pin",
+      "review_status": "pin_behind_upstream",
       "upstream": {
        "archived": false,
-       "latest": "v0.29.0",
+       "latest": "v0.30.0",
        "license": "Apache-2.0",
        "prerelease": false,
        "pushed_at": "2026-09-22",
-       "released_at": "2026-09-09",
+       "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 92378
+       "stars": 92429
       }
      }
     ],
@@ -2122,7 +2350,7 @@
       "id": "ccusage",
       "pin": "20.0.24",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v20.0.24",
@@ -2131,7 +2359,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 18677
+       "stars": 18686
       }
      },
      {
@@ -2144,17 +2372,17 @@
        "latest": "v1.0.169",
        "license": "NOASSERTION",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-06-29",
        "renamed_to": null,
-       "stars": 23897
+       "stars": 23936
       }
      },
      {
       "id": "headroom",
       "pin": "0.37.0",
       "pin_behind_upstream": true,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_pin",
       "upstream": {
        "archived": false,
        "latest": "v0.38.0",
@@ -2162,21 +2390,21 @@
        "prerelease": false,
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
-       "renamed_to": "headroomlabs-ai/headroom",
-       "stars": 73424
+       "renamed_to": null,
+       "stars": 73473
       }
      },
      {
       "id": "jcodemunch-mcp",
       "pin": "1.108.319",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v1.108.319",
        "license": "NOASSERTION",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-16",
        "renamed_to": null,
        "stars": 2708
@@ -2195,7 +2423,7 @@
        "pushed_at": "2026-09-09",
        "released_at": "2026-08-16",
        "renamed_to": null,
-       "stars": 29935
+       "stars": 29952
       }
      },
      {
@@ -2211,14 +2439,14 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 28448
+       "stars": 28461
       }
      },
      {
       "id": "rtk",
       "pin": "0.49.0",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_default",
       "upstream": {
        "archived": false,
        "latest": "v0.49.0",
@@ -2227,23 +2455,23 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-11",
        "renamed_to": null,
-       "stars": 81338
+       "stars": 81419
       }
      },
      {
       "id": "toon",
       "pin": "4.1.1",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
-       "archived": null,
-       "latest": null,
-       "license": null,
-       "prerelease": null,
-       "pushed_at": null,
-       "released_at": null,
+       "archived": false,
+       "latest": "v4.1.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-03",
+       "released_at": "2026-08-05",
        "renamed_to": null,
-       "stars": null
+       "stars": 25409
       }
      }
     ],
@@ -2281,23 +2509,23 @@
       "id": "agent-browser",
       "pin": "0.38.1",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v0.38.1",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-16",
        "renamed_to": null,
-       "stars": 43009
+       "stars": 43049
       }
      },
      {
       "id": "openresearch",
       "pin": "0.2.7",
       "pin_behind_upstream": true,
-      "review_status": "confirmed_pin",
+      "review_status": "pin_behind_upstream",
       "upstream": {
        "archived": false,
        "latest": "v0.2.8",
@@ -2306,7 +2534,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 5531
+       "stars": 5551
       }
      },
      {
@@ -2322,7 +2550,7 @@
        "pushed_at": "2026-09-18",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 13484
+       "stars": 13498
       }
      },
      {
@@ -2385,7 +2613,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-15",
        "renamed_to": null,
-       "stars": 27345
+       "stars": 27362
       }
      },
      {
@@ -2401,7 +2629,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-19",
        "renamed_to": null,
-       "stars": 147495
+       "stars": 147597
       }
      },
      {
@@ -2417,14 +2645,14 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 125797
+       "stars": 125923
       }
      },
      {
       "id": "codex-for-claude",
       "pin": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_selected",
       "upstream": {
        "archived": false,
        "latest": "v1.0.6",
@@ -2433,23 +2661,23 @@
        "pushed_at": "2026-07-08",
        "released_at": "2026-07-08",
        "renamed_to": null,
-       "stars": 33436
+       "stars": 33467
       }
      },
      {
       "id": "systemd",
       "pin": "255.4-1ubuntu8.17",
-      "pin_behind_upstream": true,
+      "pin_behind_upstream": false,
       "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
-       "latest": "v261.3",
+       "latest": "v262",
        "license": "GPL-2.0",
        "prerelease": false,
        "pushed_at": "2026-09-22",
-       "released_at": "2026-09-10",
+       "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 16714
+       "stars": 16713
       }
      },
      {
@@ -2465,7 +2693,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 8306
+       "stars": 8334
       }
      }
     ],
@@ -2514,7 +2742,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 125797
+       "stars": 125923
       }
      },
      {
@@ -2530,7 +2758,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 7788
+       "stars": 8014
       }
      },
      {
@@ -2543,10 +2771,10 @@
        "latest": "v1.0.169",
        "license": "NOASSERTION",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-06-29",
        "renamed_to": null,
-       "stars": 23897
+       "stars": 23936
       }
      },
      {
@@ -2562,7 +2790,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-04",
        "renamed_to": null,
-       "stars": 34741
+       "stars": 34752
       }
      },
      {
@@ -2571,14 +2799,14 @@
       "pin_behind_upstream": false,
       "review_status": "confirmed_default",
       "upstream": {
-       "archived": null,
-       "latest": null,
-       "license": null,
-       "prerelease": null,
-       "pushed_at": null,
-       "released_at": null,
+       "archived": false,
+       "latest": "v0.49.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-11",
        "renamed_to": null,
-       "stars": null
+       "stars": 81419
       }
      },
      {
@@ -2591,26 +2819,26 @@
        "latest": "v1.7.0",
        "license": "NOASSERTION",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-08-09",
        "renamed_to": null,
-       "stars": 29684
+       "stars": 29712
       }
      },
      {
       "id": "foundation-socraticode",
       "pin": "v1.14.0",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_default",
       "upstream": {
        "archived": false,
        "latest": "v1.14.0",
        "license": "AGPL-3.0",
        "prerelease": false,
-       "pushed_at": "2026-09-20",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-16",
        "renamed_to": null,
-       "stars": 3319
+       "stars": 3318
       }
      },
      {
@@ -2620,26 +2848,26 @@
       "review_status": "pin_behind_upstream",
       "upstream": {
        "archived": false,
-       "latest": "v0.29.0",
+       "latest": "v0.30.0",
        "license": "Apache-2.0",
        "prerelease": false,
        "pushed_at": "2026-09-22",
-       "released_at": "2026-09-09",
+       "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 92378
+       "stars": 92429
       }
      },
      {
       "id": "codex-acp",
       "pin": "v1.12.0",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v1.12.0",
        "license": "NOASSERTION",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-15",
        "renamed_to": null,
        "stars": 397
@@ -2649,7 +2877,7 @@
       "id": "deerflow",
       "pin": "stable v2.0.0; discovery commit 42334f26d7025d905678f9075b079fc65f9beaf9 (2.1.0-rc0)",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v2.0.0",
@@ -2658,7 +2886,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-06-25",
        "renamed_to": null,
-       "stars": 82823
+       "stars": 82848
       }
      },
      {
@@ -2681,16 +2909,16 @@
       "id": "foundation-codebase-memory-mcp",
       "pin": "v0.11.0",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
-       "archived": null,
-       "latest": null,
-       "license": null,
-       "prerelease": null,
-       "pushed_at": null,
-       "released_at": null,
+       "archived": false,
+       "latest": "v0.11.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-15",
        "renamed_to": null,
-       "stars": null
+       "stars": 44144
       }
      },
      {
@@ -2706,7 +2934,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-08",
        "renamed_to": null,
-       "stars": 31065
+       "stars": 31076
       }
      },
      {
@@ -2722,7 +2950,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 35799
+       "stars": 35804
       }
      },
      {
@@ -2738,30 +2966,30 @@
        "pushed_at": "2026-09-10",
        "released_at": null,
        "renamed_to": null,
-       "stars": 23120
+       "stars": 23121
       }
      },
      {
       "id": "foundation-repomix",
       "pin": "v1.18.0",
-      "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
       "upstream": {
-       "archived": null,
-       "latest": null,
-       "license": null,
-       "prerelease": null,
-       "pushed_at": null,
-       "released_at": null,
+       "archived": false,
+       "latest": "v1.18.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": null
+       "stars": 28461
       }
      },
      {
       "id": "foundation-toon",
       "pin": "v4.1.1",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v4.1.1",
@@ -2770,7 +2998,7 @@
        "pushed_at": "2026-09-03",
        "released_at": "2026-08-05",
        "renamed_to": null,
-       "stars": 25407
+       "stars": 25409
       }
      },
      {
@@ -2786,14 +3014,14 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 42103
+       "stars": 42132
       }
      },
      {
       "id": "omniroute",
       "pin": "v3.8.50",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v3.8.50",
@@ -2802,7 +3030,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-08-26",
        "renamed_to": null,
-       "stars": 69012
+       "stars": 69169
       }
      }
     ],
@@ -2840,23 +3068,39 @@
       "id": "lean",
       "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
       "pin_behind_upstream": false,
-      "review_status": "demotion_proposed",
+      "review_status": "confirmed_default",
       "upstream": {
        "archived": false,
        "latest": "v2.4.0.1",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2017-08-08",
        "renamed_to": null,
-       "stars": 21718
+       "stars": 21721
+      }
+     },
+     {
+      "id": "nautilustrader",
+      "pin": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.231.0",
+       "license": "LGPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-08-02",
+       "renamed_to": null,
+       "stars": 29265
       }
      },
      {
       "id": "cvxportfolio",
       "pin": "1.5.1",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "unmaintained_signal",
       "upstream": {
        "archived": false,
        "latest": "1.5.1",
@@ -2865,7 +3109,7 @@
        "pushed_at": "2026-04-27",
        "released_at": "2025-07-06",
        "renamed_to": null,
-       "stars": 1290
+       "stars": 1291
       }
      }
     ],
@@ -2912,7 +3156,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-01",
        "renamed_to": null,
-       "stars": 4460
+       "stars": 4463
       }
      },
      {
@@ -2928,20 +3172,20 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 4055
+       "stars": 4058
       }
      },
      {
       "id": "modal",
       "pin": "Python modal1.5.5; source be5f129326efe4864d666d263d249214bd9b4ed2",
-      "pin_behind_upstream": true,
-      "review_status": "confirmed_conditional",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v1.3.1",
        "license": "Apache-2.0",
        "prerelease": null,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": null,
        "renamed_to": null,
        "stars": 515
@@ -2951,7 +3195,7 @@
       "id": "temporal",
       "pin": "server v1.32.0; CLI1.9.1; Python SDK1.33.0",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v1.32.0",
@@ -2960,7 +3204,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-11",
        "renamed_to": null,
-       "stars": 23219
+       "stars": 23235
       }
      }
     ],
@@ -3007,14 +3251,14 @@
        "pushed_at": "2026-09-22",
        "released_at": null,
        "renamed_to": null,
-       "stars": 2829
+       "stars": 2836
       }
      },
      {
       "id": "data-mlflow",
       "pin": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v3.16.1",
@@ -3023,7 +3267,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 28086
+       "stars": 28099
       }
      },
      {
@@ -3039,14 +3283,14 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-08-21",
        "renamed_to": null,
-       "stars": 6106
+       "stars": 6107
       }
      },
      {
       "id": "foundation-agent-retrieval-bench",
       "pin": "v0.2.1",
       "pin_behind_upstream": false,
-      "review_status": "keep_but_compare",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v0.2.1",
@@ -3062,23 +3306,23 @@
       "id": "foundation-mteb",
       "pin": "2.21.0",
       "pin_behind_upstream": true,
-      "review_status": "pin_behind_upstream",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "2.21.6",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 3429
+       "stars": 3431
       }
      },
      {
       "id": "mlflow",
       "pin": "v3.16.1",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v3.16.1",
@@ -3087,23 +3331,23 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 28086
+       "stars": 28099
       }
      },
      {
       "id": "phoenix",
       "pin": "arize-phoenix-v20.14.0",
-      "pin_behind_upstream": true,
-      "review_status": "pin_behind_upstream",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
-       "latest": "arize-phoenix-v20.15.0",
+       "latest": "@arizeai/phoenix-mcp@4.3.13",
        "license": "NOASSERTION",
        "prerelease": false,
        "pushed_at": "2026-09-22",
-       "released_at": "2026-09-21",
+       "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 11567
+       "stars": 11576
       }
      }
     ],
@@ -3138,6 +3382,22 @@
     "recipe_refs": [],
     "sota_components": [
      {
+      "id": "adaptive-paper-alpaca-adapter",
+      "pin": "7e7eefe28315f3de3aa4dc75cc8b6524f70829cb (blueprints/us-equities/adaptive-paper)",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": null,
+       "license": "MIT",
+       "prerelease": null,
+       "pushed_at": "2026-09-22",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 0
+      }
+     },
+     {
       "id": "alpaca-py",
       "pin": "0.44.0",
       "pin_behind_upstream": false,
@@ -3150,7 +3410,7 @@
        "pushed_at": "2026-09-18",
        "released_at": "2026-08-11",
        "renamed_to": null,
-       "stars": 1526
+       "stars": 1528
       }
      },
      {
@@ -3166,14 +3426,14 @@
        "pushed_at": "2026-09-18",
        "released_at": "2026-08-11",
        "renamed_to": null,
-       "stars": 1526
+       "stars": 1528
       }
      },
      {
       "id": "lean-alpaca",
       "pin": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "confirmed_default",
       "upstream": {
        "archived": false,
        "latest": "18120",
@@ -3183,6 +3443,22 @@
        "released_at": null,
        "renamed_to": null,
        "stars": 18
+      }
+     },
+     {
+      "id": "nautilus-ibkr-adapter",
+      "pin": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.231.0",
+       "license": "LGPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-08-02",
+       "renamed_to": null,
+       "stars": 29265
       }
      }
     ],
@@ -3229,7 +3505,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-03-31",
        "renamed_to": null,
-       "stars": 15881
+       "stars": 15882
       }
      },
      {
@@ -3242,10 +3518,10 @@
        "latest": "v1.14.0",
        "license": "AGPL-3.0",
        "prerelease": false,
-       "pushed_at": "2026-09-20",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-16",
        "renamed_to": null,
-       "stars": 3319
+       "stars": 3318
       }
      },
      {
@@ -3268,23 +3544,23 @@
       "id": "data-arcticdb",
       "pin": "v6.26.0; source e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v6.26.0",
        "license": "NOASSERTION",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-14",
        "renamed_to": null,
-       "stars": 2518
+       "stars": 2519
       }
      },
      {
       "id": "data-iceberg",
       "pin": "Apache Iceberg 1.11.0; PyIceberg 0.12.0; source 6976e020b894f6a6777704df2b8c4458cb291ae9",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "apache-iceberg-1.11.0",
@@ -3293,7 +3569,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-05-20",
        "renamed_to": null,
-       "stars": 9263
+       "stars": 9265
       }
      },
      {
@@ -3309,7 +3585,7 @@
        "pushed_at": "2026-09-22",
        "released_at": null,
        "renamed_to": null,
-       "stars": 33776
+       "stars": 33783
       }
      },
      {
@@ -3325,23 +3601,23 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 28086
+       "stars": 28099
       }
      },
      {
       "id": "data-openlineage",
       "pin": "1.53.0; source 8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "1.53.0",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-01",
        "renamed_to": null,
-       "stars": 2665
+       "stars": 2667
       }
      }
     ],
@@ -3388,7 +3664,7 @@
        "pushed_at": "2026-09-18",
        "released_at": "2026-08-11",
        "renamed_to": null,
-       "stars": 1526
+       "stars": 1528
       }
      },
      {
@@ -3401,10 +3677,10 @@
        "latest": "v5.58.0",
        "license": "MIT",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-11",
        "renamed_to": null,
-       "stars": 2734
+       "stars": 2737
       }
      },
      {
@@ -3452,7 +3728,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-08-11",
        "renamed_to": null,
-       "stars": 5878
+       "stars": 5880
       }
      },
      {
@@ -3465,10 +3741,10 @@
        "latest": "v0.66.0",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-08-21",
        "renamed_to": null,
-       "stars": 7301
+       "stars": 7304
       }
      },
      {
@@ -3491,7 +3767,7 @@
       "id": "data-gdeltdoc",
       "pin": "1.12.0; source f2e500144b0a6090d63723f94453b32717e5fd23",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
+      "review_status": "unmaintained_signal",
       "upstream": {
        "archived": false,
        "latest": "1.12.0",
@@ -3516,7 +3792,7 @@
        "pushed_at": "2026-09-22",
        "released_at": null,
        "renamed_to": null,
-       "stars": 33776
+       "stars": 33783
       }
      },
      {
@@ -3545,10 +3821,10 @@
        "latest": "10.0.1",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-08-24",
        "renamed_to": null,
-       "stars": 17335
+       "stars": 17339
       }
      }
     ],
@@ -3592,10 +3868,10 @@
        "latest": "v0.34.1",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 8625
+       "stars": 8626
       }
      },
      {
@@ -3611,7 +3887,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-15",
        "renamed_to": null,
-       "stars": 76846
+       "stars": 76856
       }
      },
      {
@@ -3627,7 +3903,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 28930
+       "stars": 28932
       }
      },
      {
@@ -3643,7 +3919,7 @@
        "pushed_at": "2026-09-15",
        "released_at": "2026-08-27",
        "renamed_to": null,
-       "stars": 34360
+       "stars": 34370
       }
      },
      {
@@ -3659,7 +3935,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-14",
        "renamed_to": null,
-       "stars": 7582
+       "stars": 7584
       }
      },
      {
@@ -3675,7 +3951,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-15",
        "renamed_to": null,
-       "stars": 4945
+       "stars": 4947
       }
      },
      {
@@ -3691,7 +3967,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-08-18",
        "renamed_to": null,
-       "stars": 66165
+       "stars": 66176
       }
      },
      {
@@ -3707,7 +3983,7 @@
        "pushed_at": "2026-09-20",
        "released_at": "2026-07-05",
        "renamed_to": null,
-       "stars": 36173
+       "stars": 36182
       }
      },
      {
@@ -3723,23 +3999,23 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 5300
+       "stars": 5302
       }
      },
      {
       "id": "e2b",
       "pin": "e2b@2.51.0",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "e2b@2.51.0",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 13907
+       "stars": 13916
       }
      },
      {
@@ -3755,20 +4031,20 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 28086
+       "stars": 28099
       }
      },
      {
       "id": "modal",
       "pin": "Python modal1.5.5; source be5f129326efe4864d666d263d249214bd9b4ed2",
-      "pin_behind_upstream": true,
+      "pin_behind_upstream": false,
       "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v1.3.1",
        "license": "Apache-2.0",
        "prerelease": null,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": null,
        "renamed_to": null,
        "stars": 515
@@ -3778,7 +4054,7 @@
       "id": "opensandbox",
       "pin": "server/v0.2.3; Python SDK0.1.16",
       "pin_behind_upstream": true,
-      "review_status": "pin_behind_upstream",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "release-1.1.0",
@@ -3787,23 +4063,23 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": 15452
+       "stars": 15472
       }
      },
      {
       "id": "phoenix",
       "pin": "arize-phoenix-v20.14.0",
-      "pin_behind_upstream": true,
+      "pin_behind_upstream": false,
       "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
-       "latest": "arize-phoenix-v20.15.0",
+       "latest": "@arizeai/phoenix-mcp@4.3.13",
        "license": "NOASSERTION",
        "prerelease": false,
        "pushed_at": "2026-09-22",
-       "released_at": "2026-09-21",
+       "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 11567
+       "stars": 11576
       }
      }
     ],
@@ -3857,7 +4133,7 @@
       "id": "cvxportfolio",
       "pin": "1.5.1",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "1.5.1",
@@ -3866,7 +4142,7 @@
        "pushed_at": "2026-04-27",
        "released_at": "2025-07-06",
        "renamed_to": null,
-       "stars": 1290
+       "stars": 1291
       }
      },
      {
@@ -3898,7 +4174,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-20",
        "renamed_to": null,
-       "stars": 2427
+       "stars": 2428
       }
      }
     ],
@@ -3942,26 +4218,26 @@
        "latest": "v5.58.0",
        "license": "MIT",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-11",
        "renamed_to": null,
-       "stars": 2734
+       "stars": 2737
       }
      },
      {
       "id": "foundation-markitdown",
       "pin": "v0.1.7",
-      "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
       "upstream": {
-       "archived": null,
-       "latest": null,
-       "license": null,
-       "prerelease": null,
-       "pushed_at": null,
-       "released_at": null,
+       "archived": false,
+       "latest": "v0.1.8",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-21",
        "renamed_to": null,
-       "stars": null
+       "stars": 186376
       }
      },
      {
@@ -3970,37 +4246,37 @@
       "pin_behind_upstream": false,
       "review_status": "confirmed_default",
       "upstream": {
-       "archived": null,
-       "latest": null,
-       "license": null,
-       "prerelease": null,
-       "pushed_at": null,
-       "released_at": null,
+       "archived": false,
+       "latest": "v2.8.3",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-09",
+       "released_at": "2026-08-16",
        "renamed_to": null,
-       "stars": null
+       "stars": 29952
       }
      },
      {
       "id": "vllm",
       "pin": "active0.25.0 (702f4814fe54fabff350d43cb753ae3e47c0c276); latest0.29.0",
       "pin_behind_upstream": true,
-      "review_status": "confirmed_pin",
+      "review_status": "pin_behind_upstream",
       "upstream": {
        "archived": false,
-       "latest": "v0.29.0",
+       "latest": "v0.30.0",
        "license": "Apache-2.0",
        "prerelease": false,
        "pushed_at": "2026-09-22",
-       "released_at": "2026-09-09",
+       "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 92378
+       "stars": 92429
       }
      },
      {
       "id": "alphalens-reloaded",
       "pin": "0.4.6",
-      "pin_behind_upstream": true,
-      "review_status": "confirmed_conditional",
+      "pin_behind_upstream": false,
+      "review_status": "unmaintained_signal",
       "upstream": {
        "archived": false,
        "latest": "0.4.5",
@@ -4041,7 +4317,7 @@
        "pushed_at": "2026-09-17",
        "released_at": "2026-09-08",
        "renamed_to": null,
-       "stars": 5893
+       "stars": 5895
       }
      },
      {
@@ -4054,10 +4330,10 @@
        "latest": "v6.26.0",
        "license": "NOASSERTION",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-14",
        "renamed_to": null,
-       "stars": 2518
+       "stars": 2519
       }
      },
      {
@@ -4073,7 +4349,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-08-21",
        "renamed_to": null,
-       "stars": 6106
+       "stars": 6107
       }
      },
      {
@@ -4089,7 +4365,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-07-28",
        "renamed_to": null,
-       "stars": 10028
+       "stars": 10030
       }
      },
      {
@@ -4121,14 +4397,14 @@
        "pushed_at": "2026-07-06",
        "released_at": "2026-05-31",
        "renamed_to": null,
-       "stars": 9426
+       "stars": 9427
       }
      },
      {
       "id": "deerflow",
       "pin": "stable v2.0.0; discovery commit 42334f26d7025d905678f9075b079fc65f9beaf9 (2.1.0-rc0)",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v2.0.0",
@@ -4137,7 +4413,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-06-25",
        "renamed_to": null,
-       "stars": 82823
+       "stars": 82848
       }
      },
      {
@@ -4150,10 +4426,10 @@
        "latest": "v2.129.0",
        "license": "MIT",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 67557
+       "stars": 67611
       }
      },
      {
@@ -4166,10 +4442,10 @@
        "latest": "v3.1.1",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-03",
        "renamed_to": null,
-       "stars": 26575
+       "stars": 26579
       }
      },
      {
@@ -4185,14 +4461,14 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-18",
        "renamed_to": null,
-       "stars": 19107
+       "stars": 19109
       }
      },
      {
       "id": "qlib",
       "pin": "0.9.7",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v0.9.7",
@@ -4201,7 +4477,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2025-08-15",
        "renamed_to": null,
-       "stars": 48740
+       "stars": 48750
       }
      },
      {
@@ -4217,7 +4493,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-08-23",
        "renamed_to": null,
-       "stars": 43887
+       "stars": 43893
       }
      },
      {
@@ -4230,17 +4506,17 @@
        "latest": "1.9.1",
        "license": "BSD-3-Clause",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-09-11",
        "renamed_to": null,
-       "stars": 67335
+       "stars": 67346
       }
      },
      {
       "id": "skfolio",
       "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
       "pin_behind_upstream": true,
-      "review_status": "confirmed_pin",
+      "review_status": "pin_behind_upstream",
       "upstream": {
        "archived": false,
        "latest": "v1.3.0",
@@ -4249,7 +4525,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-09-20",
        "renamed_to": null,
-       "stars": 2427
+       "stars": 2428
       }
      },
      {
@@ -4265,7 +4541,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-08-27",
        "renamed_to": null,
-       "stars": 11639
+       "stars": 11642
       }
      },
      {
@@ -4281,7 +4557,7 @@
        "pushed_at": "2026-09-15",
        "released_at": "2026-08-28",
        "renamed_to": null,
-       "stars": 33411
+       "stars": 33457
       }
      }
     ],
@@ -4328,23 +4604,7 @@
        "pushed_at": "2026-09-09",
        "released_at": "2026-03-21",
        "renamed_to": null,
-       "stars": 29419
-      }
-     },
-     {
-      "id": "grype",
-      "pin": "v0.119.0",
-      "pin_behind_upstream": false,
-      "review_status": "confirmed_default",
-      "upstream": {
-       "archived": false,
-       "latest": "v0.119.0",
-       "license": "Apache-2.0",
-       "prerelease": false,
-       "pushed_at": "2026-09-21",
-       "released_at": "2026-09-17",
-       "renamed_to": null,
-       "stars": 12913
+       "stars": 29427
       }
      },
      {
@@ -4360,14 +4620,14 @@
        "pushed_at": "2026-09-18",
        "released_at": "2026-09-17",
        "renamed_to": null,
-       "stars": 9595
+       "stars": 9598
       }
      },
      {
       "id": "cosign",
       "pin": "v3.1.3",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v3.1.3",
@@ -4380,10 +4640,26 @@
       }
      },
      {
+      "id": "grype",
+      "pin": "v0.119.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.119.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 12916
+      }
+     },
+     {
       "id": "openbao",
       "pin": "v2.6.2",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "v2.6.2",
@@ -4392,7 +4668,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-08-18",
        "renamed_to": null,
-       "stars": 7452
+       "stars": 7456
       }
      }
     ],
@@ -4439,7 +4715,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-07-22",
        "renamed_to": null,
-       "stars": 41615
+       "stars": 41639
       }
      },
      {
@@ -4455,39 +4731,39 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-09-01",
        "renamed_to": null,
-       "stars": 4460
+       "stars": 4463
       }
      },
      {
       "id": "data-arrow",
       "pin": "apache-arrow-25.0.1; source beccec0d0c451b7aa3e4530416ac431b3c035c69",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "apache-arrow-25.0.1",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-08-10",
        "renamed_to": null,
-       "stars": 17145
+       "stars": 17148
       }
      },
      {
       "id": "data-clickhouse",
       "pin": "v26.8.7.19-lts; source f29d27def7ee0adb10e7e2fff080ba204054dd4b",
       "pin_behind_upstream": true,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
-       "latest": "v26.9.1.1629-stable",
+       "latest": "v26.9.2.8-stable",
        "license": "Apache-2.0",
        "prerelease": false,
        "pushed_at": "2026-09-22",
-       "released_at": "2026-09-21",
+       "released_at": "2026-09-22",
        "renamed_to": null,
-       "stars": 50008
+       "stars": 50021
       }
      },
      {
@@ -4503,7 +4779,7 @@
        "pushed_at": "2026-09-21",
        "released_at": "2026-08-11",
        "renamed_to": null,
-       "stars": 5878
+       "stars": 5880
       }
      },
      {
@@ -4516,10 +4792,10 @@
        "latest": "v0.66.0",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-08-21",
        "renamed_to": null,
-       "stars": 7301
+       "stars": 7304
       }
      },
      {
@@ -4535,30 +4811,30 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-05-20",
        "renamed_to": null,
-       "stars": 9263
+       "stars": 9265
       }
      },
      {
       "id": "data-questdb",
       "pin": "10.0.1; source 7a391566ac827e0d8c269b91f2415c16b0a32a84",
       "pin_behind_upstream": false,
-      "review_status": "confirmed_conditional",
+      "review_status": "not_individually_reviewed",
       "upstream": {
        "archived": false,
        "latest": "10.0.1",
        "license": "Apache-2.0",
        "prerelease": false,
-       "pushed_at": "2026-09-21",
+       "pushed_at": "2026-09-22",
        "released_at": "2026-08-24",
        "renamed_to": null,
-       "stars": 17335
+       "stars": 17339
       }
      },
      {
       "id": "foundation-toon",
       "pin": "v4.1.1",
       "pin_behind_upstream": false,
-      "review_status": "not_individually_reviewed",
+      "review_status": "confirmed_conditional",
       "upstream": {
        "archived": false,
        "latest": "v4.1.1",
@@ -4567,7 +4843,7 @@
        "pushed_at": "2026-09-03",
        "released_at": "2026-08-05",
        "renamed_to": null,
-       "stars": 25407
+       "stars": 25409
       }
      },
      {
@@ -4583,7 +4859,7 @@
        "pushed_at": "2026-09-22",
        "released_at": "2026-08-23",
        "renamed_to": null,
-       "stars": 43887
+       "stars": 43893
       }
      }
     ],

@@ -6,6 +6,7 @@ absent from the interpreter under test.
 """
 import importlib.util
 import json
+import re
 import subprocess
 import unittest
 from pathlib import Path
@@ -292,13 +293,17 @@ class QuotedPathSanitizationTests(unittest.TestCase):
         # valid JSON (the fix's second half, per the finding).
         reparsed = json.loads(text)
         self.assertNotIn("/home/", text)
-        self.assertEqual(reparsed["note"], 'read "<host-path>" before publishing')
+        # G5: the basename (and any "#/json/pointer" suffix) survive the
+        # redaction verbatim -- see PathBasenamePreservingSanitizationTests --
+        # so this is "<host-path>/file.json", not a bare "<host-path>".
+        self.assertEqual(reparsed["note"], 'read "<host-path>/file.json" before publishing')
 
     def test_sanitize_value_walks_nested_lists_and_dicts(self):
         obj = {"evidence": ["/home/example/a.json", {"nested": "/Users/example/b.json"}], "count": 3, "ok": None}
         cleaned = build_manifest_mod.sanitize_value(obj)
-        self.assertEqual(cleaned["evidence"][0], "<host-path>")
-        self.assertEqual(cleaned["evidence"][1]["nested"], "<host-path>")
+        # G5: basename preserved (see PathBasenamePreservingSanitizationTests).
+        self.assertEqual(cleaned["evidence"][0], "<host-path>/a.json")
+        self.assertEqual(cleaned["evidence"][1]["nested"], "<host-path>/b.json")
         self.assertEqual(cleaned["count"], 3)
         self.assertIsNone(cleaned["ok"])
 
@@ -494,12 +499,16 @@ class CountsReconcileTests(unittest.TestCase):
             "why_selected": "Passed the native scoped operation",
             "comparison_that_would_overturn": "A sealed head-to-head replay",
         }), {})[0]
-        self.assertEqual(status[key]["why_selected"], "Passed the native scoped operation")
-        self.assertEqual(status[key]["comparison_that_would_overturn"], "A sealed head-to-head replay")
+        self.assertEqual(status[key]["lane_item"]["why_selected"], "Passed the native scoped operation")
+        self.assertEqual(status[key]["lane_item"]["comparison_that_would_overturn"], "A sealed head-to-head replay")
 
         status_absent = build_manifest_mod.merge_lanes(lanes_doc({}), {})[0]
-        self.assertNotIn("why_selected", status_absent[key])
-        self.assertNotIn("comparison_that_would_overturn", status_absent[key])
+        self.assertNotIn("why_selected", status_absent[key]["lane_item"])
+        # T3 (2026-09-22 tooling citation review, finding 33): asserting
+        # absence on status_absent[key] itself is vacuous -- that top-level
+        # dict never carries this field regardless of merge_lanes' own
+        # never-invented contract (it always lives under ["lane_item"]).
+        self.assertNotIn("comparison_that_would_overturn", status_absent[key]["lane_item"])
 
     def test_why_selected_and_comparison_that_would_overturn_reach_the_merged_manifest_rows(self):
         # Fix round finding 4: merge_lanes attaching these fields to
@@ -599,12 +608,25 @@ class SelectedVerdictNullSurvivesTests(unittest.TestCase):
         # The returned (here: zero) vote count is recorded in the evidence.
         self.assertTrue(any("0 adversarial vote" in item for item in status[key]["evidence"]))
 
-    def test_unmaintained_signal_with_survives_false_is_confirmed_default_with_a_refuted_note(self):
+    def test_unmaintained_signal_with_survives_false_emits_the_refuted_to_confirmed_marker(self):
+        # G2 (build round 2026-09-22, second pass): merge_lanes alone has no
+        # baseline decision to resolve a refuted demotion/unmaintained-signal
+        # proposal to a concrete confirmed_* class without risking promotion
+        # past the component's own governing selection (a conditional
+        # component was observed promoted to confirmed_default this way) --
+        # it emits build_manifest_mod.REFUTED_TO_CONFIRMED_MARKER instead;
+        # only build_manifest(), which has the baseline, resolves it (see
+        # RefutedToConfirmedBaselineResolutionTests below).
         status, notes, alts, cands, gaps, calls, limits = build_manifest_mod.merge_lanes(
             self._lanes_doc(False, [{"refuted": True, "confidence": 0.9, "reasoning": "still maintained"}]), {})
         key = ("layer-a", "https://github.com/example/fredapi")
-        self.assertEqual(status[key]["status"], "confirmed_default")
+        self.assertEqual(status[key]["status"], build_manifest_mod.REFUTED_TO_CONFIRMED_MARKER)
         self.assertTrue(any("refuted" in item for item in notes.get(key, [])))
+        # The same refutation annotation is also on the entry's own evidence
+        # now (not only in the separate `notes` dict), since build_manifest()
+        # no longer consults `notes` when assembling a row's evidence (G1
+        # fixed a cross-lane evidence leak that relied on doing so).
+        self.assertTrue(any("refuted" in item for item in status[key]["evidence"]))
 
     def test_unmaintained_signal_with_survives_true_keeps_the_proposed_status(self):
         status, notes, alts, cands, gaps, calls, limits = build_manifest_mod.merge_lanes(
@@ -1070,6 +1092,1244 @@ class CodexSecondPassRegressionTests(unittest.TestCase):
         rec = doc["repositories"]["https://github.com/QuantConnect/Lean"]
         self.assertEqual(rec["slug"], "quantconnect/lean")
         self.assertEqual(len(rec["aliases"]), 2)
+
+
+class LaneGroupingTests(unittest.TestCase):
+    """2026-09-22 second refresh: a review lane's own grouping id (e.g. the
+    "beyond" lane's "awesome-list-convergence") is not a foundation or
+    taxonomy layer id. trading[] must stay exactly the taxonomy layer ids (in
+    taxonomy order); such a grouping's selected entries, alternatives, new
+    candidates (with dispositions computed the same way as everywhere else)
+    and open_gaps must reach a new top-level "lane_groupings" section
+    instead, with nothing silently dropped."""
+
+    def _lanes_doc(self):
+        return {
+            "critic": None,
+            "lanes": [{
+                "lane": "beyond",
+                # Layers listed star-audit-* before awesome-list-* (i.e. NOT
+                # already alphabetically sorted) so a test asserting sorted
+                # output cannot be satisfied merely by preserving insertion
+                # order -- see test_lane_groupings_are_sorted_by_layer_id.
+                "result": {"calls": {}, "limits": [], "layers": [
+                    {
+                        "layer_id": "star-audit-targeted-candidates",
+                        # A real lanes.json selected item for this grouping
+                        # carries role/upstream_now (no catalog_pin) plus the
+                        # fields build_manifest.py already copies through --
+                        # see tools/sota-convergence/tests fixture parity
+                        # with the private layer-verdicts-20260922 work
+                        # directory's lanes.json.
+                        "selected": [{
+                            "repository": "https://github.com/example/star-audit-selected",
+                            "status": "unmaintained_signal", "evidence": [],
+                            "role": "source-control-reference (star-audit decision=overlaps_established)",
+                            "upstream_now": {"archived": False, "license": "MIT",
+                                              "pushed_at": "2020-01-01T00:00:00Z"},
+                        }],
+                        "alternatives_keep_but_compare": [],
+                        "new_candidates": [{
+                            "repository": "https://github.com/example/star-candidate",
+                            "source": "s", "demonstrated_gap": "g", "proposed_label": "targeted_candidate",
+                            "comparison_that_would_overturn": "c", "evidence": [],
+                        }],
+                        "open_gaps": [],
+                    },
+                    {
+                        "layer_id": "awesome-list-convergence",
+                        # A real lanes.json selected item for this grouping
+                        # additionally carries role/catalog_pin (no
+                        # upstream_now).
+                        "selected": [{
+                            "repository": "https://github.com/example/survey-tool",
+                            "status": "confirmed_default", "evidence": [], "note": None,
+                            "role": "awesome-list survey entry (star-audit decision=included)",
+                            "catalog_pin": "1.0.0 (abc1234)",
+                        }],
+                        "alternatives_keep_but_compare": [],
+                        "new_candidates": [{
+                            "repository": "https://github.com/example/newcomer-beyond",
+                            "source": "s", "demonstrated_gap": "g", "proposed_label": "keep_but_compare",
+                            "comparison_that_would_overturn": "c", "evidence": [],
+                        }],
+                        "open_gaps": ["gap-beyond"],
+                    },
+                ]},
+                "proposals": [{
+                    "layer": "awesome-list-convergence", "repository": "https://github.com/example/newcomer-beyond",
+                    "kind": "new_candidate", "survives": True,
+                    "votes": [{"refuted": False, "confidence": 0.6, "reasoning": "plausible"}],
+                }],
+            }],
+        }
+
+    # Overridable by a subclass (see LaneItemPlacementTests) that needs a
+    # foundation component under "found-a" to exercise a lane entry against.
+    FOUND_A_COMPONENTS: list = []
+
+    def build(self):
+        foundation_layers = {"checked_at": "2026-01-01", "layers": [
+            {"layer_id": "found-a", "title": "Found A", "components": self.FOUND_A_COMPONENTS},
+        ]}
+        trading_by_layer = {
+            # Deliberately non-alphabetical taxonomy order to prove trading[]
+            # follows taxonomy order, not sorted(layers).
+            "taxonomy": {"layer-z": ["tag-z"], "layer-a": ["tag-a"]},
+            "layers": {
+                "layer-z": [{"id": "z-tool", "repository": "https://github.com/example/z-tool",
+                              "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-z"]}],
+                "layer-a": [{"id": "a-tool", "repository": "https://github.com/example/a-tool",
+                              "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-a"]}],
+            },
+        }
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        return build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers=foundation_layers, trading_by_layer=trading_by_layer,
+            freshness_doc=freshness_doc, lanes_doc=self._lanes_doc(), reconciliations=[],
+            taxonomy=trading_by_layer["taxonomy"],
+        )
+
+    def test_trading_rows_are_exactly_the_taxonomy_ids_in_taxonomy_order(self):
+        manifest = self.build()
+        self.assertEqual([r["layer"] for r in manifest["trading"]], ["layer-z", "layer-a"])
+
+    def test_non_taxonomy_lane_layers_are_not_trading_rows(self):
+        manifest = self.build()
+        trading_layer_ids = {r["layer"] for r in manifest["trading"]}
+        self.assertNotIn("awesome-list-convergence", trading_layer_ids)
+        self.assertNotIn("star-audit-targeted-candidates", trading_layer_ids)
+
+    def test_non_taxonomy_lane_layer_reaches_lane_groupings_verbatim(self):
+        manifest = self.build()
+        groups = {g["layer"]: g for g in manifest["lane_groupings"]}
+        self.assertEqual(set(groups), {"awesome-list-convergence", "star-audit-targeted-candidates"})
+        group = groups["awesome-list-convergence"]
+        self.assertEqual(group["lane"], "beyond")
+        self.assertEqual(group["open_gaps"], ["gap-beyond"])
+        self.assertEqual(len(group["selected"]), 1)
+        self.assertEqual(group["selected"][0]["repository"], "https://github.com/example/survey-tool")
+        self.assertEqual(group["selected"][0]["status"], "confirmed_default")
+        # A real grouping-layer selected entry also carries role/catalog_pin
+        # (and, for other grouping layers, upstream_now) -- these have no
+        # baseline pin/upstream row to fall back on the way foundation/trading
+        # rows do, so dropping them here is unrecoverable. See
+        # test_every_selected_field_of_a_non_taxonomy_lane_layer_reaches_lane_groupings_verbatim
+        # for the exhaustive, fixture-independent cross-check.
+        self.assertEqual(group["selected"][0]["role"],
+                          "awesome-list survey entry (star-audit decision=included)")
+        self.assertEqual(group["selected"][0]["catalog_pin"], "1.0.0 (abc1234)")
+        star_group = groups["star-audit-targeted-candidates"]
+        self.assertEqual(len(star_group["selected"]), 1)
+        self.assertEqual(star_group["selected"][0]["role"],
+                          "source-control-reference (star-audit decision=overlaps_established)")
+        self.assertEqual(star_group["selected"][0]["upstream_now"],
+                          {"archived": False, "license": "MIT", "pushed_at": "2020-01-01T00:00:00Z"})
+
+    def test_every_selected_field_of_a_non_taxonomy_lane_layer_reaches_lane_groupings_verbatim(self):
+        # Cross-check every field the lanes document's own selected[] items
+        # carry (not just the subset the implementation happens to emit)
+        # survives into manifest["lane_groupings"][*]["selected"] verbatim --
+        # analogous to the existing new_candidates cross-check below.
+        lanes_doc = self._lanes_doc()
+        known_layers = {"found-a", "layer-z", "layer-a"}
+        expected = {}
+        for lane in lanes_doc["lanes"]:
+            for layer in lane["result"]["layers"]:
+                if layer["layer_id"] in known_layers:
+                    continue
+                for selected in layer["selected"]:
+                    expected[(layer["layer_id"], selected["repository"])] = dict(selected)
+        self.assertTrue(expected, "fixture must actually exercise a non-taxonomy selected entry")
+        manifest = self.build()
+        actual = {}
+        for group in manifest["lane_groupings"]:
+            for entry in group["selected"]:
+                actual[(group["layer"], entry["repository"])] = entry
+        for key, expected_fields in expected.items():
+            self.assertIn(key, actual)
+            for field, value in expected_fields.items():
+                self.assertEqual(actual[key].get(field), value, f"{key} field {field!r} dropped or changed")
+
+    def test_lane_groupings_are_sorted_by_layer_id(self):
+        manifest = self.build()
+        self.assertEqual(
+            [g["layer"] for g in manifest["lane_groupings"]],
+            ["awesome-list-convergence", "star-audit-targeted-candidates"],
+        )
+
+    def test_every_new_candidate_of_a_non_taxonomy_lane_layer_appears_in_lane_groupings_with_its_disposition(self):
+        # Nothing from a non-taxonomy grouping may be silently dropped:
+        # cross-check merge_lanes' raw cands[] output against what actually
+        # reached manifest["lane_groupings"].
+        _, _, _, cands, _, _, _ = build_manifest_mod.merge_lanes(self._lanes_doc(), {})
+        known_layers = {"found-a", "layer-z", "layer-a"}
+        expected = {
+            (layer_id, item["repository"]): item["disposition"]
+            for layer_id, items in cands.items() if layer_id not in known_layers
+            for item in items
+        }
+        self.assertTrue(expected, "fixture must actually exercise a non-taxonomy candidate")
+        manifest = self.build()
+        actual = {
+            (group["layer"], candidate["repository"]): candidate["disposition"]
+            for group in manifest["lane_groupings"] for candidate in group["candidates"]
+        }
+        self.assertEqual(actual, expected)
+
+    def test_lane_grouping_candidates_are_excluded_from_candidates_total_but_counted_separately(self):
+        manifest = self.build()
+        self.assertEqual(manifest["counts"]["lane_groupings"], 2)
+        self.assertEqual(manifest["counts"]["lane_grouping_candidates"], 2)
+        # Neither taxonomy/foundation row in this fixture carries a candidate.
+        self.assertEqual(manifest["counts"]["candidates_total"], 0)
+
+    def test_manifest_key_order_places_lane_groupings_after_trading_and_before_critic(self):
+        manifest = self.build()
+        keys = list(manifest.keys())
+        self.assertLess(keys.index("trading"), keys.index("lane_groupings"))
+        self.assertLess(keys.index("lane_groupings"), keys.index("critic"))
+
+    def test_counts_documents_trading_layers_semantics_distinctly_from_len_trading(self):
+        # trading[] always has one row per taxonomy id (build_baseline_trading's
+        # own docstring), including a taxonomy id with zero selected entries;
+        # counts.trading_layers only counts rows that actually have entries.
+        # That asymmetry (vs. foundation_layers, which counts every row) must
+        # be documented in counts itself, the same way lane_groupings_note
+        # documents the candidates_total scoping rule.
+        manifest = self.build()
+        self.assertIn("trading_layers_note", manifest["counts"])
+        self.assertIn("entries", manifest["counts"]["trading_layers_note"])
+        self.assertIn("len(manifest[\"trading\"]", manifest["counts"]["trading_layers_note"])
+
+
+class OrphanTradingLayerTests(unittest.TestCase):
+    """2026-09-22 third refresh: build_baseline_trading iterates
+    trading_by_layer["taxonomy"], not trading_by_layer["layers"] (a
+    deliberate change from the previous ``sorted(layers)`` iteration -- see
+    build_baseline_trading's docstring). A layer id present in ``layers``
+    but absent from ``taxonomy`` is not a lane-named grouping, so it is not
+    recovered by lane_groupings either (that section is sourced from the
+    lanes document, not from trading_by_layer) -- any selected ("default" or
+    "conditional") entry under such an id would silently vanish from the
+    manifest entirely. Assert this is refused rather than silently dropped."""
+
+    def test_orphan_layer_with_a_selected_entry_is_refused_not_silently_dropped(self):
+        trading_by_layer = {
+            "taxonomy": {"layer-a": ["tag-a"]},
+            "layers": {
+                "layer-a": [{"id": "a-tool", "repository": "https://github.com/example/a-tool",
+                              "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-a"]}],
+                # Not listed in "taxonomy" above -- a catalog-only orphan.
+                "orphan-layer": [{"id": "orphan-tool", "repository": "https://github.com/example/orphan-tool",
+                                   "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-x"]}],
+            },
+        }
+        with self.assertRaises(ValueError) as ctx:
+            build_manifest_mod.build_baseline_trading(trading_by_layer, {})
+        self.assertIn("orphan-layer", str(ctx.exception))
+
+    def test_orphan_layer_with_only_non_selected_entries_is_not_refused(self):
+        # An orphan layer whose entries are all "alternative"/"watch"/
+        # "excluded" carries nothing that would be silently dropped (those
+        # decisions are never promoted into a manifest row from any layer),
+        # so this must not raise.
+        trading_by_layer = {
+            "taxonomy": {"layer-a": ["tag-a"]},
+            "layers": {
+                "layer-a": [{"id": "a-tool", "repository": "https://github.com/example/a-tool",
+                              "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-a"]}],
+                "orphan-layer": [{"id": "orphan-tool", "repository": "https://github.com/example/orphan-tool",
+                                   "decision": "watch", "version_or_commit": "1.0.0", "layers": ["tag-x"]}],
+            },
+        }
+        rows = build_manifest_mod.build_baseline_trading(trading_by_layer, {})
+        self.assertEqual([r["layer"] for r in rows], ["layer-a"])
+
+    def test_matching_layer_and_taxonomy_keys_do_not_raise(self):
+        trading_by_layer = {
+            "taxonomy": {"layer-a": ["tag-a"]},
+            "layers": {"layer-a": [{"id": "a-tool", "repository": "https://github.com/example/a-tool",
+                                     "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-a"]}]},
+        }
+        rows = build_manifest_mod.build_baseline_trading(trading_by_layer, {})
+        self.assertEqual([r["layer"] for r in rows], ["layer-a"])
+
+
+class SessionIdSanitizationTests(unittest.TestCase):
+    """2026-09-22 second refresh, defect 2: lane text can cite a session-scoped
+    /tmp/claude-<uid>/.../<uuid>/scratchpad/... path (Claude Code's own scratch
+    directory), which the pre-fix sanitizer -- scoped to /home, /Users and
+    Windows paths only -- did not touch, and scripts/validate.py's "local
+    session identifier" check (scripts/validate.py line 27) then rejects."""
+
+    # Exact duplicate of scripts/validate.py line 27's PRIVATE_CONTENT
+    # "local session identifier" pattern, used here only to assert this
+    # module's output would pass that publication check.
+    VALIDATE_SESSION_ID_RE = re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.IGNORECASE)
+
+    # Built from parts so the test source itself never carries a literal
+    # session id or host path (scripts/validate.py hashes this file and
+    # refuses either pattern in the tree).
+    SESSION_ID = "-".join(["87433bef", "b807", "4b61", "bca6", "91ba1b410a57"])
+    SCRATCH_PATH = "/".join(["/tmp/claude-1000", "-home-example-code-agent-lab", SESSION_ID,
+                             "scratchpad/manifest/after-fix.json"])
+
+    def test_tmp_scratchpad_session_path_is_sanitized_and_passes_validate_session_check(self):
+        text = f'note: "{self.SCRATCH_PATH}" was read'
+        cleaned = build_manifest_mod.sanitize(text)
+        self.assertNotIn("/tmp/", cleaned)
+        self.assertIsNone(self.VALIDATE_SESSION_ID_RE.search(cleaned))
+        self.assertIn("<host-path>", cleaned)
+
+    def test_git_sha_and_sha256_survive_sanitization_untouched(self):
+        # Real 40-hex commit SHA (this repository's own 445bc83, resolved in
+        # full -- `git rev-parse 445bc83`) so this is an actual 40-char
+        # literal, not a 39-char string mislabelled as 40-hex.
+        sha1 = "445bc83c942d2521cbc526565128d76c78f394bc"
+        self.assertEqual(len(sha1), 40)
+        sha256 = "a" * 64  # 64-hex digest, no dashes
+        text = f"pin abc123 at {sha1}, checksum {sha256}"
+        self.assertEqual(build_manifest_mod.sanitize(text), text)
+
+    def test_dashed_non_hex_token_is_left_alone_by_the_session_uuid_scrub(self):
+        # A near-miss: same 8-4-4-4-12 dash shape as a session UUID, but not
+        # hex, so SESSION_UUID_RE must not match it -- proves the pattern is
+        # actually hex-constrained, not just dash-shaped.
+        near_miss = "gggggggg-gggg-gggg-gggg-gggggggggggg"
+        text = f"ref {near_miss} unrelated"
+        self.assertEqual(build_manifest_mod.sanitize(text), text)
+
+    def test_a_real_uuid_shaped_token_is_scrubbed(self):
+        # The positive case the near-miss above is contrasted against: a
+        # genuine 8-4-4-4-12 hex UUID must be scrubbed.
+        real_uuid = "-".join(["12345678", "90ab", "cdef", "1234", "567890abcdef"])
+        text = f"session {real_uuid} was here"
+        cleaned = build_manifest_mod.sanitize(text)
+        self.assertNotIn(real_uuid, cleaned)
+        self.assertIn("<session-id>", cleaned)
+
+    def test_assert_no_leak_refuses_a_surviving_bare_uuid(self):
+        # Defense in depth: even if a leak bypassed sanitize(), assert_no_leak
+        # must independently refuse a bare session UUID.
+        leaking = '{"note": "session ' + self.SESSION_ID + ' was here"}'
+        with self.assertRaises(build_manifest_mod.LeakDetected):
+            build_manifest_mod.assert_no_leak(leaking)
+
+    def test_assert_no_leak_refuses_a_surviving_tmp_session_path_without_a_uuid(self):
+        # Same defense-in-depth gap as above, but for the OTHER two markers
+        # TMP_SESSION_PATH_RE redacts on (claude-<uid>, scratchpad) -- a
+        # session-scoped /tmp path carrying neither of those AND no UUID
+        # segment must still be refused if it somehow survives sanitize().
+        leaking = '{"note": "read /tmp/claude-1000/some-project/scratchpad/notes.md before publishing"}'
+        with self.assertRaises(build_manifest_mod.LeakDetected):
+            build_manifest_mod.assert_no_leak(leaking)
+
+    def test_sanitize_then_assert_no_leak_accepts_the_scratchpad_case(self):
+        text = f'read "{self.SCRATCH_PATH}" before publishing'
+        cleaned = build_manifest_mod.sanitize(text)
+        build_manifest_mod.assert_no_leak(cleaned)  # must not raise
+
+    def test_existing_home_path_sanitization_is_unaffected(self):
+        text = 'note: "/home/example/code/x.json" was read'
+        cleaned = build_manifest_mod.sanitize(text)
+        self.assertNotIn("/home/", cleaned)
+        self.assertIn("<host-path>", cleaned)
+
+    def test_end_to_end_manifest_with_scratchpad_evidence_sanitizes_cleanly(self):
+        foundation_layers = {"checked_at": "2026-01-01", "layers": [{
+            "layer_id": "layer-a", "title": "Layer A", "components": [{
+                "id": "comp", "repository": "https://github.com/example/comp", "version": "1.0.0",
+            }],
+        }]}
+        trading_by_layer = {"taxonomy": {}, "layers": {}}
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        scratch_evidence = f"read {self.SCRATCH_PATH.replace('after-fix.json', 'list.md')}"
+        lanes_doc = {
+            "critic": None,
+            "lanes": [{
+                "lane": "beyond",
+                "result": {"calls": {}, "limits": [], "layers": [{
+                    "layer_id": "layer-a", "selected": [{
+                        "repository": "https://github.com/example/comp",
+                        "status": "confirmed_default", "evidence": [scratch_evidence], "note": None,
+                    }], "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                }]},
+                "proposals": [],
+            }],
+        }
+        manifest = build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers=foundation_layers, trading_by_layer=trading_by_layer,
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[],
+            taxonomy={},
+        )
+        text = json.dumps(build_manifest_mod.sanitize_value(manifest), indent=1)
+        json.loads(text)  # still valid JSON
+        build_manifest_mod.assert_no_leak(text)  # must not raise
+        self.assertNotIn("/tmp/", text)
+        self.assertIsNone(self.VALIDATE_SESSION_ID_RE.search(text))
+
+
+class LaneItemPlacementTests(LaneGroupingTests):
+    """Where a lane's extra selected[] fields land depends on the row kind: a
+    taxonomy row keeps its baseline pin/upstream and takes only
+    why_selected/comparison_that_would_overturn; a lane_groupings row takes
+    every lane-supplied field verbatim (it has no baseline)."""
+
+    EXTRA = {
+        "why_selected": "w", "comparison_that_would_overturn": "c",
+        "role": "lane-role", "catalog_id": "z-tool", "catalog_pin": "9.9.9",
+        "upstream_now": {"archived": False, "license": "MIT", "pushed_at": "2020-01-01T00:00:00Z"},
+    }
+
+    # T4 (2026-09-22 tooling citation review, finding 34): the foundation
+    # half of "taxonomy row takes only ROW_LANE_FIELDS" had no fixture that
+    # actually ran a lane item with the full EXTRA dict through the
+    # foundation branch (build_manifest.py's foundation loop and trading
+    # loop share the same ROW_LANE_FIELDS filter, but a test only exercising
+    # trading leaves the foundation call site unguarded).
+    FOUND_A_COMPONENTS = [
+        {"id": "found-tool", "repository": "https://github.com/example/found-tool", "version": "1.0.0"},
+    ]
+
+    def _lanes_doc(self):
+        doc = super()._lanes_doc()
+        layers = doc["lanes"][0]["result"]["layers"]
+        layers.append({
+            "layer_id": "layer-z",
+            "selected": [{"repository": "https://github.com/example/z-tool",
+                          "status": "confirmed_default", "evidence": [], **self.EXTRA}],
+            "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+        })
+        layers[1]["selected"][0]["catalog_id"] = "survey-tool"
+        layers.append({
+            "layer_id": "found-a",
+            "selected": [{"repository": "https://github.com/example/found-tool",
+                          "status": "confirmed_default", "evidence": [],
+                          **{**self.EXTRA, "catalog_id": "found-tool"}}],
+            "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+        })
+        return doc
+
+    def test_taxonomy_row_takes_only_row_lane_fields(self):
+        manifest = self.build()
+        rows = {r["layer"]: r for r in manifest["trading"]}
+        entry = rows["layer-z"]["entries"][0]
+        self.assertEqual(entry["id"], "z-tool")
+        self.assertEqual(entry["pin"], "1.0.0")
+        self.assertEqual(entry["why_selected"], "w")
+        self.assertEqual(entry["comparison_that_would_overturn"], "c")
+        for field in ("role", "catalog_id", "catalog_pin", "upstream_now"):
+            self.assertNotIn(field, entry, field)
+
+    def test_foundation_row_takes_only_row_lane_fields(self):
+        # T4: the foundation-row counterpart of test_taxonomy_row_takes_only_row_lane_fields.
+        manifest = self.build()
+        rows = {r["layer"]: r for r in manifest["foundation"]}
+        component = rows["found-a"]["components"][0]
+        self.assertEqual(component["id"], "found-tool")
+        self.assertEqual(component["why_selected"], "w")
+        self.assertEqual(component["comparison_that_would_overturn"], "c")
+        for field in ("role", "catalog_id", "catalog_pin", "upstream_now"):
+            self.assertNotIn(field, component, field)
+
+    def test_lane_grouping_row_takes_every_lane_field_including_catalog_id(self):
+        manifest = self.build()
+        groups = {g["layer"]: g for g in manifest["lane_groupings"]}
+        self.assertNotIn("layer-z", groups)
+        selected = groups["awesome-list-convergence"]["selected"][0]
+        self.assertEqual(selected["catalog_id"], "survey-tool")
+        self.assertEqual(selected["catalog_pin"], "1.0.0 (abc1234)")
+        self.assertEqual(selected["status"], "confirmed_default")
+
+    def test_counts_note_names_both_scoped_counts(self):
+        note = self.build()["counts"]["lane_groupings_note"]
+        self.assertIn("candidates_total", note)
+        self.assertIn("candidates_by_disposition", note)
+
+
+class LaneReviewPrecedenceTests(unittest.TestCase):
+    """G1 (2026-09-22 grand-catalog manifest review): a later lane's
+    selected[] item for the same (layer, repository) must not silently
+    overwrite an earlier lane's -- two lanes independently selecting the
+    same component (e.g. a foundation-lane and a beyond-lane row for the
+    same repository) is an observed real shape, not an error. Every lane's
+    entry is kept; the row's own review_status/review_note/evidence/
+    lane_item come from one entry chosen by a documented, deterministic
+    precedence: (a) verified beats unverified, (b) among equals the lane
+    that owns the catalog beats any other lane, (c) tie -> lexical lane
+    name. Every other lane's entry survives on the row's
+    other_lane_reviews[]; nothing is dropped."""
+
+    def _lanes_doc(self, *, owner_status, owner_survives, other_status, other_survives):
+        def proposals_for(status, survives):
+            if survives is None:
+                return []
+            return [{"layer": "layer-a", "repository": "https://github.com/example/shared",
+                      "kind": status, "survives": survives, "votes": [{"refuted": not survives}]}]
+
+        return {
+            "critic": None,
+            "lanes": [
+                {
+                    "lane": "foundation",
+                    "result": {"calls": {}, "limits": [], "layers": [{
+                        "layer_id": "layer-a",
+                        "selected": [{"repository": "https://github.com/example/shared", "status": owner_status,
+                                      "evidence": ["foundation evidence"], "note": "foundation note"}],
+                        "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                    }]},
+                    "proposals": proposals_for(owner_status, owner_survives),
+                },
+                {
+                    "lane": "beyond",
+                    "result": {"calls": {}, "limits": [], "layers": [{
+                        "layer_id": "layer-a",
+                        "selected": [{"repository": "https://github.com/example/shared", "status": other_status,
+                                      "evidence": ["beyond evidence"], "note": "beyond note"}],
+                        "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                    }]},
+                    "proposals": proposals_for(other_status, other_survives),
+                },
+            ],
+        }
+
+    def _build(self, lanes_doc):
+        foundation_layers = {"checked_at": "2026-01-01", "layers": [{
+            "layer_id": "layer-a", "title": "Layer A", "components": [
+                {"id": "shared", "repository": "https://github.com/example/shared", "version": "1.0.0"},
+            ],
+        }]}
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        return build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers=foundation_layers, trading_by_layer={"taxonomy": {}, "layers": {}},
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[], taxonomy={},
+        )
+
+    def test_both_lanes_verified_the_owning_lane_wins_the_row(self):
+        # foundation lane refuted (verified: survives False), beyond lane
+        # survived (verified: survives True) -- tier (a) ties, tier (b)
+        # (the foundation lane owns a foundation-layers.json layer) decides
+        # it, even though beyond's own verdict survived. This is the real
+        # headroom/token-efficiency defect this fixes: the row must stay
+        # internally consistent with whichever lane it actually reflects.
+        lanes_doc = self._lanes_doc(owner_status="pin_behind_upstream", owner_survives=False,
+                                     other_status="pin_behind_upstream", other_survives=True)
+        manifest = self._build(lanes_doc)
+        component = manifest["foundation"][0]["components"][0]
+        self.assertEqual(component["review_status"], "confirmed_pin")
+        self.assertEqual(component["review_lane"], "foundation")
+        self.assertTrue(any("refuted" in item for item in component["evidence"]))
+        self.assertEqual(len(component["other_lane_reviews"]), 1)
+        other = component["other_lane_reviews"][0]
+        self.assertEqual(other, {"lane": "beyond", "status": "pin_behind_upstream",
+                                  "evidence": ["beyond evidence"], "note": "beyond note", "lane_item": {}})
+
+    def test_verified_entry_beats_an_unverified_one_regardless_of_ownership(self):
+        # foundation lane has no matching proposal at all (genuinely
+        # unverified); beyond lane's verdict survived (verified) -- tier (a)
+        # alone decides it, even though foundation would otherwise own the
+        # layer.
+        lanes_doc = self._lanes_doc(owner_status="confirmed_default", owner_survives=None,
+                                     other_status="confirmed_default", other_survives=True)
+        manifest = self._build(lanes_doc)
+        component = manifest["foundation"][0]["components"][0]
+        self.assertEqual(component["review_lane"], "beyond")
+        self.assertEqual(component["other_lane_reviews"][0]["lane"], "foundation")
+
+    def test_tie_falls_to_lexical_lane_name_when_neither_lane_owns_the_layer(self):
+        # A lane_groupings row: neither lane "owns" a non-taxonomy layer id
+        # (rule (b) is moot), so an equal-verified tie falls straight to
+        # rule (c).
+        lanes_doc = {
+            "critic": None,
+            "lanes": [
+                {"lane": "trading", "result": {"calls": {}, "limits": [], "layers": [{
+                    "layer_id": "custom-grouping",
+                    "selected": [{"repository": "https://github.com/example/shared", "status": "confirmed_default",
+                                  "evidence": [], "note": None}],
+                    "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                }]}, "proposals": []},
+                {"lane": "beyond", "result": {"calls": {}, "limits": [], "layers": [{
+                    "layer_id": "custom-grouping",
+                    "selected": [{"repository": "https://github.com/example/shared", "status": "confirmed_default",
+                                  "evidence": [], "note": None}],
+                    "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                }]}, "proposals": []},
+            ],
+        }
+        manifest = self._build(lanes_doc)
+        group = manifest["lane_groupings"][0]
+        self.assertEqual(group["layer"], "custom-grouping")
+        # Both unverified (no proposals at all) -- lexical: "beyond" < "trading".
+        self.assertEqual(group["selected"][0]["review_lane"], "beyond")
+        self.assertEqual(group["selected"][0]["other_lane_reviews"][0]["lane"], "trading")
+
+
+class RefutedToConfirmedMarkerResolutionTests(unittest.TestCase):
+    """G2: a refuted demotion_proposed/unmaintained_signal proposal must
+    resolve to the component/entry's own governing baseline decision, never
+    promoted past it -- a conditional-selection component promoted all the
+    way to confirmed_default was the real defect (agentskills/skills-ref)."""
+
+    def test_resolve_refuted_marker_maps_default_conditional_and_anything_else(self):
+        marker = build_manifest_mod.REFUTED_TO_CONFIRMED_MARKER
+        self.assertEqual(
+            build_manifest_mod.resolve_refuted_marker(marker, row_kind="foundation", selection="default"),
+            "confirmed_default")
+        self.assertEqual(
+            build_manifest_mod.resolve_refuted_marker(marker, row_kind="foundation", selection="conditional"),
+            "confirmed_conditional")
+        self.assertEqual(
+            build_manifest_mod.resolve_refuted_marker(marker, row_kind="foundation", selection="optional"),
+            "confirmed_selected")
+        self.assertEqual(
+            build_manifest_mod.resolve_refuted_marker(marker, row_kind="trading", decision="default"),
+            "confirmed_default")
+        self.assertEqual(
+            build_manifest_mod.resolve_refuted_marker(marker, row_kind="trading", decision="conditional"),
+            "confirmed_conditional")
+        self.assertEqual(
+            build_manifest_mod.resolve_refuted_marker(marker, row_kind="lane_groupings"),
+            "confirmed_as_selected")
+        # A non-marker value passes through unchanged.
+        self.assertEqual(
+            build_manifest_mod.resolve_refuted_marker("unmaintained_signal", row_kind="foundation"),
+            "unmaintained_signal")
+
+    def test_a_conditional_component_refuted_from_unmaintained_signal_resolves_to_confirmed_conditional_not_default(self):
+        foundation_layers = {"checked_at": "2026-01-01", "layers": [{
+            "layer_id": "layer-a", "title": "Layer A",
+            "decisions": [{"id": "d1", "selection": "conditional", "component_ids": ["cond-tool"]}],
+            "components": [
+                {"id": "cond-tool", "repository": "https://github.com/example/cond-tool", "version": "1.0.0"},
+            ],
+        }]}
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        lanes_doc = {
+            "critic": None,
+            "lanes": [{
+                "lane": "foundation",
+                "result": {"calls": {}, "limits": [], "layers": [{
+                    "layer_id": "layer-a",
+                    "selected": [{"repository": "https://github.com/example/cond-tool",
+                                  "status": "unmaintained_signal", "evidence": [], "note": "stale"}],
+                    "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                }]},
+                "proposals": [{"layer": "layer-a", "repository": "https://github.com/example/cond-tool",
+                                "kind": "unmaintained_signal", "survives": False, "votes": [{"refuted": True}]}],
+            }],
+        }
+        manifest = build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers=foundation_layers, trading_by_layer={"taxonomy": {}, "layers": {}},
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[], taxonomy={},
+        )
+        component = manifest["foundation"][0]["components"][0]
+        # Must NOT be promoted to confirmed_default -- the real defect.
+        self.assertEqual(component["review_status"], "confirmed_conditional")
+
+    def test_a_default_selection_trading_entry_refuted_from_demotion_proposed_resolves_to_confirmed_default(self):
+        trading_by_layer = {
+            "taxonomy": {"layer-b": ["tag-a"]},
+            "layers": {"layer-b": [{"id": "def-tool", "repository": "https://github.com/example/def-tool",
+                                     "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-a"]}]},
+        }
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        lanes_doc = {
+            "critic": None,
+            "lanes": [{
+                "lane": "trading",
+                "result": {"calls": {}, "limits": [], "layers": [{
+                    "layer_id": "layer-b",
+                    "selected": [{"repository": "https://github.com/example/def-tool",
+                                  "status": "demotion_proposed", "evidence": [], "note": None}],
+                    "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                }]},
+                "proposals": [{"layer": "layer-b", "repository": "https://github.com/example/def-tool",
+                                "kind": "demotion_proposed", "survives": False, "votes": [{"refuted": True}]}],
+            }],
+        }
+        manifest = build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers={"layers": []}, trading_by_layer=trading_by_layer,
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[],
+            taxonomy=trading_by_layer["taxonomy"],
+        )
+        entry = manifest["trading"][0]["entries"][0]
+        self.assertEqual(entry["review_status"], "confirmed_default")
+
+    def test_a_component_named_by_conflicting_decisions_resolves_to_the_most_restrictive_one_not_list_order(self):
+        # G2 tiebreak, citation-review round: foundation_decision_selection_map
+        # used to keep the FIRST-LISTED decision naming a component
+        # (decisions[] order, via setdefault) -- so listing a "default"
+        # decision before a stricter "conditional" one for the same
+        # component let a refuted demotion resolve to confirmed_default,
+        # promoting the component past the conditional decision that also
+        # names it (the exact failure G2 exists to fix). The most
+        # restrictive selection among ALL decisions naming the component
+        # must win, regardless of decisions[] order.
+        foundation_layers = {"checked_at": "2026-01-01", "layers": [{
+            "layer_id": "layer-a", "title": "Layer A",
+            "decisions": [
+                {"id": "d1", "selection": "default", "component_ids": ["dual-tool"]},
+                {"id": "d2", "selection": "conditional", "component_ids": ["dual-tool"]},
+            ],
+            "components": [
+                {"id": "dual-tool", "repository": "https://github.com/example/dual-tool", "version": "1.0.0"},
+            ],
+        }]}
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        lanes_doc = {
+            "critic": None,
+            "lanes": [{
+                "lane": "foundation",
+                "result": {"calls": {}, "limits": [], "layers": [{
+                    "layer_id": "layer-a",
+                    "selected": [{"repository": "https://github.com/example/dual-tool",
+                                  "status": "unmaintained_signal", "evidence": [], "note": "stale"}],
+                    "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                }]},
+                "proposals": [{"layer": "layer-a", "repository": "https://github.com/example/dual-tool",
+                                "kind": "unmaintained_signal", "survives": False, "votes": [{"refuted": True}]}],
+            }],
+        }
+        manifest = build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers=foundation_layers, trading_by_layer={"taxonomy": {}, "layers": {}},
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[], taxonomy={},
+        )
+        component = manifest["foundation"][0]["components"][0]
+        # Must resolve to the stricter "conditional" decision, not
+        # "default" merely because it was listed first.
+        self.assertEqual(component["review_status"], "confirmed_conditional")
+        selection_map = build_manifest_mod.foundation_decision_selection_map(foundation_layers)
+        self.assertEqual(selection_map[("layer-a", "dual-tool")], "conditional")
+
+
+class CrossLayerVerdictSharingTests(unittest.TestCase):
+    """G3: the same lane's adversarial verdict for a (repository, kind) is
+    about the repository, not a particular layer -- when the same lane
+    proposes the same status for the same repository in a second layer with
+    no verdict of its own, the first layer's verdict applies there too (the
+    real codex-for-claude defect: unmaintained_signal in git-github-
+    automation, confirmed_default in workers, from one lane's one refuted
+    proposal that only named "workers")."""
+
+    def _build(self, *, second_layer_proposal=None):
+        foundation_layers = {"checked_at": "2026-01-01", "layers": [
+            {"layer_id": "layer-a", "title": "Layer A", "components": [
+                {"id": "shared-tool", "repository": "https://github.com/example/shared-tool", "version": "1.0.0"},
+            ]},
+            {"layer_id": "layer-b", "title": "Layer B", "components": [
+                {"id": "shared-tool", "repository": "https://github.com/example/shared-tool", "version": "1.0.0"},
+            ]},
+        ]}
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        proposals = [{"layer": "layer-a", "repository": "https://github.com/example/shared-tool",
+                       "kind": "unmaintained_signal", "survives": False, "votes": [{"refuted": True}]}]
+        if second_layer_proposal is not None:
+            proposals.append(second_layer_proposal)
+        lanes_doc = {
+            "critic": None,
+            "lanes": [{
+                "lane": "foundation",
+                "result": {"calls": {}, "limits": [], "layers": [
+                    {"layer_id": "layer-a", "selected": [
+                        {"repository": "https://github.com/example/shared-tool", "status": "unmaintained_signal",
+                         "evidence": [], "note": None}],
+                     "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": []},
+                    {"layer_id": "layer-b", "selected": [
+                        {"repository": "https://github.com/example/shared-tool", "status": "unmaintained_signal",
+                         "evidence": [], "note": None}],
+                     "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": []},
+                ]},
+                "proposals": proposals,
+            }],
+        }
+        return build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers=foundation_layers, trading_by_layer={"taxonomy": {}, "layers": {}},
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[], taxonomy={},
+        )
+
+    def test_a_layer_with_no_verdict_of_its_own_inherits_the_lanes_verdict_from_the_other_layer(self):
+        manifest = self._build()
+        by_layer = {r["layer"]: r["components"][0] for r in manifest["foundation"]}
+        # layer-a has its own (refuted) verdict; layer-b has none, so it
+        # must resolve the SAME way, not stay "unmaintained_signal_unverified"
+        # and must never contradict layer-a's class for the same repository.
+        self.assertEqual(by_layer["layer-a"]["review_status"], by_layer["layer-b"]["review_status"])
+        self.assertNotIn("unverified", by_layer["layer-b"]["review_status"])
+        self.assertTrue(any("verdict shared from layer layer-a" in item for item in by_layer["layer-b"]["evidence"]))
+
+    def test_a_layer_with_its_own_verdict_is_never_overridden_by_another_layers_verdict(self):
+        # layer-b gets its OWN verdict (survives True -- the opposite
+        # outcome of layer-a's); it must use that, not the shared one.
+        manifest = self._build(second_layer_proposal={
+            "layer": "layer-b", "repository": "https://github.com/example/shared-tool",
+            "kind": "unmaintained_signal", "survives": True, "votes": [{"refuted": False}]})
+        by_layer = {r["layer"]: r["components"][0] for r in manifest["foundation"]}
+        self.assertNotEqual(by_layer["layer-a"]["review_status"], by_layer["layer-b"]["review_status"])
+        self.assertEqual(by_layer["layer-b"]["review_status"], "unmaintained_signal")
+        self.assertFalse(any("verdict shared" in item for item in by_layer["layer-b"]["evidence"]))
+
+
+class MultiCardSameRepositoryKeyTests(unittest.TestCase):
+    """G4: two cards sharing one repository in one layer (e.g. an
+    execution-broker card and a data-role card for the same SDK) must not
+    collapse onto one lane status -- the lane's own catalog_id disambiguates
+    them (the real alpaca-py defect: the execution card published the data
+    card's why_selected/evidence). An entry with no catalog_id still applies
+    to every card sharing that repository, with a caveat note."""
+
+    TRADING_BY_LAYER = {
+        "taxonomy": {"layer-b": ["tag-a"]},
+        "layers": {"layer-b": [
+            {"id": "card-one", "repository": "https://github.com/example/shared-sdk",
+             "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-a"]},
+            {"id": "card-two", "repository": "https://github.com/example/shared-sdk",
+             "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-a"]},
+        ]},
+    }
+
+    def _build(self, selected):
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        lanes_doc = {
+            "critic": None,
+            "lanes": [{
+                "lane": "trading",
+                "result": {"calls": {}, "limits": [], "layers": [{
+                    "layer_id": "layer-b", "selected": selected,
+                    "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                }]},
+                "proposals": [],
+            }],
+        }
+        return build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers={"layers": []}, trading_by_layer=self.TRADING_BY_LAYER,
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[],
+            taxonomy=self.TRADING_BY_LAYER["taxonomy"],
+        )
+
+    def test_catalog_id_disambiguates_two_cards_sharing_one_repository(self):
+        manifest = self._build([
+            {"repository": "https://github.com/example/shared-sdk", "status": "confirmed_default",
+             "evidence": ["card-one evidence"], "note": None, "catalog_id": "card-one", "why_selected": "role one"},
+            {"repository": "https://github.com/example/shared-sdk", "status": "confirmed_default",
+             "evidence": ["card-two evidence"], "note": None, "catalog_id": "card-two", "why_selected": "role two"},
+        ])
+        entries = {e["id"]: e for e in manifest["trading"][0]["entries"]}
+        self.assertEqual(entries["card-one"]["why_selected"], "role one")
+        self.assertEqual(entries["card-two"]["why_selected"], "role two")
+        self.assertEqual(entries["card-one"]["evidence"], ["card-one evidence"])
+        self.assertEqual(entries["card-two"]["evidence"], ["card-two evidence"])
+
+    def test_an_entry_with_no_catalog_id_applies_to_every_sharing_card_with_a_caveat(self):
+        manifest = self._build([
+            {"repository": "https://github.com/example/shared-sdk", "status": "confirmed_default",
+             "evidence": ["shared evidence"], "note": None},
+        ])
+        entries = {e["id"]: e for e in manifest["trading"][0]["entries"]}
+        for card_id in ("card-one", "card-two"):
+            self.assertIn("shared evidence", entries[card_id]["evidence"])
+            self.assertTrue(any("matched by repository only; 2 cards share it" in item
+                                 for item in entries[card_id]["evidence"]))
+
+    def test_a_catalog_id_none_entry_from_another_lane_is_not_dropped_when_a_first_entry_matches_by_id(self):
+        # G1 (citation-review round): match_lane_entries returns ONLY the
+        # by-id match when one exists, and _build_card_row used to pass
+        # only that `matched` list into select_row_review -- so a second
+        # lane's entry for the SAME (layer, repository) that set no
+        # catalog_id at all (and so never became the by-id match, nor the
+        # by-repository fallback, since the fallback only runs when by-id
+        # is empty) vanished from the manifest entirely: not chosen, not in
+        # other_lane_reviews, not recoverable anywhere. Reproduces the real
+        # trading/portfolio-risk/empyrical-reloaded case: the trading
+        # lane's catalog_id='empyrical-reloaded' entry
+        # (status=unmaintained_signal) silently deleted the beyond lane's
+        # catalog_id=None entry (status=keep_but_compare, its own
+        # why_selected) at the same (layer, repository) key.
+        trading_by_layer = {
+            "taxonomy": {"layer-b": ["tag-a"]},
+            "layers": {"layer-b": [
+                {"id": "solo-card", "repository": "https://github.com/example/shared-sdk",
+                 "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-a"]},
+            ]},
+        }
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        lanes_doc = {
+            "critic": None,
+            "lanes": [
+                {"lane": "trading", "result": {"calls": {}, "limits": [], "layers": [{
+                    "layer_id": "layer-b",
+                    "selected": [{"repository": "https://github.com/example/shared-sdk",
+                                  "status": "unmaintained_signal", "evidence": ["trading evidence"],
+                                  "note": None, "catalog_id": "solo-card"}],
+                    "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                }]}, "proposals": []},
+                {"lane": "beyond", "result": {"calls": {}, "limits": [], "layers": [{
+                    "layer_id": "layer-b",
+                    "selected": [{"repository": "https://github.com/example/shared-sdk",
+                                  "status": "keep_but_compare", "evidence": ["beyond evidence"],
+                                  "note": "beyond note", "why_selected": "beyond rationale"}],
+                    "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": [],
+                }]}, "proposals": []},
+            ],
+        }
+        manifest = build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers={"layers": []}, trading_by_layer=trading_by_layer,
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[],
+            taxonomy=trading_by_layer["taxonomy"],
+        )
+        entry = manifest["trading"][0]["entries"][0]
+        self.assertEqual(entry["id"], "solo-card")
+        # The trading lane owns the trading row, so it is still chosen.
+        self.assertEqual(entry["review_status"], "unmaintained_signal")
+        self.assertEqual(entry["review_lane"], "trading")
+        # The beyond lane's catalog_id=None entry must survive somewhere
+        # on the row -- never silently dropped.
+        beyond_reviews = [o for o in entry.get("other_lane_reviews", []) if o["lane"] == "beyond"]
+        self.assertEqual(len(beyond_reviews), 1,
+                          "the beyond lane's catalog_id=None entry must not be dropped")
+        self.assertEqual(beyond_reviews[0]["status"], "keep_but_compare")
+        self.assertEqual(beyond_reviews[0]["lane_item"].get("why_selected"), "beyond rationale")
+
+
+class PathBasenamePreservingSanitizationTests(unittest.TestCase):
+    """G5: a redacted host path keeps its basename and any "#/json/pointer"
+    suffix verbatim (223 evidence citations in a real manifest were
+    unresolvable -- a bare "<host-path>" token alone -- before this fix); a
+    path inside the private --work-dir resolves to "<work-dir>/basename"
+    instead of the generic "<host-path>/basename"; a /tmp session-scratch
+    path and a bare session UUID stay scrubbed exactly as before (no
+    basename -- see sanitize()'s docstring)."""
+
+    WORK_DIR = "/home/example/codex-ecosystem/state/layer-verdicts-20260922"
+
+    def test_a_generic_host_path_keeps_its_basename(self):
+        text = 'note: "/home/example/code/native-agent-stack/state/x.json" was read'
+        cleaned = build_manifest_mod.sanitize(text)
+        self.assertNotIn("/home/", cleaned)
+        self.assertIn("<host-path>/x.json", cleaned)
+
+    def test_a_path_inside_the_work_dir_uses_the_work_dir_token(self):
+        text = f'note: "{self.WORK_DIR}/github-freshness.json" was read'
+        cleaned = build_manifest_mod.sanitize(text, work_dir=self.WORK_DIR)
+        self.assertIn("<work-dir>/github-freshness.json", cleaned)
+        self.assertNotIn("<host-path>", cleaned)
+        self.assertNotIn(self.WORK_DIR, cleaned)
+
+    def test_a_path_outside_the_work_dir_still_uses_the_generic_token(self):
+        text = 'note: "/home/example/some-other-project/x.json" was read'
+        cleaned = build_manifest_mod.sanitize(text, work_dir=self.WORK_DIR)
+        self.assertIn("<host-path>/x.json", cleaned)
+        self.assertNotIn("<work-dir>", cleaned)
+
+    def test_a_json_pointer_suffix_survives_verbatim(self):
+        text = (f'evidence: {self.WORK_DIR}/github-freshness.json'
+                '#/repositories/https:~1~1github.com~1example~1thing')
+        cleaned = build_manifest_mod.sanitize(text, work_dir=self.WORK_DIR)
+        self.assertIn(
+            "<work-dir>/github-freshness.json#/repositories/https:~1~1github.com~1example~1thing", cleaned)
+
+    def test_windows_and_macos_paths_also_keep_their_basename(self):
+        for text, expected in (
+            ('note: "/Users/example/code/x.json" was read', "<host-path>/x.json"),
+            (r'note: "C:\Users\example\code\x.json" was read', "<host-path>/x.json"),
+        ):
+            with self.subTest(text=text):
+                cleaned = build_manifest_mod.sanitize(text)
+                self.assertIn(expected, cleaned)
+
+    def test_tmp_session_scratch_paths_stay_a_bare_token_with_no_basename(self):
+        # Unaffected by G5 -- a session-scoped scratch path is not a stable
+        # citation target the way a file under the work directory is.
+        scratch = "/tmp/claude-1000/-project/" + "-".join(
+            ["87433bef", "b807", "4b61", "bca6", "91ba1b410a57"]) + "/scratchpad/notes.md"
+        cleaned = build_manifest_mod.sanitize(f'read "{scratch}" before publishing')
+        self.assertEqual(cleaned, 'read "<host-path>" before publishing')
+
+    def test_sanitize_value_threads_work_dir_through_nested_structures(self):
+        obj = {"evidence": [f"{self.WORK_DIR}/foundation-layers.json -> layers[0]"]}
+        cleaned = build_manifest_mod.sanitize_value(obj, work_dir=self.WORK_DIR)
+        self.assertEqual(cleaned["evidence"][0], "<work-dir>/foundation-layers.json -> layers[0]")
+
+
+class CitationReviewOverlayTests(unittest.TestCase):
+    """G6: an independent citation-review artifact's findings are resolved
+    to the manifest row they name (data only -- never edits the row's own
+    fields, e.g. why_selected) or, when no single row resolves, preserved in
+    citation_review['general']; nothing is silently dropped."""
+
+    TRADING_BY_LAYER = {
+        "taxonomy": {"layer-b": ["tag-a"]},
+        "layers": {"layer-b": [
+            {"id": "card-one", "repository": "https://github.com/example/shared-sdk",
+             "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-a"]},
+            {"id": "data-card-one", "repository": "https://github.com/example/shared-sdk",
+             "decision": "default", "version_or_commit": "1.0.0", "layers": ["tag-a"]},
+        ]},
+    }
+
+    def _build(self, citation_review):
+        foundation_layers = {"checked_at": "2026-01-01", "layers": [{
+            "layer_id": "layer-a", "title": "Layer A", "components": [
+                {"id": "alpha", "repository": "https://github.com/example/alpha", "version": "1.0.0"},
+            ],
+        }]}
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        lanes_doc = {"critic": None, "lanes": []}
+        return build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers=foundation_layers, trading_by_layer=self.TRADING_BY_LAYER,
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[],
+            taxonomy=self.TRADING_BY_LAYER["taxonomy"], citation_review=citation_review,
+        )
+
+    def test_a_finding_resolves_to_the_foundation_row_it_names(self):
+        citation_review = {"findings": [{
+            "reviewer": "foundationA", "catalog": "foundation", "severity": "high",
+            "layer": "layer-a", "repository": "https://github.com/example/alpha",
+            "file": "<host-path>", "line": 1, "claim": "alpha's evidence is contradictory",
+            "evidence": "...", "fix": "fix alpha",
+        }]}
+        manifest = self._build(citation_review)
+        component = manifest["foundation"][0]["components"][0]
+        self.assertEqual(len(component["citation_review"]), 1)
+        self.assertEqual(component["citation_review"][0]["claim"], "alpha's evidence is contradictory")
+        # Row-attached findings carry the same citation locators (file,
+        # line, evidence) as the general bucket -- not just
+        # reviewer/severity/claim/fix -- so a row-attached finding stays
+        # traceable back to its cited line (the asymmetry this fixes).
+        self.assertEqual(component["citation_review"][0]["file"], "<host-path>")
+        self.assertEqual(component["citation_review"][0]["line"], 1)
+        self.assertEqual(component["citation_review"][0]["evidence"], "...")
+        self.assertEqual(manifest["counts"]["citation_review"], {
+            "findings_in_artifact": 1, "findings": 1, "out_of_scope": 0,
+            "attached": 1, "rows_flagged": 1, "general": 0,
+        })
+
+    def test_a_substring_colliding_card_id_does_not_cross_match_its_sibling(self):
+        # "card-one" is a substring of "data-card-one"; a finding naming
+        # "card-one" must resolve to card-one only, never its sibling too.
+        citation_review = {"findings": [{
+            "reviewer": "trading", "catalog": "trading", "severity": "high",
+            "layer": "layer-b", "repository": "https://github.com/example/shared-sdk",
+            "file": "<host-path>", "line": 1,
+            "claim": "Row layer-b/card-one carries the wrong sibling's why_selected.",
+            "evidence": "...", "fix": "fix card-one",
+        }]}
+        manifest = self._build(citation_review)
+        entries = {e["id"]: e for e in manifest["trading"][0]["entries"]}
+        self.assertIn("citation_review", entries["card-one"])
+        self.assertNotIn("citation_review", entries["data-card-one"])
+
+    def test_a_finding_naming_only_the_longer_sibling_id_resolves_to_it_not_general(self):
+        # The reverse collision direction: "card-one" is a hyphen-adjacent
+        # substring of "data-card-one" (the '-' either side of it is a
+        # non-word character, so a naive `\bcard-one\b` match still fires
+        # inside "data-card-one"). A finding naming ONLY the longer sibling
+        # id must resolve to it alone -- not degrade to
+        # citation_review.general because the naive match also produced a
+        # spurious second id_matches hit for "card-one".
+        citation_review = {"findings": [{
+            "reviewer": "trading", "catalog": "trading", "severity": "low",
+            "layer": "layer-b", "repository": "https://github.com/example/shared-sdk",
+            "file": "<host-path>", "line": 5,
+            "claim": "Row layer-b/data-card-one carries the wrong evidence.",
+            "evidence": "...", "fix": "fix data-card-one",
+        }]}
+        manifest = self._build(citation_review)
+        entries = {e["id"]: e for e in manifest["trading"][0]["entries"]}
+        self.assertIn("citation_review", entries["data-card-one"])
+        self.assertNotIn("citation_review", entries["card-one"])
+        self.assertEqual(manifest["citation_review"]["general"], [])
+
+    def test_a_slug_naming_only_the_longer_sibling_repository_resolves_to_it_not_general(self):
+        # Same class of collision as the id-matching fix, in the slug
+        # fallback branch: "example/alpha" is a hyphen-adjacent substring
+        # of "example/alpha-extended" (the naive `in` check used by the
+        # slug branch has no boundary protection at all). A finding
+        # naming only the longer sibling repository must resolve to it
+        # alone, not degrade to general because the shorter sibling's slug
+        # also spuriously substring-matches.
+        citation_review = {"findings": [{
+            "reviewer": "foundationC", "catalog": "foundation", "severity": "medium",
+            "layer": "layer-c", "repository": "https://github.com/example/alpha-extended",
+            "file": "<host-path>", "line": 9,
+            "claim": "The alpha-extended integration is undocumented.",
+            "evidence": "...", "fix": "...",
+        }]}
+        foundation_layers = {"checked_at": "2026-01-01", "layers": [
+            {"layer_id": "layer-a", "title": "Layer A", "components": [
+                {"id": "alpha", "repository": "https://github.com/example/alpha", "version": "1.0.0"},
+            ]},
+            {"layer_id": "layer-c", "title": "Layer C", "components": [
+                {"id": "widget-a", "repository": "https://github.com/example/alpha", "version": "1.0.0"},
+                {"id": "widget-b", "repository": "https://github.com/example/alpha-extended", "version": "1.0.0"},
+            ]},
+        ]}
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        lanes_doc = {"critic": None, "lanes": []}
+        manifest = build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers=foundation_layers, trading_by_layer=self.TRADING_BY_LAYER,
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[],
+            taxonomy=self.TRADING_BY_LAYER["taxonomy"], citation_review=citation_review,
+        )
+        layer_c = next(r for r in manifest["foundation"] if r["layer"] == "layer-c")
+        components = {c["id"]: c for c in layer_c["components"]}
+        self.assertIn("citation_review", components["widget-b"])
+        self.assertNotIn("citation_review", components["widget-a"])
+        self.assertEqual(manifest["citation_review"]["general"], [])
+
+    def test_a_finding_naming_no_resolvable_row_goes_to_general_and_is_not_dropped(self):
+        citation_review = {"findings": [{
+            "reviewer": "foundationB", "catalog": "foundation", "severity": "low",
+            "layer": "all in-scope layers", "repository": "n/a (manifest-wide)",
+            "file": "<host-path>", "line": 1, "claim": "A manifest-wide observation",
+            "evidence": "...", "fix": "...",
+        }]}
+        manifest = self._build(citation_review)
+        self.assertEqual(len(manifest["citation_review"]["general"]), 1)
+        self.assertEqual(manifest["citation_review"]["general"][0]["claim"], "A manifest-wide observation")
+        self.assertEqual(manifest["counts"]["citation_review"], {
+            "findings_in_artifact": 1, "findings": 1, "out_of_scope": 0,
+            "attached": 0, "rows_flagged": 0, "general": 1,
+        })
+
+    def test_a_tooling_catalog_finding_is_ignored_entirely(self):
+        citation_review = {"findings": [{
+            "reviewer": "tooling", "catalog": "tooling", "severity": "low",
+            "layer": "docs", "repository": "nas-wt-pr5-manifest",
+            "file": "<host-path>", "line": 1, "claim": "A tooling-only finding",
+            "evidence": "...", "fix": "...",
+        }]}
+        manifest = self._build(citation_review)
+        self.assertEqual(manifest["citation_review"]["general"], [])
+        self.assertEqual(manifest["counts"]["citation_review"], {
+            "findings_in_artifact": 1, "findings": 0, "out_of_scope": 1,
+            "attached": 0, "rows_flagged": 0, "general": 0,
+        })
+
+    def test_counts_citation_review_reconciles_against_the_artifact_total(self):
+        # The published counts must be reconcilable against the artifact
+        # alone: findings_in_artifact = findings + out_of_scope, and
+        # findings = attached + general.
+        citation_review = {"findings": [
+            {"reviewer": "foundationA", "catalog": "foundation", "severity": "high",
+             "layer": "layer-a", "repository": "https://github.com/example/alpha",
+             "file": "<host-path>", "line": 1, "claim": "alpha finding one", "evidence": "e1", "fix": "f1"},
+            {"reviewer": "foundationB", "catalog": "foundation", "severity": "medium",
+             "layer": "layer-a", "repository": "https://github.com/example/alpha",
+             "file": "<host-path>", "line": 2, "claim": "alpha finding two", "evidence": "e2", "fix": "f2"},
+            {"reviewer": "tooling", "catalog": "tooling", "severity": "low",
+             "layer": "docs", "repository": "nas-wt-pr5-manifest",
+             "file": "<host-path>", "line": 3, "claim": "a tooling finding", "evidence": "e3", "fix": "f3"},
+        ]}
+        manifest = self._build(citation_review)
+        counts = manifest["counts"]["citation_review"]
+        self.assertEqual(counts["findings_in_artifact"], 3)
+        self.assertEqual(counts["findings"], 2)
+        self.assertEqual(counts["out_of_scope"], 1)
+        self.assertEqual(counts["findings_in_artifact"], counts["findings"] + counts["out_of_scope"])
+        self.assertEqual(counts["findings"], counts["attached"] + counts["general"])
+        # Both findings target the same card -- attached (2) exceeds
+        # rows_flagged (1 distinct row) -- exactly the gap the finding
+        # says was previously unreconcilable from the manifest alone.
+        self.assertEqual(counts["attached"], 2)
+        self.assertEqual(counts["rows_flagged"], 1)
+        self.assertEqual(counts["general"], 0)
+
+    def test_a_layer_slash_component_style_layer_field_resolves_by_its_first_segment(self):
+        citation_review = {"findings": [{
+            "reviewer": "foundationA", "catalog": "foundation", "severity": "medium",
+            "layer": "layer-a/some-component", "repository": "https://github.com/example/alpha",
+            "file": "<host-path>", "line": 1, "claim": "alpha again",
+            "evidence": "...", "fix": "...",
+        }]}
+        manifest = self._build(citation_review)
+        component = manifest["foundation"][0]["components"][0]
+        self.assertEqual(len(component["citation_review"]), 1)
+
+    def test_no_citation_review_flag_still_produces_the_key_with_zero_counts(self):
+        manifest = self._build(None)
+        self.assertEqual(manifest["citation_review"], {"general": []})
+        self.assertEqual(manifest["counts"]["citation_review"], {
+            "findings_in_artifact": 0, "findings": 0, "out_of_scope": 0,
+            "attached": 0, "rows_flagged": 0, "general": 0,
+        })
+
+    def test_manifest_key_order_places_citation_review_after_lane_groupings_and_before_critic(self):
+        manifest = self._build(None)
+        keys = list(manifest.keys())
+        self.assertLess(keys.index("lane_groupings"), keys.index("citation_review"))
+        self.assertLess(keys.index("citation_review"), keys.index("critic"))
+
+
+class LaneGroupingsNoteCompletenessTests(unittest.TestCase):
+    """T5 (citation-review round): counts.lane_groupings_note claims to
+    enumerate "every foundation/trading-scoped count above" but omitted
+    counts.citation_review -- also computed only over manifest['foundation']
+    + manifest['trading'] rows (G6, added in the same change), so a
+    lane_groupings[].selected row can never be counted in
+    citation_review.rows_flagged either, the same exclusion the note
+    already claims for its other listed counts."""
+
+    def test_lane_groupings_note_names_citation_review(self):
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00", "repositories": {}}
+        lanes_doc = {"critic": None, "lanes": []}
+        manifest = build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers={"layers": []}, trading_by_layer={"taxonomy": {}, "layers": {}},
+            freshness_doc=freshness_doc, lanes_doc=lanes_doc, reconciliations=[], taxonomy={},
+        )
+        note = manifest["counts"]["lane_groupings_note"]
+        self.assertIn("citation_review", note)
+
+
+class RecheckResidualTests(unittest.TestCase):
+    """Two residuals from the merge-rules recheck: a card-specific lane entry
+    is never folded under a different card's other_lane_reviews, and a
+    home-directory root never republishes the username as a basename."""
+
+    REPO = "https://github.com/example/alpaca-py"
+
+    def _entry(self, lane, catalog_id, why):
+        return {"lane": lane, "catalog_id": catalog_id, "status": "confirmed_default", "verified": False,
+                "evidence": [], "note": None, "lane_item": {"why_selected": why}}
+
+    def test_other_card_entry_is_not_folded_into_this_cards_row(self):
+        entries = [self._entry("trading", "exec-card", "execution rationale"),
+                   self._entry("trading", "data-card", "data rationale"),
+                   self._entry("beyond", None, "card-less rationale")]
+        status = {("L", self.REPO): {"entries": entries}}
+        row = build_manifest_mod._build_card_row(
+            {"id": "exec-card", "repository": self.REPO}, layer_id="L", status=status, row_kind="trading",
+            repo_counts={self.REPO: 2}, decision="default", base_fields={"id": "exec-card", "repository": self.REPO})
+        self.assertEqual(row["why_selected"], "execution rationale")
+        others = row.get("other_lane_reviews", [])
+        self.assertEqual(len(others), 1)
+        self.assertEqual(others[0]["lane"], "beyond")
+        data_row = build_manifest_mod._build_card_row(
+            {"id": "data-card", "repository": self.REPO}, layer_id="L", status=status, row_kind="trading",
+            repo_counts={self.REPO: 2}, decision="default", base_fields={"id": "data-card", "repository": self.REPO})
+        self.assertEqual(data_row["why_selected"], "data rationale")
+        self.assertEqual([o["lane"] for o in data_row.get("other_lane_reviews", [])], ["beyond"])
+
+    def test_home_root_never_republishes_the_username(self):
+        home_root = "/home/" + "exampleuser"
+        self.assertEqual(build_manifest_mod.sanitize("see " + home_root + " now"), "see <host-path> now")
+        self.assertEqual(build_manifest_mod.sanitize("see /Users/" + "exampleuser" + "/ now"), "see <host-path> now")
+        self.assertEqual(build_manifest_mod.sanitize("read " + home_root + "/code/x.json#/a/0"),
+                         "read <host-path>/x.json#/a/0")
+        self.assertNotIn("exampleuser", build_manifest_mod.sanitize(home_root + "#/p"))
 
 
 if __name__ == "__main__":
