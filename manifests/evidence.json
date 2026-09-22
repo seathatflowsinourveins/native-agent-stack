@@ -2902,6 +2902,24 @@
         "Superseded observations, including the author's own probe and invocation errors, remain recorded."
       ],
       "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+    },
+    {
+      "id": "github-automation-newpc-20260922",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "The new-machine handbook (adoption/bootstrap.md, adoption/platforms/*.md), the three native client config templates and tools/adoption/render_config.py were built and locally verified on this Linux/WSL2 host: render_config.py --check reproduced this host's live ~/.claude/settings.json, ~/.codex/config.toml and agent-lab/.codex/config.toml byte-for-byte from the templates plus this host's own gitignored adoption/hosts/wsl-seath.json values, and the new unit tests plus every existing repository validator pass against the three new catalogs/foundation/decisions.json rows. Hosted GitHub Actions execution for the new-pc-bootstrap-ci decision is explicitly pending, not claimed here.",
+      "limitations": [
+        "Byte-identical --check is native evidence for this one host's three live files only; a different host still needs its own adoption/hosts/<host>.json and its own --check run.",
+        "adoption/platforms/macos-arm64.md is drafted, not accepted: no command on that page has run on macOS.",
+        "new-pc-bootstrap-ci is source_review: no hosted GitHub Actions workflow or run exists yet for this bootstrap sequence.",
+        "This receipt does not claim any provider/model task, account readiness check, or service start; it is structural/local-integration evidence only.",
+        "scripts/adoption_status.py exits 2 overall on this host (status prerequisites_missing) because adoption/manifest.json supported_platforms pins Python 3.13 and this host runs 3.12.3 -- a pre-existing condition, unaffected by this unit's changes; the foundation-cpu profile itself is prerequisites_present and the new macos-arm64-foundation profile correctly reports its macOS-only commands absent on Linux.",
+        "scripts/build_ecosystem.py --check was not run and currently fails on this branch (three new decision ids and one new adoption profile are absent from the committed docs/ecosystem/index.html); this is an unresolved CI gate for the coordinator's explorer regeneration, not something this unit's owned paths permit fixing."
+      ],
+      "path": "evidence/receipts/github-automation-newpc-20260922.json"
     }
   ],
   "files": [
@@ -3692,18 +3710,18 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "7eed2412ec33d7f6a3bb89c4dc956e3160980fcf0960117bdb4391e9fee678d5",
-      "bytes": 3129
+      "sha256": "72798cb0398cbf5c67c6a14215fc9364f254735a0399b723430f9d8738f49eb0",
+      "bytes": 5594
     },
     {
       "path": ".gitignore",
-      "sha256": "dfb64b11f5904053b538a1eb09f46c6ee8e304a76fd71549a42dddccd6be7fa8",
-      "bytes": 144
+      "sha256": "4167fa7e1c1544355b4623ace517eaafd2929997db3bf779abbac8b9a4fc4fd4",
+      "bytes": 195
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "80d8630d3fd4db6302d6da0077587d60eb7cf7da9df4d462b2fe1d89d3ebabf1",
-      "bytes": 846
+      "sha256": "c9956e586a7652080bc625896a9f0877695431ac0a4fe0de8c90b15939c76c03",
+      "bytes": 1878
     },
     {
       "path": "AGENTS.md",
@@ -3727,8 +3745,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "87b0acf6f1b2b3b4e2a2b0c278379bea5532a2a1c8ffde9cd6afbf568d14ea04",
-      "bytes": 12025
+      "sha256": "0e5b5bac62a5f67a42bb4bc6126829a21fd937f310b1f5784122238f6fb3f3ae",
+      "bytes": 12480
     },
     {
       "path": "adoption/host-state.example.json",
@@ -3742,8 +3760,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "bytes": 15925,
-      "sha256": "adc0c6a3c58dc0daf8c1c29061b349ca0ffd62b17950b4d6c31a7e9f63c34a76"
+      "bytes": 17023,
+      "sha256": "9a5df2ec69d4d092315584c02d506bdc7864ce1087df273234b9f8492cffa83b"
     },
     {
       "path": "adoption/paired/README.md",
@@ -6773,8 +6791,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 12065410,
-      "sha256": "b2bd7fc5ecbdebfd30ba89fc3b8fac5960b1280aedba0ab02429b68ff31098c5"
+      "bytes": 12078283,
+      "sha256": "6a4b2061f77a285dbec503feb2a9c4f08a43860cf7dd2d1a560152e059e9b8c4"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7523,8 +7541,8 @@
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "38e9fbb77fa0262622c9e06c248c1dd9baaab4b1bf69760bcb301e8347aaed9f",
-      "bytes": 4374
+      "sha256": "e93aeaa36c15584f8137621a0c407fa85307d33fc31be22309a06f020af5c678",
+      "bytes": 5861
     },
     {
       "path": "tests/test_adoption_status.py",
@@ -7717,6 +7735,11 @@
       "bytes": 2582
     },
     {
+      "path": "tests/test_workflow_security_coverage.py",
+      "sha256": "33b357c30449f78754b94fe10329d74eb057ebb1e17c06ab4bcf834e0f9eda4a",
+      "bytes": 3416
+    },
+    {
       "path": "tests/test_wsl_memory_maintenance.py",
       "sha256": "b66309e74fcd3b5e25cc1ffca585eaf12e0d4094db4efa4313a880e423212871",
       "bytes": 4729
@@ -7778,8 +7801,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "bytes": 130182,
-      "sha256": "23054ee9a9111ab08709635fea97422cc03dbe90e2e4fd0cf0237ee295ace6e4"
+      "bytes": 139189,
+      "sha256": "0bab7062a1acaa2f2292ce467966e3c6134f5be013b7021d61fbc92934a3bb39"
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -9028,18 +9051,18 @@
     },
     {
       "path": ".github/main-ruleset.json",
-      "sha256": "e466d3a4f52f6c4b2e0dcb6e73b10875b9a9a3c2bd65a2651db4ef458d47e1cd",
-      "bytes": 594
+      "sha256": "835f09f7043193afd2f4c77a0758235a1622fa8ea49ed11b6d2f53ed2fff6880",
+      "bytes": 1118
     },
     {
       "path": "docs/github-automation-evidence.json",
-      "sha256": "5f827a4302487ee863d8b9d1e1e7665f0b1baa26cc9d1ba81f90a42ed0d68fc6",
-      "bytes": 12324
+      "sha256": "7bb47481be9904ca1fcbc633ccc4438fcbc53fa9aae2c8f0369ade8c422de5fa",
+      "bytes": 12863
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "43284b9f3addbb94d56938649415f99b62618517ca8e7492b8d44b4be9fbb5a9",
-      "bytes": 15521
+      "sha256": "bb23d095af8233b4bef10f2a272285c910025c097c3ebb3f9bee71d89d8ca3aa",
+      "bytes": 29456
     },
     {
       "path": "docs/research-task-acceptance.md",
@@ -9058,8 +9081,8 @@
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
-      "sha256": "ef6c6324a74f14fa48fb8681cb0914914eeebf46ad713388a53f20ba7e15bb93",
-      "bytes": 6727
+      "sha256": "6965c83b26f43a91764d2fd0d935aa06e9c2bd017f80c2f1e2404f768d1d5b84",
+      "bytes": 10820
     },
     {
       "path": "docs/catalog-provenance.md",
@@ -9458,8 +9481,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "810120df9ec901fc0e8247fda6559ab46a352d469457524aa0798472cde9f8b4",
-      "bytes": 12635
+      "sha256": "b191557ed9b762e6abd6a9f9bb51efd29b0937a2272b285c4d4034444c956edc",
+      "bytes": 19528
     },
     {
       "path": "docs/tasks/2026-09-20-automation-resolution.md",
@@ -10218,8 +10241,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "0d96a8adfddf2d913015080770fff5b34948a65de294ca59c2c9a8f6aeb465a5",
-      "bytes": 16142
+      "sha256": "79ff220b68c581a318645096f967d03d126771d5774566c06613e6eac36fafd7",
+      "bytes": 16751
     },
     {
       "path": "examples/claude-native/workflows/check-syntax.mjs",
@@ -11360,6 +11383,116 @@
       "path": "tests/test_blind_layer_decisions.py",
       "sha256": "327f104fc335a2b25f2a910e8cae44661fe9439764f4ab778412dbf3beeaea99",
       "bytes": 2827
+    },
+    {
+      "path": ".github/workflows/catalog-freshness.yml",
+      "sha256": "1cc305b69e6b4c11db4f1bb1ff3fcf30b88b31c2123ea9e31dedc4ab2570cd00",
+      "bytes": 7591
+    },
+    {
+      "path": ".github/workflows/supply-chain.yml",
+      "sha256": "55abfe5a75a4d10ea4ad6da4209145823a06a0e28d445e42fed666f8a92323d8",
+      "bytes": 6688
+    },
+    {
+      "path": ".github/CODEOWNERS",
+      "sha256": "944beb38f10b602866c10489a3cee77325f6ef1716a37d3ef57fbd6d1ed18506",
+      "bytes": 95
+    },
+    {
+      "path": "SECURITY.md",
+      "sha256": "37f1550108a21272953972ded3daba8d725218c323ab94b6d9368159e4d170d4",
+      "bytes": 1780
+    },
+    {
+      "path": ".github/pull_request_template.md",
+      "sha256": "b3196c10719125959ffa1decf5c2924a3e7d938db5ab1f7373a192e62557fcce",
+      "bytes": 1293
+    },
+    {
+      "path": ".github/tag-ruleset.json",
+      "sha256": "615df034db59a9a297d20d92c7277bb36afc191f5ab2a5677a30385c3dbeda88",
+      "bytes": 296
+    },
+    {
+      "path": "examples/claude-native/workflows/SHA256SUMS",
+      "sha256": "ab4b14a99f3bab5ce7ba3a6a5389a8caec7f6961c88e04999e79f5aa9e360174",
+      "bytes": 955
+    },
+    {
+      "path": "adoption/bootstrap-linux.sh",
+      "sha256": "12d5700a59ea1a76910a0823a628d0f7864c56d8826582b9e371b25d2b6c2b4e",
+      "bytes": 11686
+    },
+    {
+      "path": "adoption/pins-linux-x86_64.json",
+      "sha256": "3607fc8278cd32c89f706e8dfb452c1d369b14162184cfa41e03db70f3b07593",
+      "bytes": 6757
+    },
+    {
+      "path": "tests/test_adoption_bootstrap.py",
+      "sha256": "4b4f7d7fd0624fcb1abce1a19334025bc4d5fc918927e58ec454e61c82d8c0c8",
+      "bytes": 12726
+    },
+    {
+      "path": ".github/workflows/adoption-bootstrap.yml",
+      "sha256": "4543cf637dacc0a7fe84a0618667d87494b975b81d50b801de998c8abeaae4f8",
+      "bytes": 2763
+    },
+    {
+      "path": "docs/tasks/2026-09-22-github-automation-newpc.md",
+      "sha256": "24ca1c63044562444803bc7a9b56bf433f2c5815f62cc8bb10a1535684b1911f",
+      "bytes": 6790
+    },
+    {
+      "path": "evidence/receipts/github-automation-newpc-20260922.json",
+      "sha256": "531713a7a8062ff78d8f541ea92ea57eb665d28c7a1f875f538fe3cd26d38a63",
+      "bytes": 5836
+    },
+    {
+      "path": "adoption/bootstrap.md",
+      "sha256": "2521b470971f8de308e1417a5197e06f90222fd610616fd99f20b45b7c73d23d",
+      "bytes": 6175
+    },
+    {
+      "path": "adoption/hosts/example.json",
+      "sha256": "7ec6a782fd2e19c989f4b4deb3428f17b5550608cedd38cbac454db33ab3c876",
+      "bytes": 413
+    },
+    {
+      "path": "adoption/platforms/linux-wsl2.md",
+      "sha256": "080351629a2053545ca8e5ec229dfd7c50a20c34c0ed3ac664feffccf2d5d6ae",
+      "bytes": 3691
+    },
+    {
+      "path": "adoption/platforms/macos-arm64.md",
+      "sha256": "7125ffc432bc1ac4c565d3ec8ec04e69b6b21fd7daf094229e7d18f26e921620",
+      "bytes": 8914
+    },
+    {
+      "path": "adoption/templates/claude.settings.template.json",
+      "sha256": "27a407a56b49a51baba04040de5ca9516fdc985ff07694635aadd11ffac61ba2",
+      "bytes": 5508
+    },
+    {
+      "path": "adoption/templates/codex.config.template.toml",
+      "sha256": "f48f9cfb1f2d593a29bc56b738e7242115a6ed21497a5d80d8c268fa2f9b1daa",
+      "bytes": 3953
+    },
+    {
+      "path": "adoption/templates/project.codex.config.template.toml",
+      "sha256": "f0bc6d67bb58604925a8e332c30b8fdea9a1da080d06550ba11222b6c9a58675",
+      "bytes": 2432
+    },
+    {
+      "path": "tests/test_render_config.py",
+      "sha256": "38501a1ea9b85263b879bc561436118811ae466b04c79faf0fa96b790088d7db",
+      "bytes": 8513
+    },
+    {
+      "path": "tools/adoption/render_config.py",
+      "sha256": "4432c5f49f926f4337a6fdab20db29cd2f2db61e2ee10e47a873c798f57f5005",
+      "bytes": 9480
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",

@@ -14,6 +14,24 @@
       "python": "3.13"
     }
   ],
+  "platform_profiles": [
+    {
+      "id": "linux-wsl2-x86_64",
+      "os": "linux",
+      "architecture": "x86_64",
+      "status": "accepted",
+      "doc": "adoption/platforms/linux-wsl2.md",
+      "evidence_ref": "adoption/receipt.json"
+    },
+    {
+      "id": "macos-arm64",
+      "os": "macos",
+      "architecture": "arm64",
+      "status": "drafted_not_accepted",
+      "doc": "adoption/platforms/macos-arm64.md",
+      "evidence_ref": null
+    }
+  ],
   "default_profile": "foundation-cpu",
   "acceptance_target": {
     "sdk_python": "3.13.15",
@@ -297,6 +315,33 @@
       "recipe_paths": [
         "blueprints/us-equities/state-recovery/README.md",
         "blueprints/us-equities/hosting/backup/README.md"
+      ]
+    },
+    {
+      "id": "macos-arm64-foundation",
+      "label": "Drafted, not accepted: native clients and llama.cpp Metal embedding foundation for Apple Silicon",
+      "required_commands": [
+        "brew",
+        "llama-server",
+        "launchctl",
+        "codex",
+        "claude",
+        "uv",
+        "node"
+      ],
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "context-mode",
+        "ai-memory",
+        "mcporter",
+        "llama-cpp",
+        "qdrant",
+        "socraticode"
+      ],
+      "recipe_paths": [
+        "adoption/platforms/macos-arm64.md",
+        "adoption/bootstrap.md"
       ]
     },
     {

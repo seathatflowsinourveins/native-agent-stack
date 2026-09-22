@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "github-automation-newpc-20260922",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-22T00:00:00Z",
+  "component_ids": ["codex", "claude-code"],
+  "claim": "The new-machine handbook (adoption/bootstrap.md, adoption/platforms/*.md), the three native client config templates and tools/adoption/render_config.py were built and locally verified on this Linux/WSL2 host: render_config.py --check reproduced this host's live ~/.claude/settings.json, ~/.codex/config.toml and agent-lab/.codex/config.toml byte-for-byte from the templates plus this host's own gitignored adoption/hosts/wsl-seath.json values, and the new unit tests plus every existing repository validator pass against the three new catalogs/foundation/decisions.json rows. Hosted GitHub Actions execution for the new-pc-bootstrap-ci decision is explicitly pending, not claimed here.",
+  "limitations": [
+    "Byte-identical --check is native evidence for this one host's three live files only; a different host still needs its own adoption/hosts/<host>.json and its own --check run.",
+    "adoption/platforms/macos-arm64.md is drafted, not accepted: no command on that page has run on macOS.",
+    "new-pc-bootstrap-ci is source_review: no hosted GitHub Actions workflow or run exists yet for this bootstrap sequence.",
+    "This receipt does not claim any provider/model task, account readiness check, or service start; it is structural/local-integration evidence only.",
+    "scripts/adoption_status.py exits 2 overall on this host (status prerequisites_missing) because adoption/manifest.json supported_platforms pins Python 3.13 and this host runs 3.12.3 -- a pre-existing condition, unaffected by this unit's changes; the foundation-cpu profile itself is prerequisites_present and the new macos-arm64-foundation profile correctly reports its macOS-only commands absent on Linux.",
+    "scripts/build_ecosystem.py --check was not run and currently fails on this branch (three new decision ids and one new adoption profile are absent from the committed docs/ecosystem/index.html); this is an unresolved CI gate for the coordinator's explorer regeneration, not something this unit's owned paths permit fixing."
+  ],
+  "data": {
+    "render_check": {
+      "command": "python3 tools/adoption/render_config.py --host wsl-seath --check --live-codex-project <agent-lab checkout>/.codex/config.toml",
+      "exit_code": 0,
+      "result": "settings.json, codex.config.toml and project.codex.config.toml all reported byte-identical to their live files",
+      "host_value_file": "adoption/hosts/wsl-seath.json (gitignored; not published; matches adoption/hosts/example.json's key set with this host's real values)"
+    },
+    "diff_outcome": "byte_identical",
+    "diff_outcome_note": "No JSON-formatting-only fallback was needed; the rendered and live bytes matched exactly for all three files.",
+    "commands_run": [
+      {"command": "rtk proxy python3 scripts/validate.py", "scope": "structural"},
+      {"command": "rtk proxy python3 scripts/validate_catalogs.py", "scope": "structural"},
+      {"command": "rtk proxy python3 scripts/validate_foundation.py --root . --json", "scope": "structural, covers the three new decision rows"},
+      {"command": "rtk proxy python3 scripts/landscape.py --root .", "scope": "structural"},
+      {"command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded --root . --json", "scope": "structural, unchanged records"},
+      {"command": "rtk proxy python3 -m unittest tests.test_render_config tests.test_adoption_contract -v", "scope": "new/extended local integration tests"},
+      {"command": "rtk proxy python3 -m unittest", "scope": "full repository suite"},
+      {"command": "rtk proxy python3 scripts/adoption_status.py --json", "scope": "prerequisite presence report, no login/config/service action"},
+      {"command": "rtk proxy python3 scripts/adoption_status.py --profile macos-arm64-foundation --json", "scope": "prerequisite presence report for the new macOS profile, checked from this Linux host"}
+    ],
+    "adoption_status": {
+      "overall_exit_code": 2,
+      "overall_status": "prerequisites_missing",
+      "overall_reason": "adoption/manifest.json supported_platforms pins Python 3.13; this host runs 3.12.3. Pre-existing mismatch, confirmed present at base commit 5cfed34 before this unit's changes, unrelated to this unit's edits.",
+      "foundation_cpu_profile_status": "prerequisites_present (all required_commands and recipe_paths present)",
+      "macos_arm64_foundation_profile_status": "prerequisites_missing (brew, llama-server, launchctl absent on Linux) -- expected outcome for a macOS-only profile checked from a Linux host, not a defect in the new profile"
+    },
+    "hosted_ci_status": "pending: no GitHub Actions workflow exists yet for new-pc-bootstrap-ci; this row is review_status source_review in catalogs/foundation/decisions.json",
+    "macos_status": "pending: adoption/platforms/macos-arm64.md is drafted_not_accepted; macos-embedding-backend is review_status source_review",
+    "build_ecosystem_check_status": "not run by this unit (owned paths exclude docs/ecosystem/* and --write); currently fails on this branch because the three new decision ids and the new macos-arm64-foundation adoption profile are absent from the committed docs/ecosystem/index.html -- an unresolved CI merge gate for the coordinator to resolve by regenerating the explorer, not a limitation confined to documentation"
+  },
+  "host_scope": {
+    "profile": "source-host-linux-wsl",
+    "platform": "Linux/WSL2 x86_64",
+    "identity": "Private source-host identity omitted",
+    "import_limit": "Recorded source-host Linux/WSL2 execution only; importing this receipt does not qualify installation or behavior on macOS or a second physical host."
+  }
+}
