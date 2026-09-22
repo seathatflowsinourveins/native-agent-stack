@@ -254,3 +254,26 @@ settings were not restarted or stopped. No further research or workflow was
 requested in the last correction message. Resume with the connected destination
 PC and the adoption recipe, or reopen a specific layer when its stated evidence
 gate is triggered; do not restart the whole discovery wave.
+
+## Requested post-publication reconciliation, September 22
+
+The user requested another direct exchange with the live Claude owner against
+published revision 9a88388d0db74aeb59d731dbbd699781d7d6a926. The bounded packet
+asks for concrete remaining disagreements in the final 20-layer synthesis and
+confirmation that the final source corrections reached the peer's handoff. It
+explicitly identifies this as post-seal review, not a new blinded discovery pass.
+At this checkpoint the native message is queued and a one-shot idle notice is
+subscribed; an actual return remains pending. No duplicate task or acknowledgment
+loop was sent, and the user's owner session remains untouched.
+
+The independent Codex follow-up found no additional substantive selection
+finding. All 20 layers retain evidence, limitations and overturn conditions;
+source-only discovery is not promoted to accepted behavior. The review did not
+repeat upstream/runtime tests or establish comparative superiority.
+
+A concrete practice correction is prepared: the Codex example's three-thread
+limit is independent of Claude's current eight-worker workflow setting. Both
+values remain unchanged, as confirmed by parsing the before/after TOML. Only
+comments and the cooperation recipe changed; historical three-worker Claude
+receipts retain their original scope. Incorporate the actual peer return before
+calling this additional exchange complete.

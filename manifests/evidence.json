@@ -2820,8 +2820,8 @@
     },
     {
       "path": "docs/tasks/2026-09-21-blind-catalog-convergence.md",
-      "sha256": "1b846625a1c6b51b85ed7486ae4fd18ebf259fd9c6bea9d4d68339dfe1dfa0aa",
-      "bytes": 16198
+      "sha256": "624bbd80816a319aed4a9c6d804833e5d32b64d42a42262080581155dd0ddd32",
+      "bytes": 17608
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-provenance.json",
@@ -6661,8 +6661,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "d3a2736132efbfde824d809cc1a89bf61953d05e24f79eb3f130e57c7dbf73b3",
-      "bytes": 10955097
+      "sha256": "c55f6e6b984eea47bea04aaa3b98c79d6e4e4c007507f5ad73629386d0fda65a",
+      "bytes": 10955344
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -10611,13 +10611,13 @@
     },
     {
       "path": "examples/codex-native/config.agents.toml.example",
-      "sha256": "b0e34249e6bdc06da0a94fce043bda1eefbe633433a3fd6e5fba49b3e5bb475c",
-      "bytes": 364
+      "sha256": "ac905f3ba833bd9998aad505f63ae71473802caca95416c48531b9f082fdb3e6",
+      "bytes": 465
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
-      "sha256": "7e13cb55bb5e6ebc88c14f2a98840832c701777bcac4a3cee19f035536edf56a",
-      "bytes": 5622
+      "sha256": "a8db43a7cc27fb8aafe414d0ba2bc9fd711d6642570624b0d425653c117887ed",
+      "bytes": 5866
     },
     {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/codex-pr-review.json",

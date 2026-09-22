@@ -1,7 +1,8 @@
 # Codex custom agents: merge into the project's .codex/config.toml. The agent
 # definitions live in .codex/agents/<name>.toml. Model and reasoning effort are
-# inherited from the session configuration; three concurrent threads mirror the
-# Claude setting CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS=3.
+# inherited from the session configuration. This example allows three concurrent
+# Codex threads. Claude's separate portable workflow example allows eight workers;
+# neither setting overrides the other client's limits or current host capacity.
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 3

@@ -100,6 +100,9 @@ The Codex agent examples mirror the Claude roles (`evidence-reviewer`,
 they carry no `model`, `model_reasoning_effort` or `sandbox_mode` and inherit the
 session's configuration, so the reviewer's no-edit instruction is a prompt rule,
 not an enforced sandbox.
-`[agents] max_concurrent_threads_per_session = 3` mirrors the Claude concurrency
-setting. These examples have no end-to-end run of their own in the dated guide;
+`[agents] max_concurrent_threads_per_session = 3` is this Codex example's limit.
+The current portable Claude workflow example separately configures eight workers;
+the historical discovery run retained three. These are independent client/workflow
+limits, not a shared cross-client pool or a guarantee of the host's available
+capacity. These examples have no end-to-end run of their own in the dated guide;
 qualify them per task before relying on them.
