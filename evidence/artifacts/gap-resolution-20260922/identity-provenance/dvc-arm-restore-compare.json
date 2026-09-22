@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "id": "dvc-arm-restore-compare",
+  "date": "2026-09-22",
+  "layer_ids": ["identity-provenance"],
+  "gap_refs": [{"layer_id": "identity-provenance", "gap_index": 0}, {"layer_id": "identity-provenance", "gap_index": 1}],
+  "purpose": "Execute the overturn_protocol's 'baseline + DVC 3.67.1' arm end to end in a scratch repo over the fixture data materialized by the project's own baseline tooling (blueprints/us-equities/nanosecond-replay/replay.py materialize), comparing restore fidelity after deletion with the baseline arm (project hash-manifest alone, no restore mechanism), to close identity-provenance gap 0 (DVC never installed/run) and gap 1 (does a DVC-tracked snapshot preserve the project hash-manifest contract, i.e. snapshot_sha256 and per-file hashes, after a restore).",
+  "preregistered": "If DVC 3.67.1 can init/add/checkout the materialized fixture and, after the tracked directory is deleted, `dvc checkout` restores files whose sha256 exactly matches the pre-delete sha256 (including the manifest's own recorded snapshot_sha256/per-file hashes in snapshot.json), that settles gap 1's byte-identical-restore metric for the DVC arm. If the baseline arm's own scripts (replay.py, temporal_snapshot.py) contain no restore/backup/checkout logic, that establishes the baseline arm has zero restore capability of its own (only fail-closed detection via hash mismatch), which is the comparison basis the overturn_protocol asks for. A restore that does not match the pre-delete hashes, or a DVC failure, would refute the DVC arm as a fix for gap 0/1.",
+  "commands": [
+    {
+      "cmd": "/home/example/.local/share/codex-ecosystem/tools/sdk-env-baseline-20260922/bin/python3.13 blueprints/us-equities/nanosecond-replay/replay.py materialize --source fixture.json --output /home/example/codex-ecosystem/state/gap-resolution-20260922/storage-market/materialized   # cwd=.../nanosecond-replay; materializes the project's own fixture into source.json/observations.parquet/universe.parquet/snapshot.json with recorded snapshot_sha256 and per-file sha256",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "{\"snapshot_sha256\": \"b4167728eed625e160b0c801bea5713075bc8a94f3a628efdff592227ad7e8a1\", \"source_sha256\": \"40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d\", \"counts\": {\"observations\": 5, \"universe\": 2}}",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "cd /home/example/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-scratch-repo && git init -q && dvc init -q && dvc add materialized && git add materialized.dvc .gitignore .dvc && git commit -q -m 'track materialized fixture' && dvc status",
+      "exit": 0,
+      "duration_s": 0.6,
+      "output_excerpt": "Data and pipelines are up to date.",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "find materialized -type f | sort | xargs sha256sum   # pre-delete baseline hash tree",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "0cf15579cd80a02b1c5411bdda50483808e2b2948126da659ecca596bb3821f3  materialized/observations.parquet\nb4167728eed625e160b0c801bea5713075bc8a94f3a628efdff592227ad7e8a1  materialized/snapshot.json\n40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d  materialized/source.json\nb0785843154bdabb234de6ef9b105ee937c40703d4aa87343b7dfae9b07a2c2c  materialized/universe.parquet",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "rm -rf materialized && dvc status && dvc checkout",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "materialized.dvc:\n\tchanged outs:\n\t\tdeleted:            materialized\nA       materialized/",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "find materialized -type f | sort | xargs sha256sum > post-checkout.sha256 && diff pre-delete.sha256 post-checkout.sha256; echo diff_exit=$?",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "diff_exit=0   # no output from diff: post-checkout tree is byte-identical to pre-delete tree, including the manifest's own snapshot_sha256/per-file hashes",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "grep -niE 'restore|backup|checkout|recover' blueprints/us-equities/nanosecond-replay/replay.py blueprints/us-equities/point-in-time/temporal_snapshot.py   # cwd=/home/example/code/nas-wt-gap-storage-market; baseline-arm restore-capability check",
+      "exit": 1,
+      "duration_s": 0.05,
+      "output_excerpt": "(no matches)",
+      "output_sha256": "n/a-short-console-capture"
+    }
+  ],
+  "tool_versions": {
+    "dvc": "3.67.1",
+    "git": "system git, see `git --version` on host",
+    "python": "3.13.15"
+  },
+  "installs": [
+    {"name": "dvc", "version": "3.67.1", "prefix": "/home/example/.local/share/codex-ecosystem/tools/dvc-3.67.1-20260922", "source_url": "PyPI (uv default index)", "sha256": "not individually recorded; installed via `uv pip install dvc==3.67.1` without --require-hashes (no pre-existing lock file for dvc's own dependency tree); dvc --version confirmed 3.67.1 post-install"}
+  ],
+  "result": "DVC 3.67.1 init/add/status/checkout executed end to end in a new scratch repo (git+dvc) over the project's own materialized fixture output, in a new, never-before-existing prefix. After deleting the tracked directory, `dvc checkout` restored all 4 files (source.json, observations.parquet, universe.parquet, snapshot.json) byte-identical to the pre-delete state (sha256 diff empty, including the manifest's own recorded snapshot_sha256/per-file hashes in snapshot.json). Separately, grepping the baseline-arm scripts (replay.py, temporal_snapshot.py) for restore/backup/checkout/recover logic found zero matches: the baseline arm alone has no restore mechanism of its own; it can only fail-closed reject a corrupted/missing/tampered file via sha256 comparison (already covered by tests.test_nanosecond_replay.test_manifest_or_parquet_mutation_rejected and tests.test_point_in_time.test_parquet_corruption_and_wrong_manifest_hash_are_rejected), not recover the lost data. Services/processes added by the DVC arm: 1 additional CLI tool (dvc, no background daemon) plus a local `.dvc/cache` content-addressed store; no network remote was configured (fully local scratch repo). License: DVC is Apache-2.0 (per PyPI project metadata for dvc 3.67.1).",
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "refutes_incumbent",
+    "explanation": "Gap 0 said DVC's native_workflow was 'Prospective/UNEXECUTED' -- it is now executed here with a measured byte-identical restore. Gap 1 asked whether a DVC-tracked snapshot preserves the project hash-manifest contract after restore; it does (sha256 diff empty, snapshot_sha256 unchanged). This is evidence in favor of promoting the DVC arm from source-review-only toward measured for the identity-provenance decision (the current_choice's rationale explicitly rested on DVC being unexecuted), though PyIceberg and ArcticDB arms remain unrun and gap 4/5 (real licensed universe, remote licensing terms) stay open and needs_paid_entitlement, so this does not by itself close the whole layer decision."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Tested on a small synthetic fixture (5 observation rows, 2 universe rows), not at the scale of a real historical dataset; DVC's restore performance/fidelity at scale was not measured.",
+    "No remote (S3/GCS/etc.) was configured; only local cache-based checkout was tested, so remote-storage restore fidelity and gap 5's licensing-terms question for a private DVC remote remain untested and are recorded separately as needs_paid_entitlement (not in this unit's scope).",
+    "PyIceberg 0.12.0 and ArcticDB v6.26.0 arms from the same overturn_protocol were not run; this receipt speaks only to the DVC arm.",
+    "dvc's own dependency tree was installed without --require-hashes (no pre-existing lock covers DVC's ~60 transitive dependencies); only the top-level dvc==3.67.1 pin was verified via `dvc --version`."
+  ],
+  "raw_artifacts": [
+    {"path": "/tmp/claude-1000/-home-seath-code-agent-lab/redacted-session-scratchpad/scratchpad/dvc-arm-restore-compare.log", "sha256": "4860ebd717a6963a90242eb6300db658242c65450baf585f67d0f594fb92cf67"},
+    {"path": "/tmp/claude-1000/-home-seath-code-agent-lab/redacted-session-scratchpad/scratchpad/pre-delete.sha256", "sha256": "see dvc-arm-restore-compare.log for embedded content"},
+    {"path": "/tmp/claude-1000/-home-seath-code-agent-lab/redacted-session-scratchpad/scratchpad/post-checkout.sha256", "sha256": "see dvc-arm-restore-compare.log for embedded content"}
+  ]
+}

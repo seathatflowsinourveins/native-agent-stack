@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "sdk-env-baseline",
+  "date": "2026-09-22",
+  "layer_ids": ["identity-provenance"],
+  "gap_refs": [{"layer_id": "identity-provenance", "gap_index": 0}, {"layer_id": "identity-provenance", "gap_index": 1}],
+  "purpose": "Rebuild adoption/sdk/requirements-linux-x86_64-py313.lock in a brand-new isolated uv prefix with hash checking, then run the identity-provenance overturn_protocol's named baseline regression suite (tests.test_nanosecond_replay, tests.test_point_in_time), to establish the required zero-failure/zero-skip precondition that every overturn_protocol arm (DVC, DVC+OpenLineage, PyIceberg, ArcticDB) depends on.",
+  "preregistered": "Expected result if the project hash-manifest baseline is intact: `uv pip install --require-hashes` installs all 36 locked distributions with no hash mismatch in a prefix that did not previously exist, and `python3 -m unittest tests.test_nanosecond_replay tests.test_point_in_time -v` reports 0 failures and 0 skips. Any hash mismatch, install failure, test failure, or skip would mean the overturn_protocol's required precondition is not met and no arm comparison (including dvc-arm-restore-compare) could be trusted.",
+  "commands": [
+    {
+      "cmd": "uv venv --python /home/example/.local/share/codex-ecosystem/bin/python3.13 --no-python-downloads --seed /home/example/.local/share/codex-ecosystem/tools/sdk-env-baseline-20260922",
+      "exit": 0,
+      "duration_s": 0.5,
+      "output_excerpt": "Creating virtual environment with seed packages at: .../tools/sdk-env-baseline-20260922\n + pip==26.2.1",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "uv pip install --python /home/example/.local/share/codex-ecosystem/tools/sdk-env-baseline-20260922/bin/python3.13 --require-hashes -r adoption/sdk/requirements-linux-x86_64-py313.lock   # cwd=/home/example/code/nas-wt-gap-storage-market",
+      "exit": 0,
+      "duration_s": 0.406,
+      "output_excerpt": "Resolved 36 packages in 176ms\nInstalled 36 packages in 113ms\n + alpaca-py==0.44.0\n ... (34 more) ...\n + websockets==17.1",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "/home/example/.local/share/codex-ecosystem/tools/sdk-env-baseline-20260922/bin/python3.13 -m unittest tests.test_nanosecond_replay tests.test_point_in_time -v   # cwd=/home/example/code/nas-wt-gap-storage-market",
+      "exit": 0,
+      "duration_s": 4.552,
+      "output_excerpt": "test_ambiguous_revision_or_negative_sequence_rejected ... ok\n... (23 more) ...\nRan 25 tests in 4.552s\nOK",
+      "output_sha256": "cd175642f8803d4a1647f43f72e7c6572b77a6befee5fc3696e240e65305abc7"
+    }
+  ],
+  "tool_versions": {
+    "uv": "0.12.17",
+    "python": "3.13.15"
+  },
+  "installs": [
+    {"name": "sdk-env-baseline-prefix (36 distributions from adoption/sdk/requirements-linux-x86_64-py313.lock, hash-checked)", "version": "per lock file, e.g. duckdb==1.5.5, exchange-calendars==4.13.2, pandas==3.0.6, alpaca-py==0.44.0", "prefix": "/home/example/.local/share/codex-ecosystem/tools/sdk-env-baseline-20260922", "source_url": "PyPI (uv default index, hash-verified against adoption/sdk/requirements-linux-x86_64-py313.lock)", "sha256": "per-package hashes enforced by uv --require-hashes against the pre-recorded lock file; uv reported zero hash mismatches across all 36 packages"}
+  ],
+  "result": "New prefix created (did not exist before this run; no existing pinned install was touched). All 36 locked distributions installed with --require-hashes and zero hash mismatches. Baseline suite: 25/25 tests passed (12 in tests.test_nanosecond_replay, 13 in tests.test_point_in_time), 0 failures, 0 errors, 0 skips.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Establishes the zero-failure/zero-skip baseline precondition the overturn_protocol requires before any arm (DVC, DVC+OpenLineage, PyIceberg, ArcticDB) can be meaningfully compared. This alone does not run any arm; see dvc-arm-restore-compare for the DVC arm result. PyIceberg and ArcticDB arms were not attempted (out of scope for this unit's 5 assigned checks) and remain open."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Only the DVC arm was executed as part of this unit's assigned checks (see dvc-arm-restore-compare.json); PyIceberg and ArcticDB arms from the overturn_protocol were not run.",
+    "This confirms hash-lock reproducibility and baseline correctness, not licensed market-data entitlement or a real historical universe (gap 4/5, both needs_paid_entitlement and out of scope here)."
+  ],
+  "raw_artifacts": [
+    {"path": "/tmp/claude-1000/-home-seath-code-agent-lab/redacted-session-scratchpad/scratchpad/sdk-env-baseline.log", "sha256": "cd175642f8803d4a1647f43f72e7c6572b77a6befee5fc3696e240e65305abc7"}
+  ]
+}
