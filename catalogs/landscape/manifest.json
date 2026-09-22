@@ -14,6 +14,7 @@
     "foundation_manifest": "catalogs/foundation/manifest.json",
     "foundation_decisions": "catalogs/foundation/decisions.json",
     "domain_manifest": "catalogs/us-equities/manifest.json",
+    "trading_taxonomy": "catalogs/sota-convergence/manifest-20260922.json",
     "repository_index": "catalogs/us-equities/decision-index.json",
     "selected_manifest": "manifests/stack.json",
     "freshness_snapshot": "catalogs/landscape/upstream-snapshot.json",
@@ -35,6 +36,10 @@
     "Reopen a selection when its stated overturning comparison meets the requirement; retain competitive alternatives until then."
   ],
   "handbook_guides": [
+    {
+      "path": "docs/comparison-progress-20260922.md",
+      "label": "Comparison progress, corrected evidence and open gates"
+    },
     {
       "path": "docs/catalog-reconciliation-20260922.md",
       "label": "Live Claude reconciliation and canonical decisions"

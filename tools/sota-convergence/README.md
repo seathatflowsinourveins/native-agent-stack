@@ -6,7 +6,7 @@ The 2026-09-22 wave was produced by two ad hoc, host-path-hardcoded scripts;
 these four steps replace them with arguments, resumability and a checked-in
 default reconciliation file. No step here calls a model.
 
-## The four steps
+## The five steps
 
 1. **`extract_layers.py`** -- deterministic, no-network. Reads
    `catalogs/foundation/{manifest,decisions}.json`, `manifests/stack.json` and
@@ -78,6 +78,38 @@ default reconciliation file. No step here calls a model.
      --out /path/to/manifest.json --checked-at YYYY-MM-DD --id sota-convergence-YYYYMMDD
    ```
 
+5. **`build_verdicts.py`** -- no network. A separate, independent join from the
+   four steps above: it does not read `foundation-layers.json` or
+   `trading-by-layer.json`. It reads the **landscape ledger**
+   (`catalogs/landscape/{foundation,us-equities}.json`, layer-verdict schema
+   v2 -- see [`catalogs/landscape/README.md`](../../catalogs/landscape/README.md#layer-verdict-schema-v2)),
+   the dated sota manifest (`catalogs/sota-convergence/manifest-20260922.json`,
+   for each layer's `components[]`/`entries[]` `id`/`pin`/`upstream`/
+   `review_status`/`pin_behind_upstream`) and `adoption/manifest.json`'s
+   `recipe_map`, and writes the join deterministically
+   (`json.dumps(..., sort_keys=True)`, trailing newline) to
+   `catalogs/sota-convergence/layer-verdicts-20260922.json`. It also replaces
+   the generated table between `<!-- verdicts:begin -->` /
+   `<!-- verdicts:end -->` in
+   [`docs/grand-catalog-handbook.md`](../../docs/grand-catalog-handbook.md#per-layer-verdicts-generated)
+   (added under a "## Per-layer verdicts (generated)" heading at the end of
+   the file the first time it runs) with one Markdown table per catalog:
+   layer, group, verdict status (a `pending_lanes` row renders as `pending`),
+   winner(s) + pin, evidence class, alternatives count, `overturn_when`
+   (truncated to 120 characters), recipe anchor and platform status. Reuses
+   (imports, does not reimplement) `build_manifest.py`'s `sanitize_value` /
+   `assert_no_leak` and refuses to write when a leak survives sanitization --
+   applied to both generated outputs, since the handbook table renders field
+   values (e.g. `overturn_when`) directly, not only the JSON document.
+   `--check` (the default) recomputes both outputs in memory and exits 1 on
+   any difference from what is checked in, without writing; `--write`
+   recomputes and writes them.
+
+   ```sh
+   python3 tools/sota-convergence/build_verdicts.py --write --root .
+   python3 tools/sota-convergence/build_verdicts.py --check --root .
+   ```
+
 ## Rules encoded in `build_manifest.py`
 
 - **Pin-vs-upstream** (`classify_pin`): a component/entry only counts as
@@ -123,6 +155,14 @@ default reconciliation file. No step here calls a model.
   it is still valid JSON, and `assert_no_leak()` raises if a home path or the
   broker key prefix survived. `build_manifest.py` never writes on either
   failure.
+- **Optional lane fields carried, never invented** (`merge_lanes`): a lane's
+  `selected[]` item may set `why_selected` and/or
+  `comparison_that_would_overturn`; when present, `merge_lanes` copies them
+  verbatim onto the returned `status[(layer_id, repository)]` record (the same
+  place `note`/`evidence` already land) so `build_manifest()` can carry them
+  onto the merged `components[]`/`entries[]` row. Absent on the lane item means
+  absent on the merged row -- `merge_lanes` never synthesizes a value for
+  either field.
 - **Deterministic ordering**: per-layer `components`/`entries` and
   `candidates` are sorted by `(decision-rank, id)` (`row_item_sort_key`) and
   `(disposition-rank, repository)` (`candidate_sort_key`) respectively before

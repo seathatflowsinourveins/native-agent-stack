@@ -37,6 +37,7 @@ LAYERS = {
     "document-retrieval", "semantic-rag", "durable-memory", "web-research",
     "token-efficiency", "quality-evaluation", "ci-supply-chain", "scheduling-supervision",
     "hosting-services", "recovery-portability", "observation-inference",
+    "agent-sdks", "mcp-surfaces", "secrets-credentials", "git-github-automation",
 }
 STAGES = {"install", "use", "persistence", "restart", "cleanup", "recovery"}
 STATUSES = {
@@ -85,7 +86,7 @@ def validate_foundation(root: Path) -> dict:
     lifecycle = indexed(validator.load(SOURCES["lifecycle"]).get("components"), "component_id", "lifecycle")
 
     layers = indexed(manifest["layers"], "id", "layers")
-    require(set(layers) == LAYERS, "layers", "must contain exactly the 16 required layers")
+    require(set(layers) == LAYERS, "layers", "must contain exactly the 20 required layers")
     for identifier, layer in layers.items():
         fields(layer, {"id", "title", "purpose", "selection", "activation", "lifecycle_scope", "next_gap"}, identifier)
         for key, value in layer.items():
