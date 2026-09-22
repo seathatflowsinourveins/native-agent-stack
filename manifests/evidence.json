@@ -12099,8 +12099,8 @@
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/data-quality-orchestration/dagu-inflight-resume-after-kill.json",
-      "sha256": "cb68faca141fc065dcea5762e20904992cbb505818159a9b0dc09c7571d3775d",
-      "bytes": 6826
+      "sha256": "7697ac785c597405bb7581f27cd8986838a189f0520c5a42de4be72b3d633609",
+      "bytes": 10981
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/scheduling-supervision/dagu-2170-checkpoint-parity.json",
