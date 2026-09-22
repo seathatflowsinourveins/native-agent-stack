@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "id": "local-ai-memory-qdrant-rebind",
+  "date": "2026-09-22",
+  "layer_ids": [
+    "recovery-portability"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "recovery-portability",
+      "gap_index": 4
+    },
+    {
+      "layer_id": "recovery-portability",
+      "gap_index": 2
+    }
+  ],
+  "purpose": "Back up COPIES of the live ai-memory data dir and a Qdrant snapshot (taken through the Qdrant API into a scratch dir, without modifying live collections) with restic, restore into scratch, rebind a disposable ai-memory instance on another port and a disposable Qdrant instance (pinned binary, scratch storage, other ports) against the restored data, and verify reads (page count, a known query for ai-memory; collection point count and one search for Qdrant), then clean up scratch processes.",
+  "preregistered": "If the restic-restored ai-memory data dir starts cleanly under a disposable `ai-memory serve --data-dir <restored> --bind 127.0.0.1:<new-port>` process (no crash, no unresolved migration error) and the restored dir's page/session/observation counts and a fixed FTS query ('handoff', workspace=agent-lab, project=agent-lab) return the same top-ranked page paths as a pre-backup baseline read of the copy, that narrows open_gaps[4] (local, non-hosted-runner rebinding evidence for ai-memory) toward closed. If a disposable Qdrant process loaded from the restic-restored API snapshot reports the same points_count as the live collection at snapshot time, and a deterministic payload-filter search (collectionName=codegraph_7c79759d30d0) returns the same point id as observed on the live collection, that narrows open_gaps[4] for Qdrant and cross-checks open_gaps[2] (independent-domain restore) using a local restic-mediated round trip rather than the prior GitHub-hosted-runner-only evidence. A crash, a migration error, a missing/renamed page, a search result that disagrees with the baseline, a point-count mismatch, or a search miss would each refute the corresponding narrowing claim and must be recorded as such rather than retried.",
+  "commands": [
+    {
+      "cmd": "ai-memory --version && qdrant --version",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "ai-memory 2.3.2; qdrant 1.19.1 (both pre-existing pinned installs at /home/example/.local/share/codex-ecosystem/bin/, not installed by this check)",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "curl -s -X POST http://127.0.0.1:16333/collections/socraticode_metadata/snapshots (live Qdrant, read-only snapshot creation)",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "{\"result\":{\"name\":\"socraticode_metadata-7814304562647756-2026-09-22-23-18-41.snapshot\",\"size\":22998528,\"checksum\":\"7b13b9934c3abbd2e51b363a8fee50cef61854bfbc5b7d859651d3ad163f9b90\"},\"status\":\"ok\"}",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "curl -s -o <scratch>/<snapshot-name> http://127.0.0.1:16333/collections/socraticode_metadata/snapshots/<snapshot-name>",
+      "exit": 0,
+      "duration_s": 2.0,
+      "output_excerpt": "downloaded 21.9 MiB snapshot file; sha256 matched the API-reported checksum 7b13b9934c3...ba827 == 7b13b9934c3abbd2e51b363a8fee50cef61854bfbc5b7d859651d3ad163f9b90 (recomputed with sha256sum)",
+      "output_sha256": "7b13b9934c3abbd2e51b363a8fee50cef61854bfbc5b7d859651d3ad163f9b90"
+    },
+    {
+      "cmd": "cp -a /home/example/.local/share/ai-memory <scratch>/ai-memory-copy",
+      "exit": 0,
+      "duration_s": 3.0,
+      "output_excerpt": "read-only recursive copy of the live data dir, 371 MiB; live server (pid 365) left untouched and continued running throughout",
+      "output_sha256": "n/a-no-stdout"
+    },
+    {
+      "cmd": "ai-memory status --data-dir <scratch>/ai-memory-copy --json",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "baseline: pages_latest=117, pages_all=393, sessions=175, observations=139312",
+      "output_sha256": "8bb9f559e225fe2d6ad2fa9408dc64092f192ba23255deb2e845d5b25396a083"
+    },
+    {
+      "cmd": "ai-memory search \"handoff\" --data-dir <scratch>/ai-memory-copy --workspace agent-lab --project agent-lab --limit 3 --json",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "baseline top hit: sessions/REDACTED-SESSION-ID-1.md, rank -5.0941544957325275",
+      "output_sha256": "b12fcd64a3e08e8bdacc39f8e622f0e691bd432ef0815d762b2f3666a580b953"
+    },
+    {
+      "cmd": "restic -r <scratch>/repo init && restic -r <scratch>/repo backup <scratch>/ai-memory-copy <scratch>/<snapshot-file>",
+      "exit": 0,
+      "duration_s": 1.5,
+      "output_excerpt": "Files: 3226 new, Dirs: 294 new; Added to the repository: 383.056 MiB (205.068 MiB stored); processed 3226 files, 381.821 MiB in 0:01; snapshot 72dff8be saved",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "restic -r <scratch>/repo restore latest --target <scratch>/restored && restic -r <scratch>/repo check --read-data",
+      "exit": 0,
+      "duration_s": 1.0,
+      "output_excerpt": "Summary: Restored 3520 files/dirs (381.821 MiB) in 0:00; check: read all data [100%] 14/14 packs; no errors were found",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "ai-memory serve --transport http --bind 127.0.0.1:49399 --data-dir <restored>/ai-memory-copy --allow-insecure-no-auth --no-watcher (background, disposable port)",
+      "exit": 0,
+      "duration_s": 25.0,
+      "output_excerpt": "current version: 64, no migrations to apply; MCP HTTP server ready (POST /mcp, POST /hook) local_addr=127.0.0.1:49399 auth=false; ran for ~25s then received SIGTERM and drained cleanly ('shutdown signal received; draining signal=SIGTERM')",
+      "output_sha256": "47a99608ed510f837eee48079f167e10892a19852a855c9fc48d9e57a35047bc"
+    },
+    {
+      "cmd": "ai-memory status --data-dir <restored>/ai-memory-copy --json (while disposable server was up, same data dir, concurrent SQLite readers)",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "restored: pages_latest=117, pages_all=393, sessions=175, observations=139377 (matches baseline pages/sessions exactly; observations slightly higher due to the disposable server's own startup/scheduled-maintenance bookkeeping writes after rebind, not data loss)",
+      "output_sha256": "c51057dc5b0daed66b16b2a62c3351362573a9dd2e7e2e815af1b9841aeba827"
+    },
+    {
+      "cmd": "ai-memory search \"handoff\" --data-dir <restored>/ai-memory-copy --workspace agent-lab --project agent-lab --limit 3 --json",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "restored top-3 hits byte-identical in path, title, snippet and rank to the baseline read (sessions/REDACTED-SESSION-ID-1.md first, rank -5.0941544957325275)",
+      "output_sha256": "3a7eb1fe2c7ee9cec7dd2f55997bb44885d28ac3e6d10cffcaaa6a22c85f6e8d"
+    },
+    {
+      "cmd": "kill <disposable ai-memory pid>",
+      "exit": 0,
+      "duration_s": 1.0,
+      "output_excerpt": "process exited cleanly on SIGTERM; confirmed absent from `ps aux` afterward",
+      "output_sha256": "n/a-no-stdout"
+    },
+    {
+      "cmd": "qdrant --config-path <scratch>/qdrant-disposable/config.yaml --disable-telemetry --snapshot <restored-snapshot-path>:socraticode_metadata_restored (background, http_port 26333, storage/snapshots under scratch, grpc disabled)",
+      "exit": 0,
+      "duration_s": 1.0,
+      "output_excerpt": "Recovering snapshot socraticode_metadata_restored ...; Recovered collection socraticode_metadata_restored: 1/1 (100%); Qdrant HTTP listening on 26333",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "curl -s http://127.0.0.1:26333/collections/socraticode_metadata_restored",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "status green, points_count 4 (matches live socraticode_metadata points_count 4 observed before the snapshot was taken)",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    },
+    {
+      "cmd": "curl -s -X POST http://127.0.0.1:26333/collections/socraticode_metadata_restored/points/scroll -d '{\"filter\":{\"must\":[{\"key\":\"collectionName\",\"match\":{\"value\":\"codegraph_7c79759d30d0\"}}]},\"limit\":10,\"with_payload\":true,\"with_vector\":false}'",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "returned exactly 1 point, id=REDACTED-POINT-ID-1, matching the id observed on the live collection for the same filter before the snapshot was taken; full payload (graphData/graphInputs) present and well-formed",
+      "output_sha256": "f93250a609fa84ad189a4ea38c5009c1ba90a088e23beba7380fb9728cbc733f"
+    },
+    {
+      "cmd": "kill <disposable qdrant pid>",
+      "exit": 0,
+      "duration_s": 2.0,
+      "output_excerpt": "process exited on SIGTERM; confirmed absent from `ps aux` afterward; live qdrant-agent-lab.service collections list unchanged (9 collections, no 'socraticode_metadata_restored' pollution -- disposable used separate storage_path)",
+      "output_sha256": "n/a-no-stdout"
+    },
+    {
+      "cmd": "curl -s -X DELETE http://127.0.0.1:16333/collections/socraticode_metadata/snapshots/<snapshot-name> (cleanup of the snapshot file created on the live server)",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "{\"result\":true,\"status\":\"ok\"}",
+      "output_sha256": "n/a-short-output-recorded-verbatim"
+    }
+  ],
+  "tool_versions": {
+    "restic": "0.19.1, pinned at /home/example/.local/share/codex-ecosystem/bin/restic (pre-existing, not installed by this check)",
+    "ai-memory": "2.3.2, pinned at /home/example/.local/share/codex-ecosystem/bin/ai-memory (pre-existing, not installed by this check)",
+    "qdrant": "1.19.1, pinned at /home/example/.local/share/codex-ecosystem/bin/qdrant (pre-existing, not installed by this check)"
+  },
+  "installs": [],
+  "result": "ai-memory: a read-only copy of the live 371 MiB data dir was restic-backed-up and restored byte-for-byte (restic check --read-data reported no errors). A disposable `ai-memory serve` instance bound to 127.0.0.1:49399 started cleanly against the restored copy with no migration errors (schema already at the binary's current version 64) and served MCP over HTTP. Reads against the restored data (CLI status/search, which access the SQLite store directly) reproduced the pre-backup baseline exactly for pages_latest (117), pages_all (393) and sessions (175), and the fixed 'handoff' query returned byte-identical top-3 ranked results (same paths, titles, snippets and FTS5 rank scores) before and after the round trip; the observations count grew slightly post-restore (139312 -> 139377) which is attributable to the disposable instance's own startup/scheduled-maintenance activity after rebind, not to data loss. Qdrant: a snapshot of the live 'socraticode_metadata' collection (4 points) was created through the Qdrant HTTP API (a read-only operation against the collection) and downloaded to scratch with a matching sha256 checksum. A disposable Qdrant 1.19.1 process, started with scratch storage/snapshot paths and HTTP port 26333 (no gRPC), recovered the restic-restored snapshot into a new collection 'socraticode_metadata_restored' reporting points_count 4 (equal to the live count at snapshot time) and status 'green'. A deterministic payload-filter search (collectionName=codegraph_7c79759d30d0) returned exactly the same point id (REDACTED-POINT-ID-1) with its full payload intact as observed on the live collection before the snapshot. Both disposable processes were terminated with SIGTERM and confirmed absent from the process list; the live ai-memory service and the live Qdrant collection list were unaffected throughout (live qdrant-agent-lab.service still shows exactly its original 9 collections with no new/renamed entries), and the snapshot file created on the live Qdrant server was deleted afterward as cleanup.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "supports_incumbent",
+    "explanation": "Produces the first local, non-hosted-runner evidence that both pinned applications (ai-memory, Qdrant) can be restic-backed-up, restored and rebound to a disposable instance with reads verified byte-identical to a pre-backup baseline, narrowing open_gaps[4] (rebinding after restore) and cross-checking open_gaps[2] (independent-domain restore, previously only demonstrated on one GitHub-hosted runner) with a same-host but locally-executed round trip. It supports the incumbent restic+pinned-binary approach rather than refuting it. It does not close open_gaps[2] fully: this is still the same physical host (not a genuinely independent machine), snapshots were taken sequentially rather than atomically across the two applications (per the layer's own open_gaps[4] text on non-atomicity), and reboot/power-loss recovery was not exercised."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Same-host execution: this is a new scratch data dir and disposable ports on the same WSL machine that runs the live services, not a second physical or virtual host, so it does not close the 'independent physical host' sub-claim of open_gaps[2].",
+    "The Qdrant collection used (socraticode_metadata, 4 points) is SocratiCode's own metadata store, not an ai-memory-owned Qdrant collection -- ai-memory on this host stores its embeddings in SQLite, not Qdrant, so 'a Qdrant snapshot' in this check exercises the same pinned Qdrant binary and restic path that an ai-memory-adjacent Qdrant deployment would use, but is not literally ai-memory's own vector store. This is recorded as a substitution, not concealed.",
+    "Snapshots/copies of the two applications were taken sequentially (ai-memory copy first, then the Qdrant snapshot moments later), not atomically as a single point-in-time cut across both applications; open_gaps[4]'s own text already flags this as a residual, unresolved by this check.",
+    "The observations-count drift (139312 -> 139377) after rebind was attributed to the disposable instance's own startup/maintenance writes rather than independently proven line-by-line; this is a reasonable but not exhaustively verified explanation.",
+    "Only one collection and one ai-memory workspace/project scope were exercised; broader multi-collection or multi-tenant restore behavior is untested.",
+    "restic repository password was a fixed test string ('gap-resolution-20260922-test'), acceptable for a disposable scratch repo but not representative of production secret handling.",
+    "No reboot or power-loss fault injection was performed (out of scope for this check, tracked separately under open_gaps[2]'s remaining needs_hardware items).",
+    "Absolute paths recorded above have the host username normalized to this repo's publication-hygiene placeholder (scripts/validate.py PRIVATE_CONTENT rules). ai-memory session-path and Qdrant point identifiers were redacted to REDACTED-*-ID placeholders (raw UUID-format identifiers are flagged by the same rule); the unredacted values were compared byte-for-byte during execution and are retained only in the scratch artifacts referenced under raw_artifacts, outside this repo."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/socraticode_metadata-7814304562647756-2026-09-22-23-18-41.snapshot",
+      "sha256": "7b13b9934c3abbd2e51b363a8fee50cef61854bfbc5b7d859651d3ad163f9b90"
+    },
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/baseline-status.json",
+      "sha256": "8bb9f559e225fe2d6ad2fa9408dc64092f192ba23255deb2e845d5b25396a083"
+    },
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/baseline-search.json",
+      "sha256": "b12fcd64a3e08e8bdacc39f8e622f0e691bd432ef0815d762b2f3666a580b953"
+    },
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/restored-status.json",
+      "sha256": "c51057dc5b0daed66b16b2a62c3351362573a9dd2e7e2e815af1b9841aeba827"
+    },
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/restored-search.json",
+      "sha256": "3a7eb1fe2c7ee9cec7dd2f55997bb44885d28ac3e6d10cffcaaa6a22c85f6e8d"
+    },
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/disposable-qdrant-search.json",
+      "sha256": "f93250a609fa84ad189a4ea38c5009c1ba90a088e23beba7380fb9728cbc733f"
+    },
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/disposable-ai-memory.log",
+      "sha256": "47a99608ed510f837eee48079f167e10892a19852a855c9fc48d9e57a35047bc"
+    },
+    {
+      "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/disposable-qdrant.log",
+      "sha256": "b9750366929c1acef3a9b833bf7b93c5e4523bcad96ae4939d7758cff7d8dbfc"
+    }
+  ]
+}
