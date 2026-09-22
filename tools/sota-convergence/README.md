@@ -90,8 +90,8 @@ default reconciliation file. No step here calls a model.
 - **Disposition never promotes** (`disposition`): a lane proposes a label,
   two refuters try to break it. A surviving `not_adopted` stays
   `not_adopted_confirmed`; nothing is upgraded by surviving review.
-- **Sanitize-then-refuse**: `sanitize()` strips `/home/...` fragments;
-  `assert_no_leak()` then raises if `/home/` or `APCA` is still present, and
+- **Sanitize-then-refuse**: `sanitize()` strips home-directory path fragments;
+  `assert_no_leak()` then raises if a home path or the broker key prefix is still present, and
   `build_manifest.py` never writes on that path.
 - **Deterministic ordering**: per-layer `components`/`entries` and
   `candidates` are sorted by `(decision-rank, id)` (`row_item_sort_key`) and
@@ -126,7 +126,7 @@ acceptance, or superiority.
 `(layer, repository, review_status)` identity set for both foundation and
 trading, on `candidates_total`/`candidates_by_disposition`,
 `pins_behind_upstream_unique_components` and `components_confirmed`. Rerun
-2026-09-22 against `/home/seath/codex-ecosystem/state/sota-convergence-20260922/`
+2026-09-22 against the host's private state directory for the 2026-09-22 wave
 (read-only inputs): `foundation_layers=16, trading_layers=12,
 components_confirmed=106, candidates_total=34,
 pins_behind_upstream_unique_components=15,

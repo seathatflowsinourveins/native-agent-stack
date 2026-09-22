@@ -7121,8 +7121,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "bytes": 10537,
-      "sha256": "79d93fb0a2cf83e638099fb90f950a0e087b22e697d903830862b5bf972ef42b"
+      "bytes": 10470,
+      "sha256": "c22ad8f898a5de5c779bd12d8668c7f067dc04f4634957cf2b84add44766128f"
     },
     {
       "path": "observability/receipt.json",
@@ -10391,8 +10391,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "bytes": 9204,
-      "sha256": "1bf13e0e43108670f16d1a901785d443709b3afdb8e5807a72d27f3b92b6bd33"
+      "bytes": 9226,
+      "sha256": "5f0a5d3cdc0d436296fd2e975b082a9eb57bacee9f394214af75f34ebb0e5127"
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",

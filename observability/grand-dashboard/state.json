@@ -198,7 +198,7 @@
       "kind": "gate",
       "id": "sota-convergence-20260922",
       "title": "SOTA repository convergence and practice",
-      "state": "16 foundation and 12 trading layers confirmed against 396 upstream repositories / 33 newcomers examined and 1 targeted candidate / practice tooling and saved workflow recorded / Codex cross-family review deferred to 2026-09-26",
+      "state": "28 layers confirmed against 396 upstream repositories / 33 newcomers and 1 targeted candidate / practice tooling recorded / Codex review deferred to 2026-09-26",
       "evidence_ref": "catalogs/sota-convergence/README.md"
     }
   ],
