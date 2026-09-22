@@ -472,7 +472,7 @@ class ManifestTradingCandidatesTests(LanePacketsFixture):
         self.assertEqual(sorted(c["repository"] for c in others),
                          ["https://github.com/acme/kbc-only", "https://github.com/acme/newcomer"],
                          "a repository already an entry is not added, and one in both lists appears once")
-        self.assertTrue(all(not c["adopted"] and c["review_status"] == "newcomer" for c in others))
+        self.assertTrue(all(not c["adopted"] and c.get("newcomer") is True for c in others))
         notes = {c["repository"]: c["note"] for c in others}
         self.assertEqual(notes["https://github.com/acme/newcomer"], "names the gap but demonstrates nothing")
         self.assertEqual(notes["https://github.com/acme/kbc-only"], "an executed comparison would overturn it")
@@ -496,23 +496,33 @@ class ManifestTradingCandidatesTests(LanePacketsFixture):
         self.assertEqual(ledger["foundation__layer-a.json"], manifest["foundation__layer-a.json"])
         self.assertNotIn("candidate_source", json.loads(ledger["us-equities__layer-b.json"]))
 
-    def test_decision_bearing_review_labels_are_masked(self):
-        by_component = {c["component_id"]: c for c in self.manifest_packet()["candidates"]}
-        self.assertEqual(by_component["data-one"]["review_status"], "reviewed", "confirmed_default is masked")
-        self.assertEqual(by_component["data-three"]["review_status"], "reviewed", "confirmed_conditional is masked")
-        self.assertEqual(by_component["data-two"]["review_status"], "not_individually_reviewed", "neutral labels stay")
-        self.assertNotIn("confirmed_", json.dumps(self.manifest_packet()))
+    def test_review_labels_are_not_carried(self):
+        packet = self.manifest_packet()
+        self.assertTrue(all(c["review_status"] is None for c in packet["candidates"]),
+                        "every manifest review label correlates with the withheld decision")
+        text = json.dumps(packet)
+        for label in ("confirmed_", "not_individually_reviewed", "unmaintained_signal", "keep_but_compare"):
+            self.assertNotIn(label, text)
+        by_component = {c["component_id"]: c for c in packet["candidates"]}
+        self.assertTrue(by_component["data-three"]["pin_behind_upstream"], "the pin-behind flag stays as its own field")
 
     def test_keys_follow_the_seeded_shuffle(self):
-        packet = self.manifest_packet()
+        def build(seed):
+            return json.loads(lane_packets.build_all_packets(
+                self.root, catalogs=["us-equities"], seed=seed, checked_at=lane_packets.DEFAULT_CHECKED_AT,
+                trading_candidates="manifest")["us-equities__layer-b.json"])
+        manifest = self.read("catalogs/sota-convergence/manifest-20260922.json")
+        layer = manifest["trading"][0]
+        cards = {e["id"]: e for e in self.read(lane_packets.TRADING_CARD_FILES[0])["entries"]}
+        unshuffled = lane_packets.manifest_layer_candidates(layer, cards, {}, {}, self.root)
+        expected = list(unshuffled)
+        lane_packets.make_rng(lane_packets.DEFAULT_SEED, "us-equities", "layer-b").shuffle(expected)
+        packet = build(lane_packets.DEFAULT_SEED)
+        self.assertEqual([c["repository"] for c in packet["candidates"]], [c["repository"] for c in expected])
         self.assertEqual([c["key"] for c in packet["candidates"]],
-                         [f"c{index}" for index in range(1, len(packet["candidates"]) + 1)])
-        # The order is the seeded permutation, identical across builds and different seeds change it.
-        other = json.loads(lane_packets.build_all_packets(
-            self.root, catalogs=["us-equities"], seed="another-seed", checked_at=lane_packets.DEFAULT_CHECKED_AT,
-            trading_candidates="manifest")["us-equities__layer-b.json"])
-        self.assertEqual(sorted(c["repository"] for c in packet["candidates"]),
-                         sorted(c["repository"] for c in other["candidates"]))
+                         [f"c{index}" for index in range(1, len(expected) + 1)])
+        orders = {tuple(c["repository"] for c in build(seed)["candidates"]) for seed in ("s1", "s2", "s3", "s4")}
+        self.assertGreater(len(orders), 1, "different seeds must be able to change the order")
 
     def test_a_manifest_entry_without_a_card_fails_loudly(self):
         manifest = self.read("catalogs/sota-convergence/manifest-20260922.json")

@@ -85,10 +85,10 @@ TRADING_CARD_FILES = (
     "catalogs/us-equities/engines-strategies.json", "catalogs/us-equities/foundation-memory.json",
 )
 CARD_DECISION_ADOPTED = {"default", "conditional"}
-# Manifest review labels that do not reveal the card decision; every other label
-# (confirmed_default, confirmed_conditional, keep_but_compare, ...) is reported as
-# "reviewed" so a lane cannot tell the incumbent default from a conditional entry.
-NEUTRAL_REVIEW_STATUSES = {"pin_behind_upstream", "unmaintained_signal", "not_individually_reviewed"}
+# Manifest review labels are not carried in manifest mode: every label value, including
+# not_individually_reviewed and unmaintained_signal, correlates with the withheld card
+# decision (measured over the 112 2026-09-22 trading entries). pin_behind_upstream stays
+# as its own boolean field and the upstream metadata stays.
 LAYER_REQUIREMENT_NOTE = ("The requirement, limitations and existing_overturn_when text is shared by this layer's "
                           "group; judge fit against the layer title and layer_scope_terms.")
 MANIFEST_CANDIDATE_SOURCE = "sota_manifest_layer_entries"
@@ -232,12 +232,6 @@ def trading_cards_by_id(root: Path) -> dict:
     return cards
 
 
-def neutral_review_status(value):
-    if value is None or value in NEUTRAL_REVIEW_STATUSES:
-        return value
-    return "reviewed"
-
-
 def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: dict,
                               recipe_map: dict, root: Path) -> list:
     """Layer-specific trading candidates: the sota manifest's own entries for this
@@ -265,7 +259,7 @@ def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: di
             "component_id": entry["id"],
             "pin": entry.get("pin"),
             "upstream": entry.get("upstream"),
-            "review_status": neutral_review_status(entry.get("review_status")),
+            "review_status": None,
             "pin_behind_upstream": entry.get("pin_behind_upstream"),
             "recipe_ref": resolve_recipe_ref(entry["id"], recipe_map, evidence_refs, root),
             "decisions": [],
@@ -281,7 +275,7 @@ def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: di
             "name": item.get("name") or item.get("id") or slug, "repository": repository, "adopted": False,
             "evidence_kind": None, "evidence_refs": [], "role": None,
             "card_limitations": [], "component_id": None, "pin": None, "upstream": None,
-            "review_status": "newcomer", "pin_behind_upstream": None,
+            "review_status": None, "pin_behind_upstream": None, "newcomer": True,
             "recipe_ref": None, "decisions": [],
             "note": item.get("demonstrated_gap") or item.get("comparison_that_would_overturn"),
         })
@@ -343,7 +337,7 @@ def build_packet(row: dict, *, catalog: str, sota_components: list, recipe_map: 
         packet["layer_scope_terms"] = list(layer_scope_terms or [])
         packet["requirement_note"] = LAYER_REQUIREMENT_NOTE
         packet["withheld"] = list(WITHHELD) + ["candidates[].card_rationale", "candidates[].card_decision",
-                                              "candidates[].review_status (decision-bearing labels)"]
+                                              "candidates[].review_status"]
     return packet
 
 
