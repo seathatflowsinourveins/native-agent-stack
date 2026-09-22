@@ -451,15 +451,16 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
     if not snapshot.is_file() or snapshot.suffix.lower() not in _GATE_ACCEPTED_SNAPSHOT_EXTENSIONS:
         raise SafetyError("promotion_gate_missing")
     try:
-        observed_hash = hashlib.sha256(snapshot.read_bytes()).hexdigest()
+        snapshot_bytes = snapshot.read_bytes()
     except OSError:
         raise SafetyError("promotion_gate_missing")
-    if gate.get("input_sha256") != observed_hash:
+    if gate.get("input_sha256") != hashlib.sha256(snapshot_bytes).hexdigest():
         raise SafetyError("promotion_gate_mismatch")
     if snapshot.suffix.lower() == ".csv":
-        # Bind row_count to the hashed bytes: data rows after the header line.
-        # (Parquet row counts would need a reader this runtime does not carry.)
-        data_rows = sum(1 for line in snapshot.read_bytes().splitlines()[1:] if line.strip())
+        # Bind row_count to the same hashed bytes: data rows after the header line.
+        # A quoted field containing a newline would count high and refuse (never pass);
+        # Parquet row counts would need a reader this runtime does not carry.
+        data_rows = sum(1 for line in snapshot_bytes.splitlines()[1:] if line.strip())
         if data_rows != row_count:
             raise SafetyError("promotion_gate_mismatch")
 
