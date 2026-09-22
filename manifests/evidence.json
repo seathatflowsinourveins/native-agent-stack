@@ -3722,7 +3722,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "361d15a10bb9ad17f707850e8d975cb8c2a2762491dabd915923e29d0cfe1cd6",
+      "sha256": "c235dba2bebf7e089a3994671835976cb372fa8597a47498aad8618ab0239afe",
       "bytes": 17917
     },
     {
@@ -7773,18 +7773,18 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "8d29d9b5b84a04b5c9b5fc5d9a40153595fb947aab7f59084cd4372e6c6d30d7",
-      "bytes": 12942
+      "sha256": "c2ca28919d65fe517e55a5940de95ccaad3ef67eb81ccb5b372b79756c5e4404",
+      "bytes": 13882
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "bytes": 121647,
-      "sha256": "9aef19449c37b392924f35c11f8bad4e58611ce715ae00dcbbeb285f7b8b5212"
+      "bytes": 130182,
+      "sha256": "23054ee9a9111ab08709635fea97422cc03dbe90e2e4fd0cf0237ee295ace6e4"
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "bytes": 18696,
-      "sha256": "aff21f912690c504fc138b856c789ca38af0649131591aab44118be53bda5959"
+      "bytes": 22452,
+      "sha256": "4060706737555aea23ce4bbd6261f3cebc2277397147b6912a34120a2fcd1cf8"
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -7808,13 +7808,13 @@
     },
     {
       "path": "scripts/validate_foundation.py",
-      "sha256": "fdf2386935c8297d919feb282aa6e21d59c735ad45b5f55392e98897a3c9189e",
-      "bytes": 15321
+      "sha256": "8b21236a96c73a01d56de5a692e49a968bc79f8470ee476eac02f0a3c12cd4d2",
+      "bytes": 15403
     },
     {
       "path": "tests/test_foundation_catalog.py",
-      "sha256": "b2623dea825017638d2a17a506b32fc10e77fd9fd4096f83a84691c824859de6",
-      "bytes": 11725
+      "sha256": "e89631495b52c7ee0c3a1387c4dac315a4d1d75f26850f4951b3c632fb26a6be",
+      "bytes": 11791
     },
     {
       "path": "blueprints/convergence-practice/worker-recovery/README.md",
@@ -9609,7 +9609,7 @@
     {
       "path": "docs/full-stack-convergence.md",
       "bytes": 11390,
-      "sha256": "29ee908a95c67a577da866596ccbc96e1ec7720c0233f808514fe0f489e56196"
+      "sha256": "17e03fef1f00f578f94028a1009266292f868784619392f848a17cedb41282a0"
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/agentsview-aggregate-safe.png",
@@ -10178,8 +10178,8 @@
     },
     {
       "path": "catalogs/foundation/surfaces.json",
-      "sha256": "a1bfe1fc858b5a0362250b5a6a606b862d652bbf3d42198edf282261f2da4baa",
-      "bytes": 18885
+      "sha256": "be845c04926aa9bd1d7824911839090d8e636e6016d9a641bb683ad1c951aef1",
+      "bytes": 20383
     },
     {
       "path": "docs/claude-foundation-finalization-20260921.md",
@@ -10744,7 +10744,7 @@
     {
       "path": "tests/test_sota_convergence.py",
       "bytes": 54265,
-      "sha256": "797fd5d1a90a3d82b1d2f43004e9debc33b53588f4052413aaf1b9b2efd1447a"
+      "sha256": "988985554930f5faf1be726551206a27a6149876376acc09c4f1f8f1a98c5de6"
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -10778,8 +10778,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "0146c6d958c3309a806b873fb224b3de3e77b55a278f1c7e21f54bbaccf359a1",
-      "bytes": 89462
+      "sha256": "ec2ae41a7ccd6f7c34c446cfb6a520df0f8f5ed94408ad0d011096df44a1e8c5",
+      "bytes": 98839
     },
     {
       "path": "catalogs/landscape/manifest.json",

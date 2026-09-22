@@ -324,7 +324,7 @@ class CountsReconcileTests(unittest.TestCase):
             }],
             "top_gaps": [],
         }
-        # A distinct layer id from foundation's "layer-a": real foundation (16 ids)
+        # A distinct layer id from foundation's "layer-a": real foundation (20 ids)
         # and trading (12 ids) taxonomies never collide, and lane candidates below
         # are keyed only by layer id, so a shared id here would double-count them.
         trading_by_layer = {

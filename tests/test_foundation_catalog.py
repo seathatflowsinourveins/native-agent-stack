@@ -11,7 +11,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/validate_foundation.py"
-LAYERS = "native-clients instructions-skills workers isolation code-navigation document-retrieval semantic-rag durable-memory web-research token-efficiency quality-evaluation ci-supply-chain scheduling-supervision hosting-services recovery-portability observation-inference".split()
+LAYERS = "native-clients instructions-skills workers isolation code-navigation document-retrieval semantic-rag durable-memory web-research token-efficiency quality-evaluation ci-supply-chain scheduling-supervision hosting-services recovery-portability observation-inference agent-sdks mcp-surfaces secrets-credentials git-github-automation".split()
 MANIFEST = "catalogs/foundation/manifest.json"
 DECISIONS = "catalogs/foundation/decisions.json"
 MATRIX = "blueprints/token-native-focus/saturation-audit.json"
@@ -80,7 +80,7 @@ class FoundationCatalogTests(unittest.TestCase):
     def test_valid_catalog_resolves_historical_claims_without_executing_them(self):
         result, report = self.run_check()
         self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
-        self.assertEqual(report["counts"], {"layers": 16, "decisions": 1, "foundation_components": 1,
+        self.assertEqual(report["counts"], {"layers": 20, "decisions": 1, "foundation_components": 1,
                                          "domain_components": 1, "evidence_receipts": 1, "candidates": 0})
 
     def test_duplicate_decision_ids_fail(self):
@@ -89,7 +89,7 @@ class FoundationCatalogTests(unittest.TestCase):
 
     def test_missing_or_unknown_layers_fail(self):
         self.manifest["layers"].pop()
-        self.assert_invalid("16 required layers")
+        self.assert_invalid("20 required layers")
         self.setUp()
         self.decision["layer_ids"] = ["imaginary-layer"]
         self.assert_invalid("unknown layer")
