@@ -1,0 +1,4619 @@
+{
+ "catalogs": {
+  "foundation": [
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "agent-sdks",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A concrete application needs durable multi-host state/replay (Temporal), explicit graph checkpoints (LangGraph), a remote/container worker (OpenHands SDK) or programmatic Claude session control (Claude Agent SDK), and a matched comparison passes.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [],
+    "title": "Agent SDKs and runtime workers",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "ci-supply-chain",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A specific dependency/update or vulnerability gap is demonstrated and one alternative covers it with pinned database/provenance, manageable findings and no duplicate ownership of the same dependency.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "gitleaks",
+      "pin": "8.30.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v8.30.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-09",
+       "released_at": "2026-03-21",
+       "renamed_to": null,
+       "stars": 29419
+      }
+     },
+     {
+      "id": "qmd",
+      "pin": "2.8.3",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.8.3",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-09",
+       "released_at": "2026-08-16",
+       "renamed_to": null,
+       "stars": 29935
+      }
+     },
+     {
+      "id": "repomix",
+      "pin": "1.18.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.18.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 28448
+      }
+     },
+     {
+      "id": "rtk",
+      "pin": "0.49.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.49.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-11",
+       "renamed_to": null,
+       "stars": 81338
+      }
+     },
+     {
+      "id": "syft",
+      "pin": "1.52.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.52.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 9595
+      }
+     },
+     {
+      "id": "toon",
+      "pin": "4.1.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": null,
+       "latest": null,
+       "license": null,
+       "prerelease": null,
+       "pushed_at": null,
+       "released_at": null,
+       "renamed_to": null,
+       "stars": null
+      }
+     },
+     {
+      "id": "zizmor",
+      "pin": "1.30.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.30.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-09",
+       "renamed_to": null,
+       "stars": 6551
+      }
+     }
+    ],
+    "title": "CI and supply chain",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "code-navigation",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A sealed task set in the target languages shows a challenger returning more correct source/references at an acceptable total indexing, retrieval and maintenance cost.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "ast-grep",
+      "pin": "0.45.3",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "0.45.3",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-31",
+       "renamed_to": null,
+       "stars": 15991
+      }
+     },
+     {
+      "id": "codebase-memory-mcp",
+      "pin": "0.11.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.11.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-15",
+       "renamed_to": null,
+       "stars": 44047
+      }
+     },
+     {
+      "id": "jcodemunch-mcp",
+      "pin": "1.108.319",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.108.319",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-16",
+       "renamed_to": null,
+       "stars": 2708
+      }
+     },
+     {
+      "id": "mcp-inspector",
+      "pin": "2.7.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "2.7.0",
+       "license": null,
+       "prerelease": false,
+       "pushed_at": "2026-09-19",
+       "released_at": "2026-09-16",
+       "renamed_to": null,
+       "stars": 10918
+      }
+     },
+     {
+      "id": "mcporter",
+      "pin": "0.13.13",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.13.13",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-15",
+       "released_at": "2026-09-14",
+       "renamed_to": null,
+       "stars": 5019
+      }
+     },
+     {
+      "id": "qdrant",
+      "pin": "1.19.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.19.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-04",
+       "renamed_to": null,
+       "stars": 34741
+      }
+     },
+     {
+      "id": "repomix",
+      "pin": "1.18.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.18.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 28448
+      }
+     },
+     {
+      "id": "serena",
+      "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.7.0",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-09",
+       "renamed_to": null,
+       "stars": 29684
+      }
+     },
+     {
+      "id": "socraticode",
+      "pin": "1.14.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.14.0",
+       "license": "AGPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-20",
+       "released_at": "2026-09-16",
+       "renamed_to": null,
+       "stars": 3319
+      }
+     },
+     {
+      "id": "toon",
+      "pin": "4.1.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": null,
+       "latest": null,
+       "license": null,
+       "prerelease": null,
+       "pushed_at": null,
+       "released_at": null,
+       "renamed_to": null,
+       "stars": null
+      }
+     }
+    ],
+    "title": "Code navigation",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "document-retrieval",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A sealed representative corpus/query set shows useful quality gains with acceptable repeated end-to-end latency, or layout/OCR failures justify a separately qualified parser.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "context-hub",
+      "pin": "0.1.4",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.1.4",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-05-31",
+       "released_at": "2026-04-27",
+       "renamed_to": null,
+       "stars": 13977
+      }
+     },
+     {
+      "id": "markitdown",
+      "pin": "0.1.7",
+      "pin_behind_upstream": true,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.1.8",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 186244
+      }
+     },
+     {
+      "id": "poppler",
+      "pin": "26.09.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": null,
+       "license": "GPL-2.0",
+       "prerelease": null,
+       "pushed_at": "2026-09-13",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 61
+      }
+     },
+     {
+      "id": "qmd",
+      "pin": "2.8.3",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.8.3",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-09",
+       "released_at": "2026-08-16",
+       "renamed_to": null,
+       "stars": 29935
+      }
+     }
+    ],
+    "title": "Documents and ingestion",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "durable-memory",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "An isolated representative corpus and question set shows better source-grounded recall/usefulness and acceptable complete provider use, latency, capture/deletion and restore behavior without ambiguous memory ownership.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "ai-memory",
+      "pin": "2.3.2",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.4.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 7788
+      }
+     },
+     {
+      "id": "claude-code",
+      "pin": "2.1.278",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.1.278",
+       "license": null,
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-19",
+       "renamed_to": null,
+       "stars": 147495
+      }
+     },
+     {
+      "id": "codex",
+      "pin": "0.155.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "rust-v0.155.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 125797
+      }
+     },
+     {
+      "id": "qdrant",
+      "pin": "1.19.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.19.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-04",
+       "renamed_to": null,
+       "stars": 34741
+      }
+     },
+     {
+      "id": "restic",
+      "pin": "0.19.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.19.1",
+       "license": "BSD-2-Clause",
+       "prerelease": false,
+       "pushed_at": "2026-09-20",
+       "released_at": "2026-07-05",
+       "renamed_to": null,
+       "stars": 36173
+      }
+     }
+    ],
+    "title": "Durable memory",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "git-github-automation",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A concrete cross-repository or multi-host Git/GitHub workflow needs capabilities beyond gh/worktrunk/difftastic, and a challenger passes a matched comparison.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [],
+    "title": "Git practice and GitHub automation",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "hosting-services",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A defined production, remote-team or GPU deployment requirement exceeds the local fixture, and one alternative passes its account, data, networking, rollback and workload-cost acceptance.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "apple-container",
+      "pin": "1.4.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "1.4.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-09",
+       "renamed_to": null,
+       "stars": 50102
+      }
+     },
+     {
+      "id": "fastapi",
+      "pin": "0.141.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "0.141.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-07-29",
+       "renamed_to": null,
+       "stars": 102516
+      }
+     },
+     {
+      "id": "mcp-inspector",
+      "pin": "2.7.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "2.7.0",
+       "license": null,
+       "prerelease": false,
+       "pushed_at": "2026-09-19",
+       "released_at": "2026-09-16",
+       "renamed_to": null,
+       "stars": 10918
+      }
+     },
+     {
+      "id": "mcporter",
+      "pin": "0.13.13",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.13.13",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-15",
+       "released_at": "2026-09-14",
+       "renamed_to": null,
+       "stars": 5019
+      }
+     },
+     {
+      "id": "nextjs",
+      "pin": "16.3.5",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v16.3.5",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-11",
+       "renamed_to": null,
+       "stars": 142393
+      }
+     },
+     {
+      "id": "omniroute",
+      "pin": "3.8.50",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.8.50",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-08-26",
+       "renamed_to": null,
+       "stars": 69012
+      }
+     },
+     {
+      "id": "postgresql",
+      "pin": "18.6",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "release-6-3",
+       "license": "NOASSERTION",
+       "prerelease": null,
+       "pushed_at": "2026-09-21",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 22180
+      }
+     },
+     {
+      "id": "react",
+      "pin": "19.3.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v19.3.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-09-09",
+       "renamed_to": null,
+       "stars": 250642
+      }
+     }
+    ],
+    "title": "Application and service hosting",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "instructions-skills",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A specific task exposes a missing procedure, and a pinned candidate works in native discovery and task execution with less conflict or better measured results than the current procedure.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "affaan-m/ECC",
+      "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.2.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-08",
+       "renamed_to": null,
+       "stars": 264820
+      }
+     },
+     {
+      "id": "ai-memory",
+      "pin": "2.3.2",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.4.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 7788
+      }
+     },
+     {
+      "id": "claude-code",
+      "pin": "2.1.278",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.1.278",
+       "license": null,
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-19",
+       "renamed_to": null,
+       "stars": 147495
+      }
+     },
+     {
+      "id": "codex",
+      "pin": "0.155.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "rust-v0.155.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 125797
+      }
+     },
+     {
+      "id": "context-mode",
+      "pin": "1.0.169",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.0.169",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-06-29",
+       "renamed_to": null,
+       "stars": 23897
+      }
+     },
+     {
+      "id": "davila7/claude-code-templates",
+      "pin": "c840d6f626be7ba418da60aeb0f2080413562451",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.29.6",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 30897
+      }
+     },
+     {
+      "id": "qmd",
+      "pin": "2.8.3",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.8.3",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-09",
+       "released_at": "2026-08-16",
+       "renamed_to": null,
+       "stars": 29935
+      }
+     },
+     {
+      "id": "rtk",
+      "pin": "0.49.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.49.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-11",
+       "renamed_to": null,
+       "stars": 81338
+      }
+     },
+     {
+      "id": "shanraisshan/claude-code-best-practice",
+      "pin": "15969ed2471a177d938c889255d2f23f07e4742a",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": null,
+       "license": "MIT",
+       "prerelease": null,
+       "pushed_at": "2026-09-22",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 66199
+      }
+     },
+     {
+      "id": "skills-ref",
+      "pin": "0.1.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": null,
+       "license": "Apache-2.0",
+       "prerelease": null,
+       "pushed_at": "2026-08-09",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 25578
+      }
+     },
+     {
+      "id": "tavily-cli",
+      "pin": "0.1.8",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": null,
+       "license": "MIT",
+       "prerelease": null,
+       "pushed_at": "2026-09-21",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 18
+      }
+     }
+    ],
+    "title": "Instructions and skills",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "isolation",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Untrusted code or a deployment target requires a stronger VM/OCI boundary, and the selected alternative passes workload, network, resource, cleanup and host compatibility checks.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "apple-container",
+      "pin": "1.4.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "1.4.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-09",
+       "renamed_to": null,
+       "stars": 50102
+      }
+     },
+     {
+      "id": "sandbox-runtime",
+      "pin": "0.0.77",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.0.77",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 5300
+      }
+     },
+     {
+      "id": "worktrunk",
+      "pin": "0.79.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.79.0",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 8306
+      }
+     }
+    ],
+    "title": "Isolation",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "mcp-surfaces",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A concrete MCP surface gap needs a new server, and a reviewed registry entry passes the same bridge/inspection acceptance as mcporter/mcp-inspector.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [],
+    "title": "MCP servers and client surfaces",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "native-clients",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A required structured-event, custom-tool or application state capability is unavailable through the native path and a supported SDK implementation passes the same task, account, effect and recovery checks.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "ai-memory",
+      "pin": "2.3.2",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.4.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 7788
+      }
+     },
+     {
+      "id": "claude-code",
+      "pin": "2.1.278",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.1.278",
+       "license": null,
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-19",
+       "renamed_to": null,
+       "stars": 147495
+      }
+     },
+     {
+      "id": "codex",
+      "pin": "0.155.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "rust-v0.155.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 125797
+      }
+     },
+     {
+      "id": "context-mode",
+      "pin": "1.0.169",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.0.169",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-06-29",
+       "renamed_to": null,
+       "stars": 23897
+      }
+     },
+     {
+      "id": "qmd",
+      "pin": "2.8.3",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.8.3",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-09",
+       "released_at": "2026-08-16",
+       "renamed_to": null,
+       "stars": 29935
+      }
+     },
+     {
+      "id": "rtk",
+      "pin": "0.49.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.49.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-11",
+       "renamed_to": null,
+       "stars": 81338
+      }
+     }
+    ],
+    "title": "Native clients",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "observation-inference",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A required trace, evaluation or supported model/hardware workload is unanswerable by the current path, and one alternative passes privacy, fidelity, latency/cost and recovery comparisons without duplicate capture.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "agentsview",
+      "pin": "0.43.0",
+      "pin_behind_upstream": true,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.44.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 5961
+      }
+     },
+     {
+      "id": "alertmanager",
+      "pin": "0.34.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.34.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 8625
+      }
+     },
+     {
+      "id": "ccusage",
+      "pin": "20.0.24",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v20.0.24",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 18677
+      }
+     },
+     {
+      "id": "claude-hud",
+      "pin": "0.8.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.8.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-19",
+       "released_at": "2026-08-18",
+       "renamed_to": null,
+       "stars": 28091
+      }
+     },
+     {
+      "id": "grafana",
+      "pin": "13.2.2",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v13.2.2",
+       "license": "AGPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-15",
+       "renamed_to": null,
+       "stars": 76846
+      }
+     },
+     {
+      "id": "huggingface-hub-native",
+      "pin": "1.32.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.32.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 3921
+      }
+     },
+     {
+      "id": "llama-cpp",
+      "pin": "b11057 (0.4.1-dev)",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.4.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-14",
+       "renamed_to": null,
+       "stars": 129118
+      }
+     },
+     {
+      "id": "loki",
+      "pin": "3.7.8",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.7.8",
+       "license": "AGPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 28930
+      }
+     },
+     {
+      "id": "ntfy",
+      "pin": "2.28.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.28.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-15",
+       "released_at": "2026-08-27",
+       "renamed_to": null,
+       "stars": 34360
+      }
+     },
+     {
+      "id": "omniroute",
+      "pin": "3.8.50",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.8.50",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-08-26",
+       "renamed_to": null,
+       "stars": 69012
+      }
+     },
+     {
+      "id": "opentelemetry-collector-contrib",
+      "pin": "0.161.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.161.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-15",
+       "renamed_to": null,
+       "stars": 4945
+      }
+     },
+     {
+      "id": "otel-tui",
+      "pin": "0.7.5",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.7.5",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-12",
+       "renamed_to": null,
+       "stars": 1088
+      }
+     },
+     {
+      "id": "prometheus",
+      "pin": "3.14.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.14.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-08-18",
+       "renamed_to": null,
+       "stars": 66165
+      }
+     },
+     {
+      "id": "vllm",
+      "pin": "0.25.0",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_pin",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.29.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-09",
+       "renamed_to": null,
+       "stars": 92378
+      }
+     }
+    ],
+    "title": "Observation and optional inference",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "quality-evaluation",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A defined tool-use/extraction or experiment-tracking requirement cannot be expressed adequately in the current test lane and a challenger passes a representative frozen oracle with usable failure inspection.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "difftastic",
+      "pin": "0.71.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "0.71.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 25919
+      }
+     },
+     {
+      "id": "fastapi",
+      "pin": "0.141.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "0.141.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-07-29",
+       "renamed_to": null,
+       "stars": 102516
+      }
+     },
+     {
+      "id": "gitleaks",
+      "pin": "8.30.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v8.30.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-09",
+       "released_at": "2026-03-21",
+       "renamed_to": null,
+       "stars": 29419
+      }
+     },
+     {
+      "id": "nextjs",
+      "pin": "16.3.5",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v16.3.5",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-11",
+       "renamed_to": null,
+       "stars": 142393
+      }
+     },
+     {
+      "id": "playwright-test",
+      "pin": "1.63.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.63.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-04",
+       "renamed_to": null,
+       "stars": 96480
+      }
+     },
+     {
+      "id": "postgresql",
+      "pin": "18.6",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "release-6-3",
+       "license": "NOASSERTION",
+       "prerelease": null,
+       "pushed_at": "2026-09-21",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 22180
+      }
+     },
+     {
+      "id": "promptfoo",
+      "pin": "0.123.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "0.123.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 25350
+      }
+     },
+     {
+      "id": "react",
+      "pin": "19.3.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v19.3.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-09-09",
+       "renamed_to": null,
+       "stars": 250642
+      }
+     },
+     {
+      "id": "shellcheck",
+      "pin": "0.11.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.11.0",
+       "license": "GPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2025-08-04",
+       "renamed_to": null,
+       "stars": 40063
+      }
+     },
+     {
+      "id": "skills-ref",
+      "pin": "0.1.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": null,
+       "license": "Apache-2.0",
+       "prerelease": null,
+       "pushed_at": "2026-08-09",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 25578
+      }
+     },
+     {
+      "id": "syft",
+      "pin": "1.52.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.52.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 9595
+      }
+     },
+     {
+      "id": "zizmor",
+      "pin": "1.30.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.30.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-09",
+       "renamed_to": null,
+       "stars": 6551
+      }
+     }
+    ],
+    "title": "Quality and evaluation",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "recovery-portability",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A real multi-language/system dependency or state-loss case exceeds the selected recipes, and the proposed environment/backup alternative passes install, restore, resume and cleanup on the target host.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "ai-memory",
+      "pin": "2.3.2",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_pin",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.4.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 7788
+      }
+     },
+     {
+      "id": "claude-code",
+      "pin": "2.1.278",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.1.278",
+       "license": null,
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-19",
+       "renamed_to": null,
+       "stars": 147495
+      }
+     },
+     {
+      "id": "codex",
+      "pin": "0.155.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "rust-v0.155.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 125797
+      }
+     },
+     {
+      "id": "dagu",
+      "pin": "2.16.6",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.17.0",
+       "license": "GPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 4055
+      }
+     },
+     {
+      "id": "qdrant",
+      "pin": "1.19.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.19.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-04",
+       "renamed_to": null,
+       "stars": 34741
+      }
+     },
+     {
+      "id": "restic",
+      "pin": "0.19.1",
+      "pin_behind_upstream": false,
+      "review_status": "keep_but_compare",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.19.1",
+       "license": "BSD-2-Clause",
+       "prerelease": false,
+       "pushed_at": "2026-09-20",
+       "released_at": "2026-07-05",
+       "renamed_to": null,
+       "stars": 36173
+      }
+     },
+     {
+      "id": "systemd",
+      "pin": "255.4-1ubuntu8.17",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v261.3",
+       "license": "GPL-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-10",
+       "renamed_to": null,
+       "stars": 16714
+      }
+     }
+    ],
+    "title": "Recovery and portability",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "scheduling-supervision",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Real jobs require host-loss survival, days-long waits or durable cross-host effects, and one challenger passes the declared effect/retry/recovery cases with acceptable operational burden.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "beads",
+      "pin": "1.3.0",
+      "pin_behind_upstream": false,
+      "review_status": "keep_but_compare",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.3.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-15",
+       "renamed_to": null,
+       "stars": 27345
+      }
+     },
+     {
+      "id": "claude-code",
+      "pin": "2.1.278",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.1.278",
+       "license": null,
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-19",
+       "renamed_to": null,
+       "stars": 147495
+      }
+     },
+     {
+      "id": "codex",
+      "pin": "0.155.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "rust-v0.155.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 125797
+      }
+     },
+     {
+      "id": "dagu",
+      "pin": "2.16.6",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.17.0",
+       "license": "GPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 4055
+      }
+     },
+     {
+      "id": "systemd",
+      "pin": "255.4-1ubuntu8.17",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v261.3",
+       "license": "GPL-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-10",
+       "renamed_to": null,
+       "stars": 16714
+      }
+     }
+    ],
+    "title": "Scheduling and supervision",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "secrets-credentials",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A concrete multi-host or multi-operator secret-sharing need appears, and openbao (or a comparable secret manager) passes an actual installed/queried comparison against the native-login-only policy.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [],
+    "title": "Secrets and credentials",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "semantic-rag",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A sealed project/domain retrieval set shows improved source-grounded quality and acceptable latency, memory and lifecycle costs, or a supported target model cannot run in the current service.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "ai-memory",
+      "pin": "2.3.2",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_pin",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.4.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 7788
+      }
+     },
+     {
+      "id": "huggingface-hub-native",
+      "pin": "1.32.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.32.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 3921
+      }
+     },
+     {
+      "id": "qdrant",
+      "pin": "1.19.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.19.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-04",
+       "renamed_to": null,
+       "stars": 34741
+      }
+     },
+     {
+      "id": "restic",
+      "pin": "0.19.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.19.1",
+       "license": "BSD-2-Clause",
+       "prerelease": false,
+       "pushed_at": "2026-09-20",
+       "released_at": "2026-07-05",
+       "renamed_to": null,
+       "stars": 36173
+      }
+     },
+     {
+      "id": "socraticode",
+      "pin": "1.14.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.14.0",
+       "license": "AGPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-20",
+       "released_at": "2026-09-16",
+       "renamed_to": null,
+       "stars": 3319
+      }
+     },
+     {
+      "id": "vllm",
+      "pin": "0.25.0",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_pin",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.29.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-09",
+       "renamed_to": null,
+       "stars": 92378
+      }
+     }
+    ],
+    "title": "Semantic code retrieval",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "token-efficiency",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A frozen task/artifact and repeated controlled comparison improves answer correctness or retrieval completeness while reducing complete provider use or latency, with successful raw-input recovery.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "ccusage",
+      "pin": "20.0.24",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v20.0.24",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 18677
+      }
+     },
+     {
+      "id": "context-mode",
+      "pin": "1.0.169",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.0.169",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-06-29",
+       "renamed_to": null,
+       "stars": 23897
+      }
+     },
+     {
+      "id": "headroom",
+      "pin": "0.37.0",
+      "pin_behind_upstream": true,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.38.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": "headroomlabs-ai/headroom",
+       "stars": 73424
+      }
+     },
+     {
+      "id": "jcodemunch-mcp",
+      "pin": "1.108.319",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.108.319",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-16",
+       "renamed_to": null,
+       "stars": 2708
+      }
+     },
+     {
+      "id": "qmd",
+      "pin": "2.8.3",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.8.3",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-09",
+       "released_at": "2026-08-16",
+       "renamed_to": null,
+       "stars": 29935
+      }
+     },
+     {
+      "id": "repomix",
+      "pin": "1.18.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.18.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 28448
+      }
+     },
+     {
+      "id": "rtk",
+      "pin": "0.49.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.49.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-11",
+       "renamed_to": null,
+       "stars": 81338
+      }
+     },
+     {
+      "id": "toon",
+      "pin": "4.1.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": null,
+       "latest": null,
+       "license": null,
+       "prerelease": null,
+       "pushed_at": null,
+       "released_at": null,
+       "renamed_to": null,
+       "stars": null
+      }
+     }
+    ],
+    "title": "Context and usage efficiency",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "web-research",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A defined source-coverage or ingestion task exceeds the current commands and a candidate improves attributable retrieval completeness, accuracy and total runtime/cost on the same frozen source set.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "agent-browser",
+      "pin": "0.38.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.38.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-16",
+       "renamed_to": null,
+       "stars": 43009
+      }
+     },
+     {
+      "id": "openresearch",
+      "pin": "0.2.7",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_pin",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.2.8",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-22",
+       "renamed_to": null,
+       "stars": 5531
+      }
+     },
+     {
+      "id": "playwright-cli",
+      "pin": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.1.21",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 13484
+      }
+     },
+     {
+      "id": "tavily-cli",
+      "pin": "0.1.8",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": null,
+       "license": "MIT",
+       "prerelease": null,
+       "pushed_at": "2026-09-21",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 18
+      }
+     }
+    ],
+    "title": "Web research",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": null,
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "workers",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "A real task needs durable multi-host state, approval waits or effect recovery beyond native workers, and one challenger passes frozen cancellation, replay, ownership and integration cases.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "beads",
+      "pin": "1.3.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.3.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-15",
+       "renamed_to": null,
+       "stars": 27345
+      }
+     },
+     {
+      "id": "claude-code",
+      "pin": "2.1.278",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.1.278",
+       "license": null,
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-19",
+       "renamed_to": null,
+       "stars": 147495
+      }
+     },
+     {
+      "id": "codex",
+      "pin": "0.155.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "rust-v0.155.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 125797
+      }
+     },
+     {
+      "id": "codex-for-claude",
+      "pin": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.0.6",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-07-08",
+       "released_at": "2026-07-08",
+       "renamed_to": null,
+       "stars": 33436
+      }
+     },
+     {
+      "id": "systemd",
+      "pin": "255.4-1ubuntu8.17",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v261.3",
+       "license": "GPL-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-10",
+       "renamed_to": null,
+       "stars": 16714
+      }
+     },
+     {
+      "id": "worktrunk",
+      "pin": "0.79.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.79.0",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 8306
+      }
+     }
+    ],
+    "title": "Workers and task ownership",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   }
+  ],
+  "us-equities": [
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": "foundation-memory",
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "agents-models-workers",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Run a preregistered, representative held-out financial/document and code retrieval set at the same context budget; replace or supplement a lane only if a candidate improves source/answer fidelity, abstention and measured task cost while preserving isolation, exact source recovery and native client behavior.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "codex-native-sdk",
+      "pin": "CLI rust-v0.155.1; Python openai-codex 0.154.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "rust-v0.155.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 125797
+      }
+     },
+     {
+      "id": "foundation-ai-memory",
+      "pin": "v2.3.1",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.4.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 7788
+      }
+     },
+     {
+      "id": "foundation-context-mode",
+      "pin": "v1.0.169",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.0.169",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-06-29",
+       "renamed_to": null,
+       "stars": 23897
+      }
+     },
+     {
+      "id": "foundation-qdrant",
+      "pin": "v1.19.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.19.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-04",
+       "renamed_to": null,
+       "stars": 34741
+      }
+     },
+     {
+      "id": "foundation-rtk",
+      "pin": "v0.49.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": null,
+       "latest": null,
+       "license": null,
+       "prerelease": null,
+       "pushed_at": null,
+       "released_at": null,
+       "renamed_to": null,
+       "stars": null
+      }
+     },
+     {
+      "id": "foundation-serena",
+      "pin": "v1.7.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.7.0",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-09",
+       "renamed_to": null,
+       "stars": 29684
+      }
+     },
+     {
+      "id": "foundation-socraticode",
+      "pin": "v1.14.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.14.0",
+       "license": "AGPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-20",
+       "released_at": "2026-09-16",
+       "renamed_to": null,
+       "stars": 3319
+      }
+     },
+     {
+      "id": "vllm",
+      "pin": "active0.25.0 (702f4814fe54fabff350d43cb753ae3e47c0c276); latest0.29.0",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.29.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-09",
+       "renamed_to": null,
+       "stars": 92378
+      }
+     },
+     {
+      "id": "codex-acp",
+      "pin": "v1.12.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.12.0",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-15",
+       "renamed_to": null,
+       "stars": 397
+      }
+     },
+     {
+      "id": "deerflow",
+      "pin": "stable v2.0.0; discovery commit 42334f26d7025d905678f9075b079fc65f9beaf9 (2.1.0-rc0)",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.0.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-06-25",
+       "renamed_to": null,
+       "stars": 82823
+      }
+     },
+     {
+      "id": "foundation-agent-retrieval-bench",
+      "pin": "v0.2.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.2.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-08-04",
+       "released_at": "2026-07-26",
+       "renamed_to": null,
+       "stars": 8
+      }
+     },
+     {
+      "id": "foundation-codebase-memory-mcp",
+      "pin": "v0.11.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": null,
+       "latest": null,
+       "license": null,
+       "prerelease": null,
+       "pushed_at": null,
+       "released_at": null,
+       "renamed_to": null,
+       "stars": null
+      }
+     },
+     {
+      "id": "foundation-graphiti",
+      "pin": "v0.30.2",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.30.2",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-08",
+       "renamed_to": null,
+       "stars": 31065
+      }
+     },
+     {
+      "id": "foundation-pageindex",
+      "pin": "v0.2.18",
+      "pin_behind_upstream": true,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.2.19",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 35799
+      }
+     },
+     {
+      "id": "foundation-pgvector",
+      "pin": "v0.8.6 documented tag; reviewed HEAD efa08fda9ec485d80292d0487a77939c087dedcc",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.8.6",
+       "license": "NOASSERTION",
+       "prerelease": null,
+       "pushed_at": "2026-09-10",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 23120
+      }
+     },
+     {
+      "id": "foundation-repomix",
+      "pin": "v1.18.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": null,
+       "latest": null,
+       "license": null,
+       "prerelease": null,
+       "pushed_at": null,
+       "released_at": null,
+       "renamed_to": null,
+       "stars": null
+      }
+     },
+     {
+      "id": "foundation-toon",
+      "pin": "v4.1.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v4.1.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-03",
+       "released_at": "2026-08-05",
+       "renamed_to": null,
+       "stars": 25407
+      }
+     },
+     {
+      "id": "langgraph",
+      "pin": "langgraph 1.2.11; separately released langgraph SDK0.4.4",
+      "pin_behind_upstream": true,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "1.2.12",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 42103
+      }
+     },
+     {
+      "id": "omniroute",
+      "pin": "v3.8.50",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.8.50",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-08-26",
+       "renamed_to": null,
+       "stars": 69012
+      }
+     }
+    ],
+    "title": "Agents, models and workers",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": "engines-strategies",
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "backtesting-engine",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "lean",
+      "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "pin_behind_upstream": false,
+      "review_status": "demotion_proposed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.4.0.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2017-08-08",
+       "renamed_to": null,
+       "stars": 21718
+      }
+     },
+     {
+      "id": "cvxportfolio",
+      "pin": "1.5.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "1.5.1",
+       "license": "GPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-04-27",
+       "released_at": "2025-07-06",
+       "renamed_to": null,
+       "stars": 1290
+      }
+     }
+    ],
+    "title": "Backtesting engine",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": "agents-operations",
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "data-quality-orchestration",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "data-pandera",
+      "pin": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.33.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-01",
+       "renamed_to": null,
+       "stars": 4460
+      }
+     },
+     {
+      "id": "dagu",
+      "pin": "v2.16.6",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.17.0",
+       "license": "GPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 4055
+      }
+     },
+     {
+      "id": "modal",
+      "pin": "Python modal1.5.5; source be5f129326efe4864d666d263d249214bd9b4ed2",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.3.1",
+       "license": "Apache-2.0",
+       "prerelease": null,
+       "pushed_at": "2026-09-21",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 515
+      }
+     },
+     {
+      "id": "temporal",
+      "pin": "server v1.32.0; CLI1.9.1; Python SDK1.33.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.32.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-11",
+       "renamed_to": null,
+       "stars": 23219
+      }
+     }
+    ],
+    "title": "Data quality and orchestration",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": "agents-operations",
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "evaluation-experiments",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "inspect-ai",
+      "pin": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "release/2025-11-28",
+       "license": "MIT",
+       "prerelease": null,
+       "pushed_at": "2026-09-22",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 2829
+      }
+     },
+     {
+      "id": "data-mlflow",
+      "pin": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.16.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 28086
+      }
+     },
+     {
+      "id": "data-river",
+      "pin": "0.26.1; source 64285b9dd6c606804753235fe992bcf25b9856ee",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "0.26.1",
+       "license": "BSD-3-Clause",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-21",
+       "renamed_to": null,
+       "stars": 6106
+      }
+     },
+     {
+      "id": "foundation-agent-retrieval-bench",
+      "pin": "v0.2.1",
+      "pin_behind_upstream": false,
+      "review_status": "keep_but_compare",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.2.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-08-04",
+       "released_at": "2026-07-26",
+       "renamed_to": null,
+       "stars": 8
+      }
+     },
+     {
+      "id": "foundation-mteb",
+      "pin": "2.21.0",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "2.21.6",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 3429
+      }
+     },
+     {
+      "id": "mlflow",
+      "pin": "v3.16.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.16.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 28086
+      }
+     },
+     {
+      "id": "phoenix",
+      "pin": "arize-phoenix-v20.14.0",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "arize-phoenix-v20.15.0",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 11567
+      }
+     }
+    ],
+    "title": "Evaluation and experiments",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": "engines-strategies",
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "execution-broker",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "alpaca-py",
+      "pin": "0.44.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.44.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-08-11",
+       "renamed_to": null,
+       "stars": 1526
+      }
+     },
+     {
+      "id": "data-alpaca-py",
+      "pin": "v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.44.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-08-11",
+       "renamed_to": null,
+       "stars": 1526
+      }
+     },
+     {
+      "id": "lean-alpaca",
+      "pin": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "18120",
+       "license": null,
+       "prerelease": null,
+       "pushed_at": "2026-09-21",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 18
+      }
+     }
+    ],
+    "title": "Execution and broker adapters",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": "data-research",
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "identity-provenance",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "data-dvc",
+      "pin": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "3.67.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-03-31",
+       "renamed_to": null,
+       "stars": 15881
+      }
+     },
+     {
+      "id": "foundation-socraticode",
+      "pin": "v1.14.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.14.0",
+       "license": "AGPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-20",
+       "released_at": "2026-09-16",
+       "renamed_to": null,
+       "stars": 3319
+      }
+     },
+     {
+      "id": "cosign",
+      "pin": "v3.1.3",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.1.3",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-06",
+       "renamed_to": null,
+       "stars": 6317
+      }
+     },
+     {
+      "id": "data-arcticdb",
+      "pin": "v6.26.0; source e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v6.26.0",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-14",
+       "renamed_to": null,
+       "stars": 2518
+      }
+     },
+     {
+      "id": "data-iceberg",
+      "pin": "Apache Iceberg 1.11.0; PyIceberg 0.12.0; source 6976e020b894f6a6777704df2b8c4458cb291ae9",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "apache-iceberg-1.11.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-05-20",
+       "renamed_to": null,
+       "stars": 9263
+      }
+     },
+     {
+      "id": "data-kafka",
+      "pin": "4.3.1; source 26b251a451ce941d3d7a55e6487bcb7f16b5ad48",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "show",
+       "license": "Apache-2.0",
+       "prerelease": null,
+       "pushed_at": "2026-09-22",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 33776
+      }
+     },
+     {
+      "id": "data-mlflow",
+      "pin": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.16.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 28086
+      }
+     },
+     {
+      "id": "data-openlineage",
+      "pin": "1.53.0; source 8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "1.53.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-01",
+       "renamed_to": null,
+       "stars": 2665
+      }
+     }
+    ],
+    "title": "Identity, provenance and lineage",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": "data-research",
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "market-data-reference",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "data-alpaca-py",
+      "pin": "v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.44.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-08-11",
+       "renamed_to": null,
+       "stars": 1526
+      }
+     },
+     {
+      "id": "data-edgartools",
+      "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v5.58.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-11",
+       "renamed_to": null,
+       "stars": 2734
+      }
+     },
+     {
+      "id": "data-exchange-calendars",
+      "pin": "4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "4.13.2",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-15",
+       "released_at": "2026-03-10",
+       "renamed_to": null,
+       "stars": 667
+      }
+     },
+     {
+      "id": "data-databento",
+      "pin": "v0.86.0; source e675ef30369f5ee9f68b04606080c519adf3be69",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.86.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-17",
+       "released_at": "2026-09-01",
+       "renamed_to": null,
+       "stars": 302
+      }
+     },
+     {
+      "id": "data-dlt",
+      "pin": "1.30.0; source a2f4a21e22e5c266278271b6591c70dbc485aea8",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "1.30.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-11",
+       "renamed_to": null,
+       "stars": 5878
+      }
+     },
+     {
+      "id": "data-feast",
+      "pin": "v0.66.0; source 1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.66.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-21",
+       "renamed_to": null,
+       "stars": 7301
+      }
+     },
+     {
+      "id": "data-fredapi",
+      "pin": "v0.5.2; source bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d",
+      "pin_behind_upstream": false,
+      "review_status": "unmaintained_signal",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.5.2",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-01-28",
+       "released_at": "2024-05-05",
+       "renamed_to": null,
+       "stars": 1658
+      }
+     },
+     {
+      "id": "data-gdeltdoc",
+      "pin": "1.12.0; source f2e500144b0a6090d63723f94453b32717e5fd23",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "1.12.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2025-04-22",
+       "released_at": "2025-04-03",
+       "renamed_to": null,
+       "stars": 232
+      }
+     },
+     {
+      "id": "data-kafka",
+      "pin": "4.3.1; source 26b251a451ce941d3d7a55e6487bcb7f16b5ad48",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "show",
+       "license": "Apache-2.0",
+       "prerelease": null,
+       "pushed_at": "2026-09-22",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 33776
+      }
+     },
+     {
+      "id": "data-massive",
+      "pin": "v2.8.0; source 3c247d78c603fc13d274fda1aa26749e7c8c3710",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.8.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-07-09",
+       "released_at": "2026-05-26",
+       "renamed_to": null,
+       "stars": 1512
+      }
+     },
+     {
+      "id": "data-questdb",
+      "pin": "10.0.1; source 7a391566ac827e0d8c269b91f2415c16b0a32a84",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "10.0.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-24",
+       "renamed_to": null,
+       "stars": 17335
+      }
+     }
+    ],
+    "title": "Market data and reference",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": "agents-operations",
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "observability-hosting",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "alertmanager",
+      "pin": "v0.34.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.34.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 8625
+      }
+     },
+     {
+      "id": "grafana",
+      "pin": "v13.2.2",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v13.2.2",
+       "license": "AGPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-15",
+       "renamed_to": null,
+       "stars": 76846
+      }
+     },
+     {
+      "id": "loki",
+      "pin": "v3.7.8",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.7.8",
+       "license": "AGPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 28930
+      }
+     },
+     {
+      "id": "ntfy",
+      "pin": "v2.28.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.28.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-15",
+       "released_at": "2026-08-27",
+       "renamed_to": null,
+       "stars": 34360
+      }
+     },
+     {
+      "id": "opentelemetry-collector",
+      "pin": "v0.161.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.161.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-14",
+       "renamed_to": null,
+       "stars": 7582
+      }
+     },
+     {
+      "id": "opentelemetry-collector-contrib",
+      "pin": "v0.161.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.161.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-15",
+       "renamed_to": null,
+       "stars": 4945
+      }
+     },
+     {
+      "id": "prometheus",
+      "pin": "v3.14.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.14.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-08-18",
+       "renamed_to": null,
+       "stars": 66165
+      }
+     },
+     {
+      "id": "restic",
+      "pin": "v0.19.1; publisher-signed linux/amd64 release asset",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.19.1",
+       "license": "BSD-2-Clause",
+       "prerelease": false,
+       "pushed_at": "2026-09-20",
+       "released_at": "2026-07-05",
+       "renamed_to": null,
+       "stars": 36173
+      }
+     },
+     {
+      "id": "sandbox-runtime",
+      "pin": "v0.0.77",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.0.77",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 5300
+      }
+     },
+     {
+      "id": "e2b",
+      "pin": "e2b@2.51.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "e2b@2.51.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 13907
+      }
+     },
+     {
+      "id": "mlflow",
+      "pin": "v3.16.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.16.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 28086
+      }
+     },
+     {
+      "id": "modal",
+      "pin": "Python modal1.5.5; source be5f129326efe4864d666d263d249214bd9b4ed2",
+      "pin_behind_upstream": true,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.3.1",
+       "license": "Apache-2.0",
+       "prerelease": null,
+       "pushed_at": "2026-09-21",
+       "released_at": null,
+       "renamed_to": null,
+       "stars": 515
+      }
+     },
+     {
+      "id": "opensandbox",
+      "pin": "server/v0.2.3; Python SDK0.1.16",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "release-1.1.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 15452
+      }
+     },
+     {
+      "id": "phoenix",
+      "pin": "arize-phoenix-v20.14.0",
+      "pin_behind_upstream": true,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "arize-phoenix-v20.15.0",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 11567
+      }
+     }
+    ],
+    "title": "Observability and hosting",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": "engines-strategies",
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "portfolio-risk",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "quantstats",
+      "pin": "0.0.81",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.0.81",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-07-20",
+       "released_at": "2026-01-13",
+       "renamed_to": null,
+       "stars": 7651
+      }
+     },
+     {
+      "id": "cvxportfolio",
+      "pin": "1.5.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "1.5.1",
+       "license": "GPL-3.0",
+       "prerelease": false,
+       "pushed_at": "2026-04-27",
+       "released_at": "2025-07-06",
+       "renamed_to": null,
+       "stars": 1290
+      }
+     },
+     {
+      "id": "empyrical-reloaded",
+      "pin": "0.5.12",
+      "pin_behind_upstream": false,
+      "review_status": "unmaintained_signal",
+      "upstream": {
+       "archived": false,
+       "latest": "0.5.12",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2025-12-12",
+       "released_at": "2025-06-01",
+       "renamed_to": null,
+       "stars": 122
+      }
+     },
+     {
+      "id": "skfolio",
+      "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "pin_behind_upstream": true,
+      "review_status": "pin_behind_upstream",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.3.0",
+       "license": "BSD-3-Clause",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-20",
+       "renamed_to": null,
+       "stars": 2427
+      }
+     }
+    ],
+    "title": "Portfolio and risk",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": "engines-strategies",
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "research-factors-ml",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "data-edgartools",
+      "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v5.58.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-11",
+       "renamed_to": null,
+       "stars": 2734
+      }
+     },
+     {
+      "id": "foundation-markitdown",
+      "pin": "v0.1.7",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": null,
+       "latest": null,
+       "license": null,
+       "prerelease": null,
+       "pushed_at": null,
+       "released_at": null,
+       "renamed_to": null,
+       "stars": null
+      }
+     },
+     {
+      "id": "foundation-qmd",
+      "pin": "v2.8.3",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": null,
+       "latest": null,
+       "license": null,
+       "prerelease": null,
+       "pushed_at": null,
+       "released_at": null,
+       "renamed_to": null,
+       "stars": null
+      }
+     },
+     {
+      "id": "vllm",
+      "pin": "active0.25.0 (702f4814fe54fabff350d43cb753ae3e47c0c276); latest0.29.0",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_pin",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.29.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-09",
+       "renamed_to": null,
+       "stars": 92378
+      }
+     },
+     {
+      "id": "alphalens-reloaded",
+      "pin": "0.4.6",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "0.4.5",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2025-12-15",
+       "released_at": "2025-07-23",
+       "renamed_to": null,
+       "stars": 653
+      }
+     },
+     {
+      "id": "arch",
+      "pin": "8.0.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v8.0.0",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-20",
+       "released_at": "2025-10-21",
+       "renamed_to": null,
+       "stars": 1574
+      }
+     },
+     {
+      "id": "chronos",
+      "pin": "2.3.2",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.3.2",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-17",
+       "released_at": "2026-09-08",
+       "renamed_to": null,
+       "stars": 5893
+      }
+     },
+     {
+      "id": "data-arcticdb",
+      "pin": "v6.26.0; source e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v6.26.0",
+       "license": "NOASSERTION",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-14",
+       "renamed_to": null,
+       "stars": 2518
+      }
+     },
+     {
+      "id": "data-river",
+      "pin": "0.26.1; source 64285b9dd6c606804753235fe992bcf25b9856ee",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "0.26.1",
+       "license": "BSD-3-Clause",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-21",
+       "renamed_to": null,
+       "stars": 6106
+      }
+     },
+     {
+      "id": "data-sktime",
+      "pin": "v1.1.0; source 918fa838d99eb3703fe9bc963891619608aa35b4",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.1.0",
+       "license": "BSD-3-Clause",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-07-28",
+       "renamed_to": null,
+       "stars": 10028
+      }
+     },
+     {
+      "id": "data-statsforecast",
+      "pin": "v2.1.1; source 264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.1.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-07-16",
+       "renamed_to": null,
+       "stars": 4913
+      }
+     },
+     {
+      "id": "data-tsfresh",
+      "pin": "v0.21.2; source 6aa24fdef7e3c3f48b19482535693f5796f2b598",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.21.2",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-07-06",
+       "released_at": "2026-05-31",
+       "renamed_to": null,
+       "stars": 9426
+      }
+     },
+     {
+      "id": "deerflow",
+      "pin": "stable v2.0.0; discovery commit 42334f26d7025d905678f9075b079fc65f9beaf9 (2.1.0-rc0)",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.0.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-06-25",
+       "renamed_to": null,
+       "stars": 82823
+      }
+     },
+     {
+      "id": "foundation-docling",
+      "pin": "v2.129.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.129.0",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 67557
+      }
+     },
+     {
+      "id": "foundation-haystack",
+      "pin": "v3.1.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.1.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-03",
+       "renamed_to": null,
+       "stars": 26575
+      }
+     },
+     {
+      "id": "foundation-sentence-transformers",
+      "pin": "v6.1.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v6.1.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-18",
+       "renamed_to": null,
+       "stars": 19107
+      }
+     },
+     {
+      "id": "qlib",
+      "pin": "0.9.7",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.9.7",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2025-08-15",
+       "renamed_to": null,
+       "stars": 48740
+      }
+     },
+     {
+      "id": "ray-serve",
+      "pin": "ray-2.58.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "ray-2.58.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-08-23",
+       "renamed_to": null,
+       "stars": 43887
+      }
+     },
+     {
+      "id": "scikit-learn",
+      "pin": "1.9.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "1.9.1",
+       "license": "BSD-3-Clause",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-11",
+       "renamed_to": null,
+       "stars": 67335
+      }
+     },
+     {
+      "id": "skfolio",
+      "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_pin",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.3.0",
+       "license": "BSD-3-Clause",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-20",
+       "renamed_to": null,
+       "stars": 2427
+      }
+     },
+     {
+      "id": "statsmodels",
+      "pin": "0.15.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.15.0",
+       "license": "BSD-3-Clause",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-27",
+       "renamed_to": null,
+       "stars": 11639
+      }
+     },
+     {
+      "id": "timesfm",
+      "pin": "v3.0.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.0.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-15",
+       "released_at": "2026-08-28",
+       "renamed_to": null,
+       "stars": 33411
+      }
+     }
+    ],
+    "title": "Research, factors and ML",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": "agents-operations",
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "security-supply-chain",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "gitleaks",
+      "pin": "v8.30.1",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v8.30.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-09",
+       "released_at": "2026-03-21",
+       "renamed_to": null,
+       "stars": 29419
+      }
+     },
+     {
+      "id": "grype",
+      "pin": "v0.119.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.119.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 12913
+      }
+     },
+     {
+      "id": "syft",
+      "pin": "v1.52.0",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.52.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-18",
+       "released_at": "2026-09-17",
+       "renamed_to": null,
+       "stars": 9595
+      }
+     },
+     {
+      "id": "cosign",
+      "pin": "v3.1.3",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v3.1.3",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-06",
+       "renamed_to": null,
+       "stars": 6317
+      }
+     },
+     {
+      "id": "openbao",
+      "pin": "v2.6.2",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v2.6.2",
+       "license": "MPL-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-08-18",
+       "renamed_to": null,
+       "stars": 7452
+      }
+     }
+    ],
+    "title": "Security and supply chain",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   },
+   {
+    "alternatives": [],
+    "checked_at": "2026-09-22",
+    "group": "data-research",
+    "lanes": {
+     "agreement": "pending",
+     "claude": {
+      "run_id": "",
+      "sealed_sha256": ""
+     },
+     "codex": {
+      "run_id": "",
+      "sealed_sha256": ""
+     }
+    },
+    "layer_id": "storage-compute",
+    "open_gaps": [],
+    "overturn_protocol": {
+     "arms": [],
+     "fixture_paths": [],
+     "metric": ""
+    },
+    "overturn_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+    "platform_status_summary": {},
+    "recipe_refs": [],
+    "sota_components": [
+     {
+      "id": "data-duckdb",
+      "pin": "v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v1.5.5",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-07-22",
+       "renamed_to": null,
+       "stars": 41615
+      }
+     },
+     {
+      "id": "data-pandera",
+      "pin": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_default",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.33.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-01",
+       "renamed_to": null,
+       "stars": 4460
+      }
+     },
+     {
+      "id": "data-arrow",
+      "pin": "apache-arrow-25.0.1; source beccec0d0c451b7aa3e4530416ac431b3c035c69",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "apache-arrow-25.0.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-10",
+       "renamed_to": null,
+       "stars": 17145
+      }
+     },
+     {
+      "id": "data-clickhouse",
+      "pin": "v26.8.7.19-lts; source f29d27def7ee0adb10e7e2fff080ba204054dd4b",
+      "pin_behind_upstream": true,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "v26.9.1.1629-stable",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-09-21",
+       "renamed_to": null,
+       "stars": 50008
+      }
+     },
+     {
+      "id": "data-dlt",
+      "pin": "1.30.0; source a2f4a21e22e5c266278271b6591c70dbc485aea8",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "1.30.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-11",
+       "renamed_to": null,
+       "stars": 5878
+      }
+     },
+     {
+      "id": "data-feast",
+      "pin": "v0.66.0; source 1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v0.66.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-21",
+       "renamed_to": null,
+       "stars": 7301
+      }
+     },
+     {
+      "id": "data-iceberg",
+      "pin": "Apache Iceberg 1.11.0; PyIceberg 0.12.0; source 6976e020b894f6a6777704df2b8c4458cb291ae9",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "apache-iceberg-1.11.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-05-20",
+       "renamed_to": null,
+       "stars": 9263
+      }
+     },
+     {
+      "id": "data-questdb",
+      "pin": "10.0.1; source 7a391566ac827e0d8c269b91f2415c16b0a32a84",
+      "pin_behind_upstream": false,
+      "review_status": "confirmed_conditional",
+      "upstream": {
+       "archived": false,
+       "latest": "10.0.1",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-21",
+       "released_at": "2026-08-24",
+       "renamed_to": null,
+       "stars": 17335
+      }
+     },
+     {
+      "id": "foundation-toon",
+      "pin": "v4.1.1",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "v4.1.1",
+       "license": "MIT",
+       "prerelease": false,
+       "pushed_at": "2026-09-03",
+       "released_at": "2026-08-05",
+       "renamed_to": null,
+       "stars": 25407
+      }
+     },
+     {
+      "id": "ray-serve",
+      "pin": "ray-2.58.0",
+      "pin_behind_upstream": false,
+      "review_status": "not_individually_reviewed",
+      "upstream": {
+       "archived": false,
+       "latest": "ray-2.58.0",
+       "license": "Apache-2.0",
+       "prerelease": false,
+       "pushed_at": "2026-09-22",
+       "released_at": "2026-08-23",
+       "renamed_to": null,
+       "stars": 43887
+      }
+     }
+    ],
+    "title": "Storage and compute",
+    "verdict_status": "pending_lanes",
+    "winners": []
+   }
+  ]
+ },
+ "checked_at": "2026-09-22",
+ "counts": {
+  "foundation": {
+   "by_status": {
+    "no_selection": 0,
+    "pending_lanes": 20,
+    "recorded": 0
+   },
+   "layers": 20
+  },
+  "us-equities": {
+   "by_status": {
+    "no_selection": 0,
+    "pending_lanes": 12,
+    "recorded": 0
+   },
+   "layers": 12
+  }
+ },
+ "generated_by": "tools/sota-convergence/build_verdicts.py",
+ "id": "layer-verdicts-20260922",
+ "schema_version": 1,
+ "scope": "Joins the landscape ledger's layer-verdict schema v2 rows with the dated SOTA-convergence manifest's per-layer components/entries and adoption/manifest.json's recipe_map. Every row currently pending_lanes was carried over unchanged; this generator does not itself run a lane, select a winner or claim an execution result."
+}

@@ -24,11 +24,11 @@ service or establish installation on another machine. Hosted services, generated
 reports, retained exports and live upstream UIs keep their distinct scopes.
 
 The [September 20 community review](../../docs/community-native-practice.md)
-explains the selected ECC and Claude practice sources across all sixteen layers.
+explains the selected ECC and Claude practice sources across all twenty layers.
 Use the [native Claude profile](../../recipes/claude-native-profile.md) for
 terminal entry, small persistent instructions, selected skills and new-PC checks.
 
-## Installation map across all sixteen layers
+## Installation map across all twenty layers
 
 Use each linked recipe's exact upstream commands, platform constraints and returned
 evidence. This map joins the selected implementations; it does not reinstall a
@@ -53,6 +53,10 @@ and original results remain in the canonical manifests linked below.
 | Hosting and services | FastAPI, Next.js/React, PostgreSQL, MCPorter/Inspector; platform-specific containers | [Native application installation and checks](../../blueprints/convergence-practice/wsl-application/README.md), [application contract](../../blueprints/convergence-practice/application-delivery/README.md) |
 | Recovery and portability | Restic, ai-memory, Qdrant, Dagu, systemd, native session continuation | [Lifecycle operations](../../adoption/lifecycle.md), [off-host application restore](../../blueprints/convergence-practice/offhost-app-state/README.md) |
 | Observation and inference | OpenTelemetry Collector/otel-tui, Prometheus, Grafana, Loki, Alertmanager, ntfy, AgentsView, ccusage; vLLM/llama.cpp | [Observation setup](../../observability/README.md), [native backends](../../observability/backends/README.md), [GPU compatibility evidence](../../blueprints/convergence-practice/gpu-inference/README.md) |
+| Agent SDKs and runtime workers | Codex CLI/SDK; Claude Agent SDK, OpenHands SDK, Temporal, LangGraph remain deferred | [Native client installation](../../recipes/README.md#component-catalog-install-and-check), [SDK table review](../../docs/foundation-closure-20260921.md#sdk-and-runtime-decisions) |
+| MCP servers and client surfaces | mcporter, mcp-inspector | [Native project MCP](../../recipes/README.md#native-project-mcp), [other native commands](../../recipes/README.md) |
+| Secrets and credentials | Native per-client login, Gitleaks | [Native CI/security verification](../../blueprints/convergence-practice/ci-security/README.md), [lifecycle operations](../../adoption/lifecycle.md) |
+| Git practice and GitHub automation | Worktrunk, gh CLI, Difftastic, codex-for-claude review bridge | [GitHub automation handbook](../../docs/github-automation.md), [optional Codex for Claude](../../recipes/README.md#optional-codex-for-claude) |
 
 The September 21 reconciled baseline has 43 accepted capabilities, two partial
 optional capabilities and one source-review capability. Layer coverage overlaps:
@@ -136,7 +140,7 @@ python3 scripts/validate_foundation.py --root . --json
 python3 -m unittest tests.test_foundation_catalog
 ```
 
-The validator checks the 16 layers, unique identities, component/evidence joins,
+The validator checks the 20 layers, unique identities, component/evidence joins,
 source paths, explicit scope/limitations, canonical lifecycle statuses, candidate
 separation and scoped supersession. It rejects copied pin/receipt fields. A later
 decision may supersede only an earlier decision for the same capability and

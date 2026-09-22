@@ -29,7 +29,7 @@ memory/retrieval, and token-efficiency policy. Its downloadable single HTML file
 keeps dated source reviews, recorded execution and current-host acceptance distinct.
 
 The **[current landscape comparison](catalogs/landscape/README.md)** adds
-**207 candidate decisions across all 16 foundation and four domain layers**.
+**222 candidate decisions across all 20 foundation and four domain layers**.
 Each layer explains the requirement, current selection, alternatives, evidence
 limits and what would change the choice. Fresh primary-source metadata covers
 all 68 selected components and **343 public stars**. The comparison preserves

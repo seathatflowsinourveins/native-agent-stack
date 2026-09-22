@@ -2912,8 +2912,8 @@
     },
     {
       "path": "catalogs/landscape/blind-convergence.json",
-      "sha256": "fc93749bfe12bb946bf12ad092f527adb0266b08453fb2b848dc151ee0c3bb2c",
-      "bytes": 38933
+      "sha256": "92024cd3008cec180cda69f25ec6f829bc8403fdcf884504b8bc57ccb1a23e99",
+      "bytes": 59223
     },
     {
       "path": "catalogs/landscape/independent-discovery.json",
@@ -2922,8 +2922,8 @@
     },
     {
       "path": "docs/blind-catalog-layer-findings-20260921.md",
-      "sha256": "a58e5af94b7bd5dd903d793f84714552878bf8e68259325654bbaacb1e3dbc8c",
-      "bytes": 11137
+      "sha256": "91772e49e8bd6f3ca9070c4d2f669d9d472185d816f8f47b8c8ea3467a9cf2fb",
+      "bytes": 17215
     },
     {
       "path": "docs/blind-catalog-source-adjudication-20260921.md",
@@ -2977,8 +2977,8 @@
     },
     {
       "path": "catalogs/landscape/candidate-quality-review.json",
-      "sha256": "b1bc757545b4680080942503ccfb63fcae0856c2a6201a4939aa1fa44b48b049",
-      "bytes": 120980
+      "sha256": "dbb5de39e9f5af58c20e3b75b560386776a29a994207ebf73b499e22f7d46ed8",
+      "bytes": 152069
     },
     {
       "path": "docs/candidate-quality-review-20260921.md",
@@ -2987,8 +2987,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "5b26e2694aab769f0b303288b9a393dd4b71f76cf0a7661b2804e50a6f770513",
-      "bytes": 17170
+      "sha256": "32c0e5ecc804ebbdf69c31e2150faeb7925565f7b800883556b25811236ff716",
+      "bytes": 23966
     },
     {
       "path": "docs/tasks/2026-09-21-runtime-reviewed-catalog-handbook.md",
@@ -3692,8 +3692,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "cd9e3e61630c06c5e54337de345c8f715c5eaafdb6f7848f0ec6a139b4a9bce4",
-      "bytes": 2997
+      "sha256": "7eed2412ec33d7f6a3bb89c4dc956e3160980fcf0960117bdb4391e9fee678d5",
+      "bytes": 3129
     },
     {
       "path": ".gitignore",
@@ -3722,7 +3722,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "361d15a10bb9ad17f707850e8d975cb8c2a2762491dabd915923e29d0cfe1cd6",
+      "sha256": "b708fd46cba04a41cb5746c75cc5584cb77b417cc71858f582059cf0e7d48767",
       "bytes": 17917
     },
     {
@@ -6608,8 +6608,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "273191fbc46d24a337e52d7eba6ddc8a763d0ce37878f868710029b176b7ec5f",
-      "bytes": 688158
+      "sha256": "43affe21a189575585d4669c25e7d254b0124ef41d6bb614458bfb0c4b5d2bdd",
+      "bytes": 718960
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -6773,8 +6773,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 11106658,
-      "sha256": "7ada6da0c2a68212755554060590cf4efe97edf458ed09bc146be29acddd8446"
+      "bytes": 12056704,
+      "sha256": "fa1f00ca2c695517e828ad7b9989eb431560e5d70d365e7cf3b74e0742676e23"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7773,18 +7773,18 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "53a602e95ba4d3c80e6a4b0d0673554fea6a78417e816190e1c5d8cd25e7ea77",
-      "bytes": 12942
+      "sha256": "8255dd2e6e42345b01cb5ab2fb218fb0633471866814a4de47f2861041f484c2",
+      "bytes": 13882
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "bytes": 121647,
-      "sha256": "9aef19449c37b392924f35c11f8bad4e58611ce715ae00dcbbeb285f7b8b5212"
+      "bytes": 130182,
+      "sha256": "23054ee9a9111ab08709635fea97422cc03dbe90e2e4fd0cf0237ee295ace6e4"
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "bytes": 18696,
-      "sha256": "aff21f912690c504fc138b856c789ca38af0649131591aab44118be53bda5959"
+      "bytes": 23034,
+      "sha256": "36ab5311baacd3b69e397610d9bdb726b49061c491a4211e173cdf5dcc3af71b"
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -7808,13 +7808,13 @@
     },
     {
       "path": "scripts/validate_foundation.py",
-      "sha256": "fdf2386935c8297d919feb282aa6e21d59c735ad45b5f55392e98897a3c9189e",
-      "bytes": 15321
+      "sha256": "8b21236a96c73a01d56de5a692e49a968bc79f8470ee476eac02f0a3c12cd4d2",
+      "bytes": 15403
     },
     {
       "path": "tests/test_foundation_catalog.py",
-      "sha256": "b2623dea825017638d2a17a506b32fc10e77fd9fd4096f83a84691c824859de6",
-      "bytes": 11725
+      "sha256": "e89631495b52c7ee0c3a1387c4dac315a4d1d75f26850f4951b3c632fb26a6be",
+      "bytes": 11791
     },
     {
       "path": "blueprints/convergence-practice/worker-recovery/README.md",
@@ -9609,7 +9609,7 @@
     {
       "path": "docs/full-stack-convergence.md",
       "bytes": 11390,
-      "sha256": "29ee908a95c67a577da866596ccbc96e1ec7720c0233f808514fe0f489e56196"
+      "sha256": "17e03fef1f00f578f94028a1009266292f868784619392f848a17cedb41282a0"
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/agentsview-aggregate-safe.png",
@@ -10178,8 +10178,8 @@
     },
     {
       "path": "catalogs/foundation/surfaces.json",
-      "sha256": "a1bfe1fc858b5a0362250b5a6a606b862d652bbf3d42198edf282261f2da4baa",
-      "bytes": 18885
+      "sha256": "be845c04926aa9bd1d7824911839090d8e636e6016d9a641bb683ad1c951aef1",
+      "bytes": 20383
     },
     {
       "path": "docs/claude-foundation-finalization-20260921.md",
@@ -10718,8 +10718,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "bytes": 12348,
-      "sha256": "0848f312469c0188b3b7d6348b7dce800731a57718b92e76be8910ad0db0898c"
+      "bytes": 14890,
+      "sha256": "f81cadadad8ee47a4ce75bdac37c5b95867019445d29b21b82a2032ae0b28f09"
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",
@@ -10733,8 +10733,8 @@
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "bytes": 34937,
-      "sha256": "a7e3516476fd84aae076b3e0cea7d10d9b1cad5bb5de27e9ff610ebcc308927b"
+      "bytes": 36285,
+      "sha256": "7f9797504ad1b7020e62c4e746f2ef2608266f408f90d5a72b531dc3e85c7943"
     },
     {
       "path": "tools/sota-convergence/reconciliations-20260922.json",
@@ -10743,8 +10743,8 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "bytes": 54265,
-      "sha256": "797fd5d1a90a3d82b1d2f43004e9debc33b53588f4052413aaf1b9b2efd1447a"
+      "bytes": 59286,
+      "sha256": "c342724f2c4ab9292db3f604a765eaff32470c930a2125d2a59e4d92d068f9a9"
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -10773,18 +10773,18 @@
     },
     {
       "path": "catalogs/landscape/README.md",
-      "sha256": "7e1c0ec30ae9592ad2fedfdeeb472e6e977649ffba07b3be0ee87ec69c98601c",
-      "bytes": 5450
+      "sha256": "592625d91924cf25f186955a090473ec6e06c7fafe9f9b0fa560df813db16554",
+      "bytes": 9549
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "0146c6d958c3309a806b873fb224b3de3e77b55a278f1c7e21f54bbaccf359a1",
-      "bytes": 89462
+      "sha256": "138b6170873afd36e98855a19415a66fca1a96203aecaca8987afa1931b36a2c",
+      "bytes": 125902
     },
     {
       "path": "catalogs/landscape/manifest.json",
-      "sha256": "67e9092f30332780853b693147e8406dc3c3eccd57a526fced57d45b23022566",
-      "bytes": 4224
+      "sha256": "a861b8db59ba3300ec5aee9d9041e194e7b865392c22cfc3bba0aedb11c1b557",
+      "bytes": 4300
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -10793,8 +10793,8 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "86495ce8e99645a358f3d06aad4f920c8462384e0a66463b1593e46e939811a9",
-      "bytes": 59247
+      "sha256": "15f2c59dee5c7e7b7c96d07d242ce89c104ac46cdc85745f93923ca05690361f",
+      "bytes": 250953
     },
     {
       "path": "docs/landscape-domain-notes.md",
@@ -10818,13 +10818,13 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "be100170cf13bf46c67a333ce8d352a0acbe1ad764f3db2153ae5579a79386e3",
-      "bytes": 26889
+      "sha256": "ccc018b63ae5e19f985b1f8f4957ef9248164cbd247d03d5ffc2e86532698d9b",
+      "bytes": 37773
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "a4418f3b3b8c8e90cd4fc2dc8c05f336cabb249b4b3c30fc9ae92051b6b950df",
-      "bytes": 20699
+      "sha256": "2fe76046b8f6970f2791a516bf46a27ce1ed680b34db88c39949dbedf6a78bfa",
+      "bytes": 31847
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
@@ -10908,8 +10908,8 @@
     },
     {
       "path": "catalogs/landscape/research-state.json",
-      "sha256": "d77c74140690de0c54dc36abf8caa2f2b9d3ce1416d5547235d3e900a490cfa9",
-      "bytes": 14185
+      "sha256": "f47edec17a486e4e3de14bc2e3ef3a6224f3cf09b3830cb336b16bc6480050e1",
+      "bytes": 21131
     },
     {
       "path": "docs/hosting-container-practice.md",
@@ -11288,7 +11288,7 @@
     },
     {
       "path": "blueprints/blind-catalog-convergence/audit_reports.py",
-      "sha256": "f710d236c40bdbb49dc0942df31c0f502209eee03553d07be3c5fdfa931b1b3a",
+      "sha256": "1c448cffcee108a4b7d1701f5c9d42edb8684fb7d477d30784f1f0f88589b91e",
       "bytes": 9348
     },
     {
@@ -11358,8 +11358,23 @@
     },
     {
       "path": "tests/test_blind_layer_decisions.py",
-      "sha256": "0512e58b967baed9fdc95323cd6867dbb1981785bb3d20e51d6a1df1bcb4fbc1",
+      "sha256": "327f104fc335a2b25f2a910e8cae44661fe9439764f4ab778412dbf3beeaea99",
       "bytes": 2827
+    },
+    {
+      "path": "tools/sota-convergence/build_verdicts.py",
+      "sha256": "03861ee58426eedf5cc5f659bb2415dd7b4ecc5ac0ea08c2ca39b9c210d9c7c9",
+      "bytes": 12248
+    },
+    {
+      "path": "tests/test_layer_verdicts.py",
+      "sha256": "c7743e5cb6add04001330960dd2f4a919692ec4bf4d77be69a4fcd2907fa429e",
+      "bytes": 10454
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "sha256": "c91b282a354c44b3066e40908d94815c810ec705320827183438f9a0d59b846a",
+      "bytes": 124069
     }
   ],
   "convergence_records": [

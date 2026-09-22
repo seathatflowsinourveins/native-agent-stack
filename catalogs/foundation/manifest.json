@@ -20,7 +20,7 @@
       "id": "native-clients",
       "title": "Native clients",
       "purpose": "Run ordinary coding, research and review through locally signed-in native clients.",
-      "selection": "Codex and Claude keep native accounts, model selection, caching and compaction.",
+      "selection": "Codex and Claude keep native accounts, model selection, caching and compaction. Model routing and providers are not a separate layer here: an omniroute trial and the catalogs/us-equities/models.json ledger remain notes on this native-clients selection, not an adopted routing layer.",
       "activation": "Use the intended native client and inspect its loaded project tools; new process defaults require a fresh session.",
       "lifecycle_scope": "Dated native source retrieval, process environment and scoped session continuation passed; host-wide restart recovery is separate.",
       "next_gap": "Bind fresh-session activation and resumed effects to the next target host without repeating accepted model trials."
@@ -140,7 +140,7 @@
       "selection": "Locked Next/React/FastAPI/PostgreSQL fixture; platform-specific container and MCP tools only as needed.",
       "activation": "Select the target host recipe, explicit service owner and isolated prefix; external hosting is a separate action.",
       "lifecycle_scope": "Typed API/browser flows, migration reversal and rows after restart passed on named hosts; production auth and cloud deployment are unqualified.",
-      "next_gap": "Qualify independent database restore and production-specific access requirements before broader hosting claims."
+      "next_gap": "Qualify independent database restore and production-specific access requirements before broader hosting claims. Docs and dashboard publication are not a separate layer here: .github/workflows/publish-catalog.yml and the generated docs/ecosystem explorer remain this hosting-services layer's publication treatment."
     },
     {
       "id": "recovery-portability",
@@ -149,7 +149,7 @@
       "selection": "Owned lifecycle recipes, Restic, native application backups and native session resume.",
       "activation": "Use exact snapshots and empty restore targets; keep keys/account sign-ins private and separate from the checkout.",
       "lifecycle_scope": "Selected same-host and synthetic independent-host application restores, native session/job continuations and one orderly guest scheduled-service reboot passed. Source pins, native outputs and independent observations retain separate scopes. Native Workflow graceful recovery has its own accepted local fixture and unresolved usage reconciliation; see docs/native-workflow-writing-recovery-20260921.md.",
-      "next_gap": "Reuse matching accepted recipes; qualify actual production data, client rebinding, atomicity or a physical recovery target when required by a project."
+      "next_gap": "Reuse matching accepted recipes; qualify actual production data, client rebinding, atomicity or a physical recovery target when required by a project. Packaging and distribution are not a separate layer here: adoption/lifecycle.md's install/update/roll-back stages remain the recovery-and-portability treatment of that concern."
     },
     {
       "id": "observation-inference",
@@ -159,6 +159,42 @@
       "activation": "Preserve writer/task attribution, account boundaries and native default routes; dashboards do not grant operator authority.",
       "lifecycle_scope": "Recorded telemetry reconciles scoped usage; HUD live rendering and exact-model gateway inference remain incomplete.",
       "next_gap": "Resolve only the selected unknown attribution, interactive rendering or provider compatibility condition before retrying."
+    },
+    {
+      "id": "agent-sdks",
+      "title": "Agent SDKs and runtime workers",
+      "purpose": "Select the programmatic SDK or runtime that gives a worker structured events, custom tools or session control beyond the native CLI.",
+      "selection": "Retain the existing Codex CLI/SDK integration (component codex) for supported start/run/resume workflows; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain unselected alternatives.",
+      "activation": "Use the native CLI for ordinary work; reach for an official SDK only when an application needs structured events, custom tools or programmatic session control.",
+      "lifecycle_scope": "Codex CLI/SDK use is accepted within its recorded tests; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph have no adoption lifecycle here, only source-reviewed version pins.",
+      "next_gap": "The SDK table in docs/foundation-closure-20260921.md lines 78-84 has not been revisited by any lane since 2026-09-21; qualify a concrete application need before promoting a deferred alternative."
+    },
+    {
+      "id": "mcp-surfaces",
+      "title": "MCP servers and client surfaces",
+      "purpose": "Bridge, inspect and configure Model Context Protocol servers and client-side surfaces.",
+      "selection": "mcporter for CLI bridging and mcp-inspector for stdio inspection, activated through the project's native MCP configuration policy.",
+      "activation": "Follow recipes/README.md's native project MCP section to merge or register a server; use mcp-inspector for stdio tool inspection without an LLM or interactive OAuth.",
+      "lifecycle_scope": "mcporter and mcp-inspector use is accepted within scope; registries such as punkpeye/awesome-mcp-servers remain an unexamined source per the sota critic.",
+      "next_gap": "Review a specific registry entry only against a concrete MCP surface gap; do not adopt a new server by listing alone."
+    },
+    {
+      "id": "secrets-credentials",
+      "title": "Secrets and credentials",
+      "purpose": "Keep sign-ins and credentials off the checkout and detect accidental secret exposure before publication.",
+      "selection": "Native per-client logins on the target host plus gitleaks detection; openbao remains an unused, unqualified candidate.",
+      "activation": "Sign in natively per client; run gitleaks before publishing and follow adoption/manifest.json's authentication_transfer policy (native_login_on_target_only) for any transferred credential.",
+      "lifecycle_scope": "gitleaks use is accepted within scope as the ci-supply-chain component referenced here; native login and openbao have no adoption lifecycle in this catalog.",
+      "next_gap": "Qualify openbao only against a concrete secret-management gap; broker credential handling stays a trading gate, not a foundation selection."
+    },
+    {
+      "id": "git-github-automation",
+      "title": "Git practice and GitHub automation",
+      "purpose": "Own Git worktrees, GitHub review automation and structural diffs for changed code.",
+      "selection": "worktrunk for worktree lifecycle, gh CLI for GitHub operations, the codex-for-claude review bridge for cross-client review, and difftastic for structural diffs; see docs/github-automation.md.",
+      "activation": "Create an owned worktree per writer, use gh for PR/issue operations, and reach for the codex-for-claude bridge only for a concrete cross-client review task.",
+      "lifecycle_scope": "worktrunk and difftastic use is accepted within scope; the codex-for-claude bridge holds a partial-acceptance use stage from its existing companion-backend decision.",
+      "next_gap": "Qualify gh CLI's own lifecycle evidence and a changed review-bridge version before extending acceptance."
     }
   ],
   "domain_boundary": [

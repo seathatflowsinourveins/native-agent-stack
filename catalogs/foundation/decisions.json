@@ -380,7 +380,8 @@
       "capability_key": "companion-backend",
       "checked_at": "2026-09-20",
       "layer_ids": [
-        "workers"
+        "workers",
+        "git-github-automation"
       ],
       "selection": "optional",
       "review_status": "partial_acceptance",
@@ -480,7 +481,8 @@
       "checked_at": "2026-09-20",
       "layer_ids": [
         "workers",
-        "isolation"
+        "isolation",
+        "git-github-automation"
       ],
       "selection": "default",
       "review_status": "accepted_within_scope",
@@ -1352,7 +1354,8 @@
       "capability_key": "deterministic-quality-tools",
       "checked_at": "2026-09-20",
       "layer_ids": [
-        "quality-evaluation"
+        "quality-evaluation",
+        "git-github-automation"
       ],
       "selection": "conditional",
       "review_status": "accepted_within_scope",
@@ -1413,7 +1416,8 @@
       "checked_at": "2026-09-20",
       "layer_ids": [
         "ci-supply-chain",
-        "quality-evaluation"
+        "quality-evaluation",
+        "secrets-credentials"
       ],
       "selection": "conditional",
       "review_status": "accepted_within_scope",
@@ -1840,7 +1844,8 @@
       "checked_at": "2026-09-20",
       "layer_ids": [
         "hosting-services",
-        "code-navigation"
+        "code-navigation",
+        "mcp-surfaces"
       ],
       "selection": "conditional",
       "review_status": "accepted_within_scope",
@@ -2694,6 +2699,187 @@
             "component_id": "codex",
             "stage": "use",
             "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "agent-sdk-runtime-selection",
+      "capability": "Select the native agent SDK/runtime used by programmatic workers",
+      "capability_key": "agent-sdk-runtime-selection",
+      "checked_at": "2026-09-21",
+      "layer_ids": [
+        "agent-sdks",
+        "workers"
+      ],
+      "selection": "conditional",
+      "review_status": "source_review",
+      "activation": "Use the Codex CLI/SDK for existing supported start/run/resume workflows; treat Claude Agent SDK, OpenHands SDK, Temporal and LangGraph as unselected alternatives pending a concrete application need.",
+      "component_ids": [
+        "codex"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "token-practice-coverage-20260920"
+      ],
+      "evidence_scope": "Reuses the existing native Codex CLI/SDK inventory and acceptance evidence; no new execution was run to freeze this taxonomy layer.",
+      "limitations": [
+        "Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain unqualified candidates here; their version metadata is source review only, not fresh execution."
+      ],
+      "source_paths": [
+        "docs/foundation-closure-20260921.md"
+      ],
+      "next_gap": "The SDK table in docs/foundation-closure-20260921.md lines 78-84 has not been revisited by any lane since 2026-09-21; qualify a concrete application need before promoting Claude Agent SDK, OpenHands SDK, Temporal or LangGraph.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stage and its original host/operation scope apply. No new execution was run for this taxonomy freeze.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Deferred SDK alternatives have no lifecycle stage at all.",
+        "stage_refs": [
+          {
+            "component_id": "codex",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "mcp-surface-policy",
+      "capability": "Adopt MCP servers and client surfaces through reviewed registries and project policy",
+      "capability_key": "mcp-surface-policy",
+      "checked_at": "2026-09-21",
+      "layer_ids": [
+        "mcp-surfaces"
+      ],
+      "selection": "conditional",
+      "review_status": "source_review",
+      "activation": "Follow the project MCP configuration policy in recipes/README.md before adding a new MCP server or client surface; treat unexamined registries as discovery input only.",
+      "component_ids": [
+        "mcporter",
+        "mcp-inspector"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "token-practice-coverage-20260920"
+      ],
+      "evidence_scope": "Reuses the existing mcporter/mcp-inspector inventory and acceptance evidence; no new execution was run to freeze this taxonomy layer.",
+      "limitations": [
+        "Registries such as punkpeye/awesome-mcp-servers remain an unexamined source per the sota critic; listing there does not establish adoption."
+      ],
+      "source_paths": [
+        "recipes/README.md"
+      ],
+      "next_gap": "Review a specific registry entry only against a concrete MCP surface gap; do not adopt a new server by listing alone.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. No new execution was run for this taxonomy freeze.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision.",
+        "stage_refs": [
+          {
+            "component_id": "mcporter",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "mcp-inspector",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "secrets-credentials-policy",
+      "capability": "Detect and handle secrets/credentials through native sign-in and inventory scans",
+      "capability_key": "secrets-credentials-policy",
+      "checked_at": "2026-09-21",
+      "layer_ids": [
+        "secrets-credentials"
+      ],
+      "selection": "conditional",
+      "review_status": "source_review",
+      "activation": "Keep native sign-ins outside the repository; run gitleaks detection before publishing and follow adoption/manifest.json's authentication_transfer policy for any transferred credential.",
+      "component_ids": [
+        "gitleaks"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "token-practice-coverage-20260920"
+      ],
+      "evidence_scope": "Reuses the existing gitleaks inventory and acceptance evidence; no new execution was run to freeze this taxonomy layer.",
+      "limitations": [
+        "openbao remains an unused, unqualified candidate; broker credential handling is a trading gate, not a foundation selection.",
+        "Native login state and account credentials are not inventoried as a component in this catalog."
+      ],
+      "source_paths": [
+        "adoption/manifest.json"
+      ],
+      "next_gap": "Qualify openbao only against a concrete secret-management gap that native login and gitleaks do not already cover.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stage and its original host/operation scope apply. No new execution was run for this taxonomy freeze.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Native login and openbao have no lifecycle stage at all.",
+        "stage_refs": [
+          {
+            "component_id": "gitleaks",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "git-github-automation-practice",
+      "capability": "Practice native Git worktrees and GitHub review automation with owned tooling",
+      "capability_key": "git-github-automation-practice",
+      "checked_at": "2026-09-21",
+      "layer_ids": [
+        "git-github-automation"
+      ],
+      "selection": "conditional",
+      "review_status": "source_review",
+      "activation": "Use worktrunk for worktree lifecycle and gh for GitHub operations, difftastic for structural diffs, and the codex-for-claude bridge only for a concrete cross-client review task; see docs/github-automation.md.",
+      "component_ids": [
+        "worktrunk",
+        "difftastic",
+        "codex-for-claude"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "token-practice-coverage-20260920"
+      ],
+      "evidence_scope": "Reuses the existing worktrunk/difftastic/codex-for-claude inventory and acceptance evidence; no new execution was run to freeze this taxonomy layer.",
+      "limitations": [
+        "gh CLI has no separate manifests/stack.json inventory entry in this catalog; it is used as the native GitHub client, not a newly qualified component here.",
+        "The codex-for-claude bridge's use stage is partial_acceptance, not full integration."
+      ],
+      "source_paths": [
+        "docs/github-automation.md"
+      ],
+      "next_gap": "Qualify gh CLI's own lifecycle evidence as a distinct component and a changed review-bridge version before extending acceptance.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. No new execution was run for this taxonomy freeze.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. gh CLI has no lifecycle stage at all.",
+        "stage_refs": [
+          {
+            "component_id": "worktrunk",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "difftastic",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "codex-for-claude",
+            "stage": "use",
+            "status": "partial_acceptance"
           }
         ]
       },

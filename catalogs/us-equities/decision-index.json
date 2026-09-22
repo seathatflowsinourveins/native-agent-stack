@@ -178,6 +178,18 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
+      "collection": "/layers/10/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "collection": "/layers/11/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
       "collection": "/layers/2/candidates",
       "repository_field": "repository",
       "kind": "research_supplement"
@@ -185,6 +197,42 @@
     {
       "path": "catalogs/landscape/us-equities.json",
       "collection": "/layers/3/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "collection": "/layers/4/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "collection": "/layers/5/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "collection": "/layers/6/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "collection": "/layers/7/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "collection": "/layers/8/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "collection": "/layers/9/candidates",
       "repository_field": "repository",
       "kind": "research_supplement"
     },
@@ -332,7 +380,7 @@
     "repositories": 843,
     "public_star_repositories": 342,
     "beyond_public_stars": 501,
-    "references": 1815,
+    "references": 1958,
     "repositories_by_record_type": {
       "catalog_card": 147,
       "component_record": 68,
@@ -831,7 +879,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/12",
+          "pointer": "/layers/4/candidates/12",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/12",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/12",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/12",
           "disposition": "unqualified"
         },
         {
@@ -988,7 +1054,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/0",
+          "pointer": "/layers/9/candidates/0",
           "disposition": "selected"
         },
         {
@@ -1355,13 +1421,43 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/2/candidates/0",
           "disposition": "selected"
         },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/2",
+          "pointer": "/layers/4/candidates/2",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/2",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/2",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/2",
           "disposition": "selected"
         },
         {
@@ -2407,7 +2503,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/1",
+          "pointer": "/layers/10/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/1",
           "disposition": "selected"
         },
         {
@@ -3360,7 +3474,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/16",
+          "pointer": "/layers/9/candidates/16",
           "disposition": "conditional"
         },
         {
@@ -3955,7 +4069,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/12",
+          "pointer": "/layers/10/candidates/12",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/12",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/12",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/12",
           "disposition": "conditional"
         },
         {
@@ -4371,6 +4503,18 @@
           "pointer": "/candidates/88",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/10",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/10",
+          "disposition": "conditional"
         },
         {
           "kind": "research_supplement",
@@ -5196,7 +5340,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/10",
+          "pointer": "/layers/10/candidates/10",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/10",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/10",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/10",
           "disposition": "conditional"
         },
         {
@@ -5243,7 +5405,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/2",
+          "pointer": "/layers/10/candidates/2",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/2",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/2",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/2",
           "disposition": "selected"
         },
         {
@@ -5321,6 +5501,18 @@
           "pointer": "/candidates/56",
           "decision": "discovery_only",
           "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/4",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/4",
+          "disposition": "conditional"
         },
         {
           "kind": "research_supplement",
@@ -5611,7 +5803,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/11",
+          "pointer": "/layers/9/candidates/11",
           "disposition": "conditional"
         },
         {
@@ -5879,6 +6071,18 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/2/candidates/1",
           "disposition": "selected"
         },
@@ -5973,7 +6177,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/13",
+          "pointer": "/layers/10/candidates/13",
+          "disposition": "measured_tradeoff"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/13",
+          "disposition": "measured_tradeoff"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/13",
+          "disposition": "measured_tradeoff"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/13",
           "disposition": "measured_tradeoff"
         },
         {
@@ -6153,7 +6375,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/14",
+          "pointer": "/layers/9/candidates/14",
           "disposition": "conditional"
         },
         {
@@ -6305,6 +6527,18 @@
           "pointer": "/candidates/55",
           "decision": "discovery_only",
           "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/2",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/2",
+          "disposition": "selected"
         },
         {
           "kind": "research_supplement",
@@ -7511,6 +7745,18 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/3",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/3",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/2/candidates/3",
           "disposition": "selected"
         },
@@ -7624,7 +7870,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/10",
+          "pointer": "/layers/9/candidates/10",
           "disposition": "conditional"
         },
         {
@@ -7726,7 +7972,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/3",
+          "pointer": "/layers/9/candidates/3",
           "disposition": "selected"
         },
         {
@@ -7945,7 +8191,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/15",
+          "pointer": "/layers/4/candidates/15",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/15",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/15",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/15",
           "disposition": "conditional"
         }
       ]
@@ -8236,7 +8500,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/6",
+          "pointer": "/layers/10/candidates/6",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/6",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/6",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/6",
           "disposition": "selected"
         },
         {
@@ -8281,7 +8563,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/5",
+          "pointer": "/layers/10/candidates/5",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/5",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/5",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/5",
           "disposition": "selected"
         },
         {
@@ -8496,7 +8796,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/15",
+          "pointer": "/layers/9/candidates/15",
           "disposition": "conditional"
         },
         {
@@ -8699,7 +8999,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/12",
+          "pointer": "/layers/9/candidates/12",
           "disposition": "unqualified"
         },
         {
@@ -9100,7 +9400,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/9",
+          "pointer": "/layers/4/candidates/9",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/9",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/9",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/9",
           "disposition": "conditional"
         },
         {
@@ -9356,6 +9674,18 @@
           "pointer": "/candidates/197",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/7",
+          "disposition": "overlap"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/7",
+          "disposition": "overlap"
         },
         {
           "kind": "research_supplement",
@@ -9953,7 +10283,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/7",
+          "pointer": "/layers/4/candidates/7",
+          "disposition": "out_of_scope"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/7",
+          "disposition": "out_of_scope"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/7",
+          "disposition": "out_of_scope"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/7",
           "disposition": "out_of_scope"
         },
         {
@@ -10319,7 +10667,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/17",
+          "pointer": "/layers/10/candidates/17",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/17",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/17",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/17",
           "disposition": "conditional"
         },
         {
@@ -10387,7 +10753,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/11",
+          "pointer": "/layers/10/candidates/11",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/11",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/11",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/11",
           "disposition": "conditional"
         },
         {
@@ -10685,7 +11069,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/18",
+          "pointer": "/layers/9/candidates/18",
           "disposition": "conditional"
         },
         {
@@ -11018,7 +11402,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/4",
+          "pointer": "/layers/4/candidates/4",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/4",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/4",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/4",
           "disposition": "conditional"
         },
         {
@@ -11300,6 +11702,18 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/5",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/5",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/2/candidates/5",
           "disposition": "conditional"
         },
@@ -11497,7 +11911,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/7",
+          "pointer": "/layers/9/candidates/7",
           "disposition": "overlap"
         },
         {
@@ -11556,7 +11970,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/6",
+          "pointer": "/layers/4/candidates/6",
+          "disposition": "overlap"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/6",
+          "disposition": "overlap"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/6",
+          "disposition": "overlap"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/6",
           "disposition": "overlap"
         },
         {
@@ -11657,7 +12089,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/20",
+          "pointer": "/layers/10/candidates/20",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/20",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/20",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/20",
           "disposition": "conditional"
         }
       ]
@@ -11872,7 +12322,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/11",
+          "pointer": "/layers/4/candidates/11",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/11",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/11",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/11",
           "disposition": "conditional"
         },
         {
@@ -12078,7 +12546,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/5",
+          "pointer": "/layers/9/candidates/5",
           "disposition": "selected"
         },
         {
@@ -12700,7 +13168,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/0",
+          "pointer": "/layers/4/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/0",
           "disposition": "selected"
         },
         {
@@ -13611,7 +14097,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/3",
+          "pointer": "/layers/10/candidates/3",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/3",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/3",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/3",
           "disposition": "selected"
         },
         {
@@ -13693,7 +14197,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/0",
+          "pointer": "/layers/10/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/0",
           "disposition": "selected"
         },
         {
@@ -13809,7 +14331,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/15",
+          "pointer": "/layers/10/candidates/15",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/15",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/15",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/15",
           "disposition": "conditional"
         },
         {
@@ -13944,6 +14484,18 @@
           "pointer": "/candidates/277",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/6",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/6",
+          "disposition": "conditional"
         },
         {
           "kind": "research_supplement",
@@ -14099,7 +14651,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/19",
+          "pointer": "/layers/10/candidates/19",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/19",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/19",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/19",
           "disposition": "conditional"
         },
         {
@@ -14148,7 +14718,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/18",
+          "pointer": "/layers/10/candidates/18",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/18",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/18",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/18",
           "disposition": "conditional"
         }
       ]
@@ -14291,7 +14879,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/2",
+          "pointer": "/layers/9/candidates/2",
           "disposition": "selected"
         },
         {
@@ -14516,6 +15104,18 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/15",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/15",
+          "disposition": "selected"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
@@ -14936,6 +15536,18 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/8",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/8",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/2/candidates/8",
           "disposition": "conditional"
         },
@@ -14989,7 +15601,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/5",
+          "pointer": "/layers/4/candidates/5",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/5",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/5",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/5",
           "disposition": "conditional"
         },
         {
@@ -15142,7 +15772,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/9",
+          "pointer": "/layers/10/candidates/9",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/9",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/9",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/9",
           "disposition": "conditional"
         },
         {
@@ -15287,7 +15935,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/4",
+          "pointer": "/layers/10/candidates/4",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/4",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/4",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/4",
           "disposition": "selected"
         },
         {
@@ -15564,7 +16230,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/14",
+          "pointer": "/layers/4/candidates/14",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/14",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/14",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/14",
           "disposition": "conditional"
         },
         {
@@ -15683,7 +16367,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/4",
+          "pointer": "/layers/9/candidates/4",
           "disposition": "selected"
         },
         {
@@ -15729,7 +16413,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/1",
+          "pointer": "/layers/4/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/1",
           "disposition": "selected"
         },
         {
@@ -15819,7 +16521,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/3",
+          "pointer": "/layers/4/candidates/3",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/3",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/3",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/3",
           "disposition": "conditional"
         },
         {
@@ -16020,6 +16740,18 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/9",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/9",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/2/candidates/9",
           "disposition": "conditional"
         },
@@ -16200,6 +16932,18 @@
           "pointer": "/candidates/329",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/14",
+          "disposition": "out_of_scope"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/14",
+          "disposition": "out_of_scope"
         },
         {
           "kind": "research_supplement",
@@ -16411,7 +17155,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/7",
+          "pointer": "/layers/10/candidates/7",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/7",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/7",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/7",
           "disposition": "selected"
         },
         {
@@ -16764,7 +17526,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/6",
+          "pointer": "/layers/9/candidates/6",
           "disposition": "selected"
         },
         {
@@ -16836,7 +17598,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/13",
+          "pointer": "/layers/9/candidates/13",
           "disposition": "conditional"
         },
         {
@@ -17600,7 +18362,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/10",
+          "pointer": "/layers/4/candidates/10",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/10",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/10",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/10",
           "disposition": "conditional"
         },
         {
@@ -18043,7 +18823,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/8",
+          "pointer": "/layers/4/candidates/8",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/8",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/8",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/8",
           "disposition": "conditional"
         },
         {
@@ -18277,7 +19075,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/20",
+          "pointer": "/layers/9/candidates/20",
           "disposition": "conditional"
         },
         {
@@ -18412,7 +19210,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/14",
+          "pointer": "/layers/10/candidates/14",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/14",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/14",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/14",
           "disposition": "unqualified"
         },
         {
@@ -18446,7 +19262,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/3/candidates/13",
+          "pointer": "/layers/4/candidates/13",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/5/candidates/13",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/6/candidates/13",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/7/candidates/13",
           "disposition": "unqualified"
         },
         {
@@ -18658,7 +19492,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/8",
+          "pointer": "/layers/10/candidates/8",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/8",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/8",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/8",
           "disposition": "conditional"
         },
         {
@@ -18922,7 +19774,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/17",
+          "pointer": "/layers/9/candidates/17",
           "disposition": "conditional"
         },
         {
@@ -19154,7 +20006,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/1",
+          "pointer": "/layers/9/candidates/1",
           "disposition": "selected"
         },
         {
@@ -19275,7 +20127,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/19",
+          "pointer": "/layers/9/candidates/19",
           "disposition": "conditional"
         },
         {
@@ -19495,6 +20347,18 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/11",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/11",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/2/candidates/11",
           "disposition": "unqualified"
         },
@@ -19517,6 +20381,18 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/13",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/13",
+          "disposition": "conditional"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
@@ -20043,6 +20919,18 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/12",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/12",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/2/candidates/12",
           "disposition": "unqualified"
         },
@@ -20283,7 +21171,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/8",
+          "pointer": "/layers/9/candidates/8",
           "disposition": "conditional"
         },
         {
@@ -20708,7 +21596,25 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/1/candidates/16",
+          "pointer": "/layers/10/candidates/16",
+          "disposition": "measured_tradeoff"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/11/candidates/16",
+          "disposition": "measured_tradeoff"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/16",
+          "disposition": "measured_tradeoff"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/8/candidates/16",
           "disposition": "measured_tradeoff"
         },
         {
@@ -20785,7 +21691,7 @@
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
-          "pointer": "/layers/0/candidates/9",
+          "pointer": "/layers/9/candidates/9",
           "disposition": "conditional"
         },
         {
