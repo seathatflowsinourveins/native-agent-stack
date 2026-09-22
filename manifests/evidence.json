@@ -7012,7 +7012,7 @@
     {
       "path": "observability/grand-dashboard/state.json",
       "bytes": 10097,
-      "sha256": "abc4d2b8188213ea8dc48f4e7cac97bc0fe50bf49d89447a7dbfe93c2e8fbca4"
+      "sha256": "670dcb911499a570229f1ba4193d9d2d6c25f5c430828cb810aa224e51368c10"
     },
     {
       "path": "observability/receipt.json",
