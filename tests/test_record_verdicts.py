@@ -180,7 +180,7 @@ FOUNDATION_LAYERS = [
     "rejection-overturn-layer", "rejection-nonhttps-layer", "rejection-challenger-layer",
     "citation-layer", "review-adjudicated-layer", "review-badadj-layer", "review-sealed-layer",
     "review-packet-layer", "review-nosum-layer", "review-leak-layer", "review-sources-layer",
-    "review-explorer-layer",
+    "review-explorer-layer", "verify-noalt-layer", "verify-adjleak-layer", "verify-winalt-layer",
 ]
 US_EQUITIES_LAYERS = ["unindexed-alt-layer", "unindexed-pending-layer"]
 
@@ -260,8 +260,10 @@ class RecordVerdictsFixture(unittest.TestCase):
         document = json.loads((self.root / relative).read_text(encoding="utf-8"))
         return next(row for row in document["layers"] if row["layer_id"] == layer_id)
 
-    def run_main(self, *, write=True, check=False, adjudications=None):
+    def run_main(self, *, write=True, check=False, adjudications=None, lane_roots=()):
         args = ["--root", str(self.root), "--work-dir", str(self.work_dir), "--checked-at", "2026-09-22"]
+        for lane_root in lane_roots:
+            args += ["--lane-repo-root", lane_root]
         args.append("--write" if write else "--check")
         if check:
             args.append("--check")
@@ -895,11 +897,16 @@ class ReviewFindingTests(RecordVerdictsFixture):
     def test_sources_read_are_made_repository_relative_before_sealing(self):
         layer_id = "review-sources-layer"
         self.recorded(layer_id, sources_read=["/home/example/checkout/receipt.json (lines 1-2)",
+                                              "/home/example/other-repo/receipt.json",
                                               "/home/example/.claude/skills/x/SKILL.md"])
-        self.assertEqual(self.run_main(write=True), 0)
+        self.assertEqual(self.run_main(write=True, lane_roots=["/home/example/checkout"]), 0)
         sealed = json.loads(self.sealed_path("claude", layer_id).read_text(encoding="utf-8"))
         self.assertEqual(sealed["sources_read"][0], "receipt.json (lines 1-2)")
+        # A same-named file from another checkout is never attributed to this repository.
+        self.assertNotEqual(sealed["sources_read"][1], "receipt.json")
         self.assertNotIn("/home/", json.dumps(sealed))
+        # --check reproduces the sealed text only with the same lane roots.
+        self.assertEqual(self.run_main(write=False, lane_roots=["/home/example/checkout"]), 0)
 
     def test_generated_explorer_citation_is_excluded(self):
         layer_id = "review-explorer-layer"
@@ -910,6 +917,61 @@ class ReviewFindingTests(RecordVerdictsFixture):
         row = self.load_row("foundation", layer_id)
         self.assertEqual(row["winners"][0]["evidence_refs"], ["receipt.json"])
         self.assertTrue(any("generated index" in gap for gap in row["open_gaps"]))
+
+
+class VerificationFindingTests(RecordVerdictsFixture):
+    """Branches the fix verification found untested."""
+
+    def test_recorded_row_reduced_to_no_alternative_stays_pending(self):
+        layer_id = "verify-noalt-layer"
+        c1, c2, digest = self.build_packet_pair("foundation", layer_id)
+        # The adopted c2 is named by key (so the lane passes validation) with an unindexed
+        # repository, so the only alternative is moved to open_gaps.
+        write_lane(self.work_dir, "claude", "foundation", layer_id,
+                   make_lane_return("claude", "foundation", layer_id, digest, ["c1"],
+                                    [dict(make_alternative(c2), repository="https://github.com/unindexed/c2")]))
+        self.assertEqual(self.run_main(write=True), 0)
+        row = self.load_row("foundation", layer_id)
+        self.assertEqual(row["verdict_status"], "pending_lanes")
+        self.assertEqual(row["winners"], [])
+        self.assertIn("no indexed alternative remains for this verdict; recording deferred", row["open_gaps"])
+        build_landscape(self.root)
+
+    def test_leak_in_adjudication_is_reported_not_raised(self):
+        layer_id = "verify-adjleak-layer"
+        c1, c2, digest = self.build_packet_pair("foundation", layer_id)
+        write_lane(self.work_dir, "claude", "foundation", layer_id,
+                   make_lane_return("claude", "foundation", layer_id, digest, ["c1"], [make_alternative(c2)]))
+        write_lane(self.work_dir, "codex", "foundation", layer_id,
+                   make_lane_return("codex", "foundation", layer_id, digest, ["c2"], [make_alternative(c1)]))
+        adjudications = self.work_dir / "adjudications"
+        adjudications.mkdir()
+        (adjudications / f"foundation__{layer_id}.json").write_text(json.dumps(
+            {"winner_lane": "claude", "why": "The APCA broker receipt decides it.", "evidence_refs": []}),
+            encoding="utf-8")
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.assertEqual(self.run_main(write=True, adjudications=adjudications), 1)
+        self.assertIn(f"foundation__{layer_id} [adjudication]: sealing refused", output.getvalue())
+        self.assertEqual(self.load_row("foundation", layer_id)["verdict_status"], "pending_lanes")
+
+    def test_landscape_rejects_a_winner_listed_among_alternatives(self):
+        layer_id = "verify-winalt-layer"
+        c1, c2, _ = self.recorded_pair(layer_id)
+        foundation = json.loads((self.root / "catalogs/landscape/foundation.json").read_text(encoding="utf-8"))
+        row = next(r for r in foundation["layers"] if r["layer_id"] == layer_id)
+        row["alternatives"].append(dict(row["alternatives"][0], repository=c1["repository"],
+                                        why_not_default="A hand edit that names the winner as an alternative."))
+        (self.root / "catalogs/landscape/foundation.json").write_text(json.dumps(foundation), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "lists a winner repository among its alternatives"):
+            build_landscape(self.root)
+
+    def recorded_pair(self, layer_id):
+        c1, c2, digest = self.build_packet_pair("foundation", layer_id)
+        write_lane(self.work_dir, "claude", "foundation", layer_id,
+                   make_lane_return("claude", "foundation", layer_id, digest, ["c1"], [make_alternative(c2)]))
+        self.assertEqual(self.run_main(write=True), 0)
+        return c1, c2, digest
 
 
 class LaneSchemaRuleTests(unittest.TestCase):
@@ -935,10 +997,16 @@ class LaneSchemaRuleTests(unittest.TestCase):
         with self.assertRaisesRegex(record_verdicts.LaneRejected, "challenger_preferred repository must be an https"):
             self.validate(data)
 
-    def test_why_selected_must_name_a_cited_evidence_path(self):
+    def test_why_selected_must_cite_an_evidence_path(self):
         data = self.base_return(why_selected="x" * 80)
-        with self.assertRaisesRegex(record_verdicts.LaneRejected, "why_selected must name at least one"):
+        with self.assertRaisesRegex(record_verdicts.LaneRejected, "why_selected must cite at least one"):
             self.validate(data)
+
+    def test_why_selected_may_cite_a_path_outside_its_own_refs(self):
+        # The contract lets a lane leave evidence_refs empty rather than guess.
+        data = self.base_return(winner_evidence_refs=[],
+                                why_selected="Observed native execution recorded in blueprints/x/receipt.json " * 2)
+        self.assertEqual(self.validate(data)["winner_evidence_refs"], [])
 
 
 if __name__ == "__main__":
