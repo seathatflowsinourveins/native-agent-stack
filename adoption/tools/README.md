@@ -23,6 +23,11 @@ the VM and take the whole session down; the scope kills the job instead.
     `66db06f653520ad49c2531ab2d5df762d1e952b1d1655ba5f509b6014cbc52f1`
 - `ecosystem-bounded-run` is byte-for-byte identical to its source; its copy here
   still hashes to the value above.
+- `gitleaks-guarded` differs from its source on two lines only (see below), so
+  the copy in this repository hashes to
+  `61e87881841a346fc0c4d2ec514b283696311ce033fd7b27397973fc2429a655`. Compare
+  against *that* value when checking this repository's file, and against the
+  `66db06f6…` value when checking a copy taken straight from the source host.
 
 ### Exact lines changed in `gitleaks-guarded`
 
@@ -33,7 +38,7 @@ another host.
 | Line | Was | Is now | Why |
 | --- | --- | --- | --- |
 | 5 | a literal absolute path to the pinned Gitleaks binary under one user's home | `gitleaks_native="${GITLEAKS_NATIVE:-${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/gitleaks-8.30.1/gitleaks}"` | Resolves through the same `ECO_INSTALL_ROOT` contract the bootstrap scripts use, with `GITLEAKS_NATIVE` as an explicit override. The pinned version string `gitleaks-8.30.1` is unchanged. |
-| 6 | a literal absolute path to `ecosystem-bounded-run` in one user's checkout | `gitleaks_runner="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)/ecosystem-bounded-run"` | The guarded launcher finds its runner next to itself, so the pair stays correct wherever it is installed or symlinked from. |
+| 6 | a literal absolute path to `ecosystem-bounded-run` in one user's checkout | `gitleaks_runner="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)/ecosystem-bounded-run"` | The guarded launcher finds its runner next to the path it was invoked with, so the pair stays correct wherever it is installed as long as the two files are installed together. `${BASH_SOURCE[0]}` is not symlink-resolved; see the install section. |
 
 Nothing else was touched. Every absolute `/usr/bin` tool path
 (`/usr/bin/systemd-run`, `/usr/bin/systemctl`, `/usr/bin/timeout`,
@@ -62,9 +67,16 @@ ln -sfn "$ECO_INSTALL_ROOT/bin/gitleaks-guarded" "$ECO_INSTALL_ROOT/bin/gitleaks
 export PATH="$ECO_INSTALL_ROOT/bin:$PATH"
 ```
 
-Symlinking instead of copying works equally well, because line 6 resolves
-`BASH_SOURCE` with `pwd -P`; a `gitleaks` symlink therefore still finds the
-runner beside the real `gitleaks-guarded`, not beside the link.
+The `ln -sfn` above is safe **only because the link sits in the same directory as
+`ecosystem-bounded-run`.** Bash sets `${BASH_SOURCE[0]}` to the path the script
+was *invoked* with and does not resolve a symlinked file, so line 6's
+`cd -- "$(dirname ...)" && pwd -P` canonicalises the directory the link lives in,
+not the directory the real script lives in. A `gitleaks` symlink placed anywhere
+else — `$HOME/.local/bin/gitleaks` pointing back at
+`$ECO_INSTALL_ROOT/bin/gitleaks-guarded`, for example — makes the launcher look
+for `ecosystem-bounded-run` beside *the link*, not find it, and refuse every scan
+with **78**. Install the pair together and link only within that directory.
+`tests/test_adoption_guarded_runners.py` exercises both cases.
 
 Verify the install without starting a scan:
 
@@ -121,16 +133,26 @@ and prints which containment branch it took.
 - **Local integration check** — on a host that has cgroup v2 and a working
   `systemd --user` bus, the test asserts that `ecosystem-bounded-run sh -c 'exit
   3'` propagates exit 3, that `ecosystem-bounded-run true` exits 0, and that no
-  `ecosystem-job-*` unit survives afterwards (`--collect` cleanup). That
-  cleanup is asynchronous: the runner returns while systemd is still tearing
-  the scope down, measured on the developing WSL2 host at 0.003s-0.028s over
-  three runs, so the test polls to a 15s deadline and prints the observed
-  settle time rather than sleeping a fixed interval. A listing taken in the
-  same instant the runner exits can legitimately still show the scope. It also
+  *process* survives the job. `--collect` cleanup is asynchronous and its
+  latency is not bounded: on the developing WSL2 host the same
+  `ecosystem-bounded-run true` settled in 0.03s-0.06s on most runs, but one
+  scope unit was still listed more than 30s after the runner returned. That
+  lingering unit reported `TasksCurrent=0` and an already-removed control
+  group, i.e. an empty unit waiting for systemd's garbage collector, not an
+  escaped job. So the test polls a 15s deadline, prints the observed settle
+  time, and if units are still listed it fails only when one of them still
+  holds tasks. A listing taken right after the runner exits can legitimately
+  still show the scope, so `systemctl --user list-units 'ecosystem-job-*'`
+  returning a line is not by itself a containment failure — check
+  `TasksCurrent`. It also
   drives `gitleaks-guarded version` at a stub binary via `GITLEAKS_NATIVE`,
   through an instrumented copy of the runner, and asserts the stub's oracle file
   exists while the runner's oracle file does not — i.e. the fast `version` path
   really does `exec` the native binary and never pays for a scope.
+- **Local integration check** — the install boundary above: a `gitleaks` symlink
+  created *beside* `ecosystem-bounded-run` reaches the native binary, and the
+  same symlink created in another directory refuses with 78 without entering a
+  scan path. This measures the documented rule rather than restating it.
 - On a host **without** the user bus, the same test asserts the refusal property
   instead: exit 78 and the oracle file the wrapped command would have created
   does not exist — the "never runs a command uncontained" guarantee.
@@ -138,3 +160,13 @@ and prints which containment branch it took.
 The integration branch is evidence for the host that ran it. It is not upstream
 Gitleaks evidence, and it says nothing about a host with a different systemd or
 cgroup configuration.
+
+The per-user lock is **not** covered by the suite, because a test that takes
+`/run/user/$UID/ecosystem-gitleaks.lock` would contend with a real scan on the
+same host. It was checked once by hand instead, on 2026-09-22 (bash 5.2.21): with
+a sleeping stand-in for the native binary, a second `gitleaks-guarded dir .`
+launched while the first was still scanning exited **75** with `another scan
+holds the per-user lock`, and the first then exited 0. The lock file descriptor
+opened at line 21 survives the final `exec` on this bash (verified separately via
+`/proc/self/fd`), which is what makes that guarantee hold. This is a one-host
+observation, not a suite assertion.

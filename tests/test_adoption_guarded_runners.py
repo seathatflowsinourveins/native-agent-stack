@@ -30,9 +30,12 @@ SHELLCHECK = shutil.which("shellcheck")
 
 # Built from fragments so this file can never match its own acceptance grep.
 PERSONAL_HOME = re.compile("/(?:" + "home" + "|" + "Users" + ")/[A-Za-z0-9_.-]+")
-# The sources ship ``set -euo pipefail``; they are copied byte-for-byte, so the
-# assertion accepts the optional ``E`` rather than mutating the upstream bytes.
-STRICT_MODE = re.compile(r"^set -E?euo pipefail$", re.M)
+# The sources ship ``set -euo pipefail`` and are copied byte-for-byte, so this
+# asserts the bytes actually shipped. Neither script installs an ERR trap, so the
+# absent ``-E`` is behaviourally inert here; adding it would break the
+# byte-fidelity guarantee the provenance section records. A future upstream sync
+# that does add ``-E`` must update this line deliberately.
+STRICT_MODE = re.compile(r"^set -euo pipefail$", re.M)
 
 RUNTIME_BUS = Path(f"/run/user/{os.getuid()}/bus")
 
@@ -174,24 +177,111 @@ class GuardedGitleaksFastPathTests(unittest.TestCase):
             self.assertIn("native binary or containment runner is missing", result.stderr)
 
 
+def _write_stub(path, oracle):
+    """An executable that records the arguments it was given, then succeeds."""
+    path.write_text(
+        "#!/usr/bin/env bash\n"
+        f"printf '%s\\n' \"$@\" > {oracle}\n"
+        "exit 0\n",
+        encoding="utf-8",
+    )
+    path.chmod(0o755)
+
+
+class GuardedGitleaksSymlinkInstallTests(unittest.TestCase):
+    """Local integration check of the documented symlink install boundary.
+
+    ``${BASH_SOURCE[0]}`` is the invocation path and is *not* symlink-resolved,
+    so a ``gitleaks`` link only finds the runner when the link sits in the same
+    directory as ``ecosystem-bounded-run``. The README states that boundary;
+    these two tests measure both sides of it so the claim cannot rot.
+    """
+
+    def _lay_out(self, tmp):
+        stub_oracle = tmp / "stub-was-run"
+        stub = tmp / "gitleaks-stub"
+        _write_stub(stub, stub_oracle)
+
+        runner_oracle = tmp / "runner-was-invoked"
+        sentinel_runner = tmp / "ecosystem-bounded-run"
+        _write_stub(sentinel_runner, runner_oracle)
+
+        guarded = tmp / "gitleaks-guarded"
+        guarded.write_bytes(GITLEAKS_GUARDED.read_bytes())
+        guarded.chmod(0o755)
+        return stub, stub_oracle, guarded
+
+    def test_symlink_beside_the_runner_resolves_it(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            stub, stub_oracle, guarded = self._lay_out(tmp)
+
+            # Exactly the README's `ln -sfn` recipe: link and runner share a dir.
+            link = tmp / "gitleaks"
+            link.symlink_to(guarded)
+
+            result = _run([str(link), "version"],
+                          env=dict(os.environ, GITLEAKS_NATIVE=str(stub)))
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertTrue(stub_oracle.is_file(), "native binary was not executed")
+
+    def test_symlink_from_another_directory_refuses_with_78(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            stub, stub_oracle, guarded = self._lay_out(tmp)
+
+            elsewhere = tmp / "elsewhere"
+            elsewhere.mkdir()
+            link = elsewhere / "gitleaks"
+            link.symlink_to(guarded)
+
+            # The native binary is present and executable, so the runner beside
+            # the link is the only thing missing.
+            result = _run([str(link), "version"],
+                          env=dict(os.environ, GITLEAKS_NATIVE=str(stub)))
+            self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
+            self.assertIn("native binary or containment runner is missing", result.stderr)
+            self.assertFalse(
+                stub_oracle.exists(),
+                "a scan path was entered even though the runner could not be found",
+            )
+
+
 class BoundedRunContainmentTests(unittest.TestCase):
     """Branch-aware local integration check; never skipped, always reported."""
+
+    def _list_units(self):
+        result = _run(["systemctl", "--user", "list-units",
+                       "ecosystem-job-*", "--all", "--no-legend"])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return result.stdout
 
     def _wait_for_collection(self, deadline=15.0):
         """Return (seconds, listing); seconds is None when scopes survived."""
         started = time.monotonic()
-        listing = ""
         while True:
-            result = _run(["systemctl", "--user", "list-units",
-                           "ecosystem-job-*", "--all", "--no-legend"])
-            self.assertEqual(result.returncode, 0, result.stderr)
-            listing = result.stdout
+            listing = self._list_units()
             elapsed = time.monotonic() - started
             if not listing.strip():
                 return elapsed, listing
             if elapsed > deadline:
                 return None, listing
             time.sleep(0.02)
+
+    def _live_tasks(self, listing):
+        """Units from ``listing`` that still hold at least one process."""
+        busy = []
+        for line in listing.splitlines():
+            unit = line.split()[0] if line.split() else ""
+            if not unit.endswith(".scope"):
+                continue
+            shown = _run(["systemctl", "--user", "show", unit,
+                          "-p", "TasksCurrent", "-p", "SubState", "--value"]).stdout
+            fields = shown.split()
+            tasks = next((f for f in fields if f.isdigit()), None)
+            if tasks is not None and int(tasks) > 0:
+                busy.append(f"{unit} TasksCurrent={tasks}")
+        return busy
 
     def test_containment_or_refusal(self):
         if CONTAINMENT_AVAILABLE:
@@ -203,14 +293,22 @@ class BoundedRunContainmentTests(unittest.TestCase):
             succeeding = _run([str(BOUNDED_RUN), "true"])
             self.assertEqual(succeeding.returncode, 0, succeeding.stdout + succeeding.stderr)
 
-            # `--collect` removes the scope asynchronously: the runner can exit
-            # while systemd is still tearing the unit down (measured on this
-            # host at 0.003s-0.028s). Poll to a deadline so a genuine leak
-            # still fails instead of being hidden by a sleep.
+            # `--collect` removes the scope asynchronously and the unit object
+            # can outlive its cgroup by a long, unbounded interval (measured on
+            # this host from 0.03s to over 30s for the same command). The
+            # property that matters is that no *process* survives the runner, so
+            # a surviving unit only fails when it still holds tasks.
             settled, listing = self._wait_for_collection()
-            self.assertIsNotNone(
-                settled, f"transient scopes were not collected within 15s:\n{listing}")
-            print(f"[branch] transient scopes collected after {settled:.3f}s")
+            if settled is None:
+                busy = self._live_tasks(listing)
+                self.assertEqual(
+                    busy, [],
+                    "a transient scope still holds live processes after the job "
+                    f"returned:\n{listing}")
+                print("[branch] scope units awaiting systemd GC hold no tasks "
+                      f"(not collected within 15s):\n{listing.rstrip()}")
+            else:
+                print(f"[branch] transient scopes collected after {settled:.3f}s")
         else:
             print("\n[branch] refusal: no usable systemd --user scope; asserting the uncontained guard")
 
