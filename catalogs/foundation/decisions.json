@@ -2698,6 +2698,121 @@
         ]
       },
       "supersedes": []
+    },
+    {
+      "id": "new-pc-bootstrap-ci",
+      "capability": "Run new-machine bootstrap (adoption/bootstrap.md, render_config.py, adoption_status.py) as a hosted GitHub Actions check instead of only a manually run local sequence",
+      "capability_key": "new-pc-bootstrap-ci",
+      "checked_at": "2026-09-21",
+      "layer_ids": [
+        "ci-supply-chain",
+        "hosting-services"
+      ],
+      "selection": "candidate",
+      "review_status": "source_review",
+      "activation": "Documented only: a future workflow would check out this repository on a hosted Linux runner, run tools/adoption/render_config.py --check against a fixture host and scripts/adoption_status.py --profile foundation-cpu --json, and fail the job on a nonzero exit. No such workflow file exists yet and no hosted run has occurred.",
+      "component_ids": [],
+      "candidate": {
+        "id": "github-actions-hosted-runner-bootstrap",
+        "repository": "https://github.com/actions/runner"
+      },
+      "evidence_ids": [],
+      "evidence_scope": "Drafted plan only. evidence/receipts/github-automation-newpc-20260922.json records the local render/check/test commands actually run on this host and states explicitly that hosted-runner execution is pending; it is local_integration and source_review evidence, not a hosted CI receipt.",
+      "limitations": [
+        "Alternatives considered: (a) keep bootstrap entirely manual/local (rejected: no independent, repeatable regression signal when templates or adoption_status.py drift); (b) mirror the render/check/adoption_status commands into the existing zizmor-checked native workflows now (deferred: needs its own scoped workflow file, permissions and a dated CI receipt before this row can move past source_review).",
+        "No hosted GitHub Actions run has occurred for this capability; only local command execution on this host is evidenced.",
+        "A hosted job's registration or a green local rerun would not by itself prove a real hosted pass; only an actual linked run does."
+      ],
+      "source_paths": [
+        "adoption/bootstrap.md",
+        "tools/adoption/render_config.py",
+        "scripts/adoption_status.py",
+        "docs/acceptance-evidence-policy.md",
+        "docs/tasks/2026-09-22-github-automation-newpc.md"
+      ],
+      "next_gap": "Overturn source_review only when a real hosted GitHub Actions run (linked run ID, not just a workflow file) executes render_config.py --check and adoption_status.py on a runner and its pass/fail is recorded in a dated receipt.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "No lifecycle stage is claimed for this candidate; it has no adopted component yet.",
+        "unknown": "Whether a hosted runner reproduces the same byte-identical render/check result as this local host is untested.",
+        "stage_refs": []
+      },
+      "supersedes": []
+    },
+    {
+      "id": "macos-embedding-backend",
+      "capability": "Select the macOS Apple Silicon local embedding backend for a future drafted-not-accepted macOS adoption profile",
+      "capability_key": "macos-embedding-backend",
+      "checked_at": "2026-09-21",
+      "layer_ids": [
+        "semantic-rag"
+      ],
+      "selection": "candidate",
+      "review_status": "source_review",
+      "activation": "Drafted, not accepted: llama.cpp Metal `llama-server --embedding --port 8232` (a distinct port from the Linux profile's 2048-dim Nemotron RAG endpoint at 8231) serving embeddinggemma-300M-Q8_0 (768 dims, matching QMD's own internal AST-chunk index model, not the port-8231 Nemotron endpoint) as the 24 GB default; Nemotron-3-Embed-1B (2048 dims, matching the Linux 8231 endpoint) as an open-gated 48 GB upgrade only if a GGUF build exists upstream. See adoption/platforms/macos-arm64.md for the full comparison, acceptance test and considered-not-activated alternatives (MLX, LM Studio).",
+      "component_ids": [],
+      "candidate": {
+        "id": "llama-cpp-metal-macos-embedding",
+        "repository": "https://github.com/ggml-org/llama.cpp"
+      },
+      "evidence_ids": [],
+      "evidence_scope": "Drafted, not accepted: source review of llama.cpp Metal embedding support and the existing Linux embeddinggemma/QMD usage only. No Mac has run llama-server, no /v1/embeddings response has been captured, and no cosine-parity check against a Linux reference vector has been performed.",
+      "limitations": [
+        "Alternatives considered: MLX (no measured retrieval comparison yet on this project's corpus); LM Studio (the existing Linux EMBEDDING_PROVIDER=lmstudio setting points at local vLLM, not the desktop app, so it does not transfer as-is); Nemotron-3-Embed-1B now instead of gated (rejected until a GGUF exists upstream and a recall/MRR comparison favors it).",
+        "Zero native macOS execution; this row cannot use accepted_within_scope or partial_acceptance.",
+        "The stated acceptance test (curl 127.0.0.1:8232/v1/embeddings, 768-dimension check, cosine similarity >= 0.99 against a Linux llama.cpp embeddinggemma-300M-Q8_0 reference vector -- not the Linux 2048-dim Nemotron endpoint at 8231) has not been run."
+      ],
+      "source_paths": [
+        "adoption/platforms/macos-arm64.md",
+        "recipes/README.md",
+        "docs/acceptance-evidence-policy.md"
+      ],
+      "next_gap": "Overturn the 24 GB default only on a measured retrieval comparison on this project's corpus showing Nemotron-3-Embed-1B beats embeddinggemma-300M-Q8_0 on recall/MRR AND the host has the memory headroom for it; until then the 48 GB path stays gated even on a 48 GB machine.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "No lifecycle stage is claimed for this candidate; it has no adopted component yet.",
+        "unknown": "Whether llama-server --embedding starts on Apple Silicon Metal in this configuration, and its actual embedding-quality parity with the Linux host, are both untested.",
+        "stage_refs": []
+      },
+      "supersedes": []
+    },
+    {
+      "id": "agent-lab-hosting",
+      "capability": "Select agent-lab's own remote hosting and CI shape (private GitHub remote plus minimal CI) rather than mirroring the full native-agent-stack CI suite into agent-lab",
+      "capability_key": "agent-lab-hosting",
+      "checked_at": "2026-09-21",
+      "layer_ids": [
+        "hosting-services",
+        "ci-supply-chain"
+      ],
+      "selection": "candidate",
+      "review_status": "source_review",
+      "activation": "Decision: keep agent-lab's existing private GitHub remote (origin https://github.com/seathatflowsinourveins/agent-lab.git) and add only minimal CI (the mirrored suites this repository already runs, scoped to agent-lab's own owned paths), rather than either running the full catalog CI suite inside agent-lab or keeping agent-lab entirely local with no hosted checks.",
+      "component_ids": [],
+      "candidate": {
+        "id": "agent-lab-private-github-hosting",
+        "repository": "https://github.com/seathatflowsinourveins/agent-lab"
+      },
+      "evidence_ids": [],
+      "evidence_scope": "Source review only: the existing remote was inspected (git remote -v) and the alternatives below were compared on paper. No CI workflow has been added to agent-lab and no hosted run has occurred as a result of this decision.",
+      "limitations": [
+        "Alternatives considered: (a) run the mirrored suites in this catalog's own CI against agent-lab as a submodule/checkout (rejected for now: adds cross-repository coupling and a second source of truth for agent-lab's test selection); (b) keep agent-lab entirely local with no hosted CI (rejected: no independent regression signal on push, no reviewable Actions log for collaborators).",
+        "This row records a hosting/process decision, not a software component; it has no lifecycle stage, executable, or version.",
+        "agent-lab's remote visibility (private vs. public) and any branch-protection settings were not independently re-verified beyond the local git remote URL."
+      ],
+      "source_paths": [
+        "docs/acceptance-evidence-policy.md",
+        "docs/tasks/2026-09-22-github-automation-newpc.md",
+        "docs/github-automation.md"
+      ],
+      "next_gap": "Overturn this decision only on a hosted run showing the mirrored suites give equal evidence at lower cost than running them locally plus a lightweight hosted smoke check; until then keep the minimal-CI shape rather than the full mirrored suite.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "No lifecycle stage is claimed for this candidate; it is a hosting/process decision, not an adopted component.",
+        "unknown": "Whether a future agent-lab CI workflow reproduces this catalog's own zizmor/unittest acceptance is untested.",
+        "stage_refs": []
+      },
+      "supersedes": []
     }
   ]
 }

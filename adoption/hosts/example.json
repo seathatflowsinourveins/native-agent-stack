@@ -1,0 +1,11 @@
+{
+  "HOME": "/home/example",
+  "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
+  "PROJECT_ROOT": "/home/example/code/agent-lab",
+  "HOST_PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+  "CODE_INDEX_PATH": "/home/example/.code-index",
+  "OTEL_ENDPOINT": "127.0.0.1:14318",
+  "AI_MEMORY_URL": "127.0.0.1:49374",
+  "QDRANT_URL": "127.0.0.1:16333",
+  "EMBED_URL": "127.0.0.1:8231"
+}

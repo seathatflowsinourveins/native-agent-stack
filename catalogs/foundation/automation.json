@@ -149,6 +149,8 @@
       "schedule": "29 7 * * 1",
       "purpose": "SBOM (syft) + vulnerability scan (grype) of the reproduced native-foundation-e2e.yml nautilus_trader install venv. Report-only, no fail threshold; 90-day artifact retention.",
       "required_check": false
+    },
+    {
       "repository": "seathatflowsinourveins/native-agent-stack",
       "version": "publish-catalog.yml@2026-09-22",
       "source": ".github/workflows/publish-catalog.yml",

@@ -70,6 +70,30 @@ class AdoptionContractTests(unittest.TestCase):
             if reference == 'sdk_accepted_constraints':
                 self.assertEqual(required, expected)
 
+    def test_platform_profiles_stay_linux_accepted_and_macos_drafted(self):
+        profiles = {row['id']: row for row in self.adoption['platform_profiles']}
+        self.assertEqual(profiles['linux-wsl2-x86_64']['status'], 'accepted')
+        self.assertEqual(profiles['linux-wsl2-x86_64']['evidence_ref'], 'adoption/receipt.json')
+        self.assertEqual(profiles['macos-arm64']['status'], 'drafted_not_accepted')
+        self.assertIsNone(profiles['macos-arm64']['evidence_ref'])
+        for row in profiles.values():
+            self.assertTrue({'id', 'os', 'architecture', 'status', 'doc', 'evidence_ref'} <= set(row))
+            self.assertTrue((ROOT / row['doc']).is_file(), row['doc'])
+        # supported_platforms stays Linux-only; a drafted macOS profile does not
+        # change what adoption_status.py reports as this host's supported platform.
+        self.assertEqual(
+            [(item['os'], item['architecture']) for item in self.adoption['supported_platforms']],
+            [('linux', 'x86_64')],
+        )
+
+    def test_macos_arm64_foundation_profile_uses_plain_command_names(self):
+        by_id = {row['id']: row for row in self.adoption['profiles']}
+        profile = by_id['macos-arm64-foundation']
+        components = {item['id'] for item in self.stack['components']}
+        self.assertTrue(set(profile['component_ids']) <= components)
+        for name in profile['required_commands']:
+            self.assertRegex(name, r'^[a-zA-Z0-9][a-zA-Z0-9_.-]*$')
+
     def test_host_example_claims_no_live_acceptance(self):
         host = json.loads((ROOT / 'adoption/host-state.example.json').read_text())
         self.assertEqual(host['selected_components'], [])

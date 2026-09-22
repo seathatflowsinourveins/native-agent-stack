@@ -1,0 +1,74 @@
+# Project template. Load only in a trusted project with a compatible current client.
+# Preserve the user's existing model and authentication choices.
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+
+# Native CLI discovery for Codex commands in this trusted Linux project.
+# Values are resolved on this PC; TOML does not expand shell $$PATH syntax.
+[shell_environment_policy.set]
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+RTK_TELEMETRY_DISABLED = "1"
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 3
+
+# Keep the trusted plugin hooks; start its MCP server in this project's scope.
+[plugins."context-mode@context-mode".mcp_servers.context-mode]
+enabled = false
+
+[mcp_servers.context-mode]
+command = "${ECO_ROOT}/bin/context-mode"
+cwd = "${PROJECT_ROOT}"
+startup_timeout_sec = 60
+
+[mcp_servers.context-mode.env]
+RTK_TELEMETRY_DISABLED = "1"
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+CONTEXT_MODE_PLATFORM = "codex"
+CONTEXT_MODE_PROJECT_DIR = "${PROJECT_ROOT}"
+
+[mcp_servers.jcodemunch]
+command = "${ECO_ROOT}/bin/jcodemunch-mcp"
+startup_timeout_sec = 60
+
+[mcp_servers.jcodemunch.env]
+RTK_TELEMETRY_DISABLED = "1"
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+CODE_INDEX_PATH = "${CODE_INDEX_PATH}"
+JCODEMUNCH_SHARE_SAVINGS = "0"
+
+[mcp_servers.serena]
+command = "${ECO_ROOT}/bin/serena-context"
+args = ["start-mcp-server", "--transport", "stdio", "--project-from-cwd", "--context", "codex", "--enable-web-dashboard", "true", "--open-web-dashboard", "false", "--enable-gui-log-window", "false"]
+startup_timeout_sec = 60
+
+[mcp_servers.serena.env]
+RTK_TELEMETRY_DISABLED = "1"
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+
+[mcp_servers.ai-memory]
+url = "http://${AI_MEMORY_URL}/mcp"
+
+[mcp_servers.socraticode]
+command = "${ECO_ROOT}/bin/node"
+args = ["${ECO_ROOT}/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"]
+startup_timeout_sec = 120
+
+[mcp_servers.socraticode.env]
+RTK_TELEMETRY_DISABLED = "1"
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+QDRANT_MODE = "external"
+QDRANT_URL = "http://${QDRANT_URL}"
+EMBEDDING_PROVIDER = "lmstudio"
+LMSTUDIO_URL = "http://${EMBED_URL}/v1"
+EMBEDDING_MODEL = "nvidia/Nemotron-3-Embed-1B-BF16"
+EMBEDDING_DIMENSIONS = "2048"
+EMBEDDING_CONTEXT_LENGTH = "4096"
+EMBEDDING_QUERY_PREFIX = "query: "
+EMBEDDING_DOCUMENT_PREFIX = "passage: "
+EMBEDDING_DOCUMENT_INCLUDE_PATH = "true"
+RESPECT_GITIGNORE = "true"
+INCLUDE_DOT_FILES = "false"
+SOCRATICODE_WATCHER = "auto"
+SEARCH_DEFAULT_LIMIT = "3"
