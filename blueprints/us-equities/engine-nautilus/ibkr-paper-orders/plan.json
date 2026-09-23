@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "kind": "ibkr_paper_orders_plan",
+  "frozen_at": "2026-09-23",
+  "frozen_before_first_run": true,
+  "revision": 3,
+  "revision_note": "Re-frozen on 2026-09-23 before any order run, after a second independent review: missing or unparseable SPY liquidHours for today refuses the run, a provisional cleanup_required receipt precedes the node, the flat proof runs on every exit path once the node phase began, SIGHUP is handled like SIGTERM, and a stop that does not finish is forced. Revision 2: submit rate, submit spacing, re-cancel, flatten retry delay, exec-engine in-flight horizon, unconfirmed and duplicate event policies.",
+  "gate_id": "ibkr-local-acceptance",
+  "procedure": "blueprints/us-equities/engine-nautilus/acceptance-plan.md section 5 steps 2-4 (bounded subset)",
+  "engine": {
+    "package": "nautilus_trader[ib]",
+    "version": "1.231.0",
+    "adapter": "Python InteractiveBrokers adapter on the official ibapi client",
+    "ibapi_version": "10.45.1",
+    "note": "Not the pinned 2.0.0rc5 destination; see README 'Why 1.231.0'."
+  },
+  "host": "127.0.0.1",
+  "paper_ports": [
+    4002,
+    7497
+  ],
+  "default_port": 4002,
+  "account_prefix": "DU",
+  "require_single_managed_account": true,
+  "client_ids": {
+    "node": 91,
+    "check": 92,
+    "reserved_elsewhere": [
+      71,
+      73,
+      76,
+      81,
+      82
+    ],
+    "note": "The node's data and execution clients share client id 91 (one cached adapter client per host/port/client id). 92 is the official-ibapi read-only check before and after the node."
+  },
+  "instrument": {
+    "symbol": "SPY",
+    "sec_type": "STK",
+    "exchange": "SMART",
+    "primary_exchange": "ARCA",
+    "currency": "USD",
+    "nautilus_instrument_id": "SPY.ARCA",
+    "expected_price_increment": "0.01"
+  },
+  "bounds": {
+    "max_orders": 6,
+    "max_quantity_per_order": 1,
+    "max_notional_per_order_usd": 1000,
+    "max_roundtrip_loss_usd": 5,
+    "commission_allowance_per_order_usd": 1.0,
+    "marketable_offset_usd": 0.05,
+    "resting_fraction_of_bid": 0.5,
+    "resting_price_floor_usd": 1.0,
+    "max_order_submit_rate": "100/00:00:01",
+    "time_in_force": "DAY",
+    "order_type": "LIMIT",
+    "min_submit_spacing_seconds": 1.5,
+    "max_cancel_attempts_per_order": 3,
+    "submit_rate_note": "Nautilus default risk-engine throttle (drops and denies submits beyond the rate); the run's own spacing is enforced by the harness before every order is created, so the throttle never binds."
+  },
+  "session": {
+    "timezone": "America/New_York",
+    "weekdays_only": true,
+    "open": "09:30",
+    "close": "16:00",
+    "close_buffer_minutes": 10,
+    "whole_run_inside_window": true,
+    "use_contract_liquid_hours": true,
+    "note": "The run is refused unless [now, now + overall_deadline_seconds] lies inside [open, close - close_buffer]. The pre-run check also reads SPY liquidHours (kept whole); a holiday or early close narrows or closes the window, and when today's segment is missing or unparseable the run is refused (refused_liquid_hours_unavailable), never run on the fixed window."
+  },
+  "data": {
+    "quote_source": "Nautilus quote ticks from IB tick-by-tick BidAsk (subscribe params batch_quotes=false)",
+    "market_data_type": "REALTIME",
+    "quote_max_age_seconds": 10,
+    "clock_resolution_tolerance_seconds": 2,
+    "note": "Tick-by-tick BidAsk carries the IB event time (one-second resolution) and is not served as delayed data. Age is node clock plus the server-minus-local offset from the pre-run check, minus the tick's ts_event."
+  },
+  "timeouts": {
+    "check_seconds": 30,
+    "node_start_seconds": 60,
+    "per_step_seconds": 45,
+    "cleanup_seconds": 45,
+    "flatten_fill_wait_seconds": 10,
+    "flatten_retry_delay_seconds": 2,
+    "recancel_interval_seconds": 5,
+    "node_stop_allowance_seconds": 15,
+    "post_stop_cancel_grace_seconds": 5,
+    "post_check_reserve_seconds": 60,
+    "post_check_attempts": 2,
+    "post_check_retry_delay_seconds": 5,
+    "overall_deadline_seconds": 420
+  },
+  "cases": [
+    {
+      "id": "C1",
+      "name": "accept_resting",
+      "order": "LIMIT BUY 1 SPY DAY at max(resting_price_floor_usd, floor_to_cent(resting_fraction_of_bid * bid))",
+      "expect": "OrderAccepted",
+      "record": [
+        "event types and timestamps",
+        "venue order id presence (not value)"
+      ]
+    },
+    {
+      "id": "C2",
+      "name": "cancel_resting",
+      "order": "cancel the C1 order",
+      "expect": "OrderCanceled",
+      "record": [
+        "event types and timestamps"
+      ]
+    },
+    {
+      "id": "C3",
+      "name": "fill_buy",
+      "order": "marketable LIMIT BUY 1 SPY DAY at min(ceil_to_cent(ask + marketable_offset_usd), floor_to_cent(max_notional_per_order_usd / qty)); refused before submit if that cap is below the ask or the worst-case round trip exceeds max_roundtrip_loss_usd",
+      "expect": "OrderFilled for the full quantity and an open long position",
+      "record": [
+        "fill price",
+        "fill quantity",
+        "commission and currency as reported",
+        "position opened"
+      ]
+    },
+    {
+      "id": "C4",
+      "name": "flatten",
+      "order": "marketable LIMIT SELL of the filled quantity DAY at max(0.01, floor_to_cent(bid - marketable_offset_usd))",
+      "expect": "OrderFilled for the full quantity and no open position",
+      "record": [
+        "fill price",
+        "fill quantity",
+        "commission",
+        "realized PnL (Nautilus and harness-computed)",
+        "round-trip loss against max_roundtrip_loss_usd"
+      ]
+    }
+  ],
+  "stop_rule": "Cases run in order; the first failure, exception, timeout, deadline or signal stops the sequence.",
+  "failure_disposition": "Cancel every open order of this run (re-sent at most max_cancel_attempts_per_order times, recancel_interval_seconds apart, through cancel_all_orders when an order is stuck in PENDING_CANCEL), then flatten any SPY quantity this run bought with the C4 flatten order builder (marketable limit SELL, re-priced from a fresh quote, within the remaining max_orders budget, at least flatten_retry_delay_seconds after a previous flatten order closed), then stop the node. Finishing, and the strategy's on_stop, always send a final cancel for every order of this run that is still open.",
+  "end_disposition": {
+    "positions": 0,
+    "open_orders": 0,
+    "proof": "Official-ibapi read-only check (client id 92) after the node has stopped: zero non-zero positions and zero open orders; otherwise status cleanup_required and exit 3."
+  },
+  "receipt": {
+    "kind": "ibkr_paper_orders_nautilus_1_231",
+    "never_record": [
+      "account ids",
+      "balances",
+      "credentials",
+      "home paths",
+      "host names"
+    ],
+    "redact_pattern": "\\b(?:D?[UF]|I)\\d{5,}\\b",
+    "refused_path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/receipt.json",
+    "provisional": "Before the node is built the receipt path holds a provisional cleanup_required receipt (evidence_class native_paper, run_prefix); if that write fails the run is refused before the node connects. Only the final receipt replaces it (atomic replace)."
+  },
+  "evidence_class": "native_paper",
+  "exit_codes": {
+    "passed": 0,
+    "failed_or_incomplete": 1,
+    "not_connected": 2,
+    "refused_or_cleanup_required": 3
+  },
+  "exec_engine": {
+    "inflight_check_interval_ms": 2000,
+    "inflight_check_threshold_ms": 5000,
+    "inflight_check_retries": 100,
+    "note": "LiveExecEngineConfig in-flight resolution is pushed past the run: after inflight_check_retries queries spaced at least inflight_check_threshold_ms apart the engine fabricates OrderRejected('UNKNOWN') for SUBMITTED or OrderCanceled for PENDING_CANCEL orders (live/execution_engine.py _resolve_inflight_order). threshold x retries must exceed overall_deadline_seconds. Queries themselves still run (venue-backed)."
+  },
+  "unconfirmed_event_policy": "An OrderCanceled/OrderRejected/OrderExpired with reconciliation=True was produced by the execution engine, not by an IB status callback. It never passes a case, and while one exists cleanup submits no further flatten order; the run ends for the independent flat proof.",
+  "duplicate_event_policy": "A second terminal event for an order already closed (IB reports a cancel as both error 202 and orderStatus Cancelled) is recorded as a duplicate and otherwise ignored.",
+  "stop_escalation": "A stop is the graceful node.stop(). If node.run() has not returned node_stop_allowance_seconds after the stop request, or on a second or later SIGINT/SIGTERM/SIGHUP once a stop was requested, the harness cancels the kernel's remaining tasks and stops the event loop so the flat proof and receipt still run. The hard stop requests a stop and never cuts a graceful stop short. A signal or hard stop before the strategy started marks the run finished so no case starts."
+}
