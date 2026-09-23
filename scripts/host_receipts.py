@@ -17,6 +17,7 @@ schema file.
 from __future__ import annotations
 
 import argparse
+import bisect
 import getpass
 import hashlib
 import json
@@ -354,7 +355,9 @@ def evidence_files(root: Path) -> dict[str, dict]:
 
 
 def register_file(root: Path, relative_path: str) -> None:
-    """Append or update relative_path in manifests/evidence.json files[] with its current hash."""
+    """Update relative_path in manifests/evidence.json files[] with its current hash,
+    or insert it at its sorted position (bisect) so files[] stays sorted by path --
+    conflict-friendly inserts instead of always appending at the end."""
     evidence_path = safe_file(root, "manifests/evidence.json")
     evidence = json.loads(evidence_path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
     target = safe_file(root, relative_path)
@@ -366,7 +369,8 @@ def register_file(root: Path, relative_path: str) -> None:
             files[index] = record
             break
     else:
-        files.append(record)
+        paths = [existing.get("path", "") if isinstance(existing, dict) else "" for existing in files]
+        files.insert(bisect.bisect_left(paths, relative_path), record)
     evidence_path.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
 
 

@@ -53,8 +53,21 @@ class AdoptionContractTests(unittest.TestCase):
             self.assertTrue(set(profile['component_ids']) <= components)
 
     def test_continuation_references_resolve_without_copying_gate_states(self):
-        for reference in self.adoption['sources'].values():
+        # `sources.ecosystem_explorer` (docs/ecosystem/index.html) is generated
+        # and gitignored, not committed (see
+        # docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md): a
+        # clean checkout has no such file until `python3
+        # scripts/build_ecosystem.py --write` runs. Every other source must
+        # still resolve to a real, committed file.
+        generated_not_committed = {'ecosystem_explorer'}
+        for key, reference in self.adoption['sources'].items():
+            if key in generated_not_committed:
+                continue
             self.assertTrue((ROOT / reference).is_file(), reference)
+        # Excluding the key above must not silently hide a typo'd path: pin
+        # its exact expected value rather than skipping any string that
+        # happens to match.
+        self.assertEqual(self.adoption['sources']['ecosystem_explorer'], 'docs/ecosystem/index.html')
         gates = json.loads((ROOT / self.adoption['sources']['open_gates']).read_text())
         identifiers = {gate['id'] for gate in gates['open_gates']}
         self.assertTrue(set(self.adoption['continuation']['next_action_refs']) <= identifiers)

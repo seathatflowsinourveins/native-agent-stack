@@ -8,8 +8,10 @@ is a selected way to do a task, not permission to install or activate every tool
 
 The [current layer comparisons](../landscape/foundation.json) explain why each
 choice is retained, what happened to named alternatives, and what evidence would
-change the decision. Open [Choices & alternatives](../../docs/ecosystem/index.html#landscape)
-for the searchable offline view.
+change the decision. Open Choices & alternatives
+(`docs/ecosystem/index.html#landscape`, generated with
+`python3 scripts/build_ecosystem.py --write` -- not committed, or download it
+from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only)) for the searchable offline view.
 
 The catalog references 61 selected components through 51 capability decisions. Its
 registered evidence references are listed per capability. These are coverage counts, not a
@@ -17,8 +19,9 @@ score of complete installation, execution or lifecycle acceptance.
 
 The [operator surface manifest](surfaces.json) maps every layer to its upstream
 dashboard, native terminal view or CLI, plus installation and lifecycle runbooks.
-The existing [Foundation explorer](../../docs/ecosystem/index.html#foundation)
-joins those surfaces with canonical repository pins and capability evidence.
+The existing Foundation explorer (`docs/ecosystem/index.html#foundation`, generated
+locally, not committed -- see above) joins those surfaces with canonical
+repository pins and capability evidence.
 Links labelled **This PC** are dated loopback examples: they do not provision a
 service or establish installation on another machine. Hosted services, generated
 reports, retained exports and live upstream UIs keep their distinct scopes.

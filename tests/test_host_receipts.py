@@ -825,5 +825,45 @@ class JsonEqualityTests(unittest.TestCase):
         hr.validate_against_schema(False, {"enum": [0, 1]}, "x", errors)
         self.assertTrue(errors)
 
+
+class RegisterFileSortTests(unittest.TestCase):
+    """register_file() keeps manifests/evidence.json files[] sorted by path
+    (bisect insert) instead of always appending, so record/review stay
+    conflict-friendly for parallel PRs."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_support_tree(self.root)
+
+    def _paths(self) -> list[str]:
+        evidence = json.loads((self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"))
+        return [entry["path"] for entry in evidence["files"]]
+
+    def test_new_files_are_inserted_in_sorted_position(self):
+        for relative in ("z-later.json", "a-earlier.json", "m-middle.json"):
+            (self.root / relative).write_text("{}", encoding="utf-8")
+            hr.register_file(self.root, relative)
+        self.assertEqual(self._paths(), ["a-earlier.json", "m-middle.json", "z-later.json"])
+
+    def test_updating_an_existing_path_keeps_its_position_and_hash(self):
+        for relative in ("a-earlier.json", "m-middle.json", "z-later.json"):
+            (self.root / relative).write_text("{}", encoding="utf-8")
+            hr.register_file(self.root, relative)
+        (self.root / "m-middle.json").write_text('{"changed": true}', encoding="utf-8")
+        hr.register_file(self.root, "m-middle.json")
+        self.assertEqual(self._paths(), ["a-earlier.json", "m-middle.json", "z-later.json"])
+        evidence = json.loads((self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"))
+        updated = next(entry for entry in evidence["files"] if entry["path"] == "m-middle.json")
+        self.assertEqual(updated["sha256"], hashlib.sha256(b'{"changed": true}').hexdigest())
+
+    def test_insertion_order_does_not_matter_for_final_sort(self):
+        for relative in ("delta.json", "alpha.json", "charlie.json", "bravo.json"):
+            (self.root / relative).write_text("{}", encoding="utf-8")
+            hr.register_file(self.root, relative)
+        self.assertEqual(self._paths(), sorted(self._paths()))
+
+
 if __name__ == "__main__":
     unittest.main()
