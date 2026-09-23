@@ -95,6 +95,7 @@ import argparse
 import hashlib
 import hmac
 import json
+import os
 import re
 import secrets
 import shutil
@@ -145,12 +146,11 @@ REMOVE_GLOBS = (
     "docs/ecosystem/manifest.json",
 )
 
-# Enumerated from every string value of selection/decision/disposition/current_choice/
-# review_status under blueprints/ in this repository (not just the illustrative set in
-# the module docstring): the short closed-vocabulary enum labels, plus the handful of
-# free-text values that state a retain/adopt/reject/defer selection outright rather
-# than recording a rule, a plan or a data value (e.g. "top_20", "all_events", or a
-# procedural "Divide by 10,000 exactly ..." rule stay -- they are not selections).
+# The closed-vocabulary enum labels found under selection/decision/disposition/
+# current_choice/review_status in this repository's blueprints/, plus short free-text
+# labels. Longer free text is classified by LABEL_TEXT_SHA256 / DATA_VALUE_SHA256 above
+# and by the rules below; rules, plans and data values (e.g. "top_20", "all_events", a
+# procedural "Divide by 10,000 exactly ..." rule) stay.
 LABEL_VALUES = frozenset({
     "default", "selected", "conditional", "optional", "candidate", "trial",
     "retain", "keep_but_compare", "adjust", "confirmed_default", "selected_destination",
@@ -163,6 +163,40 @@ LABEL_VALUES = frozenset({
     "retain_2.3.1_pending_functional_acceptance",
     "source-reviewed-not-executed",
     "language alternative only",
+})
+# Free-text blueprint values classified by review, keyed by the sha256 of the exact
+# string so the classification does not repeat the text. LABEL_TEXT_SHA256 values
+# state a selection that no rule below catches; DATA_VALUE_SHA256 values are rules,
+# plans or data that must survive (one of them, a corpus methodology statement, would
+# otherwise be caught by the "selected" rule). tests/test_blind_checkout.py fails on any
+# value under these keys in this repository's blueprints/ that is neither a label by
+# rule nor listed here, so a new value is classified when it appears.
+LABEL_TEXT_SHA256 = frozenset({
+    "557291dc290010e2e286e4de20b4e72ac1f8f5583719cbb3e9364d79b0477186",
+    "6b8d0f36c12c9163c12a5b05fe32d5175e12e656e7a526063ed32c701d6f49d6",
+    "6bef11d967221994271c977a708462542dd9ad5ff330f913c28ac6dde824b7e9",
+    "c0a00234303c3efdd7148d7728960af4ad23acf20e29b02f94d382432c735ec7",
+})
+DATA_VALUES = frozenset({"all_events", "top_20"})
+DATA_VALUE_SHA256 = frozenset({
+    "012c690424af3c14cb13030a4c2194070e0fb677fe9907532fbe49e07bc6b3e5",
+    "174568cc67e1432b30d6730f3d3243da4203a9bff622d7bf699f96bfd5415d20",
+    "1b972c71588a18625a1c9dedd011fd90310acd9f7efd665dad0e19d66aca8311",
+    "388940becf7468779450b62e70eddbbdd655a727ea8acf2bd15b7120bf153067",
+    "42561a847ba882e19d74f40a934ee65177cdb17673c58ce0684143a78c9d59b0",
+    "4444a1b9ddb5e7c15f4eb74c561af0c2a145ed3cfebd275b13b6291789d697ab",
+    "52732b56eb266b6fdf7f76b95cea82782909ae9bd3c70ac26d7b934659935691",
+    "5324a7f7ae5265609bd6f7f7bf2290d672a9129ece57226eadd80752e5c21c4a",
+    "536872dc694dc0e5b4dfe7650333a233a719de15ab0cee7cc4b19b6a22c90fb3",
+    "55a8a37e8d36a0549c10adb28d6009af325e13b3bc3af8bae71a75b341607fb4",
+    "657f763f81b27a3861692477c80aa4877bf68ecf9674494ee3cc28d614f8171d",
+    "838e8a1e99bdbf418375a870265da399f0ea25a8604bbed0664ae7b174d1ee39",
+    "9215e5ac002eef37310b201aee09e1529529100e366ac5e7344cbe28be87f901",
+    "a7ded62bcdb4aca0dfea4efa56fa3d966c90f3f6112aecf15a96f9e83b0dc660",
+    "c58491dcc532424f96a294d48cbbe13e70d8c60a7163c81985ccdbae5d087083",
+    "cfd9480d64d27f55bccb60b6835b8dd1ed55cc075e107a88e37ef4f3ba22b8c9",
+    "feb6292b38cf6da7a453ee6d98d34450ad5f8db235c5f86e7d923487dded2819",
+    "feda2f5cad22987636d2b6e43e37ece78a3fe964c37edfc2e2f9456d86f1ff1f",
 })
 _SELECTED_WORD = re.compile(r"selected", re.IGNORECASE)
 _KEEP_SELECTED = re.compile(r"\bkeep\b.*\bselected\b", re.IGNORECASE)
@@ -190,7 +224,10 @@ def is_label_value(value) -> bool:
     number) is never a label."""
     if not isinstance(value, str):
         return False
-    if value in LABEL_VALUES:
+    digest = hashlib.sha256(value.encode("utf-8")).hexdigest()
+    if value in DATA_VALUES or digest in DATA_VALUE_SHA256:
+        return False
+    if value in LABEL_VALUES or digest in LABEL_TEXT_SHA256:
         return True
     if _SELECTED_WORD.search(value) or _KEEP_SELECTED.search(value):
         return True
@@ -374,7 +411,11 @@ def main(argv=None) -> int:
     dest = args.dest.resolve()
     manifest = run_blind_checkout(source, args.rev, dest)
     key_path = dest.parent / f"{dest.name}.hmac-key"
-    key_path.write_text(manifest.pop("hmac_key_hex") + "\n", encoding="utf-8")
+    # Owner-only, created exclusively: the key reverses the keyed hashes over a small
+    # vocabulary, so no lane that can read the parent directory may read it.
+    fd = os.open(key_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+        handle.write(manifest.pop("hmac_key_hex") + "\n")
     print(json.dumps({"removed_files": len(manifest["removed_files"]),
                        "stripped_fields": len(manifest["stripped_fields"]),
                        "hmac_key_path": str(key_path)}, sort_keys=True))

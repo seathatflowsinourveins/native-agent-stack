@@ -6,6 +6,7 @@ runs the real ``git worktree add``/``git worktree remove`` commands against
 it, but the fixture content, taxonomy and every catalog/blueprint shape are
 synthetic, not a real repository checkout.
 """
+import hashlib
 import importlib.util
 import json
 import shutil
@@ -333,6 +334,42 @@ class IdempotenceTests(BlindCheckoutFixture):
         second_manifest = json.loads((second_dest / "BLIND-MANIFEST.json").read_text(encoding="utf-8"))
         self.assertEqual(second_manifest["stripped_fields"], third["stripped_fields"])
         self.assertNotEqual(third["stripped_fields"], first["stripped_fields"])
+
+
+class RepositoryClassificationTests(unittest.TestCase):
+    """Runs over this repository's own blueprints/ (local integration)."""
+
+    def test_every_blueprint_value_under_a_label_key_is_classified(self):
+        root = Path(__file__).resolve().parents[1]
+        keys = {"selection", "decision", "disposition", "current_choice", "review_status"}
+        unclassified = set()
+
+        def walk(node):
+            if isinstance(node, dict):
+                for key, value in node.items():
+                    if key in keys and isinstance(value, str) and not blind_checkout.is_label_value(value):
+                        digest = hashlib.sha256(value.encode("utf-8")).hexdigest()
+                        if value not in blind_checkout.DATA_VALUES and digest not in blind_checkout.DATA_VALUE_SHA256:
+                            unclassified.add(value[:120])
+                    walk(value)
+            elif isinstance(node, list):
+                for value in node:
+                    walk(value)
+
+        for path in sorted((root / "blueprints").rglob("*.json")):
+            try:
+                walk(json.loads(path.read_text(encoding="utf-8")))
+            except (ValueError, UnicodeDecodeError):
+                continue
+        self.assertEqual(sorted(unclassified), [], "classify these into LABEL_TEXT_SHA256 or DATA_VALUE_SHA256")
+
+    def test_classified_texts_override_the_rules(self):
+        methodology = ("Fifteen directly read public documentation files selected before evaluation, "
+                       "with source bytes fixed by the base commit. No retrieval or ranking selected these files.")
+        if hashlib.sha256(methodology.encode("utf-8")).hexdigest() in blind_checkout.DATA_VALUE_SHA256:
+            self.assertFalse(blind_checkout.is_label_value(methodology))
+        self.assertTrue(blind_checkout.is_label_value("selected"))
+        self.assertFalse(blind_checkout.is_label_value("top_20"))
 
 
 if __name__ == "__main__":

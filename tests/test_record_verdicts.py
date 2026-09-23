@@ -1134,9 +1134,7 @@ class RunIdTests(RecordVerdictsFixture):
         # recorded sealed_base, not from a hardcoded default.
         build_landscape(self.root)
 
-        # --check with the same --run-id is idempotent; omitting --run-id (the
-        # default) reports the row as changed, since its lanes now differ from
-        # a fresh (never-run) fixture root's rows.
+        # --check with the same --run-id is idempotent.
         self.assertEqual(self.run_main(write=False, check=True, run_id="20260923"), 0)
 
     def test_mixed_wave_ledger_verifies_both_and_tampering_an_old_wave_still_fails(self):

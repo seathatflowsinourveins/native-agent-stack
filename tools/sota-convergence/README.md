@@ -811,9 +811,7 @@ Every other JSON file under `catalogs/` has `selection`, `decision`,
 `disposition`, `current_choice` and `review_status` removed wherever they
 appear, regardless of value; under `blueprints/` the same five keys are
 removed only when the value is itself a label -- a closed-vocabulary string
-(enumerated in `blind_checkout.LABEL_VALUES` from every string value
-actually found under these keys in this repository's `blueprints/`, not an
-illustrative subset: `selected`, `retain`, `confirmed_default`,
+(the closed-vocabulary labels in `blind_checkout.LABEL_VALUES`, for example `selected`, `retain`, `confirmed_default`,
 `selected_destination`, `adopt_within_scope`, `reject_evidence`, `defer`,
 `advisory_supported`/`advisory_contradicted`/`advisory_insufficient` and
 their `... retained; reviewer concurs` forms, `qualified_within_isolated_
@@ -825,7 +823,12 @@ selected"), or free text that opens with "retain"/"adopt"/"reject"/"defer"
 pin..."`) -- a mapping/rule value or an unrelated data or procedural value
 (e.g. `"top_20"`, or `"Submission is deferred by session, not by bar
 count..."`, which does not open with the decision verb) under one of those
-keys is left alone.
+keys is left alone. Longer free text is classified by review into
+`LABEL_TEXT_SHA256` (stripped) and `DATA_VALUE_SHA256` (kept, including one
+corpus methodology statement the "selected" rule would otherwise catch), keyed by
+the sha256 of the exact string. `tests/test_blind_checkout.py` fails when a value
+under these keys in this repository's `blueprints/` is neither a label by rule
+nor classified, so each new value gets a decision when it first appears.
 
 `<dest>/BLIND-MANIFEST.json` lists every removed file and every stripped
 JSON path together with its old value's **HMAC-SHA256** (never a plain
