@@ -2963,9 +2963,14 @@
       "id": "catalog-freshness-20260923",
       "kind": "upstream_provenance",
       "component_ids": [
-        "codex"
+        "claude-code",
+        "codex",
+        "llama-cpp",
+        "mcp-inspector",
+        "openresearch",
+        "skfolio"
       ],
-      "claim": "Scheduled catalog-freshness run (https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35822476248) rebuilt the SOTA-convergence manifest and found 2 component(s) with pin/upstream drift against the currently published manifest. This receipt, and the branch/PR it is registered from, are report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* file was selected, evaluated, or changed by this run. A pin bump requires its own separately qualified receipt under evidence/artifacts/*/, produced by the existing SOTA-convergence lane review, not by this automation.",
+      "claim": "Scheduled catalog-freshness run (https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35934519434) rebuilt the SOTA-convergence manifest and found 13 component(s) with pin/upstream drift against the currently published manifest. This receipt, and the branch/PR it is registered from, are report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* file was selected, evaluated, or changed by this run. A pin bump requires its own separately qualified receipt under evidence/artifacts/*/, produced by the existing SOTA-convergence lane review, not by this automation.",
       "limitations": [
         "This is drift detection only: it reports that a pin or upstream 'latest' value differs from the published manifest; it does not evaluate, select, or adopt any candidate, and it changes no catalog selection file.",
         "component_ids lists only this run's drifted rows whose id is also a manifests/stack.json component; it is not a claim that every drifted id in the full drift report was reviewed.",
@@ -9685,13 +9690,13 @@
     },
     {
       "path": "evidence/artifacts/catalog-freshness-20260923/drift.md",
-      "sha256": "ba8563ad05c077cf5403822314efe246a408edc279c800279bb8d1960cd6c282",
-      "bytes": 5789
+      "sha256": "9c9706c7296fd68c459276e66d616f04ac5b698196c35d1d921f8757be0510e3",
+      "bytes": 9091
     },
     {
       "path": "evidence/artifacts/catalog-freshness-20260923/manifest-20260923.json",
-      "sha256": "24be193752ce980c04aa2f70ce4f1200263532015da8742367eb4376f307e267",
-      "bytes": 165458
+      "sha256": "ec6f40a94567c8f0a95a3d22688ec7cefc412ef97de94f99a2803676e6954290",
+      "bytes": 166445
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -26550,8 +26555,8 @@
     },
     {
       "path": "evidence/receipts/catalog-freshness-20260923.json",
-      "sha256": "b952a45d650cffda3fe5eb0967d9adda29d2d420b00224a0852bb3540d5961a5",
-      "bytes": 1996
+      "sha256": "8598a451bb1b3415528153293c3418e823b40e0d25a4eae160c2d8494494fc50",
+      "bytes": 2090
     },
     {
       "path": "evidence/receipts/catalog-runtime-review-20260921.json",
