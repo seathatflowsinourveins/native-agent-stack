@@ -2216,7 +2216,36 @@
       ]
     }
   ],
-  "qualified_models": [],
+  "qualified_models": [
+    {
+      "catalog": "foundation",
+      "layer_id": "semantic-rag",
+      "component_id": "vllm",
+      "platform": "linux-wsl2-x86_64",
+      "bars": "local worker for mini-swe-agent/pydantic-ai, hermes tool-call parser, thinking off: 20/20 valid tool calls (bar 19) and 4/5 exact-content tasks (bar 4), one run, exactly at the task bar; evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json",
+      "host_id": "rtx5090-laptop-20260923",
+      "model_id": "Qwen/Qwen3-8B-AWQ",
+      "receipt_path": "evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json",
+      "result": "pass",
+      "revision": "4da05a8e",
+      "runtime": "vllm",
+      "runtime_version": "0.29.0"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "semantic-rag",
+      "component_id": "vllm",
+      "platform": "linux-wsl2-x86_64",
+      "bars": "ai-memory hybrid retrieval with query:/passage: prefixes at max-model-len 8192: nDCG@10 +0.078 over all-MiniLM-L6-v2 (95% CI 0.037-0.128, bar 0.03), top-5 hits not lower, 130/130 pages; evidence/artifacts/local-model-alignment-20260923/",
+      "host_id": "rtx5090-laptop-20260923",
+      "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "receipt_path": "evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json",
+      "result": "pass",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "runtime": "vllm",
+      "runtime_version": "0.25.0"
+    }
+  ],
   "summary": {
     "layers": {
       "foundation": 20,

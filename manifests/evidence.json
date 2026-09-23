@@ -8560,8 +8560,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "2159fdd3be82c5d20e8500a868999d03a4a4dbec397b9d67cac3fe60e65d7eba",
-      "bytes": 179499
+      "sha256": "44e20f2c66969b6281af5c47f585a2871c2e271427a3cab4dfaca9cfc03edf8c",
+      "bytes": 181016
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -8610,8 +8610,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "1e7de47b4c2ef57adf35b13912c7cae42184a61858a28ba0d17030e355c2bdec",
-      "bytes": 73869
+      "sha256": "31c127d82da4690b256c5d483a05fe8af59c2955e08f888412d525c3c3247d32",
+      "bytes": 75364
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9040,7 +9040,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "c4d18d82e9dd132b284dad5846a89491d7c8f122aa062e52548df531d845aac5",
+      "sha256": "a91a6c459f84085ed54e4cfcfe1198b53da01cce1492e52ff9d881e8df2001e8",
       "bytes": 18618
     },
     {
@@ -9325,8 +9325,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "26ac5cb6768a6ce624b3885e1500fb660097bd029930c39a538b833d997d637c",
-      "bytes": 14451
+      "sha256": "8b6c807bd90d7f5bd49d15e926e1a0e307d0fd1c416ddaafbd763fabd70c0cb4",
+      "bytes": 14833
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -13517,6 +13517,11 @@
       "path": "evidence/artifacts/usage-report.source.txt",
       "sha256": "e5ba2fc9e397b97888a4929069434321e4ea17ea298a536ae20360638a304d50",
       "bytes": 11763
+    },
+    {
+      "path": "evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json",
+      "sha256": "3d5a293615e6ddd3e82e9323e54f8784d46d7adaa94606ec373b81f9426a2a4e",
+      "bytes": 3875
     },
     {
       "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--difftastic--use--20260923.json",
