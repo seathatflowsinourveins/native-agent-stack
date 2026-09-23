@@ -21,7 +21,7 @@
   "blueprints/us-equities/adaptive-paper/simulation.py": "085e578e9fabe03ccefdc68b4796b9cf5012aca8d832d65107e4b95e0a80621b",
   "blueprints/us-equities/adaptive-paper/strategies.py": "56e9f639f61111282de3d0795908ea11719a22058899cc59f8839e10529f86cf",
   "blueprints/us-equities/adaptive-paper/strategies_v1.py": "5721d077d321347d769ad0b35ccd75ffb805076f3d6fc11d9a59168334e98a8c",
-  "blueprints/us-equities/adaptive-paper/transport.py": "fe10f01bfe05880da08625fb5280a26ca51d05cf2262687fb0cde1caa32af8c5",
+  "blueprints/us-equities/adaptive-paper/transport.py": "861acfed36a25e760a53cb3aee539dcedb34c9e2395679576e4ffcc49a635b9b",
   "tests/test_adaptive_market_research.py": "dfd7a09380a7b1b10633c2edf05daf5a35bfcb48498fff130a2d84ff7190e395",
   "tests/test_adaptive_paper_exits.py": "13a82d65ad1b2e72a8ca0fbb8bbb178a01ded1301399604c9e304ae213456764",
   "tests/test_adaptive_paper_metrics.py": "8b0627f752ddf11c87005200e76d0ad4873261905ba073163476c66659d564f9",
@@ -33,5 +33,5 @@
   "tests/test_adaptive_paper_sessions.py": "6fb5f03cdbdb7fd4cf0105cfd4002a41ae0adb1ef18770f0bdaaae054661e92b",
   "tests/test_adaptive_paper_stop_status.py": "4d7d11330f340abb9b1937042ca269065f5f0afdd5b4522874f68719a96ac7b3",
   "tests/test_adaptive_paper_strategies.py": "76319884c13693ef82f976a06ddfb69973029d4386e88d667b84bf9b382ccffa",
-  "tests/test_adaptive_paper_transport.py": "7b2e96bcbd1385bcceb6d7f055382bf59985020b22d7d7bd11478b7d86370352"
+  "tests/test_adaptive_paper_transport.py": "c4873848baacb28ff2fd439d0e341622e0f2c8fc752e0421da09933039fc773c"
 }

@@ -104,6 +104,20 @@ class Normalization(unittest.TestCase):
         with self.assertRaises(t.TransportError):
             t.timestamp_ns("2026-09-21T15:00:00")
 
+    def test_crossed_and_one_sided_quotes_are_untradable_not_corrupt(self):
+        base = {"S": "SPY", "bp": "100.01", "ap": "100.02", "bs": 1, "as": 1, "t": "2026-09-23T15:00:00.000000001Z"}
+        self.assertEqual(t.normalize_quote(base)["bid"], "100.01")
+        self.assertEqual(t.normalize_quote({**base, "bp": "100.02"})["ask"], "100.02")  # locked is tradable
+        for changes, reason in (({"bp": "336.23", "ap": "336.21"}, "crossed"), ({"bp": 0}, "one_sided"),
+                                ({"ap": "0.00"}, "one_sided")):
+            with self.subTest(changes=changes), self.assertRaises(t.InvalidQuote) as caught:
+                t.normalize_quote({**base, **changes})
+            self.assertEqual(caught.exception.reason, reason)
+        for changes in ({"bp": "-1"}, {"t": None}, {"bs": -1}, {"ap": "NaN"}):
+            with self.subTest(changes=changes), self.assertRaises(t.TransportError) as caught:
+                t.normalize_quote({**base, **changes})
+            self.assertNotIsInstance(caught.exception, t.InvalidQuote)
+
     def test_cumulative_fill_cannot_exceed_order(self):
         with self.assertRaises(t.TransportError):
             t.normalize_order(order(filled_qty="2"))
@@ -465,6 +479,38 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         self.assertIn("queue_overflow", self.port.health["reasons"])
         with self.assertRaises(t.TransportError):
             self.port.mark_reconciled()
+
+    def _stream_quote(self, **changes):
+        stamp = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime()) + ".000000000Z"
+        return {"S": "SPY", "bp": "100.01", "ap": "100.02", "bs": 1, "as": 1, "t": stamp, **changes}
+
+    async def _drain(self):
+        task = asyncio.create_task(self.port._consume_events())
+        for _ in range(100):
+            if self.port._events.empty():
+                break
+            await asyncio.sleep(0.01)
+        await asyncio.sleep(0.02)
+        task.cancel()
+        await asyncio.gather(task, return_exceptions=True)
+
+    async def test_crossed_streamed_quote_is_dropped_and_counted_not_fatal(self):
+        seen = []
+        self.port._on_quote = seen.append
+        self.port._enqueue("quote", self._stream_quote(bp="100.03", ap="100.02"))
+        self.port._enqueue("quote", self._stream_quote(bp=0))
+        self.port._enqueue("quote", self._stream_quote())
+        await self._drain()
+        self.assertEqual(self.port.health["reasons"], [])
+        self.assertEqual(self.port.health["dropped_quotes"], {"crossed": 1, "one_sided": 1})
+        self.assertEqual([q["bid"] for q in seen], ["100.01"])
+        self.assertTrue(self.port.ready)
+
+    async def test_malformed_streamed_quote_still_fails_the_transport(self):
+        self.port._on_quote = lambda quote: None
+        self.port._enqueue("quote", self._stream_quote(bs=-1))
+        await self._drain()
+        self.assertIn("callback_failure", self.port.health["reasons"])
 
     async def test_missing_order_update_freezes(self):
         self.port._pending_stream["trial-1"] = time.monotonic() - 20
