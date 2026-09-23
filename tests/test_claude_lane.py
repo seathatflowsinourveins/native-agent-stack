@@ -4,6 +4,9 @@ The Claude lane workflow returns its layers without writing files; claude_lane.p
 that writes <work-dir>/claude/<catalog>__<layer_id>.json with the runner-owned model.family and
 provenance a new-wave return needs, refusing workflow bytes that are uncommitted or not vendored.
 """
+import contextlib
+import hashlib
+import io
 import importlib.util
 import json
 import shutil
@@ -63,8 +66,10 @@ class ClaudeLaneWriterTests(unittest.TestCase):
             "lost": ["us-equities/l3"]}), encoding="utf-8")
 
     def run_main(self, *extra):
+        # The vendored role stands in for the host's installed copy, which CI does not have.
         return claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
-                                 "--agentlab-root", str(self.agentlab), *extra])
+                                 "--agentlab-root", str(self.agentlab), "--agent-file",
+                                 str(claude_lane.VENDORED_AGENT), *extra])
 
     def test_written_return_carries_family_and_vendored_provenance(self):
         self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
@@ -74,7 +79,20 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         self.assertIsNone(lane_provenance_issue("claude", data["provenance"]))
         self.assertEqual(data["provenance"]["workflow_path"], ".claude/workflows/layer-verdict-lane.js")
         self.assertEqual(data["provenance"]["workflow_sha256"], claude_lane.vendored_sums()["layer-verdict-lane.js"])
+        self.assertEqual(data["provenance"]["agent_sha256"],
+                         hashlib.sha256(claude_lane.VENDORED_AGENT.read_bytes()).hexdigest())
         self.assertFalse((self.work / "claude" / "foundation__l2.json").exists())
+
+    def test_a_role_definition_other_than_the_vendored_one_is_refused(self):
+        # Codex review of #145: a stale or edited same-named role could load labels or broader tools.
+        edited = self.result.parent / "blind-lane-reviewer.md"
+        edited.write_text(claude_lane.VENDORED_AGENT.read_text(encoding="utf-8") + "\nextra rule\n", encoding="utf-8")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            code = claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
+                                     "--agentlab-root", str(self.agentlab), "--agent-file", str(edited)])
+        self.assertEqual(code, 2)
+        self.assertIn("is not the vendored", err.getvalue())
+        self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
 
     def test_the_refutation_summary_is_copied_and_layers_without_a_final_are_listed_as_failures(self):
         # Review of catalog #122, findings 5 and 7: the lane's votes were dropped, and a layer without

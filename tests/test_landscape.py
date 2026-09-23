@@ -31,14 +31,14 @@ NEW_WAVE_MODELS = {"claude": {"name": "claude-opus-5-5", "effort": "high", "fami
                    "codex": {"name": "gpt-6-astra", "effort": "high", "family": "openai"}}
 NEW_WAVE_PROVENANCE = {
     "claude": {"workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
-               "workflow_sha256": "a" * 64, "agentlab_commit": "b" * 40},
+               "workflow_sha256": "a" * 64, "agentlab_commit": "b" * 40, "agent_sha256": "e" * 64},
     "codex": {"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64},
 }
 # The fixture's tools/sota-convergence/lane-provenance.json: the lane code above is registered.
 NEW_WAVE_REGISTRY = {
     "claude": [{"workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
                 "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
-                "workflow_sha256": "a" * 64}],
+                "workflow_sha256": "a" * 64, "agent_sha256": "e" * 64}],
     "codex": [{"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64}],
 }
 

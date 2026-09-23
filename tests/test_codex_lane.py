@@ -753,5 +753,18 @@ class DocumentedCommandTests(unittest.TestCase):
                         f"the module docstring {docstring} must contain {isolation} in order")
 
 
+class EffortResumeTests(CodexLaneFixture):
+    """Codex review of #145: a changed --effort reruns a layer instead of resuming it."""
+
+    def test_a_return_made_at_another_effort_is_not_resumed(self):
+        self.write_packet("foundation", "native-clients")
+        self.assertEqual(self.run_lane(["--model", "gpt-6-astra", "--effort", "high"]), 0)
+        first = len(self.argv_calls())
+        self.assertEqual(self.run_lane(["--model", "gpt-6-astra", "--effort", "high"]), 0)
+        self.assertEqual(len(self.argv_calls()), first)
+        self.assertEqual(self.run_lane(["--model", "gpt-6-astra", "--effort", "medium"]), 0)
+        self.assertGreater(len(self.argv_calls()), first)
+
+
 if __name__ == "__main__":
     unittest.main()

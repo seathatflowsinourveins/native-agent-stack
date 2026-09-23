@@ -13,7 +13,7 @@ adding the two runner-owned fields a new-wave Claude return must carry
 - ``model.family`` is ``"anthropic"``; ``model.name`` is ``--resolved-model``
   when given (the resolved child model, for example ``claude-opus-5-5`` from
   ``child-usage.mjs --latest``), else the workflow's bound alias.
-- ``provenance`` is ``{workflow_path, workflow_sha256, agentlab_commit}``:
+- ``provenance`` is ``{workflow_path, workflow_sha256, agentlab_commit, agent_sha256}``:
   the workflow path relative to the agent-lab checkout, the sha256 of those
   bytes, and that checkout's ``HEAD``. The script refuses (exit 2) when the
   workflow file differs from ``HEAD`` or its sha256 is not the vendored
@@ -44,6 +44,11 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 CATALOG_ROOT = HERE.parent.parent
 VENDORED_SUMS = CATALOG_ROOT / "examples" / "claude-native" / "workflows" / "SHA256SUMS"
+# The role every lane stage runs as (layer-verdict-lane.js agentType); its definition carries the blinding
+# (Read/Glob/Grep, no skills, omitClaudeMd), so a return names the role bytes it ran with (Codex review of #145).
+LANE_AGENT = "blind-lane-reviewer"
+VENDORED_AGENT = CATALOG_ROOT / "examples" / "claude-native" / "agents" / f"{LANE_AGENT}.md"
+DEFAULT_AGENT_FILE = Path.home() / ".claude" / "agents" / f"{LANE_AGENT}.md"
 DEFAULT_WORKFLOW = ".claude/workflows/layer-verdict-lane.js"
 LANE_FAMILY = "anthropic"
 
@@ -69,8 +74,22 @@ def git(agentlab_root: Path, *args) -> subprocess.CompletedProcess:
         raise ProvenanceError("git is not installed; it is needed to name the agent-lab commit") from error
 
 
-def lane_provenance(agentlab_root: Path, workflow: str, sums: dict) -> dict:
-    """{workflow_path, workflow_sha256, agentlab_commit} for committed, vendored workflow bytes."""
+def agent_sha256(agent_file: Path, vendored: Path = VENDORED_AGENT) -> str:
+    """The sha256 of the role definition the lane loaded, which must equal the catalog's vendored copy: a stale
+    or locally edited same-named role could load incumbent-revealing instructions or broader tools."""
+    if not agent_file.is_file():
+        raise ProvenanceError(f"role definition {agent_file} not found; install the vendored {LANE_AGENT}.md")
+    digest = hashlib.sha256(agent_file.read_bytes()).hexdigest()
+    expected = hashlib.sha256(vendored.read_bytes()).hexdigest() if vendored.is_file() else None
+    if digest != expected:
+        raise ProvenanceError(f"{agent_file} sha256 {digest} is not the vendored {vendored.name} ({expected}); "
+                              "install the vendored role before recording")
+    return digest
+
+
+def lane_provenance(agentlab_root: Path, workflow: str, sums: dict, agent_file: Path = DEFAULT_AGENT_FILE) -> dict:
+    """{workflow_path, workflow_sha256, agentlab_commit, agent_sha256} for committed, vendored workflow bytes and
+    the vendored role definition the lane ran as."""
     path = agentlab_root / workflow
     if not path.is_file():
         raise ProvenanceError(f"workflow {workflow} not found under {agentlab_root}")
@@ -84,7 +103,8 @@ def lane_provenance(agentlab_root: Path, workflow: str, sums: dict) -> dict:
         raise ProvenanceError(f"{agentlab_root} is not a git checkout: {head.stderr.strip()}")
     if git(agentlab_root, "diff", "--quiet", "HEAD", "--", workflow).returncode != 0:
         raise ProvenanceError(f"{workflow} differs from HEAD in {agentlab_root}; commit it before recording")
-    return {"workflow_path": workflow, "workflow_sha256": digest, "agentlab_commit": head.stdout.strip()}
+    return {"workflow_path": workflow, "workflow_sha256": digest, "agentlab_commit": head.stdout.strip(),
+            "agent_sha256": agent_sha256(agent_file)}
 
 
 def lane_return(layer: dict, provenance: dict, resolved_model=None) -> dict:
@@ -123,6 +143,9 @@ def parse_args(argv=None):
     parser.add_argument("--work-dir", type=Path, required=True, help="The lane_packets.py work dir.")
     parser.add_argument("--agentlab-root", type=Path, required=True, help="The agent-lab checkout the lane ran from.")
     parser.add_argument("--workflow", default=DEFAULT_WORKFLOW, help="Workflow path relative to --agentlab-root.")
+    parser.add_argument("--agent-file", type=Path, default=DEFAULT_AGENT_FILE,
+                        help=f"The {LANE_AGENT} definition the lane loaded (default: the user-level copy; a "
+                             "project-level copy in the directory the lane ran from wins over it).")
     parser.add_argument("--resolved-model", default=None,
                         help="Resolved child model name (e.g. claude-opus-5-5); default keeps the bound alias.")
     return parser.parse_args(argv)
@@ -131,7 +154,7 @@ def parse_args(argv=None):
 def main(argv=None) -> int:
     args = parse_args(argv)
     try:
-        provenance = lane_provenance(args.agentlab_root.resolve(), args.workflow, vendored_sums())
+        provenance = lane_provenance(args.agentlab_root.resolve(), args.workflow, vendored_sums(), args.agent_file)
     except ProvenanceError as error:
         print(error, file=sys.stderr)
         return 2

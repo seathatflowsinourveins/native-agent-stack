@@ -96,7 +96,8 @@ class AdjudicateFixture(unittest.TestCase):
             {"preferred": claude_position if preferred_lane == "claude" else other, "why": WHY,
              "evidence_refs": [str(self.repo / "evidence/receipt.json")]},
             {"refuted": refuted, "reason": "The cited receipt exists and shows the run.", "evidence_refs": []},
-            input_sha256=adjudicate.sha256_file(input_path) if input_path.is_file() else None)
+            input_sha256=adjudicate.sha256_file(input_path) if input_path.is_file() else None,
+            provenance=adjudicate.adjudication_provenance())
         adjudicate.write_json(self.work / "adjudication-judgments" / lane / f"{NAME}.{order}.json", record)
 
     def assemble(self):
@@ -611,6 +612,46 @@ class RereviewOf145Tests(AdjudicateFixture):
                              "text": "the Codex lane"}}]}
         adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
         self.assertEqual(adjudicate.recorded_leaks(self.work), set())
+
+
+class SecondRereviewOf145Tests(AdjudicateFixture):
+    """Codex re-review of #145 (second round)."""
+
+    def test_a_layer_with_a_missing_return_is_skipped_and_purged(self):
+        self.inputs()
+        out = self.base / "adjudications"
+        out.mkdir()
+        (out / f"{NAME}.json").write_text("{}", encoding="utf-8")
+        (self.work / "codex" / f"{NAME}.json").unlink()
+        self.inputs()
+        index = json.loads((self.work / "adjudication-inputs" / "index.json").read_text(encoding="utf-8"))
+        self.assertIn(NAME, [entry["layer"] for entry in index["skipped"]])
+        quiet(adjudicate.main, ["assemble", "--work-dir", str(self.work), "--out", str(out)])
+        self.assertFalse((out / f"{NAME}.json").exists())
+
+    def test_paths_inside_backticks_are_scrubbed_and_caught(self):
+        text = "cited `/home/example/lane-codex/evidence/x.json` in the review"
+        self.assertNotIn("/home/example", adjudicate.scrub_text(text, str(self.work / "packets"), ()))
+        self.assertTrue(adjudicate.unscrubbed_paths({"why": "left `/opt/lane/x.json` here"}))
+
+    def test_roots_with_tokenizer_delimiters_are_refused(self):
+        for root in ("/work/blind/lane(repo)/export", "/work/blind/lane's/export", "/work/blind/a;b/export"):
+            self.assertIsNotNone(adjudicate.root_issue(root), root)
+        self.assertIsNone(adjudicate.root_issue("/work/blind/lane-repo/export"))
+
+    def test_judgments_under_different_provenance_refuse_the_layer(self):
+        self.inputs()
+        for lane in ("claude", "codex"):
+            for order in adjudicate.ORDERS:
+                self.judgment(lane, order, "codex")
+        path = self.work / "adjudication-judgments" / "codex" / f"{NAME}.BA.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        data["provenance"] = dict(data["provenance"], prompt_sha256="0" * 64)
+        path.write_text(json.dumps(data), encoding="utf-8")
+        code, err, record = self.assemble()
+        self.assertEqual(code, 1)
+        self.assertIsNone(record)
+        self.assertIn("different provenance", err)
 
 
 class InputScrubTests(AdjudicateFixture):

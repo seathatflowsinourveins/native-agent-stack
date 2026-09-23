@@ -177,7 +177,8 @@ def discover_packets(work_dir: Path, layers: "set[str] | None") -> list:
 
 
 def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet_sha256: str,
-                             provenance: dict = None, configured_model: str = None) -> bool:
+                             provenance: dict = None, configured_model: str = None,
+                             configured_effort: str = None) -> bool:
     """Resumable-skip check: the file must parse as a JSON object already
     forced onto this lane and this exact packet. A present-but-different
     ``packet_sha256`` (the packet changed since the file was written) is
@@ -216,6 +217,10 @@ def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet
     if model.get("name") in (None, "", "unknown"):
         return False
     if configured_model and model.get("name") != configured_model:
+        return False
+    # A changed --effort reruns the layer too (Codex review of #145): the requested reasoning setting must
+    # not be silently ignored by resuming a return made at another effort.
+    if configured_effort and model.get("effort") != configured_effort:
         return False
     return True
 
@@ -550,7 +555,8 @@ def main(argv=None) -> int:
     for catalog, layer_id, packet_path in packets:
         packet_sha256 = sha256_file(packet_path)
         out_path = codex_dir / f"{catalog}__{layer_id}.json"
-        if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256, provenance, args.model):
+        if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256, provenance, args.model,
+                                    args.effort):
             continue
         pending.append((catalog, layer_id, packet_path, packet_sha256, out_path))
 

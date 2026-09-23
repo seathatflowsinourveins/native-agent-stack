@@ -1352,11 +1352,13 @@ CODEX_LANE_BYTES = b"# fixture codex_lane.py\n"
 LANE_PROMPT_BYTES = b"# fixture lane-prompt.md\n"
 VENDORED_WORKFLOW = "examples/claude-native/workflows/layer-verdict-lane.js"
 SOURCE_WORKFLOW = ".claude/workflows/layer-verdict-lane.js"
+AGENT_SHA256 = "e" * 64  # the fixture's registered blind-lane-reviewer definition hash
 
 
 def lane_provenance(lane):
     if lane == "claude":
-        return {"workflow_path": SOURCE_WORKFLOW, "workflow_sha256": WORKFLOW_SHA256, "agentlab_commit": "b" * 40}
+        return {"workflow_path": SOURCE_WORKFLOW, "workflow_sha256": WORKFLOW_SHA256, "agentlab_commit": "b" * 40,
+                "agent_sha256": AGENT_SHA256}
     return {"codex_lane_py_sha256": hashlib.sha256(CODEX_LANE_BYTES).hexdigest(),
             "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest()}
 
@@ -1408,7 +1410,7 @@ def prepare_new_wave_root(fixture):
     fixture.write("tools/sota-convergence/lane-provenance.json", {
         "schema_version": 1,
         "claude": [{"workflow_path": SOURCE_WORKFLOW, "vendored_path": VENDORED_WORKFLOW,
-                    "workflow_sha256": WORKFLOW_SHA256}],
+                    "workflow_sha256": WORKFLOW_SHA256, "agent_sha256": AGENT_SHA256}],
         "codex": [{key: value for key, value in lane_provenance("codex").items()}]})
     fixture.write("evidence/receipt.json", {"exit_code": 0, "scope": "A registered local fixture receipt"})
     receipt_bytes = (fixture.root / "evidence/receipt.json").read_bytes()

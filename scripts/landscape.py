@@ -82,7 +82,7 @@ FAMILY_MODEL_PATTERNS = {
 SHA256_TEXT = re.compile(r"[a-f0-9]{64}")
 GIT_COMMIT_TEXT = re.compile(r"[a-f0-9]{40}")
 LANE_PROVENANCE_FIELDS = {
-    "claude": ("workflow_path", "workflow_sha256", "agentlab_commit"),
+    "claude": ("workflow_path", "workflow_sha256", "agentlab_commit", "agent_sha256"),
     "codex": ("codex_lane_py_sha256", "prompt_sha256"),
 }
 RUN_MANIFEST_NAME = "run-manifest.json"
@@ -140,7 +140,7 @@ REFUTATION_STATUSES = ("unrefuted", "refuted", "unknown")
 # prompt_sha256). tests/test_verdict_lane_vendoring.py keeps it covering the current
 # codex_lane.py, lane-prompt.md and vendored workflow bytes.
 LANE_PROVENANCE_REGISTRY = "tools/sota-convergence/lane-provenance.json"
-LANE_PROVENANCE_KEYS = {"claude": ("workflow_path", "workflow_sha256"),
+LANE_PROVENANCE_KEYS = {"claude": ("workflow_path", "workflow_sha256", "agent_sha256"),
                         "codex": ("codex_lane_py_sha256", "prompt_sha256")}
 
 
@@ -296,8 +296,9 @@ def claude_refutation_issue(refutation):
 
 
 def lane_provenance_issue(lane, provenance):
-    """A new-wave sealed return names what produced it: the Claude lane its workflow file, hash and
-    agent-lab commit; the Codex lane the hashes of codex_lane.py and the prompt it filled."""
+    """A new-wave sealed return names what produced it: the Claude lane its workflow file, hash, agent-lab
+    commit and the hash of the role definition its stages ran as; the Codex lane the hashes of codex_lane.py
+    and the prompt it filled."""
     fields = LANE_PROVENANCE_FIELDS[lane]
     if not isinstance(provenance, dict) or set(provenance) != set(fields):
         return f"provenance must be an object with exactly {', '.join(fields)} for the {lane} lane"

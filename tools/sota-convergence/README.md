@@ -1522,6 +1522,18 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
 - **Snapshot scope:** `claude-collect` touches only the items in the `claude-args` snapshot. It discards a
   leak reported on an input rebuilt since that snapshot, so the stale leak cannot mark the new content.
 - **Assembly:** `assemble` first removes the earlier record of every layer `inputs` indexed or skipped.
+- **Missing returns:** a layer with a missing lane return is recorded as skipped, so its earlier record is
+  purged too.
+- **Provenance:** judgments carry the adjudication provenance captured when they ran: at the Codex run's
+  launch, or in the `claude-args` snapshot. `assemble` refuses a layer whose counted judgments ran under
+  different provenance.
+- **Codex leaks:** a Codex leak is bound to the input content hashed before the call.
+- **Paths:** roots and work dirs are limited to `[A-Za-z0-9._/-]`. Backticks are path delimiters, and the
+  residual check does not depend on the replacement boundary.
+- **Claude lane role:** its provenance includes `agent_sha256`, the hash of the `blind-lane-reviewer`
+  definition it loaded. `claude_lane.py` refuses a definition other than the vendored
+  `examples/claude-native/agents/blind-lane-reviewer.md`, and `lane-provenance.json` registers the hash.
+- **`codex_lane` resume:** a lane return is reused only at the same `--model` and `--effort`.
 
 **Limits:**
 - Writing style can still reveal a lane.

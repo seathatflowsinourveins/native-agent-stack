@@ -77,14 +77,20 @@ class LaneProvenanceRegistryTests(unittest.TestCase):
 
     def test_registry_entries_are_well_formed_and_unique(self):
         registry = self.registry()
-        for lane, fields in (("claude", ("workflow_path", "workflow_sha256")),
+        # agent_sha256 (the blind-lane-reviewer role hash) is part of the Claude key from 2026-09-23; entries
+        # registered before it simply lack it (the registry is append-only).
+        for lane, fields in (("claude", ("workflow_path", "workflow_sha256", "agent_sha256")),
                              ("codex", ("codex_lane_py_sha256", "prompt_sha256"))):
-            keys = [tuple(entry[field] for field in fields) for entry in registry[lane]]
+            keys = [tuple(entry.get(field) for field in fields) for entry in registry[lane]]
             self.assertEqual(len(keys), len(set(keys)), lane)
             for entry in registry[lane]:
                 for field in fields:
-                    if field.endswith("sha256"):
+                    if field.endswith("sha256") and field in entry:
                         self.assertRegex(entry[field], r"^[a-f0-9]{64}$")
+
+    def test_the_vendored_lane_role_is_registered(self):
+        agent = hashlib.sha256((ROOT / "examples/claude-native/agents/blind-lane-reviewer.md").read_bytes()).hexdigest()
+        self.assertIn(agent, [entry.get("agent_sha256") for entry in self.registry()["claude"]])
 
 
 if __name__ == "__main__":
