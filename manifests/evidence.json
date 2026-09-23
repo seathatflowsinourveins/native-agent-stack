@@ -3108,8 +3108,8 @@
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "4587079459a59ddedb12b3fb13b96019c142a91273290fb2cff0f577aeae75c1",
-      "bytes": 29420
+      "sha256": "9955f1ca0bdee97668f822ce257818629b75b50057aa5ba89451f5bbe21db206",
+      "bytes": 33297
     },
     {
       "path": "adoption/bootstrap.md",
@@ -3153,8 +3153,8 @@
     },
     {
       "path": "adoption/launchd/launchd-agents.sh",
-      "sha256": "15ebb4b155c428339f86a8177d7338852a7e90e387d733240784981de6ca9517",
-      "bytes": 13054
+      "sha256": "aa5ec6c7c7dc769e1fbb0732acc6c8ca1da0db70300597ccad5c2fb2e91cb7f5",
+      "bytes": 15595
     },
     {
       "path": "adoption/lifecycle.md",
@@ -3203,8 +3203,8 @@
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "1b919a5876c37561f65452ddc81f3b92f9984d0bc5a5b52990a8c625b5bcbc01",
-      "bytes": 16503
+      "sha256": "82be4ffd2125f887de73658d59ad896ff2ee9f820de029d2c41b9825a8474623",
+      "bytes": 17784
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -8024,8 +8024,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "822fa078142d43b08f64020808df5d5027986d5913bd223e15ba9b52ba3fe1d3",
-      "bytes": 71540
+      "sha256": "9f9b90fca6a3f669e12932aa95b3aab1ac3460cb1cfc6b8aa52c7c88cf07592e",
+      "bytes": 71603
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -8719,8 +8719,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "156de59bca9d4df1bd977fbf3fdc04c1eddf08c45576540b56d2f66bbc32fae6",
-      "bytes": 13372
+      "sha256": "6fd2ed5d6f83a0e99bc39343f5986cfd90163cca13dc474bb933e7d288a12ec5",
+      "bytes": 13408
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -14039,8 +14039,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "473f10e1642ff27304a90212fb2cedb3ddac6aa8a57169ea213aaf57c0a426ee",
-      "bytes": 67012
+      "sha256": "434d2fbc5fd8cb73745ffd9ec55e7bb244ebbe2a1b9d81f29d769da49ae78ebd",
+      "bytes": 80077
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -14054,8 +14054,8 @@
     },
     {
       "path": "tests/test_adoption_launchd.py",
-      "sha256": "970aebc7cf0b81f3de7f6d7cc8190c257c66f9938ea1b87f96de325fe7eefa59",
-      "bytes": 34819
+      "sha256": "79b66e6809b8552653161054c539b202a76d7823d12b62de8dfb1a0867977705",
+      "bytes": 41886
     },
     {
       "path": "tests/test_adoption_status.py",
@@ -14449,8 +14449,8 @@
     },
     {
       "path": "tools/adoption/render_launchd.py",
-      "sha256": "071647d1e60241dff386ccb2048d59e83a3d7bd4b6022ee8da7bb428dba78251",
-      "bytes": 5247
+      "sha256": "253a3f4591fa1eb22314a7d085988464f3a3c7c009c7a52b5ee2566d160f0749",
+      "bytes": 5605
     },
     {
       "path": "tools/sota-convergence/README.md",
