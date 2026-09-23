@@ -3063,8 +3063,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "b4140521ab4c77f1bb5f792254f57492e8ab20e85dd3d8c32a8c5e307d6162bb",
-      "bytes": 28593
+      "sha256": "960f589437a93e3fdb31201e2f7b34944bd9d87cba8d623b8df395e6745abb7d",
+      "bytes": 32514
     },
     {
       "path": "AGENTS.md",
@@ -7624,7 +7624,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "1c71e08a4b07f6b252bd246e0c3dec547c056a90ab109ef9e2ffd127c4a4e1e2",
+      "sha256": "c17cf5797c9cfc1452fa0e162f127569d913485538f884ec573b8e1b4916765c",
       "bytes": 12921432
     },
     {
@@ -11634,8 +11634,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "84832096310d51d71d60bbccaadbc55d5ec8584579fe842bf84deaf77b9237c2",
-      "bytes": 33946
+      "sha256": "e92909cf9ef09d4a4098c5c2acb7c821d7e59af6709cd9c11e22d8ae3932fe18",
+      "bytes": 42708
     },
     {
       "path": "tests/test_gpu_inference.py",

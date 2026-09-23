@@ -331,6 +331,56 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 f"allowlisted commit reference must still be detected, got: {findings}",
             )
 
+    def test_c7_narrative_marker_word_followed_by_unrelated_long_hex_is_still_detected(self):
+        """Fourth-round finding (blind Opus/Codex evidence review of fix round
+        3): round 3 widened the marker-hex length window to `[0-9a-f]{4,64}`,
+        which newly exempted a marker word used as ORDINARY PROSE (not an
+        actual commit reference) immediately followed by an unrelated
+        41-64-char hex secret, e.g. `"detail": "source token: <64-hex>"` --
+        "source" here is not a commit/pin marker, just an English sentence,
+        but it matched the marker alternative all the same. The round-4 fix
+        narrows the marker-hex window to `4-12` (short abbreviated hashes) or
+        exactly `40` (a full SHA-1), so a marker word followed by a 64-hex
+        run is no longer exempted."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            allow_dir = target / "evidence" / "artifacts" / "blind-catalog-convergence-20260921"
+            allow_dir.mkdir(parents=True)
+            (allow_dir / "claude-coverage-review.json").write_text(
+                "{\n"
+                f'  "detail": "source token: {HEX64}"\n'
+                "}\n"
+            )
+            findings = self._scan(target)
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(
+                HEX64, secrets,
+                f"a 64-hex secret preceded only by the generic prose word 'source' (not a real "
+                f"commit reference) must still be detected, got: {findings}",
+            )
+
+    def test_c8_narrative_marker_and_unrelated_long_hex_secret_inside_the_SAME_string_is_still_detected(self):
+        """Same round-4 finding, the same-string variant: a real 40-hex
+        commit reference AND an unrelated 64-hex secret, both introduced by
+        marker words, inside the SAME JSON string value."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            allow_dir = target / "evidence" / "artifacts" / "blind-catalog-convergence-20260921"
+            allow_dir.mkdir(parents=True)
+            (allow_dir / "screening-ledger.json").write_text(
+                "{\n"
+                f'  "detail": "commit {HEX40}; source api_key: {HEX64}"\n'
+                "}\n"
+            )
+            findings = self._scan(target)
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(
+                HEX64, secrets,
+                f"a 64-hex secret introduced by the marker word 'source' but citing no real "
+                f"commit id must still be detected even alongside a genuine commit reference "
+                f"in the same string, got: {findings}",
+            )
+
     def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):
         """`--exit-code 0` must return process exit code 0 even when real leaks are found.
 
@@ -410,6 +460,22 @@ class GitleaksNarrativeAllowlistRegexTests(unittest.TestCase):
         r'''(?i)^\s*"[A-Za-z0-9_]+":\s*"(?:[^"\\]|\\.)*?(?:@\s*|\b(?:pin|pinned|commit|tree|'''
         r'''source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b'''
         r'''(?:[^"\\]|\\.)*"\s*,?\s*$'''
+    )
+    # The allowlist regex exactly as it read after the round-3 (Codex review of
+    # PR #83) fix but before the round-4 (blind Opus/Codex evidence review of
+    # fix round 3) fix: closes the same-string case (ROUND_2_REGEX above) but
+    # widens the marker-hex window to `[0-9a-f]{4,64}\b`, which newly exempts a
+    # marker word used as ordinary prose (not a real commit reference)
+    # immediately followed by an unrelated 41-64-char hex secret.
+    # .gitleaks.toml no longer contains this form.
+    ROUND_3_REGEX = (
+        r'''(?i)^\s*"[A-Za-z0-9_]+":\s*"(?:(?:\\.|(?:@\s*|\b(?:pin|pinned|commit|tree|'''
+        r'''source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{4,64}\b|'''
+        r'''(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:[^"\\0-9a-fA-F]|\\.)))*(?:[0-9]{8,}|[0-9a-fA-F]{0,7})'''
+        r'''(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b'''
+        r'''[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{4,64}\b(?:(?:\\.|(?:@\s*|\b(?:pin|pinned|commit|tree|'''
+        r'''source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{4,64}\b|'''
+        r'''(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:[^"\\0-9a-fA-F]|\\.)))*(?:[0-9]{8,}|[0-9a-fA-F]{0,7})"\s*,?\s*$'''
     )
 
     def _current_allowlist_regexes(self):
@@ -548,6 +614,91 @@ class GitleaksNarrativeAllowlistRegexTests(unittest.TestCase):
             "documented residual gap: an all-decimal secret-shaped run adjacent to a real "
             "commit reference in the same string is still exempted",
         )
+
+    def test_round4_marker_hex_length_rejects_unrelated_long_hex_but_keeps_every_real_narrative_match(self):
+        """Fourth-round (blind Opus/Codex evidence review of fix round 3)
+        coverage: round 3's `[0-9a-f]{4,64}\\b` marker-hex window is narrowed
+        to `(?:[0-9a-f]{4,12}|[0-9a-f]{40})\\b` (short abbreviated hashes or a
+        full 40-hex id), which are the only two shapes real narrative lines
+        use. This closes a round-3 regression: a marker word used as ordinary
+        prose (not an actual commit reference), e.g. "source" in
+        `"detail": "source token: <64-hex>"`, immediately followed by an
+        unrelated 41-64-char hex secret, was wrongly exempted by round 3's
+        widened window."""
+        regexes = self._current_allowlist_regexes()
+        current = re.compile(regexes[0])
+        round_3 = re.compile(self.ROUND_3_REGEX)
+
+        hex40 = "1bf6df330b056ef93ab283083afdcce642387949"
+        source_prefixed = f'  "detail": "source token: {HEX64}"'
+        pinned_prefixed = f'  "detail": "pinned token: {HEX64}"'
+        same_string_with_real_commit = f'  "detail": "commit {hex40}; source api_key: {HEX64}"'
+
+        for adversarial, label in (
+            (source_prefixed, "'source' as ordinary prose before an unrelated 64-hex secret"),
+            (pinned_prefixed, "'pinned' as ordinary prose before an unrelated 64-hex secret"),
+            (same_string_with_real_commit, "real commit id plus an unrelated 64-hex secret, same string"),
+        ):
+            with self.subTest(label=label):
+                self.assertTrue(
+                    round_3.match(adversarial),
+                    f"sanity check: the round-3 regex must match this line ({label}); "
+                    "it is the round-4 reported regression",
+                )
+                self.assertFalse(
+                    current.match(adversarial),
+                    f"the round-4 fixed regex must not exempt a marker word followed by an "
+                    f"unrelated 41-64-char hex secret ({label})",
+                )
+
+        real_matches_before = 0
+        for path in self.NARRATIVE_FILES:
+            for line in path.read_text().splitlines():
+                if round_3.match(line):
+                    real_matches_before += 1
+                    self.assertTrue(
+                        current.match(line),
+                        f"round-4 fixed regex regressed a real, previously-allowlisted narrative "
+                        f"line: {line[:160]}",
+                    )
+        self.assertGreater(
+            real_matches_before, 0,
+            "the two narrative files must contain at least one real line the round-3 regex "
+            "matched, or this comparison is not exercising real content",
+        )
+
+    def test_round4_documented_residual_gap_non_hex_secret_is_not_closed(self):
+        """The round-4 fix only restricts the marker-hex window's LENGTH; it
+        does not change the free-text grammar unit's treatment of non-hex-
+        shaped characters. A high-entropy secret that is NOT hex-shaped
+        (contains letters outside a-f/A-F, e.g. a base64-ish or
+        underscore-prefixed API key) sharing the SAME JSON string as a real
+        commit/pin/tree/source marker reference is still exempted in full --
+        see .gitleaks.toml's header comment for why this is not closed with a
+        blanket non-hex run-length cap (it would break real narrative prose).
+        Pins the documented residual gap so a future tightening attempt that
+        accidentally reintroduces it (or silently over-tightens and breaks
+        real lines) is caught either way."""
+        regexes = self._current_allowlist_regexes()
+        current = re.compile(regexes[0])
+        hex40 = "1bf6df330b056ef93ab283083afdcce642387949"
+        # Non-hex-shaped (contains g/y/k/L/m/N/p/Q/r/S/t/U/v/W/z, none of
+        # which are valid hex digits) high-entropy value. Named without a
+        # credential-like substring for the same reason as the constants
+        # above (this file is itself scanned by gitleaks).
+        non_hex_high_entropy_value = "sk_" + "live_" + "Xy9kLmN2pQrStUvWz4hJ8gTq"  # built at runtime: the literal never sits in git (push protection)
+        same_string_equals = f'  "detail": "pinned commit {hex40}; password={non_hex_high_entropy_value}"'
+        same_string_colon = f'  "detail": "commit {hex40} api_key: {non_hex_high_entropy_value}"'
+        for adversarial, label in (
+            (same_string_equals, "trailing = separator"),
+            (same_string_colon, "trailing : separator"),
+        ):
+            with self.subTest(label=label):
+                self.assertTrue(
+                    current.match(adversarial),
+                    f"documented residual gap: a non-hex-shaped secret adjacent to a real "
+                    f"commit reference in the same string is still exempted ({label})",
+                )
 
 
 class GitleaksBranchAncestryHistoryTests(unittest.TestCase):

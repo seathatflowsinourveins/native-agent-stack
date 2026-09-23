@@ -113,12 +113,18 @@
 # `pin b11057`, `pin 985ef30`, `cites commit c6fbd1c5932d.`) alongside full
 # 40-hex/64-hex ids; narrowing this to exactly 40 regressed a real line (see
 # tests/test_gitleaks_config.py's round-3 regression coverage, which caught
-# this during development). Widening the marker's accepted hex length does
-# not reopen the round-1/round-2 gaps: any marker-preceded hex run was
-# already unconditionally trusted as a legitimate reference by this
-# allowlist's original design (that trust boundary -- an attacker can still
-# forge `"commit <hex-that-is-actually-a-secret>"` -- is the same
-# free-text-narrative limitation already acknowledged below, not a new one).
+# this during development). NOTE (round-4 correction): this paragraph
+# originally claimed here that widening the marker's accepted hex length to
+# 4-64 chars did not reopen the round-1/round-2 gaps, reasoning that any
+# marker-preceded hex run was already unconditionally trusted. That claim was
+# wrong for every length other than exactly 40: round 2's marker branch
+# required `[0-9a-f]{40}\b`, so a marker word immediately followed by an
+# UNRELATED 41-64-char hex secret citing no real commit id at all -- e.g.
+# `"detail": "source token: <64-hex>"` or `"pinned token: <64-hex>"`, where
+# "source"/"pinned" is ordinary prose rather than an actual commit reference
+# -- was newly exempted by the round-3 4-64 widening. See the round-4
+# paragraph below for the fix and tests/test_gitleaks_config.py's round-4
+# coverage.
 # A hex-valid run of 8+ characters that mixes in even one a-f/A-F letter
 # therefore has no valid parse anywhere in the string unless it is directly
 # preceded by a marker -- which is exactly the shape a real hex-looking
@@ -145,6 +151,59 @@
 # password, token) overwhelmingly uses the full hex alphabet, not pure
 # decimal digits. Regression coverage for the two-key-value-pair case (round
 # 2) and the same-string case (round 3) is in tests/test_gitleaks_config.py.
+#
+# 2026-09-22, fourth-round findings from a blind Opus/Codex evidence review of
+# fix round 3 (before merge to PR #83):
+#
+# Major 1 (marker-hex length regression) -- the marker-hex length window
+# round 3 widened to `[0-9a-f]{4,64}\b` is narrowed to exactly the two real
+# shapes the narrative content uses: `[0-9a-f]{4,12}` (short
+# git-abbreviated hashes, e.g. `pin b11057`, `pin 985ef30`,
+# `cites commit c6fbd1c5932d.`) or `[0-9a-f]{40}` (a full SHA-1 commit/tree
+# id) -- i.e. `(?:[0-9a-f]{4,12}|[0-9a-f]{40})\b` in place of the round-3
+# `[0-9a-f]{4,64}\b`, applied to all three occurrences of the marker branch
+# in each rule-scoped copy of this allowlist. This closes the round-3
+# regression described in the NOTE above: a marker word (including the
+# generic "source"/"pinned" words used as ordinary prose, not an actual
+# commit reference) immediately followed by an unrelated 41-64-char hex
+# secret is no longer exempted, since that length is neither a short
+# abbreviated hash nor a full 40-hex id. Verified with Python `re` (RE2-
+# compatible: no lookaround/backreferences, so match/reject decisions are
+# engine-invariant) that the fixed regex changes 0 of the 95 real lines the
+# round-3 (`{4,64}`) regex matched in the two narrative files (re-enumerated
+# directly from their current content) and newly rejects
+# `"source token: <64-hex>"`, `"pinned token: <64-hex>"`, and a marker
+# immediately followed by an unrelated same-string secret of non-40/non-
+# short-abbreviation length. Regression coverage is in
+# tests/test_gitleaks_config.py's round-4 tests.
+#
+# Major 2 (non-hex same-string secret, documented residual) -- the round-3
+# same-string fix above only restricts UNMARKED runs that are hex-VALID
+# (only `[0-9a-fA-F]`/decimal-digit characters). A non-hex-shaped
+# high-entropy secret sharing the SAME JSON string as a real commit/pin/
+# tree/source marker reference -- e.g. `"detail": "pinned commit <40-hex>;
+# password=<stripe-shaped live key built at test time>"` -- is still exempted in full,
+# because the free-text grammar unit places no limit on runs containing
+# g-z/G-Z letters, underscores or hyphens, which is exactly the character
+# class ordinary narrative prose (sentences, filenames, doc paths, URLs) is
+# made of. A blanket restriction on non-hex alphanumeric run length is NOT
+# usable here without further engineering: 40 of the 95 real narrative
+# lines the round-4 marker-hex regex matches contain a bare `=`
+# (e.g. `stack.json id=dagu`, `state=open`), and both files' prose
+# regularly uses runs of 8+ mixed-case letters (ordinary words,
+# `camelCase`/`snake_case` identifiers, filenames) well past the length a
+# real secret's local part would need. RE2 has no lookaround or
+# backreferences, so this residual cannot be closed with a negative-
+# lookahead exclusion either. This is the same trust-boundary limitation as
+# the all-decimal residual documented above, extended from "no letters at
+# all" to "any character outside the hex alphabet": a non-hex-shaped secret
+# narrated in the same string as a genuine commit/pin/tree/source reference
+# is still exempted, and no real line in either narrative file pairs a
+# marker-preceded reference with an adjacent non-hex high-entropy
+# secret-shaped run in the same string. This residual is pinned, not
+# silently left uncovered, by tests/test_gitleaks_config.py's
+# test_round4_documented_residual_gap_non_hex_secret_is_not_closed.
+#
 # After this config, `gitleaks git . --config .gitleaks.toml --max-target-megabytes 2`
 # restricted to this branch's own ancestry (--log-opts="HEAD") scanned 392 commits
 # (~915 MB) and produced 0 findings (re-measured 2026-09-22, codex-review-64 fix
@@ -286,7 +345,7 @@ paths = [
 ]
 regexTarget = "line"
 regexes = [
-  '''(?i)^\s*"[A-Za-z0-9_]+":\s*"(?:(?:\\.|(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{4,64}\b|(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:[^"\\0-9a-fA-F]|\\.)))*(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{4,64}\b(?:(?:\\.|(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{4,64}\b|(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:[^"\\0-9a-fA-F]|\\.)))*(?:[0-9]{8,}|[0-9a-fA-F]{0,7})"\s*,?\s*$''',
+  '''(?i)^\s*"[A-Za-z0-9_]+":\s*"(?:(?:\\.|(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})(?:[0-9a-f]{4,12}|[0-9a-f]{40})\b|(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:[^"\\0-9a-fA-F]|\\.)))*(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})(?:[0-9a-f]{4,12}|[0-9a-f]{40})\b(?:(?:\\.|(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})(?:[0-9a-f]{4,12}|[0-9a-f]{40})\b|(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:[^"\\0-9a-fA-F]|\\.)))*(?:[0-9]{8,}|[0-9a-fA-F]{0,7})"\s*,?\s*$''',
 ]
 
 # Opaque Alpaca pagination cursor retained in one historical-bars receipt. Anchored
@@ -383,5 +442,5 @@ paths = [
 ]
 regexTarget = "line"
 regexes = [
-  '''(?i)^\s*"[A-Za-z0-9_]+":\s*"(?:(?:\\.|(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{4,64}\b|(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:[^"\\0-9a-fA-F]|\\.)))*(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{4,64}\b(?:(?:\\.|(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{4,64}\b|(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:[^"\\0-9a-fA-F]|\\.)))*(?:[0-9]{8,}|[0-9a-fA-F]{0,7})"\s*,?\s*$''',
+  '''(?i)^\s*"[A-Za-z0-9_]+":\s*"(?:(?:\\.|(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})(?:[0-9a-f]{4,12}|[0-9a-f]{40})\b|(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:[^"\\0-9a-fA-F]|\\.)))*(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})(?:[0-9a-f]{4,12}|[0-9a-f]{40})\b(?:(?:\\.|(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})(?:[0-9a-f]{4,12}|[0-9a-f]{40})\b|(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:[^"\\0-9a-fA-F]|\\.)))*(?:[0-9]{8,}|[0-9a-fA-F]{0,7})"\s*,?\s*$''',
 ]
