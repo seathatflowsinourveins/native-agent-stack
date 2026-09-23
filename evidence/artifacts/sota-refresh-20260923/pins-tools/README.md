@@ -26,15 +26,17 @@ changed in response.
 
 - **langgraph (major)**: `smoke_test.py` is now stored in this repository at
   [langgraph-smoke-test/smoke_test.py](langgraph-smoke-test/smoke_test.py)
-  (sha256 `8405ef4086b1ab134658027ed156d9a62a8a3b454a7ad39584a162945bfae646`,
-  listed in `manifests/evidence.json`), not only in the unit's `.cache/`
-  prefix. Full raw stdout for each venv (starting at `langgraph version:
-  ...`, matching the script's actual print order) plus each run's exit code
-  is recorded at
+  (sha256 `94ffdf4c915fe0b724a35404ca5678a09c6c29a0a5a4f063d9fa0814c6bc3240`
+  after the docstring fix below, listed in `manifests/evidence.json`), not
+  only in the unit's `.cache/` prefix. Full raw stdout for each venv
+  (starting at `langgraph version: ...`, matching the script's actual print
+  order) is recorded at
   [langgraph-smoke-test/out_1.2.11.txt](langgraph-smoke-test/out_1.2.11.txt)
   and
   [langgraph-smoke-test/out_1.2.12.txt](langgraph-smoke-test/out_1.2.12.txt)
-  and quoted verbatim (not edited) in `langgraph.json`. The test now also
+  and quoted verbatim (not edited) in `langgraph.json`; each run's exit code
+  (0 for both) is recorded only in `langgraph.json`'s `results.exit_old`/
+  `results.exit_new` fields, not inside these stdout-only files. The test now also
   builds a second, checkpointed graph using
   `langgraph.checkpoint.memory.InMemorySaver` -- the exact import this
   repository's own catalog names
@@ -82,8 +84,10 @@ changed in response.
   (the retained receipt shows socraticode at 0.2s; this unit's own re-run of
   0.13.13 in the same session shows 0.4s, and 0.14.0 shows 0.5s) and that the
   byte-identical claim applies only to server names, tool counts and
-  health/error text against the retained receipt, plus a full byte-for-byte
-  comparison against a same-session 0.13.13 re-run. `mcporter --help` is now
+  health/error text against the retained receipt; the same-session 0.13.13
+  re-run vs. 0.14.0 `list` output is not byte-for-byte identical either
+  (they differ in the version-string banner and the non-deterministic
+  socraticode timing, 0.4s vs 0.5s). `mcporter --help` is now
   an actual listed command for both versions, with exit codes recorded and a
   `diff`/sha256 confirming the full --help output (not just a prose summary)
   is byte-identical between 0.13.13 and 0.14.0.
@@ -138,23 +142,93 @@ changed in response.
   command), and `catalogs/us-equities/architecture/foundation.json` from
   :851-859 to :850 for the `acceptance_gate` field (the `uv sync --frozen
   --group test --no-dev` upstream command is correctly at :859, unchanged).
-- **Raw-output storage (minor)**: the `mp_old_help.txt`/`mp_new_help.txt`
-  (mcporter), `av_old_help.txt` (agentsview) and `orx_old_discover.txt`
-  (openresearch) captures that the receipts hash and diff against were left
-  in `/tmp` after the fix round instead of the cache prefix; they are now
-  copied into `$HOME/.cache/sota-refresh-20260923/pins-tools/{mcporter,agentsview,openresearch}/`
+- **Raw-output storage (minor, first attempt)**: the `mp_old_help.txt`/
+  `mp_new_help.txt` (mcporter), `av_old_help.txt` (agentsview) and
+  `orx_old_discover.txt` (openresearch) captures that the receipts hash and
+  diff against were left in `/tmp` after the fix round instead of the cache
+  prefix; they were copied into
+  `$HOME/.cache/sota-refresh-20260923/pins-tools/{mcporter,agentsview,openresearch}/`
   with their original mtimes preserved (sha256 values unchanged and
-  re-verified against the receipts). `av_new_help.txt` and
-  `orx_new_discover.txt` (the newer-version captures) were never written to
-  disk by the original run and could not be recovered; each affected receipt
-  now discloses this as a limitation rather than implying both sides of the
-  diff are stored. For opensandbox, the `README.md` the Docker requirement
-  is quoted from was re-fetched at the exact cited commit
-  (`b1a29cf93a823a95913f7943010febb3f29de05c`) and stored at
+  re-verified against the receipts). This first attempt incorrectly claimed
+  `av_new_help.txt` and `orx_new_discover.txt` (the newer-version captures)
+  and `mp_old_list_rerun.txt`/`mp_new_list.txt` "were never written to disk"
+  or "could not be recovered" -- all four files were in fact still present
+  in `/tmp` the whole time, unrecovered rather than unrecoverable; see the
+  "Second cleanup round" section below for the correction. For opensandbox,
+  the `README.md` the Docker requirement is quoted from was re-fetched at
+  the exact cited commit (`b1a29cf93a823a95913f7943010febb3f29de05c`) and
+  stored at
   `$HOME/.cache/sota-refresh-20260923/pins-tools/opensandbox/opensandbox_readme.md`
   (sha256 `ab78736660038f0f08365302d511c10b01c48af9678d71dd5844abf09e8b026b`);
   `grep -n` against that file confirms 'Requirements:' at line 166 and the
   two quoted bullets at lines 168-169, exactly as cited.
+
+## Second cleanup round
+
+A further independent re-review of the round above found one major and
+several minor findings, all resolved here:
+
+- **Raw-output storage (major)**: `av_new_help.txt`, `orx_new_discover.txt`,
+  `mp_old_list_rerun.txt` and `mp_new_list.txt` were, contrary to the prior
+  round's claims, still present in `/tmp` the entire time -- they were never
+  moved or lost, just never copied out of the ephemeral session scratch
+  area. All ten of this unit's raw capture files (the six already handled
+  plus these four) are now copied with `cp -p` (mtime preserved) into this
+  repository at
+  [raw/](raw/) (`evidence/artifacts/sota-refresh-20260923/pins-tools/raw/`),
+  with host-path strings checked; the only home-directory-shaped string
+  found was `agentsview --help`'s own built-in `sync_include_cwd_prefixes`
+  example config value, a placeholder baked into the tool's help text, not
+  a path from this host -- it has been rewritten to the repository's
+  `/home/example/work` placeholder convention in the committed `raw/`
+  copies (sha256 recomputed after the rewrite, mtime preserved via
+  `touch -r`; the unmodified original bytes stay in the unit's `.cache/`
+  prefix, matching the sha256 already cited elsewhere in this receipt set).
+  `agentsview.json`, `openresearch.json` and `mcporter.json` now
+  record each file's sha256 and mtime and state plainly that both sides of
+  every diff/hash comparison are stored and independently re-verifiable;
+  every "not preserved" / "not recoverable" / "moved ... not left in /tmp"
+  statement in those three receipts has been corrected to "copied (not
+  moved)" or to name the actual stored location.
+- **langgraph sha256 citation (minor)**: `smoke_test.py`'s docstring fix in
+  the first cleanup round changed the committed file's sha256 from
+  `8405ef4086b1ab...` to `94ffdf4c915fe0b724a35404ca5678a09c6c29a0a5a4f063d9fa0814c6bc3240`
+  (per `manifests/evidence.json`), but `langgraph.json` and this README kept
+  citing the stale hash. Both now cite the current hash and disclose that
+  only the docstring differs from the script that produced
+  `out_1.2.11.txt`/`out_1.2.12.txt` -- no executable line changed.
+- **Timestamp accuracy (minor)**: `mcporter.json`, `langgraph.json` and
+  `opensandbox.json` had `written_at` values that did not match the file
+  mtimes their own notes cited, or (for `opensandbox.json`) combined
+  commands that write no output file with ones that do. Per this round's
+  instruction, each `written_at` that could not be tied to a measured file
+  mtime is now set to the commit time that finalized the text
+  (`d4888f1`, `2026-09-22T21:12:27-04:00`, from `git log --format=%cI`)
+  with the LATE label kept, rather than an unmeasured round value.
+  `opensandbox.json`'s preregistration no longer says "Expectation before
+  running anything" -- that wording is replaced with an explicit statement
+  that each Docker/Podman/compose/socket absence is confirmed by its own
+  exit-code check in `results`.
+- **checked_at accuracy (minor)**: `agentsview.json` and `openresearch.json`
+  set `checked_at` from only the older-version capture's mtime, even though
+  the newer-version capture (now that it is disclosed as stored, see above)
+  is the actual last check. Both now cite the later of the two mtimes
+  (both round to the same displayed second). `langgraph.json`'s
+  `checked_at_note` claimed a `date -u` command was run immediately after
+  each smoke test; no such command appears in `commands`, so that claim is
+  removed and the note now relies only on the file mtimes.
+- **mcporter same-session claim (minor)**: this README's own "Fix round
+  changes" bullet still claimed "a full byte-for-byte comparison against a
+  same-session 0.13.13 re-run" for the `list` output, contradicting
+  `mcporter.json` (which says the same-session runs differ in banner text
+  and non-deterministic timing). The bullet above is corrected.
+- **langgraph exit-code / provenance (minor)**: this README's "Fix round
+  changes" bullet claimed `out_1.2.11.txt`/`out_1.2.12.txt` record "each
+  run's exit code"; they contain stdout only (exit codes are recorded
+  separately in `langgraph.json`'s `results.exit_old`/`results.exit_new`).
+  The bullet above is corrected, and `langgraph.json` now discloses that
+  these two committed files are renamed copies of the working directory's
+  `out_old.txt`/`out_new.txt` (content verified identical).
 
 ## Notes (carried from the original pass, still accurate)
 
