@@ -15,3 +15,9 @@ node_modules/
 *.jsonl
 adoption/hosts/*.json
 !adoption/hosts/example.json
+
+# Generated public explorer (scripts/build_ecosystem.py --write); rebuilt
+# locally or downloaded from the publish-catalog.yml release artifact/
+# attestation, never committed. See docs/decisions/2026-09-23-generated-
+# explorer-sorted-manifest.md.
+/docs/ecosystem/index.html

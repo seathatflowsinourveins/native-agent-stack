@@ -297,6 +297,7 @@ class Validator:
         profiles = self.records(stack.get("profiles"), "profiles")
         receipts = self.records(evidence.get("receipts"), "receipts")
         files = {}
+        previous_path = None
         for index, record in enumerate(self.sequence(evidence.get("files"), "files", nonempty=True)):
             if not isinstance(record, dict):
                 self.error(f"files[{index}]: expected object")
@@ -308,6 +309,10 @@ class Validator:
                 continue
             if path_value in files:
                 self.error(f"files: duplicate path {path_value}")
+            if previous_path is not None and path_value < previous_path:
+                self.error(f"{label}: files[] must be sorted by path (found {path_value!r} after "
+                           f"{previous_path!r}); run `python3 scripts/evidence_manifest.py --write` to sort it")
+            previous_path = path_value
             files[path_value] = record
             digest = record.get("sha256")
             if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):

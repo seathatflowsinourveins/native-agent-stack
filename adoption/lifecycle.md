@@ -6,8 +6,10 @@ Use the selected component's [native recipe](manifest.json), the current pin in
 The matrix covers every selected component. The broader
 [decision index](../catalogs/us-equities/decision-index.json) also contains
 alternatives and research identities. Current counts are generated in the
-[HTML catalog](../docs/ecosystem/index.html); installing every alternative is
-not a prerequisite for the selected workflow.
+HTML catalog (`docs/ecosystem/index.html`, generated with
+`python3 scripts/build_ecosystem.py --write` -- not committed, download it
+from a `publish-catalog.yml` release artifact otherwise); installing every
+alternative is not a prerequisite for the selected workflow.
 
 An accepted stage means the linked dated operation passed within its stated
 scope. `observed_installed` means an executable or library was available; it does

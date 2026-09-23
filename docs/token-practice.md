@@ -20,7 +20,9 @@ These are bounded catalog counts, not a universal ranking, 68 successful full
 E2E runs, or savings from every repository. Supporting runtimes and historical
 alternative installations retain separate scope.
 
-The [offline HTML setup guide](ecosystem/index.html) brings the selected stack,
+The offline HTML setup guide (`ecosystem/index.html`, generated with
+`python3 scripts/build_ecosystem.py --write` -- not committed, or download it
+from a `publish-catalog.yml` release artifact) brings the selected stack,
 layer/profile filters, native recipes, lifecycle stages and baseline choices
 together. Its historical results do not become a new PC's acceptance. Use the
 [lifecycle guide](../adoption/lifecycle.md) for installation ownership, restart,

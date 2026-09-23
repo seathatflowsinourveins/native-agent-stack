@@ -1,6 +1,8 @@
 # Continue the grand catalog on another PC or session
 
-Open the generated [grand catalog](ecosystem/index.html#landscape). The source
+Open the generated grand catalog (`ecosystem/index.html#landscape`; build it
+with `python3 scripts/build_ecosystem.py --write` -- it is not committed, or
+download it from a `publish-catalog.yml` release artifact). The source
 template is a build input; use its recovery link if opened directly. The current
 [manifest](../catalogs/landscape/manifest.json) joins foundation and US-equities
 choices. The [research queue](../catalogs/landscape/research-state.json) carries

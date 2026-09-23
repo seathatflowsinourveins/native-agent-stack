@@ -56,7 +56,12 @@ class PublicationValidationTests(unittest.TestCase):
 
     def save(self):
         self.write_json("manifests/stack.json", self.stack)
-        self.write_json("manifests/evidence.json", self.evidence)
+        # files[] must be sorted by path on disk (scripts/validate.py now enforces
+        # it); sort only the written copy so in-memory index/append/pop-based test
+        # fixtures above are unaffected.
+        ordered = {**self.evidence, "files": sorted(
+            self.evidence["files"], key=lambda entry: entry.get("path", "") if isinstance(entry, dict) else "")}
+        self.write_json("manifests/evidence.json", ordered)
 
     def assert_invalid(self, fragment):
         with self.assertRaisesRegex(InvalidPublication, fragment):
@@ -81,6 +86,17 @@ class PublicationValidationTests(unittest.TestCase):
     def test_unhashed_evidence_fails(self):
         self.write("evidence/artifacts/extra.txt", "extra evidence")
         self.assert_invalid("not hash-listed")
+
+    def test_unsorted_files_fail_and_name_the_normalizer(self):
+        # The fixture's own build order (receipts/sample.json, then
+        # artifacts/output.txt) is not path-sorted; write it directly,
+        # bypassing the test harness's own sort-on-write (save()), to
+        # exercise the validator's ordering rule.
+        self.assertEqual([entry["path"] for entry in self.evidence["files"]],
+                          ["evidence/receipts/sample.json", "evidence/artifacts/output.txt"])
+        self.write_json("manifests/evidence.json", self.evidence)
+        self.assert_invalid(r"files\[1\]: files\[\] must be sorted by path.*"
+                             r"scripts/evidence_manifest\.py --write")
 
     def test_traversal_and_absolute_paths_fail(self):
         for path in ("../outside.txt", "/etc/passwd", "evidence/../outside.txt", "evidence//output.txt", "C:\\temp\\output.txt"):

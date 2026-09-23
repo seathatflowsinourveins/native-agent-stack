@@ -56,6 +56,19 @@ jobs:
           cd "$PUBLICATION_DIR"
           sha256sum "$(basename "$archive")" | tee archive.sha256
           stat --format='archive_bytes=%s' "$archive" | tee -a source.log
+      - name: Build the public explorer
+        shell: bash
+        run: |
+          set -euo pipefail
+          # docs/ecosystem/index.html is generated, not committed (see
+          # docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md);
+          # rebuild it from this validated commit and publish it as its own
+          # attested artifact alongside the source archive.
+          python3 scripts/build_ecosystem.py --write
+          explorer="$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.explorer.html"
+          cp docs/ecosystem/index.html "$explorer"
+          cd "$PUBLICATION_DIR"
+          sha256sum "$(basename "$explorer")" | tee -a archive.sha256
       - name: Fetch and SHA-checked-verify syft
         shell: bash
         run: |
@@ -194,6 +207,32 @@ jobs:
           expected="$(sha256sum "$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.spdx.json" | awk '{print $1}')"
           printf 'expected_sbom_sha256=%s\nuploaded_sbom_sha256=%s\n' \
             "$expected" "$UPLOADED_DIGEST" | tee "$PUBLICATION_DIR/sbom-upload.log"
+          test "$UPLOADED_DIGEST" = "$expected"
+      - name: Attest the public explorer
+        id: attest-explorer
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.explorer.html
+          push-to-registry: false
+          create-storage-record: false
+      - name: Upload the public explorer next to the archive
+        id: explorer-upload
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: native-agent-stack-${{ github.sha }}-explorer
+          path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.explorer.html
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+      - name: Match the uploaded explorer digest to the attested file
+        env:
+          UPLOADED_DIGEST: ${{ steps.explorer-upload.outputs.artifact-digest }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="$(sha256sum "$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.explorer.html" | awk '{print $1}')"
+          printf 'expected_explorer_sha256=%s\nuploaded_explorer_sha256=%s\n' \
+            "$expected" "$UPLOADED_DIGEST" | tee "$PUBLICATION_DIR/explorer-upload.log"
           test "$UPLOADED_DIGEST" = "$expected"
       - name: Preserve publication success or failure evidence
         if: always()

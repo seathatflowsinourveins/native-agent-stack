@@ -490,15 +490,27 @@ weekly (Monday 06:47 UTC), and on manual dispatch, then asserts every
 header records this as synthetic/local-integration evidence on a disposable
 runner, not a second-machine developer-laptop acceptance.
 
-### Secret-scan coverage boundary (2026-09-22)
+### Secret-scan coverage boundary (2026-09-22, updated 2026-09-23)
 
 The first hosted run of the `secret-scan` job was cancelled by its own timeout while
 scanning history: every commit re-diffs the 11 MB generated explorer
 `docs/ecosystem/index.html`. The job now passes `--config .gitleaks.toml` and
-`--max-target-megabytes 2`. The size skip means the generated explorer HTML is
-**not** scanned in either `git` or working-tree mode; this is recorded as
-incomplete coverage, mitigated because the explorer is built only from repository
-sources that are scanned and is rebuilt by `scripts/build_ecosystem.py`.
+`--max-target-megabytes 2`.
+
+As of 2026-09-23 (`docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md`),
+`docs/ecosystem/index.html` is generated locally with
+`python3 scripts/build_ecosystem.py --write` and is no longer committed: it is
+`.gitignore`d, and `publish-catalog.yml` builds and publishes it as its own attested
+release artifact instead. `gitleaks dir .` (working-tree mode) therefore has nothing
+generated left to skip in the current tree, and a `gitleaks git .` scan of any commit
+made after this change has nothing generated to skip either. The size-based skip
+remains an **incomplete-coverage boundary only for the repository's existing git
+history**: every commit before this change still carries the old committed
+`docs/ecosystem/index.html` (up to ~13 MB) inside `git`'s object history, so a full
+`gitleaks git .` history scan still skips those old blobs at `--max-target-megabytes 2`.
+`--max-target-megabytes 2` itself is kept as a general guard against any other
+oversized file that might be committed in the future, not specifically for the
+explorer any more.
 
 Suppression lives in two files. `.gitleaks.toml` holds the rule allowlists, each
 scoped to a path and an anchored key shape. The root `.gitleaksignore` holds

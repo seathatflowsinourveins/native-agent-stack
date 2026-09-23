@@ -7,7 +7,9 @@ that foundation and adds data, strategy, risk and broker-specific requirements.
 
 The [current four-layer comparisons](../landscape/us-equities.json) explain the
 selected roles and meaningful alternatives using later retained evidence. The
-[offline comparison view](../../docs/ecosystem/index.html#landscape) also preserves
+offline comparison view (`docs/ecosystem/index.html#landscape`, generated
+with `python3 scripts/build_ecosystem.py --write` -- not committed, or
+download it from a `publish-catalog.yml` release artifact) also preserves
 every historical candidate card. Current target selection takes precedence over
 old default labels; source-only proposals remain unqualified until executed.
 

@@ -10,6 +10,7 @@ import html
 import json
 from pathlib import Path
 import re
+import tempfile
 from urllib.parse import quote, urlsplit
 
 try:
@@ -688,8 +689,7 @@ def build_data(root):
             "inputs": sorted(inputs.values(), key=lambda row: row["path"]), **curated}
 
 
-def render(root):
-    data = build_data(root)
+def render_from_data(data, root):
     template = safe_file(root, TEMPLATE).read_text(encoding="utf-8")
     require(template.count("@@DATA@@") == 1, "template must have one embedded data marker")
     encoded = canonical_json(data).replace("&", "\\u0026").replace("<", "\\u003c").replace(
@@ -704,27 +704,56 @@ def render(root):
     return result.replace("@@SCRIPT_HASH@@", script_hash).encode("utf-8")
 
 
+def render(root):
+    return render_from_data(build_data(root), root)
+
+
+def input_digest(data):
+    """sha256 over the sorted list of every input path this build actually read
+    (path, sha256, bytes, scope), so the report is tied to exact source content
+    without re-reading files a second time outside the build itself."""
+    return digest(canonical_json(data["inputs"]).encode())
+
+
+def check(root):
+    """Build twice, each time into its own temporary directory, and require
+    byte-identical output. docs/ecosystem/index.html is no longer committed,
+    so --check has nothing checked-in to compare against; this instead
+    verifies the build is deterministic from the current repository state."""
+    built = []
+    with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
+        for directory in (first, second):
+            data = build_data(root)
+            result = render_from_data(data, root)
+            (Path(directory) / "index.html").write_bytes(result)
+            built.append(((Path(directory) / "index.html").read_bytes(), data))
+    (first_bytes, first_data), (second_bytes, second_data) = built
+    require(first_bytes == second_bytes,
+            "explorer build is not deterministic across two independent builds")
+    return first_bytes, input_digest(first_data)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     mode = parser.add_mutually_exclusive_group()
-    mode.add_argument("--write", action="store_true", help="Rebuild the public HTML")
-    mode.add_argument("--check", action="store_true", help="Check exact rebuild equality (default)")
+    mode.add_argument("--write", action="store_true", help="Rebuild the public HTML (writes it locally; not committed)")
+    mode.add_argument("--check", action="store_true", help="Check deterministic rebuild (default)")
     args = parser.parse_args(argv)
     try:
         root = args.root.resolve()
-        result = render(root)
-        target = safe_file(root, OUTPUT)
         if args.write:
-            target.write_bytes(result)
+            result = render(root)
+            safe_file(root, OUTPUT).write_bytes(result)
+            report = {"status": "written", "bytes": len(result), "sha256": digest(result)}
         else:
-            require(target.is_file() and target.read_bytes() == result,
-                    "generated HTML is stale or changed; rebuild with --write")
+            result, source_digest = check(root)
+            report = {"status": "passed", "bytes": len(result), "output_sha256": digest(result),
+                      "input_sha256": source_digest}
     except (InvalidDecisionIndex, OSError, ValueError, KeyError, TypeError) as error:
         print(f"Explorer validation failed: {error}")
         return 1
-    print(json.dumps({"status": "written" if args.write else "passed", "bytes": len(result),
-                      "sha256": digest(result)}, sort_keys=True))
+    print(json.dumps(report, sort_keys=True))
     return 0
 
 

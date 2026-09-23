@@ -4,7 +4,9 @@ This is the topic-specific entry point for the selected stack on September 20,
 2026. The [machine-readable list](token-efficiency-stack.json) contains the full
 upstream install, use and statistics commands, versioned sources, returned results,
 baseline comparisons and lifecycle limits for each tool. The
-[offline HTML](ecosystem/index.html#efficiency) embeds this guide and those rows;
+offline HTML (`ecosystem/index.html#efficiency`, generated with
+`python3 scripts/build_ecosystem.py --write` -- not committed, or download it
+from a `publish-catalog.yml` release artifact) embeds this guide and those rows;
 its Setup view contains all 66 selected components across ten layers. The broader
 512-repository catalog includes alternatives and references, not 512 installations.
 
