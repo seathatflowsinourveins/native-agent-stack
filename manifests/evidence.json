@@ -13014,8 +13014,8 @@
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
-      "sha256": "da8de643e23c06ba97830dac983e404f064dff2118d1c54f06d09b88dbf3f323",
-      "bytes": 614864
+      "sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8",
+      "bytes": 614862
     },
     {
       "path": "docs/gap-crosswalk-92bb279.md",
@@ -13024,13 +13024,13 @@
     },
     {
       "path": "tools/sota-convergence/gap_crosswalk.py",
-      "sha256": "5f0176784b47eb6953d378dc58724a16df0180be3eef8bc3ff297060591b8bce",
-      "bytes": 24528
+      "sha256": "012d515016a61a1b7c78d47fa79fb80eb69ba5f7215a204cc69f09dfeb6f4c00",
+      "bytes": 25258
     },
     {
       "path": "tests/test_gap_crosswalk.py",
-      "sha256": "cb3aba9e3bc6f9b0dfd919065afb215ddc4138fbbd4ab584512c1d25e199ca73",
-      "bytes": 4145
+      "sha256": "af5b008bbe49ad5493aac73568405442ff05d5d921b9655e2ff2caa0e8801876",
+      "bytes": 5678
     },
     {
       "path": "evidence/artifacts/gap-crosswalk-92bb279/PREREGISTRATION.md",
@@ -13048,14 +13048,14 @@
       "bytes": 242607
     },
     {
-      "path": "evidence/artifacts/gap-crosswalk-92bb279/typesafe-current.jsonl",
-      "sha256": "cbf12222372aca31c7eb948ced9d05019267671a453bd826ff88957f2b5cdf6f",
-      "bytes": 512833
+      "path": "evidence/artifacts/gap-crosswalk-92bb279/typesafe-eval.json",
+      "sha256": "9a884962639d4c2166aa776a0c9c9afb67b92f29fa54542d9f28f6866b9776de",
+      "bytes": 439688
     },
     {
-      "path": "evidence/artifacts/gap-crosswalk-92bb279/typesafe-eval.jsonl",
-      "sha256": "d938cdb35bb9298fe046a93a34d3e84a7bb729aef3dbf68272967f742cc7b8cf",
-      "bytes": 432966
+      "path": "evidence/artifacts/gap-crosswalk-92bb279/typesafe-current.json",
+      "sha256": "8004e97dee541070839195bcadf4ac21432acfc488ad20044a6eb65b8df70435",
+      "bytes": 520806
     }
   ],
   "convergence_records": [

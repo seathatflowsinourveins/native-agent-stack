@@ -194,6 +194,12 @@ LABEL = {"settled": "settles", "advanced": "partially", "not_settled": "not_addr
 BLOCKER_MAP = {"documentation_fix": "catalog_edit", "manifest_gap": "catalog_edit", "needs_user_input": "needs_user_decision"}
 
 
+def load_judgments(path):
+    """A judge run appends JSON lines; the retained evidence copy is one JSON array (the repo ignores *.jsonl)."""
+    text = pathlib.Path(path).read_text()
+    return json.loads(text) if str(path).endswith(".json") else [json.loads(l) for l in text.splitlines()]
+
+
 def gap_prediction(rec):
     best, p_addr = "not_addressed", 0.0
     for qid, a in rec["answers"].items():
@@ -209,8 +215,7 @@ def score(args):
     root = pathlib.Path(".").resolve()
     ledger = json.loads((root / LEDGER).read_text())
     lab = {(l["catalog"], l["layer_id"], g["index"]): g for l in ledger["layers"] for g in l["gaps"]}
-    rows = [json.loads(l) for l in pathlib.Path(args.judgments).read_text().splitlines()]
-    rows = [r for r in rows if "answers" in r]
+    rows = [r for r in load_judgments(args.judgments) if "answers" in r]
     conf, thr, blk = {}, {}, {"agree": 0, "total": 0, "pairs": {}}
     for r in rows:
         g = lab[(r["catalog"], r["layer"], r["index"])]
@@ -259,7 +264,8 @@ def sha_file(path):
 def build(args):
     root = pathlib.Path(".").resolve()
     ev = root / EVID
-    judg = {(r["catalog"], r["layer"], r["index"]): r for r in map(json.loads, (ev / "typesafe-current.jsonl").read_text().splitlines())}
+    judg = {(r["catalog"], r["layer"], r["index"]): r for r in load_judgments(ev / "typesafe-current.json")}
+    cand = candidates(json.loads((root / LEDGER).read_text()))
     results = json.loads((ev / "review-results.json").read_text())["results"]
     review, verify = {}, {}
     for g in results:
@@ -278,6 +284,11 @@ def build(args):
                 j = judg[(cat, lid, i)]
                 if j.get("gap_sha256") != hashlib.sha256(text.encode()).hexdigest():
                     raise SystemExit(f"judgment text drift {cat}/{lid}[{i}]")
+                if j["receipts"] != cand.get(lid, []):
+                    raise SystemExit(f"judged candidates differ from the ledger's candidate rule: {cat}/{lid}[{i}]")
+                body = request_body(root, {"layer": lid, "gap": text, "receipts": j["receipts"]})
+                if j.get("state_sha256") != hashlib.sha256(body["state"].encode()).hexdigest():
+                    raise SystemExit(f"receipt or gap content changed since judging: {cat}/{lid}[{i}]")
                 rv = review.get((lid, i))
                 if rv is None:
                     raise SystemExit(f"no review for {lid}[{i}]")
@@ -325,7 +336,7 @@ def build(args):
             "candidates": "every gap receipt of the gap-resolution ledger whose layer_ids or gap_refs name the gap's layer",
             "typesafe": {"model": MODEL, "schema_revision": SCHEMA_REVISION, "threshold_p_addressed": THRESHOLD,
                          "eval": json.loads((ev / "eval-score.json").read_text()),
-                         "judgments_sha256": {n: sha_file(ev / n) for n in ("typesafe-eval.jsonl", "typesafe-current.jsonl")}},
+                         "judgments_sha256": {n: sha_file(ev / n) for n in ("typesafe-eval.json", "typesafe-current.json")}},
             "review": ("Every queued pair and every gap's category: one semantic-evidence-reviewer (Opus/high) per packet group; "
                        "every positive decision re-checked by an independent evidence-reviewer (Opus/high); a disagreement "
                        "replaces the decision. TypeSafe never sets a status. Categories are the reviewers', not TypeSafe's "

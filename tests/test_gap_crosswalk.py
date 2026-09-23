@@ -68,6 +68,38 @@ class GapCrosswalkTests(unittest.TestCase):
         for layer in self.doc["layers"]:
             self.assertIn(layer["owner"], owners)
 
+    def _tool(self):
+        import importlib.util
+        rev = self.doc["source_revision"]
+        if subprocess.run(["git", "-C", str(ROOT), "cat-file", "-e", f"{rev}^{{commit}}"], capture_output=True).returncode:
+            self.skipTest(f"{rev} is not in this checkout's history (shallow clone)")
+        spec = importlib.util.spec_from_file_location("gap_crosswalk", ROOT / "tools/sota-convergence/gap_crosswalk.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def _build_check(self, module):
+        import argparse
+        import contextlib
+        with contextlib.chdir(ROOT), self.assertRaises(SystemExit) as raised:
+            module.build(argparse.Namespace(check=True))
+        return raised.exception
+
+    def test_build_check_is_up_to_date(self):
+        self.assertEqual(self._build_check(self._tool()).code, 0)
+
+    def test_build_rejects_receipt_content_changed_since_judging(self):
+        module = self._tool()
+        original = module.receipt_state
+        module.receipt_state = lambda root, path: {**original(root, path), "result": "withdrawn"}
+        self.assertIn("changed since judging", str(self._build_check(module).code))
+
+    def test_build_rejects_candidates_outside_the_rule(self):
+        module = self._tool()
+        original = module.candidates
+        module.candidates = lambda ledger: {k: v[:-1] for k, v in original(ledger).items()}
+        self.assertIn("candidate rule", str(self._build_check(module).code))
+
     def test_no_host_paths_or_session_identifiers(self):
         pattern = re.compile(r"/home/(?!example/)|/tmp/claude-|[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I)
         for path in [LEDGER, *EVID.iterdir()]:

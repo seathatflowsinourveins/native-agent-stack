@@ -91,8 +91,8 @@
     }
    },
    "judgments_sha256": {
-    "typesafe-eval.jsonl": "d938cdb35bb9298fe046a93a34d3e84a7bb729aef3dbf68272967f742cc7b8cf",
-    "typesafe-current.jsonl": "cbf12222372aca31c7eb948ced9d05019267671a453bd826ff88957f2b5cdf6f"
+    "typesafe-eval.json": "9a884962639d4c2166aa776a0c9c9afb67b92f29fa54542d9f28f6866b9776de",
+    "typesafe-current.json": "8004e97dee541070839195bcadf4ac21432acfc488ad20044a6eb65b8df70435"
    }
   },
   "review": "Every queued pair and every gap's category: one semantic-evidence-reviewer (Opus/high) per packet group; every positive decision re-checked by an independent evidence-reviewer (Opus/high); a disagreement replaces the decision. TypeSafe never sets a status. Categories are the reviewers', not TypeSafe's (its blocker agreement on the eval set was below the preregistered bar).",
