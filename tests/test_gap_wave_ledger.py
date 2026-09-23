@@ -28,6 +28,8 @@ class GapWaveLedgerTests(unittest.TestCase):
     def test_ledger_is_up_to_date(self):
         self.assertEqual(self.tool.main(["--root", str(ROOT), "--wave", "gap-wave2-20260923",
                                          "--owner", "gap-resolution", "--check"]), 0)
+        self.assertEqual(self.tool.main(["--root", str(ROOT), "--wave", "gap-wave2-20260923",
+                                         "--wave", "gap-wave3-20260923", "--owner", "gap-resolution", "--check"]), 0)
 
     def test_status_is_the_best_credit_and_multi_gap_receipts_never_settle(self):
         receipts = {r["path"]: r for r in self.doc["receipts"]}
@@ -117,6 +119,15 @@ class GapWaveLedgerTests(unittest.TestCase):
             self.assertEqual(names, ["r.json"])
             self.assertEqual(len(self.tool.load_receipts(Path(tmp), "wave-z", "catalog__layer")), 1)
 
+    def test_combined_waves_take_the_best_status_per_gap(self):
+        doc = self.tool.build(ROOT, ["gap-wave2-20260923", "gap-wave3-20260923"], "gap-resolution")
+        single = self.tool.build(ROOT, "gap-wave2-20260923", "gap-resolution")
+        by_gap = {(l["layer_id"], g["index"]): g["status"] for l in single["layers"] for g in l["gaps"]}
+        self.assertEqual(doc["id"], "gap-wave2-20260923+gap-wave3-20260923--gap-resolution")
+        for layer in doc["layers"]:
+            for gap in layer["gaps"]:
+                self.assertGreaterEqual(RANK[gap["status"]], RANK[by_gap[(layer["layer_id"], gap["index"])]])
+
     def test_rank_keeps_deferral_below_any_executed_outcome(self):
         rank = self.tool.RANK
         self.assertLess(rank["not_run"], rank["deferred"])
@@ -129,8 +140,9 @@ class GapWaveLedgerTests(unittest.TestCase):
 
     def test_repo_raw_artifacts_match_their_recorded_hash(self):
         import hashlib
-        files = [p for style in ("layer", "catalog__layer")
-                 for p, _ in self.tool.iter_receipt_files(ROOT, "gap-wave2-20260923", style)]
+        files = [p for wave in ("gap-wave2-20260923", "gap-wave3-20260923") if (ROOT / "evidence/artifacts" / wave).is_dir()
+                 for style in ("layer", "catalog__layer")
+                 for p, _ in self.tool.iter_receipt_files(ROOT, wave, style)]
         for path in files:  # the same receipt selector the ledger uses; raw captures are never parsed
             data = json.loads(path.read_text(encoding="utf-8"))
             if not isinstance(data, dict):

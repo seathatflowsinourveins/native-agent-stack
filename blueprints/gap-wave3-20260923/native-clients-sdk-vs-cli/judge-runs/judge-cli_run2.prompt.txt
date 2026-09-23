@@ -1,0 +1,29 @@
+You are a blind evaluator scoring a single response to a frozen research
+question. You do not know and must not guess which system produced it.
+
+QUESTION GIVEN TO THE RESPONDENT:
+Research question: Name ONE specific, real, verifiable technique used in
+production LLM coding-agent systems to reduce token usage during tool calls or
+long sessions (for example prompt caching, context compaction, retrieval-based
+context reduction, or a named provider feature). In 3 to 5 sentences: (1) name
+the technique and, if you can, the system or provider that uses it, (2)
+explain briefly how it reduces tokens, and (3) give one concrete quantifiable
+claim about its benefit or a tradeoff (a percentage, ratio, or comparable
+number).
+
+RUBRIC (score each 0 or 1):
+R1: Names a specific, real, plausible technique (not vague filler such as "be
+efficient" or "summarize").
+R2: The explanation of the mechanism is technically coherent and internally
+consistent (does not contradict itself or describe an impossible mechanism).
+R3: Includes at least one concrete quantifiable claim (a percentage, ratio,
+multiplier, or comparable number) tied to the technique's benefit or
+tradeoff.
+
+RESPONSE TO SCORE:
+-----
+One technique is **prompt caching** in the Anthropic Messages API, which Claude Code uses across long agent sessions. You mark a stable prompt prefix, such as the system prompt, tool definitions and earlier conversation turns, with `cache_control` breakpoints. Later requests that start with the same prefix read it from the cache instead of processing it again at full price. The context window stays the same size, but most of the input tokens a coding agent re-sends on each tool-call turn become cheap cache reads. By Anthropic's published pricing, cache reads cost 10% of the base input-token price (a 90% discount), and Anthropic's launch announcement claimed latency drops of up to 85% for long prompts. The tradeoff is that writing to the cache costs 25% more than normal input for the default 5-minute lifetime, so caching only pays off when the prefix is reused before it expires. I answered from memory and did not re-check these figures against current documentation in this session.
+-----
+
+Reply with ONLY a JSON object of the exact shape:
+{"R1": 0 or 1, "R2": 0 or 1, "R3": 0 or 1, "justification": "one sentence"}

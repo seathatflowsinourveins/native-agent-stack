@@ -5923,6 +5923,186 @@
       "bytes": 236
     },
     {
+      "path": "blueprints/gap-wave3-20260923/container-build-start-resource-vs-native/Containerfile.app",
+      "sha256": "a6d7e672bd13eb34282a719f24bd2c93a9a30ac87dff05be2c06beee4d0c38a2",
+      "bytes": 612
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/forced-skill-ab/cases.json",
+      "sha256": "b40d720fc5831deae3035829eaeab7e59f22c8744a1bb521c6d4011ce5a579a0",
+      "bytes": 9193
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/forced-skill-ab/scored-results.json",
+      "sha256": "a94c29379c9a0185916333a26f245c8b3f758c05767776bc4b95fb56c03de7c3",
+      "bytes": 2887
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/extract-summary.json",
+      "sha256": "3ca8f07fcd60e4e650828cd878347bb47de05f8ca4de4ef5e71dd9bfbeb7fb1d",
+      "bytes": 9361
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/extract.py",
+      "sha256": "7fca83183672c8a8b81d95ffb566a26cc0dc1bf36c15fc1f0111e642efdd3f10",
+      "bytes": 3366
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-packets/run1_codex.txt",
+      "sha256": "a0722b99b15baf6ba4fca366e95d706a732b41418cf39a20d926d4e56d75bf81",
+      "bytes": 461
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-packets/run2_claude.txt",
+      "sha256": "c746515c8e9b126f32e6411bda33afe26a168b852355720b1bda654885e50148",
+      "bytes": 811
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-packets/run3_codex.txt",
+      "sha256": "96d15170f0b7d9a616c82bbdb2c5141f7bc052b8db326f2ab7669b2b6223bac3",
+      "bytes": 473
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-packets/run4_codex.txt",
+      "sha256": "b483cfb0edb2c8f54872e6b3ae09faa92fbc28a85bcba76cca575c98068a9326",
+      "bytes": 471
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-packets/run5_claude.txt",
+      "sha256": "95f848571557cd7fef0ae70264b24814a7bf602cc4a4e7fde4b2555f74d6f35a",
+      "bytes": 978
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-packets/run6_claude.txt",
+      "sha256": "87280a2948b0d81c10a7b9eb6626dad1f35fd81c9e7df64f7e07b38609776d31",
+      "bytes": 1036
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-prompt-template.txt",
+      "sha256": "d0b0095b1799a5abfc3992cf5a564f3be27bf22c321b91c61c2b5c39e8206dcc",
+      "bytes": 1335
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-runs/judge-run1_codex.prompt.txt",
+      "sha256": "446fe973ecc4d32ff859be4c245b1c6f7bcf70844e0cafaeb4d01f06f10a7d70",
+      "bytes": 1786
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-runs/judge-run2_claude.prompt.txt",
+      "sha256": "3c223fc2e77c81bf4c32c15183b7afa94862dba48a90b1900c604d7a5fe836d6",
+      "bytes": 2136
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-runs/judge-run3_codex.prompt.txt",
+      "sha256": "7516eee276036d9a949c68eeaf143d02a5c725fb6f2df3ba00d72f9aed03eb65",
+      "bytes": 1798
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-runs/judge-run4_codex.prompt.txt",
+      "sha256": "84f7cc77db9ce5c0103788c110e6147f1c51e5d8af203d4924e7264c88d29878",
+      "bytes": 1796
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-runs/judge-run5_claude.prompt.txt",
+      "sha256": "615c33b23d06014b4403f3bc41bbbc95bf35ee84fc5c6d8a82bd6177667d0fe0",
+      "bytes": 2303
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-runs/judge-run6_claude.prompt.txt",
+      "sha256": "a045abb050bdd15507f8b05f55673862513d908bd887fc0be158c1c26b042042",
+      "bytes": 2361
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/resume-followup-prompt.txt",
+      "sha256": "fca8312b97533253270bc3e79802f62ac3200f64dbea95a93877397b4e9348be",
+      "bytes": 319
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/rubric.json",
+      "sha256": "753ed0c3535bd09c6050d4ea00db0bcd2bd513620796ccb5227c7f69344a21ee",
+      "bytes": 2428
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/run-arm.sh",
+      "sha256": "f132fe8fe36f41f04bfd386dc3cc1247c99f71928066e2b9d62f2dcb28b81e15",
+      "bytes": 1074
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/run-judge.sh",
+      "sha256": "a5e3a43aa37f627449749aee9e15bdab0738e9f9dcfcd2ae71aef94a485d579a",
+      "bytes": 514
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/run-order.json",
+      "sha256": "f1d823a0120cd8ba0f42135021c2889f56c44435ff32e2d9ad97c188cb2aa1a7",
+      "bytes": 677
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/task-prompt.txt",
+      "sha256": "dbde6c33aa7b8132161cc13b77a705f551c0c8addf5c8353530c65a8cca82422",
+      "bytes": 789
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/task.md",
+      "sha256": "f3cd0e93819e7087c4f966b1a0fd5b89db20b67d9e6ee69e7897e52a2a8838df",
+      "bytes": 4501
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-packets/cli_run1.txt",
+      "sha256": "b9bfe4e2bfe79473bc2e319693938cc9342db10923ce73c0443f0298c3aa6c9f",
+      "bytes": 872
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-packets/cli_run2.txt",
+      "sha256": "a2f4c18bc9ff70301e306f0e32b2fb5e4e2cc71a7bd2a0f09dfea01b749c5a28",
+      "bytes": 995
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-packets/sdk_run1.txt",
+      "sha256": "0301b2517377325c2a98a340887fca7a3d4609aab6288c9a1de5acf802e2e17f",
+      "bytes": 954
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-packets/sdk_run2.txt",
+      "sha256": "efbf29549ef15bec9a8dea80058060d7a7e2927d6f3d643e99c57cbe0d35e39f",
+      "bytes": 1033
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-runs/judge-cli_run1.prompt.txt",
+      "sha256": "8cf69affb5076405b3c6d2e441169efb28e9d0ce03bb3eabe9bfe58584fb1023",
+      "bytes": 2197
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-runs/judge-cli_run2.prompt.txt",
+      "sha256": "530f27e2f72b21907e89ba69165bad53e4949f26f99743791e8cf43b29590f0b",
+      "bytes": 2320
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-runs/judge-sdk_run1.prompt.txt",
+      "sha256": "8b2a923f0ab799f462786cbd859b52aa4efaacd6b84e137dfe009c3f7a526785",
+      "bytes": 2279
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-runs/judge-sdk_run2.prompt.txt",
+      "sha256": "f9519d38e4be91967931f047ce346755df390924193dbf6a2dcd3ead599c396d",
+      "bytes": 2358
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/main-runs-summary.json",
+      "sha256": "c1522f4dc3c6bc898f1be4bfc1085b4b6faeb2dd47a8e33dd94dc8e0cd1ab5bc",
+      "bytes": 8173
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/sdk-task.py",
+      "sha256": "0d1945ca05a12b87dd948791e8451684f08855373cad7eacfccd9baef32f05a4",
+      "bytes": 3483
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/typesafe-extended/cases.json",
+      "sha256": "7adef5c4578f4636a1596ff3e67f5dab43c051f6015c1d0e477f071579168462",
+      "bytes": 16076
+    },
+    {
       "path": "blueprints/memory-lifecycle-probe/README.md",
       "sha256": "c50ba6b05cba66095a357f1185429761b251462b9b91d1d23a51532b317bc042",
       "bytes": 9126
@@ -7988,6 +8168,11 @@
       "sha256": "45c9f3a0d38f4a8bad7d0f59bbc31ff87f6631135273b8a2f731388e993c6555"
     },
     {
+      "path": "catalogs/landscape/gap-wave2-20260923+gap-wave3-20260923--gap-resolution.json",
+      "sha256": "73938516243619fc0ae548562cc1e743d1125492bd63a827b72b6492be11fe2d",
+      "bytes": 75039
+    },
+    {
       "path": "catalogs/landscape/gap-wave2-20260923--gap-resolution.json",
       "sha256": "c7c9e05bdacc5263d370333fd4679ee9c7599f16445c7c75a07dffaf9291b801",
       "bytes": 69876
@@ -8586,6 +8771,11 @@
       "path": "docs/gap-resolution-20260922.md",
       "bytes": 16438,
       "sha256": "f8c93e1889a46ef7800cb2cbd78168da21dfe77dcce2ef965316c0eb5ce8e6d5"
+    },
+    {
+      "path": "docs/gap-wave2-20260923+gap-wave3-20260923--gap-resolution.md",
+      "sha256": "bd9b90496d427dc1181ca17373b1d7a1a1fd77f7a887eef8f8c947446e5d78ce",
+      "bytes": 13940
     },
     {
       "path": "docs/gap-wave2-20260923--gap-resolution.md",
@@ -10126,6 +10316,41 @@
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/watcher-kill-restart-recovery.json",
       "sha256": "1702356a6e2ee2db38b4bf38daa8a7caf14df71efb802635153616a8d7e2e120",
       "bytes": 19163
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-build-start-resource-vs-native.json",
+      "sha256": "4351c9149427d3170585991a4fb2bedfa1fd7765864105861347881f8766365d",
+      "bytes": 19511
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-recovery-isolation-cpu-mem-vs-native.json",
+      "sha256": "f987aab25c2e8ab955da021e950c134e4f55f7a421064a7ddc5b59e932e47502",
+      "bytes": 17082
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/forced-skill-arm-ab.json",
+      "sha256": "81f3b123cac3b9e9a8130e0cf7cdc90cc29c53c118c5b871567c87cf3fa88df6",
+      "bytes": 19994
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/typesafe-extended-label-set.json",
+      "sha256": "fb5429623046a121bf7bb8e709ea07d695a8e4b4fa759c0384d7964528dbc21d",
+      "bytes": 23471
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/worker-skill-preload-probe.json",
+      "sha256": "5766a209f68ae045c650026e9074157330a618526879900c2265528c4f5e5002",
+      "bytes": 6867
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/native-clients/arm-comparison-research-task.json",
+      "sha256": "e63a2fd34d5003bc68d0a28d4d5d4c45e6f7b02f8bb8f959d3cc3768205672f7",
+      "bytes": 22636
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/native-clients/sdk-vs-cli-resume-comparison.json",
+      "sha256": "c51d516dd0ff1e3438d2a9371b089e647c621c749a723e488b57190b4034d5c5",
+      "bytes": 22807
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
@@ -14204,8 +14429,8 @@
     },
     {
       "path": "tests/test_gap_wave_ledger.py",
-      "sha256": "186b9c6909939136f2f4a6177410c13709f3acdece31978e6e08ca488b4f2d23",
-      "bytes": 9020
+      "sha256": "7857d26cddfa114483dff44b8813afbd937de044fa2a28c3c71cda8b1cac0db3",
+      "bytes": 9965
     },
     {
       "path": "tests/test_gitleaks_config.py",
@@ -14484,8 +14709,8 @@
     },
     {
       "path": "tools/sota-convergence/gap_wave_ledger.py",
-      "sha256": "8de1e940df6f214728b98fd2fb4e98d544de3a528e2b8805886283ba1cd03153",
-      "bytes": 12685
+      "sha256": "142eb93021eb2f299900cd1a2443f842c22d642d0b047f5cf714fd038dc71492",
+      "bytes": 13299
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",

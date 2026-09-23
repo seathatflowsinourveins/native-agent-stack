@@ -1,0 +1,31 @@
+You are a blind evaluator scoring a single response to a frozen research
+question. You do not know and must not guess which system produced it.
+
+QUESTION GIVEN TO THE RESPONDENT:
+Research question: Name ONE specific, real, verifiable technique used in
+production LLM coding-agent systems to reduce token usage during tool calls or
+long sessions (for example prompt caching, context compaction, retrieval-based
+context reduction, or a named provider feature). In 3 to 5 sentences: (1) name
+the technique and, if you can, the system or provider that uses it, (2)
+explain briefly how it reduces tokens, and (3) give one concrete quantifiable
+claim about its benefit or a tradeoff (a percentage, ratio, or comparable
+number).
+
+RUBRIC (score each 0 or 1):
+R1: Names a specific, real, plausible technique (not vague filler such as "be
+efficient" or "summarize").
+R2: The explanation of the mechanism is technically coherent and internally
+consistent (does not contradict itself or describe an impossible mechanism).
+R3: Includes at least one concrete quantifiable claim (a percentage, ratio,
+multiplier, or comparable number) tied to the technique's benefit or
+tradeoff.
+
+RESPONSE TO SCORE:
+-----
+The technique is **prompt caching**, specifically Anthropic's prompt caching for the Claude API, which Claude Code uses. An agent resends the same long prefix on every tool-call turn: system prompt, tool definitions, and earlier conversation. Caching lets the API store that prefix at marked `cache_control` breakpoints and reuse it on later requests, so the unchanged part is not billed or processed as fresh input. Anthropic's published pricing bills a cache read at 10% of the base input-token price, about a 90% saving on the reused prefix. The tradeoff is on writes: storing the prefix costs 1.25× the base input price with the default 5-minute lifetime, or 2× with the 1-hour option. Caching also only helps when the prefix stays byte-for-byte identical and is reused before it expires.
+
+These figures come from my knowledge of Anthropic's documentation, not from a source I checked in this session. The only tool I ran was the timestamp command.
+-----
+
+Reply with ONLY a JSON object of the exact shape:
+{"R1": 0 or 1, "R2": 0 or 1, "R3": 0 or 1, "justification": "one sentence"}

@@ -118,8 +118,10 @@ def load_receipts(root, wave, dir_style="layer"):
 
 
 def build(root, wave, owner, dir_style="layer"):
+    """wave is one wave name, or a list for a combined ledger (best status per gap across waves)."""
+    waves = [wave] if isinstance(wave, str) else list(wave)
     crosswalk = json.loads((root / CROSSWALK).read_text(encoding="utf-8"))
-    receipts = load_receipts(root, wave, dir_style)
+    receipts = [r for w in waves for r in load_receipts(root, w, dir_style)]
     rev = crosswalk["source_revision"]
     for r in receipts:
         if r["source_revision"] is None and dir_style == "catalog__layer":
@@ -153,7 +155,8 @@ def build(root, wave, owner, dir_style="layer"):
                          "status": status, "receipts": [{"path": p, "credit": c} for p, c in hits]})
         layers.append({"catalog": layer["catalog"], "layer_id": layer["layer_id"], "gaps": gaps})
     doc = {
-        "schema_version": 1, "id": f"{wave}--{owner}", "wave": wave, "owner": owner,
+        "schema_version": 1, "id": f"{'+'.join(waves)}--{owner}",
+        "wave": waves[0] if len(waves) == 1 else waves, "owner": owner,
         "source_revision": rev, "crosswalk": CROSSWALK,
         "crosswalk_sha256": hashlib.sha256((root / CROSSWALK).read_bytes()).hexdigest(),
         "rule": ("status is the best credit over the receipts naming the gap; settles_gap true/partially/false "
@@ -168,7 +171,10 @@ def build(root, wave, owner, dir_style="layer"):
 
 
 def render(doc):
-    lines = [f"# Gap evidence wave `{doc['wave']}` ({doc['owner']} layers)", "",
+    waves = doc["wave"] if isinstance(doc["wave"], list) else [doc["wave"]]
+    title = (f"Gap evidence wave `{waves[0]}`" if len(waves) == 1
+             else "Gap evidence, combined waves " + " + ".join(f"`{w}`" for w in waves))
+    lines = [f"# {title} ({doc['owner']} layers)", "",
              f"This page summarizes [`catalogs/landscape/{doc['id']}.json`](../catalogs/landscape/{doc['id']}.json). "
              f"It records the executed checks for the `executable_now` gaps the [crosswalk](gap-crosswalk-92bb279.md) "
              f"assigned to `{doc['owner']}`, keyed to the rows at `{doc['source_revision'][:7]}`. "
@@ -195,14 +201,15 @@ def render(doc):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--root", type=pathlib.Path, default=pathlib.Path(__file__).resolve().parents[2])
-    ap.add_argument("--wave", required=True)
+    ap.add_argument("--wave", required=True, action="append",
+                    help="wave directory name; repeat for a combined ledger (best status per gap across waves)")
     ap.add_argument("--owner", required=True)
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--dir-style", choices=("layer", "catalog__layer"), default="layer",
                     help="receipt directory layout: <layer_id>/ (default) or <catalog>__<layer_id>/")
     args = ap.parse_args(argv)
     root = args.root.resolve()
-    doc = build(root, args.wave, args.owner, args.dir_style)
+    doc = build(root, args.wave if len(args.wave) > 1 else args.wave[0], args.owner, args.dir_style)
     text = json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
     page = render(doc)
     out, md = root / f"catalogs/landscape/{doc['id']}.json", root / f"docs/{doc['id']}.md"
