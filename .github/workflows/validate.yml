@@ -142,7 +142,11 @@ jobs:
           # --config: reviewed allowlists (.gitleaks.toml); --max-target-megabytes 2: the
           # generated explorer HTML is skipped (recorded as incomplete coverage in
           # docs/github-automation.md); measured 2026-09-22: 522 commits, 777 MB, 34 s locally.
+          # --log-opts=HEAD: scan what this run would land (a pull request's merge commit, or
+          # main on push). The default is every fetched ref, so one open branch's finding
+          # failed every other pull request (2026-09-23: #116's branch failed #117).
           "$RUNNER_TEMP/gitleaks/gitleaks" git . --config .gitleaks.toml --max-target-megabytes 2 \
+            --log-opts="HEAD" \
             --redact --no-banner --report-format json --report-path "$RUNNER_TEMP/gitleaks/gitleaks.json"
       - name: Scan working tree for secrets
         if: always()
