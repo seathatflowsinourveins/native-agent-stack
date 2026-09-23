@@ -1,6 +1,8 @@
 # Native token tools: session and new-PC handbook
 
-Use the installed tools for the current task; setup is a one-time operation per selected client/project. This handbook covers all **24 topic repositories**: 14 context tools, nine observation tools and one optional gateway. The wider [HTML catalog](ecosystem/index.html) generates current selected-component and repository-identity counts from the canonical manifests. Those are different scopes, and catalog inclusion does not mean installed or active. Pins, exact commands and dated results remain in the [topic manifest](token-efficiency-stack.json), [component manifest](../manifests/stack.json) and [foundation receipt](../evidence/receipts/foundation-native-20260920.json).
+Use the installed tools for the current task; setup is a one-time operation per selected client/project. This handbook covers all **24 topic repositories**: 14 context tools, nine observation tools and one optional gateway. The wider HTML catalog (`ecosystem/index.html`, generated with
+`python3 scripts/build_ecosystem.py --write` -- not committed, or download it
+from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only)) generates current selected-component and repository-identity counts from the canonical manifests. Those are different scopes, and catalog inclusion does not mean installed or active. Pins, exact commands and dated results remain in the [topic manifest](token-efficiency-stack.json), [component manifest](../manifests/stack.json) and [foundation receipt](../evidence/receipts/foundation-native-20260920.json).
 
 ## Persistent defaults for future sessions
 
