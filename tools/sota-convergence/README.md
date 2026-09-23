@@ -628,9 +628,13 @@ With the flag, every candidate and `sota_components_not_in_candidates` entry car
 the `manifests/evidence.json` receipts that name its component, sorted by path, each with `kind`, `path` and
 `matched_by`.
 - **`matched_by: "component_id"`:** the receipt's `component_ids` names the item's own id.
-- **`matched_by: "repository"`:** receipts name components in the `manifests/stack.json` id space, which
-  differs from the sota manifest's for some components (`nautilus-trader` and `nautilustrader`, `duckdb`
-  and `data-duckdb`). A repository match is used only when (a) the item's own id matches no receipt,
+- **`matched_by: "alias"`:** receipts name components in the `manifests/stack.json` id space, which differs
+  from the sota manifest's for some components. `receipt-component-aliases.json` maps each such stack id to
+  its sota id (`nautilus-trader` to `nautilustrader`; `duckdb`, `edgartools` and `exchange-calendars` to their
+  `data-` ids), and a receipt naming the stack id is attached to the sota id with `matched_by: "alias"`. The
+  index build fails when an alias's two ids do not share one repository (see "Receipt aliases" below).
+- **`matched_by: "repository"`:** a fallback for a respelling the alias map does not list. It is used only
+  when (a) the item's own id and aliases match no receipt,
   (b) exactly one `manifests/stack.json` component uses the item's repository slug and the receipt names
   that component, and (c) no other sota manifest component id, in either catalog, uses that slug.
   Otherwise nothing is attached by repository (PR #142 re-review: an unconditional repository match gave
@@ -645,12 +649,29 @@ A packet-level `registered_receipts_note` says how each entry matched, that a re
 components and that its `kind` is the registrant's label. The lane opens the receipt and judges what it ran
 for this component.
 
-On the 2026-09-23 tree with `manifest-20260923`, `--trading-candidates manifest` and `--withhold-labels`, 92
-of 286 candidates carry at least one receipt, 4 of them by repository (`data-duckdb` gets 13). The shared
-repository rule leaves `nautilustrader`, `nautilus-ibkr-adapter`, `codex-native-sdk` and the trading
-`foundation-*` aliases (for example `foundation-ai-memory`) with no repository-matched receipt: each shares its
-slug with another manifest id, so its receipts need a manifest id change or an id-matched registration. The
-flag is off by default, so the 2026-09-22 packets reproduce.
+Measured on the 2026-09-23 tree (round-2 review, rebuilt with
+`lane_packets.py --root . --out <dir> --manifest catalogs/sota-convergence/manifest-20260923.json
+--trading-candidates manifest --withhold-labels --registered-receipts`):
+- 93 of 286 candidates carry at least one receipt.
+- Candidate entries by `matched_by`: `component_id` 1097, `alias` 34, `repository` 0.
+- The alias entries: `data-edgartools` 14, `data-duckdb` 13, `nautilustrader` 6 and `data-exchange-calendars` 1.
+- `nautilus-ibkr-adapter`, `codex-native-sdk` and the trading `foundation-*` ids (for example
+  `foundation-ai-memory`) get no receipt by repository, because each shares its slug with another manifest id.
+
+**Limit: withholding receipt ids hides little.** 99 of the 142 registered receipt paths contain the receipt id
+(`evidence/receipts/<id>.json` and similar), and the path stays in the packet so the lane can open it.
+
+The flag is off by default, so the 2026-09-22 packets reproduce.
+
+**Gap-wave receipts** (`--gap-receipts`, 2026-09-23 re-record). The gap-resolution waves executed checks
+for the evidence gaps that the previous verdicts listed, but no ledger `evidence_refs` point to their
+receipts.
+
+With the flag, every packet carries `gap_receipts`: the sorted receipt paths that the gap-wave owner ledgers
+(`catalogs/landscape/gap-wave*--*.json`) list for its layer, with missing files dropped. A
+`gap_receipts_note` tells the lane to judge them like `evidence_refs`. The gap text and status are not
+carried: they derive from the previous verdict rows' `open_gaps`, which can name the incumbent. The flag is
+off by default.
 
 **Popularity and recency are withheld too** (2026-09-23 peer audit: 132
 foundation-packet objects still carried GitHub `stars` and `pushed_at` through
@@ -1106,14 +1127,27 @@ On the 2026-09-23 tree this covers `AGENTS.md`, `CLAUDE.md`,
 `examples/claude-native/CLAUDE.md`; the tree has no `.claude/`, `.codex/` or `.agents/` directory. The CLI
 prints both lists (`export_instruction_files_replaced`, `export_instruction_dirs_removed`).
 
-**Remaining limit: Markdown prose still carries labels.** The export strips JSON label fields (below) and
-the instruction files, not prose. Markdown elsewhere is copied unchanged and still names selections, for
-example `README.md` ("selected components"), `docs/foundation-stack.md`,
-`docs/landscape-continuation.md`, `blueprints/us-equities/north-star.md`,
-`blueprints/us-equities/engine-nautilus/`, `adoption/`, `recipes/` and the `catalogs/**/*.md` narratives.
-(`docs/grand-catalog-handbook.md` is removed outright.) These are not stripped wholesale, because a lane
-also reads them as evidence. The lane prompt's rules and the post-run blind audit are the controls here,
-and a coordinator discloses the limit with the wave.
+**Remaining limits: what the export still carries.** The export strips the JSON label fields under
+`catalogs/` and `blueprints/` (below) and the instruction files. It does not strip:
+- **Markdown prose.** It is copied unchanged and still names selections, for example `README.md` ("selected
+  components"), `docs/foundation-stack.md`, `docs/landscape-continuation.md`,
+  `blueprints/us-equities/north-star.md`, `blueprints/us-equities/engine-nautilus/`, `adoption/`, `recipes/`
+  and the `catalogs/**/*.md` narratives. (`docs/grand-catalog-handbook.md` is removed outright.)
+- **Prior evidence artifacts.** JSON under `evidence/artifacts/` other than `layer-verdicts-*` is kept,
+  because packets cite prior artifacts as evidence. On the 2026-09-23 tree, "selected" (case-insensitive)
+  occurs 1,799 times in 121 JSON files across 35 of those directories. The largest are
+  `blind-catalog-convergence-20260921/` (541 in 9 files; `claude-final-layers.json` alone has 158),
+  `full-stack-convergence-20260921/` (220), `claude-repository-evidence-20260921/` (152),
+  `sdk-runtime-coverage-20260922/` (139) and `catalog-runtime-review-20260921/` (133).
+  `catalog-reconciliation-20260922/claude-return.json` also records a prior lane's selections.
+- **Instruction files outside the export.** The export cannot neutralize instructions a client loads from
+  elsewhere: a parent directory's `AGENTS.md` or `CLAUDE.md`, `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`
+  (`$CODEX_HOME/AGENTS.md`). A probe Codex child quoted `~/.codex/AGENTS.md`, so it is known to load for
+  Codex children. The Claude lane's `blind-lane-reviewer` agents run with `omitClaudeMd`.
+
+None of these is stripped wholesale, because a lane also reads them as evidence. The controls are lane-prompt
+rule 1, placing the export outside every repository, and the post-run blind audit (a lower bound). A
+coordinator discloses these limits with the wave.
 
 It removes outright: `evidence/artifacts/layer-verdicts-*/` (recursively),
 `catalogs/sota-convergence/layer-verdicts-*.json`,
@@ -1197,7 +1231,8 @@ that hash still matching the packet file's current bytes, and its `provenance`
 equal to the current `lane_provenance(--prompt)` (this `codex_lane.py`'s and the
 prompt template's sha256; a return from older lane code, an older prompt or
 without provenance is rerun, not skipped, because `record_verdicts.py` would
-reject it on every later run) -- it fills the
+reject it on every later run), and its `model.name` neither `"unknown"` nor, when `--model` is given,
+different from it (round-2 review) -- it fills the
 shared lane prompt (`lane-prompt.md`, placeholders `{PACKET_PATH}`
 `{REPO_ROOT}` `{LANE}`) and runs:
 
@@ -1287,15 +1322,23 @@ What remains and how it is handled:
   report-only reading of each child's events. It counts web searches and MCP tool calls, and flags
   commands that do any of the following:
   - name an absolute path outside the repository and the packets directory. Only `/dev/null` and a
-    command segment's executable token are exempt, and the token only when it is under `/bin/`, `/usr/` or
-    `/sbin/`: the first word at the start, after `;`, `&&`, `||`, `|` or a newline, or right after
-    `bash -lc '` (or `sh -c "`). A data path under `/usr/` or `/bin/` is flagged, so
-    `/bin/cat /usr/local/share/prior-verdict.json` flags `/usr/local/share/prior-verdict.json`;
-  - use a `~`, `$HOME` or `${HOME}` path;
+    command segment's executable token are exempt, and the token only when it is under `/bin/`, `/sbin/`,
+    `/usr/bin/`, `/usr/sbin/` or `/usr/local/bin/`. The executable token is the first word at the start,
+    after `;`, `&&`, `||`, `|` or a newline, or right after `bash -lc '` (or `sh -c "`). A data path under
+    `/usr/` or `/bin/` is flagged, so `/bin/cat /usr/local/share/prior-verdict.json` flags
+    `/usr/local/share/prior-verdict.json`, and so is an executable elsewhere under `/usr/`, such as
+    `bash -lc '/usr/local/share/verdicts/show'`;
+  - use a `~`, `$HOME` or `${HOME}` path, or any other `$VAR/...` or `${VAR}/...` path (for example
+    `$CODEX_HOME/AGENTS.md`), whose value the event does not show;
+  - `cd` somewhere the command does not name: bare `cd`, `cd -`, `cd ~`, or `cd` to a bare variable such as
+    `$OLDPWD` or `"$OLDPWD"`;
   - climb out with `..`;
   - run git, ai-memory, agentsview, mcporter, qmd, socraticode, jcodemunch, serena, sqlite3, curl or wget.
 
-  A flag is evidence for the coordinator to review and disclose, not a verdict.
+  A flag is evidence for the coordinator to review and disclose, not a verdict. The audit is a heuristic
+  lower bound: it reads only the command text. Known gaps include a path a program computes (a
+  `python3 -c` that joins path parts, a glob, a variable set in an earlier command) and anything a command
+  reads indirectly (a script's own reads, a config file it loads, a symlink under the repository).
 - **Claude lane:** it has no equivalent audit in these tools. Its agents run Read, Glob and Grep only, but
   those have no path limit. A wave's coordinator audits the file paths in the lane's agent transcripts and
   discloses the result.
@@ -1355,7 +1398,8 @@ where the two lanes chose different winner components (2026-09-23 re-record).
   the packet and the blind export.
 
 ```sh
-python3 tools/sota-convergence/adjudicate.py inputs --work-dir W        # A/B and B/A inputs, index.json
+python3 tools/sota-convergence/adjudicate.py inputs --work-dir W \
+  --lane-repo-root <claude lane export> --lane-repo-root <codex lane export>   # A/B and B/A inputs, index.json
 python3 tools/sota-convergence/adjudicate.py codex --work-dir W --repo <blind export> --model <model>
 python3 tools/sota-convergence/adjudicate.py claude-args --work-dir W --repo <blind export> > args.json
 # run tools/sota-convergence/adjudication-lane.js with args.json (blind-lane-reviewer agents)
@@ -1367,20 +1411,41 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   writes each layer's two returns in both orders, scrubbed to the eleven verdict fields both lanes share.
   Lane, model, provenance and refutation fields are removed. Prose that names a lane is reported in
   `index.json` as `identity_mentions`, not removed.
+  Every evidence-path list is reduced to sorted, deduplicated bare paths (round-2 review). This covers
+  `sources_read`, `winner_evidence_refs`, every nested `evidence_refs` (`alternatives[]`,
+  `challenger_preferred`) and `overturn_protocol.fixture_paths`. Each entry keeps its leading path token and
+  any `#fragment`, loses a trailing `:line` reference and every note, and becomes repository-relative when it
+  is absolute under a `--lane-repo-root`. In the 2026-09-22 sealed returns, 263 of 423 Claude `sources_read`
+  entries carried notes such as "path (lines 60-104, prior round)", while all 558 Codex entries were bare
+  paths, so the notes alone showed which lane wrote A.
 - **`codex`:** runs one judge and one refuter per input through `codex exec` with `codex_lane.ISOLATION_ARGS`
   (no user config, hooks or web search) and the strict schemas `adjudication-judge.schema.json` and
   `adjudication-refute.schema.json`. It refuses a repository under any `.git`, retries once, resumes, and
-  writes a blind audit.
+  writes a blind audit. `--model` is required and must match the openai pattern in `scripts/landscape.py`
+  `FAMILY_MODEL_PATTERNS` (exit 2 otherwise). It is passed to `codex exec -m` and recorded on each judgment
+  ahead of the event-stream model name, the same order `codex_lane.py` uses. Resume skips a judgment only when
+  it is usable and was made with this `--model`.
 - **`adjudication-lane.js`:** the Claude family's judge and refuter, one pair per input. Both run as
   `blind-lane-reviewer` (Read, Glob and Grep; no skills or project instructions). `claude-collect` records
   its return; a lost judge or refuter makes that judgment missing, never unrefuted.
 - **`assemble`:** writes one record per layer. `claude_position` follows the order, `refuting_votes` is 1 when
   the refuter refuted, and `judge` is `{model, family}`. `stripped_packet_sha256` is the layer's sealed lane
   packet. Each record is validated with `judge_adjudication` before it is written. A missing family gives a
-  split record naming it.
+  split record naming it. A judgment whose model does not match its family's pattern (for example
+  `"unknown"`) does not count (`usable_judgment`), so a resumed run reruns it. Each written record carries a
+  top-level `provenance`: `adjudicate_py_sha256`, `prompt_sha256` (`adjudication-prompt.md`),
+  `judge_schema_sha256`, `refute_schema_sha256` and `workflow_sha256` (`adjudication-lane.js`).
+  `judge_adjudication` and `record_verdicts.load_adjudication` ignore extra top-level keys, so the key needs
+  no validator change. Nothing checks these hashes against a registry yet.
 
 **Limits:**
 - Writing style can still reveal a lane.
+- The raw lane returns sit next to the adjudication inputs in the work directory
+  (`<work-dir>/{claude,codex}/`, beside `<work-dir>/adjudication-inputs/`). A judge that reads outside its
+  input file can read the unscrubbed returns, which name the lane, model and provenance. The Codex blind audit
+  allows the inputs directory and the packets but not the lane directories, so such a read is flagged there.
+- `provenance.prompt_sha256` is the default `adjudication-prompt.md`; a `codex --prompt` override is not
+  recorded.
 - One refuter per judgment, not two.
 - The judge may read the packet outside the repository root, which it needs for the requirement and
   candidate keys.

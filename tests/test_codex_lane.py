@@ -265,7 +265,8 @@ class CodexLaneTests(CodexLaneFixture):
         codex_dir = self.work_dir / "codex"
         codex_dir.mkdir()
         existing = canned_return(packet_sha256=packet_sha256,
-                                 provenance=codex_lane.lane_provenance(FIXTURE_PROMPT))
+                                 provenance=codex_lane.lane_provenance(FIXTURE_PROMPT),
+                                 model={"name": "gpt-6-astra", "effort": "high", "family": "openai"})
         out_path = codex_dir / "foundation__native-clients.json"
         out_path.write_text(json.dumps(existing, sort_keys=True, indent=1) + "\n", encoding="utf-8")
         before = out_path.read_text(encoding="utf-8")
@@ -285,7 +286,8 @@ class CodexLaneTests(CodexLaneFixture):
         out_path.parent.mkdir()
         stale = (None, {**current, "codex_lane_py_sha256": "1" * 64}, {**current, "prompt_sha256": "2" * 64})
         for index, provenance in enumerate(stale, start=1):
-            existing = canned_return(packet_sha256=packet_sha256)
+            existing = canned_return(packet_sha256=packet_sha256,
+                                     model={"name": "gpt-6-astra", "effort": "high", "family": "openai"})
             if provenance is not None:
                 existing["provenance"] = provenance
             out_path.write_text(json.dumps(existing), encoding="utf-8")
@@ -294,6 +296,30 @@ class CodexLaneTests(CodexLaneFixture):
             self.assertEqual(json.loads(out_path.read_text(encoding="utf-8"))["provenance"], current)
         self.assertTrue(codex_lane.existing_output_is_valid(out_path, "foundation", "native-clients",
                                                              packet_sha256, current))
+
+    def test_a_return_with_an_unknown_or_other_model_reruns_instead_of_being_skipped(self):
+        """Round-2 review: a return whose model.name is "unknown", or differs from --model, was skipped."""
+        packet_path = self.write_packet("foundation", "native-clients")
+        packet_sha256 = hashlib.sha256(packet_path.read_bytes()).hexdigest()
+        current = codex_lane.lane_provenance(FIXTURE_PROMPT)
+        out_path = self.out_path("foundation", "native-clients")
+        out_path.parent.mkdir()
+
+        def write(name):
+            out_path.write_text(json.dumps(canned_return(
+                packet_sha256=packet_sha256, provenance=current,
+                model={"name": name, "effort": "high", "family": "openai"})), encoding="utf-8")
+
+        write("unknown")
+        self.assertEqual(self.run_lane(), 0)
+        self.assertEqual(len(self.argv_calls()), 1, "an unknown model reruns")
+        self.assertEqual(json.loads(out_path.read_text(encoding="utf-8"))["model"]["name"], "gpt-6-astra")
+        write("gpt-6-astra")
+        self.assertEqual(self.run_lane(["--model", "gpt-6-codex"]), 0)
+        self.assertEqual(len(self.argv_calls()), 2, "a return from another model than --model reruns")
+        self.assertEqual(json.loads(out_path.read_text(encoding="utf-8"))["model"]["name"], "gpt-6-codex")
+        self.assertEqual(self.run_lane(["--model", "gpt-6-codex"]), 0)
+        self.assertEqual(len(self.argv_calls()), 2, "a return from the configured model is skipped")
 
     def test_timeout_handling_retries_once_then_fails(self):
         self.write_packet("foundation", "native-clients")
@@ -677,6 +703,36 @@ class BlindIsolationTests(CodexLaneFixture):
             "/bin/bash -lc \"ls /usr/local/lib/verdicts\"": ["/usr/local/lib/verdicts"],
             "/bin/sh -c '/home/example/bin/tool --flag'": ["/home/example/bin/tool"],
         })
+
+    def audit_reasons(self, command):
+        events = self.work_dir / "audit-events.jsonl"
+        events.write_text(json.dumps({"type": "item.completed", "item": {
+            "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
+        report = codex_lane.blind_audit(events, [str(self.repo), str(self.work_dir / "packets")])
+        return [reason for item in report["flagged_commands"] for reason in item["reasons"]]
+
+    def test_round_two_audit_gaps_are_flagged(self):
+        """Round-2 review: cd to an unnamed directory, non-HOME variable paths and a /usr/ executable outside
+        the executable directories were not flagged."""
+        expected = {
+            "/bin/bash -lc 'cd'": "cd leaves for an unnamed directory: cd (home)",
+            "cd": "cd leaves for an unnamed directory: cd (home)",
+            "/bin/bash -lc 'cd -'": "cd leaves for an unnamed directory: cd -",
+            "/bin/bash -lc 'cd ~ && rg verdict'": "cd leaves for an unnamed directory: cd ~",
+            "/bin/bash -lc 'cd $OLDPWD'": "cd leaves for an unnamed directory: cd $OLDPWD",
+            "/bin/bash -lc 'cd \"$OLDPWD\"; ls'": "cd leaves for an unnamed directory: cd $OLDPWD",
+            "/bin/bash -lc 'cat $CODEX_HOME/AGENTS.md'": "variable path: $CODEX_HOME/AGENTS.md",
+            "/bin/bash -lc 'ls ${XDG_DATA_HOME}/x'": "variable path: ${XDG_DATA_HOME}/x",
+            "/bin/bash -lc '/usr/local/share/verdicts/show'":
+                "path outside the repository and packets: /usr/local/share/verdicts/show",
+            "/bin/bash -lc '/usr/lib/verdicts/show --all'":
+                "path outside the repository and packets: /usr/lib/verdicts/show",
+        }
+        for command, reason in expected.items():
+            self.assertIn(reason, self.audit_reasons(command), command)
+        for command in ("/bin/bash -lc 'cd catalogs && ls'", "/usr/local/bin/rg -n x catalogs",
+                        "/usr/sbin/tool x", "/sbin/tool x", "/bin/bash -lc 'for f in a b; do cat $f; done'"):
+            self.assertEqual(self.audit_reasons(command), [], command)
 
 
 

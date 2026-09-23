@@ -177,7 +177,7 @@ def discover_packets(work_dir: Path, layers: "set[str] | None") -> list:
 
 
 def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet_sha256: str,
-                             provenance: dict = None) -> bool:
+                             provenance: dict = None, configured_model: str = None) -> bool:
     """Resumable-skip check: the file must parse as a JSON object already
     forced onto this lane and this exact packet. A present-but-different
     ``packet_sha256`` (the packet changed since the file was written) is
@@ -188,7 +188,11 @@ def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet
     ``provenance`` is the current ``lane_provenance(prompt_path)``: when given, the file's own
     ``provenance`` must equal it field for field. A return written by older lane code or from an older
     prompt (or one without provenance) is stale: record_verdicts.py rejects it, so skipping it would
-    leave the layer rejected on every later run (PR #141 review). It reruns instead."""
+    leave the layer rejected on every later run (PR #141 review). It reruns instead.
+
+    A return whose ``model.name`` is ``"unknown"`` (no model was configured or observed; record_verdicts.py
+    rejects it by family pattern), or differs from a given ``configured_model`` (the ``--model`` of this
+    run), also reruns (round-2 review)."""
     if not out_path.exists():
         return False
     try:
@@ -208,6 +212,11 @@ def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet
         existing = data.get("provenance")
         if not isinstance(existing, dict) or any(existing.get(key) != value for key, value in provenance.items()):
             return False
+    model = data.get("model") if isinstance(data.get("model"), dict) else {}
+    if model.get("name") in (None, "", "unknown"):
+        return False
+    if configured_model and model.get("name") != configured_model:
+        return False
     return True
 
 
@@ -262,6 +271,13 @@ AUDIT_TOOLS = ("git", "ai-memory", "agentsview", "mcporter", "qmd", "socraticode
                "sqlite3", "curl", "wget")
 ABSOLUTE_PATH = re.compile(r"(?<![\w.~}-])(/[^\s'\"|;&<>()`]+)")
 HOME_PATH = re.compile(r"(?:~|\$HOME|\$\{HOME\})(?:/[^\s'\"|;&<>()`]*)?")
+# Any other environment variable used as a path (``$CODEX_HOME/AGENTS.md``, ``${XDG_DATA_HOME}/x``) can point
+# outside the repository; only its value, which the event does not show, says where (round-2 review).
+VARIABLE_PATH = re.compile(r"\$(?:\{(?!HOME\})[A-Za-z_]\w*\}|(?!HOME\b)[A-Za-z_]\w*)/[^\s'\"|;&<>()`]*")
+# A ``cd`` that leaves the working directory for somewhere the command does not name: bare ``cd`` (home),
+# ``cd -``, ``cd ~`` and ``cd $OLDPWD`` / ``cd "${OLDPWD}"`` (the previous directory), or any other bare variable.
+CD_TARGET = re.compile(r"(?:^|[;&|\n(]|\b(?:ba|z|da)?sh\s+-l?c\s+['\"])\s*cd(?=$|[\s;&|)'\"])([^;&|\n)]*)")
+UNNAMED_CD_TARGETS = re.compile(r"-|~|\$[A-Za-z_]\w*|\$\{[A-Za-z_]\w*\}|")
 PARENT_PATH = re.compile(r"(?:^|[\s'\"=:])((?:[^\s'\"|;&<>()`]*/)?\.\.(?:/[^\s'\"|;&<>()`]*)?)")
 ROOT_PATH = re.compile(r"(?:^|[\s'\"=])/(?=$|[\s'\";&|)])")
 # Only the executable token of a command segment is exempt, and only when it is a system executable: the
@@ -270,7 +286,9 @@ ROOT_PATH = re.compile(r"(?:^|[\s'\"=])/(?=$|[\s'\";&|)])")
 # ``/bin/...`` data path included -- ``/bin/cat /usr/local/share/prior-verdict.json`` reads data (PR #141
 # review). ``/dev/null`` stays exempt wherever it appears.
 EXECUTABLE_TOKEN = re.compile(r"(?:^|;|&&|\|\||\||\n|\b(?:ba|z|da)?sh\s+-l?c\s+['\"])\s*(?=/)")
-SYSTEM_EXECUTABLE_PREFIXES = ("/bin/", "/usr/", "/sbin/")
+# ``/usr/`` only for its executable directories: ``bash -lc '/usr/local/share/verdicts/show'`` runs a script
+# kept with data and is flagged (round-2 review).
+SYSTEM_EXECUTABLE_PREFIXES = ("/bin/", "/sbin/", "/usr/bin/", "/usr/sbin/", "/usr/local/bin/")
 EXEMPT_PATHS = ("/dev/null",)
 
 
@@ -296,10 +314,24 @@ def outside_paths(command: str, allowed_roots) -> list:
     return found
 
 
+def unnamed_cd_targets(command: str) -> list:
+    """The raw argument of every ``cd`` in ``command`` that goes home or back rather than to a named path."""
+    found = []
+    for match in CD_TARGET.finditer(command):
+        target = match.group(1).strip().strip("'\"").strip()
+        if UNNAMED_CD_TARGETS.fullmatch(target):
+            found.append(target or "(home)")
+    return found
+
+
 def blind_audit(events_path: Path, allowed_roots) -> dict:
     """Report-only reading of one child's event stream: web searches, MCP tool calls, and commands that
     name an absolute path outside ``allowed_roots`` (the repository and the packets directory) or run a
-    CLI in AUDIT_TOOLS. A flag is evidence for the coordinator to review and disclose, not a verdict."""
+    CLI in AUDIT_TOOLS. A flag is evidence for the coordinator to review and disclose, not a verdict.
+
+    This is a heuristic lower bound, not a boundary: it reads command text only, so a path a program
+    computes (``python3 -c`` joining parts, a glob, a variable set earlier) and anything a command reads
+    indirectly (a script's own reads, a config it loads, a symlink under the repository) are not seen."""
     report = {"web_search": 0, "mcp_tool_calls": 0, "commands": 0, "flagged_commands": []}
     if not events_path.is_file():
         return report
@@ -323,6 +355,8 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
                        for path in outside_paths(command, allowed_roots)]
             reasons += ["names the filesystem root /"] if ROOT_PATH.search(command) else []
             reasons += [f"home-relative path: {path}" for path in HOME_PATH.findall(command)]
+            reasons += [f"variable path: {path}" for path in VARIABLE_PATH.findall(command)]
+            reasons += [f"cd leaves for an unnamed directory: cd {target}" for target in unnamed_cd_targets(command)]
             reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
             words = set(re.findall(r"[A-Za-z][\w.-]*", command))
             reasons += [f"runs {tool}" for tool in AUDIT_TOOLS if tool in words]
@@ -516,7 +550,7 @@ def main(argv=None) -> int:
     for catalog, layer_id, packet_path in packets:
         packet_sha256 = sha256_file(packet_path)
         out_path = codex_dir / f"{catalog}__{layer_id}.json"
-        if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256, provenance):
+        if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256, provenance, args.model):
             continue
         pending.append((catalog, layer_id, packet_path, packet_sha256, out_path))
 

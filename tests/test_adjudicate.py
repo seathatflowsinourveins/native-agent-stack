@@ -127,6 +127,35 @@ class InputsTests(AdjudicateFixture):
                         "schema_version"):
                 self.assertNotIn(key, side)
 
+    def test_evidence_path_lists_are_reduced_to_sorted_bare_paths(self):
+        """Round-2 review: Claude sources_read entries carried notes ("path (lines 60-104, prior round)")
+        while Codex entries were bare paths, so the notes told the judge which lane wrote A."""
+        claude_repo = self.base / "claude-export"
+        self.write_return(
+            "claude", "c1", refutation={"status": "unrefuted"},
+            sources_read=["evidence/receipt.json (lines 60-104, prior round)", f"{claude_repo}/docs/a.md#setup",
+                          "docs/b.md:12-30", "evidence/receipt.json"],
+            winner_evidence_refs=[f"{claude_repo}/evidence/receipt.json (native run)"],
+            alternatives=[{"key": "c2", "evidence_refs": ["docs/b.md (README claim only)"]}],
+            challenger_preferred={"key": "c2", "evidence_refs": ["tests/x.py (fixture)"]},
+            overturn_protocol={"fixture_paths": ["tests/x.py (fixture)"], "metric": "", "arms": []})
+        self.write_return("codex", "c2", sources_read=["docs/b.md", "docs/a.md#setup", "evidence/receipt.json"],
+                          alternatives=[{"key": "c1", "evidence_refs": ["docs/b.md"]}],
+                          challenger_preferred={"key": "c1", "evidence_refs": ["tests/x.py"]})
+        code, _err = quiet(adjudicate.main, ["inputs", "--work-dir", str(self.work),
+                                             "--lane-repo-root", str(claude_repo)])
+        self.assertEqual(code, 0)
+        ab = json.loads((self.work / "adjudication-inputs" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        claude_side, codex_side = ab["A"], ab["B"]
+        self.assertEqual(claude_side["sources_read"], ["docs/a.md#setup", "docs/b.md", "evidence/receipt.json"])
+        self.assertEqual(claude_side["sources_read"], codex_side["sources_read"])
+        self.assertEqual(claude_side["winner_evidence_refs"], ["evidence/receipt.json"])
+        self.assertEqual(claude_side["alternatives"][0]["evidence_refs"], ["docs/b.md"])
+        self.assertEqual(claude_side["challenger_preferred"]["evidence_refs"], ["tests/x.py"])
+        self.assertEqual(claude_side["overturn_protocol"]["fixture_paths"], ["tests/x.py"])
+        self.assertNotIn("prior round", json.dumps(ab))
+        self.assertNotIn(str(claude_repo), json.dumps(ab))
+
     def test_agreeing_layer_writes_no_input(self):
         self.write_return("codex", "c1")
         self.inputs()
@@ -194,11 +223,45 @@ class AssembleTests(AdjudicateFixture):
     def test_a_record_that_fails_validation_is_not_written(self):
         for lane in ("claude", "codex"):
             for order in adjudicate.ORDERS:
-                self.judgment(lane, order, "claude", model="unknown" if lane == "codex" else None)
-        code, err, record = self.assemble()
+                self.judgment(lane, order, "claude")
+        with mock.patch.object(adjudicate, "judge_adjudication", return_value=("rejected", None)):
+            code, err, record = self.assemble()
         self.assertEqual(code, 1)
         self.assertIsNone(record)
-        self.assertIn("not written", err)
+        self.assertIn("not written: rejected", err)
+
+    def test_unknown_model_judgments_are_left_out_so_the_record_is_a_split(self):
+        # Before the round-2 fix these counted and the whole record failed validation.
+        for lane in ("claude", "codex"):
+            for order in adjudicate.ORDERS:
+                self.judgment(lane, order, "claude", model="unknown" if lane == "codex" else None)
+        code, err, record = self.assemble()
+        self.assertEqual(code, 0)
+        self.assertIsNone(record["winner_lane"])
+        self.assertEqual(record["missing_families"], ["openai"])
+        self.assertIn("does not match the openai pattern", err)
+        self.assert_valid(record)
+
+    def test_each_record_carries_the_provenance_of_its_code(self):
+        for lane in ("claude", "codex"):
+            for order in adjudicate.ORDERS:
+                self.judgment(lane, order, "codex")
+        _code, _err, record = self.assemble()
+        expected = {"adjudicate_py_sha256": TOOL_DIR / "adjudicate.py",
+                    "prompt_sha256": TOOL_DIR / "adjudication-prompt.md",
+                    "judge_schema_sha256": TOOL_DIR / "adjudication-judge.schema.json",
+                    "refute_schema_sha256": TOOL_DIR / "adjudication-refute.schema.json",
+                    "workflow_sha256": TOOL_DIR / "adjudication-lane.js"}
+        self.assertEqual(record["provenance"], {key: hashlib.sha256(path.read_bytes()).hexdigest()
+                                                for key, path in expected.items()})
+        self.assertEqual(self.assert_valid(record)["winner_lane"], "codex")
+
+    def test_a_judgment_whose_model_misses_its_family_pattern_does_not_count(self):
+        self.judgment("codex", "AB", "codex", model="unknown")
+        data = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        self.assertIn("does not match the openai pattern", adjudicate.usable_judgment(data, "openai", "AB", self.sha))
+        data["model"] = "gpt-6-astra"
+        self.assertIsNone(adjudicate.usable_judgment(data, "openai", "AB", self.sha))
 
     def test_claude_collect_records_a_lost_agent_as_missing(self):
         index_items = adjudicate.claude_args(self.work, self.repo)["items"]
@@ -242,10 +305,10 @@ class CodexTests(AdjudicateFixture):
                     "CODEX_FAKE_ARGV_LOG": str(self.argv_log), "CODEX_FAKE_RETURN_FILE": str(return_file),
                     "CODEX_FAKE_EVENTS_FILE": str(events), "CODEX_FAKE_COUNTER_FILE": str(self.base / "count")}
 
-    def run_codex(self, repo=None, **env):
+    def run_codex(self, repo=None, model="gpt-6-astra", **env):
         with mock.patch.dict(os.environ, {**self.env, **env}):
             return quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(repo or self.repo),
-                                           "--timeout", "30"])
+                                           "--timeout", "30", "--model", model])
 
     def calls(self):
         return [json.loads(line) for line in self.argv_log.read_text(encoding="utf-8").splitlines()]
@@ -275,6 +338,36 @@ class CodexTests(AdjudicateFixture):
         # Resumable: a second run skips both valid judgments.
         self.run_codex()
         self.assertEqual(len(self.calls()), 4)
+
+    def test_model_is_required_and_must_match_the_openai_pattern(self):
+        with mock.patch.dict(os.environ, self.env), contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit) as raised:
+                adjudicate.main(["codex", "--work-dir", str(self.work), "--repo", str(self.repo)])
+        self.assertEqual(raised.exception.code, 2)
+        for model in ("unknown", "claude-opus-5-5"):
+            code, err = self.run_codex(model=model)
+            self.assertEqual(code, 2)
+            self.assertIn("openai pattern", err)
+        self.assertFalse(self.argv_log.exists())
+
+    def test_the_configured_model_is_recorded_over_the_event_stream_name(self):
+        code, err = self.run_codex(model="gpt-6-codex")
+        self.assertEqual(code, 0, err)
+        for argv in self.calls():
+            self.assertEqual(argv[argv.index("-m") + 1], "gpt-6-codex")
+        data = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        self.assertEqual(data["model"], "gpt-6-codex")
+
+    def test_resume_reruns_a_judgment_with_an_unknown_or_other_model(self):
+        self.run_codex()
+        self.assertEqual(len(self.calls()), 4)
+        path = self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        path.write_text(json.dumps({**data, "model": "unknown"}), encoding="utf-8")
+        self.run_codex()
+        self.assertEqual(len(self.calls()), 6, "the unknown-model judgment reruns (judge and refuter)")
+        self.run_codex(model="gpt-6-codex")
+        self.assertEqual(len(self.calls()), 10, "a different --model reruns both orders")
 
     def test_a_failed_call_is_retried_once(self):
         code, err = self.run_codex(CODEX_FAKE_FAIL_ATTEMPTS="1")

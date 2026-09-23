@@ -44,11 +44,12 @@ for _path in (HERE, REPO_ROOT):
 
 import codex_lane  # noqa: E402
 from scripts.landscape import (  # noqa: E402
-    FAMILY_MODEL_PATTERNS, LANE_FAMILIES, judge_adjudication, lane_winner_components)
+    FAMILY_MODEL_PATTERNS, LANE_FAMILIES, judge_adjudication, lane_winner_components, model_family_issue)
 
 PROMPT_PATH = HERE / "adjudication-prompt.md"
 JUDGE_SCHEMA = HERE / "adjudication-judge.schema.json"
 REFUTE_SCHEMA = HERE / "adjudication-refute.schema.json"
+WORKFLOW_PATH = HERE / "adjudication-lane.js"
 REFUTER_MARKER = "<!-- refuter -->"
 ORDERS = ("AB", "BA")
 # claude_position per order: AB shows the Claude return as A, BA shows it as B.
@@ -84,10 +85,52 @@ def write_json(path: Path, data) -> None:
 
 # ---------------------------------------------------------------- inputs
 
-def scrub_pair(claude_return: dict, codex_return: dict):
-    """(scrubbed claude, scrubbed codex): only SCRUB_KEEP keys present in both returns."""
+# Keys whose value is a list of evidence paths, at any depth of a kept field (winner_evidence_refs,
+# alternatives[].evidence_refs, challenger_preferred.evidence_refs, overturn_protocol.fixture_paths, ...).
+PATH_LIST_KEYS = frozenset({"sources_read", "winner_evidence_refs", "evidence_refs", "fixture_paths"})
+_TRAILING_PUNCTUATION = ",;:)"
+# A trailing line reference ("path:60-104", "path:L12") is a note too; record_verdicts.py strips the same form.
+_LINE_SUFFIX = re.compile(r":[0-9L][0-9L,\-]*$")
+
+
+def bare_path(entry: str, repo_roots=()) -> str:
+    """The leading path token of one evidence-path entry, without the lane's notes: in the 2026-09-22
+    returns 263 of 423 Claude sources_read entries read like "path (lines 60-104, prior round)" while every
+    Codex entry is a bare path, so the notes alone told the judge which lane wrote A. A ``#fragment`` stays
+    (it is part of the token), a trailing ``:line`` reference goes, and an absolute path under one of
+    ``repo_roots`` becomes repository-relative."""
+    token = entry.strip().split(None, 1)[0] if entry.strip() else ""
+    path, hash_mark, fragment = token.partition("#")
+    path = _LINE_SUFFIX.sub("", path.rstrip(_TRAILING_PUNCTUATION)).rstrip(_TRAILING_PUNCTUATION)
+    for root in repo_roots:
+        prefix = str(root).rstrip("/") + "/"
+        if path.startswith(prefix):
+            path = path[len(prefix):]
+            break
+    return path + (hash_mark + fragment.rstrip(_TRAILING_PUNCTUATION) if hash_mark else "")
+
+
+def bare_paths(value, repo_roots=()):
+    """``value`` with every PATH_LIST_KEYS list reduced to sorted, deduplicated bare paths, at any depth."""
+    if isinstance(value, dict):
+        result = {}
+        for key, item in value.items():
+            if key in PATH_LIST_KEYS and isinstance(item, list) and all(isinstance(entry, str) for entry in item):
+                result[key] = sorted({path for path in (bare_path(entry, repo_roots) for entry in item) if path})
+            else:
+                result[key] = bare_paths(item, repo_roots)
+        return result
+    if isinstance(value, list):
+        return [bare_paths(item, repo_roots) for item in value]
+    return value
+
+
+def scrub_pair(claude_return: dict, codex_return: dict, repo_roots=()):
+    """(scrubbed claude, scrubbed codex): only SCRUB_KEEP keys present in both returns, with every evidence-path
+    list reduced to sorted bare paths (``bare_paths``)."""
     shared = [key for key in SCRUB_KEEP if key in claude_return and key in codex_return]
-    return ({key: claude_return[key] for key in shared}, {key: codex_return[key] for key in shared})
+    return (bare_paths({key: claude_return[key] for key in shared}, repo_roots),
+            bare_paths({key: codex_return[key] for key in shared}, repo_roots))
 
 
 def identity_mentions(scrubbed: dict) -> list:
@@ -98,8 +141,9 @@ def components_list(components) -> list:
     return sorted([component_id, repository] for component_id, repository in components)
 
 
-def build_inputs(work_dir: Path, layers=None) -> dict:
-    """Write the counterbalanced input files and index.json; return the index."""
+def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
+    """Write the counterbalanced input files and index.json; return the index. ``repo_roots`` are the
+    checkouts the lanes were given (their absolute evidence paths become repository-relative)."""
     work_dir = Path(work_dir).resolve()
     out_dir = work_dir / INPUTS_DIR
     index = {"schema_version": 1, "layers": [], "skipped": []}
@@ -147,7 +191,7 @@ def build_inputs(work_dir: Path, layers=None) -> dict:
             index["layers"].append(entry)
             continue
         entry["agreement"] = "disagree"
-        claude_scrubbed, codex_scrubbed = scrub_pair(returns["claude"], returns["codex"])
+        claude_scrubbed, codex_scrubbed = scrub_pair(returns["claude"], returns["codex"], repo_roots)
         entry["identity_mentions"] = sorted(set(identity_mentions(claude_scrubbed))
                                             | set(identity_mentions(codex_scrubbed)))
         entry["inputs"] = {}
@@ -214,12 +258,22 @@ def judgment_record(family, name, order, input_path, packet_sha256, model, repo,
             "exit_codes": exit_codes or {}}
 
 
+def model_issue(model, family):
+    """None when ``model`` is a name matching ``family``'s scripts/landscape.py model pattern."""
+    return model_family_issue({"family": family, "name": model}, family, "model")
+
+
 def usable_judgment(data, family, order, packet_sha256):
-    """None when the judgment file counts, else the reason it does not."""
+    """None when the judgment file counts, else the reason it does not. A judgment whose model does not
+    match its family's pattern (for example "unknown") does not count, so a resumed run reruns it rather
+    than leaving a record judge_adjudication will reject."""
     if not isinstance(data, dict):
         return "not a JSON object"
     if data.get("family") != family or data.get("order") != order:
         return "family or order does not match its file name"
+    issue = model_issue(data.get("model"), family)
+    if issue:
+        return issue
     if data.get("packet_sha256") != packet_sha256:
         return "judged a different packet"
     if valid_judge(data.get("judge")) is None:
@@ -287,6 +341,10 @@ def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events
 def run_codex(args) -> int:
     work_dir = args.work_dir.resolve()
     repo = args.repo.resolve()
+    if model_issue(args.model, "openai"):
+        print(f"adjudicate: --model {args.model!r} does not match the openai pattern "
+              f"{FAMILY_MODEL_PATTERNS['openai'].pattern}", file=sys.stderr)
+        return 2
     refusal = refuse_git_repo(repo)
     if refusal:
         print(refusal, file=sys.stderr)
@@ -299,9 +357,12 @@ def run_codex(args) -> int:
     for name, order, input_path, packet_sha256 in items:
         out_path = out_dir / f"{name}.{order}.json"
         try:
-            if usable_judgment(load_json(out_path), "openai", order, packet_sha256) is None:
+            existing = load_json(out_path)
+            # Resume skips only a judgment made with the configured model.
+            if (usable_judgment(existing, "openai", order, packet_sha256) is None
+                    and existing.get("model") == args.model):
                 continue
-        except (OSError, ValueError):
+        except (OSError, ValueError, AttributeError):
             pass
         pending.append((name, order, input_path, packet_sha256, out_path))
     if pending and shutil.which("codex") is None:
@@ -332,7 +393,8 @@ def run_codex(args) -> int:
             failure = f"refuter {failure}" if failure else None
         elif failure:
             failure = f"judge {failure}"
-        model = judge_model or args.model or "unknown"
+        # The configured --model first, as codex_lane.py records it; the event stream only reports.
+        model = args.model or judge_model or "unknown"
         write_json(out_path, judgment_record(
             "openai", name, order, input_path, packet_sha256, model, repo, judge, refuter, failure,
             {"judge": judge_codes, "refuter": refute_codes}))
@@ -465,10 +527,18 @@ def assemble_layer(work_dir: Path, entry: dict):
     return record, notes
 
 
+def adjudication_provenance() -> dict:
+    """What produced a record: this script, the prompt, both judgment schemas and the Claude family's workflow."""
+    return {"adjudicate_py_sha256": sha256_file(Path(__file__).resolve()), "prompt_sha256": sha256_file(PROMPT_PATH),
+            "judge_schema_sha256": sha256_file(JUDGE_SCHEMA), "refute_schema_sha256": sha256_file(REFUTE_SCHEMA),
+            "workflow_sha256": sha256_file(WORKFLOW_PATH)}
+
+
 def assemble(work_dir: Path, out_dir: Path, layers=None):
     """Write every valid record; return (written names, issues)."""
     work_dir, out_dir = Path(work_dir).resolve(), Path(out_dir)
     written, issues = [], []
+    provenance = adjudication_provenance()
     for entry in load_index(work_dir).get("layers") or []:
         if entry.get("agreement") != "disagree":
             continue
@@ -482,7 +552,8 @@ def assemble(work_dir: Path, out_dir: Path, layers=None):
         if issue:
             issues.append((name, issue))
             continue
-        write_json(out_dir / f"{name}.json", record)
+        # judge_adjudication and record_verdicts.load_adjudication ignore extra top-level keys.
+        write_json(out_dir / f"{name}.json", {**record, "provenance": provenance})
         written.append(name)
     return written, issues
 
@@ -495,10 +566,15 @@ def parse_args(argv=None):
     inputs = sub.add_parser("inputs", help="Write the AB/BA input files for every disagreeing layer.")
     inputs.add_argument("--work-dir", required=True, type=Path)
     inputs.add_argument("--layers", default=None)
+    inputs.add_argument("--lane-repo-root", action="append", default=[], type=Path,
+                        help="A checkout a lane was given as its repository root (repeatable): absolute evidence "
+                             "paths under it become repository-relative in the inputs.")
     codex = sub.add_parser("codex", help="Run the Codex judge and refuter for every input file.")
     codex.add_argument("--work-dir", required=True, type=Path)
     codex.add_argument("--repo", required=True, type=Path)
-    codex.add_argument("--model", default=None)
+    codex.add_argument("--model", required=True,
+                       help="Model passed to codex exec -m and recorded on each judgment; must match the openai "
+                            "pattern of scripts/landscape.py FAMILY_MODEL_PATTERNS.")
     codex.add_argument("--effort", default="high")
     codex.add_argument("--jobs", type=int, default=1)
     codex.add_argument("--layers", default=None)
@@ -527,7 +603,8 @@ def layer_set(text):
 def main(argv=None) -> int:
     args = parse_args(argv)
     if args.command == "inputs":
-        index = build_inputs(args.work_dir, layer_set(args.layers))
+        index = build_inputs(args.work_dir, layer_set(args.layers),
+                             [str(root.resolve()) for root in args.lane_repo_root])
         for skipped in index["skipped"]:
             print(f"adjudicate: skipped {skipped['layer']}: {skipped['reason']}", file=sys.stderr)
         disagree = [entry["layer"] for entry in index["layers"] if entry["agreement"] == "disagree"]

@@ -531,6 +531,28 @@ def attach_registered_receipts(packet: dict, index: dict, withhold: bool = False
     return packet
 
 
+GAP_LEDGER_GLOB = "catalogs/landscape/gap-wave*--*.json"
+GAP_RECEIPTS_NOTE = ("gap_receipts lists receipts from the gap-resolution waves for this layer: executed checks of "
+                     "evidence gaps, recorded after the layer's previous verdict. Open and judge them like "
+                     "evidence_refs; a receipt's content, not its presence, decides what it establishes.")
+
+
+def gap_receipts_index(root: Path) -> dict:
+    """(catalog, layer_id) -> sorted receipt paths from every gap-wave owner ledger
+    (catalogs/landscape/gap-wave*--*.json). Only paths are carried: a gap's text and status derive from the
+    previous verdict rows' open_gaps, which can name the incumbent (2026-09-23 re-record)."""
+    index: dict = {}
+    for ledger in sorted(root.glob(GAP_LEDGER_GLOB)):
+        for layer in load_json(ledger).get("layers") or []:
+            key = (layer.get("catalog"), layer.get("layer_id"))
+            for gap in layer.get("gaps") or []:
+                for receipt in gap.get("receipts") or []:
+                    path = receipt.get("path")
+                    if isinstance(path, str) and (root / path).is_file():
+                        index.setdefault(key, set()).add(path)
+    return {key: sorted(paths) for key, paths in index.items()}
+
+
 def serialize(document: dict) -> str:
     sanitized = sanitize_value(document)
     text = json.dumps(sanitized, indent=1, sort_keys=True)
@@ -563,7 +585,8 @@ def withhold_labels(packet: dict) -> dict:
 
 def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                       trading_candidates: str = "ledger", withhold: bool = False,
-                      manifest: str = None, registered_receipts: bool = False) -> dict:
+                      manifest: str = None, registered_receipts: bool = False,
+                      gap_receipts: bool = False) -> dict:
     """Returns {filename: serialized packet text}, fully built and leak-
     checked in memory before any file is written. ``manifest`` overrides the
     dated sota manifest joined in (default reproduces the 2026-09-22
@@ -579,6 +602,7 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
     cards = trading_cards_by_id(root) if manifest_mode else {}
     trading_layers = {layer["layer"]: layer for layer in sota_doc.get("trading", [])}
     receipts_index = registered_receipts_index(root, sota_doc) if registered_receipts else None
+    gap_index = gap_receipts_index(root) if gap_receipts else None
 
     packets = {}
     for catalog in catalogs:
@@ -605,6 +629,9 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 # Every packet, manifest-mode trading packets included, loses popularity and
                 # recency signals; the default (no --withhold-labels) build is unchanged.
                 packet = withhold_popularity(packet)
+            if gap_index is not None:
+                packet["gap_receipts"] = gap_index.get((catalog, row["layer_id"]), [])
+                packet["gap_receipts_note"] = GAP_RECEIPTS_NOTE
             if receipts_index is not None:
                 packet = attach_registered_receipts(packet, receipts_index, withhold)
             packets[packet_filename(catalog, row["layer_id"])] = serialize(packet)
@@ -645,6 +672,10 @@ def parse_args(argv=None):
                              "--withhold-labels), matched by component id, or by repository only when no other "
                              "component shares it, so a lane can open and cite them. Off by default so the "
                              "2026-09-22 packets reproduce.")
+    parser.add_argument("--gap-receipts", action="store_true",
+                        help="Attach to every packet the receipt paths the gap-wave owner ledgers "
+                             "(catalogs/landscape/gap-wave*--*.json) list for its layer; paths only, no gap text. "
+                             "Off by default: the default build path is unchanged.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
                         help="Candidate source for us-equities packets: the ledger row's group-wide list "
                              "(default; reproduces the 2026-09-22 packets) or the sota manifest's own entries "
@@ -660,7 +691,7 @@ def main(argv=None) -> int:
     packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at,
                                 trading_candidates=args.trading_candidates, withhold=args.withhold_labels,
                                 manifest=str(args.manifest) if args.manifest else None,
-                                registered_receipts=args.registered_receipts)
+                                registered_receipts=args.registered_receipts, gap_receipts=args.gap_receipts)
 
     out_dir = args.out / "packets"
     out_dir.mkdir(parents=True, exist_ok=True)

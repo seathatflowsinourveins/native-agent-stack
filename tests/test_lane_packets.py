@@ -812,6 +812,34 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
         self.assertEqual(withheld_packet_keys(packet), [])
 
 
+class GapReceiptsTests(LanePacketsFixture):
+    """2026-09-23 re-record: --gap-receipts gives each packet the receipt paths the gap-wave owner ledgers list
+    for its layer, and never the gap text (it derives from the previous verdict's open_gaps)."""
+
+    def test_packets_carry_their_layers_gap_receipt_paths_only(self):
+        self.write("evidence/artifacts/gap-wave9/layer-a/1-check.json", {"k": 1})
+        self.write("evidence/artifacts/gap-wave9/layer-a/0-check.json", {"k": 0})
+        for owner in ("owner-a", "owner-b"):
+            self.write(f"catalogs/landscape/gap-wave9--{owner}.json", {"layers": [
+                {"catalog": "foundation", "layer_id": "layer-a", "gaps": [
+                    {"index": 0, "text": "SECRET-GAP-TEXT names the incumbent", "status": "settled", "receipts": [
+                        {"path": "evidence/artifacts/gap-wave9/layer-a/1-check.json"},
+                        {"path": "evidence/artifacts/gap-wave9/layer-a/0-check.json"},
+                        {"path": "evidence/artifacts/gap-wave9/layer-a/missing.json"}]}]}]})
+        packets = self.build(gap_receipts=True)
+        packet = json.loads(packets[lane_packets.packet_filename("foundation", "layer-a")])
+        self.assertEqual(packet["gap_receipts"], ["evidence/artifacts/gap-wave9/layer-a/0-check.json",
+                                                  "evidence/artifacts/gap-wave9/layer-a/1-check.json"])
+        self.assertIn("gap_receipts lists", packet["gap_receipts_note"])
+        self.assertNotIn("SECRET-GAP-TEXT", "".join(packets.values()))
+        other = json.loads(packets[lane_packets.packet_filename("us-equities", "layer-b")])
+        self.assertEqual(other["gap_receipts"], [])
+
+    def test_default_build_has_no_gap_receipts(self):
+        for text in self.build().values():
+            self.assertNotIn("gap_receipts", text)
+
+
 class RegisteredReceiptsTests(LanePacketsFixture):
     """2026-09-23 re-record: --registered-receipts attaches each component's registered receipts, so a
     lane can open and cite a native receipt its ledger row never named. PR #142 re-review: a repository
