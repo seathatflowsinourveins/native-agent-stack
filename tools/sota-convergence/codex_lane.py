@@ -50,6 +50,7 @@ import argparse
 import hashlib
 import json
 import shlex
+import shutil
 import subprocess
 import sys
 import threading
@@ -409,6 +410,12 @@ def main(argv=None) -> int:
             cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model)
             print(shlex.join(cmd))
         return 0
+
+    if pending and shutil.which("codex") is None:
+        # A missing CLI is a setup error, not a lane failure: say so instead of a traceback.
+        print("codex_lane: the codex CLI is not on PATH; install it and sign in natively "
+              "(see adoption/) before running the Codex lane", file=sys.stderr)
+        return 2
 
     events_dir.mkdir(parents=True, exist_ok=True)
     strict_schema_path = write_strict_schema(schema_path, codex_dir)
