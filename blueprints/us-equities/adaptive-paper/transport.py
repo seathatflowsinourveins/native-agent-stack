@@ -189,7 +189,7 @@ def normalize_account(raw, *, include_margin=False):
     # validated _leverage_policy). False (every default call site) keeps
     # this function's return keys byte-identical to before G-e.
     if include_margin:
-        for key in ("multiplier", "daytrading_buying_power", "regt_buying_power"):
+        for key in ("multiplier", "daytrading_buying_power", "regt_buying_power", "maintenance_margin", "initial_margin"):
             if key in raw:
                 result[key] = decimal_string(raw[key])
         if "daytrade_count" in raw:

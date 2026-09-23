@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -6319,6 +6319,11 @@
       "bytes": 869
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/evidence/alpaca-account-schema-20260923.json",
+      "sha256": "260f393d1acb9268f18b81413f0d2c9082a1762dbc7334adf75a3dc63903ea41",
+      "bytes": 1727
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/exits.py",
       "sha256": "189133e6df99bda201d73d36a15f45ccbfb38979a3319ae6f75d077f5db5b3df",
       "bytes": 7049
@@ -6400,8 +6405,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "ab835d811c0248e9c6e84589e7981a295b0dabf71d4f419d8965bc684241a213",
-      "bytes": 95435
+      "sha256": "9f1bb40524892900a1742cebc02b8dab3c7e0935848f7f8565a277fd75bc1e93",
+      "bytes": 96892
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -6425,7 +6430,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "0963529ca9034e4c96f02b124709778fe59c4e9d2090bd8308de1dde34746d10",
+      "sha256": "646fe7c424e12924a0b444178af28f12866cd4a468f9fe0b9215c7e34b2a2c09",
       "bytes": 4661
     },
     {
@@ -6440,8 +6445,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "325f0817abc3607665c7a3d60c896721f9d667622bcf09ab00f9a4efa64f92a2",
-      "bytes": 46451
+      "sha256": "59ffbb35726b0909c9b9db9043f993242e9beb29329c0d851359617244b06934",
+      "bytes": 46491
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -14755,8 +14760,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "b71380a2734c366303dab487261d4f84f71719fdfe3987e700c4ec79eed8c039",
-      "bytes": 130220
+      "sha256": "c7a3f40a0547673a6494790baebeab8736a48cfa73b8a31b6f221a80911798d1",
+      "bytes": 131140
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -14770,8 +14775,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "3a31bf896ee00b97ee141a6a5f16cb9b70df194dd38faad2d696060621648178",
-      "bytes": 40517
+      "sha256": "95d606e5aa79b4be25603ce77a8690c4008e59905a0e9bedbae4e73f538f3dd9",
+      "bytes": 41484
     },
     {
       "path": "tests/test_adoption_bootstrap.py",

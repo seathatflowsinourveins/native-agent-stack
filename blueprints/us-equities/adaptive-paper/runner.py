@@ -500,15 +500,28 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
 def intraday_buying_power(account):
     """(value, field) for the account's intraday buying power, or None.
 
-    Alpaca's current GetAccount schema has no ``daytrading_buying_power``: FINRA's
-    intraday margin rule ended the pattern-day-trader designation, and the schema
-    documents ``buying_power`` as the day-trade buying power when ``multiplier`` is
-    4 (docs.alpaca.markets/us/reference/getaccount-1, read 2026-09-23). The legacy
-    field is preferred when a broker still reports it."""
-    for field in ("daytrading_buying_power", "buying_power"):
-        if account.get(field) is not None:
-            return str(account[field]), field
-    return None
+    Alpaca's responses dropped ``daytrading_buying_power``, ``pattern_day_trader`` and
+    ``daytrade_count`` on 2026-07-06 (alpaca-py 0.44.0 models), after FINRA's intraday
+    margin rule ended the PDT designation; buying power is now computed in real time
+    (docs.alpaca.markets/us/docs/the-intraday-margin-rule, 2026-07-07). A read-only
+    paper account read on 2026-09-23 showed, at multiplier 4,
+    ``buying_power == 4 * (equity - maintenance_margin)`` on current equity (not the
+    prior-close formula the older schema page still gives). The legacy field is
+    preferred when a broker still reports it; otherwise ``buying_power`` is used,
+    bounded by ``multiplier * (equity - maintenance_margin)`` whenever those fields are
+    present, so a stale or prior-close figure can never admit more than current equity
+    supports."""
+    if account.get("daytrading_buying_power") is not None:
+        return str(account["daytrading_buying_power"]), "daytrading_buying_power"
+    if account.get("buying_power") is None:
+        return None
+    value = Decimal(str(account["buying_power"]))
+    if all(account.get(k) is not None for k in ("multiplier", "equity", "maintenance_margin")):
+        bound = Decimal(str(account["multiplier"])) * max(
+            Decimal(str(account["equity"])) - Decimal(str(account["maintenance_margin"])), Decimal(0))
+        if bound < value:
+            return str(bound), "multiplier*(equity-maintenance_margin)"
+    return str(value), "buying_power"
 
 
 def _check_margin_entitlement(account, config, lev, session_policy):
@@ -522,6 +535,8 @@ def _check_margin_entitlement(account, config, lev, session_policy):
     need = lev.max_leverage
     if any(key not in account for key in ("multiplier", "regt_buying_power")) or intraday_buying_power(account) is None:
         raise SafetyError("account_margin_fields_missing")
+    # Tolerated legacy signal: Alpaca no longer sends pattern_day_trader (2026-07-06), but
+    # a broker that still flags an account PDT under the old rule is refused below 25,000.
     if account.get("pattern_day_trader") is True and Decimal(account["equity"]) < 25000:
         raise SafetyError("account_restricted")
     mult = Decimal(account["multiplier"])
@@ -562,7 +577,7 @@ def validate_preflight(observation, config, *, require_open, allow_existing=Fals
     if (account.get("status") != "ACTIVE" or account.get("currency") != "USD" or any(account.get(k) is not False for k in
             ("trading_blocked", "account_blocked", "trade_suspended_by_user"))
             or (not allow_existing and (Decimal(account["cash"]) < Decimal(config["capital_usd"])
-            or Decimal(account["equity"]) < 25000))):
+            or Decimal(account["equity"]) < PROJECT_EQUITY_FLOOR_USD))):
         raise SafetyError("account_not_ready")
     # G-e: margin-entitlement preflight, only under a validated leverage
     # policy (config["_leverage_policy"], set by load_config). Runs after
@@ -860,6 +875,11 @@ def _leverage_achievement_step(state, *, dt_seconds, achieved_leverage, ceiling,
 _INITIAL_LEVERAGE_ACHIEVEMENT_STATE = {"peak_achieved_leverage": Decimal("0"), "ceiling_at_peak": Decimal("0"),
                                        "seconds_above_next_lower_rung_ceiling": 0.0}
 
+
+# A deliberate project capital floor for a fresh paper start. It began as the PDT day-trading
+# minimum; FINRA's intraday margin rule removed that minimum (Reg T margin needs 2,000), and the
+# floor is kept on purpose as a conservative project limit, not as a broker rule (2026-09-23).
+PROJECT_EQUITY_FLOOR_USD = 25000
 
 RECONCILE_EVERY_SECONDS = 30  # periodic broker snapshot and reconciliation during a run
 

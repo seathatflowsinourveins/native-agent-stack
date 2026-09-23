@@ -2099,6 +2099,17 @@ class LeverageMarginEntitlementTests(unittest.TestCase):
             runner_module._check_margin_entitlement(self.current_schema_account(buying_power="100"), self.config(),
                                                      self.leverage_policy("4"), {"overnight_holds": False})
 
+    def test_buying_power_is_bounded_by_current_equity(self):
+        # A stale or prior-close buying_power can never admit more than current equity supports.
+        account = self.current_schema_account(buying_power="40000", equity="10000", maintenance_margin="5000")
+        self.assertEqual(runner_module.intraday_buying_power(account),
+                         ("20000", "multiplier*(equity-maintenance_margin)"))
+        with self.assertRaisesRegex(SafetyErrorAlways, "account_daytrading_buying_power_insufficient"):
+            runner_module._check_margin_entitlement(account, self.config(), self.leverage_policy("4"),
+                                                     {"overnight_holds": False})
+        consistent = self.current_schema_account(buying_power="40000", equity="10000", maintenance_margin="0")
+        self.assertEqual(runner_module.intraday_buying_power(consistent), ("40000", "buying_power"))
+
     def test_no_intraday_buying_power_field_is_missing(self):
         account = self.current_schema_account()
         del account["buying_power"]
