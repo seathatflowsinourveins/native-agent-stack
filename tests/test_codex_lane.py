@@ -272,6 +272,30 @@ class CodexLaneTests(CodexLaneFixture):
             self.assertIsNone(row["exit_code"])
 
         self.assertFalse(self.out_path("foundation", "native-clients").exists())
+        # Review of catalog #122, finding 7: the failure and its reason reach record_verdicts.py's
+        # run manifest through codex/failures.json instead of a bare "missing".
+        failures_path = self.out_path("foundation", "native-clients").parent / "failures.json"
+        failures = json.loads(failures_path.read_text(encoding="utf-8"))
+        self.assertEqual(failures["failures"], [{"catalog": "foundation", "layer_id": "native-clients",
+                                                 "reason": "failed after retry: timed out"}])
+
+    def test_a_failed_rerun_removes_the_stale_return_for_an_older_packet(self):
+        # Review of catalog #124 (codex_lane.py:482): a stale return rejected for an older packet
+        # hash must not survive a failed rerun, or record_verdicts.py records `rejected`, not `failed`.
+        self.write_packet("foundation", "native-clients")
+        codex_dir = self.work_dir / "codex"
+        codex_dir.mkdir()
+        stale = self.out_path("foundation", "native-clients")
+        stale.write_text(json.dumps(canned_return(packet_sha256="f" * 64), sort_keys=True, indent=1) + "\n",
+                         encoding="utf-8")
+        os.environ["CODEX_FAKE_FAIL_ATTEMPTS"] = "1,2"
+        os.environ["CODEX_FAKE_EXIT_CODE"] = "7"
+        self.assertEqual(self.run_lane(), 1)
+        self.assertEqual(len(self.argv_calls()), 2, "the stale return must not be skipped as valid")
+        self.assertFalse(stale.exists())
+        failures = json.loads((codex_dir / "failures.json").read_text(encoding="utf-8"))
+        self.assertEqual(failures["failures"], [{"catalog": "foundation", "layer_id": "native-clients",
+                                                 "reason": "failed after retry: codex exec exited 7"}])
 
     def test_timed_out_attempt_keeps_its_partial_event_stream(self):
         self.write_packet("foundation", "native-clients")
@@ -439,6 +463,9 @@ class StrictSchemaTests(CodexLaneFixture):
         strict = codex_lane.strict_output_schema(json.loads(codex_lane.DEFAULT_SCHEMA.read_text()))
         self.assertNotIn("provenance", strict["properties"])
         self.assertNotIn("family", strict["properties"]["model"]["properties"])
+        # The Claude lane's refutation summary (review of catalog #122, finding 5) is never asked of Codex.
+        self.assertIn("refutation", json.loads(codex_lane.DEFAULT_SCHEMA.read_text())["properties"])
+        self.assertNotIn("refutation", strict["properties"])
         self.assertEqual(set(strict["properties"]), set(strict["required"]))
         self.assertEqual(set(strict["properties"]["model"]["properties"]), set(strict["properties"]["model"]["required"]))
 

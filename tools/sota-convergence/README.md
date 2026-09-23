@@ -637,7 +637,10 @@ listed in the packet's `withheld` list (for example
 always, not only when it is date-shaped (the stricter of the two options; no
 packet requirement names releases, versions or maintenance), together with
 `upstream.prerelease`, which describes that release, and the copy's
-`pin_behind_upstream`, which is derived by comparing the pin with it. The pin
+`pin_behind_upstream`, which is derived by comparing the pin with it, and
+`upstream.latest_flag`, the flagged tag-listing fallback (it can be
+date-shaped, such as `release/2025-11-28`). The strip reaches any depth of a
+copy, not only the copy and its `upstream` record. The pin
 itself and `upstream.renamed_to` stay. The default mode is byte-identical, so the retained
 2026-09-22 packets still reproduce; they were built before this rule and carry
 those fields.
@@ -788,11 +791,14 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   every rule below.
 - *Single-family winner.* Claude-only (`codex_absent`) records nothing by
   default: the row stays `pending_lanes`. `--allow-single-lane PATH` (an
-  existing repository file with a date, `YYYY-MM-DD` or `YYYYMMDD`, in its
-  name) records a `codex_absent` layer from Claude alone only when the record
-  names that layer id as a whole token (`workers` is not named by
-  `agents-models-workers`), and stores the path on the row as
-  `lanes.single_lane_decision`; `scripts/landscape.py` rejects any recorded
+  existing file under `docs/decisions/` with a date, `YYYY-MM-DD` or
+  `YYYYMMDD`, in its name) records a `codex_absent` layer from Claude alone
+  only when the record carries the exact line
+  `single-lane-authorization: <catalog>/<layer_id>` for it (mentioning the
+  layer id anywhere else, as a wave document does for all 32 layers,
+  authorizes nothing), and stores the path and the record's sha256 on the row
+  as `lanes.single_lane_decision` and `lanes.single_lane_decision_sha256`;
+  `scripts/landscape.py` re-checks all of it and rejects any recorded
   `codex_absent` row without such a record (this rule has no grandfathering:
   no 2026-09-22 row is `codex_absent`).
 - *New-wave rows cannot opt out.* `scripts/landscape.py` applies every rule
@@ -820,15 +826,55 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   a split whether its `winner_lane` is `null` or names the lane its judges
   chose. A recorded
   `disagree` row needs its sealed adjudication in CI as well.
+- *The row is what its sealed wave establishes* (review of catalog #122).
+  `scripts/landscape.py` recomputes a new-wave row's `agreement` from both
+  sealed returns' `winner_keys`, resolved to component ids through the
+  retained packet each return names (`packet_sha256`), and requires a recorded
+  row's winners to be exactly the chosen lane's set (`same_winner` or
+  `codex_absent`: the claude lane; `disagree`: the adjudication's
+  `winner_lane`); an unrecorded row carries no winners. Relabelling a
+  disagreement or swapping in the other lane's winners fails CI.
+- *Claude refutation.* A new-wave Claude return carries the lane's
+  `refutation` summary (`layer-verdict-lane.js`, copied by `claude_lane.py`);
+  it is rejected unless `status` is `unrefuted` and both lens votes
+  (`evidence`, `challenger`) on the round that produced the final returned
+  `refuted: false`. A layer whose final was refuted or unknown gets no return.
 - *Survivorship.* Every run writes
   `evidence/artifacts/layer-verdicts-<run-id>/run-manifest.json`: every packet
   (catalog, layer, packet sha256), each lane's outcome (`sealed` with its run id
-  and sealed sha256, `rejected` with its reasons, or `missing`), rejected
-  adjudications, and the verbatim `packets/SHA256SUMS` text. A reason that would
-  still carry a leak marker is replaced by a fixed note. `scripts/landscape.py`
-  requires every row recorded in a non-grandfathered wave to appear in that
-  manifest exactly once, with both lanes accounted for and its packet hash in
-  the recorded SHA256SUMS text.
+  and sealed sha256, `rejected` with its reasons, `failed` with the reason the
+  lane runner listed in `<work-dir>/<lane>/failures.json`, or `missing`),
+  rejected adjudications, the retained packets (`retained_packets`) and the
+  `packets/SHA256SUMS` text. A reason that would still carry a leak marker is
+  replaced by a fixed note. `scripts/landscape.py` requires every row recorded
+  in a non-grandfathered wave to appear in that manifest exactly once, with both
+  lanes accounted for and its packet hash in the recorded SHA256SUMS text.
+- *Retained packets.* A new wave's `--write` copies the packets and their
+  `SHA256SUMS` into `<sealed_base>/packets/` and refuses a packet that still
+  carries a withheld key (`scripts/landscape.py` `withheld_packet_keys`, which
+  walks the whole packet: at any depth a popularity count, any `*_at` other
+  than the packet's own `checked_at`, `pin_behind_upstream`, `newcomer`,
+  `note`, or a key naming the latest version, a release or a newcomer --
+  `upstream.latest`, `upstream.prerelease`, `upstream.latest_flag`, a nested
+  `release` or a top-level `newcomers` list; `archived`/`license` unless the
+  requirement names them; on a candidate or component copy `selection`,
+  `disposition`, `rationale`, `current_choice` or a non-null `review_status`;
+  and any always-listed policy label missing from `withheld[]`, which shows
+  the packet was not built with `--withhold-labels`). `withhold_popularity`
+  strips with the same predicate at any depth. CI re-reads each retained
+  packet (hash and withheld keys), requires each row's packet there, and binds
+  the adjudication judgments' `stripped_packet_sha256` to it.
+- *A sealed wave is never rewritten.* A new wave's `--write` refuses once its
+  `run-manifest.json` exists, unless `--append-rows CATALOG/LAYER_ID[,...]`
+  names only rows absent from it (the manifest keeps its entries and gains
+  those rows), and never overwrites a sealed file with other bytes. Each row
+  stores `lanes.run_manifest_sha256` (an append re-binds the wave's rows) and,
+  when an adjudication was sealed for it, `lanes.adjudication_sha256`, which
+  the manifest entry also lists (`adjudication: {outcome: sealed, sha256}`);
+  `scripts/landscape.py` verifies each against the other and the file, rejects
+  any file under a new wave's sealed folder that no row and not the run
+  manifest references, and rejects a `layer-verdicts-<id>` folder whose id is
+  not alphanumeric (no row can name it).
 - *Platform status (one shared rule).* `record_verdicts.platform_status_for`
   calls `scripts/platform_status.py` `platform_status(platform_id, winner,
   context)` for every platform, with `context = load_context(root)` read once
