@@ -1148,6 +1148,6 @@ if [[ "$configure_claude_user_profile" == 1 ]]; then
   python3 "$repo_root/tools/adoption/install_claude_profile.py" --claude-bin "$bin_dir/claude" --eco-root "$ecosystem_root"
 else
   printf '\nAfter native Claude sign-in, run:\n'
-  printf '  python3 %q/tools/adoption/install_claude_profile.py --eco-root %q\n' "$repo_root" "$ecosystem_root"
+  printf '  python3 %q/tools/adoption/install_claude_profile.py --eco-root %q --claude-bin %q\n' "$repo_root" "$ecosystem_root" "$bin_dir/claude"
   printf 'to install the guard hook, agents and user-scope MCP servers (or re-run this script with --configure-claude-user-profile).\n'
 fi

@@ -148,7 +148,7 @@ class McpRenderAndCommandTests(unittest.TestCase):
 
     def test_differing_registration_is_left_unchanged_without_replace(self):
         calls = []
-        with mock.patch.object(icp, "claude_mcp_get", return_value="Scope: User\n  Type: stdio\n  Command: /other\n"), \
+        with mock.patch.object(icp, "claude_mcp_get", return_value="x:\n  Scope: User config\n  Type: stdio\n  Command: /other\n"), \
              mock.patch.object(icp.subprocess, "run", side_effect=lambda *a, **k: calls.append(a[0])):
             results = icp.install_mcp_servers("claude", False, Path("/h"), Path("/e"))
         self.assertEqual(results, ["differs", "differs", "differs"])
@@ -197,6 +197,25 @@ class McpGetOutputTests(unittest.TestCase):
         self.assertFalse(self.matches(reordered, spec))
         self.assertFalse(self.matches(extra, spec))
 
+    def test_header_lines_do_not_override_fields(self):
+        text = self.AI_MEMORY.replace("  URL: http://127.0.0.1:49374/mcp\n",
+                                      "  URL: http://127.0.0.1:49374/mcp\n  Headers:\n    URL: http://evil.invalid/\n")
+        self.assertEqual(icp.parse_mcp_get(text)["url"], "http://127.0.0.1:49374/mcp")
+
+    def test_a_non_user_scope_server_is_left_alone(self):
+        managed = self.AI_MEMORY.replace("User config (available in all your projects)", "Managed config")
+        with mock.patch.object(icp, "claude_mcp_get", return_value=managed), \
+             mock.patch.object(icp.subprocess, "run") as run:
+            results = icp.install_mcp_servers("claude", False, Path("/home/example"), Path("/e"), replace=True)
+        self.assertEqual(results, ["other-scope"] * 3)
+        run.assert_not_called()
+
+    def test_missing_claude_binary_is_a_clean_failure(self):
+        with mock.patch("sys.stderr", new_callable=io.StringIO) as err:
+            code = icp.main(["--only", "mcp", "--claude-bin", "/nonexistent/claude", "--home", "/home/example"])
+        self.assertEqual(code, 1)
+        self.assertIn("pass --claude-bin", err.getvalue())
+
     def test_get_runs_outside_any_project(self):
         seen = {}
 
@@ -209,7 +228,7 @@ class McpGetOutputTests(unittest.TestCase):
         self.assertNotEqual(Path(seen["cwd"]).resolve(), Path.cwd().resolve())
 
     def test_dry_run_with_replace_shows_the_remove(self):
-        with mock.patch.object(icp, "claude_mcp_get", return_value="x:\n  Type: stdio\n  Command: /other\n"), \
+        with mock.patch.object(icp, "claude_mcp_get", return_value="x:\n  Scope: User config\n  Type: stdio\n  Command: /other\n"), \
              mock.patch("sys.stdout", new_callable=io.StringIO) as out:
             icp.install_mcp_servers("claude", True, Path("/home/example"), Path("/e"), replace=True)
         self.assertIn("mcp remove serena -s user", out.getvalue())

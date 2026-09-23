@@ -3139,13 +3139,13 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "814ae27fe514025181bc285231550a3e95bd95d15dbeb69e03c8f4839d16744e",
-      "bytes": 18050
+      "sha256": "7ffa94c2a654c2ceb2fe0ab56ac6bc7cce8e44b135ac10f824ce257ac2b294ae",
+      "bytes": 18084
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "a7ca6319798be7532a47d60570548b5ee89f1a28a63b49918105f009a720dc47",
-      "bytes": 57899
+      "sha256": "4de962dbcd13ea7878c17c24562aad582980ebf47f687e7ed8049e3ab7d8e511",
+      "bytes": 57933
     },
     {
       "path": "adoption/bootstrap.md",
@@ -15030,8 +15030,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "9ee9add18e11d6e4c1a0485301e0949eae9f9bf4c3933d2b2b75bd2ce8824176",
-      "bytes": 11828
+      "sha256": "b01a05e900adecedb804d9a96903d0c3a3534a86e43a4390c215e8a791eb0f14",
+      "bytes": 13050
     },
     {
       "path": "tests/test_job_recovery.py",

@@ -131,7 +131,8 @@ def parse_mcp_get(text: str) -> dict:
             in_env = True
             continue
         key, sep, value = stripped.partition(":")
-        if sep and line.startswith("  ") and key in ("Scope", "Type", "Command", "Args", "URL"):
+        # Exactly two-space fields only: four-space lines are Environment or Headers entries.
+        if sep and line.startswith("  ") and not line.startswith("   ") and key in ("Scope", "Type", "Command", "Args", "URL"):
             fields[key.lower()] = value.strip()
     return fields
 
@@ -200,6 +201,13 @@ def install_mcp_servers(claude_bin: str, dry_run: bool, home: Path, eco_root: Pa
         server_type = spec.get("type", "stdio")
         command_or_url = spec["url"] if server_type == "http" else spec["command"]
         existing = claude_mcp_get(claude_bin, name)
+        scope = parse_mcp_get(existing).get("scope", "") if existing is not None else ""
+        if existing is not None and not scope.startswith("User"):
+            # From an empty directory only user and managed servers are visible; a managed
+            # server of the same name wins over any user entry, so leave it alone.
+            print(f"mcp: {name} is registered at another scope ({scope or 'unknown'}); left unchanged", file=sys.stderr)
+            results.append("other-scope")
+            continue
         if existing is not None and existing_config_matches(
                 existing, server_type, command_or_url, spec.get("args", []), spec.get("env", {})):
             print(f"mcp: {name} already registered with matching config; skipped")
@@ -255,6 +263,9 @@ def main(argv: list[str] | None = None) -> int:
         if "mcp" in steps:
             eco_root = Path(args.eco_root) if args.eco_root else default_eco_root(home)
             install_mcp_servers(args.claude_bin, args.dry_run, home, eco_root, args.replace_mcp)
+    except FileNotFoundError as error:
+        print(f"install failed: {error.filename or error} not found (pass --claude-bin)", file=sys.stderr)
+        return 1
     except InstallError as error:
         print(f"install failed: {error}", file=sys.stderr)
         return 1
