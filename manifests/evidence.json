@@ -13011,6 +13011,51 @@
       "path": "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/versions.txt",
       "sha256": "cbf4b3fd8a992d165bc76a525789d864d893a67e39e281420290eadf644f3c2c",
       "bytes": 68
+    },
+    {
+      "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
+      "sha256": "da8de643e23c06ba97830dac983e404f064dff2118d1c54f06d09b88dbf3f323",
+      "bytes": 614864
+    },
+    {
+      "path": "docs/gap-crosswalk-92bb279.md",
+      "sha256": "700288195fa9074314eb2d17a5948c7c39bde2cafc9e79652e0fe59dc0118a4d",
+      "bytes": 75512
+    },
+    {
+      "path": "tools/sota-convergence/gap_crosswalk.py",
+      "sha256": "5f0176784b47eb6953d378dc58724a16df0180be3eef8bc3ff297060591b8bce",
+      "bytes": 24528
+    },
+    {
+      "path": "tests/test_gap_crosswalk.py",
+      "sha256": "cb3aba9e3bc6f9b0dfd919065afb215ddc4138fbbd4ab584512c1d25e199ca73",
+      "bytes": 4145
+    },
+    {
+      "path": "evidence/artifacts/gap-crosswalk-92bb279/PREREGISTRATION.md",
+      "sha256": "0bfbb8fdc99ae114645f31da2c899626f8bc7a224f2f4189c79615d232e0014a",
+      "bytes": 1906
+    },
+    {
+      "path": "evidence/artifacts/gap-crosswalk-92bb279/eval-score.json",
+      "sha256": "21fa1e08e671d2cb26e831c120c7d353c1c1802690916960e5803ab3a272028b",
+      "bytes": 1815
+    },
+    {
+      "path": "evidence/artifacts/gap-crosswalk-92bb279/review-results.json",
+      "sha256": "d0218e01fea4e22f0009098a4224d1406a76cb5a27bdd0abd81d3702e46479e3",
+      "bytes": 242607
+    },
+    {
+      "path": "evidence/artifacts/gap-crosswalk-92bb279/typesafe-current.jsonl",
+      "sha256": "cbf12222372aca31c7eb948ced9d05019267671a453bd826ff88957f2b5cdf6f",
+      "bytes": 512833
+    },
+    {
+      "path": "evidence/artifacts/gap-crosswalk-92bb279/typesafe-eval.jsonl",
+      "sha256": "d938cdb35bb9298fe046a93a34d3e84a7bb729aef3dbf68272967f742cc7b8cf",
+      "bytes": 432966
     }
   ],
   "convergence_records": [
