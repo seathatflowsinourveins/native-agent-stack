@@ -82,6 +82,18 @@ class IngestSnapshotCompleteness(unittest.TestCase):
         self.assertEqual(ingest.coverage_problems({"SPY": full}, 3, date(2026, 9, 22)),
                          {"SPY": "only_2_of_3_sessions"})
 
+    def test_expected_latest_session_with_the_engine_calendar_skips_holidays(self):
+        import sys
+        sys.path.insert(0, str(ROOT / "blueprints/us-equities/adaptive-paper"))
+        from sessions import _is_trading_day, previous_trading_day
+        # Friday 2026-11-27 09:00 ET: Thanksgiving (Thu 2026-11-26) is closed, so the
+        # latest completed session is Wed 2026-11-25.
+        now = datetime(2026, 11, 27, 14, 0, tzinfo=timezone.utc)
+        self.assertEqual(ingest.expected_latest_session(now, _is_trading_day, previous_trading_day), date(2026, 11, 25))
+        # Monday 2026-09-07 is Labor Day; Tuesday morning expects Friday 2026-09-04.
+        now = datetime(2026, 9, 8, 13, 0, tzinfo=timezone.utc)
+        self.assertEqual(ingest.expected_latest_session(now, _is_trading_day, previous_trading_day), date(2026, 9, 4))
+
     def test_non_positive_sessions_is_refused(self):
         with self.assertRaises(SystemExit):
             ingest.main(["--env-file", "x", "--out", "o.csv", "--receipt", "r.json", "--sessions", "0"])
