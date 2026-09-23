@@ -6,8 +6,10 @@ runs the real ``git worktree add``/``git worktree remove`` commands against
 it, but the fixture content, taxonomy and every catalog/blueprint shape are
 synthetic, not a real repository checkout.
 """
+import contextlib
 import hashlib
 import importlib.util
+import io
 import json
 import shutil
 import subprocess
@@ -370,6 +372,32 @@ class RepositoryClassificationTests(unittest.TestCase):
             self.assertFalse(blind_checkout.is_label_value(methodology))
         self.assertTrue(blind_checkout.is_label_value("selected"))
         self.assertFalse(blind_checkout.is_label_value("top_20"))
+
+
+class ExportTests(BlindCheckoutFixture):
+    """2026-09-23 re-record: lanes get a copy without .git, whose history recovers every stripped value."""
+
+    def test_export_has_the_stripped_tree_without_git_or_the_manifest(self):
+        export = self.dest.parent / "export"
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",
+                                                  "--dest", str(self.dest), "--export", str(export)]), 0)
+        self.addCleanup(lambda: git(["worktree", "remove", "--force", str(self.dest)], self.source))
+        self.assertTrue((self.dest / ".git").exists())
+        self.assertFalse((export / ".git").exists())
+        self.assertFalse((export / "BLIND-MANIFEST.json").exists())
+        exported = json.loads((export / "catalogs/other/decisions.json").read_text(encoding="utf-8"))
+        self.assertNotIn("selection", json.dumps(exported))
+        self.assertEqual((export / "catalogs/other/decisions.json").read_bytes(),
+                         (self.dest / "catalogs/other/decisions.json").read_bytes())
+
+    def test_an_existing_export_is_refused_before_anything_is_created(self):
+        export = self.dest.parent / "export"
+        export.mkdir()
+        with self.assertRaises(SystemExit):
+            blind_checkout.main(["--source", str(self.source), "--rev", "HEAD", "--dest", str(self.dest),
+                                 "--export", str(export)])
+        self.assertFalse(self.dest.exists())
 
 
 if __name__ == "__main__":

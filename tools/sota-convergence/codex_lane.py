@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the Codex lane of the 2026-09-22 layer-verdict convergence.
+"""Run the Codex lane of the layer-verdict convergence.
 
 For each packet under ``<work-dir>/packets/`` (written by ``lane_packets.py``)
 without a valid ``<work-dir>/codex/<catalog>__<layer_id>.json`` already on
@@ -8,7 +8,8 @@ absolute path, the repository root and ``LANE=codex``, then run
 
     codex exec --sandbox read-only --skip-git-repo-check --ephemeral \
         -C <repo> --output-schema <schema> -o <out.tmp> --json \
-        -c model_reasoning_effort=<effort> <prompt>
+        -c model_reasoning_effort=<effort> \
+        --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false <prompt>
 
 capturing the JSON event stream to
 ``<work-dir>/codex/events/<catalog>__<layer_id>.jsonl`` and a usage row per
@@ -49,6 +50,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import shlex
 import shutil
 import subprocess
@@ -207,7 +209,7 @@ def fill_prompt(template: str, packet_path: Path, repo_root: Path) -> str:
 
 
 def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str, prompt_text: str,
-                  model: str = None) -> list:
+                  model: str = None, isolation=()) -> list:
     return [
         "codex", "exec",
         *(["-m", model] if model else []),
@@ -219,8 +221,76 @@ def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str
         "-o", str(out_tmp),
         "--json",
         "-c", f"model_reasoning_effort={effort}",
+        *isolation,
         prompt_text,
     ]
+
+
+# Channels a lane child is denied by configuration (2026-09-23 re-record); memory stores, code indexes and
+# the web can return the incumbent verdicts or the catalog's selection labels.
+# - ``--ignore-user-config`` skips ``$CODEX_HOME/config.toml`` (auth still uses ``CODEX_HOME``), so the user's
+#   MCP servers, plugins, profiles and project trust do not load, and without trust no project
+#   ``.codex/config.toml`` loads either. Measured with codex-cli 0.155.1 from the agent-lab checkout
+#   (RUST_LOG=info): a default ``codex exec`` initialized seven MCP servers (ai-memory, SocratiCode,
+#   jCodeMunch, Serena, context-mode, plugin-runtime, OpenAI Developers MCP); with these flags only
+#   plugin-runtime and OpenAI Developers MCP initialized.
+# - Lifecycle hooks are off (``features.hooks``, ``features.plugin_hooks``).
+# - Native web search is off (``web_search="disabled"``): without it a probe child ran a web search, with
+#   it the child reported no web search tool.
+# Not denied: shell reads under ``--sandbox read-only`` (any host path, and CLIs such as ai-memory on PATH)
+# and ``$CODEX_HOME/AGENTS.md``, which a probe child still quoted. Those rest on lane-prompt.md rule 1,
+# a repository without ``.git`` (refused unless --allow-git-history) and the post-run blind audit below.
+# Per-server ``mcp_servers.<name>.enabled=false`` overrides are not used: codex rejects them as a partial
+# table ("invalid transport") when the loaded config does not define that server.
+ISOLATION_ARGS = ("--ignore-user-config", "-c", "features.hooks=false", "-c", "features.plugin_hooks=false",
+                  "-c", 'web_search="disabled"')
+
+AUDIT_NAME = "blind-audit.json"
+# CLIs that reach memory stores, code indexes, session history, git history or the network.
+AUDIT_TOOLS = ("git", "ai-memory", "agentsview", "mcporter", "qmd", "socraticode", "jcodemunch", "serena",
+               "sqlite3", "curl", "wget")
+ABSOLUTE_PATH = re.compile(r"(?<![\w.~}-])(/[^\s'\"|;&<>()`]+)")
+HOME_PATH = re.compile(r"(?:~|\$HOME|\$\{HOME\})(?:/[^\s'\"|;&<>()`]*)?")
+PARENT_PATH = re.compile(r"(?:^|[\s'\"=:])((?:[^\s'\"|;&<>()`]*/)?\.\.(?:/[^\s'\"|;&<>()`]*)?)")
+ROOT_PATH = re.compile(r"(?:^|[\s'\"=])/(?=$|[\s'\";&|)])")
+SYSTEM_PREFIXES = ("/bin/", "/usr/", "/dev/null")
+
+
+def blind_audit(events_path: Path, allowed_roots) -> dict:
+    """Report-only reading of one child's event stream: web searches, MCP tool calls, and commands that
+    name an absolute path outside ``allowed_roots`` (the repository and the packets directory) or run a
+    CLI in AUDIT_TOOLS. A flag is evidence for the coordinator to review and disclose, not a verdict."""
+    report = {"web_search": 0, "mcp_tool_calls": 0, "commands": 0, "flagged_commands": []}
+    if not events_path.is_file():
+        return report
+    for line in events_path.read_text(encoding="utf-8", errors="replace").splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict) or event.get("type") != "item.completed":
+            continue
+        item = event.get("item") if isinstance(event.get("item"), dict) else {}
+        kind = item.get("type")
+        if kind == "web_search":
+            report["web_search"] += 1
+        elif kind == "mcp_tool_call":
+            report["mcp_tool_calls"] += 1
+        elif kind == "command_execution":
+            report["commands"] += 1
+            command = item.get("command") if isinstance(item.get("command"), str) else ""
+            reasons = [f"path outside the repository and packets: {path}"
+                       for path in ABSOLUTE_PATH.findall(command)
+                       if not path.startswith(SYSTEM_PREFIXES)
+                       and not any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots)]
+            reasons += ["names the filesystem root /"] if ROOT_PATH.search(command) else []
+            reasons += [f"home-relative path: {path}" for path in HOME_PATH.findall(command)]
+            reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
+            words = set(re.findall(r"[A-Za-z][\w.-]*", command))
+            reasons += [f"runs {tool}" for tool in AUDIT_TOOLS if tool in words]
+            if reasons:
+                report["flagged_commands"].append({"command": command, "reasons": reasons})
+    return report
 
 
 def run_attempt(cmd: list, timeout: float) -> dict:
@@ -359,6 +429,9 @@ def parse_args(argv=None):
                              "(default: Codex's configured model, recorded from the event stream).")
     parser.add_argument("--jobs", type=int, default=1, help="Concurrent codex exec invocations.")
     parser.add_argument("--dry-run", action="store_true", help="Print the command per pending layer; write nothing.")
+    parser.add_argument("--allow-git-history", action="store_true",
+                        help="Run against a --repo that has .git. A blind wave never does: git history recovers "
+                             "every label blind_checkout.py strips, so give the lanes its --export copy.")
     parser.add_argument("--prompt", type=Path, default=DEFAULT_PROMPT,
                          help="Override the lane prompt template path (default: lane-prompt.md next to this script).")
     parser.add_argument("--schema", type=Path, default=DEFAULT_SCHEMA,
@@ -383,6 +456,13 @@ def main(argv=None) -> int:
         print(f"codex_lane: output schema not found: {schema_path}", file=sys.stderr)
         return 2
     template = prompt_path.read_text(encoding="utf-8")
+    git_dirs = [str(path) for path in (repo, *repo.parents) if (path / ".git").exists()]
+    if git_dirs and not args.allow_git_history:
+        # git walks up from a subdirectory, so an export inside any repository still reaches history.
+        print(f"codex_lane: {git_dirs[0]} has .git, whose history a child can read from {repo}; run the lane on a "
+              "blind_checkout.py --export copy placed outside every repository, or pass --allow-git-history "
+              "outside a blind wave", file=sys.stderr)
+        return 2
 
     layers_filter = None
     if args.layers:
@@ -407,7 +487,7 @@ def main(argv=None) -> int:
         for catalog, layer_id, packet_path, packet_sha256, out_path in pending:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
-            cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model)
+            cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model, ISOLATION_ARGS)
             print(shlex.join(cmd))
         return 0
 
@@ -427,7 +507,8 @@ def main(argv=None) -> int:
         catalog, layer_id, packet_path, packet_sha256, out_path = item
         prompt_text = fill_prompt(template, packet_path.resolve(), repo)
         tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
-        cmd = build_command(repo, strict_schema_path.resolve(), tmp_out, args.effort, prompt_text, args.model)
+        cmd = build_command(repo, strict_schema_path.resolve(), tmp_out, args.effort, prompt_text, args.model,
+                            ISOLATION_ARGS)
         events_path = events_dir / f"{catalog}__{layer_id}.jsonl"
         events_path.write_text("", encoding="utf-8")
 
@@ -497,6 +578,23 @@ def main(argv=None) -> int:
     else:
         for item in pending:
             process(item)
+
+    audit_path = codex_dir / AUDIT_NAME
+    try:
+        audit = json.loads(audit_path.read_text(encoding="utf-8")) if audit_path.is_file() else {}
+    except ValueError:
+        audit = {}
+    layers = audit.get("layers") if isinstance(audit.get("layers"), dict) else {}
+    roots = [str(repo), str((work_dir / "packets").resolve())]
+    for catalog, layer_id, _packet_path, _packet_sha256, _out_path in pending:
+        layers[f"{catalog}__{layer_id}"] = blind_audit(events_dir / f"{catalog}__{layer_id}.jsonl", roots)
+    audit_path.write_text(json.dumps({"schema_version": 1, "allowed_roots": roots, "layers": layers},
+                                     indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    flagged = sorted(name for name, entry in layers.items()
+                     if entry["web_search"] or entry["mcp_tool_calls"] or entry["flagged_commands"])
+    if flagged:
+        print(f"codex_lane: blind audit flags {len(flagged)} layer(s) for review in {audit_path}: "
+              + ", ".join(flagged), file=sys.stderr)
 
     failures_path = codex_dir / FAILURES_NAME
     if failures:
