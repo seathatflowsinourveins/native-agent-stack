@@ -310,6 +310,26 @@ class Harness:
 
     async def cleanup(self, port):
         out = {"client_id_prefix": self.prefix, "cancels": [], "flat": None}
+        try:
+            if await self._cancel_and_prove(port, out):
+                return out
+        except Exception as exc:  # any cleanup failure leaves the run marked, never silently clean
+            out.update(proof="failed", flat=False, error=describe(exc))
+        if out["flat"] is not True:
+            marker = self.run_dir / "CLEANUP_REQUIRED"
+            try:
+                marker.write_text(json.dumps({"client_id_prefix": self.prefix, "at": time.time()}) + "\n")
+                out["marker"] = "CLEANUP_REQUIRED written in the run state directory"
+            except OSError as exc:
+                out["marker_error"] = describe(exc)
+            print("CLEANUP_REQUIRED: " + str(marker), file=sys.stderr)
+        else:
+            self.in_flight.unlink(missing_ok=True)  # Removed only after flat is proven.
+        return out
+
+    async def _cancel_and_prove(self, port, out):
+        """Cancel this run's open intents and prove flat into ``out``; True when
+        no broker write ever happened, so no proof is required."""
         for intent in self.ledger.intents():
             if intent.client_id.startswith(self.prefix) and intent.submit_attempted and not intent.terminal:
                 entry = {"client_order_id": intent.client_id}
@@ -323,7 +343,7 @@ class Harness:
         if self.posts == 0 and not any(i.submit_attempted for i in self.ledger.intents()):
             out["proof"] = "not_required_no_broker_writes"
             self.in_flight.unlink(missing_ok=True)
-            return out
+            return True
         try:
             snap = await port.snapshot()
             rec = reconcile(self.ledger, snap, self.baseline_cash)
@@ -333,14 +353,7 @@ class Harness:
                              and not any(Decimal(p["qty"]) for p in snap["positions"])))
         except Exception as exc:
             out.update(proof="failed", flat=False, error=describe(exc))
-        if out["flat"] is not True:
-            marker = self.run_dir / "CLEANUP_REQUIRED"
-            marker.write_text(json.dumps({"client_id_prefix": self.prefix, "at": time.time()}) + "\n")
-            out["marker"] = "CLEANUP_REQUIRED written in the run state directory"
-            print("CLEANUP_REQUIRED: " + str(marker), file=sys.stderr)
-        else:
-            self.in_flight.unlink(missing_ok=True)  # Removed only after flat is proven.
-        return out
+        return False
 
     async def execute(self, factory, key, secret):
         try:

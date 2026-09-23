@@ -14,8 +14,11 @@ partial native evidence only (C01 and C02), with the best status
 `native_faults_incomplete`.
 
 The one live run (2026-09-23 14:20:24Z, from a read-only `git archive` of the
-harness commit; harness, plan and engine source hashes in the receipt match
-this tree) went exactly that way:
+harness commit) went exactly that way. The plan and engine source hashes in
+the receipt match this tree; its `harness_sha256` (742fb666...) is the harness
+as run. `harness.py` was changed after the run so that an exception inside
+cleanup still writes `CLEANUP_REQUIRED` and a receipt (the run itself cleaned
+up without error), so the next run binds a new harness hash.
 
 | Case | Outcome | Evidence class | Broker requests |
 |---|---|---|---|

@@ -183,6 +183,13 @@ class HarnessRuns(unittest.TestCase):
             self.assertNotIn(secret, text)
         return code, receipt, port
 
+    @staticmethod
+    def flagged(cleanup):
+        async def wrapper(harness, port):
+            harness.cleaning = True
+            return await cleanup(harness, port)
+        return wrapper
+
     def markers(self, name="CLEANUP_REQUIRED"):
         return list(self.root.glob("*/" + name))
 
@@ -273,6 +280,24 @@ class HarnessRuns(unittest.TestCase):
         self.assertEqual(len(in_flight), 1)
         self.assertEqual(json.loads(in_flight[0].read_text())["client_id_prefix"], receipt["client_id_prefix"])
         self.assertTrue(receipt["in_flight_marker_present"])
+
+    def test_cleanup_exception_still_writes_the_marker_and_a_receipt(self):
+        # C02's cancel raises, so C01's order is still open when cleanup runs and
+        # cleanup's own settle call then raises.
+        original = h.Harness.settle
+
+        async def settle_then_break(harness, cid):
+            if harness.cleaning:
+                raise RuntimeError("settle failed")
+            return await original(harness, cid)
+        with patch.object(h.Harness, "settle", settle_then_break), \
+                patch.object(h.Harness, "cleaning", False, create=True), \
+                patch.object(h.Harness, "cleanup", self.flagged(h.Harness.cleanup)):
+            code, receipt, port = self.run_harness(cancel_raises_first=True)
+        self.assertEqual((receipt["cleanup"]["proof"], receipt["cleanup"]["flat"]), ("failed", False))
+        self.assertEqual((receipt["status"], code), ("cleanup_required", 3))
+        self.assertEqual(len(self.markers()), 1)
+        self.assertEqual(len(self.markers("IN_FLIGHT")), 1)
 
     def test_state_root_must_be_dedicated(self):
         for bad in (self.state_base, self.state_base / "alpaca-paper", self.state_base / "alpaca-paper/x",
