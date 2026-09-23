@@ -122,6 +122,9 @@ macOS host, another agent session, or CI), use
 [the host evidence contribution guide](../docs/contributing-evidence.md) with
 [`scripts/host_receipts.py`](../scripts/host_receipts.py) and
 [the receipt schema](host-receipt.schema.json). It never uploads anything; it
-only records what actually ran on your host into a reviewable PR.
+only records what actually ran on your host into a reviewable PR. Use
+[the component evidence matrix](../docs/component-evidence-matrix.md) to see,
+per layer, which winners still need a host receipt or an independent lane
+review on your platform before picking what to run.
 
 Primary references: [uv locking and synchronization](https://docs.astral.sh/uv/pip/compile/), [official Codex SDK](https://learn.chatgpt.com/docs/codex-sdk), [Codex authentication](https://learn.chatgpt.com/docs/auth), [Claude authentication](https://code.claude.com/docs/en/authentication), [Claude settings](https://code.claude.com/docs/en/settings).

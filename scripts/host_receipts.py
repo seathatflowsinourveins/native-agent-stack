@@ -565,8 +565,17 @@ def cmd_validate(args: argparse.Namespace) -> int:
 # ------------------------------------------------------------------------ summary
 
 
-def cmd_summary(args: argparse.Namespace) -> int:
-    root = repo_root(args.root)
+def build_summary(root: Path) -> dict:
+    """Aggregate every recorded host receipt by component x platform.
+
+    Each platform bucket additionally reports
+    ``independently_reviewed_native_proven_pass_stages``: the sorted list of
+    lifecycle stages with at least one receipt that is ``result: pass``,
+    ``evidence_class: native_proven`` and carries a non-``self`` review with
+    verdict ``agree``. Callers needing that stricter combination (for example
+    ``scripts/component_matrix.py``'s macOS-acceptance flip rule) can check
+    that list directly instead of re-deriving it from raw receipts.
+    """
     components: dict[str, dict] = {}
     for _host_dir_name, path in _iter_receipt_files(root):
         try:
@@ -577,12 +586,16 @@ def cmd_summary(args: argparse.Namespace) -> int:
         platform_id = (receipt.get("host") or {}).get("platform_id")
         stage = receipt.get("stage")
         result = receipt.get("result")
+        evidence_class = receipt.get("evidence_class")
         observed_at = receipt.get("observed_at_utc")
         if not isinstance(component_id, str) or not isinstance(platform_id, str):
             continue
         component_bucket = components.setdefault(component_id, {"platforms": {}})
         platform_bucket = component_bucket["platforms"].setdefault(
-            platform_id, {"stages": {}, "latest_observed_at_utc": None, "independently_reviewed_passes": 0},
+            platform_id, {
+                "stages": {}, "latest_observed_at_utc": None, "independently_reviewed_passes": 0,
+                "independently_reviewed_native_proven_pass_stages": set(),
+            },
         )
         stage_counts = platform_bucket["stages"].setdefault(
             stage, {"pass": 0, "fail": 0, "partial": 0, "not_runnable": 0},
@@ -600,8 +613,22 @@ def cmd_summary(args: argparse.Namespace) -> int:
         )
         if result == "pass" and independently_reviewed:
             platform_bucket["independently_reviewed_passes"] += 1
+            if evidence_class == "native_proven" and isinstance(stage, str):
+                platform_bucket["independently_reviewed_native_proven_pass_stages"].add(stage)
 
-    summary = {"generated_at_utc": utc_now(), "components": components}
+    for component_bucket in components.values():
+        for platform_bucket in component_bucket["platforms"].values():
+            platform_bucket["independently_reviewed_native_proven_pass_stages"] = sorted(
+                platform_bucket["independently_reviewed_native_proven_pass_stages"]
+            )
+
+    return {"generated_at_utc": utc_now(), "components": components}
+
+
+def cmd_summary(args: argparse.Namespace) -> int:
+    root = repo_root(args.root)
+    summary = build_summary(root)
+    components = summary["components"]
     if args.json:
         print(json.dumps(summary, indent=2, sort_keys=True))
     else:

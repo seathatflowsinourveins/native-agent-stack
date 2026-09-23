@@ -1,0 +1,4640 @@
+{
+  "checked_at": "2026-09-22",
+  "rows": [
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "measured_comparison",
+          "name": "Claude Agent SDK",
+          "repository": "https://github.com/anthropics/claude-agent-sdk-python"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "OpenHands SDK",
+          "repository": "https://github.com/openhands/software-agent-sdk"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Temporal",
+          "repository": "https://github.com/temporalio/temporal"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "LangGraph",
+          "repository": "https://github.com/langchain-ai/langgraph"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "agent-sdks",
+      "open_executable_now_gaps": 12,
+      "title": "Agent SDKs and runtime workers",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "codex",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "recovery",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.155.1",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/openai/codex"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "actionlint",
+          "repository": "https://github.com/rhysd/actionlint"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Trivy",
+          "repository": "https://github.com/aquasecurity/trivy"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Dependabot",
+          "repository": "https://github.com/dependabot/dependabot-core"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "gitleaks",
+          "repository": "https://github.com/gitleaks/gitleaks"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Grype",
+          "repository": "https://github.com/anchore/grype"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "ci-supply-chain",
+      "open_executable_now_gaps": 9,
+      "title": "CI and supply chain",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "zizmor",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "1.30.1",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/zizmorcore/zizmor"
+        },
+        {
+          "component_id": "syft",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "1.52.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/anchore/syft"
+        },
+        {
+          "component_id": "candidate:actions-attest",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "unpinned",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/actions/attest"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-code-navigation-20260922.json",
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "ast-grep",
+          "repository": "https://github.com/ast-grep/ast-grep"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "CodeGraph",
+          "repository": "https://github.com/colbymchenry/codegraph"
+        },
+        {
+          "disposition": "measured_tradeoff",
+          "e2e_state": "not_run",
+          "evidence_class": "measured_comparison",
+          "name": "jCodeMunch",
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "codebase-memory-mcp",
+          "repository": "https://github.com/DeusData/codebase-memory-mcp"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_adjudicated",
+      "layer_id": "code-navigation",
+      "open_executable_now_gaps": 2,
+      "title": "Code navigation",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "serena",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/oraios/serena"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-document-retrieval-20260922.json",
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "local_integration",
+          "name": "Context Hub",
+          "repository": "https://github.com/andrewyng/context-hub"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Docling",
+          "repository": "https://github.com/docling-project/docling"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "LlamaIndex",
+          "repository": "https://github.com/run-llama/llama_index"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_adjudicated",
+      "layer_id": "document-retrieval",
+      "open_executable_now_gaps": 5,
+      "title": "Documents and ingestion",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "qmd",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "2.8.3",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/tobi/qmd"
+        },
+        {
+          "component_id": "markitdown",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.1.7",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/microsoft/markitdown"
+        },
+        {
+          "component_id": "poppler",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "26.09.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/tsdgeos/poppler_mirror"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "synthetic",
+          "name": "Basic Memory",
+          "repository": "https://github.com/basicmachines-co/basic-memory"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Mem0",
+          "repository": "https://github.com/mem0ai/mem0"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Letta Code",
+          "repository": "https://github.com/letta-ai/letta-code"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "OpenViking",
+          "repository": "https://github.com/volcengine/OpenViking"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Graphiti",
+          "repository": "https://github.com/getzep/graphiti"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Cognee",
+          "repository": "https://github.com/topoteretes/cognee"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Supermemory",
+          "repository": "https://github.com/supermemoryai/supermemory"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Hindsight",
+          "repository": "https://github.com/vectorize-io/hindsight"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Claude-mem",
+          "repository": "https://github.com/thedotmack/claude-mem"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "durable-memory",
+      "open_executable_now_gaps": 9,
+      "title": "Durable memory",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "ai-memory",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "cleanup",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "install",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "persistence",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "recovery",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "restart",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "2.3.2",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/akitaonrails/ai-memory"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Codex for Claude review bridge",
+          "repository": "https://github.com/openai/codex-plugin-cc"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "git-github-automation",
+      "open_executable_now_gaps": 11,
+      "title": "Git practice and GitHub automation",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "worktrunk",
+          "evidence_class": "source_review",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.79.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "not_established",
+              "e2e_state": "not_established",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/max-sixty/worktrunk"
+        },
+        {
+          "component_id": "candidate:cli-cli",
+          "evidence_class": "source_review",
+          "lifecycle_stages": [],
+          "pin": "unpinned",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "not_established",
+              "e2e_state": "not_established",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/cli/cli"
+        },
+        {
+          "component_id": "difftastic",
+          "evidence_class": "source_review",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.71.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "not_established",
+              "e2e_state": "not_established",
+              "host_receipts": {
+                "fail": 1,
+                "independently_reviewed_pass": 0,
+                "latest": "2026-09-23T01:05:55Z",
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/Wilfred/difftastic"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "React",
+          "repository": "https://github.com/react/react"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Docker Compose",
+          "repository": "https://github.com/docker/compose"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Docker Engine / Moby",
+          "repository": "https://github.com/moby/moby"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Podman / Quadlet",
+          "repository": "https://github.com/podman-container-tools/podman"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Dev Containers CLI",
+          "repository": "https://github.com/devcontainers/cli"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Dockerized IB Gateway",
+          "repository": "https://github.com/gnzsnz/ib-gateway-docker"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Modal",
+          "repository": "https://github.com/modal-labs/modal-client"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "BentoML",
+          "repository": "https://github.com/bentoml/BentoML"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "hosting-services",
+      "open_executable_now_gaps": 6,
+      "title": "Application and service hosting",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "fastapi",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "install",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "persistence",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "recovery",
+              "status": "not_established"
+            },
+            {
+              "stage": "restart",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.141.1",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/fastapi/fastapi"
+        },
+        {
+          "component_id": "nextjs",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "install",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "persistence",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "recovery",
+              "status": "not_established"
+            },
+            {
+              "stage": "restart",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "16.3.5",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/vercel/next.js"
+        },
+        {
+          "component_id": "postgresql",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "install",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "persistence",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "recovery",
+              "status": "not_established"
+            },
+            {
+              "stage": "restart",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "18.6",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/postgres/postgres"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-instructions-skills-20260922.json",
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "local_integration",
+          "name": "Agent Skills reference tools",
+          "repository": "https://github.com/agentskills/agentskills"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Shan Claude best practice",
+          "repository": "https://github.com/shanraisshan/claude-code-best-practice"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Trail of Bits security skills",
+          "repository": "https://github.com/trailofbits/skills"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Vercel frontend skills",
+          "repository": "https://github.com/vercel-labs/agent-skills"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Claude Code Templates",
+          "repository": "https://github.com/davila7/claude-code-templates"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "VoltAgent subagent collection",
+          "repository": "https://github.com/voltagent/awesome-claude-code-subagents"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Anthropic webapp-testing skill",
+          "repository": "https://github.com/anthropics/skills"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_adjudicated",
+      "layer_id": "instructions-skills",
+      "open_executable_now_gaps": 10,
+      "title": "Instructions and skills",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "affaan-m/ECC",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "not_applicable"
+            }
+          ],
+          "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/affaan-m/ECC"
+        },
+        {
+          "component_id": "candidate:typesafe-ai-skills",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [],
+          "pin": "unpinned",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/typesafe-ai/skills"
+        },
+        {
+          "component_id": "candidate:openai-skills",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [],
+          "pin": "unpinned",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/openai/skills"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Apple Container",
+          "repository": "https://github.com/apple/container"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Podman / Quadlet",
+          "repository": "https://github.com/podman-container-tools/podman"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Docker Engine / Moby",
+          "repository": "https://github.com/moby/moby"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "E2B",
+          "repository": "https://github.com/e2b-dev/E2B"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "gVisor",
+          "repository": "https://github.com/google/gvisor"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "isolation",
+      "open_executable_now_gaps": 16,
+      "title": "Isolation",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "worktrunk",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.79.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/max-sixty/worktrunk"
+        },
+        {
+          "component_id": "sandbox-runtime",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.0.77",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/anthropics/sandbox-runtime"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Awesome MCP servers registry",
+          "repository": "https://github.com/punkpeye/awesome-mcp-servers"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "mcp-surfaces",
+      "open_executable_now_gaps": 12,
+      "title": "MCP servers and client surfaces",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "mcporter",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.13.13",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/openclaw/mcporter"
+        },
+        {
+          "component_id": "mcp-inspector",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "2.7.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/modelcontextprotocol/inspector"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "local_integration",
+          "name": "MCPorter native bridge",
+          "repository": "https://github.com/openclaw/mcporter"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Claude Agent SDK",
+          "repository": "https://github.com/anthropics/claude-agent-sdk-python"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "OpenAI Agents SDK",
+          "repository": "https://github.com/openai/openai-agents-python"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Letta Code",
+          "repository": "https://github.com/letta-ai/letta-code"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Letta V1 legacy server",
+          "repository": "https://github.com/letta-ai/letta"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "native-clients",
+      "open_executable_now_gaps": 9,
+      "title": "Native clients",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "claude-code",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "recovery",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "2.1.278",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/anthropics/claude-code"
+        },
+        {
+          "component_id": "codex",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "recovery",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.155.1",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/openai/codex"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-observation-inference-20260922.json",
+      "alternatives": [
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Grafana",
+          "repository": "https://github.com/grafana/grafana"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Alertmanager",
+          "repository": "https://github.com/prometheus/alertmanager"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "ntfy",
+          "repository": "https://github.com/binwiederhier/ntfy"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "llama.cpp optional local inference",
+          "repository": "https://github.com/ggml-org/llama.cpp"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "AgentsView",
+          "repository": "https://github.com/kenn-io/agentsview"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "synthetic",
+          "name": "otel-tui",
+          "repository": "https://github.com/ymtdzzz/otel-tui"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Claude HUD",
+          "repository": "https://github.com/jarrodwatts/claude-hud"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Phoenix",
+          "repository": "https://github.com/Arize-ai/phoenix"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "OpenLIT",
+          "repository": "https://github.com/openlit/openlit"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "SGLang",
+          "repository": "https://github.com/sgl-project/sglang"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_adjudicated",
+      "layer_id": "observation-inference",
+      "open_executable_now_gaps": 8,
+      "title": "Observation and optional inference",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "opentelemetry-collector-contrib",
+          "evidence_class": "synthetic",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.161.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib"
+        },
+        {
+          "component_id": "prometheus",
+          "evidence_class": "synthetic",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "3.14.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/prometheus/prometheus"
+        },
+        {
+          "component_id": "loki",
+          "evidence_class": "synthetic",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "3.7.8",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/grafana/loki"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "ShellCheck",
+          "repository": "https://github.com/koalaman/shellcheck"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Difftastic",
+          "repository": "https://github.com/Wilfred/difftastic"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "MCP Inspector",
+          "repository": "https://github.com/modelcontextprotocol/inspector"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "measured_comparison",
+          "name": "TypeSafe semantic skill",
+          "repository": "https://github.com/typesafe-ai/skills"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Official OpenAI CI and security skills",
+          "repository": "https://github.com/openai/skills"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Inspect AI",
+          "repository": "https://github.com/UKGovernmentBEIS/inspect_ai"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "MLflow",
+          "repository": "https://github.com/mlflow/mlflow"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "quality-evaluation",
+      "open_executable_now_gaps": 9,
+      "title": "Quality and evaluation",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "promptfoo",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.123.1",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/promptfoo/promptfoo"
+        },
+        {
+          "component_id": "playwright-test",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "1.63.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/microsoft/playwright"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "mise",
+          "repository": "https://github.com/jdx/mise"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "chezmoi",
+          "repository": "https://github.com/twpayne/chezmoi"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Litestream",
+          "repository": "https://github.com/benbjohnson/litestream"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Determinate Nix installer",
+          "repository": "https://github.com/DeterminateSystems/nix-installer"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Devbox",
+          "repository": "https://github.com/jetify-com/devbox"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "recovery-portability",
+      "open_executable_now_gaps": 4,
+      "title": "Recovery and portability",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "restic",
+          "evidence_class": "synthetic",
+          "lifecycle_stages": [
+            {
+              "stage": "cleanup",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "install",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "persistence",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "recovery",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.19.1",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/restic/restic"
+        },
+        {
+          "component_id": "candidate:astral-sh-uv",
+          "evidence_class": "synthetic",
+          "lifecycle_stages": [],
+          "pin": "unpinned",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/astral-sh/uv"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Prefect",
+          "repository": "https://github.com/PrefectHQ/prefect"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Dagster",
+          "repository": "https://github.com/dagster-io/dagster"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Restate",
+          "repository": "https://github.com/restatedev/restate"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Temporal",
+          "repository": "https://github.com/temporalio/temporal"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "scheduling-supervision",
+      "open_executable_now_gaps": 5,
+      "title": "Scheduling and supervision",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "dagu",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "cleanup",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "persistence",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "recovery",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "restart",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "2.16.6",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/dagucloud/dagu"
+        },
+        {
+          "component_id": "systemd",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "cleanup",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "persistence",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "recovery",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "restart",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "255.4-1ubuntu8.17",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/systemd/systemd"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "OpenBao",
+          "repository": "https://github.com/openbao/openbao"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "secrets-credentials",
+      "open_executable_now_gaps": 5,
+      "title": "Secrets and credentials",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "gitleaks",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "8.30.1",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/gitleaks/gitleaks"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Hugging Face Hub native CLI",
+          "repository": "https://github.com/huggingface/huggingface_hub"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "code-memory",
+          "repository": "https://github.com/kapillamba4/code-memory"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Haystack",
+          "repository": "https://github.com/deepset-ai/haystack"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "pgvector",
+          "repository": "https://github.com/pgvector/pgvector"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "LanceDB",
+          "repository": "https://github.com/lancedb/lancedb"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "semantic-rag",
+      "open_executable_now_gaps": 10,
+      "title": "Semantic code retrieval",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "socraticode",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "persistence",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "recovery",
+              "status": "not_established"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "1.14.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/giancarloerra/SocratiCode"
+        },
+        {
+          "component_id": "qdrant",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "cleanup",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "install",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "persistence",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "recovery",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "1.19.1",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/qdrant/qdrant"
+        },
+        {
+          "component_id": "vllm",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.25.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/vllm-project/vllm"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-token-efficiency-20260922.json",
+      "alternatives": [
+        {
+          "disposition": "measured_tradeoff",
+          "e2e_state": "not_run",
+          "evidence_class": "measured_comparison",
+          "name": "Context Mode",
+          "repository": "https://github.com/mksglu/context-mode"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "local_integration",
+          "name": "Repomix",
+          "repository": "https://github.com/yamadashy/repomix"
+        },
+        {
+          "disposition": "measured_tradeoff",
+          "e2e_state": "not_run",
+          "evidence_class": "measured_comparison",
+          "name": "TOON",
+          "repository": "https://github.com/toon-format/toon"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Claude Token Efficient",
+          "repository": "https://github.com/drona23/claude-token-efficient"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_adjudicated",
+      "layer_id": "token-efficiency",
+      "open_executable_now_gaps": 4,
+      "title": "Context and usage efficiency",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "rtk",
+          "evidence_class": "synthetic",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.49.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": "2026-09-23T01:05:22Z",
+                "pass": 1
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/rtk-ai/rtk"
+        },
+        {
+          "component_id": "headroom",
+          "evidence_class": "synthetic",
+          "lifecycle_stages": [
+            {
+              "stage": "cleanup",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "install",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "recovery",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "restart",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.37.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/headroomlabs-ai/headroom"
+        },
+        {
+          "component_id": "ccusage",
+          "evidence_class": "synthetic",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "20.0.24",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/ccusage/ccusage"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-web-research-20260922.json",
+      "alternatives": [
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "local_integration",
+          "name": "Playwright CLI",
+          "repository": "https://github.com/microsoft/playwright-cli"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Crawl4AI",
+          "repository": "https://github.com/unclecode/crawl4ai"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Cua Driver",
+          "repository": "https://github.com/trycua/cua"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Firecrawl MCP",
+          "repository": "https://github.com/firecrawl/firecrawl-mcp-server"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Browser Use",
+          "repository": "https://github.com/browser-use/browser-use"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_adjudicated",
+      "layer_id": "web-research",
+      "open_executable_now_gaps": 7,
+      "title": "Web research",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "tavily-cli",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.1.8",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/tavily-ai/tavily-cli"
+        },
+        {
+          "component_id": "agent-browser",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.38.1",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/vercel-labs/agent-browser"
+        },
+        {
+          "component_id": "openresearch",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.2.7",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/alphaXiv/OpenResearch"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-workers-20260922.json",
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Codex native workers",
+          "repository": "https://github.com/openai/codex"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Codex for Claude companion",
+          "repository": "https://github.com/openai/codex-plugin-cc"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Beads",
+          "repository": "https://github.com/gastownhall/beads"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "DeerFlow",
+          "repository": "https://github.com/bytedance/deer-flow"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Deep Agents",
+          "repository": "https://github.com/langchain-ai/deepagents"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "OpenHands SDK",
+          "repository": "https://github.com/OpenHands/software-agent-sdk"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "OpenHands Agent Canvas",
+          "repository": "https://github.com/OpenHands/OpenHands"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Microsoft Agent Framework",
+          "repository": "https://github.com/microsoft/agent-framework"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "LangGraph",
+          "repository": "https://github.com/langchain-ai/langgraph"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Temporal",
+          "repository": "https://github.com/temporalio/temporal"
+        }
+      ],
+      "catalog": "foundation",
+      "independent_review": "dual_lane_adjudicated",
+      "layer_id": "workers",
+      "open_executable_now_gaps": 7,
+      "title": "Workers and task ownership",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "claude-code",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "recovery",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "2.1.278",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/anthropics/claude-code"
+        },
+        {
+          "component_id": "worktrunk",
+          "evidence_class": "local_integration",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "0.79.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/max-sixty/worktrunk"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "foundation-toon",
+          "repository": "https://github.com/toon-format/toon"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "foundation-pageindex",
+          "repository": "https://github.com/VectifyAI/PageIndex"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "langgraph",
+          "repository": "https://github.com/langchain-ai/langgraph"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "vllm",
+          "repository": "https://github.com/vllm-project/vllm"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "omniroute",
+          "repository": "https://github.com/diegosouzapw/OmniRoute"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "foundation-repomix",
+          "repository": "https://github.com/yamadashy/repomix"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Serena",
+          "repository": "https://github.com/oraios/serena"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "foundation-pgvector",
+          "repository": "https://github.com/pgvector/pgvector"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Context Mode",
+          "repository": "https://github.com/mksglu/context-mode"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "RTK",
+          "repository": "https://github.com/rtk-ai/rtk"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "foundation-codebase-memory-mcp",
+          "repository": "https://github.com/DeusData/codebase-memory-mcp"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Graphiti",
+          "repository": "https://github.com/getzep/graphiti"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "Qdrant",
+          "repository": "https://github.com/qdrant/qdrant"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "codex-acp",
+          "repository": "https://github.com/agentclientprotocol/codex-acp"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "deerflow",
+          "repository": "https://github.com/bytedance/deer-flow"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "foundation-agent-retrieval-bench",
+          "repository": "https://github.com/eyuansu62/agent-retrieval-bench"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "loopx-project/loopx",
+          "repository": "https://github.com/loopx-project/loopx"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "gastownhall/beads",
+          "repository": "https://github.com/gastownhall/beads"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "jdx/mise",
+          "repository": "https://github.com/jdx/mise"
+        }
+      ],
+      "catalog": "us-equities",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "agents-models-workers",
+      "open_executable_now_gaps": 9,
+      "title": "Agents, models and workers",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "codex-native-sdk",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "CLI rust-v0.155.1; Python openai-codex 0.154.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/openai/codex"
+        },
+        {
+          "component_id": "foundation-ai-memory",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "v2.3.1",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/akitaonrails/ai-memory"
+        },
+        {
+          "component_id": "foundation-socraticode",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "v1.14.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/giancarloerra/SocratiCode"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "cvxportfolio",
+          "repository": "https://github.com/cvxgrp/cvxportfolio"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "lumiwealth/lumibot",
+          "repository": "https://github.com/Lumiwealth/lumibot"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "nkaz001/hftbacktest",
+          "repository": "https://github.com/nkaz001/hftbacktest"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "whchien/ai-trader",
+          "repository": "https://github.com/whchien/ai-trader"
+        }
+      ],
+      "catalog": "us-equities",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "backtesting-engine",
+      "open_executable_now_gaps": 8,
+      "title": "Backtesting engine",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "nautilustrader",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/nautechsystems/nautilus_trader"
+        },
+        {
+          "component_id": "lean",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/QuantConnect/Lean"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-data-quality-orchestration-20260922.json",
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Temporal",
+          "repository": "https://github.com/temporalio/temporal"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "modal",
+          "repository": "https://github.com/modal-labs/modal-client"
+        }
+      ],
+      "catalog": "us-equities",
+      "independent_review": "dual_lane_adjudicated",
+      "layer_id": "data-quality-orchestration",
+      "open_executable_now_gaps": 6,
+      "title": "Data quality and orchestration",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "dagu",
+          "evidence_class": "synthetic",
+          "lifecycle_stages": [
+            {
+              "stage": "cleanup",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "persistence",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "recovery",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "restart",
+              "status": "accepted_within_scope"
+            },
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "v2.16.6",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/dagucloud/dagu"
+        },
+        {
+          "component_id": "data-pandera",
+          "evidence_class": "synthetic",
+          "lifecycle_stages": [],
+          "pin": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "conditional",
+              "e2e_state": "conditional",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/unionai-oss/pandera"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-evaluation-experiments-20260922.json",
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-river",
+          "repository": "https://github.com/online-ml/river"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "foundation-mteb",
+          "repository": "https://github.com/embeddings-benchmark/mteb"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "phoenix",
+          "repository": "https://github.com/Arize-ai/phoenix"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "local_integration",
+          "name": "promptfoo",
+          "repository": "https://github.com/promptfoo/promptfoo"
+        }
+      ],
+      "catalog": "us-equities",
+      "independent_review": "dual_lane_adjudicated",
+      "layer_id": "evaluation-experiments",
+      "open_executable_now_gaps": 8,
+      "title": "Evaluation and experiments",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "foundation-agent-retrieval-bench",
+          "evidence_class": "source_review",
+          "lifecycle_stages": [],
+          "pin": "v0.2.1",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "not_established",
+              "e2e_state": "not_established",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/eyuansu62/agent-retrieval-bench"
+        },
+        {
+          "component_id": "inspect-ai",
+          "evidence_class": "source_review",
+          "lifecycle_stages": [],
+          "pin": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "not_established",
+              "e2e_state": "not_established",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/UKGovernmentBEIS/inspect_ai"
+        },
+        {
+          "component_id": "data-mlflow",
+          "evidence_class": "source_review",
+          "lifecycle_stages": [],
+          "pin": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "not_established",
+              "e2e_state": "not_established",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/mlflow/mlflow"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json",
+      "alternatives": [],
+      "catalog": "us-equities",
+      "independent_review": "pending_lanes",
+      "layer_id": "execution-broker",
+      "open_executable_now_gaps": 0,
+      "title": "Execution and broker adapters",
+      "verdict_status": "pending_lanes",
+      "winners": []
+    },
+    {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-identity-provenance-20260922.json",
+      "alternatives": [
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "cosign",
+          "repository": "https://github.com/sigstore/cosign"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-kafka",
+          "repository": "https://github.com/apache/kafka"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "foundation-socraticode",
+          "repository": "https://github.com/giancarloerra/SocratiCode"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-arcticdb",
+          "repository": "https://github.com/man-group/ArcticDB"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-mlflow",
+          "repository": "https://github.com/mlflow/mlflow"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-iceberg",
+          "repository": "https://github.com/apache/iceberg"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-openlineage",
+          "repository": "https://github.com/OpenLineage/OpenLineage"
+        }
+      ],
+      "catalog": "us-equities",
+      "independent_review": "dual_lane_adjudicated",
+      "layer_id": "identity-provenance",
+      "open_executable_now_gaps": 2,
+      "title": "Identity, provenance and lineage",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "data-dvc",
+          "evidence_class": "source_review",
+          "lifecycle_stages": [],
+          "pin": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "not_established",
+              "e2e_state": "not_established",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/treeverse/dvc"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Databento",
+          "repository": "https://github.com/databento/databento-python"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Massive Python client",
+          "repository": "https://github.com/massive-com/client-python"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-feast",
+          "repository": "https://github.com/feast-dev/feast"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-dlt",
+          "repository": "https://github.com/dlt-hub/dlt"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-gdeltdoc",
+          "repository": "https://github.com/alex9smith/gdelt-doc-api"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-fredapi",
+          "repository": "https://github.com/mortada/fredapi"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-kafka",
+          "repository": "https://github.com/apache/kafka"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "QuestDB",
+          "repository": "https://github.com/questdb/questdb"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "atilaahmettaner/tradingview-mcp",
+          "repository": "https://github.com/atilaahmettaner/tradingview-mcp"
+        }
+      ],
+      "catalog": "us-equities",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "market-data-reference",
+      "open_executable_now_gaps": 8,
+      "title": "Market data and reference",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "data-alpaca-py",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/alpacahq/alpaca-py"
+        },
+        {
+          "component_id": "data-edgartools",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/dgunning/edgartools"
+        },
+        {
+          "component_id": "data-exchange-calendars",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/gerrymanoim/exchange_calendars"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json",
+      "alternatives": [],
+      "catalog": "us-equities",
+      "independent_review": "pending_lanes",
+      "layer_id": "observability-hosting",
+      "open_executable_now_gaps": 1,
+      "title": "Observability and hosting",
+      "verdict_status": "pending_lanes",
+      "winners": []
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "cvxportfolio",
+          "repository": "https://github.com/cvxgrp/cvxportfolio"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "empyrical-reloaded",
+          "repository": "https://github.com/stefan-jansen/empyrical-reloaded"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "quantstats",
+          "repository": "https://github.com/ranaroussi/quantstats"
+        }
+      ],
+      "catalog": "us-equities",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "portfolio-risk",
+      "open_executable_now_gaps": 10,
+      "title": "Portfolio and risk",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "skfolio",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/skfolio/skfolio"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "foundation-qmd",
+          "repository": "https://github.com/tobi/qmd"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-arcticdb",
+          "repository": "https://github.com/man-group/ArcticDB"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-sktime",
+          "repository": "https://github.com/sktime/sktime"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "alphalens-reloaded",
+          "repository": "https://github.com/stefan-jansen/alphalens-reloaded"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "chronos",
+          "repository": "https://github.com/amazon-science/chronos-forecasting"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-tsfresh",
+          "repository": "https://github.com/blue-yonder/tsfresh"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "deerflow",
+          "repository": "https://github.com/bytedance/deer-flow"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "vllm",
+          "repository": "https://github.com/vllm-project/vllm"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "foundation-haystack",
+          "repository": "https://github.com/deepset-ai/haystack"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-river",
+          "repository": "https://github.com/online-ml/river"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-statsforecast",
+          "repository": "https://github.com/Nixtla/statsforecast"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "foundation-docling",
+          "repository": "https://github.com/docling-project/docling"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "arch",
+          "repository": "https://github.com/bashtage/arch"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "ray-serve",
+          "repository": "https://github.com/ray-project/ray"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "timesfm",
+          "repository": "https://github.com/google-research/timesfm"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "foundation-markitdown",
+          "repository": "https://github.com/microsoft/markitdown"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "statsmodels",
+          "repository": "https://github.com/statsmodels/statsmodels"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "foundation-sentence-transformers",
+          "repository": "https://github.com/huggingface/sentence-transformers"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "scikit-learn",
+          "repository": "https://github.com/scikit-learn/scikit-learn"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "Qlib",
+          "repository": "https://github.com/microsoft/qlib"
+        }
+      ],
+      "catalog": "us-equities",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "research-factors-ml",
+      "open_executable_now_gaps": 9,
+      "title": "Research, factors and ML",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "skfolio",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/skfolio/skfolio"
+        },
+        {
+          "component_id": "data-edgartools",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/dgunning/edgartools"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "openbao",
+          "repository": "https://github.com/openbao/openbao"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "cosign",
+          "repository": "https://github.com/sigstore/cosign"
+        }
+      ],
+      "catalog": "us-equities",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "security-supply-chain",
+      "open_executable_now_gaps": 12,
+      "title": "Security and supply chain",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "grype",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "v0.119.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/anchore/grype"
+        },
+        {
+          "component_id": "syft",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "v1.52.0",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/anchore/syft"
+        },
+        {
+          "component_id": "gitleaks",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [
+            {
+              "stage": "use",
+              "status": "accepted_within_scope"
+            }
+          ],
+          "pin": "v8.30.1",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/gitleaks/gitleaks"
+        }
+      ]
+    },
+    {
+      "adjudication_ref": null,
+      "alternatives": [
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-dlt",
+          "repository": "https://github.com/dlt-hub/dlt"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-iceberg",
+          "repository": "https://github.com/apache/iceberg"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "ray-serve",
+          "repository": "https://github.com/ray-project/ray"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "QuestDB",
+          "repository": "https://github.com/questdb/questdb"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "ClickHouse",
+          "repository": "https://github.com/ClickHouse/ClickHouse"
+        },
+        {
+          "disposition": "overlap",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-arrow",
+          "repository": "https://github.com/apache/arrow"
+        },
+        {
+          "disposition": "conditional",
+          "e2e_state": "not_run",
+          "evidence_class": "synthetic",
+          "name": "Pandera",
+          "repository": "https://github.com/unionai-oss/pandera"
+        },
+        {
+          "disposition": "out_of_scope",
+          "e2e_state": "not_run",
+          "evidence_class": "native_proven",
+          "name": "foundation-toon",
+          "repository": "https://github.com/toon-format/toon"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "data-feast",
+          "repository": "https://github.com/feast-dev/feast"
+        },
+        {
+          "disposition": "unqualified",
+          "e2e_state": "not_run",
+          "evidence_class": "source_review",
+          "name": "bytebase/dbhub",
+          "repository": "https://github.com/bytebase/dbhub"
+        }
+      ],
+      "catalog": "us-equities",
+      "independent_review": "dual_lane_same_winner",
+      "layer_id": "storage-compute",
+      "open_executable_now_gaps": 5,
+      "title": "Storage and compute",
+      "verdict_status": "recorded",
+      "winners": [
+        {
+          "component_id": "data-duckdb",
+          "evidence_class": "native_proven",
+          "lifecycle_stages": [],
+          "pin": "v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "catalog_status": "accepted",
+              "e2e_state": "accepted",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            },
+            "macos-arm64": {
+              "catalog_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              }
+            }
+          },
+          "repository": "https://github.com/duckdb/duckdb"
+        }
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "scope": "Per-component independent-review status and per-platform E2E state, joined from catalogs/landscape/{foundation,us-equities}.json winners/alternatives, catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts and the gap crosswalk (open executable_now gaps per layer, when present). It never selects a winner or records a receipt; it is a read-only join of evidence recorded elsewhere.",
+  "summary": {
+    "needs_host": {
+      "linux-wsl2-x86_64": [
+        {
+          "catalog": "foundation",
+          "component_id": "markitdown",
+          "e2e_state": "conditional",
+          "layer_id": "document-retrieval"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "poppler",
+          "e2e_state": "conditional",
+          "layer_id": "document-retrieval"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "qmd",
+          "e2e_state": "conditional",
+          "layer_id": "document-retrieval"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "candidate:cli-cli",
+          "e2e_state": "not_established",
+          "layer_id": "git-github-automation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "difftastic",
+          "e2e_state": "not_established",
+          "layer_id": "git-github-automation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "worktrunk",
+          "e2e_state": "not_established",
+          "layer_id": "git-github-automation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "affaan-m/ECC",
+          "e2e_state": "conditional",
+          "layer_id": "instructions-skills"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "candidate:openai-skills",
+          "e2e_state": "conditional",
+          "layer_id": "instructions-skills"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "candidate:typesafe-ai-skills",
+          "e2e_state": "conditional",
+          "layer_id": "instructions-skills"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "loki",
+          "e2e_state": "conditional",
+          "layer_id": "observation-inference"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "opentelemetry-collector-contrib",
+          "e2e_state": "conditional",
+          "layer_id": "observation-inference"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "prometheus",
+          "e2e_state": "conditional",
+          "layer_id": "observation-inference"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "playwright-test",
+          "e2e_state": "conditional",
+          "layer_id": "quality-evaluation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "promptfoo",
+          "e2e_state": "conditional",
+          "layer_id": "quality-evaluation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "candidate:astral-sh-uv",
+          "e2e_state": "conditional",
+          "layer_id": "recovery-portability"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "restic",
+          "e2e_state": "conditional",
+          "layer_id": "recovery-portability"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "dagu",
+          "e2e_state": "conditional",
+          "layer_id": "scheduling-supervision"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "systemd",
+          "e2e_state": "conditional",
+          "layer_id": "scheduling-supervision"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "gitleaks",
+          "e2e_state": "conditional",
+          "layer_id": "secrets-credentials"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "ccusage",
+          "e2e_state": "conditional",
+          "layer_id": "token-efficiency"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "headroom",
+          "e2e_state": "conditional",
+          "layer_id": "token-efficiency"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "rtk",
+          "e2e_state": "conditional",
+          "layer_id": "token-efficiency"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "agent-browser",
+          "e2e_state": "conditional",
+          "layer_id": "web-research"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "openresearch",
+          "e2e_state": "conditional",
+          "layer_id": "web-research"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "tavily-cli",
+          "e2e_state": "conditional",
+          "layer_id": "web-research"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "claude-code",
+          "e2e_state": "conditional",
+          "layer_id": "workers"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "worktrunk",
+          "e2e_state": "conditional",
+          "layer_id": "workers"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "dagu",
+          "e2e_state": "conditional",
+          "layer_id": "data-quality-orchestration"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "data-pandera",
+          "e2e_state": "conditional",
+          "layer_id": "data-quality-orchestration"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "data-mlflow",
+          "e2e_state": "not_established",
+          "layer_id": "evaluation-experiments"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "foundation-agent-retrieval-bench",
+          "e2e_state": "not_established",
+          "layer_id": "evaluation-experiments"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "inspect-ai",
+          "e2e_state": "not_established",
+          "layer_id": "evaluation-experiments"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "data-dvc",
+          "e2e_state": "not_established",
+          "layer_id": "identity-provenance"
+        }
+      ],
+      "macos-arm64": [
+        {
+          "catalog": "foundation",
+          "component_id": "codex",
+          "e2e_state": "untested",
+          "layer_id": "agent-sdks"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "candidate:actions-attest",
+          "e2e_state": "untested",
+          "layer_id": "ci-supply-chain"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "syft",
+          "e2e_state": "untested",
+          "layer_id": "ci-supply-chain"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "zizmor",
+          "e2e_state": "untested",
+          "layer_id": "ci-supply-chain"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "serena",
+          "e2e_state": "untested",
+          "layer_id": "code-navigation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "markitdown",
+          "e2e_state": "untested",
+          "layer_id": "document-retrieval"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "poppler",
+          "e2e_state": "untested",
+          "layer_id": "document-retrieval"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "qmd",
+          "e2e_state": "untested",
+          "layer_id": "document-retrieval"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "ai-memory",
+          "e2e_state": "untested",
+          "layer_id": "durable-memory"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "candidate:cli-cli",
+          "e2e_state": "untested",
+          "layer_id": "git-github-automation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "difftastic",
+          "e2e_state": "untested",
+          "layer_id": "git-github-automation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "worktrunk",
+          "e2e_state": "untested",
+          "layer_id": "git-github-automation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "fastapi",
+          "e2e_state": "untested",
+          "layer_id": "hosting-services"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "nextjs",
+          "e2e_state": "untested",
+          "layer_id": "hosting-services"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "postgresql",
+          "e2e_state": "untested",
+          "layer_id": "hosting-services"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "affaan-m/ECC",
+          "e2e_state": "untested",
+          "layer_id": "instructions-skills"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "candidate:openai-skills",
+          "e2e_state": "untested",
+          "layer_id": "instructions-skills"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "candidate:typesafe-ai-skills",
+          "e2e_state": "untested",
+          "layer_id": "instructions-skills"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "sandbox-runtime",
+          "e2e_state": "untested",
+          "layer_id": "isolation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "worktrunk",
+          "e2e_state": "untested",
+          "layer_id": "isolation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "mcp-inspector",
+          "e2e_state": "untested",
+          "layer_id": "mcp-surfaces"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "mcporter",
+          "e2e_state": "untested",
+          "layer_id": "mcp-surfaces"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "claude-code",
+          "e2e_state": "untested",
+          "layer_id": "native-clients"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "codex",
+          "e2e_state": "untested",
+          "layer_id": "native-clients"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "loki",
+          "e2e_state": "untested",
+          "layer_id": "observation-inference"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "opentelemetry-collector-contrib",
+          "e2e_state": "untested",
+          "layer_id": "observation-inference"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "prometheus",
+          "e2e_state": "untested",
+          "layer_id": "observation-inference"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "playwright-test",
+          "e2e_state": "untested",
+          "layer_id": "quality-evaluation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "promptfoo",
+          "e2e_state": "untested",
+          "layer_id": "quality-evaluation"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "candidate:astral-sh-uv",
+          "e2e_state": "untested",
+          "layer_id": "recovery-portability"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "restic",
+          "e2e_state": "untested",
+          "layer_id": "recovery-portability"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "dagu",
+          "e2e_state": "untested",
+          "layer_id": "scheduling-supervision"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "systemd",
+          "e2e_state": "untested",
+          "layer_id": "scheduling-supervision"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "gitleaks",
+          "e2e_state": "untested",
+          "layer_id": "secrets-credentials"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "qdrant",
+          "e2e_state": "untested",
+          "layer_id": "semantic-rag"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "socraticode",
+          "e2e_state": "untested",
+          "layer_id": "semantic-rag"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "vllm",
+          "e2e_state": "untested",
+          "layer_id": "semantic-rag"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "ccusage",
+          "e2e_state": "untested",
+          "layer_id": "token-efficiency"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "headroom",
+          "e2e_state": "untested",
+          "layer_id": "token-efficiency"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "rtk",
+          "e2e_state": "untested",
+          "layer_id": "token-efficiency"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "agent-browser",
+          "e2e_state": "untested",
+          "layer_id": "web-research"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "openresearch",
+          "e2e_state": "untested",
+          "layer_id": "web-research"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "tavily-cli",
+          "e2e_state": "untested",
+          "layer_id": "web-research"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "claude-code",
+          "e2e_state": "untested",
+          "layer_id": "workers"
+        },
+        {
+          "catalog": "foundation",
+          "component_id": "worktrunk",
+          "e2e_state": "untested",
+          "layer_id": "workers"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "codex-native-sdk",
+          "e2e_state": "untested",
+          "layer_id": "agents-models-workers"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "foundation-ai-memory",
+          "e2e_state": "untested",
+          "layer_id": "agents-models-workers"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "foundation-socraticode",
+          "e2e_state": "untested",
+          "layer_id": "agents-models-workers"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "lean",
+          "e2e_state": "untested",
+          "layer_id": "backtesting-engine"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "nautilustrader",
+          "e2e_state": "untested",
+          "layer_id": "backtesting-engine"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "dagu",
+          "e2e_state": "untested",
+          "layer_id": "data-quality-orchestration"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "data-pandera",
+          "e2e_state": "untested",
+          "layer_id": "data-quality-orchestration"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "data-mlflow",
+          "e2e_state": "untested",
+          "layer_id": "evaluation-experiments"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "foundation-agent-retrieval-bench",
+          "e2e_state": "untested",
+          "layer_id": "evaluation-experiments"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "inspect-ai",
+          "e2e_state": "untested",
+          "layer_id": "evaluation-experiments"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "data-dvc",
+          "e2e_state": "untested",
+          "layer_id": "identity-provenance"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "data-alpaca-py",
+          "e2e_state": "untested",
+          "layer_id": "market-data-reference"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "data-edgartools",
+          "e2e_state": "untested",
+          "layer_id": "market-data-reference"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "data-exchange-calendars",
+          "e2e_state": "untested",
+          "layer_id": "market-data-reference"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "skfolio",
+          "e2e_state": "untested",
+          "layer_id": "portfolio-risk"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "data-edgartools",
+          "e2e_state": "untested",
+          "layer_id": "research-factors-ml"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "skfolio",
+          "e2e_state": "untested",
+          "layer_id": "research-factors-ml"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "gitleaks",
+          "e2e_state": "untested",
+          "layer_id": "security-supply-chain"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "grype",
+          "e2e_state": "untested",
+          "layer_id": "security-supply-chain"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "syft",
+          "e2e_state": "untested",
+          "layer_id": "security-supply-chain"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "data-duckdb",
+          "e2e_state": "untested",
+          "layer_id": "storage-compute"
+        }
+      ]
+    },
+    "needs_independent_review": [
+      {
+        "catalog": "us-equities",
+        "independent_review": "pending_lanes",
+        "layer_id": "execution-broker"
+      },
+      {
+        "catalog": "us-equities",
+        "independent_review": "pending_lanes",
+        "layer_id": "observability-hosting"
+      }
+    ],
+    "totals": {
+      "alternatives": 183,
+      "dual_lane_adjudicated": 10,
+      "dual_lane_same_winner": 20,
+      "layers": 32,
+      "pending_lanes": 2,
+      "single_lane": 0,
+      "winners": 66
+    }
+  }
+}

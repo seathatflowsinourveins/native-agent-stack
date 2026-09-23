@@ -3053,8 +3053,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "71c6378af2c489d3be3f7047da49e3af7f31d5768d03a4f251e046ce150fd8cc",
-      "bytes": 7358
+      "sha256": "e006e36e9ef1577ddeef37e53632fe718c3fa609a13b527feb772cf392fc9df3",
+      "bytes": 7494
     },
     {
       "path": ".gitignore",
@@ -3093,8 +3093,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "88914966634f28081d9423bb520a1987c0d1fa2e82960504f5b203bd3a8292db",
-      "bytes": 12888
+      "sha256": "6e7e219f6ed43cd36ba6d97bc6c5f981d3e8d886b3a8968de0d19d538208ee25",
+      "bytes": 13096
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -7629,8 +7629,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "401acf7e546b7af5369073729fbc06de3a9f7775a4a72817bffc43566e4eeb01",
-      "bytes": 12919033
+      "sha256": "db2b5e9270a4901e2beb99d66ea796bb40d2e49f29a5b6f68cddba3824535dec",
+      "bytes": 12919244
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -13104,8 +13104,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "9778d5737cacc30ab0ae50feb0c21787b73a4ef8a981f32bde027dc43fe7f7ad",
-      "bytes": 30215
+      "sha256": "6a6476e0941a9d0c20d7de667e92a4e67609deb15a1943ab25836822d659cca5",
+      "bytes": 31542
     },
     {
       "path": "tests/test_host_receipts.py",
@@ -13151,6 +13151,26 @@
       "path": "docs/contributing-evidence.md",
       "sha256": "ea03454e1f6758e7dbedf06aaa1846d91f40ea68189fa7ae454a906a5472ef7b",
       "bytes": 8890
+    },
+    {
+      "path": "scripts/component_matrix.py",
+      "sha256": "8c068247236dcc5078352f4d738568eda35aa8bec0ecb453c5d7a0d7ff39ec16",
+      "bytes": 20968
+    },
+    {
+      "path": "catalogs/landscape/component-evidence-matrix.json",
+      "sha256": "17e29057694b81889ac695f0eb83bb05a20d476a96fac720a7ea54270ca7a58a",
+      "bytes": 145386
+    },
+    {
+      "path": "docs/component-evidence-matrix.md",
+      "sha256": "56d4b76805e7e95d44d76328589501bb87be384278d86b220dd7012c9a657430",
+      "bytes": 16169
+    },
+    {
+      "path": "tests/test_component_matrix.py",
+      "sha256": "34c64d6dbf6f8b3fd7a2deb3ac78829cecbccdc0809a7896cf10fde934503be9",
+      "bytes": 13736
     }
   ],
   "convergence_records": [
