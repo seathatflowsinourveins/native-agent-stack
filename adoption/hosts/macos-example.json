@@ -1,0 +1,13 @@
+{
+  "HOME": "/Users/example",
+  "ECO_ROOT": "/Users/example/.local/share/codex-ecosystem",
+  "PROJECT_ROOT": "/Users/example/code/agent-lab",
+  "HOST_PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+  "CODE_INDEX_PATH": "/Users/example/.code-index",
+  "OTEL_ENDPOINT": "127.0.0.1:14318",
+  "AI_MEMORY_URL": "127.0.0.1:49374",
+  "QDRANT_URL": "127.0.0.1:16333",
+  "EMBED_URL": "127.0.0.1:8232",
+  "EMBED_MODEL_PATH": "/Users/example/.local/share/codex-ecosystem/state/models/embeddinggemma-300M-Q8_0.gguf",
+  "HARDWARE_PROFILE_ID": "macos-arm64-48gb-projected"
+}

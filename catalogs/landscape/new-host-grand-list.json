@@ -1233,8 +1233,8 @@
             },
             "macos-arm64": {
               "e2e_state": "untested",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "1.14.0"
             }
           }
         },
@@ -1599,8 +1599,8 @@
             },
             "macos-arm64": {
               "e2e_state": "untested",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "1.14.0"
             }
           }
         }
@@ -2224,8 +2224,10 @@
         "claude-code",
         "codex",
         "foundation-ai-memory",
+        "foundation-socraticode",
         "mcporter",
-        "qdrant"
+        "qdrant",
+        "socraticode"
       ]
     },
     "needs_host": {

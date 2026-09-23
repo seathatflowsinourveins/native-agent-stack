@@ -2,7 +2,7 @@
   "schema_version": 1,
   "reviewed_at": "2026-09-22",
   "platform": "macos-arm64",
-  "source": "Drafted for the macos-arm64-foundation profile on 2026-09-22 from a Linux workstation: no macOS host executed anything here. Every sha256 below was obtained from the publisher, never guessed. Node, uv, gh and ai-memory come from the publisher's own checksum file or .sha256 sidecar; llama.cpp and Qdrant publish no checksum file for these assets, so each asset's GitHub release `digest` field was read via `gh api repos/<owner>/<repo>/releases/tags/<tag>` and the asset was additionally downloaded to a scratch directory under $TMPDIR and re-hashed with sha256sum (both agreed). The four npm registry tarballs are byte-identical to the ones pinned in adoption/pins-linux-x86_64.json (same registry tarball, re-downloaded and re-hashed here, and cross-checked against `npm view <pkg>@<ver> dist.integrity`); npm still resolves each client's darwin-arm64 optional dependency package unpinned at install time, which is recorded per entry. Versions match pins-linux-x86_64.json wherever the component is the same.",
+  "source": "Drafted for the macos-arm64-foundation profile on 2026-09-22, updated 2026-09-23, from a Linux workstation: no macOS host executed anything here. Every sha256 below was obtained from the publisher, never guessed. Node, uv, gh and ai-memory come from the publisher's own checksum file or .sha256 sidecar; llama.cpp and Qdrant publish no checksum file for these assets, so each asset's GitHub release `digest` field was read via `gh api repos/<owner>/<repo>/releases/tags/<tag>` and the asset was additionally downloaded to a scratch directory under $TMPDIR and re-hashed with sha256sum (both agreed). The five npm registry tarballs (codex, claude-code, mcporter, context-mode, socraticode) are byte-identical to what `npm view <pkg>@<ver> dist.integrity` reports, cross-checked by downloading each tarball to a scratch directory and independently sha256- and sha512-hashing it; four of the five are also byte-identical to the ones pinned in adoption/pins-linux-x86_64.json (socraticode has no linux-x86_64 pins entry: recipes/README.md documents it there as a manual --ignore-scripts recipe rather than a pins-file entry). codex and claude-code each additionally carry a `platform_dependency`: the darwin-arm64 optional dependency npm itself resolves and installs alongside the pinned wrapper tarball, read 2026-09-23 with `npm view <pkg>@<ver> optionalDependencies` for its identity and `npm view <resolved-package>@<resolved-version> dist.tarball`/`dist.integrity` for its url/integrity, each independently re-downloaded and sha256/sha512-hashed to confirm. It is never installed by trusting npm's own automatic resolution of it (unverified) or by reading back npm's install state afterward (measured directly on this project's own host: npm 11.19.0's `--global --prefix` install writes no lockfile anywhere under the prefix and no package.json `_integrity` field, nests a platform-specific optional dependency under the wrapper's own node_modules regardless of --omit=optional/--no-optional/NPM_CONFIG_OMIT=optional, and overwrites a pre-placed nested copy during its own install pass). adoption/bootstrap-macos.sh's install_platform_dependency instead fetches and SHA-256 verifies the platform tarball itself with the same fetch() every other pin uses, then OVERWRITES the unverified nested copy npm's own install just fetched at the exact path Node's own require.resolve (scoped to the wrapper's own directory, and matched against the exact expected nested path -- never trusted if it resolves anywhere else, since require.resolve's GLOBAL_FOLDERS fallback can point outside the prefix entirely) finds it from, falling back to a top-level alias only when nothing is nested there at all; it then re-verifies both the resolved path and the resolved package's own name against this pin's `resolved_package` before running `npm rebuild` to trigger any lifecycle script the wrapper's own --ignore-scripts install deferred. Versions match pins-linux-x86_64.json wherever the component is the same.",
   "tools": [
     {
       "id": "node",
@@ -42,7 +42,16 @@
       "sha256": "fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66",
       "checksum_source": "npm_registry_integrity_crosscheck",
       "checksum_ref": "npm view @openai/codex@0.155.1 dist.integrity = sha512-02fAAGyBtlA1zPjEo3kTj/bOSYbPz5DvjLwRZJdV7weFFEDzNFOMjQGmZ/+5CuirYV0hE+AZTrnjzwXYU4AdAQ== (2026-09-22); the tarball was re-downloaded and sha256sum matched adoption/pins-linux-x86_64.json exactly",
-      "install_note": "Platform-independent wrapper package, identical bytes to the linux-x86_64 pin. UNPINNED SUB-DEPENDENCY: on Apple Silicon npm resolves the optional dependency '@openai/codex-darwin-arm64' (npm alias to @openai/codex@0.155.1-darwin-arm64), which carries the real binary and is NOT covered by this sha256. Record its resolved version and integrity from the host's npm ls/package-lock at first install."
+      "install_note": "Platform-independent wrapper package, identical bytes to the linux-x86_64 pin. On Apple Silicon npm additionally resolves the optional dependency '@openai/codex-darwin-arm64', which carries the real binary; see platform_dependency below for its pinned identity. adoption/bootstrap-macos.sh's install_npm installs this wrapper with --ignore-scripts (codex has no lifecycle scripts of its own, so that is a no-op for codex specifically, but this pin shares the same code path as claude-code below), then install_platform_dependency fetches and SHA-256 verifies the platform tarball itself and OVERWRITES whatever npm auto-fetched, unverified, wherever Node's own require.resolve actually finds it from inside this wrapper -- measured directly (npm 11.19.0): a plain global install always nests a platform-specific optionalDependency under the wrapper's own node_modules regardless of --omit=optional/--no-optional/NPM_CONFIG_OMIT=optional (none suppressed the on-disk fetch for this no-lockfile install shape) or of pre-placing verified content first (npm overwrote it during its own install pass); only overwriting AFTER npm's own install, at wherever Node itself resolves from, survives.",
+      "platform_dependency": {
+        "name": "@openai/codex-darwin-arm64",
+        "resolved_package": "@openai/codex",
+        "version": "0.155.1-darwin-arm64",
+        "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.155.1-darwin-arm64.tgz",
+        "sha256": "93cc218b25b71c8da3edb50a013fbd22acf8f39058fb64083fefff638a084976",
+        "integrity": "sha512-cYxzGcRRoBrncyHlR8ed4yXwcoVJZC1pipGULSyJkGFKXJw/Uu57BklvzayuAptjJIipamnOk32CfUkk1F0bLw==",
+        "checksum_ref": "'@openai/codex-darwin-arm64' is not itself a published package: npm view @openai/codex@0.155.1 optionalDependencies (read 2026-09-23) shows it as an npm: alias to '@openai/codex@0.155.1-darwin-arm64', the same package name at a platform-suffixed version. npm view '@openai/codex@0.155.1-darwin-arm64' dist.tarball/dist.integrity read 2026-09-23 gives the url/integrity above; the tarball was independently downloaded to a scratch directory and sha256- and sha512-hashed, both matching (sha512 matches dist.integrity exactly)."
+      }
     },
     {
       "id": "claude-code",
@@ -52,7 +61,21 @@
       "sha256": "08c6dfcf3dafcfd30e09b2926c596e274f0fa20844a5801ada7f1c8e6227157e",
       "checksum_source": "npm_registry_integrity_crosscheck",
       "checksum_ref": "npm view @anthropic-ai/claude-code@2.1.278 dist.integrity = sha512-mfNRqC0GaEXqmP97NiwJBeYBmRuqe2VzgLUreUUaEhyJxJWx2Z6ClW1tBOncGNNXdhj6EY4LPvUIWP+oq311CA== (2026-09-22); the tarball was re-downloaded and sha256sum matched adoption/pins-linux-x86_64.json exactly",
-      "install_note": "Identical bytes to the linux-x86_64 pin. UNPINNED SUB-DEPENDENCY: npm resolves '@anthropic-ai/claude-code-darwin-arm64@2.1.278' on Apple Silicon for the native binary; this sha256 does not cover it. Set DISABLE_AUTOUPDATER=1 so the pinned version stays pinned."
+      "install_note": "Identical bytes to the linux-x86_64 pin. npm additionally resolves '@anthropic-ai/claude-code-darwin-arm64@2.1.278' on Apple Silicon for the native binary; see platform_dependency below for its pinned identity. This wrapper's own postinstall (install.cjs) calls require.resolve for that platform package and copies/hard-links from wherever THAT resolves into its own bin/claude.exe -- so adoption/bootstrap-macos.sh's install_npm installs this wrapper with --ignore-scripts first (deferring that postinstall), install_platform_dependency then overwrites the unverified nested copy npm auto-fetched with the independently SHA-256-verified tarball at the exact path Node's own require.resolve finds, and only then does install_npm run `npm rebuild` to trigger the deferred postinstall, now against the verified copy. Confirmed end to end against a real npm install of a fixture that mimics install.cjs's exact copy-on-postinstall shape (tests.PlatformDependencyInstallTests.test_claude_code_like_wrapper_postinstall_copies_the_verified_dependency): running the postinstall before this fix-up, or skipping --ignore-scripts, lets it copy the unverified bytes once, irrecoverably, before this script regains control. Set DISABLE_AUTOUPDATER=1 so the pinned version stays pinned.",
+      "platform_dependency": {
+        "name": "@anthropic-ai/claude-code-darwin-arm64",
+        "resolved_package": "@anthropic-ai/claude-code-darwin-arm64",
+        "version": "2.1.278",
+        "url": "https://registry.npmjs.org/@anthropic-ai/claude-code-darwin-arm64/-/claude-code-darwin-arm64-2.1.278.tgz",
+        "sha256": "934a258c59e90ed6ba768d0d46502d3163607dec949845650af80e5f1228330c",
+        "integrity": "sha512-Jgl//CpT1KR1N8uxAN0CmkFu3eESU7GYzPOwdGH1pCENysJqYgo2LwsIrTol+EequNMrTG3kkrNW9mIoS8eWLg==",
+        "checksum_ref": "unlike the codex alias, '@anthropic-ai/claude-code-darwin-arm64' IS a standalone published package; npm view @anthropic-ai/claude-code-darwin-arm64@2.1.278 dist.tarball/dist.integrity read 2026-09-23 gives the url/integrity above. The tarball was independently downloaded to a scratch directory and sha256- and sha512-hashed, both matching (sha512 matches dist.integrity exactly).",
+        "postinstall_binary_check": {
+          "platform_file": "claude",
+          "wrapper_file": "bin/claude.exe",
+          "note": "`tar -tzf` on the downloaded tarball (read 2026-09-23) lists exactly package/claude, package/package.json, package/LICENSE.md, package/README.md -- matching install.cjs's own BINARY_NAME='claude' and PLATFORMS['darwin-arm64'].bin. adoption/bootstrap-macos.sh's install_platform_dependency compares this file against $wrapper_dir/bin/claude.exe (install.cjs's own copy/hardlink destination) with `cmp` after npm rebuild, fail closed on any difference."
+        }
+      }
     },
     {
       "id": "mcporter",
@@ -103,6 +126,31 @@
       "checksum_source": "github_release_asset_digest_plus_local_rehash",
       "checksum_ref": "gh api repos/qdrant/qdrant/releases/tags/v1.19.1 asset digest sha256:e060209dfefc9d977ddcec48521349f505f8fd1ce21f2a3db444140870522fe4 (size 27974838), and an independent sha256sum of the downloaded asset in a $TMPDIR scratch directory returned the same value on 2026-09-22",
       "install_note": "Version 1.19.1 matches the qdrant row in manifests/stack.json. The archive is a single top-level file named qdrant (tar -tzf shows exactly one entry), so the generic single-binary tarball installer applies. Collections are re-indexed on the new host, never copied."
+    },
+    {
+      "id": "socraticode",
+      "version": "1.14.0",
+      "kind": "npm",
+      "ignore_scripts": true,
+      "url": "https://registry.npmjs.org/socraticode/-/socraticode-1.14.0.tgz",
+      "sha256": "3dbb106c876be4214048289cef31094eb0e48e97007fb90180270edc4eed7c46",
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "npm view socraticode@1.14.0 dist.integrity read 2026-09-23; the tarball was downloaded to a scratch directory and independently sha256- and sha512-hashed, both matching",
+      "install_note": "Not part of adoption/pins-linux-x86_64.json: recipes/README.md documents socraticode 1.14.0 with --ignore-scripts as a manual Linux install recipe rather than a pins-file entry (`npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.14.0\" --ignore-scripts socraticode@1.14.0`). This pin brings macOS the same reviewed version and --ignore-scripts convention, so socraticode is no longer a documented, unpinned skip on this platform. AGPL-3.0-only; --ignore-scripts (this pin's own ignore_scripts:true field, read by install_npm) skips native postinstall/build steps exactly like the Linux recipe. Only a reviewed archive hash, not a claim of a working native codebase-index handshake on macOS."
+    }
+  ],
+  "models": [
+    {
+      "id": "embeddinggemma-300M-Q8_0",
+      "hf_repo": "ggml-org/embeddinggemma-300M-GGUF",
+      "hf_revision": "0f741b5a6585bd53aeb15cd1372c56f2a0f65e12",
+      "file": "embeddinggemma-300M-Q8_0.gguf",
+      "url": "https://huggingface.co/ggml-org/embeddinggemma-300M-GGUF/resolve/0f741b5a6585bd53aeb15cd1372c56f2a0f65e12/embeddinggemma-300M-Q8_0.gguf",
+      "sha256": "b5ce9d77a3fc4b3b39ccb5643c36777911cc4eb46a66962eadfa3f5f60490d63",
+      "size": 333590944,
+      "checksum_source": "huggingface_lfs_oid_plus_local_rehash",
+      "checksum_ref": "Hugging Face tree API lfs.oid for ggml-org/embeddinggemma-300M-GGUF@0f741b5a6585bd53aeb15cd1372c56f2a0f65e12/embeddinggemma-300M-Q8_0.gguf, equal to a local sha256sum, read 2026-09-23",
+      "install_note": "Round 3h: the llama-embed launchd agent had no -m flag at all (it would restart in a loop, never serving embeddings). Downloaded and verified by bootstrap-macos.sh's dedicated install_embed_model step (not the generic tools[] dispatch above: this is a single raw GGUF file, never an archive to extract) into $ECO_INSTALL_ROOT/state/models/embeddinggemma-300M-Q8_0.gguf. The llama-embed template's -m flag names this same path via EMBED_MODEL_PATH (adoption/hosts/<host>.json or --set). Kept in this separate models[] section, not tools[], so it is never swept into adoption/manifest.json profile-component coverage."
     }
   ]
 }

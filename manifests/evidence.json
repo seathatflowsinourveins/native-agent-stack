@@ -2973,6 +2973,27 @@
         "The rebuilt manifest and drift table are read from this run's own catalog-freshness workflow artifact; this receipt does not independently re-fetch upstream sources."
       ],
       "path": "evidence/receipts/catalog-freshness-20260923.json"
+    },
+    {
+      "id": "adoption-macos-hosted-smoke-20260923",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "context-mode",
+        "ai-memory",
+        "mcporter",
+        "llama-cpp",
+        "qdrant"
+      ],
+      "claim": "On a GitHub-hosted macOS arm64 runner (label macos-15, macOS 15.7.9 build 24G830), adoption-bootstrap run 35875188590 at head 75a6e0d, the PR #94 branch, passed every job. bootstrap-macos: adoption/bootstrap-macos.sh --profile macos-arm64-foundation installed the pinned darwin-arm64 set into a disposable ECO_INSTALL_ROOT, including the pinned embeddinggemma-300M-Q8_0 model (sha256 checked). launchd-agents.sh rendered, linted, bootstrapped and booted out the qdrant and llama-embed LaunchAgents. qdrant health reported 1.19.1. The llama-embed embedding acceptance passed: dimension 768, cosine 0.99944 against the Linux CPU reference vector evidence/artifacts/macos-embed-reference-20260923/, threshold 0.99. The llama.cpp startup log assigns layers to Metal device MTL0, with flash attention on CPU. bootstrap-macos-brew: the Homebrew prerequisite path completed. validate-macos: validators, the adoption test modules (238 tests OK) and a real host_receipts.py record/validate/component_matrix/new_host_grand_list smoke in a throwaway checkout copy passed, on setup-python 3.13.15 and on the runner's system /usr/bin/python3 3.9.6.",
+      "limitations": [
+        "This is native operation on a GitHub-hosted macOS arm64 runner only. It is not acceptance on a user's Mac workstation, which must record its own receipt with host_receipts.py and --second-physical-machine plus an independent review.",
+        "platform_profiles[macos-arm64] stays drafted_not_accepted. No macos-arm64 platform_status is changed by this receipt.",
+        "The launchd agents ran for the duration of one job in the runner's GUI domain. Persistence across logins, reboots and user sessions was not observed.",
+        "The non-gating full python3 -m unittest on this runner ran 2929 tests with 29 failures and 95 errors, recorded as an artifact. Most failures come from macOS's symlinked temp directories (/var/folders and /tmp resolve to /private/...) tripping repository path-containment checks, plus Linux-only tests not skipped on macOS. They are tracked as a follow-up and not claimed as passing."
+      ],
+      "path": "evidence/receipts/adoption-macos-hosted-smoke-20260923.json"
     }
   ],
   "files": [
@@ -3018,8 +3039,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "f658db4e87f0a2545b3e9da8f3e42c6c64c55e34957586edbe4b4b43a2130a2b",
-      "bytes": 9408
+      "sha256": "6943e9be5b85f83eed08dcef0fabf2e25f3a4dde385af86be454d9acf7dfbf9e",
+      "bytes": 31324
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -3073,8 +3094,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "020e8648df963e7ff87274f0ef96601e18522ba7a842ebf440d6034e2444389c",
-      "bytes": 472
+      "sha256": "69dfc36b845b2a2fffe49431a8a5d3c267257ca795a80603e10f53cb012e8977",
+      "bytes": 507
     },
     {
       "path": ".gitleaks.toml",
@@ -3123,13 +3144,13 @@
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "6352627d2289c25040d04463e913c16d0939d664435d33791e5b9aa35b16a141",
-      "bytes": 20386
+      "sha256": "257f6756f5bec1e8eaf7bfec0fa0c93f96f2b1c347dee04534f2d3eab96ccfc0",
+      "bytes": 54524
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "96e67ed5862cc074f6acf932fcc997bda8ffd4966a746e63347cb9625968e452",
-      "bytes": 8501
+      "sha256": "28345f156fda89e1ec2588e112af5da99b0023c35c6906664610eb6eddb7be35",
+      "bytes": 9571
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3147,14 +3168,39 @@
       "bytes": 413
     },
     {
+      "path": "adoption/hosts/macos-example.json",
+      "sha256": "4f73e4e2ec963e69f44b08dc386c33e3a348280de937d5d3fdcbd8bfe3a7f9b2",
+      "bytes": 586
+    },
+    {
+      "path": "adoption/launchd/com.native-stack.ai-memory.plist.template",
+      "sha256": "be1278a7d2134d771fa041a74c898a78127b42adf799e27f951c11fdb6749545",
+      "bytes": 2730
+    },
+    {
+      "path": "adoption/launchd/com.native-stack.llama-embed.plist.template",
+      "sha256": "dc6f09818861f2e190e8ed5b65a828494d12bd2116400210b14a305b34195c52",
+      "bytes": 2511
+    },
+    {
+      "path": "adoption/launchd/com.native-stack.qdrant.plist.template",
+      "sha256": "24461dfeafba82d73aa135e5b76c85b7128f776c0988eec2baa0954ca2060301",
+      "bytes": 2039
+    },
+    {
+      "path": "adoption/launchd/launchd-agents.sh",
+      "sha256": "1a7508626e59509ee97bfc2517463ba9ed771f5279ca5cfa7abc119403deba3e",
+      "bytes": 37066
+    },
+    {
       "path": "adoption/lifecycle.md",
       "sha256": "e3a7d9091e134d11b2e1871492319dc03fe05c11ae84fe9dca0f15bedc084d4f",
       "bytes": 16875
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "f15170e3376a66bc98425489ac6b2c2b1bc0213b9692ccba810849e0bfa908e6",
-      "bytes": 18190
+      "sha256": "1269f880b74d0260437bee256e2545b47c45c379385870aeba5a7dc8cdcb833c",
+      "bytes": 18281
     },
     {
       "path": "adoption/paired/README.md",
@@ -3193,8 +3239,8 @@
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "cf645139500175634c9fda870935f3441a808a9b57e7939453a028b17c7ef5cd",
-      "bytes": 10170
+      "sha256": "c5f6d5bb506a53c575f24d6b358a12fb8705cfa6609d3b88a8c6003769169287",
+      "bytes": 19197
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -3203,8 +3249,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "8f55582741fbd1e0230ef4ea9d37bf5c7dc2f5c9569705cbc99dbe2f5cb14756",
-      "bytes": 17458
+      "sha256": "f01728afc16ae7e2c8a0ee64918bac7f93794025eeef9a91eaddf2c1fb9c535c",
+      "bytes": 32991
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -8379,8 +8425,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "fa93dc2e5ede135f27bac017b1723c33d691c380d7eab93b94e5279be408b904",
-      "bytes": 72266
+      "sha256": "ea65fb0a70f21c62344a33906a082903559d6915c72bb9ed3883bad1fa5825ed",
+      "bytes": 72329
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9094,8 +9140,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "6c13e86a1e8bd0078e7df68766a49371d7000e010e47ba80e2b25cbaad6dd9a6",
-      "bytes": 13568
+      "sha256": "cfc6de1e1dfe96ca2cdfe32fa983208793f3b18813f689238d495631ce29e006",
+      "bytes": 13604
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -11228,6 +11274,11 @@
       "bytes": 16887
     },
     {
+      "path": "evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json",
+      "sha256": "c07177bccb5cc2eabaab8910616cce33f2b49fd76f048411a47d3e83fd7c164a",
+      "bytes": 20209
+    },
+    {
       "path": "evidence/artifacts/memory-landscape-20260921/catalog-memory-guide.png",
       "sha256": "bca87e44e3375122ac2078115a82d5c69fd574335ca0408394a46cfaeb5c5ab7",
       "bytes": 125442
@@ -13318,6 +13369,11 @@
       "bytes": 4713
     },
     {
+      "path": "evidence/receipts/adoption-macos-hosted-smoke-20260923.json",
+      "sha256": "7908cd187f86f2898be31860584502e71ab16b7a9978069cc9bf071158566a65",
+      "bytes": 4676
+    },
+    {
       "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
       "sha256": "dc77da98626554db016f1b519eba1db891a76af9b5f49849aad8aad2c126d461",
       "bytes": 866
@@ -14344,8 +14400,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "f612a10aa9394fc68e1d6180dde7737653104ada16c911eef105f23e760f5ae2",
-      "bytes": 11841
+      "sha256": "2a52657e7ca6ebf7b447257d9f84e0e3314bf245dc34bf3e6e02db0e4354f182",
+      "bytes": 12759
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -14519,13 +14575,13 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "9dda4e75569c4e3c2d063594e66f25f221c3919fb0dc342287c8ad67fa3490d5",
-      "bytes": 21911
+      "sha256": "c06ad9151a2589aba290d2968530427ea29a4aebf54ae0077a6425baf0b8d06f",
+      "bytes": 22139
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "d99bf558684c7c666884b1ef6e5c29d88999c6412b0643d53270934c7c1cccd8",
-      "bytes": 37057
+      "sha256": "aeeb644b53e0ab0075ed97596d6a625ed156c26612971b3bdd1ff28cacea40a0",
+      "bytes": 159726
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -14538,9 +14594,14 @@
       "bytes": 30901
     },
     {
+      "path": "tests/test_adoption_launchd.py",
+      "sha256": "78f2190610770ff7af561886dbb63ea0e70c2afae2e100c9405109e4107f4b0f",
+      "bytes": 97478
+    },
+    {
       "path": "tests/test_adoption_status.py",
-      "sha256": "539e2df0def93dea2412e61eb7890ac8073fc288ac5ed46334271c461fe9eb9d",
-      "bytes": 12338
+      "sha256": "573445d0cd82e678460a080d0f0d6dd9fbf8b4d18ee189019a846e6d4c19db55",
+      "bytes": 12936
     },
     {
       "path": "tests/test_alpaca_capabilities.py",
@@ -14908,6 +14969,11 @@
       "bytes": 11205
     },
     {
+      "path": "tests/test_workflow_hardening.py",
+      "sha256": "3085c8952788857a4178b4692f7327f71f675feb062689d5b751baba024f28a0",
+      "bytes": 23081
+    },
+    {
       "path": "tests/test_workflow_security.py",
       "sha256": "2c260c8d7fd58e747819037177ec9e077ee1cac7dc1e8ebd1ff7ddd1c405266b",
       "bytes": 2582
@@ -14938,9 +15004,19 @@
       "bytes": 7469
     },
     {
+      "path": "tools/adoption/embed_acceptance.py",
+      "sha256": "b567a3ce64d66f0798bd5fc73cf78d8a12074d583177c204d5465050873258b1",
+      "bytes": 8209
+    },
+    {
       "path": "tools/adoption/render_config.py",
       "sha256": "ca30b4f62c3df35e96c1da766ac8cd76e21af23a4a5d913317b4a4d77f28c819",
       "bytes": 10586
+    },
+    {
+      "path": "tools/adoption/render_launchd.py",
+      "sha256": "253a3f4591fa1eb22314a7d085988464f3a3c7c009c7a52b5ee2566d160f0749",
+      "bytes": 5605
     },
     {
       "path": "tools/sota-convergence/README.md",

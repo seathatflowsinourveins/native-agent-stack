@@ -30,8 +30,18 @@ HASH_FROZEN = {
     # four dated execution receipts record it (docs/github-automation-evidence.json)
     "native-token-e2e.yml": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install/receipt.json",
 }
-# harden-runner supports Linux runners only.
-UNSUPPORTED_RUNNER = re.compile(r"runs-on:\s*macos-")
+# step-security/harden-runner's pinned version supports macOS runners too,
+# in audit mode -- its README, read at this exact pinned commit
+# (e14015d583714f6e62063499dc959a02595150a1) on 2026-09-23: "GitHub-hosted
+# runners (Windows, macOS): Audit mode only", which is the only mode this
+# project ever uses (test_harden_runner_never_blocks_egress below). A macOS
+# job is therefore held to the same requirement as an ubuntu job, except for
+# a job whose macOS job is owned by a different, concurrent task and must
+# not be edited from this file's own change: adding it here is a narrow,
+# named ownership exemption, never a platform-support one. Keyed per
+# "file.yml:job_id", not per file, so a ubuntu job sharing that same file
+# (hardware-profile-smoke.yml's own linux-profile) stays checked.
+MACOS_JOBS_OWNED_ELSEWHERE = {"hardware-profile-smoke.yml:macos-profile"}
 
 
 def jobs(text):
@@ -92,14 +102,14 @@ def permission_blocks(text):
 
 
 class HardenRunnerTests(unittest.TestCase):
-    def test_every_ubuntu_job_starts_with_harden_runner_in_audit_mode(self):
+    def test_every_ubuntu_and_macos_job_starts_with_harden_runner_in_audit_mode(self):
         unclassified, missing = [], []
         for path in sorted(WORKFLOWS.glob("*.yml")):
             for job_id, job_text in jobs(path.read_text(encoding="utf-8")).items():
                 name = f"{path.name}:{job_id}"
-                if UNSUPPORTED_RUNNER.search(job_text):
+                if name in MACOS_JOBS_OWNED_ELSEWHERE:
                     continue
-                if not re.search(r"runs-on:\s*ubuntu-\d", job_text):
+                if not re.search(r"runs-on:\s*(?:ubuntu|macos)-\d", job_text):
                     unclassified.append(name)
                     continue
                 if path.name in HASH_FROZEN:
@@ -108,7 +118,35 @@ class HardenRunnerTests(unittest.TestCase):
                 if HARDEN not in step or "egress-policy: audit" not in step:
                     missing.append(name)
         self.assertEqual(unclassified, [], "jobs whose runner is neither a literal ubuntu nor macos label")
-        self.assertEqual(missing, [], "ubuntu jobs without a first-step harden-runner audit")
+        self.assertEqual(missing, [], "ubuntu/macos jobs without a first-step harden-runner audit")
+
+    def test_adoption_bootstrap_macos_jobs_are_not_exempt(self):
+        # Regression guard: MACOS_JOBS_OWNED_ELSEWHERE must never grow to
+        # cover this project's own macOS jobs (only a file owned by a
+        # different, concurrent task belongs there); this enumerates them
+        # explicitly so a future edit to the exemption set alone cannot
+        # silently drop this coverage.
+        for job_id in ("bootstrap-macos", "bootstrap-macos-brew", "validate-macos"):
+            self.assertNotIn(f"adoption-bootstrap.yml:{job_id}", MACOS_JOBS_OWNED_ELSEWHERE)
+        text = (WORKFLOWS / "adoption-bootstrap.yml").read_text(encoding="utf-8")
+        job_map = jobs(text)
+        for job_id in ("bootstrap-macos", "bootstrap-macos-brew", "validate-macos"):
+            self.assertIn(job_id, job_map)
+            step = first_step(job_map[job_id])
+            self.assertIn(HARDEN, step, job_id)
+            self.assertIn("egress-policy: audit", step, job_id)
+
+    def test_hardware_profile_smoke_linux_job_stays_checked_despite_the_macos_job_exemption(self):
+        # Regression guard for the exemption's own precision: it is keyed
+        # per "file.yml:job_id" specifically so this file's ubuntu job is
+        # never accidentally exempted alongside its macOS one.
+        self.assertNotIn("hardware-profile-smoke.yml:linux-profile", MACOS_JOBS_OWNED_ELSEWHERE)
+        text = (WORKFLOWS / "hardware-profile-smoke.yml").read_text(encoding="utf-8")
+        job_map = jobs(text)
+        self.assertIn("linux-profile", job_map)
+        step = first_step(job_map["linux-profile"])
+        self.assertIn(HARDEN, step)
+        self.assertIn("egress-policy: audit", step)
 
     def test_hash_frozen_exemptions_are_still_pinned(self):
         for name, pin in HASH_FROZEN.items():

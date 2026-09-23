@@ -21,10 +21,9 @@ usage() {
     'null sha256 refuses to install (fail closed). A selected component with' \
     'no pin at all also fails closed (exit 3) before installing anything, and' \
     'in --plan mode too, unless it is named in --allow-unpinned, in which case' \
-    'it is skipped and echoed to the run log; socraticode, documented on' \
-    'adoption/platforms/macos-arm64.md as having no reviewed darwin-arm64' \
-    'archive in this draft, is skipped the same way without the flag.' \
-    'Uses Homebrew only for a missing jq prerequisite, installed before the' \
+    'it is skipped and echoed to the run log.' \
+    'Installs any of jq, python@3.13, ripgrep, coreutils, restic and' \
+    'shellcheck that brew list --versions reports missing, before the' \
     'curl/git/tar/jq presence check unless --skip-system-packages is given,' \
     'in which case that check lists what is missing and exits 4.' \
     'Never edits a shell profile.' \
@@ -93,16 +92,29 @@ done
 command -v sw_vers >/dev/null || { printf 'Cannot identify the macOS release (sw_vers missing).\n' >&2; exit 1; }
 macos_version="$(sw_vers -productVersion)"
 
-# jq is the only prerequisite Homebrew may supply here; everything else ships
-# with macOS or the Command Line Tools. Like the Linux apt block, this install
-# runs *before* the presence check below, so a Mac that has no jq yet satisfies
-# that check without a second run. shasum replaces Linux sha256sum.
+# Homebrew supplies six formulae this profile still leaves floating: jq (a
+# script prerequisite), python@3.13 (a fresh Mac's system python3 is 3.9, below
+# the acceptance_target in adoption/manifest.json), ripgrep, coreutils, restic
+# and shellcheck (macos-arm64.md's own `brew install jq python@3.13 ripgrep
+# coreutils restic shellcheck` line). jq is installed first and alone, right
+# here, because the --profile/pins validation further down already shells
+# out to it; the other five are deferred until after that validation
+# succeeds (below the unpinned fail-closed check), so a bad --profile or an
+# unresolved pin fails fast without installing five brew formulae the run is
+# about to abort on anyway. `command -v jq` is the presence oracle for jq
+# specifically (its formula name and command name match); the deferred five
+# use `brew list --versions <formula>` instead (not `command -v`), since
+# python@3.13 and coreutils install commands under other names, so a
+# name-based check would under- or over-report what is actually installed.
+brew_formulae=(jq python@3.13 ripgrep coreutils restic shellcheck)
 if [[ "$skip_system" == 0 && "$plan_mode" == 0 ]] && ! command -v jq >/dev/null; then
   command -v brew >/dev/null || {
     printf 'Homebrew is required to install the missing jq prerequisite; install it from https://brew.sh or rerun with --skip-system-packages.\n' >&2
     exit 1
   }
   brew install jq
+elif [[ "$skip_system" == 0 && "$plan_mode" == 1 ]]; then
+  printf 'plan brew formulae (installed only if brew list --versions reports them missing): %s\n' "${brew_formulae[*]}"
 fi
 
 missing_prerequisites=()
@@ -142,13 +154,15 @@ done < <(printf '%s' "$component_ids_json" | jq -r '.[]')
 # anything and before --plan prints a single line: install_pin's own
 # "no pin -> skip" path only ever reaches components allowed here.
 #
-# socraticode has no reviewed darwin-arm64 release archive in this draft and is
-# documented as skipped on adoption/platforms/macos-arm64.md (it is not a
-# required_command of this profile), so it is allowed by default exactly like
-# an explicit --allow-unpinned id: skipped, echoed, never installed. The Linux
-# script needs no such list because every component it selects is pinned.
-documented_unpinned_ids=(socraticode)
-allowed_unpinned_ids=("${documented_unpinned_ids[@]}" ${allow_unpinned_ids[@]+"${allow_unpinned_ids[@]}"})
+# socraticode now has a reviewed npm pin (adoption/pins-macos-arm64.json), the
+# same --ignore-scripts convention recipes/README.md documents for Linux, so no
+# selected component is exempted from a pin by default any more.
+# documented_unpinned_ids stays as the mechanism --allow-unpinned itself uses,
+# now empty, so a future undocumented gap still fails closed instead of
+# silently reusing a stale skip list. The Linux script needs no such list
+# because every component it selects is pinned.
+documented_unpinned_ids=()
+allowed_unpinned_ids=(${documented_unpinned_ids[@]+"${documented_unpinned_ids[@]}"} ${allow_unpinned_ids[@]+"${allow_unpinned_ids[@]}"})
 all_selected_ids=(node uv gh)
 for selected_id in ${component_ids[@]+"${component_ids[@]}"}; do
   case "$selected_id" in
@@ -170,7 +184,7 @@ if [[ "$unpinned_count" -gt 0 ]]; then
   unresolved_count=0
   for unpinned_id in "${unpinned_ids[@]}"; do
     allowed=0
-    for allowed_id in "${allowed_unpinned_ids[@]}"; do
+    for allowed_id in ${allowed_unpinned_ids[@]+"${allowed_unpinned_ids[@]}"}; do
       [[ "$unpinned_id" == "$allowed_id" ]] && { allowed=1; break; }
     done
     if [[ "$allowed" == 0 ]]; then
@@ -187,12 +201,28 @@ if [[ "$unpinned_count" -gt 0 ]]; then
   printf 'Allowed unpinned components (documented skip or --allow-unpinned): %s\n' "${unpinned_ids[*]}"
 fi
 
-# Homebrew formulae float; the version record below is the retained evidence.
+# jq was already ensured above (the validation that just ran needed it); the
+# remaining five formulae only matter to actual tool installation from here
+# on, so they wait until --profile and every selected component's pin have
+# already validated. Bash 3.2 supports this slice (introduced in bash 3.0).
+remaining_brew_formulae=("${brew_formulae[@]:1}")
 if [[ "$skip_system" == 0 && "$plan_mode" == 0 ]]; then
   command -v brew >/dev/null || {
-    printf 'Homebrew is required for the system prerequisites; install it from https://brew.sh or rerun with --skip-system-packages.\n' >&2
+    printf 'Homebrew is required to install the missing prerequisite formulae (%s); install it from https://brew.sh or rerun with --skip-system-packages.\n' \
+      "${remaining_brew_formulae[*]}" >&2
     exit 1
   }
+  missing_formulae=()
+  missing_formula_count=0
+  for formula in "${remaining_brew_formulae[@]}"; do
+    if ! brew list --versions "$formula" >/dev/null 2>&1; then
+      missing_formulae+=("$formula")
+      missing_formula_count=$((missing_formula_count + 1))
+    fi
+  done
+  if [[ "$missing_formula_count" -gt 0 ]]; then
+    brew install "${missing_formulae[@]}"
+  fi
 fi
 
 ecosystem_root="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
@@ -223,9 +253,34 @@ lock_dir="$ecosystem_root/bootstrap.lock.d"
 # cleanup can never remove a lock another bootstrap is holding.
 lock_held=0
 stage_dir=""
+# install_npm's one-time real-directory-to-symlink migration (round 3d) is
+# the one step of its atomic flip that is not itself a single rename: moving
+# the old final_prefix aside happens before the new symlink is flipped into
+# its place, so a failure or a signal in between needs its own recovery,
+# tracked here (a stray tmp_link, install_npm's OTHER transient file for
+# that same flip, needs no separate tracking: it always lives under
+# stage_dir, which this same cleanup() already removes wholesale below).
+pending_migration_prefix=""
+pending_migration_dest=""
 cleanup() {
+  # Round 3e (Codex Medium #6, applied defensively here too): never itself
+  # fatal under the script's own `set -e` -- an ordinary failure in one
+  # cleanup step (the stage_dir removal below, say) must never abort this
+  # function before the lock release after it also runs. Every command from
+  # here on is checked explicitly rather than relied on to abort the whole
+  # function via errexit.
+  set +e
+  if [[ -n "$pending_migration_prefix" && -e "$pending_migration_prefix" && -n "$pending_migration_dest" ]]; then
+    if [[ ! -e "$pending_migration_dest" ]]; then
+      mv -- "$pending_migration_prefix" "$pending_migration_dest" 2>/dev/null && pending_migration_prefix=""
+    fi
+    if [[ -n "$pending_migration_prefix" ]]; then
+      printf 'WARNING: an unexpected exit left a previous install moved aside at %s; its usual location %s was not restored automatically. Restore it manually with: mv -- %q %q\n' \
+        "$pending_migration_prefix" "$pending_migration_dest" "$pending_migration_prefix" "$pending_migration_dest" >&2
+    fi
+  fi
   if [[ -n "${stage_dir:-}" && "$stage_dir" == "$ecosystem_root"/staging.* && -d "$stage_dir" ]]; then
-    rm -rf -- "$stage_dir"
+    rm -rf -- "$stage_dir" 2>/dev/null || true
   fi
   if [[ "${lock_held:-0}" == 1 && -d "$lock_dir" ]]; then
     rmdir "$lock_dir" 2>/dev/null || true
@@ -234,6 +289,17 @@ cleanup() {
 # Installed before the lock is taken: a failure between mkdir and the first
 # command after it (mktemp, for one) must still release this run's lock.
 trap cleanup EXIT
+# Round 3e (Codex Medium #5): explicitly trapping INT, TERM and HUP -- not
+# relying on their default, untrapped disposition -- makes bash defer
+# acting on a caught signal until whatever foreign command is currently
+# running in the foreground (a migration mv, the atomic os.replace flip,
+# ...) actually finishes, guaranteeing the EXIT handler above only ever
+# observes a completed step, never one still in flight. Each handler does
+# nothing but exit with the conventional 128+signal code, which is itself
+# what triggers the EXIT trap; recovery logic lives in cleanup() alone.
+trap 'exit 130' INT
+trap 'exit 143' TERM
+trap 'exit 129' HUP
 if mkdir "$lock_dir" 2>/dev/null; then
   lock_held=1
 else
@@ -260,6 +326,110 @@ fetch() {
 find_one() {
   local directory="$1" name="$2"
   find "$directory" -type f -name "$name" -print -quit
+}
+
+# Canonicalizes a path (resolving every symlink in whatever prefix of it
+# already exists) so a string comparison against what Node's require.resolve
+# reports is not defeated by a symlinked ancestor -- macOS's /var ->
+# /private/var (also /tmp -> /private/tmp, and a symlinked TMPDIR-based test
+# fixture root on any platform) is the exact case that broke the
+# install_platform_dependency containment/resolution checks below: Node
+# realpath-resolves symlinks by default when it locates a module, so a
+# hand-built expected path using the ORIGINAL (non-canonical) prefix spelling
+# never matched. Deliberately does NOT shell out to a `realpath` binary: a
+# stock Mac (this script's own test suite enforces this) is not guaranteed
+# to have one pre-macOS 13. python3's `os.path.realpath` is used instead --
+# it never requires the path to exist either, unlike most `realpath`
+# implementations, which matters for a platform dependency's nested
+# directory before it is ever fetched -- and, only if python3 is somehow
+# unavailable, `cd -P && pwd -P` for an existing directory, or a manual walk
+# up to the nearest existing ancestor for anything else (a file, or a path
+# that does not exist yet). A stock Mac has bash 3.2 but no other guarantee,
+# so this avoids arrays and `[[ =~ ]]`.
+canonical_path() {
+  local target="$1"
+  if [[ -e "$target" ]]; then
+    if command -v python3 >/dev/null 2>&1; then
+      local via_python3
+      via_python3="$(python3 -c 'import os, sys
+print(os.path.realpath(sys.argv[1]))' "$target" 2>/dev/null)" && [[ -n "$via_python3" ]] && {
+        printf '%s\n' "$via_python3"; return
+      }
+    fi
+    if [[ -d "$target" ]]; then
+      (cd -P -- "$target" >/dev/null 2>&1 && pwd -P) && return
+    fi
+  fi
+  # $target does not exist (or every canonicalizer above failed): walk up to
+  # the nearest existing ancestor, canonicalize only that, and reattach the
+  # non-existent remainder unchanged -- matching os.path.realpath's own
+  # semantics for a path whose tail has not been created yet.
+  local remainder="" walk="$target"
+  while [[ "$walk" != "/" && -n "$walk" && ! -e "$walk" ]]; do
+    if [[ -z "$remainder" ]]; then
+      remainder="$(basename -- "$walk")"
+    else
+      remainder="$(basename -- "$walk")/$remainder"
+    fi
+    walk="$(dirname -- "$walk")"
+  done
+  local canonical_walk="$walk"
+  if [[ -d "$walk" ]]; then
+    canonical_walk="$(cd -P -- "$walk" >/dev/null 2>&1 && pwd -P)" || canonical_walk="$walk"
+  fi
+  if [[ -n "$remainder" ]]; then
+    printf '%s/%s\n' "$canonical_walk" "$remainder"
+  else
+    printf '%s\n' "$canonical_walk"
+  fi
+}
+
+# Round 3e (Codex High): deletes a superseded versioned install directory
+# ONLY when it is safely known to be one this script itself owns -- never
+# merely because install_npm's atomic flip (below) once pointed a symlink
+# at it. Without this, a previous final_prefix symlink whose target was
+# external (or a relative "../" path resolving outside tools/, or simply
+# misnamed) would be handed straight to `rm -rf`, deleting whatever it
+# actually names. Fail closed toward NOT deleting: the caller passes the
+# raw, unverified target (a symlink's own readlink() text, or a literal
+# path it built itself); this canonicalizes it (tolerating a symlink loop,
+# which canonical_path's python3 os.path.realpath handles without hanging,
+# and which then simply fails every check below and is left alone) and
+# checks BOTH that its canonical parent is exactly the canonical tools/
+# directory (not nested deeper, not outside it -- rejects an external or
+# "../" target) AND that its basename matches "<id>-<version>-*" (rejects a
+# same-directory but differently-named target, e.g. a different tool's own
+# versioned directory). Never fails the install: a rejected target, or a
+# deletion that itself fails, is logged and left in place, not retried or
+# escalated -- pruning is disk hygiene, never a correctness requirement,
+# since bin_dir's symlinks only ever depend on final_prefix, not on this.
+prune_old_version() {
+  local id="$1" version="$2" target="$3"
+  [[ -n "$target" ]] || return 0
+  local canonical_tools canonical_target
+  canonical_tools="$(canonical_path "$ecosystem_root/tools")"
+  canonical_target="$(canonical_path "$target")"
+  if [[ ! -d "$canonical_target" ]]; then
+    printf 'Note: leaving %s in place (not a directory after resolving symlinks; not pruned for safety).\n' \
+      "$target" >&2
+    return 0
+  fi
+  if [[ "$(dirname -- "$canonical_target")" != "$canonical_tools" ]]; then
+    printf 'Note: leaving %s in place (resolves to %s, not directly under %s; not pruned for safety).\n' \
+      "$target" "$canonical_target" "$canonical_tools" >&2
+    return 0
+  fi
+  local base="${canonical_target##*/}"
+  case "$base" in
+    "$id-$version-"*) : ;;
+    *)
+      printf 'Note: leaving %s in place (resolved name %s does not match %s-%s-<stamp>; not pruned for safety).\n' \
+        "$target" "$base" "$id" "$version" >&2
+      return 0
+      ;;
+  esac
+  rm -rf -- "$canonical_target" 2>/dev/null \
+    || printf 'Note: failed to prune superseded %s; left in place (not fatal).\n' "$canonical_target" >&2
 }
 
 # Node needs multiple executables symlinked from one --strip-components=1 tree.
@@ -375,16 +545,353 @@ npm_package_name() {
   printf '%s\n' "$rest"
 }
 
+# codex and claude-code each carry a platform_dependency in
+# pins-macos-arm64.json: the darwin-arm64 optional dependency npm itself
+# resolves and installs at `npm install` time (the real native binary), which
+# is not covered by this tool's own sha256 archive check above.
+#
+# This does NOT trust npm's own automatic, unverified fetch of it, and does
+# NOT try to read it back afterward: measured directly against npm 11.19.0 on
+# this project's own host, `npm install --global --prefix <dir> <pkg>` writes
+# no lockfile at all (neither `<dir>/lib/node_modules/.package-lock.json` nor
+# any package-lock.json anywhere under the prefix), and every installed
+# package.json's `_integrity` field is absent (npm 7+ no longer writes it).
+# Every already-installed npm-kind prefix on this host confirms the same
+# shape. A platform-specific optional dependency is in any case placed
+# NESTED under the parent package's own node_modules by npm's dependency
+# placement algorithm, not at the top level this pin's `name` would suggest
+# checking.
+#
+# Measured directly on this host (npm 11.19.0): a plain `<alias>@file:<path>`
+# top-level install (this function's earlier design) is NOT what the parent's
+# own require() actually finds, because installing the WRAPPER package
+# itself already auto-fetches this same optional dependency, unverified, and
+# nests it under the wrapper's own node_modules -- and Node's resolution
+# checks that nested copy before ever considering a top-level sibling.
+# --omit=optional, --no-optional and NPM_CONFIG_OMIT=optional were each
+# tried against a real fixture (a plain optionalDependency, no lockfile,
+# `npm install --global --prefix <dir> <pkg>`); none of them suppressed the
+# physical on-disk fetch -- npm's own docs describe `omit` in terms of a
+# package-lock.json this install path never has. Pre-placing verified
+# content at the nested path before installing the wrapper was also tried;
+# npm still overwrote it during the wrapper's own install ("changed N
+# packages"). So this instead: (1) installs the wrapper with
+# --ignore-scripts, deferring its lifecycle scripts so nothing consumes the
+# unverified fetch yet; (2) asks Node itself, via require.resolve with the
+# wrapper's own directory as the search path, exactly where it would resolve
+# this dependency from (nested, in every case measured); (3) deletes that
+# path and extracts the independently sha256-verified tarball there
+# instead (falling back to a top-level alias if Node found nothing there at
+# all, e.g. a genuine platform mismatch); (4) re-verifies resolution and the
+# resolved package's own version against the pin, fail closed on either
+# mismatch; (5) then runs `npm rebuild` for the wrapper, which is npm's own
+# documented way to run the lifecycle scripts an --ignore-scripts install
+# deferred, now that the dependency it resolves is the verified one.
+# claude-code's own postinstall (install.cjs) does exactly this: it calls
+# require.resolve for its platform package and copies/hard-links from
+# wherever that resolves into its own bin/claude.exe -- verified end to end
+# with a real npm install + real npm rebuild against a fixture that mimics
+# that exact copy-on-postinstall shape, confirming the final bin/ file
+# carries the verified bytes, not the unverified ones npm fetched first.
+# codex has no lifecycle scripts at all; it resolves its platform package at
+# every invocation of bin/codex.js, so step (5) is a no-op for it and step
+# (3)'s replacement alone is what matters. A component with no
+# platform_dependency pin is a silent no-op. Step (2) only ever trusts an
+# EXACT string match between what require.resolve reports and the one nested
+# path this wrapper's own node_modules would place this dependency at
+# (computed independently, never derived from `resolved` itself); anything
+# else -- including a decoy resolved from NODE_PATH/GLOBAL_FOLDERS outside
+# the prefix entirely, see the comment at the containment check below -- is
+# never trusted enough to delete. Step (4) re-verifies both the resolved
+# package.json's `version` against the pin's `version` AND its own `name`
+# against the pin's `resolved_package`, fail closed on either mismatch, so a
+# same-version fixture published under the wrong package name cannot pass.
+# Every path compared or deleted here is canonicalized first (`prefix` on
+# entry, and independently whatever Node itself reports), because Node
+# realpath-resolves symlinks by default when it locates a module: on a real
+# Mac, `/var` is a symlink to `/private/var`, and a prefix built under
+# `$TMPDIR` (or any other symlinked ancestor) would otherwise never
+# string-equal what require.resolve reports, tripping the fail-closed path on
+# a perfectly good install (see canonical_path's own comment above).
+install_platform_dependency() {
+  local id="$1" prefix="$2" wrapper_ignore_scripts="${3:-false}"
+  prefix="$(canonical_path "$prefix")"
+  local dep
+  dep="$(jq -c --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")"
+  [[ -n "$dep" && "$dep" != "null" ]] || return 0
+  local dep_name dep_url dep_sha256 dep_version dep_resolved_package
+  dep_name="$(jq -r '.name' <<<"$dep")"
+  dep_url="$(jq -r '.url' <<<"$dep")"
+  dep_sha256="$(jq -r '.sha256' <<<"$dep")"
+  dep_version="$(jq -r '.version' <<<"$dep")"
+  dep_resolved_package="$(jq -r '.resolved_package' <<<"$dep")"
+  if [[ "$dep_sha256" == "null" || -z "$dep_sha256" ]]; then
+    printf 'Refusing %s: platform dependency %s has no verified sha256 in %s (fail closed).\n' \
+      "$id" "$dep_name" "$pins_path" >&2
+    exit 1
+  fi
+  local archive="$cache_dir/${id}-platform-dependency.tgz"
+  fetch "$dep_url" "$dep_sha256" "$archive"
+
+  local wrapper_url package
+  wrapper_url="$(jq -r --arg id "$id" '.tools[] | select(.id == $id) | .url' "$pins_path")"
+  package="$(npm_package_name "$wrapper_url")"
+  local wrapper_dir="$prefix/lib/node_modules/$package"
+  local expected_nested="$wrapper_dir/node_modules/$dep_name/package.json"
+  local resolved=""
+  resolved="$(node -e '
+    try {
+      console.log(require.resolve(process.argv[1] + "/package.json", { paths: [process.argv[2]] }));
+    } catch (error) {
+      process.exit(1);
+    }
+  ' "$dep_name" "$wrapper_dir" 2>/dev/null)" || resolved=""
+  # Node already realpath-resolves symlinks when it locates a module (unless
+  # --preserve-symlinks is set), so this is normally a no-op; canonicalizing
+  # it here too, independently of $expected_nested's own canonical prefix,
+  # is the "realpath what Node reports" half of the fix -- belt and braces
+  # against a Node build or flag where that default does not hold.
+  [[ -n "$resolved" ]] && resolved="$(canonical_path "$resolved")"
+
+  local target_dir
+  if [[ "$resolved" == "$expected_nested" ]]; then
+    target_dir="$(dirname -- "$resolved")"
+    rm -rf -- "$target_dir"
+  else
+    # Node's require.resolve, even given an explicit `paths` array, still
+    # searches its GLOBAL_FOLDERS fallback (NODE_PATH entries,
+    # $HOME/.node_modules, etc. -- Node's own module docs) -- measured
+    # directly: setting NODE_PATH to a decoy directory made this resolve
+    # OUTSIDE the prefix entirely. Only the EXACT nested path this wrapper's
+    # own node_modules would use is ever trusted enough to delete; anything
+    # else (a genuinely absent nested copy, a platform mismatch, or a decoy
+    # resolved from outside the prefix) falls back to a top-level alias
+    # inside this prefix, never touching whatever `resolved` actually named.
+    target_dir="$prefix/lib/node_modules/$dep_name"
+  fi
+  mkdir -p "$target_dir"
+  local extract_dir="$stage_dir/${id}-platform-dependency"
+  rm -rf -- "$extract_dir"
+  mkdir -p "$extract_dir"
+  tar -xzf "$archive" -C "$extract_dir"
+  cp -R "$extract_dir/package/." "$target_dir/"
+  rm -rf -- "$extract_dir"
+
+  local verify
+  verify="$(node -e '
+    const fs = require("fs");
+    const resolvedPath = require.resolve(process.argv[1] + "/package.json", { paths: [process.argv[2]] });
+    // fs.realpathSync canonicalizes both sides explicitly here (not the
+    // shell-side canonical_path helper): resolvedPath normally already has
+    // every symlink resolved by require.resolve itself, and argv[3] was
+    // built from the bash-canonicalized target_dir variable, but a
+    // symlinked ancestor introduced between the two calls (or a Node build
+    // with --preserve-symlinks) must not defeat this fail-closed comparison
+    // either way.
+    const expectedPath = fs.realpathSync(process.argv[3]);
+    const canonicalResolvedPath = fs.realpathSync(resolvedPath);
+    if (canonicalResolvedPath !== expectedPath) {
+      console.error("resolved to " + canonicalResolvedPath + ", expected " + expectedPath);
+      process.exit(1);
+    }
+    const pkg = require(resolvedPath);
+    console.log(pkg.version);
+    console.log(pkg.name);
+  ' "$dep_name" "$wrapper_dir" "$target_dir/package.json" 2>&1)" || {
+    printf 'Refusing %s: platform dependency %s does not resolve to %s after installing the verified copy (fail closed): %s\n' \
+      "$id" "$dep_name" "$target_dir/package.json" "$verify" >&2
+    exit 1
+  }
+  local verify_version verify_name
+  verify_version="$(sed -n '1p' <<<"$verify")"
+  verify_name="$(sed -n '2p' <<<"$verify")"
+  if [[ "$verify_version" != "$dep_version" ]]; then
+    printf 'Refusing %s: platform dependency %s resolves as version %s, pinned as %s (fail closed).\n' \
+      "$id" "$dep_name" "$verify_version" "$dep_version" >&2
+    exit 1
+  fi
+  if [[ "$verify_name" != "$dep_resolved_package" ]]; then
+    printf 'Refusing %s: platform dependency %s resolves with package.json name %s, pinned resolved_package is %s (fail closed).\n' \
+      "$id" "$dep_name" "$verify_name" "$dep_resolved_package" >&2
+    exit 1
+  fi
+  printf 'Installed and verified platform dependency %s@%s (%s) for %s (resolves from %s)\n' \
+    "$dep_name" "$verify_version" "$verify_name" "$id" "$wrapper_dir"
+
+  if [[ "$wrapper_ignore_scripts" != "true" ]]; then
+    # npm's own documented way to run the lifecycle scripts the
+    # --ignore-scripts install (in install_npm) deferred, now that the
+    # dependency it resolves is the verified one. --ignore-scripts=false is
+    # explicit: a user-level .npmrc with ignore-scripts=true would otherwise
+    # make this call return early without running anything.
+    npm rebuild --global --no-audit --no-fund --ignore-scripts=false --prefix "$prefix" "$package" >/dev/null
+
+    local binary_check
+    binary_check="$(jq -c '.postinstall_binary_check // empty' <<<"$dep")"
+    if [[ -n "$binary_check" && "$binary_check" != "null" ]]; then
+      # A wrapper whose own postinstall copies/hard-links from the platform
+      # dependency into its own bin/ (claude-code's install.cjs) can only be
+      # confirmed by comparing what actually landed there against the
+      # already fully verified source, byte for byte -- cmp works whether
+      # install.cjs used a hardlink or fell back to a plain copy.
+      local platform_file wrapper_file
+      platform_file="$(jq -r '.platform_file' <<<"$binary_check")"
+      wrapper_file="$(jq -r '.wrapper_file' <<<"$binary_check")"
+      if ! cmp -s "$wrapper_dir/$wrapper_file" "$target_dir/$platform_file"; then
+        printf 'Refusing %s: %s does not match the verified %s byte for byte after npm rebuild (fail closed; a lifecycle script may have used an unverified source).\n' \
+          "$id" "$wrapper_dir/$wrapper_file" "$target_dir/$platform_file" >&2
+        exit 1
+      fi
+      printf 'Verified %s is byte-identical to the verified platform dependency binary %s\n' \
+        "$wrapper_dir/$wrapper_file" "$target_dir/$platform_file"
+    fi
+  fi
+}
+
 install_npm() {
-  local id="$1" version="$2" url="$3" sha256="$4"
+  local id="$1" version="$2" url="$3" sha256="$4" ignore_scripts="${5:-false}"
   command -v npm >/dev/null || { printf 'npm is required to install %s; install node first.\n' "$id" >&2; exit 1; }
   local archive="$cache_dir/${id}-${version}.tgz"
   fetch "$url" "$sha256" "$archive"
-  local prefix="$ecosystem_root/tools/$id-$version"
-  mkdir -p "$prefix"
+  # final_prefix is deliberately NEVER canonicalized (round 3d fix): once a
+  # platform_dependency install has run once, it is a SYMLINK (see below),
+  # and canonical_path would resolve straight through it to whatever
+  # versioned directory it currently targets -- silently defeating the
+  # entire point of it being a stable, never-resolved name. ecosystem_root
+  # is already canonical by the time the top-level script reaches here (see
+  # its own canonicalization above); the one path that still genuinely
+  # needs canonical_path for install_platform_dependency's sake is the
+  # versioned prefix itself, canonicalized separately below.
+  local final_prefix="$ecosystem_root/tools/$id-$version"
   local package
   package="$(npm_package_name "$url")"
-  npm install --global --no-audit --no-fund --prefix "$prefix" "$archive" >/dev/null
+  local has_platform_dependency=0
+  if [[ "$(jq -r --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")" != "" ]]; then
+    has_platform_dependency=1
+  fi
+
+  local prefix="$final_prefix"
+  if [[ "$has_platform_dependency" == 1 ]]; then
+    # Round 3d (Codex): rounds 3b/3c's rename-aside-then-move-in swap was
+    # only ever RECOVERABLE, not atomic, and the recovery itself had two
+    # more bugs -- an unchecked rollback `mv` that could itself fail
+    # silently, and no coverage at all for a signal landing between the
+    # rename and reporting success. This replaces it with the Homebrew
+    # Cellar/opt pattern: final_prefix becomes a SYMLINK to a versioned,
+    # never-reused directory (tools/<id>-<version>-<stamp>), installed here
+    # BEFORE it is ever live. bin_dir's own symlinks point into
+    # final_prefix/bin/* (unchanged below) and so transparently follow
+    # final_prefix through this extra indirection -- they never need to be
+    # re-created when a later install flips final_prefix to a new target.
+    # Flipping final_prefix is then a SINGLE rename(2) of one symlink over
+    # another (via python3's os.replace, guaranteed available -- see
+    # canonical_path's own comment -- and, unlike `ln -sfn`, a genuine
+    # single-syscall rename rather than an unlink-then-symlink pair), so at
+    # every instant final_prefix resolves to the complete old tree or the
+    # complete new one, never neither.
+    local stamp
+    stamp="$(date -u +%Y%m%d%H%M%S)-$$"
+    prefix="$final_prefix-$stamp"
+  fi
+  mkdir -p "$prefix"
+  prefix="$(canonical_path "$prefix")"
+
+  local npm_install_args=(--global --no-audit --no-fund --prefix "$prefix")
+  if [[ "$ignore_scripts" == "true" || "$has_platform_dependency" == 1 ]]; then
+    # A platform_dependency needs the wrapper's own lifecycle scripts
+    # deferred until install_platform_dependency has replaced whatever npm
+    # auto-fetched with the verified copy; see that function's comment.
+    npm_install_args+=(--ignore-scripts)
+  fi
+  npm install "${npm_install_args[@]}" "$archive" >/dev/null
+  if [[ "$has_platform_dependency" == 1 ]]; then
+    install_platform_dependency "$id" "$prefix" "$ignore_scripts"
+
+    # --- Atomic-flip recovery step table (round 3e) -------------------------
+    # INT, TERM and HUP are explicitly trapped (script-wide, "exit N" only;
+    # see the top-level trap block) so bash always defers a caught signal
+    # until whatever foreign command (mv, ln, python3, rm) is currently
+    # running actually finishes -- every "On a signal here" cell below is
+    # therefore identical to "On failure here": a signal can only ever be
+    # acted on at a step boundary, never mid-step.
+    # Step                                    | On failure or a signal here
+    # 1. mkdir versioned dir, npm install,    | final_prefix untouched; the new versioned directory is an orphan
+    #    install_platform_dependency (above)  | (never referenced), safe to ignore or prune
+    # 2. one-time migration: mv a REAL        | pending_migration_prefix set; final_prefix now absent, previous
+    #    final_prefix aside (only when it     | install moved aside but not yet restored -- top-level cleanup()
+    #    predates this design and is not      | (trap, script-wide) moves it back onto pending_migration_dest if
+    #    already a symlink)                   | that destination is still free; reports the exact manual `mv`
+    #                                         | otherwise
+    # 3. readlink final_prefix (only when     | read-only; nothing mutated. The value read here is UNVERIFIED
+    #    already a symlink) -> previous_ver-  | (an external or "../" target, or one this run does not own) and
+    #    ioned                                | is never trusted directly -- see step 6
+    # 4. ln -s new versioned dir -> tmp_link  | tmp_link absent or partial; final_prefix untouched. Harmless:
+    #    (a NEW symlink under stage_dir)      | tmp_link lives under stage_dir, removed wholesale by cleanup()
+    # 5. os.replace(tmp_link, final_prefix)   | rename(2) either completes or does not begin; a failed call never
+    #    -- THE atomic step                   | touches final_prefix at all. On failure, tmp_link is removed and
+    #                                         | any pending migration is left for cleanup() to restore
+    # 6. prune_old_version(previous_versioned | best-effort ONLY, never fails the install: deletes previous_
+    #    or migration_prefix) -- only after   | versioned ONLY when its canonical form is a direct child of the
+    #    step 5 already succeeded             | canonical tools/ directory with a name matching <id>-<version>-*
+    #                                         | (rejects an external target, a relative "../" target, a wrong-
+    #                                         | name target, and a symlink loop, which canonical_path resolves
+    #                                         | without hanging and which then simply fails these checks); a
+    #                                         | rejected or failed deletion is logged and left in place, never
+    #                                         | escalated. migration_prefix (this run's own, already known-safe)
+    #                                         | skips the ownership check but is equally best-effort
+    # -------------------------------------------------------------------------
+    local migration_prefix=""
+    if [[ -e "$final_prefix" && ! -L "$final_prefix" ]]; then
+      migration_prefix="${final_prefix}.migrating.$$"
+      # Set BEFORE the mv, not after: a signal landing exactly between the
+      # mv completing and the next script line would otherwise reach
+      # cleanup() with pending_migration_prefix still empty, unable to find
+      # what it should restore even though the mv itself already succeeded.
+      # Harmless the other way around (signalled before the mv even starts):
+      # cleanup() only acts once pending_migration_prefix actually exists on
+      # disk.
+      pending_migration_prefix="$migration_prefix"
+      pending_migration_dest="$final_prefix"
+      mv -- "$final_prefix" "$migration_prefix"
+    fi
+
+    local previous_versioned=""
+    if [[ -L "$final_prefix" ]]; then
+      previous_versioned="$(readlink -- "$final_prefix")"
+      case "$previous_versioned" in
+        /*) : ;;
+        *) previous_versioned="$ecosystem_root/tools/$previous_versioned" ;;
+      esac
+    fi
+
+    local tmp_link="$stage_dir/${id}-${version}-link.$$"
+    rm -f -- "$tmp_link"
+    ln -s -- "$prefix" "$tmp_link"
+    if python3 -c '
+import os, sys
+os.replace(sys.argv[1], sys.argv[2])
+' "$tmp_link" "$final_prefix"; then
+      if [[ -n "$migration_prefix" ]]; then
+        # This run's own, already known-safe (we created it above); still
+        # best-effort, never fatal, matching prune_old_version's own
+        # contract.
+        rm -rf -- "$migration_prefix" 2>/dev/null \
+          || printf 'Note: failed to prune the migrated-aside %s; left in place (not fatal).\n' "$migration_prefix" >&2
+        pending_migration_prefix=""
+        pending_migration_dest=""
+      fi
+      if [[ -n "$previous_versioned" ]]; then
+        prune_old_version "$id" "$version" "$previous_versioned"
+      fi
+    else
+      rm -f -- "$tmp_link"
+      printf 'Failed to flip %s to the newly installed %s %s (fail closed).\n' \
+        "$final_prefix" "$id" "$version" >&2
+      exit 1
+    fi
+    prefix="$final_prefix"
+  fi
+
   local linked=0 executable
   if [[ -d "$prefix/bin" ]]; then
     for executable in "$prefix/bin"/*; do
@@ -396,6 +903,102 @@ install_npm() {
   [[ "$linked" == 1 ]] || printf 'Note: %s (%s) published no bin/ executable; installed for its library only.\n' "$id" "$package" >&2
 }
 
+# Round 3h (2026-09-23 readiness audit): the llama-embed launchd agent's
+# template ran llama-server with no model argument at all -- KeepAlive
+# would restart it in a loop forever, never actually serving embeddings.
+# Downloads and sha256-verifies the one pinned embedding model this
+# profile needs, failing closed on a digest mismatch exactly like every
+# other pin (reuses fetch(), the same download-then-verify-then-rename
+# helper install_pin's own install_* functions use). Deliberately NOT
+# routed through install_pin/the tools[] dispatch below: a single raw GGUF
+# file, never an archive to extract, kept in pins-macos-arm64.json's own
+# separate "models" section (not "tools") so it is never swept into
+# adoption/manifest.json's profile-component coverage. The destination
+# path this writes to is exactly what the launchd-agents.sh-rendered
+# plist's EMBED_MODEL_PATH must resolve to (adoption/hosts/<host>.json, or
+# an explicit override) for the model this downloads and the model the
+# plist's own -m flag names to actually be the same file.
+install_embed_model() {
+  local entry
+  entry="$(jq -c '.models[0] // empty' "$pins_path")"
+  if [[ -z "$entry" ]]; then
+    printf 'No embedding model pin in %s; skipping.\n' "$pins_path" >&2
+    return 0
+  fi
+  local id file url sha256 size
+  id="$(jq -r '.id' <<<"$entry")"
+  file="$(jq -r '.file' <<<"$entry")"
+  url="$(jq -r '.url' <<<"$entry")"
+  sha256="$(jq -r '.sha256' <<<"$entry")"
+  size="$(jq -r '.size' <<<"$entry")"
+  if [[ "$sha256" == "null" || -z "$sha256" ]]; then
+    printf 'Refusing to install embedding model %s: pin has no verified sha256.\n' "$id" >&2
+    exit 1
+  fi
+  if [[ "$plan_mode" == 1 ]]; then
+    printf 'plan %-13s %-10s %-9s %s sha256=%s size=%s\n' "$id" model gguf "$file" "$sha256" "$size"
+    return 0
+  fi
+  local models_dir="$ecosystem_root/state/models"
+  mkdir -p "$models_dir"
+  local destination="$models_dir/$file"
+  fetch "$url" "$sha256" "$destination"
+  printf 'Installed embedding model %s (%s bytes, sha256 verified) at %s\n' "$id" "$size" "$destination"
+}
+
+# Round 3j (Codex P2 thread 4, "the most important one"): nothing on a
+# clean host ever created $ECO_ROOT/config/qdrant.yaml -- the plist
+# template's own --config-path points there
+# (adoption/launchd/com.native-stack.qdrant.plist.template), but the only
+# thing that ever wrote it was the hosted CI step's own disposable file,
+# never this bootstrap. A fresh install_pin-installed qdrant binary would
+# have nothing to load its --config-path from at all. Mirrors the selected
+# Linux recipe's own reviewed shape byte-for-byte
+# (examples/qdrant.yaml.example, recipes/README.md "Local semantic code
+# search": loopback bind, telemetry and gRPC disabled, storage outside any
+# binary prefix): storage under $ECO_ROOT/state/qdrant (never inside
+# tools/<id>-<version>, which install_npm-style installs can replace
+# wholesale on a later version bump), 127.0.0.1, and port 16333 -- the
+# same port this profile's own QDRANT_URL host value
+# (adoption/hosts/macos-example.json) and recipes/README.md both name.
+# Never overwrites an existing file: a config a person has already tuned
+# (a different port, cluster settings, an API key) is never silently
+# replaced by this default.
+provision_qdrant_config() {
+  local config_path="$ecosystem_root/config/qdrant.yaml"
+  if [[ "$plan_mode" == 1 ]]; then
+    if [[ -e "$config_path" ]]; then
+      printf 'plan qdrant-config  (existing)  yaml      %s (left as is)\n' "$config_path"
+    else
+      printf 'plan qdrant-config  (default)   yaml      %s (would be written)\n' "$config_path"
+    fi
+    return 0
+  fi
+  if [[ -e "$config_path" ]]; then
+    printf 'Existing %s left as is (never overwritten by this default).\n' "$config_path"
+    return 0
+  fi
+  mkdir -p "$ecosystem_root/config" "$ecosystem_root/state/qdrant/storage" "$ecosystem_root/state/qdrant/snapshots"
+  cat > "$config_path.partial" <<EOF
+# Provisioned by adoption/bootstrap-macos.sh's provision_qdrant_config
+# (round 3j); mirrors examples/qdrant.yaml.example. Edit freely -- once
+# this file exists, this bootstrap never overwrites or removes it again.
+storage:
+  storage_path: $ecosystem_root/state/qdrant/storage
+  snapshots_path: $ecosystem_root/state/qdrant/snapshots
+service:
+  host: 127.0.0.1
+  http_port: 16333
+  grpc_port: null
+  enable_cors: false
+cluster:
+  enabled: false
+telemetry_disabled: true
+EOF
+  mv -- "$config_path.partial" "$config_path"
+  printf 'Provisioned default qdrant config at %s\n' "$config_path"
+}
+
 install_pin() {
   local id="$1"
   local entry
@@ -404,12 +1007,13 @@ install_pin() {
     printf 'No pin for component %s in %s; skipping.\n' "$id" "$pins_path" >&2
     return 0
   fi
-  local version kind url sha256 note
+  local version kind url sha256 note ignore_scripts
   version="$(jq -r '.version' <<<"$entry")"
   kind="$(jq -r '.kind' <<<"$entry")"
   url="$(jq -r '.url' <<<"$entry")"
   sha256="$(jq -r '.sha256' <<<"$entry")"
   note="$(jq -r '.install_note' <<<"$entry")"
+  ignore_scripts="$(jq -r '.ignore_scripts // false' <<<"$entry")"
   if [[ "$sha256" == "null" || -z "$sha256" ]]; then
     printf 'Refusing to install %s %s: pin has no verified sha256 (%s)\n' "$id" "$version" "$note" >&2
     exit 1
@@ -424,7 +1028,7 @@ install_pin() {
     gh-zip) install_gh_zip "$version" "$url" "$sha256" ;;
     llama-cpp-tarball) install_llama_cpp "$version" "$url" "$sha256" ;;
     *-tarball) install_single_binary_tarball "$id" "$version" "$url" "$sha256" ;;
-    *-npm) install_npm "$id" "$version" "$url" "$sha256" ;;
+    *-npm) install_npm "$id" "$version" "$url" "$sha256" "$ignore_scripts" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
   esac
   printf 'Installed %s %s (%s)\n' "$id" "$version" "$kind"
@@ -442,6 +1046,19 @@ for id in ${component_ids[@]+"${component_ids[@]}"}; do
   esac
   install_pin "$id"
 done
+
+# Round 3h: not gated on component_ids (the embedding model is not a
+# "component" adoption/manifest.json's profile system knows about at all,
+# by design -- see install_embed_model's own comment); this profile always
+# needs it. install_embed_model handles plan_mode internally, the same way
+# install_pin does.
+install_embed_model
+
+# Round 3j: likewise unconditional -- qdrant is always in this profile's
+# default component set, and its own launchd plist has nowhere else to
+# get a config from. provision_qdrant_config handles plan_mode internally
+# and never overwrites an existing file.
+provision_qdrant_config
 
 if [[ "$plan_mode" == 1 ]]; then
   printf 'Plan only for profile %s on macOS %s: nothing was downloaded or installed.\n' "$profile_id" "$macos_version"
