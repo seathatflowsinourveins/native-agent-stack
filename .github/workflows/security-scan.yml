@@ -59,7 +59,9 @@ jobs:
         env:
           WRITE_SARIF: ${{ github.event_name != 'pull_request' }}
         run: |
-          set -uo pipefail
+          # `shell: bash` runs with -e; turn it off so a findings exit (1) is captured and
+          # the SARIF is still written, then fail the step with the table run's status.
+          set +e -u -o pipefail
           inventory=.github/osv-scanner-lockfiles.json
           # An entry without a parser lets OSV-Scanner infer it from the file name (":<path>").
           mapfile -t lockfiles < <(jq -r '.lockfiles[] | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
@@ -92,8 +94,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
-      contents: read
-      security-events: write # upload the zizmor SARIF to code scanning; this job only
+      contents: read # zizmor gets only a read token; zizmor-sarif-upload holds the write scope
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -113,11 +114,43 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # --no-exit-codes: findings exit 0 and land in the SARIF; any non-zero exit is an analyzer failure.
+          # --no-exit-codes: findings exit 0 and land in the SARIF; any non-zero exit is an
+          # analyzer failure, which fails this step and skips the artifact and the upload.
+          mkdir -p "$RUNNER_TEMP/zizmor"
           zizmor --no-config --no-ignores --no-exit-codes --persona regular --strict-collection \
-            --format sarif .github/workflows > "$RUNNER_TEMP/zizmor.sarif"
+            --format sarif .github/workflows > "$RUNNER_TEMP/zizmor/zizmor.sarif"
+      - name: Keep the zizmor SARIF for the upload job
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: zizmor-sarif-${{ github.run_id }}
+          path: ${{ runner.temp }}/zizmor/zizmor.sarif
+          if-no-files-found: error
+          retention-days: 1
+
+  zizmor-sarif-upload:
+    needs: zizmor-online
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      security-events: write # upload only: this job runs no installed tool and no shell step
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download the zizmor SARIF
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: zizmor-sarif-${{ github.run_id }}
+          path: ${{ runner.temp }}/zizmor
       - name: Upload zizmor SARIF to code scanning
         uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
         with:
-          sarif_file: ${{ runner.temp }}/zizmor.sarif
+          sarif_file: ${{ runner.temp }}/zizmor/zizmor.sarif
           category: zizmor

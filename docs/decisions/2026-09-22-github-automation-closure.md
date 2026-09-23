@@ -193,6 +193,22 @@ locally with `GH_TOKEN` set and no `--offline`, using
   fails the job. It runs on push, schedule and dispatch, with `GH_TOKEN` from
   `github.token` through `env`, and uploads SARIF with category `zizmor`.
   `validate.yml`'s offline `regular` gate on every PR is unchanged.
+- **Token split (2026-09-23 review).** zizmor runs in a `contents: read` job and
+  hands its SARIF over as a 1-day artifact; a separate `zizmor-sarif-upload` job
+  holds `security-events: write` and runs no shell step or installed tool (only
+  harden-runner, checkout, download-artifact and upload-sarif, asserted by
+  `tests/test_workflow_hardening.py`). A write-scoped token handed to a
+  pip-installed analyzer could dismiss the CodeQL alerts that the target
+  `code_scanning` rule gates on. Found by comparing this branch with an
+  independently built alternative; an analyzer crash still skips the upload.
+- **OSV failure path fixed (same review).** `shell: bash` implies `-e`, so the
+  earlier `set -uo pipefail` let a findings exit (1) end the step before the
+  SARIF run; code scanning would have received OSV results only when there were
+  none. The step now uses `set +e -u -o pipefail`, captures the status, writes
+  the SARIF and exits with the table run's status. Found independently by the
+  alternative-branch comparison and the Codex cross-family review; reproduced
+  with `bash --noprofile --norc -eo pipefail -c 'set -uo pipefail; false; echo reached'`
+  (prints nothing) and guarded by a test assertion that fails if the old line returns.
 - **Result.** 0 online findings on `168a3a8` and on this branch.
 - **Overturn.** An online-only finding class (impostor commit, known-vulnerable
   action, ref-version mismatch) appears. Then it becomes a PR gate.

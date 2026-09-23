@@ -4,7 +4,7 @@
 #
 # Ignore policy: add a rule only for a reviewed High/Critical match, scoped by
 # `vulnerability` plus `package.name`/`package.version`, with a `reason` naming
-# the evidence and a re-review date; list it in
+# the evidence and `review-by: YYYY-MM-DD` (enforced by tests/test_workflow_hardening.py); list it in
 # docs/decisions/2026-09-22-github-automation-closure.md.
 #
 # Reviewed 2026-09-22 against supply-chain run 35799579095 (grype 0.119.0, DB

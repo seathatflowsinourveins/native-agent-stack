@@ -123,6 +123,19 @@ class IgnorePolicyTests(unittest.TestCase):
                 until = until.date()
             self.assertLessEqual(until, latest, f"{entry.get('id')}: ignoreUntil more than 90 days away")
 
+    def test_no_other_suppression_mechanism_bypasses_the_policy(self):
+        config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
+        self.assertLessEqual(set(config), {"IgnoredVulns", "PackageOverrides"})
+        latest = date.today() + timedelta(days=90)
+        for entry in config.get("PackageOverrides", []):
+            # An override can silently ignore a whole package; it needs the same reason and expiry.
+            self.assertTrue(str(entry.get("reason", "")).strip(), entry)
+            until = entry.get("effectiveUntil")
+            self.assertIsInstance(until, date, f"{entry}: effectiveUntil must be a TOML date")
+            if hasattr(until, "date"):
+                until = until.date()
+            self.assertLessEqual(until, latest, f"{entry}: effectiveUntil more than 90 days away")
+
 
 if __name__ == "__main__":
     unittest.main()

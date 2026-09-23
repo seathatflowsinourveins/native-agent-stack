@@ -9,6 +9,7 @@ advisories; security-scan.yml and publish-catalog.yml's release job keep write s
 a full commit SHA.
 """
 
+from datetime import date
 from pathlib import Path
 import hashlib
 import re
@@ -147,13 +148,27 @@ class SecurityScanTests(unittest.TestCase):
 
     def test_write_scope_is_job_local_and_limited_to_security_events(self):
         self.assertEqual(scopes(self.text.split("\njobs:\n", 1)[0]), [{"contents": "read"}])
-        for job_id, job in jobs(self.text).items():
-            self.assertEqual(scopes(job), [{"contents": "read", "security-events": "write"}], job_id)
+        expected = {"osv-scanner": [{"contents": "read", "security-events": "write"}],
+                    "zizmor-online": [{"contents": "read"}],
+                    "zizmor-sarif-upload": [{"contents": "read", "security-events": "write"}]}
+        self.assertEqual({job_id: scopes(job) for job_id, job in jobs(self.text).items()}, expected)
         self.assertNotRegex(self.text, r"(?m)permissions:[ \t]*[^\s#]", "no inline read-all/write-all form")
+
+    def test_the_zizmor_write_token_never_reaches_an_installed_tool(self):
+        tool = jobs(self.text)["zizmor-online"]
+        upload = jobs(self.text)["zizmor-sarif-upload"]
+        self.assertIn("GH_TOKEN: ${{ github.token }}", tool)
+        self.assertIn("needs: zizmor-online", upload)
+        self.assertNotRegex(upload, r"(?m)^\s+(- )?run:", "the write-scope job runs no shell step")
+        actions = re.findall(r"uses: ([\w.-]+/[\w./-]+)@", upload)
+        self.assertEqual(actions, ["step-security/harden-runner", "actions/checkout",
+                                   "actions/download-artifact", "github/codeql-action/upload-sarif"])
 
     def test_osv_scanner_fails_on_findings_and_uploads_sarif_off_pull_requests(self):
         job = jobs(self.text)["osv-scanner"]
         self.assertNotIn("\n    if:", job, "the required PR check must run on every event")
+        # `shell: bash` implies -e; without `set +e` a findings exit stops the step before the SARIF run.
+        self.assertIn("set +e -u -o pipefail", job)
         self.assertIn('exit "$status"', job)
         self.assertNotIn("continue-on-error", job)
         upload = job.split("Upload OSV-Scanner SARIF", 1)[1]
@@ -170,7 +185,8 @@ class SecurityScanTests(unittest.TestCase):
         self.assertIn("--no-exit-codes", job)
         self.assertIn("--format sarif", job)
         self.assertNotIn("--offline", job)
-        self.assertIn("category: zizmor", job)
+        self.assertIn("if-no-files-found: error", job)
+        self.assertIn("category: zizmor", jobs(self.text)["zizmor-sarif-upload"])
 
     def test_jobs_check_out_without_persisted_credentials(self):
         for job_id, job in jobs(self.text).items():
@@ -245,6 +261,18 @@ class SupplyChainGateTests(unittest.TestCase):
         for event in ("push", "pull_request"):
             block = trigger.split(f"\n  {event}:\n", 1)[1].split("\n  schedule:", 1)[0].split("\n  pull_request:", 1)[0]
             self.assertIn("- '.grype.yaml'", block, event)
+
+    def test_every_grype_ignore_names_a_review_date_that_has_not_passed(self):
+        # grype ignore rules have no expiry field, so the reason carries `review-by: YYYY-MM-DD`.
+        body = (ROOT / ".grype.yaml").read_text(encoding="utf-8").split("\nignore:", 1)[1]
+        if body.strip() == "[]":
+            return
+        rules = re.split(r"(?m)^  - ", body)[1:]
+        self.assertTrue(rules, "ignore must be [] or a list of rules")
+        for rule in rules:
+            match = re.search(r"reason:.*review-by: (\d{4}-\d{2}-\d{2})", rule)
+            self.assertIsNotNone(match, rule)
+            self.assertGreaterEqual(date.fromisoformat(match.group(1)), date.today(), rule)
 
 
 class PinningTests(unittest.TestCase):
