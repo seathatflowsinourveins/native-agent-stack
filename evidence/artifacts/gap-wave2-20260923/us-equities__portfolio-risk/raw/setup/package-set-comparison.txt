@@ -1,0 +1,6 @@
+venv-lock vs blueprints/us-equities/research-evaluation/requirements.lock pins:
+IDENTICAL
+venv-nautilus vs tools/nautilus-2.0.0rc5 (the accepted native install):
+IDENTICAL
+venv-libs vs requirements-libs.lock pins:
+IDENTICAL

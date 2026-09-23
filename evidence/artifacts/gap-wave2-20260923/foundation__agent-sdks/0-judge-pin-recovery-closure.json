@@ -1,0 +1,79 @@
+{
+  "id": "gap-wave2-20260923/foundation/agent-sdks/0-judge-pin-recovery-closure",
+  "gap_index": 0,
+  "gap_text_sha256": "03addfe129dd8a09768cb7d2df664538404dd96960fa99cf3f27107db64245d1",
+  "preregistration": {
+    "written_at": "2026-09-23T03:24:52Z",
+    "expectation": "advanced: a judge pin (model IDs plus prompt sha256) can be authored here; the recovery re-run needs 18 submissions including two Claude arms, which the reserved Claude account forbids, so closure cannot be rerun.",
+    "criteria": [
+      "settled only if (a) a judge is pinned by model ID and prompt sha256, (b) the recovery step (RECOVERY_INDICES [4,5,6], 3 arms) is executed, and (c) closure is rerun and retain/overturn/unresolved recorded in summary.json",
+      "advanced if only (a) or only the Codex-arm resume prerequisite is shown"
+    ]
+  },
+  "commands": [
+    "authored blueprints/gap-wave2-20260923/foundation__agent-sdks/workers-judge-pin/{pin.json,judge-prompt.md,adjudicator-prompt.md}",
+    "sha256sum $HOME/code/agent-lab/.claude/agents/blind-judge.md",
+    "rg -n 'artifact_acceptance_rate|recovery_case_pass_rate' $HOME/code/agent-lab/tools/compare/workers/lib/{constants,protocol}.mjs"
+  ],
+  "results": {
+    "judge_pin": [
+      {
+        "role": "blind_judge_1",
+        "family": "openai",
+        "model_id": "gpt-6-astra",
+        "runner": "codex exec --sandbox read-only --ephemeral (native Codex 0.155.1)",
+        "prompt": "judge-prompt.md",
+        "prompt_sha256": "4f061b611a0b51fa5e4532ba6afd04b6a8735cadb2d5a29472e1f670ab8127a3"
+      },
+      {
+        "role": "blind_judge_2",
+        "family": "anthropic",
+        "model_id": "claude-opus-5-5",
+        "runner": "agent-lab project agent blind-judge (Read only, effort high, omitClaudeMd)",
+        "agent_definition_sha256": "629ff7df616fe0ad78f978bcd6ba6d91456662c3a3a80732f011caccfe55a1e6",
+        "prompt": "judge-prompt.md",
+        "prompt_sha256": "4f061b611a0b51fa5e4532ba6afd04b6a8735cadb2d5a29472e1f670ab8127a3"
+      },
+      {
+        "role": "adjudicator",
+        "family": "openai",
+        "model_id": "gpt-6-astra",
+        "runner": "codex exec --sandbox read-only --ephemeral",
+        "prompt": "adjudicator-prompt.md",
+        "prompt_sha256": "ac2eadd39f903ff9c30156c1f5586533024ca87dfe2b878c7354e9b2b4823767"
+      }
+    ],
+    "recovery_requirement_quoted": "Re-run with RECOVERY_INDICES = [4,5,6] and a budget of 3 arms x 6 = 18 submissions. (agent-lab tools/compare/workers/lib/constants.mjs)",
+    "arm_B_resume_prerequisite": "native_worker.py now supports --persistent/--resume-thread-id; a resumed turn recalled the turn-1 token in a new process (gap 3 receipt), so arm B recovery is no longer 'not_supported' by construction.",
+    "recovery_run": "not executed",
+    "closure_rerun": "not executed",
+    "summary_json_changed": false
+  },
+  "raw_outputs": [],
+  "outcome": "advanced",
+  "evidence_class": "source_review",
+  "remaining": "Seal the pin into a new workers protocol instance, run the recovery indices [4,5,6] for all three arms, rerun closure.mjs and record retain/overturn/unresolved in comparison-progress-20260922/summary.json (blocked on the reserved Claude account).",
+  "limits": [
+    "The judge pin is a proposed protocol amendment; it binds only once sealed into a new protocol instance before judging.",
+    "Recovery needs 18 submissions including 12 on two Claude arms (about 200 s each); the shared Claude account is reserved for another session's long-horizon run, so it was not run (blocker, not a capability limit).",
+    "The sealed protocol 0034d6c7 and its run directories are private to the originating host phase; they were not opened here."
+  ],
+  "checked_at": "2026-09-23T04:23:16Z",
+  "round_4": {
+    "note": "Not run in round 4 (preregistered). The recovery needs 12 submissions on the Claude arms with Claude models; the loopback open-weight provider cannot stand in for the protocol's arms, and the shared Claude account stays reserved. comparison-progress-20260922/summary.json unchanged.",
+    "preregistration": {
+      "file": "preregistration-round4.json",
+      "written_at": null,
+      "written_window": {
+        "not_before": "2026-09-23T14:11:57Z",
+        "not_after": "2026-09-23T14:12:27Z"
+      },
+      "written_at_note": "Written between 14:11:57Z (a date call just before writing) and 14:12:27Z (commit 1ce3105 time); the first draft carried 14:13:00Z, which was later than its own commit and is corrected here in an amended commit. Written before the round-4 model download, before the local vLLM server started and before any round-4 inference.",
+      "expectation": "Not run: the recovery needs 12 submissions on Claude arms with Claude models; a local model cannot stand in for the protocol's arms. Outcome stays advanced.",
+      "criteria": [
+        "no change to comparison-progress-20260922/summary.json in this round"
+      ]
+    },
+    "checked_at": "2026-09-23T14:12:27Z"
+  }
+}

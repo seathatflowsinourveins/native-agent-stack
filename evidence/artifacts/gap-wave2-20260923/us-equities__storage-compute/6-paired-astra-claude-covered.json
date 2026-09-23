@@ -1,0 +1,76 @@
+{
+  "id": "us-equities__storage-compute-6-paired-astra-claude-covered",
+  "gap_index": 6,
+  "layer_id": "storage-compute",
+  "catalog": "us-equities",
+  "gap_text": "The research-runtime receipt says the paired Astra-to-Claude workflow was not executed (paired_model_workflow_executed false).",
+  "gap_text_sha256": "21f7ced119ada7eca0d052a4b203540c12cfcc7e41f52095a47f76cf2c9b39d0",
+  "next_check": "Run the research-runtime paired workflow once (Codex gpt-6-astra stage, then a Claude review stage) on a retained research question, and record paired_model_workflow_executed with outputs, model IDs and usage.",
+  "preregistration": {
+    "gap_index": 6,
+    "written_at": "2026-09-23T05:15:15Z",
+    "expectation": "covered_elsewhere: adoption/paired/receipt.json (native-paired-adoption-20260919) already records the Dagu research-pair workflow succeeded with workflow astra_then_claude, gpt-6-astra and claude-opus-5, both reports validated, usage for both. Expect the four report/packet hashes in the receipt to equal the committed files and the Claude prompt to bind the Astra report hash. No new model call is needed.",
+    "criteria": "covered_elsewhere if the receipt's report and packet hashes match committed files and status fields show both roles completed in one research-pair run; otherwise run one Codex astra stage and one bounded Claude review call.",
+    "note": "Written before the check's commands were run. For gap 6 an exploratory sha256 of the four adoption/paired files was run minutes earlier while locating evidence; the verification is rerun by script after this file.",
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/prereg/6.json",
+    "file_sha256": "c2e80ef7df7a6cf033bc4b9a73a09d5986e59b7051ccc2700024d5dbfb61f6c9",
+    "committed_in": "af80671 (before any check command ran)",
+    "fix_round": {
+      "gap_index": 6,
+      "written_at": "2026-09-23T05:52:16Z",
+      "round": 2,
+      "label": "fix-round (late relative to round 1, written before round 2)",
+      "expectation": "Round 2 verifier additionally reconstructs both prompts with run_worker.native_prompt and requires their sha256 to equal the receipt's astra.prompt_sha256 and claude.prompt_sha256 (the Claude prompt embeds the accepted Astra report). A second negative control edits a finding in a copied Astra report and updates its report hash in the copied receipt, so only the handoff (prompt-hash) check can fail. Expected: real receipt passes; control fails only the Claude prompt-hash check.",
+      "criteria": "covered_elsewhere stands if both prompt hashes reconstruct and the handoff control fails as expected.",
+      "note": "Fix-round preregistration, written after round 1 and the Codex gpt-6-astra read-only review of a0f57fa, before any round-2 command ran.",
+      "file": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/prereg/6-fixround.json",
+      "file_sha256": "dd95fb8961174926feb52293c42c8c13fc30986c3c5126b08b53d3a0a56c9e1d",
+      "committed_in": "23c9902 (after round 1 and the Codex review, before any round-2 command ran)"
+    }
+  },
+  "commands": [
+    "python3 blueprints/gap-wave2-20260923/us-equities__storage-compute/verify_paired_receipt.py .   # round 1 and round 2 (round 2 adds prompt reconstruction via run_worker.native_prompt)",
+    "copy adoption/paired and blueprints/us-equities/research-runtime/run_worker.py to $T; printf ' ' >> $T/adoption/paired/astra.report.json; python3 blueprints/gap-wave2-20260923/us-equities__storage-compute/verify_paired_receipt.py $T   # control 'bytes', exit 1 expected",
+    "copy as above; append ' (edited)' to astra.report.json findings[0].claim and set the copied receipt's astra report_sha256 to the new file hash; python3 blueprints/gap-wave2-20260923/us-equities__storage-compute/verify_paired_receipt.py $T   # control 'handoff', exit 1 expected"
+  ],
+  "results": [
+    "Round 2 verify_paired_receipt.py exit 0; all_pass=True; checks={\"research_pair_status_succeeded\": true, \"native_history_status_verified\": true, \"astra_completed_gpt_6_astra\": true, \"claude_completed_claude_opus_5\": true, \"both_roles_workflow_astra_then_claude\": true, \"same_packet_both_roles\": true, \"astra_report_hash_matches_file\": true, \"claude_report_hash_matches_file\": true, \"both_reports_validated\": true, \"usage_recorded_both_roles\": true, \"model_calls_two\": true, \"astra_prompt_reconstructs\": true, \"claude_prompt_embeds_accepted_astra_report\": true}",
+    "research-pair window ['2026-09-19T19:41:23Z', '2026-09-19T19:41:50Z']; models ['gpt-6-astra', ['claude-opus-5']]; usage astra_total_tokens=20776 claude_total_tokens=16293",
+    "file sha256: {\"astra.report.json\": \"b396469ae54867014a174852e93ab042ecde68a179a2cd6444c22b2688c6573c\", \"claude.report.json\": \"1b65a75fbd41f65bc1c93640436908193f70fec4e75c9405508c9a6f030be179\", \"packet.json\": \"c9c0a26829aa4336e8339dc6da84ead9e29a0e83951c5ef2fe49adb3e2bd8490\", \"observation.json\": \"1a24e0d90853d3873665aca278efb668e2ceebe33195eddb7cfa53fd69bab5fe\"}; receipt sha256 9b00455d09dba24ed47cd5be8cc09b573573f122c9ca10e931f68146e7e57730",
+    "Round 2 controls: [{\"control\": \"bytes\", \"exit\": 1, \"failing_checks\": [\"astra_report_hash_matches_file\"]}, {\"control\": \"handoff\", \"exit\": 1, \"failing_checks\": [\"claude_prompt_embeds_accepted_astra_report\"]}] (the handoff control shows the Claude prompt hash binds the accepted Astra report content, independent of the report-hash field).",
+    "Round 1 (a0f57fa): all_pass=True; one-byte control failed {'astra_report_hash_matches_file': False}",
+    "blueprints/us-equities/research-runtime/README.md opens with 'Later paired acceptance: native sign-in restored Codex readiness and the existing workflow completed fresh LEAN -> Dagu -> DuckDB -> Astra -> Claude ... See the paired receipt and native results (../../../adoption/paired/README.md).'"
+  ],
+  "outcome": "covered_elsewhere",
+  "covered_by": {
+    "receipt": "adoption/paired/receipt.json",
+    "id": "native-paired-adoption-20260919",
+    "kind": "native_model_e2e",
+    "observed_at_utc": "2026-09-19T19:41:50Z"
+  },
+  "evidence_class": "source_review",
+  "limits": [
+    "No model was called in this wave. The covering run is the 2026-09-19 native pair (evidence class native_model_e2e in that receipt); this unit verified the committed receipt, its file hashes, status fields and reconstructed prompt hashes.",
+    "blueprints/us-equities/research-runtime/receipt.json still carries paired_model_workflow_executed false for its own earlier run; that field is historical and was not edited.",
+    "The gap-6 preregistration notes that an exploratory hash of the four files was taken before it was written; the scripted verification and controls ran after it."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/paired-receipt-verification-r2.json",
+      "sha256": "578ca9287716f3360719b50a77e5097b31259b40d4febcfda13072c1a8a86cc6"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/paired-receipt-negative-controls-r2.json",
+      "sha256": "ebc57fa43b5213019e8e4a97fe5ae0933c94d8d6ab0cd86d4feb2e819ae6d2af"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/paired-receipt-verification.json",
+      "sha256": "8267aa6ca1de221e9a82e939d26164dc03cfc528414cf4a0ea2549c5d5ecbb19"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/paired-receipt-negative-control.txt",
+      "sha256": "ff00a2aff3ab980738424388a12014063485d644554460efd1a787394cfd1dfb"
+    }
+  ],
+  "checked_at": "2026-09-23T05:59:00Z"
+}

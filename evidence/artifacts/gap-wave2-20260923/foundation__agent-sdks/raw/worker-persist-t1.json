@@ -1,0 +1,80 @@
+{
+  "mode": "run",
+  "model_inference_submitted": true,
+  "usage": {
+    "last": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 12032,
+      "inputTokens": 17647,
+      "outputTokens": 7,
+      "reasoningOutputTokens": 0,
+      "totalTokens": 17654
+    },
+    "modelContextWindow": 258400,
+    "total": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 12032,
+      "inputTokens": 17647,
+      "outputTokens": 7,
+      "reasoningOutputTokens": 0,
+      "totalTokens": 17654
+    }
+  },
+  "usage_status": "reported",
+  "sdk_version": "0.155.1",
+  "sandbox": "read-only",
+  "approval_mode": "deny_all",
+  "config_overrides": [
+    "features.hooks=false",
+    "features.plugin_hooks=false",
+    "features.apps=false",
+    "otel.exporter=\"none\"",
+    "otel.metrics_exporter=\"none\"",
+    "analytics.enabled=false",
+    "plugins={\"context-mode@context-mode\"={enabled=false}}"
+  ],
+  "readiness": {
+    "model": "gpt-6-astra",
+    "model_available": true,
+    "ordinary_usage_allowed": true,
+    "windows": {
+      "primary": {
+        "usedPercent": 13,
+        "resetsAt": 1790719654,
+        "windowDurationMins": 10080
+      }
+    },
+    "ready": true
+  },
+  "native_runtime": "codex_python_sdk/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)",
+  "thread_mode": "persistent",
+  "thread_id": "redacted-id:bb1930eaaa81b664",
+  "configured_model": "gpt-6-astra",
+  "configured_provider": "openai",
+  "status": "completed",
+  "final_response": "STORED",
+  "duration_ms": 7050,
+  "items": [
+    {
+      "clientId": null,
+      "content": [
+        {
+          "text": "Remember this exact token for later in this conversation: tk-5763c3da5ea5\nDo not use any tool. Reply with only the word STORED.\n",
+          "text_elements": [],
+          "type": "text"
+        }
+      ],
+      "id": "redacted-id:0cb35ff01eec05de",
+      "type": "userMessage"
+    },
+    {
+      "delivery": null,
+      "id": "msg_07470492c69d1f2a016ab34801009c87d18f2fdeca66eeddea",
+      "memoryCitation": null,
+      "phase": "final_answer",
+      "questions": null,
+      "text": "STORED",
+      "type": "agentMessage"
+    }
+  ]
+}

@@ -1,0 +1,515 @@
+=== RUN   TestRetryCommand
+=== RUN   TestRetryCommand/RetryDAGWithFilePath
+=== PAUSE TestRetryCommand/RetryDAGWithFilePath
+=== RUN   TestRetryCommand/RetryDAGWithName
+=== PAUSE TestRetryCommand/RetryDAGWithName
+=== RUN   TestRetryCommand/QueuedCatchupRegeneratesLogAndPreservesTriggerType
+=== PAUSE TestRetryCommand/QueuedCatchupRegeneratesLogAndPreservesTriggerType
+=== RUN   TestRetryCommand/QueuedRetryCreatesNewAttempt
+=== PAUSE TestRetryCommand/QueuedRetryCreatesNewAttempt
+=== RUN   TestRetryCommand/QueuedRetryDoesNotWaitForTerminalSourceProc
+time=2026-09-23T02:53:54.696Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-1>601385755/data/dag-runs/queued-retry-live-source-dag/dag-runs/2026/09/23/dag-run_20260923_025254Z_queued-retry-live-source-run/a_20260923_025254_692Z_f206c0/status.jsonl
+time=2026-09-23T02:53:54.705Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-1>601385755/config.yaml dir=/tmp/dagu-test-<uuid-1>601385755/dags
+time=2026-09-23T02:53:54.705Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-1>601385755/logs data-dir=/tmp/dagu-test-<uuid-1>601385755/data dag-runs-dir=/tmp/dagu-test-<uuid-1>601385755/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-1>601385755/data/dag-state
+time=2026-09-23T02:53:54.707Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-1>601385755/data/dag-runs/queued-retry-live-source-dag/dag-runs/2026/09/23/dag-run_20260923_025254Z_queued-retry-live-source-run/a_20260923_025254_692Z_f206c0/status.jsonl
+time=2026-09-23T02:53:54.718Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:521 msg="Enqueued retry; will run when queue capacity is available" dag=queued-retry-live-source-dag run-id=queued-retry-live-source-run
+=== RUN   TestRetryCommand/QueueDispatchRetryTreatsMissingRunAsStaleDispatch
+time=2026-09-23T02:53:54.729Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-2>580642921/config.yaml dir=/tmp/dagu-test-<uuid-2>580642921/dags
+time=2026-09-23T02:53:54.729Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-2>580642921/logs data-dir=/tmp/dagu-test-<uuid-2>580642921/data dag-runs-dir=/tmp/dagu-test-<uuid-2>580642921/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-2>580642921/data/dag-state
+Error: dag-run is not queued
+=== RUN   TestRetryCommand/QueueDispatchRetryUsesQueuedAttempt
+time=2026-09-23T02:53:54.739Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-3>240614897/data/dag-runs/queue-dispatch-existing-attempt/dag-runs/2026/09/23/dag-run_20260923_025354Z_queue-dispatch-run/a_20260923_025354_735Z_53da9a/status.jsonl
+time=2026-09-23T02:53:54.749Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-3>240614897/config.yaml dir=/tmp/dagu-test-<uuid-3>240614897/dags
+time=2026-09-23T02:53:54.749Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-3>240614897/logs data-dir=/tmp/dagu-test-<uuid-3>240614897/data dag-runs-dir=/tmp/dagu-test-<uuid-3>240614897/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-3>240614897/data/dag-state
+time=2026-09-23T02:53:54.752Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-23T02:53:54.752Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-<uuid-3>240614897/logs/queue-dispatch-test.log
+time=2026-09-23T02:53:54.756Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-3>240614897/data/dag-runs/queue-dispatch-existing-attempt/dag-runs/2026/09/23/dag-run_20260923_025354Z_queue-dispatch-run/a_20260923_025354_735Z_53da9a/status.jsonl
+time=2026-09-23T02:53:54.765Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_queue-dispatch-existing-attempt_b6c64a.sock
+time=2026-09-23T02:53:54.766Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=53da9a retry-target-attempt-id=53da9a
+time=2026-09-23T02:53:54.766Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:54.766Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-23T02:53:54.766Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-23T02:53:54.766Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-23T02:53:54.766Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-23T02:53:54.766Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-23T02:53:54.766Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-23T02:53:54.773Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-23T02:53:54.773Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:54.779Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:54Z
+Succeeded - 2026-09-23T02:53:54Z
+
+dag: queue-dispatch-existing-attempt (0s)
+├─log: /tmp/dagu-test-<uuid-3>240614897/logs/queue-dispatch-test.log
+│
+└─1 (0s) [succeeded]
+  ├─cat templates/input.txt
+  │
+  └─stdout: /tmp/dagu-test-<uuid-3>240614897/logs/run_20260923_025354Z_53da9a/1.20260923.025354.766.queue-di.out
+      queued dispatch
+
+Result: Succeeded
+
+time=2026-09-23T02:53:54.787Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:54.787Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+=== RUN   TestRetryCommand/QueueDispatchRetryTriggerCreatesNewAttempt
+time=2026-09-23T02:53:54.799Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-4>4100154636/data/dag-runs/queue-dispatch-retry-attempt/dag-runs/2026/09/23/dag-run_20260923_025354Z_queue-dispatch-retry-run/a_20260923_025354_797Z_9a5dab/status.jsonl
+time=2026-09-23T02:53:54.808Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-4>4100154636/config.yaml dir=/tmp/dagu-test-<uuid-4>4100154636/dags
+time=2026-09-23T02:53:54.808Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-4>4100154636/logs data-dir=/tmp/dagu-test-<uuid-4>4100154636/data dag-runs-dir=/tmp/dagu-test-<uuid-4>4100154636/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-4>4100154636/data/dag-state
+time=2026-09-23T02:53:54.812Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-23T02:53:54.812Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-<uuid-4>4100154636/logs/queue-dispatch-retry-test.log
+time=2026-09-23T02:53:54.814Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-4>4100154636/data/dag-runs/queue-dispatch-retry-attempt/dag-runs/2026/09/23/dag-run_20260923_025354Z_queue-dispatch-retry-run/a_20260923_025354_810Z_1b319e/status.jsonl
+time=2026-09-23T02:53:54.825Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_queue-dispatch-retry-attempt_725fac.sock
+time=2026-09-23T02:53:54.825Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=1b319e retry-target-attempt-id=9a5dab
+time=2026-09-23T02:53:54.825Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:54.825Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-23T02:53:54.825Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-23T02:53:54.825Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-23T02:53:54.825Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-23T02:53:54.825Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-23T02:53:54.826Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-23T02:53:54.830Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-23T02:53:54.830Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:54.833Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:54Z
+Succeeded - 2026-09-23T02:53:54Z
+
+dag: queue-dispatch-retry-attempt (0s)
+├─log: /tmp/dagu-test-<uuid-4>4100154636/logs/queue-dispatch-retry-test.log
+│
+└─1 (0s) [succeeded]
+  ├─echo queued retry dispatch
+  │
+  └─stdout: /tmp/dagu-test-<uuid-4>4100154636/logs/run_20260923_025354Z_1b319e/1.20260923.025354.825.queue-di.out
+      queued retry dispatch
+
+Result: Succeeded
+
+time=2026-09-23T02:53:54.841Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:54.841Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+=== RUN   TestRetryCommand/RetryAllowsRootFlagPointingAtSameRun
+=== PAUSE TestRetryCommand/RetryAllowsRootFlagPointingAtSameRun
+=== RUN   TestRetryCommand/StepRetryPreservesExplicitWorkingDir
+=== PAUSE TestRetryCommand/StepRetryPreservesExplicitWorkingDir
+=== RUN   TestRetryCommand/QueuedCatchupRetryRestoresEnvSecretsFromPersistedFullDAG
+time=2026-09-23T02:53:54.852Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-5>1769524497/data/dag-runs/queued-catchup-secret-dag/dag-runs/2026/09/23/dag-run_20260923_025354Z_queued-catchup-secret-run/a_20260923_025354_849Z_793170/status.jsonl
+time=2026-09-23T02:53:54.861Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/service/scheduler/enqueue.go:91 msg="Catchup run enqueued" dag=queued-catchup-secret-dag run-id=queued-catchup-secret-run
+time=2026-09-23T02:53:54.865Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-5>1769524497/config.yaml dir=/tmp/dagu-test-<uuid-5>1769524497/dags
+time=2026-09-23T02:53:54.865Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-5>1769524497/logs data-dir=/tmp/dagu-test-<uuid-5>1769524497/data dag-runs-dir=/tmp/dagu-test-<uuid-5>1769524497/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-5>1769524497/data/dag-state
+time=2026-09-23T02:53:54.868Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-23T02:53:54.868Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-<uuid-5>1769524497/logs/queued-catchup-secret-dag/dag-run_20260923_025354Z_queued-catchup-secret-run/dag-run_20260923.025354.849.queued-c.log
+time=2026-09-23T02:53:54.868Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1962 msg="Resolving secrets" count=1
+time=2026-09-23T02:53:54.868Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1980 msg="Secrets resolved successfully" count=1
+time=2026-09-23T02:53:54.870Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-5>1769524497/data/dag-runs/queued-catchup-secret-dag/dag-runs/2026/09/23/dag-run_20260923_025354Z_queued-catchup-secret-run/a_20260923_025354_867Z_632a4f/status.jsonl
+time=2026-09-23T02:53:54.880Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_queued-catchup-secret-dag_1b4eee.sock
+time=2026-09-23T02:53:54.880Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=632a4f retry-target-attempt-id=793170
+time=2026-09-23T02:53:54.880Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:54.880Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-23T02:53:54.880Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-23T02:53:54.880Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-23T02:53:54.880Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-23T02:53:54.880Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-23T02:53:54.880Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-23T02:53:54.880Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/output.go:146 msg="Created new output pipes" step=1 output-var=RESULT
+time=2026-09-23T02:53:54.881Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/output.go:471 msg="Captured output: closing output writer"
+time=2026-09-23T02:53:54.881Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/output.go:491 msg="Captured output" length=10
+time=2026-09-23T02:53:54.884Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-23T02:53:54.884Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:54.887Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:54Z
+Succeeded - 2026-09-23T02:53:54Z
+
+dag: queued-catchup-secret-dag (0s)
+├─log: /tmp/dagu-test-<uuid-5>1769524497/logs/queued-catchup-secret-dag/dag-run_20260923_025354Z_queued-catchup-secret-run/dag-run_20260923.025354.849.queued-c.log
+│
+└─1 (0s) [succeeded]
+  └─printf '%s|%s' "$EXPORTED_SECRET" "${QUEUED_CATCHUP_SECRET_SOURCE:-}"
+
+Result: Succeeded
+
+time=2026-09-23T02:53:54.897Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:54.897Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+=== RUN   TestRetryCommand/TrueRetryKeepsRetryTriggerType
+=== PAUSE TestRetryCommand/TrueRetryKeepsRetryTriggerType
+=== CONT  TestRetryCommand/RetryDAGWithFilePath
+=== CONT  TestRetryCommand/RetryAllowsRootFlagPointingAtSameRun
+=== CONT  TestRetryCommand/StepRetryPreservesExplicitWorkingDir
+=== CONT  TestRetryCommand/TrueRetryKeepsRetryTriggerType
+=== CONT  TestRetryCommand/QueuedCatchupRegeneratesLogAndPreservesTriggerType
+=== CONT  TestRetryCommand/QueuedRetryCreatesNewAttempt
+=== CONT  TestRetryCommand/RetryDAGWithName
+time=2026-09-23T02:53:54.907Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-6>3722826833/config.yaml dir=/tmp/dagu-test-<uuid-6>3722826833/dags
+time=2026-09-23T02:53:54.907Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-6>3722826833/logs data-dir=/tmp/dagu-test-<uuid-6>3722826833/data dag-runs-dir=/tmp/dagu-test-<uuid-6>3722826833/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-6>3722826833/data/dag-state
+time=2026-09-23T02:53:54.907Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:263 msg="Executing root dag-run" params="\"foo\""
+time=2026-09-23T02:53:54.911Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:553 msg="Dag-run initiated" file=/tmp/dagu-test-<uuid-6>3722826833/logs/<uuid-7>/dag-run_20260923_025354Z_034TZiGn8LE4xT0gz1Itjq/dag-run_20260923.025354.911.034TZiGn.log
+time=2026-09-23T02:53:54.915Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-8>2548614471/config.yaml dir=/tmp/dagu-test-<uuid-8>2548614471/dags
+time=2026-09-23T02:53:54.915Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-8>2548614471/logs data-dir=/tmp/dagu-test-<uuid-8>2548614471/data dag-runs-dir=/tmp/dagu-test-<uuid-8>2548614471/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-8>2548614471/data/dag-state
+time=2026-09-23T02:53:54.915Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-6>3722826833/data/dag-runs/<uuid-7>/dag-runs/2026/09/23/dag-run_20260923_025354Z_034TZiGn8LE4xT0gz1Itjq/a_20260923_025354_907Z_ab69e0/status.jsonl
+time=2026-09-23T02:53:54.915Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:263 msg="Executing root dag-run" params=""
+time=2026-09-23T02:53:54.918Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:553 msg="Dag-run initiated" file=/tmp/dagu-test-<uuid-8>2548614471/logs/retry-root-same-run/dag-run_20260923_025354Z_root-same-run/dag-run_20260923.025354.918.root-sam.log
+time=2026-09-23T02:53:54.922Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-9>144020129/config.yaml dir=/tmp/dagu-test-<uuid-9>144020129/dags
+time=2026-09-23T02:53:54.922Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-9>144020129/logs data-dir=/tmp/dagu-test-<uuid-9>144020129/data dag-runs-dir=/tmp/dagu-test-<uuid-9>144020129/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-9>144020129/data/dag-state
+time=2026-09-23T02:53:54.922Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-8>2548614471/data/dag-runs/retry-root-same-run/dag-runs/2026/09/23/dag-run_20260923_025354Z_root-same-run/a_20260923_025354_915Z_55ce12/status.jsonl
+time=2026-09-23T02:53:54.922Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:263 msg="Executing root dag-run" params=""
+time=2026-09-23T02:53:54.926Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:553 msg="Dag-run initiated" file=/tmp/dagu-test-<uuid-9>144020129/logs/retry-working-dir/dag-run_20260923_025354Z_retry-working-dir-run/dag-run_20260923.025354.926.retry-wo.log
+time=2026-09-23T02:53:54.929Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-10>2262055902/data/dag-runs/queued-catchup-dag/dag-runs/2026/09/23/dag-run_20260923_025354Z_queued-catchup-run/a_20260923_025354_925Z_49312e/status.jsonl
+time=2026-09-23T02:53:54.931Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_8040a047-0fe1-42e5-9e0e-e51350eb_44291d.sock
+time=2026-09-23T02:53:54.931Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1057 msg="DAG run started" attempt-id=ab69e0 params="[1=foo]"
+time=2026-09-23T02:53:54.931Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:54.931Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-23T02:53:54.931Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-23T02:53:54.931Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-23T02:53:54.931Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-9>144020129/data/dag-runs/retry-working-dir/dag-runs/2026/09/23/dag-run_20260923_025354Z_retry-working-dir-run/a_20260923_025354_923Z_f6f436/status.jsonl
+time=2026-09-23T02:53:54.932Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-23T02:53:54.932Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-23T02:53:54.932Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-23T02:53:54.938Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-23T02:53:54.938Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:54.941Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-11>58857342/config.yaml dir=/tmp/dagu-test-<uuid-11>58857342/dags
+time=2026-09-23T02:53:54.941Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-11>58857342/logs data-dir=/tmp/dagu-test-<uuid-11>58857342/data dag-runs-dir=/tmp/dagu-test-<uuid-11>58857342/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-11>58857342/data/dag-state
+time=2026-09-23T02:53:54.941Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_retry-root-same-run_fb36ff.sock
+time=2026-09-23T02:53:54.941Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:263 msg="Executing root dag-run" params=""
+time=2026-09-23T02:53:54.941Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1057 msg="DAG run started" attempt-id=55ce12 params=[]
+time=2026-09-23T02:53:54.942Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:54.942Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-23T02:53:54.942Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-23T02:53:54.942Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-23T02:53:54.942Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-23T02:53:54.942Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-23T02:53:54.942Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-23T02:53:54.942Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-10>2262055902/config.yaml dir=/tmp/dagu-test-<uuid-10>2262055902/dags
+time=2026-09-23T02:53:54.942Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-10>2262055902/logs data-dir=/tmp/dagu-test-<uuid-10>2262055902/data dag-runs-dir=/tmp/dagu-test-<uuid-10>2262055902/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-10>2262055902/data/dag-state
+time=2026-09-23T02:53:54.944Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-10>2262055902/data/dag-runs/queued-catchup-dag/dag-runs/2026/09/23/dag-run_20260923_025354Z_queued-catchup-run/a_20260923_025354_925Z_49312e/status.jsonl
+time=2026-09-23T02:53:54.945Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:54Z
+time=2026-09-23T02:53:54.946Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:553 msg="Dag-run initiated" file=/tmp/dagu-test-<uuid-11>58857342/logs/retry-trigger-dag/dag-run_20260923_025354Z_034TZiGqRudIKKyB3HDk2a/dag-run_20260923.025354.946.034TZiGq.log
+time=2026-09-23T02:53:54.949Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-12>3745830509/data/dag-runs/queued-retry-dag/dag-runs/2026/09/23/dag-run_20260923_025354Z_queued-retry-run/a_20260923_025354_942Z_c42505/status.jsonl
+time=2026-09-23T02:53:54.949Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-23T02:53:54.949Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:54.950Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-11>58857342/data/dag-runs/retry-trigger-dag/dag-runs/2026/09/23/dag-run_20260923_025354Z_034TZiGqRudIKKyB3HDk2a/a_20260923_025354_942Z_209c0d/status.jsonl
+time=2026-09-23T02:53:54.951Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_retry-working-dir_0abacc.sock
+time=2026-09-23T02:53:54.952Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1057 msg="DAG run started" attempt-id=f6f436 params=[]
+time=2026-09-23T02:53:54.952Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:54.952Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=target
+time=2026-09-23T02:53:54.952Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=target
+time=2026-09-23T02:53:54.952Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=target
+time=2026-09-23T02:53:54.952Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-23T02:53:54.952Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-23T02:53:54.952Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-23T02:53:54.955Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:54Z
+time=2026-09-23T02:53:54.956Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-23T02:53:54.956Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-<uuid-10>2262055902/logs/queued-catchup-dag/dag-run_20260923_025354Z_queued-catchup-run/dag-run_20260923.025354.944.queued-c.log
+Succeeded - 2026-09-23T02:53:54Z
+
+dag: <uuid-7> (0s)
+├─log: /tmp/dagu-test-<uuid-6>3722826833/logs/<uuid-7>/dag-run_20260923_025354Z_034TZiGn8LE4xT0gz1Itjq/dag-run_20260923.025354.911.034TZiGn.log
+│
+└─1 (0s) [succeeded]
+  ├─echo param is foo
+  │
+  └─stdout: /tmp/dagu-test-<uuid-6>3722826833/logs/<uuid-7>/dag-run_20260923_025354Z_034TZiGn8LE4xT0gz1Itjq/run_20260923_025354Z_ab69e0/1.20260923.025354.932.034TZiGn.out
+      param is foo
+
+Result: Succeeded
+
+time=2026-09-23T02:53:54.959Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-13>3908505112/config.yaml dir=/tmp/dagu-test-<uuid-13>3908505112/dags
+time=2026-09-23T02:53:54.959Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-13>3908505112/logs data-dir=/tmp/dagu-test-<uuid-13>3908505112/data dag-runs-dir=/tmp/dagu-test-<uuid-13>3908505112/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-13>3908505112/data/dag-state
+time=2026-09-23T02:53:54.959Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:263 msg="Executing root dag-run" params="\"bar\""
+time=2026-09-23T02:53:54.959Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=target
+time=2026-09-23T02:53:54.959Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=failed err="exit status 1"
+time=2026-09-23T02:53:54.960Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-6>3722826833/config.yaml dir=/tmp/dagu-test-<uuid-6>3722826833/dags
+time=2026-09-23T02:53:54.960Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-6>3722826833/logs data-dir=/tmp/dagu-test-<uuid-6>3722826833/data dag-runs-dir=/tmp/dagu-test-<uuid-6>3722826833/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-6>3722826833/data/dag-state
+time=2026-09-23T02:53:54.960Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-10>2262055902/data/dag-runs/queued-catchup-dag/dag-runs/2026/09/23/dag-run_20260923_025354Z_queued-catchup-run/a_20260923_025354_953Z_50b62b/status.jsonl
+time=2026-09-23T02:53:54.963Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:553 msg="Dag-run initiated" file=/tmp/dagu-test-<uuid-13>3908505112/logs/<uuid-14>/dag-run_20260923_025354Z_034TZiGsCdfp6yzxp3t0ng/dag-run_20260923.025354.963.034TZiGs.log
+time=2026-09-23T02:53:54.965Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-12>3745830509/config.yaml dir=/tmp/dagu-test-<uuid-12>3745830509/dags
+time=2026-09-23T02:53:54.965Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-12>3745830509/logs data-dir=/tmp/dagu-test-<uuid-12>3745830509/data dag-runs-dir=/tmp/dagu-test-<uuid-12>3745830509/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-12>3745830509/data/dag-state
+time=2026-09-23T02:53:54.965Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-23T02:53:54.965Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-<uuid-6>3722826833/logs/<uuid-7>/dag-run_20260923_025354Z_034TZiGn8LE4xT0gz1Itjq/dag-run_20260923.025354.911.034TZiGn.log
+Succeeded - 2026-09-23T02:53:54Z
+
+dag: retry-root-same-run (0s)
+├─log: /tmp/dagu-test-<uuid-8>2548614471/logs/retry-root-same-run/dag-run_20260923_025354Z_root-same-run/dag-run_20260923.025354.918.root-sam.log
+│
+└─1 (0s) [succeeded]
+  ├─echo retry root
+  │
+  └─stdout: /tmp/dagu-test-<uuid-8>2548614471/logs/retry-root-same-run/dag-run_20260923_025354Z_root-same-run/run_20260923_025354Z_55ce12/1.20260923.025354.942.root-sam.out
+      retry root
+
+Result: Succeeded
+
+time=2026-09-23T02:53:54.966Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=failed started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:54Z
+time=2026-09-23T02:53:54.967Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-13>3908505112/data/dag-runs/<uuid-14>/dag-runs/2026/09/23/dag-run_20260923_025354Z_034TZiGsCdfp6yzxp3t0ng/a_20260923_025354_960Z_b3e045/status.jsonl
+time=2026-09-23T02:53:54.968Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-8>2548614471/config.yaml dir=/tmp/dagu-test-<uuid-8>2548614471/dags
+time=2026-09-23T02:53:54.968Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-8>2548614471/logs data-dir=/tmp/dagu-test-<uuid-8>2548614471/data dag-runs-dir=/tmp/dagu-test-<uuid-8>2548614471/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-8>2548614471/data/dag-state
+time=2026-09-23T02:53:54.969Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_retry-trigger-dag_04f7ff.sock
+time=2026-09-23T02:53:54.969Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1057 msg="DAG run started" attempt-id=209c0d params=[]
+time=2026-09-23T02:53:54.969Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:54.969Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-23T02:53:54.969Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-23T02:53:54.969Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-23T02:53:54.969Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-23T02:53:54.969Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-23T02:53:54.969Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-23T02:53:54.970Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-6>3722826833/data/dag-runs/<uuid-7>/dag-runs/2026/09/23/dag-run_20260923_025354Z_034TZiGn8LE4xT0gz1Itjq/a_20260923_025354_962Z_cb67dc/status.jsonl
+time=2026-09-23T02:53:54.971Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-23T02:53:54.971Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-<uuid-12>3745830509/logs/queued-retry-test.log
+time=2026-09-23T02:53:54.972Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-23T02:53:54.972Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-<uuid-8>2548614471/logs/retry-root-same-run/dag-run_20260923_025354Z_root-same-run/dag-run_20260923.025354.918.root-sam.log
+time=2026-09-23T02:53:54.975Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-12>3745830509/data/dag-runs/queued-retry-dag/dag-runs/2026/09/23/dag-run_20260923_025354Z_queued-retry-run/a_20260923_025354_967Z_16c875/status.jsonl
+time=2026-09-23T02:53:54.976Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-8>2548614471/data/dag-runs/retry-root-same-run/dag-runs/2026/09/23/dag-run_20260923_025354Z_root-same-run/a_20260923_025354_969Z_ec9117/status.jsonl
+time=2026-09-23T02:53:54.976Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-23T02:53:54.976Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:54.978Z level=ERROR source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/agent_executor.go:36 msg="Failed to execute dag-run" err="exit status 1"
+Failed - 2026-09-23T02:53:54Z
+
+dag: retry-working-dir (0s)
+├─log: /tmp/dagu-test-<uuid-9>144020129/logs/retry-working-dir/dag-run_20260923_025354Z_retry-working-dir-run/dag-run_20260923.025354.926.retry-wo.log
+│
+└─target (0s) [failed]
+  └─error: exit status 1
+
+Result: Failed
+
+Error: failed to execute the dag-run retry-working-dir (dag-run ID: retry-working-dir-run): exit status 1
+time=2026-09-23T02:53:54.979Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_queued-catchup-dag_1a6d2f.sock
+time=2026-09-23T02:53:54.979Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=50b62b retry-target-attempt-id=49312e
+time=2026-09-23T02:53:54.980Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:54.980Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-23T02:53:54.980Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-23T02:53:54.980Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-23T02:53:54.980Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-9>144020129/config.yaml dir=/tmp/dagu-test-<uuid-9>144020129/dags
+time=2026-09-23T02:53:54.980Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-9>144020129/logs data-dir=/tmp/dagu-test-<uuid-9>144020129/data dag-runs-dir=/tmp/dagu-test-<uuid-9>144020129/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-9>144020129/data/dag-state
+time=2026-09-23T02:53:54.980Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-23T02:53:54.980Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-23T02:53:54.980Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-23T02:53:54.983Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:54Z
+time=2026-09-23T02:53:54.983Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-23T02:53:54.983Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-<uuid-9>144020129/logs/retry-working-dir/dag-run_20260923_025354Z_retry-working-dir-run/dag-run_20260923.025354.926.retry-wo.log
+time=2026-09-23T02:53:54.986Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-23T02:53:54.986Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:54.987Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-9>144020129/data/dag-runs/retry-working-dir/dag-runs/2026/09/23/dag-run_20260923_025354Z_retry-working-dir-run/a_20260923_025354_981Z_5acd92/status.jsonl
+time=2026-09-23T02:53:54.989Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_3a69518e-aa94-45da-a314-83660650_75fd23.sock
+time=2026-09-23T02:53:54.989Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1057 msg="DAG run started" attempt-id=b3e045 params="[1=bar]"
+time=2026-09-23T02:53:54.990Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:54.990Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-23T02:53:54.990Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-23T02:53:54.990Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-23T02:53:54.990Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-23T02:53:54.990Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-23T02:53:54.990Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-23T02:53:54.993Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:54Z
+time=2026-09-23T02:53:54.996Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-23T02:53:54.996Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+Succeeded - 2026-09-23T02:53:54Z
+
+dag: retry-trigger-dag (0s)
+├─log: /tmp/dagu-test-<uuid-11>58857342/logs/retry-trigger-dag/dag-run_20260923_025354Z_034TZiGqRudIKKyB3HDk2a/dag-run_20260923.025354.946.034TZiGq.log
+│
+└─1 (0s) [succeeded]
+  ├─echo retry trigger
+  │
+  └─stdout: /tmp/dagu-test-<uuid-11>58857342/logs/retry-trigger-dag/dag-run_20260923_025354Z_034TZiGqRudIKKyB3HDk2a/run_20260923_025354Z_209c0d/1.20260923.025354.969.034TZiGq.out
+      retry trigger
+
+Result: Succeeded
+
+time=2026-09-23T02:53:54.998Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-11>58857342/config.yaml dir=/tmp/dagu-test-<uuid-11>58857342/dags
+time=2026-09-23T02:53:54.998Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-11>58857342/logs data-dir=/tmp/dagu-test-<uuid-11>58857342/data dag-runs-dir=/tmp/dagu-test-<uuid-11>58857342/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-11>58857342/data/dag-state
+time=2026-09-23T02:53:55.000Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_8040a047-0fe1-42e5-9e0e-e51350eb_44291d.sock
+time=2026-09-23T02:53:55.000Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=cb67dc retry-target-attempt-id=ab69e0
+time=2026-09-23T02:53:55.000Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:55.000Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:55.000Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:55Z
+time=2026-09-23T02:53:55.001Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-23T02:53:55.001Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-<uuid-11>58857342/logs/retry-trigger-dag/dag-run_20260923_025354Z_034TZiGqRudIKKyB3HDk2a/dag-run_20260923.025354.946.034TZiGq.log
+time=2026-09-23T02:53:55.003Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:54Z
+Succeeded - 2026-09-23T02:53:54Z
+
+dag: queued-catchup-dag (0s)
+├─log: /tmp/dagu-test-<uuid-10>2262055902/logs/queued-catchup-dag/dag-run_20260923_025354Z_queued-catchup-run/dag-run_20260923.025354.944.queued-c.log
+│
+└─1 (0s) [succeeded]
+  ├─echo queued catchup
+  │
+  └─stdout: /tmp/dagu-test-<uuid-10>2262055902/logs/queued-catchup-dag/dag-run_20260923_025354Z_queued-catchup-run/run_20260923_025354Z_50b62b/1.20260923.025354.980.queued-c.out
+      queued catchup
+
+Result: Succeeded
+
+time=2026-09-23T02:53:55.004Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:55.004Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-23T02:53:55.005Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-11>58857342/data/dag-runs/retry-trigger-dag/dag-runs/2026/09/23/dag-run_20260923_025354Z_034TZiGqRudIKKyB3HDk2a/a_20260923_025354_999Z_2027a5/status.jsonl
+time=2026-09-23T02:53:55.010Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_queued-retry-dag_c639a3.sock
+time=2026-09-23T02:53:55.010Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=16c875 retry-target-attempt-id=c42505
+time=2026-09-23T02:53:55.010Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:55.010Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-23T02:53:55.010Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-23T02:53:55.010Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-23T02:53:55.011Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-23T02:53:55.011Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-23T02:53:55.011Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+Succeeded - 2026-09-23T02:53:54Z
+
+dag: <uuid-7> (1.0s)
+├─log: /tmp/dagu-test-<uuid-6>3722826833/logs/<uuid-7>/dag-run_20260923_025354Z_034TZiGn8LE4xT0gz1Itjq/dag-run_20260923.025354.911.034TZiGn.log
+│
+└─1 (0s) [succeeded]
+  ├─echo param is $1
+  │
+  └─stdout: /tmp/dagu-test-<uuid-6>3722826833/logs/<uuid-7>/dag-run_20260923_025354Z_034TZiGn8LE4xT0gz1Itjq/run_20260923_025354Z_ab69e0/1.20260923.025354.932.034TZiGn.out
+      param is foo
+
+Result: Succeeded
+
+time=2026-09-23T02:53:55.011Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:55.011Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:55.011Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-23T02:53:55.011Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+Succeeded - 2026-09-23T02:53:54Z
+
+dag: <uuid-14> (0s)
+├─log: /tmp/dagu-test-<uuid-13>3908505112/logs/<uuid-14>/dag-run_20260923_025354Z_034TZiGsCdfp6yzxp3t0ng/dag-run_20260923.025354.963.034TZiGs.log
+│
+└─1 (0s) [succeeded]
+  ├─echo param is bar
+  │
+  └─stdout: /tmp/dagu-test-<uuid-13>3908505112/logs/<uuid-14>/dag-run_20260923_025354Z_034TZiGsCdfp6yzxp3t0ng/run_20260923_025354Z_b3e045/1.20260923.025354.990.034TZiGs.out
+      param is bar
+
+Result: Succeeded
+
+time=2026-09-23T02:53:55.016Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-13>3908505112/config.yaml dir=/tmp/dagu-test-<uuid-13>3908505112/dags
+time=2026-09-23T02:53:55.016Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-13>3908505112/logs data-dir=/tmp/dagu-test-<uuid-13>3908505112/data dag-runs-dir=/tmp/dagu-test-<uuid-13>3908505112/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-13>3908505112/data/dag-state
+time=2026-09-23T02:53:55.018Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-23T02:53:55.018Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:55.019Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-23T02:53:55.019Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-<uuid-13>3908505112/logs/<uuid-14>/dag-run_20260923_025354Z_034TZiGsCdfp6yzxp3t0ng/dag-run_20260923.025354.963.034TZiGs.log
+time=2026-09-23T02:53:55.020Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_retry-root-same-run_fb36ff.sock
+time=2026-09-23T02:53:55.020Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=ec9117 retry-target-attempt-id=55ce12
+time=2026-09-23T02:53:55.020Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:55.020Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:55.020Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:55Z
+time=2026-09-23T02:53:55.023Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-<uuid-13>3908505112/data/dag-runs/<uuid-14>/dag-runs/2026/09/23/dag-run_20260923_025354Z_034TZiGsCdfp6yzxp3t0ng/a_20260923_025355_017Z_0db232/status.jsonl
+time=2026-09-23T02:53:55.024Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:55Z
+Succeeded - 2026-09-23T02:53:54Z
+
+dag: retry-root-same-run (1.0s)
+├─log: /tmp/dagu-test-<uuid-8>2548614471/logs/retry-root-same-run/dag-run_20260923_025354Z_root-same-run/dag-run_20260923.025354.918.root-sam.log
+│
+└─1 (0s) [succeeded]
+  ├─echo retry root
+  │
+  └─stdout: /tmp/dagu-test-<uuid-8>2548614471/logs/retry-root-same-run/dag-run_20260923_025354Z_root-same-run/run_20260923_025354Z_55ce12/1.20260923.025354.942.root-sam.out
+      retry root
+
+Result: Succeeded
+
+time=2026-09-23T02:53:55.030Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:55.030Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-23T02:53:55.030Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:55.030Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-23T02:53:55.030Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_retry-working-dir_0abacc.sock
+time=2026-09-23T02:53:55.030Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=5acd92 retry-target-attempt-id=f6f436
+time=2026-09-23T02:53:55.030Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:55.030Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=target
+time=2026-09-23T02:53:55.030Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=target
+time=2026-09-23T02:53:55.030Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=target
+time=2026-09-23T02:53:55.031Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-23T02:53:55.031Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-23T02:53:55.031Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+Succeeded - 2026-09-23T02:53:54Z
+
+dag: queued-retry-dag (1.0s)
+├─log: /tmp/dagu-test-<uuid-12>3745830509/logs/queued-retry-test.log
+│
+└─1 (0s) [succeeded]
+  ├─echo queued retry
+  │
+  └─stdout: /tmp/dagu-test-<uuid-12>3745830509/logs/run_20260923_025354Z_16c875/1.20260923.025355.010.queued-r.out
+      queued retry
+
+Result: Succeeded
+
+time=2026-09-23T02:53:55.035Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:55.035Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-23T02:53:55.037Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=target
+time=2026-09-23T02:53:55.037Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:55.040Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_retry-trigger-dag_04f7ff.sock
+time=2026-09-23T02:53:55.040Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=2027a5 retry-target-attempt-id=209c0d
+time=2026-09-23T02:53:55.040Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:55.040Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:55.040Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:55Z finished-at=2026-09-23T02:53:55Z
+time=2026-09-23T02:53:55.043Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:54Z finished-at=2026-09-23T02:53:55Z
+Succeeded - 2026-09-23T02:53:55Z
+
+dag: retry-trigger-dag (0s)
+├─log: /tmp/dagu-test-<uuid-11>58857342/logs/retry-trigger-dag/dag-run_20260923_025354Z_034TZiGqRudIKKyB3HDk2a/dag-run_20260923.025354.946.034TZiGq.log
+│
+└─1 (0s) [succeeded]
+  ├─echo retry trigger
+  │
+  └─stdout: /tmp/dagu-test-<uuid-11>58857342/logs/retry-trigger-dag/dag-run_20260923_025354Z_034TZiGqRudIKKyB3HDk2a/run_20260923_025354Z_209c0d/1.20260923.025354.969.034TZiGq.out
+      retry trigger
+
+Result: Succeeded
+
+time=2026-09-23T02:53:55.049Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:55.049Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-23T02:53:55.049Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:55.049Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-23T02:53:55.050Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_3a69518e-aa94-45da-a314-83660650_75fd23.sock
+time=2026-09-23T02:53:55.050Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=0db232 retry-target-attempt-id=b3e045
+Succeeded - 2026-09-23T02:53:54Z
+
+dag: retry-working-dir (1.0s)
+├─log: /tmp/dagu-test-<uuid-9>144020129/logs/retry-working-dir/dag-run_20260923_025354Z_retry-working-dir-run/dag-run_20260923.025354.926.retry-wo.log
+│
+└─target (0s) [succeeded]
+  └─stdout: /tmp/dagu-test-<uuid-9>144020129/logs/retry-working-dir/dag-run_20260923_025354Z_retry-working-dir-run/run_20260923_025354Z_5acd92/target.20260923.025355.031.retry-wo.out
+      retry ok
+
+Result: Succeeded
+
+time=2026-09-23T02:53:55.050Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-23T02:53:55.051Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-23T02:53:55.051Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-23T02:53:55Z finished-at=2026-09-23T02:53:55Z
+time=2026-09-23T02:53:55.051Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:55.051Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-23T02:53:55.051Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:55.051Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+Succeeded - 2026-09-23T02:53:55Z
+
+dag: <uuid-14> (0s)
+├─log: /tmp/dagu-test-<uuid-13>3908505112/logs/<uuid-14>/dag-run_20260923_025354Z_034TZiGsCdfp6yzxp3t0ng/dag-run_20260923.025354.963.034TZiGs.log
+│
+└─1 (0s) [succeeded]
+  ├─echo param is $1
+  │
+  └─stdout: /tmp/dagu-test-<uuid-13>3908505112/logs/<uuid-14>/dag-run_20260923_025354Z_034TZiGsCdfp6yzxp3t0ng/run_20260923_025354Z_b3e045/1.20260923.025354.990.034TZiGs.out
+      param is bar
+
+Result: Succeeded
+
+time=2026-09-23T02:53:55.058Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:55.058Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-23T02:53:55.058Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-23T02:53:55.058Z level=INFO source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+--- PASS: TestRetryCommand (0.22s)
+    --- PASS: TestRetryCommand/QueuedRetryDoesNotWaitForTerminalSourceProc (0.04s)
+    --- PASS: TestRetryCommand/QueueDispatchRetryTreatsMissingRunAsStaleDispatch (0.01s)
+    --- PASS: TestRetryCommand/QueueDispatchRetryUsesQueuedAttempt (0.06s)
+    --- PASS: TestRetryCommand/QueueDispatchRetryTriggerCreatesNewAttempt (0.05s)
+    --- PASS: TestRetryCommand/QueuedCatchupRetryRestoresEnvSecretsFromPersistedFullDAG (0.06s)
+    --- PASS: TestRetryCommand/QueuedCatchupRegeneratesLogAndPreservesTriggerType (0.11s)
+    --- PASS: TestRetryCommand/RetryDAGWithFilePath (0.12s)
+    --- PASS: TestRetryCommand/RetryAllowsRootFlagPointingAtSameRun (0.13s)
+    --- PASS: TestRetryCommand/QueuedRetryCreatesNewAttempt (0.14s)
+    --- PASS: TestRetryCommand/TrueRetryKeepsRetryTriggerType (0.15s)
+    --- PASS: TestRetryCommand/StepRetryPreservesExplicitWorkingDir (0.15s)
+    --- PASS: TestRetryCommand/RetryDAGWithName (0.16s)
+=== RUN   TestRetryCommand_BuiltExecutableRestoresExplicitEnv
+--- PASS: TestRetryCommand_BuiltExecutableRestoresExplicitEnv (5.19s)
+=== RUN   TestRetryCommand_DownstreamRequiresStep
+time=2026-09-23T02:54:00.262Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-<uuid-15>2916380723/config.yaml dir=/tmp/dagu-test-<uuid-15>2916380723/dags
+time=2026-09-23T02:54:00.262Z level=DEBUG source=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-<uuid-15>2916380723/logs data-dir=/tmp/dagu-test-<uuid-15>2916380723/data dag-runs-dir=/tmp/dagu-test-<uuid-15>2916380723/data/dag-runs dag-state-dir=/tmp/dagu-test-<uuid-15>2916380723/data/dag-state
+Error: --downstream requires --step
+--- PASS: TestRetryCommand_DownstreamRequiresStep (0.01s)
+PASS
+ok  	github.com/dagucloud/dagu/v2/internal/cmd	5.615s

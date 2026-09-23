@@ -1,0 +1,5 @@
+{"gap_index": 0, "written_at": "2026-09-23T16:18:25Z", "written_before_results": true,
+ "label": "fix-round-2 addendum, written after T0-T3 (no arm wrote config.toml) and before this positive control",
+ "arm": {"P positive control": "Same isolated setup; app-server config/value/write {keyPath: projects, value: {<ws>: {trust_level: trusted}}, mergeStrategy: upsert} with no filePath (defaults to $CODEX_HOME/config.toml)."},
+ "expectation": "The temp config.toml appears with a [projects.\"<ws>\"] trust_level = \"trusted\" table, showing the probe's read-after check detects a persisted trust write; T0-T3 negatives are then real negatives for thread/start.",
+ "criteria": ["If P writes nothing, the T0-T3 negatives are not evidence of anything and are reported as such."]}

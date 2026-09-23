@@ -1,0 +1,66 @@
+{
+  "0": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/0-network-fixture-extension.json"
+  },
+  "1": {
+    "outcome": "settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/1-filesystem-fixture-versioned.json"
+  },
+  "2": {
+    "outcome": "settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/2-readiness-race-quantified.json"
+  },
+  "3": {
+    "outcome": "settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/3-overlapping-denyread-write-reproduced.json"
+  },
+  "4": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/4-resource-limit-workloads.json"
+  },
+  "5": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/5-worktrunk-0-79-0-cargo-test.json"
+  },
+  "6": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/6-worktrunk-lifecycle-rerun-versioned.json"
+  },
+  "7": {
+    "outcome": "settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/7-worktrunk-dirty-removal-refused.json"
+  },
+  "8": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/8-worktrunk-crash-cleanup-fixture.json"
+  },
+  "10": {
+    "outcome": "not_settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/10-podman-boundary-deferred.json"
+  },
+  "12": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/12-worktrunk-crash-cleanup-fixture-dup.json"
+  },
+  "13": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/13-network-and-resource-limits-combined.json"
+  },
+  "14": {
+    "outcome": "covered_elsewhere",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/14-readiness-race-quantified-dup.json"
+  },
+  "15": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/15-overlapping-denyread-write-reproduced-dup.json"
+  },
+  "17": {
+    "outcome": "not_settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/17-podman-comparison-deferred.json"
+  },
+  "18": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/18-worktrunk-lifecycle-rerun-versioned-dup.json"
+  }
+}

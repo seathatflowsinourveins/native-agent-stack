@@ -1,0 +1,26 @@
+{
+ "started_at": "2026-09-23T16:18:32Z",
+ "codex_version": "codex-cli 0.155.1",
+ "arms": [
+  {
+   "arm": "P-positive-control",
+   "override_sent": false,
+   "first_thread_start": false,
+   "second_ephemeral_thread_start": false,
+   "config_toml_existed_before": false,
+   "thread_start_ok": true,
+   "thread_start_error": null,
+   "config_toml_after": "[projects]\n\n[projects.\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/trustprobe/P-positive-control-aev1p18k/ws\"]\ntrust_level = \"trusted\"\n",
+   "config_toml_after_sha256": "87727474a47f236202c56fa5036aa1b9286c039f4966c964959a076ce3106af5",
+   "stdout_first_lines": [
+    "{\"id\":0,\"result\":{\"userAgent\":\"trust-probe/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (trust-probe; 0)\",\"codexHome\":\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/trustprobe/P-positive-control-aev1p18k/codex-home\",\"platformFamily\":\"unix\",\"platformOs\":\"linux\"}}",
+    "{\"method\":\"remoteControl/status/changed\",\"params\":{\"status\":\"disabled\",\"serverName\":\"<host>\",\"installationId\":\"<id-1>\",\"environmentId\":null},\"emittedAtMs\":1790180312235}",
+    "{\"id\":1,\"result\":{\"status\":\"ok\",\"version\":\"sha256:e1e8e4488717b86faa897191ac94de5124b8c5e0eb459152d5d73562ac3e5214\",\"filePath\":\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/trustprobe/P-positive-control-aev1p18k/codex-home/config.toml\",\"overriddenMetadata\":null}}"
+   ],
+   "stderr_tail": "",
+   "exit_code": 0,
+   "ws": "$HOME/.cache/gap-wave2-20260923/agents-models-workers/trustprobe/P-positive-control-aev1p18k/ws"
+  }
+ ],
+ "finished_at": "2026-09-23T16:18:34Z"
+}

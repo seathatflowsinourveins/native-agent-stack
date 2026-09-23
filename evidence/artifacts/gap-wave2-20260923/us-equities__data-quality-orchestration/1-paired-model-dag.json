@@ -1,0 +1,110 @@
+{
+  "id": "gap-wave2-20260923-us-equities-data-quality-orchestration-1-paired-model-dag",
+  "gap_index": 1,
+  "gap_text_sha256": "15b828a624ecb469ce985ffe202b3a5ca3b9a86628699fea90255a2c5328923f",
+  "gap_text": "Dagu: the paired Astra-to-Claude model workflow was not executed (paired_model_workflow_executed false) because the Codex allowance was exhausted (usedPercent 100). The Claude Opus 5 report ran standalone, outside the Dagu graph, so complete returned results from a model worker running inside the orchestrated graph are not established.",
+  "next_check": "Check Codex usage (`codex` /status). Then run the paired Astra-to-Claude model DAG under the pinned Dagu 2.16.6 service and retain `dagu history --run-id <id> --format json` plus each step's returned model output, with paired_model_workflow_executed recorded.",
+  "preregistration": {
+    "written_at": "2026-09-23T05:16:19Z",
+    "expectation": "The paired Astra->Claude DAG was already executed under Dagu 2.16.6 on 2026-09-19 (adoption/paired/receipt.json, commit a9f40f2), after the allowance blocker recorded in research-runtime/receipt.json. Source review of that retained native evidence should show both model steps returned complete, validated results inside the graph. No new model inference is planned: the shared Claude account is reserved and the hooks of a native Claude/Codex run would write to the live ai-memory store.",
+    "criteria": "covered_elsewhere iff adoption/paired/receipt.json records dagu.version 2.16.6, research_pair.status succeeded with exit 0, astra and claude status completed with report_validation passed, and the sha256 of the retained adoption/paired/astra.report.json and claude.report.json equal the receipt's report_sha256 values. A mismatch or missing file makes it not_settled. Retaining the raw `dagu history --format json` record is a separate arm: if a read-only listing of the service's DAGU_HOME shows a research-pair run record, its status line is copied (host paths replaced); otherwise that arm is recorded as not retained."
+  },
+  "commands": [
+    "python3 (inline) sha256 of adoption/paired/{astra,claude}.report.json and packet.json vs adoption/paired/receipt.json data.{astra,claude}.report_sha256 / packet_sha256",
+    "find $HOME/.local/share/codex-ecosystem/dagu-equities/data/dag-runs/research-pair -type f   (read-only listing of the service's DAGU_HOME)",
+    "cp -r --preserve=timestamps <that run dir>/dag-run_20260919_194123Z_portable-adoption-model-pair-20260919 $C/replay-home/data/dag-runs/research-pair/dag-runs/2026/09/19/   (copy; sha256 of status.jsonl identical before/after: b529c0a1aa3b5843c12b...)",
+    "env -i HOME=$C/replay-home PATH=/usr/bin:/bin DAGU_HOME=$C/replay-home $C/bin/dagu-2.16.6/dagu history --dagu-home $C/replay-home --run-id portable-adoption-model-pair-20260919 --format json research-pair",
+    "env -i HOME=$C/replay-home PATH=/usr/bin:/bin DAGU_HOME=$C/replay-home $C/bin/dagu-2.16.6/dagu status --dagu-home $C/replay-home --run-id portable-adoption-model-pair-20260919 research-pair",
+    "cat $HOME/.local/share/codex-ecosystem/dagu-equities/logs/research-pair/dag-run_20260919_194123Z_portable-adoption-model-pair-20260919/run_20260919_194123Z_df98bd/{astra,claude}.*.out   (read-only; copied)"
+  ],
+  "results": {
+    "paired_model_workflow_executed": true,
+    "adoption_paired_receipt": "adoption/paired/receipt.json (commit a9f40f2, observed_at_utc 2026-09-19T19:41:50Z): dagu.version \"2.16.6\"; research_pair {\"status\": \"succeeded\", \"exit_code\": 0, \"started_at\": \"2026-09-19T19:41:23Z\", \"finished_at\": \"2026-09-19T19:41:50Z\"}; astra status \"completed\", report_validation \"citations_values_units_and_scope_passed\", process_exit_code 0; claude status \"completed\", same validation, process_exit_code 0",
+    "report_hashes": "astra.report.json sha256 b396469ae5486701... equals receipt report_sha256: True; claude.report.json 1b65a75fbd41f65b... equals: True; packet.json equals packet_sha256: True",
+    "dagu_history_json": "[{\"name\": \"research-pair\", \"dagRunId\": \"portable-adoption-model-pair-20260919\", \"status\": \"succeeded\", \"startedAt\": \"2026-09-19T15:41:23-04:00\", \"finishedAt\": \"2026-09-19T15:41:50-04:00\", \"duration\": \"27s\", \"workerId\": \"local\"}]  (exit 0)",
+    "dagu_status_steps": "Succeeded; astra (16.0s) [succeeded]; claude (11.0s) [succeeded]",
+    "step_returned_outputs": {
+      "astra": "{\"role\": \"astra\", \"status\": \"completed\", \"inference_attempted\": true, \"duration_ms\": 14953}",
+      "claude": "{\"role\": \"claude\", \"status\": \"completed\", \"inference_attempted\": true, \"duration_ms\": 10538}"
+    },
+    "interpretation": "The gap text describes the earlier research-runtime receipt (allowance at 100%). The later paired acceptance on 2026-09-19 ran Astra then Claude as the two steps of the research-pair graph under Dagu 2.16.6. The native run record, replayed through the pinned dagu history/status CLI, shows both steps succeeded, and each step printed the worker result that the adoption receipt records (duration_ms 14953 and 10538). The full returned reports are retained with matching hashes. Complete returned results from model workers inside the orchestrated graph are therefore established by the adoption/paired record."
+  },
+  "outcome": "covered_elsewhere",
+  "evidence_class": "source_review",
+  "limits": [
+    "No new model inference was run for this check (the only model call in this unit was the read-only Codex review): the Codex /status arm of the next_check was not executed because no new paired run was needed, the shared Claude account is reserved, and a new paired run would add native Claude/Codex hook observations to the live ai-memory store. The evidence is the 2026-09-19 native run, not a fresh one.",
+    "The dagu history/status output was produced by the pinned 2.16.6 binary against a byte-identical copy of the retained run record in a temp DAGU_HOME, not against the live service home, so the live service was not touched. It is a replay of the stored record, not a re-execution.",
+    "The step stdout records are the run_worker.py summaries (role, status, duration); the full reports are the hash-matched files under adoption/paired/.",
+    "The research-runtime README/receipt text that still says paired_model_workflow_executed false is historical and is superseded by its own \"Later paired acceptance\" pointer; the landscape ledger row was not edited (forbidden path).",
+    "Disclosure (fix round 4, second independent review): this unit did make contact with the live ai-memory service indirectly. $HOME/.codex/hooks.json runs `ai-memory ... hook --event <session-start|user-prompt-submit|pre-tool-use|post-tool-use|stop|session-end> --server-url http://127.0.0.1:49374` for every Codex session, so the one sanctioned `codex exec --sandbox read-only --ephemeral` review (cwd = this worktree) most likely posted lifecycle observations to the live store; likewise the Claude worker session itself runs under $HOME/.claude/settings.json hooks that post to the same service. The unit made no direct ai-memory CLI/HTTP call and did not query the live store to check (the hard rule forbids calls to it), so whether those hooks created a live project/workspace for the worktree path is unverified and is left to the coordinator."
+  ],
+  "checked_at": "2026-09-23T05:23:40Z",
+  "command_variables": {
+    "C": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration",
+    "R": "worktree root (claude/g2-data-quality-orchestration-20260923)",
+    "H": "R/blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration"
+  },
+  "covered_by": "adoption/paired/receipt.json with adoption/paired/{astra,claude}.report.json (native_model_e2e, 2026-09-19, commit a9f40f2)",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/1-dagu-history-research-pair.json",
+      "original_sha256": "47d0c768426b1bb52605e1c65c6c18978d47adf548d59a976540a4e8ac30c893",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/1-dagu-history-research-pair.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "47d0c768426b1bb52605e1c65c6c18978d47adf548d59a976540a4e8ac30c893",
+      "bytes": 265
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/1-dagu-status-research-pair.txt",
+      "original_sha256": "e64d324d4baad6b785402f3697a32d9801c04fcbcca92f8f9c4051fdeb058a22",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/1-dagu-status-research-pair.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "a52bb22dc1882369bf134bda1a5f008b6b2322fe674d7f20ee0b88d0cdc8447a",
+      "bytes": 2015
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/1-research-pair-status.jsonl.txt",
+      "original_sha256": "b529c0a1aa3b5843c12b444c6de6ea6ea9a22e403121f5b25a39b7c6b0aff4bc",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/1-research-pair-status.jsonl",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "7c7c40482bf3e7b3b2d3b62e0532f8dc0bfe77bc3a6b8181784127ad2071006e",
+      "bytes": 3930
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/1-step-astra.out",
+      "original_sha256": "b4e5568322cad15f1bca1eac46bead46f12ca7ebe518f0ad7dcca33263e587f2",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/1-step-astra.out",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "b4e5568322cad15f1bca1eac46bead46f12ca7ebe518f0ad7dcca33263e587f2",
+      "bytes": 92
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/1-step-claude.out",
+      "original_sha256": "4b3a6c5297eb5693fab413e41802c2e6030fc85bb54ffbb8021776efaa54bfa1",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/1-step-claude.out",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "4b3a6c5297eb5693fab413e41802c2e6030fc85bb54ffbb8021776efaa54bfa1",
+      "bytes": 93
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+      "original_sha256": "765352de082804501782e86a64029211bf1504edbf823d3aba4f8ae77753b7c8",
+      "source": "<ephemeral session scratchpad>/g2dqo-review.md",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "dd0283b76a5c85ea9aff1c3506538b1aa02fc7f221fd12b8f361d9576ca254f4",
+      "bytes": 3926
+    }
+  ],
+  "review": {
+    "reviewer": "one codex exec --sandbox read-only --ephemeral call (Codex account) with blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration/review_prompt.md; output retained as raw/0-codex-review-r1.md",
+    "raw": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+    "findings_for_this_receipt": "Finding 2: raw/1-research-pair-status.jsonl was gitignored (*.jsonl) and so not committed. Resolved: committed as raw/1-research-pair-status.jsonl.txt with identical sanitized content.",
+    "second_review_fix_round_4": "Independent Opus review finding 2: the README's 'No ai-memory call' claim ignored hook capture. Resolved by the disclosure in limits and the README isolation section; the live-store check is left to the coordinator."
+  }
+}

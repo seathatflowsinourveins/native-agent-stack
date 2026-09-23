@@ -1,0 +1,47 @@
+{
+ "id": "foundation__quality-evaluation__gap10",
+ "gap_index": 10,
+ "gap_text_sha256": "32b93dd4aa7758ddbd3ebd968c747fef9c51061511c369e85afba87a6cb0c767",
+ "preregistration": {
+  "written_at": "2026-09-23T02:42:37Z",
+  "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+  "expectation": "Using the Codex and Claude outputs of gap 5 restricted to the identical eight TypeSafe cases C1-C8, agreement with the TypeSafe verdicts and with the frozen source-review labels is computed per model, including C4. Expected: settled if both arms return schema-valid verdicts for all eight.",
+  "criteria": "agreement counts per model vs TypeSafe and vs frozen labels; C4 verdicts listed; schema validation output retained.",
+  "committed_in": "ebf6ac1 (preregistrations-fixround.json), before any fix-round command"
+ },
+ "original_round_preregistration": {
+  "written_at": null,
+  "note": "Round 1 recorded written_at 2026-09-23T02:46:00Z, a value reconstructed after its runs (raw-output mtimes and eval ids precede it). It is labelled late and superseded; the round-1 artifacts are at commit b37df23."
+ },
+ "commands": [
+  "bash blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_review_call.sh codex $PWD/evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/typesafe-extension $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/review-out",
+  "bash blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_review_call.sh claude $PWD/evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/typesafe-extension $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/review-out",
+  "pinned-venv/bin/python blueprints/gap-wave2-20260923/foundation__quality-evaluation/score_reviews.py evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/typesafe-extension .../review-out/codex-last-message.json .../review-out/claude-result.json .../review-out/agreement.json  (shared with gap 5; C1-C8 are the identical TypeSafe case set)"
+ ],
+ "results": {
+  "schema_validated": "Codex and Claude outputs both validate against schema.json (agreement.json schema_validation)",
+  "agreement_C1_C8": {
+   "codex": "8/8 vs frozen source-review labels, 7/8 vs TypeSafe",
+   "claude": "6/8 vs frozen labels, 7/8 vs TypeSafe",
+   "typesafe": "7/8 vs frozen labels"
+  },
+  "C4": {
+   "frozen_label": "insufficient",
+   "codex": "insufficient (contaminated: label disclosed in the same prompt)",
+   "claude": "contradicted (contaminated: label disclosed in the same prompt)",
+   "typesafe_2026_09_21": "contradicted",
+   "prior_codex_review": "insufficient",
+   "prior_claude_review": "insufficient"
+  },
+  "baseline_match": "Identical case set (C1-C8) and schema-validated output, but not blind on C4: the same prompt's C15-C17 source excerpt (prompt.txt lines 193-215) says the earlier native reviews 'corrected C4 to `insufficient`', and C18-C20 (lines 217-239) disclose TypeSafe's 7/8 aggregate. No per-case TypeSafe verdicts or label file were in the prompt."
+ },
+ "outcome": "advanced",
+ "evidence_class": "native_proven",
+ "limits": "The matched-blind-baseline clause is only partly closed (reconciliation): the native reviews use the identical case set with schema-validated output, but the prompt disclosed the reference C4 label (C15-C17 excerpt) and TypeSafe's 7/8 aggregate (C18-C20). Codex's C4 'insufficient' and its 8/8 therefore cannot count as independent agreement with the frozen label, and the Claude arm, which cannot be rerun under the one-call limit, is recorded as contaminated on C4. A Codex rerun on C1-C8 alone (or a packet without C15-C20) remains open. The C4 disagreement is not resolved: Claude (Sonnet) answered 'contradicted' like TypeSafe despite the disclosure, while Codex, the frozen label and both earlier reviews say 'insufficient'. The split turns on whether 'not established here' contradicts a universal efficiency claim. Settling it needs an explicit labelling rule or an independent adjudicator, so the outcome is advanced. One call per model; no repeat runs, so run-to-run variance is unknown. This differs from the preregistered expectation ('settled if both arms return schema-valid verdicts'): both arms did return valid verdicts, but the reproduced C4 split leaves one clause of the gap text open.",
+ "checked_at": "2026-09-23T02:55:07Z",
+ "artifacts": [
+  "support/fixround/g5-g10-reviews/agreement.json",
+  "support/fixround/g5-g10-reviews/*",
+  "support/typesafe-extension/*"
+ ]
+}

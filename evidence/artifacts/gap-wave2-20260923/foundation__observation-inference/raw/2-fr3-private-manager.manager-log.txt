@@ -1,0 +1,5 @@
+Exception: File exists @init.cpp:2782 (InstallSystemdUnit)
+
+Failed to create unit file '$HOME/.cache/gap-wave2-20260923/observation-inference/private-systemd-Z7psrViD/run/systemd/generator.late/app-snap\x2duserd\x2dautostart@autostart.service': File exists
+Failed to create unit file '$HOME/.cache/gap-wave2-20260923/observation-inference/private-systemd-Z7psrViD/run/systemd/generator.late/app-at\x2dspi\x2ddbus\x2dbus@autostart.service': File exists
+Failed to create unit file '$HOME/.cache/gap-wave2-20260923/observation-inference/private-systemd-Z7psrViD/run/systemd/generator.late/app-xdg\x2duser\x2ddirs@autostart.service': File exists

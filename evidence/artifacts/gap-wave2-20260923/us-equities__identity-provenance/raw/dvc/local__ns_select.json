@@ -1,0 +1,201 @@
+{
+  "all_match": true,
+  "arm_code": "$HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities",
+  "cutoffs": {
+    "2025-02-01T21:00:00.000000099Z": {
+      "exit": 0,
+      "expected_row_ids": [],
+      "matches_test_assertion": true,
+      "records_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "result": {
+        "availability_evidence_authenticated": false,
+        "contract": "synthetic-exact-utc-ns-v1",
+        "cutoff_ns": "1738443600000000099",
+        "cutoff_text": "2025-02-01T21:00:00.000000099Z",
+        "feed": "fixture-feed",
+        "market_data_adapter_accepted": false,
+        "records": [],
+        "schema_version": 1,
+        "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af",
+        "snapshot_sha256": "54391e638b838ad9cb70e670ecc09029f8c0a3e4b8a75d8402626eb3042f8d4e",
+        "source_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+        "synthetic": true,
+        "universe_id": "fixture-universe"
+      },
+      "row_ids": [],
+      "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af",
+      "snapshot_sha256": "54391e638b838ad9cb70e670ecc09029f8c0a3e4b8a75d8402626eb3042f8d4e",
+      "source_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d"
+    },
+    "2025-02-01T21:00:00.000000100Z": {
+      "exit": 0,
+      "expected_row_ids": [
+        "original"
+      ],
+      "matches_test_assertion": true,
+      "records_sha256": "d8b21892d669a6755c0cc297a59df66545e046480a0ee790071d2b9917f58094",
+      "result": {
+        "availability_evidence_authenticated": false,
+        "contract": "synthetic-exact-utc-ns-v1",
+        "cutoff_ns": "1738443600000000100",
+        "cutoff_text": "2025-02-01T21:00:00.000000100Z",
+        "feed": "fixture-feed",
+        "market_data_adapter_accepted": false,
+        "records": [
+          {
+            "asset_id": "fixture-a",
+            "available_at": "2025-02-01T21:00:00.000000100Z",
+            "available_ns": "1738443600000000100",
+            "event_at": "2025-02-01T21:00:00.000000010Z",
+            "event_ns": "1738443600000000010",
+            "feed": "fixture-feed",
+            "logical_event_id": "fixture-event-a",
+            "row_id": "original",
+            "source_sequence": "1",
+            "symbol": "AAPL",
+            "universe_effective_ns": "1738443600000000000",
+            "universe_row_id": "member-a",
+            "value_text": "100"
+          }
+        ],
+        "schema_version": 1,
+        "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af",
+        "snapshot_sha256": "54391e638b838ad9cb70e670ecc09029f8c0a3e4b8a75d8402626eb3042f8d4e",
+        "source_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+        "synthetic": true,
+        "universe_id": "fixture-universe"
+      },
+      "row_ids": [
+        "original"
+      ],
+      "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af",
+      "snapshot_sha256": "54391e638b838ad9cb70e670ecc09029f8c0a3e4b8a75d8402626eb3042f8d4e",
+      "source_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d"
+    },
+    "2025-02-01T21:00:00.000000200Z": {
+      "exit": 0,
+      "expected_row_ids": [
+        "correction",
+        "future-member"
+      ],
+      "matches_test_assertion": true,
+      "records_sha256": "4235cd81564fe52de5bf30d5fb673a4dc2df607a694a3ab0945aaa6b6afd4e4d",
+      "result": {
+        "availability_evidence_authenticated": false,
+        "contract": "synthetic-exact-utc-ns-v1",
+        "cutoff_ns": "1738443600000000200",
+        "cutoff_text": "2025-02-01T21:00:00.000000200Z",
+        "feed": "fixture-feed",
+        "market_data_adapter_accepted": false,
+        "records": [
+          {
+            "asset_id": "fixture-a",
+            "available_at": "2025-02-01T21:00:00.000000200Z",
+            "available_ns": "1738443600000000200",
+            "event_at": "2025-02-01T21:00:00.000000010Z",
+            "event_ns": "1738443600000000010",
+            "feed": "fixture-feed",
+            "logical_event_id": "fixture-event-a",
+            "row_id": "correction",
+            "source_sequence": "1",
+            "symbol": "AAPL",
+            "universe_effective_ns": "1738443600000000000",
+            "universe_row_id": "member-a",
+            "value_text": "90"
+          },
+          {
+            "asset_id": "fixture-b",
+            "available_at": "2025-02-01T21:00:00.000000150Z",
+            "available_ns": "1738443600000000150",
+            "event_at": "2025-02-01T21:00:00.000000010Z",
+            "event_ns": "1738443600000000010",
+            "feed": "fixture-feed",
+            "logical_event_id": "fixture-event-b",
+            "row_id": "future-member",
+            "source_sequence": "1",
+            "symbol": "MSFT",
+            "universe_effective_ns": "1738443600000000200",
+            "universe_row_id": "member-b-announced",
+            "value_text": "200"
+          }
+        ],
+        "schema_version": 1,
+        "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af",
+        "snapshot_sha256": "54391e638b838ad9cb70e670ecc09029f8c0a3e4b8a75d8402626eb3042f8d4e",
+        "source_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+        "synthetic": true,
+        "universe_id": "fixture-universe"
+      },
+      "row_ids": [
+        "correction",
+        "future-member"
+      ],
+      "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af",
+      "snapshot_sha256": "54391e638b838ad9cb70e670ecc09029f8c0a3e4b8a75d8402626eb3042f8d4e",
+      "source_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d"
+    },
+    "2025-02-01T21:00:00.000000201Z": {
+      "exit": 0,
+      "expected_row_ids": [
+        "sequence-correction",
+        "future-member"
+      ],
+      "matches_test_assertion": true,
+      "records_sha256": "40a39995d09a056dd7707f5d7b2dfe9c082cc82cc68c77154b7d643402c42116",
+      "result": {
+        "availability_evidence_authenticated": false,
+        "contract": "synthetic-exact-utc-ns-v1",
+        "cutoff_ns": "1738443600000000201",
+        "cutoff_text": "2025-02-01T21:00:00.000000201Z",
+        "feed": "fixture-feed",
+        "market_data_adapter_accepted": false,
+        "records": [
+          {
+            "asset_id": "fixture-a",
+            "available_at": "2025-02-01T21:00:00.000000201Z",
+            "available_ns": "1738443600000000201",
+            "event_at": "2025-02-01T21:00:00.000000010Z",
+            "event_ns": "1738443600000000010",
+            "feed": "fixture-feed",
+            "logical_event_id": "fixture-event-a",
+            "row_id": "sequence-correction",
+            "source_sequence": "3",
+            "symbol": "AAPL",
+            "universe_effective_ns": "1738443600000000000",
+            "universe_row_id": "member-a",
+            "value_text": "85"
+          },
+          {
+            "asset_id": "fixture-b",
+            "available_at": "2025-02-01T21:00:00.000000150Z",
+            "available_ns": "1738443600000000150",
+            "event_at": "2025-02-01T21:00:00.000000010Z",
+            "event_ns": "1738443600000000010",
+            "feed": "fixture-feed",
+            "logical_event_id": "fixture-event-b",
+            "row_id": "future-member",
+            "source_sequence": "1",
+            "symbol": "MSFT",
+            "universe_effective_ns": "1738443600000000200",
+            "universe_row_id": "member-b-announced",
+            "value_text": "200"
+          }
+        ],
+        "schema_version": 1,
+        "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af",
+        "snapshot_sha256": "54391e638b838ad9cb70e670ecc09029f8c0a3e4b8a75d8402626eb3042f8d4e",
+        "source_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+        "synthetic": true,
+        "universe_id": "fixture-universe"
+      },
+      "row_ids": [
+        "sequence-correction",
+        "future-member"
+      ],
+      "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af",
+      "snapshot_sha256": "54391e638b838ad9cb70e670ecc09029f8c0a3e4b8a75d8402626eb3042f8d4e",
+      "source_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d"
+    }
+  },
+  "snapshot_sha256_used": "54391e638b838ad9cb70e670ecc09029f8c0a3e4b8a75d8402626eb3042f8d4e"
+}

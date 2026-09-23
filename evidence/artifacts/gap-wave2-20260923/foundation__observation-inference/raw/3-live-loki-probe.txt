@@ -1,0 +1,46 @@
+2026-09-23T03:29:36Z
+{
+ "method": "read-only GET /loki/api/v1/query_range on the live Loki",
+ "window": [
+  "2026-09-23T02:50:00Z",
+  "2026-09-23T03:00:00Z"
+ ],
+ "child_session_hits": 0,
+ "child_query_status": "success",
+ "positive_control_hits": 0,
+ "control_query_status": "success",
+ "detection_demonstrated": false,
+ "child_absent": true
+}
+exit=1
+## field discovery on live Loki (read-only GET labels/query_range, 02:50-03:00Z): stream field names seen: app_version cache_creation_tokens cache_read_tokens decision detected_level duration_ms ecosystem_client_scope effort error_type event_name event_sequence event_timestamp input_tokens model observed_timestamp output_tokens query_source scope_name service_instance_id service_name service_version success tool_name  -> no session_id field
+2026-09-23T03:30:01Z
+{
+ "method": "read-only GET /loki/api/v1/query_range on the live Loki",
+ "window": [
+  "2026-09-23T02:50:00Z",
+  "2026-09-23T03:00:00Z"
+ ],
+ "child_session_hits": 0,
+ "child_query_status": "success",
+ "positive_control_hits": 0,
+ "control_query_status": "success",
+ "detection_demonstrated": false,
+ "child_absent": true,
+ "signature": {
+  "model": "claude-haiku-4-5-20251001",
+  "input_tokens": 10,
+  "output_tokens": 99,
+  "cache_creation_tokens": 6575,
+  "cache_read_tokens": 0
+ },
+ "live_api_request_events_in_window": 621,
+ "live_events_matching_child_signature": 0,
+ "live_api_request_models_in_window": {
+  "claude-sonnet-5": 369,
+  "claude-opus-5-5": 252
+ },
+ "signature_detection_demonstrated": true,
+ "child_signature_absent": true
+}
+exit=0

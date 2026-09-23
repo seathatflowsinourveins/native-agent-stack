@@ -1,0 +1,106 @@
+{
+ "id": "gap-wave2-20260923/us-equities__agents-models-workers/11-twelve-query-per-lane",
+ "catalog": "us-equities",
+ "layer_id": "agents-models-workers",
+ "gap_index": 11,
+ "gap_text": "The twelve-query lexical diagnostic measures a separate QMD lane; its results cannot be attributed to SocratiCode or ai-memory.",
+ "gap_text_sha256": "f50d888932f72a72e4f064fa9ed25c16eaeb11c035e5e6e87eb130449f520186",
+ "next_check": "Run the existing twelve-query diagnostic set through SocratiCode search and `ai-memory search` with the same gold paths, and report exact-source recall per lane.",
+ "base_commit": "41d39b3",
+ "preregistration": {
+  "written_at": "2026-09-23T07:23:05Z",
+  "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/11-twelve-query-per-lane.json",
+  "commit": "5480a9c (2026-09-23T07:23:50Z, before any check ran)",
+  "expectation": "SocratiCode (dense+hybrid) will recover more of the twelve intended sources in the top 3 than QMD BM25 (8/12), especially the two vocabulary-mismatch queries; ai-memory search over the same 18 documents written as isolated pages (embedding provider none, i.e. FTS) will behave like a lexical lane (around QMD's level).",
+  "criteria": [
+   "Same twelve frozen queries (fixture.json, unchanged), same 18 eligible documents restored byte-identically from bfd03bc (hash-verified).",
+   "SocratiCode: disposable Qdrant, limit 10, minScore 0; results deduplicated to documents in rank order.",
+   "ai-memory 2.3.2: isolated server with temp --data-dir, AI_MEMORY_SERVER_URL set to it; each document written as a page at its relative path; `search --json` limit 10.",
+   "Report exact-source recall@1/@3/@5 and MRR per lane beside the recorded QMD numbers."
+  ]
+ },
+ "commands": [
+  "# main-round services (exact commands in raw/services-main-round.txt, exported fix round 2, not re-run): 07:18:45Z qdrant --config-path $GAPCACHE/qdrant.yaml --disable-telemetry (yaml: host 127.0.0.1, http 27333, grpc 27334, storage/snapshots under $GAPCACHE); 07:25:00Z HOME=$GAPCACHE/aim-home AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 AI_MEMORY_EMBEDDING_PROVIDER=none ai-memory-2.3.2 --data-dir $GAPCACHE/aim-data init; 07:25:03Z sed -i on aim-data/config.toml: bind = 127.0.0.1:27374, embedding_provider = none; 07:25:07Z same env, setsid nohup ai-memory-2.3.2 --data-dir $GAPCACHE/aim-data serve --transport http (log: bind=127.0.0.1:27374, providers llm disabled, embedding disabled); 07:39:45Z kill of both PIDs, ports 27333/27334/27374 verified free",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/services/export_main_round_services.py <this unit's session transcript .jsonl> evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/services-main-round.txt  # fix round 2 export",
+  "git show bfd03bc:blueprints/us-equities/<18 eligible paths>  # restored, sha256 verified against source-manifest.json (18/18)",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/socraticode_eval.py $GAPCACHE/corpus-foundation blueprints/us-equities/retrieval-evaluation/fixture.json ...  # limit 10, minScore 0",
+  "ai-memory --data-dir $GAPCACHE/aim-data write-page --workspace g2amw --project foundation12 --path <rel> --body - < <file>  (x18, AI_MEMORY_SERVER_URL=http://127.0.0.1:27374)",
+  "ai-memory --data-dir $GAPCACHE/aim-data search '<fixed query>' --workspace g2amw --project foundation12 --limit 10 --json  (x12)",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/score_gap11.py fixture.json ... "
+ ],
+ "results": {
+  "qmd_bm25_recorded_baseline": {
+   "recall@1": "5/12",
+   "recall@3": "8/12",
+   "recall@5": "9/12",
+   "mrr@10": 0.56875
+  },
+  "socraticode_1.14.0": {
+   "recall@1": "7/12",
+   "recall@3": "11/12",
+   "recall@5": "11/12",
+   "mrr@10": 0.72222,
+   "misses": {
+    "savings-scope": "not in top 10"
+   },
+   "ranks": {
+    "native-token-subsets": 3,
+    "worker-cancellation": 3,
+    "broker-timeout": 2,
+    "alpaca-entitlement": 2
+   }
+  },
+  "ai_memory_2.3.2_cli_search (FTS5)": {
+   "recall@1": "8/12",
+   "recall@3": "11/12",
+   "recall@5": "11/12",
+   "mrr@10": 0.80208,
+   "misses": {
+    "savings-scope": "rank 8"
+   }
+  },
+  "reading": "Per lane over the 18 eligible documents: SocratiCode and ai-memory each recover 11/12 intended sources in the top 3 and both miss 'selected text provider savings' in the top 5. The recorded QMD baseline (8/12) returned results only from the same 18 eligible documents, but its BM25 document-frequency and length statistics covered 33 documents (blueprints/us-equities/retrieval-evaluation/README.md and full-corpus-manifest.json: the collection filter is applied after scoring). The returnable set is therefore identical; the lexical scoring statistics differ, so the per-lane numbers are comparable on result set but not identical in scoring corpus. The QMD figures cannot be attributed to either lane. (Correction 2026-09-23 round 3, source review: earlier text called the 15 extra documents distractors in the ranking.)",
+  "corpus_sizes": {
+   "socraticode": "18 files, 86 chunks (raw/11-socraticode-raw.json final_status 'Files: 18, Chunks: 86')",
+   "ai_memory": "18 pages",
+   "qmd_recorded_baseline": "results limited to the 18 eligible documents; BM25 statistics over 33 documents"
+  }
+ },
+ "outcome": "settled",
+ "what_remains": null,
+ "evidence_class": "native_proven",
+ "limits": [
+  "Both lanes run here (SocratiCode and ai-memory) indexed only the 18 eligible documents, whereas the recorded QMD baseline indexed 33 documents for BM25 statistics and then filtered results to the same 18 eligible documents (the other 15 were never returnable). Per-lane recall is valid on the 18-document corpus; the comparison with QMD's 8/12 shares the result set but not the lexical scoring statistics, and n=12 with one gold path per query. Neither the SocratiCode nor the ai-memory lane was re-run over the 33-document statistics corpus. (Fix round: the first-round limit named only ai-memory. Round 3 correction, source review only: the earlier wording '15 more distractors' was wrong.)",
+  "ai-memory `search` is FTS5-only by design (embedding provider none here).",
+  "SocratiCode chunk hits were deduplicated to documents; one gold path per query, not exhaustive relevance.",
+  "The scoring script was written after the searches ran but implements the preregistered rule (exact path, recall@1/3/5, MRR <=10 docs).",
+  "Isolation: disposable Qdrant 1.19.1 on 127.0.0.1:27333/27334 (storage under $HOME/.cache/gap-wave2-20260923/agents-models-workers/qdrant-storage), isolated ai-memory 2.3.2 `serve` on 127.0.0.1:27374 with a temp --data-dir and temp HOME, and AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 exported for the gap-9 and gap-11 ai-memory CLI calls; both started by this unit and stopped at the end (ports verified free). Correction (fix round): the first-round gap-6 CLI calls did NOT point at that server (--version/--help/backfill --help ran with no AI_MEMORY_SERVER_URL set, and init with http://127.0.0.1:1, a closed port); no live-store contact is possible from those commands, and they were re-run in the fix round against isolated 2.3.2 (127.0.0.1:27374) and 2.4.0 (127.0.0.1:27375) servers started for that purpose (gap-6 receipt). Every Codex run disabled native lifecycle hooks (-c features.hooks=false -c features.plugin_hooks=false) so no ai-memory hook call could reach the live service; the one Claude call used --setting-sources project from a temp cwd (user-settings hooks not loaded) and --strict-mcp-config. Embeddings: read-only POST /v1/embeddings calls to the running Nemotron-3-Embed-1B vLLM endpoint 127.0.0.1:8231 (the adopted SocratiCode profile); that service was not restarted or reconfigured. Start/stop evidence for the main-round Qdrant and ai-memory 2.3.2 services (fix round 2): raw/services-main-round.txt has the exact commands and outputs, exported without re-running from this unit's own session transcript by services/export_main_round_services.py."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/11-socraticode-raw.json",
+   "sha256": "6eb40e2456884fb8177f92a08c09e335d09929e6db4dd35677dd290c2c0a0c06"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/11-aimemory-raw.json",
+   "sha256": "3ead7017421f8c343f943680b1f931790b8f0977c0bc9dd1eca85020e3ce2505"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/11-scores.json",
+   "sha256": "a78a42d91cf2259b7b95ba83e60f7c7cdbdb1c20a7b6965c1f162d279f93a570"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/services-main-round.txt",
+   "sha256": "d1109be89f5b729b21737ae6a579d34abf0f9a9a0b4bc74e5c61833c221a03a1",
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  }
+ ],
+ "helpers": [
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/socraticode_eval.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/score_gap11.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/mcp_client.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/services/export_main_round_services.py"
+ ],
+ "checked_at": "2026-09-23"
+}

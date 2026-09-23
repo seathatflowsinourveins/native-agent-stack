@@ -1,0 +1,130 @@
+{
+  "id": "us-equities__storage-compute-0-alpaca-snapshot-parquet-duckdb-gate",
+  "gap_index": 0,
+  "layer_id": "storage-compute",
+  "catalog": "us-equities",
+  "gap_text": "DuckDB's retained runs cover a bundled LEAN historical simulation (6 order events) and artificial SEC-shaped fixtures. Neither is licensed US-equity market-data ingestion.",
+  "gap_text_sha256": "926703a690eebdfe064f04eab47577e7105433a5ed3aeda26fed66a6b2d6a884",
+  "next_check": "Use pinned alpaca-py with the paper credentials to fetch daily IEX bars for about 5 symbols over 1 year, write immutable Parquet, and run the DuckDB catalyst/bars queries plus the Pandera gate on it. Record the feed=iex licence scope in the receipt.",
+  "preregistration": {
+    "gap_index": 0,
+    "written_at": "2026-09-23T05:15:15Z",
+    "expectation": "Advanced, not settled. The Alpaca market-data fetch arm needs the paper credential file and broker data-API contact, which this unit may not use (owner: sota-workflow-resolution). A real, licensed Alpaca SIP snapshot produced by the merged #84 ingest (ingest_snapshot.py) is already on disk with an ingest receipt. Expect: its file hash equals the receipt's snapshot_sha256; converting it to Zstandard Parquet written exclusively and then made read-only reproduces the same rows; DuckDB 1.5.5 bars queries (row count, symbols, sessions per symbol, date range, per-symbol close-to-close aggregate) agree with the receipt's counts (480 rows, 24 symbols, 20 sessions, 2026-08-25..2026-09-22); the pinned Pandera gate passes 12/12 on it.",
+    "criteria": "advanced if the Parquet/DuckDB/Pandera arms run on the real Alpaca snapshot and agree with its receipt; settled is not reachable here because the 1-year IEX fetch and its feed=iex licence-scope record need credentials; not_settled if hashes or counts disagree.",
+    "note": "Written before the check's commands were run. While locating evidence (before this file), the two ingest receipts were read and the two snapshot CSVs were sha256-hashed once (hashes matched their receipts); no gate, Parquet or DuckDB command had been run.",
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/prereg/0.json",
+    "file_sha256": "5c1d80b7d254d3688222b7bc113cf0127c4b21a77ec6a8ce4c8da18042a04ce5",
+    "committed_in": "af80671 (before any check command ran)",
+    "fix_round": {
+      "gap_index": 0,
+      "written_at": "2026-09-23T05:52:16Z",
+      "round": 2,
+      "label": "fix-round (late relative to round 1, written before round 2)",
+      "expectation": "Same round-2 rerun as gap 4 (retained ingest receipts, precision check).",
+      "criteria": "advanced stands if round 2 reproduces round 1.",
+      "note": "Fix-round preregistration, written after round 1 and the Codex gpt-6-astra read-only review of a0f57fa, before any round-2 command ran.",
+      "file": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/prereg/0-fixround.json",
+      "file_sha256": "c666ee31749f6e2894577b748e01e7dc243e1b90e988884dc02230dc164c2e2f",
+      "committed_in": "23c9902 (after round 1 and the Codex review, before any round-2 command ran)"
+    }
+  },
+  "commands": [
+    "uv venv --python $HOME/.local/share/codex-ecosystem/python/cpython-3.13-linux-x86_64-gnu/bin/python3.13 venv-gate && uv pip sync --python venv-gate/bin/python --require-hashes blueprints/us-equities/data/requirements.lock   # cwd $HOME/.cache/gap-wave2-20260923/storage-compute, UV_CACHE_DIR there",
+    "uv venv --python ...python3.13 venv-bench && uv pip install --python venv-bench/bin/python duckdb==1.5.5 'pyiceberg[sql-sqlite,pyarrow]==0.12.0' pyarrow numpy pandas clickhouse-connect questdb 'psycopg[binary]' psutil",
+    "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/real_snapshot_checks.py --run-dir $HOME/.cache/gap-wave2-20260923/storage-compute/runs/real-snapshots --gate-python $HOME/.cache/gap-wave2-20260923/storage-compute/venv-gate/bin/python --gate blueprints/us-equities/data/promotion_gate.py --snapshot alpaca-sip-20260922=$HOME/.local/state/native-agent-stack/alpaca-paper/snapshots/20260922/universe-daily.csv:$HOME/.local/state/native-agent-stack/alpaca-paper/snapshots/20260922/ingest-receipt.json --snapshot alpaca-sip-dryrun-20260922=$HOME/.local/state/native-agent-stack/alpaca-paper/trials/dryrun-20260922/universe-daily.csv:$HOME/.local/state/native-agent-stack/alpaca-paper/trials/dryrun-20260922/ingest-receipt.json --lean-daily $HOME/.local/share/codex-ecosystem/tools/lean-985ef30/Data/equity/usa/daily --out evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/real-snapshot-summary.json   # round 1; wrapped in $HOME/codex-ecosystem/bin/ecosystem-bounded-run (ECOSYSTEM_JOB_SECONDS=1200, MEMORY_MAX=4G)",
+    "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/real_snapshot_checks.py --run-dir $HOME/.cache/gap-wave2-20260923/storage-compute/runs/real-snapshots-r2 --gate-python $HOME/.cache/gap-wave2-20260923/storage-compute/venv-gate/bin/python --gate blueprints/us-equities/data/promotion_gate.py --snapshot alpaca-sip-20260922=$HOME/.local/state/native-agent-stack/alpaca-paper/snapshots/20260922/universe-daily.csv:$HOME/.local/state/native-agent-stack/alpaca-paper/snapshots/20260922/ingest-receipt.json --snapshot alpaca-sip-dryrun-20260922=$HOME/.local/state/native-agent-stack/alpaca-paper/trials/dryrun-20260922/universe-daily.csv:$HOME/.local/state/native-agent-stack/alpaca-paper/trials/dryrun-20260922/ingest-receipt.json --lean-daily $HOME/.local/share/codex-ecosystem/tools/lean-985ef30/Data/equity/usa/daily --out evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/real-snapshot-summary-r2.json   # round 2; wrapped in $HOME/codex-ecosystem/bin/ecosystem-bounded-run (ECOSYSTEM_JOB_SECONDS=1200, MEMORY_MAX=4G)",
+    "curl -sL https://docs.alpaca.markets/docs/about-market-data-api   # public docs page, excerpt retained"
+  ],
+  "results": [
+    "Round 2 (primary):",
+    "alpaca-sip-20260922: copy sha256 914b7d949b3de201c1e64225a5c9d36e1f5c1d370a49371ef09776537c158c82 == ingest receipt snapshot_sha256 -> True; ingest receipt kind=promotion_gate_snapshot_ingest evidence_class=native_market_data_readonly feed=sip adjustment=raw fetched_at=2026-09-22T21:55:59Z symbols=24 row_count=480 symbols_missing=[] coverage_problems=field absent; gate status=pass row_count=480 failed_checks=[] of 12; Parquet sha256 6bc3038f1f0f370ff87bd5b52fa5f4c6760b5a510fae20edaafc4adc5d39f8e8 mode 0o444 writable=False; precision_loss_rows=0 (max price decimals in text 4; probe '1.23456' detected=True); CSV-vs-Parquet EXCEPT ALL diffs 0/0; DuckDB 1.5.5: rows=480 symbols=24 sessions 2026-08-25..2026-09-22 per-symbol 20-20 null_cells=0 ohlc_inconsistent_rows=0; control gate status=fail failed=['high_ge_max_open_close', 'unique_symbol_session']",
+    "alpaca-sip-dryrun-20260922: copy sha256 ffc988e2e850ed3fb5ea9b13bc4443392a329c4c2f5ccd949b574375a2c9b115 == ingest receipt snapshot_sha256 -> True; ingest receipt kind=promotion_gate_snapshot_ingest evidence_class=native_market_data_readonly feed=sip adjustment=raw fetched_at=2026-09-23T00:33:24Z symbols=24 row_count=480 symbols_missing=field absent coverage_problems={}; gate status=pass row_count=480 failed_checks=[] of 12; Parquet sha256 afb308a708057fccb3ada5789ced533206fedc486dc3c156c57ef43ed5cfac0f mode 0o444 writable=False; precision_loss_rows=0 (max price decimals in text 4; probe '1.23456' detected=True); CSV-vs-Parquet EXCEPT ALL diffs 0/0; DuckDB 1.5.5: rows=480 symbols=24 sessions 2026-08-25..2026-09-22 per-symbol 20-20 null_cells=0 ohlc_inconsistent_rows=0; control gate status=fail failed=['high_ge_max_open_close', 'unique_symbol_session']",
+    "Round 1 (a0f57fa) gave the same gate status, row counts, snapshot hashes and control failures: {\"alpaca-sip-20260922\": [\"pass\", true, [\"high_ge_max_open_close\", \"unique_symbol_session\"]], \"alpaca-sip-dryrun-20260922\": [\"pass\", true, [\"high_ge_max_open_close\", \"unique_symbol_session\"]]}",
+    "Alpaca plan scope (docs excerpt, raw/alpaca-market-data-plans-excerpt.txt): 'The Basic plan serves as the default option for both Paper and Live trading accounts ... for equities only the IEX exchange ... Historical data timeframe Since 2016 ... Historical data limitation* latest 15 minutes' and 'all the standard plans are real time IEX or 15 mins delayed SIP'.",
+    "Both snapshots were fetched after the 2026-09-22 session closed (21:55:59Z and 00:33:24Z), so every daily bar is older than the Basic plan's 15-minute historical SIP limitation."
+  ],
+  "outcome": "advanced",
+  "remaining": [
+    "Fetch about 5 symbols x 1 year of Alpaca feed=iex daily bars (next_check's exact request) and record its licence scope: needs the paper credential file and a broker market-data call; owner sota-workflow-resolution.",
+    "Run the DuckDB catalyst query (catalyst-dataset join) against a bars snapshot; only the bars queries ran here."
+  ],
+  "evidence_class": "local_integration",
+  "limits": [
+    "The Alpaca fetch was not run by this unit. The two real snapshots were written by the merged #84 ingest (blueprints/us-equities/data/ingest_snapshot.py, alpaca-py 0.44.0) on 2026-09-22/23 and read here read-only from the paper-trial state directory; the file hashes match their ingest receipts, which are retained whole in raw/real-snapshot-summary-r2.json.",
+    "Feed is sip, adjustment raw, 24 symbols x 20 sessions (480 rows), not feed=iex over one year.",
+    "The account's actual Alpaca data plan was not checked (no account call). The licence scope above is the public plan description, not an entitlement record.",
+    "No price row or price-derived value is committed; Parquet files stay in the private run directory. The per-symbol return aggregate is kept only as a hash.",
+    "Evidence class local_integration: licensed native market data from a retained ingest, processed locally."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/real-snapshot-summary-r2.json",
+      "sha256": "d7bd03cef73017d79f77f78f0789b6ae7a2977c9a0e846fd991e855e7cdf7172"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/real-snapshot-stdout-r2.txt",
+      "sha256": "d1404316a836f2ccbf06368925d4577f295b8030cfcabe96c8f5c794c24bae62"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-20260922-gate-result-r2.json",
+      "sha256": "52099e3cd0b45d5d4b38eb9c590116976a06156ec64a002dcee60d6f753e5d49"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-dryrun-20260922-gate-result-r2.json",
+      "sha256": "8b1d641dcdfc68e4ba1275f497cb0694dd9944e00744aada4c29c324e2a71d8d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-20260922-control-gate-result-r2.json",
+      "sha256": "f14c5c6a46ed4672f57455a8b650d01284b47e0d96c6b3f5286848e5855a1140"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-dryrun-20260922-control-gate-result-r2.json",
+      "sha256": "73f4f3edc20c3d93a3ee7183524e73499188be8a1f9d10eac8f0633af2e53dba"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/lean-five-252-gate-result-r2.json",
+      "sha256": "cff2237f66d30af7dd76a712975ee44c3e6cab61d8f958dd5b06b8b5aca6d261"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/lean-all-full-gate-result-r2.json",
+      "sha256": "ed72b7fc09c69af396e48b904bd83c35b73987c8473cd6109aef87910de84e3f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/real-snapshot-summary.json",
+      "sha256": "f56a278b8f221264f1a981bc4c6676d2c4954f8c6b2163c3e14a8904c415fdae"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/real-snapshot-stdout.txt",
+      "sha256": "d1404316a836f2ccbf06368925d4577f295b8030cfcabe96c8f5c794c24bae62"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-20260922-gate-result.json",
+      "sha256": "c47af2118fac4aa23f93149771b8b64cc18cc89845142a6bdecc6b7303fd67c4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-dryrun-20260922-gate-result.json",
+      "sha256": "843bcca9d6bf411fcd13bc9d1411accaddf450042b1a498eabcb71567419db27"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-20260922-control-gate-result.json",
+      "sha256": "de382d1d6283cc0c74bdf4647e7895271c80b0c0f29067de759df2687017f1fd"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-dryrun-20260922-control-gate-result.json",
+      "sha256": "423e60db543fb93d05d99ba66130c732581b130c0559074825a60c89bcb104e1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/lean-five-252-gate-result.json",
+      "sha256": "e11d26a253fb05be267a43346a53f12898d36df5241021e1ff59618b887138f3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/lean-all-full-gate-result.json",
+      "sha256": "86a64a5c82354e561d83161f40133cd5ab53d6241b87faa24ca2faba5b556112"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-market-data-plans-excerpt.txt",
+      "sha256": "a101dc2023731195d1fd40fcf85868287e1837fcdbbe1ed595df0f82530ad5a4"
+    }
+  ],
+  "checked_at": "2026-09-23T06:01:32.948884+00:00"
+}

@@ -1,0 +1,31 @@
+{
+ "upstream_tool": "invoke_acp_agent",
+ "inputs_sha256": {
+  "worker-receipt.json": "4308f002936d354757ab819b1b537e26db41c76bf8201f58e0ce559750986afc",
+  "acp-research-receipt.json": "b34779394c4fbc2a8444075ea002627e2e6bc4ec187e2cfa436d5c646101e95f"
+ },
+ "codex_config": {
+  "model": "gpt-6-astra",
+  "model_provider": "openai",
+  "model_reasoning_effort": "high",
+  "features": {
+   "hooks": false,
+   "plugin_hooks": false
+  }
+ },
+ "started_at": "2026-09-23T07:28:49Z",
+ "response": "I\u2019ll read both files with the specified command and extract the six values.\n{\"sdk_run_duration_ms\":58410,\"sdk_run_total_tokens\":135311,\"sdk_blocked_file_extraction_tasks\":2,\"acp_native_turn_duration_ms\":31027,\"acp_cumulative_total_tokens\":42345,\"acp_sandbox_policy_type\":\"workspaceWrite\"}",
+ "status": "returned_text",
+ "elapsed_seconds": 11.24,
+ "usage_cumulative_last_event": {
+  "totalTokens": 43313,
+  "inputTokens": 43178,
+  "cachedInputTokens": 31488,
+  "cacheWriteInputTokens": 0,
+  "outputTokens": 135,
+  "reasoningOutputTokens": 0
+ },
+ "usage_events_seen": 2,
+ "hook_lines_seen": [],
+ "finished_at": "2026-09-23T07:29:01Z"
+}

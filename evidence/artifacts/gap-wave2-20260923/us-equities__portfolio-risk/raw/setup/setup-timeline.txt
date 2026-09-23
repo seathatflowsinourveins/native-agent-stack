@@ -1,0 +1,29 @@
+# post-hoc provenance collected 2026-09-23T16:08:40Z in fix round 4; the creation commands of venv-lock and venv-nautilus were not retained
+## venv-lock
+birth 2026-09-23 02:30:05.158666728 -0400 | modify 2026-09-23 02:30:05.296624092 -0400
+home = $HOME/.local/share/codex-ecosystem/python/cpython-3.13-linux-x86_64-gnu/bin
+implementation = CPython
+uv = 0.12.17
+version_info = 3.13
+include-system-site-packages = false
+## venv-nautilus
+birth 2026-09-23 02:30:13.690690297 -0400 | modify 2026-09-23 02:30:13.745432707 -0400
+home = /usr/bin
+implementation = CPython
+uv = 0.12.17
+version_info = 3.12.3
+include-system-site-packages = false
+## venv-libs
+birth 2026-09-23 02:30:25.574726254 -0400 | modify 2026-09-23 02:30:26.613998457 -0400
+home = $HOME/.local/share/codex-ecosystem/python/cpython-3.13-linux-x86_64-gnu/bin
+implementation = CPython
+uv = 0.12.17
+version_info = 3.13
+include-system-site-packages = false
+## skfolio-src
+birth 2026-09-23 02:30:31.270741892 -0400 | modify 2026-09-23 02:30:31.271951189 -0400
+## requirements-libs.in / .lock (worktree mtime)
+blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.in modify 2026-09-23 02:30:19.905871249 -0400
+blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock modify 2026-09-23 02:30:20.166707607 -0400
+## preregistration commit
+acfccf2 2026-09-23T02:32:48-04:00

@@ -1,0 +1,78 @@
+{
+ "results": [
+  {
+   "arm": "RAW",
+   "path": "development",
+   "episodes": 249,
+   "traded_episodes": 138,
+   "fills": 276,
+   "fees_usd": "27073.48",
+   "ending_cash_usd": "87359.71",
+   "net_pnl_usd": "-12640.29",
+   "dividends_entitled_usd": "2542.51",
+   "max_daily_volume_participation": "0.0000812",
+   "strategy_decision_check": {
+    "checked": 249,
+    "mismatches": 0
+   },
+   "reconciled": true,
+   "problems": []
+  },
+  {
+   "arm": "ADJ",
+   "path": "development",
+   "episodes": 249,
+   "traded_episodes": 138,
+   "fills": 276,
+   "fees_usd": "27407.36",
+   "ending_cash_usd": "89651.82",
+   "net_pnl_usd": "-10348.18",
+   "dividends_entitled_usd": "2652.43",
+   "max_daily_volume_participation": "0.0000844",
+   "strategy_decision_check": {
+    "checked": 249,
+    "adjusted_price_choice_differs_from_frozen_raw": 6
+   },
+   "reconciled": true,
+   "problems": []
+  },
+  {
+   "arm": "RAW",
+   "path": "reserved",
+   "episodes": 11,
+   "traded_episodes": 10,
+   "fills": 20,
+   "fees_usd": "2079.93",
+   "ending_cash_usd": "100808.61",
+   "net_pnl_usd": "808.61",
+   "dividends_entitled_usd": "0",
+   "max_daily_volume_participation": "0.0000267",
+   "strategy_decision_check": {
+    "checked": 11,
+    "mismatches": 0
+   },
+   "reconciled": true,
+   "problems": []
+  },
+  {
+   "arm": "ADJ",
+   "path": "reserved",
+   "episodes": 11,
+   "traded_episodes": 10,
+   "fills": 20,
+   "fees_usd": "2080.04",
+   "ending_cash_usd": "100814.92",
+   "net_pnl_usd": "814.92",
+   "dividends_entitled_usd": "0",
+   "max_daily_volume_participation": "0.0000267",
+   "strategy_decision_check": {
+    "checked": 11,
+    "adjusted_price_choice_differs_from_frozen_raw": 0
+   },
+   "reconciled": true,
+   "problems": []
+  }
+ ],
+ "inputs_unchanged": true,
+ "summary_sha256": "1089e537363c9af3f58f664e0ec4c47b1c8b0cedc59b729808b472c33a90662c"
+}

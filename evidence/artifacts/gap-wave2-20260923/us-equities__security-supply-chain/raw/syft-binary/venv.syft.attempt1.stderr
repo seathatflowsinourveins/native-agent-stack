@@ -1,0 +1,9 @@
+Suggestions:                                                                                          
+                                                                                                      
+ ❖ Given expression "--select-catalogers binary"                                                      
+   However, tags are not allowed with this operation (must use exact names).                          
+   Adding groups of catalogers may result in surprising behavior (create inaccurate SBOMs).           
+   If you are certain this is what you want to do, use "--override-default-catalogers binary" instead.
+                                                                                                      
+[0000] ERROR [31m1 error occurred:
+	* invalid expression: "binary": tags are not allowed with this operation (must use exact names)[0m

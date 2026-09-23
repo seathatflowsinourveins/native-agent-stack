@@ -1,0 +1,148 @@
+{
+  "controller_pid": 177518,
+  "server_address_is_loopback": true,
+  "worker_a_pid": 177912,
+  "worker_a_stopped_at": 1790174186.3005443,
+  "worker_b_pid": 177972,
+  "result": {
+    "activity": "attempt=4 keyed_applied=True pid=177972",
+    "key": "effect-{workflow_id}"
+  },
+  "workflow_completed_at": 1790174223.3313148,
+  "effects_before_resume": [
+    {
+      "key": "effect-{workflow_id}",
+      "attempt": 4,
+      "pid": 177972
+    }
+  ],
+  "worker_a_resumed_at": 1790174223.3319583,
+  "workflow_status_after_resume": "2",
+  "history_events": 17,
+  "activity_events": [
+    "activity_task_scheduled_event_attributes",
+    "activity_task_started_event_attributes",
+    "activity_task_completed_event_attributes"
+  ],
+  "replay_failure": null,
+  "attempts": [
+    {
+      "attempt": 1,
+      "pid": 177912,
+      "phase": "start",
+      "at": 1790174186.2509325
+    },
+    {
+      "attempt": 1,
+      "pid": 177912,
+      "phase": "slow",
+      "at": 1790174186.2641227
+    },
+    {
+      "attempt": 4,
+      "pid": 177972,
+      "phase": "start",
+      "at": 1790174203.2494912
+    },
+    {
+      "attempt": 2,
+      "pid": 177912,
+      "phase": "start",
+      "at": 1790174223.3396418
+    },
+    {
+      "attempt": 3,
+      "pid": 177912,
+      "phase": "start",
+      "at": 1790174223.3734775
+    },
+    {
+      "attempt": 1,
+      "pid": 177912,
+      "phase": "cancel-during-write:CancelledError",
+      "at": 1790174223.3736317
+    }
+  ],
+  "writes": [
+    {
+      "attempt": 4,
+      "pid": 177972,
+      "keyed_applied": 1,
+      "at": 1790174203.2530541
+    },
+    {
+      "attempt": 1,
+      "pid": 177912,
+      "keyed_applied": 0,
+      "at": 1790174223.332305
+    },
+    {
+      "attempt": 2,
+      "pid": 177912,
+      "keyed_applied": 0,
+      "at": 1790174223.353305
+    },
+    {
+      "attempt": 3,
+      "pid": 177912,
+      "keyed_applied": 0,
+      "at": 1790174223.381871
+    },
+    {
+      "attempt": 1,
+      "pid": 177912,
+      "keyed_applied": 0,
+      "at": 1790174223.3975534
+    }
+  ],
+  "effects": [
+    {
+      "key": "effect-{workflow_id}",
+      "attempt": 4,
+      "pid": 177972
+    }
+  ],
+  "effects_nokey": [
+    {
+      "key": "effect-{workflow_id}",
+      "attempt": 4,
+      "pid": 177972
+    },
+    {
+      "key": "effect-{workflow_id}",
+      "attempt": 1,
+      "pid": 177912
+    },
+    {
+      "key": "effect-{workflow_id}",
+      "attempt": 2,
+      "pid": 177912
+    },
+    {
+      "key": "effect-{workflow_id}",
+      "attempt": 3,
+      "pid": 177912
+    },
+    {
+      "key": "effect-{workflow_id}",
+      "attempt": 1,
+      "pid": 177912
+    }
+  ],
+  "server_stopped": true,
+  "worker_a_log_lines_mentioning_completion_or_not_found": [
+    "Completing activity as failed ({'activity_id': '1', 'activity_type': 'apply_effect', 'attempt': 2, 'namespace': 'default', 'task_queue': 'gap11-zombie-queue', 'workflow_id': 'gap11-zombie-wf', 'workflow_run_id': 'redacted-id:b7fd3c13d0e17b54', 'workflow_type': 'ZombieWorkflow'})",
+    "Completing activity as failed ({'activity_id': '1', 'activity_type': 'apply_effect', 'attempt': 3, 'namespace': 'default', 'task_queue': 'gap11-zombie-queue', 'workflow_id': 'gap11-zombie-wf', 'workflow_run_id': 'redacted-id:b7fd3c13d0e17b54', 'workflow_type': 'ZombieWorkflow'})"
+  ],
+  "worker_b_log_lines_mentioning_completion_or_not_found": [],
+  "checks": {
+    "attempt1_on_worker_a": true,
+    "attempt2_on_worker_b": true,
+    "result_from_worker_b": true,
+    "stale_write_attempted_after_resume": true,
+    "stale_keyed_write_refused": true,
+    "keyed_effect_rows": 1,
+    "unkeyed_control_rows": 5,
+    "replay_clean": true
+  }
+}

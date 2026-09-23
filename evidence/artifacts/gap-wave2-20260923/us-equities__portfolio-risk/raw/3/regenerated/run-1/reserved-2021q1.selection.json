@@ -1,0 +1,20 @@
+{
+  "chosen": "momentum20",
+  "evaluation_cutoff": "2021-01-04",
+  "id": "reserved-2021q1",
+  "latest_training_exit": "2020-12-24",
+  "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+  "scores": {
+    "cash": "0.000",
+    "momentum120": "0.006522720714197431759787494864",
+    "momentum20": "0.008326706879852623489172828732",
+    "momentum60": "0.002428490049143028157923746934"
+  },
+  "test_first": "2021-01-04",
+  "test_last": "2021-03-31",
+  "test_sessions": 61,
+  "train_first": "2019-12-24",
+  "train_last": "2020-12-22",
+  "train_sessions": 252,
+  "training_episode_count": 50
+}

@@ -1,0 +1,468 @@
+{
+ "venv": {
+  "source_file": {
+   "cache_path": "$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/syft-binary/venv.syft.json",
+   "bytes": 702466,
+   "sha256": "a094cf4b7b3c768d7442ecd966b4576921f9e058c8c839e5133add8c1d657184",
+   "committed": false
+  },
+  "syft_version": "1.52.0",
+  "source_name": "nautilus-rc5-venv",
+  "packages": 21,
+  "by_type": {
+   "python": 21
+  },
+  "by_cataloger": {
+   "python-installed-package-cataloger": 21
+  },
+  "executable_files": 74,
+  "executable_formats": {
+   "elf": 74
+  },
+  "so_files_with_elf_metadata": 74,
+  "so_files_related_to_a_package": 0,
+  "binary_identified_packages": [],
+  "package_list": [
+   [
+    "python",
+    "alpaca-py",
+    "0.44.0"
+   ],
+   [
+    "python",
+    "annotated-types",
+    "0.8.0"
+   ],
+   [
+    "python",
+    "certifi",
+    "2026.7.22"
+   ],
+   [
+    "python",
+    "charset-normalizer",
+    "3.5.1"
+   ],
+   [
+    "python",
+    "duckdb",
+    "1.5.5"
+   ],
+   [
+    "python",
+    "idna",
+    "3.20"
+   ],
+   [
+    "python",
+    "msgpack",
+    "1.2.2"
+   ],
+   [
+    "python",
+    "nautilus-trader",
+    "2.0.0rc5"
+   ],
+   [
+    "python",
+    "numpy",
+    "2.5.3"
+   ],
+   [
+    "python",
+    "pandas",
+    "3.0.6"
+   ],
+   [
+    "python",
+    "pydantic",
+    "2.13.5"
+   ],
+   [
+    "python",
+    "pydantic-core",
+    "2.46.5"
+   ],
+   [
+    "python",
+    "python-dateutil",
+    "2.9.0.post0"
+   ],
+   [
+    "python",
+    "pytz",
+    "2026.3.post1"
+   ],
+   [
+    "python",
+    "requests",
+    "2.34.2"
+   ],
+   [
+    "python",
+    "six",
+    "1.17.0"
+   ],
+   [
+    "python",
+    "sseclient-py",
+    "1.9.0"
+   ],
+   [
+    "python",
+    "typing-extensions",
+    "4.16.0"
+   ],
+   [
+    "python",
+    "typing-inspection",
+    "0.4.4"
+   ],
+   [
+    "python",
+    "urllib3",
+    "2.8.0"
+   ],
+   [
+    "python",
+    "websockets",
+    "17.1"
+   ]
+  ]
+ },
+ "root": {
+  "source_file": {
+   "cache_path": "$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/syft-binary/root.syft.json",
+   "bytes": 31591982,
+   "sha256": "5f0b8ecb74f02cb87f86364e35079e267ad6e1ba088696a8ec9ea0037dbc2079",
+   "committed": false
+  },
+  "syft_version": "1.52.0",
+  "source_name": "host-root",
+  "packages": 3034,
+  "by_type": {
+   "linux-kernel-module": 961,
+   "binary": 842,
+   "deb": 834,
+   "go-module": 277,
+   "python": 61,
+   "dotnet": 55,
+   "java-archive": 4
+  },
+  "by_cataloger": {
+   "linux-kernel-cataloger": 961,
+   "pe-binary-package-cataloger": 842,
+   "dpkg-db-cataloger": 677,
+   "go-module-binary-cataloger": 277,
+   "deb-archive-cataloger": 157,
+   "python-installed-package-cataloger": 61,
+   "dotnet-deps-binary-cataloger": 55,
+   "java-archive-cataloger": 4
+  },
+  "executable_files": 3887,
+  "executable_formats": {
+   "elf": 2478,
+   "pe": 1409
+  },
+  "so_files_with_elf_metadata": 1221,
+  "so_files_related_to_a_package": 1159,
+  "binary_identified_packages": [],
+  "package_list": "omitted (>200 packages); see by_type",
+  "dpkg_db_packages_vs_dpkg_query": {
+   "syft_dpkg_db": 677,
+   "dpkg_query": 677,
+   "both": 677,
+   "dpkg_query_only": 0
+  }
+ },
+ "interp": {
+  "source_file": {
+   "cache_path": "$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/syft-binary/interp.syft.json",
+   "bytes": 125739,
+   "sha256": "ec3a9160e1f66271ec8e143b2f862639225ba322f9eead0fbf228c4f7e770cc0",
+   "committed": false
+  },
+  "syft_version": "1.52.0",
+  "source_name": "sdk-cpython",
+  "packages": 8,
+  "by_type": {
+   "binary": 7,
+   "python": 1
+  },
+  "by_cataloger": {
+   "pe-binary-package-cataloger": 6,
+   "python-installed-package-cataloger": 1,
+   "binary-classifier-cataloger": 1
+  },
+  "executable_files": 15,
+  "executable_formats": {
+   "elf": 9,
+   "pe": 6
+  },
+  "so_files_with_elf_metadata": 8,
+  "so_files_related_to_a_package": 1,
+  "binary_identified_packages": [
+   [
+    "python",
+    "3.13.15",
+    "binary-classifier-cataloger"
+   ]
+  ],
+  "package_list": [
+   [
+    "binary",
+    "Simple Launcher",
+    "1.1.0.14"
+   ],
+   [
+    "binary",
+    "python",
+    "3.13.15"
+   ],
+   [
+    "python",
+    "pip",
+    "26.2.1"
+   ]
+  ]
+ },
+ "ibgw-jars": {
+  "source_file": {
+   "cache_path": "$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/syft-binary/ibgw-jars.syft.json",
+   "bytes": 148422,
+   "sha256": "fb8416221a61538cbb4bc0d5bedc362bb6419149e9e5de166788bab77d4c3e94",
+   "committed": false
+  },
+  "syft_version": "1.52.0",
+  "source_name": "ibgateway-1050-jars",
+  "packages": 25,
+  "by_type": {
+   "java-archive": 25
+  },
+  "by_cataloger": {
+   "java-archive-cataloger": 25
+  },
+  "executable_files": 0,
+  "executable_formats": {},
+  "so_files_with_elf_metadata": 0,
+  "so_files_related_to_a_package": 0,
+  "binary_identified_packages": [],
+  "package_list": [
+   [
+    "java-archive",
+    "Java-WebSocket",
+    "1.6.0"
+   ],
+   [
+    "java-archive",
+    "batik-all",
+    "1.16"
+   ],
+   [
+    "java-archive",
+    "commons-io",
+    "2.11.0"
+   ],
+   [
+    "java-archive",
+    "core",
+    "3.5.3"
+   ],
+   [
+    "java-archive",
+    "fop",
+    "2.8"
+   ],
+   [
+    "java-archive",
+    "jackson-annotations",
+    "2.12.3"
+   ],
+   [
+    "java-archive",
+    "jackson-core",
+    "2.12.3"
+   ],
+   [
+    "java-archive",
+    "jackson-databind",
+    "2.12.3"
+   ],
+   [
+    "java-archive",
+    "jlayer",
+    "1.0.3"
+   ],
+   [
+    "java-archive",
+    "jna",
+    "5.16.0"
+   ],
+   [
+    "java-archive",
+    "jna-platform",
+    "5.16.0"
+   ],
+   [
+    "java-archive",
+    "jts4launch",
+    "1050"
+   ],
+   [
+    "java-archive",
+    "jxbrowser",
+    "8.9.4"
+   ],
+   [
+    "java-archive",
+    "jxbrowser-linux64",
+    "8.9.4"
+   ],
+   [
+    "java-archive",
+    "jxbrowser-swing",
+    "8.9.4"
+   ],
+   [
+    "java-archive",
+    "log4j-api",
+    "2.25.3"
+   ],
+   [
+    "java-archive",
+    "log4j-core",
+    "2.25.3"
+   ],
+   [
+    "java-archive",
+    "log4j-slf4j2-impl",
+    "2.25.3"
+   ],
+   [
+    "java-archive",
+    "oshi-core",
+    "6.7.0"
+   ],
+   [
+    "java-archive",
+    "protobuf-java",
+    "3.25.6"
+   ],
+   [
+    "java-archive",
+    "slf4j-api",
+    "2.0.17"
+   ],
+   [
+    "java-archive",
+    "total",
+    "2024"
+   ],
+   [
+    "java-archive",
+    "twslaunch",
+    "1050"
+   ],
+   [
+    "java-archive",
+    "twslaunch-install4j",
+    "1.12"
+   ],
+   [
+    "java-archive",
+    "xmlgraphics-commons",
+    "2.8"
+   ]
+  ]
+ },
+ "ibgw-jre": {
+  "source_file": {
+   "cache_path": "$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/syft-binary/ibgw-jre.syft.json",
+   "bytes": 111388,
+   "sha256": "1a59ec54a2ba8dc65b2a614da27f19fc9b7f8ccd458402abb4e5af954ed7e9fa",
+   "committed": false
+  },
+  "syft_version": "1.52.0",
+  "source_name": "ibgateway-1050-jre",
+  "packages": 3,
+  "by_type": {
+   "java-archive": 2,
+   "binary": 1
+  },
+  "by_cataloger": {
+   "java-archive-cataloger": 2,
+   "java-jvm-cataloger": 1
+  },
+  "executable_files": 69,
+  "executable_formats": {
+   "elf": 69
+  },
+  "so_files_with_elf_metadata": 61,
+  "so_files_related_to_a_package": 61,
+  "binary_identified_packages": [
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "java-jvm-cataloger"
+   ]
+  ],
+  "package_list": [
+   [
+    "binary",
+    "openjdk",
+    "25.0.2.0.101"
+   ],
+   [
+    "java-archive",
+    "javafx-swt",
+    "UNKNOWN"
+   ],
+   [
+    "java-archive",
+    "jrt-fs",
+    "25.0.2.0.101"
+   ]
+  ]
+ },
+ "ibkr-venv": {
+  "source_file": {
+   "cache_path": "$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/syft-binary/ibkr-venv.syft.json",
+   "bytes": 69573,
+   "sha256": "cdbd87854145670a3d0e22762cc05be315e6ffebd8b162a18f5c7a823d1a2381",
+   "committed": false
+  },
+  "syft_version": "1.52.0",
+  "source_name": "ibkr-lane-venv",
+  "packages": 3,
+  "by_type": {
+   "python": 3
+  },
+  "by_cataloger": {
+   "python-installed-package-cataloger": 3
+  },
+  "executable_files": 1,
+  "executable_formats": {
+   "elf": 1
+  },
+  "so_files_with_elf_metadata": 1,
+  "so_files_related_to_a_package": 0,
+  "binary_identified_packages": [],
+  "package_list": [
+   [
+    "python",
+    "defusedxml",
+    "0.7.1"
+   ],
+   [
+    "python",
+    "nautilus-ibapi",
+    "10.45.1"
+   ],
+   [
+    "python",
+    "protobuf",
+    "5.29.6"
+   ]
+  ]
+ }
+}

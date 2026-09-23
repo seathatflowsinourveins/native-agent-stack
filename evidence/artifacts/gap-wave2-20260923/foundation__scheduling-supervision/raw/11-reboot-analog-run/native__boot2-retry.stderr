@@ -1,0 +1,4 @@
+time=2026-09-22T22:54:13.148-04:00 level=INFO msg="Dag-run retry initiated" dag=realboot run-id=realboot-59dd2fcf40df9ebc step=finalize file=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/dagu-home/logs/realboot/dag-run_20260923_025407Z_realboot-59dd2fcf40df9ebc/dag-run_20260922.225407.830.realboot.log
+time=2026-09-22T22:54:13.162-04:00 level=INFO msg="DAG run retry started" dag=realboot run-id=realboot-59dd2fcf40df9ebc worker-id=local attempt-id=524db0 retry-target-attempt-id=fe06cc
+time=2026-09-22T22:54:13.163-04:00 level=INFO msg="Step started" dag=realboot run-id=realboot-59dd2fcf40df9ebc worker-id=local attempt-id=524db0 step=finalize
+time=2026-09-22T22:54:19.591-04:00 level=INFO msg="DAG run finished" dag=realboot run-id=realboot-59dd2fcf40df9ebc worker-id=local attempt-id=524db0 status=succeeded started-at=2026-09-22T22:54:13-04:00 finished-at=2026-09-22T22:54:19-04:00

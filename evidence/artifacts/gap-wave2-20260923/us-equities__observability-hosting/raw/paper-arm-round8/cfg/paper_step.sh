@@ -1,0 +1,4 @@
+cd "$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/work"; export TMPDIR="$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/work"
+"$HOME/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python" "$HOME/code/nas-wt-g2-observability-hosting/blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_sim_workload.py" --journal "$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/work/journal.db" --result "$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/work/result.json" --mark "obsgap-paper-162545" --seconds 30
+echo "PAPER_RC=$?"
+sh "$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/cfg/probes.sh" "$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/outside" "$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/decoy/decoy.txt"

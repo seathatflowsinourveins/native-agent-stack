@@ -1,0 +1,37 @@
+{
+  "id": "9-matched-comparison-deferred",
+  "gap_index": 9,
+  "gap_text_sha256": "99e485e1ecad6699d55a5789c49f27025a8f5445ce571b53435f2e7d9f4dafd6",
+  "preregistration": {
+    "written_at": "2026-09-23T01:31:35Z",
+    "late": true,
+    "late_reason": "Written by the fix round at 01:31:35Z; no command ran.",
+    "expectation": "Composite of gaps 0 and 6: needs a labelled handoff/decision question set scored blind, run through ai-memory and an alternative/no-memory baseline in native sessions, with complete provider usage recorded per arm.",
+    "criteria": "Settled only by an executed, blind-scored, matched comparison across arms with full usage accounting.",
+    "timestamp_note": "Timestamps reconciled on 2026-09-23T02:30:41Z from the unit workers' session transcripts (tool-call times, listed in raw/INDEX.json). The earlier value 2026-09-23T01:20:00Z was shared by every receipt, fell after the first-pass commit (01:19:05Z) and matched no recorded event."
+  },
+  "commands": [
+    {
+      "cmd": "n/a -- composite of gaps 0 and 6, neither executed",
+      "exit": null,
+      "output_excerpt": "No new execution; this gap restates the union of gap 0 (recall/MRR benchmark) and gap 6 (paired native token-savings comparison), which have their own named blockers below."
+    }
+  ],
+  "results": "Deferred, not settled. This is the composite of gap 0 and gap 6. Gap 0's named blocker: building a labelled question set and installing a second alternative memory server is multi-hour work exceeding a single check's time-box (see 0-no-benchmark-run.json). Gap 6's named blocker: a paired same-task with/without-memory native Claude comparison is a multi-run Claude comparison, which exceeds the one-bounded-single-call allowance during the Claude-account reservation window (see 6-token-savings-deferred.json). Both blockers must be resolved (a built benchmark set plus an available native-session budget) before this composite gap can be attempted; neither was available to this worker in this fix round.",
+  "outcome": "deferred",
+  "evidence_class": "source_review",
+  "limits": [
+    "No new execution.",
+    "Named blockers, inherited from gap 0 (benchmark-construction time-box) and gap 6 (Claude-account reservation): both apply and neither was resolved this session.",
+    "Outcome corrected in this fix round from 'not_settled' to 'deferred' because no check was actually run for this composite gap (not_settled requires that a check ran and did not resolve it)."
+  ],
+  "checked_at": null,
+  "checked_at_note": "No command was run for this gap, so there is no check time.",
+  "reconciliation": {
+    "reconciled_at": "2026-09-23T02:30:41Z",
+    "new_checks_run": false,
+    "changes": [
+      "Real written_at; checked_at set to null because no command ran."
+    ]
+  }
+}

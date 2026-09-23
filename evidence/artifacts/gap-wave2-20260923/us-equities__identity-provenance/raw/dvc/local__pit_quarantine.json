@@ -1,0 +1,57 @@
+{
+  "all_ok": true,
+  "arm_code": "$HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities",
+  "cases": {
+    "snapshot:availability_basis_unknown": {
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": true,
+      "stdout": {
+        "reason": "unsupported_availability_basis",
+        "status": "rejected"
+      }
+    },
+    "snapshot:availability_evidence_empty": {
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": true,
+      "stdout": {
+        "reason": "invalid_availability_evidence",
+        "status": "rejected"
+      }
+    },
+    "snapshot:available_at_date_only": {
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": true,
+      "stdout": {
+        "reason": "timestamp_requires_rfc3339_microsecond_precision",
+        "status": "rejected"
+      }
+    },
+    "snapshot:available_at_null": {
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": true,
+      "stdout": {
+        "reason": "timestamp_requires_rfc3339_microsecond_precision",
+        "status": "rejected"
+      }
+    },
+    "snapshot:available_at_removed": {
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": true,
+      "stdout": {
+        "reason": "row_schema_mismatch",
+        "status": "rejected"
+      }
+    },
+    "snapshot:control_unmutated": {
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "stdout": "(snapshotted)"
+    }
+  }
+}

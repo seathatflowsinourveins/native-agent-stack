@@ -1,0 +1,5 @@
+2026-09-23T06:51:21Z
+blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json 51d6600 2026-09-22 f881ee3208317c9f954639c5229a7c1e2c785b196d6ea7cfbac1e1d3088f041c
+blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json 51d6600 2026-09-22 1816835f9cf2ea2fa3134e4f5c44a57dc48158499efc7d1fc649e0ed715c9fcd
+blueprints/us-equities/engine-nautilus/spy-parity/dividend-module-receipt.json 51d6600 2026-09-22 660f3260a8bdd717b59a2d67209a706ea5ec02aa65538ef7ef977fb9d1ebcbd2
+{'attribution_evidence': 'converted bars', 'blocking_mappings': [], 'case': 'one_zero', 'checks': [{'blocked_by': None, 'delta': '0', 'expected': '2', 'field': 'count', 'id': 'intent_count', 'key': 'intent_count.count#1', 'observed': '2', 'ordinal': 1, 'status': 'PASS', 'tolerance': '0'}, {'blocked_by': None, 'delta': '0', 'expected': '2', 'field': 'count', 'id': 'fill_count', 'key': 'fill_count.count#2', 'observed': '2', 'ordinal': 2, 'status': 'PASS', 'tolerance': '0'}, {'blocked_by': None, 'delta': '0', 'expected': '0', 'field': 'fills_beyond_oracle', 'id': 'extra_fills', 'key': 'extra_fill

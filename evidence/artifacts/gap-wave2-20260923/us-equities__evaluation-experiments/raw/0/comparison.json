@@ -1,0 +1,369 @@
+{
+ "cases": [
+  "C1",
+  "C2",
+  "C3",
+  "C4",
+  "C5",
+  "C6",
+  "C7",
+  "C8"
+ ],
+ "outcome_vector": {
+  "promptfoo": {
+   "C1": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": false,
+    "assertions": [
+     false,
+     true,
+     false
+    ]
+   },
+   "C2": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": true,
+    "assertions": [
+     true,
+     true,
+     true
+    ]
+   },
+   "C3": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": false,
+    "assertions": [
+     false,
+     true,
+     false
+    ]
+   },
+   "C4": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": true,
+    "assertions": [
+     true,
+     true,
+     true
+    ]
+   },
+   "C5": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": false,
+    "assertions": [
+     false,
+     true,
+     false
+    ]
+   },
+   "C6": {
+    "verdict": "insufficient",
+    "eligible": false,
+    "disposition": "reject_evidence",
+    "pass": false,
+    "assertions": [
+     false,
+     true,
+     true
+    ]
+   },
+   "C7": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": false,
+    "assertions": [
+     false,
+     true,
+     false
+    ]
+   },
+   "C8": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": true,
+    "assertions": [
+     true,
+     true,
+     true
+    ]
+   }
+  },
+  "inspect": {
+   "C1": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": false,
+    "assertions": [
+     false,
+     true,
+     false
+    ]
+   },
+   "C2": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": true,
+    "assertions": [
+     true,
+     true,
+     true
+    ]
+   },
+   "C3": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": false,
+    "assertions": [
+     false,
+     true,
+     false
+    ]
+   },
+   "C4": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": true,
+    "assertions": [
+     true,
+     true,
+     true
+    ]
+   },
+   "C5": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": false,
+    "assertions": [
+     false,
+     true,
+     false
+    ]
+   },
+   "C6": {
+    "verdict": "insufficient",
+    "eligible": false,
+    "disposition": "reject_evidence",
+    "pass": false,
+    "assertions": [
+     false,
+     true,
+     true
+    ]
+   },
+   "C7": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": false,
+    "assertions": [
+     false,
+     true,
+     false
+    ]
+   },
+   "C8": {
+    "verdict": "insufficient",
+    "eligible": true,
+    "disposition": "advisory_insufficient",
+    "pass": true,
+    "assertions": [
+     true,
+     true,
+     true
+    ]
+   }
+  }
+ },
+ "label_matches": {
+  "promptfoo": 3,
+  "inspect": 3,
+  "cases": 8
+ },
+ "reproducibility": {
+  "promptfoo_repeat_identical": true,
+  "inspect_repeat_identical": true,
+  "cross_arm_identical": true,
+  "differing_cases": []
+ },
+ "gate_source_hash": {
+  "C1": {
+   "frozen": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+   "promptfoo": "81b5898828924531619f318f6d944406560bff056402cbe7e9ef5bb14449c319",
+   "inspect": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3"
+  },
+  "C2": {
+   "frozen": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+   "promptfoo": "81b5898828924531619f318f6d944406560bff056402cbe7e9ef5bb14449c319",
+   "inspect": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3"
+  },
+  "C3": {
+   "frozen": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+   "promptfoo": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+   "inspect": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9"
+  },
+  "C4": {
+   "frozen": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+   "promptfoo": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+   "inspect": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9"
+  },
+  "C5": {
+   "frozen": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+   "promptfoo": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+   "inspect": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f"
+  },
+  "C6": {
+   "frozen": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+   "promptfoo": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+   "inspect": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f"
+  },
+  "C7": {
+   "frozen": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+   "promptfoo": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+   "inspect": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df"
+  },
+  "C8": {
+   "frozen": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+   "promptfoo": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+   "inspect": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df"
+  }
+ },
+ "gate_source_hash_summary": {
+  "promptfoo_equal_frozen": [
+   "C3",
+   "C4",
+   "C5",
+   "C6",
+   "C7",
+   "C8"
+  ],
+  "inspect_equal_frozen": [
+   "C1",
+   "C2",
+   "C3",
+   "C4",
+   "C5",
+   "C6",
+   "C7",
+   "C8"
+  ]
+ },
+ "provider_calls": {
+  "promptfoo_provider_labels": [
+   "exact-text-baseline-v1"
+  ],
+  "promptfoo_error_rows_clean": 0,
+  "inspect_model": "mockllm/model",
+  "inspect_model_usage": {
+   "mockllm/model": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0
+   }
+  },
+  "inspect_sample_errors_clean": 0,
+  "network": "all arms under unshare -rn (loopback down, no route); any HTTP attempt would error"
+ },
+ "failure_log_fidelity": {
+  "promptfoo": {
+   "failed_cases": [
+    "C1",
+    "C3",
+    "C5",
+    "C6",
+    "C7"
+   ],
+   "failed_with_per_assertion_detail": [
+    "C1",
+    "C3",
+    "C5",
+    "C6",
+    "C7"
+   ],
+   "injected_error": {
+    "first_run_db_row_failure_reason": [
+     2
+    ],
+    "after_retry_db_row_failure_reason": [
+     1
+    ],
+    "db_row_id_replaced_on_retry": true,
+    "final_output_has_error_row": false,
+    "retained_error_log_files_with_text": [
+     "promptfoo-error-2026-09-23_07-26-43-274Z.log"
+    ],
+    "retry_recovered_outcome_equals_clean": true,
+    "output_file_overwritten_by_retry": true
+   }
+  },
+  "inspect": {
+   "failed_cases": [
+    "C1",
+    "C3",
+    "C5",
+    "C6",
+    "C7"
+   ],
+   "failed_with_per_assertion_detail": [
+    "C1",
+    "C3",
+    "C5",
+    "C6",
+    "C7"
+   ],
+   "injected_error": {
+    "final_log_status": "success",
+    "C3_error_retries_in_final_log": [
+     "RuntimeError('injected transient failure for C3 (first attempt)')"
+    ],
+    "retry_recovered_outcome_equals_clean": true,
+    "no_retry_log_status": "error",
+    "no_retry_error_message": "RuntimeError('injected transient failure for C3 (first attempt)')",
+    "no_retry_samples_in_log": 4
+   }
+  }
+ },
+ "interrupt_resume": {
+  "promptfoo": {
+   "evals_before": 1,
+   "evals_after": 1,
+   "same_eval_id": true,
+   "rows_before_resume": 2,
+   "rows_after_resume": 8,
+   "duplicate_test_idx_after": false,
+   "pre_interrupt_rows_preserved": true,
+   "final_outcome_equals_clean": true
+  },
+  "inspect": {
+   "interrupted_log_status": "cancelled",
+   "completed_before": [
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "cancelled_samples": [
+    "C4"
+   ],
+   "resumed_log_status": "success",
+   "samples_after": 8,
+   "completed_samples_reused_not_rerun": true,
+   "final_outcome_equals_clean": true
+  }
+ }
+}

@@ -1,0 +1,154 @@
+{
+ "id": "gap-wave2-20260923/us-equities__evaluation-experiments/5-fixture-abstention-bootstrap",
+ "gap_index": 5,
+ "gap_text_sha256": "1839faa7e29b58606bd8b87544e11fa24a2b254ad2392a8cc5def50a70dfddd8",
+ "next_check": "Add unanswerable queries to the 24-query fixture, compute an abstention rate and a paired bootstrap confidence interval between arms, and record whether any default-promotion claim follows.",
+ "preregistration": {
+  "written_at": "2026-09-23T07:18:31Z",
+  "expectation": "A new versioned fixture (v2) keeps the 24 frozen queries unchanged and adds 8 newly authored unanswerable queries (written before any ranking in this wave, checked by rg for absence of their key terms from the 15 corpus files), for 20 answerable and 12 unanswerable. A preregistered score-threshold abstention policy with leave-one-out threshold selection gives an abstention rate and abstention accuracy per ranker. A paired bootstrap (10,000 resamples, seed 20260923, percentile 95% CI) of BM25 minus lexical is computed for MRR and Recall@1 over the 20 positives and for abstention-decision accuracy over all 32 queries. Expected: the MRR/Recall@1 CIs include 0 (n=20; the recorded difference comes from a few cases), so no default-promotion claim follows.",
+  "criteria": [
+   "Positive metrics on the original 20 answerable queries equal the 2026-09-20 receipt (MRR lexical 0.9, bm25 0.9666666666666666) as a replay check.",
+   "Abstention policy (fixed before ranking): abstain when the top-1 native chunk score is below threshold t; t is chosen by leave-one-out on the other 31 queries as the midpoint threshold maximizing decision accuracy (ties: lowest threshold). Secondary: same procedure on top1/top2 score ratio. Report abstention rate, abstention recall on unanswerables, false-abstention rate on answerables and decision accuracy.",
+   "Paired bootstrap as stated; report CI bounds.",
+   "Default-promotion rule (fixed before ranking): a promotion claim for BM25 over lexical on this fixture follows only if the MRR CI lower bound is > 0 and the abstention-accuracy CI lower bound is >= 0; even then it applies to the ARB internal rankers on this fixture, not to any installed retrieval tool.",
+   "Outcome at most advanced: the fixture remains source-authored over 15 public docs; an external held-out set is still missing."
+  ],
+  "file": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/prereg/5-fixture-abstention-bootstrap.json",
+  "committed_in": "20fbeb6 (2026-09-23T07:18:35Z), before any check ran"
+ },
+ "commands": [
+  "git commit 2dbd582: freeze fixture-v2/fixture-v2-extension.json (8 added unanswerable queries, sha256 6e3aef38...) before any ranking",
+  "cd $HOME/.cache/gap-wave2-20260923/evaluation-experiments/arb && PYTHONPATH=upstream/src runtime/bin/python blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/fixture_abstention_bootstrap.py <repo> > $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/5/result.json"
+ ],
+ "results": {
+  "added_unanswerable_queries": [
+   "Which Kubernetes Helm chart version deploys the memory service in production?",
+   "What IBKR paper account number and gateway port did the worker supervision exercise connect to?",
+   "What Sharpe ratio did the momentum20 rule achieve over the 2015 to 2020 development folds?",
+   "How many gigabytes of GPU memory did the Qdrant restore consume on the Windows host?",
+   "Which Slack channel receives an alert when a research worker exceeds its cgroup memory limit?",
+   "What monthly subscription price was paid for the market data used in the authenticated AAPL check?",
+   "List the ticker symbols the catalyst strategy bought in live trading last week.",
+   "What recovery time objective in minutes was agreed for off-host disaster recovery of the memory store?"
+  ],
+  "replay_ranking_mismatches_vs_2026_09_20": [],
+  "replay_positive_metrics": {
+   "lexical": {
+    "MRR": 0.9,
+    "Recall@1": 0.8
+   },
+   "bm25": {
+    "MRR": 0.9666666666666666,
+    "Recall@1": 0.95
+   }
+  },
+  "summary": {
+   "lexical": {
+    "positive_n": 20,
+    "MRR": 0.9,
+    "Recall@1": 0.8,
+    "top1": {
+     "abstention_rate": 0.1875,
+     "abstention_recall_unanswerable": 0.5,
+     "false_abstention_answerable": 0.0,
+     "decision_accuracy": 0.8125,
+     "loo_threshold_range": [
+      0.48196259467051716,
+      0.4862931319940018
+     ]
+    },
+    "ratio": {
+     "abstention_rate": 0.125,
+     "abstention_recall_unanswerable": 0.16666666666666666,
+     "false_abstention_answerable": 0.1,
+     "decision_accuracy": 0.625,
+     "loo_threshold_range": [
+      1.0109861876428279,
+      1.0212750479880772
+     ]
+    }
+   },
+   "bm25": {
+    "positive_n": 20,
+    "MRR": 0.9666666666666666,
+    "Recall@1": 0.95,
+    "top1": {
+     "abstention_rate": 0.25,
+     "abstention_recall_unanswerable": 0.5,
+     "false_abstention_answerable": 0.1,
+     "decision_accuracy": 0.75,
+     "loo_threshold_range": [
+      8.094214461211951,
+      10.064363542450456
+     ]
+    },
+    "ratio": {
+     "abstention_rate": 0.28125,
+     "abstention_recall_unanswerable": 0.25,
+     "false_abstention_answerable": 0.3,
+     "decision_accuracy": 0.53125,
+     "loo_threshold_range": [
+      1.0805973661102621,
+      1.3372975292665839
+     ]
+    }
+   }
+  },
+  "bootstrap": {
+   "bm25_minus_lexical": {
+    "MRR": {
+     "mean_difference": 0.06666666666666667,
+     "ci95": [
+      -0.008333333333333335,
+      0.15
+     ],
+     "n": 20
+    },
+    "Recall@1": {
+     "mean_difference": 0.15,
+     "ci95": [
+      0.0,
+      0.3
+     ],
+     "n": 20
+    },
+    "decision_accuracy_top1": {
+     "mean_difference": -0.0625,
+     "ci95": [
+      -0.1875,
+      0.0625
+     ],
+     "n": 32
+    },
+    "decision_accuracy_ratio": {
+     "mean_difference": -0.09375,
+     "ci95": [
+      -0.21875,
+      0.03125
+     ],
+     "n": 32
+    }
+   },
+   "seed": 20260923,
+   "resamples": 10000,
+   "method": "paired percentile bootstrap over queries"
+  },
+  "default_promotion_rule": "MRR CI lower bound > 0 and top1 decision-accuracy CI lower bound >= 0",
+  "default_promotion_claim_follows": false
+ },
+ "outcome": "advanced",
+ "outcome_note": "Executed every arm of the next_check: 8 unanswerable queries added (v2: 20 answerable, 12 unanswerable), abstention rate/recall/false-abstention/decision accuracy under a preregistered leave-one-out threshold policy, paired bootstrap CIs (BM25 minus lexical MRR +0.067 [-0.008, 0.150]; Recall@1 +0.15 [0.00, 0.30]; top-1 decision accuracy -0.0625 [-0.1875, 0.0625]), and the preregistered promotion rule, which does not fire: no default-promotion claim follows. The original 24-query rankings replay exactly. What remains: the fixture is still source-authored over 15 public documents by the same author class; an external held-out or real-user query set is needed to close that clause.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "n=20 answerable and 12 unanswerable; CIs are wide.",
+  "The added unanswerables are authored with rg term scans as support; paraphrased answers could exist.",
+  "The abstention threshold is chosen by leave-one-out on the same 32 queries; it is not a transferable operating point."
+ ],
+ "raw_outputs": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/5/result.json",
+   "sha256": "0244fa70da20749c25c6fe633e1fbd35a3a169597630a091494c26af03b0e63e"
+  }
+ ],
+ "checked_at": "2026-09-23T13:51:51Z"
+}

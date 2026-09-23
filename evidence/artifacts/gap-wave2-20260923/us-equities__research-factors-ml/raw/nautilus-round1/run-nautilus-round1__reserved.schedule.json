@@ -1,0 +1,101 @@
+[
+ {
+  "fold": "reserved-2021q1",
+  "candidate": "momentum20",
+  "decision": "2021-01-08",
+  "entry": "2021-01-11",
+  "exit": "2021-01-19",
+  "asset": "IWM",
+  "gross_price_label": "0.040226242137598127651275050"
+ },
+ {
+  "fold": "reserved-2021q1",
+  "candidate": "momentum20",
+  "decision": "2021-01-15",
+  "entry": "2021-01-19",
+  "exit": "2021-01-26",
+  "asset": "IWM",
+  "gross_price_label": "0.014062060560607481016218243"
+ },
+ {
+  "fold": "reserved-2021q1",
+  "candidate": "momentum20",
+  "decision": "2021-01-25",
+  "entry": "2021-01-26",
+  "exit": "2021-02-02",
+  "asset": "IWM",
+  "gross_price_label": "-0.0148377553850420634186927984"
+ },
+ {
+  "fold": "reserved-2021q1",
+  "candidate": "momentum20",
+  "decision": "2021-02-01",
+  "entry": "2021-02-02",
+  "exit": "2021-02-09",
+  "asset": "IWM",
+  "gross_price_label": "0.065640688781494862290620748"
+ },
+ {
+  "fold": "reserved-2021q1",
+  "candidate": "momentum20",
+  "decision": "2021-02-08",
+  "entry": "2021-02-09",
+  "exit": "2021-02-17",
+  "asset": "IWM",
+  "gross_price_label": "-0.0154543853469531525184924269"
+ },
+ {
+  "fold": "reserved-2021q1",
+  "candidate": "momentum20",
+  "decision": "2021-02-16",
+  "entry": "2021-02-17",
+  "exit": "2021-02-24",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0415952359469457728051971488"
+ },
+ {
+  "fold": "reserved-2021q1",
+  "candidate": "momentum20",
+  "decision": "2021-02-23",
+  "entry": "2021-02-24",
+  "exit": "2021-03-03",
+  "asset": "IWM",
+  "gross_price_label": "-0.0008983918785374180217410835"
+ },
+ {
+  "fold": "reserved-2021q1",
+  "candidate": "momentum20",
+  "decision": "2021-03-02",
+  "entry": "2021-03-03",
+  "exit": "2021-03-10",
+  "asset": "IWM",
+  "gross_price_label": "0.014252315439259059437100980"
+ },
+ {
+  "fold": "reserved-2021q1",
+  "candidate": "momentum20",
+  "decision": "2021-03-09",
+  "entry": "2021-03-10",
+  "exit": "2021-03-17",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "reserved-2021q1",
+  "candidate": "momentum20",
+  "decision": "2021-03-16",
+  "entry": "2021-03-17",
+  "exit": "2021-03-24",
+  "asset": "IWM",
+  "gross_price_label": "-0.0397029919196331076654291330"
+ },
+ {
+  "fold": "reserved-2021q1",
+  "candidate": "momentum20",
+  "decision": "2021-03-23",
+  "entry": "2021-03-24",
+  "exit": "2021-03-31",
+  "asset": "SPY",
+  "gross_price_label": "0.011332241890923974214673079"
+ }
+]

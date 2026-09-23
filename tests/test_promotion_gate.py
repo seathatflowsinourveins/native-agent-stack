@@ -347,5 +347,160 @@ class FixtureGateRuns(unittest.TestCase):
             self.assertEqual(result["status"], "fail")
 
 
+def _gate_has_duckdb():
+    if not GATE_PYTHON:
+        return False
+    proc = subprocess.run([GATE_PYTHON, "-c", "import duckdb"], capture_output=True, text=True, timeout=60)
+    return proc.returncode == 0
+
+
+GATE_HAS_DUCKDB = _gate_has_duckdb()
+
+
+@unittest.skipUnless(GATE_PYTHON, "requires the gate's isolated venv")
+class DuckdbInputRuns(unittest.TestCase):
+    """The duckdb://<db>#<table> input path, run in the gate venv synced from
+    requirements.lock (which pins duckdb). Each CSV fixture is copied into a
+    DuckDB table by DuckDB's own read_csv (auto-typed columns) and must give
+    the same status, row_count and per-check statuses as its retained CSV
+    result. A venv provisioned before duckdb entered the lock skips locally;
+    under REQUIRE_PROMOTION_GATE_VENV=1 (CI) a missing duckdb fails."""
+
+    def setUp(self):
+        if not GATE_HAS_DUCKDB:
+            if os.environ.get("REQUIRE_PROMOTION_GATE_VENV") == "1":
+                self.fail("gate venv cannot import duckdb although requirements.lock pins it")
+            self.skipTest("gate venv predates the duckdb pin in requirements.lock")
+
+    def _build(self, db, body, *args):
+        """Runs `body` in the gate venv with `con` open on `db` (read-write)
+        and `argv` bound to `args`; closes the connection afterwards unless
+        `body` exits the process first."""
+        script = ("import duckdb, os, sys\n"
+                  "con = duckdb.connect(sys.argv[1])\n"
+                  "argv = sys.argv[2:]\n" + body + "\ncon.close()\n")
+        build = subprocess.run([GATE_PYTHON, "-c", script, str(db), *map(str, args)],
+                               capture_output=True, text=True, timeout=60)
+        self.assertEqual(build.returncode, 0, build.stderr)
+
+    def _gate(self, db, relation, tmp):
+        out = Path(tmp) / "gate-result.json"
+        proc = subprocess.run([GATE_PYTHON, str(GATE_FILE), "--input", f"duckdb://{db}#{relation}",
+                                "--out", str(out)], capture_output=True, text=True, timeout=60)
+        result = json.loads(out.read_text())
+        self.assertEqual(result["input_sha256"], hashlib.sha256(db.read_bytes()).hexdigest())
+        return proc.returncode, result
+
+    def _run_duckdb(self, fixture_name, column_types=None):
+        """Copies a CSV fixture into a DuckDB base table with DuckDB's own
+        read_csv; `column_types` overrides auto-detection for named columns."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "snapshot.duckdb"
+            self._build(db, "import json\n"
+                            "types = json.loads(argv[1])\n"
+                            "option = ', types={' + ', '.join(f\"'{k}': '{v}'\" for k, v in types.items()) + '}' if types else ''\n"
+                            "con.execute('CREATE TABLE snapshot AS SELECT * FROM read_csv(?' + option + ')', [argv[0]])",
+                        FIXTURES / fixture_name, json.dumps(column_types or {}))
+            return self._gate(db, "snapshot", tmp)
+
+    def test_duckdb_inputs_match_the_retained_csv_results(self):
+        # lossy-volume-conversion stores `volume` as VARCHAR: DuckDB's
+        # auto-detection would type it DOUBLE and lose -1e-400 and
+        # 9007199254740992.5 at write time, before the gate runs (a lossy
+        # snapshot writer, like a Parquet float column). Stored exactly, it
+        # must fail the gate exactly as its CSV does, including the detail.
+        cases = (("good", None), ("bad", None), ("null-price-cell", None), ("empty-snapshot", None),
+                 ("fractional-negative-volume", None), ("lossy-volume-conversion", {"volume": "VARCHAR"}))
+        for stem, column_types in cases:
+            with self.subTest(fixture=stem):
+                code, result = self._run_duckdb(f"{stem}.csv", column_types)
+                expected = json.loads((FIXTURES / f"{stem}-gate-result.json").read_text())
+                self.assertEqual(code, 0 if expected["status"] == "pass" else 1)
+                self.assertEqual(result["status"], expected["status"])
+                self.assertEqual(result["row_count"], expected["row_count"])
+                self.assertEqual({c["name"]: c["status"] for c in result["checks"]},
+                                  {c["name"]: c["status"] for c in expected["checks"]})
+                if stem == "lossy-volume-conversion":
+                    self.assertEqual(result["checks"], expected["checks"])
+
+    def test_duckdb_decimal_volume_keeps_exact_precision(self):
+        """Regression (Codex, PR #132): fetch_df() turned a DECIMAL volume
+        into float64, rounding 9007199254740992.5 to 9007199254740992.0, so
+        a non-integral volume passed. It must fail, and only that row."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "snapshot.duckdb"
+            self._build(db, "con.execute(\"CREATE TABLE snapshot AS SELECT * REPLACE "
+                            "(CAST(volume AS DECIMAL(38, 1)) AS volume) FROM read_csv(?)\", [argv[0]])\n"
+                            "con.execute(\"UPDATE snapshot SET volume = 9007199254740992.5 "
+                            "WHERE symbol = 'QQQ' AND session = DATE '2026-09-15'\")",
+                        FIXTURES / "good.csv")
+            code, result = self._gate(db, "snapshot", tmp)
+        self.assertEqual(code, 1)
+        self.assertEqual(result["status"], "fail")
+        failing = {c["name"]: c["detail"] for c in result["checks"] if c["status"] == "fail"}
+        self.assertEqual(failing, {"volume_integral_non_negative": "1 of 4 rows failed; example row indices [3]"},
+                         result["checks"])
+
+    def test_duckdb_decimal_numeric_columns_still_pass(self):
+        """Every numeric column stored as DECIMAL (integral volume) keeps the
+        good fixture's all-pass result: reading volume as text must not break
+        the price, volume or row checks."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "snapshot.duckdb"
+            self._build(db, "con.execute('CREATE TABLE snapshot AS SELECT * REPLACE (CAST(open AS DECIMAL(18, 4)) AS open,"
+                            " CAST(high AS DECIMAL(18, 4)) AS high, CAST(low AS DECIMAL(18, 4)) AS low,"
+                            " CAST(close AS DECIMAL(18, 4)) AS close, CAST(volume AS DECIMAL(38, 0)) AS volume)"
+                            " FROM read_csv(?)', [argv[0]])", FIXTURES / "good.csv")
+            code, result = self._gate(db, "snapshot", tmp)
+        self.assertEqual(code, 0, result["checks"])
+        self.assertEqual(result["status"], "pass")
+        self.assertEqual(result["row_count"], 4)
+
+    def test_duckdb_view_over_external_file_is_rejected(self):
+        """Regression (Codex, PR #132): input_sha256 hashes only the .duckdb
+        file, so a view over read_parquet() let the gate validate mutable
+        external rows the receipt does not identify. Only a base table in
+        the hashed file is accepted; the base table beside the view passes."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "snapshot.duckdb"
+            parquet = Path(tmp) / "current.parquet"
+            self._build(db, "con.execute('CREATE TABLE snapshot AS SELECT * FROM read_csv(?)', [argv[0]])\n"
+                            "con.execute(\"COPY snapshot TO '\" + argv[1] + \"' (FORMAT parquet)\")\n"
+                            "con.execute(\"CREATE VIEW current_bars AS SELECT * FROM read_parquet('\" + argv[1] + \"')\")",
+                        FIXTURES / "good.csv", parquet)
+            code, result = self._gate(db, "current_bars", tmp)
+            self.assertEqual(code, 1)
+            self.assertEqual(result["status"], "fail")
+            self.assertEqual([c["name"] for c in result["checks"]], ["gate_execution"])
+            self.assertIn("duckdb_relation_not_base_table: current_bars is VIEW", result["checks"][0]["detail"])
+            for relation in ("snapshot", "main.snapshot", "Main.SNAPSHOT", "snapshot.main.snapshot"):
+                with self.subTest(relation=relation):
+                    code, result = self._gate(db, relation, tmp)
+                    self.assertEqual(code, 0, result["checks"])
+                    self.assertEqual(result["status"], "pass")
+            for relation in ("missing_table", "information_schema.tables", "system.information_schema.tables",
+                             "temp.main.snapshot"):
+                with self.subTest(relation=relation):
+                    code, result = self._gate(db, relation, tmp)
+                    self.assertEqual(code, 1)
+                    self.assertRegex(result["checks"][0]["detail"],
+                                     "duckdb_relation_not_found|duckdb_relation_not_base_table")
+
+    def test_duckdb_pending_wal_is_rejected(self):
+        """Rows still in `<db>.wal` are replayed by a read-only open but are
+        not in the hashed file, so input_sha256 would not identify them."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "snapshot.duckdb"
+            self._build(db, "con.execute('CREATE TABLE snapshot AS SELECT * FROM read_csv(?)', [argv[0]])",
+                        FIXTURES / "good.csv")
+            self._build(db, "con.execute(\"UPDATE snapshot SET volume = -1 WHERE symbol = 'SPY'\")\n"
+                            "sys.stdout.flush(); os._exit(0)")
+            self.assertTrue(Path(str(db) + ".wal").exists(), "builder left no WAL to test against")
+            code, result = self._gate(db, "snapshot", tmp)
+        self.assertEqual(code, 1)
+        self.assertEqual(result["status"], "fail")
+        self.assertIn("duckdb_wal_present", result["checks"][0]["detail"])
+
+
 if __name__ == "__main__":
     unittest.main()

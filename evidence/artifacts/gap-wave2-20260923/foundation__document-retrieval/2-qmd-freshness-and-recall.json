@@ -1,0 +1,50 @@
+{
+  "id": "gap-wave2-20260923-foundation-document-retrieval-2",
+  "gap_index": 2,
+  "gap_text_sha256": "8db8f6d0bae2aeaec1469ccc888b2fb0abe323ddb61bdee800ed2594512af400",
+  "preregistration": {
+    "written_at": null,
+    "expectation": "On a disposable qmd index over a small synthetic corpus, adding/editing a Markdown file without running `qmd update` will not surface the new content in `qmd search`; running `qmd update` afterward will surface it. A held-out 8-query set (distinct from the corpus authoring) against 5 documents will show a recall@3 measurably below 100%, showing BM25 keyword search over a small corpus is not a general arbitrary-query recall guarantee.",
+    "criteria": "settled if both the freshness before/after behavior and a held-out recall@3 number are measured and recorded, even if the exact recall number differs from any specific prediction.",
+    "late": true,
+    "timestamp_note": "Actual write time unknown, so written_at is null. The first round recorded 2026-09-23T00:00:00Z, a round-number placeholder that was never a captured time. This preregistration was first committed in b78ed96 (2026-09-23T01:14:48Z, the only upper bound) together with its results, so it is late: it is not shown to precede the check. The fix round (f366da1) only labelled it late; this reconciliation round replaced the placeholder with null."
+  },
+  "commands": [
+    "mkdir -p ~/.cache/gap-wave2-20260923/document-retrieval/freshness-corpus (4 synthetic .md files)",
+    "qmd --index gap-wave2-freshness-20260923 collection add . --name freshness-test",
+    "qmd --index gap-wave2-freshness-20260923 search 'torque wrench calibration' -c freshness-test --format json",
+    "echo new doc5-epsilon.md + append to doc2.md (no reindex yet)",
+    "qmd --index gap-wave2-freshness-20260923 search 'zorbnaxian coolant valve' -c freshness-test --format json",
+    "qmd --index gap-wave2-freshness-20260923 search 'quixotropic signal self-test' -c freshness-test --format json",
+    "qmd --index gap-wave2-freshness-20260923 update",
+    "qmd --index gap-wave2-freshness-20260923 search 'zorbnaxian coolant valve' -c freshness-test --format json",
+    "qmd --index gap-wave2-freshness-20260923 search 'quixotropic signal self-test' -c freshness-test --format json",
+    "8x qmd --index gap-wave2-freshness-20260923 search '<held-out query>' -c freshness-test --format json -n 3, scored against a hand-written expected file per query",
+    "rm -f ~/.cache/qmd/gap-wave2-freshness-20260923.sqlite* ~/.config/qmd/gap-wave2-freshness-20260923.yml (cleanup)"
+  ],
+  "results": [
+    "Before qmd update: search for 'zorbnaxian coolant valve' (unique term only in the newly added, never-indexed doc5-epsilon.md) -> [] (empty). Search for 'quixotropic signal self-test' (unique term appended to already-indexed doc2.md) -> [] (empty). Confirms indexing is NOT automatic; new/changed content is invisible to search until a manual `qmd update`.",
+    "qmd update output: 'Indexed: 1 new, 1 updated, 3 unchanged, 0 removed / Cleaned up 1 orphaned content hash(es)'.",
+    "After qmd update: search 'zorbnaxian coolant valve' -> hit on doc5-epsilon.md (score 0.77). search 'quixotropic signal self-test' -> hit on doc2.md (score 0.74). Confirms `qmd update` makes new/edited content searchable.",
+    "Held-out 8-query recall@3 over 5 documents (BM25 `search`, -n 3): 5/8 = 62.5%. Hits: 'USB firmware update gadget'->doc2.md, 'never needs lubrication'->doc4.md, 'reactor coolant valve replacement'->doc5-epsilon.md, 'sealed bearing lubrication pump'->doc4.md, 'quarterly calibration widget'->doc1.md. Misses (empty result sets, exact vocabulary mismatch): 'five minute reporting interval'->doc3.md, 'humidity temperature sensor readings'->doc3.md, 'annual firmware update process'->doc2.md."
+  ],
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Synthetic 5-document corpus, not a representative production corpus; recall@3 numbers (62.5%) are not comparable in magnitude to production retrieval quality and should not be quoted outside this fixture.",
+    "Only BM25 `search` mode was exercised for the recall measurement (no embeddings were pulled/generated in this bounded check, consistent with the isolation and time-box rules); vec/hybrid/hyde freshness and recall were not separately measured.",
+    "The freshness half is settled: automatic indexing does not happen, and `qmd update` is required and sufficient in this fixture. The arbitrary-query-recall half is NOT settled by this receipt, only advanced: the preregistered criterion ('settled if both numbers are recorded, whatever they are') made settlement automatic regardless of the measured value, which is not a genuine acceptance bar for an arbitrary-query-recall claim. The 8 held-out queries were written by the same agent that authored the 5-document synthetic corpus in the same session, so they are not truly held-out against an independent corpus or an independent query author; the queries are held-out only from the two exact phrases originally cited in the gap text, not from the corpus-authoring process as a whole. The measured 5/8 = 62.5% recall@3 is one reproducible number on a non-independent, non-representative fixture and does not establish arbitrary-query recall in general. Remaining work to settle this half: an independently authored query set (or a real production-representative corpus) with a pre-registered pass/fail recall threshold decided before the corpus or queries are seen by the checking agent.",
+    "Isolation breach, disclosed: `qmd --index gap-wave2-freshness-20260923` wrote ~/.cache/qmd/gap-wave2-freshness-20260923.sqlite (shared qmd cache directory) and auto-created ~/.config/qmd/gap-wave2-freshness-20260923.yml, outside this unit's cache dir; the hard isolation rule prohibits writing to ~/.config. Both were deleted by the cleanup command, and in the 2026-09-23 reconciliation round a listing of ~/.config/qmd/ and ~/.cache/qmd/ showed no gap-wave2-* entry. No before-listing was taken, so it is unverified whether other entries there changed. The first-round wording ('no shared qmd cache/config content was modified') was wrong and is withdrawn.",
+    "Retained raw evidence is only the corpus in its post-edit state (raw/freshness-corpus/, doc2.md with the appended line and doc5-epsilon.md). The qmd search JSON outputs, the `qmd update` output and the per-query expected-file list were printed to the terminal and not saved, so results[0]-[3] are transcriptions that cannot be re-checked from committed files."
+  ],
+  "checked_at": null,
+  "checked_at_note": "The first round's checked_at was an invented round-number placeholder and was removed. Surviving wall-clock evidence: retained raw outputs for this gap have file mtimes 2026-09-23T01:03:38Z to 2026-09-23T01:03:48Z UTC (see raw/raw-manifest.json); the searches, `qmd update` and the recall queries left no retained file, so their times are unknown. All steps precede the b78ed96 commit at 2026-09-23T01:14:48Z.",
+  "raw_outputs": [
+    "raw/freshness-corpus/doc1.md",
+    "raw/freshness-corpus/doc2.md",
+    "raw/freshness-corpus/doc3.md",
+    "raw/freshness-corpus/doc4.md",
+    "raw/freshness-corpus/doc5-epsilon.md"
+  ],
+  "raw_outputs_manifest": "raw/raw-manifest.json (source and committed sha256, host paths as $HOME, session UUIDs redacted; binary and third-party files hash-only)"
+}

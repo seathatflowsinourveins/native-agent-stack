@@ -1,0 +1,685 @@
+{
+  "assets": [
+    "SPY",
+    "QQQ",
+    "IWM"
+  ],
+  "final_close": "2021-03-31",
+  "inputs_unchanged": true,
+  "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+  "schedule": [
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.0736869716312496,
+          "sessions": 63,
+          "sum_daily": 0.07614556113636552
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.07606355421608946,
+          "sessions": 63,
+          "sum_daily": 0.07739295031806406
+        }
+      },
+      "id": "development-1",
+      "rebalance_close": "2016-01-12",
+      "test_first": "2016-01-13",
+      "test_last": "2016-04-13",
+      "train_first": "2015-01-05",
+      "train_last": "2016-01-04",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.4879141784043496,
+          "QQQ": 0.21964991029397193,
+          "SPY": 0.29243591130167845
+        },
+        "meanrisk_min_variance": {
+          "IWM": 0.18734495436921597,
+          "QQQ": 2.6055372958621934e-07,
+          "SPY": 0.8126547850770545
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.04016135522483477,
+          "sessions": 63,
+          "sum_daily": 0.04258327179722108
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.033798099187939856,
+          "sessions": 63,
+          "sum_daily": 0.035598056456180936
+        }
+      },
+      "id": "development-2",
+      "rebalance_close": "2016-04-13",
+      "test_first": "2016-04-14",
+      "test_last": "2016-07-13",
+      "train_first": "2015-04-07",
+      "train_last": "2016-04-05",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.473245982279197,
+          "QQQ": 0.2172635303488839,
+          "SPY": 0.3094904873719191
+        },
+        "meanrisk_min_variance": {
+          "IWM": 0.023285028109391773,
+          "QQQ": 1.2634769846239354e-07,
+          "SPY": 0.9767148455429097
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.021155047694063844,
+          "sessions": 63,
+          "sum_daily": 0.022552193521387716
+        },
+        "meanrisk_min_variance": {
+          "compounded": -0.006978762586263509,
+          "sessions": 63,
+          "sum_daily": -0.005853071714663925
+        }
+      },
+      "id": "development-3",
+      "rebalance_close": "2016-07-13",
+      "test_first": "2016-07-14",
+      "test_last": "2016-10-11",
+      "train_first": "2015-07-07",
+      "train_last": "2016-07-05",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.4577789411713694,
+          "QQQ": 0.22578833212379093,
+          "SPY": 0.31643272670483963
+        },
+        "meanrisk_min_variance": {
+          "IWM": 6.089171923761337e-06,
+          "QQQ": 1.116661420096123e-06,
+          "SPY": 0.999992794166655
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.0809619628707885,
+          "sessions": 63,
+          "sum_daily": 0.07922417359969874
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.06404910085065474,
+          "sessions": 63,
+          "sum_daily": 0.0629693475721535
+        }
+      },
+      "id": "development-4",
+      "rebalance_close": "2016-10-11",
+      "test_first": "2016-10-12",
+      "test_last": "2017-01-11",
+      "train_first": "2015-10-05",
+      "train_last": "2016-10-03",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.39945828635125624,
+          "QQQ": 0.24964938472468834,
+          "SPY": 0.3508923289240554
+        },
+        "meanrisk_min_variance": {
+          "IWM": 1.2731339072827287e-07,
+          "QQQ": 5.000948198291684e-07,
+          "SPY": 0.9999993725917895
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.02400251371464135,
+          "sessions": 63,
+          "sum_daily": 0.02466503319456548
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.030515199753698097,
+          "sessions": 63,
+          "sum_daily": 0.030626154253709917
+        }
+      },
+      "id": "development-5",
+      "rebalance_close": "2017-01-11",
+      "test_first": "2017-01-12",
+      "test_last": "2017-04-12",
+      "train_first": "2016-01-05",
+      "train_last": "2017-01-03",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.3750271400804871,
+          "QQQ": 0.2500473464254348,
+          "SPY": 0.3749255134940781
+        },
+        "meanrisk_min_variance": {
+          "IWM": 5.813199840341682e-08,
+          "QQQ": 3.087439176772188e-07,
+          "SPY": 0.9999996331240838
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.055064748519288775,
+          "sessions": 63,
+          "sum_daily": 0.05482199418152949
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.04439615760982152,
+          "sessions": 63,
+          "sum_daily": 0.044214532209775566
+        }
+      },
+      "id": "development-6",
+      "rebalance_close": "2017-04-12",
+      "test_first": "2017-04-13",
+      "test_last": "2017-07-13",
+      "train_first": "2016-04-06",
+      "train_last": "2017-04-04",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.3150236337930641,
+          "QQQ": 0.2857960787084958,
+          "SPY": 0.3991802874984401
+        },
+        "meanrisk_min_variance": {
+          "IWM": 3.137924662018549e-07,
+          "QQQ": 4.193899522564642e-06,
+          "SPY": 0.9999954923080112
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.04951949237493869,
+          "sessions": 63,
+          "sum_daily": 0.04916533076492464
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.04336797504985768,
+          "sessions": 63,
+          "sum_daily": 0.043029533345712245
+        }
+      },
+      "id": "development-7",
+      "rebalance_close": "2017-07-13",
+      "test_first": "2017-07-14",
+      "test_last": "2017-10-11",
+      "train_first": "2016-07-06",
+      "train_last": "2017-07-05",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.28297500762285854,
+          "QQQ": 0.26572673744140274,
+          "SPY": 0.4512982549357387
+        },
+        "meanrisk_min_variance": {
+          "IWM": 4.3613265874221305e-08,
+          "QQQ": 1.7612529612043407e-07,
+          "SPY": 0.9999997802614379
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.07913929022794819,
+          "sessions": 63,
+          "sum_daily": 0.07683713260809431
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.08273865449443418,
+          "sessions": 63,
+          "sum_daily": 0.07995818076409222
+        }
+      },
+      "id": "development-8",
+      "rebalance_close": "2017-10-11",
+      "test_first": "2017-10-12",
+      "test_last": "2018-01-11",
+      "train_first": "2016-10-04",
+      "train_last": "2017-10-03",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.2752992224834655,
+          "QQQ": 0.2374311917248892,
+          "SPY": 0.4872695857916453
+        },
+        "meanrisk_min_variance": {
+          "IWM": 7.012189574945848e-07,
+          "QQQ": 3.228002460491277e-06,
+          "SPY": 0.999996070778582
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": -0.02704048458541386,
+          "sessions": 63,
+          "sum_daily": -0.021346387715361577
+        },
+        "meanrisk_min_variance": {
+          "compounded": -0.039728842919747986,
+          "sessions": 63,
+          "sum_daily": -0.03498113178927166
+        }
+      },
+      "id": "development-9",
+      "rebalance_close": "2018-01-11",
+      "test_first": "2018-01-12",
+      "test_last": "2018-04-13",
+      "train_first": "2017-01-04",
+      "train_last": "2018-01-03",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.1591452711981538,
+          "QQQ": 0.34910079345095724,
+          "SPY": 0.49175393535088896
+        },
+        "meanrisk_min_variance": {
+          "IWM": 3.3653886520319792e-06,
+          "QQQ": 7.0990226847443165e-06,
+          "SPY": 0.9999895355886631
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.08109926391071243,
+          "sessions": 63,
+          "sum_daily": 0.07935502938153982
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.05562122550908599,
+          "sessions": 63,
+          "sum_daily": 0.05539052127205518
+        }
+      },
+      "id": "development-10",
+      "rebalance_close": "2018-04-13",
+      "test_first": "2018-04-16",
+      "test_last": "2018-07-13",
+      "train_first": "2017-04-05",
+      "train_last": "2018-04-05",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.4666589132491029,
+          "QQQ": 0.19077069759948384,
+          "SPY": 0.34257038915141325
+        },
+        "meanrisk_min_variance": {
+          "IWM": 0.03505340330448954,
+          "QQQ": 7.697253488266473e-08,
+          "SPY": 0.9649465197229757
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": -0.06019841832225503,
+          "sessions": 63,
+          "sum_daily": -0.0605088053744271
+        },
+        "meanrisk_min_variance": {
+          "compounded": -0.0398123300360671,
+          "sessions": 63,
+          "sum_daily": -0.0393359896048908
+        }
+      },
+      "id": "development-11",
+      "rebalance_close": "2018-07-13",
+      "test_first": "2018-07-16",
+      "test_last": "2018-10-11",
+      "train_first": "2017-07-06",
+      "train_last": "2018-07-05",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.5042993944255942,
+          "QQQ": 0.18129791310909973,
+          "SPY": 0.31440269246530606
+        },
+        "meanrisk_min_variance": {
+          "IWM": 0.23351869088596847,
+          "QQQ": 4.399426813155263e-08,
+          "SPY": 0.7664812651197636
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": -0.06497692892107554,
+          "sessions": 63,
+          "sum_daily": -0.058378057703607614
+        },
+        "meanrisk_min_variance": {
+          "compounded": -0.06006028863808399,
+          "sessions": 63,
+          "sum_daily": -0.05434760770235274
+        }
+      },
+      "id": "development-12",
+      "rebalance_close": "2018-10-11",
+      "test_first": "2018-10-12",
+      "test_last": "2019-01-14",
+      "train_first": "2017-10-04",
+      "train_last": "2018-10-03",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.5125649570790896,
+          "QQQ": 0.17622088996783916,
+          "SPY": 0.31121415295307125
+        },
+        "meanrisk_min_variance": {
+          "IWM": 0.30681303245891484,
+          "QQQ": 2.9551926960335484e-08,
+          "SPY": 0.6931869379891581
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.12208709906912607,
+          "sessions": 63,
+          "sum_daily": 0.11725383270905723
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.1210896268380568,
+          "sessions": 63,
+          "sum_daily": 0.11594503610106832
+        }
+      },
+      "id": "development-13",
+      "rebalance_close": "2019-01-14",
+      "test_first": "2019-01-15",
+      "test_last": "2019-04-15",
+      "train_first": "2018-01-04",
+      "train_last": "2019-01-04",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.5258458039205407,
+          "QQQ": 0.17048875196733812,
+          "SPY": 0.30366544411212115
+        },
+        "meanrisk_min_variance": {
+          "IWM": 0.25631696217284905,
+          "QQQ": 2.6807009482458194e-08,
+          "SPY": 0.7436830110201416
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.012137439817097917,
+          "sessions": 63,
+          "sum_daily": 0.01445231732436946
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.03358895519968108,
+          "sessions": 63,
+          "sum_daily": 0.03477155543986465
+        }
+      },
+      "id": "development-14",
+      "rebalance_close": "2019-04-15",
+      "test_first": "2019-04-16",
+      "test_last": "2019-07-16",
+      "train_first": "2018-04-06",
+      "train_last": "2019-04-05",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.49037883799098836,
+          "QQQ": 0.17432035542746932,
+          "SPY": 0.3353008065815423
+        },
+        "meanrisk_min_variance": {
+          "IWM": 1.5861957768975138e-05,
+          "QQQ": 4.260669030630947e-07,
+          "SPY": 0.999983711975328
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": -0.022927394005460844,
+          "sessions": 63,
+          "sum_daily": -0.019219504226350027
+        },
+        "meanrisk_min_variance": {
+          "compounded": -0.012545563386384795,
+          "sessions": 63,
+          "sum_daily": -0.009282538225782453
+        }
+      },
+      "id": "development-15",
+      "rebalance_close": "2019-07-16",
+      "test_first": "2019-07-17",
+      "test_last": "2019-10-14",
+      "train_first": "2018-07-06",
+      "train_last": "2019-07-08",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.46978448614683943,
+          "QQQ": 0.18152333173004254,
+          "SPY": 0.34869218212311803
+        },
+        "meanrisk_min_variance": {
+          "IWM": 4.613301076366624e-06,
+          "QQQ": 4.568788851590137e-07,
+          "SPY": 0.9999949298200363
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.11817737195912259,
+          "sessions": 63,
+          "sum_daily": 0.11252430308528806
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.10643690700884889,
+          "sessions": 63,
+          "sum_daily": 0.1018095991429563
+        }
+      },
+      "id": "development-16",
+      "rebalance_close": "2019-10-14",
+      "test_first": "2019-10-15",
+      "test_last": "2020-01-14",
+      "train_first": "2018-10-04",
+      "train_last": "2019-10-04",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.46833291641425034,
+          "QQQ": 0.19112396962447042,
+          "SPY": 0.34054311396127923
+        },
+        "meanrisk_min_variance": {
+          "IWM": 6.933652561078928e-07,
+          "QQQ": 9.108383115835104e-08,
+          "SPY": 0.9999992155509128
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": -0.1915580245629518,
+          "sessions": 63,
+          "sum_daily": -0.16800019385748266
+        },
+        "meanrisk_min_variance": {
+          "compounded": -0.1517483641992362,
+          "sessions": 63,
+          "sum_daily": -0.12231389520689873
+        }
+      },
+      "id": "development-17",
+      "rebalance_close": "2020-01-14",
+      "test_first": "2020-01-15",
+      "test_last": "2020-04-15",
+      "train_first": "2019-01-07",
+      "train_last": "2020-01-06",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.41295768511352415,
+          "QQQ": 0.2200235009873002,
+          "SPY": 0.3670188138991756
+        },
+        "meanrisk_min_variance": {
+          "IWM": 5.179472111505966e-08,
+          "QQQ": 2.1152069882641533e-08,
+          "SPY": 0.999999927053209
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.22415936759427257,
+          "sessions": 63,
+          "sum_daily": 0.21354267468658522
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.1587342254195041,
+          "sessions": 63,
+          "sum_daily": 0.15512944831096964
+        }
+      },
+      "id": "development-18",
+      "rebalance_close": "2020-04-15",
+      "test_first": "2020-04-16",
+      "test_last": "2020-07-15",
+      "train_first": "2019-04-08",
+      "train_last": "2020-04-06",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.45654039335966423,
+          "QQQ": 0.26112951817550717,
+          "SPY": 0.2823300884648286
+        },
+        "meanrisk_min_variance": {
+          "IWM": 1.8524658682568772e-07,
+          "QQQ": 5.737766117890622e-07,
+          "SPY": 0.9999992409768014
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.10881860212431071,
+          "sessions": 63,
+          "sum_daily": 0.10810279499060624
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.10128098557267595,
+          "sessions": 63,
+          "sum_daily": 0.10163151518043949
+        }
+      },
+      "id": "development-19",
+      "rebalance_close": "2020-07-15",
+      "test_first": "2020-07-16",
+      "test_last": "2020-10-13",
+      "train_first": "2019-07-09",
+      "train_last": "2020-07-07",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.4121837516750304,
+          "QQQ": 0.28967137385085323,
+          "SPY": 0.29814487447411636
+        },
+        "meanrisk_min_variance": {
+          "IWM": 1.1680656709631724e-08,
+          "QQQ": 0.3174732518749319,
+          "SPY": 0.6825267364444115
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.12327862548770274,
+          "sessions": 55,
+          "sum_daily": 0.119537692773475
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.06777325118102606,
+          "sessions": 55,
+          "sum_daily": 0.06826993957896844
+        }
+      },
+      "id": "development-20",
+      "rebalance_close": "2020-10-13",
+      "test_first": "2020-10-14",
+      "test_last": "2020-12-31",
+      "train_first": "2019-10-07",
+      "train_last": "2020-10-05",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.4148969461069961,
+          "QQQ": 0.27856045440529126,
+          "SPY": 0.3065425994877126
+        },
+        "meanrisk_min_variance": {
+          "IWM": 4.2222994392567304e-08,
+          "QQQ": 0.07252259843383681,
+          "SPY": 0.9274773593431689
+        }
+      }
+    },
+    {
+      "descriptive": {
+        "hrp_variance": {
+          "compounded": 0.0914494720957384,
+          "sessions": 60,
+          "sum_daily": 0.09264053130571377
+        },
+        "meanrisk_min_variance": {
+          "compounded": 0.07277210241552012,
+          "sessions": 60,
+          "sum_daily": 0.07323273298416783
+        }
+      },
+      "id": "reserved-2021q1",
+      "rebalance_close": "2021-01-04",
+      "test_first": "2021-01-05",
+      "test_last": "2021-03-31",
+      "train_first": "2019-12-26",
+      "train_last": "2020-12-22",
+      "weights": {
+        "hrp_variance": {
+          "IWM": 0.4138079135185544,
+          "QQQ": 0.2751279843514368,
+          "SPY": 0.3110641021300088
+        },
+        "meanrisk_min_variance": {
+          "IWM": 4.5889281817823247e-07,
+          "QQQ": 0.04581491109232139,
+          "SPY": 0.9541846300148604
+        }
+      }
+    }
+  ],
+  "skfolio": "1.2.9"
+}

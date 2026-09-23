@@ -1,0 +1,43 @@
+{
+  "id": "5-headroom-pin-stale-requalify",
+  "gap_index": 5,
+  "gap_text_sha256": "5222a40e4f34cbaa61e956495d282564d815d79ac3984bbef5c01ad9edba82b2",
+  "fix_round_disclosure": "Supersedes the first version, which correctly established that this gap is not covered by sota-refresh-20260923 (unchanged below) but then did not run the gap's next_check (isolated MCP compress/retrieve with HEADROOM_OFFLINE=1 on a disposable workspace) despite it being an offline, no-account check well within the time-box, only citing the time-box with no concrete blocker. This receipt re-runs the 0.38.0 arm of that check only (reconciliation: the 0.37.0 arm and the exact-fixture comparison were not run), on a freshly generated fixture (not reused from 2026-09-22), against the same already-isolated-installed 0.38.0 prefix.",
+  "preregistration": {
+    "written_at": null,
+    "expectation": "Reuse the existing isolated uv-tool 0.38.0 headroom install ($HOME/.local/share/codex-ecosystem/tools/headroom-ai-0.38.0), start its MCP server via mcporter with a fresh disposable HEADROOM_WORKSPACE_DIR, HEADROOM_OFFLINE=1, HEADROOM_TELEMETRY=off, and an unreachable proxy target (matching the whole receipt lineage's convention of not exercising the proxy-intercept path), send a freshly generated, larger synthetic MCP-tools-list-shaped fixture (not reused bytes from the 2026-09-22 receipt) through headroom_compress, then headroom_retrieve the result and verify byte-for-byte recovery, then stat the live ~/.headroom store files before and after to confirm isolation held.",
+    "criteria": "Reconfirms (does not newly settle) the pin_behind_upstream question for the exact-recovery property specifically if compression is real (not router:noop) and recovery is byte-exact and the live store is untouched; any deviation (no real compression, retrieval mismatch, or live-store mtime change) would be a new, more serious finding than the 2026-09-22 receipt and must be reported as such.",
+    "written_at_note": "Reconciliation 2026-09-23: timestamps set to null because the recorded values are impossible or unverifiable. First-pass commit 0699663 was made at 2026-09-23T01:49:24Z yet carried first-pass times as late as 01:57Z; fix-round commit f796901 was made at 02:06:06Z yet carried fix-round times as late as 02:22Z. The fix-round time 02:00Z cannot be verified from any surviving file: the fixture and workspace were deleted. The scratch directory was last modified at 02:02:53Z."
+  },
+  "commands": [
+    "$HOME/.local/share/codex-ecosystem/tools/headroom-ai-0.38.0/bin/headroom --version  -> headroom, version 0.38.0 (confirms the isolated install still present, unmodified)",
+    "stat -c '%Y %n' ~/.headroom/ccr_store.db ~/.headroom/update_check.json  (pre-run baseline)",
+    "<unrecorded generator: a 200-tool synthetic MCP tools/list JSON with repeated descriptions, 103,509 bytes; the command was not saved>",
+    "HEADROOM_WORKSPACE_DIR=<disposable> HEADROOM_OFFLINE=1 HEADROOM_TELEMETRY=off mcporter call --stdio <0.38.0-prefix>/bin/headroom --stdio-arg mcp --stdio-arg serve --stdio-arg --proxy-url --stdio-arg http://127.0.0.1:1 --name headroom038v3 --tool headroom_compress --output json --no-oauth _dummy 'content=@fixture.json'",
+    "HEADROOM_WORKSPACE_DIR=<disposable> HEADROOM_OFFLINE=1 HEADROOM_TELEMETRY=off mcporter call --stdio <0.38.0-prefix>/bin/headroom --stdio-arg mcp --stdio-arg serve --stdio-arg --proxy-url --stdio-arg http://127.0.0.1:1 --name headroom038v3 --tool headroom_retrieve --args '{\"hash\":\"<hash from compress>\"}' --output json --no-oauth",
+    "python3 -c \"sha256(orig) == sha256(retrieved)\"",
+    "stat -c '%Y %n' ~/.headroom/ccr_store.db ~/.headroom/update_check.json  (post-run, isolation check)"
+  ],
+  "results": {
+    "compress": "hash=51d556688990075478303896, original_tokens=22016, compressed_tokens=14634, tokens_saved=7382, savings_percent=33.5, transforms=[\"router:mixed:0.62\"] -- real compression, not a no-op.",
+    "retrieve": "len(original_content)=103509 bytes, matches fixture.json byte length exactly; sha256(original)==sha256(retrieved)==51d556688990075478303896081a447a65688eef9d079f73b33e3c1fe16651e4 -- exact byte-for-byte recovery.",
+    "isolation_check": "Transcribed mtimes: ccr_store.db 1790120875 (2026-09-22T23:47:55Z) and update_check.json 1790127877 (2026-09-23T01:44:37Z), both equal to the files' current mtimes. mtime detects writes, not reads. update_check.json's mtime comes from the `headroom doctor` call in this unit's first pass (before first-pass commit 0699663 at 01:49:24Z), not from 'earlier in this fix round' as the previous version said. The stat outputs were not saved.",
+    "retention": "Not retained: the fixture, its generator, and the compress/retrieve responses. The compression and recovery values above are transcriptions and cannot be reproduced from this repository."
+  },
+  "outcome": "not_settled",
+  "note": "No clause left open by the 2026-09-22 receipt was closed. The next_check runs both 0.37.0 and 0.38.0 on the exact fixture from the 0.37.0 receipt and compares recovery and compression. Only 0.38.0 was run, on a new fixture that was then deleted, with no retained output. Isolated 0.37.0 installs exist on this host ($HOME/.local/share/codex-ecosystem/python-tools-versioned/headroom-ai-0.37.0/ and $HOME/.local/share/codex-ecosystem/context/headroom-0.37.0/), so the cross-version arm was executable and was not run. The transcribed 0.38.0 result (33.5% compression, exact byte recovery) matches the 2026-09-22 receipt but adds no retained evidence. The gap keeps its prior advanced_by_receipt status from 2026-09-22; this wave did not advance it.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "The pin in manifests/stack.json remains 0.37.0 (outside this unit's editable paths).",
+    "headroom is absent from every tracked sota-refresh-20260923 subdirectory (`git log --all --oneline --name-only | grep -i sota-refresh-2026`), unchanged from the first version.",
+    "The disposable HEADROOM_WORKSPACE_DIR, fixture and responses were deleted after the run."
+  ],
+  "checked_at": null,
+  "checked_at_note": "Reconciliation 2026-09-23: timestamps set to null because the recorded values are impossible or unverifiable. First-pass commit 0699663 was made at 2026-09-23T01:49:24Z yet carried first-pass times as late as 01:57Z; fix-round commit f796901 was made at 02:06:06Z yet carried fix-round times as late as 02:22Z. The fix-round time 02:03Z cannot be verified from any surviving file.",
+  "reconciliation": [
+    "Outcome changed from advanced to not_settled: the 0.37.0 arm and exact-fixture comparison were executable (installs present) and not run, and the 0.38.0 run's outputs were not retained.",
+    "The placeholder generator command is marked unrecorded.",
+    "The update_check.json mtime is attributed to the first pass, consistent with receipt 1.",
+    "Timestamps set to null."
+  ]
+}

@@ -1,0 +1,27 @@
+{
+ "schema_version": 1,
+ "layer": "us-equities/identity-provenance",
+ "label": "fix-round 4 preregistration (after a Codex read-only review of fix round 3, 2026-09-23T15:05-15:15Z)",
+ "written_at": "2026-09-23T15:16:17Z",
+ "written_at_note": "shell stamp taken immediately before writing this file; committed before the fix-round-4 verifier ran. Written after the review, which agreed with all four outcomes (gap 0 settled, 2 advanced, 4 settled, 5 settled).",
+ "review_findings_addressed": [
+  "P2 verify_lineage_fixround3.py:57 `for o, p in zip(orig, pub)` assumes publication preserves events and identities; in-memory probes passed after removing the published select COMPLETE event or collapsing every published runId",
+  "P3 store_arms.py:678 retry_summary counts CommitFailedException in stderr only, while writers catch exceptions into their progress files"
+ ],
+ "gaps": {
+  "5": {
+   "criteria": [
+    "L5.3a The verifier (verify_lineage_fixround3.py, hardened in place) requires: equal event counts in original and published files; per-position equal job name and eventType; every published runId matching ^uuid-redacted-\\d{2}$; and the original-runId -> placeholder mapping one-to-one in both directions.",
+    "L5.3b Three new in-memory detector controls on the published events must each fail the alignment check: (i) the select COMPLETE event removed, (ii) every runId collapsed to one placeholder, (iii) the job names of the first two events swapped.",
+    "L5.3c The real published file must pass L5.1, L5.2 and L5.3a with the same original file and schema as fix round 3.",
+    "Outcome rule: if L5.3c fails, gap 5 drops to advanced with the failure recorded; if a control in L5.3b is not flagged, the verifier is not accepted and the fix-round-3 L5.1/L5.2 result is reported without the L5.3 claim."
+   ]
+  },
+  "4": {
+   "criteria": [
+    "H4.5 From the retained raw/stores-fixround3/conc30-iceberg-{1,2}.json, record writer_error_counts (progress-file errors, which include caught commit failures) next to commit_failed_exception_lines. No rerun: this is a reading of retained output, labelled source_review within the local_integration receipt.",
+    "Outcome rule: any nonzero writer_error_counts in the supplement drops the 'no CommitFailedException' limit wording to the measured counts; the gap 4 outcome depends on decoded rows, not on this field."
+   ]
+  }
+ }
+}

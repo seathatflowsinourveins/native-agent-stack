@@ -1,0 +1,26 @@
+created restic repository a3f9db432c at $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/restic-repo
+
+Please note that knowledge of your password is required to access
+the repository. Losing your password means that your data is
+irrecoverably lost.
+no parent snapshot found, will read all files
+
+Files:          31 new,     0 changed,     0 unmodified
+Dirs:           54 new,     0 changed,     0 unmodified
+Added to the repository: 556.232 KiB (76.146 KiB stored)
+
+processed 31 files, 524.729 KiB in 0:00
+snapshot 5378ee27 saved
+using temporary cache in /tmp/restic-check-cache-2361953231
+create exclusive lock for repository
+load indexes
+check all packs
+check snapshots, trees and blobs
+[0:00] 100.00%  1 / 1 snapshots
+read all data
+[0:00] 100.00%  2 / 2 packs
+no errors were found
+restoring snapshot 5378ee27 of [$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/work $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/dagu $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/data/prom $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/data/loki] at 2026-09-23 12:27:32.766596346 -0400 EDT by <user>@<host> to $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/restore
+Summary: Restored 85 files/dirs (524.729 KiB) in 0:00
+verifying files in $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/restore
+finished verifying 31 files in $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/restore (took 1ms)

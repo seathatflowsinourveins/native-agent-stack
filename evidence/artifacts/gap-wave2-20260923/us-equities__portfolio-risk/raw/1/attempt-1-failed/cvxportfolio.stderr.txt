@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "$HOME/code/nas-wt-g2-portfolio-risk/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap1_libs.py", line 108, in <module>
+    main()
+    ~~~~^^
+  File "$HOME/code/nas-wt-g2-portfolio-risk/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap1_libs.py", line 96, in main
+    frozen = common.frozen_panel()
+  File "$HOME/code/nas-wt-g2-portfolio-risk/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/common.py", line 36, in frozen_panel
+    inputs = ev.verify_inputs(root, plan["inputs"])
+  File "$HOME/code/nas-wt-g2-portfolio-risk/blueprints/us-equities/research-evaluation/evaluate.py", line 33, in verify_inputs
+    if not path.resolve().is_relative_to(root.resolve()) or digest(path) != sha:
+                                                            ~~~~~~^^^^^^
+  File "$HOME/code/nas-wt-g2-portfolio-risk/blueprints/us-equities/research-evaluation/evaluate.py", line 20, in digest
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                          ~~~~~~~~~~~~~~~~~~~~~^^
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_abc.py", line 625, in read_bytes
+    with self.open(mode='rb') as f:
+         ~~~~~~~~~^^^^^^^^^^^
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '$HOME/.cache/gap-wave2-20260923/portfolio-risk/tmphome/.local/share/codex-ecosystem/tools/lean-985ef30/Data/equity/usa/daily/spy.zip'

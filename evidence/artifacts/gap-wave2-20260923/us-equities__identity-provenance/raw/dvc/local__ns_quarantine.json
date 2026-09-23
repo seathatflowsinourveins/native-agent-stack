@@ -1,0 +1,81 @@
+{
+  "all_ok": true,
+  "arm_code": "$HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities",
+  "cases": {
+    "materialize:control_unmutated": {
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true,
+      "stdout": "(materialized)"
+    },
+    "materialize:obs_available_at_date_only": {
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": true,
+      "stdout": {
+        "reason": "rfc3339_explicit_offset_at_most_nine_fractional_digits_required",
+        "status": "rejected"
+      }
+    },
+    "materialize:obs_available_at_null": {
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": true,
+      "stdout": {
+        "reason": "invalid_available_at",
+        "status": "rejected"
+      }
+    },
+    "materialize:obs_available_at_removed": {
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": true,
+      "stdout": {
+        "reason": "row_schema_mismatch",
+        "status": "rejected"
+      }
+    },
+    "materialize:obs_backdated_event_after_availability": {
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": true,
+      "stdout": {
+        "reason": "realized_event_after_availability",
+        "status": "rejected"
+      }
+    },
+    "materialize:universe_available_at_removed": {
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": true,
+      "stdout": {
+        "reason": "row_schema_mismatch",
+        "status": "rejected"
+      }
+    },
+    "select:control_restored_snapshot": {
+      "exit": 0,
+      "expected_exit": 0,
+      "ok": true
+    },
+    "select:parquet_tamper": {
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": true,
+      "stdout": {
+        "reason": "snapshot_artifact_hash_mismatch",
+        "status": "rejected"
+      }
+    },
+    "select:wrong_snapshot_sha256": {
+      "exit": 2,
+      "expected_exit": 2,
+      "ok": true,
+      "stdout": {
+        "reason": "snapshot_manifest_hash_mismatch",
+        "status": "rejected"
+      }
+    }
+  },
+  "detection_method": "exit code of the project CLI compared with expected_exit; the unmutated control must exit 0, so a non-rejecting path would show exit 0 for a mutation and fail ok"
+}

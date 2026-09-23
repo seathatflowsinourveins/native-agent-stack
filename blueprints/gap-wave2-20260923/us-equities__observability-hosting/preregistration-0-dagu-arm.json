@@ -1,0 +1,13 @@
+{
+ "written_at": "2026-09-23T07:49:21Z",
+ "label": "second-round preregistration, written after the independent Codex review of commit 508ec00 found covered_elsewhere overclaimed the unexecuted Dagu arm; written before any Dagu-arm command ran",
+ "gap_index": 0,
+ "check": "Dagu arm of next_check: run a real Dagu 2.16.6 DAG (temp HOME and DAGU_HOME, loopback ports) whose native otel tracing exports to the pinned otelcol-contrib 0.161.0; the collector turns Dagu spans into metrics (spanmetrics connector) for Prometheus 3.14.0 and tails Dagu's step log files (filelog receiver) into Loki 3.7.8. One DAG step runs a worker command under srt 1.0.0 attempting egress to example.com. Then kill -9 the three telemetry processes, restart and re-query; then restic 0.19.1 backs up Dagu's run history and both backend data dirs hot, check --read-data, restore --verify, and Dagu reads the restored history.",
+ "expectation": "Dagu spans arrive (span-metric series with the DAG's service.name queryable in Prometheus), Dagu step log lines are queryable in Loki, both survive kill -9 + restart, restic check/restore pass and the restored DAGU_HOME is byte-identical (dagu idle) and dagu history/status reads the run as succeeded, and the srt-wrapped step's egress is denied (srt debug line 'No matching config rule, denying: example.com:443').",
+ "criteria": {
+  "advanced": "every sub-check above passes; outcome stays advanced because the paper-runtime telemetry and live order-journal backup arm (peer sota-workflow-resolution) and the ledger re-judgement (coordinator) remain",
+  "partial": "any sub-check fails or cannot run: record it verbatim, keep advanced for what passed",
+  "detection": "Prometheus/Loki queries return series/streams filtered by labels unique to this run (service_name=dagu-obsgap-20260923, run marker string); a missing series returns an empty result array, which the script records as a failure. srt denial is detected from its own debug line, not from curl failure alone.",
+  "timebox": "stop at 20 minutes and record not_settled for the unfinished sub-checks"
+ }
+}

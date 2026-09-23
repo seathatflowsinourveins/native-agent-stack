@@ -1,0 +1,117 @@
+{
+ "components.schemas.cash_dividend": {
+  "description": "Cash dividend.",
+  "examples": [
+   {
+    "cusip": "319829107",
+    "ex_date": "2023-05-04",
+    "foreign": false,
+    "id": "<uuid-redacted>",
+    "payable_date": "2023-05-19",
+    "process_date": "2023-05-19",
+    "rate": 0.125,
+    "record_date": "2023-05-05",
+    "special": false,
+    "symbol": "FCF"
+   }
+  ],
+  "properties": {
+   "currency": {
+    "$ref": "#/components/schemas/currency"
+   },
+   "cusip": {
+    "type": "string"
+   },
+   "due_bill_off_date": {
+    "format": "date",
+    "type": "string"
+   },
+   "due_bill_on_date": {
+    "format": "date",
+    "type": "string"
+   },
+   "ex_date": {
+    "$ref": "#/components/schemas/ex_date"
+   },
+   "foreign": {
+    "type": "boolean"
+   },
+   "id": {
+    "$ref": "#/components/schemas/ca_id"
+   },
+   "isin": {
+    "$ref": "#/components/schemas/isin"
+   },
+   "payable_date": {
+    "$ref": "#/components/schemas/payable_date"
+   },
+   "process_date": {
+    "$ref": "#/components/schemas/process_date"
+   },
+   "rate": {
+    "format": "double",
+    "type": "number"
+   },
+   "record_date": {
+    "$ref": "#/components/schemas/record_date"
+   },
+   "special": {
+    "type": "boolean"
+   },
+   "sub_type": {
+    "description": "Sub-type of the cash dividend.",
+    "enum": [
+     "interest",
+     "return_of_capital"
+    ],
+    "type": "string"
+   },
+   "symbol": {
+    "type": "string"
+   }
+  },
+  "required": [
+   "id",
+   "symbol",
+   "cusip",
+   "rate",
+   "special",
+   "foreign",
+   "process_date",
+   "ex_date"
+  ],
+  "type": "object"
+ },
+ "components.schemas.currency": {
+  "description": "The ISO 4217 currency code associated with the corporate action.\nEmpty value can mean USD, non-applicable (e.g. for name changes) or unknown\n(can change later to a valid currency).\n",
+  "type": "string"
+ },
+ "page_sha256": "ee3a3fbb730e2a4bec7dc32439f67929b26046bbdbf7ae3ef30c567f36636de8",
+ "sse_example.CashDividend": {
+  "description": "Example SSE payload delivered when `event_type == cash_dividend_corporateaction_event`.",
+  "summary": "Cash dividend inserted (US)",
+  "value": [
+   {
+    "action": "insert",
+    "at": "2026-03-20T12:24:58.807230Z",
+    "ca": {
+     "currency": "USD",
+     "cusip": "037833100",
+     "ex_date": "2026-05-09",
+     "foreign": false,
+     "id": "<uuid-redacted>",
+     "payable_date": "2026-05-15",
+     "process_date": "2026-05-15",
+     "rate": "0.24",
+     "record_date": "2026-05-12",
+     "special": false,
+     "symbol": "AAPL"
+    },
+    "event_id": "01J9RPMV5TKB8WX3M4F1KZ7QH2",
+    "event_type": "cash_dividend_corporateaction_event",
+    "region": "us"
+   }
+  ]
+ },
+ "url": "https://docs.alpaca.markets/us/reference/corporateactions-1"
+}

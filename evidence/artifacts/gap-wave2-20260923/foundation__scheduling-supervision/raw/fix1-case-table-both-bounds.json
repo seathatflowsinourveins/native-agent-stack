@@ -1,0 +1,75 @@
+{
+  "preregistered_bound_seconds": 150,
+  "runs": {
+    "original-three-engine-run": {
+      "source": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/4-6-three-engine-comparison/result.json",
+      "engines": {
+        "dagu": {
+          "stop": true,
+          "retry": true,
+          "checkpoint_reuse": true,
+          "sigkill_within_run_window": true,
+          "run_window_seconds": 270,
+          "recovery_seconds": 181.4,
+          "final_status": "succeeded",
+          "sigkill_within_preregistered_150s": false,
+          "dagu_recovery_mode": "scheduler (original run; flag did not exist yet)"
+        },
+        "prefect": {
+          "stop": true,
+          "retry": true,
+          "checkpoint_reuse": true,
+          "sigkill_within_run_window": false,
+          "run_window_seconds": 270,
+          "recovery_seconds": 287.7,
+          "final_status": "RUNNING",
+          "sigkill_within_preregistered_150s": false,
+          "dagu_recovery_mode": null
+        },
+        "temporal": {
+          "stop": true,
+          "retry": true,
+          "checkpoint_reuse": true,
+          "sigkill_within_run_window": true,
+          "run_window_seconds": 270,
+          "recovery_seconds": 15.1,
+          "final_status": "COMPLETED",
+          "sigkill_within_preregistered_150s": true,
+          "dagu_recovery_mode": null
+        }
+      }
+    },
+    "fix1-F1-dagu-preregistered": {
+      "source": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F1-dagu-sigkill-preregistered-150s/result.json",
+      "engines": {
+        "dagu": {
+          "stop": true,
+          "retry": true,
+          "checkpoint_reuse": true,
+          "sigkill_within_run_window": false,
+          "run_window_seconds": 150,
+          "recovery_seconds": 150.8,
+          "final_status": "running",
+          "sigkill_within_preregistered_150s": false,
+          "dagu_recovery_mode": "none"
+        }
+      }
+    },
+    "fix1-F2-dagu-scheduler-variant": {
+      "source": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F2-dagu-sigkill-scheduler-variant/result.json",
+      "engines": {
+        "dagu": {
+          "stop": true,
+          "retry": true,
+          "checkpoint_reuse": true,
+          "sigkill_within_run_window": true,
+          "run_window_seconds": 270,
+          "recovery_seconds": 182.6,
+          "final_status": "succeeded",
+          "sigkill_within_preregistered_150s": false,
+          "dagu_recovery_mode": "scheduler"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "written_at": "2026-09-23T06:21:22Z",
+  "unit": "us-equities/backtesting-engine",
+  "note": "Written before any gap check in this unit ran. Earlier read-only discovery (gh release list without --exclude-pre-releases, upstream tree listing at 1b0a49d) happened before this file and is disclosed in the receipts.",
+  "gaps": {
+    "0": {
+      "gap_text_sha256": "d8b9300e15e6aab1aa28acf22fb888a84b1f09a79c2ca2331fd88523b1eecbd4",
+      "expectation": "covered_elsewhere: the SPY/LEAN parity gate (spy-lean-parity) and the dividend-sim-module gate are owned by peer:sota-workflow-resolution; this unit runs no parity rerun or mapping change.",
+      "criteria": [
+        "covered_elsewhere if gates-20260922.json assigns spy-lean-parity and dividend-sim-module to peer:sota-workflow-resolution and the verdict file still reads BLOCKED on main at base 41d39b3"
+      ],
+      "next_check": "Resolve or explicitly model costs_and_rounding_stress and margin_and_adaptive_state in the spy-parity mapping, rerun the comparator on all blocked cases, and record the new verdict.json."
+    },
+    "1": {
+      "gap_text_sha256": "af57d3a526310f0826a65869555e234ea5ae2afa6e13820f5fbb7b359e4b64d6",
+      "expectation": "advanced: retained authenticated Alpaca AAPL daily bars (25 sessions 2020-08-03..2020-09-04, receipt a59c6ed7) include the 2020-08-07 cash dividend ex-date and the 2020-08-31 4:1 split ex-date. A native Nautilus 2.0.0rc5 backtest holding 10 shares from the 2020-08-03 close through the 2020-09-04 close is expected to fill at raw bar closes, post no dividend cash, keep position quantity 10 across the split (no split adjustment) and therefore book a split-induced spurious loss of roughly three quarters of the entry notional. No unchanged upstream equity backtest example is expected to exist at pin 1b0a49d.",
+      "criteria": [
+        "settled only if an UNCHANGED upstream Nautilus equity example runs on Alpaca bars spanning a dividend or split and fills plus corporate-action handling are recorded",
+        "advanced if the native engine runs over the retained Alpaca bars spanning both actions and fills, cash and position across both ex-dates are recorded and independently reconciled, while the unchanged-example arm remains unmet",
+        "detection: the independent Decimal ledger compares native account cash and position quantity after each ex-date; any native dividend credit or quantity change would appear as a cash or quantity delta not explained by fills"
+      ],
+      "next_check": "Run an unchanged Nautilus equity backtest example on free Alpaca historical bars for a symbol and window containing a split or dividend, and record the fills and the corporate-action handling."
+    },
+    "2": {
+      "gap_text_sha256": "c56fa1e680668f955ac229ce7d3deb63076496c185c43b4eaee443b2c236740f",
+      "expectation": "settled: the exact gh command returns the latest non-prerelease releases; expected to show whether v1.231.0 is still the latest stable, retained as a dated raw receipt.",
+      "criteria": [
+        "settled if the exact next_check command exits 0 and its raw output is committed with sha256 and the checked_at time",
+        "not_settled if the command fails; the retained output is reported verbatim"
+      ],
+      "next_check": "Run `gh release list --repo nautechsystems/nautilus_trader --exclude-pre-releases --limit 3` and retain the output as a dated receipt."
+    },
+    "4": {
+      "gap_text_sha256": "4d9e0b7274baa32b1f95765448df6b809224841affd1ec638a317bdf4e7bdcc2",
+      "expectation": "advanced: running the six frozen LEAN SPY oracle cases with SetBrokerageModel(BrokerageName.Alpaca, AccountType.Margin) added before AddEquity (all other lines unchanged) is expected to change behaviour because AlpacaBrokerageModel only accepts MarketOnOpen orders submitted between 19:00 and 09:28 New York, while the oracle submits at the 16:00 bar: entry orders are expected to be rejected as Invalid and the algorithm's lifecycle check to fail. The Alpaca adapter paper-endpoint initialization arm is broker contact and is deferred to peer:sota-workflow-resolution.",
+      "criteria": [
+        "settled only if both the Alpaca brokerage-model oracle run and an Alpaca adapter initialization against paper endpoints are executed and recorded",
+        "advanced if the brokerage-model arm runs offline for all six cases with per-case exit code, order statuses and rejection messages recorded",
+        "detection: per-case LEAN exit code, stderr, audit ledger order events (status Invalid plus message) and fill count; a zero-fill run with no rejection message would be reported as unexplained"
+      ],
+      "next_check": "Run the LEAN SPY oracle with SetBrokerageModel(BrokerageName.Alpaca), initialize the Alpaca adapter against paper endpoints, and record the results."
+    },
+    "6": {
+      "gap_text_sha256": "3deee2ea0925dbe07d32fe371ca17ee2935a7d492691c125a52fbc5fc191f189",
+      "expectation": "settled: (a) a fresh bwrap Nautilus replay (run.py) produces its own converted rows; compare.py in --bars mode with those rows and in no-evidence mode (plus --lean-data as the control) reproduces the README table: --bars exit 1 BLOCKED 25 passed / 4 failed complete true; neither: exit 1 FAIL with 4 unattributed and 1 SKIPPED, complete false. (b) the 21-of-24 review claim is committed by retaining the agent-lab task-record excerpt with its commit and sha256 and pointing the README at it.",
+      "criteria": [
+        "settled if both comparator modes other than --lean-data are executed on the real retained data, their verdict files and exit codes are retained, and the review-count claim is either retained in-repo with provenance or dropped",
+        "advanced if only one arm completes",
+        "detection: exit codes and verdict JSON fields (verdict, complete, counts, unattributed_failures) are read from the written files, and the fresh receipt's converted_rows_sha256 is compared to the committed receipt"
+      ],
+      "next_check": "Run the spy-parity acceptance set in each comparator mode other than --lean-data and retain the result. Separately, commit or drop the unretained 21-of-24 review-count claim."
+    },
+    "7": {
+      "gap_text_sha256": "a2d912c233c144a38fa69201959cbac0fd2ce68f53903c032ab6ed99faf8423b",
+      "expectation": "covered_elsewhere: one_zero parity, distribution posting and fill-price alignment belong to the spy-lean-parity and dividend-sim-module gates owned by peer:sota-workflow-resolution.",
+      "criteria": [
+        "covered_elsewhere if both gates name that owner at base 41d39b3"
+      ],
+      "next_check": "Post the SPY distributions in the Nautilus replay, align the fill-price rule with LEAN, rerun one_zero parity, and report the ending-cash delta against the -655.12 USD baseline."
+    },
+    "8": {
+      "gap_text_sha256": "f2cd2409dd7a864b1cadb4f8e101e1fa81869c7e6bbc8c319e3e7ce0c69c8cd5",
+      "expectation": "advanced: the same retained Alpaca bars allow a replay across both AAPL actions with fills and position/cash reconciliation, but they are daily bars only; quote-based fills need an Alpaca quote acquisition, which needs a credential read this wave forbids.",
+      "criteria": [
+        "settled only if the replay uses quote-based fills over a window with a dividend or split and records fills plus position/cash reconciliation",
+        "advanced if the bar-based replay across both actions completes with an independent position and cash reconciliation"
+      ],
+      "next_check": "Replay AAPL over a window that includes a dividend or split with Alpaca historical bars and quote-based fills, and record the fills and position/cash reconciliation."
+    },
+    "9": {
+      "gap_text_sha256": "62fcf6999e960825fd8e1c386485030c2e645e0cf7350b124d6522cb1067be73",
+      "expectation": "covered_elsewhere: the stress and adaptive/margin parity cases (one_stress, two_stress, adaptive_stress, over_limit) are the blocked comparison statuses of the spy-lean-parity gate owned by peer:sota-workflow-resolution.",
+      "criteria": [
+        "covered_elsewhere if the gate row names that owner at base 41d39b3"
+      ],
+      "next_check": "Run the stress and adaptive/margin parity cases (one_stress, two_stress, adaptive_stress, over_limit) in LEAN and Nautilus and compare the margin and cost outcomes."
+    }
+  }
+}

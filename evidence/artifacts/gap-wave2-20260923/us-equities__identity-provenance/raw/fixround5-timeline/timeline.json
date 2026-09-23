@@ -1,0 +1,89 @@
+{
+  "purpose": "fix round 5 (late, no preregistration): timestamp the L5.3b(iii) control change; source review of retained host records",
+  "transcript": {
+    "path": "$HOME/.claude/projects/<project-dir>/<lead-session>/subagents/workflows/wf_1339111f-58d/agent-a75c0fc2d88408319.jsonl",
+    "sha256": "367539137ce045c5e1a5ca7f53720bdeac7730fad9475da3211cbb2494df10ed",
+    "window": [
+      "2026-09-23T15:16:00",
+      "2026-09-23T15:16:45"
+    ],
+    "timestamp_meaning": "the transcript's logged time of the assistant message carrying each tool call (the call ran just after it)"
+  },
+  "tool_calls_in_window": [
+    {
+      "logged_at": "2026-09-23T15:16:05.608Z",
+      "tool": "Bash",
+      "touches_verifier": false,
+      "markers": [],
+      "runs_verifier": false,
+      "description": "Read fix round 3 preregistration and receipt builder"
+    },
+    {
+      "logged_at": "2026-09-23T15:16:17.242Z",
+      "tool": "Bash",
+      "touches_verifier": true,
+      "markers": [
+        "writes_preregistration_fixround4"
+      ],
+      "runs_verifier": false,
+      "description": "Write and commit fix-round-4 preregistration"
+    },
+    {
+      "logged_at": "2026-09-23T15:16:23.716Z",
+      "tool": "Edit",
+      "touches_verifier": true,
+      "markers": [],
+      "runs_verifier": false,
+      "description": null
+    },
+    {
+      "logged_at": "2026-09-23T15:16:28.900Z",
+      "tool": "Edit",
+      "touches_verifier": true,
+      "markers": [
+        "control_name_first_two",
+        "first_two_swap_as_preregistered",
+        "rename_fallback_suffix"
+      ],
+      "runs_verifier": false,
+      "description": null
+    },
+    {
+      "logged_at": "2026-09-23T15:16:30.452Z",
+      "tool": "Bash",
+      "touches_verifier": false,
+      "markers": [],
+      "runs_verifier": false,
+      "description": "Inspect published events and publish helper"
+    },
+    {
+      "logged_at": "2026-09-23T15:16:43.905Z",
+      "tool": "Bash",
+      "touches_verifier": true,
+      "markers": [
+        "across_job_swap",
+        "control_name_across_jobs",
+        "control_name_first_two",
+        "first_two_swap_as_preregistered",
+        "late_amendment_comment",
+        "rename_fallback_suffix",
+        "writes_preregistration_fixround4"
+      ],
+      "runs_verifier": true,
+      "description": "Adjust control and run hardened verifier"
+    }
+  ],
+  "verifier_runs_in_window": [
+    "2026-09-23T15:16:43.905Z"
+  ],
+  "verifier_file_mtime_utc": "2026-09-23T15:16:43.992430631Z",
+  "verifier_at_prereg_commit_aa85595": {
+    "sha256": "75f3d5120d9a77d3df6ca5c5c88c07523657a83d7024d7540686108c887b2770",
+    "contains_swap_control": false,
+    "contains_alignment_problems": false
+  },
+  "commit_times": {
+    "aa85595": "2026-09-23T11:16:18-04:00",
+    "87ab1db": "2026-09-23T11:19:23-04:00"
+  }
+}

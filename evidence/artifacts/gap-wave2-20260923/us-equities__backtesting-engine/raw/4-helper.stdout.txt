@@ -1,0 +1,90 @@
+{
+ "control": [
+  {
+   "id": "one_zero",
+   "exit": 0,
+   "fills": 2,
+   "invalid": 0,
+   "accepted": true
+  },
+  {
+   "id": "one_stress",
+   "exit": 0,
+   "fills": 2,
+   "invalid": 0,
+   "accepted": true
+  },
+  {
+   "id": "two_zero",
+   "exit": 0,
+   "fills": 5,
+   "invalid": 0,
+   "accepted": true
+  },
+  {
+   "id": "two_stress",
+   "exit": 0,
+   "fills": 5,
+   "invalid": 0,
+   "accepted": true
+  },
+  {
+   "id": "adaptive_stress",
+   "exit": 0,
+   "fills": 3,
+   "invalid": 0,
+   "accepted": true
+  },
+  {
+   "id": "over_limit",
+   "exit": 0,
+   "fills": 0,
+   "invalid": 1,
+   "accepted": true
+  }
+ ],
+ "alpaca": [
+  {
+   "id": "one_zero",
+   "exit": 1,
+   "fills": 0,
+   "invalid": 1,
+   "accepted": false
+  },
+  {
+   "id": "one_stress",
+   "exit": 1,
+   "fills": 0,
+   "invalid": 1,
+   "accepted": false
+  },
+  {
+   "id": "two_zero",
+   "exit": 1,
+   "fills": 0,
+   "invalid": 1,
+   "accepted": false
+  },
+  {
+   "id": "two_stress",
+   "exit": 1,
+   "fills": 0,
+   "invalid": 1,
+   "accepted": false
+  },
+  {
+   "id": "adaptive_stress",
+   "exit": 1,
+   "fills": 0,
+   "invalid": 1,
+   "accepted": false
+  },
+  {
+   "id": "over_limit",
+   "exit": 0,
+   "fills": 0,
+   "invalid": 1,
+   "accepted": true
+  }
+ ]
+}

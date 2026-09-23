@@ -1,0 +1,3 @@
+Collection not found: us-equities-foundation
+Run 'qmd ls' to see available collections.
+If qmd still behaves unexpectedly, run 'qmd doctor' for diagnostics.

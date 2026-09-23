@@ -1,0 +1,21 @@
+test store::tests::title_source_roundtrips_and_defaults_to_none ... ok
+test store::tests::synthetic_recovery_message_stays_on_the_failed_turn_branch ... ok
+test store::tests::the_resume_picker_sees_every_project_newest_first ... ok
+test store::tests::ui_state_roundtrips_functional_preferences ... ok
+test store::tests::title_if_placeholder_respects_provenance ... ok
+test store::tests::unfinished_turn_reconciliation_respects_live_leases ... ok
+test store::tests::ui_state_singleton_seeds_existing_projects_and_latest_session ... ok
+test store::tests::unfinished_turns_reconcile_by_delivery_certainty ... ok
+test store::tests::workspace_state_roundtrips_without_touching_project_activity_or_preferences ... ok
+test local::storage::tests::move_and_verified_copy_preserve_projects_and_worktrees ... ok
+test local::storage::tests::interrupted_reference_updates_need_no_marker ... ok
+test local::demo::tests::repository_and_snapshot_seed_are_idempotent ... ok
+test local::demo::tests::an_install_seeded_at_the_previous_experiment_keeps_working ... ok
+test store::tests::status_writers_enforce_every_transition_and_preserve_terminal_outcomes ... ok
+test local::demo::tests::demo_seed_preserves_legacy_user_artifacts_with_the_nanochat_slug ... ok
+test jobs::localbox::tests::local_job_lifecycle ... ok
+test local::opencode::runtime::tests::background_database_check_does_not_wait_for_a_turn ... ok
+
+test result: ok. 914 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 3.50s
+
+test result: ok. 914 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 3.50s

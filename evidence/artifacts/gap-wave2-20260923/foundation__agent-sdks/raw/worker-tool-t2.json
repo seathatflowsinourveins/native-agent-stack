@@ -1,0 +1,89 @@
+{
+  "mode": "run",
+  "model_inference_submitted": true,
+  "usage": {
+    "last": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 17920,
+      "inputTokens": 18116,
+      "outputTokens": 12,
+      "reasoningOutputTokens": 0,
+      "totalTokens": 18128
+    },
+    "modelContextWindow": 258400,
+    "total": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 35456,
+      "inputTokens": 53869,
+      "outputTokens": 367,
+      "reasoningOutputTokens": 298,
+      "totalTokens": 54236
+    }
+  },
+  "usage_status": "reported",
+  "sdk_version": "0.155.1",
+  "sandbox": "read-only",
+  "approval_mode": "deny_all",
+  "config_overrides": [
+    "features.hooks=false",
+    "features.plugin_hooks=false",
+    "features.apps=false",
+    "otel.exporter=\"none\"",
+    "otel.metrics_exporter=\"none\"",
+    "analytics.enabled=false",
+    "plugins={\"context-mode@context-mode\"={enabled=false}}"
+  ],
+  "readiness": {
+    "model": "gpt-6-astra",
+    "model_available": true,
+    "ordinary_usage_allowed": true,
+    "windows": {
+      "primary": {
+        "usedPercent": 18,
+        "resetsAt": 1790719654,
+        "windowDurationMins": 10080
+      }
+    },
+    "ready": true
+  },
+  "native_runtime": {
+    "server_info": null,
+    "user_agent": "codex_python_sdk/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)"
+  },
+  "dynamic_tool": {
+    "name": "vault_lookup",
+    "registered": "at_thread_start_of_resumed_thread",
+    "calls": [],
+    "declined_server_requests": []
+  },
+  "thread_id": "redacted-id:92d6ac9147cf5fb6",
+  "thread_mode": "resumed",
+  "configured_model": "gpt-6-astra",
+  "configured_provider": "openai",
+  "status": "completed",
+  "final_response": "vw-59debe49327d",
+  "duration_ms": 2995,
+  "items": [
+    {
+      "clientId": null,
+      "content": [
+        {
+          "text": "Without calling any tool or running any command, what exact value did vault_lookup return earlier in this conversation? Reply with only that value.\n",
+          "text_elements": [],
+          "type": "text"
+        }
+      ],
+      "id": "redacted-id:ca534ce0722ef06d",
+      "type": "userMessage"
+    },
+    {
+      "delivery": null,
+      "id": "msg_01339f24c730002c016ab357dd2ad487d1b29f25251f498558",
+      "memoryCitation": null,
+      "phase": "final_answer",
+      "questions": null,
+      "text": "vw-59debe49327d",
+      "type": "agentMessage"
+    }
+  ]
+}

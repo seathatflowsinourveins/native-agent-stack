@@ -1,0 +1,46 @@
+{
+  "source_dir": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-round-3",
+  "substitution": "host home path -> $HOME; host username -> <user> (privacy sweep 2026-09-23)",
+  "files": [
+    {
+      "source": "incident-observe.txt",
+      "committed_as": "incident-observe.txt",
+      "raw_sha256": "fb9dfc8d7f287116cbf5bde63caf2f083ed274176045fd3e4f944c8afeead4c4",
+      "committed_sha256": "860c6822b8edcc1802f299b59a9502dbde385f479d0b094ff03e539051ce3460",
+      "bytes": 7191,
+      "produced_by": "blueprints/gap-wave2-20260923/foundation__scheduling-supervision/incident_observe.sh (read-only)"
+    },
+    {
+      "source": "venv-prefect-3.8.6.txt",
+      "committed_as": "venv-prefect-3.8.6-freeze.txt",
+      "raw_sha256": "b640dd32da3cfbf9ff5fd2de855030065dec5b902415ae19cb841dffb6972ed8",
+      "committed_sha256": "00ea8acc68d46217775c9bbcd6e22589cd58a904d136ba18267d0869b1c7bc52",
+      "bytes": 3063,
+      "produced_by": "uv pip freeze, du -sb and dist-info stat of the prefect challenger venv (read-only)"
+    },
+    {
+      "source": "venv-temporalio-1.33.0.txt",
+      "committed_as": "venv-temporalio-1.33.0-freeze.txt",
+      "raw_sha256": "aed66ab9c4e78c1ed36cc66d5fdfff61cc2dd43fc3e6b84fc4f716beb22886bc",
+      "committed_sha256": "713382d0f974d2494a2f3d1259003c6ec5d16c24a0f744285882e29e3cc49787",
+      "bytes": 1325,
+      "produced_by": "uv pip freeze, du -sb and dist-info stat of the temporalio challenger venv (read-only)"
+    },
+    {
+      "source": "codex-gate-test.txt",
+      "committed_as": "codex-gate-test.txt",
+      "raw_sha256": "a48b541c051e4ab2cb578e1c4c279fb3b6395736e4275d6c495339f8b8364c0a",
+      "committed_sha256": "38c3830237501eb923f6418c446b9e87d645e13bbe6689392fcf6e59aab05ec9",
+      "bytes": 3345,
+      "produced_by": "test_codex_gate.py against the fixed helper and against git 91fa4a4 dagu_common.py"
+    },
+    {
+      "source": "receipt-3-11-checks.txt",
+      "committed_as": "receipt-3-11-checks.txt",
+      "raw_sha256": "572711696a5fa051826a6dfe148e34c51ae967c70b2be0117f66bc67fc3e293a",
+      "committed_sha256": "58b78fa07a02720165dc0b2e06ef3b409183e3f749e270d16969d92f875dfeb9",
+      "bytes": 2154,
+      "produced_by": "git object checks for 43bb931 and run.py:145-152 quote; qemu/kvm presence (read-only)"
+    }
+  ]
+}

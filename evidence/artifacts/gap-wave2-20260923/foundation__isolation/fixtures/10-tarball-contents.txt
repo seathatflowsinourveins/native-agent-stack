@@ -1,0 +1,10 @@
+podman-linux-amd64/usr/local/bin/
+podman-linux-amd64/usr/local/bin/podman
+podman-linux-amd64/usr/local/bin/pasta
+podman-linux-amd64/usr/local/bin/fuse-overlayfs
+podman-linux-amd64/usr/local/bin/crun
+podman-linux-amd64/usr/local/bin/pasta.avx2
+podman-linux-amd64/usr/local/bin/passt.avx2
+podman-linux-amd64/usr/local/bin/fusermount3
+podman-linux-amd64/usr/local/bin/runc
+podman-linux-amd64/usr/local/bin/passt

@@ -1,0 +1,96 @@
+{
+ "id": "gap6-crawl4ai-browseruse-fixture",
+ "gap_index": 6,
+ "gap_text_sha256": "95ee3c08e0a8b3c6130a2daee59c06b4c3ed1f4cce7113e28bb02c92eccad0cc",
+ "preregistration": {
+  "written_at": "2026-09-23T01:38:00Z",
+  "expectation": "Crawl4AI and Browser Use can each be installed via pip/uv in a fresh, isolated prefix and can navigate the same loopback fixture and one public site without needing a paid LLM API key (browser-use's low-level BrowserSession/CDP navigation primitives do not require an LLM call; only its full agentic loop does, and that was not exercised).",
+  "criteria": "Record install success/version, and per-tool pass/fail plus any error text on: (a) fixtures/greeting.html over loopback HTTP, (b) https://example.com.",
+  "written_late": true,
+  "written_late_note": "FIX ROUND: written_at is identical to checked_at (rounded to the same minute) in the original submission, which cannot demonstrate the preregistration preceded execution. It is relabelled late here: the expectation/criteria below were drafted as part of planning this check but recorded concurrently with, not strictly before, the run."
+ },
+ "commands": [
+  "uv venv .../venvs/crawl4ai && uv pip install crawl4ai",
+  "crawl4ai-setup  (Playwright/patchright browser + local db init)",
+  "python3 crawl4ai_test.py  (AsyncWebCrawler.arun on loopback fixture and example.com)",
+  "uv venv .../venvs/browseruse && uv pip install browser-use",
+  "python3 browseruse_test.py  (Browser().navigate_to + get_current_page_title, no LLM/agent loop, on loopback fixture and example.com)",
+  "FIX ROUND: uv pip install \"crawl4ai==0.9.3\" (explicit pin, same venv)",
+  "FIX ROUND: uv pip install \"browser-use==0.13.10\" (explicit pin, same venv)",
+  "FIX ROUND: python3 browseruse_fillclick_test.py  (fill #name, click #greet, CDP Runtime.evaluate readback of #status, on the loopback fixture)",
+  "FIX ROUND: uv venv .../venvs/cua && uv pip install cua-computer  (installability probe only)",
+  "FIX ROUND: npx -y firecrawl-mcp --help  (installability/keyless-mode probe); then an ad hoc stdio MCP client attempting initialize + tools/call firecrawl_scrape on https://example.com (timed out at 60s, not retained as a script)"
+ ],
+ "results": {
+  "crawl4ai_version": "0.9.3",
+  "crawl4ai": [
+   {
+    "task": "crawl_fixture",
+    "success": false,
+    "ms": 312,
+    "status_code": 200,
+    "markdown_snippet": "# Local browser command check\nNameGreet\nReady\n"
+   },
+   {
+    "task": "crawl_public_site",
+    "success": true,
+    "ms": 301,
+    "status_code": 200,
+    "markdown_snippet": "# Example Domain\nThis domain is for use in documentation examples without needing permission. Avoid use in operations.\n[Learn more](https://iana.org/domains/example)\n"
+   }
+  ],
+  "browser_use_version": "0.13.10",
+  "browser_use": [
+   {
+    "task": "navigate_fixture",
+    "success": true,
+    "ms": 262,
+    "title": "127.0.0.1:8317/greeting.html"
+   },
+   {
+    "task": "navigate_public_site",
+    "success": true,
+    "ms": 125,
+    "title": "example.com"
+   }
+  ],
+  "browser_use_fillclick_fix_round": {
+   "purpose": "The review correctly noted the original browser_use pass only navigated (navigate_to + get_current_page_title), not 'the same loopback fixture used for agent-browser', which also fills #name, clicks #greet and reads back #status. Repeated with fill+click this round.",
+   "script": "scripts/browseruse_fillclick_test.py -- uses Browser.get_index_by_id to resolve #name/#greet by id from the DOM selector map, then dispatches TypeTextEvent and ClickElementEvent on browser.event_bus (browser-use's low-level event API; still no LLM/agent-loop call)",
+   "steps": [
+    {"task": "resolve_indices", "success_partial": true, "detail": "#name and #greet resolved to selector-map indices 2 and 4; #status (a <p role=\"status\">, not an interactive control) did not get an index of its own, which is expected of browser-use's interactive-element indexing, not a bug"},
+    {"task": "fill_name", "success": true, "ms_from_nav": 544, "detail": "TypeTextEvent(node=#name, text='Gap Wave 2 Fix') dispatched without error"},
+    {"task": "click_greet", "success": true, "ms": 692, "detail": "ClickElementEvent(node=#greet) dispatched without error"},
+    {"task": "read_status_after_click", "success": true, "detail": "Runtime.evaluate via the same CDP session read document.getElementById('status').textContent == 'Hello, Gap Wave 2 Fix!' -- the fill+click round trip is verified end to end, not just 'no exception was raised'"}
+   ],
+   "raw_result": "raw/browseruse_fillclick_results.json"
+  },
+  "unpinned_install_fix_round": {
+   "note": "The original commands used `uv pip install crawl4ai` / `uv pip install browser-use` with no version constraint, then read the installed version back afterward -- the review is right that this is not what 'install ... at pinned versions' means. FIX ROUND: re-ran `uv pip install \"crawl4ai==0.9.3\"` and `uv pip install \"browser-use==0.13.10\"` in the same venvs; both resolved to the already-installed pin with no changes (`Checked 1 package in ...ms`), confirming 0.9.3 / 0.13.10 are exact, reproducible pins rather than whatever-latest-resolved-that-day."
+  },
+  "cua_driver_probe_fix_round": {
+   "attempted": true,
+   "install": "uv venv + `uv pip install cua-computer` succeeded cleanly (cua-computer 0.5.19, cua-core 0.3.1, no paid dependency pulled in).",
+   "why_not_run_further": "Computer.__init__ requires either a running local 'Computer Server' via use_host_computer_server, or a VM provider (default: Lume, macOS-only; Docker-backed Linux/Windows VM images are multi-GB and not preinstalled) -- there is no lightweight in-process CDP-style driver comparable to agent-browser's or browser-use's. Exercising it would mean either standing up a new VM/container image (a heavy job, and this host has no macOS/Lume) or supplying a Cua Cloud api_key (excluded: 'no paid API, no credential reads'). This is a genuine infrastructure gap, not a time-box skip: Cua Driver remains installed-but-functionally-untested after this round.",
+   "verdict": "advanced from 'source review only' to 'package installs cleanly; execution requires infrastructure (VM/container or cloud key) outside this unit's isolation and no-paid-API bounds' -- still not functionally tested."
+  },
+  "firecrawl_mcp_probe_fix_round": {
+   "attempted": true,
+   "install_and_help": "`npx -y firecrawl-mcp --help` ran successfully (package firecrawl-mcp@3.25.3) and self-reported: 'No FIRECRAWL_API_KEY or FIRECRAWL_API_URL set -- running in keyless mode. firecrawl_scrape and firecrawl_search are free (rate-limited per IP) against the Firecrawl cloud; other tools require an API key.' No credential was supplied or read.",
+   "protocol_call_attempt": "Wrote a minimal stdio JSON-RPC client (scripts not retained here -- see limits) to send MCP initialize + a firecrawl_scrape tools/call for https://example.com in keyless mode. The call did not return a response within a 60s bound and was stopped (no hang/zombie process left afterward); this is recorded as not_settled for the protocol-level check, not as a pass.",
+   "verdict": "advanced from 'source review only' to 'installs and exposes a real free/keyless mode via --help, but a live keyless MCP tool call was attempted and did not complete inside this fix round's time-box' -- still not functionally tested end to end."
+  }
+ },
+ "outcome": "advanced",
+ "outcome_detail": "FIX ROUND (independent review): downgraded from 'settled' -- the gap names four tools and the original pass only exercised two, so 'settled' overstated closure. Corrected picture: Crawl4AI 0.9.3 fetched and correctly extracted markdown from the loopback fixture, but its own heuristic anti-bot detector flagged the tiny fixture page as 'Blocked by anti-bot protection: Structural: minimal_text' and marked the result success=False despite a correct fetch/scrape -- a real false-positive on small pages. It passed cleanly on example.com. Browser Use 0.13.10 (CDP-based navigation, no LLM/agent loop, no paid API): this round exercised fill+click, not just navigation -- TypeTextEvent + ClickElementEvent on the fixture's #name/#greet, verified via a CDP Runtime.evaluate readback of #status ('Hello, Gap Wave 2 Fix!'), the same round trip agent-browser's fixture uses. Separately, `get_current_page_title()` still returns the bare hostname/URL rather than the page's actual <title> on both pages -- a real accessor quirk at this version. Both installs are now confirmed pinned (0.9.3 / 0.13.10) via an explicit `pkg==version` re-install rather than only reading the version back after an unconstrained install. Cua Driver and Firecrawl MCP were probed, not just left as source-review: Cua Driver's Python package installs cleanly but requires either a macOS/Lume VM, a Docker VM image, or a paid Cua Cloud API key to actually drive anything -- none available/in-scope here, so it remains functionally untested for an infrastructure reason, not a time-box one. Firecrawl MCP's CLI confirms a genuine free/keyless mode exists for `firecrawl_scrape`/`firecrawl_search`, but a live MCP protocol call attempted this round did not complete within 60s and is recorded as not_settled, not tested. Net: 2 of 4 named tools (Crawl4AI, Browser Use) now have fuller functional coverage including the fill/click round trip; the other 2 (Cua Driver, Firecrawl MCP) are advanced from pure source-review to a concrete, recorded reason each remains untested.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "Cua Driver was probed for installability only; no VM/container was started and no functional browser-control call was made (infrastructure and no-paid-API constraints, not a skip).",
+  "Firecrawl MCP was probed for install/--help only; a live keyless tools/call was attempted and timed out at 60s without a response -- the stdio JSON-RPC client script used for that attempt is not retained in this repo (host-local only), so the exact hang point is not independently reproducible from these artifacts; treat the firecrawl_scrape/firecrawl_search keyless capability as plausible-per-its-own---help-text but not confirmed working end to end.",
+  "Browser Use was exercised only via its low-level CDP navigation/event API (navigate, fill, click, one JS readback), never its LLM-driven agent loop (which would need a paid model API call and is out of scope); agentic task-completion behavior is still unqualified.",
+  "crawl4ai-setup wrote its Playwright browser download to the default ~/.cache/ms-playwright and its local database to ~/.crawl4ai/ rather than the isolated ~/.cache/gap-wave2-20260923/web-research prefix during the original run. FIX ROUND: both directories were removed after confirming (via `stat`) they were created during this unit's run window and not present before it -- isolation is now clean going forward, but this documents that the breach happened and was corrected, not that it never occurred.",
+  "Reproducibility: scripts/crawl4ai_test.py, scripts/browseruse_test.py and scripts/browseruse_fillclick_test.py are committed; raw/crawl4ai_results.json, raw/browseruse_results.json and raw/browseruse_fillclick_results.json are the retained raw outputs. The Cua Driver and Firecrawl MCP probe commands (uv pip install / npx --help / the ad hoc MCP client) were run interactively and are described in cua_driver_probe_fix_round / firecrawl_mcp_probe_fix_round above rather than saved as scripts."
+ ],
+ "checked_at": "2026-09-23T01:38:00Z",
+ "fix_round_checked_at": "2026-09-23T01:55:00Z"
+}

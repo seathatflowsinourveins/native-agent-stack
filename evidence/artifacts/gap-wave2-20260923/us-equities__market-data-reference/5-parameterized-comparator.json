@@ -1,0 +1,75 @@
+{
+ "id": "gap-wave2-20260923/us-equities__market-data-reference/5-parameterized-comparator",
+ "gap_index": 5,
+ "layer_id": "market-data-reference",
+ "catalog": "us-equities",
+ "gap_text": "No generalized multi-provider comparator exists. compare.py is hard-coded to AAPL, 25 sessions and the Alpaca collector, so a Databento or Massive arm cannot be scored without new code.",
+ "gap_text_sha256": "b0bad972e3060257eb98565ff4c1548e01cfcab40001d09101c03d73c1b1cbbe",
+ "next_check": "Parameterize compare.py by provider, symbol list and session range. Verify it reproduces the existing AAPL 25-session Alpaca result and scores a second symbol.",
+ "preregistration": {
+  "written_at": "2026-09-23T04:22:33Z",
+  "expectation": "A new parameterized comparator (provider, symbols, session range) reproduces the original compare.py AAPL 25-session output field-for-field (bars 25/25 equal, max diff 0.00; actions numeric 2, unknown_currency 1) and scores a second symbol from the retained broad-market Alpaca raw daily parquet against LEAN's bundled raw daily data.",
+  "criteria": "settled if (a) the AAPL result JSON equals original compare.py output except the comparison_code hash, (b) a second symbol is scored with nonzero compared sessions, and (c) a provider-neutral normalized-file arm exists so a Databento/Massive export needs no new code; negative control: perturbing one close must flip status to differences (detection).",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration.json",
+  "committed_in": "c6846f1"
+ },
+ "fix_round_preregistration": {
+  "written_at": "2026-09-23T04:41:56Z",
+  "label": "fix-round preregistration, written after the Codex round-1 review and before the fix-round reruns",
+  "expectation": "After fixing reference-status handling, per-symbol action filtering and empty-reference handling, the AAPL result stays identical to compare.py and the second-symbol counts are unchanged.",
+  "criteria": "identical=true again; new controls: unavailable reference -> bars unavailable (not equal); symbol absent from reference -> unavailable/no_reference_sessions; other-symbol action rows excluded from provider_records.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration-fix-round1.json",
+  "committed_in": "0481e46"
+ },
+ "fix_round2_preregistration": null,
+ "fix_round3_preregistration": null,
+ "eol_fix_preregistration": null,
+ "independent_review_round3": null,
+ "independent_review_round2": {
+  "reviewer": "independent Opus review of fe8b66e (findings relayed by the coordinator)",
+  "findings_for_this_gap": "none"
+ },
+ "independent_review": {
+  "reviewer": "codex exec --sandbox read-only --ephemeral (codex-cli 0.155.1); invocation 1 stalled reading stdin and was stopped without output, invocation 2 (stdin from /dev/null) completed, 62,448 tokens",
+  "output": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/review-codex-round1.txt",
+  "findings_for_this_gap": "2 findings (unavailable reference reported equal; actions not filtered by symbol/range) - both fixed in round 1 and re-run"
+ },
+ "commands": [
+  "bash blueprints/gap-wave2-20260923/us-equities__market-data-reference/run_compare.sh",
+  "$HOME/.local/share/codex-ecosystem/tools/sdk-env-baseline-20260922/bin/python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/diff_by_year.py blueprints/gap-wave2-20260923/us-equities__market-data-reference lean-daily:... alpaca-parquet:... IBM,SPY,AAPL 2016-01-04 2021-03-31"
+ ],
+ "results": [
+  "original compare.py and compare_multi.py (lean-probe vs alpaca-run, AAPL, 2020-08-03..2020-09-04, --expect-sessions 25): per-symbol result identical: {\"identical\": true, \"keys_only_original\": [], \"keys_only_multi\": []} (bars 25/25 equal, max diff 0.00; actions reconciliation_incomplete, numeric_values_equal 2, unknown_currency 1)",
+  "AAPL lean-probe vs alpaca-parquet (broad-market store): bars equal 25/25, max 0.00",
+  "second symbols, lean-daily vs alpaca-parquet, same 25 sessions: IBM compared 25, different 1, max 0.0200; SPY compared 25, different 24, max 0.5106",
+  "2016-01-04..2021-03-31: AAPL 1320 compared / 43 different / max 0.3400; IBM 1320 / 211 / 2.2100; SPY 1320 / 1214 / 7.1300; missing 0, extra 0 for all",
+  "normalized-csv arm (provider-neutral export): clean IBM copy -> equal 25/25; one close +0.01 -> different 1, max 0.0100; --expect-sessions 24 -> ValueError unsupported_reference_session_count (exit 1)",
+  "Fix round 1 (after Codex review raw/review-codex-round1.txt): unavailable reference -> {\"status\": \"unavailable\", \"reason\": \"reference_request_failed\"} (was reported equal); symbol absent from reference -> no_reference_sessions; alpaca-run actions filtered to requested symbols and in-range ex_date ([{\"symbol\": \"AAPL\", \"ex_date\": \"2020-08-07\"}] kept of 3 synthetic rows). All round-1 outputs unchanged apart from code hashes and one traceback line number; AAPL identical=true again."
+ ],
+ "detection_method": "Negative control: a single +0.01 close perturbation in the normalized-csv arm flips status to differences (different=1); the session-count guard rejects a wrong expectation.",
+ "outcome": "advanced",
+ "evidence_class": "local_integration",
+ "limits": [
+  "The parameterized comparator is a successor module under blueprints/gap-wave2-20260923/ (reusing compare.py's numeric validation); blueprints/us-equities/authenticated-data/compare.py itself was not edited because its hash is pinned in earlier receipts and it is outside this unit's owned paths. Promotion into the authenticated-data blueprint is left to the coordinator, so the gap text 'compare.py is hard-coded' still literally holds.",
+  "No Databento or Massive data exists on this host and acquiring it needs paid/credentialed access; a Databento/Massive arm needs only a normalized CSV export (symbol,session_date,close) but that arm was exercised with a LEAN-derived CSV, not a real Databento/Massive export.",
+  "Second-symbol disagreements (notably SPY on ~91% of sessions) are unexplained here: LEAN's bundled daily close and Alpaca's SIP daily close likely use different close definitions for ETFs; the comparator reports, it does not diagnose. The parquet arm converts stored doubles with repr() (shortest round-trip text).",
+  "Private Alpaca data was read in memory only; only aggregate counts are published."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/5-compare-multi-run.txt",
+   "sha256": "f3bbb92892b7b75eb3887565c1da90add017a12cf399678f44908213fab052a8"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/5-diff-by-year.json",
+   "sha256": "e9a049492d54c9aa98c48ddd75f9cc5a713220ff39711c9453e3f2062d0a9c6e"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/5-compare-multi-run.fix1.txt",
+   "sha256": "309a313b23b91dce3553c3ea2e76c389c009c56d7610428a4db62a50b20f5cc8"
+  }
+ ],
+ "checked_at": "2026-09-23T04:42:15Z",
+ "checked_at_source": "UTC mtime of the latest raw output the receipt cites (sed path-redaction can postdate the run by seconds)",
+ "host_paths": "host paths are written as $HOME; private Alpaca payloads stay outside the repository"
+}

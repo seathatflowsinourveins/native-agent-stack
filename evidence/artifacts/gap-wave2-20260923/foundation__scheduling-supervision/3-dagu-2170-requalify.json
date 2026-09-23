@@ -1,0 +1,61 @@
+{
+  "id": "gap-wave2-20260923-scheduling-supervision-3",
+  "gap_index": 3,
+  "gap_text_sha256": "695b839d83071610aa82aaca2b99d7cdd67a18d76a6a5b670ed6cce0cadf4dc7",
+  "preregistration": {
+    "written_at": "2026-09-22T22:42:40-04:00",
+    "expectation": "Per the dispatch, stale-pin upgrades are covered_elsewhere by evidence/artifacts/sota-refresh-20260923/ merged in #87 (origin/main 43bb931). Expect pins-runtime/dagu.json there to record the 2.17.0 job-recovery rerun (passed) and the SIGKILL/stale-lock rerun (inconclusive), and to not cover the service-reboot protocol or upstream retry tests at v2.17.0.",
+    "criteria": "covered_elsewhere iff the cited artifact exists on origin/main and addresses the 2.17.0 re-qualification; the receipt lists the arms that artifact did not cover so the owner can see what remains.",
+    "committed_before_running": "git commit 7802cab (preregistrations/3.json)"
+  },
+  "commands": [
+    "git fetch origin; git log --oneline origin/main  # 43bb931 SOTA refresh evidence wave: pin qualification, observability comparison, hardware profiles (#87)",
+    "git ls-tree -r --name-only origin/main | grep sota-refresh-20260923 | grep -i dagu",
+    "git show origin/main:evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json"
+  ],
+  "results": [
+    "origin/main carries evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json plus patched-harnesses/dagu-job-recovery-run-2170.{py,diff} and dagu-inflight-resume-after-kill-fixture-v2.{py,diff} (merged in #87)",
+    "dagu.json results: job_recovery_acceptance 'PASSED on 2.17.0, matching the 2.16.6 retained receipt shape exactly (graceful stop -> targeted --step retry -> succeeded, checkpoint reused, 12/12 tests, same run-id)'; inflight_resume_after_kill remains 'UNTESTED and INCONCLUSIVE' (no scheduler was started; bare retry refused 120 s after SIGKILL)",
+    "Not in dagu.json: the service-reboot protocol and the unchanged upstream retry tests at tag v2.17.0 (the gap's next_check names both)."
+  ],
+  "outcome": "covered_elsewhere",
+  "outcome_detail": "Owner: the sota-refresh-20260923 pin-qualification wave, merged in #87 (evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json). Per this dispatch, stale-pin upgrades are covered there and not re-executed here. For that owner, the arms still open against the gap's next_check are: the SIGKILL/stale-lock case with a running scheduler held past ~225 s, the service-reboot protocol and the upstream `TestRetryCommand` tests at v2.17.0. Related observation for that owner (Dagu 2.16.6, not 2.17.0; this sentence was added late, after 23:06:50-04:00, and revised in fix round 1): in this unit's challenger harness, without a scheduler (the preregistered protocol, fix-round F1) bare retries were refused for the whole 150 s bound; in a post-hoc variant a scheduler started after the SIGKILL confirmed the zombie run about 180 s after it started and the next `dagu retry --step finalize` succeeded (181.4 s, and 182.6 s in fix-round F2); see 6-executed-challenger-comparison.json.",
+  "evidence_class": "source_review",
+  "limits": [
+    "This receipt verifies that the covering artifact exists on origin/main and what it covers; it does not re-run its commands.",
+    "Unit-level isolation (fix round 2 cross-reference): this receipt's isolation statements cover this gap's own runs only. During fix round 1, between the fix-round preregistration and the F1/F2/F3 reruns, an unquoted heredoc started an unintended `dagu scheduler` (PATH dagu, default config) that wrote state into the default Dagu home $HOME/.local/share/dagu/data and bound :8090 on all interfaces for about 2 min 15 s, and an unintended `codex exec` that was killed while waiting for stdin. Fix round 2 verified that the running host `dagu server` (pid 366, the dagu-equities service) uses DAGU_HOME=$HOME/.local/share/codex-ecosystem/dagu-equities, a different store. See incidents/2026-09-22-fix-round-heredoc-substitution.json.",
+    "Integration dependency (fix round 3): the covering artifact evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json was added by 43bb931 (#87). 43bb931 is an ancestor of origin/main (05e134f at the check) but not of this branch (base 41d39b3), so the path does not exist in this branch's tree and the citation resolves only after this branch is integrated into a branch that contains 43bb931. Content at 43bb931: sha256 246f4b7ca3e672efd6bdbd86780bd093c39257b8afe2d8ef91bdf3e8947bbb8b; line 42 holds the quoted 'PASSED on 2.17.0' job_recovery_acceptance text; `grep -c -E 'service-reboot|TestRetryCommand'` returns 0 (raw/fix3/receipt-3-11-checks.txt)."
+  ],
+  "checked_at": "2026-09-22T23:32:59-04:00",
+  "checked_at_note": "Fix round 1: the original checked_at (2026-09-22T23:05:33-04:00) preceded an observation quoted in outcome_detail (the Dagu SIGKILL recovery at 181.4 s, completed 03:06:50Z = 23:06:50-04:00), so that sentence was a late addition edited after the check. checked_at now records this fix-round edit; the covering-artifact verification (git show origin/main) ran at the original 23:05:33 time.",
+  "fix_round_1": {
+    "edited_at": "2026-09-22T23:32:59-04:00",
+    "review_findings_addressed": [
+      4
+    ],
+    "outcome_changed": false
+  },
+  "fix_round_2": {
+    "edited_at": "2026-09-23T08:50:58-04:00",
+    "changes": "Receipt text only; no check re-run. Added the unit-level isolation cross-reference."
+  },
+  "covering_artifact": {
+    "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json",
+    "commit": "43bb931",
+    "sha256_at_commit": "246f4b7ca3e672efd6bdbd86780bd093c39257b8afe2d8ef91bdf3e8947bbb8b",
+    "in_this_branch_tree": false,
+    "ancestor_of_origin_main": true,
+    "requires_integration_target_containing": "43bb931"
+  },
+  "fix_round_3": {
+    "edited_at": "2026-09-23T10:18:07-04:00",
+    "preregistration": "preregistrations/fix-round-3.json (written 2026-09-23T10:15:57-04:00, before the fix-round-3 observations)",
+    "review_findings_addressed": [
+      5
+    ],
+    "changes": "Recorded that the covering artifact exists at 43bb931 and not in this branch's tree; added its sha256 and the integration dependency. No check re-run; outcome unchanged.",
+    "raw_output": [
+      "raw/fix3/receipt-3-11-checks.txt"
+    ]
+  }
+}

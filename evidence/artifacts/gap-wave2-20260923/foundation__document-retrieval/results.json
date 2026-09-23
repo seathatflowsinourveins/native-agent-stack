@@ -1,0 +1,22 @@
+{
+  "0": {
+    "outcome": "not_settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__document-retrieval/0-qmd-four-mode-disposable-bench.json"
+  },
+  "2": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__document-retrieval/2-qmd-freshness-and-recall.json"
+  },
+  "3": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__document-retrieval/3-poppler-difficult-layouts.json"
+  },
+  "4": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__document-retrieval/4-markitdown-extras-fixtures.json"
+  },
+  "5": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__document-retrieval/5-e2e-single-question-pilot.json"
+  }
+}

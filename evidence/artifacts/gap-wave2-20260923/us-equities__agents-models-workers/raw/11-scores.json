@@ -1,0 +1,269 @@
+{
+ "socraticode": {
+  "summary": {
+   "recall@1": "7/12",
+   "recall@3": "11/12",
+   "recall@5": "11/12",
+   "mrr@10": 0.72222
+  },
+  "per_query": [
+   {
+    "id": "sec-availability",
+    "gold": "financial-data/README.md",
+    "rank": 1,
+    "top3": [
+     "financial-data/README.md",
+     "north-star.md",
+     "gap-resolution.md"
+    ]
+   },
+   {
+    "id": "backup-host-loss",
+    "gold": "hosting/backup/README.md",
+    "rank": 1,
+    "top3": [
+     "hosting/backup/README.md",
+     "gap-resolution.md",
+     "hosting.md"
+    ]
+   },
+   {
+    "id": "acp-readonly",
+    "gold": "deerflow/README.md",
+    "rank": 1,
+    "top3": [
+     "deerflow/README.md",
+     "gap-resolution.md",
+     "README.md"
+    ]
+   },
+   {
+    "id": "native-token-subsets",
+    "gold": "workers/README.md",
+    "rank": 3,
+    "top3": [
+     "north-star.md",
+     "gap-resolution.md",
+     "workers/README.md"
+    ]
+   },
+   {
+    "id": "restart-allowance",
+    "gold": "research-runtime/README.md",
+    "rank": 1,
+    "top3": [
+     "research-runtime/README.md",
+     "gap-resolution.md",
+     "hosting/README.md"
+    ]
+   },
+   {
+    "id": "broker-timeout",
+    "gold": "engine/README.md",
+    "rank": 2,
+    "top3": [
+     "north-star.md",
+     "engine/README.md",
+     "README.md"
+    ]
+   },
+   {
+    "id": "alpaca-entitlement",
+    "gold": "engine/resolution.md",
+    "rank": 2,
+    "top3": [
+     "engine/README.md",
+     "engine/resolution.md",
+     "README.md"
+    ]
+   },
+   {
+    "id": "dagu-recovery",
+    "gold": "hosting/README.md",
+    "rank": 1,
+    "top3": [
+     "hosting/README.md",
+     "hosting.md",
+     "research-runtime/README.md"
+    ]
+   },
+   {
+    "id": "gateway-parity",
+    "gold": "routing/README.md",
+    "rank": 1,
+    "top3": [
+     "routing/README.md",
+     "deerflow/README.md",
+     "hosting.md"
+    ]
+   },
+   {
+    "id": "paper-risk-controls",
+    "gold": "north-star.md",
+    "rank": 1,
+    "top3": [
+     "north-star.md",
+     "research-runtime/README.md",
+     "deerflow/research-result.md"
+    ]
+   },
+   {
+    "id": "worker-cancellation",
+    "gold": "research-runtime/README.md",
+    "rank": 3,
+    "top3": [
+     "hosting.md",
+     "workers/README.md",
+     "research-runtime/README.md"
+    ]
+   },
+   {
+    "id": "savings-scope",
+    "gold": "research-runtime/README.md",
+    "rank": null,
+    "top3": [
+     "gap-resolution.md",
+     "north-star.md",
+     "financial-data/README.md"
+    ]
+   }
+  ]
+ },
+ "ai_memory_cli_search": {
+  "summary": {
+   "recall@1": "8/12",
+   "recall@3": "11/12",
+   "recall@5": "11/12",
+   "mrr@10": 0.80208
+  },
+  "per_query": [
+   {
+    "id": "sec-availability",
+    "gold": "financial-data/README.md",
+    "rank": 1,
+    "top3": [
+     "financial-data/README.md",
+     "gap-resolution.md",
+     "research-runtime/README.md"
+    ]
+   },
+   {
+    "id": "backup-host-loss",
+    "gold": "hosting/backup/README.md",
+    "rank": 2,
+    "top3": [
+     "routing/README.md",
+     "hosting/backup/README.md",
+     "README.md"
+    ]
+   },
+   {
+    "id": "acp-readonly",
+    "gold": "deerflow/README.md",
+    "rank": 1,
+    "top3": [
+     "deerflow/README.md",
+     "deerflow/research-result.md",
+     "deerflow/research-task.md"
+    ]
+   },
+   {
+    "id": "native-token-subsets",
+    "gold": "workers/README.md",
+    "rank": 1,
+    "top3": [
+     "workers/README.md",
+     "routing/README.md",
+     "gap-resolution.md"
+    ]
+   },
+   {
+    "id": "restart-allowance",
+    "gold": "research-runtime/README.md",
+    "rank": 1,
+    "top3": [
+     "research-runtime/README.md",
+     "gap-resolution.md",
+     "workers/README.md"
+    ]
+   },
+   {
+    "id": "broker-timeout",
+    "gold": "engine/README.md",
+    "rank": 1,
+    "top3": [
+     "engine/README.md",
+     "north-star.md",
+     "README.md"
+    ]
+   },
+   {
+    "id": "alpaca-entitlement",
+    "gold": "engine/resolution.md",
+    "rank": 1,
+    "top3": [
+     "engine/resolution.md",
+     "gap-resolution.md",
+     "engine/README.md"
+    ]
+   },
+   {
+    "id": "dagu-recovery",
+    "gold": "hosting/README.md",
+    "rank": 1,
+    "top3": [
+     "hosting/README.md",
+     "research-runtime/README.md",
+     "hosting.md"
+    ]
+   },
+   {
+    "id": "gateway-parity",
+    "gold": "routing/README.md",
+    "rank": 1,
+    "top3": [
+     "routing/README.md",
+     "workers/policy.md",
+     "hosting.md"
+    ]
+   },
+   {
+    "id": "paper-risk-controls",
+    "gold": "north-star.md",
+    "rank": 2,
+    "top3": [
+     "README.md",
+     "north-star.md",
+     "gap-resolution.md"
+    ]
+   },
+   {
+    "id": "worker-cancellation",
+    "gold": "research-runtime/README.md",
+    "rank": 2,
+    "top3": [
+     "hosting.md",
+     "research-runtime/README.md",
+     "deerflow/research-task.md"
+    ]
+   },
+   {
+    "id": "savings-scope",
+    "gold": "research-runtime/README.md",
+    "rank": 8,
+    "top3": [
+     "workers/policy.md",
+     "gap-resolution.md",
+     "north-star.md"
+    ]
+   }
+  ]
+ },
+ "qmd_recorded_baseline": {
+  "recall@1": "5/12",
+  "recall@3": "8/12",
+  "recall@5": "9/12",
+  "mrr@10": 0.56875,
+  "source": "blueprints/us-equities/retrieval-evaluation/README.md (exact intended-source audit)"
+ }
+}

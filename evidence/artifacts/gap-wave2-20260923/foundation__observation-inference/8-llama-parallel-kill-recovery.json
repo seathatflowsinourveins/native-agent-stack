@@ -1,0 +1,108 @@
+{
+  "id": "gap-wave2-20260923-foundation-observation-inference-8",
+  "gap_index": 8,
+  "gap_text_sha256": "92b27ec178a9e4709db547f5548bca1e2bdac5f637df413a147e41bd4cf928e2",
+  "gap_text": "The llama.cpp route is qualified on one fixture and one trial only; it has no host portability, concurrency or recovery evidence.",
+  "next_check": "Run llama-server with --parallel 4 against several fixtures under concurrent requests, kill and restart it mid-load, and record success rates and recovery time.",
+  "arms": [
+    {
+      "arm": "run llama-server with --parallel 4",
+      "status": "executed",
+      "detail": "frozen b11057 CUDA 13.3 + Qwen3.8-27B Q4_K_M route, 32 GPU layers"
+    },
+    {
+      "arm": "against several fixtures under concurrent requests",
+      "status": "executed",
+      "detail": "4 fixtures, 12 requests, 8 client threads"
+    },
+    {
+      "arm": "kill and restart it mid-load",
+      "status": "executed (one trial)",
+      "detail": "SIGKILL 8 s into an 8-request batch"
+    },
+    {
+      "arm": "record success rates and recovery time",
+      "status": "executed",
+      "detail": "per-phase success rate, restart-to-healthy, kill-to-first-success"
+    },
+    {
+      "arm": "gap clause: host portability",
+      "status": "not addressed",
+      "detail": "one host only (GPU reported as RTX 5090 Laptop vs RTX4090 in the original receipt)"
+    }
+  ],
+  "preregistration": {
+    "written_at": "2026-09-23T02:46:44Z",
+    "expectation": "The pinned llama.cpp b11057 CUDA 13.3 server will serve --parallel 4 concurrent requests across several fixtures on this host's GPU with a locally available small GGUF, fail in-flight requests when killed with SIGKILL mid-load, and recover within tens of seconds after restart.",
+    "criteria": "Record per-phase success rates (concurrent phase, kill phase, post-restart phase), time from restart to first /health 200 and first successful completion. The originally qualified Qwen3.8-27B Q4_K_M route model is not on this host (19 GB download not attempted), so this can at best advance the gap; host portability (a second host) is not reachable here.",
+    "late": false,
+    "committed_in": "1a59606 (2026-09-23T02:46:44Z, before any check ran)",
+    "late_note": "The original gap-8 preregistration planned a small local GGUF; the revised plan using the frozen route model was preregistered at 03:18:03Z (commit 741ecab) before llama_load.py ran.",
+    "followup": {
+      "written_at": "2026-09-23T03:18:03Z",
+      "label": "revised preregistration, written after the runtime/model downloads and before llama_load.py ran; supersedes the small-GGUF plan in gaps.8",
+      "expectation": "With the actual frozen route (b11057 CUDA 13.3 llama-server sha256 7740775d..., Qwen3.8-27B-Q4_K_M sha256 c600de03..., 32 GPU layers) and --parallel 4 --ctx-size 8192, 12 concurrent requests over 4 fixtures (8 client threads) all succeed but slowly (single-stream generation was about 2.2 tok/s on the original host); SIGKILL 8 s into an 8-request batch fails every in-flight request; restart reaches /health 200 in under 30 s (model pages cached) and the 8 post-restart requests all succeed.",
+      "criteria": "Report success rate per phase, wall time, cold-start and restart-to-healthy seconds, kill-to-first-success seconds, GPU memory min free / max used, memory-guard events. Any post-restart failure counts against recovery. Host portability is not testable here beyond recording this host's GPU (reported RTX 5090 Laptop, 24 GB) versus the RTX4090 in the original receipt."
+    }
+  },
+  "commands": [
+    "ecosystem-bounded-run curl ... llama-b11057-bin-ubuntu-cuda-13.3-x64.tar.gz and cudart-llama-b11057-bin-ubuntu-cuda-13.3-x64.tar.gz (560 MB) and ggml-org/Qwen3.8-27B-GGUF@efbb3b1f/Qwen3.8-27B-Q4_K_M.gguf (18,973,870,528 bytes) into $HOME/.cache/gap-wave2-20260923/observation-inference/llama-b11057/dl; sha256 and gh attestation verify recorded in raw/8-llama-install.txt",
+    "cd $HOME/code/nas-wt-g2-observation-inference && python3 blueprints/gap-wave2-20260923/foundation__observation-inference/llama_load.py --out evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/8-llama-load.json",
+    "server (inside the script): $HOME/.cache/gap-wave2-20260923/observation-inference/llama-b11057/runtime/llama-b11057/llama-server --model $HOME/.cache/gap-wave2-20260923/observation-inference/llama-b11057/dl/Qwen3.8-27B-Q4_K_M.gguf --alias local-qwen38-frozen --host 127.0.0.1 --port 59818 --ctx-size 8192 --parallel 4 --n-gpu-layers 32 --batch-size 128 --ubatch-size 128 --threads 8 --n-predict 1536 --fit off --no-webui --no-agent --jinja --perf"
+  ],
+  "results": [
+    "gpu_before={'free_mib': 19060, 'used_mib': 5078, 'total_mib': 24463}, gpu_min_free_mib=9135, gpu_max_used_mib=15003, memory_guard_events=[]",
+    "cold_start_healthy_s=14.118",
+    "phase1_concurrent: requests=12, ok=12, failed=0, success_rate=1.0, wall_s=130.483, errors=[]",
+    "phase2_kill_midload: requests=8, ok=0, failed=8, success_rate=0.0, wall_s=8.518, errors=['RemoteDisconnected']",
+    "phase3_after_restart: requests=8, ok=8, failed=0, success_rate=1.0, wall_s=57.67, errors=[]",
+    "kill: {\"at_s\": 8.003, \"done_before_kill\": 0, \"exit\": -9}",
+    "restart_healthy_after_start_s=5.264, recovery_kill_to_first_success_s=10.702, restart_first_request={\"fixture\": \"primes\", \"ok\": true, \"http\": 200, \"latency_s\": 4.923, \"completion_tokens\": 15, \"prompt_tokens\": 22, \"finish_reason\": \"stop\"}",
+    "runtime/model hashes matched the frozen plan (llama-server 7740775d..., model c600de03...); both archives passed gh attestation verify at source digest 59657a61 (raw/8-llama-install.txt)"
+  ],
+  "outcome": "advanced",
+  "note": "With the frozen b11057 CUDA 13.3 runtime and Qwen3.8-27B Q4_K_M route (32 GPU layers) at --parallel 4, 12 concurrent requests over 4 fixtures all succeeded (130 s wall). SIGKILL 8 s into an 8-request batch failed all 8 in-flight requests with RemoteDisconnected; after restart the server was healthy in 5.3 s, served its first request 10.7 s after the kill and completed 8/8. Remaining: one kill/restart trial only; no client-side retry for in-flight requests; answer quality was not rechecked (max_tokens 32); host portability beyond this one host (GPU reported as RTX 5090 Laptop, 24 GB, driver 610.47, versus the RTX4090 in the original receipt) is untested.",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Profile differs from the frozen plan only in --parallel 4 and --ctx-size 8192; outputs were capped at 32 tokens, so this measures serving, not quality.",
+    "Shared GPU (about 5 GB already used by another process); latencies are shared-host observations, not a benchmark.",
+    "Network downloads: 61 MB Jaeger (gap 5), 560 MB llama.cpp runtime and 18.97 GB model, all over HTTPS from the pinned upstream URLs into the unit cache directory."
+  ],
+  "checked_at": "2026-09-23T03:21:49.984392+00:00",
+  "independent_review": {
+    "round1": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+    "round2": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt"
+  },
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/8-llama-load.json",
+      "sha256": "fd0158b23a17d12bef638e95656b29e4fa157ca53dddc94c5e69501af4749763"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/8-llama-load.stdout.txt",
+      "sha256": "8ea780574ad8977ee908fe2f1ef02148d05e92db51c4dabec4f3cd01951354ba"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/8-llama-load.exit.txt",
+      "sha256": "372681a2845d7b1de9f7475ce1cff4b81869d3795acfcdd90bbae5c029daf133"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/8-llama-load.started.txt",
+      "sha256": "3eb9c0f093c84642c2a25473f7ca9101d3dc211d2d8c7353c455dbc5427b1b73"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/8-llama-install.txt",
+      "sha256": "24ed466c5cb818804940e66b0c5279dedc46d286375f929a71b14b6c5ca803a7"
+    }
+  ],
+  "helper_scripts": [
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/isostack.py",
+      "sha256": "0fe3cb2014d707aef0d0dfeafa4e2175a43ee44a78da31906ee6f04b0e3ee9e9"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/llama_load.py",
+      "sha256": "2b42f6dd1cc7e461f4a2a693e48a3089d6bcda3544aa5a9c40f4a64e1d5bfcef"
+    }
+  ]
+}

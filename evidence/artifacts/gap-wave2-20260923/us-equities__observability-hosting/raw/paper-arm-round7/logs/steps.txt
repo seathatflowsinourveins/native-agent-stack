@@ -1,0 +1,49 @@
+[2026-09-23T16:22:16Z] versions dagu=2.16.6 otel=otelcol-contrib version 0.161.0 prom=prometheus, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610) loki=loki, version 3.7.8 (branch: release-3.7.x, revision: 09e6ce2f) restic=restic 0.19.1 compiled with go1.26.4 on linux/amd64 srt=1.0.0 py=3.12.3 2.0.0rc5
+[2026-09-23T16:22:41Z] stack pids prom=1654928 loki=1654929 otel=1661820 ready_prom=Prometheus Server is Ready. ready_loki=ready
+[2026-09-23T16:22:41Z] listeners initial: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:38889 127.0.0.1:39090 
+[2026-09-23T16:22:41Z] dagu start
+[2026-09-23T16:23:13Z] dagu start exit=0
+[2026-09-23T16:23:13Z] dagu status exit=0
+[2026-09-23T16:23:25Z] before-kill spans={"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"Step: hot-backup"},"value":[1790180605.132,"1"]},{"metric":{"span_name":"DAG: obsgap-paper"},"value":[1790180605.132,"1"]},{"metric":{"span_name":"Step: paper-runtime"},"value":[1790180605.132,"1"]}]}}
+[2026-09-23T16:23:25Z] before-kill count={"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"paper_runtime_intents_total","exported_job":"paper-obsgap-20260923","instance":"127.0.0.1:38889","job":"otelcol-count","otel_scope_name":"github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector"},"value":[1790180605.139,"2"]},{"metric":{"__name__":"paper_runtime_log_records_total","exported_job":"paper-obsgap-20260923","instance":"127.0.0.1:38889","job":"otelcol-count","otel_scope_name":"github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector"},"value":[1790180605.139,"2"]}]}}
+[2026-09-23T16:23:25Z] before-kill countmax={"status":"error","errorType":"execution","error":"vector cannot contain metrics with the same labelset"}
+[2026-09-23T16:23:25Z] before-kill loki_lines=312
+[2026-09-23T16:23:25Z] step output: [SandboxDebug] No matching config rule, denying: example.com:443 {"mark": "obsgap-paper-162216", "kind": "paper_sim_end", "at": 1790180592.9548845, "status": "passed", "flat": true, "native_fill_events": 20, "journal_counts": {"intents": 20, "requests": 22, "events": 41, "positions": 2, "marks": 6, "trials": 0}} PAPER_RC=0 PROBE egress HTTPSTATUS:000 EXIT:56 PROBE egress curl_rc=56 PROBE write_outside rc=2 PROBE read_decoy rc=1 HOT_BACKUP_OK 
+[2026-09-23T16:23:25Z] controls (unsandboxed; must succeed)
+CONTROL egress HTTPSTATUS:200 EXIT:0
+[2026-09-23T16:23:25Z] CONTROL write_outside rc=0
+[2026-09-23T16:23:25Z] CONTROL read_decoy rc=0
+[2026-09-23T16:23:25Z] kill -9
+[2026-09-23T16:23:50Z] stack pids prom=1677398 loki=1677399 otel=1683672 ready_prom=Prometheus Server is Ready. ready_loki=ready
+[2026-09-23T16:23:50Z] listeners after-restart: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:38889 127.0.0.1:39090 
+[2026-09-23T16:23:58Z] after-restart spans={"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"Step: hot-backup"},"value":[1790180638.712,"1"]},{"metric":{"span_name":"DAG: obsgap-paper"},"value":[1790180638.712,"1"]},{"metric":{"span_name":"Step: paper-runtime"},"value":[1790180638.712,"1"]}]}}
+[2026-09-23T16:23:58Z] after-restart count={"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"paper_runtime_intents_total","exported_job":"paper-obsgap-20260923","instance":"127.0.0.1:38889","job":"otelcol-count","otel_scope_name":"github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector"},"value":[1790180638.718,"2"]},{"metric":{"__name__":"paper_runtime_log_records_total","exported_job":"paper-obsgap-20260923","instance":"127.0.0.1:38889","job":"otelcol-count","otel_scope_name":"github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector"},"value":[1790180638.718,"2"]}]}}
+[2026-09-23T16:23:58Z] after-restart countmax={"status":"error","errorType":"execution","error":"vector cannot contain metrics with the same labelset"}
+[2026-09-23T16:23:58Z] after-restart loki_lines=312
+[2026-09-23T16:23:58Z] restic backup (stack running, workload finished)
+[2026-09-23T16:24:01Z] backup exit=0
+[2026-09-23T16:24:02Z] check exit=0
+[2026-09-23T16:24:03Z] restore exit=0
+[2026-09-23T16:24:04Z] hot check exit=0
+[2026-09-23T16:24:04Z] hot restore exit=0
+[2026-09-23T16:24:04Z] diff -rq work exit=0 lines=0
+[2026-09-23T16:24:04Z] diff -rq dagu exit=0 lines=0
+[2026-09-23T16:24:04Z] dagu status on restored home exit=0
+[2026-09-23T16:24:27Z] restored spans={"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"Step: hot-backup"},"value":[1790180667.164,"1"]},{"metric":{"span_name":"DAG: obsgap-paper"},"value":[1790180667.164,"1"]},{"metric":{"span_name":"Step: paper-runtime"},"value":[1790180667.164,"1"]}]}}
+[2026-09-23T16:24:27Z] restored count={"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"paper_runtime_intents_total","exported_job":"paper-obsgap-20260923","instance":"127.0.0.1:38889","job":"otelcol-count","otel_scope_name":"github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector"},"value":[1790180667.170,"2"]},{"metric":{"__name__":"paper_runtime_log_records_total","exported_job":"paper-obsgap-20260923","instance":"127.0.0.1:38889","job":"otelcol-count","otel_scope_name":"github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector"},"value":[1790180667.170,"2"]}]}}
+[2026-09-23T16:24:27Z] restored countmax={"status":"error","errorType":"execution","error":"vector cannot contain metrics with the same labelset"}
+[2026-09-23T16:24:27Z] restored loki_lines=312
+[2026-09-23T16:24:27Z] listeners restored: 127.0.0.1:33110 127.0.0.1:33111 127.0.0.1:39091 
+PASS paper runtime passed flat with fills {'mark': 'obsgap-paper-162216', 'kind': 'paper_sim_end', 'at': 1790180592.9548845, 'status': 'passed', 'flat': True, 'native_fill_events': 20, 'journal_counts': {'intents': 20, 'requests': 22, 'events': 41, 'positions': 2, 'marks': 6, 'trials': 0}}
+PASS paper step rc 0
+PASS sandboxed egress denied
+PASS sandboxed write outside allowWrite denied
+PASS sandboxed decoy read denied
+PASS unsandboxed controls succeed
+PASS hot backup during the run
+PASS prom span names before-kill ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']
+FAIL prom exact counts before kill (records, intents) {'paper_runtime_intents_total': 2.0, 'paper_runtime_log_records_total': 2.0} 312 20
+[2026-09-23T16:24:27Z] stop stack
+[2026-09-23T16:24:51Z] processes left for scratch path (excluding this script's ancestors 1654392 1654391 1654372 1252910 1252901 1252899 1252897 2 1 ): 0
+[2026-09-23T16:24:51Z] listeners left: 0
+MARK=obsgap-paper-162216

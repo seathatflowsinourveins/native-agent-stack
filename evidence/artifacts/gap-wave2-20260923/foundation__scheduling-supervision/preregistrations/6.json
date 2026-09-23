@@ -1,0 +1,6 @@
+{
+  "gap_index": 6,
+  "written_at": "2026-09-22T22:42:40-04:00",
+  "expectation": "Using the same harness as gap 4, run the frozen job-recovery cases on Dagu 2.16.6, Prefect 3.8.6 and a Temporal dev server through one shared oracle and record per-case pass/fail plus setup steps (installs, downloads, processes started) and operational steps (commands to stop/retry/recover).",
+  "criteria": "Settled iff one invocation produced a per-engine per-case pass/fail table for all three engines with setup and operational steps recorded. Dagster and Restate are not in the next_check; they remain unexecuted and are named in limits. Partial table -> advanced."
+}

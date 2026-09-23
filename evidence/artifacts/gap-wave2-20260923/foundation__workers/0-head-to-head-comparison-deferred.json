@@ -1,0 +1,26 @@
+{
+  "id": "0-head-to-head-comparison-deferred",
+  "gap_index": 0,
+  "gap_text_sha256": "f7fffbc964e1eeefe71eb09a320182d9eaa793ac8cea188e43327d261c775e13",
+  "preregistration": {
+    "written_at": "2026-09-23T00:47:23Z",
+    "expectation": "This gap requires a 3-5 task head-to-head between native Claude workers and one pinned challenger, graded by a held-out oracle, with success/time/usage recorded per arm.",
+    "criteria": "Settled only if both arms actually run to completion on the same tasks with a real oracle grading; a single probe call cannot satisfy this.",
+    "timing": "post_hoc: written 2026-09-23T00:47:23Z by the first-round receipt generator, which hard-coded 00:55:00Z (later than the write and the first commit 1a4448c at 00:50:10Z, so not a real time). No check ran, so no result preceded it. Timing label first added in the fix round at 01:03:20Z and corrected in the reconciliation pass."
+  },
+  "commands": [
+    {
+      "cmd": "(analysis only, no execution — see limits)",
+      "exit": null,
+      "duration_s": 0,
+      "output_excerpt": "n/a",
+      "output_sha256": null
+    }
+  ],
+  "results": "Not run. This is a multi-task, multi-arm comparison, not a single bounded call. The Claude account is reserved for a peer session's long-horizon comparison (2026-09-23 00:33 UTC); dispatching native Claude workers for a 3-5 task suite would be exactly the multi-agent fan-out/long run this run is told to defer. The one-bounded-single-call allowance (usable with Codex) cannot substitute because the gap specifically requires a same-tasks two-arm comparison including a native-worker arm.",
+  "outcome": "deferred",
+  "evidence_class": "source_review",
+  "limits": "Deferred, not attempted. Owner: needs a session not under the Claude-account reservation, or explicit authorization to run a bounded native-worker arm. Blocker: gap requires a native-Claude-worker arm; this run's Claude usage is limited to at most one bounded single call, insufficient for a 3-5 task suite.",
+  "checked_at": "2026-09-23T00:47:23Z",
+  "reconciliation": "reconciliation 2026-09-23T02:21:44Z (no new checks; claims aligned to the transcripts and files on disk, see README 'Reconciliation'): fictitious 00:55:00Z timestamps replaced by the real write time."
+}

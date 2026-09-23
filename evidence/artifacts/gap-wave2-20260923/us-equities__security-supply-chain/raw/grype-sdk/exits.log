@@ -1,0 +1,14 @@
+6912fc526853724556519872207534d54bda90f9c22b48c9625b689c12b210fc  $HOME/codex-ecosystem/state/supply-chain-20260919/inventory/runtime.syft.json
+db-status exit=0
+sdk-json exit=0
+sdk-cdx exit=0
+mutated exit=0
+purls exit=0
+sbom artifacts: 36 Counter({'python': 36})
+sbom has openai ['3.16.2']
+sbom has openai-codex ['0.154.0']
+sbom has exchange-calendars ['4.13.2']
+grype cdx components by type: Counter({'file': 87, 'library': 36})
+sdk matches: 0 db built: 2026-09-23T06:31:39Z schema: v6.1.9 ids: []
+mutated matches: 5 db built: 2026-09-23T06:31:39Z schema: v6.1.9 ids: ['GHSA-9hjg-9r4m-mvj7', 'GHSA-9wx4-h78v-vm56', 'GHSA-gc5v-m9x4-r6x2', 'GHSA-j8r2-6x86-q33q', 'GHSA-x84v-xcm2-53pg']
+positive matches: 17 db built: 2026-09-23T06:31:39Z schema: v6.1.9 ids: ['GHSA-2xpw-w6gg-jr37', 'GHSA-34jh-p97f-mpxf', 'GHSA-38jv-5279-wg99', 'GHSA-9hjg-9r4m-mvj7', 'GHSA-9wx4-h78v-vm56', 'GHSA-g4mx-q9vg-27p4', 'GHSA-gc5v-m9x4-r6x2', 'GHSA-gm62-xv2j-4w53']

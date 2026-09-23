@@ -1,0 +1,11 @@
+{
+ "gap_index": 4,
+ "slug": "socraticode-holdout-recall",
+ "written_at": "2026-09-23T07:23:05Z",
+ "written_before_results": true,
+ "expectation": "Covered elsewhere: the semantic-rag wave-2 unit already ran a sealed 35-question held-out set with gold file:line spans against SocratiCode 1.14.0 (limit 5, recall@5 and MRR). This unit also adds its own 32-query exhaustive-gold run (gap 12) with limit 10.",
+ "criteria": [
+  "Verify the cited receipt exists on origin/main, is sealed before retrieval, has >=20 queries, limit>1 and reports recall@k and MRR.",
+  "If any clause is missing, record advanced instead of covered_elsewhere."
+ ]
+}

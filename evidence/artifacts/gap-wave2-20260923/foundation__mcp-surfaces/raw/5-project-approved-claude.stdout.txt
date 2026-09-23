@@ -1,0 +1,14 @@
+Checking MCP server health…
+
+serena: $HOME/.local/share/codex-ecosystem/bin/serena-context start-mcp-server --transport stdio --project-from-cwd --context claude-code --enable-web-dashboard true --open-web-dashboard false --enable-gui-log-window false - ✘ Failed to connect — CONNECTION_CLOSED: Connection closed
+ai-memory: http://127.0.0.1:49374/mcp (HTTP) - ✘ Failed to connect — ENETUNREACH: ENETUNREACH: Was there a typo in the url or port?
+socraticode: $HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js - ✔ Connected
+
+MCP config diagnostics ⚠
+
+For help configuring MCP servers, see: https://code.claude.com/docs/en/mcp
+
+[Contains warnings] Project config (shared via .mcp.json)
+Location: $HOME/code/agent-lab/.mcp.json
+ └ [Warning] [socraticode] mcpServers.socraticode: Leading or trailing whitespace in: env.EMBEDDING_QUERY_PREFIX, env.EMBEDDING_DOCUMENT_PREFIX
+

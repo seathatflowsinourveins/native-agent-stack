@@ -1,0 +1,26 @@
+[09/23/26 03:27:22] WARNING  Control server failed to start (eval server.py:1862
+                             will run without control surface):                 
+                             AF_UNIX path too long                              
+Running 1 tasks...
+---------------------------------------------------------                       
+catalog_cases (8 samples): mockllm/model                                        
+max_connections: 1, retry_on_error: 1, max_samples: 1, delay: 1.5, dataset:     
+(samples)                                                                       
+---------------------------------------------------------                       
+                                                                                
+generate     | Steps:   6/8  75% | Samples:   6/  8 | accuracy: 0.33 | mockllm:  0/ 1 | HTTP retries: 0
+generate     | Steps:   8/8 100% | Samples:   8/  8 | accuracy: 0.38 | mockllm:  0/ 1 | HTTP retries: 0
+
+---------------------------------------------------------                       
+catalog_cases (8 samples): mockllm/model                                        
+max_connections: 1, retry_on_error: 1, max_samples: 1, delay: 1.5, dataset:     
+(samples)                                                                       
+                                                                                
+total time:                    0:00:08                                          
+mockllm/model                  0 tokens [I: 0, O: 0]                            
+promptfoo_equivalent_assertions                                                 
+accuracy                         0.375                                          
+Log:                                                                            
+../../../../../../.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/in…
+---------------------------------------------------------                       
+                                                                                

@@ -1,0 +1,410 @@
+{
+  "id": "identity-provenance-g2-dvc-executes-selection-quarantine",
+  "gap_index": 2,
+  "gap_text_sha256": "268937f91e52e677c3a410fecfe26a032f2eed990ec7a8d6c77087c8b4bd03a8",
+  "gap_text": "The identity-readiness receipt demonstrates bounded observation-time selection and quarantine through project-local adapters. It does not qualify DVC or another candidate as the executing implementation.",
+  "preregistration": {
+    "written_at": "2026-09-23T04:57:25Z",
+    "written_at_note": "written_at is approximate (between the 04:57:11Z shell stamp and the 04:57:40Z first commit). Written and committed before any gap-wave-2 check for this layer ran. Each receipt copies its entry verbatim.",
+    "committed_in": "7078d05 (Preregister gap-wave-2 checks for us-equities identity-provenance), before any check ran",
+    "source": "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration.json",
+    "expectation": "DVC can be the executing implementation of the selection and quarantine path in the sense that `dvc repro` runs the select stages and a quarantine stage (asserting exit 2 for tampered snapshot, wrong digest and unknown-availability source) and the stage outputs, restored by `dvc checkout`, equal the project-local adapter results. The identity-readiness security-identity ledger (Alpaca captures) is not reproducible offline here, so the quarantine compared is replay.py's exit-code-2 path, not the zero-volume quarantine row of the identity-readiness receipt.",
+    "criteria": [
+      "C2.1 dvc.yaml has select stages per cutoff and a quarantine stage; `dvc repro` exits 0 and dvc.lock records their outs.",
+      "C2.2 Quarantine stage records exit 2 for: wrong --snapshot-sha256, parquet byte tamper of a DVC-restored copy, and each unknown-availability source mutation; and exit 0 for the unmutated control.",
+      "C2.3 The DVC-produced select outputs (restored via checkout after deletion) equal the project-local adapter outputs on canonical records and selection_sql_sha256 for every cutoff; snapshot_sha256 fields differ only because each materialization stamps ingested_at.",
+      "C2.4 Also check whether the identity-readiness ledger adapter (security-identity) can run offline from repository data; if it cannot, record that clause as remaining.",
+      "Outcome rule: settled only if C2.1-C2.3 pass and C2.4 shows the identity-readiness adapter path also ran through DVC; otherwise advanced naming what remains."
+    ],
+    "amendments_after_preregistration": [
+      {
+        "at": "2026-09-23T05:01Z (approx.)",
+        "late": true,
+        "change": "Installed pytz==2026.3.post1 (pinned in adoption/sdk/requirements-linux-x86_64-py313.lock) after a debug run showed temporal_snapshot.py select needs it for DuckDB TIMESTAMPTZ fetch."
+      },
+      {
+        "at": "2026-09-23T05:02Z (approx.)",
+        "late": true,
+        "change": "Attempt 1 (one git+DVC repo) failed: security-identity probe.py refuses to write inside a git work tree (ValueError private_output_must_be_outside_git). The identity chain moved to a `dvc init --no-scm` repo. Log kept: raw/dvc/attempt1-run.log."
+      },
+      {
+        "at": "2026-09-23T05:05Z (approx.)",
+        "late": true,
+        "change": "Attempt 2 passed; attempt 3 (cited) added an explicit native `dvc add` / delete / `dvc checkout` / select arm. Log kept: raw/dvc/attempt2-run.log."
+      },
+      {
+        "at": "2026-09-23T05:04Z (approx.)",
+        "late": true,
+        "change": "C0.3 raw diff flags data/.gitignore and out/.gitignore. These are git-tracked files that DVC writes and git restores. The comparison reports them separately and checks the 14 DVC-tracked files on their own."
+      },
+      {
+        "at": "2026-09-23T05:25Z (approx.)",
+        "late": true,
+        "change": "The outcome is stricter than the preregistered rule. C2.4 ran, but only on the security-identity test suite's synthetic transport. The retained identity-readiness captures are private and outside the repository, and they were not used, so the outcome is advanced rather than settled."
+      }
+    ]
+  },
+  "commands": [
+    "bash blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_dvc_arm.sh $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z",
+    "$HOME/.cache/gap-wave2-20260923/identity-provenance/venv-core/bin/python blueprints/gap-wave2-20260923/us-equities__identity-provenance/compare_dvc_arm.py $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z $PWD > comparison.json",
+    "(inside run_dvc_arm.sh, cwd = scratch `dvc init --no-scm` repo) dvc repro (id_capture -> id_quality -> id_ledger -> id_select); dvc repro; rm -rf data out; dvc checkout; stage.py id-select on the restored ledger; dvc repro --force; project-local arm: stage.py id-capture/id-quality/id-ledger/id-select against blueprints/us-equities/security-identity"
+  ],
+  "results": {
+    "exit_codes": {
+      "git_repro1_exit": "0",
+      "identity_repro1_exit": "0",
+      "identity_repro2_exit": "0",
+      "identity_checkout_exit": "0",
+      "identity_restore_diff_exit": "0",
+      "restored_id_select_exit": "0",
+      "restored_ns_quarantine_exit": "0",
+      "restored_pit_quarantine_exit": "0",
+      "local_id_select_exit": "0"
+    },
+    "C2.1_stages_in_dvc_lock": "git repo: ns_select, ns_quarantine, pit_select, pit_quarantine; no-scm repo: id_capture, id_quality, id_ledger, id_select (raw/dvc/run.log `cat dvc.lock`)",
+    "C2.1_second_repro_skipped": [
+      "ns_materialize",
+      "ns_select",
+      "ns_quarantine",
+      "pit_snapshot",
+      "pit_select",
+      "pit_quarantine",
+      "id_capture",
+      "id_quality",
+      "id_ledger",
+      "id_select"
+    ],
+    "C2.2_quarantine_exit_codes_by_arm": {
+      "replay": {
+        "materialize:control_unmutated": {
+          "dvc_repro": 0,
+          "dvc_restored_rerun": 0,
+          "expected": 0,
+          "project_local": 0
+        },
+        "materialize:obs_available_at_date_only": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "materialize:obs_available_at_null": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "materialize:obs_available_at_removed": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "materialize:obs_backdated_event_after_availability": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "materialize:universe_available_at_removed": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "select:control_restored_snapshot": {
+          "dvc_repro": 0,
+          "dvc_restored_rerun": 0,
+          "expected": 0,
+          "project_local": 0
+        },
+        "select:parquet_tamper": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "select:wrong_snapshot_sha256": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        }
+      },
+      "temporal_snapshot": {
+        "snapshot:availability_basis_unknown": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "snapshot:availability_evidence_empty": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "snapshot:available_at_date_only": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "snapshot:available_at_null": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "snapshot:available_at_removed": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "snapshot:control_unmutated": {
+          "dvc_repro": 0,
+          "dvc_restored_rerun": 0,
+          "expected": 0,
+          "project_local": 0
+        }
+      }
+    },
+    "C2.3_selection_equal_to_project_local": {
+      "replay_records": true,
+      "replay_sql_hash": true,
+      "pit_records": true,
+      "pit_sql_hash": true
+    },
+    "C2.4_identity_chain": {
+      "restore": {
+        "differing": [],
+        "differing_are_only_git_tracked_gitignores": true,
+        "dvc_tracked_files_identical": true,
+        "files_after": 82,
+        "files_before": 82
+      },
+      "counts_qualified_quarantined_and_sql_hash_equal_across_dvc_repro_restored_local": true,
+      "counts_by_arm": {
+        "dvc_repro": {
+          "after-observation-meta_mapped": [
+            3,
+            3,
+            0,
+            "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+          ],
+          "after-observation-meta_unmapped": [
+            2,
+            1,
+            1,
+            "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+          ],
+          "before-first-observation": [
+            0,
+            0,
+            0,
+            "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+          ],
+          "historical-2022-meta_unmapped": [
+            0,
+            0,
+            0,
+            "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+          ]
+        },
+        "dvc_restored_rerun": {
+          "after-observation-meta_mapped": [
+            3,
+            3,
+            0,
+            "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+          ],
+          "after-observation-meta_unmapped": [
+            2,
+            1,
+            1,
+            "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+          ],
+          "before-first-observation": [
+            0,
+            0,
+            0,
+            "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+          ],
+          "historical-2022-meta_unmapped": [
+            0,
+            0,
+            0,
+            "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+          ]
+        },
+        "project_local": {
+          "after-observation-meta_mapped": [
+            3,
+            3,
+            0,
+            "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+          ],
+          "after-observation-meta_unmapped": [
+            2,
+            1,
+            1,
+            "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+          ],
+          "before-first-observation": [
+            0,
+            0,
+            0,
+            "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+          ],
+          "historical-2022-meta_unmapped": [
+            0,
+            0,
+            0,
+            "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+          ]
+        }
+      },
+      "quarantine_preserved_all_arms": true,
+      "refusals_all_arms": {
+        "dvc_repro": {
+          "bars_parquet_tamper": {
+            "error": "ValueError: artifact_hash_mismatch",
+            "refused": true
+          },
+          "wrong_manifest_sha256": {
+            "error": "ValueError: manifest_hash_mismatch",
+            "refused": true
+          }
+        },
+        "dvc_restored_rerun": {
+          "bars_parquet_tamper": {
+            "error": "ValueError: artifact_hash_mismatch",
+            "refused": true
+          },
+          "wrong_manifest_sha256": {
+            "error": "ValueError: manifest_hash_mismatch",
+            "refused": true
+          }
+        },
+        "project_local": {
+          "bars_parquet_tamper": {
+            "error": "ValueError: artifact_hash_mismatch",
+            "refused": true
+          },
+          "wrong_manifest_sha256": {
+            "error": "ValueError: manifest_hash_mismatch",
+            "refused": true
+          }
+        }
+      },
+      "raw_selected_rows_sha256_equal": {
+        "after-observation-meta_mapped": false,
+        "after-observation-meta_unmapped": false,
+        "before-first-observation": true,
+        "historical-2022-meta_unmapped": true
+      },
+      "raw_difference_cause": {
+        "frozen_at": {
+          "dvc_after_force_repro": "2026-09-23T05:06:22.553746021Z",
+          "project_local": "2026-09-23T05:06:34.099525496Z"
+        },
+        "note": "probe.collect stamps frozen_at (wall clock) into freeze.json; the receipt anchors derived from it are row columns acquisition_receipt_sha256/derivation_receipt_sha256"
+      },
+      "anchor_stripped_rows_equal": true,
+      "detection_note": "The raw selected_rows_sha256 differs wherever rows are selected, because probe.collect stamps frozen_at and the receipt anchors become row columns. That difference shows the comparator detects row-level change. With only the two anchor columns set to NULL, the rows are equal."
+    },
+    "git_guard_finding": "Attempt 1 raised ValueError private_output_must_be_outside_git from probe.new_directory inside a git+DVC repo (raw/dvc/attempt1-run.log). The identity capture chain runs under DVC only as `dvc init --no-scm`."
+  },
+  "outcome": "advanced",
+  "outcome_reason": "DVC (`dvc repro` plus restore) now executes the replay and point-in-time selection and quarantine paths. It also executes the full security-identity capture, quality, ledger and select chain with its zero-activity quarantine (2 rows, 1 qualified, 1 quarantined). Restored outputs equal the project-local adapter path on counts, selection_sql_sha256 and anchor-stripped rows, and all refusals are preserved.",
+  "remaining": [
+    "Run the identity-readiness receipt's own retained Alpaca captures (private, outside the repository) through the DVC no-scm pipeline, offline, and compare with native-receipt.json's eligibility hashes. This needs the private capture directory, which this unit did not access.",
+    "Decide whether an identity pipeline in a `--no-scm` repo meets the layer's reproducibility needs. In that mode dvc.lock has no git history. A git-backed DVC repo is refused by the adapters' outside-git guard."
+  ],
+  "evidence_class": "local_integration",
+  "limits": [
+    "Synthetic transport from tests/test_security_identity.py (zero_capture); no provider request, broker contact or credential read.",
+    "The native identity-readiness run used alpaca-py 0.44.0 transport; this run patches native_identity and fetch exactly as the unit tests do."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/run.log",
+      "sha256": "a39ec6cb789d60c088f80efbd08d9fc8198446229e9ed8c7d366162b8de311a8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/attempt1-run.log",
+      "sha256": "ad9a05e951b2d543df97f70a5a01065de7ad0f1de199bb15322ab1384177073f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/comparison.json",
+      "sha256": "e578bf3dedadcb349e380b6d1ef7d37a4adeb1e5009938d9059dc1d51134b983"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/identity-pre-delete.sha256",
+      "sha256": "cee04aca728979a4c02316b119f7464040c2c5fda8579adb9f960937d407b191"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/identity-post-checkout.sha256",
+      "sha256": "cee04aca728979a4c02316b119f7464040c2c5fda8579adb9f960937d407b191"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/identity-post-force.sha256",
+      "sha256": "6cef213400b727024a722639f6cd04deda08766a190be3c3f5b58a981a66c8d7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/identity-repro-out__id_select.json",
+      "sha256": "5718833a644a769e6169958448dbaa1b064d104690dce97c5e22380f607345e9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/restored-rerun__id_select.json",
+      "sha256": "5718833a644a769e6169958448dbaa1b064d104690dce97c5e22380f607345e9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/local__id_select.json",
+      "sha256": "4b84bcf59a78779d0584dbc451a7b0e899c73b87378909055ea2087c7532204e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/restored-rerun__id_ledger.json",
+      "sha256": "c6ac4fc1915aba417554ba8b39b35106f2acfa6c8d9946738ef591fc722caa96"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/local__id_ledger.json",
+      "sha256": "996b32c9563addcad40bffda7d8ae0d6fb1faac834bc82d24f60bca13becab96"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/repo-identity__dvc.lock",
+      "sha256": "166b7081b10d37335e108d87b157919d40f5fdbc3f0d5e1d642f03eb62d29898"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/git-repro-out__ns_quarantine.json",
+      "sha256": "466d09d79e29aea9e593de4192e57d1a788afb69bb919ecb6ab231329ad6a84a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/git-repro-out__pit_quarantine.json",
+      "sha256": "c06115156ef5f5f0b201c20bc2c7f23bd0ea11f78a57c47d1ba25786f651f332"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/local__pit_select.json",
+      "sha256": "9ec569276cec5429ec4d9c4b7e103dbf21dd0d0b58b4a81fff78379297d644cb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/local__pit_quarantine.json",
+      "sha256": "2b171998b32b57dc056b65a0c08e24415bd6ab7e3567569d65ae50c4044e5a1a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/local.sha256",
+      "sha256": "d1faab665d238772d72946a35a7c96c2c38b2f745b99b80734f605b2de4e79c6"
+    }
+  ],
+  "helpers": [
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_dvc_arm.sh",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/dvc.yaml",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/dvc-identity.yaml",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/compare_dvc_arm.py"
+  ],
+  "checked_at": "2026-09-23T05:52:31Z",
+  "layer": "us-equities/identity-provenance",
+  "crosswalk": "main 92bb279, crosswalk PR #85"
+}

@@ -1,0 +1,163 @@
+{
+  "candidates": {
+    "cash": {
+      "episodes": 260,
+      "note": "no invested episode; engine not needed",
+      "orders": 0
+    },
+    "equalweight": {
+      "account_rows": 1624,
+      "alerts_fired": 57,
+      "credited_dividend_cash_usd": "7156.72",
+      "credited_minus_unmodelled_usd": "-0.92",
+      "distribution_credits": 63,
+      "dividend_contribution_per_episode": "0.000275258461538461538461538462",
+      "ending_cash_native_equals_ledger": "1103942.03",
+      "episodes": 260,
+      "fills_reconciled": 1560,
+      "fixed_case_total_pnl_without_dividends_usd": "96785.31",
+      "mean_gross_price_label": "0.003791554409528185485714460015",
+      "mean_native_net_return_per_episode_with_dividends": "0.003997770384615384615384615385",
+      "mean_native_net_return_per_episode_without_dividends": "0.003722511923076923076923076923",
+      "mean_net_cost_proxy_label_20bp": "0.001791554409528185485714460017",
+      "mutation_self_tests": {
+        "cash_corrupted_first_transition": "account transitions differ: native 1623 rows, ledger 1623",
+        "dividend_account_row_removed": "account transitions differ: native 1622 rows, ledger 1623",
+        "dividend_account_row_shifted_to_0100": "account transitions differ: native 1623 rows, ledger 1623",
+        "dividend_account_transition_off_by_one_cent": "account transitions differ: native 1623 rows, ledger 1623",
+        "emission_amount_off_by_one_cent": "distribution emissions differ from ledger credits",
+        "emission_instant_shifted_one_hour": "distribution emissions differ from ledger credits",
+        "emission_removed": "distribution emissions differ from ledger credits",
+        "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}"
+      },
+      "nonzero_distribution_credits": 63,
+      "orders": 1560,
+      "previously_reported_unmodelled_dividend_cash_usd": "7157.64",
+      "report_sha256": {
+        "account": "0bf9384b19abe498b1cf4fdc7612dcde09ac75ac0abe0447ae6c5b7970579c19",
+        "fills": "75e6b4ed23bcb69fe26c96b1e68603bf8a36bab90032433e2ce9c955ac6d0c29"
+      },
+      "total_pnl_usd": "103942.03"
+    },
+    "momentum120": {
+      "account_rows": 518,
+      "alerts_fired": 57,
+      "credited_dividend_cash_usd": "5221.74",
+      "credited_minus_unmodelled_usd": "2.67",
+      "distribution_credits": 63,
+      "dividend_contribution_per_episode": "0.000200836153846153846153846154",
+      "ending_cash_native_equals_ledger": "1100118.00",
+      "episodes": 260,
+      "fills_reconciled": 454,
+      "fixed_case_total_pnl_without_dividends_usd": "94896.26",
+      "mean_gross_price_label": "0.003669413222858226001110052234",
+      "mean_native_net_return_per_episode_with_dividends": "0.003850692307692307692307692308",
+      "mean_native_net_return_per_episode_without_dividends": "0.003649856153846153846153846154",
+      "mean_net_cost_proxy_label_20bp": "0.001923259376704379847263898388",
+      "mutation_self_tests": {
+        "cash_corrupted_first_transition": "account transitions differ: native 517 rows, ledger 517",
+        "dividend_account_row_removed": "account transitions differ: native 516 rows, ledger 517",
+        "dividend_account_row_shifted_to_0100": "account transitions differ: native 517 rows, ledger 517",
+        "dividend_account_transition_off_by_one_cent": "account transitions differ: native 517 rows, ledger 517",
+        "emission_amount_off_by_one_cent": "distribution emissions differ from ledger credits",
+        "emission_instant_shifted_one_hour": "distribution emissions differ from ledger credits",
+        "emission_removed": "distribution emissions differ from ledger credits",
+        "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}"
+      },
+      "nonzero_distribution_credits": 19,
+      "orders": 454,
+      "previously_reported_unmodelled_dividend_cash_usd": "5219.07",
+      "report_sha256": {
+        "account": "c6100df86fd1cfc9447a5f2048b3443f496f27786751ffdb4a1a635265b1292d",
+        "fills": "61fd98d298171f9a5f283e0cf543e15f9c6538e9a58257dd1a7b4235ef276916"
+      },
+      "total_pnl_usd": "100118.00"
+    },
+    "momentum20": {
+      "account_rows": 476,
+      "alerts_fired": 57,
+      "credited_dividend_cash_usd": "5172.13",
+      "credited_minus_unmodelled_usd": "-3.88",
+      "distribution_credits": 63,
+      "dividend_contribution_per_episode": "0.000198928076923076923076923077",
+      "ending_cash_native_equals_ledger": "1072999.73",
+      "episodes": 260,
+      "fills_reconciled": 412,
+      "fixed_case_total_pnl_without_dividends_usd": "67827.60",
+      "mean_gross_price_label": "0.002625816040226568298490841387",
+      "mean_native_net_return_per_episode_with_dividends": "0.002807681923076923076923076923",
+      "mean_native_net_return_per_episode_without_dividends": "0.002608753846153846153846153846",
+      "mean_net_cost_proxy_label_20bp": "0.001041200655611183683106226002",
+      "mutation_self_tests": {
+        "cash_corrupted_first_transition": "account transitions differ: native 475 rows, ledger 475",
+        "dividend_account_row_removed": "account transitions differ: native 474 rows, ledger 475",
+        "dividend_account_row_shifted_to_0100": "account transitions differ: native 475 rows, ledger 475",
+        "dividend_account_transition_off_by_one_cent": "account transitions differ: native 475 rows, ledger 475",
+        "emission_amount_off_by_one_cent": "distribution emissions differ from ledger credits",
+        "emission_instant_shifted_one_hour": "distribution emissions differ from ledger credits",
+        "emission_removed": "distribution emissions differ from ledger credits",
+        "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}"
+      },
+      "nonzero_distribution_credits": 16,
+      "orders": 412,
+      "previously_reported_unmodelled_dividend_cash_usd": "5176.01",
+      "report_sha256": {
+        "account": "8812a0dc5b35d86c0847da4f202185b49c42922c0f947b5ff38a8f1ad834acc9",
+        "fills": "5058b163b278fa1632cddd3426c50583854ee5709523743e918c7aadb3cf13cb"
+      },
+      "total_pnl_usd": "72999.73"
+    },
+    "momentum60": {
+      "account_rows": 488,
+      "alerts_fired": 57,
+      "credited_dividend_cash_usd": "4852.58",
+      "credited_minus_unmodelled_usd": "-5.97",
+      "distribution_credits": 63,
+      "dividend_contribution_per_episode": "0.000186637692307692307692307693",
+      "ending_cash_native_equals_ledger": "1073686.17",
+      "episodes": 260,
+      "fills_reconciled": 424,
+      "fixed_case_total_pnl_without_dividends_usd": "68833.59",
+      "mean_gross_price_label": "0.002665154746893804428543657945",
+      "mean_native_net_return_per_episode_with_dividends": "0.002834083461538461538461538462",
+      "mean_native_net_return_per_episode_without_dividends": "0.002647445769230769230769230769",
+      "mean_net_cost_proxy_label_20bp": "0.001034385516124573659312888714",
+      "mutation_self_tests": {
+        "cash_corrupted_first_transition": "account transitions differ: native 487 rows, ledger 487",
+        "dividend_account_row_removed": "account transitions differ: native 486 rows, ledger 487",
+        "dividend_account_row_shifted_to_0100": "account transitions differ: native 487 rows, ledger 487",
+        "dividend_account_transition_off_by_one_cent": "account transitions differ: native 487 rows, ledger 487",
+        "emission_amount_off_by_one_cent": "distribution emissions differ from ledger credits",
+        "emission_instant_shifted_one_hour": "distribution emissions differ from ledger credits",
+        "emission_removed": "distribution emissions differ from ledger credits",
+        "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}"
+      },
+      "nonzero_distribution_credits": 16,
+      "orders": 424,
+      "previously_reported_unmodelled_dividend_cash_usd": "4858.55",
+      "report_sha256": {
+        "account": "a084e9005eea3b108120beffad9c9537f1b9cb5214eab8773e6a3e0de6fc2bf3",
+        "fills": "f6f45d08d5d3627b3d9d3c5952ee938fb928e1a46e357cfa95e0ca42838a4239"
+      },
+      "total_pnl_usd": "73686.17"
+    }
+  },
+  "case": "fixed (FixedFeeModel 1 USD per order) with DistributionModule per instrument",
+  "distribution_events": {
+    "IWM": 21,
+    "QQQ": 21,
+    "SPY": 21
+  },
+  "engine": "2.0.0rc5",
+  "first_entry": "2016-01-15",
+  "inputs_unchanged": true,
+  "last_exit": "2021-03-31",
+  "ledger_sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672",
+  "no_dividend_summary_sha256": "6b2caa703307c04396093ef651a1404f86839b8f2491f94db28ff9ae3a77b96a",
+  "notional_usd": "100000",
+  "runner_sha256": "0db727fef6e8cce90789506657f5d04233cbd1549fe591e47bb4f702ea4b64ad",
+  "vendored_distribution_module": {
+    "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/vendored/distribution_module.py",
+    "sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b"
+  }
+}

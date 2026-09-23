@@ -1,0 +1,9 @@
+23:07:18.837 | INFO    | Flow run 'exceptional-potoo' - Beginning flow run 'exceptional-potoo' for flow 'recovery'
+23:07:18.842 | INFO    | Flow run 'exceptional-potoo' - View at http://127.0.0.1:57430/runs/flow-run/<uuid-2>
+23:07:18.928 | INFO    | Task run 'checkpoint-7f3' - Finished in state Completed()
+23:12:11.193 | INFO    | prefect.runner - SIGTERM received, initiating graceful shutdown...
+$HOME/.cache/gap-wave2-20260923/scheduling-supervision/challengers/prefect-3.8.6/lib/python3.13/site-packages/prefect/runner/runner.py:596: RuntimeWarning: coroutine 'Runner.astop' was never awaited
+  self.stop()
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+23:12:11.199 | INFO    | prefect.runner - Pausing all deployments...
+23:12:11.221 | INFO    | prefect.runner - All deployments have been paused!

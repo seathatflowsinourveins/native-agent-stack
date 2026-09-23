@@ -1,0 +1,607 @@
+{
+  "id": "gap-wave2-20260923-us-equities-portfolio-risk-14-parity-and-paper",
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "gap_index": 14,
+  "gap_text": "Broker-specific execution, deterministic pre-trade enforcement and Nautilus/LEAN accounting parity require separate acceptance.",
+  "gap_text_sha256": "b71fbb1085af2bbc18b7cf144661e5a276b2763aacea76f46b22bd235fc88900",
+  "next_check": "Run the same weight schedule through the NautilusTrader 2.0.0rc5 and LEAN backtests and diff cash, positions and fees. Then submit Alpaca paper orders through Nautilus with RiskEngine limits and reconcile the broker-reported fills.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:32:44Z",
+    "expectation": "The Nautilus-versus-LEAN weight-schedule parity is covered under the peer session sota-workflow-resolution's SPY/LEAN parity preregistration, and Alpaca paper order submission with RiskEngine limits is a broker-contact lane owned by that same peer. No broker contact or paper-account call is made by this unit.",
+    "criteria": "deferred with owner sota-workflow-resolution; the local RiskEngine denial evidence from gap 6 is cited as a partial input only.",
+    "fix_round_4_addendum": {
+      "written_at": "2026-09-23T16:01:45Z",
+      "label": "fix-round-4 preregistration, written after the second independent Opus review and before the fix-round-4 runs",
+      "text": "Fix round 4 after the Opus review (LEAN arm executable here but not run): run the first arm of the next_check. A new C# algorithm (lean_parity/WeightScheduleParityAlgorithm.cs) replays raw/4-10/skfolio-fold-weights.json (sha256 30e9b17a989c288357889b4c4d91254450c2b52c97dca509ec20139161f81765) for meanrisk_min_variance and hrp_variance in native LEAN 985ef30 (the accepted patched build) on the same raw daily SPY/QQQ/IWM bars: 1,000,000 USD, the same sizing rule floor(equity x 0.99 x weight / close) with Decimal weights parsed from the float repr, sells submitted and filled before buys, liquidation at the 2021-03-31 close. Declared LEAN settings: ConstantFeeModel 1 USD per order; a close-fill model (FillModel subclass that fills market orders at the triggering daily bar's close at 16:00 New York, because LEAN's MarketOrder helper converts daily-resolution orders to MarketOnOpen/MarketOnClose); orders submitted with SubmitOrderRequest(OrderType.Market); margin account, leverage 1, immediate settlement; no fill-forward. Runs use the execution-realism bwrap sandbox (no network, read-only engine/data). Cases: (a) no_dividends, factor files hidden by a tmpfs over /data/equity/usa/factor_files, diffed against raw/4-10/nautilus-run-fix2; (b) dividends, LEAN's native raw-mode dividend cash, diffed against raw/4/nautilus-dividends-run-fix3 (peer DistributionModule); (c) negative control, fee 2 USD without dividends, diffed against fix2 and required to be reported as a mismatch. Criteria per optimizer in (a) and (b): fills equal exactly as a multiset of (16:00 New York timestamp, asset, side, quantity, fill price, fee), reading LEAN's native order-events JSON; rebalance decisions equal exactly (date, equity before, integer targets); every cash transition after each fill (and, in (b), each dividend credit with ex-date, asset, quantity and amount) equal exactly in order; total fees equal; ending cash equal exactly; final positions flat. Detection: mutation self-tests on copies of the LEAN outputs (fill price +0.0001, fill time +1 h, one fill removed, first cash transition +0.01, one fee +0.01, one dividend credit removed in (b)) must each be detected, and case (c) must be detected natively. Expected: (a) and (b) match exactly and (c) is detected. Any mismatch is reported with the first differing rows, not tolerated. Outcome: advanced at best, because the Alpaca paper-order arm stays deferred to its owner sota-workflow-resolution; LEAN runs exceeding 20 minutes are stopped and recorded."
+    },
+    "fix_round_4_review_addendum": {
+      "written_at": "2026-09-23T16:33:32Z",
+      "label": "fix-round-4 review-rerun preregistration, written after the Codex round-4 review and before the reruns",
+      "text": "Fix round 4, review rerun (after the Codex round-4 review, finding 1 and 3): compare.py will split the checks into LEAN-internal checks (run completed, statuses, algorithm ledger fills equal native order events, ledger well formed) and cross-engine checks; the fee-2 control counts as detected only if the internal checks pass and a cross-engine check raises, and each mutation counts as detected only if the internal checks pass on the mutated copy and a cross-engine check raises. Rerun compare.py on the committed LEAN outputs into raw/14/lean-parity-compare-fix4b.json; no LEAN rerun. The mounted-input count in the receipt will be generated from run.json. Expected: all matches and detections unchanged."
+    }
+  },
+  "commands": [
+    {
+      "cmd": "git log origin/main -1 -- blueprints/us-equities/engine-nautilus/spy-parity/{receipt-v2,verdict-v2,dividend-module-receipt}.json; git show ... | sha256sum",
+      "exit": 0,
+      "output": "raw/14/citation-check.txt"
+    },
+    {
+      "cmd": "python3 blueprints/gap-wave2-20260923/us-equities__portfolio-risk/lean_parity/run.py --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30 --dotnet $HOME/.local/share/codex-ecosystem/tools/dotnet-equity10/dotnet --weights evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/skfolio-fold-weights.json --out $CACHE/lean-parity-attempt1",
+      "exit": 0,
+      "started_utc": "2026-09-23T16:03:50Z",
+      "finished_utc": "2026-09-23T16:04:09Z",
+      "note": "fix round 4 (preregistered 16:01:45Z in 21899c4): first and only execution; 1 csc compile and 6 LEAN launcher runs (3 cases x 2 optimizers), each exit 0 inside Bubblewrap (no network, read-only engine/SDK/data, empty environment); every mounted engine/data file hash-unchanged (count in results, from run.json); outputs copied to raw/14/lean-parity-run with $HOME/host-name redaction (raw/REDACTIONS.json lean_parity_redacted), LEAN's >1 MB full result JSONs and the DLL listed with sha256 in raw/14/lean-parity-run/NOT_COPIED.json",
+      "output": [
+        "raw/14/lean-parity-run.stdout.txt",
+        "raw/14/lean-parity-run.stderr.txt",
+        "raw/14/lean-parity-run/run.json"
+      ]
+    },
+    {
+      "cmd": "python3 blueprints/gap-wave2-20260923/us-equities__portfolio-risk/lean_parity/compare.py --lean-out $CACHE/lean-parity-attempt1 --nautilus-base evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2 --nautilus-dividends evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3 --out $CACHE/lean-parity-attempt1-compare-dev.json",
+      "exit": 0,
+      "started_utc": "2026-09-23T16:05Z (approximate; exact second not captured)",
+      "output": "raw/14/lean-parity-compare-first-on-cache.json",
+      "note": "first comparison, on the cache copy"
+    },
+    {
+      "cmd": "python3 blueprints/gap-wave2-20260923/us-equities__portfolio-risk/lean_parity/compare.py --lean-out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run --nautilus-base evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2 --nautilus-dividends evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3 --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-compare.json",
+      "exit": 0,
+      "started_utc": "2026-09-23T16:06:06Z",
+      "output": [
+        "raw/14/lean-parity-compare.json",
+        "raw/14/lean-parity-compare.stdout.txt"
+      ],
+      "note": "same comparison on the committed, redacted copy; every match, detection and mutation result is identical to the first comparison"
+    },
+    {
+      "cmd": "python3 blueprints/gap-wave2-20260923/us-equities__portfolio-risk/lean_parity/compare.py --lean-out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run --nautilus-base evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2 --nautilus-dividends evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3 --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-compare-fix4b.json",
+      "exit": 0,
+      "started_utc": "2026-09-23T16:33:57Z",
+      "output": [
+        "raw/14/lean-parity-compare-fix4b.json",
+        "raw/14/lean-parity-compare-fix4b.stdout.txt"
+      ],
+      "note": "fix-round-4 review rerun (preregistered 16:33:32Z in 81e1c86, after the Codex round-4 review finding 1): LEAN-internal checks separated from cross-engine checks; the fee-2 control and each mutation count only when the internal checks pass and a cross-engine check raises; broken-control self-tests (runtime error injected, native fill inconsistent with the ledger) are not counted as detections. No LEAN rerun. These are the reported results."
+    }
+  ],
+  "results": {
+    "lean_parity": {
+      "no_dividends": {
+        "meanrisk_min_variance": {
+          "match": true,
+          "fills_matched": 33,
+          "decisions_matched": 22,
+          "cash_points_matched": 33,
+          "dividend_credits_matched": 0,
+          "nonzero_dividend_credits": 0,
+          "dividend_cash_usd": "0",
+          "fees_usd": "33.0",
+          "ending_cash_usd": "2009391.95",
+          "lean_summary_end_equity": "2009391.95",
+          "lean_summary_total_fees": "$33.00",
+          "mutation_self_tests_detected": {
+            "fill_price_plus_0.0001": true,
+            "fill_time_plus_one_hour": true,
+            "fill_fee_plus_0.01": true,
+            "last_fill_removed": true,
+            "first_cash_transition_plus_0.01": true,
+            "decision_equity_plus_0.01": true
+          }
+        },
+        "hrp_variance": {
+          "match": true,
+          "fills_matched": 66,
+          "decisions_matched": 22,
+          "cash_points_matched": 66,
+          "dividend_credits_matched": 0,
+          "nonzero_dividend_credits": 0,
+          "dividend_cash_usd": "0",
+          "fees_usd": "66.0",
+          "ending_cash_usd": "2279895.57",
+          "lean_summary_end_equity": "2279895.57",
+          "lean_summary_total_fees": "$66.00",
+          "mutation_self_tests_detected": {
+            "fill_price_plus_0.0001": true,
+            "fill_time_plus_one_hour": true,
+            "fill_fee_plus_0.01": true,
+            "last_fill_removed": true,
+            "first_cash_transition_plus_0.01": true,
+            "decision_equity_plus_0.01": true
+          }
+        }
+      },
+      "dividends": {
+        "meanrisk_min_variance": {
+          "match": true,
+          "fills_matched": 34,
+          "decisions_matched": 22,
+          "cash_points_matched": 91,
+          "dividend_credits_matched": 63,
+          "nonzero_dividend_credits": 30,
+          "dividend_cash_usd": "138948.42",
+          "fees_usd": "34.0",
+          "ending_cash_usd": "2207656.15",
+          "lean_summary_end_equity": "2207656.15",
+          "lean_summary_total_fees": "$34.00",
+          "mutation_self_tests_detected": {
+            "fill_price_plus_0.0001": true,
+            "fill_time_plus_one_hour": true,
+            "fill_fee_plus_0.01": true,
+            "last_fill_removed": true,
+            "first_cash_transition_plus_0.01": true,
+            "decision_equity_plus_0.01": true,
+            "one_nonzero_dividend_credit_removed": true
+          }
+        },
+        "hrp_variance": {
+          "match": true,
+          "fills_matched": 66,
+          "decisions_matched": 22,
+          "cash_points_matched": 123,
+          "dividend_credits_matched": 63,
+          "nonzero_dividend_credits": 63,
+          "dividend_cash_usd": "111669.90",
+          "fees_usd": "66.0",
+          "ending_cash_usd": "2451556.98",
+          "lean_summary_end_equity": "2451556.98",
+          "lean_summary_total_fees": "$66.00",
+          "mutation_self_tests_detected": {
+            "fill_price_plus_0.0001": true,
+            "fill_time_plus_one_hour": true,
+            "fill_fee_plus_0.01": true,
+            "last_fill_removed": true,
+            "first_cash_transition_plus_0.01": true,
+            "decision_equity_plus_0.01": true,
+            "one_nonzero_dividend_credit_removed": true
+          }
+        }
+      },
+      "control_fee2": {
+        "meanrisk_min_variance": {
+          "detected_as_mismatch": true,
+          "difference": "fill mismatch: {'index': 0, 'lean': \"('2016-01-12 16:00:00', 'IWM', 'BUY', Decimal('1788.0'), Decimal('103.72'), Decimal('2.0'))\", 'nautilus': \"('2016-01-12 16:00:00', 'IWM', 'BUY', Decimal('1788'), Decimal('103.7200'), Decimal('1.00'))\"}"
+        },
+        "hrp_variance": {
+          "detected_as_mismatch": true,
+          "difference": "fill mismatch: {'index': 0, 'lean': \"('2016-01-12 16:00:00', 'IWM', 'BUY', Decimal('4657.0'), Decimal('103.72'), Decimal('2.0'))\", 'nautilus': \"('2016-01-12 16:00:00', 'IWM', 'BUY', Decimal('4657'), Decimal('103.7200'), Decimal('1.00'))\"}"
+        }
+      }
+    },
+    "lean_parity_all_criteria_met": true,
+    "broken_control_self_tests": {
+      "meanrisk_min_variance": {
+        "runtime_error_injected": {
+          "counted_as_detected": false
+        },
+        "native_fill_inconsistent_with_ledger": {
+          "counted_as_detected": false
+        }
+      },
+      "hrp_variance": {
+        "runtime_error_injected": {
+          "counted_as_detected": false
+        },
+        "native_fill_inconsistent_with_ledger": {
+          "counted_as_detected": false
+        }
+      }
+    },
+    "mounted_engine_and_data_files_hash_unchanged": {
+      "count": 1465,
+      "unchanged": true
+    },
+    "lean_parity_summary": "Native LEAN 985ef30 and native NautilusTrader 2.0.0rc5 produce identical fills (time, asset, side, quantity, price, fee), rebalance decisions (equity and integer targets), cash sequences, total fees and ending cash for both optimizers: 2009391.95 / 2279895.57 USD without dividends and 2207656.15 / 2451556.98 USD with dividends (LEAN native raw-mode dividends versus the peer DistributionModule: 63 credits each, 138948.42 / 111669.90 USD). The fee-2 control is reported as a cross-engine mismatch with LEAN-internal checks passing, broken controls are not counted, and every mutation passes the LEAN-internal checks and is detected by a cross-engine comparison.",
+    "alpaca_paper": "deferred: submitting Alpaca paper orders through Nautilus and reconciling broker fills is a broker-contact lane owned by sota-workflow-resolution; this unit makes no broker or paper-account call",
+    "local_partial_input": "gap 6 shows RiskEngine notional and rate denials with simulated-venue reconciliation"
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Remaining (blocker named): the second arm of the next_check, Alpaca paper orders through Nautilus with RiskEngine limits and reconciliation of broker-reported fills, needs broker contact, which is reserved for peer session sota-workflow-resolution (owner). Broker-specific execution and deterministic pre-trade enforcement against a broker therefore remain open.",
+    "Declared LEAN conventions (preregistered): a project-authored close-fill model (FillModel subclass filling market orders at the triggering daily bar's close at 16:00 New York) replaces LEAN's default daily-order conversion to MarketOnOpen/MarketOnClose; orders are submitted with SubmitOrderRequest(OrderType.Market); margin account with leverage 1 and immediate settlement stands in for Nautilus's CASH account; no fill-forward. Parity is therefore shown for accounting under matched fill conventions, not for LEAN's default fill behaviour.",
+    "The no-dividend case hides LEAN's factor files with a tmpfs so LEAN emits no dividends (0 dividend rows observed); the dividend case uses LEAN's native raw-mode dividend credits and 63 dividend rows were observed per optimizer, so each case exercised what it claims.",
+    "Deviation from the preregistration: LEAN exposes cash to the algorithm only after all same-instant dividends are applied, so dividend cash is compared per ex-date instant (57 instants), while individual credits are compared by (ex-date, asset, quantity, amount); fills are compared per transition.",
+    "Evidence class local_integration: the C# algorithm, fill model, runner and comparison are project-authored; both engines are unmodified native builds. The LEAN build is the previously accepted patched 985ef30 engine.",
+    "Same 3 ETFs, daily bars and 22 decisions (21 fold rebalances plus the final liquidation) as gaps 4/10; no financing, borrowing, partial fills or liquidity limits are modelled in either engine."
+  ],
+  "checked_at": "2026-09-23T16:06:06Z",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/citation-check.txt",
+      "sha256": "c66543d49f6febf871e043611e8c1d27e9136fa4e977f00dec734167c4f1951f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-compare-first-on-cache.json",
+      "sha256": "05e0b2a515ca857ad5be6e877640e10f3c04120169d3b705411fa2f0100a3ebc"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-compare-fix4b.json",
+      "sha256": "e8b4871bcf0c78ded4763087e33c2a6503da8dc5f714cddfe6250244b79c6cb2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-compare-fix4b.stdout.txt",
+      "sha256": "8963969532beef3ab8a2520211d5c4a6d7f8d5fb32cf716fc64737e7aac7fdc8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-compare.json",
+      "sha256": "05e0b2a515ca857ad5be6e877640e10f3c04120169d3b705411fa2f0100a3ebc"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-compare.stdout.txt",
+      "sha256": "8963969532beef3ab8a2520211d5c4a6d7f8d5fb32cf716fc64737e7aac7fdc8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/NOT_COPIED.json",
+      "sha256": "ca4f6eaecf08ed26e3b071eccf392e389ba72b24837e0ec017144f053cff31c3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/build/WeightScheduleParityAlgorithm.cs",
+      "sha256": "a1b2f07efe269c1176cec1a4f69a5effdf69989ea3356e53fc6bb10395932ca5"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/build/compiler.rsp",
+      "sha256": "b697b9777849061d51b95184139de751962060ee7a794c1c5661b62a0bd3d960"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/build/hrp_variance.csv",
+      "sha256": "c48d4c70140e9a001c05b7a3a2a36b87ec57f06031ebff00c3b2ec0443b439e7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/build/meanrisk_min_variance.csv",
+      "sha256": "b0343b9a7dc1e1d0e4b3fbd66d46b1378076e3b4167f6f8322708e0c80a74150"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/compile.command.json",
+      "sha256": "23785425e4a0d88b8d93afa772183b445990fa865a129c8c442b047d2b33ee34"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/compile.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/compile.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/hrp_variance/WeightScheduleParityAlgorithm-log.txt",
+      "sha256": "66bec99c0a10ed0a6714ed5691c9bbee3a6ac300caa552726d326d921710840e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/hrp_variance/WeightScheduleParityAlgorithm-order-events.json",
+      "sha256": "ee4c3eadf62f1f35850cebd2e349b57454561519633f9067b1b528f3fce4ef79"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/hrp_variance/WeightScheduleParityAlgorithm-summary.json",
+      "sha256": "47977c8da5a355fe47ab8de2f113c28b9e160a913553f64594c57994506e6474"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/hrp_variance/config.json",
+      "sha256": "7ae9e14ff38077dcee5268ec9d43dfa19f11b0a57abf5a020c71b30b55483178"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/hrp_variance/data-monitor-report-20260923160409582.json",
+      "sha256": "17ad5d33d1c8f562fcb4c9681d347cfb94971a5afb2be3c1d7e6ea16f2112f7e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/hrp_variance/failed-data-requests-20260923160407838.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/hrp_variance/log.txt",
+      "sha256": "9dd950c0de8ff83d6e201759254222d20e5638e134161fa1016924ca02450d81"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/hrp_variance/parity-ledger.csv",
+      "sha256": "12dab63c0a85f940abae2e13889e4183ce1df4caa20a0cd6fd0894d98cbe01fc"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/hrp_variance/succeeded-data-requests-20260923160407838.txt",
+      "sha256": "a48a255f52fefad331f1f80352cca2d0196f54d13aee1407ea57cf007a577267"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/meanrisk_min_variance/WeightScheduleParityAlgorithm-log.txt",
+      "sha256": "ce2d41b74f97188e953a2c5294e5be5835d23c9d3085291fd3234b263904aa8f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/meanrisk_min_variance/WeightScheduleParityAlgorithm-order-events.json",
+      "sha256": "408ed8536aa908ff15e0b54140351df1c1d2dbbd2306aefec17e9ac46cebe001"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/meanrisk_min_variance/WeightScheduleParityAlgorithm-summary.json",
+      "sha256": "8c2a727b5c2c70754602e6d604e9c8f3dbac4821cc7c5b6d03e676908cedd519"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/meanrisk_min_variance/config.json",
+      "sha256": "42e604f670dc490a4b98bded12e35e1454b78f31f967e162dae9f049ad05ec52"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/meanrisk_min_variance/data-monitor-report-20260923160406624.json",
+      "sha256": "17ad5d33d1c8f562fcb4c9681d347cfb94971a5afb2be3c1d7e6ea16f2112f7e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/meanrisk_min_variance/failed-data-requests-20260923160404914.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/meanrisk_min_variance/log.txt",
+      "sha256": "e9ece4a56b96210319c0b3194c2902e17fdcc0cf3260411a4577b96fdfa70ee7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/meanrisk_min_variance/parity-ledger.csv",
+      "sha256": "f2adeb2c314f1f13486f7eca3f453897321da830939bba60c8907910095d8aaa"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/meanrisk_min_variance/succeeded-data-requests-20260923160404914.txt",
+      "sha256": "aa1baf55e26339423ba96296470c2b47fa7840b50f0fde8ec01d8a46444e9063"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2.hrp_variance.command.json",
+      "sha256": "865b4e85609af34ff02c2e1bc637598860439725afd6d4c277c858e148fe5ff6"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2.hrp_variance.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2.hrp_variance.stdout.txt",
+      "sha256": "97c31fe2579a26b0f1a4f472997c84888340e32cd6ef5c5f8a3541f581b2ce5e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2.meanrisk_min_variance.command.json",
+      "sha256": "b9bfacedd7f81e56cbaddfee1e1796a369f67d10d7ac4108128d3c223f83af2b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2.meanrisk_min_variance.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2.meanrisk_min_variance.stdout.txt",
+      "sha256": "34cbdc43004da35bc8d436944078b906fd8dfa234868af4aa55ca2b1f684747d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/hrp_variance/WeightScheduleParityAlgorithm-log.txt",
+      "sha256": "faf020cf8e2fc52651b182523779372597e7f78fee44b433e6736834992c90d4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/hrp_variance/WeightScheduleParityAlgorithm-order-events.json",
+      "sha256": "90e3db6ae1f25f61082e3635d34436c35885df964dd34e96276e6574d33f982c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/hrp_variance/WeightScheduleParityAlgorithm-summary.json",
+      "sha256": "b8c8f20f047f63cd612f443e82a81c78775c0239feb196504692f3d8a46f43bf"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/hrp_variance/config.json",
+      "sha256": "77ff165ef2eedd31976af48eb1d1390d7df637175b2514514e07b3077c05a854"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/hrp_variance/data-monitor-report-20260923160403737.json",
+      "sha256": "17ad5d33d1c8f562fcb4c9681d347cfb94971a5afb2be3c1d7e6ea16f2112f7e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/hrp_variance/failed-data-requests-20260923160401953.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/hrp_variance/log.txt",
+      "sha256": "03e401842d84b9ea50881954dcd1b78901c4fa5e03c8214785936a6ec274c27d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/hrp_variance/parity-ledger.csv",
+      "sha256": "25b795bfe1d230383dbb9de70b00104c07e281e3bf6c09620642a397395a727d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/hrp_variance/succeeded-data-requests-20260923160401953.txt",
+      "sha256": "aa1baf55e26339423ba96296470c2b47fa7840b50f0fde8ec01d8a46444e9063"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/meanrisk_min_variance/WeightScheduleParityAlgorithm-log.txt",
+      "sha256": "897154278ccb997d7109b7c22328e6d37f5ecbc0dc2df5eb752dc774b9595311"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/meanrisk_min_variance/WeightScheduleParityAlgorithm-order-events.json",
+      "sha256": "8ab9fa84daa298dfbe599d7f93dcb75b4b5e0a611cf5585ee1e6140467f7e98a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/meanrisk_min_variance/WeightScheduleParityAlgorithm-summary.json",
+      "sha256": "70b31aedb7d6f52dd367726ac4a9b7e51f93573806b6f8846b47fe15c5057ff7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/meanrisk_min_variance/config.json",
+      "sha256": "e3b71c7e71515a26fd34675ec12fc4851168369c8abf303c950fadc7d81e4b8a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/meanrisk_min_variance/data-monitor-report-20260923160400837.json",
+      "sha256": "17ad5d33d1c8f562fcb4c9681d347cfb94971a5afb2be3c1d7e6ea16f2112f7e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/meanrisk_min_variance/failed-data-requests-20260923160359168.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/meanrisk_min_variance/log.txt",
+      "sha256": "68284952c0e03f8eca6957a7e2606f870af305a2e2bce0a2e9fdc62626c02787"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/meanrisk_min_variance/parity-ledger.csv",
+      "sha256": "8dab8de8b260dbbf8c7b96765db4a1e29f4a8b5475097dfa3c4d8da9ed61d77d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/meanrisk_min_variance/succeeded-data-requests-20260923160359168.txt",
+      "sha256": "aa1baf55e26339423ba96296470c2b47fa7840b50f0fde8ec01d8a46444e9063"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends.hrp_variance.command.json",
+      "sha256": "142303d98d38930d85cd923ed17743019fa5b3809d8e8a6e1d0efefee25d2ca3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends.hrp_variance.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends.hrp_variance.stdout.txt",
+      "sha256": "4a29304569c88f05bc1621d2e30176749fa4af5144b459b78b824e4857219290"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends.meanrisk_min_variance.command.json",
+      "sha256": "a9337cf29aea533d130ca42f29fbb6a2de127d4e02a35640a12fab68663d1817"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends.meanrisk_min_variance.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends.meanrisk_min_variance.stdout.txt",
+      "sha256": "99e4030d890f88569da1e8e0424742fca09a03e61c0953794f211de8ab5693d2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/hrp_variance/WeightScheduleParityAlgorithm-log.txt",
+      "sha256": "ce2d41b74f97188e953a2c5294e5be5835d23c9d3085291fd3234b263904aa8f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/hrp_variance/WeightScheduleParityAlgorithm-order-events.json",
+      "sha256": "045c773e0c0a9520caadba6c44f0b47f79841f4e624ad33c95ca2e0c69109fd8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/hrp_variance/WeightScheduleParityAlgorithm-summary.json",
+      "sha256": "f6516acf875b46b95b5ec39ca45b9d3b106bb17a8ba894afcbb006504e3bae1a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/hrp_variance/config.json",
+      "sha256": "d146bfd01b3d20cd74de41ad51b094d57305814f2e91e8b784d948f62e368b8d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/hrp_variance/data-monitor-report-20260923160358073.json",
+      "sha256": "17ad5d33d1c8f562fcb4c9681d347cfb94971a5afb2be3c1d7e6ea16f2112f7e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/hrp_variance/failed-data-requests-20260923160356448.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/hrp_variance/log.txt",
+      "sha256": "37894bb47bdb920f26fcb235776ccdc55c6c26e49ba63dfab2af94698d180678"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/hrp_variance/parity-ledger.csv",
+      "sha256": "943fee355de0b6fcd75ae9a804d43db5b4d2213a5848fc75030eec3df0e51cc3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/hrp_variance/succeeded-data-requests-20260923160356448.txt",
+      "sha256": "2cb1912ee5a1cf68d7c53eca1dda6c82f826d5e7ef9f3099785100430a3efe0e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/meanrisk_min_variance/WeightScheduleParityAlgorithm-log.txt",
+      "sha256": "6e65a635ed1cbb8ff46152ea7e04a8cb00d7cfcf0666364178e487219353e853"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/meanrisk_min_variance/WeightScheduleParityAlgorithm-order-events.json",
+      "sha256": "7e1895edef79e0b416812071136cc74bedd59028f0adbd4891c461729a15dddb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/meanrisk_min_variance/WeightScheduleParityAlgorithm-summary.json",
+      "sha256": "70a827c1bde5f8557000c8585feeba6a46d83c86c26b41d7d6462293184dd261"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/meanrisk_min_variance/config.json",
+      "sha256": "9c3adf00533b04da5f429f8cafa58ebc5dfe994478a179fc8f1b0c7f229b56f2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/meanrisk_min_variance/data-monitor-report-20260923160355151.json",
+      "sha256": "17ad5d33d1c8f562fcb4c9681d347cfb94971a5afb2be3c1d7e6ea16f2112f7e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/meanrisk_min_variance/failed-data-requests-20260923160353508.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/meanrisk_min_variance/log.txt",
+      "sha256": "dcdc2352ab544cf3db7d0ce3bde26672e005d0c543106182e2a16286a1b15634"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/meanrisk_min_variance/parity-ledger.csv",
+      "sha256": "ba5709b5ba7344195860d5be9269f282ac976ce0535ce3c2bb9a28fea88a526e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/meanrisk_min_variance/succeeded-data-requests-20260923160353507.txt",
+      "sha256": "c2353bb630a4422fe56b3398bcec79b24b7e8650c6aa047bcad0830ea15e3782"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends.hrp_variance.command.json",
+      "sha256": "9b8ca20e9b3182b878b2b49a3eaa39820c238cbc1111a5c2cbab6d1d96f94141"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends.hrp_variance.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends.hrp_variance.stdout.txt",
+      "sha256": "76eb5ac54b3b7525b75746481dfdbb23d1ecc305a81180bebcce2082077de9bf"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends.meanrisk_min_variance.command.json",
+      "sha256": "d5f6b0f8d4ff86acd20c33f8a4d8cdeff0c6597267633718c7aaeb8c1bb353bb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends.meanrisk_min_variance.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends.meanrisk_min_variance.stdout.txt",
+      "sha256": "4a14ed773dcdf10fb3bf7a64c7855b9bf0077a8b53d928274c1b91f55ca1e82e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/run.json",
+      "sha256": "feb8e9c9484a61c2d246841b5bb3b33bb2792d237a385fc9257d4abd11a99ba1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run.stdout.txt",
+      "sha256": "9abeb1e9d46de768fb9b9b653cca129b4b9f48ca5b0bbc8cfb361e04de4c594a"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/lean_parity/WeightScheduleParityAlgorithm.cs",
+      "sha256": "a1b2f07efe269c1176cec1a4f69a5effdf69989ea3356e53fc6bb10395932ca5"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/lean_parity/compare.py",
+      "sha256": "e0899b243cf79fa42577dd86bfdd75f503657b32bfbd59e9542bb3a086dd0b0f"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/lean_parity/publish.py",
+      "sha256": "9d116069b4d34d79691f898316a48656fae2a852e07865c7439d098f63ff85bf"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/lean_parity/run.py",
+      "sha256": "c346ecc89bcbec3303ac5bbf249392ce8f78b9731d9024068d7371593f3512ae"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "Codex CLI 0.155.1 (gpt-6-astra), codex exec --sandbox read-only --ephemeral, one bounded call",
+    "record": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md"
+    ],
+    "round_2": "no round-2 finding for this gap",
+    "findings_and_resolution": "no finding for this gap",
+    "round_3": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "resolution": "minor: LEAN arm was labelled covered by the peer's SPY fixture -> relabelled 'not run (executable here)'; outcome stays deferred on the Alpaca broker arm"
+    },
+    "round_4": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "resolution": "major: the LEAN arm was executable here and was skipped -> fix round 4 ran it in native LEAN: fills, decisions, cash sequence, fees, dividend credits and ending cash equal the Nautilus reports exactly for both optimizers with and without dividends; the fee-2 control and all mutations were detected; outcome deferred -> advanced, Alpaca paper arm deferred to sota-workflow-resolution"
+    },
+    "round_4_codex": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "reviewer": "Codex CLI (codex exec --sandbox read-only --ephemeral), one bounded call on commits 6ed9709..a4cbcf8",
+      "resolution": "P2: a failed or internally inconsistent control could count as a cross-engine detection -> LEAN-internal and cross-engine checks separated, broken-control self-tests added, compare rerun (fix4b); P3: receipt claimed 1,476 mounted files but run.json records 1,465 -> count generated from run.json"
+    }
+  }
+}

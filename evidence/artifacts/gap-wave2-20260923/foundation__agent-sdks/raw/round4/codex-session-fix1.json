@@ -1,0 +1,382 @@
+{
+  "phase": "session",
+  "pid": 445343,
+  "effective_provider": {
+    "model": "qwen3-4b",
+    "model_provider": "localvllm",
+    "providers": {
+      "localvllm": {
+        "name": "local vLLM (loopback)",
+        "base_url": "http://127.0.0.1:28431/v1",
+        "wire_api": "responses"
+      }
+    }
+  },
+  "account": {
+    "account": null,
+    "requiresOpenaiAuth": false
+  },
+  "turn1": {
+    "method_counts": {
+      "turn/started": 1,
+      "item/started": 3,
+      "item/completed": 3,
+      "thread/tokenUsage/updated": 2,
+      "item/agentMessage/delta": 12,
+      "turn/completed": 1
+    },
+    "untyped_methods": [],
+    "documented_notification_types": 82,
+    "received_types_documented": [
+      "item/agentMessage/delta",
+      "item/completed",
+      "item/started",
+      "thread/tokenUsage/updated",
+      "turn/completed",
+      "turn/started"
+    ],
+    "received_types_undocumented": [],
+    "documented_types_not_received": 76,
+    "item_types": [
+      "agentMessage",
+      "dynamicToolCall",
+      "userMessage"
+    ],
+    "tool_items": [
+      {
+        "server": null,
+        "tool": "vault_lookup",
+        "namespace": null,
+        "status": "completed",
+        "success": true
+      }
+    ],
+    "last_token_usage": {
+      "last": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 10688,
+        "inputTokens": 10726,
+        "outputTokens": 13,
+        "reasoningOutputTokens": 0,
+        "totalTokens": 10739
+      },
+      "modelContextWindow": 258400,
+      "total": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 10688,
+        "inputTokens": 21407,
+        "outputTokens": 33,
+        "reasoningOutputTokens": 0,
+        "totalTokens": 21440
+      }
+    },
+    "turn_completed": {
+      "at": 1790175462.7442687,
+      "method": "turn/completed",
+      "typed": true,
+      "turn_status": "completed",
+      "turn_error": null
+    },
+    "final_answer": "vx-a489f45cb1e9",
+    "tool_host_calls": [
+      {
+        "at": 1790175462.2104332,
+        "tool": "vault_lookup",
+        "arguments": {
+          "key": "alpha"
+        },
+        "answered": true
+      }
+    ],
+    "provider_delta": {
+      "vllm:prompt_tokens_total": 21407.0,
+      "vllm:generation_tokens_total": 33.0,
+      "finished_by_reason": {
+        "stop": 2.0
+      },
+      "seconds": 2.826
+    },
+    "answer_contains_value": true,
+    "tool_round_trip": true
+  },
+  "turn2_interrupt": {
+    "streaming_observed_before_interrupt": true,
+    "interrupt_requested_at": 1790175466.9297574,
+    "interrupt_response": {},
+    "method_counts": {
+      "turn/started": 1,
+      "item/started": 2,
+      "item/completed": 1,
+      "item/agentMessage/delta": 121,
+      "thread/tokenUsage/updated": 1,
+      "turn/completed": 1
+    },
+    "untyped_methods": [],
+    "documented_notification_types": 82,
+    "received_types_documented": [
+      "item/agentMessage/delta",
+      "item/completed",
+      "item/started",
+      "thread/tokenUsage/updated",
+      "turn/completed",
+      "turn/started"
+    ],
+    "received_types_undocumented": [],
+    "documented_types_not_received": 76,
+    "item_types": [
+      "agentMessage",
+      "userMessage"
+    ],
+    "tool_items": [],
+    "last_token_usage": {
+      "last": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 10688,
+        "inputTokens": 10726,
+        "outputTokens": 13,
+        "reasoningOutputTokens": 0,
+        "totalTokens": 10739
+      },
+      "modelContextWindow": 258400,
+      "total": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 10688,
+        "inputTokens": 21407,
+        "outputTokens": 33,
+        "reasoningOutputTokens": 0,
+        "totalTokens": 21440
+      }
+    },
+    "turn_completed": {
+      "at": 1790175466.9500577,
+      "method": "turn/completed",
+      "typed": true,
+      "turn_status": "interrupted",
+      "turn_error": null
+    },
+    "samples": {
+      "before": {
+        "at": 1790175462.7644107,
+        "vllm:num_requests_running": 0.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 21407.0,
+        "vllm:generation_tokens_total": 33.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 2.0,
+          "length": 0.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      },
+      "at_interrupt": {
+        "at": 1790175466.929413,
+        "vllm:num_requests_running": 1.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 32202.0,
+        "vllm:generation_tokens_total": 154.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 2.0,
+          "length": 0.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      },
+      "after_completed_1s": {
+        "at": 1790175466.9566047,
+        "vllm:num_requests_running": 0.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 32202.0,
+        "vllm:generation_tokens_total": 154.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 2.0,
+          "length": 0.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      },
+      "settle1": {
+        "at": 1790175476.9624176,
+        "vllm:num_requests_running": 0.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 32202.0,
+        "vllm:generation_tokens_total": 154.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 2.0,
+          "length": 0.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      },
+      "settle2": {
+        "at": 1790175486.968207,
+        "vllm:num_requests_running": 0.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 32202.0,
+        "vllm:generation_tokens_total": 154.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 2.0,
+          "length": 0.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      }
+    },
+    "provider_delta_before_to_interrupt": {
+      "vllm:prompt_tokens_total": 10795.0,
+      "vllm:generation_tokens_total": 121.0,
+      "finished_by_reason": {},
+      "seconds": 4.165
+    },
+    "provider_delta_before_to_settle1": {
+      "vllm:prompt_tokens_total": 10795.0,
+      "vllm:generation_tokens_total": 121.0,
+      "finished_by_reason": {},
+      "seconds": 14.198
+    },
+    "provider_delta_settle1_to_settle2": {
+      "vllm:prompt_tokens_total": 0.0,
+      "vllm:generation_tokens_total": 0.0,
+      "finished_by_reason": {},
+      "seconds": 10.006
+    },
+    "running_at_settle1": 0.0,
+    "consumption_stopped": true,
+    "sdk_token_usage_notifications": [
+      {
+        "last": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 10688,
+          "inputTokens": 10726,
+          "outputTokens": 13,
+          "reasoningOutputTokens": 0,
+          "totalTokens": 10739
+        },
+        "modelContextWindow": 258400,
+        "total": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 10688,
+          "inputTokens": 21407,
+          "outputTokens": 33,
+          "reasoningOutputTokens": 0,
+          "totalTokens": 21440
+        }
+      }
+    ],
+    "rollout": {
+      "rollout_found": true,
+      "rollout_name": "rollout-2026-09-23T10-57-39-redacted-id:f005fe26c123b6cd.jsonl",
+      "entries": [
+        {
+          "timestamp": "2026-09-23T14:57:39.933Z",
+          "event": "task_started",
+          "reason": null
+        },
+        {
+          "timestamp": "2026-09-23T14:57:42.219Z",
+          "total": {
+            "input_tokens": 10681,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 20,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 10701
+          },
+          "last": {
+            "input_tokens": 10681,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 20,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 10701
+          }
+        },
+        {
+          "timestamp": "2026-09-23T14:57:42.735Z",
+          "total": {
+            "input_tokens": 21407,
+            "cached_input_tokens": 10688,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 33,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 21440
+          },
+          "last": {
+            "input_tokens": 10726,
+            "cached_input_tokens": 10688,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 13,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 10739
+          }
+        },
+        {
+          "timestamp": "2026-09-23T14:57:42.741Z",
+          "event": "task_complete",
+          "reason": null
+        },
+        {
+          "timestamp": "2026-09-23T14:57:42.772Z",
+          "event": "task_started",
+          "reason": null
+        },
+        {
+          "timestamp": "2026-09-23T14:57:46.930Z",
+          "total": {
+            "input_tokens": 21407,
+            "cached_input_tokens": 10688,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 33,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 21440
+          },
+          "last": {
+            "input_tokens": 10726,
+            "cached_input_tokens": 10688,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 13,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 10739
+          }
+        },
+        {
+          "timestamp": "2026-09-23T14:57:46.947Z",
+          "event": "turn_aborted",
+          "reason": "interrupted"
+        }
+      ]
+    }
+  },
+  "tap": {
+    "tapped_total": 161,
+    "tapped_counts": {
+      "account/rateLimits/updated": 3,
+      "deprecationNotice": 1,
+      "item/agentMessage/delta": 133,
+      "item/completed": 4,
+      "item/started": 5,
+      "remoteControl/status/changed": 1,
+      "thread/started": 1,
+      "thread/status/changed": 4,
+      "thread/tokenUsage/updated": 3,
+      "turn/completed": 2,
+      "turn/started": 2,
+      "warning": 2
+    },
+    "tapped_untyped": [],
+    "tapped_undocumented": [],
+    "detector": {
+      "unknown_method_untyped": true,
+      "malformed_known_method_untyped": true
+    }
+  },
+  "thread_id_private_in_state": true,
+  "status": "ok",
+  "sdk": "openai-codex",
+  "started_at": 1790175459.6237674,
+  "finished_at": 1790175487.0039887
+}

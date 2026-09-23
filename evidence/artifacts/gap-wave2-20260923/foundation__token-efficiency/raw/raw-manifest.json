@@ -1,0 +1,162 @@
+{
+  "generated_by": "tools/store_raw.py during the 2026-09-23 reconciliation round (copies existing files only; no check re-run)",
+  "sanitization": "$HOME = the host home directory; $HOME_SLUG = $HOME with '/' replaced by '-', as Claude Code names project directories",
+  "files": [
+    {
+      "gap_indexes": [
+        3,
+        0
+      ],
+      "source": "<coordinator scratchpad>/ccusage_session.json",
+      "source_sha256": "e73cd4ad1006a1f0e50ed1915c9495e46a816959f5f2776109e9e168c1d3889e",
+      "source_bytes": 261749,
+      "source_mtime_utc": "2026-09-23T01:56:16.556708Z",
+      "committed_path": "raw/gap3/ccusage-claude-session-snapshot-a.json",
+      "committed_sha256": "f423a302ee1094ce00f55715e701061d8e8a443ea82b6ed9575ae34a1fad79fc",
+      "attribution": "Attributed to receipt 3's `ccusage claude session --json --offline --no-cost` run by exact match of all four wf_f4b0c001-b52 per-model counters quoted in receipt 3 (sonnet 1758/606436/1644279/97461208, opus 166/95840/369862/5225670); no cost fields, consistent with --no-cost. Receipt 0's excerpt also quoted its session count (325) and first-session cacheCreationTokens (23630420).",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "home_slug_to_$HOME_SLUG": true,
+        "uuid_session_ids_pseudonymized": 339
+      }
+    },
+    {
+      "gap_indexes": [
+        0,
+        3
+      ],
+      "source": "<coordinator scratchpad>/ccsess0.json",
+      "source_sha256": "8818ec6b7cf8572d68d1cff29bf8f81eaf267c88ea2eefd55f113cb5abbd2844",
+      "source_bytes": 262431,
+      "source_mtime_utc": "2026-09-23T02:02:06.679721Z",
+      "committed_path": "raw/gap0/ccusage-claude-session-snapshot-b.json",
+      "committed_sha256": "bd6c63a39320d0cf2fbe445d0e93a93b79a4fcc0a7ac4b81bdb52feb14012f5d",
+      "attribution": "Attributed to receipt 0's fix-round `ccusage claude session --json --offline --no-cost` run by name and timing (written 8 s before receipt 0's last write) and by the first-session inputTokens (20082) quoted in receipt 0. Also shows wf_f4b0c001-b52 still growing after snapshot a (used by receipt 3's reconciliation).",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "home_slug_to_$HOME_SLUG": true,
+        "uuid_session_ids_pseudonymized": 340
+      }
+    },
+    {
+      "gap_indexes": [
+        2
+      ],
+      "committed_path": "raw/gap2-rerun/req2_rtk_default.json",
+      "committed_sha256": "31842bbb13b7323fbdbb8171b6f5df546321a975f89b64fbae08114c9fa5d75d",
+      "committed_bytes": 1776,
+      "worktree_mtime_utc": "2026-09-23T01:59:09.472722Z",
+      "note": "committed unchanged in f796901; mtime is when the file was written into this worktree (an upper bound on when the response existed)"
+    },
+    {
+      "gap_indexes": [
+        2
+      ],
+      "committed_path": "raw/gap2-rerun/req_lite_default.json",
+      "committed_sha256": "c34c463f13691c05e14c2d2b36b73ef1587b1b97a20806c069240d80b08c9d7f",
+      "committed_bytes": 252,
+      "worktree_mtime_utc": "2026-09-23T01:59:09.472712Z",
+      "note": "committed unchanged in f796901; mtime is when the file was written into this worktree (an upper bound on when the response existed)"
+    },
+    {
+      "gap_indexes": [
+        2
+      ],
+      "committed_path": "raw/gap2-rerun/req_rtk_default.json",
+      "committed_sha256": "96ba8cad1504b9267eec6ab988f84850a29599e5903c0a504fdb5fc5ae409511",
+      "committed_bytes": 251,
+      "worktree_mtime_utc": "2026-09-23T01:59:09.472694Z",
+      "note": "committed unchanged in f796901; mtime is when the file was written into this worktree (an upper bound on when the response existed)"
+    },
+    {
+      "gap_indexes": [
+        2
+      ],
+      "committed_path": "raw/gap2-rerun/resp2_rtk_default.json",
+      "committed_sha256": "94d62d95cc48f470c5ca8922193ffe9e5a3b8f2682e2cb9c94e7af047f22f63a",
+      "committed_bytes": 4477,
+      "worktree_mtime_utc": "2026-09-23T01:59:09.472874Z",
+      "note": "committed unchanged in f796901; mtime is when the file was written into this worktree (an upper bound on when the response existed)"
+    },
+    {
+      "gap_indexes": [
+        2
+      ],
+      "committed_path": "raw/gap2-rerun/resp_lite_default.json",
+      "committed_sha256": "182b0af649bf196f1eb55f9ae075f644b33ae62b8c09a43db4ecb8265126b9d2",
+      "committed_bytes": 1320,
+      "worktree_mtime_utc": "2026-09-23T01:59:09.472862Z",
+      "note": "committed unchanged in f796901; mtime is when the file was written into this worktree (an upper bound on when the response existed)"
+    },
+    {
+      "gap_indexes": [
+        2
+      ],
+      "committed_path": "raw/gap2-rerun/resp_rtk_default.json",
+      "committed_sha256": "07e2228afe3ae3dba31e45b3233278a388bc4fe3d345d9f0a7749444303a28f7",
+      "committed_bytes": 1445,
+      "worktree_mtime_utc": "2026-09-23T01:59:09.472733Z",
+      "note": "committed unchanged in f796901; mtime is when the file was written into this worktree (an upper bound on when the response existed)"
+    },
+    {
+      "gap_indexes": [
+        3
+      ],
+      "source": "$HOME/.claude/projects/$HOME_SLUG-code-agent-lab/<session>/subagents/workflows/wf_f4b0c001-b52/journal.jsonl",
+      "source_sha256_at_reconciliation": "ce215c40a1a734aa9dc366624778bb17466328ebef8ebe71ffa84e59e87830d4",
+      "source_lines_at_reconciliation": 37,
+      "source_mtime_utc": "2026-09-23T02:23:55.955595Z",
+      "committed_path": null,
+      "not_committed_reason": "another session's workflow journal; its result entries carry that session's task output. Hash, line count and mtime only.",
+      "observation": "27 lines when the review read it (line 27 an unmatched 'started' for exec:worktree-diff); 37 lines and a 02:23:55Z mtime at reconciliation, so the workflow was still running during and after receipt 3's reads"
+    },
+    {
+      "gap_indexes": [
+        3
+      ],
+      "output": "`node .claude/workflows/child-usage.mjs --latest` output for wf_f4b0c001-b52",
+      "committed_path": null,
+      "not_retained_reason": "never saved; the receipt's child-usage figures are transcriptions with no stored output"
+    },
+    {
+      "gap_indexes": [
+        2
+      ],
+      "output": "isolated OmniRoute server log for the rerun",
+      "committed_path": null,
+      "not_retained_reason": "scratch tree $HOME/.cache/gap-wave2-20260923/token-efficiency/ is empty (checked at reconciliation); the quoted 'Loaded env from ...' line cannot be verified"
+    },
+    {
+      "gap_indexes": [
+        2
+      ],
+      "output": "`stat` outputs for $HOME/.omniroute/.env before/after",
+      "committed_path": null,
+      "not_retained_reason": "not saved; only the transcribed epoch 1789995647 remains (equal to the file's current mtime, 2026-09-21T13:00:47Z)"
+    },
+    {
+      "gap_indexes": [
+        1
+      ],
+      "output": "`headroom proxy --help` output",
+      "committed_path": null,
+      "not_retained_reason": "not saved; receipt 1's proxy_help field was a paraphrase, now replaced by source-line citations"
+    },
+    {
+      "gap_indexes": [
+        5
+      ],
+      "output": "gap-5 fixture.json, its generator, and the headroom_compress/headroom_retrieve responses",
+      "committed_path": null,
+      "not_retained_reason": "fixture, generator and disposable workspace were deleted; the receipt's generator command is a placeholder"
+    },
+    {
+      "gap_indexes": [
+        5
+      ],
+      "output": "`stat` outputs for $HOME/.headroom before/after",
+      "committed_path": null,
+      "not_retained_reason": "not saved; transcribed epochs match the files' current mtimes (ccr_store.db 2026-09-22T23:47:55Z, update_check.json 2026-09-23T01:44:37Z)"
+    }
+  ]
+}

@@ -1,0 +1,283 @@
+{
+  "dagu_version": "2.17.0",
+  "scenario": "hosting",
+  "tag": "g2h2170",
+  "result": {
+    "failure_fixture": {
+      "requested_step_exit": 23,
+      "cli_exit": 1,
+      "status": "failed",
+      "status_cmd_stdout": "Failed - 2026-09-23T01:20:36-04:00\n\ndag: g2h2170-failure (0s)\n\u251c\u2500log: $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home/logs/g2h2170-failure/dag-run_20260923_052036Z_g2h2170-failure-1/dag-run_20260923.012036.451.g2h2170-.log\n\u2502\n\u251c\u2500fail (0s) [failed]\n\u2502 \u251c\u2500exit 23\n\u2502 \u2502\n\u2502 \u2514\u2500error: exit status 23\n\u2502 \n\u2514\u2500after [aborted]\n\nResult: Failed\n"
+    },
+    "cancellation_fixture": {
+      "stop_exit": 0,
+      "cancelled_cli_exit": 0,
+      "status": "aborted",
+      "status_cmd_stdout": "Aborted - 2026-09-23T01:20:36-04:00\n\ndag: g2h2170-cancel (1.0s)\n\u251c\u2500log: $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home/logs/g2h2170-cancel/dag-run_20260923_052036Z_g2h2170-cancel-1/dag-run_20260923.012036.571.g2h2170-.log\n\u2502\n\u251c\u2500long [aborted]\n\u2502 \n\u2514\u2500after\n\nResult: Aborted\n"
+    },
+    "success_fixture": {
+      "cli_exit": 0,
+      "status": "succeeded"
+    },
+    "restart_history": {
+      "server_up_before": true,
+      "server_down_between": true,
+      "server_up_after": true,
+      "before": {
+        "cli_history": {
+          "g2h2170-failure": "failed",
+          "g2h2170-cancel": "aborted",
+          "g2h2170-ok": "succeeded"
+        },
+        "api_http": 200,
+        "api_latest_runs": {
+          "g2h2170-cancel": {
+            "dagRunId": "g2h2170-cancel-1",
+            "statusLabel": "aborted"
+          },
+          "g2h2170-failure": {
+            "dagRunId": "g2h2170-failure-1",
+            "statusLabel": "failed"
+          },
+          "g2h2170-ok": {
+            "dagRunId": "g2h2170-ok-1",
+            "statusLabel": "succeeded"
+          }
+        }
+      },
+      "after": {
+        "cli_history": {
+          "g2h2170-failure": "failed",
+          "g2h2170-cancel": "aborted",
+          "g2h2170-ok": "succeeded"
+        },
+        "api_http": 200,
+        "api_latest_runs": {
+          "g2h2170-cancel": {
+            "dagRunId": "g2h2170-cancel-1",
+            "statusLabel": "aborted"
+          },
+          "g2h2170-failure": {
+            "dagRunId": "g2h2170-failure-1",
+            "statusLabel": "failed"
+          },
+          "g2h2170-ok": {
+            "dagRunId": "g2h2170-ok-1",
+            "statusLabel": "succeeded"
+          }
+        }
+      },
+      "prior_history_rows_preserved": true
+    }
+  },
+  "command_log": [
+    {
+      "t": 0.1,
+      "cmd": "dagu start --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home --run-id g2h2170-failure-1 $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home/dags/g2h2170-failure.yaml",
+      "exit": 1,
+      "stdout_tail": "Failed - 2026-09-23T01:20:36-04:00\n\ndag: g2h2170-failure (0s)\n\u251c\u2500log: $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home/logs/g2h2170-failure/dag-run_20260923_052036Z_g2h2170-failure-1/dag-run_20260923.012036.451.g2h2170-.log\n\u2502\n\u251c\u2500fail (0s) [failed]\n\u2502 \u251c\u2500exit 23\n\u2502 \u2502\n\u2502 \u2514\u2500error: exit status 23\n\u2502 \n\u2514\u2500after [aborted]\n\nResult: Failed\n\n",
+      "stderr_tail": "vel=INFO msg=\"Step started\" dag=g2h2170-failure run-id=g2h2170-failure-1 worker-id=local attempt-id=ae7d3e step=fail\ntime=2026-09-23T01:20:36.477-04:00 level=INFO msg=\"DAG run finished\" dag=g2h2170-failure run-id=g2h2170-failure-1 worker-id=local attempt-id=ae7d3e status=failed started-at=2026-09-23T01:20:36-04:00 finished-at=2026-09-23T01:20:36-04:00\ntime=2026-09-23T01:20:36.486-04:00 level=ERROR msg=\"Failed to execute dag-run\" dag=g2h2170-failure run-id=g2h2170-failure-1 err=\"exit status 23\"\nError: failed to execute the dag-run g2h2170-failure (dag-run ID: g2h2170-failure-1): exit status 23\n"
+    },
+    {
+      "t": 0.1,
+      "cmd": "dagu status --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home --run-id g2h2170-failure-1 g2h2170-failure",
+      "exit": 0,
+      "stdout_tail": "Failed - 2026-09-23T01:20:36-04:00\n\ndag: g2h2170-failure (0s)\n\u251c\u2500log: $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home/logs/g2h2170-failure/dag-run_20260923_052036Z_g2h2170-failure-1/dag-run_20260923.012036.451.g2h2170-.log\n\u2502\n\u251c\u2500fail (0s) [failed]\n\u2502 \u251c\u2500exit 23\n\u2502 \u2502\n\u2502 \u2514\u2500error: exit status 23\n\u2502 \n\u2514\u2500after [aborted]\n\nResult: Failed\n",
+      "stderr_tail": ""
+    },
+    {
+      "t": 0.2,
+      "cmd": "dagu history --format json g2h2170-failure",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2h2170-failure-1",
+          "status": "failed",
+          "startedAt": "2026-09-23T01:20:36-04:00",
+          "finishedAt": "2026-09-23T01:20:36-04:00",
+          "duration": "< 1s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 0.2,
+      "spawn": "dagu start --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home --run-id g2h2170-cancel-1 $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home/dags/g2h2170-cancel.yaml",
+      "pid": 350196
+    },
+    {
+      "t": 0.2,
+      "cmd": "dagu history --format json g2h2170-cancel",
+      "exit": 0,
+      "rows": [],
+      "stderr_tail": "No DAG runs found matching the specified filters.\n"
+    },
+    {
+      "t": 0.7,
+      "cmd": "dagu history --format json g2h2170-cancel",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2h2170-cancel-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:36-04:00",
+          "finishedAt": null,
+          "duration": "1s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 0.8,
+      "cmd": "dagu stop --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home --run-id g2h2170-cancel-1 g2h2170-cancel",
+      "exit": 0,
+      "stdout_tail": "",
+      "stderr_tail": "d=bef2dd file=$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home/data/dag-runs/g2h2170-cancel/dag-runs/2026/09/23/dag-run_20260923_052036Z_g2h2170-cancel-1/a_20260923_052036_568Z_bef2dd/CANCEL_REQUESTED\ntime=2026-09-23T01:20:37.134-04:00 level=INFO msg=\"Abort flag created for DAG run\" dag=g2h2170-cancel run-id=g2h2170-cancel-1\ntime=2026-09-23T01:20:37.134-04:00 level=INFO msg=\"Successfully stopped DAG via socket\" dag=g2h2170-cancel run-id=g2h2170-cancel-1\ntime=2026-09-23T01:20:37.134-04:00 level=INFO msg=\"Dag-run stop/cancel completed\" dag=g2h2170-cancel\n"
+    },
+    {
+      "t": 0.8,
+      "cmd": "dagu status --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home --run-id g2h2170-cancel-1 g2h2170-cancel",
+      "exit": 0,
+      "stdout_tail": "Aborted - 2026-09-23T01:20:36-04:00\n\ndag: g2h2170-cancel (1.0s)\n\u251c\u2500log: $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home/logs/g2h2170-cancel/dag-run_20260923_052036Z_g2h2170-cancel-1/dag-run_20260923.012036.571.g2h2170-.log\n\u2502\n\u251c\u2500long [aborted]\n\u2502 \n\u2514\u2500after\n\nResult: Aborted\n",
+      "stderr_tail": ""
+    },
+    {
+      "t": 0.8,
+      "cmd": "dagu history --format json g2h2170-cancel",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2h2170-cancel-1",
+          "status": "aborted",
+          "startedAt": "2026-09-23T01:20:36-04:00",
+          "finishedAt": "2026-09-23T01:20:37-04:00",
+          "duration": "1s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 0.9,
+      "cmd": "dagu start --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home --run-id g2h2170-ok-1 $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home/dags/g2h2170-ok.yaml",
+      "exit": 0,
+      "stdout_tail": "20260923.012037.252.g2h2170-.log\n\u2502\n\u251c\u2500one (0s) [succeeded]\n\u2502 \u251c\u2500echo one\n\u2502 \u2502\n\u2502 \u2514\u2500stdout: $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home/logs/g2h2170-ok/dag-run_20260923_052037Z_g2h2170-ok-1/run_20260923_052037Z_fed9b1/one.20260923.012037.272.g2h2170-.out\n\u2502     one\n\u2502 \n\u2514\u2500two (0s) [succeeded]\n  \u251c\u2500echo two\n  \u2502\n  \u2514\u2500stdout: $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home/logs/g2h2170-ok/dag-run_20260923_052037Z_g2h2170-ok-1/run_20260923_052037Z_fed9b1/two.20260923.012037.285.g2h2170-.out\n      two\n\nResult: Succeeded\n\n",
+      "stderr_tail": "ted\" dag=g2h2170-ok run-id=g2h2170-ok-1 worker-id=local attempt-id=fed9b1 params=[]\ntime=2026-09-23T01:20:37.270-04:00 level=INFO msg=\"Step started\" dag=g2h2170-ok run-id=g2h2170-ok-1 worker-id=local attempt-id=fed9b1 step=one\ntime=2026-09-23T01:20:37.283-04:00 level=INFO msg=\"Step started\" dag=g2h2170-ok run-id=g2h2170-ok-1 worker-id=local attempt-id=fed9b1 step=two\ntime=2026-09-23T01:20:37.297-04:00 level=INFO msg=\"DAG run finished\" dag=g2h2170-ok run-id=g2h2170-ok-1 worker-id=local attempt-id=fed9b1 status=succeeded started-at=2026-09-23T01:20:37-04:00 finished-at=2026-09-23T01:20:37-04:00\n"
+    },
+    {
+      "t": 1.0,
+      "cmd": "dagu history --format json g2h2170-ok",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2h2170-ok-1",
+          "status": "succeeded",
+          "startedAt": "2026-09-23T01:20:37-04:00",
+          "finishedAt": "2026-09-23T01:20:37-04:00",
+          "duration": "< 1s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 1.0,
+      "spawn": "dagu server --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home",
+      "pid": 350366
+    },
+    {
+      "t": 2.0,
+      "cmd": "dagu history --format json g2h2170-failure",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2h2170-failure-1",
+          "status": "failed",
+          "startedAt": "2026-09-23T01:20:36-04:00",
+          "finishedAt": "2026-09-23T01:20:36-04:00",
+          "duration": "< 1s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 2.1,
+      "cmd": "dagu history --format json g2h2170-cancel",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2h2170-cancel-1",
+          "status": "aborted",
+          "startedAt": "2026-09-23T01:20:36-04:00",
+          "finishedAt": "2026-09-23T01:20:37-04:00",
+          "duration": "1s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 2.1,
+      "cmd": "dagu history --format json g2h2170-ok",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2h2170-ok-1",
+          "status": "succeeded",
+          "startedAt": "2026-09-23T01:20:37-04:00",
+          "finishedAt": "2026-09-23T01:20:37-04:00",
+          "duration": "< 1s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 2.2,
+      "spawn": "dagu server --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-hosting-2170/dagu-home",
+      "pid": 350545
+    },
+    {
+      "t": 2.7,
+      "cmd": "dagu history --format json g2h2170-failure",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2h2170-failure-1",
+          "status": "failed",
+          "startedAt": "2026-09-23T01:20:36-04:00",
+          "finishedAt": "2026-09-23T01:20:36-04:00",
+          "duration": "< 1s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 2.7,
+      "cmd": "dagu history --format json g2h2170-cancel",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2h2170-cancel-1",
+          "status": "aborted",
+          "startedAt": "2026-09-23T01:20:36-04:00",
+          "finishedAt": "2026-09-23T01:20:37-04:00",
+          "duration": "1s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 2.7,
+      "cmd": "dagu history --format json g2h2170-ok",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2h2170-ok-1",
+          "status": "succeeded",
+          "startedAt": "2026-09-23T01:20:37-04:00",
+          "finishedAt": "2026-09-23T01:20:37-04:00",
+          "duration": "< 1s"
+        }
+      ],
+      "stderr_tail": ""
+    }
+  ],
+  "elapsed_s": 2.8
+}

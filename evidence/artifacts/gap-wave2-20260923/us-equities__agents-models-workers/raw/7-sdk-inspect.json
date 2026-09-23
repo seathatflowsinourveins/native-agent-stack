@@ -1,0 +1,25 @@
+{
+ "mode": "inspect",
+ "overrides": [
+  "features.hooks=false",
+  "features.plugin_hooks=false"
+ ],
+ "started_at": "2026-09-23T07:27:59Z",
+ "model_inference_submitted": false,
+ "readiness": {
+  "model": "gpt-6-astra",
+  "model_available": true,
+  "ordinary_usage_allowed": true,
+  "windows": {
+   "primary": {
+    "usedPercent": 32,
+    "resetsAt": 1790719654,
+    "windowDurationMins": 10080
+   }
+  },
+  "ready": true
+ },
+ "status": "discovery_complete",
+ "wall_seconds": 0.633,
+ "finished_at": "2026-09-23T07:27:59Z"
+}

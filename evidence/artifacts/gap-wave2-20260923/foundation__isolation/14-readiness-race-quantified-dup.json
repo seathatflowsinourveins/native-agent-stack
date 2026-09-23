@@ -1,0 +1,50 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-14",
+  "gap_index": 14,
+  "gap_text_sha256": "29547db1af775c7af878e1eeaf3d56271cf898f51417070217760575f346dd33",
+  "checked_at": "2026-09-23T00:43:41.764Z",
+  "outcome": "covered_elsewhere",
+  "note": "Duplicate of gap 2's next_check ('run the HTTP fixture repeatedly without retries ... record first-request failure counts'). See evidence/artifacts/gap-wave2-20260923/foundation__isolation/2-readiness-race-quantified.json (100% failure over N=8 at 0.0.77=latest; upstream issue #257 explicitly excludes this race from its fix).",
+  "evidence_class": "local_integration",
+  "commands": [
+    "See gap 2 receipt."
+  ],
+  "results": [
+    "See gap 2 receipt."
+  ],
+  "preregistration": {
+    "written_at": "2026-09-23T01:35:53.117Z",
+    "late": true,
+    "expectation": "Gap 14's next_check is textually the same request as gap 2's ('run the HTTP fixture repeatedly without retries, record first-request failure counts'); no new distinguishing question was found in gap 14's text, unlike gap 15's, so citing gap 2's receipt directly is expected to remain accurate on inspection.",
+    "criteria": "Compare gap 14's next_check text against gap 2's; if they ask the same question with no additional distinguishing clause, covered_elsewhere citing gap 2 is appropriate; if any distinguishing clause exists, it must be separately executed as gap 15 required.",
+    "late_note": "Written at 2026-09-23T01:35:53.117Z by fix#62, after the evidence it covers was produced (2026-09-23T00:43:13.671Z to 2026-09-23T00:43:41.764Z). The previously recorded written_at '2026-09-23T01:46:00+00:00' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps."
+  },
+  "limits": [
+    "Gap 14's next_check was compared to gap 2's and found to ask the same thing verbatim, unlike gap 15 vs gap 3 (which had a distinguishing clause and was re-executed separately in this fix round); no additional limits beyond gap 2's receipt apply here."
+  ],
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:43:13.671Z to 2026-09-23T00:43:41.764Z. The previous value '2026-09-23T00:53:20.715653+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#36",
+        "original#37",
+        "original#38",
+        "original#39",
+        "original#40",
+        "original#41",
+        "original#42"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Preregistration relabelled: written at fix#62 (01:35:53Z), after the gap 2 evidence it cites, so late=true (was false). Outcome kept covered_elsewhere (gap 2, settled): gap 14's next_check is a subset of gap 2's."
+    ]
+  }
+}

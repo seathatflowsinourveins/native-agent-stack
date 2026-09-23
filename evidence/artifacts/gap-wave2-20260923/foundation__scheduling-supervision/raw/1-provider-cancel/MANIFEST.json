@@ -1,0 +1,112 @@
+{
+  "source_dir": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g1-cancel-1790131730",
+  "substitution": "host home path -> $HOME; UUID-shaped identifiers -> <uuid-N> (same id, same N)",
+  "files": [
+    {
+      "source": "result.json",
+      "committed_as": "result.json",
+      "raw_sha256": "dbabc57b4cafa8d4a92d9741a562cbbb10858d5d9cc43f72a0634f0ae23e3309",
+      "committed_sha256": "dbabc57b4cafa8d4a92d9741a562cbbb10858d5d9cc43f72a0634f0ae23e3309",
+      "bytes": 1008
+    },
+    {
+      "source": "events.jsonl",
+      "committed_as": "events.jsonl",
+      "raw_sha256": "c0a4012e637f4e9a5173a52c92e54fa4b49f10d771579d7361e785a49bbac108",
+      "committed_sha256": "9d94a28b9bfc302a4436558abeb6184c69525989acd42c21fedb7f15a2496f4d",
+      "bytes": 73
+    },
+    {
+      "source": "codex-stderr.txt",
+      "committed_as": "codex-stderr.txt",
+      "raw_sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+      "committed_sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+      "bytes": 39
+    },
+    {
+      "source": "cancelprobe.yaml",
+      "committed_as": "cancelprobe.yaml",
+      "raw_sha256": "75a521684384b3b1b607451125df688b1d1bd666184b006f5dac13fdf05c18a7",
+      "committed_sha256": "35409fa1ecfdf2d0ca05863fac51fe8834b464fb94c4c24beb0ecc8d871e3721",
+      "bytes": 687
+    },
+    {
+      "source": "native/history.stderr",
+      "committed_as": "native__history.stderr",
+      "raw_sha256": "c63ed7d03565d1fe1e12e873b509fe7275be5152b899f8416e53cddf95627eb2",
+      "committed_sha256": "c63ed7d03565d1fe1e12e873b509fe7275be5152b899f8416e53cddf95627eb2",
+      "bytes": 203
+    },
+    {
+      "source": "native/history.stdout",
+      "committed_as": "native__history.stdout",
+      "raw_sha256": "a69e4d3320fc8e2d9f28f022aaed938a73cca636f607bcd6689806a098a97d0a",
+      "committed_sha256": "a69e4d3320fc8e2d9f28f022aaed938a73cca636f607bcd6689806a098a97d0a",
+      "bytes": 247
+    },
+    {
+      "source": "native/start.stderr",
+      "committed_as": "native__start.stderr",
+      "raw_sha256": "90ad8136022f20b5d7739b2da77c8b394ce83e0bfa5fddeec76772f00d6c55f7",
+      "committed_sha256": "90ad8136022f20b5d7739b2da77c8b394ce83e0bfa5fddeec76772f00d6c55f7",
+      "bytes": 1486
+    },
+    {
+      "source": "native/start.stdout",
+      "committed_as": "native__start.stdout",
+      "raw_sha256": "068f940f3fa2ef5a27785f7b67ab7d84b4f891fee1aa3a05eb2d66ecc10d24e4",
+      "committed_sha256": "792c2b150bb264046a14a0f76367ce48df7108778acbc488d96d7b86c63846c7",
+      "bytes": 323
+    },
+    {
+      "source": "native/stop.stderr",
+      "committed_as": "native__stop.stderr",
+      "raw_sha256": "df1f502fda592be604d30f321d2f94b92c658ad140461b5b5d436601fe9466e8",
+      "committed_sha256": "49052d086105623f3fa869eda8dda3aa823e987002e756caef9be067040843fe",
+      "bytes": 1139
+    },
+    {
+      "source": "native/stop.stdout",
+      "committed_as": "native__stop.stdout",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "native/validate.stderr",
+      "committed_as": "native__validate.stderr",
+      "raw_sha256": "c918e4ac526970a7c34b35370c12bfe08cede72c945b4063b24933311a100f34",
+      "committed_sha256": "298a4b7bd85251953aece52681d5f4aed545d2f2faad03169b66077f374bc7bc",
+      "bytes": 519
+    },
+    {
+      "source": "native/validate.stdout",
+      "committed_as": "native__validate.stdout",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "native/version.stderr",
+      "committed_as": "native__version.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "native/version.stdout",
+      "committed_as": "native__version.stdout",
+      "raw_sha256": "7ee203ac73fca7d93c699ceefabb5bb5cdea2e02213de22ceea56908ff0945c5",
+      "committed_sha256": "7ee203ac73fca7d93c699ceefabb5bb5cdea2e02213de22ceea56908ff0945c5",
+      "bytes": 7
+    },
+    {
+      "source": "dagu-home/data/dag-runs/cancelprobe/dag-runs/2026/09/23/dag-run_20260923_024851Z_cancelprobe-ba0a1b8f27ff/a_20260923_024851_171Z_3150e7/status.jsonl",
+      "committed_as": "dagu-home__data__dag-runs__cancelprobe__dag-runs__2026__09__23__dag-run_20260923_024851Z_cancelprobe-ba0a1b8f27ff__a_20260923_024851_171Z_3150e7__status.jsonl",
+      "raw_sha256": "8bd2eaf5f17fbe1dda02e825189b16a0811a11c41fba0b305131e7a2b2d392ae",
+      "committed_sha256": "cc831005791afbe2ba4d97d6d0705d9a57206e5c286c277560e23d7c60f9e873",
+      "bytes": 2623
+    }
+  ],
+  "uuid_placeholders": 1
+}

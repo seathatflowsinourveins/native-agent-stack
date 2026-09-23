@@ -1,0 +1,234 @@
++ date -u +%FT%TZ
+2026-09-23T13:20:58Z
++ dvc --version
+3.67.1
++ git --version
+git version 2.43.0
++ R=$HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/repo-git
++ mkdir -p $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/repo-git/code $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/repo-git/stages
++ for d in nanosecond-replay point-in-time financial-data
++ cp -a $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/nanosecond-replay $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/repo-git/code/nanosecond-replay
++ for d in nanosecond-replay point-in-time financial-data
++ cp -a $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/point-in-time $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/repo-git/code/point-in-time
++ for d in nanosecond-replay point-in-time financial-data
++ cp -a $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/financial-data $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/repo-git/code/financial-data
++ cp $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/repo-git/stages/stage.py
++ cp $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/dvc.yaml $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/repo-git/dvc.yaml
++ cd $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/repo-git
++ git init -q
++ git config user.email gap-wave2@local
++ git config user.name gap-wave2
++ dvc init -q
++ dvc config core.analytics false
++ dvc config core.check_update false
++ dvc config core.site_cache_dir $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/dvc-site-cache
++ git add -A
++ git commit -q -m 'code, stage driver and dvc.yaml'
++ : ==== G0.3a dvc repro, commit lock and gitignores, second repro
++ dvc repro
+Running stage 'ns_materialize':
+> mkdir -p data && python code/nanosecond-replay/replay.py materialize --source code/nanosecond-replay/fixture.json --output data/ns_materialized > data/ns_materialize.json
+Generating lock file 'dvc.lock'
+Updating lock file 'dvc.lock'
+
+Running stage 'ns_select':
+> python stages/stage.py ns-select --code code --materialized data/ns_materialized --manifest data/ns_materialize.json --out out/ns_select.json
+Updating lock file 'dvc.lock'
+
+Running stage 'ns_quarantine':
+> python stages/stage.py ns-quarantine --code code --materialized data/ns_materialized --manifest data/ns_materialize.json --out out/ns_quarantine.json
+Updating lock file 'dvc.lock'
+
+Running stage 'pit_snapshot':
+> mkdir -p data && python code/point-in-time/temporal_snapshot.py snapshot --source code/point-in-time/fixture.json --output data/pit_snapshot > data/pit_snapshot.json
+Updating lock file 'dvc.lock'
+
+Running stage 'pit_select':
+> python stages/stage.py pit-select --code code --materialized data/pit_snapshot --manifest data/pit_snapshot.json --out out/pit_select.json
+Updating lock file 'dvc.lock'
+
+Running stage 'pit_quarantine':
+> python stages/stage.py pit-quarantine --code code --materialized data/pit_snapshot --manifest data/pit_snapshot.json --out out/pit_quarantine.json
+Updating lock file 'dvc.lock'
+
+To track the changes with git, run:
+
+	git add data/.gitignore out/.gitignore dvc.lock
+
+To enable auto staging, run:
+
+	dvc config core.autostage true
+Use `dvc push` to send your updates to remote storage.
++ echo repro1_exit=0
+repro1_exit=0
++ git add -A
++ git commit -q -m 'dvc.lock and .gitignore after first repro'
++ git ls-files data out
+data/.gitignore
+out/.gitignore
++ git status --short
++ dvc repro
+Stage 'ns_materialize' didn't change, skipping
+Stage 'ns_select' didn't change, skipping
+Stage 'ns_quarantine' didn't change, skipping
+Stage 'pit_snapshot' didn't change, skipping
+Stage 'pit_select' didn't change, skipping
+Stage 'pit_quarantine' didn't change, skipping
+Data and pipelines are up to date.
++ echo repro2_exit=0
+repro2_exit=0
++ dvc status
+Data and pipelines are up to date.
++ echo status_exit=0
+status_exit=0
++ tree_list pre-delete
++ find data out -type f
++ sort
++ xargs sha256sum
++ wc -l
+16
++ : ==== G0.3b as written: rm -rf data out, dvc checkout only
++ chmod -R u+w data
++ rm -rf data out
++ dvc checkout
+A       data/ns_materialized/
+A       data/pit_snapshot/
+A       data/ns_materialize.json
+A       data/pit_snapshot.json
+A       out/ns_quarantine.json
+A       out/ns_select.json
+A       out/pit_quarantine.json
+A       out/pit_select.json
++ echo b_checkout_exit=0
+b_checkout_exit=0
++ tree_list b-post-checkout
++ find data out -type f
++ sort
++ xargs sha256sum
++ wc -l
+14
++ diff $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/pre-delete.sha256 $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/b-post-checkout.sha256
+1d0
+< 71701562b963f283a25b2ab12ba2e6ca26a65acdeeb898434b6b240806050b88  data/.gitignore
+12d10
+< 0dd351f92574166a1b410905304bc4a8bdb032586269719c640c1da3af2f372c  out/.gitignore
++ echo b_diff_exit=1
+b_diff_exit=1
++ : ==== G0.3c rm -rf data out, git checkout of the gitignores, dvc checkout
++ chmod -R u+w data
++ rm -rf data out
++ git checkout -- data/.gitignore out/.gitignore
++ echo c_git_checkout_exit=0
+c_git_checkout_exit=0
++ dvc checkout
+A       data/ns_materialized/
+A       data/pit_snapshot/
+A       data/ns_materialize.json
+A       data/pit_snapshot.json
+A       out/ns_quarantine.json
+A       out/ns_select.json
+A       out/pit_quarantine.json
+A       out/pit_select.json
++ echo c_checkout_exit=0
+c_checkout_exit=0
++ tree_list c-post-checkout
++ find data out -type f
++ sort
++ xargs sha256sum
++ wc -l
+16
++ diff $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/pre-delete.sha256 $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/c-post-checkout.sha256
++ echo c_diff_exit=0
+c_diff_exit=0
++ dvc status
+Data and pipelines are up to date.
++ echo c_status_exit=0
+c_status_exit=0
++ : ==== G0.3d delete only the eight DVC outs declared in dvc.yaml
++ chmod -R u+w data
++ rm -rf data/ns_materialized data/ns_materialize.json data/pit_snapshot data/pit_snapshot.json out/ns_select.json out/ns_quarantine.json out/pit_select.json out/pit_quarantine.json
++ find data out -type f
++ sort
+data/.gitignore
+out/.gitignore
++ dvc checkout
+A       data/ns_materialized/
+A       data/pit_snapshot/
+A       data/ns_materialize.json
+A       data/pit_snapshot.json
+A       out/ns_quarantine.json
+A       out/ns_select.json
+A       out/pit_quarantine.json
+A       out/pit_select.json
++ echo d_checkout_exit=0
+d_checkout_exit=0
++ tree_list d-post-checkout
++ find data out -type f
++ sort
++ xargs sha256sum
++ wc -l
+16
++ diff $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/pre-delete.sha256 $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/d-post-checkout.sha256
++ echo d_diff_exit=0
+d_diff_exit=0
++ dvc status
+Data and pipelines are up to date.
++ echo d_status_exit=0
+d_status_exit=0
++ : ==== G0.3e detector control: one-byte overwrite, then dvc checkout --force
++ F=data/ns_materialized/observations.parquet
++ ls -l data/ns_materialized/observations.parquet
+-rw-r--r-- 1 <user> <user> 2374 Sep 23 09:21 data/ns_materialized/observations.parquet
++ chmod u+w data/ns_materialized/observations.parquet
++ rm -f data/ns_materialized/observations.parquet.tmp
++ cp data/ns_materialized/observations.parquet data/ns_materialized/observations.parquet.tmp
++ rm -f data/ns_materialized/observations.parquet
++ mv data/ns_materialized/observations.parquet.tmp data/ns_materialized/observations.parquet
++ printf X
++ dd of=data/ns_materialized/observations.parquet bs=1 seek=100 conv=notrunc status=none
++ echo e_tamper_exit=0
+e_tamper_exit=0
++ tree_list e-tampered
++ find data out -type f
++ sort
++ xargs sha256sum
++ wc -l
+16
++ diff $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/pre-delete.sha256 $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/e-tampered.sha256
+3c3
+< 0cf15579cd80a02b1c5411bdda50483808e2b2948126da659ecca596bb3821f3  data/ns_materialized/observations.parquet
+---
+> 97b0e233849837c605a6c712406c63de94716821b6e179ea1228cef7b330863e  data/ns_materialized/observations.parquet
++ echo e_tamper_diff_exit=1
+e_tamper_diff_exit=1
++ dvc status
+ns_materialize:
+	changed outs:
+		modified:           data/ns_materialized
+ns_select:
+	changed deps:
+		modified:           data/ns_materialized
+ns_quarantine:
+	changed deps:
+		modified:           data/ns_materialized
++ echo e_status_exit=0
+e_status_exit=0
++ dvc checkout --force
+M       data/ns_materialized/
++ echo e_force_checkout_exit=0
+e_force_checkout_exit=0
++ tree_list e-post-force-checkout
++ find data out -type f
++ sort
++ xargs sha256sum
++ wc -l
+16
++ diff $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/pre-delete.sha256 $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z/e-post-force-checkout.sha256
++ echo e_restore_diff_exit=0
+e_restore_diff_exit=0
++ dvc status
+Data and pipelines are up to date.
++ echo e_status_after_restore_exit=0
+e_status_after_restore_exit=0
++ date -u +%FT%TZ
+2026-09-23T13:21:11Z

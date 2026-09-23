@@ -1,0 +1,125 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-0",
+  "gap_index": 0,
+  "gap_text_sha256": "046f0ad2ae5624cff4c1c4eabbb72d036b0b25039111fb96fa76710d83c0ddbe",
+  "checked_at": "2026-09-23T01:01:56.062Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:52:08.551Z",
+    "expectation": "TLS opaque-tunnel, IPv6-loopback, SOCKS5 (raw TCP), and a public remote host will each show a distinct allow (200/echo) vs deny (403/refused) outcome under sandbox-runtime 0.0.77; DNS-rebinding via a non-'localhost' hostname resolving to loopback should be denied per the documented resolved-address guard, but proving it end-to-end needs either root (to edit /etc/hosts) or a real DNS record we do not control, which this host and time-box do not provide.",
+    "criteria": "Each of TLS/IPv6/SOCKS5/remote-host produces a real, distinguishable allow vs deny transcript captured with srt --debug; the DNS-rebinding claim is checked by source review of resolved-address-guard.js plus one live proxy transcript demonstrating the adjacent 'localhost' exemption path, since a full external rebinding PoC is out of scope for this host.",
+    "late": true,
+    "late_note": "Written at 2026-09-23T00:52:08.551Z by original#66 (Write of $SCRATCHPAD/write_receipts.py; receipts written by original#67 at 00:52:11Z), after the first-pass commands it describes had run (original-session calls 2026-09-23T00:40:04.958Z to 2026-09-23T00:43:27.053Z); any fix-round evidence in this receipt came later and has its own fix-round preregistration where one exists. The previously recorded written_at '2026-09-23T00:35:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps."
+  },
+  "commands": [
+    "original#15 [2026-09-23T00:40:04.958Z]: mkdir -p $HOME/.cache/gap-wave2-20260923/isolation/netfix\ncd $HOME/.cache/gap-wave2-20260923/isolation/netfix\n\n# 1. Loopback IPv4 HTTP test server\npython3 -c \"\nimport http.server, threading, socket\nclass H(http.server.BaseHTTPRequestHandler):\n    def do_GET(self):\n        self.send_response(200); self.end_headers(); self.wfile.write(b'ok4')\n    def log_message(self,*a): pass\nsrv = http.server.HTTPServer(('127.0.0.1', 18091), H)\nsrv.serve_forever()\n\" &\necho IPV4_PID=$!\nsleep 1\n\n# 2. IPv6 loopback HTTP server\npython3 -c \"\nimport http.server, socketserver\nclass H(http.server.BaseHTTPRequestHandler):\n    def do_GET(self):\n        self.send_response(200); self.end_headers(); self.wfile.write(b'ok6')\n    def log_message(self,*a): pass\nclass S(http.server.HTTPServer):\n    address_family = __import__('socket').AF_INET6\nsrv = S(('::1', 18092), H)\nsrv.serve_forever()\n\" &\necho IPV6_PID=$!\nsleep 1\ncurl -sS -o /dev/null -w \"direct4=%{http_code}\\n\" http://127.0.0.1:18091/ --max-time 3\ncurl -sS -o /dev/null -w \"direct6=%{http_code}\\n\" -g \"http://[::1]:18092/\" --max-time 3\njobs -l",
+    "original#16 [2026-09-23T00:40:13.824Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/netfix\nopenssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 1 -subj \"/CN=127.0.0.1\" 2>&1 | tail -3\npython3 -c \"\nimport http.server, ssl\nclass H(http.server.BaseHTTPRequestHandler):\n    def do_GET(self):\n        self.send_response(200); self.end_headers(); self.wfile.write(b'oktls')\n    def log_message(self,*a): pass\nsrv = http.server.HTTPServer(('127.0.0.1', 18093), H)\nctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)\nctx.load_cert_chain('cert.pem','key.pem')\nsrv.socket = ctx.wrap_socket(srv.socket, server_side=True)\nsrv.serve_forever()\n\" &\necho TLS_PID=$!\nsleep 1\ncurl -sSk -o /dev/null -w \"directtls=%{http_code}\\n\" https://127.0.0.1:18093/ --max-time 3\n\n# raw TCP echo server for SOCKS test\npython3 -c \"\nimport socket\ns = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\ns.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)\ns.bind(('127.0.0.1', 18094)); s.listen(5)\nwhile True:\n    c,_ = s.accept()\n    data = c.recv(4096)\n    c.sendall(b'ECHO:' + data)\n    c.close()\n\" &\necho TCP_PID=$!\nsleep 1\npython3 -c \"\nimport socket\ns=socket.create_connection(('127.0.0.1',18094),timeout=3)\ns.sendall(b'hi')\nprint('directecho=',s.recv(100))\n\"",
+    "original#17 [2026-09-23T00:40:26.345Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/netfix\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\n\ncat > settings-allow4.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"]},\"network\":{\"allowedDomains\":[\"127.0.0.1:18091\"]}}\nEOF\ncat > settings-deny.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"]},\"network\":{\"allowedDomains\":[]}}\nEOF\ncat > settings-allow6.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"]},\"network\":{\"allowedDomains\":[\"[::1]:18092\"]}}\nEOF\ncat > settings-allowtls.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"]},\"network\":{\"allowedDomains\":[\"127.0.0.1:18093\"]}}\nEOF\ncat > settings-allowecho.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"]},\"network\":{\"allowedDomains\":[\"127.0.0.1:18094\"]}}\nEOF\ncat > settings-rebind.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"]},\"network\":{\"allowedDomains\":[\"fakehost.test\"]}}\nEOF\ncat > settings-remoteallow.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"]},\"network\":{\"allowedDomains\":[\"example.com\"]}}\nEOF\n\nrun() { echo \"== $1 ==\"; shift; \"$@\" 2>&1; echo \"exit=$?\"; }\n\nrun \"ipv4 allow\" \"$SRT\" --settings settings-allow4.json curl -sS --max-time 5 --retry 2 --retry-connrefused --retry-delay 1 --noproxy \"\" -o /dev/null -w \"http=%{http_code}\\n\" http://127.0.0.1:18091/\nrun \"ipv4 deny\" \"$SRT\" --settings settings-deny.json curl -sS --max-time 5 --noproxy \"\" -o /dev/null -w \"http=%{http_code}\\n\" http://127.0.0.1:18091/\nrun \"ipv6 allow\" \"$SRT\" --settings settings-allow6.json curl -sSg --max-time 5 --retry 2 --retry-connrefused --retry-delay 1 --noproxy \"\" -o /dev/null -w \"http=%{http_code}\\n\" \"http://[::1]:18092/\"\nrun \"tls allow (opaque tunnel)\" \"$SRT\" --settings settings-allowtls.json curl -sSk --max-time 5 --retry 2 --retry-connrefused --retry-delay 1 --noproxy \"\" -o /dev/null -w \"http=%{http_code}\\n\" https://127.0.0.1:18093/\nrun \"tls deny\" \"$SRT\" --settings settings-deny.json curl -sSk --max-time 5 --noproxy \"\" -o /dev/null -w \"http=%{http_code}\\n\" https://127.0.0.1:18093/",
+    "original#18 [2026-09-23T00:40:35.037Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/netfix\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\nrun() { echo \"== $1 ==\"; shift; \"$@\" 2>&1; echo \"exit=$?\"; }\n\nrun \"ipv4 allow\" \"$SRT\" --settings settings-allow4.json -c \"curl -sS --max-time 5 --retry 2 --retry-connrefused --retry-delay 1 --noproxy '' -o /dev/null -w 'http=%{http_code}\\n' http://127.0.0.1:18091/\"\nrun \"ipv4 deny\" \"$SRT\" --settings settings-deny.json -c \"curl -sS --max-time 5 --noproxy '' -o /dev/null -w 'http=%{http_code}\\n' http://127.0.0.1:18091/\"",
+    "original#19 [2026-09-23T00:40:39.412Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/netfix\nmk() { cat > \"$1\" <<EOF\n{\"filesystem\":{\"allowWrite\":[\".\"],\"denyRead\":[],\"denyWrite\":[]},\"network\":{\"allowedDomains\":$2,\"deniedDomains\":[]}}\nEOF\n}\nmk settings-allow4.json '[\"127.0.0.1:18091\"]'\nmk settings-deny.json '[]'\nmk settings-allow6.json '[\"[::1]:18092\"]'\nmk settings-allowtls.json '[\"127.0.0.1:18093\"]'\nmk settings-allowecho.json '[\"127.0.0.1:18094\"]'\nmk settings-rebind.json '[\"fakehost.test\"]'\nmk settings-remoteallow.json '[\"example.com\"]'\ncat settings-allow4.json",
+    "original#20 [2026-09-23T00:40:45.565Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/netfix\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\nrun() { echo \"== $1 ==\"; shift; \"$@\" 2>&1; echo \"exit=$?\"; }\n\nrun \"ipv4 allow\" \"$SRT\" --settings settings-allow4.json -c \"curl -sS --max-time 5 --retry 2 --retry-connrefused --retry-delay 1 --noproxy '' -o /dev/null -w 'http=%{http_code}\\n' http://127.0.0.1:18091/\"\nrun \"ipv4 deny\" \"$SRT\" --settings settings-deny.json -c \"curl -sS --max-time 5 --noproxy '' -o /dev/null -w 'http=%{http_code}\\n' http://127.0.0.1:18091/\"\nrun \"ipv6 allow\" \"$SRT\" --settings settings-allow6.json -c \"curl -sSg --max-time 5 --retry 2 --retry-connrefused --retry-delay 1 --noproxy '' -o /dev/null -w 'http=%{http_code}\\n' 'http://[::1]:18092/'\"\nrun \"tls allow (opaque tunnel)\" \"$SRT\" --settings settings-allowtls.json -c \"curl -sSk --max-time 5 --retry 2 --retry-connrefused --retry-delay 1 --noproxy '' -o /dev/null -w 'http=%{http_code}\\n' https://127.0.0.1:18093/\"\nrun \"tls deny\" \"$SRT\" --settings settings-deny.json -c \"curl -sSk --max-time 5 --noproxy '' -o /dev/null -w 'http=%{http_code}\\n' https://127.0.0.1:18093/\"",
+    "original#21 [2026-09-23T00:40:59.604Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/netfix\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\nrun() { echo \"== $1 ==\"; shift; \"$@\" 2>&1; echo \"exit=$?\"; }\n\nrun \"ipv4 deny (retry)\" \"$SRT\" --settings settings-deny.json -c \"curl -sS --max-time 5 --retry 2 --retry-connrefused --retry-delay 1 --noproxy '' -o /dev/null -w 'http=%{http_code}\\n' http://127.0.0.1:18091/\"\nrun \"tls deny (retry)\" \"$SRT\" --settings settings-deny.json -c \"curl -sSk --max-time 5 --retry 2 --retry-connrefused --retry-delay 1 --noproxy '' -o /dev/null -w 'http=%{http_code}\\n' https://127.0.0.1:18093/\"\nrun \"dns-rebind allow-by-name-resolves-loopback\" \"$SRT\" --settings settings-rebind.json -c \"curl -sS --max-time 5 --retry 2 --retry-connrefused --retry-delay 1 --noproxy '' --resolve fakehost.test:18091:127.0.0.1 -o /dev/null -w 'http=%{http_code}\\n' http://fakehost.test:18091/\"\nrun \"remote allow example.com\" \"$SRT\" --settings settings-remoteallow.json -c \"curl -sS --max-time 8 --retry 2 --retry-connrefused --retry-delay 1 --noproxy '' -o /dev/null -w 'http=%{http_code}\\n' https://example.com/\"\nrun \"remote deny example.com\" \"$SRT\" --settings settings-deny.json -c \"curl -sS --max-time 8 --retry 2 --retry-connrefused --retry-delay 1 --noproxy '' -o /dev/null -w 'http=%{http_code}\\n' https://example.com/\"",
+    "original#22 [2026-09-23T00:41:13.861Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/netfix\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\n\"$SRT\" --debug --settings settings-rebind.json -c \"curl -v --max-time 5 --retry 2 --retry-connrefused --retry-delay 1 --noproxy '' --resolve fakehost.test:18091:127.0.0.1 http://fakehost.test:18091/\" 2>&1 | tail -40",
+    "original#23 [2026-09-23T00:41:35.269Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/netfix\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\ncat > settings-localhost-name.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"],\"denyRead\":[],\"denyWrite\":[]},\"network\":{\"allowedDomains\":[\"localhost:18091\"],\"deniedDomains\":[]}}\nEOF\n\"$SRT\" --debug --settings settings-localhost-name.json -c \"curl -sS --max-time 5 --retry 2 --retry-connrefused --retry-delay 1 --noproxy '' -o /dev/null -w 'http=%{http_code}\\n' http://localhost:18091/\" 2>&1 | tail -20",
+    "original#24 [2026-09-23T00:41:50.201Z]: D=$HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/lib/node_modules/@anthropic-ai/sandbox-runtime\ngrep -rl \"resolved to a loopback\\|isDeniedResolvedAddress\\|deniedResolvedAddresses\\|resolveOnce\\|dns.lookup\" \"$D\"/dist 2>/dev/null | head",
+    "original#25 [2026-09-23T00:41:53.111Z]: D=$HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/lib/node_modules/@anthropic-ai/sandbox-runtime\ngrep -n \"localhost\\|isIpLiteral\\|function \\|module.exports\\|exports\\.\" \"$D/dist/sandbox/resolved-address-guard.js\" | head -60",
+    "original#26 [2026-09-23T00:41:56.484Z]: D=$HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/lib/node_modules/@anthropic-ai/sandbox-runtime\nsed -n '1,40p' \"$D/dist/sandbox/resolved-address-guard.js\"\necho ---\nsed -n '126,230p' \"$D/dist/sandbox/resolved-address-guard.js\"",
+    "original#27 [2026-09-23T00:42:08.667Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/netfix\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\n\"$SRT\" --settings settings-allowecho.json -c \"env | grep -iE 'proxy'\" 2>&1",
+    "original#28 [2026-09-23T00:42:21.646Z]: cat > $HOME/.cache/gap-wave2-20260923/isolation/netfix/socks_client.py <<'PYEOF'\nimport socket, struct, sys, os, urllib.parse\n\ndef socks5_connect(proxy_host, proxy_port, user, pw, dst_host, dst_port, timeout=5):\n    s = socket.create_connection((proxy_host, proxy_port), timeout=timeout)\n    s.sendall(b'\\x05\\x01\\x02')  # ver, 1 method, user/pass auth\n    resp = s.recv(2)\n    if resp[1] == 0xff:\n        raise RuntimeError('no acceptable auth')\n    u = user.encode(); p = pw.encode()\n    s.sendall(b'\\x01' + bytes([len(u)]) + u + bytes([len(p)]) + p)\n    auth_resp = s.recv(2)\n    if auth_resp[1] != 0x00:\n        return s, 'AUTH_FAILED', auth_resp\n    host = dst_host.encode()\n    req = b'\\x05\\x01\\x00\\x03' + bytes([len(host)]) + host + struct.pack('>H', dst_port)\n    s.sendall(req)\n    reply = s.recv(10)\n    rep_code = reply[1]\n    return s, rep_code, reply\n\nproxy_url = os.environ['all_proxy'] if 'all_proxy' in os.environ else os.environ.get('ftp_proxy')\nu = urllib.parse.urlparse(os.environ['ftp_proxy'])\nproxy_host = 'localhost'\nproxy_port = int(u.port)\nuser = urllib.parse.unquote(u.username)\npw = urllib.parse.unquote(u.password)\ndst_host = sys.argv[1]\ndst_port = int(sys.argv[2])\ns, rep, raw = socks5_connect(proxy_host, proxy_port, user, pw, dst_host, dst_port)\nprint('SOCKS_REPLY_CODE=', rep)\nif rep == 0:\n    s.sendall(b'hi')\n    s.settimeout(3)\n    try:\n        data = s.recv(100)\n        print('ECHO_RESPONSE=', data)\n    except Exception as e:\n        print('ECHO_RECV_ERROR=', e)\ns.close()\nPYEOF\ncd $HOME/.cache/gap-wave2-20260923/isolation/netfix\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\necho \"== socks allow ==\" \n\"$SRT\" --settings settings-allowecho.json -c \"python3 socks_client.py 127.0.0.1 18094\" 2>&1\necho \"== socks deny ==\" \n\"$SRT\" --settings settings-deny.json -c \"python3 socks_client.py 127.0.0.1 18094\" 2>&1",
+    "original#30 [2026-09-23T00:42:30.333Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/netfix\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\necho \"== socks allow ==\"\n\"$SRT\" --settings settings-allowecho.json -c \"python3 socks_client.py 127.0.0.1 18094\" 2>&1\necho \"== socks deny ==\"\n\"$SRT\" --settings settings-deny.json -c \"python3 socks_client.py 127.0.0.1 18094\" 2>&1",
+    "original#31 [2026-09-23T00:42:36.362Z]: kill $(jobs -p) 2>/dev/null\npkill -f \"python3 -c\" 2>/dev/null\nsleep 1\njobs -l\nps aux | grep -E \"1809[1-4]\" | grep -v grep",
+    "original#32 [2026-09-23T00:42:38.479Z]: ps aux | grep python3 | grep -v grep",
+    "original#33 [2026-09-23T00:42:42.436Z]: ss -tlnp 2>/dev/null | grep -E \"18091|18092|18093|18094\" || echo \"clear\"",
+    "original#39 [2026-09-23T00:43:26.287Z]: timeout 15 npm view @anthropic-ai/sandbox-runtime versions --json 2>&1 | tail -20",
+    "fix#4 [2026-09-23T01:01:10.882Z]: cd $HOME/code/nas-wt-g2-isolation && which srt wt curl python3 rustc cargo 2>&1; echo ---; srt --version 2>&1; wt --version 2>&1; echo ---net---; curl -sS --max-time 5 -o /dev/null -w \"%{http_code}\\n\" http://127-0-0-1.nip.io:80/ 2>&1; getent hosts 127-0-0-1.nip.io 2>&1; echo ---disk---; df -h ~/.cache 2>&1 | tail -1; echo ---sudo---; sudo -n true && echo have_passwordless_sudo",
+    "fix#5 [2026-09-23T01:01:15.325Z]: getent hosts example.com 2>&1; echo ---; getent hosts nip.io 2>&1; echo ---; getent hosts sslip.io 2>&1; echo ---; nslookup 127.0.0.1.nip.io 2>&1 | head -20; echo ---resolv---; cat /etc/resolv.conf 2>&1",
+    "fix#6 [2026-09-23T01:01:19.508Z]: getent hosts 127.0.0.1.nip.io 2>&1; echo ---; getent hosts 127-0-0-1.sslip.io 2>&1; echo ---; getent hosts localtest.me 2>&1",
+    "fix#7 [2026-09-23T01:01:30.634Z]: python3 -c \"import socket; print(socket.gethostbyname('127.0.0.1.nip.io'))\" 2>&1\npython3 -c \"import socket; print(socket.gethostbyname('sslip.io'))\" 2>&1\npython3 -c \"import socket; print(socket.gethostbyname('127.0.0.1.sslip.io'))\" 2>&1\npython3 -c \"import socket; print(socket.getaddrinfo('1.1.1.1.nip.io', 80))\" 2>&1",
+    "fix#8 [2026-09-23T01:01:39.520Z]: python3 -c \"import socket; print(socket.getaddrinfo('10.0.0.1.nip.io', 80))\" 2>&1\npython3 -c \"import socket; print(socket.getaddrinfo('192.168.1.1.nip.io', 80))\" 2>&1\npython3 -c \"import socket; print(socket.getaddrinfo('127.0.0.1.sslip.io', 80))\" 2>&1\npython3 -c \"import socket; print(socket.getaddrinfo('localtest.me', 80))\" 2>&1\npython3 -c \"import socket; print(socket.getaddrinfo('127.0.0.1.xip.io', 80))\" 2>&1",
+    "fix#9 [2026-09-23T01:01:55.463Z]: python3 -c \"import socket; print(socket.getaddrinfo('lvh.me', 80))\" 2>&1\npython3 -c \"import socket; print(socket.getaddrinfo('vcap.me', 80))\" 2>&1\npython3 -c \"import socket; print(socket.getaddrinfo('127.0.0.1.nip.io.', 80))\" 2>&1"
+  ],
+  "results": [
+    "TLS opaque tunnel (original#20/#21): allow `http=200` (after the first-attempt race message `curl: (7) Failed to connect to localhost port 3128`); deny with retries `curl: (56) CONNECT tunnel failed, response 403`, exit=56.",
+    "IPv6 loopback (original#20): allow `http=200` for http://[::1]:18092/. No IPv6 deny case was run.",
+    "SOCKS5 raw TCP (original#30): allow `SOCKS_REPLY_CODE= 0` and `ECHO_RESPONSE= b'ECHO:hi'`; deny `SOCKS_REPLY_CODE= 2`.",
+    "Public remote host example.com (original#21): allow `http=200`; deny `curl: (56) CONNECT tunnel failed, response 403`, exit=56.",
+    "IPv4 loopback (original#20/#21): allow `http=200`; deny without retries hit the readiness race (`http=000`, exit=7), deny with retries returned `http=403`.",
+    "Pinned-name case (original#21/#22): allowedDomains [\"fakehost.test\"] with curl `--resolve fakehost.test:18091:127.0.0.1` gave exit=23; srt --debug showed `Allowed by config rule: fakehost.test:18091` then `Proxy request failed: getaddrinfo ENOTFOUND fakehost.test` and `502 Bad Gateway`. The host-side proxy resolves the name itself, so a client-side --resolve pin does not reach the resolved-address guard; this is not a rebinding test.",
+    "localhost-name exemption (original#23): allowedDomains [\"localhost:18091\"] gave `Allowed by config rule: localhost:18091` and `http=200`.",
+    "DNS-rebinding candidates through this host resolver (fix#4-#9; /etc/resolv.conf `nameserver <lan-ip>`, WSL-generated): `127-0-0-1.nip.io` (curl: Could not resolve host), `127.0.0.1.nip.io`, `127.0.0.1.sslip.io`, `127-0-0-1.sslip.io`, `localtest.me`, `10.0.0.1.nip.io`, `192.168.1.1.nip.io`, `lvh.me` and `127.0.0.1.nip.io.` all failed (`[Errno -5] No address associated with hostname`, getent exit 2); `127.0.0.1.xip.io` gave `[Errno -2] Name or service not known`. `1.1.1.1.nip.io` resolved to 1.1.1.1, `sslip.io` to 78.46.204.247 and `vcap.me` to 103.224.182.214 (a public address). No name resolved to loopback.",
+    "Cause of the DNS result is undetermined. Public and private encodings on the same wildcard service behaved differently (1.1.1.1.nip.io resolved; 10.0.0.1, 192.168.1.1 and 127.0.0.1 encodings did not), which is consistent with private-answer (rebind) filtering somewhere in the resolver chain, but no lookup bypassed the host resolver (for example a direct query to a public resolver), so resolver filtering and provider behaviour were not separated. nip.io documents that 127.0.0.1.nip.io answers 127.0.0.1, so the earlier attribution to nip.io policy is withdrawn.",
+    "npm registry (original#39): the versions list ends at \"0.0.77\"; no newer sandbox-runtime release existed to compare."
+  ],
+  "outcome": "advanced",
+  "note": "TLS opaque tunnel, SOCKS5 raw TCP and a public remote host each have an executed allow and deny transcript at sandbox-runtime 0.0.77 (npm latest). IPv6 loopback has an allow transcript only. DNS rebinding was not tested live: every loopback or private encoding failed to resolve through this host resolver, for an undetermined cause (see results). Remaining: an IPv6 deny case, a live rebinding case (candidate isolated route not tried here: run srt inside `unshare --user --map-root-user --mount` with a loopback-only resolver bind-mounted over /etc/resolv.conf, if bwrap works in that namespace), and general sandbox escape, which no fixture addressed.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Single Linux/WSL host; no macOS or Windows sandbox-runtime backend.",
+    "All allow cases used curl --retry-connrefused because of the gap 2 readiness race; the first attempt in every run printed the connection-refused message.",
+    "TLS used opaque CONNECT tunnelling; network.tlsTerminate was not configured or tested.",
+    "IPv6 was tested for allow only.",
+    "DNS lookups all went through the WSL-generated resolver; the cause of the missing private answers was not isolated.",
+    "Some outputs in the raw record were condensed by the RTK Bash hook; the quoted lines above appear verbatim there."
+  ],
+  "fix_round_preregistration": {
+    "written_at": "2026-09-23T01:27:38.713Z",
+    "expectation": "The prior claim that a live DNS-rebinding PoC needs root or a controlled DNS record is likely inaccurate: public wildcard-DNS-to-IP services (nip.io, sslip.io, lvh.me, vcap.me) exist and can be tried without either. Testing whether any of them actually resolves an attacker-controlled hostname to 127.0.0.1 on this host will either produce the missing live transcript or identify the real (different) blocker.",
+    "criteria": "Resolve each candidate wildcard hostname with Python's stdlib resolver (host's actual DNS path) and record success/failure per name; if any resolves to 127.0.0.1, run the srt fixture against it and capture allow/deny; if none resolve to loopback, record that as the actual (corrected) blocker instead of the root/DNS-control framing.",
+    "late": true,
+    "label": "fix-round preregistration, written after the fix-round commands it describes",
+    "late_note": "Written at 2026-09-23T01:27:38.713Z by fix#48; fix-round commands ran fix#4-fix#46 (01:01:10Z-01:27:09Z); cargo attempt 2 had finished by fix#54 (01:28:38Z). The previously recorded written_at '2026-09-23T01:10:00+00:00' was a placeholder, not the time this block was written, and it was not written before its sub-check ran."
+  },
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:40:04.958Z to 2026-09-23T01:01:56.062Z. The previous value '2026-09-23T00:52:11.952018+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#15",
+        "original#16",
+        "original#17",
+        "original#18",
+        "original#19",
+        "original#20",
+        "original#21",
+        "original#22",
+        "original#23",
+        "original#24",
+        "original#25",
+        "original#26",
+        "original#27",
+        "original#28",
+        "original#30",
+        "original#31",
+        "original#32",
+        "original#33",
+        "original#39"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/fix-session-tool-calls.txt",
+      "sha256": "b1a1bce670082262521365455849b1618b460a9bbd53fdec5d6d0337523d8899",
+      "calls": [
+        "fix#4",
+        "fix#5",
+        "fix#6",
+        "fix#7",
+        "fix#8",
+        "fix#9"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Review finding 8: removed the unsupported attribution of the DNS result to nip.io policy; the cause is now recorded as undetermined, with the detection gap (no lookup bypassed the host resolver).",
+      "Corrected the candidate results from the raw record: vcap.me (not lvh.me) resolved to 103.224.182.214; lvh.me failed; added names that were tried but missing from the receipt: 10.0.0.1.nip.io, 192.168.1.1.nip.io, 127.0.0.1.xip.io and the trailing-dot 127.0.0.1.nip.io.",
+      "Recorded that IPv6 was tested for allow only and that the fakehost.test --resolve case returned 502/ENOTFOUND.",
+      "commands replaced with the exact command text of each cited call; preregistration and fix-round timestamps corrected from the transcript; raw_evidence added."
+    ]
+  }
+}

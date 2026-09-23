@@ -1,0 +1,1 @@
+control: GET /repos/cli/cli/attestations/sha256:9bca2d1c16825f109907a23307628a2f0698fbf99662b73a5cf0b020293072b8 (gh_2.101.0_linux_amd64.tar.gz)

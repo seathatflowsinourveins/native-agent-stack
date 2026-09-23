@@ -1,0 +1,7 @@
+type: graph
+timeout_sec: 300
+max_active_runs: 1
+working_dir: "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g1-cancel-1790131730"
+steps:
+  - id: provider_call
+    run: "sh -c 'env HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin $HOME/.local/share/codex-ecosystem/bin/codex exec --json --sandbox read-only --ephemeral --skip-git-repo-check -C $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g1-cancel-1790131730/model-cwd '\"'\"'Without using any tools, write a detailed explanation of at least 1500 words of how five-field cron expressions are evaluated, with twenty worked examples.'\"'\"' < /dev/null > events.jsonl 2> codex-stderr.txt'"

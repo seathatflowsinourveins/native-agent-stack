@@ -1,0 +1,43 @@
+
+### start 1 (fresh data dir, embedding_provider unset)  (2026-09-23T08:01:39Z)
+  embeddings:   0 rows; 0 latest pages missing
+  providers:
+    llm:       disabled
+    embedding: disabled
+
+### models dir after fetch wait (12 s)
+total 89208
+drwxr-xr-x 2 <user> <group>     4096 Sep 23 04:01 .
+drwxr-xr-x 3 <user> <group>     4096 Sep 23 04:01 ..
+-rw-r--r-- 1 <user> <group>      612 Sep 23 04:01 config.json
+-rw-r--r-- 1 <user> <group> 90868376 Sep 23 04:01 model.safetensors
+-rw-r--r-- 1 <user> <group>   466247 Sep 23 04:01 tokenizer.json
+88M	$HOME/.cache/gap-wave2-20260923/agents-models-workers/fix6b/data/models
+
+### start 2 (after model fetch, restart)  (2026-09-23T08:01:54Z)
+  embeddings:   0 rows; 0 latest pages missing
+  providers:
+    llm:       disabled
+    embedding: local/all-MiniLM-L6-v2 (384d) unknown (no calls yet)
+
+### after one write-page  (2026-09-23T08:01:57Z)
+  embeddings:   1 rows; 0 latest pages missing
+  providers:
+    llm:       disabled
+    embedding: local/all-MiniLM-L6-v2 (384d) ok (last call: 2026-09-23T08:01:54.813333704Z)
+
+### serve log (model/embedding lines)
+2026-09-23T08:01:38.655892Z  INFO ai_memory_cli: ai-memory starting version="2.4.0" server_url=http://127.0.0.1:27375 data_dir=$HOME/.cache/gap-wave2-20260923/agents-models-workers/fix6b/data bind=127.0.0.1:49374
+2026-09-23T08:01:38.655958Z  INFO ai_memory_cli::commands::serve: single-instance serve lock held lock=$HOME/.cache/gap-wave2-20260923/agents-models-workers/fix6b/data/.serve.lock
+2026-09-23T08:01:38.712158Z  INFO ai_memory_cli::commands::serve: fetching the default local embedding model in the background (~87 MB, one time); hybrid search enables on the next start dir=$HOME/.cache/gap-wave2-20260923/agents-models-workers/fix6b/data/models
+2026-09-23T08:01:38.714608Z  INFO ai_memory_llm::local: fetching local embedding model file file="model.safetensors"
+2026-09-23T08:01:38.718565Z  INFO ai_memory_cli::commands::serve: starting wiki watcher root=$HOME/.cache/gap-wave2-20260923/agents-models-workers/fix6b/data/wiki workspace=default project=scratch
+2026-09-23T08:01:40.036030Z  INFO ai_memory_llm::local: fetching local embedding model file file="tokenizer.json"
+2026-09-23T08:01:40.132204Z  INFO ai_memory_llm::local: fetching local embedding model file file="config.json"
+2026-09-23T08:01:51.230073Z  INFO ai_memory_cli: ai-memory starting version="2.4.0" server_url=http://127.0.0.1:27375 data_dir=$HOME/.cache/gap-wave2-20260923/agents-models-workers/fix6b/data bind=127.0.0.1:49374
+2026-09-23T08:01:51.230182Z  INFO ai_memory_cli::commands::serve: single-instance serve lock held lock=$HOME/.cache/gap-wave2-20260923/agents-models-workers/fix6b/data/.serve.lock
+2026-09-23T08:01:51.390334Z  INFO ai_memory_cli::commands::serve: embedder enabled provider="local" model="all-MiniLM-L6-v2" dim=384
+2026-09-23T08:01:51.390696Z  INFO ai_memory_cli::commands::serve: starting wiki watcher root=$HOME/.cache/gap-wave2-20260923/agents-models-workers/fix6b/data/wiki workspace=default project=scratch
+
+### listeners after stop (expect none)
+none

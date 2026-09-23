@@ -1,0 +1,138 @@
+{
+ "ref": "origin/main",
+ "merge_commit": "43bb931",
+ "merge_is_ancestor_of_ref": true,
+ "files": {
+  "observability-hosting-comparison.json": {
+   "sha256_ref": "3baa597c122ed91bf95f4c16d00a01f7f048119e439ae024972b595511b0a1bf",
+   "identical_to_merge": true,
+   "bytes": 36369
+  },
+  "README.md": {
+   "sha256_ref": "7ad30ecf39eb37d644a37d9cd36160109843dd2a068f05a118c8cb5073978177",
+   "identical_to_merge": true,
+   "bytes": 15054
+  },
+  "fixround-preregistration.md": {
+   "sha256_ref": "20cbe6c6fe1a44ed7440cf51e7166611f7330c4ff1ca72fec5bb5c53479a9465",
+   "identical_to_merge": true,
+   "bytes": 3053
+  },
+  "logs-fixround/egress-default-retry.log": {
+   "sha256_ref": "e6b96f1f0a010432d5084f47356d18de5db09f5ddd77667f102e95fc2cca4120",
+   "identical_to_merge": true,
+   "bytes": 4501
+  },
+  "logs-fixround/egress-allowlisted.log": {
+   "sha256_ref": "19ba0ae0e2d5463fd9488dc64535bfe9e82f7493ed59720383e6476de8ed58bf",
+   "identical_to_merge": true,
+   "bytes": 5774
+  },
+  "logs-fixround/egress-allowlisted-otherhost-denied.log": {
+   "sha256_ref": "cadcbf90c7303f28c406bab26a124c89b1794a9626a14b487201d945d29a2a7f",
+   "identical_to_merge": true,
+   "bytes": 5895
+  }
+ },
+ "receipt_evidence_class": "native_proven",
+ "receipt_verdict": "not_comparable",
+ "receipt_checked_at": "2026-09-23T00:52:00Z",
+ "candidates": [
+  {
+   "key": "c14",
+   "name": "opentelemetry-collector-contrib",
+   "in_claude_set": true,
+   "in_codex_set": true,
+   "verdict": "qualified",
+   "evidence_class": "native_proven",
+   "works_under_requirement": true
+  },
+  {
+   "key": "c5",
+   "name": "prometheus",
+   "in_claude_set": true,
+   "in_codex_set": false,
+   "verdict": "qualified",
+   "evidence_class": "native_proven",
+   "works_under_requirement": true
+  },
+  {
+   "key": "c6",
+   "name": "loki",
+   "in_claude_set": true,
+   "in_codex_set": false,
+   "verdict": "qualified",
+   "evidence_class": "native_proven",
+   "works_under_requirement": true
+  },
+  {
+   "key": "c8",
+   "name": "restic",
+   "in_claude_set": false,
+   "in_codex_set": true,
+   "verdict": "qualified",
+   "evidence_class": "native_proven",
+   "works_under_requirement": true
+  },
+  {
+   "key": "c3",
+   "name": "sandbox-runtime",
+   "in_claude_set": false,
+   "in_codex_set": true,
+   "verdict": "not_comparable",
+   "evidence_class": "native_proven",
+   "works_under_requirement": true
+  }
+ ],
+ "clause_probe": {
+  "positive_control_restic": {
+   "restic": 75
+  },
+  "both_candidate_sets": {
+   "in_claude_set": 5,
+   "in_codex_set": 5
+  },
+  "log_metric_retention": {
+   "kill -9": 10,
+   "retention": 4
+  },
+  "log_metric_query": {
+   "query_range": 2,
+   "query-back": 6,
+   "/loki/api/v1/query": 1
+  },
+  "snapshot_restore_fidelity": {
+   "restore --verify": 7,
+   "diff -rq": 6,
+   "check --read-data": 12
+  },
+  "sandbox_isolation": {
+   "unshare-net": 5,
+   "no matching config rule": 5
+  },
+  "dagu_workload": {
+   "dagu": 0
+  },
+  "paper_runtime_telemetry": {
+   "paper-runtime": 0,
+   "paper runtime": 0,
+   "paper_runtime": 0,
+   "paper account": 0
+  }
+ },
+ "clause_covered": {
+  "positive_control_restic": true,
+  "both_candidate_sets": true,
+  "log_metric_retention": true,
+  "log_metric_query": true,
+  "snapshot_restore_fidelity": true,
+  "sandbox_isolation": true,
+  "dagu_workload": false,
+  "paper_runtime_telemetry": false
+ },
+ "ledger_row_on_ref": {
+  "verdict_status": "pending_lanes",
+  "winners": [],
+  "open_gaps_count": 1
+ }
+}

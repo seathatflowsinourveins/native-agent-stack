@@ -1,0 +1,9 @@
+{
+  "gap_index": 10,
+  "written_at": "2026-09-23T06:08:19Z",
+  "round": 3,
+  "label": "second fix-round (late relative to rounds 1-2, written before round 3)",
+  "expectation": "The Codex re-review of 6155b51 showed the round-2 'S' marker is written before fsync, registration and the engine call, so an unmatched S does not prove an engine-level write was interrupted. Round 3 adds an 'I b t' marker written immediately before the engine call (insert/append) and kills only when the last marker is I, no ack exists for b, and at least 25% of the median insert duration of the acknowledged batches has elapsed since I. Proof of an interrupted engine write: I(b) < kill time, no A(b), and elapsed-in-engine at kill >= 0.25 x median (A-I) duration. Expected: all four stores pass per-batch verification with the in-flight batch absent or complete.",
+  "criteria": "settled if round 3 shows engine-level interruption by that criterion for all four stores and per-batch verification passes; advanced (naming the store) otherwise.",
+  "note": "Round 3 reruns the full bench for all four stores (third sample); rounds 1 and 2 stay retained."
+}

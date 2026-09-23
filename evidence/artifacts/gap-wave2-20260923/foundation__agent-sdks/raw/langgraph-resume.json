@@ -1,0 +1,25 @@
+{
+  "phase": "resume",
+  "pid": 3562229,
+  "loaded_state": {
+    "values": {
+      "log": [
+        "fetch@pid3562107"
+      ],
+      "total": 40
+    },
+    "next": [
+      "approve"
+    ]
+  },
+  "result": {
+    "log": [
+      "fetch@pid3562107",
+      "approve@pid3562229",
+      "publish@pid3562229"
+    ],
+    "total": 42
+  },
+  "next": [],
+  "checkpoints": 5
+}

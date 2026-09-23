@@ -1,0 +1,23 @@
+Aborted - 2026-09-22T22:54:07-04:00
+
+dag: realboot (5.0s)
+├─log: $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994/dagu-home/logs/realboot/dag-run_20260923_025407Z_realboot-59dd2fcf40df9ebc/dag-run_20260922.225407.830.realboot.log
+│
+├─checkpoint (5.0s) [succeeded]
+│ └─/usr/bin/python3 -B
+│     $HOME/code/nas-wt-g2-scheduling-supervision/blueprints/gap-wave2
+│     -20260923/foundation__scheduling-supervision/real_steps.py checkpoint
+│     $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-
+│     run-1790131994
+│ 
+└─finalize (0s) [failed]
+  ├─/usr/bin/python3 -B
+  │   $HOME/code/nas-wt-g2-scheduling-supervision/blueprints/gap-wave2-2
+  │   0260923/foundation__scheduling-supervision/real_steps.py finalize
+  │   $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-ru
+  │   n-1790131994
+  │
+  └─error: signal: terminated
+
+Result: Aborted
+

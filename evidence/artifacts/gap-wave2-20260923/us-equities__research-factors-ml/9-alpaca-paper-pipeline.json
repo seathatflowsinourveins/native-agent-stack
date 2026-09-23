@@ -1,0 +1,33 @@
+{
+  "id": "gap-wave2-20260923-research-factors-ml-9-alpaca-paper-pipeline",
+  "layer_id": "research-factors-ml",
+  "catalog": "us-equities",
+  "gap_index": 9,
+  "gap_text_sha256": "88ad71754edf15f1de8dbaa9627274a68a658f06d85a692e7b47c3e12031cc49",
+  "gap_text": "No winner establishes a complete factor/ML pipeline through NautilusTrader, broker-specific execution, deterministic risk enforcement and independently reconciled accounting.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:19:39Z",
+    "written_at_note": "Upper bound: the commit time of the first preregistration commit (4484138). Written between 06:18:35Z and that commit; corrected in the same unpushed commit before any check ran.",
+    "source": "preregistration.json gaps.9",
+    "expectation": "Not executed here: requires Alpaca paper-account contact and gate rows owned by peer session sota-workflow-resolution.",
+    "criteria": [
+      "Record deferred with owner sota-workflow-resolution."
+    ]
+  },
+  "commands": [],
+  "results": {
+    "not_executed": "Requires contacting the Alpaca paper account and changing gate rows. Those lanes are owned by peer session sota-workflow-resolution. Receipt 0 supplies only the historical Nautilus leg (no broker adapter, no RiskEngine limit configuration beyond the default pre-trade balance check)."
+  },
+  "outcome": "deferred",
+  "evidence_class": "source_review",
+  "detection_method": "n/a (not executed).",
+  "remaining": "Blocker: broker contact and paper-account calls are reserved to peer session sota-workflow-resolution (owner). No isolated alternative exists here, because a loopback-only instance cannot reconcile against the real Alpaca paper account API.",
+  "limits": [
+    "Deferred; no broker, paper-account or gate action was taken."
+  ],
+  "raw_outputs": [],
+  "checked_at": "2026-09-23T07:09:07Z",
+  "checked_at_note": "mtime of the last check output, $CACHE/run-fcmp-merged-r2/results.json. Corrected from 07:15:00Z, which post-dated its own commit 01e6054 (07:11:23Z); correction written 2026-09-23 after 13:37Z.",
+  "base_commit": "41d39b3",
+  "branch": "claude/g2-research-factors-ml-20260923"
+}

@@ -1,0 +1,3 @@
+check_updates: false
+scheduler:
+  port: 0

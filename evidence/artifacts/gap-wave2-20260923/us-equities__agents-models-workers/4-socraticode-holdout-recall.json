@@ -1,0 +1,85 @@
+{
+ "id": "gap-wave2-20260923/us-equities__agents-models-workers/4-socraticode-holdout-recall",
+ "catalog": "us-equities",
+ "layer_id": "agents-models-workers",
+ "gap_index": 4,
+ "gap_text": "Retrieval quality rests on a single limit-1 query (score 0.6429) in native-rag.json. That is not a holdout or recall measurement. The group's 8/12 exact-source recall figure comes from the packet limitations, not from a file I opened.",
+ "gap_text_sha256": "82bd7efb6525b13b5650ecfdaf407b84c04f52654cb58aff113c5343b3ae37a5",
+ "next_check": "Run a preregistered holdout of at least 20 queries with gold source paths against SocratiCode search (limit>1) and report recall@k and MRR.",
+ "base_commit": "41d39b3",
+ "preregistration": {
+  "written_at": "2026-09-23T07:23:05Z",
+  "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/4-socraticode-holdout-recall.json",
+  "commit": "5480a9c (2026-09-23T07:23:50Z, before any check ran)",
+  "expectation": "Covered elsewhere: the semantic-rag wave-2 unit already ran a sealed 35-question held-out set with gold file:line spans against SocratiCode 1.14.0 (limit 5, recall@5 and MRR). This unit also adds its own 32-query exhaustive-gold run (gap 12) with limit 10.",
+  "criteria": [
+   "Verify the cited receipt exists on origin/main, is sealed before retrieval, has >=20 queries, limit>1 and reports recall@k and MRR.",
+   "If any clause is missing, record advanced instead of covered_elsewhere."
+  ]
+ },
+ "commands": [
+  "# main-round services (exact commands in raw/services-main-round.txt, exported fix round 2, not re-run): 07:18:45Z qdrant --config-path $GAPCACHE/qdrant.yaml --disable-telemetry (yaml: host 127.0.0.1, http 27333, grpc 27334, storage/snapshots under $GAPCACHE); 07:25:00Z HOME=$GAPCACHE/aim-home AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 AI_MEMORY_EMBEDDING_PROVIDER=none ai-memory-2.3.2 --data-dir $GAPCACHE/aim-data init; 07:25:03Z sed -i on aim-data/config.toml: bind = 127.0.0.1:27374, embedding_provider = none; 07:25:07Z same env, setsid nohup ai-memory-2.3.2 --data-dir $GAPCACHE/aim-data serve --transport http (log: bind=127.0.0.1:27374, providers llm disabled, embedding disabled); 07:39:45Z kill of both PIDs, ports 27333/27334/27374 verified free",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/services/export_main_round_services.py <this unit's session transcript .jsonl> evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/services-main-round.txt  # fix round 2 export",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/socraticode_eval.py $GAPCACHE/corpus-scripts blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/gap12_queries.json $GAPCACHE/out/gap12_socraticode_raw.json  # limit 10, minScore 0",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/score_gap12.py ...",
+  "git show origin/main:evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-vs-baselines.json  # corroborating peer receipt"
+ ],
+ "results": {
+  "this_unit (gap-12 set, 32 preregistered queries sealed in commit 5480a9c before indexing, exhaustive file:line gold, SocratiCode 1.14.0, limit 10)": {
+   "hit@1": 0.6562,
+   "hit@5": 0.9062,
+   "hit@10": 0.9375,
+   "mrr@10": 0.7618
+  },
+  "this_unit (gap-11 twelve-query set, limit 10)": {
+   "recall@1": "7/12",
+   "recall@3": "11/12",
+   "recall@5": "11/12",
+   "mrr@10": 0.72222
+  },
+  "outcome_note": "The preregistration expected covered_elsewhere; this unit's own sealed 32-query run (gap 12) executes the next_check directly (>=20 queries, gold source paths, limit 10 > 1, recall@k and MRR), so the outcome is settled.",
+  "peer_receipt_corroboration": "semantic-rag wave-2 socraticode-vs-baselines.json on origin/main: sealed 35-question set, SocratiCode Recall@5=0.857 (30/35), MRR=0.721."
+ },
+ "outcome": "settled",
+ "what_remains": null,
+ "evidence_class": "native_proven",
+ "limits": [
+  "Both query sets were authored by the agent running the benchmark (no independent human set).",
+  "Gap-12 relevance is pattern-defined over 11 files of scripts/*.py; SocratiCode chunks average 23.6 lines, which helps containment scoring.",
+  "Isolation: disposable Qdrant 1.19.1 on 127.0.0.1:27333/27334 (storage under $HOME/.cache/gap-wave2-20260923/agents-models-workers/qdrant-storage), isolated ai-memory 2.3.2 `serve` on 127.0.0.1:27374 with a temp --data-dir and temp HOME, and AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 exported for the gap-9 and gap-11 ai-memory CLI calls; both started by this unit and stopped at the end (ports verified free). Correction (fix round): the first-round gap-6 CLI calls did NOT point at that server (--version/--help/backfill --help ran with no AI_MEMORY_SERVER_URL set, and init with http://127.0.0.1:1, a closed port); no live-store contact is possible from those commands, and they were re-run in the fix round against isolated 2.3.2 (127.0.0.1:27374) and 2.4.0 (127.0.0.1:27375) servers started for that purpose (gap-6 receipt). Every Codex run disabled native lifecycle hooks (-c features.hooks=false -c features.plugin_hooks=false) so no ai-memory hook call could reach the live service; the one Claude call used --setting-sources project from a temp cwd (user-settings hooks not loaded) and --strict-mcp-config. Embeddings: read-only POST /v1/embeddings calls to the running Nemotron-3-Embed-1B vLLM endpoint 127.0.0.1:8231 (the adopted SocratiCode profile); that service was not restarted or reconfigured. Start/stop evidence for the main-round Qdrant and ai-memory 2.3.2 services (fix round 2): raw/services-main-round.txt has the exact commands and outputs, exported without re-running from this unit's own session transcript by services/export_main_round_services.py."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/12-socraticode-raw.json",
+   "sha256": "4fe37e0a2df730cba2ed0726e89dcea56fb0ad78d1ce3816ab05763e9f982335"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/12-scores.json",
+   "sha256": "3f7f284d37f67024d852c8d842935fc098cc159a22eb548cd9f31b7a4a62329c"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/11-socraticode-raw.json",
+   "sha256": "6eb40e2456884fb8177f92a08c09e335d09929e6db4dd35677dd290c2c0a0c06"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/11-scores.json",
+   "sha256": "a78a42d91cf2259b7b95ba83e60f7c7cdbdb1c20a7b6965c1f162d279f93a570"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/services-main-round.txt",
+   "sha256": "d1109be89f5b729b21737ae6a579d34abf0f9a9a0b4bc74e5c61833c221a03a1",
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  }
+ ],
+ "helpers": [
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/gap12_queries.json",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/build_gap12_queries.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/socraticode_eval.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/score_gap12.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/retrieval/mcp_client.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/services/export_main_round_services.py"
+ ],
+ "checked_at": "2026-09-23",
+ "corroborating_receipt": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-vs-baselines.json (origin/main)"
+}

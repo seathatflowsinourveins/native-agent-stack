@@ -1,0 +1,18 @@
+2197926 2197926 ai-memory-sensitivity-probe x hook --event probe 0.1
+2197926 2197926 ai-memory-sensitivity-probe x hook --event probe 0.1
+2197926 2197926 ai-memory-sensitivity-probe x hook --event probe 0.1
+2198371 2198371 /bin/sh -c $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event pre-tool-use --agent claude-code --server-url http://127.0.0.1:49374
+2198373 2198371 $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event pre-tool-use --agent claude-code --server-url http://127.0.0.1:49374
+2200831 2200831 /bin/sh -c $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://127.0.0.1:49374
+2200832 2200831 $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://127.0.0.1:49374
+2202710 2202710 /bin/sh -c $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event pre-tool-use --agent claude-code --server-url http://127.0.0.1:49374
+2202712 2202710 $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event pre-tool-use --agent claude-code --server-url http://127.0.0.1:49374
+2204257 2204257 $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event post-tool-use --agent codex --server-url http://127.0.0.1:49374
+2204358 2204358 /bin/sh -c $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://127.0.0.1:49374
+2204360 2204358 $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://127.0.0.1:49374
+2204358 2204358 /bin/sh -c $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://127.0.0.1:49374
+2204360 2204358 $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://127.0.0.1:49374
+2204358 2204358 /bin/sh -c $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://127.0.0.1:49374
+2204360 2204358 $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://127.0.0.1:49374
+2205916 2205916 $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event post-tool-use --agent codex --server-url http://127.0.0.1:49374
+2205998 2205998 /bin/sh -c $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event pre-tool-use --agent claude-code --server-url http://127.0.0.1:49374

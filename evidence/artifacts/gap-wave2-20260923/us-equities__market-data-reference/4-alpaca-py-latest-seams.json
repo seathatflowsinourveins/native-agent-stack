@@ -1,0 +1,93 @@
+{
+ "id": "gap-wave2-20260923/us-equities__market-data-reference/4-alpaca-py-latest-seams",
+ "gap_index": 4,
+ "layer_id": "market-data-reference",
+ "catalog": "us-equities",
+ "gap_text": "The c9 native path relies on custom pagination/provenance code and pinned private _session/_retry seams of alpaca-py (native-receipt.json lines 215-218). An SDK upgrade could break those seams.",
+ "gap_text_sha256": "98e7761edcb65ff0fca2004b608392f1707449d2fbb8eec12f5d9d1c8e8a0a00",
+ "next_check": "Install the latest alpaca-py in a new prefix and run the c9 native collector tests against it. Record whether the _session and _retry seams still resolve and the tests pass.",
+ "preregistration": {
+  "written_at": "2026-09-23T04:22:33Z",
+  "expectation": "Latest alpaca-py on PyPI is newer than 0.44.0. Unchanged tests: the three native-seam tests fail with alpaca_sdk_version_mismatch (pin guard works). With the version pin lifted in a temp copy only, _session is still a requests.Session, _retry still exists, and all tests in tests/test_alpaca_historical.py pass.",
+  "criteria": "settled if the latest version is installed in a new prefix, the unchanged suite result is recorded, the pin-lifted copy runs every test with 0 skips and the seams resolve by attribute inspection; the 429/302 single-attempt test is the detection method for a retry seam that no longer disables retries (a retried 429 adds a capture and fails the assertion). not_settled if any seam test fails on the latest SDK.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration.json",
+  "committed_in": "c6846f1"
+ },
+ "fix_round_preregistration": null,
+ "fix_round2_preregistration": null,
+ "fix_round3_preregistration": null,
+ "eol_fix_preregistration": null,
+ "independent_review_round3": null,
+ "independent_review_round2": {
+  "reviewer": "independent Opus review of fe8b66e (findings relayed by the coordinator)",
+  "findings_for_this_gap": "none"
+ },
+ "independent_review": {
+  "reviewer": "codex exec --sandbox read-only --ephemeral (codex-cli 0.155.1); invocation 1 stalled reading stdin and was stopped without output, invocation 2 (stdin from /dev/null) completed, 62,448 tokens",
+  "output": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/review-codex-round1.txt",
+  "findings_for_this_gap": "none (helpers for this gap were not in the review scope)"
+ },
+ "commands": [
+  "uv venv --python 3.13 $HOME/.cache/gap-wave2-20260923/market-data-reference/alpaca-latest && uv pip install alpaca-py   # via ecosystem-bounded-run; resolved 0.44.0",
+  "curl -sS https://pypi.org/pypi/alpaca-py/json   # info.version 0.44.0, uploaded 2026-08-11",
+  "uv venv --python 3.13 $HOME/.cache/gap-wave2-20260923/market-data-reference/alpaca-master && uv pip install 'alpaca-py @ git+https://github.com/alpacahq/alpaca-py@232179c19091fd0f70daf0972a90bf8def329ec0'   # upstream master HEAD",
+  "bash blueprints/gap-wave2-20260923/us-equities__market-data-reference/run_alpaca_seams.sh $HOME/.cache/gap-wave2-20260923/market-data-reference/alpaca-latest/bin/python",
+  "bash blueprints/gap-wave2-20260923/us-equities__market-data-reference/run_alpaca_seams.sh $HOME/.cache/gap-wave2-20260923/market-data-reference/alpaca-master/bin/python",
+  "bash blueprints/gap-wave2-20260923/us-equities__market-data-reference/retry_mutation.sh $HOME/.cache/gap-wave2-20260923/market-data-reference/alpaca-master/bin/python"
+ ],
+ "results": [
+  "Latest PyPI release is 0.44.0 (= the pinned version); upstream master HEAD 232179c = 0.44.0.post12.dev0; diff -rq of installed alpaca/ trees: only __init__.py differs; rest.py sha256 887753b0... identical",
+  "seam probe (both prefixes): StockHistoricalDataClient and CorporateActionsClient _session_is_requests_Session=true, has__retry=true, default__retry=3",
+  "0.44.0 prefix, unchanged tests/test_alpaca_historical.py: Ran 23 tests ... OK (0 skips); pin-lifted copy: Ran 23 tests ... OK",
+  "master prefix, unchanged suite: FAILED (errors=3) - the three native-seam tests raise ValueError('alpaca_sdk_version_mismatch') (version pin guard working as designed); pin-lifted temp copy: Ran 23 tests ... OK",
+  "negative control (master, `client._retry = 0` deleted in temp copy): AssertionError: 4 != 3 : native retry or redirect added an HTTP attempt -> mutant_exit=1"
+ ],
+ "detection_method": "The 429/302 single-attempt assertion fails when the _retry seam no longer disables native retries (shown by the mutant run); seam attributes are checked by isinstance/hasattr.",
+ "outcome": "settled",
+ "evidence_class": "local_integration",
+ "limits": [
+  "No released version newer than the pin exists as of 2026-09-23, so the 'upgrade' arm could only exercise unreleased master HEAD (12 commits past 0.44.0, code-identical in alpaca/ apart from __init__.py). A future release can still break the private seams; the version pin plus these tests is the guard.",
+  "Synthetic HTTP adapters only; no provider request."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-alpaca-latest-tests.txt",
+   "sha256": "681d5d8c60703917bcf4829e693d37d5a3b9992e7a23b08f7a8a39296eccaa2d"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-alpaca-master-tests.txt",
+   "sha256": "c968c934ce2a4d54ce7c21667d8dbedbf9e21ebcf1bff2f2ee1f920f4c4047c4"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-alpaca-master-retry-mutant.txt",
+   "sha256": "2b024a325813ac4b8566e0a31f4546d12b688b66da96bc7e9912b02a554691ed"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-sdk-0440-vs-master-diff.txt",
+   "sha256": "361935c34aebc7b5cd9f71f62e198908c9297ea6ba7ef710498b001c59c15597"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-pypi-alpaca-py.json",
+   "sha256": "307ab2dec1484d06935a61f7a08ee302a51f12e0e560b13ec8491ede623e9a20"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-alpaca-py-ls-remote.txt",
+   "sha256": "5f74468b29065dd2eced7f3dea199187c4a17b2bc95c07fa5e002cd546e96458"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/REDACTIONS.json",
+   "sha256": "7d08a65951826ef4a8d0bd6fd9a21aa747305527b3e2b1daa42173cffe090c69"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/install-alpaca-install.log",
+   "sha256": "d5c07e3ee98ccea3f28dbd3260722b7737a42ffa0071c231aa8d5dafd982e29d"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/install-alpaca-master-install.log",
+   "sha256": "e760613696b3bca8ae84ac668065ca01988bf94f7ce406651d24859282912fa7"
+  }
+ ],
+ "checked_at": "2026-09-23T04:35:41Z",
+ "checked_at_source": "UTC mtime of the latest raw output the receipt cites (sed path-redaction can postdate the run by seconds)",
+ "host_paths": "host paths are written as $HOME; private Alpaca payloads stay outside the repository"
+}

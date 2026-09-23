@@ -1,0 +1,2 @@
+unmutated parser: injected cell reported = True
+mutant parse_cell returning None: injected cell reported = False

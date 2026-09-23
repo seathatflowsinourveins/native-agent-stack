@@ -1,0 +1,46 @@
+== date
+2026-09-23T10:17:02-04:00
+== fixed helper (working tree)
+$ python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/test_codex_gate.py -v
+helper under test: $HOME/code/nas-wt-g2-scheduling-supervision/blueprints/gap-wave2-20260923/foundation__scheduling-supervision/dagu_common.py
+test_a_gate_does_not_release_while_two_others_run (__main__.CodexGateTest.test_a_gate_does_not_release_while_two_others_run) ... ok
+test_b_gate_releases_immediately_with_one_other (__main__.CodexGateTest.test_b_gate_releases_immediately_with_one_other) ... ok
+test_c_matcher_counts_global_options_and_alias_not_decoy (__main__.CodexGateTest.test_c_matcher_counts_global_options_and_alias_not_decoy) ... matcher observation: {'global-opts-exec': True, 'alias-e': True, 'decoy-login': False}
+ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.613s
+
+OK
+exit=0
+== pre-fix helper (git show 91fa4a4:blueprints/gap-wave2-20260923/foundation__scheduling-supervision/dagu_common.py), detection control
+$ GW2_DAGU_COMMON=<work>/dagu_common_91fa4a4.py python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/test_codex_gate.py -v
+helper under test: $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-round-3/dagu_common_91fa4a4.py
+test_a_gate_does_not_release_while_two_others_run (__main__.CodexGateTest.test_a_gate_does_not_release_while_two_others_run) ... FAIL
+test_b_gate_releases_immediately_with_one_other (__main__.CodexGateTest.test_b_gate_releases_immediately_with_one_other) ... ok
+test_c_matcher_counts_global_options_and_alias_not_decoy (__main__.CodexGateTest.test_c_matcher_counts_global_options_and_alias_not_decoy) ... matcher observation: {'global-opts-exec': False, 'alias-e': False, 'decoy-login': False}
+FAIL
+
+======================================================================
+FAIL: test_a_gate_does_not_release_while_two_others_run (__main__.CodexGateTest.test_a_gate_does_not_release_while_two_others_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$HOME/code/nas-wt-g2-scheduling-supervision/blueprints/gap-wave2-20260923/foundation__scheduling-supervision/test_codex_gate.py", line 34, in test_a_gate_does_not_release_while_two_others_run
+    self.assertIsNotNone(timeout_class, "helper has no CodexGateTimeout: it returns on timeout")
+AssertionError: unexpectedly None : helper has no CodexGateTimeout: it returns on timeout
+
+======================================================================
+FAIL: test_c_matcher_counts_global_options_and_alias_not_decoy (__main__.CodexGateTest.test_c_matcher_counts_global_options_and_alias_not_decoy)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$HOME/code/nas-wt-g2-scheduling-supervision/blueprints/gap-wave2-20260923/foundation__scheduling-supervision/test_codex_gate.py", line 58, in test_c_matcher_counts_global_options_and_alias_not_decoy
+    self.assertTrue(seen["global-opts-exec"], "`codex <global options> exec` not counted")
+AssertionError: False is not true : `codex <global options> exec` not counted
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.311s
+
+FAILED (failures=2)
+exit=1
+== end
+2026-09-23T10:17:03-04:00

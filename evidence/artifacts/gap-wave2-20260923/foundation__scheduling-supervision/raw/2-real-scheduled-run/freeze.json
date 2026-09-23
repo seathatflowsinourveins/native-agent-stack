@@ -1,0 +1,22 @@
+{
+  "cron": "48 22 * * *",
+  "dagu_binary_sha256": "20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7",
+  "frozen_at_utc": "2026-09-23T02:46:51.269528+00:00",
+  "inputs": {
+    "config.yaml": "a2651229d74dd660c8f98f884292ecb8e405ea6ab3bc363ad4985d4d1eb4a087",
+    "dagu_common.py": "1ce91e2b253a36611e08f4de5897b889df671aaf4d0735c3111d357c56610d7d",
+    "real_scheduled_recovery.py": "44057b5facf2fefcf598d4d305cebb2d25e427c79845b8df763ed486c30587c8",
+    "real_steps.py": "fe8787054a719222b1a6aeb3570f6cadd665a06e0ba84fdb0c4dd4bd385bc7a7",
+    "realmaint.yaml": "b028c5171e8dc3801fcdc5ed49844df896742f8fa22095df58b82628e5386796"
+  },
+  "planned_fire_local": "2026-09-22T22:48:00-04:00",
+  "python_version": "3.12.3",
+  "reference": {
+    "ecosystem": "{\"bytes\": 12918618, \"sha256\": \"693c295e2e2e6d7d20443ecd0ef3e18d8404450f1687c0e0ff7933019b1da66e\", \"status\": \"passed\"}",
+    "validate": "{\"components\": 69, \"hashed_files\": 2012, \"profiles\": 4, \"receipts\": 140, \"status\": \"passed\"}"
+  },
+  "snapshot": {
+    "archive_sha256": "25dd92d1ebef69c44ebbd396485778ff47a4d5c9418c7bb9368289478d4340aa",
+    "commit": "41d39b3"
+  }
+}

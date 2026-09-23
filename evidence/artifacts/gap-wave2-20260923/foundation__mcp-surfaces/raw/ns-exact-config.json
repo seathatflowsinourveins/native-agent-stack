@@ -1,0 +1,470 @@
+{
+ "started_at": "2026-09-23T04:51:15Z",
+ "temp_root": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115",
+ "runs": [
+  {
+   "label": "host-cfg-list-context-mode",
+   "gaps": [
+    0
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "--config",
+    "$HOME/codex-ecosystem/config/mcporter.json",
+    "list",
+    "context-mode",
+    "--brief",
+    "--no-oauth"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 820,
+   "stdout": "context-mode\n\n  function ctx_execute(language: \"javascript\" | \"typescript\" | \"python\" | \"shell\" | \"ruby\" | \"go\" | \"rust\" | \"php\" | \"perl\" | \"r\" | \"elixir\" | \"csharp\", code: string, timeout?: number, background?: boolean, cwd?: string);\n  // optional (1): intent\n\n  function ctx_execute_file(path: string, language: \"javascript\" | \"typescript\" | \"python\" | \"shell\" | \"ruby\" | \"go\" | \"rust\" | \"php\" | \"perl\" | \"r\" | \"elixir\" | \"csharp\", code: string, timeout?: number, intent?: string);\n\n  function ctx_index(content?: string, path?: string, source?: string, include?: string[], exclude?: string[]);\n  // optional (5): maxDepth, maxFiles, extensions, respectGitignore, followSymlinks\n\n  function ctx_search(queries?: string[], limit?: number, source?: string, contentType?: \"code\" | \"prose\", sort?: \"relevance\" | \"timeline\");\n  // optional (1): project\n\n  function ctx_fetch_and_index(url?: string, source?: string, requests?: Record<string, unknown>[], concurrency?: number, force?: boolean);\n  // optional (1): ttl\n\n  function ctx_batch_execute(commands: Record<string, unknown>[], queries: string[], timeout?: number, concurrency?: number, cwd?: string);\n  // optional (1): query_scope\n\n  function ctx_stats();\n\n  function ctx_doctor();\n\n  function ctx_upgrade();\n\n  function ctx_purge(confirm: boolean, sessionId?: string, scope?: \"session\" | \"project\");\n\n  function ctx_insight();\n\n  Optional parameters hidden; run with --all-parameters to view all fields.\n\n  11 tools · 540ms · STDIO $HOME/.local/share/codex-ecosystem/bin/node /mnt/c/Users/$WINUSER/.codex/plugins/cache/context-mode/context-mode/1.0.169/start.mjs\n\n",
+   "stderr": ""
+  },
+  {
+   "label": "host-cfg-list-ai-memory",
+   "gaps": [
+    0
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "--config",
+    "$HOME/codex-ecosystem/config/mcporter.json",
+    "list",
+    "ai-memory",
+    "--brief",
+    "--no-oauth"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 370,
+   "stdout": "ai-memory\n  Instructions: Long-term memory for the current project. **Choose project scope from the MCP client's identity support.** Session-aware MCP clients that forward the real lifecycle-hook session id on every request should omit `workspace`, `project`, and `cwd` for the current repository. Static MCP clients, including clients with lifecycle hooks but no bridge connecting that hook session id to MCP requests, must pass `workspace` and `project` together on every project-scoped call, even for 'this project'. Read …\n\n  function memory_auto_improve(session_id?: string, project?: string, workspace?: string, min_observations?: number, min_session_duration_secs?: number);\n  // optional (4): min_confidence, max_input_tokens, max_proposals, include_raw_fallback\n\n  function memory_briefing(recent_pages_limit?: number, project?: string, workspace?: string, settled_first?: boolean);\n\n  function memory_consolidate(session_id?: string, dry_run?: boolean, multi_page?: boolean, instructions?: string);\n\n  function memory_delete_page(path: string, project?: string, workspace?: string);\n\n  function memory_explore(focus?: string, recent_pages_limit?: number, project?: string, workspace?: string);\n\n  function memory_feedback(path: string, signal: unknown, reason?: string, project?: string, workspace?: string);\n\n  function memory_forget_sweep(dry_run?: boolean, project?: string, workspace?: string);\n\n  function memory_handoff_accept(cwd?: string, any_owner?: boolean, project?: string, workspace?: string, handoff_id?: string);\n\n  function memory_handoff_begin(summary: string, open_questions?: string[], next_steps?: string[], files_touched?: string[], cwd?: string);\n  // optional (3): shared, project, workspace\n\n  function memory_handoff_cancel(any_owner?: boolean, handoff_id: string, project?: string, workspace?: string);\n\n  function memory_handoff_list(any_owner?: boolean, limit?: number, project?: string, workspace?: string);\n\n  function memory_install_self_routing(compact?: boolean);\n\n  function memory_lint(dry_run?: boolean, no_llm?: boolean, project?: string, workspace?: string);\n\n  function memory_message_cancel(message_id?: string, project?: string, workspace?: string);\n\n  function memory_message_list(box?: string, limit?: number, project?: string, workspace?: string);\n\n  function memory_message_pop(message_id?: string, project?: string, workspace?: string);\n\n  function memory_message_send(to_workspace: string, to_project: string, body: string, subject?: string, from_project?: string);\n  // optional (1): from_workspace\n\n  function memory_query(query: string, limit?: number, project?: string, workspace?: string, scopes?: unknown[]);\n  // optional (4): global, include_expired, explain, as_of\n\n  function memory_read_page(query?: string, path?: string, project?: string, workspace?: string);\n\n  function memory_read_session_observations(session_id?: string, limit?: number, offset?: number, order?: string, kinds?: string[]);\n  // optional (4): query, body_max_chars, project, workspace\n\n  function memory_recent(limit?: number, project?: string, workspace?: string);\n\n  function memory_status(project?: string, workspace?: string);\n\n  function memory_write_page(path: string, body: string, title?: string, tier?: string, tags?: string[]);\n  // optional (5): pinned, project, workspace, scope, expires_at\n\n  Optional parameters hidden; run with --all-parameters to view all fields.\n\n  23 tools · 64ms · HTTP http://127.0.0.1:49374/mcp\n\n",
+   "stderr": ""
+  },
+  {
+   "label": "host-cfg-list-socraticode",
+   "gaps": [
+    0
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "--config",
+    "$HOME/codex-ecosystem/config/mcporter.json",
+    "list",
+    "socraticode",
+    "--brief",
+    "--no-oauth"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 737,
+   "stdout": "socraticode\n\n  function codebase_index(projectPath?: string, extraExtensions?: string);\n\n  function codebase_update(projectPath?: string, extraExtensions?: string);\n\n  function codebase_remove(projectPath: string);\n\n  function codebase_prune(apply?: boolean, identity?: string, confirmationToken?: string, acknowledgeNoRemoteWriters?: boolean);\n\n  function codebase_stop(projectPath?: string);\n\n  function codebase_watch(projectPath?: string, action: \"start\" | \"stop\" | \"status\");\n\n  function codebase_search(query: string, projectPath?: string, limit?: number, fileFilter?: string, languageFilter?: string);\n  // optional (2): minScore, includeLinked\n\n  function codebase_status(projectPath?: string);\n\n  function codebase_graph_build(projectPath?: string, extraExtensions?: string);\n\n  function codebase_graph_query(projectPath?: string, filePath: string);\n\n  function codebase_graph_stats(projectPath?: string);\n\n  function codebase_graph_circular(projectPath?: string);\n\n  function codebase_graph_visualize(projectPath?: string, mode?: \"mermaid\" | \"interactive\", open?: boolean);\n\n  function codebase_graph_remove(projectPath: string);\n\n  function codebase_graph_status(projectPath?: string);\n\n  function codebase_impact(projectPath?: string, target?: string, file?: string, symbolId?: string, depth?: number);\n\n  function codebase_flow(projectPath?: string, entrypoint?: string, file?: string, depth?: number);\n\n  function codebase_symbol(projectPath?: string, name: string, file?: string);\n\n  function codebase_symbols(projectPath?: string, file?: string, query?: string, limit?: number);\n\n  function codebase_context(projectPath?: string);\n\n  function codebase_context_search(query: string, projectPath?: string, artifactName?: string, limit?: number, minScore?: number);\n\n  function codebase_context_index(projectPath?: string);\n\n  function codebase_context_remove(projectPath: string);\n\n  function codebase_health();\n\n  function codebase_list_projects();\n\n  function codebase_about();\n\n  Optional parameters hidden; run with --all-parameters to view all fields.\n\n  26 tools · 275ms · STDIO $HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js\n\n",
+   "stderr": ""
+  },
+  {
+   "label": "host-cfg-ctx-execute-file",
+   "gaps": [
+    0
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "--config",
+    "$HOME/codex-ecosystem/config/mcporter.json",
+    "call",
+    "context-mode.ctx_execute_file",
+    "--args",
+    "{\"path\": \"README.md\", \"language\": \"python\", \"code\": \"import hashlib; print('BYTES=%d SHA=%s' % (len(FILE_CONTENT.encode()), hashlib.sha256(FILE_CONTENT.encode()).hexdigest()))\"}",
+    "--output",
+    "json",
+    "--no-oauth"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 348,
+   "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"path=README.md\\n```python\\nimport hashlib; print('BYTES=%d SHA=%s' % (len(FILE_CONTENT.encode()), hashlib.sha256(FILE_CONTENT.encode()).hexdigest()))\\n```\\n\\nBYTES=2190 SHA=802377ec2ef58029235f917fbe321877a5137d629a6f1c64fe1723e9c0fc95c9\\n\"\n    }\n  ]\n}\n",
+   "stderr": ""
+  },
+  {
+   "label": "host-cfg-fresh-memory-status",
+   "gaps": [
+    0,
+    3
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "--config",
+    "$HOME/codex-ecosystem/config/mcporter.json",
+    "call",
+    "ai-memory.memory_status",
+    "--args",
+    "{\"workspace\": \"agent-lab\", \"project\": \"agent-lab\"}",
+    "--output",
+    "json",
+    "--no-oauth"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 266,
+   "stdout": "{\n  \"counts\": {\n    \"pages_latest\": 0,\n    \"pages_all\": 0,\n    \"sessions\": 0,\n    \"observations\": 0\n  }\n}\n",
+   "stderr": ""
+  },
+  {
+   "label": "host-cfg-fresh-socraticode-status",
+   "gaps": [
+    0,
+    3
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "--config",
+    "$HOME/codex-ecosystem/config/mcporter.json",
+    "call",
+    "socraticode.codebase_status",
+    "--args",
+    "{\"projectPath\": \"$HOME/code/agent-lab\"}",
+    "--output",
+    "json",
+    "--no-oauth"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 466,
+   "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"No index found for project: $HOME/code/agent-lab\\nRun codebase_index to create one.\\n\\nFile watcher: disabled (SOCRATICODE_WATCHER=off)\\n  Warning: another MCP process is watching this project. Set SOCRATICODE_WATCHER=off for every process that uses this checkout.\"\n    }\n  ]\n}\n",
+   "stderr": ""
+  },
+  {
+   "label": "adhoc-jcodemunch-session-stats",
+   "gaps": [
+    0
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "call",
+    "--stdio",
+    "jcodemunch-mcp",
+    "--env",
+    "CODE_INDEX_PATH=$HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/code-index",
+    "--env",
+    "JCODEMUNCH_SHARE_SAVINGS=0",
+    "--tool",
+    "order",
+    "--args",
+    "{\"action\": \"get_session_stats\", \"args\": {}}",
+    "--output",
+    "json",
+    "--no-oauth"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 708,
+   "stdout": "{\n  \"session_tokens_saved\": 0,\n  \"session_calls\": 0,\n  \"session_duration_s\": 0.1,\n  \"session_response_tokens\": 0,\n  \"total_tokens_saved\": 0,\n  \"total_tokens_saved_basis\": {\n    \"generation\": 2,\n    \"first_generation\": 2,\n    \"mixed_basis\": false\n  },\n  \"lifetime_by_tool\": {},\n  \"lifetime_by_tool_since\": null,\n  \"lifetime_unattributed\": 0,\n  \"tool_breakdown\": {},\n  \"tool_calls\": {},\n  \"savings_per_call\": 0,\n  \"result_cache\": {\n    \"total_hits\": 0,\n    \"total_misses\": 0,\n    \"hit_rate\": 0,\n    \"cached_entries\": 0\n  },\n  \"latency_per_tool\": {},\n  \"session_cost_avoided\": {\n    \"claude_opus_4_6\": 0,\n    \"claude_sonnet_4_6\": 0,\n    \"claude_haiku_4_5\": 0,\n    \"gpt5_latest\": 0\n  },\n  \"total_cost_avoided\": {\n    \"claude_opus_4_6\": 0,\n    \"claude_sonnet_4_6\": 0,\n    \"claude_haiku_4_5\": 0,\n    \"gpt5_latest\": 0\n  },\n  \"runtime_signal\": {\n    \"rows\": 0,\n    \"by_source\": {}\n  },\n  \"savings_provenance\": {\n    \"token_reduction\": {\n      \"average_pct\": 99.6,\n      \"task_runs\": 15,\n      \"tokenizer\": \"cl100k_base\",\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/measured.json\",\n      \"methodology\": \"benchmarks/METHODOLOGY.md\"\n    },\n    \"replay_retrieval_quality\": {\n      \"fixture\": \"self_v1_75_0\",\n      \"k\": 10,\n      \"ndcg\": 1,\n      \"mrr\": 1,\n      \"recall\": 1,\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/measured.json\",\n      \"ci_gated\": true\n    },\n    \"implementation_channel_accuracy\": {\n      \"corpus\": \"authored-scenarios-v2\",\n      \"languages\": [\n        \"python\",\n        \"typescript\",\n        \"go\"\n      ],\n      \"channels\": {\n        \"ast\": {\n          \"precision\": 0.818,\n          \"recall\": 1\n        },\n        \"duck\": {\n          \"precision\": 0.5,\n          \"recall\": 1\n        },\n        \"decorator\": {\n          \"precision\": 0.556,\n          \"recall\": 1\n        }\n      },\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/channel_accuracy.json\",\n      \"ci_gated\": true,\n      \"scope_note\": \"authored gold corpus — channel discrimination on known patterns and traps, not in-the-wild base rates; n small and disclosed in the artifact\"\n    },\n    \"contract\": \"declared = engineering prior; measured = committed benchmark artifact (benchmarks/provenance/measured.json)\"\n  },\n  \"processes\": {\n    \"live\": 1,\n    \"others\": 0,\n    \"this_pid\": 4036608,\n    \"oldest_age_seconds\": 0\n  },\n  \"tool_surface\": {\n    \"surface\": \"counter\",\n    \"profile\": \"full\",\n    \"visible_tools\": 6,\n    \"catalog_tools\": 94,\n    \"schema_tokens_visible\": 1050,\n    \"schema_tokens_catalog\": 27782,\n    \"schema_tokens_avoided\": 26732,\n    \"schema_tokens_basis\": \"one_time_at_full_rate_then_cache_read\",\n    \"schema_tokens_basis_note\": \"The tool-schema block is stable across requests, so it is paid at full rate approximately once per cache lifetime and at cache-read rates (~0.1x) thereafter. This count is payload size, NOT a per-request saving; reading it as one overstates the cost impact by roughly an order of magnitude. Measured: benchmarks/codex_surface/.\",\n    \"heaviest_tools\": {\n      \"order\": 260,\n      \"route\": 229,\n      \"announce_model\": 161,\n      \"jcodemunch_guide\": 147,\n      \"menu\": 128,\n      \"set_tool_tier\": 125\n    },\n    \"estimator\": \"bytes/4\"\n  }\n}\n",
+   "stderr": ""
+  },
+  {
+   "label": "host-daemon-status",
+   "gaps": [
+    0
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "daemon",
+    "status",
+    "--json"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 171,
+   "stdout": "{\"pid\":4035934,\"protocolVersion\":3,\"startedAt\":1790139076360,\"configPath\":\"\",\"socketPath\":\"$HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/dm/daemon/user.sock\",\"generation\":\"uuid-1\",\"views\":0,\"servers\":[{\"name\":\"uuid-2\",\"connectionId\":\"uuid-2\",\"connectionGeneration\":1,\"connected\":false,\"activeCalls\":0,\"lastUsedAt\":1790139078162}],\"idleShutdownBlocked\":false}\n",
+   "stderr": ""
+  },
+  {
+   "label": "host-daemon-stop",
+   "gaps": [
+    0
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "daemon",
+    "stop"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 174,
+   "stdout": "Daemon stopped (if it was running).\n",
+   "stderr": ""
+  },
+  {
+   "label": "inspector-context-mode-42",
+   "gaps": [
+    0
+   ],
+   "argv": [
+    "node",
+    "$HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js",
+    "--cli",
+    "node",
+    "$HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs",
+    "--method",
+    "tools/call",
+    "--tool-name",
+    "ctx_execute",
+    "--tool-arg",
+    "language=javascript",
+    "--tool-arg",
+    "code=console.log(6*7)"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 330,
+   "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log(6*7)\\n```\\n\\n42\\n\"\n    }\n  ]\n}\n",
+   "stderr": ""
+  },
+  {
+   "label": "inspector-inside-list-serena",
+   "gaps": [
+    4,
+    8
+   ],
+   "argv": [
+    "node",
+    "$HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js",
+    "--cli",
+    "--config",
+    ".mcp.json",
+    "--server",
+    "serena",
+    "--method",
+    "tools/list"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 1,
+   "elapsed_ms": 853,
+   "stdout": "",
+   "stderr": "Traceback (most recent call last):\n  File \"$HOME/.local/share/codex-ecosystem/context/serena-c6fbd1c/bin/serena\", line 10, in <module>\n    sys.exit(top_level())\n             ~~~~~~~~~^^\n  File \"$HOME/.local/share/codex-ecosystem/context/serena-c6fbd1c/lib/python3.13/site-packages/click/core.py\", line 1631, in __call__\n    return self.main(*args, **kwargs)\n           ~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File \"$HOME/.local/share/codex-ecosystem/context/serena-c6fbd1c/lib/python3.13/site-packages/click/core.py\", line 1552, in main\n    rv = self.invoke(ctx)\n  File \"$HOME/.local/share/codex-ecosystem/context/serena-c6fbd1c/lib/python3.13/site-packages/click/core.py\", line 2032, in invoke\n    return _process_result(sub_ctx.command.invoke(sub_ctx))\n                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^\n  File \"$HOME/.local/share/codex-ecosystem/context/serena-c6fbd1c/lib/python3.13/site-packages/click/core.py\", line 1415, in invoke\n    return ctx.invoke(self.callback, **ctx.params)\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/.local/share/codex-ecosystem/context/serena-c6fbd1c/lib/python3.13/site-packages/click/core.py\", line 910, in invoke\n    return callback(*args, **kwargs)\n  File \"$HOME/.local/share/codex-ecosystem/context/serena-c6fbd1c/lib/python3.13/site-packages/serena/cli.py\", line 362, in start_mcp_server\n    file_handler = logging.FileHandler(log_path, mode=\"w\")\n  File \"$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/logging/__init__.py\", line 1219, in __init__\n    StreamHandler.__init__(self, self._open())\n                                 ~~~~~~~~~~^^\n  File \"$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/logging/__init__.py\", line 1248, in _open\n    return open_func(self.baseFilename, self.mode,\n                     encoding=self.encoding, errors=self.errors)\nOSError: [Errno 30] Read-only file system: '$HOME/.local/share/codex-ecosystem/context/serena-home/logs/2026-09-23/mcp_20260923-005120_4036839.txt'\n{\"error\":{\"code\":\"error\",\"message\":\"Connection closed\"}}\n"
+  },
+  {
+   "label": "inspector-inside-list-ai-memory",
+   "gaps": [
+    4,
+    8
+   ],
+   "argv": [
+    "node",
+    "$HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js",
+    "--cli",
+    "--config",
+    ".mcp.json",
+    "--server",
+    "ai-memory",
+    "--method",
+    "tools/list"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 236,
+   "stdout": "{\n  \"tools\": [\n    {\n      \"name\": \"memory_auto_improve\",\n      \"description\": \"Run manual auto-improvement for one completed session and apply or stage validated wiki edit proposals through the auto-improvement approval path. Use when the user asks what durable lessons should be captured, what memory pages this session suggests, or at explicit wrap-up when a learning review is useful. Omit `session_id` to review the latest completed session that has not already produced an auto-improvement run in the current project; repeated implicit calls advance through the remaining sessions, including after a preflight skip. Pass `session_id` to rerun a specific session. The server also schedules background review for newly completed sessions in every project when an LLM provider is configured. Admins can set `[auto_improve.scheduler] enabled = false` to stop automatic review, or `[auto_improve] require_approval = true` to leave scheduled and manual proposals pending for review.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"session_id\": {\n            \"description\": \"Completed session UUID to review. Omit to review the latest completed\\nsession without a persisted auto-improvement run in the resolved\\ncurrent project.\",\n            \"type\": [\n              \"string\",\n              \"null\"\n            ],\n            \"default\": null\n          },\n          \"project\": {\n            \"description\": \"Project to review. Session-aware clients may omit it for the current\\nproject. Static MCP clients must pass it together with `workspace` for\\nevery project-scoped call.\",\n            \"type\": [\n              \"string\",\n              \"null\"\n            ],\n            \"default\": null\n          },\n          \"workspace\": {\n            \"description\": \"Workspace to review together with `project`. Session-aware clients may\\nomit both for the current project; static MCP clients must pass both.\",\n            \"type\": [\n              \"string\",\n              \"null\"\n            ],\n            \"default\": null\n          },\n          \"min_observations\": {\n            \"description\": \"Override the minimum observation count for this run.\",\n            \"type\": [\n              \"integer\",\n              \"null\"\n            ],\n            \"format\": \"uint\",\n            \"minimum\": 0,\n            \"default\": null\n          },\n          \"min_session_duration_secs\": {\n            \"description\": \"Override the minimum session span for this run.\",\n            \"type\": [\n              \"integer\",\n              \"null\"\n            ],\n            \"format\": \"uint64\",\n            \"minimum\": 0,\n            \"default\": null\n          },\n          \"min_confidence\": {\n            \"description\": \"Override the proposal confidence floor for this run.\",\n            \"type\": [\n              \"number\",\n              \"null\"\n            ],\n            \"format\": \"float\",\n            \"default\": null\n          },\n          \"max_input_tokens\": {\n            \"description\": \"Override the approximate chars/4 input token budget for this run.\",\n            \"type\": [\n              \"integer\",\n              \"null\"\n            ],\n            \"format\": \"uint\",\n            \"minimum\": 0,\n            \"default\": null\n          },\n          \"max_proposals\": {\n            \"description\": \"Override the maximum validated proposal count for this run.\",\n            \"type\": [\n              \"integer\",\n              \"null\"\n            ],\n            \"format\": \"uint\",\n            \"minimum\": 0,\n            \"default\": null\n          },\n          \"include_raw_fallback\": {\n            \"description\": \"Include raw fallback context when the reviewer supports it.\",\n            \"type\": [\n              \"boolean\",\n              \"null\"\n            ],\n            \"default\": null\n          }\n        },\n        \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n        \"title\": \"AutoImproveArgs\"\n      }\n    },\n    {\n      \"name\": \"memory_briefing\",\n      \"description\": \"Compose a structured snapshot of project activity WITHOUT any LLM call: lifetime counts, 7-day and 30-day activity windows, last-observation timestamp, pending handoff count, current `_rules/` pages, and recent-page list. Cheap, fast, deterministic, and READ-ONLY: it never creates handoffs or mutates project state. Use this when you want a programmatic view of project state; use `memory_explore` if you want an LLM-composed prose summary on top of the same data. Pass `settled_first: true` to also lead the briefing with the project's settled rule/decision pages (highest-standing, ordered by evidence then recency).\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"recent_pages_limit\": {\n            \"description\": \"How many recently-updated pages to include (default 10, max 100).\",\n            \"type\": [\n              \"integer\",\n              \"null\"\n            ],\n            \"format\": \"uint\",\n            \"minimum\": 0,\n            \"default\": null\n          },\n          \"project\": {\n            \"description\": \"Project to brief on. Session-aware clients may omit it for the current\\nproject. Static MCP clients must pass it together with `workspace` for\\nevery project-scoped call.\",\n            \"type\": [\n              \"string\",\n              \"null\"\n            ],\n            \"default\": null\n          },\n          \"workspace\": {\n            \"description\": \"Workspace to brief together with `project`. Session-aware clients may\\nomit both for the current project; static MCP clients must pass both.\",\n            \"type\": [\n              \"string\",\n              \"null\"\n            ],\n            \"default\": null\n          },\n          \"settled_first\": {\n            \"description\": \"Lead the briefing with the project's settled rule/decision pages\\n(highest-standing, ordered by evidence then recency). Default `false`\\nleaves the briefing shape unchanged.\",\n            \"type\": [\n              \"boolean\",\n              \"null\"\n            ],\n            \"default\": null\n          }\n        }",
+   "stderr": "Schema portability: 0 errors, 94 warnings across 23 tools. Re-run with --strict for details.\n"
+  },
+  {
+   "label": "inspector-inside-list-socraticode",
+   "gaps": [
+    4,
+    8
+   ],
+   "argv": [
+    "node",
+    "$HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js",
+    "--cli",
+    "--config",
+    ".mcp.json",
+    "--server",
+    "socraticode",
+    "--method",
+    "tools/list"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 389,
+   "stdout": "{\n  \"tools\": [\n    {\n      \"name\": \"codebase_index\",\n      \"description\": \"Start indexing a codebase in the background. Returns immediately. Call codebase_status to poll progress until 100%. Do NOT search until indexing is complete. If already indexing, returns current progress.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"projectPath\": {\n            \"type\": \"string\",\n            \"description\": \"Absolute path to the project directory. If omitted, uses the current working directory.\"\n          },\n          \"extraExtensions\": {\n            \"type\": \"string\",\n            \"description\": \"Comma-separated list of additional file extensions to index beyond the built-in set (e.g. '.tpl,.blade,.hbs'). Useful for projects with non-standard file extensions. Can also be set globally via EXTRA_EXTENSIONS env var.\"\n          }\n        },\n        \"additionalProperties\": false,\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n      },\n      \"execution\": {\n        \"taskSupport\": \"forbidden\"\n      }\n    },\n    {\n      \"name\": \"codebase_update\",\n      \"description\": \"Incrementally update an existing codebase index. Only re-indexes changed files. Runs synchronously. Use it to refresh a manual/off snapshot, or whenever an immediate catch-up is needed.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"projectPath\": {\n            \"type\": \"string\",\n            \"description\": \"Absolute path to the project directory.\"\n          },\n          \"extraExtensions\": {\n            \"type\": \"string\",\n            \"description\": \"Comma-separated list of additional file extensions to index (e.g. '.tpl,.blade').\"\n          }\n        },\n        \"additionalProperties\": false,\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n      },\n      \"execution\": {\n        \"taskSupport\": \"forbidden\"\n      }\n    },\n    {\n      \"name\": \"codebase_remove\",\n      \"description\": \"Remove a project's codebase index entirely from the vector database. Safely stops the file watcher, cancels any in-progress indexing/update (with drain), and waits for any in-flight graph build before deleting.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"projectPath\": {\n            \"type\": \"string\",\n            \"description\": \"Absolute path to the project directory.\"\n          }\n        },\n        \"required\": [\n          \"projectPath\"\n        ],\n        \"additionalProperties\": false,\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n      },\n      \"execution\": {\n        \"taskSupport\": \"forbidden\"\n      }\n    },\n    {\n      \"name\": \"codebase_prune\",\n      \"description\": \"Inventory stored project identities and their resources. Report-only by default. Applying requires an exact identity, the confirmation token from a fresh inventory, and an acknowledgement that no other host is writing to it; path absence on this host is advisory, not proof of abandonment.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"apply\": {\n            \"type\": \"boolean\",\n            \"description\": \"Delete the selected identity only when true. Omit for the report-only inventory.\"\n          },\n          \"identity\": {\n            \"type\": \"string\",\n            \"description\": \"Exact identity returned by codebase_prune.\"\n          },\n          \"confirmationToken\": {\n            \"type\": \"string\",\n            \"description\": \"Opaque token returned for that identity by codebase_prune.\"\n          },\n          \"acknowledgeNoRemoteWriters\": {\n            \"type\": \"boolean\",\n            \"description\": \"Required with apply. Locks on this host cannot see another host sharing the same Qdrant; true states that none is writing to this identity.\"\n          }\n        },\n        \"additionalProperties\": false,\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n      },\n      \"execution\": {\n        \"taskSupport\": \"forbidden\"\n      }\n    },\n    {\n      \"name\": \"codebase_stop\",\n      \"description\": \"Gracefully stop an in-progress indexing operation. The current batch will finish and checkpoint, preserving all progress. Re-run codebase_index to resume from where it left off.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"projectPath\": {\n            \"type\": \"string\",\n            \"description\": \"Absolute path to the project directory. If omitted, uses the current working directory.\"\n          }\n        },\n        \"additionalProperties\": false,\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n      },\n      \"execution\": {\n        \"taskSupport\": \"forbidden\"\n      }\n    },\n    {\n      \"name\": \"codebase_watch\",\n      \"description\": \"Start/stop watching a project directory for file changes and automatically update the index. When starting, first runs an incremental update to catch up, then watches for changes. SOCRATICODE_WATCHER=manual allows explicit starts only; off rejects starts.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"projectPath\": {\n            \"type\": \"string\",\n            \"description\": \"Absolute path to the project directory.\"\n          },\n          \"action\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"start\",\n              \"stop\",\n              \"status\"\n            ],\n            \"description\": \"start/stop watching, or get status of watchers.\"\n          }\n        },\n        \"required\": [\n          \"action\"\n        ],\n        \"additionalProperties\": false,\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n      },\n      \"execution\": {\n        \"taskSupport\": \"forbidden\"\n      }\n    },\n    {\n      \"name\": \"codebase_search\",\n      \"description\": \"Semantic search across an indexed codebase. Only use after codebase_index is complete (check codebase_status first). Returns relevant code chunks matching a natural language query.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n  ",
+   "stderr": ""
+  },
+  {
+   "label": "inspector-inside-call-memory-status",
+   "gaps": [
+    8
+   ],
+   "argv": [
+    "node",
+    "$HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js",
+    "--cli",
+    "--config",
+    ".mcp.json",
+    "--server",
+    "ai-memory",
+    "--method",
+    "tools/call",
+    "--tool-name",
+    "memory_status",
+    "--tool-arg",
+    "workspace=agent-lab",
+    "--tool-arg",
+    "project=agent-lab"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 252,
+   "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{\\n  \\\"counts\\\": {\\n    \\\"pages_latest\\\": 0,\\n    \\\"pages_all\\\": 0,\\n    \\\"sessions\\\": 0,\\n    \\\"observations\\\": 0\\n  }\\n}\"\n    }\n  ],\n  \"isError\": false\n}\n",
+   "stderr": ""
+  },
+  {
+   "label": "inspector-inside-call-codebase-status-cwd",
+   "gaps": [
+    8
+   ],
+   "argv": [
+    "node",
+    "$HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js",
+    "--cli",
+    "--config",
+    ".mcp.json",
+    "--server",
+    "socraticode",
+    "--method",
+    "tools/call",
+    "--tool-name",
+    "codebase_status"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 0,
+   "elapsed_ms": 440,
+   "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"No index found for project: $HOME/code/agent-lab\\nRun codebase_index to create one.\\n\\nFile watcher: active (watched by another process)\"\n    }\n  ]\n}\n",
+   "stderr": ""
+  },
+  {
+   "label": "inspector-inside-no-config",
+   "gaps": [
+    8
+   ],
+   "argv": [
+    "node",
+    "$HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js",
+    "--cli",
+    "--server",
+    "socraticode",
+    "--method",
+    "tools/list"
+   ],
+   "cwd": "$HOME/code/agent-lab",
+   "exit": 1,
+   "elapsed_ms": 153,
+   "stdout": "",
+   "stderr": "{\"error\":{\"code\":\"error\",\"message\":\"Server 'socraticode' not found. Available servers: \"}}\n"
+  },
+  {
+   "label": "inspector-outside-relative-config",
+   "gaps": [
+    8
+   ],
+   "argv": [
+    "node",
+    "$HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js",
+    "--cli",
+    "--config",
+    ".mcp.json",
+    "--server",
+    "socraticode",
+    "--method",
+    "tools/list"
+   ],
+   "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/outside",
+   "exit": 1,
+   "elapsed_ms": 164,
+   "stdout": "",
+   "stderr": "{\"error\":{\"code\":\"error\",\"message\":\"Error loading configuration: Config file not found: $HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/outside/.mcp.json\",\"cause\":\"Config file not found: $HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/outside/.mcp.json\"}}\n"
+  },
+  {
+   "label": "inspector-outside-absolute-list",
+   "gaps": [
+    8
+   ],
+   "argv": [
+    "node",
+    "$HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js",
+    "--cli",
+    "--config",
+    "$HOME/code/agent-lab/.mcp.json",
+    "--server",
+    "socraticode",
+    "--method",
+    "tools/list"
+   ],
+   "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/outside",
+   "exit": 0,
+   "elapsed_ms": 401,
+   "stdout": "{\n  \"tools\": [\n    {\n      \"name\": \"codebase_index\",\n      \"description\": \"Start indexing a codebase in the background. Returns immediately. Call codebase_status to poll progress until 100%. Do NOT search until indexing is complete. If already indexing, returns current progress.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"projectPath\": {\n            \"type\": \"string\",\n            \"description\": \"Absolute path to the project directory. If omitted, uses the current working directory.\"\n          },\n          \"extraExtensions\": {\n            \"type\": \"string\",\n            \"description\": \"Comma-separated list of additional file extensions to index beyond the built-in set (e.g. '.tpl,.blade,.hbs'). Useful for projects with non-standard file extensions. Can also be set globally via EXTRA_EXTENSIONS env var.\"\n          }\n        },\n        \"additionalProperties\": false,\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n      },\n      \"execution\": {\n        \"taskSupport\": \"forbidden\"\n      }\n    },\n    {\n      \"name\": \"codebase_update\",\n      \"description\": \"Incrementally update an existing codebase index. Only re-indexes changed files. Runs synchronously. Use it to refresh a manual/off snapshot, or whenever an immediate catch-up is needed.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"projectPath\": {\n            \"type\": \"string\",\n            \"description\": \"Absolute path to the project directory.\"\n          },\n          \"extraExtensions\": {\n            \"type\": \"string\",\n            \"description\": \"Comma-separated list of additional file extensions to index (e.g. '.tpl,.blade').\"\n          }\n        },\n        \"additionalProperties\": false,\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n      },\n      \"execution\": {\n        \"taskSupport\": \"forbidden\"\n      }\n    },\n    {\n      \"name\": \"codebase_remove\",\n      \"description\": \"Remove a project's codebase index entirely from the vector database. Safely stops the file watcher, cancels any in-progress indexing/update (with drain), and waits for any in-flight graph build before deleting.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"projectPath\": {\n            \"type\": \"string\",\n            \"description\": \"Absolute path to the project directory.\"\n          }\n        },\n        \"required\": [\n          \"projectPath\"\n        ],\n        \"additionalProperties\": false,\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n      },\n      \"execution\": {\n        \"taskSupport\": \"forbidden\"\n      }\n    },\n    {\n      \"name\": \"codebase_prune\",\n      \"description\": \"Inventory stored project identities and their resources. Report-only by default. Applying requires an exact identity, the confirmation token from a fresh inventory, and an acknowledgement that no other host is writing to it; path absence on this host is advisory, not proof of abandonment.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"apply\": {\n            \"type\": \"boolean\",\n            \"description\": \"Delete the selected identity only when true. Omit for the report-only inventory.\"\n          },\n          \"identity\": {\n            \"type\": \"string\",\n            \"description\": \"Exact identity returned by codebase_prune.\"\n          },\n          \"confirmationToken\": {\n            \"type\": \"string\",\n            \"description\": \"Opaque token returned for that identity by codebase_prune.\"\n          },\n          \"acknowledgeNoRemoteWriters\": {\n            \"type\": \"boolean\",\n            \"description\": \"Required with apply. Locks on this host cannot see another host sharing the same Qdrant; true states that none is writing to this identity.\"\n          }\n        },\n        \"additionalProperties\": false,\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n      },\n      \"execution\": {\n        \"taskSupport\": \"forbidden\"\n      }\n    },\n    {\n      \"name\": \"codebase_stop\",\n      \"description\": \"Gracefully stop an in-progress indexing operation. The current batch will finish and checkpoint, preserving all progress. Re-run codebase_index to resume from where it left off.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"projectPath\": {\n            \"type\": \"string\",\n            \"description\": \"Absolute path to the project directory. If omitted, uses the current working directory.\"\n          }\n        },\n        \"additionalProperties\": false,\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n      },\n      \"execution\": {\n        \"taskSupport\": \"forbidden\"\n      }\n    },\n    {\n      \"name\": \"codebase_watch\",\n      \"description\": \"Start/stop watching a project directory for file changes and automatically update the index. When starting, first runs an incremental update to catch up, then watches for changes. SOCRATICODE_WATCHER=manual allows explicit starts only; off rejects starts.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"projectPath\": {\n            \"type\": \"string\",\n            \"description\": \"Absolute path to the project directory.\"\n          },\n          \"action\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"start\",\n              \"stop\",\n              \"status\"\n            ],\n            \"description\": \"start/stop watching, or get status of watchers.\"\n          }\n        },\n        \"required\": [\n          \"action\"\n        ],\n        \"additionalProperties\": false,\n        \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n      },\n      \"execution\": {\n        \"taskSupport\": \"forbidden\"\n      }\n    },\n    {\n      \"name\": \"codebase_search\",\n      \"description\": \"Semantic search across an indexed codebase. Only use after codebase_index is complete (check codebase_status first). Returns relevant code chunks matching a natural language query.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n  ",
+   "stderr": ""
+  },
+  {
+   "label": "inspector-outside-absolute-call-codebase-status-cwd",
+   "gaps": [
+    8
+   ],
+   "argv": [
+    "node",
+    "$HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js",
+    "--cli",
+    "--config",
+    "$HOME/code/agent-lab/.mcp.json",
+    "--server",
+    "socraticode",
+    "--method",
+    "tools/call",
+    "--tool-name",
+    "codebase_status"
+   ],
+   "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/outside",
+   "exit": 0,
+   "elapsed_ms": 415,
+   "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"No index found for project: $HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/outside\\nRun codebase_index to create one.\\n\\nFile watcher: inactive\"\n    }\n  ]\n}\n",
+   "stderr": ""
+  }
+ ],
+ "enforcement_probe": {
+  "shared_socket": "FileNotFoundError: No such file or directory",
+  "shared_dir_entries": [],
+  "live_tcp": {
+   "49374": "ConnectionRefusedError: Connection refused",
+   "16333": "ConnectionRefusedError: Connection refused"
+  }
+ },
+ "write_probe": {
+  "$HOME/code/agent-lab/.ns-write-probe": "OSError: Read-only file system",
+  "$HOME/.local/share/codex-ecosystem/ns-write-probe": "OSError: Read-only file system"
+ },
+ "pre_start_probe": {
+  "49374": "ConnectionRefusedError: Connection refused",
+  "16333": "ConnectionRefusedError: Connection refused",
+  "8231": "ConnectionRefusedError: Connection refused"
+ },
+ "post_start_probe": {
+  "49374": "connected",
+  "16333": "connected"
+ },
+ "owned_socket_control": "connected",
+ "ai_memory_log_tail": "[2m:\u001b[0m \u001b[2mrmcp::service\u001b[0m\u001b[2m:\u001b[0m Service initialized as server \u001b[3mpeer_info\u001b[0m\u001b[2m=\u001b[0mNone\n\u001b[2m2026-09-23T04:51:22.005415Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[1mserve_inner\u001b[0m\u001b[2m:\u001b[0m \u001b[2mrmcp::service\u001b[0m\u001b[2m:\u001b[0m input stream terminated\n\u001b[2m2026-09-23T04:51:22.005432Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[1mserve_inner\u001b[0m\u001b[2m:\u001b[0m \u001b[2mrmcp::service\u001b[0m\u001b[2m:\u001b[0m serve finished \u001b[3mquit_reason\u001b[0m\u001b[2m=\u001b[0mClosed\n\u001b[2m2026-09-23T04:51:22.022344Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[1mserve_inner\u001b[0m\u001b[2m:\u001b[0m \u001b[2mrmcp::service\u001b[0m\u001b[2m:\u001b[0m Service initialized as server \u001b[3mpeer_info\u001b[0m\u001b[2m=\u001b[0mNone\n\u001b[2m2026-09-23T04:51:22.022441Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[1mserve_inner\u001b[0m\u001b[2m:\u001b[0m \u001b[2mrmcp::service\u001b[0m\u001b[2m:\u001b[0m input stream terminated\n\u001b[2m2026-09-23T04:51:22.022456Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[1mserve_inner\u001b[0m\u001b[2m:\u001b[0m \u001b[2mrmcp::service\u001b[0m\u001b[2m:\u001b[0m serve finished \u001b[3mquit_reason\u001b[0m\u001b[2m=\u001b[0mClosed\n\u001b[2m2026-09-23T04:51:22.030355Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[1mserve_inner\u001b[0m\u001b[2m:\u001b[0m \u001b[2mrmcp::service\u001b[0m\u001b[2m:\u001b[0m Service initialized as server \u001b[3mpeer_info\u001b[0m\u001b[2m=\u001b[0mNone\n\u001b[2m2026-09-23T04:51:22.031203Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[1mserve_inner\u001b[0m\u001b[2m:\u001b[0m \u001b[2mrmcp::service\u001b[0m\u001b[2m:\u001b[0m input stream terminated\n\u001b[2m2026-09-23T04:51:22.031218Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[1mserve_inner\u001b[0m\u001b[2m:\u001b[0m \u001b[2mrmcp::service\u001b[0m\u001b[2m:\u001b[0m serve finished \u001b[3mquit_reason\u001b[0m\u001b[2m=\u001b[0mClosed\n\u001b[2m2026-09-23T04:51:23.643153Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[2mai_memory_cli::commands::serve\u001b[0m\u001b[2m:\u001b[0m shutdown signal received; draining \u001b[3msignal\u001b[0m\u001b[2m=\u001b[0m\"SIGTERM\"\n",
+ "ended_at": "2026-09-23T04:51:23Z",
+ "shared_daemon_before": {
+  "metadata_mtime_ns": 1790132456915116162,
+  "metadata_pid": 2276114,
+  "socket_inode": 2215748,
+  "metadata_pid_alive": true
+ },
+ "shared_daemon_after": {
+  "metadata_mtime_ns": 1790132456915116162,
+  "metadata_pid": 2276114,
+  "socket_inode": 2215748,
+  "metadata_pid_alive": true
+ },
+ "shared_daemon_unchanged": true
+}

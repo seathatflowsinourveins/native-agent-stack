@@ -1,0 +1,36 @@
+# Codex read-only review 1 (codex exec --sandbox read-only --ephemeral); prompt then final message
+## prompt
+You are an independent reviewer. Read-only. Repository: the current directory (git commit a0f57fa).
+Review the gap-wave-2 evidence for layer us-equities/storage-compute:
+- evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/ (receipts N-*.json, results.json, README.md, prereg/, raw/, gaps-input.json)
+- blueprints/gap-wave2-20260923/us-equities__storage-compute/ (bench.py, real_snapshot_checks.py, verify_paired_receipt.py, build_receipts.py)
+Rules the receipts must satisfy: "settled" only if every arm of the gap's next_check (or a stronger check) was executed and the evidence closes every clause of the gap text, otherwise "advanced" with what remains; covered_elsewhere must cite real covering evidence; every result a receipt quotes must be supported by a committed raw file; preregistration written_at precedes results; a probe must be able to detect the failure it reports absent; results.json must equal receipt outcomes.
+For each gap (0, 3, 4, 6, 10) say whether the outcome is supported, and list concrete findings (file:line or JSON field, what is wrong, suggested fix), most severe first. Also check bench.py for bugs that would invalidate the reported numbers (e.g. wrong percentiles, counting, kill-test logic, cross-store query mismatch). Be concise; no more than 40 lines.
+## final message
+Reviewed `a0f57fa`, read-only.
+
+| Gap | Outcome supported? |
+|---|---|
+| 0 | **Yes—advanced.** Missing year-long IEX acquisition and catalyst query are disclosed. |
+| 3 | **Yes for measurement coverage.** All four stores and concurrency levels ran; query-agreement verification is weak. |
+| 4 | **Substantive closure supported.** SIP snapshots exercise the feed-independent gate; unsupported provenance assertions need correction. |
+| 6 | **Yes—covered_elsewhere.** Retained reports, models, usage and reconstructed prompt hashes support the actual Astra→Claude handoff. |
+| 10 | **No—should be advanced.** Recovery detection and timing do not support full closure. |
+
+Findings, most severe first:
+
+1. **P1 — Recovery can falsely pass data loss.** [bench.py:741]($HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py:741) checks aggregate count and divisibility only. Losing one acknowledged batch while duplicating another passes; offsetting partial batches also pass. Verify acknowledged batch IDs, unique rows and content; downgrade receipt 10 and `results.json` pending corrected evidence.
+
+2. **P2 — Iceberg recovery time measures directory creation.** [bench.py:730]($HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py:730) stops timing after `start()`, which only calls `mkdir`. The reported **0.000031 seconds** excludes catalog/table reopening. Time through a fresh successful recovery query.
+
+3. **P2 — Embedded-store interruption is unproven.** [bench.py:714]($HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py:714) kills after 30 acknowledgments without establishing an active insert. Receipt 10 acknowledges this for DuckDB/Iceberg despite preregistering interruption during inserts. Instrument active-write interruption and retain its evidence.
+
+4. **P2 — Query “digests” hide mismatches.** [bench.py:880]($HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py:880) retains only group count and aggregate sums for Q3/Q4, discarding symbols and individual values. Different results reproduce identical digests. Compare canonical full results, including keys, with explicit numeric tolerance.
+
+5. **P2 — Receipt 4 quotes unavailable raw fields.** [Receipt 4:29]($HOME/code/nas-wt-g2-storage-compute/evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/4-real-snapshot-promotion-gate.json:29) asserts `evidence_class=native_market_data_readonly` and `symbols_missing=[]`; neither appears in committed raw evidence. Retain sanitized source-receipt fields or remove these assertions.
+
+6. **P2 — Parquet equality can conceal precision loss.** [real_snapshot_checks.py:77]($HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/real_snapshot_checks.py:77) casts prices to `DECIMAL(18,4)` before both writing and comparison. Thus `1.23456→1.2346` can still report zero differences. Preserve source precision or check representability before casting. Actual loss on these snapshots is unverified.
+
+7. **P3 — Paired verifier omits the promised handoff check.** [verify_paired_receipt.py:26]($HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/verify_paired_receipt.py:26) accepts workflow labels even with a corrupted Claude prompt hash. Reconstruct and verify prompt hashes and add a handoff-negative control. Independent reconstruction supports the current receipt.
+
+All referenced raw hashes match committed files; `results.json` equals receipt outcomes. Preregistration chronology is consistent. Stored percentiles and operation counts reproduce; no actual cross-store query mismatch was found.

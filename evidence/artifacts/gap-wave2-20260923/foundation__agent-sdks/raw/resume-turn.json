@@ -1,0 +1,78 @@
+{
+  "mode": "resume-turn",
+  "new_process_pid": 2724584,
+  "resumed_thread_matches": true,
+  "method_counts": {
+    "turn/started": 1,
+    "item/started": 2,
+    "item/completed": 2,
+    "item/agentMessage/delta": 7,
+    "thread/tokenUsage/updated": 1,
+    "turn/completed": 1
+  },
+  "untyped_methods": [],
+  "documented_notification_types": 82,
+  "received_types_documented": [
+    "item/agentMessage/delta",
+    "item/completed",
+    "item/started",
+    "thread/tokenUsage/updated",
+    "turn/completed",
+    "turn/started"
+  ],
+  "received_types_undocumented": [],
+  "documented_types_not_received": 76,
+  "item_types": [
+    "agentMessage",
+    "userMessage"
+  ],
+  "tool_items": [],
+  "last_token_usage": {
+    "last": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 19968,
+      "inputTokens": 22656,
+      "outputTokens": 11,
+      "reasoningOutputTokens": 0,
+      "totalTokens": 22667
+    },
+    "modelContextWindow": 258400,
+    "total": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 39680,
+      "inputTokens": 62739,
+      "outputTokens": 264,
+      "reasoningOutputTokens": 205,
+      "totalTokens": 63003
+    }
+  },
+  "turn_completed": {
+    "at": 1790133933.4297109,
+    "method": "turn/completed",
+    "typed": true,
+    "turn_status": "completed",
+    "turn_error": null
+  },
+  "turns_in_thread": 2,
+  "final_answer_matches_turn1_tool_value": true,
+  "final_answer_contains_value": true,
+  "turn2_prompt_contains_value": false,
+  "status": "ok",
+  "isolation_overrides": [
+    "features.hooks=false",
+    "features.plugin_hooks=false",
+    "features.apps=false",
+    "otel.exporter=\"none\"",
+    "otel.metrics_exporter=\"none\"",
+    "analytics.enabled=false",
+    "plugins={\"context-mode@context-mode\"={enabled=false}}"
+  ],
+  "sdk": "openai-codex",
+  "started_at": 1790133927.201667,
+  "finished_at": 1790133933.4686108,
+  "python_env_keys": [
+    "HOME",
+    "LC_CTYPE",
+    "PATH"
+  ]
+}

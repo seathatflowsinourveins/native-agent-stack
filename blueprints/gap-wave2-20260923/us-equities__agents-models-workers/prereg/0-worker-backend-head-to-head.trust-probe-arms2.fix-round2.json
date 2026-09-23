@@ -1,0 +1,8 @@
+{"gap_index": 0, "written_at": "2026-09-23T16:18:02Z", "written_before_results": true,
+ "label": "fix-round-2 addendum, written AFTER the T0/T1 results (neither wrote config.toml) and BEFORE running T2/T3",
+ "reason": "Adapter log: config.toml mtime 03:28:59.234 (local) is 2-3 ms after turn/completed (59.231) and a second codex-acp thread/start {cwd: acp-workspace, ephemeral: true} with no config override (59.232). T1 showed the override alone is not persisted at thread/start.",
+ "arms": {
+  "T2 override-then-ephemeral": "Same isolated setup: thread/start with the projects trust override, then a second thread/start {cwd: ws, ephemeral: true} as in log line 242.",
+  "T3 ephemeral-only": "Only thread/start {cwd: ws, ephemeral: true} with no override."},
+ "expectation": "Uncertain. If T2 writes the trust table and T3 does not, the second thread/start inherits and persists the first thread's override. If neither writes, the write is tied to the turn (turn/start or turn completion), which cannot run here without auth; the writer is then attributed from timing and source as the native codex app-server process serving the codex-acp session, with the exact persisting call unconfirmed.",
+ "criteria": ["Same detection method as T0/T1 (temp config.toml absent before, read after).", "No auth, no turn/start, no live CODEX_HOME contact; live config.toml mtime checked before/after."]}

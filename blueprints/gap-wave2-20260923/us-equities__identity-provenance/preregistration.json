@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "layer": "us-equities/identity-provenance",
+  "written_at": "2026-09-23T04:57:25Z",
+  "note": "written_at is approximate (between the 04:57:11Z shell stamp and the 04:57:40Z first commit). Written and committed before any gap-wave-2 check for this layer ran. Each receipt copies its entry verbatim.",
+  "gaps": {
+    "0": {
+      "expectation": "A dvc.yaml pipeline in a fresh git+DVC 3.67.1 scratch repo, whose stages run replay.py materialize and replay.py select over the tracked fixture, completes under `dvc repro`, records a dvc.lock, and after deleting the outputs `dvc checkout` restores them byte-identically. replay.py select against the DVC-restored snapshot returns per-cutoff records and selection_sql_sha256 equal to the project-local path (materialize+select outside DVC), and the unknown-availability mutations still exit 2 when fed through the DVC-restored source.",
+      "criteria": [
+        "C0.1 `dvc repro` exits 0 and dvc.lock pins md5 of every stage dep and out.",
+        "C0.2 A second `dvc repro` with unchanged deps skips every stage (reproduction is cache-aware), and `dvc status` reports up to date.",
+        "C0.3 After `rm -rf` of every out, `dvc checkout` restores the tree; the sha256 list equals the pre-delete list.",
+        "C0.4 For each cutoff in the replay test suite (…099Z, …100Z, …200Z, …201Z) replay.py select on the DVC-restored snapshot returns the same row_ids as tests/test_nanosecond_replay.py asserts and the same canonical records sha256 and selection_sql_sha256 as the project-local arm.",
+        "C0.5 Unknown-availability mutations of the DVC-restored source.json (observation available_at removed, universe available_at removed, available_at null) make replay.py materialize exit 2 with status rejected; a detector control (unmutated restored source) exits 0, so the probe can see a non-rejection.",
+        "C0.6 `dvc repro --force` regenerates a snapshot whose three data files are byte-identical to the first run and whose snapshot.json differs only in ingested_at; that is the recorded expectation, not a failure.",
+        "Refutation: any C0.x failing marks the gap not_settled with the observed failure."
+      ]
+    },
+    "2": {
+      "expectation": "DVC can be the executing implementation of the selection and quarantine path in the sense that `dvc repro` runs the select stages and a quarantine stage (asserting exit 2 for tampered snapshot, wrong digest and unknown-availability source) and the stage outputs, restored by `dvc checkout`, equal the project-local adapter results. The identity-readiness security-identity ledger (Alpaca captures) is not reproducible offline here, so the quarantine compared is replay.py's exit-code-2 path, not the zero-volume quarantine row of the identity-readiness receipt.",
+      "criteria": [
+        "C2.1 dvc.yaml has select stages per cutoff and a quarantine stage; `dvc repro` exits 0 and dvc.lock records their outs.",
+        "C2.2 Quarantine stage records exit 2 for: wrong --snapshot-sha256, parquet byte tamper of a DVC-restored copy, and each unknown-availability source mutation; and exit 0 for the unmutated control.",
+        "C2.3 The DVC-produced select outputs (restored via checkout after deletion) equal the project-local adapter outputs on canonical records and selection_sql_sha256 for every cutoff; snapshot_sha256 fields differ only because each materialization stamps ingested_at.",
+        "C2.4 Also check whether the identity-readiness ledger adapter (security-identity) can run offline from repository data; if it cannot, record that clause as remaining.",
+        "Outcome rule: settled only if C2.1-C2.3 pass and C2.4 shows the identity-readiness adapter path also ran through DVC; otherwise advanced naming what remains."
+      ]
+    },
+    "4": {
+      "expectation": "On the materialized nanosecond-replay fixture (5 observations, 2 universe rows), PyIceberg 0.12.0 (SQLite catalog, local warehouse) and ArcticDB 6.26.0 (LMDB) both restore canonical rows exactly, retain the pre-correction version by time travel, record a version history, recover a readable last-committed version after SIGKILL of a writer, and handle two concurrent writers (Iceberg: optimistic commit conflict or serialised retry; ArcticDB: last-writer-wins version race on one symbol). DVC and the baseline arms are measured on the same metrics. Absolute numbers are for this tiny fixture only.",
+      "criteria": [
+        "C4.1 Restore fidelity: canonical row-content sha256 (rows sorted by row_id, JSON-canonical) read back equals the materialized parquet content for every arm; per-file sha256 recorded where the arm keeps files (DVC, baseline).",
+        "C4.2 Correction retention: write v1 (rows without correction rows), then v2 (all rows); reading v1 by version/snapshot id returns exactly the v1 rows.",
+        "C4.3 Lineage completeness: count which of {version id, parent version, commit timestamp, operation, per-file content hash, input dataset name} each arm records natively.",
+        "C4.4 Recovery: SIGKILL a writer process mid-loop of appends; reopen and verify the latest committed version reads without error and its row count equals a whole number of completed appends.",
+        "C4.5 Concurrency: two processes append simultaneously N times each; record final row count vs expected, errors/conflicts raised.",
+        "C4.6 Storage bytes (du -sb of the arm's store) and latency (median of 5 write and 5 read wall times).",
+        "Outcome rule: settled only if every metric is measured for all four arms (baseline, DVC, PyIceberg, ArcticDB); a metric an arm lacks by design is recorded as not_supported rather than skipped."
+      ]
+    },
+    "5": {
+      "expectation": "openlineage-python 1.53.0 FileTransport persists START and COMPLETE RunEvents for a replay.py materialize run with a custom dataset-version facet (snapshot_sha256, per-file sha256) and a knowledge-cutoff facet; reading the file back yields events whose runId, version and cutoff facets are consistent across START/COMPLETE. MLflow 3.16.1 with a local SQLite tracking store records the same run with mlflow.log_input bindings for the materialized datasets (digest, source) and the bindings read back through MlflowClient/search.",
+      "criteria": [
+        "C5.1 The OpenLineage event file exists after emission, parses as JSON lines, and contains START and COMPLETE with the same runId.",
+        "C5.2 Every event's output dataset carries a version facet equal to snapshot_sha256 and per-file sha256 equal to the manifest, and a cutoff facet with the same value across events; a detector control (a deliberately mismatched facet in a third synthetic event written by the check) is flagged by the consistency checker.",
+        "C5.3 MLflow run has dataset inputs (log_input) whose names, digests and sources read back via get_run().inputs.dataset_inputs and match the manifest; the OpenLineage runId is stored as a tag and matches.",
+        "C5.4 Persistence: a fresh Python process reopening the same file and the same SQLite DB reads back identical records.",
+        "Outcome rule: settled only if C5.1-C5.4 pass."
+      ]
+    }
+  }
+}

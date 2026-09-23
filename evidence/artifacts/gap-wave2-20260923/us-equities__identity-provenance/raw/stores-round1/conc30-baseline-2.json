@@ -1,0 +1,31 @@
+{
+  "arm": "baseline",
+  "concurrent_writers": {
+    "appends_each": 30,
+    "no_silent_loss": true,
+    "reported_successful_appends": 60,
+    "rows_expected_from_reported_successes": 300,
+    "rows_found": 300,
+    "rows_lost_after_reported_success": 0,
+    "state": {
+      "committed_versions": 60,
+      "incomplete_dirs_without_manifest": 0,
+      "manifest_present_but_invalid": [],
+      "readable": true,
+      "rows": 300
+    },
+    "stderr_tail": {
+      "a": "",
+      "b": ""
+    },
+    "writer_error_counts": {
+      "a": 0,
+      "b": 0
+    },
+    "writer_error_examples": {
+      "a": [],
+      "b": []
+    },
+    "writers": 2
+  }
+}

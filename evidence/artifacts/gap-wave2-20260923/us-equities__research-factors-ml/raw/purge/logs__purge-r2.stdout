@@ -1,0 +1,45 @@
+{
+ "arms": {
+  "Z-check": {
+   "status": "raised",
+   "error": "ValueError: incomplete training label"
+  },
+  "Z-leaky": {
+   "status": "completed",
+   "folds": 20,
+   "ledger_records": 6615,
+   "reserved": "momentum20",
+   "reserved_mean_net": "0.001184071666615635470939591764",
+   "eval_crossings_before_censor": 115,
+   "train_crossings": 120
+  },
+  "P6": {
+   "status": "completed",
+   "folds": 20,
+   "ledger_records": 6605,
+   "reserved": "momentum20",
+   "reserved_mean_net": "0.001184071666615635470939591764",
+   "eval_crossings_before_censor": 115,
+   "train_crossings": 0
+  },
+  "P6E5": {
+   "status": "completed",
+   "folds": 20,
+   "ledger_records": 6500,
+   "reserved": "momentum20",
+   "reserved_mean_net": "0.001184071666615635470939591764",
+   "eval_crossings_before_censor": 115,
+   "train_crossings": 0
+  },
+  "Z-choose": {
+   "status": "raised",
+   "error": "ValueError: training label overlap with evaluation decision"
+  },
+  "P6-assert": {
+   "status": "raised",
+   "error": "AssertionError: development label window crosses a fold boundary: development-1"
+  }
+ },
+ "inputs_unchanged": true,
+ "results_sha256": "0511b50293263b15d031314d7a709810348c233000877922b05e5a581030378c"
+}

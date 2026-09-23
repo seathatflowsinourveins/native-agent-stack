@@ -1,0 +1,32 @@
+{"type": "queue-operation", "subtype": null, "timestamp": "2026-09-23T14:21:52.871Z", "message": {}}
+{"type": "queue-operation", "subtype": null, "timestamp": "2026-09-23T14:21:52.876Z", "message": {}}
+{"type": "user", "subtype": null, "timestamp": "2026-09-23T14:21:52.888Z", "message": {"role": "user"}}
+{"type": "attachment", "subtype": null, "timestamp": "2026-09-23T14:21:52.887Z", "message": {}}
+{"type": "attachment", "subtype": null, "timestamp": "2026-09-23T14:21:52.887Z", "message": {}}
+{"type": "attachment", "subtype": null, "timestamp": "2026-09-23T14:21:52.887Z", "message": {}}
+{"type": "atis-latch", "subtype": null, "timestamp": null, "message": {}}
+{"type": "attachment", "subtype": null, "timestamp": "2026-09-23T14:21:52.898Z", "message": {}}
+{"type": "attachment", "subtype": null, "timestamp": "2026-09-23T14:21:52.898Z", "message": {}}
+{"type": "attachment", "subtype": null, "timestamp": "2026-09-23T14:21:52.900Z", "message": {}}
+{"type": "assistant", "subtype": null, "timestamp": "2026-09-23T14:21:53.783Z", "message": {"id": "chatcmpl-b461607c73d4cea6", "model": "qwen3-4b", "role": "assistant", "stop_reason": "tool_use", "usage": {"input_tokens": 331, "cache_creation_input_tokens": 0, "cache_read_input_tokens": 0, "output_tokens": 25, "output_tokens_details": {"thinking_tokens": 0}, "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0}, "service_tier": "standard", "cache_creation": {"ephemeral_1h_input_tokens": 0, "ephemeral_5m_input_tokens": 0}, "inference_geo": "", "iterations": [], "speed": "standard"}}}
+{"type": "user", "subtype": null, "timestamp": "2026-09-23T14:21:53.796Z", "message": {"role": "user"}}
+{"type": "attachment", "subtype": null, "timestamp": "2026-09-23T14:21:53.798Z", "message": {}}
+{"type": "attachment", "subtype": null, "timestamp": "2026-09-23T14:21:53.799Z", "message": {}}
+{"type": "assistant", "subtype": null, "timestamp": "2026-09-23T14:21:54.220Z", "message": {"id": "chatcmpl-af82ff00d3c48d71", "model": "qwen3-4b", "role": "assistant", "stop_reason": "end_turn", "usage": {"input_tokens": 398, "cache_creation_input_tokens": 0, "cache_read_input_tokens": 0, "output_tokens": 13, "output_tokens_details": {"thinking_tokens": 0}, "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0}, "service_tier": "standard", "cache_creation": {"ephemeral_1h_input_tokens": 0, "ephemeral_5m_input_tokens": 0}, "inference_geo": "", "iterations": [], "speed": "standard"}}}
+{"type": "queue-operation", "subtype": null, "timestamp": "2026-09-23T14:21:54.254Z", "message": {}}
+{"type": "queue-operation", "subtype": null, "timestamp": "2026-09-23T14:21:54.254Z", "message": {}}
+{"type": "user", "subtype": null, "timestamp": "2026-09-23T14:21:54.257Z", "message": {"role": "user"}}
+{"type": "attachment", "subtype": null, "timestamp": "2026-09-23T14:21:54.257Z", "message": {}}
+{"type": "assistant", "subtype": null, "timestamp": "2026-09-23T14:21:58.366Z", "message": {"id": "chatcmpl-987328a303f5978b", "model": "qwen3-4b", "role": "assistant", "stop_reason": null, "usage": {"input_tokens": 484, "output_tokens": 0}}}
+{"type": "user", "subtype": null, "timestamp": "2026-09-23T14:21:58.367Z", "message": {"role": "user"}}
+{"type": "last-prompt", "subtype": null, "timestamp": null, "message": {}}
+{"type": "cost-state", "subtype": null, "timestamp": null, "message": {}}
+{"type": "queue-operation", "subtype": null, "timestamp": "2026-09-23T14:22:29.949Z", "message": {}}
+{"type": "queue-operation", "subtype": null, "timestamp": "2026-09-23T14:22:29.954Z", "message": {}}
+{"type": "assistant", "subtype": null, "timestamp": "2026-09-23T14:22:29.905Z", "message": {"id": "redacted-id:9436f232584a5bfa", "model": "<synthetic>", "role": "assistant", "stop_reason": "stop_sequence", "usage": {"output_tokens_details": null, "input_tokens": 0, "output_tokens": 0, "cache_creation_input_tokens": 0, "cache_read_input_tokens": 0, "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0}, "service_tier": null, "cache_creation": {"ephemeral_1h_input_tokens": 0, "ephemeral_5m_input_tokens": 0}, "inference_geo": null, "iterations": null, "speed": null}}}
+{"type": "user", "subtype": null, "timestamp": "2026-09-23T14:22:29.966Z", "message": {"role": "user"}}
+{"type": "attachment", "subtype": null, "timestamp": "2026-09-23T14:22:29.966Z", "message": {}}
+{"type": "assistant", "subtype": null, "timestamp": "2026-09-23T14:22:30.481Z", "message": {"id": "chatcmpl-a4eb3bbb2aa44484", "model": "qwen3-4b", "role": "assistant", "stop_reason": "end_turn", "usage": {"input_tokens": 704, "cache_creation_input_tokens": 0, "cache_read_input_tokens": 0, "output_tokens": 13, "output_tokens_details": {"thinking_tokens": 0}, "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0}, "service_tier": "standard", "cache_creation": {"ephemeral_1h_input_tokens": 0, "ephemeral_5m_input_tokens": 0}, "inference_geo": "", "iterations": [], "speed": "standard"}}}
+{"type": "last-prompt", "subtype": null, "timestamp": null, "message": {}}
+{"type": "mode", "subtype": null, "timestamp": null, "message": {}}
+{"type": "cost-state", "subtype": null, "timestamp": null, "message": {}}

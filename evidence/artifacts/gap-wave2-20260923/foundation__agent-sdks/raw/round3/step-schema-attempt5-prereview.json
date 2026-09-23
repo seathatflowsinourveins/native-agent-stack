@@ -1,0 +1,10 @@
+{
+  "step": "schema",
+  "started_at": "2026-09-23T13:04:25Z",
+  "generate_exit_code": 0,
+  "native_version": "codex-cli 0.155.1",
+  "exit_code": 0,
+  "stdout": "{\"native_methods\": 82, \"sdk_registry\": 82, \"native_equals_sdk_registry\": true, \"native_only\": [], \"sdk_only\": [], \"samples_native_valid_both\": 82, \"typed_minimal\": 82, \"typed_maximal\": 82, \"typed_both_among_native_valid\": 82, \"untyped_among_native_valid\": [], \"negative_controls\": 80, \"negative_controls_untyped\": 79, \"router_routes\": {\"turn\": 28, \"global\": 54}, \"router_global_queue_size\": 54, \"sdk_more_lenient_than_native\": [\"thread/project/updated\"], \"not_native_valid\": []}\n",
+  "stderr_tail": "",
+  "finished_at": "2026-09-23T13:05:08Z"
+}

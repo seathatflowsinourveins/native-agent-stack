@@ -1,0 +1,72 @@
+time=2026-09-23T12:15:36.396-04:00 level=INFO msg="Executing root dag-run" dag=obsgap-paper run-id=034TtO4p4ZjfF4sVMuL0e7 params=""
+time=2026-09-23T12:15:36.418-04:00 level=INFO msg="DAG run started" dag=obsgap-paper run-id=034TtO4p4ZjfF4sVMuL0e7 worker-id=local trace-id=2fe7b9e3678cd041c59b16075f26e7fc span-id=d614ab5929061e04 trace-flags=01 attempt-id=cf7d6e params=[]
+time=2026-09-23T12:15:36.419-04:00 level=INFO msg="Step started" dag=obsgap-paper run-id=034TtO4p4ZjfF4sVMuL0e7 worker-id=local trace-id=2fe7b9e3678cd041c59b16075f26e7fc span-id=d614ab5929061e04 trace-flags=01 attempt-id=cf7d6e step=paper-runtime
+time=2026-09-23T12:15:36.420-04:00 level=INFO msg="Step started" dag=obsgap-paper run-id=034TtO4p4ZjfF4sVMuL0e7 worker-id=local trace-id=2fe7b9e3678cd041c59b16075f26e7fc span-id=d614ab5929061e04 trace-flags=01 attempt-id=cf7d6e step=hot-backup
+time=2026-09-23T12:15:52.038-04:00 level=INFO msg="DAG run finished" dag=obsgap-paper run-id=034TtO4p4ZjfF4sVMuL0e7 worker-id=local trace-id=2fe7b9e3678cd041c59b16075f26e7fc span-id=d614ab5929061e04 trace-flags=01 attempt-id=cf7d6e status=failed started-at=2026-09-23T12:15:36-04:00 finished-at=2026-09-23T12:15:52-04:00
+time=2026-09-23T12:15:52.049-04:00 level=ERROR msg="Failed to execute dag-run" dag=obsgap-paper run-id=034TtO4p4ZjfF4sVMuL0e7 err="exit status 1\nrecent stderr (tail):\n[SandboxDebug] Initializing sandbox...\n[SandboxDebug] [SeccompFilter] Looking for apply-seccomp binary for architecture: x64\n[SandboxDebug] [SeccompFilter] Found apply-seccomp binary: $HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/lib/node_modules/@anthropic-ai/sandbox-runtime/vendor/seccomp/x64/apply-seccomp (x64)\n[SandboxDebug] mux: HTTP backend listening on $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/work/srt-mux-1497012-0.sock\n[SandboxDebug] Mux proxy (HTTP+SOCKS) listening on localhost:58158\n[SandboxDebug] Starting HTTP bridge: socat UNIX-LISTEN:$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/work/claude-http-bdeb07aeac2680e0.sock,fork,reuseaddr TCP:localhost:58158,keepalive,keepidle=10,keepintvl=5,keepcnt=3\n[SandboxDebug] HTTP bridge process exited with code 1, signal null\nError: Failed to create bridge sockets after 5 attempts\n"
+Failed - 2026-09-23T12:15:36-04:00
+
+dag: obsgap-paper (16.0s)
+├─log: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/dagu/logs/obsgap-paper/dag-run_20260923_161536Z_034TtO4p4ZjfF4sVMuL0e7/dag-run_20260923.121536.400.034TtO4p.log
+│
+├─paper-runtime (1.0s) [failed]
+│ ├─$HOME/.local/share/codex-ecosystem/bin/srt -d -s
+│ │   $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-
+│ │   5/cfg/srt.json -c "sh
+│ │   $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-
+│ │   5/cfg/paper_step.sh"
+│ │
+│ ├─stderr: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/dagu/logs/obsgap-paper/dag-run_20260923_161536Z_034TtO4p4ZjfF4sVMuL0e7/run_20260923_161536Z_cf7d6e/paper-runtime.20260923.121536.421.034TtO4p.err
+│ │   [SandboxDebug] Initializing sandbox...
+│ │   [SandboxDebug] [SeccompFilter] Looking for apply-seccomp binary for
+│ │   architecture: x64
+│ │   [SandboxDebug] [SeccompFilter] Found apply-seccomp binary:
+│ │   $HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/
+│ │   lib/node_modules/@anthropic-ai/sandbox-runtime/vendor/seccomp/x64/appl
+│ │   y-seccomp (x64)
+│ │   [SandboxDebug] mux: HTTP backend listening on
+│ │   $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-
+│ │   5/work/srt-mux-1497012-0.sock
+│ │   [SandboxDebug] Mux proxy (HTTP+SOCKS) listening on localhost:58158
+│ │   [SandboxDebug] Starting HTTP bridge: socat
+│ │   UNIX-LISTEN:$HOME/.cache/gap-wave2-20260923/observability-hostin
+│ │   g/paper-arm-5/work/claude-http-bdeb07aeac2680e0.sock,fork,reuseaddr
+│ │   TCP:localhost:58158,keepalive,keepidle=10,keepintvl=5,keepcnt=3
+│ │   [SandboxDebug] HTTP bridge process exited with code 1, signal null
+│ │   Error: Failed to create bridge sockets after 5 attempts
+│ │
+│ └─error: exit status 1
+│ 
+└─hot-backup (16.0s) [succeeded]
+  ├─sh
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/
+  │   cfg/hot_step.sh
+  │
+  └─stdout: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/dagu/logs/obsgap-paper/dag-run_20260923_161536Z_034TtO4p4ZjfF4sVMuL0e7/run_20260923_161536Z_cf7d6e/hot-backup.20260923.121536.421.034TtO4p.out
+      created restic repository ff86ed9371 at
+      $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/re
+      stic-hot
+      Please note that knowledge of your password is required to access
+      the repository. Losing your password means that your data is
+      irrecoverably lost.
+      no parent snapshot found, will read all files
+      Files:           0 new,     0 changed,     0 unmodified
+      Dirs:            7 new,     0 changed,     0 unmodified
+      Added to the repository: 2.598 KiB (2.130 KiB stored)
+      processed 0 files, 0 B in 0:00
+      snapshot 71ee12e6 saved
+      HOT_BACKUP_OK
+
+Result: Failed
+
+Error: failed to execute the dag-run obsgap-paper (dag-run ID: 034TtO4p4ZjfF4sVMuL0e7): exit status 1
+recent stderr (tail):
+[SandboxDebug] Initializing sandbox...
+[SandboxDebug] [SeccompFilter] Looking for apply-seccomp binary for architecture: x64
+[SandboxDebug] [SeccompFilter] Found apply-seccomp binary: $HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/lib/node_modules/@anthropic-ai/sandbox-runtime/vendor/seccomp/x64/apply-seccomp (x64)
+[SandboxDebug] mux: HTTP backend listening on $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/work/srt-mux-1497012-0.sock
+[SandboxDebug] Mux proxy (HTTP+SOCKS) listening on localhost:58158
+[SandboxDebug] Starting HTTP bridge: socat UNIX-LISTEN:$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/work/claude-http-bdeb07aeac2680e0.sock,fork,reuseaddr TCP:localhost:58158,keepalive,keepidle=10,keepintvl=5,keepcnt=3
+[SandboxDebug] HTTP bridge process exited with code 1, signal null
+Error: Failed to create bridge sockets after 5 attempts
+

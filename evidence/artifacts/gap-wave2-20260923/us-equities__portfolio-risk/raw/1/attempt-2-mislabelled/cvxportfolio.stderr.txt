@@ -1,0 +1,2 @@
+$HOME/code/nas-wt-g2-portfolio-risk/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap1_libs.py:37: Pandas4Warning: 'd' is deprecated and will be removed in a future version. Please use 'D' instead of 'd'.
+  md = cvx.UserProvidedMarketData(returns=fwd, min_history=pd.Timedelta("0d"), base_location=workdir,

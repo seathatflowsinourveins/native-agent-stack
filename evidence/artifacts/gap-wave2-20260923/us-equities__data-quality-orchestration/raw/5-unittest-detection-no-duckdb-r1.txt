@@ -1,0 +1,6 @@
+AssertionError: gate venv cannot import duckdb although requirements.lock pins it
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (failures=1)

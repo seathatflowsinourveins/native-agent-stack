@@ -1,0 +1,729 @@
+{
+  "id": "gap-wave2-20260923/foundation/agent-sdks/8-langgraph-temporal-openhands",
+  "gap_index": 8,
+  "gap_text_sha256": "ec7e4e3aeb962858d4d7c82101b64095efc17e112ef25a62e2e87046b7bfee82",
+  "preregistration": {
+    "written_at": "2026-09-23T03:24:52Z",
+    "expectation": "LangGraph checkpoint save/resume and a Temporal dev-server worker restart with replay execute locally; OpenHands SDK conversation needs an LLM, so it runs only with a local mocked LLM (no paid API).",
+    "criteria": [
+      "LangGraph: interrupt then resume from a SqliteSaver checkpoint in a new process, state carries over",
+      "Temporal: local dev server, worker killed mid-workflow, new worker completes, Replayer replays history without nondeterminism",
+      "OpenHands: a Conversation runs at least one tool action locally; with a mocked LLM this is local_integration, not provider E2E",
+      "settled only if all three run with a real conversation; advanced otherwise"
+    ],
+    "fix_round": {
+      "written_at": "2026-09-23T04:22:00Z",
+      "label": "fix-round preregistration, written after the Codex cross-family review (review findings 3-6); not back-dated",
+      "expectation": "Rerunning the three runtime checks under one driver records exit codes 0 and installed versions from importlib.metadata; outputs replace the earlier ones.",
+      "criteria": [
+        "gap8-runs.json has exit_code per run and versions per venv",
+        "outcome stays advanced (OpenHands model is scripted)"
+      ]
+    }
+  },
+  "commands": [
+    "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/run_gap8.py $HOME/.cache/gap-wave2-20260923/agent-sdks $HOME/.cache/gap-wave2-20260923/agent-sdks/runs $HOME/.cache/gap-wave2-20260923/agent-sdks/tmp-VB16/cli",
+    "(first pass, same scripts run individually: langgraph_checkpoint.py start/resume; temporal_restart.py controller under ecosystem-bounded-run, which downloaded the Temporal CLI; openhands_local.py first/reload)"
+  ],
+  "results": {
+    "exit_codes": {
+      "langgraph_start": 0,
+      "langgraph_resume": 0,
+      "temporal_controller": 0,
+      "openhands_first": 0,
+      "openhands_reload": 0
+    },
+    "versions": {
+      "langgraph": {
+        "langgraph": "1.2.12",
+        "langgraph-checkpoint-sqlite": "3.1.1"
+      },
+      "temporal": {
+        "temporalio": "1.33.0"
+      },
+      "openhands": {
+        "openhands-sdk": "1.49.4",
+        "openhands-tools": "1.49.4",
+        "litellm": "1.102.0"
+      }
+    },
+    "temporal_cli_version": "temporal version 1.9.1 (Server 1.32.0, UI 2.54.1)",
+    "langgraph": {
+      "start": {
+        "phase": "start",
+        "pid": 3562107,
+        "result": {
+          "log": [
+            "fetch@pid3562107"
+          ],
+          "total": 40
+        },
+        "next": [
+          "approve"
+        ]
+      },
+      "resume": {
+        "phase": "resume",
+        "pid": 3562229,
+        "loaded_state": {
+          "values": {
+            "log": [
+              "fetch@pid3562107"
+            ],
+            "total": 40
+          },
+          "next": [
+            "approve"
+          ]
+        },
+        "result": {
+          "log": [
+            "fetch@pid3562107",
+            "approve@pid3562229",
+            "publish@pid3562229"
+          ],
+          "total": 42
+        },
+        "next": [],
+        "checkpoints": 5
+      }
+    },
+    "temporal": {
+      "result": {
+        "activity": "attempt=2 applied_now=False pid=3562776",
+        "key": "effect-gap8-wf"
+      },
+      "attempts": [
+        {
+          "n": 1,
+          "attempt": 1,
+          "pid": 3562607,
+          "at": 1790137328.3412135
+        },
+        {
+          "n": 2,
+          "attempt": 2,
+          "pid": 3562776,
+          "at": 1790137337.2957098
+        }
+      ],
+      "effects": [
+        {
+          "key": "effect-gap8-wf",
+          "pid": 3562607,
+          "at": 1790137328.341282
+        }
+      ],
+      "worker1_returncode": -9,
+      "history_events": 18,
+      "replay_failure": null,
+      "negative_control_replay_failure": "NondeterminismError('Workflow activation completion failed: Failure { failure: Some(Failure { message: \"[TMPRL1100] Nondeterminism error: Timer machine does not handle this event: HistoryEvent(id: 5, ActivityTaskScheduled)\", source: \"\", stack_trace: \"\", encoded_attributes: None, cause: None, failure_info: Some(ApplicationFailureInfo(ApplicationFailureInfo { r#type: \"\", non_retryable: false, detail",
+      "server_stopped": true
+    },
+    "openhands": {
+      "first": {
+        "event_types": [
+          "SystemPromptEvent",
+          "MessageEvent",
+          "ActionEvent",
+          "ObservationEvent",
+          "ActionEvent",
+          "ObservationEvent"
+        ],
+        "execution_status": "ConversationExecutionStatus.FINISHED",
+        "proof_file": "gap8-openhands-3567670",
+        "llm_calls": 2
+      },
+      "reload": {
+        "events_before": 6,
+        "events_after": 11,
+        "execution_status": "ConversationExecutionStatus.FINISHED",
+        "proof_file": "gap8-openhands-3567670",
+        "llm_calls": 2
+      }
+    }
+  },
+  "raw_outputs": [
+    {
+      "path": "raw/gap8-runs.json",
+      "sha256": "d58f8b63ca52595b47145e6419bc4cf065f6eccfd483b2453ec6650c97c379c7"
+    },
+    {
+      "path": "raw/langgraph-start.json",
+      "sha256": "2520363ed55bf389dbd6be6094a6a7e567ca10c87d2d2f7a76b950f58eca948d"
+    },
+    {
+      "path": "raw/langgraph-resume.json",
+      "sha256": "b62990cffed9bad3224df449b142290da6e80d5a73f667dfca35962b5ebb7e9b"
+    },
+    {
+      "path": "raw/temporal-restart.json",
+      "sha256": "0e176203c63cf8d58c48a667b8034b08cfaa82c6121522fee4f983847eeedc4f"
+    },
+    {
+      "path": "raw/openhands-first.json",
+      "sha256": "ac542a17603d5b01b646a2e5d59262e7fa56611b5a88001695bb86004279982d"
+    },
+    {
+      "path": "raw/openhands-reload.json",
+      "sha256": "b393b31a37ad5dbe3d2cbdde80b51b05a215b21a5f280b5e05299f410e3cc094"
+    },
+    {
+      "path": "raw/openhands-install.log",
+      "sha256": "cebe5feda0b6015094320192c26c364e300e7b169f964640d7d8a59038b6eed8"
+    }
+  ],
+  "outcome": "settled",
+  "evidence_class": "local_integration",
+  "checked_at": "2026-09-23T15:47:16Z",
+  "round_4": {
+    "preregistration": {
+      "file": "preregistration-round4.json",
+      "written_at": null,
+      "written_window": {
+        "not_before": "2026-09-23T14:11:57Z",
+        "not_after": "2026-09-23T14:12:27Z"
+      },
+      "written_at_note": "Written between 14:11:57Z (a date call just before writing) and 14:12:27Z (commit 1ce3105 time); the first draft carried 14:13:00Z, which was later than its own commit and is corrected here in an amended commit. Written before the round-4 model download, before the local vLLM server started and before any round-4 inference.",
+      "expectation": "The OpenHands SDK (1.49.4, existing venv) runs a local Conversation with a real model through LiteLLM (openai-compatible base_url to the loopback vLLM), and the agent uses the terminal or file-editor tool to create a file with a requested content. If openhands-agent-server installs into a fresh prefix, a second conversation runs through a loopback agent-server process (RemoteWorkspace/remote conversation).",
+      "criteria": [
+        "local conversation: execution status FINISHED, at least one ActionEvent from the model (not TestLLM), the file exists with the requested content, provider request count > 0",
+        "remote arm: conversation created on the loopback agent-server, events returned over its API, the file exists in the server's workspace",
+        "container arm: attempted only if an agent-server image and a docker-compatible runtime are available without touching shared container storage; otherwise named as the remaining blocker",
+        "settled only if LangGraph and Temporal (round 1) plus an OpenHands real-model conversation hold and the remote/container clause is exercised; otherwise advanced with the remainder named"
+      ]
+    },
+    "commands": [
+      "ECOSYSTEM_JOB_SECONDS=1200 $HOME/codex-ecosystem/bin/ecosystem-bounded-run env -u HF_TOKEN HF_HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/hf HF_HUB_DISABLE_TELEMETRY=1 $HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/bin/python -c \"from huggingface_hub import snapshot_download; snapshot_download('Qwen/Qwen3-4B-Instruct-2507-FP8', revision='8591804019c8b22094c3b5b4454e0edc05dffc98')\"  # 4.9 GB download from huggingface.co",
+      "ECOSYSTEM_JOB_MEMORY_HIGH=10G ECOSYSTEM_JOB_MEMORY_MAX=14G ECOSYSTEM_JOB_SECONDS=10800 ECOSYSTEM_JOB_TASKS_MAX=1024 $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/serve.sh  # contents in raw/round4/serve.sh (pasta netns, only 127.0.0.1:28431 forwarded); three earlier launches failed or were replaced, logs retained",
+      "kill -TERM <vllm api-server pid inside the pasta namespace>  # stop at 14:37:38Z; nvidia-smi before/after in raw/round4/gpu-before.txt, gpu-after.txt",
+      "(review fix round) the same serve.sh restarted at about 14:56:36Z and stopped the same way at 15:03:19Z; gpu-before-fix.txt, gpu-after-fix.txt",
+      "(second review fix) blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_fix2_remote.sh restarted it at 15:46:08Z; its stop step failed and the api-server was stopped by pid at 15:49:59Z (see receipt 8, round_4.results.provider_stop_rule_gpu)",
+      "env -i PATH=/usr/bin:/bin HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-home OPENHANDS_SUPPRESS_BANNER=1 LITELLM_LOCAL_MODEL_COST_MAP=True $HOME/.cache/gap-wave2-20260923/agent-sdks/openhands/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_openhands.py local $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-ws-local2 $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-persist2 $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/openhands-local.json  # exit 0",
+      "ECOSYSTEM_JOB_SECONDS=900 $HOME/codex-ecosystem/bin/ecosystem-bounded-run bash -c \"uv venv --python $HOME/.local/share/codex-ecosystem/bin/python3.13 --no-python-downloads $HOME/.cache/gap-wave2-20260923/agent-sdks/oh-agent-server && UV_CACHE_DIR=$HOME/.cache/gap-wave2-20260923/agent-sdks/uv-cache uv pip install --python $HOME/.cache/gap-wave2-20260923/agent-sdks/oh-agent-server/bin/python --default-index https://pypi.org/simple 'openhands-agent-server==1.49.4' 'openhands-sdk==1.49.4' 'openhands-tools==1.49.4'\"  # exit 0, 490 MB prefix",
+      "(cwd $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-server-cwd) env -i PATH=$HOME/.cache/gap-wave2-20260923/agent-sdks/oh-agent-server/bin:/usr/bin:/bin HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-server-home OPENHANDS_SUPPRESS_BANNER=1 LITELLM_LOCAL_MODEL_COST_MAP=True $HOME/.cache/gap-wave2-20260923/agent-sdks/oh-agent-server/bin/agent-server --host 127.0.0.1 --port 28432",
+      "(run 1, pre-commit working-tree revision of r4_openhands.py without the workspace read-back; not the committed script) env -i PATH=/usr/bin:/bin HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-home OPENHANDS_SUPPRESS_BANNER=1 LITELLM_LOCAL_MODEL_COST_MAP=True $HOME/.cache/gap-wave2-20260923/agent-sdks/openhands/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_openhands.py remote $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-ws-remote $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-persist-remote-unused $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/openhands-remote.json http://127.0.0.1:28432  # exit 0",
+      "(second review fix, cited remote run) bash blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_fix2_remote.sh  # committed in 994c085 before running; restarts serve.sh, starts a fresh agent-server on 127.0.0.1:28432 with the same env -i command (cwd $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-server-cwd-fix2, HOME $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-server-home-fix2) and runs env -i PATH=/usr/bin:/bin HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-home OPENHANDS_SUPPRESS_BANNER=1 LITELLM_LOCAL_MODEL_COST_MAP=True $HOME/.cache/gap-wave2-20260923/agent-sdks/openhands/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_openhands.py remote $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-ws-remote-fix2 $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-persist-remote-unused $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/openhands-remote-fix2.json http://127.0.0.1:28432 with the committed script (git hash-object d9360477c09e..., equal to HEAD's blob); driver exit 0, r4_openhands exit 0",
+      "(second review fix, manual stop after the script's stop step failed) kill -TERM 1146122 1155940  # vLLM api-server and agent-server pids from ps, 15:49:59Z",
+      "ECOSYSTEM_JOB_SECONDS=1200 $HOME/codex-ecosystem/bin/ecosystem-bounded-run podman --root $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/root --runroot /tmp/r4p.XXXX --tmpdir $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/tmp --events-backend none pull ghcr.io/openhands/agent-server@sha256:5b84b74a821dff19fc49ca157f284c0b4c9bd5b8623e468b17f57b22dee81061  # tag 1.49.4-python, amd64; 1168 MB compressed download from ghcr.io, 3.1 GB on disk; exit 0",
+      "(run 1, rule deviation) podman --root $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/root --runroot /tmp/r4p.XXXX --tmpdir $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/tmp --events-backend none run -d --name r4-oh-agent-server --network host c8abc05c6d73 --host 127.0.0.1 --port 28433  # exit 0; VSCode bound 0.0.0.0:8001 on the host network",
+      "(run 1) env -i PATH=/usr/bin:/bin HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-home OPENHANDS_SUPPRESS_BANNER=1 LITELLM_LOCAL_MODEL_COST_MAP=True $HOME/.cache/gap-wave2-20260923/agent-sdks/openhands/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_openhands.py container /tmp/r4ws $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-persist-container-unused $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/openhands-container.json http://127.0.0.1:28433  # exit 0",
+      "(run 1) podman --root $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/root --runroot /tmp/r4p.XXXX --tmpdir $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/tmp --events-backend none exec r4-oh-agent-server sh -c 'cat /tmp/r4ws/proof.txt; hostname'; podman --root $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/root --runroot /tmp/r4p.XXXX --tmpdir $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/tmp --events-backend none stop -t 10 r4-oh-agent-server; podman --root $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/root --runroot /tmp/r4p.XXXX --tmpdir $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/tmp --events-backend none rm r4-oh-agent-server",
+      "(fix round) ss -ltnH | awk '{print $4}' | sort > fix-listeners-before.txt",
+      "(fix round) podman --root $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/root --runroot /tmp/r4p.XXXX --tmpdir $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/tmp --events-backend none run -d --name r4-oh-fix --network pasta:-T,28431 -p 127.0.0.1:28433:8000 -e OH_ENABLE_VSCODE=false c8abc05c6d73 --host 0.0.0.0 --port 8000  # exit 0",
+      "(fix round) ss -ltnH | awk '{print $4}' | sort > fix-listeners-during.txt  # and fix-listeners-during2.txt after the conversation",
+      "(fix round) podman --root $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/root --runroot /tmp/r4p.XXXX --tmpdir $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/tmp --events-backend none exec r4-oh-fix python3 -c '<list LISTEN sockets from /proc/net/tcp and tcp6>' > fix-container-listeners.txt",
+      "(fix round) env -i PATH=/usr/bin:/bin HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-home OPENHANDS_SUPPRESS_BANNER=1 LITELLM_LOCAL_MODEL_COST_MAP=True $HOME/.cache/gap-wave2-20260923/agent-sdks/openhands/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_openhands.py container /tmp/r4ws $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/oh-persist-container-unused $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/openhands-container-fix.json http://127.0.0.1:28433  # exit 0",
+      "(fix round) podman --root $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/root --runroot /tmp/r4p.XXXX --tmpdir $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/tmp --events-backend none exec r4-oh-fix sh -c 'cat /tmp/r4ws/proof.txt; hostname'  # exit 0 -> podman-exec-proof-fix.txt",
+      "ls /tmp/r4ws  # on the host: No such file or directory (the file exists only in the container)",
+      "(fix round) podman --root $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/root --runroot /tmp/r4p.XXXX --tmpdir $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/tmp --events-backend none logs r4-oh-fix > podman-container-fix.log; podman --root $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/root --runroot /tmp/r4p.XXXX --tmpdir $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/tmp --events-backend none stop -t 10 r4-oh-fix; podman --root $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/root --runroot /tmp/r4p.XXXX --tmpdir $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/podman/tmp --events-backend none rm r4-oh-fix; podman unshare rm -rf /tmp/r4p.XXXX",
+      "kill -TERM <agent-server pid>  # the loopback agent-server process"
+    ],
+    "raw_outputs": [
+      {
+        "path": "raw/round4/openhands-local.json",
+        "sha256": "a31d5d5a67dc94b96c50b9592ae3d7b54d3cdc8895e67a6c5b19629d9d47c69b"
+      },
+      {
+        "path": "raw/round4/openhands-local-attempt1.json",
+        "sha256": "2b5107e3e79543b522b94fed3b9e809ae042a0e0778e122bfc337c27fa886fa3"
+      },
+      {
+        "path": "raw/round4/openhands-remote.json",
+        "sha256": "4ac81bfcf068c11af23f0d5ee6217c6c189f4813345d77837520c3dab694aabb"
+      },
+      {
+        "path": "raw/round4/openhands-remote-fix2.json",
+        "sha256": "7465d2af49f034393e8787430cb4333ffd09c55478a7a6ff1acfa479efff3cbe"
+      },
+      {
+        "path": "raw/round4/openhands-remote-fix2.exit",
+        "sha256": "03922623ed3bca337e0eda980e7a2ffaab9763746888e0c06f0f57f2a5786ebe"
+      },
+      {
+        "path": "raw/round4/r4_openhands-hash-fix2.txt",
+        "sha256": "4fe8faee7994e6e4497e46ab8eabee763dba576b1ab0fea3d889770292aaf6c7"
+      },
+      {
+        "path": "raw/round4/fix2-driver.log",
+        "sha256": "cb05ce5b5dda6e9d3d98d51ae4fd1129e6a720589ca5a55159cb3962ee2ea485"
+      },
+      {
+        "path": "raw/round4/fix2-listeners-before.txt",
+        "sha256": "8c4b125ed8b7b185b4b65254f486c527009711dc17d834cb487819685a80df4e"
+      },
+      {
+        "path": "raw/round4/fix2-listeners-during.txt",
+        "sha256": "d71ff3f89623ffe72420ecdde16a0fe3e3647f028c7cc7d89816d8ed8e50ab92"
+      },
+      {
+        "path": "raw/round4/fix2-listeners-after.txt",
+        "sha256": "d71ff3f89623ffe72420ecdde16a0fe3e3647f028c7cc7d89816d8ed8e50ab92"
+      },
+      {
+        "path": "raw/round4/fix2-listeners-after-manual.txt",
+        "sha256": "8c4b125ed8b7b185b4b65254f486c527009711dc17d834cb487819685a80df4e"
+      },
+      {
+        "path": "raw/round4/gpu-before.txt",
+        "sha256": "ae7f46451503f89e7b8b5e6ca1b80ab2119f4dbfc686414a9ca2c5c3fcc66f33"
+      },
+      {
+        "path": "raw/round4/gpu-after.txt",
+        "sha256": "8c5688332709707c1e3a4f52b540032b9370aa05626bb2ea2fe84fa0fe63160b"
+      },
+      {
+        "path": "raw/round4/gpu-before-fix.txt",
+        "sha256": "ee4fe180573742b5c82e6fa5e60cb4f8b9413e48d622edf349153a0c11d62162"
+      },
+      {
+        "path": "raw/round4/gpu-after-fix.txt",
+        "sha256": "f3ecaae60a44ce7baa101c316a107053f14aea3e47f468057c01c4fd3d4ab4c7"
+      },
+      {
+        "path": "raw/round4/gpu-before-fix2.txt",
+        "sha256": "e5d7e35fd5684e064f224816f5f210edb280b5bcb49f21ddc3b4ff54a00cbdb5"
+      },
+      {
+        "path": "raw/round4/gpu-during-fix2.txt",
+        "sha256": "13767a15f9b73fcb13ae100187a425523151687ae1fa81791fdc74ae7ae1db73"
+      },
+      {
+        "path": "raw/round4/gpu-after-fix2.txt",
+        "sha256": "c1c9b3febfd37c885ac64f0d66fe4569857404222262fae5cb19613edf6e5bd6"
+      },
+      {
+        "path": "raw/round4/gpu-after-fix2-manual.at",
+        "sha256": "cd1dd594bbe0a90ea4d7ce5adff7436d9a7b55bf72b998818f4c27daf2689ef4"
+      },
+      {
+        "path": "raw/round4/gpu-after-fix2-manual.txt",
+        "sha256": "327060dcdbd9b866609c99becc288fe6b4647df5def065de1c6122651990a879"
+      },
+      {
+        "path": "raw/round4/compute-apps-before-fix2.txt",
+        "sha256": "cae79969ce448872401f5d9bcd1d52bbefa1a5450cf3a5658f62f068ab59294b"
+      },
+      {
+        "path": "raw/round4/compute-apps-during-fix2.txt",
+        "sha256": "5fc70f5dd00611288e74a419a6d00502af44d716bc97ed7a915a6248dfc5ca45"
+      },
+      {
+        "path": "raw/round4/compute-apps-after-fix2.txt",
+        "sha256": "5fc70f5dd00611288e74a419a6d00502af44d716bc97ed7a915a6248dfc5ca45"
+      },
+      {
+        "path": "raw/round4/compute-apps-after-fix2-manual.txt",
+        "sha256": "cae79969ce448872401f5d9bcd1d52bbefa1a5450cf3a5658f62f068ab59294b"
+      },
+      {
+        "path": "raw/round4/vllm-procs-before-fix2.txt",
+        "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345"
+      },
+      {
+        "path": "raw/round4/vllm-procs-after-fix2.txt",
+        "sha256": "bf388eab96421c60bf38324d9fe9bcd46a6d9a24482ca7f70a5a4335e0430fe1"
+      },
+      {
+        "path": "raw/round4/oh-server-procs-after-fix2.txt",
+        "sha256": "e4a3f34e693e01ec3c8fd3160a40bd8715a5d5661890100f12e9a63b3692d5fc"
+      },
+      {
+        "path": "raw/round4/vllm-pid-fix2.txt",
+        "sha256": "e83ccb4b4180d06219c33e27f6aa8b816089bd0d7a736870c9579cf2600fa57b"
+      },
+      {
+        "path": "raw/round4/vllm-start-fix2.txt",
+        "sha256": "e44dd2c0f158503c31f242cec954aa70c6354a3762045f7e272c17e8ffaf9cf2"
+      },
+      {
+        "path": "raw/round4/vllm-ready-fix2.txt",
+        "sha256": "be65c7ac396f5a954fc1d40a5ca14e8359bda1c79cecc51207de8d235fa377e7"
+      },
+      {
+        "path": "raw/round4/vllm-stop-fix2.txt",
+        "sha256": "945bd011c0c0e17a95b3d8e0965701e8e93b3fdf2d81bd42def343ca2992eadb"
+      },
+      {
+        "path": "raw/round4/fix2-manual-stop.txt",
+        "sha256": "212c0d8d6a54d665bb332375c55fcad0ab004af6a2c8bc40bf0ae8e91dcc5563"
+      },
+      {
+        "path": "raw/round4/vllm-stop-fix2-manual.txt",
+        "sha256": "6139a1a1a08c78ea4fc35e4f3ea8ef8f5d160e79b28c36dded93c935b63180f4"
+      },
+      {
+        "path": "raw/round4/vllm-procs-after-fix2-manual.txt",
+        "sha256": "69d93ea5a681c448f8eb924e499be0cb66aecc7a38b1ca0243c392a17f0e72f7",
+        "published": false,
+        "retention": "host-local, owner-only; not published under the catalog rule against machine-specific active client configuration and personal paths (PR #132 review)"
+      },
+      {
+        "path": "raw/round4/oh-server-procs-after-fix2-manual.txt",
+        "sha256": "c70402b182ec967540902e85f3632657685b5d656b6d59f1d767d27672d92869",
+        "published": false,
+        "retention": "host-local, owner-only; not published under the catalog rule against machine-specific active client configuration and personal paths (PR #132 review)"
+      },
+      {
+        "path": "raw/round4/procs-after-fix2-recheck.txt",
+        "sha256": "c65977fbb91519f3728764f8ae00b01e4eef8d2aa7626269b5f0e87115a2d106"
+      },
+      {
+        "path": "raw/round4/vllm-fix2.log",
+        "sha256": "8eb78ac0c6f6ac49f340e32b67590329b7b77d4301a57a9a03007d98214152f6"
+      },
+      {
+        "path": "raw/round4/openhands-container.json",
+        "sha256": "9ece9b6bbe269c762b3413881dcf1125884847c55cab6dccbff1596dc89e2334"
+      },
+      {
+        "path": "raw/round4/podman-exec-proof.txt",
+        "sha256": "c960306452486c14fdf85abb792f1a2825cd9f79f14c3166c3aaf8088e2af3d0"
+      },
+      {
+        "path": "raw/round4/podman-pull.log",
+        "sha256": "ad990374f568a2d52ea617618c163fc97969160aa778372c5f9b85300de580ee"
+      },
+      {
+        "path": "raw/round4/podman-run.log",
+        "sha256": "9442829d8422e1f0cd05b7b84bc751bc9b94c9e186f2bb598bf8f6d52773fa40"
+      },
+      {
+        "path": "raw/round4/podman-container.log",
+        "sha256": "95923bcd58fcb55e7763588146f010f78575aec04ba5bca9a66046ef208b4f4c"
+      },
+      {
+        "path": "raw/round4/oh-agent-server-install.log",
+        "sha256": "a48f85741cdb38d6fe8c51d54ad881c3eeec2c896a15040780f730b251798609"
+      },
+      {
+        "path": "raw/round4/openhands-container-fix.json",
+        "sha256": "f2863188ace1cf5b5f975f62af74dfc5cc46e8b2d8fdd17f8efcd9e38966ffb0"
+      },
+      {
+        "path": "raw/round4/podman-exec-proof-fix.txt",
+        "sha256": "36ddc22bbe64023252601231c2955c44bc9444f9f09429a60a7d64fdbdab36d1"
+      },
+      {
+        "path": "raw/round4/podman-run-fix.log",
+        "sha256": "ef3458686b9dccb424322d65546f5b7cd9282e4ae11b4f698be056677d456ff7"
+      },
+      {
+        "path": "raw/round4/podman-container-fix.log",
+        "sha256": "6377595a9211a36e4fe06ba6b01dc19f15184c5af9bc5344cb89c654440d143a"
+      },
+      {
+        "path": "raw/round4/fix-listeners-before.txt",
+        "sha256": "e9bd19fdee49c82e6a26d574cbccaa1e3b7ee1339bce45ab6ed32f3708b507d9"
+      },
+      {
+        "path": "raw/round4/fix-listeners-during.txt",
+        "sha256": "889355148008ac964d05e76ca48a41b5ea1bfbad87346e721736ca1884f9f740"
+      },
+      {
+        "path": "raw/round4/fix-listeners-during2.txt",
+        "sha256": "889355148008ac964d05e76ca48a41b5ea1bfbad87346e721736ca1884f9f740"
+      },
+      {
+        "path": "raw/round4/fix-container-listeners.txt",
+        "sha256": "899b0211204c88fba32a703d86c6b5bea3c6e7c19b44259dbe2b8d445ef5f6bf"
+      }
+    ],
+    "results": {
+      "local": {
+        "status": "ok",
+        "conversation_class": null,
+        "execution_status": "ConversationExecutionStatus.FINISHED",
+        "tool_names": [
+          "file_editor",
+          "terminal",
+          "finish"
+        ],
+        "proof_file_has_token": true,
+        "workspace_cat": null,
+        "sdk_metrics": {
+          "accumulated_token_usage": {
+            "model": "default",
+            "prompt_tokens": 18201,
+            "completion_tokens": 239,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "reasoning_tokens": 0,
+            "context_window": 0,
+            "per_turn_token": 6307,
+            "response_id": ""
+          },
+          "accumulated_cost": 0.0
+        },
+        "provider_delta": {
+          "vllm:prompt_tokens_total": 18201.0,
+          "vllm:generation_tokens_total": 239.0,
+          "finished_by_reason": {
+            "stop": 3.0
+          },
+          "seconds": 13.429
+        }
+      },
+      "remote_agent_server_process": {
+        "status": "ok",
+        "conversation_class": "RemoteConversation",
+        "execution_status": "ConversationExecutionStatus.FINISHED",
+        "tool_names": [
+          "file_editor",
+          "terminal",
+          "finish"
+        ],
+        "proof_file_has_token": true,
+        "workspace_cat": {
+          "exit_code": 0,
+          "stdout_has_token": true
+        },
+        "sdk_metrics": {
+          "accumulated_token_usage": {
+            "model": "default",
+            "prompt_tokens": 18638,
+            "completion_tokens": 256,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "reasoning_tokens": 0,
+            "context_window": 0,
+            "per_turn_token": 6360,
+            "response_id": ""
+          },
+          "accumulated_cost": 0.0
+        },
+        "provider_delta": {
+          "vllm:prompt_tokens_total": 18638.0,
+          "vllm:generation_tokens_total": 256.0,
+          "finished_by_reason": {
+            "stop": 4.0
+          },
+          "seconds": 14.832
+        }
+      },
+      "official_container": {
+        "status": "ok",
+        "conversation_class": "RemoteConversation",
+        "execution_status": "ConversationExecutionStatus.FINISHED",
+        "tool_names": [
+          "file_editor",
+          "terminal",
+          "finish"
+        ],
+        "proof_file_has_token": true,
+        "workspace_cat": {
+          "exit_code": 0,
+          "stdout_has_token": true
+        },
+        "sdk_metrics": {
+          "accumulated_token_usage": {
+            "model": "default",
+            "prompt_tokens": 18117,
+            "completion_tokens": 162,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "reasoning_tokens": 0,
+            "context_window": 0,
+            "per_turn_token": 6095,
+            "response_id": ""
+          },
+          "accumulated_cost": 0.0
+        },
+        "provider_delta": {
+          "vllm:prompt_tokens_total": 18117.0,
+          "vllm:generation_tokens_total": 162.0,
+          "finished_by_reason": {
+            "stop": 4.0
+          },
+          "seconds": 12.628
+        }
+      },
+      "remote_run_1": {
+        "status": "ok",
+        "conversation_class": "RemoteConversation",
+        "execution_status": "ConversationExecutionStatus.FINISHED",
+        "tool_names": [
+          "file_editor",
+          "terminal",
+          "finish"
+        ],
+        "proof_file_has_token": true,
+        "workspace_cat": null,
+        "sdk_metrics": {
+          "accumulated_token_usage": {
+            "model": "default",
+            "prompt_tokens": 18625,
+            "completion_tokens": 251,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "reasoning_tokens": 0,
+            "context_window": 0,
+            "per_turn_token": 6351,
+            "response_id": ""
+          },
+          "accumulated_cost": 0.0
+        },
+        "provider_delta": {
+          "vllm:prompt_tokens_total": 18625.0,
+          "vllm:generation_tokens_total": 251.0,
+          "finished_by_reason": {
+            "stop": 4.0
+          },
+          "seconds": 13.016
+        },
+        "provenance": "openhands-remote.json (14:30:50-14:31:03Z) was produced by a working-tree revision of r4_openhands.py that predates the committed one (first committed in 69fa1bb at 14:43:17Z, never changed since). The committed script always writes workspace_cat or workspace_cat_error for a non-local run that ends ok; this output has neither, so the workspace read-back was not run in run 1. Found by the independent Opus review of the round-4 fix round. Run 1 is retained; the cited remote run is the second-fix rerun (openhands-remote-fix2.json), which used the committed script."
+      },
+      "remote_listeners_second_fix": {
+        "host_added_during": [
+          "127.0.0.1:28431",
+          "127.0.0.1:28432"
+        ],
+        "host_after_manual_stop_equals_before": true
+      },
+      "provider_stop_rule_gpu": {
+        "first_stop_14_37_38Z": {
+          "before_mib": 5463,
+          "after_mib": 5521,
+          "evaluation": "aggregate pair only (no reading while the server ran); cannot confirm release"
+        },
+        "review_fix_stop_15_03_19Z": {
+          "before_mib": 5526,
+          "after_mib": 5758,
+          "evaluation": "aggregate pair only; after is 232 MiB above before, which these readings cannot attribute (other GPU users, including the host's embedding vLLM, share the card; with no unit server running the total was 5832 MiB at 15:46:08Z). The rule was not evaluated at the time and cannot confirm release for this stop. After the fact, vllm-procs-before-fix2.txt (pgrep for the unit's model path at 15:46:08Z) is 'none', so that server process had exited by then."
+        },
+        "second_fix_stop": {
+          "before_mib": 5832,
+          "during_mib": 18438,
+          "after_script_stop_mib": 18424,
+          "after_manual_stop_mib": 5836,
+          "after_manual_stop_at": "2026-09-23T15:52:06Z",
+          "rise_mib": 12606,
+          "fall_mib": 12602,
+          "criterion": "the unit's vLLM process is gone and memory.used falls back by at least 80% of the during-minus-before rise",
+          "unit_vllm_and_agent_server_processes_gone": true,
+          "released_in_aggregate": true,
+          "script_stop_failure": "r4_fix2_remote.sh's stop step selected pid 1146119, most likely pasta (/usr/bin/pasta re-execs /usr/bin/pasta.avx2, so its comm was not 'pasta' and the comm filter did not skip it; inference, the comm was not recorded). The vLLM api-server kept running (vllm-procs-after-fix2.txt, gpu-after-fix2.txt at 18424 MiB) and the script's vllm-stop-fix2.txt time is when its wait loop gave up, not a stop. The api-server (1146122) and agent-server (1155940) were then stopped by pid at 15:49:59Z, about 2 min 43 s after the conversation finished (15:47:16Z). The script's agent-server kill had also missed: its pid file held 1155939, the setsid launcher, not the server (1155940). While both kept running, the host listeners stayed 127.0.0.1:28431 and 127.0.0.1:28432 only (fix2-listeners-after.txt); after pasta exited, an ss -ltnp call attributed the forwarded 127.0.0.1:28431 socket to the vllm process (printed to the terminal only, not a retained file). vllm-fix2.log shows '[shutdown] API server: shutdown triggered' at 11:49:59 local time (15:49:59Z). The manual wait loop then self-matched its own pgrep pattern and timed out after 120 s (fix2-manual-stop.txt 'wait exit 124'; vllm-procs-after-fix2-manual.txt and oh-server-procs-after-fix2-manual.txt list only that shell). procs-after-fix2-recheck.txt is the valid check: /proc entries for both pids absent and a non-self-matching pgrep ('[v]llm serve .*Qwen3-4B') returns none.",
+          "per_process_attribution": {
+            "method": "nvidia-smi --query-compute-apps",
+            "rows": {
+              "compute-apps-before-fix2.txt": [],
+              "compute-apps-during-fix2.txt": [
+                "114, [Not Found], [N/A]"
+              ],
+              "compute-apps-after-fix2.txt": [
+                "114, [Not Found], [N/A]"
+              ],
+              "compute-apps-after-fix2-manual.txt": []
+            },
+            "note": "On this WSL host the query lists no row for the host's running embedding vLLM, and while the unit's server ran it listed only '114, [Not Found], [N/A]' (no name or memory). That row appeared only while the unit's server ran and was gone after the manual stop, but it cannot be tied to the process, so per-process release is not attributable here."
+          }
+        },
+        "limit": "Aggregate memory.used is shared by every GPU user on the host; the second-fix pair shows a fall matching the rise, which is consistent with release, not a per-process proof."
+      },
+      "container_image": {
+        "ref": "ghcr.io/openhands/agent-server:1.49.4-python",
+        "amd64_digest": "sha256:5b84b74a821dff19fc49ca157f284c0b4c9bd5b8623e468b17f57b22dee81061",
+        "image_id_prefix": "c8abc05c6d73",
+        "user": "openhands (uid 10001)",
+        "build_git_ref": "refs/tags/v1.49.4"
+      },
+      "container_proof_via_podman_exec": true,
+      "container_listeners_fix_round": {
+        "host_added_at_server_start": [
+          "127.0.0.1:28433"
+        ],
+        "host_removed_at_server_start": [],
+        "host_added_after_conversation": [
+          "127.0.0.1:28433"
+        ],
+        "container_listeners": [
+          "tcp 00000000 8000",
+          "tcp 0100007F 28431"
+        ],
+        "vscode_disabled_in_log": true,
+        "vscode_started_in_log": false
+      },
+      "container_listeners_ok": true,
+      "container_run_1": {
+        "status": "ok",
+        "conversation_class": "RemoteConversation",
+        "execution_status": "ConversationExecutionStatus.FINISHED",
+        "tool_names": [
+          "file_editor",
+          "terminal",
+          "finish"
+        ],
+        "proof_file_has_token": true,
+        "workspace_cat": {
+          "exit_code": 0,
+          "stdout_has_token": true
+        },
+        "sdk_metrics": {
+          "accumulated_token_usage": {
+            "model": "default",
+            "prompt_tokens": 18109,
+            "completion_tokens": 169,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "reasoning_tokens": 0,
+            "context_window": 0,
+            "per_turn_token": 6102,
+            "response_id": ""
+          },
+          "accumulated_cost": 0.0
+        },
+        "provider_delta": {
+          "vllm:prompt_tokens_total": 18109.0,
+          "vllm:generation_tokens_total": 169.0,
+          "finished_by_reason": {
+            "stop": 4.0
+          },
+          "seconds": 10.344
+        },
+        "rule_deviation": "run 1 used --network host; the image's VSCode service started on 0.0.0.0:8001 in the host network namespace for about a minute (podman-container.log: 'VSCode server started successfully on port 8001'). The fix-round rerun replaces it as evidence."
+      },
+      "attempt_1": {
+        "tool_names": [
+          "file_editor",
+          "terminal",
+          "terminal",
+          "terminal",
+          "terminal",
+          "terminal",
+          "finish"
+        ],
+        "proof_file_has_token": false,
+        "note": "The model first tried /proof.txt (permission denied), then wrote ~/proof.txt in the temp HOME; the prompt then named the absolute target path. Model-quality failure, retained."
+      },
+      "all_three_real_model_conversations_ok": true,
+      "round_1_langgraph_temporal": "unchanged (receipt results above): LangGraph SQLite checkpoint resumed in a new process; Temporal worker SIGKILL, restart and clean replay with a flagged negative control."
+    },
+    "evidence_class": "local_integration",
+    "limits": [
+      "The provider is an open-weight model (Qwen3-4B-Instruct-2507-FP8) on a vLLM server this unit started; neither the hosted OpenAI nor the hosted Anthropic service was involved, so hosted-model behaviour and hosted billing are not shown.",
+      "The cited container run (fix round) used rootless podman's pasta network: only 127.0.0.1:28433 was published on the host, the container reached the model through a pasta -T 28431 forward, and VSCode was disabled (OH_ENABLE_VSCODE=false). OpenHands' DockerWorkspace class was not used: the image was started by podman directly and reached through Workspace(host=...).",
+      "Exit codes 0 were observed in the shell for every command above; the JSON outputs record status ok, which r4_openhands.py maps to exit 0. There is no separate exit-code file for round 4 except the second-fix remote rerun (openhands-remote-fix2.exit, fix2-driver.log).",
+      "The provider stop-rule readings are aggregate memory.used values; see round_4.results.provider_stop_rule_gpu for all three stops and the failed scripted stop.",
+      "The agent-server console log and the client stderr files are not exported (rich console wrapping)."
+    ],
+    "checked_at": "2026-09-23T15:47:16Z",
+    "rule_deviations": [
+      "vLLM launch 3 (about 14:16-14:18Z) ran on the host network; its engine's torch-distributed store listened on a wildcard port until it was stopped and relaunched inside a pasta namespace (vllm-attempt3-hostnet.log).",
+      "Container run 1 (about 14:32:35-14:33:25Z) exposed the image's VSCode service on 0.0.0.0:8001 through --network host; found by the cross-family review, rerun in the fix round."
+    ]
+  },
+  "pre_round_4_outcome": "advanced",
+  "pre_round_4_remaining": "An OpenHands conversation with a real model (needs a model endpoint: a provider key or subscription sign-in, not available under this unit's no-paid-API/no-credential rules) and a container/remote workspace run.",
+  "pre_round_4_limits": [
+    "OpenHands ran with the SDK's own scripted TestLLM (no provider); the agent loop, terminal tool, event log and persistence reload are real, the model is not. Remote/container workspaces were not exercised.",
+    "Temporal: dev server on loopback from temporalio.testing (CLI 150 MB download into the temp dir, disclosed); worker #1 SIGKILLed after the effect write; a nondeterministic negative control was flagged by Replayer (the detector works).",
+    "LangGraph: no model; interrupt_before checkpoint in SQLite resumed by a second process.",
+    "Retained outputs come from the fix-round driver run (run_gap8.py); the first pass (03:37-03:47Z) ran the same scripts individually, all exit 0 with the same results shape. OpenHands stderr logs are not exported (console wrapping split UUIDs past redaction)."
+  ],
+  "limits": [
+    "The provider is an open-weight model (Qwen3-4B-Instruct-2507-FP8) on a vLLM server this unit started; neither the hosted OpenAI nor the hosted Anthropic service was involved, so hosted-model behaviour and hosted billing are not shown.",
+    "OpenHands ran with a 4B open-weight model; round 1's TestLLM run remains the persistence-reload evidence.",
+    "LangGraph ran without a model (checkpointing only); Temporal ran on one host (see receipt 11 for the round-4 paused-worker test)."
+  ],
+  "settled_scope": "OpenHands with a local open-weight model (local, loopback agent-server and official container image); LangGraph and Temporal on one host"
+}

@@ -1,0 +1,34 @@
+2026-09-23T08:51:42-04:00
+$ find $HOME/.local/share/dagu/data -mindepth 1 | sort
+$HOME/.local/share/dagu/data/auth
+$HOME/.local/share/dagu/data/auth/encryption_key
+$HOME/.local/share/dagu/data/contexts
+$HOME/.local/share/dagu/data/dag-settings
+$HOME/.local/share/dagu/data/incidents
+$HOME/.local/share/dagu/data/incidents/monitor-state.json
+$HOME/.local/share/dagu/data/incidents/monitor-state.json.lock
+$HOME/.local/share/dagu/data/incidents/monitor-state.json.lock.flock
+$HOME/.local/share/dagu/data/incidents/policies
+$HOME/.local/share/dagu/data/incidents/policies/dags
+$HOME/.local/share/dagu/data/incidents/policies/workspaces
+$HOME/.local/share/dagu/data/incidents/providers
+$HOME/.local/share/dagu/data/incidents/states
+$HOME/.local/share/dagu/data/notifications
+$HOME/.local/share/dagu/data/notifications/channels
+$HOME/.local/share/dagu/data/notifications/dags
+$HOME/.local/share/dagu/data/notifications/monitor-state.json
+$HOME/.local/share/dagu/data/notifications/monitor-state.json.lock
+$HOME/.local/share/dagu/data/notifications/monitor-state.json.lock.flock
+$HOME/.local/share/dagu/data/notifications/routes
+$HOME/.local/share/dagu/data/notifications/routes/workspaces
+$HOME/.local/share/dagu/data/scheduler
+$HOME/.local/share/dagu/data/scheduler/.dagu_record_locks
+$HOME/.local/share/dagu/data/scheduler/.dagu_record_locks/47
+$HOME/.local/share/dagu/data/scheduler/.dagu_record_locks/4b
+$HOME/.local/share/dagu/data/scheduler/checkpoint.json
+$HOME/.local/share/dagu/data/scheduler/locks
+$HOME/.local/share/dagu/data/scheduler/state.json
+$HOME/.local/share/dagu/data/service-registry
+$HOME/.local/share/dagu/data/service-registry/scheduler
+$ count excluding auth/ and contexts/ subtrees
+27

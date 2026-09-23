@@ -1,0 +1,82 @@
+{
+  "id": "gap-wave2-20260923-us-equities-portfolio-risk-2-walkforward-source-hash-match",
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "gap_index": 2,
+  "gap_text": "The match between the installed WalkForward source hash (receipt line 32) and the reviewed upstream revision c99fcf71... (line 36) is stated only in README.md. The receipt records no comparison result, and independent_review does not list it among its checks.",
+  "gap_text_sha256": "de434262f4df5b42cb8917009f32acd9e4a283612152324d842bec4bb8960318",
+  "next_check": "sha256 the installed skfolio model_selection WalkForward source file in the 1.2.9 venv, compare it with the same path from `git show c99fcf71:<path>` of the skfolio repository, and record the comparison result in the receipt.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:32:44Z",
+    "expectation": "The installed skfolio 1.2.9 file skfolio/model_selection/_walk_forward.py in the lock venv hashes to the receipt's walkforward_source_sha256 f85cbe8b..., and `git show c99fcf71349e2df4a7a1033ee85ca2e9ced9abee:src/skfolio/model_selection/_walk_forward.py` of the skfolio repository hashes to the same value.",
+    "criteria": "settled iff all three hashes (installed file, receipt value, upstream git blob at c99fcf71) are computed and the pairwise comparison result is recorded, whether match or mismatch; a mismatch is reported as a finding. Detection: the same hashing is applied to the file at skfolio tag v1.3.0 (or another revision) as a negative control; if that file differs, the comparison is shown able to report a mismatch."
+  },
+  "commands": [
+    {
+      "cmd": "git clone --filter=blob:none --no-checkout https://github.com/skfolio/skfolio $CACHE/skfolio-src",
+      "exit": 0
+    },
+    {
+      "cmd": "bash blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap2_hash_compare.sh > evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/2/hash-compare.txt",
+      "exit": 0
+    },
+    {
+      "cmd": "(fix round 4) add a dated later_checks entry with the comparison result and a link to this receipt to blueprints/us-equities/research-evaluation/receipt.json",
+      "exit": 0,
+      "started_utc": "2026-09-23T16:09:34Z",
+      "note": "additive field only; the historical independent_review block is unchanged"
+    }
+  ],
+  "results": {
+    "installed_sha256": "f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397",
+    "receipt_walkforward_source_sha256": "f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397",
+    "git_show_c99fcf71_sha256": "f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397",
+    "c99fcf71_is_tag": "v1.2.9",
+    "comparison": "installed == receipt == upstream c99fcf71 (byte-identical, diff reports identical)",
+    "negative_control": "git show b500f88~1 file sha256 0a881afb... differs; diff against the installed file is 8 lines, so the comparison can report a mismatch",
+    "v1_3_0_same_file": true
+  },
+  "outcome": "settled",
+  "evidence_class": "source_review",
+  "limits": [
+    "Recording (second Opus review, fix round 4): the comparison result is now recorded in the original receipt as blueprints/us-equities/research-evaluation/receipt.json later_checks[0] (added 2026-09-23T16:09:34Z, linking this receipt). Its independent_review block describes the original review and is left unchanged; the later check was reviewed in this wave's Codex rounds 1-2 and the Opus review, which reproduced two of the three hashes. Round 1 (before fix round 4) recorded the result only in this receipt.",
+    "Hashing checks byte identity of one source file, not the rest of the installed distribution."
+  ],
+  "checked_at": "2026-09-23T06:33Z (exact second not captured; between the 06:32:48Z preregistration commit and the 06:33:39Z gap 3 start)",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/2/hash-compare.txt",
+      "sha256": "769b617915c3cc4afe3a8d631cf97719d2332dfff415f92701577bad49d74920"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap2_hash_compare.sh",
+      "sha256": "2707348a053238eabec4881b1f5b036554e4cf14fd1887b70335ca9e5cb195b4"
+    },
+    {
+      "path": "blueprints/us-equities/research-evaluation/receipt.json",
+      "sha256": "92a2c4c1984c7cd38af21fbc9b5290395805fed3177522b19d408ad50c59d56b"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "Codex CLI 0.155.1 (gpt-6-astra), codex exec --sandbox read-only --ephemeral, one bounded call",
+    "record": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md"
+    ],
+    "round_2": "no round-2 finding for this gap",
+    "findings_and_resolution": "no finding for this gap",
+    "round_3": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "resolution": "no round-3 finding for this gap"
+    },
+    "round_4": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "resolution": "minor: result recorded only in a new wave receipt -> a dated later_checks entry in blueprints/us-equities/research-evaluation/receipt.json now records the comparison result and links this receipt; its historical independent_review block is left unchanged"
+    },
+    "round_4_codex": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "reviewer": "Codex CLI (codex exec --sandbox read-only --ephemeral), one bounded call on commits 6ed9709..a4cbcf8",
+      "resolution": "no finding for this gap"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+skfolio==1.2.9
+statsmodels==0.15.0
+arch==8.0.0
+statsforecast==2.1.1
+chronos-forecasting==2.3.2
+torch==2.13.0
+einops
+huggingface_hub
+safetensors
+tqdm

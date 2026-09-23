@@ -1,0 +1,318 @@
+{
+ "note": "Post-hoc, first 20 of 34 misses as reported by the arm; tokenizer regex is the haystack InMemory BM25 default (?u)\\b\\w+\\b from document_store.py line 67 (case-folding assumed)",
+ "rows": [
+  {
+   "query": "SPY 2015-05",
+   "top1": "QQQ 2015-05",
+   "query_tokens_in_true_doc": [
+    "05",
+    "2015",
+    "spy"
+   ],
+   "query_tokens_in_top1_doc": [
+    "05",
+    "2015"
+   ],
+   "top1_text": "QQQ 2015-05: monthly close-to-close return +2.25%, last close 110.05 USD.",
+   "true_text": "SPY 2015-05: monthly close-to-close return +1.25%, last close 211.13 USD."
+  },
+  {
+   "query": "SPY 2015-10",
+   "top1": "SPY 2015-08",
+   "query_tokens_in_true_doc": [
+    "10",
+    "2015",
+    "spy"
+   ],
+   "query_tokens_in_top1_doc": [
+    "10",
+    "2015",
+    "spy"
+   ],
+   "top1_text": "SPY 2015-08: monthly close-to-close return -6.10%, last close 197.67 USD.",
+   "true_text": "SPY 2015-10: monthly close-to-close return +8.51%, last close 207.93 USD."
+  },
+  {
+   "query": "SPY 2016-08",
+   "top1": "SPY 2016-05",
+   "query_tokens_in_true_doc": [
+    "08",
+    "2016",
+    "spy"
+   ],
+   "query_tokens_in_top1_doc": [
+    "08",
+    "2016",
+    "spy"
+   ],
+   "top1_text": "SPY 2016-05: monthly close-to-close return +1.83%, last close 210.08 USD.",
+   "true_text": "SPY 2016-08: monthly close-to-close return +0.13%, last close 217.44 USD."
+  },
+  {
+   "query": "SPY 2016-11",
+   "top1": "IWM 2016-11",
+   "query_tokens_in_true_doc": [
+    "11",
+    "2016",
+    "spy"
+   ],
+   "query_tokens_in_top1_doc": [
+    "11",
+    "2016"
+   ],
+   "top1_text": "IWM 2016-11: monthly close-to-close return +11.06%, last close 131.61 USD.",
+   "true_text": "SPY 2016-11: monthly close-to-close return +3.68%, last close 220.38 USD."
+  },
+  {
+   "query": "SPY 2017-02",
+   "top1": "QQQ 2017-02",
+   "query_tokens_in_true_doc": [
+    "02",
+    "2017",
+    "spy"
+   ],
+   "query_tokens_in_top1_doc": [
+    "02",
+    "2017"
+   ],
+   "top1_text": "QQQ 2017-02: monthly close-to-close return +4.38%, last close 130.02 USD.",
+   "true_text": "SPY 2017-02: monthly close-to-close return +3.93%, last close 236.47 USD."
+  },
+  {
+   "query": "SPY 2017-08",
+   "top1": "SPY 2017-04",
+   "query_tokens_in_true_doc": [
+    "08",
+    "2017",
+    "spy"
+   ],
+   "query_tokens_in_top1_doc": [
+    "08",
+    "2017",
+    "spy"
+   ],
+   "top1_text": "SPY 2017-04: monthly close-to-close return +0.99%, last close 238.08 USD.",
+   "true_text": "SPY 2017-08: monthly close-to-close return +0.29%, last close 247.49 USD."
+  },
+  {
+   "query": "SPY 2018-12",
+   "top1": "IWM 2018-12",
+   "query_tokens_in_true_doc": [
+    "12",
+    "2018",
+    "spy"
+   ],
+   "query_tokens_in_top1_doc": [
+    "12",
+    "2018"
+   ],
+   "top1_text": "IWM 2018-12: monthly close-to-close return -12.27%, last close 133.90 USD.",
+   "true_text": "SPY 2018-12: monthly close-to-close return -9.33%, last close 249.92 USD."
+  },
+  {
+   "query": "SPY 2019-09",
+   "top1": "SPY 2019-04",
+   "query_tokens_in_true_doc": [
+    "09",
+    "2019",
+    "spy"
+   ],
+   "query_tokens_in_top1_doc": [
+    "09",
+    "2019",
+    "spy"
+   ],
+   "top1_text": "SPY 2019-04: monthly close-to-close return +4.09%, last close 294.02 USD.",
+   "true_text": "SPY 2019-09: monthly close-to-close return +1.48%, last close 296.77 USD."
+  },
+  {
+   "query": "SPY 2020-04",
+   "top1": "SPY 2020-01",
+   "query_tokens_in_true_doc": [
+    "04",
+    "2020",
+    "spy"
+   ],
+   "query_tokens_in_top1_doc": [
+    "04",
+    "2020",
+    "spy"
+   ],
+   "top1_text": "SPY 2020-01: monthly close-to-close return -0.04%, last close 321.73 USD.",
+   "true_text": "SPY 2020-04: monthly close-to-close return +12.70%, last close 290.48 USD."
+  },
+  {
+   "query": "SPY 2020-11",
+   "top1": "QQQ 2020-11",
+   "query_tokens_in_true_doc": [
+    "11",
+    "2020",
+    "spy"
+   ],
+   "query_tokens_in_top1_doc": [
+    "11",
+    "2020"
+   ],
+   "top1_text": "QQQ 2020-11: monthly close-to-close return +11.23%, last close 299.62 USD.",
+   "true_text": "SPY 2020-11: monthly close-to-close return +10.88%, last close 362.06 USD."
+  },
+  {
+   "query": "SPY 2020-12",
+   "top1": "SPY 2020-04",
+   "query_tokens_in_true_doc": [
+    "12",
+    "2020",
+    "spy"
+   ],
+   "query_tokens_in_top1_doc": [
+    "12",
+    "2020",
+    "spy"
+   ],
+   "top1_text": "SPY 2020-04: monthly close-to-close return +12.70%, last close 290.48 USD.",
+   "true_text": "SPY 2020-12: monthly close-to-close return +3.26%, last close 373.88 USD."
+  },
+  {
+   "query": "QQQ 2015-07",
+   "top1": "QQQ 2015-06",
+   "query_tokens_in_true_doc": [
+    "07",
+    "2015",
+    "qqq"
+   ],
+   "query_tokens_in_top1_doc": [
+    "07",
+    "2015",
+    "qqq"
+   ],
+   "top1_text": "QQQ 2015-06: monthly close-to-close return -2.71%, last close 107.07 USD.",
+   "true_text": "QQQ 2015-07: monthly close-to-close return +4.56%, last close 111.95 USD."
+  },
+  {
+   "query": "QQQ 2015-08",
+   "top1": "QQQ 2015-01",
+   "query_tokens_in_true_doc": [
+    "08",
+    "2015",
+    "qqq"
+   ],
+   "query_tokens_in_top1_doc": [
+    "08",
+    "2015",
+    "qqq"
+   ],
+   "top1_text": "QQQ 2015-01: monthly close-to-close return -2.08%, last close 101.10 USD.",
+   "true_text": "QQQ 2015-08: monthly close-to-close return -6.82%, last close 104.31 USD."
+  },
+  {
+   "query": "QQQ 2015-10",
+   "top1": "QQQ 2015-01",
+   "query_tokens_in_true_doc": [
+    "10",
+    "2015",
+    "qqq"
+   ],
+   "query_tokens_in_top1_doc": [
+    "10",
+    "2015",
+    "qqq"
+   ],
+   "top1_text": "QQQ 2015-01: monthly close-to-close return -2.08%, last close 101.10 USD.",
+   "true_text": "QQQ 2015-10: monthly close-to-close return +11.37%, last close 113.33 USD."
+  },
+  {
+   "query": "QQQ 2015-11",
+   "top1": "QQQ 2015-10",
+   "query_tokens_in_true_doc": [
+    "11",
+    "2015",
+    "qqq"
+   ],
+   "query_tokens_in_top1_doc": [
+    "11",
+    "2015",
+    "qqq"
+   ],
+   "top1_text": "QQQ 2015-10: monthly close-to-close return +11.37%, last close 113.33 USD.",
+   "true_text": "QQQ 2015-11: monthly close-to-close return +0.61%, last close 114.02 USD."
+  },
+  {
+   "query": "QQQ 2016-11",
+   "top1": "IWM 2016-11",
+   "query_tokens_in_true_doc": [
+    "11",
+    "2016",
+    "qqq"
+   ],
+   "query_tokens_in_top1_doc": [
+    "11",
+    "2016"
+   ],
+   "top1_text": "IWM 2016-11: monthly close-to-close return +11.06%, last close 131.61 USD.",
+   "true_text": "QQQ 2016-11: monthly close-to-close return +0.44%, last close 117.50 USD."
+  },
+  {
+   "query": "QQQ 2018-07",
+   "top1": "QQQ 2018-05",
+   "query_tokens_in_true_doc": [
+    "07",
+    "2018",
+    "qqq"
+   ],
+   "query_tokens_in_top1_doc": [
+    "07",
+    "2018",
+    "qqq"
+   ],
+   "top1_text": "QQQ 2018-05: monthly close-to-close return +5.67%, last close 170.07 USD.",
+   "true_text": "QQQ 2018-07: monthly close-to-close return +2.80%, last close 176.45 USD."
+  },
+  {
+   "query": "QQQ 2018-12",
+   "top1": "IWM 2018-12",
+   "query_tokens_in_true_doc": [
+    "12",
+    "2018",
+    "qqq"
+   ],
+   "query_tokens_in_top1_doc": [
+    "12",
+    "2018"
+   ],
+   "top1_text": "IWM 2018-12: monthly close-to-close return -12.27%, last close 133.90 USD.",
+   "true_text": "QQQ 2018-12: monthly close-to-close return -8.92%, last close 154.26 USD."
+  },
+  {
+   "query": "QQQ 2019-10",
+   "top1": "QQQ 2019-07",
+   "query_tokens_in_true_doc": [
+    "10",
+    "2019",
+    "qqq"
+   ],
+   "query_tokens_in_top1_doc": [
+    "10",
+    "2019",
+    "qqq"
+   ],
+   "top1_text": "QQQ 2019-07: monthly close-to-close return +2.33%, last close 191.10 USD.",
+   "true_text": "QQQ 2019-10: monthly close-to-close return +4.38%, last close 197.08 USD."
+  },
+  {
+   "query": "QQQ 2020-04",
+   "top1": "QQQ 2020-01",
+   "query_tokens_in_true_doc": [
+    "04",
+    "2020",
+    "qqq"
+   ],
+   "query_tokens_in_top1_doc": [
+    "04",
+    "2020",
+    "qqq"
+   ],
+   "top1_text": "QQQ 2020-01: monthly close-to-close return +3.04%, last close 219.07 USD.",
+   "true_text": "QQQ 2020-04: monthly close-to-close return +14.97%, last close 218.91 USD."
+  }
+ ]
+}

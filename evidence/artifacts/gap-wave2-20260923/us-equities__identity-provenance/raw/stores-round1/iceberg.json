@@ -1,0 +1,159 @@
+{
+  "arm": "iceberg",
+  "concurrent_writers": {
+    "appends_each": 10,
+    "no_silent_loss": true,
+    "reported_successful_appends": 20,
+    "rows_expected_from_reported_successes": 100,
+    "rows_found": 100,
+    "rows_lost_after_reported_success": 0,
+    "state": {
+      "readable": true,
+      "rows": 100,
+      "snapshots": 20
+    },
+    "stderr_tail": {
+      "a": "Commit failed due to a concurrent update, retrying (1/4) in 102 ms\nCommit failed due to a concurrent update, retrying (2/4) in 211 ms\n",
+      "b": ""
+    },
+    "writer_error_counts": {
+      "a": 0,
+      "b": 0
+    },
+    "writer_error_examples": {
+      "a": [],
+      "b": []
+    },
+    "writers": 2
+  },
+  "correction_retention": {
+    "mechanism": "scan(snapshot_id=<v1 snapshot>) time travel",
+    "v1_row_ids": [
+      "future-member",
+      "original"
+    ],
+    "v1_rows_equal": true
+  },
+  "elapsed_s": 7.75,
+  "fixture_rows": {
+    "observations": [
+      "aeeacfe8f0cfa22b73c71a6b2b7349f05c3bfd031c2ef8f8bbe98784c7ac9ebe",
+      5
+    ],
+    "universe": [
+      "37cb0502779e72b2c0ff66e7dd64932d0b75a43873cde1d46e83a229e67a11c9",
+      2
+    ]
+  },
+  "latency_ms": {
+    "read_median": 11.837,
+    "unit_of_work": "new SQLite catalog + create/append two tables / fresh catalog + scan two tables",
+    "write_median": 66.309,
+    "write_samples": 5
+  },
+  "lineage": {
+    "commit_timestamp": 1790140517391,
+    "data_file_fields": [
+      "file_path",
+      "file_size_in_bytes",
+      "record_count"
+    ],
+    "data_files_recorded": 2,
+    "history_entries": 2,
+    "input_dataset_name": null,
+    "native_fields_present": [
+      "version_id",
+      "parent_version",
+      "commit_timestamp",
+      "operation"
+    ],
+    "note": "manifests record data file path, size, record count and column stats; no content hash",
+    "operation": "Operation.APPEND",
+    "parent_version": 8726877434470689087,
+    "per_file_content_hash": null,
+    "version_id": 8429301743250395144
+  },
+  "python": "3.13.15",
+  "recovery_after_sigkill": {
+    "all_recovered": true,
+    "detection_method": "after SIGKILL, reopen the store in a fresh process handle; pass only if it reads, holds a whole number of 5-row batches, and the committed count is the writer's last recorded count or one more (a commit that finished before its progress line was written)",
+    "trials": [
+      {
+        "committed_units": 9,
+        "progress_recorded_commits": 9,
+        "state": {
+          "readable": true,
+          "rows": 45,
+          "snapshots": 9
+        },
+        "trial": 0,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 8,
+        "progress_recorded_commits": 8,
+        "state": {
+          "readable": true,
+          "rows": 40,
+          "snapshots": 8
+        },
+        "trial": 1,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 15,
+        "progress_recorded_commits": 15,
+        "state": {
+          "readable": true,
+          "rows": 75,
+          "snapshots": 15
+        },
+        "trial": 2,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 8,
+        "progress_recorded_commits": 8,
+        "state": {
+          "readable": true,
+          "rows": 40,
+          "snapshots": 8
+        },
+        "trial": 3,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 11,
+        "progress_recorded_commits": 11,
+        "state": {
+          "readable": true,
+          "rows": 55,
+          "snapshots": 11
+        },
+        "trial": 4,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      }
+    ]
+  },
+  "restore": {
+    "observations": true,
+    "universe": true
+  },
+  "restore_after_delete": {
+    "mechanism": "row store; the fixture parquet files are rewritten into Iceberg data files, so source per-file sha256 is not preserved",
+    "per_file_equal": "not_supported"
+  },
+  "started_utc": "2026-09-23T05:15:16Z",
+  "storage_bytes": 64771,
+  "versions": {
+    "duckdb": "1.5.5",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "pyiceberg": "0.12.0"
+  }
+}

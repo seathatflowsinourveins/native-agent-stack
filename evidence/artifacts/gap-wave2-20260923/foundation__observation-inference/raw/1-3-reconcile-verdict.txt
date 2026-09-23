@@ -1,0 +1,12 @@
+{
+ "checks": {
+  "result_usage_equal_all_categories": true,
+  "before_empty": true,
+  "only_child_session_id": true,
+  "claude_exit_zero": true
+ },
+ "passed": true
+}
+exit=0
+negative-check (tampered copy) passed= False
+negative-check attribution passed= False

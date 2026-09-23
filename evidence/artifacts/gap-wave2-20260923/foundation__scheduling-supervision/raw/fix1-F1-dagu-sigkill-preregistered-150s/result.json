@@ -1,0 +1,194 @@
+{
+  "completed_at": "2026-09-23T03:30:27.109459+00:00",
+  "engines": {
+    "dagu": {
+      "case_table": {
+        "checkpoint_reuse": true,
+        "retry": true,
+        "sigkill": false,
+        "stop": true
+      },
+      "scenario_a": {
+        "after_retry_status": "succeeded",
+        "before_retry_status": "aborted",
+        "cases": {
+          "checkpoint_reuse": true,
+          "retry": true,
+          "stop": true
+        },
+        "completed_at": "2026-09-23T03:27:53.979842+00:00",
+        "completed_before_retry": false,
+        "executor_helpers_not_run_scoped": [],
+        "frozen": {
+          "expected": {
+            "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+            "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+          },
+          "fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        },
+        "native_run": "recovery-37b04d106c4b5a53",
+        "observed_owned_processes_remaining": 0,
+        "oracle": {
+          "checkpoint_execution_count": 1,
+          "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+          "checkpoint_sha256_unchanged": true,
+          "checkpoint_tests": 12,
+          "completed": {
+            "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+            "execution_count": 1,
+            "tests": 12
+          },
+          "completed_matches": true,
+          "final_tests": 12,
+          "retry_ready_written": true
+        },
+        "owned_processes_observed": 4,
+        "remaining_process_commands": [],
+        "retry_finalizer_remaining": false,
+        "same_native_run_id": true,
+        "started_at": "2026-09-23T03:27:53.472395+00:00"
+      },
+      "scenario_b": {
+        "alive_after_kill": [],
+        "all_killed": true,
+        "cases": {
+          "sigkill": false
+        },
+        "completed_at": "2026-09-23T03:30:27.098123+00:00",
+        "final_status": "running",
+        "frozen": {
+          "expected": {
+            "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+            "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+          },
+          "fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        },
+        "killed_process_count": 4,
+        "native_run": "recovery-a0235d718230f171",
+        "operational_steps": [
+          "no scheduler (preregistered protocol)",
+          "dagu retry --run-id --step finalize every 15 s"
+        ],
+        "oracle": {
+          "checkpoint_execution_count": 1,
+          "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+          "checkpoint_sha256_unchanged": true,
+          "checkpoint_tests": 12,
+          "completed": null,
+          "completed_matches": false,
+          "final_tests": 0,
+          "retry_ready_written": false
+        },
+        "recovery_attempts": [
+          {
+            "at": "2026-09-23T03:28:11.320351+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-a0235d718230f171 err=\"already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-a0235d718230f171): already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:28:26.377614+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-a0235d718230f171 err=\"already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-a0235d718230f171): already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:28:41.439516+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-a0235d718230f171 err=\"already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-a0235d718230f171): already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:28:56.537821+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-a0235d718230f171 err=\"already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-a0235d718230f171): already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:29:11.640047+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-a0235d718230f171 err=\"already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-a0235d718230f171): already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:29:26.760001+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-a0235d718230f171 err=\"already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-a0235d718230f171): already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:29:41.852387+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-a0235d718230f171 err=\"already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-a0235d718230f171): already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:29:56.955180+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-a0235d718230f171 err=\"already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-a0235d718230f171): already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:30:12.017381+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-a0235d718230f171 err=\"already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-a0235d718230f171): already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:30:27.073035+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-a0235d718230f171 err=\"already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-a0235d718230f171): already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock\n",
+            "verb": "dagu retry --step finalize"
+          }
+        ],
+        "recovery_seconds": 150.8,
+        "scheduler_isolation": null,
+        "sigkill_within_preregistered_150s": false,
+        "started_at": "2026-09-23T03:27:53.980817+00:00",
+        "status_after_kill": "running",
+        "status_after_kill_2s": "running",
+        "window_seconds": 150
+      },
+      "setup": {
+        "install": "existing pinned binary (sha256 20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7), no new download",
+        "long_running_processes": [
+          "none for stop/retry (dagu start runs the DAG in-process)",
+          "dagu scheduler during SIGKILL recovery only (--dagu-recovery scheduler)"
+        ],
+        "private_config": "check_updates: false\nscheduler:\n  port: 0\n",
+        "sigkill_recovery_mode": "none",
+        "version": "2.16.6"
+      }
+    }
+  },
+  "inputs": {
+    "compare.py": "973e602ece0b253d606162456198dc041ebedd8918bed55de22b7cf6e894fc7e",
+    "dagu_common.py": "7e47c8d6d07a3ecbba27888db7affa2eec32e66af7b637e6b1f05429d5b664b4",
+    "prefect_ctl.py": "68d19902bd4f8e3a1d8096f9eedd8ed72edda6bf9ba2e06773ab63a11feaf35e",
+    "prefect_flow.py": "7c49fb35afaa7f418a9c77cc99f2ee586af1f86031b4995c410165b2eaa379ac",
+    "temporal_worker.py": "7df916a18e743c42486aeb58682644637ea2d5a7ca153a7abffddb67a0ec3055"
+  },
+  "job_recovery_fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+  "leftover_processes_mentioning_work_dir": [
+    "2749434 python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/challenger/compare.py --engines dagu --dagu-recovery none --window 150 --work $HOME/.cache/gap-wave2-20260923/sch",
+    "2769974 timeout 290 bash -c until [ -f $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f1-dagu-prereg-1790134073/result.json ]; do sleep 5; done",
+    "2769975 bash -c until [ -f $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f1-dagu-prereg-1790134073/result.json ]; do sleep 5; done"
+  ],
+  "platform": "Linux 6.18.33.2-microsoft-standard-WSL2",
+  "protocol": {
+    "dagu_recovery": "none",
+    "window_seconds": 150
+  },
+  "python": "3.12.3",
+  "started_at": "2026-09-23T03:27:53.446575+00:00"
+}

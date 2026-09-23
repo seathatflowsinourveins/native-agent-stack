@@ -1,0 +1,72 @@
+[
+  {
+    "line": 17,
+    "category": "survivorship",
+    "explanation": "Using download-date S&P 500 members throughout history excludes former constituents and includes future entrants before their admission, creating survivorship and membership look-ahead bias."
+  },
+  {
+    "line": 25,
+    "category": "position_sizing",
+    "explanation": "Average-rank ties and insufficient eligible stocks can select a number other than ten, so dividing by ten creates unintended leverage or underinvestment."
+  },
+  {
+    "line": 34,
+    "category": "data_quality",
+    "explanation": "On pandas versions where pct_change defaults to forward filling, missing quotes become artificial zero returns because no missing-data policy is specified."
+  },
+  {
+    "line": 35,
+    "category": "look_ahead",
+    "explanation": "Weights incorporating today's closing price are applied to the return ending at that same close, crediting the strategy with returns earned before its positions could be established."
+  },
+  {
+    "line": 35,
+    "category": "transaction_costs",
+    "explanation": "The daily portfolio calculation omits commissions, bid-ask spreads, slippage, and market impact associated with rebalancing."
+  },
+  {
+    "line": 35,
+    "category": "data_quality",
+    "explanation": "The default skip-NaN summation treats unavailable returns on held positions as zero contributions, potentially concealing missing losses."
+  },
+  {
+    "line": 42,
+    "category": "risk_metric_error",
+    "explanation": "Returning zero for every zero-volatility series reports a finite Sharpe ratio where the ratio is undefined, including for constant nonzero returns."
+  },
+  {
+    "line": 48,
+    "category": "risk_metric_error",
+    "explanation": "The running peak omits initial capital, so the drawdown function understates drawdown for return series beginning with a loss."
+  },
+  {
+    "line": 56,
+    "category": "data_quality",
+    "explanation": "When stack preserves NaNs, comparing forward returns with zero converts unavailable terminal-horizon outcomes into negative-class labels that the subsequent dropna cannot remove."
+  },
+  {
+    "line": 59,
+    "category": "label_leakage_cv",
+    "explanation": "Shuffled row-level KFold trains on future observations while testing earlier observations, so the reported accuracy does not estimate performance on unseen future periods."
+  },
+  {
+    "line": 59,
+    "category": "label_leakage_cv",
+    "explanation": "The folds do not purge overlapping forward-label intervals, allowing training targets to incorporate price movements from validation outcome windows."
+  },
+  {
+    "line": 68,
+    "category": "data_quality",
+    "explanation": "Silently excluding constituents without price columns conditions the evaluated universe on data availability and conceals incomplete constituent coverage."
+  },
+  {
+    "line": 72,
+    "category": "overfitting_multiple_testing",
+    "explanation": "Selecting the maximum observed Sharpe across four lookbacks without independent validation or accounting for multiple trials produces an optimistically selected performance estimate."
+  },
+  {
+    "line": 73,
+    "category": "in_sample_selection",
+    "explanation": "The selected lookback is evaluated on the same prices used to select it, so the subsequently reported out-of-sample Sharpe is actually in-sample."
+  }
+]

@@ -1,0 +1,221 @@
+{
+  "n_requested": 20,
+  "spacing_s": 1.0,
+  "started_at": "2026-09-23T02:51:55.844677+00:00",
+  "route": {
+    "group_wait": "5s",
+    "group_interval": "30s",
+    "source": "observability/backends/templates/ecosystem-alertmanager.yml.example"
+  },
+  "firing": {
+    "n": 20,
+    "min_s": 5.004,
+    "median_s": 5.008,
+    "p90_s": 5.015,
+    "max_s": 5.119,
+    "mean_s": 5.014,
+    "stdev_s": 0.024
+  },
+  "resolved": {
+    "n": 20,
+    "min_s": 10.707,
+    "median_s": 20.244,
+    "p90_s": 27.879,
+    "max_s": 29.782,
+    "mean_s": 20.245,
+    "stdev_s": 5.79
+  },
+  "fire_delivered": 20,
+  "resolved_delivered": 20,
+  "fire_lost": 0,
+  "resolved_lost": 0,
+  "total_messages_seen": 40,
+  "rows": [
+    {
+      "alertname": "SyntheticLatency025155N00",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.012,
+      "resolve_latency_s": 10.707
+    },
+    {
+      "alertname": "SyntheticLatency025155N01",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.011,
+      "resolve_latency_s": 11.707
+    },
+    {
+      "alertname": "SyntheticLatency025155N02",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.006,
+      "resolve_latency_s": 12.713
+    },
+    {
+      "alertname": "SyntheticLatency025155N03",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.008,
+      "resolve_latency_s": 13.719
+    },
+    {
+      "alertname": "SyntheticLatency025155N04",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.01,
+      "resolve_latency_s": 14.723
+    },
+    {
+      "alertname": "SyntheticLatency025155N05",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.011,
+      "resolve_latency_s": 15.727
+    },
+    {
+      "alertname": "SyntheticLatency025155N06",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.007,
+      "resolve_latency_s": 16.728
+    },
+    {
+      "alertname": "SyntheticLatency025155N07",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.008,
+      "resolve_latency_s": 17.733
+    },
+    {
+      "alertname": "SyntheticLatency025155N08",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.006,
+      "resolve_latency_s": 18.735
+    },
+    {
+      "alertname": "SyntheticLatency025155N09",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.015,
+      "resolve_latency_s": 19.742
+    },
+    {
+      "alertname": "SyntheticLatency025155N10",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.01,
+      "resolve_latency_s": 20.746
+    },
+    {
+      "alertname": "SyntheticLatency025155N11",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.119,
+      "resolve_latency_s": 21.776
+    },
+    {
+      "alertname": "SyntheticLatency025155N12",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.008,
+      "resolve_latency_s": 22.751
+    },
+    {
+      "alertname": "SyntheticLatency025155N13",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.005,
+      "resolve_latency_s": 23.753
+    },
+    {
+      "alertname": "SyntheticLatency025155N14",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.006,
+      "resolve_latency_s": 24.755
+    },
+    {
+      "alertname": "SyntheticLatency025155N15",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.007,
+      "resolve_latency_s": 25.761
+    },
+    {
+      "alertname": "SyntheticLatency025155N16",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.016,
+      "resolve_latency_s": 26.775
+    },
+    {
+      "alertname": "SyntheticLatency025155N17",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.006,
+      "resolve_latency_s": 27.779
+    },
+    {
+      "alertname": "SyntheticLatency025155N18",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.004,
+      "resolve_latency_s": 28.78
+    },
+    {
+      "alertname": "SyntheticLatency025155N19",
+      "fire_http": 200,
+      "resolve_http": 200,
+      "fire_notifications": 1,
+      "resolved_notifications": 1,
+      "fire_latency_s": 5.007,
+      "resolve_latency_s": 29.782
+    }
+  ],
+  "sample_firing_message": {
+    "title": "\ud83d\udea8 Alert: SyntheticLatency025155N00",
+    "message": "Status: Firing\nReceiver: local-ntfy\n\nAlert: SyntheticLatency025155N00\nSeverity: info\nStarts at: 2026-09-23T02:51:57.479847Z\nSummary: Synthetic latency fixture; no service affected.\nSource: http://127.0.0.1/synthetic"
+  },
+  "resolve_all_posted_over_s": 0.018,
+  "stopped_at": "2026-09-23T02:52:51.633450+00:00"
+}

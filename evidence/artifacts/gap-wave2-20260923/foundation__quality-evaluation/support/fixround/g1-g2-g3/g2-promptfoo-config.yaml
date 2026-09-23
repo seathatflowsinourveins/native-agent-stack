@@ -1,0 +1,8 @@
+description: Mutation-catch check for Promptfoo winner
+prompts: ["hello"]
+providers:
+  - id: exec:python3 echo_provider.py
+tests:
+  - assert:
+      - type: equals
+        value: "EXPECTED_OUTPUT_42"

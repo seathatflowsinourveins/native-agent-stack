@@ -1,0 +1,92 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-1",
+  "gap_index": 1,
+  "gap_text_sha256": "079b7e9593248dd9477eca820d0c8944efb232fb9dcd4070c337d1a5f7bb57f3",
+  "checked_at": "2026-09-23T01:02:59.374Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:52:08.551Z",
+    "late": true,
+    "expectation": "Rerunning the runtime-tools filesystem permit/deny fixture while recording `srt --version` and the installed package version/path will show the fixture ran under the same 0.0.77 pin as the network receipt, closing the inferred-not-recorded gap.",
+    "criteria": "srt --version and the resolved package.json version are both captured in the same receipt as the filesystem allow/deny/deny-outside-cwd transcript.",
+    "late_note": "Written at 2026-09-23T00:52:08.551Z by original#66 (Write of $SCRATCHPAD/write_receipts.py; receipts written by original#67 at 00:52:11Z), after the first-pass commands it describes had run (original-session calls 2026-09-23T00:42:49.553Z to 2026-09-23T00:42:50.830Z); any fix-round evidence in this receipt came later and has its own fix-round preregistration where one exists. The previously recorded written_at '2026-09-23T00:50:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps."
+  },
+  "commands": [
+    "original#34 [2026-09-23T00:42:49.553Z]: SRT=$HOME/.local/share/codex-ecosystem/bin/srt\n\"$SRT\" --version\nD=$HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77\nsha256sum \"$D/lib/node_modules/@anthropic-ai/sandbox-runtime/dist/sandbox/index.js\" 2>/dev/null\ncat \"$D/lib/node_modules/@anthropic-ai/sandbox-runtime/package.json\" | grep '\"version\"'\nmkdir -p $HOME/.cache/gap-wave2-20260923/isolation/fsfix\ncd $HOME/.cache/gap-wave2-20260923/isolation/fsfix\nmkdir -p protected allowed\ncat > settings-fs.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"],\"denyRead\":[],\"denyWrite\":[\"protected\"]},\"network\":{\"allowedDomains\":[],\"deniedDomains\":[]}}\nEOF\nrun() { echo \"== $1 ==\"; shift; \"$@\" 2>&1; echo \"exit=$?\"; }\nrun \"allowed write\" \"$SRT\" --settings settings-fs.json -c \"echo hello > allowed/ok.txt && cat allowed/ok.txt\"\nrun \"denied write\" \"$SRT\" --settings settings-fs.json -c \"echo bad > protected/bad.txt\"\nls -la protected/ 2>&1\nrun \"denied read (deny outside cwd)\" \"$SRT\" --settings settings-fs.json -c \"cat /etc/shadow\"",
+    "fix#11 [2026-09-23T01:02:39.090Z]: mkdir -p /tmp/gapfix && cd /tmp/gapfix\nrm -rf fsfixture && mkdir fsfixture && cd fsfixture\ncat > settings-fs.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\"allowed\"],\"denyWrite\":[\"protected\"],\"allowRead\":[\".\"]}}\nEOF\nmkdir -p allowed protected\nsrt --version\nreadlink -f \"$(which srt)\"\ngrep '\"version\"' \"$(dirname $(readlink -f $(which srt)))/../package.json\" 2>/dev/null || find \"$(dirname $(readlink -f $(which srt)))/..\" -maxdepth 2 -name package.json -exec grep -H '\"version\"' {} \\;\nsha256sum \"$(readlink -f $(which srt))\" 2>/dev/null\necho \"== write allowed ==\"\nsrt --settings settings-fs.json -c \"echo hello > allowed/ok.txt && cat allowed/ok.txt\"; echo exit=$?\necho \"== write denied ==\"\nsrt --settings settings-fs.json -c \"echo bad > protected/bad.txt\"; echo exit=$?\nls -la protected/\necho \"== read outside cwd (real permission-neutral target) ==\"\necho \"should-not-be-visible\" > $HOME/.cache/gap-wave2-20260923/isolation/outside-marker.txt 2>/dev/null || mkdir -p $HOME/.cache/gap-wave2-20260923/isolation && echo \"should-not-be-visible\" > $HOME/.cache/gap-wave2-20260923/isolation/outside-marker.txt\nchmod 644 $HOME/.cache/gap-wave2-20260923/isolation/outside-marker.txt\nsrt --settings settings-fs.json -c \"cat $HOME/.cache/gap-wave2-20260923/isolation/outside-marker.txt\"; echo exit=$?",
+    "fix#12 [2026-09-23T01:02:44.248Z]: cd /tmp/gapfix/fsfixture\nmkdir -p $HOME/.cache/gap-wave2-20260923/isolation\necho \"should-not-be-visible\" > $HOME/.cache/gap-wave2-20260923/isolation/outside-marker.txt\ncat > settings-fs.json <<'EOF'\n{\"network\":{\"allow\":[]},\"filesystem\":{\"allowWrite\":[\"allowed\"],\"denyWrite\":[\"protected\"],\"denyRead\":[],\"allowRead\":[\".\"]}}\nEOF\nsha256sum settings-fs.json\necho \"== write allowed ==\"\nsrt --settings settings-fs.json -c \"echo hello > allowed/ok.txt && cat allowed/ok.txt\"; echo exit=$?\necho \"== write denied ==\"\nsrt --settings settings-fs.json -c \"echo bad > protected/bad.txt\"; echo exit=$?\nls -la protected/\necho \"== read outside cwd (permission-neutral target, world-readable) ==\"\nsrt --settings settings-fs.json -c \"cat $HOME/.cache/gap-wave2-20260923/isolation/outside-marker.txt\"; echo exit=$?",
+    "fix#13 [2026-09-23T01:02:48.600Z]: cd /tmp/gapfix/fsfixture\ncat > settings-fs.json <<'EOF'\n{\"network\":{\"allowedDomains\":[],\"deniedDomains\":[\"*\"]},\"filesystem\":{\"allowWrite\":[\"allowed\"],\"denyWrite\":[\"protected\"],\"denyRead\":[],\"allowRead\":[\".\"]}}\nEOF\nsha256sum settings-fs.json\necho \"== write allowed ==\"\nsrt --settings settings-fs.json -c \"echo hello > allowed/ok.txt && cat allowed/ok.txt\"; echo exit=$?\necho \"== write denied ==\"\nsrt --settings settings-fs.json -c \"echo bad > protected/bad.txt\"; echo exit=$?\nls -la protected/\necho \"== read outside cwd (permission-neutral target, world-readable) ==\"\nsrt --settings settings-fs.json -c \"cat $HOME/.cache/gap-wave2-20260923/isolation/outside-marker.txt\"; echo exit=$?",
+    "fix#14 [2026-09-23T01:02:58.975Z]: cd /tmp/gapfix/fsfixture\ncat > settings-fs-denyread.json <<'EOF'\n{\"network\":{\"allowedDomains\":[],\"deniedDomains\":[\"*\"]},\"filesystem\":{\"allowWrite\":[\"allowed\"],\"denyWrite\":[\"protected\"],\"denyRead\":[\"$HOME/.cache/gap-wave2-20260923/isolation\"],\"allowRead\":[\".\"]}}\nEOF\nsha256sum settings-fs-denyread.json\necho \"== read explicitly denyRead-covered path ==\"\nsrt --settings settings-fs-denyread.json -c \"cat $HOME/.cache/gap-wave2-20260923/isolation/outside-marker.txt\"; echo exit=$?"
+  ],
+  "results": [
+    "`srt --version` printed `1.0.0`; the resolved entry point is `$HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/lib/node_modules/@anthropic-ai/sandbox-runtime/dist/cli.js` and its package.json has `\"version\": \"0.0.77\"` (fix#11).",
+    "sha256 of that dist/cli.js entry script (a JavaScript file, not a native binary): 812528d3b98c4c48b6acd4c791f8da61928c6ed75b9178a85967bf0589e8448d (fix#11).",
+    "Two settings files were refused before the valid run: `does not hold a valid config ... network: Required; filesystem.denyRead: Required` (fix#11) and `network.allowedDomains: Required; network.deniedDomains: Required` (fix#12). srt exited 1 without running the command in both cases.",
+    "settings-fs.json (sha256 b743cf5e25db2dd8b9948a50d9941c2e3614272c12e8f970ab949a0adbd94787): allowed write printed `hello`, exit=0; denied write `protected/bad.txt: Read-only file system`, exit=1, and host protected/ stayed empty; read of the world-readable marker outside the cwd printed `should-not-be-visible`, exit=0 (fix#13).",
+    "settings-fs-denyread.json (as-run sha256 b67c149d8ed22fcb0c8608e251aa69f0566b3da423b511e7bc57dabd336d4e51, denyRead covering the marker directory): the same read gave `cat: ...outside-marker.txt: No such file or directory`, exit=1 (fix#14).",
+    "Superseded first-pass case (original#34): `cat /etc/shadow` returned `Permission denied`, which ordinary Unix permissions also produce; it is not used as evidence of srt policy."
+  ],
+  "outcome": "settled",
+  "note": "The filesystem permit/deny fixture is rerun with the exact 0.0.77 pin recorded (via symlink target, package.json, and the resolved binary's own sha256). The original 'denied read outside cwd' case was corrected: it previously tested /etc/shadow, which is denied to any unprivileged user by ordinary Unix permissions regardless of srt, so it never actually exercised srt's own read policy. The rerun instead reads a world-readable, user-owned file outside the cwd twice \u2014 once under a config with no denyRead entry (succeeds, exit=0) and once with the same path added to filesystem.denyRead (fails as a not-found/ephemeral-hide, exit=1) \u2014 isolating srt's own enforcement from host permissions. sha256 of the srt binary and both settings files is recorded, and the settings file contents are retained verbatim in this directory's companion files (not just referenced).",
+  "evidence_class": "local_integration",
+  "limits": [
+    "The historical runtime-tools fixture configuration is not public (its receipt says the raw artifacts are retained privately), so the rerun reproduces its case categories (allowed write, protected write, denied read, host file not created), not a byte-identical configuration.",
+    "srt --version reports the CLI version (1.0.0); the 0.0.77 package version comes from the resolved install path and package.json.",
+    "denyRead was tested at directory level only.",
+    "Retained fixtures: fixtures/1-settings-fs.json is byte-identical to the as-run file (sha256 b743cf5e...). fixtures/1-settings-fs-denyread.json contains the literal `$HOME` in place of the host home path; `sed \"s#\\$HOME#$HOME#\" fixtures/1-settings-fs-denyread.json | sha256sum` on this host reproduces the as-run sha256 b67c149d... (verified during reconciliation by hashing, not by rerunning srt)."
+  ],
+  "fix_round_preregistration": {
+    "written_at": "2026-09-23T01:28:03.577Z",
+    "expectation": "The original 'denied read outside cwd' case used /etc/shadow, which any unprivileged user is denied by ordinary Unix permissions with or without srt, so it does not test srt's own denyRead enforcement. Rerunning with an explicit denyRead entry over a world-readable file the user owns (so only srt's policy, not Unix permissions, can be the cause of a denial) will show whether srt itself denies the read, and recording sha256 of both the settings file and the resolved srt binary closes the missing-sha256 criterion.",
+    "criteria": "A world-readable, user-owned file with no denyRead entry is read successfully from inside the sandbox; the same file becomes unreadable (via an ephemeral hide, not a permission error) once its containing directory is added to filesystem.denyRead; sha256 of the settings file(s) and the resolved srt binary are recorded in the receipt; the settings file content itself is retained verbatim.",
+    "late": true,
+    "label": "fix-round preregistration, written after the fix-round commands it describes",
+    "late_note": "Written at 2026-09-23T01:28:03.577Z by fix#49; fix-round commands ran fix#4-fix#46 (01:01:10Z-01:27:09Z); cargo attempt 2 had finished by fix#54 (01:28:38Z). The previously recorded written_at '2026-09-23T01:20:00+00:00' was a placeholder, not the time this block was written, and it was not written before its sub-check ran."
+  },
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:42:49.553Z to 2026-09-23T01:02:59.374Z. The previous value '2026-09-23T00:52:11.952018+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#34"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/fix-session-tool-calls.txt",
+      "sha256": "b1a1bce670082262521365455849b1618b460a9bbd53fdec5d6d0337523d8899",
+      "calls": [
+        "fix#11",
+        "fix#12",
+        "fix#13",
+        "fix#14"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "fixtures": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/fixtures/1-settings-fs.json",
+      "sha256": "b743cf5e25db2dd8b9948a50d9941c2e3614272c12e8f970ab949a0adbd94787",
+      "as_run_sha256": "b743cf5e25db2dd8b9948a50d9941c2e3614272c12e8f970ab949a0adbd94787",
+      "transform": "none"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/fixtures/1-settings-fs-denyread.json",
+      "sha256": "5393d78669323f6a926bb00cd81eb4838dfb0e2fd65137084f278c6bd91e155c",
+      "as_run_sha256": "b67c149d8ed22fcb0c8608e251aa69f0566b3da423b511e7bc57dabd336d4e51",
+      "transform": "host home path replaced by the literal $HOME; reverse the substitution to recover the as-run bytes"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Review finding 2 (fixture hash mismatch): the retained denyRead fixture had been rewritten with `~` after the run. It now uses `$HOME`, the receipt records both the retained sha256 and the as-run sha256, and the reverse substitution was checked to reproduce the as-run hash b67c149d... exactly.",
+      "Recorded the two refused settings files (fix#11, fix#12) that preceded the valid run, and that the recorded sha256 is of the dist/cli.js entry script.",
+      "Outcome kept settled: both arms of the next_check (rerun under 0.0.77; record version and sha256) are in the raw record; the limit on the private historical configuration is stated."
+    ]
+  }
+}

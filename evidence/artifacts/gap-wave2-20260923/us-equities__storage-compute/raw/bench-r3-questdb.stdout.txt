@@ -1,0 +1,17 @@
+$HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py:385: DeprecationWarning: questdb.ingress is deprecated; import from questdb instead (or use questdb.connect() for QWP/WebSocket).
+  from questdb.ingress import Sender
+Process SpawnProcess-53:
+Traceback (most recent call last):
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/multiprocessing/process.py", line 313, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py", line 700, in kill_writer
+    conn["sender"].flush()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "src/questdb/_client.pyx", line 7928, in questdb._client.Sender.flush
+  File "src/questdb/_client.pyx", line 8022, in questdb._client.Sender.flush
+questdb._client.QuestDBError: Could not flush buffer: http://127.0.0.1:19120/write: io: Connection reset by peer (os error 104)
+{"store": "questdb", "error": "", "load": {"seconds": 26.266577411006438, "rows_per_s": 1903559.767899132, "wal_visible_after_s": 0.00672604199644411, "seconds_until_visible": 26.27330345300288, "rows_per_s_until_visible": 1903072.4510695399, "row_count": 50000000, "row_count_ok": true}, "queries": {"Q1": 0.0012934080004924908, "Q2": 0.002469914994435385, "Q3": 0.03258890500001144, "Q4": 0.0037437239952851087}, "kill": {"killed": "server_process_group", "signal": "SIGKILL", "kill_time_unix": 1790144021.6790786, "acked_batches": 30, "acked_rows": 300000, "inflight_batches_at_kill": [30], "inflight_proven": true, "median_engine_call_s_acked": 0.0052640438079833984, "engine_call_elapsed_at_kill_s": {"30": 0.001485586166381836}, "engine_interrupted_proven": true, "acks_after_kill_time": [], "inflight_state_after_recovery": {"30": "absent"}, "rows_after_recovery": 300000, "acked_batches_failing_verification": [], "all_acked_batches_exact": true, "unexpected_batch_indices": [], "per_batch_checks": "rows == 10000, distinct ts == 10000, sum(volume) == deterministic expected", "restart_or_reopen_through_first_query_s": 5.284724807999737, "server_ready_s": 2.216234130995872, "questdb_wal_visible_after_s": 0.0574789839956793, "total_rows_after_recovery": 55500000}}

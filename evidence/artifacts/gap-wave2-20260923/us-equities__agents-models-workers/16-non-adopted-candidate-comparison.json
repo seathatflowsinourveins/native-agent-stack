@@ -1,0 +1,96 @@
+{
+ "id": "gap-wave2-20260923/us-equities__agents-models-workers/16-non-adopted-candidate-comparison",
+ "catalog": "us-equities",
+ "layer_id": "agents-models-workers",
+ "gap_index": 16,
+ "gap_text": "No non-adopted candidate in this packet has retained comparative evidence sufficient to prefer it.",
+ "gap_text_sha256": "b5f7b26cd48f55e032f5b895bed74374a526cae2d1436c6a3d9fce067006f61b",
+ "next_check": "Run one non-adopted candidate (e.g. OpenHands SDK) and codex-native-sdk on the same preregistered task, and retain the comparison receipt.",
+ "base_commit": "41d39b3",
+ "preregistration": {
+  "written_at": "2026-09-23T07:23:05Z",
+  "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/16-non-adopted-candidate-comparison.json",
+  "commit": "5480a9c (2026-09-23T07:23:50Z, before any check ran)",
+  "expectation": "LoopX 1.1.0 (non-adopted candidate in this packet) can run one governed Turn through its built-in codex-cli adapter on the same preregistered fact-extraction task used for gap 0, with an independent validator; it should reach the same facts as codex-native-sdk with extra control-plane overhead.",
+  "criteria": [
+   "Install LoopX 1.1.0 only into a venv under this unit's cache with a temporary HOME (no skills installed into the real ~/.codex or ~/.claude).",
+   "Same input files, same gold, same scoring script as gap 0; validator = the scoring script over the artifact.",
+   "Record committed/repair status, facts correct, blocks, and whatever native usage the adapter exposes (unavailable usage is reported as unavailable).",
+   "If LoopX cannot run headless here, record the exact blocker and outcome deferred/not_settled."
+  ]
+ },
+ "commands": [
+  "uv venv --python 3.13 $GAPCACHE/loopx-venv && uv pip install loopx==1.1.0  # network download: 6.2 MB wheel from PyPI, no dependencies",
+  "$GAPCACHE/loopx-venv/bin/python blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/loopx_arm.py $GAPCACHE/runs/g16-loopx  # HOME=<temp>; loopx --registry ... turn run-once --host codex-cli --execution-mode isolated-headless --codex-sandbox read-only --codex-model gpt-6-astra --validation-command-json [loopx_validator.py gold.json] --no-global-sync --execute"
+ ],
+ "results": {
+  "candidate": "LoopX 1.1.0 (loopx-project/loopx, non-adopted newcomer c5 in this packet), built-in codex-cli adapter driving the same native Codex 0.155.1 / gpt-6-astra",
+  "same_task_as_gap_0": true,
+  "loopx": {
+   "status": "failed",
+   "result_kind": "validation_failed",
+   "recovery_kind": "repair_required",
+   "facts_correct": "0/6",
+   "command": "/bin/bash -lc 'head -c 24000 -- worker-receipt.json acp-research-receipt.json' (same method)",
+   "codex_turn_usage": {
+    "input_tokens": 41936,
+    "cached_input_tokens": 18688,
+    "output_tokens": 1100,
+    "reasoning_output_tokens": 694,
+    "total": 43036
+   },
+   "elapsed_seconds": 40.6,
+   "effects": {
+    "host_invoked": true,
+    "state_written": false,
+    "quota_spent": false
+   },
+   "returned_summary_excerpt": "Read both files using exactly one shell command ... Both receipts are dated 2026-09-19 and report matching engine counts: 3,943 data points, 3 simulated orders, and 0 failed data requests; historical DeerFlow discovery found 23 skills,"
+  },
+  "codex_native_sdk_same_task": {
+   "facts_correct": "6/6",
+   "total_tokens": 41039,
+   "wall_seconds": 9.71
+  },
+  "reading": "LoopX's typed Turn result (schema loopx_turn_result_v0, 400-char summary) displaced the task's requested JSON: the model wrote a prose summary, the independent validator failed, and LoopX correctly refused to commit or spend quota. On this single-turn task the evidence does not favour LoopX over codex-native-sdk."
+ },
+ "outcome": "advanced",
+ "what_remains": "LoopX's own overturn condition (a long-running worker surviving restarts and quota exhaustion where the current coordinator loses state) was not exercised; no repair Turn was run (preregistered as one Turn), and n=1.",
+ "evidence_class": "native_proven",
+ "limits": [
+  "Single-turn extraction task; it does not test LoopX's long-horizon governance value.",
+  "The LoopX host prompt was not captured, so whether the full todo text reached the model is not verified.",
+  "The codex binary handed to LoopX was a wrapper adding hooks-off and --ephemeral (isolation); otherwise LoopX's adapter command was unchanged.",
+  "Isolation: disposable Qdrant 1.19.1 on 127.0.0.1:27333/27334 (storage under $HOME/.cache/gap-wave2-20260923/agents-models-workers/qdrant-storage), isolated ai-memory 2.3.2 `serve` on 127.0.0.1:27374 with a temp --data-dir and temp HOME, and AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 exported for the gap-9 and gap-11 ai-memory CLI calls; both started by this unit and stopped at the end (ports verified free). Correction (fix round): the first-round gap-6 CLI calls did NOT point at that server (--version/--help/backfill --help ran with no AI_MEMORY_SERVER_URL set, and init with http://127.0.0.1:1, a closed port); no live-store contact is possible from those commands, and they were re-run in the fix round against isolated 2.3.2 (127.0.0.1:27374) and 2.4.0 (127.0.0.1:27375) servers started for that purpose (gap-6 receipt). Every Codex run disabled native lifecycle hooks (-c features.hooks=false -c features.plugin_hooks=false) so no ai-memory hook call could reach the live service; the one Claude call used --setting-sources project from a temp cwd (user-settings hooks not loaded) and --strict-mcp-config. Embeddings: read-only POST /v1/embeddings calls to the running Nemotron-3-Embed-1B vLLM endpoint 127.0.0.1:8231 (the adopted SocratiCode profile); that service was not restarted or reconfigured. Start/stop evidence for the main-round Qdrant and ai-memory 2.3.2 services (fix round 2): raw/services-main-round.txt has the exact commands and outputs, exported without re-running from this unit's own session transcript by services/export_main_round_services.py."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/16-loopx-arm-result.json",
+   "sha256": "2f4e758a0e86620e6b91377e68943dbc32b39ab14e39a5eaaf039022fd73dcea"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/16-loopx-codex-events.jsonl",
+   "sha256": "8ed674aaa61ab6a3b996310c3d3f013d07c664373f4c5469831f131b4403dc5b"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/16-loopx-validator-stdin.json",
+   "sha256": "4f34e91ec042db640615183d19e7be2e3a185425363c61ace347a05eb7ad46db"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/16-loopx-codex-argv.log",
+   "sha256": "67740dfdf3b075a814fc06a41c6e298d6090eed9ed8df916cdcf93c7a12e2897"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-sdk-arm.json",
+   "sha256": "b7fc4c005b44bd09c4796cf69fae30eeedbd7cb9b6843cb80d1fad1a3e99a7a3"
+  }
+ ],
+ "helpers": [
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/loopx_arm.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/loopx_validator.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/task-prompt.md",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/gold.json",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/score_facts.py"
+ ],
+ "checked_at": "2026-09-23"
+}

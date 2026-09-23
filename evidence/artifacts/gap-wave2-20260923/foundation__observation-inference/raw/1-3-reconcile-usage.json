@@ -1,0 +1,173 @@
+{
+  "started_at": "2026-09-23T02:54:02.912281+00:00",
+  "session_id": "<child-claude-session-id>",
+  "model_requested": "haiku",
+  "query": "sum by (type) (ecosystem_claude_code_token_usage_tokens_total)",
+  "before": {},
+  "before_series_count": 0,
+  "command_redacted": [
+    "claude",
+    "-p",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--max-turns",
+    "1",
+    "--model",
+    "haiku",
+    "--tools",
+    "",
+    "--setting-sources",
+    "local",
+    "--settings",
+    "<settings JSON: env above + disableAllHooks>",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "{\"mcpServers\":{}}",
+    "--session-id",
+    "<child-claude-session-id>",
+    "--no-session-persistence",
+    "--",
+    "Reply with exactly the two characters OK and nothing else."
+  ],
+  "child_env_otel": {
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "OTEL_METRICS_EXPORTER": "otlp",
+    "OTEL_LOGS_EXPORTER": "otlp",
+    "OTEL_TRACES_EXPORTER": "none",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "<isolated collector>",
+    "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+    "OTEL_LOGS_EXPORT_INTERVAL": "1000",
+    "OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE": "cumulative",
+    "OTEL_LOG_USER_PROMPTS": "false",
+    "OTEL_LOG_ASSISTANT_RESPONSES": "false",
+    "OTEL_LOG_TOOL_DETAILS": "false",
+    "OTEL_LOG_TOOL_CONTENT": "false",
+    "OTEL_LOG_RAW_API_BODIES": "false",
+    "OTEL_METRICS_INCLUDE_ACCOUNT_UUID": "false",
+    "OTEL_METRICS_INCLUDE_SESSION_ID": "true",
+    "OTEL_METRICS_INCLUDE_VERSION": "true"
+  },
+  "claude_exit_code": 0,
+  "claude_elapsed_s": 2.38,
+  "stream_event_types": [
+    "assistant",
+    "rate_limit_event",
+    "result",
+    "system"
+  ],
+  "init_session_id_matches": true,
+  "init_model": "claude-haiku-4-5-20251001",
+  "init_tools_count": 0,
+  "init_mcp_servers_count": 0,
+  "native_result": {
+    "subtype": "success",
+    "is_error": false,
+    "num_turns": 1,
+    "duration_ms": 1423,
+    "duration_api_ms": 1367,
+    "total_cost_usd": 0.013655
+  },
+  "native_usage": {
+    "input": 10,
+    "output": 99,
+    "cacheRead": 0,
+    "cacheCreation": 6575
+  },
+  "native_model_usage": {
+    "claude-haiku-4-5-20251001": {
+      "input": 10,
+      "output": 99,
+      "cacheRead": 0,
+      "cacheCreation": 6575
+    }
+  },
+  "after": {
+    "cacheCreation": 6575.0,
+    "cacheRead": 0.0,
+    "input": 10.0,
+    "output": 99.0
+  },
+  "after_by_model": [
+    {
+      "type": "cacheCreation",
+      "model": "claude-haiku-4-5-20251001",
+      "value": 6575.0
+    },
+    {
+      "type": "cacheRead",
+      "model": "claude-haiku-4-5-20251001",
+      "value": 0.0
+    },
+    {
+      "type": "input",
+      "model": "claude-haiku-4-5-20251001",
+      "value": 10.0
+    },
+    {
+      "type": "output",
+      "model": "claude-haiku-4-5-20251001",
+      "value": 99.0
+    }
+  ],
+  "attribution_distinct_session_ids": [
+    "<child-claude-session-id>"
+  ],
+  "attribution_only_child_session": true,
+  "loki_events_for_session": {
+    "api_request": 1,
+    "assistant_response": 1,
+    "managed_settings_resolved": 1,
+    "plugin_loaded": 2,
+    "user_prompt": 1
+  },
+  "loki_api_request_events": 1,
+  "loki_api_request_token_sum": {
+    "input_tokens": 10,
+    "output_tokens": 99,
+    "cache_read_tokens": 0,
+    "cache_creation_tokens": 6575
+  },
+  "comparison": {
+    "input": {
+      "before": "absent",
+      "after": 10.0,
+      "delta": 10.0,
+      "native_result_usage": 10,
+      "native_model_usage_sum": 10,
+      "delta_equals_result_usage": true,
+      "delta_equals_model_usage_sum": true
+    },
+    "output": {
+      "before": "absent",
+      "after": 99.0,
+      "delta": 99.0,
+      "native_result_usage": 99,
+      "native_model_usage_sum": 99,
+      "delta_equals_result_usage": true,
+      "delta_equals_model_usage_sum": true
+    },
+    "cacheRead": {
+      "before": "absent",
+      "after": 0.0,
+      "delta": 0.0,
+      "native_result_usage": 0,
+      "native_model_usage_sum": 0,
+      "delta_equals_result_usage": true,
+      "delta_equals_model_usage_sum": true
+    },
+    "cacheCreation": {
+      "before": "absent",
+      "after": 6575.0,
+      "delta": 6575.0,
+      "native_result_usage": 6575,
+      "native_model_usage_sum": 6575,
+      "delta_equals_result_usage": true,
+      "delta_equals_model_usage_sum": true
+    }
+  },
+  "all_categories_match_result_usage": true,
+  "all_categories_match_model_usage_sum": true,
+  "stopped_at": "2026-09-23T02:54:39.090566+00:00"
+}

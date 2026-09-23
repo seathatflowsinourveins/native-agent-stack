@@ -1,0 +1,482 @@
+{
+  "id": "identity-provenance-g5-openlineage-mlflow-bindings",
+  "gap_index": 5,
+  "gap_text_sha256": "03f83eaf101acab6a3fd18031ca2977e5c07b40e5ddff9a77c708d6d23b6485f",
+  "gap_text": "OpenLineage event persistence and consistent version/cutoff facets, and MLflow run-to-dataset bindings, remain unqualified.",
+  "preregistration": {
+    "written_at": "2026-09-23T04:57:25Z",
+    "written_at_note": "written_at is approximate (between the 04:57:11Z shell stamp and the 04:57:40Z first commit). Written and committed before any gap-wave-2 check for this layer ran. Each receipt copies its entry verbatim.",
+    "committed_in": "7078d05 (Preregister gap-wave-2 checks for us-equities identity-provenance), before any check ran",
+    "source": "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration.json",
+    "expectation": "openlineage-python 1.53.0 FileTransport persists START and COMPLETE RunEvents for a replay.py materialize run with a custom dataset-version facet (snapshot_sha256, per-file sha256) and a knowledge-cutoff facet; reading the file back yields events whose runId, version and cutoff facets are consistent across START/COMPLETE. MLflow 3.16.1 with a local SQLite tracking store records the same run with mlflow.log_input bindings for the materialized datasets (digest, source) and the bindings read back through MlflowClient/search.",
+    "criteria": [
+      "C5.1 The OpenLineage event file exists after emission, parses as JSON lines, and contains START and COMPLETE with the same runId.",
+      "C5.2 Every event's output dataset carries a version facet equal to snapshot_sha256 and per-file sha256 equal to the manifest, and a cutoff facet with the same value across events; a detector control (a deliberately mismatched facet in a third synthetic event written by the check) is flagged by the consistency checker.",
+      "C5.3 MLflow run has dataset inputs (log_input) whose names, digests and sources read back via get_run().inputs.dataset_inputs and match the manifest; the OpenLineage runId is stored as a tag and matches.",
+      "C5.4 Persistence: a fresh Python process reopening the same file and the same SQLite DB reads back identical records.",
+      "Outcome rule: settled only if C5.1-C5.4 pass."
+    ],
+    "amendments_after_preregistration": [
+      {
+        "at": "2026-09-23T05:18Z (approx.)",
+        "late": true,
+        "change": "Added validation of the persisted events against the OpenLineage core spec 2-0-2 JSON schema (fetched with curl, sha256 recorded), with a detector control. Added jsonschema 4.26.0 to the mlflow venv. Attempt 1 log kept."
+      },
+      {
+        "at": "2026-09-23T05:19Z (approx.)",
+        "late": true,
+        "change": "Added a knowledge-horizon facet to the materialize run (the maximum available_at in the source) and an MLflow run for the materialize step, so the materialize run itself is logged in MLflow with log_input. Attempt 2 log kept."
+      },
+      {
+        "at": "2026-09-23T05:18Z (approx.)",
+        "late": true,
+        "change": "MLflow refused the project's 64-character sha256 as a dataset digest ('digest' exceeds the maximum length of 36 characters). The binding keeps MLflow's own digest, and file_sha256/snapshot_sha256 are recorded as dataset-input tags."
+      },
+      {
+        "at": "2026-09-23T13:20:19Z",
+        "late": true,
+        "change": "Fix round 3 (preregistration-fixround3.json L5.1/L5.2, commit 9f84cc9) after the independent Opus review: the readback's C5.1 listing shows only an 8-character runId prefix, identical for both runs, so it cannot show the run structure; and the published ndjson, redacted to 'uuid-redacted-NN', no longer met format: uuid. verify_lineage_fixround3.py now derives the full runId structure from the original event file (sha256 checked against raw-index source_sha256) and validates the published file with FormatChecker."
+      },
+      {
+        "at": "2026-09-23T13:27:46Z",
+        "late": true,
+        "change": "Fix round 3, L5.2 amended after its first execution: publishing valid-format placeholder UUIDs (00000000-0000-4000-8000-0000000000NN) made scripts/validate.py fail with 'contains possible local session identifier', because the publication validator rejects every UUID-shaped string. That attempt's output ($HOME/.cache/gap-wave2-20260923/identity-provenance/runs/lineage-fix3-attempt1-validuuid) passed but is not published, since it contains UUID-shaped placeholders. Publishing went back to 'uuid-redacted-NN'. Amended L5.2: validate the published bytes with FormatChecker after mapping, in memory, only run.runId values that exactly match ^uuid-redacted-NN$ to valid-format UUIDs. The unmapped published file is the detector control and must fail on format. L5.2 as preregistered (a published file that is itself format-valid) is recorded as unmet."
+      },
+      {
+        "at": "2026-09-23T15:16:17Z",
+        "late": true,
+        "change": "Fix round 4 (preregistration-fixround4.json L5.3, commit aa85595) after the Codex review of fix round 3: the verifier mapped placeholders by zip(orig, pub), so in-memory probes passed after removing the published select COMPLETE event or collapsing every published runId. verify_lineage_fixround3.py now also checks equal event counts, per-position job name and eventType, placeholder format and a one-to-one runId mapping in both directions, with three detector controls. The L5.3b(iii) deviation is recorded separately below with the time it was written."
+      },
+      {
+        "at": "2026-09-23T15:16:43.905Z",
+        "late": true,
+        "change": "L5.3b(iii) deviation, written after the 15:16:17Z preregistration and after its commit aa85595 (15:16:18Z). Preregistered (iii) swaps the job names of the first two published events; those two share one job (nanosecond-replay.materialize), so that swap changes nothing. Timeline from the fix-round-4 worker's session transcript and the file mtime (raw/fixround5-timeline/timeline.json): at 15:16:28.900Z an Edit added the control as preregistered (swap events 0 and 1) with a fallback that appended '-swapped' to event 0's job name when the names were equal, i.e. a rename rather than a swap; this draft was never run. At 15:16:30Z the worker listed the published events and saw the shared job. At 15:16:43.905Z one Bash command replaced the control with the executed one (swap event 0's job name with the first event of the other job, control 'job_names_swapped_across_jobs') and in the same command ran run_verify_fixround4.sh (run.log 15:16:43Z-15:16:44Z; verifier mtime 15:16:43.992Z). That was the only verifier run in the window, so the change preceded the only run whose output was read, but it was not recorded before that run: this amendment text was first written at 15:17:24Z and corrected in fix round 5. The across-job swap code did not exist before 15:16:17Z: the verifier committed at aa85595 has no swap control and no alignment check (timeline.json verifier_at_prereg_commit_aa85595). The code comment 'fix-round-4 late amendment' in verify_lineage_fixround3.py refers to this entry."
+      },
+      {
+        "at": "2026-09-23T15:30:35Z",
+        "late": true,
+        "change": "Fix round 5 (no preregistration; documentation correction after the independent Opus review of fix round 4, no rerun of any measurement): the 15:16:17Z entry previously carried the (iii) deviation and the claim 'amended before the run was read' without a time of its own. The deviation now has the 15:16:43.905Z entry above, reconstructed by extract_fixround4_timeline.py from retained host records. preregistration-fixround4.json is unchanged and still reads '(iii) the job names of the first two events swapped'."
+      },
+      {
+        "at": "2026-09-23T05:30:25Z",
+        "late": true,
+        "change": "Fix round, preregistered in preregistration-fixround.json (commit 3ce38e9) after the Codex review. The original C5.2 says every event's output dataset carries a version facet. That was UNMET as written for the materialize START event: its declared output has no facets, because the snapshot does not exist before the run. The fix round replaces it with a lifecycle-aware rule (F5.1), requires every expected (event, role, dataset) to be present (F5.2), and adds removal and rename detector controls (F5.3). Round-1 raw outputs are kept in raw/lineage-round1/."
+      }
+    ],
+    "fix_round": {
+      "label": "fix-round preregistration (written after the first results and after the Codex read-only review of 2026-09-23T05:23-05:29Z)",
+      "written_at": "2026-09-23T05:30:25Z",
+      "written_at_note": "approximate: between the 05:30:19Z shell stamp and the 05:30:35Z commit",
+      "committed_in": "3ce38e9 (Preregister the identity-provenance fix round after Codex review), before the fix-round reruns",
+      "source": "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround.json",
+      "review_findings_addressed": [
+        "P1 gap 4: baseline recovery and concurrency derived rows as committed_versions*5 without decoding Parquet, so rows % 5 could not fail",
+        "P1 gap 5: check_events accepted missing or renamed dataset bindings",
+        "P1 gap 5: original C5.2 says every event's output carries version facets; the materialize START output carries none",
+        "P2 gap 4: lineage counts treated caller-supplied text (DVC commit subject, baseline provenance prose) as native fields",
+        "P2 gap 4: storage measured as a Python file-length sum, not the preregistered du -sb, and outcome text called totals medians",
+        "P2 gap 0: outcome text said every criterion passed although the literal C0.3 full-tree diff exited 1",
+        "P2 gap 5: the OpenLineage event file was published as .jsonl, which .gitignore excludes"
+      ],
+      "criteria": [
+        "F5.1 Lifecycle-aware facet rule (amends original C5.2, which was unmet for the materialize START event): START events must carry the input dataset with its version facet and the declared output dataset by name. COMPLETE events must carry the output (materialize) or input (select) 'materialized' dataset with a version facet equal to snapshot_sha256 and file hashes equal to the manifest. The cutoff/horizon run facet must be identical across START and COMPLETE of each run.",
+        "F5.2 Presence is required: every expected (event, role, dataset name) triple must exist; missing or renamed datasets are violations.",
+        "F5.3 Detector controls, each of which must be flagged: (a) tampered version and cutoff, (b) removal of the materialize COMPLETE output, (c) removal of the select START input, (d) renaming of the materialize COMPLETE output, (e) schema control (missing eventTime, bad runId).",
+        "F5.4 Publish the event file as .ndjson so git tracks it.",
+        "Outcome rule: settled only if F5.1-F5.3 pass on a fresh emit and readback and the MLflow checks (original C5.3/C5.4) still pass; the unmet literal original C5.2 is recorded in the receipt."
+      ]
+    },
+    "fix_round_3": {
+      "label": "fix-round 3 preregistration (after the independent Opus review of the fix-round-2 handoff, 2026-09-23)",
+      "written_at": "2026-09-23T13:20:19Z",
+      "written_at_note": "shell stamp taken immediately before writing this file; committed before any fix-round-3 check ran. This is a fix-round preregistration written after the original C0.3 result was seen; it is labelled as such and does not replace the original criterion, whose failure stays recorded.",
+      "committed_in": "9f84cc9 (Preregister identity-provenance fix round 3 ...), before any fix-round-3 check ran",
+      "source": "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround3.json",
+      "review_findings_addressed": [
+        "major gap 0: C0.3 as written (full-tree sha256 list after `rm -rf` of every out and `dvc checkout` equals the pre-delete list) failed with git_restore_diff_exit=1, the original refutation rule makes the original run not_settled, and the settled outcome rested on an amendment written after the result",
+        "minor gap 4: fix-round-2 R4.1 named 'Iceberg: rows/5; ArcticDB: rows/5' as store-reported units, but the code used the Iceberg snapshot count and ArcticDB versions minus the seed, with no amendment recorded",
+        "minor gap 4: the 'highest retry attempt 3/4' limit rests on stderr truncated to its last 300 characters",
+        "minor gap 5: the C5.1 listing shows only an identical 8-character runId prefix for both runs, and the redacted published ndjson no longer satisfies the uuid format of the schema"
+      ],
+      "criteria": [
+        "L5.1 From the original, unredacted openlineage-events.ndjson of the cited lineage-fix run (its sha256 must equal raw-index source_sha256), derive per event (job, eventType, full runId): START and COMPLETE of the materialize job share one runId, START and COMPLETE of the select job share one runId, and the two runIds differ. Detector control: a copy with the select COMPLETE runId replaced by the materialize runId must fail the check.",
+        "L5.2 Published redaction maps each UUID to a valid-format placeholder UUID (stable across all published files), so the published ndjson validates against the OpenLineage 2-0-2 RunEvent schema with jsonschema's FormatChecker. Validate the published file; detector control: a copy with runId 'uuid-redacted-01' must fail validation on format.",
+        "Outcome rule for gap 5: unchanged if L5.1 and L5.2 pass; if L5.1 fails, gap 5 is not_settled."
+      ]
+    },
+    "fix_round_4": {
+      "label": "fix-round 4 preregistration (after a Codex read-only review of fix round 3, 2026-09-23T15:05-15:15Z)",
+      "written_at": "2026-09-23T15:16:17Z",
+      "written_at_note": "shell stamp taken immediately before writing this file; committed before the fix-round-4 verifier ran. Written after the review, which agreed with all four outcomes (gap 0 settled, 2 advanced, 4 settled, 5 settled).",
+      "committed_in": "aa85595 (Preregister identity-provenance fix round 4 ...), before the fix-round-4 verifier ran",
+      "source": "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround4.json",
+      "review_findings_addressed": [
+        "P2 verify_lineage_fixround3.py:57 `for o, p in zip(orig, pub)` assumes publication preserves events and identities; in-memory probes passed after removing the published select COMPLETE event or collapsing every published runId",
+        "P3 store_arms.py:678 retry_summary counts CommitFailedException in stderr only, while writers catch exceptions into their progress files"
+      ],
+      "criteria": [
+        "L5.3a The verifier (verify_lineage_fixround3.py, hardened in place) requires: equal event counts in original and published files; per-position equal job name and eventType; every published runId matching ^uuid-redacted-\\d{2}$; and the original-runId -> placeholder mapping one-to-one in both directions.",
+        "L5.3b Three new in-memory detector controls on the published events must each fail the alignment check: (i) the select COMPLETE event removed, (ii) every runId collapsed to one placeholder, (iii) the job names of the first two events swapped.",
+        "L5.3c The real published file must pass L5.1, L5.2 and L5.3a with the same original file and schema as fix round 3.",
+        "Outcome rule: if L5.3c fails, gap 5 drops to advanced with the failure recorded; if a control in L5.3b is not flagged, the verifier is not accepted and the fix-round-3 L5.1/L5.2 result is reported without the L5.3 claim."
+      ]
+    }
+  },
+  "commands": [
+    "bash blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_lineage_mlflow.sh $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/lineage-fix-20260923T053153Z   (fix round, cited)",
+    "bash blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_lineage_mlflow.sh $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/lineage-20260923T051940Z   (round 1, superseded)",
+    "(inside) unshare -rn venv-mlflow/bin/python lineage_mlflow.py emit --work <dir>",
+    "(inside) unshare -rn venv-mlflow/bin/python lineage_mlflow.py readback --work <dir> --spec $HOME/.cache/gap-wave2-20260923/identity-provenance/spec/OpenLineage-2-0-2.json",
+    "curl -sS -o $HOME/.cache/gap-wave2-20260923/identity-provenance/spec/OpenLineage-2-0-2.json https://openlineage.io/spec/2-0-2/OpenLineage.json",
+    "network probe control outside the namespace (raw/lineage-round1/netprobe-control.log)",
+    "unshare -rn $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-mlflow/bin/python blueprints/gap-wave2-20260923/us-equities__identity-provenance/verify_lineage_fixround3.py --original $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/lineage-fix-20260923T053153Z/work/openlineage-events.ndjson --expected-source-sha256 <raw-index source_sha256> --published evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage/work__openlineage-events.ndjson --spec $HOME/.cache/gap-wave2-20260923/identity-provenance/spec/OpenLineage-2-0-2.json   (fix round 3)",
+    "bash blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_verify_fixround4.sh   (fix round 4, L5.3: the same verifier, hardened, on the same original, published file and schema; output in $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/lineage-verify-fix4)"
+  ],
+  "results": {
+    "C5.1_events_readback_listing": {
+      "rows": [
+        [
+          "01a0ccbf",
+          "nanosecond-replay.materialize",
+          "START"
+        ],
+        [
+          "01a0ccbf",
+          "nanosecond-replay.materialize",
+          "COMPLETE"
+        ],
+        [
+          "01a0ccbf",
+          "nanosecond-replay.select",
+          "START"
+        ],
+        [
+          "01a0ccbf",
+          "nanosecond-replay.select",
+          "COMPLETE"
+        ]
+      ],
+      "note": "(runId[:8], job, eventType) as printed by the readback; both runs share the 8-character prefix, so this listing cannot distinguish them. See L5.1_run_id_structure."
+    },
+    "L5.1_run_id_structure": {
+      "original_sha256": "6356b077266baba83804538bfadab91a5a467e31e170c292b4c6d5c9aca07d9f",
+      "original_sha256_matches_raw_index_source": true,
+      "events": [
+        {
+          "job": "nanosecond-replay.materialize",
+          "eventType": "START",
+          "run_id_published_placeholder": "uuid-redacted-01"
+        },
+        {
+          "job": "nanosecond-replay.materialize",
+          "eventType": "COMPLETE",
+          "run_id_published_placeholder": "uuid-redacted-01"
+        },
+        {
+          "job": "nanosecond-replay.select",
+          "eventType": "START",
+          "run_id_published_placeholder": "uuid-redacted-02"
+        },
+        {
+          "job": "nanosecond-replay.select",
+          "eventType": "COMPLETE",
+          "run_id_published_placeholder": "uuid-redacted-02"
+        }
+      ],
+      "per_job": {
+        "nanosecond-replay.materialize": {
+          "run_id_published_placeholder": "uuid-redacted-01",
+          "start_complete_same_run_id": true
+        },
+        "nanosecond-replay.select": {
+          "run_id_published_placeholder": "uuid-redacted-02",
+          "start_complete_same_run_id": true
+        }
+      },
+      "two_distinct_run_ids": true,
+      "problems": [],
+      "detector_control": {
+        "mutation": "nanosecond-replay.select COMPLETE runId replaced by the nanosecond-replay.materialize runId",
+        "problems": [
+          "nanosecond-replay.select: START and COMPLETE runIds differ"
+        ],
+        "flagged": true
+      },
+      "passed": true
+    },
+    "L5.3_publication_alignment_fixround4": {
+      "checks": "equal event counts; per-position job name and eventType; placeholder format; one-to-one runId mapping both ways",
+      "published_problems": [],
+      "detector_controls": {
+        "select_complete_removed": {
+          "problems": [
+            "event count differs: original 4, published 3"
+          ],
+          "flagged": true
+        },
+        "all_runids_collapsed": {
+          "problems": [
+            "placeholder uuid-redacted-01 stands for several original runIds"
+          ],
+          "flagged": true
+        },
+        "job_names_swapped_across_jobs": {
+          "problems": [
+            "line 1: job/eventType differ after publication",
+            "line 3: job/eventType differ after publication"
+          ],
+          "flagged": true
+        }
+      },
+      "passed": true,
+      "L5.1_passed_on_rerun": true,
+      "L5.2_passed_on_rerun": true,
+      "published_sha256": "e89b90f6795aff1a60f9984a7cd049a4b8dc324eae8cba278a2bfe020b35d5da"
+    },
+    "L5.2_published_file_schema_validation": {
+      "as_preregistered": "unmet: the published file cannot carry valid-format placeholder UUIDs because scripts/validate.py rejects every UUID-shaped string in published files (see the 13:27:46Z amendment)",
+      "published_sha256": "e89b90f6795aff1a60f9984a7cd049a4b8dc324eae8cba278a2bfe020b35d5da",
+      "spec_id": "https://openlineage.io/spec/2-0-2/OpenLineage.json",
+      "spec_sha256": "69f68bee00b9beac88a87059c0102410e7bb05f3f43c46d02a0409831eceb0d2",
+      "format_checker": "jsonschema.FormatChecker()",
+      "jsonschema_version": "4.26.0",
+      "published_events": 4,
+      "runids_mapped_from_placeholder": 4,
+      "mapping": "only run.runId values matching ^uuid-redacted-NN$ -> 00000000-0000-4000-8000-0000000000NN, in memory",
+      "published_errors_after_runid_mapping": [],
+      "detector_control": {
+        "input": "the published bytes unmapped",
+        "format_errors": [
+          "'uuid-redacted-01' is not a 'uuid'",
+          "'uuid-redacted-02' is not a 'uuid'"
+        ],
+        "error_count": 8,
+        "flagged": true
+      },
+      "passed": true
+    },
+    "event_file_sha256": "6356b077266baba83804538bfadab91a5a467e31e170c292b4c6d5c9aca07d9f",
+    "C5.2_consistency_problems": [],
+    "original_C5.2_as_written": "unmet for the materialize START event: its output dataset has facets {} (raw/lineage/work__openlineage-events.ndjson, line 1)",
+    "F5.3_detector_controls": {
+      "a_tampered_version_and_cutoff": {
+        "flagged": true,
+        "problems": [
+          "select COMPLETE inputs materialized: version 0000000000000000000000000000000000000000000000000000000000000000 != expected",
+          "select COMPLETE: cutoff facet 2025-02-01T21:00:00.000000200Z/1 differs"
+        ]
+      },
+      "b_removed_materialize_complete_output": {
+        "flagged": true,
+        "problems": [
+          "materialize COMPLETE outputs materialized: dataset missing"
+        ]
+      },
+      "c_removed_select_start_input": {
+        "flagged": true,
+        "problems": [
+          "select START inputs materialized: dataset missing"
+        ]
+      },
+      "d_renamed_materialize_complete_output": {
+        "flagged": true,
+        "problems": [
+          "materialize COMPLETE outputs materialized: dataset missing"
+        ]
+      }
+    },
+    "F5.3_all_flagged": true,
+    "schema_validation": {
+      "spec_id": "https://openlineage.io/spec/2-0-2/OpenLineage.json",
+      "spec_sha256": "69f68bee00b9beac88a87059c0102410e7bb05f3f43c46d02a0409831eceb0d2",
+      "all_valid": true,
+      "detector_control_flagged": true,
+      "detector_control_errors": [
+        "{'eventType': 'START', 'inputs': [{'facets': {'version': {'_producer': 'https://github.com/OpenLineage/OpenLineage/tree/1.53.0/client/python', '_schemaURL': 'ht",
+        "'eventTime' is a required property",
+        "'not-a-uuid' is not a 'uuid'"
+      ]
+    },
+    "C5.3_mlflow_inputs": {
+      "materialize": [
+        {
+          "digest": "c36188b4",
+          "name": "fixture.observations",
+          "source": "$HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/nanosecond-replay/fixture.json",
+          "source_type": "local",
+          "tags": {
+            "file_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+            "mlflow.data.context": "materialize_source"
+          }
+        },
+        {
+          "digest": "7526bc37",
+          "name": "fixture.universe",
+          "source": "$HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/nanosecond-replay/fixture.json",
+          "source_type": "local",
+          "tags": {
+            "file_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+            "mlflow.data.context": "materialize_source"
+          }
+        }
+      ],
+      "select": [
+        {
+          "digest": "7332d160",
+          "name": "observations",
+          "source": "$HOME/.cache/gap-wave2-20260923/identity-provenance/runs/lineage-fix-20260923T053153Z/work/materialized/observations.parquet",
+          "source_type": "local",
+          "tags": {
+            "file_sha256": "0cf15579cd80a02b1c5411bdda50483808e2b2948126da659ecca596bb3821f3",
+            "mlflow.data.context": "replay_select_input",
+            "snapshot_sha256": "ddb645851f42db581c912956a4d708498bb3a041218ac2dbd2f963c84a025ee2"
+          }
+        },
+        {
+          "digest": "7252fbe9",
+          "name": "universe",
+          "source": "$HOME/.cache/gap-wave2-20260923/identity-provenance/runs/lineage-fix-20260923T053153Z/work/materialized/universe.parquet",
+          "source_type": "local",
+          "tags": {
+            "file_sha256": "b0785843154bdabb234de6ef9b105ee937c40703d4aa87343b7dfae9b07a2c2c",
+            "mlflow.data.context": "replay_select_input",
+            "snapshot_sha256": "ddb645851f42db581c912956a4d708498bb3a041218ac2dbd2f963c84a025ee2"
+          }
+        }
+      ]
+    },
+    "C5.3_mlflow_tags": {
+      "materialize": {
+        "knowledge_horizon": "2025-02-01T21:00:00.000000201Z",
+        "knowledge_horizon_ns": "1738443600000000201",
+        "openlineage.run_id": "uuid-redacted-01",
+        "snapshot_sha256": "ddb645851f42db581c912956a4d708498bb3a041218ac2dbd2f963c84a025ee2"
+      },
+      "select": {
+        "knowledge_cutoff": "2025-02-01T21:00:00.000000200Z",
+        "knowledge_cutoff_ns": "1738443600000000200",
+        "openlineage.materialize_run_id": "uuid-redacted-01",
+        "openlineage.select_run_id": "uuid-redacted-02",
+        "snapshot_sha256": "ddb645851f42db581c912956a4d708498bb3a041218ac2dbd2f963c84a025ee2"
+      }
+    },
+    "C5.3_mlflow_problems": [],
+    "digest_attempts": {
+      "observations": "project sha256 refused as digest: MlflowException: 'digest' exceeds the maximum length of 36 characters",
+      "universe": "project sha256 refused as digest: MlflowException: 'digest' exceeds the maximum length of 36 characters"
+    },
+    "C5.4_fresh_process_readback": "readback ran in a new process under unshare -rn; readback_exit=0, all_ok true",
+    "network": "inside the namespace the probe printed network_blocked OSError; outside it (control) it printed network_reachable",
+    "snapshot_sha256": "ddb645851f42db581c912956a4d708498bb3a041218ac2dbd2f963c84a025ee2",
+    "cutoff": [
+      "2025-02-01T21:00:00.000000200Z",
+      "1738443600000000200"
+    ],
+    "horizon": [
+      "2025-02-01T21:00:00.000000201Z",
+      "1738443600000000201"
+    ],
+    "versions": {
+      "duckdb": "1.5.5",
+      "mlflow": "3.16.1",
+      "openlineage-python": "1.53.0",
+      "pandas": "3.0.6"
+    }
+  },
+  "outcome": "settled",
+  "outcome_reason": "Fix round 4 reran the hardened verifier: the published event file has the same event count, job names and eventTypes as the original, placeholder-format runIds and a one-to-one runId mapping; dropped-event, collapsed-runId and swapped-job controls were each flagged, and L5.1/L5.2 passed again. The swapped-job control deviates from preregistered L5.3b(iii) (first two events, which share one job); the deviation was written at 15:16:43.905Z, after the preregistration and in the same command as the only run (see the amendments). Fix round 3: from the original event file, START and COMPLETE of the materialize run share one runId, START and COMPLETE of the select run share another, and the two differ (a runId-swap control was flagged); the published, redacted file validates against the 2-0-2 RunEvent schema with FormatChecker once its four 'uuid-redacted-NN' runIds are mapped to valid-format UUIDs, and the unmapped published file fails on format (detector control). L5.2 as preregistered is unmet by a repository constraint: published files may not carry UUID-shaped strings. Settled under the fix-round rule, which is lifecycle-aware; the original C5.2 as written was unmet for the materialize START event and is recorded above. openlineage-python 1.53.0 FileTransport persisted START and COMPLETE events for a replay.py materialize run and its select run. The events carry DatasetVersionDatasetFacet (snapshot_sha256, fixture sha256), per-file content-hash facets and knowledge-cutoff/horizon run facets. A fresh process read them back with 0 problems under the presence-requiring checker, and all 4 events validate against the OpenLineage 2-0-2 core schema. All five detector controls were flagged: tampered version/cutoff, removed materialize COMPLETE output, removed select START input, renamed output, and a schema control with missing eventTime and a bad runId. MLflow 3.16.1 on a local SQLite store logged the materialize run and the select run with mlflow.log_input bindings. The bindings read back through MlflowClient.get_run with matching names, digests, sources, file and snapshot sha256 tags and OpenLineage run-id tags.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "The version, file-hash and cutoff facets beyond DatasetVersionDatasetFacet are project-defined custom facets (g2_fileHashes, g2_knowledgeCutoff). OpenLineage has no standard knowledge-cutoff facet. Schema validation covers the core RunEvent envelope, not the custom facet schemas (their _schemaURL is not published).",
+    "MLflow dataset digests are limited to 36 characters, so the project's sha256 sits in dataset-input tags, not the digest. MLflow's digest is its own 8-character DataFrame hash.",
+    "FileTransport only; no Marquez or other lineage backend and no HTTP transport. Local SQLite MLflow store; no tracking server.",
+    "Synthetic replay fixture. One materialize run and one select run.",
+    "The published event file carries 'uuid-redacted-NN' placeholders, not the real runIds, so as published it does not meet format: uuid; it validates once only those runIds are mapped to valid-format UUIDs. The L5.1 runId structure was derived from the unpublished original, whose sha256 equals the raw-index source_sha256; the redaction is one-for-one, so equality relations hold in the published file too."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage/run.log",
+      "sha256": "6f2bae142de8b1a7a23d1816c0ab1c6f15a11dda2c4dfb81785a16e7d1f3f4f4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage/work__emit.json",
+      "sha256": "7c381170564f18dacdf0f4d1e185d840b4d9734d2941867ec07e66c37489c35c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage/work__readback.json",
+      "sha256": "4f9fec3f46248a951309f6909bcf13d3dcf748c68ddab85928aafeb0444e6a49"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage/work__openlineage-events.ndjson",
+      "sha256": "e89b90f6795aff1a60f9984a7cd049a4b8dc324eae8cba278a2bfe020b35d5da"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage-round1/run.log",
+      "sha256": "277953c845ca1700faa57084f5cfbe58abad7fb0c56967e4ab0bfe96320fd7ab"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage-round1/attempt1-run.log",
+      "sha256": "fc2e16bc3a934927e2dc61c99df374860c59003c1c31398fd4b3cde48d1aca95"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage-round1/attempt2-run.log",
+      "sha256": "22a02e8a96eda3ecb0ca50cbf1e612520c8ab3c4a962c5644bcb3dad4d438713"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage-round1/netprobe-control.log",
+      "sha256": "e512630a594c30c0bdb835e1b9570780089e3a7653302cc0f7afb49d8a5a11aa"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage-round1/work__emit.json",
+      "sha256": "80d21cd7b60824ddc7ebed58e06a7dd590fe2625d60852178fbb22e95981aebb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage-round1/work__readback.json",
+      "sha256": "d89f3993a1b98770af6e3ed64b2b5710145021c8e2ac275dcb024d4720b358e9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage-round1/work__openlineage-events.ndjson",
+      "sha256": "2067bccc68d54be0f233be9b641aa1df5982736fce1921fc39aa278b85021318"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/install/OpenLineage-2-0-2.json",
+      "sha256": "69f68bee00b9beac88a87059c0102410e7bb05f3f43c46d02a0409831eceb0d2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/install/venv-mlflow.freeze.txt",
+      "sha256": "497f1bc4be35e2cefd5ad3ec6bec9a265034ff54ee437b87680e6870518b094b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage-fixround3/run.log",
+      "sha256": "35bdefff2551cb2eea6394db3b2590b9c706484bb22b5a0a692d03857db2c626"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage-fixround3/verify.json",
+      "sha256": "10b8e01f5e55b26e01b8197de0a5fc06a8d0ea92e3f3ef462b834685e5563b5c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage-fixround4/run.log",
+      "sha256": "b28aa3b7cfd0a57a370b0324ee494f9e588776e7a9ebfe702de2471b8c1cb3d4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage-fixround4/verify.json",
+      "sha256": "a8dad381c07d3c310d938e76ab2e4e10254ebd28c274c08344e7a1914b6ba16a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/fixround5-timeline/timeline.json",
+      "sha256": "7b13f708f4f6638ba6989b7d981c987b98bc8c2f4734c5014a583879072c2051"
+    }
+  ],
+  "helpers": [
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_lineage_mlflow.sh",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/lineage_mlflow.py",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/verify_lineage_fixround3.py",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround3.json",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_verify_fixround4.sh",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround4.json",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/extract_fixround4_timeline.py"
+  ],
+  "checked_at": "2026-09-23T15:17:32Z",
+  "layer": "us-equities/identity-provenance",
+  "crosswalk": "main 92bb279, crosswalk PR #85"
+}

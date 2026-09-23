@@ -1,0 +1,82 @@
+{
+ "sources": {
+  "alpaca_customer_agreement": {
+   "url": "https://files.alpaca.markets/disclosures/library/AcctAppMarginAndCustAgmt.pdf",
+   "raw_sha256": "d086d69f063bba1e9693fffbb3185c4469b24b47bda79f587053bd771580fcf6",
+   "raw_bytes": 478094,
+   "clauses": {
+    "I also agree to the terms of the NASDAQ OMX Global Subscriber Agreement": "I also agree to the terms of the NASDAQ OMX Global Subscriber Agreement and AGREEMENT FOR MARKET DATA DISPLAY SERVICES if I am provided access to such data, which are also incorporated by reference and constitute part of this Agreement. I understand that the Alpaca trading platform (the “Platform”) is operated by each of Alpaca Securities LLC and Alpaca Crypto LLC (“Alpaca Crypto”) (each, an “Alpaca Entity”). The Platform is accessed via website (the “Website”) and mobile application (the “App”). In order to access",
+    "30. Use of Market Data": "30. Use of Market Data and Waiver or Limitation of Liability. I understand that each participating national securities exchange or association asserts a proprietary interest in all of the market data it furnishes to parties that disseminate said data. I understand that neither Alpaca nor any participating national securities exchange or association nor any supplier of market data guarantees the timeliness, sequence, accuracy, completeness, reliability or content of market information, or messages disseminated to or",
+    "AlpacaDB, Inc. provides market data to non-professional": "AlpacaDB, Inc. provides market data to non-professional Alpaca customers. The terms “non-professional” and “nonprofessional” are defined within both the NASDAQ OMX Global Subscriber Agreement as well as the NYSE Market Data Display Services Agreement, and are incorporated by reference. I agree that My use of the App, the Website, the API, or any other Alpaca service is at My sole risk. I agree not to reproduce, distribute, sell or commercially exploit the market data in any manner without written consent from Alpac",
+    "I agree not to reproduce, distribute, sell or commercially exploit the market data": "I agree not to reproduce, distribute, sell or commercially exploit the market data in any manner without written consent from Alpaca. The Alpaca service is provided on an “as is,” “as available” basis without warranties of any kind, either express or implied, including, without limitation, those of merchantability and fitness for a particular purpose, other than those warranties which are implied by and incapable of exclusion, restriction or modification under the laws applicable to this Agreement. NEITHER I NOR AN",
+    "V26.2026.07": "V26.2026.07 INTO THIS AGREEMENT, I ACKNOWLEDGE RECEIPT OF THE ALPACA PRIVACY STATEMENT. I UNDERSTAND THAT THIS AGREEMENT MAY BE AMENDED FROM TIME TO TIME BY ALPACA, WITH REVISED TERMS POSTED ON THE ALPACA WEBSITE. I AGREE TO CHECK FOR UPDATES TO THIS AGREEMENT. I UNDERSTAND THAT BY CONTINUING TO MAINTAIN MY SECURITIES BROKERAGE ACCOUNT WITHOUT OBJECTING TO ANY REVISED TERMS OF THIS AGREEMENT, I AM ACCEPTING THE TERMS OF THE REVISED AGREEMENT AND I WILL BE LEGALLY BOUND BY ITS TERMS AND CONDITIONS. IF I REQUEST OTHE"
+   },
+   "storage_terms_found": [
+    "retain",
+    "storage",
+    "stored"
+   ]
+  },
+  "alpaca_terms_and_conditions": {
+   "url": "https://files.alpaca.markets/disclosures/library/TermsAndConditions.pdf",
+   "raw_sha256": "2dc774d4aeeafbe4c7f0565e7842d932bc8bc10488af805fce43b8734e7b9859",
+   "raw_bytes": 27092,
+   "clauses": {
+    "Content is provided exclusively for personal and noncommercial access and use": "Content is provided exclusively for personal and noncommercial access and use. No part of the Service or Content may be copied, reproduced, republished, uploaded, posted, publicly displayed, encoded, translated, transmitted or distributed in any way (including “mirroring”) to any other computer, server, web site or other medium for publication or distribution or for any commercial enterprise, without Alpaca’s express prior written consent. You acknowledge that Alpaca is the sole owner of Alpaca Marks and that other",
+    "Alpaca offers a ‘Basic’ market data plan": "Alpaca offers a ‘Basic’ market data plan, which is made available at no cost, as well as a ‘Pro’ market data plan, that is made available on a paid subscription basis (a “Paid Subscription”). By selecting the ‘Pro’ market data plan during the user account creation/onboarding through Alpaca’s Services, you agree to: (i) the NASDAQ OMX Global Subscriber Agreement, or AGREEMENT FOR MARKET DATA DISPLAY SERVICES, each to the extent applicable; and (ii) to allow Alpaca to charge your selected payment method for your Paid"
+   },
+   "storage_terms_found": [
+    "mirroring",
+    "retention",
+    "store"
+   ]
+  },
+  "nyse_market_data_display_services_agreement": {
+   "url": "https://files.alpaca.markets/disclosures/library/NYSE+Market+Data+Display+Services+Agreement.pdf",
+   "raw_sha256": "d5a672e2895c69398b3064e16719354940aa6f585f3c4f22e058ff0a778933e2",
+   "raw_bytes": 175675,
+   "clauses": {
+    "5. PERMITTED USE": "5. PERMITTED USE – Subscriber shall not furnish Market Data to any other person or entity. If Subscriber receives Market Data other than as a Nonprofessional Subscriber, it shall use Market Data only for its individual use in its business. 6. DISSEMINATION DISCONTINUANCE OR MODIFICATION – Subscriber understands and acknowledge s that, at any time, the Authorizing SROs may discontinue disseminating any category of Market Data, may change or eliminate any transmission method and may change transmission speeds or othe",
+    "NONPROFESSIONAL SUBSCRIBER DEFINITION": "NONPROFESSIONAL SUBSCRIBER DEFINITION -\"Nonprofessional Subscriber\" means any natural person who receives mark et data solely for his/her personal, non - business use and who is not a “Securities Professional.” A “Securities Professional” includes an individual who, if working in the United States, is: (a) registered or qualified with the Securities and Exchange Commis sion (the \"SEC\"), the Commodities Futures Trading Commission, any state securities agency, any securities exchange or association, or any commoditie"
+   },
+   "storage_terms_found": []
+  },
+  "nasdaq_global_subscriber_agreement": {
+   "url": "https://files.alpaca.markets/disclosures/library/NASDAQ+OMX+Global+Subscriber+Agreement.pdf",
+   "raw_sha256": "54dc85b3e4a2a4d023a1de66373f0221f868ecfa8f7638ef122dade7e46a3b53",
+   "raw_bytes": 427324,
+   "clauses": {
+    "Information is licensed only for personal use": "Information is licensed only for personal use. By representing to Distributor that Subscriber is a Non - Professional or Private Subscriber, or by continuing to receive the Information at a Non-Professional or Private Subscriber rate, Subscriber is affirming to Distributor and to NASDAQ OMX that Subscriber meets the definition of Non -Professional or Business Subscriber as set forth in Section 12 of this Agreement. A Non -Professional or Private Subscriber shall comply promptly with any reasonable request from NASD",
+    "Subscriber shall take reasonable security precautions": "Subscriber shall take reasonable security precautions to prevent unauthorized Persons from gaining access to the Information. a. Non-Professional or Private Subscriber — For Non-Professional or Private Subscriber, the Information is licensed only for personal use. By representing to Distributor that Subscriber is a Non - Professional or Private Subscriber, or by continuing to receive the Information at a Non-Professional or Private Subscriber rate, Subscriber is affirming to Distributor and to NASDAQ OMX that Subsc"
+   },
+   "storage_terms_found": []
+  },
+  "sec_privacy_website_dissemination": {
+   "url": "http://web.archive.org/web/20260919152816id_/https://www.sec.gov/about/privacy-information",
+   "raw_sha256": "752ce594f103b1b7b13c948535de24130bf348859f010ccbd22708d8cd59e9c7",
+   "raw_bytes": 90345,
+   "clauses": {
+    "Information presented on sec.gov is considered public information": "Information presented on sec.gov is considered public information and may be copied or further distributed by users of the web site without the SEC’s permission. Please consider appropriate citation to the SEC as the source. Videos, social media posts, and other educational materials on sec.gov are printed, published, or produced and disseminated at U.S. taxpayer expense. Please do not use the SEC seal or any of the other logos or artwork from this site. In addition, please be advised that “SEC,” the EDGAR logo, an",
+    "Current guidelines limit users to a total of no more than 10 requests per second": "Current guidelines limit users to a total of no more than 10 requests per second, regardless of the number of machines used to submit requests. If a user or application submits more than 10 requests per second, further requests from the IP address(es) may be limited for a brief period. Once the rate of requests has dropped below the threshold for 10 minutes, the user may resume accessing content on SEC.gov. This SEC practice is designed to limit excessive automated searches on SEC.gov and is not intended or expecte"
+   },
+   "storage_terms_found": [
+    "store",
+    "stored"
+   ]
+  },
+  "sec_accessing_edgar_data": {
+   "url": "http://web.archive.org/web/20260821173111id_/https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data",
+   "raw_sha256": "8d6378b888c1de4708d36b0b808a053fe2cfe2fa6c43d3b9f1c7be5eb87278d8",
+   "raw_bytes": 79786,
+   "clauses": {
+    "Anyone can access and download this information for free": "Anyone can access and download this information for free or query it through a variety of EDGAR public searches . Fair access Current max request rate: 10 requests/second. To ensure everyone has equitable access to SEC EDGAR content, please use efficient scripting. Download only what you need and please moderate requests to minimize server load. SEC reserves the right to limit request rates to preserve fair access for all users. See our Internet Security Policy for our current rate request limit . The SEC does not ",
+    "Current max request rate: 10 requests/second": "Current max request rate: 10 requests/second. To ensure everyone has equitable access to SEC EDGAR content, please use efficient scripting. Download only what you need and please moderate requests to minimize server load. SEC reserves the right to limit request rates to preserve fair access for all users. See our Internet Security Policy for our current rate request limit . The SEC does not allow botnets or automated tools to crawl the site. Any request that has been identified as part of a botnet or an automated t",
+    "Please declare your user agent in request headers": "Please declare your user agent in request headers: Sample Declared Bot Request Headers: User-Agent: Sample Company Name AdminContact@<sample company domain>.com Accept-Encoding: gzip, deflate Host: www.sec.gov We do not offer technical support for developing or debugging scripted processes. How far back does EDGAR data go? EDGAR started in 1994/1995 . Paper copies of filing documents prior to 1994 may be available by filing a Freedom of Information Act request. See How To Access Or Request Records Not Accessible Vi"
+   },
+   "storage_terms_found": [
+    "archive"
+   ]
+  }
+ },
+ "missing_anchors": []
+}

@@ -1,0 +1,67 @@
+{
+  "mode": "container",
+  "pid": 515170,
+  "started_at": 1790175764.609219,
+  "conversation_class": "RemoteConversation",
+  "event_types": [
+    "ConversationStateUpdateEvent",
+    "SystemPromptEvent",
+    "MessageEvent",
+    "ConversationStateUpdateEvent",
+    "ConversationStateUpdateEvent",
+    "ConversationStateUpdateEvent",
+    "ConversationStateUpdateEvent",
+    "ActionEvent",
+    "ObservationEvent",
+    "ConversationStateUpdateEvent",
+    "ActionEvent",
+    "ObservationEvent",
+    "ConversationStateUpdateEvent",
+    "ActionEvent",
+    "ObservationEvent",
+    "ConversationStateUpdateEvent",
+    "ConversationStateUpdateEvent"
+  ],
+  "actions": [
+    "FileEditorAction",
+    "TerminalAction",
+    "FinishAction"
+  ],
+  "tool_names": [
+    "file_editor",
+    "terminal",
+    "finish"
+  ],
+  "execution_status": "ConversationExecutionStatus.FINISHED",
+  "sdk_metrics": {
+    "accumulated_token_usage": {
+      "model": "default",
+      "prompt_tokens": 18117,
+      "completion_tokens": 162,
+      "cache_read_tokens": 0,
+      "cache_write_tokens": 0,
+      "reasoning_tokens": 0,
+      "context_window": 0,
+      "per_turn_token": 6095,
+      "response_id": ""
+    },
+    "accumulated_cost": 0.0
+  },
+  "workspace_cat": {
+    "exit_code": 0,
+    "stdout_has_token": true
+  },
+  "status": "ok",
+  "provider_delta": {
+    "vllm:prompt_tokens_total": 18117.0,
+    "vllm:generation_tokens_total": 162.0,
+    "finished_by_reason": {
+      "stop": 4.0
+    },
+    "seconds": 12.628
+  },
+  "proof_file_exists": null,
+  "proof_file_has_token": true,
+  "token_in_prompt_only": true,
+  "finished_at": 1790175777.2516613
+}

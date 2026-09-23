@@ -1,0 +1,236 @@
+{
+ "id": "gap-wave2-20260923-foundation-mcp-surfaces-5",
+ "gap_index": 5,
+ "gap_text_sha256": "ad43157d0b1d47c7ad130995ba99f5b9ea9f1258b5b7bd48e47f53e6625f0976",
+ "gap_text": "The requirement's configure-without-registry-adoption part (mcp-surface-policy) rests on source review only. No new execution was run for this taxonomy layer.",
+ "next_check": "Run `claude mcp list` and `codex mcp list` in the project and a scratch project to show which servers load from project configuration without any registry install, and record the results.",
+ "preregistration": {
+  "written_at": "2026-09-23T03:54:03Z",
+  "expectation": "With a temp CLAUDE_CONFIG_DIR/HOME/CODEX_HOME and no network namespace access, `claude mcp list` lists the project .mcp.json servers and `codex mcp list` lists the project .codex/config.toml servers (trusted in the temp CODEX_HOME), and in an empty scratch project neither lists any server; a scratch project with its own .mcp.json/.codex/config.toml lists exactly those servers. No registry fetch is possible (no network in the namespace).",
+  "criteria": "settled if both CLIs were run in the project and in a scratch project and the listings match the project files with no registry install step; advanced if an arm could only run on a copy of the project configuration.",
+  "source": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/preregistrations.json",
+  "addenda": [
+   {
+    "written_at": "2026-09-23T04:23:01Z",
+    "label": "added arm, written after the first gap-5 run (04:22Z) and before this arm ran",
+    "expectation": "Seeding only local client state (the temp $CLAUDE_CONFIG_DIR/.claude.json project entry with hasTrustDialogAccepted true) makes claude health-check the project servers: in the no-network namespace ai-memory (HTTP, live port) must fail to connect, the scratch jcodemunch stdio server should connect. No registry or network is involved.",
+    "criteria": "Record per-server status lines for the approved project and approved scratch-config arms."
+   },
+   {
+    "written_at": "2026-09-23T13:07:02Z",
+    "label": "FIX ROUND 3, written after the round-4 independent Opus review (raw/review-opus-round4.json) and before the chrishayuk/mcp-cli clone and review",
+    "expectation": "chrishayuk/mcp-cli (a Python CLI chat/command client) spawns stdio servers per invocation and has no persistent bridge daemon, so it has no daemon-recovery role and is rejected for the gap-7 concrete gap. Source citations at a pinned commit will show how it launches servers and whether any persistent/reconnect state exists.",
+    "criteria": "Gap 7 stays settled only if chrishayuk/mcp-cli is reviewed at a pinned commit with verbatim citations and a disposition, and the receipt's disposition arm lists every section-rule entry (wong2 included with its role). If its source shows a persistent daemon with automatic stale-state recovery, it becomes keep-but-compare instead. Gaps 1, 3, 5: presentation/sanitization fixes only; outcomes unchanged unless the regenerated receipts contradict them. A committed verify_receipts.py recomputes sha256 of each g2-units.json gap text and checks it, the required receipt fields, and results.json equality."
+   }
+  ]
+ },
+ "checked_at": "2026-09-23T13:09:10Z",
+ "arms": [
+  {
+   "arm": "claude mcp list in the project (agent-lab, read-only mount, no network)",
+   "status": "executed",
+   "detail": {
+    "exit": 0,
+    "lines": [
+     "serena: $HOME/.local/share/codex-ecosystem/bin/serena-context start-mcp-server --transport stdio --project-from-cwd --context claude-code --enable-web-dashboard true --open-web-dashboard false --enable-gui-log-window false - ⏸ Pending approval (run `claude` to approve)",
+     "ai-memory: http://127.0.0.1:49374/mcp (HTTP) - ⏸ Pending approval (run `claude` to approve)",
+     "socraticode: $HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js - ⏸ Pending approval (run `claude` to approve)"
+    ]
+   }
+  },
+  {
+   "arm": "codex mcp list in the project (trusted in a temp CODEX_HOME)",
+   "status": "executed",
+   "detail": {
+    "exit": 0,
+    "servers": [
+     "ai-memory",
+     "context-mode",
+     "jcodemunch",
+     "serena",
+     "socraticode"
+    ]
+   }
+  },
+  {
+   "arm": "both CLIs in an empty scratch project",
+   "status": "executed",
+   "detail": {
+    "scratch-empty/claude": {
+     "exit": 0,
+     "lines": [
+      "No MCP servers configured. Use `claude mcp add` to add a server."
+     ]
+    },
+    "scratch-empty/codex": {
+     "exit": 0,
+     "servers": []
+    }
+   }
+  },
+  {
+   "arm": "both CLIs in a scratch project with its own .mcp.json / .codex/config.toml",
+   "status": "executed",
+   "detail": {
+    "scratch-config/claude": {
+     "exit": 0,
+     "lines": [
+      "scratch-jcodemunch: $HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp  - ⏸ Pending approval (run `claude` to approve)"
+     ]
+    },
+    "scratch-config/codex": {
+     "exit": 0,
+     "servers": [
+      "scratch-jcodemunch"
+     ]
+    },
+    "scratch-config-approved/claude": {
+     "exit": 0,
+     "lines": [
+      "scratch-jcodemunch: $HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp  - ✔ Connected"
+     ]
+    }
+   }
+  },
+  {
+   "arm": "controls: codex without project trust; claude with local approval state seeded (addendum 04:23:01Z)",
+   "status": "executed",
+   "detail": {
+    "project-untrusted/codex": {
+     "exit": 0,
+     "servers": []
+    },
+    "project-approved/claude": {
+     "exit": 0,
+     "lines": [
+      "serena: $HOME/.local/share/codex-ecosystem/bin/serena-context start-mcp-server --transport stdio --project-from-cwd --context claude-code --enable-web-dashboard true --open-web-dashboard false --enable-gui-log-window false - ✘ Failed to connect — CONNECTION_CLOSED: Connection closed",
+      "ai-memory: http://127.0.0.1:49374/mcp (HTTP) - ✘ Failed to connect — ENETUNREACH: ENETUNREACH: Was there a typo in the url or port?",
+      "socraticode: $HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js - ✔ Connected"
+     ]
+    },
+    "scratch-config-approved/claude": {
+     "exit": 0,
+     "lines": [
+      "scratch-jcodemunch: $HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp  - ✔ Connected"
+     ]
+    }
+   }
+  }
+ ],
+ "commands": [
+  "bash blueprints/gap-wave2-20260923/foundation__mcp-surfaces/run_mcp_list.sh evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw",
+  "ONLY_APPROVED=1 bash blueprints/gap-wave2-20260923/foundation__mcp-surfaces/run_mcp_list.sh evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw",
+  "(each) unshare -rnm bash -c 'mount --rbind $HOME $HOME && mount -o remount,bind,ro $HOME && ... && env -i HOME=<temp> CLAUDE_CONFIG_DIR=<temp> CODEX_HOME=<temp> ... claude mcp list | codex mcp list --json'"
+ ],
+ "results": [
+  "project/claude: {'exit': 0, 'lines': ['serena: $HOME/.local/share/codex-ecosystem/bin/serena-context start-mcp-server --transport stdio --project-from-cwd --context claude-code --enable-web-dashboard true --open-web-dashboard false --enable-gui-log-window false - ⏸ Pending approval (run `claude` to approve)', 'ai-memory: http://127.0.0.1:49374/mcp (HTTP) - ⏸ Pending approval (run `claude` to approve)', 'socraticode: $HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js - ⏸ Pending approval (run `claude` to approve)']}",
+  "scratch-empty/claude: {'exit': 0, 'lines': ['No MCP servers configured. Use `claude mcp add` to add a server.']}",
+  "scratch-config/claude: {'exit': 0, 'lines': ['scratch-jcodemunch: $HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp  - ⏸ Pending approval (run `claude` to approve)']}",
+  "project/codex: {'exit': 0, 'servers': ['ai-memory', 'context-mode', 'jcodemunch', 'serena', 'socraticode']}",
+  "scratch-empty/codex: {'exit': 0, 'servers': []}",
+  "scratch-config/codex: {'exit': 0, 'servers': ['scratch-jcodemunch']}",
+  "project-untrusted/codex: {'exit': 0, 'servers': []}",
+  "project-approved/claude: {'exit': 0, 'lines': ['serena: $HOME/.local/share/codex-ecosystem/bin/serena-context start-mcp-server --transport stdio --project-from-cwd --context claude-code --enable-web-dashboard true --open-web-dashboard false --enable-gui-log-window false - ✘ Failed to connect — CONNECTION_CLOSED: Connection closed', 'ai-memory: http://127.0.0.1:49374/mcp (HTTP) - ✘ Failed to connect — ENETUNREACH: ENETUNREACH: Was there a typo in the url or port?', 'socraticode: $HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js - ✔ Connected']}",
+  "scratch-config-approved/claude: {'exit': 0, 'lines': ['scratch-jcodemunch: $HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp  - ✔ Connected']}",
+  "temp client homes: T=$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/mcplist-20260923T042241Z T=$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/mcplist-20260923T042313Z (end; empty list = no plugin/marketplace state)"
+ ],
+ "outcome": "settled",
+ "note": "With fresh client homes, no network and a read-only checkout, `codex mcp list` in agent-lab lists exactly the 5 servers of its .codex/config.toml once the project is trusted, and none when it is not. `claude mcp list` lists the 3 .mcp.json servers (pending approval until local approval state exists). With that state, SocratiCode connects and Serena fails (read-only log dir). For ai-memory the client attempted an HTTP connect to the live-service URL in agent-lab's .mcp.json (http://127.0.0.1:49374/mcp); the no-network namespace blocked it before any packet left (ENETUNREACH). Empty scratch projects list nothing; a scratch project with its own files lists and connects its server. No registry, marketplace or plugin state existed or was created.",
+ "evidence_class": "native_proven",
+ "limits": [
+  "Temp client homes: the user's real ~/.claude.json and ~/.codex/config.toml (user-scope servers, claude.ai connectors, plugins) were deliberately not read.",
+  "Claude connects project servers only after local approval state; the approved arm seeded that state in the temp CLAUDE_CONFIG_DIR (not a registry action).",
+  "Health checks ran without network, so HTTP servers on the host loopback cannot be reached.",
+  "Disclosure (round-4 review finding 4): the project-approved Claude arm approved ai-memory, so the client attempted a connect to the LIVE ai-memory URL http://127.0.0.1:49374/mcp hard-coded in agent-lab's .mcp.json. No owned ai-memory server was running and AI_MEMORY_SERVER_URL was not set (it would not redirect a hard-coded project URL anyway). The attempt was blocked by the network namespace: `unshare -rnm` gives a fresh net namespace whose loopback is never brought up (run_mcp_list.sh has no `ip link set lo up`), and the client reported ENETUNREACH, i.e. the connect failed with no route before any packet was sent; the live store was not contacted. This meets the no-contact intent but not the letter of the ai-memory rule; any rerun must drop ai-memory from the approval list or point the entry at an owned temp-data-dir server.",
+  "These arms ran at 04:22-04:23Z, before fix round 1. They did not use the tmpfs over $HOME/.mcporter; claude/codex mcp list do not use mcporter, and the network namespace blocked live TCP.",
+  "run_mcp_list.sh was edited after these runs only to replace hard-coded home paths with $HOME (publication rule); command behavior is unchanged. The run-time version is at commit feb2cd1."
+ ],
+ "raw_evidence": [
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-mcp-list-index.tsv",
+   "sha256": "550b9ca35d978ec802578ed09e094aa75fa01425152ecd4f2538f290a5495680"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-project-approved-claude.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-project-approved-claude.stdout.txt",
+   "sha256": "8c5981da6c0a9ca67101483b53f4cb9190e9f66deadf37afbbe58f7c63231572"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-project-claude.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-project-claude.stdout.txt",
+   "sha256": "835d0e64a8900d8dce998fcb2d7b1088579ad638691a8b04e926e49052b5031a"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-project-codex.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-project-codex.stdout.txt",
+   "sha256": "978c47ddd9bc461b218e9fd0324a7c4d0eedfb9b96b1c15bf6603f9a6e7fc72b"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-project-untrusted-codex.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-project-untrusted-codex.stdout.txt",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-registry-state-find.txt",
+   "sha256": "c6663a814582e98247475d43f4592b88f89ffb8c87b4b132eeebb825b93a0322"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-scratch-config-approved-claude.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-scratch-config-approved-claude.stdout.txt",
+   "sha256": "9ed7ba4bb7a102068bc979bd46da0e248a1216f144d536ddf44c36c885fe7605"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-scratch-config-claude.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-scratch-config-claude.stdout.txt",
+   "sha256": "b4f0c4cdf15a6977800dc1192713f551e71044e63269b188cb02d45cba728726"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-scratch-config-codex.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-scratch-config-codex.stdout.txt",
+   "sha256": "4bfe567dbff993931bcf81522cd6020fb2db4b0f6fe4b77dbec3a020c40200cf"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-scratch-empty-claude.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-scratch-empty-claude.stdout.txt",
+   "sha256": "9d1a7c33f8d28d239e37dc3965e51922cf31f13b4db921a190b1193688f6a6ea"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-scratch-empty-codex.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/5-scratch-empty-codex.stdout.txt",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  }
+ ],
+ "helper_scripts": [
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/run_mcp_list.sh",
+   "sha256": "309c4b652b4a1ae1911d272a43781e7c32c59b317af08d366e261fd6811dc72e"
+  }
+ ]
+}

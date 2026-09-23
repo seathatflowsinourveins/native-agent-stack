@@ -1,0 +1,1 @@
+print("EXPECTED_OUTPUT_42")

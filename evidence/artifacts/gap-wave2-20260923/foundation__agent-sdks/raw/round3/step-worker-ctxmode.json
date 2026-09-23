@@ -1,0 +1,24 @@
+{
+  "step": "worker-ctxmode",
+  "started_at": "2026-09-23T13:00:34Z",
+  "slot_checks": [
+    {
+      "at": "2026-09-23T13:00:34Z",
+      "real_codex_exec": 0
+    }
+  ],
+  "run": {
+    "exit_code": 0,
+    "seconds": 32.65,
+    "stdout": "{\"status\": \"completed\", \"model_inference_submitted\": true, \"observation_status\": \"not_configured\"}\n",
+    "stderr_tail": []
+  },
+  "iso_context_mode_files": [
+    "sessions/stats-pid-691.json",
+    "sessions/stats-pid-82.json"
+  ],
+  "iso_sessions": [
+    "rollout-2026-09-23T09-00-40-redacted-id:a65a972a65998324.jsonl"
+  ],
+  "finished_at": "2026-09-23T13:01:07Z"
+}

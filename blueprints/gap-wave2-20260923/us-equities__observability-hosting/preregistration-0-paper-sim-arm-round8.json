@@ -1,0 +1,12 @@
+{
+ "written_at": "2026-09-23T16:25:19Z",
+ "label": "round-8 addendum, written after round 7 (16:22:36Z-16:24:51Z) and before round 8 ran",
+ "round7_observed": [
+  "The count series through the loopback prometheus exporter read 2 and 2 before the kill against 312 MARK lines and 20 intent lines. The exporter did not accumulate the count connector's delta sums; each scrape showed only a recent delta.",
+  "The max_over_time query without a metric name failed ('vector cannot contain metrics with the same labelset') because dropping __name__ merged the two series. The in-script checker then raised on the error response after the first count FAIL, so the later Loki, restic and journal assertions did not print in round 7. Its steps.txt still shows restic, diff and restored-status exits of 0, and 0 processes and 0 listeners left.",
+  "Round 7's paper runtime, sandbox probes and controls, hot backup, and span-name assertions passed."
+ ],
+ "changes": "The count path returns to round 6's delta_to_cumulative + prometheusremotewrite. The file_storage offsets are kept. Collector self-telemetry is set to level detailed on a loopback pull endpoint (127.0.0.1:38888) scraped by Prometheus, so any datapoints the delta_to_cumulative processor drops become visible (the detection method for round 6's undercount). max_over_time is queried per metric name. An independent LogQL metric query, sum(count_over_time(<MARK selector>[1h])), is added and asserted equal to the step-log MARK line count at every stage. The checker handles error responses as FAIL instead of raising.",
+ "expectation": "Every round-7 assertion that ran PASSes again. Loki shows no duplicates after restart or restore, and LogQL count_over_time equals the step log. For the count connector series, exact equality is expected but not certain given round 6. If it diverges, the drop counters, if any, are reported and the metric-path finding stays open as a limit.",
+ "criteria": "As round 7. A FAIL is reported as observed, not hidden."
+}

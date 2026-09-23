@@ -1,0 +1,37 @@
+{
+ "written_at": "2026-09-23T13:01:09Z",
+ "label": "fix-round-3 preregistration, written by a re-dispatched unit after fix round 2 (5dc2706) and before any round-3 fetch",
+ "gaps": {
+  "14": {
+   "expectation": "Internet Archive snapshots of NYSE's own pages captured shortly after each ad-hoc closure announcement (nyse.com/markets/hours-calendars or an NYSE/ICE notice) state that NYSE markets closed on Wednesday 2018-12-05 (President George H.W. Bush national day of mourning) and Thursday 2025-01-09 (President Jimmy Carter national day of mourning).",
+   "criteria": "For each date, a retained archived NYSE/ICE page (snapshot timestamp and sha256 recorded) whose extracted text contains that date together with a closure statement. Detection: the extractor reports every 'Month D, YYYY' date appearing within 300 characters of 'clos' in the page text; a self-test on an injected sentence must report the injected date, and a non-closure date on the same page (negative control) must not be reported as a closure. If no snapshot can be found or parsed within the 20-minute bound, record that and leave the clause open. Outcome stays advanced in any case: security-specific halts remain unchecked."
+  },
+  "6": {
+   "expectation": "Same as gap 14 round 3 (the ad-hoc closures are part of gap 6's schedule coverage).",
+   "criteria": "Same as gap 14 round 3; outcome stays advanced because halts remain unchecked."
+  }
+ },
+ "addendum": {
+  "written_at": "2026-09-23T13:03:27Z",
+  "label": "round-3 addendum, written after the ad-hoc closure press releases were fetched and read (so late for gap 14's closure arm, which is not changed by it) and before any archived NYSE holiday table was parsed or compared",
+  "expectation": "Internet Archive snapshots of nyse.com/markets/hours-calendars list 'All NYSE markets observe U.S. holidays as listed below' for multi-year windows; the listed full-day holidays and 1:00 p.m. early closes for 2016-2025 equal exchange_calendars XNYS and pandas_market_calendars NYSE, except that the pages do not list the two ad-hoc closures (announced separately).",
+  "criteria": "For each parsed snapshot: >= 9 holidays per listed year (parser detection floor); holidays_only_page and holidays_only_library empty per year after excluding library-only ad-hoc closures, which are reported separately; a self-test that injects an extra holiday cell must report it. Years with no parseable snapshot stay open. Gap 6/14 outcome stays advanced (halts, Nasdaq/Cboe pre-2026)."
+ },
+ "review_fix": {
+  "written_at": "2026-09-23T13:18:12Z",
+  "label": "round-3 review-fix preregistration, written after the Codex read-only review of the uncommitted round-3 diff (2 minor findings) and after guarded gitleaks flagged the ICE pages' embedded public Q4 API key, before the rerun",
+  "findings": [
+   "minor: the press extractor reports only the first date after each closure verb, not every date as documented",
+   "minor: the holiday self-test inserts into the parsed set, bypassing the HTML parser; the preregistration said an injected cell"
+  ],
+  "expectation": "Narrowing the extractor documentation to 'first date within 200 characters after each closure verb, same sentence' changes no output. An injected holiday row in each snapshot's HTML table, re-parsed, is reported page-only for all 6 snapshots. Publishing the ICE pages as tag-stripped text changes no press-arm closure date.",
+  "criteria": "Rerun on the published copies: closure_dates unchanged (2018-12-05, 2025-01-09), negative controls and self-tests true, per_year_latest_snapshot all match, and self_test_injected_holiday_cell reported for 6/6 snapshots. Any change is reported, not hidden."
+ },
+ "eol_fix": {
+  "written_at": "2026-09-23T13:25:21Z",
+  "label": "round-3 integrity-fix preregistration, written after git reported CRLF normalization on commit 78be820 and before any file was rewritten",
+  "finding": "five published raw HTML files have CRLF line endings in the worktree while .gitattributes (* text=auto eol=lf) stores LF; the manifest and receipts hash the CRLF bytes, so a fresh checkout mismatches. Two are round-2 files already committed (6-nasdaqtrader-holiday-calendar.html, 7-quantconnect-terms.html); three are round-3 NYSE snapshots.",
+  "expectation": "Normalizing the five worktree files to LF makes their sha256 equal the committed blob hash; venue_pages_check.py (gap 6), lean_rights.py if it reads the QuantConnect page (gap 7) and archive_calendar_check.py (gaps 6/14) produce the same results on the LF copies.",
+  "criteria": "For each file: worktree sha256 == git blob sha256 after the change. Check outputs compared with the committed outputs (sha256 fields excluded); any difference is reported. REDACTIONS.json records the normalization."
+ }
+}

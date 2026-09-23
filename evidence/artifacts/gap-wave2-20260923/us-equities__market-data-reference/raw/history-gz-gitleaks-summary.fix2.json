@@ -1,0 +1,40 @@
+{
+ "scanned_at": "2026-09-23T05:01:24Z",
+ "purpose": "cover the gzip raw blobs added in dfcfa51 and deleted later, which the guarded gitleaks history scan does not decode",
+ "commands": [
+  "git ls-tree -r --name-only dfcfa51 | grep '\\.gz$' | while read p; do git show dfcfa51:\"$p\" | gunzip > SCRATCH/mdr-gz-scan/$(basename \"$p\" .gz); done",
+  "$HOME/codex-ecosystem/bin/gitleaks-guarded dir --no-banner --report-format json --report-path SCRATCH/mdr-gz-gitleaks.json SCRATCH/mdr-gz-scan"
+ ],
+ "blobs_decoded": 9,
+ "bytes_scanned_reported": "~1485653 bytes (1.49 MB)",
+ "findings_total": 21,
+ "findings_by_file_rule_key": [
+  {
+   "file": "1-alpaca-corporateactions-docs.html",
+   "rule": "curl-auth-header",
+   "json_key_or_context": "curl --header Authorization (httpbin.org example)",
+   "count": 1
+  },
+  {
+   "file": "1-alpaca-corporateactions-docs.html",
+   "rule": "generic-api-key",
+   "json_key_or_context": "apiKey",
+   "count": 2
+  },
+  {
+   "file": "1-alpaca-corporateactions-docs.html",
+   "rule": "generic-api-key",
+   "json_key_or_context": "next_page_token",
+   "count": 17
+  },
+  {
+   "file": "1-alpaca-corporateactions-docs.html",
+   "rule": "generic-api-key",
+   "json_key_or_context": "readmeRecaptchaSiteKey",
+   "count": 1
+  }
+ ],
+ "secret_values": "not recorded here (masked); all findings are in the third-party Alpaca docs page: pagination next_page_token examples, the docs site's public search apiKey, its public reCAPTCHA site key, and an httpbin.org bearer example",
+ "files_without_findings": 8,
+ "integration_condition": "squash-merge this branch so commit dfcfa51 (and its .gz blobs) does not reach main"
+}

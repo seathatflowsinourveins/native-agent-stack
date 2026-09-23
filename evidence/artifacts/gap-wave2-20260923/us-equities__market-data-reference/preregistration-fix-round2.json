@@ -1,0 +1,16 @@
+{
+ "written_at": "2026-09-23T04:58:07Z",
+ "label": "fix-round-2 preregistration, written after the independent Opus review of fe8b66e and before the round-2 fetches and reruns",
+ "review_findings": ["gap 6/14: venue pairs are aliases of one NYSE calendar class in both libraries; per-venue corroboration missing", "gap 7: settled while LEAN/QuantConnect data rights and account-plan terms uncovered", "gaps 1/17/18: catalog-write standard applied inconsistently", "handoff: docs/ecosystem/index.html not changed", "dfcfa51 history holds gzip raw files outside gitleaks coverage"],
+ "gaps": {
+  "6": {
+   "expectation": "Nasdaq's published holiday calendar (nasdaqtrader.com) and Cboe's published US equities holiday schedule list the same full-day closures and 1:00 p.m. early closes for their published years as xcals XNAS / pmc NASDAQ and pmc BATS. The retained NYSE page states that all NYSE markets (incl. Arca, American) observe the listed holidays.",
+   "criteria": "Per source: holidays_only_page and holidays_only_library empty, early closes match, for the years the page publishes. A source that cannot be fetched or parsed is recorded as such and the per-venue clause stays open for that venue. Detection: the parser must extract >= 9 holidays per published year, and an injected extra holiday must be reported (self-test). Outcome stays advanced because security-specific halts remain unchecked."
+  },
+  "14": {"expectation": "Same as gap 6 round 2.", "criteria": "Same as gap 6 round 2; ad-hoc closure non-code corroboration searched on the Nasdaq/Cboe pages only if they list past years."},
+  "7": {
+   "expectation": "QuantConnect/LEAN publish terms for the bundled sample data (LEAN repository license and QuantConnect data terms). The gap likely stays advanced because account-plan terms need account access.",
+   "criteria": "Quote the governing clause for LEAN repository Data/ (license file and any data-specific notice) and QuantConnect's terms on data redistribution, with exact anchors. settled only if every acquired data source used by this layer (Alpaca, SEC, LEAN) has a quoted storage/redistribution clause AND account-plan terms are read; otherwise advanced."
+  }
+ }
+}

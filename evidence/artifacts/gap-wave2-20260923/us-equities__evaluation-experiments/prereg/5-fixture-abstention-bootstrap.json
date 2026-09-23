@@ -1,0 +1,17 @@
+{
+  "gap_index": 5,
+  "slug": "fixture-abstention-bootstrap",
+  "gap_text_sha256": "1839faa7e29b58606bd8b87544e11fa24a2b254ad2392a8cc5def50a70dfddd8",
+  "next_check": "Add unanswerable queries to the 24-query fixture, compute an abstention rate and a paired bootstrap confidence interval between arms, and record whether any default-promotion claim follows.",
+  "preregistration": {
+    "written_at": "2026-09-23T07:18:31Z",
+    "expectation": "A new versioned fixture (v2) keeps the 24 frozen queries unchanged and adds 8 newly authored unanswerable queries (written before any ranking in this wave, checked by rg for absence of their key terms from the 15 corpus files), for 20 answerable and 12 unanswerable. A preregistered score-threshold abstention policy with leave-one-out threshold selection gives an abstention rate and abstention accuracy per ranker. A paired bootstrap (10,000 resamples, seed 20260923, percentile 95% CI) of BM25 minus lexical is computed for MRR and Recall@1 over the 20 positives and for abstention-decision accuracy over all 32 queries. Expected: the MRR/Recall@1 CIs include 0 (n=20; the recorded difference comes from a few cases), so no default-promotion claim follows.",
+    "criteria": [
+      "Positive metrics on the original 20 answerable queries equal the 2026-09-20 receipt (MRR lexical 0.9, bm25 0.9666666666666666) as a replay check.",
+      "Abstention policy (fixed before ranking): abstain when the top-1 native chunk score is below threshold t; t is chosen by leave-one-out on the other 31 queries as the midpoint threshold maximizing decision accuracy (ties: lowest threshold). Secondary: same procedure on top1/top2 score ratio. Report abstention rate, abstention recall on unanswerables, false-abstention rate on answerables and decision accuracy.",
+      "Paired bootstrap as stated; report CI bounds.",
+      "Default-promotion rule (fixed before ranking): a promotion claim for BM25 over lexical on this fixture follows only if the MRR CI lower bound is > 0 and the abstention-accuracy CI lower bound is >= 0; even then it applies to the ARB internal rankers on this fixture, not to any installed retrieval tool.",
+      "Outcome at most advanced: the fixture remains source-authored over 15 public docs; an external held-out set is still missing."
+    ]
+  }
+}

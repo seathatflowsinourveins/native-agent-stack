@@ -1,0 +1,702 @@
+{
+ "id": "gap-wave2-20260923-foundation-mcp-surfaces-6",
+ "gap_index": 6,
+ "gap_text_sha256": "222d3443a627a71366a548cc2c6cd3cbd8f2f0c3d3e5daa6a9d3a0dc0ad80114",
+ "gap_text": "No measured comparison against other MCP bridges or inspectors was found. The selection rests on retained native execution alone, not on a head-to-head comparison.",
+ "next_check": "Install a pinned alternative MCP CLI bridge/inspector and run the same list and call operations against the same local servers as mcporter and Inspector, comparing success, latency and lifecycle behavior.",
+ "preregistration": {
+  "written_at": "2026-09-23T03:54:03Z",
+  "expectation": "@wong2/mcp-cli 2.0.0 (listed in punkpeye/awesome-mcp-servers) can call the same tools non-interactively but has no persistent daemon, so each call spawns a new server (higher latency for slow-starting servers); listing is interactive-only or limited.",
+  "criteria": "settled if the alternative was installed pinned and run for the same list and call operations against the same isolated servers as mcporter and Inspector, with success, latency (median of repeated runs) and lifecycle (server pid reuse) compared; advanced if an operation class could not be run on the alternative.",
+  "source": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/preregistrations.json",
+  "addenda": [
+   {
+    "written_at": "2026-09-23T04:36:13Z",
+    "label": "FIX ROUND 1, written after the round-1 independent review (raw/review-codex-round1.txt, received 04:35:13Z) and before the fix-round runs",
+    "expectation": "Re-running the bridge matrix, both lifecycle fixtures and the unmodified-config arm inside unshare -rnm with an empty tmpfs mounted over $HOME/.mcporter (the shared daemon's socket path does not exist there) gives the same outcomes. A connect probe to the shared socket path inside the namespace returns ENOENT, while the same probe against the owned daemon socket connects. That owned control shows the probe detects a reachable socket. wong2 interactive listing is executed x3 for all 5 servers and renders at most one page (10 tools). With a lock holder that EXITS ON ITS OWN (sleep with a fixed lifetime, no harness kill), a call made while the lock is held times out after 45 s, a second call while still held also fails, and the first call after the holder exits succeeds with no step taken by the harness or the operator.",
+    "criteria": "Gap 10 and the no-contact claim in the other receipts are settled only by the enforced (tmpfs + netns) runs with the probe and owned control recorded. Gap 12/6: settled only if every wong2 list arm executed (interactive), with incompleteness reported as a result. Gap 9: the startup-timeout conclusion is restated to match what the natural-expiry arm shows."
+   },
+   {
+    "written_at": "2026-09-23T04:59:55Z",
+    "label": "FIX ROUND 2, written after the round-2 review (raw/review-codex-round2.txt, received 04:59:39Z) and before the round-2 run",
+    "expectation": "After connecting, the pty driver presses Down repeatedly (at least the full tool count plus a margin), collecting every rendered tool(name). For context-mode, socraticode, codebase-memory and ai-memory, the collected set equals the Inspector tools/list names. jcodemunch still crashes with MCP -32601. Time to listing readiness (spawn until the 'Connected, server capabilities' line) is recorded separately from the harness duration.",
+    "criteria": "The wong2 list ops count as complete only if the collected tool-name set equals the Inspector tools/list name set for that server. Latency comparisons use only ready_ms. Gap 6/12 outcomes are re-decided on the recomputed table."
+   }
+  ]
+ },
+ "checked_at": "2026-09-23T13:09:10Z",
+ "arms": [
+  {
+   "arm": "install a pinned alternative MCP CLI (registry-listed)",
+   "status": "executed",
+   "detail": "@wong2/mcp-cli 2.0.0 (raw/1-install-identity.txt; awesome-mcp-servers line 4667)"
+  },
+  {
+   "arm": "same call operations against the same servers (x3)",
+   "status": "executed",
+   "detail": {
+    "ctx-execute-file": true,
+    "ctx-arith-42": true,
+    "ctx-ppid": true,
+    "jcodemunch-session-stats": true,
+    "fresh-static-graph": true,
+    "fresh-static-callees": true,
+    "fresh-memory-status": false,
+    "fresh-socraticode-status": true
+   }
+  },
+  {
+   "arm": "same list operations against the same servers (x3)",
+   "status": "executed",
+   "detail": {
+    "method": "2.0.0 has no non-interactive list; its interactive mode was driven through a pty and scrolled with Down x45 (fix round 2) so every autocomplete choice renders; completeness = collected tool-name set equals Inspector tools/list names",
+    "per_server": {
+     "context-mode": {
+      "executed_interactive_reps": 3,
+      "connected": [
+       true,
+       true,
+       true
+      ],
+      "tools_collected": [
+       11,
+       11,
+       11
+      ],
+      "full_tool_count": 11,
+      "complete": true,
+      "missing_vs_inspector": [],
+      "median_ready_ms": 472,
+      "median_harness_ms_not_latency": 6467,
+      "error": null
+     },
+     "socraticode": {
+      "executed_interactive_reps": 3,
+      "connected": [
+       true,
+       true,
+       true
+      ],
+      "tools_collected": [
+       26,
+       26,
+       26
+      ],
+      "full_tool_count": 26,
+      "complete": true,
+      "missing_vs_inspector": [],
+      "median_ready_ms": 520,
+      "median_harness_ms_not_latency": 6461,
+      "error": null
+     },
+     "codebase-memory": {
+      "executed_interactive_reps": 3,
+      "connected": [
+       true,
+       true,
+       true
+      ],
+      "tools_collected": [
+       17,
+       17,
+       17
+      ],
+      "full_tool_count": 17,
+      "complete": true,
+      "missing_vs_inspector": [],
+      "median_ready_ms": 4028,
+      "median_harness_ms_not_latency": 9968,
+      "error": null
+     },
+     "jcodemunch": {
+      "executed_interactive_reps": 3,
+      "connected": [
+       false,
+       false,
+       false
+      ],
+      "tools_collected": [
+       0,
+       0,
+       0
+      ],
+      "full_tool_count": 6,
+      "complete": false,
+      "missing_vs_inspector": [
+       "announce_model",
+       "jcodemunch_guide",
+       "menu",
+       "order",
+       "route",
+       "set_tool_tier"
+      ],
+      "median_ready_ms": null,
+      "median_harness_ms_not_latency": 1283,
+      "error": "McpError: MCP error -32601: Method not found\r"
+     },
+     "ai-memory": {
+      "executed_interactive_reps": 3,
+      "connected": [
+       true,
+       true,
+       true
+      ],
+      "tools_collected": [
+       23,
+       23,
+       23
+      ],
+      "full_tool_count": 23,
+      "complete": true,
+      "missing_vs_inspector": [],
+      "median_ready_ms": 401,
+      "median_harness_ms_not_latency": 6399,
+      "error": null
+     }
+    }
+   }
+  },
+  {
+   "arm": "compare success, latency and lifecycle",
+   "status": "executed",
+   "detail": {
+    "lifecycle (distinct context-mode server pids over 3 calls)": {
+     "mcporter-0.13.13": 1,
+     "inspector": 3,
+     "wong2-mcp-cli-2.0.0": 3
+    }
+   }
+  }
+ ],
+ "per_op": {
+  "list-context-mode": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 343
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 377
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "non_interactive": "not available in 2.0.0 (src/cli.js usage)",
+    "interactive_pty": {
+     "executed_interactive_reps": 3,
+     "connected": [
+      true,
+      true,
+      true
+     ],
+     "tools_collected": [
+      11,
+      11,
+      11
+     ],
+     "full_tool_count": 11,
+     "complete": true,
+     "missing_vs_inspector": [],
+     "median_ready_ms": 472,
+     "median_harness_ms_not_latency": 6467,
+     "error": null
+    }
+   }
+  },
+  "list-ai-memory": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 365
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 266
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "non_interactive": "not available in 2.0.0 (src/cli.js usage)",
+    "interactive_pty": {
+     "executed_interactive_reps": 3,
+     "connected": [
+      true,
+      true,
+      true
+     ],
+     "tools_collected": [
+      23,
+      23,
+      23
+     ],
+     "full_tool_count": 23,
+     "complete": true,
+     "missing_vs_inspector": [],
+     "median_ready_ms": 401,
+     "median_harness_ms_not_latency": 6399,
+     "error": null
+    }
+   }
+  },
+  "list-socraticode": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 685
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 457
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "non_interactive": "not available in 2.0.0 (src/cli.js usage)",
+    "interactive_pty": {
+     "executed_interactive_reps": 3,
+     "connected": [
+      true,
+      true,
+      true
+     ],
+     "tools_collected": [
+      26,
+      26,
+      26
+     ],
+     "full_tool_count": 26,
+     "complete": true,
+     "missing_vs_inspector": [],
+     "median_ready_ms": 520,
+     "median_harness_ms_not_latency": 6461,
+     "error": null
+    }
+   }
+  },
+  "list-codebase-memory": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 4856
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 4418
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "non_interactive": "not available in 2.0.0 (src/cli.js usage)",
+    "interactive_pty": {
+     "executed_interactive_reps": 3,
+     "connected": [
+      true,
+      true,
+      true
+     ],
+     "tools_collected": [
+      17,
+      17,
+      17
+     ],
+     "full_tool_count": 17,
+     "complete": true,
+     "missing_vs_inspector": [],
+     "median_ready_ms": 4028,
+     "median_harness_ms_not_latency": 9968,
+     "error": null
+    }
+   }
+  },
+  "list-jcodemunch": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 1081
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 816
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "non_interactive": "not available in 2.0.0 (src/cli.js usage)",
+    "interactive_pty": {
+     "executed_interactive_reps": 3,
+     "connected": [
+      false,
+      false,
+      false
+     ],
+     "tools_collected": [
+      0,
+      0,
+      0
+     ],
+     "full_tool_count": 6,
+     "complete": false,
+     "missing_vs_inspector": [
+      "announce_model",
+      "jcodemunch_guide",
+      "menu",
+      "order",
+      "route",
+      "set_tool_tier"
+     ],
+     "median_ready_ms": null,
+     "median_harness_ms_not_latency": 1283,
+     "error": "McpError: MCP error -32601: Method not found\r"
+    }
+   }
+  },
+  "ctx-execute-file": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 374
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 538
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 501
+   }
+  },
+  "ctx-arith-42": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 364
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 570
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 475
+   }
+  },
+  "ctx-ppid": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 367,
+    "distinct_server_pids": 1
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 496,
+    "distinct_server_pids": 3
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 467,
+    "distinct_server_pids": 3
+   }
+  },
+  "jcodemunch-session-stats": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 1072
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 868
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 763
+   }
+  },
+  "fresh-static-graph": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 4911
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 5278
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 4384
+   }
+  },
+  "fresh-static-callees": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 4492
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 4331
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 4246
+   }
+  },
+  "fresh-memory-status": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 294
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 220
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "all_pass": false,
+    "exits": [
+     1,
+     1,
+     1
+    ],
+    "median_ms": 288
+   }
+  },
+  "fresh-socraticode-status": {
+   "mcporter-0.13.13": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 698
+   },
+   "inspector": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 415
+   },
+   "wong2-mcp-cli-2.0.0": {
+    "all_pass": true,
+    "exits": [
+     0,
+     0,
+     0
+    ],
+    "median_ms": 551
+   }
+  }
+ },
+ "commands": [
+  "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/wong2-mcp-cli-2.0.0/node_modules/.bin/mcp-cli -c $HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/bridges-20260923T043746Z/state/mcp.json call-tool context-mode:ctx_execute --args {\"language\": \"javascript\", \"code\": \"console.log(6*7)\"}",
+  "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/wong2-mcp-cli-2.0.0/node_modules/.bin/mcp-cli -c $HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/bridges-20260923T043746Z/state/mcp.json call-tool ai-memory:memory_status --args {\"workspace\": \"agent-lab\", \"project\": \"agent-lab\"}",
+  "python3 blueprints/gap-wave2-20260923/foundation__mcp-surfaces/enforce.py evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/wong2-interactive-list.enforce.json -- python3 blueprints/gap-wave2-20260923/foundation__mcp-surfaces/wong2_pty_list.py evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/wong2-interactive-list.json"
+ ],
+ "results": [
+  "call operations passing 3/3 (of 8): {'mcporter-0.13.13': 8, 'inspector': 8, 'wong2-mcp-cli-2.0.0': 7}",
+  "list operations complete 3/3 (of 5): {'mcporter-0.13.13': 5, 'inspector': 5, 'wong2-mcp-cli-2.0.0': 4} (wong2 via interactive pty, name sets compared with Inspector)",
+  "wong2 interactive listing per server (collected/full, median ready ms): context-mode [11, 11, 11]/11 (472), socraticode [26, 26, 26]/26 (520), codebase-memory [17, 17, 17]/17 (4028), jcodemunch [0, 0, 0]/6 (None) [McpError: MCP error -32601: Method not found\r], ai-memory [23, 23, 23]/23 (401)",
+  "list latency, median ms (mcporter/Inspector: whole CLI run; wong2: spawn -> listing ready, excludes scrolling/teardown): context-mode: 343/377/472, socraticode: 685/457/520, codebase-memory: 4856/4418/4028, jcodemunch: 1081/816/None, ai-memory: 365/266/401",
+  "median of context-mode call medians (ms): {'mcporter-0.13.13': 367, 'inspector': 538, 'wong2-mcp-cli-2.0.0': 475}",
+  "wong2 ai-memory (HTTP) non-interactive call: { \"error\": \"The \\\"file\\\" argument must be of type string. Received undefined\" }",
+  "codebase-memory calls take ~4-5 s on every bridge (server startup dominates; not keep-alive in the config)"
+ ],
+ "outcome": "settled",
+ "note": "A measured head-to-head now exists, with every list and call operation executed 3 times on each bridge against the same owned servers. Calls passing: mcporter 8/8, Inspector 8/8, @wong2/mcp-cli 2.0.0 7/8 (its non-interactive mode cannot call the HTTP ai-memory server). Complete lists: mcporter 5/5, Inspector 5/5, wong2 4/5. wong2 lists only interactively. Scrolled through its autocomplete, it shows every tool of 4 servers, but it crashed on jcodemunch with MCP -32601 in all 3 runs. mcporter's keep-alive daemon reused one context-mode server over 3 calls, where the others started 3, and it had the lowest context-mode call latency. Fix round 1 replaced skipped list rows with executed runs. Fix round 2 scrolled the interactive list and separated listing readiness from harness time.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "Servers ran with owned state only (temp HOME/XDG, MCPORTER_DAEMON_DIR under $HOME/.cache/gap-wave2-20260923, owned ai-memory --data-dir and Qdrant storage). Fix round 1 runs are ENFORCED: unshare -rnm with an empty tmpfs over $HOME/.mcporter and a fresh network namespace (enforce.py / ns_exact.py). Inside, an AF_UNIX connect to the shared daemon socket path returned 'FileNotFoundError: No such file or directory' and TCP 49374/16333 returned 'ConnectionRefusedError: Connection refused', while the same AF_UNIX probe against each owned daemon socket returned ['connected'] (owned control, so the probe can detect a reachable socket). Round-1 runs (raw/round1/) set only environment-level isolation; their stat() of the shared daemon (pid, socket inode, metadata mtime) could not detect a client connection, so they are not cited for the no-contact claim.",
+  "/tmp was not isolated; SocratiCode reported another process watching the agent-lab checkout, i.e. it read host watcher state.",
+  "One alternative only; latency is 3 reps on one host (fix-round medians are higher than round 1 because of host load).",
+  "The interactive listing is captured through a pty; 'complete' means the collected tool-name set equals the Inspector tools/list name set.",
+  "The jcodemunch crash is an interop failure: jcodemunch 1.108.319 advertises resources but answers resources/templates/list with 'Method not found' (raw/6-jcodemunch-method-probe.txt), and wong2 lists resource templates whenever resources are advertised and aborts on the error. mcporter and Inspector only request tools/list here.",
+  "wong2 list latency is spawn-to-ready inside an interactive session, not a whole non-interactive CLI run; it is not strictly matched with the mcporter/Inspector list timings."
+ ],
+ "raw_evidence": [
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/bridges-matched.json",
+   "sha256": "50ee509141f31e7aebe75cd45f08dea288c2dbc85bd7b2da3de6dde54d0e18ff"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/bridges-matched.enforce.json",
+   "sha256": "6088f9c5ab68df745dcf8722243ebf38ac58aa6b9067282467f4caf18fa3c8c6"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/wong2-interactive-list.json",
+   "sha256": "0e46404851ab2d24601797552afde6a7c10f4bf073c9eebe1b93ab3a88c8e664"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/wong2-interactive-list.enforce.json",
+   "sha256": "306d70dd3fe6d161a5abebd2899d71d66e8b6fcea6cdf819b7ac542eb5a112f8"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/6-jcodemunch-method-probe.txt",
+   "sha256": "a6e9b51c393f13e4c3cfc31d7fc7fb7c07856729202f88e5580024dfb808050e"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/7-source-review.json",
+   "sha256": "36bb6030433beaaeb93218c25dd3159e16e488ab685df7c58078423071982fac"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/1-install-identity.txt",
+   "sha256": "941e23c2c8ce2afd9d8531fa2e2498e6082871beaae86334fd0d90785d70e3a2"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/round1/wong2-interactive-list.fix1.json",
+   "sha256": "e4238cfbf9daecd192726847c9a80a079ed3184bb6d3d7de4b330c7192f9b5ee"
+  }
+ ],
+ "helper_scripts": [
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/iso.py",
+   "sha256": "29677ff5175f71676feb6ea379fdb255f48f1a8fb69d7f3e909ddc66a6b28560"
+  },
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/enforce.py",
+   "sha256": "64ea85756615270fb848351797b680115ba54f91a10405e805716b6983bd0833"
+  },
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/run_bridges.py",
+   "sha256": "5ebad3ba47b27abefb866108fb19685fe8a7474230849e24a6723be3a00d353f"
+  },
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/wong2_pty_list.py",
+   "sha256": "f442786a85a70491d58ae922553988a74ae15f5e8935185c03dcebbe0f8ebc99"
+  }
+ ]
+}

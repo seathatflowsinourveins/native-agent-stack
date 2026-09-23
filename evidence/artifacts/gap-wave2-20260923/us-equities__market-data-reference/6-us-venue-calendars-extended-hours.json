@@ -1,0 +1,241 @@
+{
+ "id": "gap-wave2-20260923/us-equities__market-data-reference/6-us-venue-calendars-extended-hours",
+ "gap_index": 6,
+ "layer_id": "market-data-reference",
+ "catalog": "us-equities",
+ "gap_text": "Exchange-calendar native evidence covers the XNYS session 2013-10-07 and a 104-session date check. It does not cover other venues, extended hours, halts or future schedules.",
+ "gap_text_sha256": "79da7e794ce3fa5e6f8df6ebc1b6315b3423afb4c1a0fbfa64499d421e2c5860",
+ "next_check": "Extend the cross-library check to XNAS, ARCX and other US venue calendars and to pandas_market_calendars' pre/post extended-hours schedule for 2016-2027. Corroborate the results against NYSE's published holiday page.",
+ "preregistration": {
+  "written_at": "2026-09-23T04:22:33Z",
+  "expectation": "exchange_calendars and pandas_market_calendars agree on XNAS/NASDAQ and ARCX (NYSE Arca uses the NYSE holiday schedule) sessions 2016-2027; pmc NYSE pre/post extended schedule yields 04:00-09:30 and 16:00-20:00 ET boundaries; NYSE's published holiday page lists 2026-2028 holidays that match both libraries. Halts are not modelled by either library.",
+  "criteria": "advanced (not settled) expected because security-specific halts cannot be covered by calendar libraries; settled only if venues, extended hours, future schedules AND halts are all covered with evidence.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration.json",
+  "committed_in": "c6846f1"
+ },
+ "fix_round_preregistration": {
+  "written_at": "2026-09-23T04:41:56Z",
+  "label": "fix-round preregistration, written after the Codex round-1 review and before the fix-round reruns",
+  "expectation": "Adding per-session open/close time comparison and all non-16:00 closes vs the NYSE page leaves zero disagreements for the five agreeing venue pairs and the NYSE page; IEX still disagrees.",
+  "criteria": "open/close disagreement counts reported per pair; NYSE page check uses every library close != 16:00 and requires 13:00 on page dates; an injected 10:00 open and an injected 14:00 close must be reported (self-test).",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration-fix-round1.json",
+  "committed_in": "0481e46"
+ },
+ "fix_round2_preregistration": {
+  "written_at": "2026-09-23T04:58:07Z",
+  "label": "fix-round-2 preregistration, written after the independent Opus review of fe8b66e and before the round-2 fetches and reruns",
+  "expectation": "Nasdaq's published holiday calendar (nasdaqtrader.com) and Cboe's published US equities holiday schedule list the same full-day closures and 1:00 p.m. early closes for their published years as xcals XNAS / pmc NASDAQ and pmc BATS. The retained NYSE page states that all NYSE markets (incl. Arca, American) observe the listed holidays.",
+  "criteria": "Per source: holidays_only_page and holidays_only_library empty, early closes match, for the years the page publishes. A source that cannot be fetched or parsed is recorded as such and the per-venue clause stays open for that venue. Detection: the parser must extract >= 9 holidays per published year, and an injected extra holiday must be reported (self-test). Outcome stays advanced because security-specific halts remain unchecked.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration-fix-round2.json",
+  "committed_in": "5f248b6"
+ },
+ "fix_round3_preregistration": {
+  "written_at": "2026-09-23T13:01:09Z",
+  "label": "fix-round-3 preregistration, written by a re-dispatched unit after fix round 2 (5dc2706) and before any round-3 fetch",
+  "expectation": "Same as gap 14 round 3 (the ad-hoc closures are part of gap 6's schedule coverage).",
+  "criteria": "Same as gap 14 round 3; outcome stays advanced because halts remain unchecked.",
+  "addendum": {
+   "written_at": "2026-09-23T13:03:27Z",
+   "label": "round-3 addendum, written after the ad-hoc closure press releases were fetched and read (so late for gap 14's closure arm, which is not changed by it) and before any archived NYSE holiday table was parsed or compared",
+   "expectation": "Internet Archive snapshots of nyse.com/markets/hours-calendars list 'All NYSE markets observe U.S. holidays as listed below' for multi-year windows; the listed full-day holidays and 1:00 p.m. early closes for 2016-2025 equal exchange_calendars XNYS and pandas_market_calendars NYSE, except that the pages do not list the two ad-hoc closures (announced separately).",
+   "criteria": "For each parsed snapshot: >= 9 holidays per listed year (parser detection floor); holidays_only_page and holidays_only_library empty per year after excluding library-only ad-hoc closures, which are reported separately; a self-test that injects an extra holiday cell must report it. Years with no parseable snapshot stay open. Gap 6/14 outcome stays advanced (halts, Nasdaq/Cboe pre-2026)."
+  },
+  "review_fix": {
+   "written_at": "2026-09-23T13:18:12Z",
+   "label": "round-3 review-fix preregistration, written after the Codex read-only review of the uncommitted round-3 diff (2 minor findings) and after guarded gitleaks flagged the ICE pages' embedded public Q4 API key, before the rerun",
+   "findings": [
+    "minor: the press extractor reports only the first date after each closure verb, not every date as documented",
+    "minor: the holiday self-test inserts into the parsed set, bypassing the HTML parser; the preregistration said an injected cell"
+   ],
+   "expectation": "Narrowing the extractor documentation to 'first date within 200 characters after each closure verb, same sentence' changes no output. An injected holiday row in each snapshot's HTML table, re-parsed, is reported page-only for all 6 snapshots. Publishing the ICE pages as tag-stripped text changes no press-arm closure date.",
+   "criteria": "Rerun on the published copies: closure_dates unchanged (2018-12-05, 2025-01-09), negative controls and self-tests true, per_year_latest_snapshot all match, and self_test_injected_holiday_cell reported for 6/6 snapshots. Any change is reported, not hidden."
+  },
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration-fix-round3.json",
+  "committed_in": [
+   "97cf2a8",
+   "4074556 (addendum)",
+   "107cfdf (review_fix)"
+  ]
+ },
+ "eol_fix_preregistration": {
+  "written_at": "2026-09-23T13:25:21Z",
+  "label": "round-3 integrity-fix preregistration, written after git reported CRLF normalization on commit 78be820 and before any file was rewritten",
+  "finding": "five published raw HTML files have CRLF line endings in the worktree while .gitattributes (* text=auto eol=lf) stores LF; the manifest and receipts hash the CRLF bytes, so a fresh checkout mismatches. Two are round-2 files already committed (6-nasdaqtrader-holiday-calendar.html, 7-quantconnect-terms.html); three are round-3 NYSE snapshots.",
+  "expectation": "Normalizing the five worktree files to LF makes their sha256 equal the committed blob hash; venue_pages_check.py (gap 6), lean_rights.py if it reads the QuantConnect page (gap 7) and archive_calendar_check.py (gaps 6/14) produce the same results on the LF copies.",
+  "criteria": "For each file: worktree sha256 == git blob sha256 after the change. Check outputs compared with the committed outputs (sha256 fields excluded); any difference is reported. REDACTIONS.json records the normalization.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration-fix-round3.json",
+  "committed_in": "1240cb9"
+ },
+ "independent_review_round3": {
+  "reviewer": "codex exec --sandbox read-only --ephemeral over the uncommitted round-3 diff, stdin from /dev/null, 79,605 tokens",
+  "output": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/review-codex-round3.txt",
+  "findings_for_this_gap": "2 minor (extractor documented as reporting every date, but takes the first date per verb; holiday self-test bypassed the parser); no blocker or major; both fixed under the review_fix preregistration and rerun"
+ },
+ "independent_review_round2": {
+  "reviewer": "independent Opus review of fe8b66e (findings relayed by the coordinator)",
+  "findings_for_this_gap": "major: venue pairs are aliases of one NYSE rule set, per-venue corroboration missing - aliasing disclosed; Nasdaq and Cboe published 2026 schedules and the NYSE all-markets statement added (fix round 2); outcome stays advanced"
+ },
+ "independent_review": {
+  "reviewer": "codex exec --sandbox read-only --ephemeral (codex-cli 0.155.1); invocation 1 stalled reading stdin and was stopped without output, invocation 2 (stdin from /dev/null) completed, 62,448 tokens",
+  "output": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/review-codex-round1.txt",
+  "findings_for_this_gap": "2 findings (opening times not compared; NYSE-page check limited to 13:00 closes) - both fixed in round 1 and re-run"
+ },
+ "commands": [
+  "curl -sSL -A 'Mozilla/5.0 (X11; Linux x86_64) research-check' https://www.nyse.com/markets/hours-calendars   # 200, redirected to /trade/hours-calendars, 109133 bytes",
+  "$HOME/.local/share/codex-ecosystem/tools/pandas-market-calendars-5.4.0/bin/python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/calendar_check.py $HOME/.cache/gap-wave2-20260923/market-data-reference/docs/nyse-hours.html > evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-calendar-check.json   # attempt 3; attempts 1-2 raised DateOutOfBounds (start, then end) and were fixed by padding the construction bounds",
+  "# fix round 2 (after the Opus review):",
+  "curl -sSL -A 'Mozilla/5.0 (X11; Linux x86_64) research-check' https://www.nasdaqtrader.com/Trader.aspx?id=Calendar   # 200, 54661 bytes",
+  "curl -sSL -A '<same UA>' https://www.cboe.com/about/hours/   # 200, 382879 bytes (https://www.cboe.com/about/hours/us-equities/ returned 404)",
+  "curl -sSL -A '<same UA>' https://www.nasdaq.com/stock-market-trading-hours-for-nasdaq   # 200, redirected to /market-activity/stock-market-holiday-schedule; same 2026 table as nasdaqtrader, not used as a separate source",
+  "python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/publish_raw.py evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw 6-nasdaqtrader-holiday-calendar.html 6-cboe-hours-holidays.html   # UUID redaction plus 2 home-directory-shaped URL paths (nasdaqtrader links of the form slash-home-slash-index.jsp) redacted; hashes in REDACTIONS.json; the check output is byte-identical on the redacted copies",
+  "$HOME/.local/share/codex-ecosystem/tools/pandas-market-calendars-5.4.0/bin/python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/venue_pages_check.py evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nasdaqtrader-holiday-calendar.html evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-cboe-hours-holidays.html evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nyse-hours-calendars.html > evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-venue-pages-check.fix2.json   # run on the cache originals, then re-run on the published copies: byte-identical (cmp)",
+  "# fix round 3 (re-dispatched unit; preregistration-fix-round3.json 13:01:09Z, addendum 13:03:27Z, both committed before the parse):",
+  "curl -sS 'https://web.archive.org/cdx/search/cdx?url=nyse.com/markets/hours-calendars&from=...&to=...&filter=statuscode:200'   # snapshot discovery for 2016, 2017, 2018, 2021, 2022, 2023, 2024, 2025 windows (one 2022 query hit 'Internet Archive: Temporarily Offline' and was retried)",
+  "curl -sS 'https://web.archive.org/cdx/search/cdx?url=ir.theice.com/press/news-details/{2018,2024,2025}/&matchType=prefix&filter=original:.*(Bush|Carter|Mourning|close).*'   # found both ICE press releases",
+  "curl -sS -o SNAP.html 'https://web.archive.org/web/<TS>id_/<URL>'   # NYSE hours-calendars snapshots 20160108005018, 20170301172132, 20181204174714, 20181215174802, 20210111130129, 20220706011712, 20230102062613, 20240111002222, 20250109223733, 20250115012652; ICE releases 20250108195503 (Bush) and 20241230155348 + 20241230201900 (Carter); the 20181204, 20230102 and 2025 NYSE snapshots have no holiday table (JS-rendered) and the Carter 20241230201900 copy is a stub without body text, so none of those is used",
+  "python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/publish_raw.py evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw 14-wayback-nyse-20160108005018.html 14-wayback-nyse-20170301172132.html 14-wayback-nyse-20181215174802.html 14-wayback-nyse-20210111130129.html 14-wayback-nyse-20220706011712.html 14-wayback-nyse-20240111002222.html   # UUID redaction; original hashes in REDACTIONS.json (the two ICE pages were first published the same way, then replaced by the next step)",
+  "python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/ice_text_publish.py $HOME/.cache/gap-wave2-20260923/market-data-reference/round3 evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw   # review-fix step: guarded gitleaks flagged the ICE HTML (generic-api-key: the ir.theice.com site's embedded public Q4 API key, 4 findings); the two press releases are published as tag-stripped text only, original HTML sha256 in REDACTIONS.json, full HTML kept in the cache; rerun after scripts/validate.py flagged Business Wire's third-party '/home/<id>' URL path, which is now redacted as in publish_raw.py (2 redactions, Bush text only). The press-page sha256 values inside 14-archive-calendar-check.fix3.json refer to the pre-redaction text; 14-archive-calendar-check.eolfix3.json carries the published ones",
+  "$HOME/.local/share/codex-ecosystem/tools/pandas-market-calendars-5.4.0/bin/python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/archive_calendar_check.py --press evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-ice-*.txt --nyse evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-*.html > evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-archive-calendar-check.fix3.json   # final run 4 (after the review fixes: documented extractor scope narrowed to the first date per verb, holiday self-test now injects a table row and re-parses); run 3 was the pre-review version; run 1 did not parse the 2018 table (bare <thead> header), run 2 paired a title 'Close' with a date ~1,600 chars later (verb-to-date distance now capped at 200); the final run on the cache originals and on the published copies is identical except file names and hashes (cmp)",
+  "$HOME/.local/share/codex-ecosystem/tools/pandas-market-calendars-5.4.0/bin/python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/selftest_mutation.py evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20181215174802.html > evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-selftest-mutation.fix3.txt   # review fix: the injected-cell self-test must fail when the cell parser is disabled",
+  "# round-3 EOL integrity fix (eol_fix preregistration 13:25:21Z, committed in 1240cb9): git stores these raw HTML files with LF (.gitattributes '* text=auto eol=lf') but the worktree copies were CRLF, so recorded hashes did not match a fresh checkout",
+  "python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/eol_normalize.py evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw 6-nasdaqtrader-holiday-calendar.html 7-quantconnect-terms.html 14-wayback-nyse-20160108005018.html 14-wayback-nyse-20170301172132.html 14-wayback-nyse-20181215174802.html   # worktree sha256 now equals the git blob sha256 for all five",
+  "$HOME/.local/share/codex-ecosystem/tools/pandas-market-calendars-5.4.0/bin/python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/venue_pages_check.py evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nasdaqtrader-holiday-calendar.html evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-cboe-hours-holidays.html evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nyse-hours-calendars.html > evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-venue-pages-check.eolfix3.json   # identical to 6-venue-pages-check.fix2.json",
+  "$HOME/.local/share/codex-ecosystem/tools/pandas-market-calendars-5.4.0/bin/python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/archive_calendar_check.py --press evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-ice-*.txt --nyse evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-*.html > evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-archive-calendar-check.eolfix3.json   # identical to 14-archive-calendar-check.fix3.json except the three normalized files' sha256 fields; stderr empty"
+ ],
+ "results": [
+  "exchange_calendars 4.13.2 vs pandas_market_calendars 5.4.0, 2016-01-01..2027-12-31: XNYS~NYSE, XNAS~NASDAQ, ARCX~NYSE, XASE~NYSE, XNYS~BATS: 3016 sessions each, only_xcals [], only_pmc [], 24 early closes each, 0 early-close disagreements. ALIASING (disclosed in fix round 2): every one of these venue names resolves to the same NYSE rule set in both libraries (raw 6-calendar-check.fix1.json: xcals_calendar_objects ARCX/XASE/XNAS/XNYS = XNYSExchangeCalendar; pmc_calendar_objects NASDAQ/BATS/NYSE = NYSEExchangeCalendar; xcals alias table XNAS/ARCX/XASE/BATS/NASDAQ -> XNYS). The five pairs are therefore one comparison (xcals XNYS vs pmc NYSE) repeated, not per-venue evidence.",
+  "pmc IEX calendar disagrees: 3041 sessions, 25 extra dates incl. every New Year's Day and Labor Day and 2018-12-05/2025-01-09; 12 early closes missing -> pmc 5.4.0 IEX calendar is not usable as a US holiday source",
+  "pmc NYSE and NASDAQ extended schedule (start='pre', end='post'): 2992 sessions 04:00|09:30|16:00|20:00 ET, 24 early-close sessions 04:00|09:30|13:00|17:00 ET; exchange_calendars has no pre/post attributes (pre_opens/post_closes false)",
+  "NYSE published page (years 2026, 2027, 2028): 29 holidays and 5 early closes (2026-11-27, 2026-12-24, 2027-11-26, 2028-07-03, 2028-11-24) - vs xcals XNYS and vs pmc NYSE: holidays_only_page [], holidays_only_library [], early_only_page [], early_only_library []",
+  "NYSE page Arca hours: 'Early Trading Session: 4:00 a.m. to 9:30 a.m. ET', 'Late Trading Session: 4:00 p.m. to 8:00 p.m. ET'; early-close days: Arca/American/National/Texas late sessions close at 5:00 p.m. -> matches pmc pre/post 04:00/20:00 and 17:00 on early closes",
+  "Fix round 1 (after Codex review): per-session open AND close time comparison added: 0 disagreements for XNYS~NYSE, XNAS~NASDAQ, ARCX~NYSE, XASE~NYSE, XNYS~BATS (the aliased NYSE rule set); IEX 12. NYSE page now compared against every library close != 16:00 and requires 13:00 on page dates: all lists empty for both libraries. Self-test: an injected 10:00 open and 14:00 close are both reported (self_test_detected=true). Ad-hoc closures, controls and extended-hours sections unchanged.",
+  "Fix round 2, per-venue published corroboration (independent of the libraries): Nasdaq's 'U.S. Equity and Options Markets Holiday Schedule 2026' (nasdaqtrader.com) lists 10 closed days and 2 early closes at 1:00 p.m. (2026-11-27, 2026-12-24); vs xcals XNAS, pmc NASDAQ, xcals XNYS and pmc NYSE: holidays_only_page [], holidays_only_library [], early_only_page [], early_only_library [], early_time_mismatch [] (agree=true for all four).",
+  "Fix round 2: Cboe's '2026 Equities Holiday Schedule' (cboe.com/about/hours, covering Cboe BZX/BYX/EDGX/EDGA equities) lists 10 closed days and 2 early closes (Thanksgiving Early Close 2026-11-27, Christmas Early Close 2026-12-24; the page publishes no early-close time); vs pmc BATS and xcals XNYS: all difference lists empty (agree=true).",
+  "Fix round 2: NYSE page scope statement 'All NYSE markets observe U.S. holidays as listed below for 2026, 2027, and 2028.' - the 2026-2028 NYSE-page corroboration therefore applies directly to NYSE Arca and NYSE American (XASE), not only indirectly.",
+  "Fix round 2, extended hours per venue (published): NYSE Arca Equities early session 4:00 a.m.-9:30 a.m.; NYSE American, NYSE National and NYSE Texas 7:00 a.m.-9:30 a.m.; Cboe BZX/EDGX early session 4:00 a.m.; Cboe BYX/EDGA 7:00 a.m.; all late/post sessions end 8:00 p.m. pmc's single pre/post schedule (04:00/20:00) matches Arca and BZX/EDGX only; it is not per-venue for American, National, Texas, BYX or EDGA.",
+  "Fix round 2 self-test: an injected extra holiday (2026-03-10) and a shifted early close (2026-11-27 at 14:00) are both reported (detected=true); parser_detection_ok=true (>= 9 holidays parsed from each page).",
+  "Fix round 3, archived NYSE published tables (Internet Archive snapshots of nyse.com/markets/hours-calendars, each stating 'All NYSE markets observe U.S. holidays as listed below for ...'): the latest snapshot listing each year matches xcals XNYS and pmc NYSE exactly (holidays both directions and 1:00 p.m. early closes) for every year 2016-2026: 2016 (20160108), 2017 (20170301), 2018-2020 (20181215), 2021 (20210111), 2022-2023 (20220706), 2024-2026 (20240111). With the fix-round-2 live page (2026-2028), NYSE-markets published corroboration now spans 2016-2028.",
+  "Fix round 3: the only per-snapshot mismatches are in the 20210111 snapshot's forward years (2022-06-20 and 2023-06-19 library-only): that page predates NYSE's adoption of Juneteenth, and the later 20220706 snapshot lists both dates, matching the libraries. The tables omit the ad-hoc closures (reported separately as library_adhoc_closures 2018-12-05 and 2025-01-09).",
+  "Fix round 3 self-tests (after the review fix): a holiday row injected into each snapshot's HTML table and re-parsed is reported page-only for every snapshot (6/6); with the cell parser disabled (mutant parse_cell returning None) the same self-test reports false, so it detects parser failure (raw 14-selftest-mutation.fix3.txt); every compared snapshot-year met the >= 9 parsed-holiday floor except 2022 in the 20210111 snapshot (8: no New Year observance and no Juneteenth yet), which is reported, not hidden."
+ ],
+ "detection_method": "Set differences in both directions per venue pair; the IEX pair shows the method reports disagreements (25 dates). Positive controls 2018-12-04/06 and 2025-01-08/10 are sessions in every calendar. Fix round 2: page-vs-library set differences in both directions plus early-close time equality; injected holiday and early-close time are reported (self-test), and each page must yield >= 9 parsed holidays.",
+ "outcome": "advanced",
+ "evidence_class": "native_proven",
+ "limits": [
+  "Security-specific trading halts (LULD pauses, regulatory halts) are not modelled by either library and were not checked; this clause of the gap remains open.",
+  "Library venue names are aliases of one NYSE rule set in both libraries, so the library comparison alone is not per-venue evidence. Per-venue published corroboration: NYSE markets (incl. Arca and American) 2016-2028 (archived tables in fix round 3 plus the live page); Nasdaq and Cboe 2026 only. Nasdaq and Cboe schedules for 2016-2025 and 2027 rest on the aliased NYSE rule set; this remains open.",
+  "IEX, NYSE National, NYSE Texas and Cboe BYX/EDGA/EDGX have no separate library calendar here (pmc IEX is wrong, see results); their holidays are corroborated only through the NYSE and Cboe pages for their published years.",
+  "pmc pre/post boundaries match NYSE Arca's published extended hours; NYSE Tape A itself publishes no 04:00 early session, so pre/post are consolidated/venue-dependent, not per-venue truth.",
+  "NYSE corroboration for 2016-2025 (fix round 3) comes from Internet Archive copies of NYSE's page, not from NYSE directly; each snapshot's timestamp and sha256 are retained. 2027 rests on the live page only.",
+  "Attempts 1 and 2 of calendar_check.py failed with exchange_calendars DateOutOfBounds (stderr retained); the fix only padded construction bounds."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-calendar-check.json",
+   "sha256": "0fb30f50d52a094c8aabc40baa035e45e6be71f6012539d06a11dcd71b390c4d"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nyse-hours-calendars.html",
+   "sha256": "06c1061151ddacfa85fa917a587c40bed428d18e6298c3b13ae85d86fc076886"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/REDACTIONS.json",
+   "sha256": "7d08a65951826ef4a8d0bd6fd9a21aa747305527b3e2b1daa42173cffe090c69"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-calendar-check.attempt1.stderr",
+   "sha256": "238acf9743b900d3c5697fba32b1fbc1ed4ffb08ae3c4f7798dc2133f3f874e7"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-calendar-check.attempt2.stderr",
+   "sha256": "49f4761d671a8389233ea250c1ebf123ee7d0b5cc051a1af6c0b367be535e7ea"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-calendar-check.stderr",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-calendar-check.fix1.json",
+   "sha256": "b88ca915dbebf8e57bf8f7869c28441c1c7c4d2ee6143ecfc083cbf2159556a1"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-calendar-check.fix1.stderr",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-venue-pages-check.fix2.json",
+   "sha256": "143784bd7631e2fb7744b4e326b6428cf275811b428cc13b1d38cd75a8641791"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-venue-pages-check.fix2.stderr",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nasdaqtrader-holiday-calendar.html",
+   "sha256": "8fbccb34565e1d755a6295fd97b01e58f9f7b9983ebfb6e718fdedfed00afbe6"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-cboe-hours-holidays.html",
+   "sha256": "882cc187beac422a3722d5ba7bf2e9d0708ec36e4c10b9ed8fb628302768f829"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-archive-calendar-check.fix3.json",
+   "sha256": "683b31b0b2f89e50d55486269620ae94637fca4dc4a39dda368a8fe64b427d09"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-archive-calendar-check.fix3.stderr",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-ice-bush-20250108195503.txt",
+   "sha256": "548127fe5b845554447b6836bea1542ff33a48beca0c36f76306df1f8a8a1e3e"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-ice-carter-20241230155348.txt",
+   "sha256": "c2c45bd4b63f17123283b01dba526333e19a96ad605e4760d349ced26d16e3a2"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-selftest-mutation.fix3.txt",
+   "sha256": "cffd4d9fc12635f32d3eece1fc6ed88612db00fa7b470529ad328c19fc123891"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/review-codex-round3.txt",
+   "sha256": "ebcf1d9e48a6ee940b74eb0a1c7bca9cadeeafacbd2f71c066b7c1028f24d290"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-archive-calendar-check.eolfix3.json",
+   "sha256": "c4db914dd1099a41143aabda9571288754a58ddc63f1e45df16d98a1ad3258a6"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-venue-pages-check.eolfix3.json",
+   "sha256": "143784bd7631e2fb7744b4e326b6428cf275811b428cc13b1d38cd75a8641791"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20160108005018.html",
+   "sha256": "a4fa3e02b8d391a7052b1754dbd029273ac26ff6d9045c61252be34a9bdeb79c"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20170301172132.html",
+   "sha256": "d0e150530e79f6e873861b8b09023c6a1061dafd0b93b4ad00ba26acb832891a"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20181215174802.html",
+   "sha256": "4a432da747fd5941a77e20b1ee14defcef23e39cf4ea419f2f0446e9d47dddc3"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20210111130129.html",
+   "sha256": "4e50fc36bdb85a9d5a67cc17368975f75856e057ed2c9acf6e3837fdb4fd20b9"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20220706011712.html",
+   "sha256": "c008ba82c32c774014884f7c6f56951ea07b70f2281d33cd625ef89ece2d55ea"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20240111002222.html",
+   "sha256": "adbcdb88cf6336537c0853cacbdaa3d81b31270c74ad4d8b97903a9c1cd259a0"
+  }
+ ],
+ "checked_at": "2026-09-23T13:29:13Z",
+ "checked_at_source": "UTC mtime of the latest raw output the receipt cites (sed path-redaction can postdate the run by seconds)",
+ "host_paths": "host paths are written as $HOME; private Alpaca payloads stay outside the repository"
+}

@@ -1,0 +1,21 @@
+Succeeded - 2026-09-22T23:06:50-04:00
+
+dag: recovery (0s)
+├─log: $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-run-1790132622/dagu/sigkill/dagu-home/logs/recovery/dag-run_20260923_030347Z_recovery-70b41190dc7dd523/dag-run_20260922.230347.115.recovery.log
+│
+├─checkpoint (0s) [succeeded]
+│ └─/usr/bin/python3 -B
+│     $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-
+│     run-1790132622/dagu/sigkill/fixture.py checkpoint
+│     $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-
+│     run-1790132622/dagu/sigkill
+│ 
+└─finalize (0s) [succeeded]
+  └─/usr/bin/python3 -B
+      $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-ru
+      n-1790132622/dagu/sigkill/fixture.py finalize
+      $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-ru
+      n-1790132622/dagu/sigkill
+
+Result: Succeeded
+

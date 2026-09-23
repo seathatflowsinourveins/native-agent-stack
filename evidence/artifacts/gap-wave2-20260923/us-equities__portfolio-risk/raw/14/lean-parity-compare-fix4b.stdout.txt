@@ -1,0 +1,39 @@
+{
+ "no_dividends": {
+  "meanrisk_min_variance": [
+   true,
+   null,
+   ""
+  ],
+  "hrp_variance": [
+   true,
+   null,
+   ""
+  ]
+ },
+ "dividends": {
+  "meanrisk_min_variance": [
+   true,
+   null,
+   ""
+  ],
+  "hrp_variance": [
+   true,
+   null,
+   ""
+  ]
+ },
+ "control_fee2": {
+  "meanrisk_min_variance": [
+   false,
+   true,
+   "fill mismatch: {'index': 0, 'lean': \"('2016-01-12 16:00:00', 'IWM', 'BUY', Decimal('1788.0'), Decimal('103.72'), Decimal"
+  ],
+  "hrp_variance": [
+   false,
+   true,
+   "fill mismatch: {'index': 0, 'lean': \"('2016-01-12 16:00:00', 'IWM', 'BUY', Decimal('4657.0'), Decimal('103.72'), Decimal"
+  ]
+ }
+}
+all_criteria_met True

@@ -1,0 +1,52 @@
+{
+  "arm": "arctic",
+  "concurrent_writers": {
+    "appends_each": 30,
+    "content": {
+      "batches": 35,
+      "content_ok": true,
+      "decoded_rows": 175,
+      "problems": []
+    },
+    "detector_controls": {
+      "corrupted_row_flagged": true,
+      "dropped_row_flagged": true,
+      "foreign_row_flagged": true
+    },
+    "no_silent_loss": false,
+    "reported_successful_appends": 60,
+    "rows_expected_from_reported_successes": 300,
+    "rows_found": 170,
+    "rows_lost_after_reported_success": 130,
+    "state": {
+      "content": {
+        "batches": 35,
+        "content_ok": true,
+        "decoded_rows": 175,
+        "problems": []
+      },
+      "detector_controls": {
+        "corrupted_row_flagged": true,
+        "dropped_row_flagged": true,
+        "foreign_row_flagged": true
+      },
+      "readable": true,
+      "rows": 170,
+      "rows_including_seed": 175,
+      "versions": 35
+    },
+    "stderr_tail": {
+      "a": "",
+      "b": ""
+    },
+    "writer_error_counts": {
+      "a": 0,
+      "b": 0
+    },
+    "writer_error_examples": {
+      "a": [],
+      "b": []
+    },
+    "writers": 2
+  }
+}

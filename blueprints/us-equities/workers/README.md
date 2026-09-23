@@ -36,6 +36,19 @@ timeout --signal=TERM --kill-after=10s 240s "$SDK_ENV/bin/python" \
   --receipt "$PRIVATE_RUN_DIR/research.json" --turn-deadline-seconds 180
 ```
 
+Optional flags added on 2026-09-23 keep the defaults above unchanged:
+`--persistent` keeps the thread and writes its id to the private receipt,
+`--resume-thread-id` continues it from a new process, `--sandbox`
+(`read-only`/`workspace-write`), `--approval-mode` (`deny_all`/`auto_review`, both
+non-interactive) and repeatable `--config-override KEY=TOML` for per-process native
+overrides such as disabling hooks. `--lookup-tool JSON` (deny_all only) registers
+one read-only custom lookup tool (`{name, description, values}`) through the SDK's
+`CodexClient` (`thread_start` with the experimental `dynamicTools` field, answered by
+its `approval_handler`), because `AsyncCodex.thread_start` has no tool field in
+0.155.1. The executed tool turn and resume, SDK 0.155.1 rerun and
+Context Mode root finding are in
+[the gap-wave-2 receipts](../../../evidence/artifacts/gap-wave2-20260923/foundation__agent-sdks/README.md).
+
 `native_worker.py` is a small integration example around upstream
 `CodexClient.initialize`, `model_list`, `account/rateLimits/read`,
 `AsyncCodex.thread_start`, `thread.read`, `thread.turn` and `turn.run`.

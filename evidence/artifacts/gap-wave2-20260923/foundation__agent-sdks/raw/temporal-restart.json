@@ -1,0 +1,50 @@
+{
+  "controller_pid": 3562374,
+  "server_address": "127.0.0.1:58770",
+  "worker1_pid": 3562607,
+  "worker1_killed_at": 1790137328.429836,
+  "worker1_returncode": -9,
+  "worker2_pid": 3562776,
+  "result": {
+    "activity": "attempt=2 applied_now=False pid=3562776",
+    "key": "effect-gap8-wf"
+  },
+  "history_events": 18,
+  "history_event_types": [
+    "activity_task_completed_event_attributes",
+    "activity_task_scheduled_event_attributes",
+    "activity_task_started_event_attributes",
+    "timer_fired_event_attributes",
+    "timer_started_event_attributes",
+    "workflow_execution_completed_event_attributes",
+    "workflow_execution_started_event_attributes",
+    "workflow_task_completed_event_attributes",
+    "workflow_task_scheduled_event_attributes",
+    "workflow_task_started_event_attributes",
+    "workflow_task_timed_out_event_attributes"
+  ],
+  "replay_failure": null,
+  "negative_control_replay_failure": "NondeterminismError('Workflow activation completion failed: Failure { failure: Some(Failure { message: \"[TMPRL1100] Nondeterminism error: Timer machine does not handle this event: HistoryEvent(id: 5, ActivityTaskScheduled)\", source: \"\", stack_trace: \"\", encoded_attributes: None, cause: None, failure_info: Some(ApplicationFailureInfo(ApplicationFailureInfo { r#type: \"\", non_retryable: false, detail",
+  "attempts": [
+    {
+      "n": 1,
+      "attempt": 1,
+      "pid": 3562607,
+      "at": 1790137328.3412135
+    },
+    {
+      "n": 2,
+      "attempt": 2,
+      "pid": 3562776,
+      "at": 1790137337.2957098
+    }
+  ],
+  "effects": [
+    {
+      "key": "effect-gap8-wf",
+      "pid": 3562607,
+      "at": 1790137328.341282
+    }
+  ],
+  "server_stopped": true
+}

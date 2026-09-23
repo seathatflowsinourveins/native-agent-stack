@@ -1,0 +1,4335 @@
+{
+  "evalId": "eval-Jjb-2026-09-23T12:47:28",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-09-23T12:47:28.901Z",
+    "prompts": [
+      {
+        "id": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "raw": "{{payload}}",
+        "label": "{{payload}}",
+        "provider": "Nemotron-3-Embed-1B, model-card input_type query/document",
+        "metrics": {
+          "score": 30,
+          "testPassCount": 30,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 30,
+          "assertFailCount": 0,
+          "totalLatencyMs": 2601,
+          "tokenUsage": {
+            "prompt": 2432,
+            "completion": 0,
+            "cached": 0,
+            "total": 2432,
+            "numRequests": 60,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "namedScores": {},
+          "namedScoresCount": {},
+          "namedScoreWeights": {},
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=3 vars.label=3",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 409,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The nearest train station is two blocks north of the main office.\",\"Our return policy allows refunds within 30 days of purchase.\",\"Photosynthesis converts sunlight into chemical energy in plants.\",\"To reset your password, click Forgot Password on the login page and follow the emailed reset link.\"],\"query\":\"How do you reset a forgotten password on this website?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=3",
+          "tokenUsage": {
+            "prompt": 83,
+            "completion": 0,
+            "cached": 0,
+            "total": 83,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-00",
+          "vars": {
+            "payload": "{\"candidates\":[\"The nearest train station is two blocks north of the main office.\",\"Our return policy allows refunds within 30 days of purchase.\",\"Photosynthesis converts sunlight into chemical energy in plants.\",\"To reset your password, click Forgot Password on the login page and follow the emailed reset link.\"],\"query\":\"How do you reset a forgotten password on this website?\"}",
+            "label": 3
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "tokenUsage": {
+          "prompt": 83,
+          "completion": 0,
+          "cached": 0,
+          "total": 83,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The nearest train station is two blocks north of the main office.\",\"Our return policy allows refunds within 30 days of purchase.\",\"Photosynthesis converts sunlight into chemical energy in plants.\",\"To reset your password, click Forgot Password on the login page and follow the emailed reset link.\"],\"query\":\"How do you reset a forgotten password on this website?\"}",
+          "label": 3
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=2 vars.label=2",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 80,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"A standard chess board has 64 squares.\",\"Shakespeare wrote Hamlet in the early 1600s.\",\"Water boils at 100 degrees Celsius (212 Fahrenheit) at sea level atmospheric pressure.\",\"The capital of Australia is Canberra, not Sydney.\"],\"query\":\"What is the boiling point of water at sea level?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=2",
+          "tokenUsage": {
+            "prompt": 83,
+            "completion": 0,
+            "cached": 0,
+            "total": 83,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-01",
+          "vars": {
+            "payload": "{\"candidates\":[\"A standard chess board has 64 squares.\",\"Shakespeare wrote Hamlet in the early 1600s.\",\"Water boils at 100 degrees Celsius (212 Fahrenheit) at sea level atmospheric pressure.\",\"The capital of Australia is Canberra, not Sydney.\"],\"query\":\"What is the boiling point of water at sea level?\"}",
+            "label": 2
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "tokenUsage": {
+          "prompt": 83,
+          "completion": 0,
+          "cached": 0,
+          "total": 83,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"A standard chess board has 64 squares.\",\"Shakespeare wrote Hamlet in the early 1600s.\",\"Water boils at 100 degrees Celsius (212 Fahrenheit) at sea level atmospheric pressure.\",\"The capital of Australia is Canberra, not Sydney.\"],\"query\":\"What is the boiling point of water at sea level?\"}",
+          "label": 2
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=3 vars.label=3",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 82,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The Great Wall of China is visible from space is a common myth.\",\"Bees communicate through a waggle dance.\",\"Mount Everest is the tallest mountain above sea level.\",\"Go to Account Settings, select Billing, and click Cancel Subscription to stop future charges.\"],\"query\":\"How can I cancel my monthly subscription?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=3",
+          "tokenUsage": {
+            "prompt": 75,
+            "completion": 0,
+            "cached": 0,
+            "total": 75,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-02",
+          "vars": {
+            "payload": "{\"candidates\":[\"The Great Wall of China is visible from space is a common myth.\",\"Bees communicate through a waggle dance.\",\"Mount Everest is the tallest mountain above sea level.\",\"Go to Account Settings, select Billing, and click Cancel Subscription to stop future charges.\"],\"query\":\"How can I cancel my monthly subscription?\"}",
+            "label": 3
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 2,
+        "tokenUsage": {
+          "prompt": 75,
+          "completion": 0,
+          "cached": 0,
+          "total": 75,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The Great Wall of China is visible from space is a common myth.\",\"Bees communicate through a waggle dance.\",\"Mount Everest is the tallest mountain above sea level.\",\"Go to Account Settings, select Billing, and click Cancel Subscription to stop future charges.\"],\"query\":\"How can I cancel my monthly subscription?\"}",
+          "label": 3
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=2 vars.label=2",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 248,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The stock market closes at 4pm Eastern time on weekdays.\",\"Dogs have a much stronger sense of smell than humans.\",\"Rainbows form when sunlight is refracted, reflected, and dispersed by water droplets in the atmosphere.\",\"The French Revolution began in 1789.\"],\"query\":\"What causes rainbows to form in the sky?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=2",
+          "tokenUsage": {
+            "prompt": 82,
+            "completion": 0,
+            "cached": 0,
+            "total": 82,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-03",
+          "vars": {
+            "payload": "{\"candidates\":[\"The stock market closes at 4pm Eastern time on weekdays.\",\"Dogs have a much stronger sense of smell than humans.\",\"Rainbows form when sunlight is refracted, reflected, and dispersed by water droplets in the atmosphere.\",\"The French Revolution began in 1789.\"],\"query\":\"What causes rainbows to form in the sky?\"}",
+            "label": 2
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 3,
+        "tokenUsage": {
+          "prompt": 82,
+          "completion": 0,
+          "cached": 0,
+          "total": 82,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The stock market closes at 4pm Eastern time on weekdays.\",\"Dogs have a much stronger sense of smell than humans.\",\"Rainbows form when sunlight is refracted, reflected, and dispersed by water droplets in the atmosphere.\",\"The French Revolution began in 1789.\"],\"query\":\"What causes rainbows to form in the sky?\"}",
+          "label": 2
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=3 vars.label=3",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 67,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The human heart has four chambers.\",\"Volcanoes form at tectonic plate boundaries.\",\"The Olympics are held every four years.\",\"Open printer settings, select Add Printer, choose the wireless network printer, and confirm the connection.\"],\"query\":\"How do I connect my laptop to a wireless printer?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=3",
+          "tokenUsage": {
+            "prompt": 70,
+            "completion": 0,
+            "cached": 0,
+            "total": 70,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-04",
+          "vars": {
+            "payload": "{\"candidates\":[\"The human heart has four chambers.\",\"Volcanoes form at tectonic plate boundaries.\",\"The Olympics are held every four years.\",\"Open printer settings, select Add Printer, choose the wireless network printer, and confirm the connection.\"],\"query\":\"How do I connect my laptop to a wireless printer?\"}",
+            "label": 3
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 4,
+        "tokenUsage": {
+          "prompt": 70,
+          "completion": 0,
+          "cached": 0,
+          "total": 70,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The human heart has four chambers.\",\"Volcanoes form at tectonic plate boundaries.\",\"The Olympics are held every four years.\",\"Open printer settings, select Add Printer, choose the wireless network printer, and confirm the connection.\"],\"query\":\"How do I connect my laptop to a wireless printer?\"}",
+          "label": 3
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=3 vars.label=3",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 69,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Jupiter is the largest planet in our solar system.\",\"A leap year occurs every four years to keep the calendar aligned.\",\"The Eiffel Tower was completed in 1889.\",\"Health guidelines generally recommend about 2 to 3 liters of water per day for adults.\"],\"query\":\"What is the recommended daily water intake for adults?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=3",
+          "tokenUsage": {
+            "prompt": 80,
+            "completion": 0,
+            "cached": 0,
+            "total": 80,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-05",
+          "vars": {
+            "payload": "{\"candidates\":[\"Jupiter is the largest planet in our solar system.\",\"A leap year occurs every four years to keep the calendar aligned.\",\"The Eiffel Tower was completed in 1889.\",\"Health guidelines generally recommend about 2 to 3 liters of water per day for adults.\"],\"query\":\"What is the recommended daily water intake for adults?\"}",
+            "label": 3
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 5,
+        "tokenUsage": {
+          "prompt": 80,
+          "completion": 0,
+          "cached": 0,
+          "total": 80,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Jupiter is the largest planet in our solar system.\",\"A leap year occurs every four years to keep the calendar aligned.\",\"The Eiffel Tower was completed in 1889.\",\"Health guidelines generally recommend about 2 to 3 liters of water per day for adults.\"],\"query\":\"What is the recommended daily water intake for adults?\"}",
+          "label": 3
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=2 vars.label=2",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 76,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Sharks have existed for hundreds of millions of years.\",\"The Amazon rainforest produces a large share of Earth's oxygen.\",\"Multiply the Celsius temperature by 9/5 and then add 32 to get Fahrenheit.\",\"The speed of light is approximately 300,000 kilometers per second.\"],\"query\":\"How do you convert Celsius to Fahrenheit?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=2",
+          "tokenUsage": {
+            "prompt": 87,
+            "completion": 0,
+            "cached": 0,
+            "total": 87,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-06",
+          "vars": {
+            "payload": "{\"candidates\":[\"Sharks have existed for hundreds of millions of years.\",\"The Amazon rainforest produces a large share of Earth's oxygen.\",\"Multiply the Celsius temperature by 9/5 and then add 32 to get Fahrenheit.\",\"The speed of light is approximately 300,000 kilometers per second.\"],\"query\":\"How do you convert Celsius to Fahrenheit?\"}",
+            "label": 2
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 6,
+        "tokenUsage": {
+          "prompt": 87,
+          "completion": 0,
+          "cached": 0,
+          "total": 87,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Sharks have existed for hundreds of millions of years.\",\"The Amazon rainforest produces a large share of Earth's oxygen.\",\"Multiply the Celsius temperature by 9/5 and then add 32 to get Fahrenheit.\",\"The speed of light is approximately 300,000 kilometers per second.\"],\"query\":\"How do you convert Celsius to Fahrenheit?\"}",
+          "label": 2
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=2 vars.label=2",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 71,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Penguins are flightless birds found mostly in the Southern Hemisphere.\",\"Coral reefs support a quarter of all marine species.\",\"Contact the airline immediately for rebooking, check refund eligibility, and request compensation documentation.\",\"The Renaissance began in Italy in the 14th century.\"],\"query\":\"What steps should I take if my flight gets cancelled?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=2",
+          "tokenUsage": {
+            "prompt": 79,
+            "completion": 0,
+            "cached": 0,
+            "total": 79,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-07",
+          "vars": {
+            "payload": "{\"candidates\":[\"Penguins are flightless birds found mostly in the Southern Hemisphere.\",\"Coral reefs support a quarter of all marine species.\",\"Contact the airline immediately for rebooking, check refund eligibility, and request compensation documentation.\",\"The Renaissance began in Italy in the 14th century.\"],\"query\":\"What steps should I take if my flight gets cancelled?\"}",
+            "label": 2
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 7,
+        "tokenUsage": {
+          "prompt": 79,
+          "completion": 0,
+          "cached": 0,
+          "total": 79,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Penguins are flightless birds found mostly in the Southern Hemisphere.\",\"Coral reefs support a quarter of all marine species.\",\"Contact the airline immediately for rebooking, check refund eligibility, and request compensation documentation.\",\"The Renaissance began in Italy in the 14th century.\"],\"query\":\"What steps should I take if my flight gets cancelled?\"}",
+          "label": 2
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=0 vars.label=0",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 76,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Compound interest is calculated on the initial principal plus previously accumulated interest, growing balances over time.\",\"The Pacific Ocean is the largest ocean on Earth.\",\"Elephants are the largest living land animals.\",\"Vincent van Gogh painted Starry Night in 1889.\"],\"query\":\"How does compound interest work on a savings account?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=0",
+          "tokenUsage": {
+            "prompt": 75,
+            "completion": 0,
+            "cached": 0,
+            "total": 75,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-08",
+          "vars": {
+            "payload": "{\"candidates\":[\"Compound interest is calculated on the initial principal plus previously accumulated interest, growing balances over time.\",\"The Pacific Ocean is the largest ocean on Earth.\",\"Elephants are the largest living land animals.\",\"Vincent van Gogh painted Starry Night in 1889.\"],\"query\":\"How does compound interest work on a savings account?\"}",
+            "label": 0
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 8,
+        "tokenUsage": {
+          "prompt": 75,
+          "completion": 0,
+          "cached": 0,
+          "total": 75,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Compound interest is calculated on the initial principal plus previously accumulated interest, growing balances over time.\",\"The Pacific Ocean is the largest ocean on Earth.\",\"Elephants are the largest living land animals.\",\"Vincent van Gogh painted Starry Night in 1889.\"],\"query\":\"How does compound interest work on a savings account?\"}",
+          "label": 0
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=2 vars.label=2",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 79,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Antarctica is the coldest continent on Earth.\",\"The printing press was invented by Gutenberg around 1440.\",\"File Form 4868 with the IRS before the original deadline to receive an automatic six-month extension.\",\"The human body has 206 bones in adulthood.\"],\"query\":\"What is the process for filing a tax extension?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=2",
+          "tokenUsage": {
+            "prompt": 83,
+            "completion": 0,
+            "cached": 0,
+            "total": 83,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-09",
+          "vars": {
+            "payload": "{\"candidates\":[\"Antarctica is the coldest continent on Earth.\",\"The printing press was invented by Gutenberg around 1440.\",\"File Form 4868 with the IRS before the original deadline to receive an automatic six-month extension.\",\"The human body has 206 bones in adulthood.\"],\"query\":\"What is the process for filing a tax extension?\"}",
+            "label": 2
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 9,
+        "tokenUsage": {
+          "prompt": 83,
+          "completion": 0,
+          "cached": 0,
+          "total": 83,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Antarctica is the coldest continent on Earth.\",\"The printing press was invented by Gutenberg around 1440.\",\"File Form 4868 with the IRS before the original deadline to receive an automatic six-month extension.\",\"The human body has 206 bones in adulthood.\"],\"query\":\"What is the process for filing a tax extension?\"}",
+          "label": 2
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=3 vars.label=3",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 83,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Honey never spoils if stored properly.\",\"The Sahara is the largest hot desert in the world.\",\"The Titanic sank in 1912 after hitting an iceberg.\",\"Go to Security Settings, enable Two-Factor Authentication, and link an authenticator app or phone number.\"],\"query\":\"How do I set up two-factor authentication on my account?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=3",
+          "tokenUsage": {
+            "prompt": 82,
+            "completion": 0,
+            "cached": 0,
+            "total": 82,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-10",
+          "vars": {
+            "payload": "{\"candidates\":[\"Honey never spoils if stored properly.\",\"The Sahara is the largest hot desert in the world.\",\"The Titanic sank in 1912 after hitting an iceberg.\",\"Go to Security Settings, enable Two-Factor Authentication, and link an authenticator app or phone number.\"],\"query\":\"How do I set up two-factor authentication on my account?\"}",
+            "label": 3
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 10,
+        "tokenUsage": {
+          "prompt": 82,
+          "completion": 0,
+          "cached": 0,
+          "total": 82,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Honey never spoils if stored properly.\",\"The Sahara is the largest hot desert in the world.\",\"The Titanic sank in 1912 after hitting an iceberg.\",\"Go to Security Settings, enable Two-Factor Authentication, and link an authenticator app or phone number.\"],\"query\":\"How do I set up two-factor authentication on my account?\"}",
+          "label": 3
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=3 vars.label=3",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 69,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The Berlin Wall fell in 1989.\",\"Octopuses have three hearts and blue blood.\",\"The Statue of Liberty was a gift from France to the United States.\",\"Weather describes short-term atmospheric conditions, while climate describes long-term average patterns over years.\"],\"query\":\"What is the difference between weather and climate?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=3",
+          "tokenUsage": {
+            "prompt": 75,
+            "completion": 0,
+            "cached": 0,
+            "total": 75,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-11",
+          "vars": {
+            "payload": "{\"candidates\":[\"The Berlin Wall fell in 1989.\",\"Octopuses have three hearts and blue blood.\",\"The Statue of Liberty was a gift from France to the United States.\",\"Weather describes short-term atmospheric conditions, while climate describes long-term average patterns over years.\"],\"query\":\"What is the difference between weather and climate?\"}",
+            "label": 3
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 11,
+        "tokenUsage": {
+          "prompt": 75,
+          "completion": 0,
+          "cached": 0,
+          "total": 75,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The Berlin Wall fell in 1989.\",\"Octopuses have three hearts and blue blood.\",\"The Statue of Liberty was a gift from France to the United States.\",\"Weather describes short-term atmospheric conditions, while climate describes long-term average patterns over years.\"],\"query\":\"What is the difference between weather and climate?\"}",
+          "label": 3
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=2 vars.label=2",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 75,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Tokyo is the most populous metropolitan area in the world.\",\"The Nile is often cited as the longest river in the world.\",\"Add insulation, seal air leaks, upgrade to energy-efficient windows, and use programmable thermostats.\",\"Chess originated in India over a thousand years ago.\"],\"query\":\"How can I improve my home's energy efficiency?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=2",
+          "tokenUsage": {
+            "prompt": 80,
+            "completion": 0,
+            "cached": 0,
+            "total": 80,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-12",
+          "vars": {
+            "payload": "{\"candidates\":[\"Tokyo is the most populous metropolitan area in the world.\",\"The Nile is often cited as the longest river in the world.\",\"Add insulation, seal air leaks, upgrade to energy-efficient windows, and use programmable thermostats.\",\"Chess originated in India over a thousand years ago.\"],\"query\":\"How can I improve my home's energy efficiency?\"}",
+            "label": 2
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 12,
+        "tokenUsage": {
+          "prompt": 80,
+          "completion": 0,
+          "cached": 0,
+          "total": 80,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Tokyo is the most populous metropolitan area in the world.\",\"The Nile is often cited as the longest river in the world.\",\"Add insulation, seal air leaks, upgrade to energy-efficient windows, and use programmable thermostats.\",\"Chess originated in India over a thousand years ago.\"],\"query\":\"How can I improve my home's energy efficiency?\"}",
+          "label": 2
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=3 vars.label=3",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 68,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Saturn's rings are made mostly of ice and rock particles.\",\"The Louvre in Paris is the world's most visited museum.\",\"The Wright brothers achieved powered flight in 1903.\",\"Common symptoms include thirst, dark urine, fatigue, dizziness, and dry mouth.\"],\"query\":\"What are the symptoms of dehydration?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=3",
+          "tokenUsage": {
+            "prompt": 76,
+            "completion": 0,
+            "cached": 0,
+            "total": 76,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-13",
+          "vars": {
+            "payload": "{\"candidates\":[\"Saturn's rings are made mostly of ice and rock particles.\",\"The Louvre in Paris is the world's most visited museum.\",\"The Wright brothers achieved powered flight in 1903.\",\"Common symptoms include thirst, dark urine, fatigue, dizziness, and dry mouth.\"],\"query\":\"What are the symptoms of dehydration?\"}",
+            "label": 3
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 13,
+        "tokenUsage": {
+          "prompt": 76,
+          "completion": 0,
+          "cached": 0,
+          "total": 76,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Saturn's rings are made mostly of ice and rock particles.\",\"The Louvre in Paris is the world's most visited museum.\",\"The Wright brothers achieved powered flight in 1903.\",\"Common symptoms include thirst, dark urine, fatigue, dizziness, and dry mouth.\"],\"query\":\"What are the symptoms of dehydration?\"}",
+          "label": 3
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=0 vars.label=0",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 73,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Install a cloud storage app, sign in, select folders to sync, and enable automatic backup.\",\"The blue whale is the largest animal to have ever existed.\",\"Coffee is one of the most traded commodities in the world.\",\"The Magna Carta was signed in 1215.\"],\"query\":\"How do I back up files to the cloud?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=0",
+          "tokenUsage": {
+            "prompt": 79,
+            "completion": 0,
+            "cached": 0,
+            "total": 79,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-14",
+          "vars": {
+            "payload": "{\"candidates\":[\"Install a cloud storage app, sign in, select folders to sync, and enable automatic backup.\",\"The blue whale is the largest animal to have ever existed.\",\"Coffee is one of the most traded commodities in the world.\",\"The Magna Carta was signed in 1215.\"],\"query\":\"How do I back up files to the cloud?\"}",
+            "label": 0
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 14,
+        "tokenUsage": {
+          "prompt": 79,
+          "completion": 0,
+          "cached": 0,
+          "total": 79,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Install a cloud storage app, sign in, select folders to sync, and enable automatic backup.\",\"The blue whale is the largest animal to have ever existed.\",\"Coffee is one of the most traded commodities in the world.\",\"The Magna Carta was signed in 1215.\"],\"query\":\"How do I back up files to the cloud?\"}",
+          "label": 0
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=1 vars.label=1",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 67,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The Colosseum in Rome could hold tens of thousands of spectators.\",\"Blot the stain, apply cold water and salt or a stain remover, then wash as usual before it dries.\",\"Beethoven composed nine symphonies.\",\"The moon causes tides through gravitational pull on Earth's oceans.\"],\"query\":\"What is the best way to remove a red wine stain?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=1",
+          "tokenUsage": {
+            "prompt": 85,
+            "completion": 0,
+            "cached": 0,
+            "total": 85,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-15",
+          "vars": {
+            "payload": "{\"candidates\":[\"The Colosseum in Rome could hold tens of thousands of spectators.\",\"Blot the stain, apply cold water and salt or a stain remover, then wash as usual before it dries.\",\"Beethoven composed nine symphonies.\",\"The moon causes tides through gravitational pull on Earth's oceans.\"],\"query\":\"What is the best way to remove a red wine stain?\"}",
+            "label": 1
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 15,
+        "tokenUsage": {
+          "prompt": 85,
+          "completion": 0,
+          "cached": 0,
+          "total": 85,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The Colosseum in Rome could hold tens of thousands of spectators.\",\"Blot the stain, apply cold water and salt or a stain remover, then wash as usual before it dries.\",\"Beethoven composed nine symphonies.\",\"The moon causes tides through gravitational pull on Earth's oceans.\"],\"query\":\"What is the best way to remove a red wine stain?\"}",
+          "label": 1
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=3 vars.label=3",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 56,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The Andes is the longest mountain range in the world.\",\"The first modern Olympics were held in Athens in 1896.\",\"Peacocks are known for their colorful tail feathers.\",\"Hybrid cars combine a gasoline engine with an electric motor, using regenerative braking to improve fuel efficiency.\"],\"query\":\"How does a hybrid car save fuel compared to a gas car?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=3",
+          "tokenUsage": {
+            "prompt": 83,
+            "completion": 0,
+            "cached": 0,
+            "total": 83,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-16",
+          "vars": {
+            "payload": "{\"candidates\":[\"The Andes is the longest mountain range in the world.\",\"The first modern Olympics were held in Athens in 1896.\",\"Peacocks are known for their colorful tail feathers.\",\"Hybrid cars combine a gasoline engine with an electric motor, using regenerative braking to improve fuel efficiency.\"],\"query\":\"How does a hybrid car save fuel compared to a gas car?\"}",
+            "label": 3
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 16,
+        "tokenUsage": {
+          "prompt": 83,
+          "completion": 0,
+          "cached": 0,
+          "total": 83,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The Andes is the longest mountain range in the world.\",\"The first modern Olympics were held in Athens in 1896.\",\"Peacocks are known for their colorful tail feathers.\",\"Hybrid cars combine a gasoline engine with an electric motor, using regenerative braking to improve fuel efficiency.\"],\"query\":\"How does a hybrid car save fuel compared to a gas car?\"}",
+          "label": 3
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=2 vars.label=2",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 53,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Giraffes have the same number of neck vertebrae as humans.\",\"Leonardo da Vinci painted the Mona Lisa in the early 1500s.\",\"Turn off electricity to the area, remove water with a pump, and identify and fix the source of the leak.\",\"The Dead Sea is one of the saltiest bodies of water on Earth.\"],\"query\":\"What should I do if my basement is flooding?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=2",
+          "tokenUsage": {
+            "prompt": 92,
+            "completion": 0,
+            "cached": 0,
+            "total": 92,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-17",
+          "vars": {
+            "payload": "{\"candidates\":[\"Giraffes have the same number of neck vertebrae as humans.\",\"Leonardo da Vinci painted the Mona Lisa in the early 1500s.\",\"Turn off electricity to the area, remove water with a pump, and identify and fix the source of the leak.\",\"The Dead Sea is one of the saltiest bodies of water on Earth.\"],\"query\":\"What should I do if my basement is flooding?\"}",
+            "label": 2
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 17,
+        "tokenUsage": {
+          "prompt": 92,
+          "completion": 0,
+          "cached": 0,
+          "total": 92,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Giraffes have the same number of neck vertebrae as humans.\",\"Leonardo da Vinci painted the Mona Lisa in the early 1500s.\",\"Turn off electricity to the area, remove water with a pump, and identify and fix the source of the leak.\",\"The Dead Sea is one of the saltiest bodies of water on Earth.\"],\"query\":\"What should I do if my basement is flooding?\"}",
+          "label": 2
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=3 vars.label=3",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 66,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The Suez Canal connects the Mediterranean and Red Seas.\",\"Mozart began composing music at a very young age.\",\"The Grand Canyon was carved by the Colorado River over millions of years.\",\"Vaccines train the immune system to recognize and respond to a pathogen without causing the disease itself.\"],\"query\":\"How do vaccines help the immune system fight disease?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=3",
+          "tokenUsage": {
+            "prompt": 78,
+            "completion": 0,
+            "cached": 0,
+            "total": 78,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-18",
+          "vars": {
+            "payload": "{\"candidates\":[\"The Suez Canal connects the Mediterranean and Red Seas.\",\"Mozart began composing music at a very young age.\",\"The Grand Canyon was carved by the Colorado River over millions of years.\",\"Vaccines train the immune system to recognize and respond to a pathogen without causing the disease itself.\"],\"query\":\"How do vaccines help the immune system fight disease?\"}",
+            "label": 3
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 18,
+        "tokenUsage": {
+          "prompt": 78,
+          "completion": 0,
+          "cached": 0,
+          "total": 78,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The Suez Canal connects the Mediterranean and Red Seas.\",\"Mozart began composing music at a very young age.\",\"The Grand Canyon was carved by the Colorado River over millions of years.\",\"Vaccines train the immune system to recognize and respond to a pathogen without causing the disease itself.\"],\"query\":\"How do vaccines help the immune system fight disease?\"}",
+          "label": 3
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=0 vars.label=0",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 54,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Connect positive to positive, then negative to an unpainted metal surface on the dead car, avoiding sparks near the battery.\",\"The kangaroo is native to Australia and known for hopping.\",\"The Panama Canal opened to shipping traffic in 1914.\",\"Rainforests contain the majority of the world's plant species.\"],\"query\":\"What is the safest way to jump-start a car battery?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=0",
+          "tokenUsage": {
+            "prompt": 94,
+            "completion": 0,
+            "cached": 0,
+            "total": 94,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-19",
+          "vars": {
+            "payload": "{\"candidates\":[\"Connect positive to positive, then negative to an unpainted metal surface on the dead car, avoiding sparks near the battery.\",\"The kangaroo is native to Australia and known for hopping.\",\"The Panama Canal opened to shipping traffic in 1914.\",\"Rainforests contain the majority of the world's plant species.\"],\"query\":\"What is the safest way to jump-start a car battery?\"}",
+            "label": 0
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 19,
+        "tokenUsage": {
+          "prompt": 94,
+          "completion": 0,
+          "cached": 0,
+          "total": 94,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Connect positive to positive, then negative to an unpainted metal surface on the dead car, avoiding sparks near the battery.\",\"The kangaroo is native to Australia and known for hopping.\",\"The Panama Canal opened to shipping traffic in 1914.\",\"Rainforests contain the majority of the world's plant species.\"],\"query\":\"What is the safest way to jump-start a car battery?\"}",
+          "label": 0
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=0 vars.label=0",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 69,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Place the egg in water; a fresh egg sinks and lies flat, while a bad egg floats due to gas buildup.\",\"Wolves live and hunt in coordinated packs.\",\"The Berlin Marathon is one of the six World Marathon Majors.\",\"The Hubble Space Telescope was launched in 1990.\"],\"query\":\"How can I tell if an egg is still fresh?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=0",
+          "tokenUsage": {
+            "prompt": 87,
+            "completion": 0,
+            "cached": 0,
+            "total": 87,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-20",
+          "vars": {
+            "payload": "{\"candidates\":[\"Place the egg in water; a fresh egg sinks and lies flat, while a bad egg floats due to gas buildup.\",\"Wolves live and hunt in coordinated packs.\",\"The Berlin Marathon is one of the six World Marathon Majors.\",\"The Hubble Space Telescope was launched in 1990.\"],\"query\":\"How can I tell if an egg is still fresh?\"}",
+            "label": 0
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 20,
+        "tokenUsage": {
+          "prompt": 87,
+          "completion": 0,
+          "cached": 0,
+          "total": 87,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Place the egg in water; a fresh egg sinks and lies flat, while a bad egg floats due to gas buildup.\",\"Wolves live and hunt in coordinated packs.\",\"The Berlin Marathon is one of the six World Marathon Majors.\",\"The Hubble Space Telescope was launched in 1990.\"],\"query\":\"How can I tell if an egg is still fresh?\"}",
+          "label": 0
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=0 vars.label=0",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 82,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Trim the stems and place basil in a glass of water at room temperature, away from direct sunlight.\",\"Tennis originated in France before spreading to England.\",\"Roman aqueducts transported water across long distances.\",\"The Andromeda galaxy is the closest large galaxy to the Milky Way.\"],\"query\":\"What is the correct way to store fresh basil to keep it from wilting?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=0",
+          "tokenUsage": {
+            "prompt": 86,
+            "completion": 0,
+            "cached": 0,
+            "total": 86,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-21",
+          "vars": {
+            "payload": "{\"candidates\":[\"Trim the stems and place basil in a glass of water at room temperature, away from direct sunlight.\",\"Tennis originated in France before spreading to England.\",\"Roman aqueducts transported water across long distances.\",\"The Andromeda galaxy is the closest large galaxy to the Milky Way.\"],\"query\":\"What is the correct way to store fresh basil to keep it from wilting?\"}",
+            "label": 0
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 21,
+        "tokenUsage": {
+          "prompt": 86,
+          "completion": 0,
+          "cached": 0,
+          "total": 86,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Trim the stems and place basil in a glass of water at room temperature, away from direct sunlight.\",\"Tennis originated in France before spreading to England.\",\"Roman aqueducts transported water across long distances.\",\"The Andromeda galaxy is the closest large galaxy to the Milky Way.\"],\"query\":\"What is the correct way to store fresh basil to keep it from wilting?\"}",
+          "label": 0
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=3 vars.label=3",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 80,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The Sistine Chapel ceiling was painted by Michelangelo.\",\"The Trans-Siberian Railway is one of the longest railway lines in the world.\",\"Antibiotics are ineffective against viral infections.\",\"Divide your weight in kilograms by your height in meters squared to get your BMI.\"],\"query\":\"How do I calculate my body mass index (BMI)?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=3",
+          "tokenUsage": {
+            "prompt": 80,
+            "completion": 0,
+            "cached": 0,
+            "total": 80,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-22",
+          "vars": {
+            "payload": "{\"candidates\":[\"The Sistine Chapel ceiling was painted by Michelangelo.\",\"The Trans-Siberian Railway is one of the longest railway lines in the world.\",\"Antibiotics are ineffective against viral infections.\",\"Divide your weight in kilograms by your height in meters squared to get your BMI.\"],\"query\":\"How do I calculate my body mass index (BMI)?\"}",
+            "label": 3
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 22,
+        "tokenUsage": {
+          "prompt": 80,
+          "completion": 0,
+          "cached": 0,
+          "total": 80,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The Sistine Chapel ceiling was painted by Michelangelo.\",\"The Trans-Siberian Railway is one of the longest railway lines in the world.\",\"Antibiotics are ineffective against viral infections.\",\"Divide your weight in kilograms by your height in meters squared to get your BMI.\"],\"query\":\"How do I calculate my body mass index (BMI)?\"}",
+          "label": 3
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=2 vars.label=2",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 70,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The Ottoman Empire lasted for several centuries.\",\"Maple syrup is primarily produced in Canada and the northeastern US.\",\"A firewall monitors and controls incoming and outgoing network traffic based on security rules to block unauthorized access.\",\"Cheetahs are the fastest land animals over short distances.\"],\"query\":\"What is the purpose of a firewall in computer networking?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=2",
+          "tokenUsage": {
+            "prompt": 77,
+            "completion": 0,
+            "cached": 0,
+            "total": 77,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-23",
+          "vars": {
+            "payload": "{\"candidates\":[\"The Ottoman Empire lasted for several centuries.\",\"Maple syrup is primarily produced in Canada and the northeastern US.\",\"A firewall monitors and controls incoming and outgoing network traffic based on security rules to block unauthorized access.\",\"Cheetahs are the fastest land animals over short distances.\"],\"query\":\"What is the purpose of a firewall in computer networking?\"}",
+            "label": 2
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 23,
+        "tokenUsage": {
+          "prompt": 77,
+          "completion": 0,
+          "cached": 0,
+          "total": 77,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The Ottoman Empire lasted for several centuries.\",\"Maple syrup is primarily produced in Canada and the northeastern US.\",\"A firewall monitors and controls incoming and outgoing network traffic based on security rules to block unauthorized access.\",\"Cheetahs are the fastest land animals over short distances.\"],\"query\":\"What is the purpose of a firewall in computer networking?\"}",
+          "label": 2
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=1 vars.label=1",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 56,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Origami is the traditional Japanese art of paper folding.\",\"Do light aerobic activity followed by dynamic stretches targeting the legs and hips before racing.\",\"The Amazon River discharges more water than any other river.\",\"The Berlin Philharmonic is one of the world's leading orchestras.\"],\"query\":\"How should I properly warm up before running a race?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=1",
+          "tokenUsage": {
+            "prompt": 76,
+            "completion": 0,
+            "cached": 0,
+            "total": 76,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-24",
+          "vars": {
+            "payload": "{\"candidates\":[\"Origami is the traditional Japanese art of paper folding.\",\"Do light aerobic activity followed by dynamic stretches targeting the legs and hips before racing.\",\"The Amazon River discharges more water than any other river.\",\"The Berlin Philharmonic is one of the world's leading orchestras.\"],\"query\":\"How should I properly warm up before running a race?\"}",
+            "label": 1
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 24,
+        "tokenUsage": {
+          "prompt": 76,
+          "completion": 0,
+          "cached": 0,
+          "total": 76,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Origami is the traditional Japanese art of paper folding.\",\"Do light aerobic activity followed by dynamic stretches targeting the legs and hips before racing.\",\"The Amazon River discharges more water than any other river.\",\"The Berlin Philharmonic is one of the world's leading orchestras.\"],\"query\":\"How should I properly warm up before running a race?\"}",
+          "label": 1
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=2 vars.label=2",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 74,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The Komodo dragon is the largest living lizard species.\",\"Iceland has significant geothermal energy resources.\",\"A modem connects your network to the internet service provider, while a router distributes that connection to local devices.\",\"The Renaissance produced major advances in art and science.\"],\"query\":\"What is the difference between a router and a modem?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=2",
+          "tokenUsage": {
+            "prompt": 77,
+            "completion": 0,
+            "cached": 0,
+            "total": 77,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-25",
+          "vars": {
+            "payload": "{\"candidates\":[\"The Komodo dragon is the largest living lizard species.\",\"Iceland has significant geothermal energy resources.\",\"A modem connects your network to the internet service provider, while a router distributes that connection to local devices.\",\"The Renaissance produced major advances in art and science.\"],\"query\":\"What is the difference between a router and a modem?\"}",
+            "label": 2
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 25,
+        "tokenUsage": {
+          "prompt": 77,
+          "completion": 0,
+          "cached": 0,
+          "total": 77,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The Komodo dragon is the largest living lizard species.\",\"Iceland has significant geothermal energy resources.\",\"A modem connects your network to the internet service provider, while a router distributes that connection to local devices.\",\"The Renaissance produced major advances in art and science.\"],\"query\":\"What is the difference between a router and a modem?\"}",
+          "label": 2
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=3 vars.label=3",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 57,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The ancient Library of Alexandria was a major center of scholarship.\",\"Dolphins use echolocation to navigate and hunt.\",\"The Empire State Building was completed in 1931.\",\"Plan meals ahead, store food properly, use leftovers creatively, and freeze items before they spoil.\"],\"query\":\"How can I reduce food waste at home?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=3",
+          "tokenUsage": {
+            "prompt": 79,
+            "completion": 0,
+            "cached": 0,
+            "total": 79,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-26",
+          "vars": {
+            "payload": "{\"candidates\":[\"The ancient Library of Alexandria was a major center of scholarship.\",\"Dolphins use echolocation to navigate and hunt.\",\"The Empire State Building was completed in 1931.\",\"Plan meals ahead, store food properly, use leftovers creatively, and freeze items before they spoil.\"],\"query\":\"How can I reduce food waste at home?\"}",
+            "label": 3
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 26,
+        "tokenUsage": {
+          "prompt": 79,
+          "completion": 0,
+          "cached": 0,
+          "total": 79,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The ancient Library of Alexandria was a major center of scholarship.\",\"Dolphins use echolocation to navigate and hunt.\",\"The Empire State Building was completed in 1931.\",\"Plan meals ahead, store food properly, use leftovers creatively, and freeze items before they spoil.\"],\"query\":\"How can I reduce food waste at home?\"}",
+          "label": 3
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=2 vars.label=2",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 68,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The Taj Mahal was built as a mausoleum in the 17th century.\",\"The first transcontinental railroad was completed in 1869.\",\"Install outlet covers or safety plugs, and consider tamper-resistant receptacles in homes with young children.\",\"Polar bears are the largest land carnivores.\"],\"query\":\"What is the recommended way to childproof electrical outlets?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=2",
+          "tokenUsage": {
+            "prompt": 88,
+            "completion": 0,
+            "cached": 0,
+            "total": 88,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-27",
+          "vars": {
+            "payload": "{\"candidates\":[\"The Taj Mahal was built as a mausoleum in the 17th century.\",\"The first transcontinental railroad was completed in 1869.\",\"Install outlet covers or safety plugs, and consider tamper-resistant receptacles in homes with young children.\",\"Polar bears are the largest land carnivores.\"],\"query\":\"What is the recommended way to childproof electrical outlets?\"}",
+            "label": 2
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 27,
+        "tokenUsage": {
+          "prompt": 88,
+          "completion": 0,
+          "cached": 0,
+          "total": 88,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The Taj Mahal was built as a mausoleum in the 17th century.\",\"The first transcontinental railroad was completed in 1869.\",\"Install outlet covers or safety plugs, and consider tamper-resistant receptacles in homes with young children.\",\"Polar bears are the largest land carnivores.\"],\"query\":\"What is the recommended way to childproof electrical outlets?\"}",
+          "label": 2
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=2 vars.label=2",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 67,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"The Rosetta Stone helped decipher Egyptian hieroglyphs.\",\"The Sydney Opera House was completed in 1973.\",\"Follow the manufacturer's mileage interval, check the oil color and level, and watch for the dashboard oil warning light.\",\"Migratory birds travel thousands of miles seasonally.\"],\"query\":\"How do I know when my car needs an oil change?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=2",
+          "tokenUsage": {
+            "prompt": 86,
+            "completion": 0,
+            "cached": 0,
+            "total": 86,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-28",
+          "vars": {
+            "payload": "{\"candidates\":[\"The Rosetta Stone helped decipher Egyptian hieroglyphs.\",\"The Sydney Opera House was completed in 1973.\",\"Follow the manufacturer's mileage interval, check the oil color and level, and watch for the dashboard oil warning light.\",\"Migratory birds travel thousands of miles seasonally.\"],\"query\":\"How do I know when my car needs an oil change?\"}",
+            "label": 2
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 28,
+        "tokenUsage": {
+          "prompt": 86,
+          "completion": 0,
+          "cached": 0,
+          "total": 86,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"The Rosetta Stone helped decipher Egyptian hieroglyphs.\",\"The Sydney Opera House was completed in 1973.\",\"Follow the manufacturer's mileage interval, check the oil color and level, and watch for the dashboard oil warning light.\",\"Migratory birds travel thousands of miles seasonally.\"],\"query\":\"How do I know when my car needs an oil change?\"}",
+          "label": 2
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "pred=0 vars.label=0",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 57,
+        "namedScores": {},
+        "prompt": {
+          "raw": "{\"candidates\":[\"Water deeply in the early morning or evening to reduce evaporation and encourage deep root growth.\",\"The Berlin Wall separated East and West Berlin for decades.\",\"Octopuses can change color to camouflage themselves.\",\"The Panama hat actually originated in Ecuador.\"],\"query\":\"What is the best practice for watering a vegetable garden in summer?\"}",
+          "label": "{{payload}}",
+          "config": {}
+        },
+        "promptId": "0d3a27db341ed0992078ede057f48ea72d960261ea7a7338cde085a073852afb",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://pf_provider_typed.py",
+          "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+        },
+        "response": {
+          "output": "pred=0",
+          "tokenUsage": {
+            "prompt": 75,
+            "completion": 0,
+            "cached": 0,
+            "total": 75,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "case-29",
+          "vars": {
+            "payload": "{\"candidates\":[\"Water deeply in the early morning or evening to reduce evaporation and encourage deep root growth.\",\"The Berlin Wall separated East and West Berlin for decades.\",\"Octopuses can change color to camouflage themselves.\",\"The Panama hat actually originated in Ecuador.\"],\"query\":\"What is the best practice for watering a vegetable garden in summer?\"}",
+            "label": 0
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 29,
+        "tokenUsage": {
+          "prompt": 75,
+          "completion": 0,
+          "cached": 0,
+          "total": 75,
+          "numRequests": 2,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "payload": "{\"candidates\":[\"Water deeply in the early morning or evening to reduce evaporation and encourage deep root growth.\",\"The Berlin Wall separated East and West Berlin for decades.\",\"Octopuses can change color to camouflage themselves.\",\"The Panama hat actually originated in Ecuador.\"],\"query\":\"What is the best practice for watering a vegetable garden in summer?\"}",
+          "label": 0
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 30,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 2432,
+        "completion": 0,
+        "cached": 0,
+        "total": 2432,
+        "numRequests": 60,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "durationMs": 2764,
+      "evaluationDurationMs": 2764
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Held-out retrieval eval (fix round 2); label read from test vars, not provider output",
+    "prompts": [
+      "{{payload}}"
+    ],
+    "providers": [
+      {
+        "id": "file://pf_provider_typed.py",
+        "label": "Nemotron-3-Embed-1B, model-card input_type query/document"
+      }
+    ],
+    "tests": [
+      {
+        "description": "case-00",
+        "vars": {
+          "payload": "{\"candidates\":[\"The nearest train station is two blocks north of the main office.\",\"Our return policy allows refunds within 30 days of purchase.\",\"Photosynthesis converts sunlight into chemical energy in plants.\",\"To reset your password, click Forgot Password on the login page and follow the emailed reset link.\"],\"query\":\"How do you reset a forgotten password on this website?\"}",
+          "label": 3
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-01",
+        "vars": {
+          "payload": "{\"candidates\":[\"A standard chess board has 64 squares.\",\"Shakespeare wrote Hamlet in the early 1600s.\",\"Water boils at 100 degrees Celsius (212 Fahrenheit) at sea level atmospheric pressure.\",\"The capital of Australia is Canberra, not Sydney.\"],\"query\":\"What is the boiling point of water at sea level?\"}",
+          "label": 2
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-02",
+        "vars": {
+          "payload": "{\"candidates\":[\"The Great Wall of China is visible from space is a common myth.\",\"Bees communicate through a waggle dance.\",\"Mount Everest is the tallest mountain above sea level.\",\"Go to Account Settings, select Billing, and click Cancel Subscription to stop future charges.\"],\"query\":\"How can I cancel my monthly subscription?\"}",
+          "label": 3
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-03",
+        "vars": {
+          "payload": "{\"candidates\":[\"The stock market closes at 4pm Eastern time on weekdays.\",\"Dogs have a much stronger sense of smell than humans.\",\"Rainbows form when sunlight is refracted, reflected, and dispersed by water droplets in the atmosphere.\",\"The French Revolution began in 1789.\"],\"query\":\"What causes rainbows to form in the sky?\"}",
+          "label": 2
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-04",
+        "vars": {
+          "payload": "{\"candidates\":[\"The human heart has four chambers.\",\"Volcanoes form at tectonic plate boundaries.\",\"The Olympics are held every four years.\",\"Open printer settings, select Add Printer, choose the wireless network printer, and confirm the connection.\"],\"query\":\"How do I connect my laptop to a wireless printer?\"}",
+          "label": 3
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-05",
+        "vars": {
+          "payload": "{\"candidates\":[\"Jupiter is the largest planet in our solar system.\",\"A leap year occurs every four years to keep the calendar aligned.\",\"The Eiffel Tower was completed in 1889.\",\"Health guidelines generally recommend about 2 to 3 liters of water per day for adults.\"],\"query\":\"What is the recommended daily water intake for adults?\"}",
+          "label": 3
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-06",
+        "vars": {
+          "payload": "{\"candidates\":[\"Sharks have existed for hundreds of millions of years.\",\"The Amazon rainforest produces a large share of Earth's oxygen.\",\"Multiply the Celsius temperature by 9/5 and then add 32 to get Fahrenheit.\",\"The speed of light is approximately 300,000 kilometers per second.\"],\"query\":\"How do you convert Celsius to Fahrenheit?\"}",
+          "label": 2
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-07",
+        "vars": {
+          "payload": "{\"candidates\":[\"Penguins are flightless birds found mostly in the Southern Hemisphere.\",\"Coral reefs support a quarter of all marine species.\",\"Contact the airline immediately for rebooking, check refund eligibility, and request compensation documentation.\",\"The Renaissance began in Italy in the 14th century.\"],\"query\":\"What steps should I take if my flight gets cancelled?\"}",
+          "label": 2
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-08",
+        "vars": {
+          "payload": "{\"candidates\":[\"Compound interest is calculated on the initial principal plus previously accumulated interest, growing balances over time.\",\"The Pacific Ocean is the largest ocean on Earth.\",\"Elephants are the largest living land animals.\",\"Vincent van Gogh painted Starry Night in 1889.\"],\"query\":\"How does compound interest work on a savings account?\"}",
+          "label": 0
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-09",
+        "vars": {
+          "payload": "{\"candidates\":[\"Antarctica is the coldest continent on Earth.\",\"The printing press was invented by Gutenberg around 1440.\",\"File Form 4868 with the IRS before the original deadline to receive an automatic six-month extension.\",\"The human body has 206 bones in adulthood.\"],\"query\":\"What is the process for filing a tax extension?\"}",
+          "label": 2
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-10",
+        "vars": {
+          "payload": "{\"candidates\":[\"Honey never spoils if stored properly.\",\"The Sahara is the largest hot desert in the world.\",\"The Titanic sank in 1912 after hitting an iceberg.\",\"Go to Security Settings, enable Two-Factor Authentication, and link an authenticator app or phone number.\"],\"query\":\"How do I set up two-factor authentication on my account?\"}",
+          "label": 3
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-11",
+        "vars": {
+          "payload": "{\"candidates\":[\"The Berlin Wall fell in 1989.\",\"Octopuses have three hearts and blue blood.\",\"The Statue of Liberty was a gift from France to the United States.\",\"Weather describes short-term atmospheric conditions, while climate describes long-term average patterns over years.\"],\"query\":\"What is the difference between weather and climate?\"}",
+          "label": 3
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-12",
+        "vars": {
+          "payload": "{\"candidates\":[\"Tokyo is the most populous metropolitan area in the world.\",\"The Nile is often cited as the longest river in the world.\",\"Add insulation, seal air leaks, upgrade to energy-efficient windows, and use programmable thermostats.\",\"Chess originated in India over a thousand years ago.\"],\"query\":\"How can I improve my home's energy efficiency?\"}",
+          "label": 2
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-13",
+        "vars": {
+          "payload": "{\"candidates\":[\"Saturn's rings are made mostly of ice and rock particles.\",\"The Louvre in Paris is the world's most visited museum.\",\"The Wright brothers achieved powered flight in 1903.\",\"Common symptoms include thirst, dark urine, fatigue, dizziness, and dry mouth.\"],\"query\":\"What are the symptoms of dehydration?\"}",
+          "label": 3
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-14",
+        "vars": {
+          "payload": "{\"candidates\":[\"Install a cloud storage app, sign in, select folders to sync, and enable automatic backup.\",\"The blue whale is the largest animal to have ever existed.\",\"Coffee is one of the most traded commodities in the world.\",\"The Magna Carta was signed in 1215.\"],\"query\":\"How do I back up files to the cloud?\"}",
+          "label": 0
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-15",
+        "vars": {
+          "payload": "{\"candidates\":[\"The Colosseum in Rome could hold tens of thousands of spectators.\",\"Blot the stain, apply cold water and salt or a stain remover, then wash as usual before it dries.\",\"Beethoven composed nine symphonies.\",\"The moon causes tides through gravitational pull on Earth's oceans.\"],\"query\":\"What is the best way to remove a red wine stain?\"}",
+          "label": 1
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-16",
+        "vars": {
+          "payload": "{\"candidates\":[\"The Andes is the longest mountain range in the world.\",\"The first modern Olympics were held in Athens in 1896.\",\"Peacocks are known for their colorful tail feathers.\",\"Hybrid cars combine a gasoline engine with an electric motor, using regenerative braking to improve fuel efficiency.\"],\"query\":\"How does a hybrid car save fuel compared to a gas car?\"}",
+          "label": 3
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-17",
+        "vars": {
+          "payload": "{\"candidates\":[\"Giraffes have the same number of neck vertebrae as humans.\",\"Leonardo da Vinci painted the Mona Lisa in the early 1500s.\",\"Turn off electricity to the area, remove water with a pump, and identify and fix the source of the leak.\",\"The Dead Sea is one of the saltiest bodies of water on Earth.\"],\"query\":\"What should I do if my basement is flooding?\"}",
+          "label": 2
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-18",
+        "vars": {
+          "payload": "{\"candidates\":[\"The Suez Canal connects the Mediterranean and Red Seas.\",\"Mozart began composing music at a very young age.\",\"The Grand Canyon was carved by the Colorado River over millions of years.\",\"Vaccines train the immune system to recognize and respond to a pathogen without causing the disease itself.\"],\"query\":\"How do vaccines help the immune system fight disease?\"}",
+          "label": 3
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-19",
+        "vars": {
+          "payload": "{\"candidates\":[\"Connect positive to positive, then negative to an unpainted metal surface on the dead car, avoiding sparks near the battery.\",\"The kangaroo is native to Australia and known for hopping.\",\"The Panama Canal opened to shipping traffic in 1914.\",\"Rainforests contain the majority of the world's plant species.\"],\"query\":\"What is the safest way to jump-start a car battery?\"}",
+          "label": 0
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-20",
+        "vars": {
+          "payload": "{\"candidates\":[\"Place the egg in water; a fresh egg sinks and lies flat, while a bad egg floats due to gas buildup.\",\"Wolves live and hunt in coordinated packs.\",\"The Berlin Marathon is one of the six World Marathon Majors.\",\"The Hubble Space Telescope was launched in 1990.\"],\"query\":\"How can I tell if an egg is still fresh?\"}",
+          "label": 0
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-21",
+        "vars": {
+          "payload": "{\"candidates\":[\"Trim the stems and place basil in a glass of water at room temperature, away from direct sunlight.\",\"Tennis originated in France before spreading to England.\",\"Roman aqueducts transported water across long distances.\",\"The Andromeda galaxy is the closest large galaxy to the Milky Way.\"],\"query\":\"What is the correct way to store fresh basil to keep it from wilting?\"}",
+          "label": 0
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-22",
+        "vars": {
+          "payload": "{\"candidates\":[\"The Sistine Chapel ceiling was painted by Michelangelo.\",\"The Trans-Siberian Railway is one of the longest railway lines in the world.\",\"Antibiotics are ineffective against viral infections.\",\"Divide your weight in kilograms by your height in meters squared to get your BMI.\"],\"query\":\"How do I calculate my body mass index (BMI)?\"}",
+          "label": 3
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-23",
+        "vars": {
+          "payload": "{\"candidates\":[\"The Ottoman Empire lasted for several centuries.\",\"Maple syrup is primarily produced in Canada and the northeastern US.\",\"A firewall monitors and controls incoming and outgoing network traffic based on security rules to block unauthorized access.\",\"Cheetahs are the fastest land animals over short distances.\"],\"query\":\"What is the purpose of a firewall in computer networking?\"}",
+          "label": 2
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-24",
+        "vars": {
+          "payload": "{\"candidates\":[\"Origami is the traditional Japanese art of paper folding.\",\"Do light aerobic activity followed by dynamic stretches targeting the legs and hips before racing.\",\"The Amazon River discharges more water than any other river.\",\"The Berlin Philharmonic is one of the world's leading orchestras.\"],\"query\":\"How should I properly warm up before running a race?\"}",
+          "label": 1
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-25",
+        "vars": {
+          "payload": "{\"candidates\":[\"The Komodo dragon is the largest living lizard species.\",\"Iceland has significant geothermal energy resources.\",\"A modem connects your network to the internet service provider, while a router distributes that connection to local devices.\",\"The Renaissance produced major advances in art and science.\"],\"query\":\"What is the difference between a router and a modem?\"}",
+          "label": 2
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-26",
+        "vars": {
+          "payload": "{\"candidates\":[\"The ancient Library of Alexandria was a major center of scholarship.\",\"Dolphins use echolocation to navigate and hunt.\",\"The Empire State Building was completed in 1931.\",\"Plan meals ahead, store food properly, use leftovers creatively, and freeze items before they spoil.\"],\"query\":\"How can I reduce food waste at home?\"}",
+          "label": 3
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-27",
+        "vars": {
+          "payload": "{\"candidates\":[\"The Taj Mahal was built as a mausoleum in the 17th century.\",\"The first transcontinental railroad was completed in 1869.\",\"Install outlet covers or safety plugs, and consider tamper-resistant receptacles in homes with young children.\",\"Polar bears are the largest land carnivores.\"],\"query\":\"What is the recommended way to childproof electrical outlets?\"}",
+          "label": 2
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-28",
+        "vars": {
+          "payload": "{\"candidates\":[\"The Rosetta Stone helped decipher Egyptian hieroglyphs.\",\"The Sydney Opera House was completed in 1973.\",\"Follow the manufacturer's mileage interval, check the oil color and level, and watch for the dashboard oil warning light.\",\"Migratory birds travel thousands of miles seasonally.\"],\"query\":\"How do I know when my car needs an oil change?\"}",
+          "label": 2
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      },
+      {
+        "description": "case-29",
+        "vars": {
+          "payload": "{\"candidates\":[\"Water deeply in the early morning or evening to reduce evaporation and encourage deep root growth.\",\"The Berlin Wall separated East and West Berlin for decades.\",\"Octopuses can change color to camouflage themselves.\",\"The Panama hat actually originated in Ecuador.\"],\"query\":\"What is the best practice for watering a vegetable garden in summer?\"}",
+          "label": 0
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = String(output).trim().match(/^pred=(\\d+)$/);\nif (!m) { return {pass: false, score: 0, reason: 'unparseable output: ' + output}; }\nconst pred = Number(m[1]); const label = Number(context.vars.label);\nreturn {pass: pred === label, score: pred === label ? 1 : 0, reason: 'pred=' + pred + ' vars.label=' + label};\n"
+          }
+        ]
+      }
+    ],
+    "env": {},
+    "outputPath": [
+      "$HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/g0/easy/typed-results.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.123.1",
+    "nodeVersion": "v24.21.0",
+    "platform": "linux",
+    "arch": "x64",
+    "exportedAt": "2026-09-23T12:47:31.743Z",
+    "evaluationCreatedAt": "2026-09-23T12:47:28.901Z"
+  },
+  "vars": [
+    "payload",
+    "label"
+  ],
+  "runtimeOptions": {
+    "eventSource": "cli",
+    "showProgressBar": true,
+    "repeat": 1,
+    "maxConcurrency": 1,
+    "cache": false
+  }
+}

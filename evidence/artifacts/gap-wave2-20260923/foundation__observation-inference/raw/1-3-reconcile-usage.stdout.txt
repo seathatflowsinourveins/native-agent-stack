@@ -1,0 +1,34 @@
+{
+ "claude_exit_code": 0,
+ "native_usage": {
+  "input": 10,
+  "output": 99,
+  "cacheRead": 0,
+  "cacheCreation": 6575
+ },
+ "native_model_usage": {
+  "claude-haiku-4-5-20251001": {
+   "input": 10,
+   "output": 99,
+   "cacheRead": 0,
+   "cacheCreation": 6575
+  }
+ },
+ "before": {},
+ "after": {
+  "cacheCreation": 6575.0,
+  "cacheRead": 0.0,
+  "input": 10.0,
+  "output": 99.0
+ },
+ "all_categories_match_result_usage": true,
+ "all_categories_match_model_usage_sum": true,
+ "attribution_only_child_session": true,
+ "loki_events_for_session": {
+  "api_request": 1,
+  "assistant_response": 1,
+  "managed_settings_resolved": 1,
+  "plugin_loaded": 2,
+  "user_prompt": 1
+ }
+}

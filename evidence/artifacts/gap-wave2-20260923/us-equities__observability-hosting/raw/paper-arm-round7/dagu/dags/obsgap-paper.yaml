@@ -1,0 +1,11 @@
+name: obsgap-paper
+otel:
+  enabled: true
+  endpoint: 127.0.0.1:34317
+  insecure: true
+  resource: {service.name: paper-obsgap-20260923}
+steps:
+  - name: paper-runtime
+    command: $HOME/.local/share/codex-ecosystem/bin/srt -d -s $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/cfg/srt.json -c "sh $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/cfg/paper_step.sh"
+  - name: hot-backup
+    command: sh $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/cfg/hot_step.sh

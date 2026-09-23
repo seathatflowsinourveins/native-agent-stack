@@ -1,0 +1,23 @@
+{
+ "written_at": "2026-09-23T04:41:56Z",
+ "label": "fix-round preregistration, written after the Codex round-1 review and before the fix-round reruns",
+ "review": "raw/review-codex-round1.txt",
+ "gaps": {
+  "5": {
+   "expectation": "After fixing reference-status handling, per-symbol action filtering and empty-reference handling, the AAPL result stays identical to compare.py and the second-symbol counts are unchanged.",
+   "criteria": "identical=true again; new controls: unavailable reference -> bars unavailable (not equal); symbol absent from reference -> unavailable/no_reference_sessions; other-symbol action rows excluded from provider_records."
+  },
+  "6": {
+   "expectation": "Adding per-session open/close time comparison and all non-16:00 closes vs the NYSE page leaves zero disagreements for the five agreeing venue pairs and the NYSE page; IEX still disagrees.",
+   "criteria": "open/close disagreement counts reported per pair; NYSE page check uses every library close != 16:00 and requires 13:00 on page dates; an injected 10:00 open and an injected 14:00 close must be reported (self-test)."
+  },
+  "14": {
+   "expectation": "Same as gap 6 fix round.",
+   "criteria": "Same as gap 6."
+  },
+  "8": {
+   "expectation": "Join cardinality check (no duplicate or unrequested rows) passes on Feast 0.66.0 and the earlier values are unchanged.",
+   "criteria": "Counter of returned (symbol, ts) keys must be <= entity Counter; a self-test appending a duplicate and an unrequested row must fail the check."
+  }
+ }
+}

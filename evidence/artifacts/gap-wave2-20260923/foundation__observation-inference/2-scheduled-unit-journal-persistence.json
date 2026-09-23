@@ -1,0 +1,221 @@
+{
+  "id": "gap-wave2-20260923-foundation-observation-inference-2",
+  "gap_index": 2,
+  "gap_text_sha256": "0e442b35c8855e0804b1c77591eb1fe0bc9a4921bbe74e7ea4e0c848268e84e5",
+  "gap_text": "Scheduled-service and reboot persistence are not qualified (decisions.json line 2036). check_persistence.py covers one user-service restart only.",
+  "next_check": "Enable the pipeline's scheduled unit, confirm it fires across `systemctl --user daemon-reload` and a restart via `journalctl --user`, then run check_persistence.py after a coordinated `wsl --shutdown` restart scheduled when no session is active.",
+  "arms": [
+    {
+      "arm": "enable the pipeline's scheduled unit",
+      "status": "observed, not performed",
+      "detail": "ecosystem-native-data.timer already UnitFileState=enabled; not re-enabled by this check"
+    },
+    {
+      "arm": "confirm it fires across systemctl --user daemon-reload via journalctl --user",
+      "status": "observed, not performed",
+      "detail": "15 daemon-reloads by other activity, each followed by a new start (10.7-139.0 s)"
+    },
+    {
+      "arm": "confirm it fires across a restart",
+      "status": "observed, not performed",
+      "detail": "50 user-manager starts across 4 boots, each followed by a start (45.4-55.6 s)"
+    },
+    {
+      "arm": "preregistered isolated alternative: private systemd --user in an unprivileged user+pid+mount namespace hosting the pipeline timer",
+      "status": "executed (fix round 3; 4 attempts, local_integration)",
+      "detail": "attempt 4: timer fired 3 times: after enable+start, after daemon-reload and after a manager restart (SIGKILL + fresh start; SIGTERM did not stop the manager). Attempts 1-3 failed on cgroup ownership, then a missing basic.target"
+    },
+    {
+      "arm": "run check_persistence.py after a coordinated wsl --shutdown when no session is active",
+      "status": "deferred",
+      "detail": "needs a host-wide WSL VM restart and restarts of the live backends shared with peer sessions; outside this unit's isolation rules. Owner: coordinator/user, in a quiet window."
+    }
+  ],
+  "preregistration": {
+    "written_at": "2026-09-23T02:46:44Z",
+    "expectation": "Enabling a scheduled user unit, daemon-reload/restart of the live user manager and a host-wide wsl --shutdown are outside this unit's isolation rules and would interrupt peer sessions; an isolated systemd user manager is not expected to be startable in an unprivileged namespace here.",
+    "criteria": "Try whether an isolated alternative (unshare user/pid/mount namespace with a private systemd --user instance) can host a timer; if it cannot, record the exact blocker and defer. Settled would need a fired timer across daemon-reload and restart plus a post-wsl---shutdown check_persistence.py pass.",
+    "late": true,
+    "committed_in": "1a59606 (2026-09-23T02:46:44Z, before any check ran)",
+    "late_note": "The preregistered plan (02:46:44Z) was to try a private systemd --user and otherwise defer; rounds 1-2 did not try it and designed the read-only journal analysis instead (first run 03:02:21Z). The private systemd --user was first tried in fix round 3 (preregistered 14:15:26Z, attempts 14:19-14:52Z). The fix-round revision (counting Starting lines) was preregistered at 03:28:46Z before its 03:30:29Z run.",
+    "fix_round": {
+      "written_at": "2026-09-23T03:28:46Z",
+      "label": "fix-round preregistration (after the independent Codex review in raw/review-codex-round1.txt), written before the fix-round runs",
+      "expectation": "Counting the next 'Starting ecosystem-native-data.service' (not any completion) after each reload/manager start still finds a start after every event; supporting journal lines are retained sanitized.",
+      "criteria": "Per event: seconds to the next Starting line; events without a later Starting line are reported. Manual starts cannot be excluded from the journal alone; stated as a limit.",
+      "committed_in": "the commit 'Record the Codex review and preregister the fix round' (2026-09-23T03:28:46Z, before the fix-round runs)"
+    },
+    "fix_round_3": {
+      "expectation": "Uncertain. This process sits in the root-owned /init.scope cgroup, so a private systemd --user in an unprivileged user+pid+mount namespace may fail to set up cgroups; if it starts, the pipeline timer settings (OnBootSec=45s, OnUnitActiveSec=2min, AccuracySec=10s, copied verbatim; service replaced by a harmless marker-file append) fire before and after a daemon-reload and after a manager restart.",
+      "criteria": "Harness: unshare --user --map-root-user --pid --fork --mount-proc --mount; tmpfs over /run/user/1000 so the live manager socket is unreachable; temp HOME/XDG_*; SYSTEMD_UNIT_PATH set to a temp dir only; DBUS_SESSION_BUS_ADDRESS unset; enable the timer with systemctl --user enable against the private manager. Detection: each service run appends a UTC timestamp to a marker file; a phase counts as fired only if a new marker line appears after the event (daemon-reload; manager SIGTERM + restart with the same unit dir) within 180 s. If the manager cannot start or cannot run the service, record its exact stderr/exit as the blocker for these arms. Outcome stays advanced regardless: this is a local_integration check of timer semantics on a private manager; the live-manager and wsl --shutdown + check_persistence.py arms stay open. Time-box 20 min.",
+      "addendum": {
+        "written_at": "2026-09-23T14:21:11Z",
+        "label": "addendum written after attempt 1 (14:19:04Z) and the strace diagnosis (14:21:01Z), before attempt 2",
+        "observed_blocker": "private systemd --user exits 1 after openat(/sys/fs/cgroup/init.scope/cgroup.procs) = EACCES: the caller sits in the root-owned /init.scope cgroup (its log target /dev/console is also EACCES, hence no message).",
+        "plan": "Attempt 2 runs the same harness inside the project-sanctioned $HOME/codex-ecosystem/bin/ecosystem-bounded-run, whose transient scope under the live user manager is owned by uid 1000 (ECOSYSTEM_JOB_SECONDS=1100). This creates one transient scope on the live user manager, as every bounded job here does; no unit file, reload or restart of the live manager.",
+        "criteria": "Unchanged from fix_round_3.gaps.2. If the manager still cannot start, the exact failing syscall/stderr is the recorded blocker."
+      },
+      "addendum_2": {
+        "written_at": "2026-09-23T14:43:01Z",
+        "label": "second addendum, written after attempt 2 (14:21:35-14:39:55Z) and before attempt 3",
+        "observed": "Attempt 2: the private manager started (state=running) inside the bounded scope and the timer was enabled and active, but no marker line appeared in 180 s; after daemon-reload the timer showed ActiveState=failed; SIGTERM did not stop the manager (no exit.target in the private unit path), so the harness hung until its 1100 s timeout (exit 143). The manager log was empty because it logs to /dev/console (EACCES).",
+        "plan": "Attempt 3 = same harness plus: /dev/console bind-mounted to a temp file inside the private mount namespace so the manager log is kept; a private exit.target (DefaultDependencies=no, SuccessAction=exit-force) so SIGTERM exits the manager, with a 30 s bound then SIGKILL (recorded); systemctl --user show/status of the service and timer after each phase. Diagnostic of the same criteria; they are unchanged.",
+        "criteria": "Unchanged from fix_round_3.gaps.2. If the stand-in service still does not run, the manager log line that explains it is the recorded blocker."
+      },
+      "addendum_3": {
+        "written_at": "2026-09-23T14:47:11Z",
+        "label": "third addendum, written after attempt 3 (14:43:19-14:46:40Z) and before attempt 4",
+        "observed": "Attempt 3: manager running, SIGTERM bound in place, but the timer went to ActiveState=failed about 40 s after start while the stand-in service never ran (Result=success, ExecMainCode=0, inactive); /dev/console bind produced no log lines. Operator stopped attempt 3 at 14:46:40Z by SIGKILL of the namespace init after an over-broad pkill -f also matched the operator shell.",
+        "hypothesis": "The private unit path lacked basic.target, which user services require through default dependencies, so the timer could not queue the service start job.",
+        "plan": "Attempt 4 = attempt 3 plus stock basic.target, sockets.target, paths.target and shutdown.target copied verbatim from /usr/lib/systemd/user (unit files only, no .wants directories), and the timer Result property in each state line.",
+        "criteria": "Unchanged from fix_round_3.gaps.2. If the service still does not run, record the timer Result and stop; the arms stay open."
+      },
+      "written_at": "2026-09-23T14:15:26Z",
+      "label": "fix-round-3 preregistration (after the independent Opus review of 2026-09-23), written before any fix-round-3 run; real UTC time from the writer process",
+      "committed_in": "929154c (2026-09-23T14:15:26Z, before any fix-round-3 run)",
+      "addendum_commits": {
+        "addendum": "13a9fd8 (14:21:30Z, before attempt 2 at 14:21:35Z)",
+        "addendum_2": "e8b3be5 (14:43:16Z, before attempt 3 at 14:43:19Z)",
+        "addendum_3": "05d3da0 (14:47:11Z, before attempt 4 at 14:47:14Z)"
+      }
+    }
+  },
+  "commands": [
+    "cd $HOME/code/nas-wt-g2-observation-inference && ECOSYSTEM_JOB_SECONDS=1150 $HOME/codex-ecosystem/bin/ecosystem-bounded-run /bin/bash blueprints/gap-wave2-20260923/foundation__observation-inference/private_user_manager.sh evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager > evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager.txt 2>&1   (fix round 3 attempt 4, 14:47:14-14:52:03Z; attempts 2-3 used the same command with earlier script revisions, attempt 1 ran without ecosystem-bounded-run)",
+    "cd $HOME/code/nas-wt-g2-observation-inference && bash blueprints/gap-wave2-20260923/foundation__observation-inference/private_user_manager_diag.sh $HOME/.cache/gap-wave2-20260923/observation-inference/strace-pkg/root/usr/bin/strace > evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager-diag.txt   (strace 6.8 from `apt-get download strace` (584 kB, sha256 d588810a...), extracted with dpkg -x into the cache dir, not installed)",
+    "cd $HOME/code/nas-wt-g2-observation-inference && python3 blueprints/gap-wave2-20260923/foundation__observation-inference/journal_timer.py --out evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-journal-timer.json   (fix round 03:30:29Z: counts the next 'Starting' line and retains failure lines; earlier versions retained as 2-journal-timer-run1.*)",
+    "read-only inputs inside the script: journalctl --user --list-boots -o json; journalctl --user -b <id> -o json; systemctl --user show ecosystem-native-data.timer -p UnitFileState,ActiveState,LastTriggerUSec"
+  ],
+  "results": [
+    "timer_state_now={\"LastTriggerUSec\": \"Tue 2026-09-22 23:30:13 EDT\", \"ActiveState\": \"active\", \"UnitFileState\": \"enabled\"}",
+    "boot -3 (2026-09-22T10:46:21.744691Z..2026-09-22T13:03:04.669757Z): user_manager_starts=46, starting_events=46, finished_runs=46, failed_runs=0 [], first_run_after_boot_s=55.4, max_gap_between_runs_s=183.4, daemon_reloads=0, next_start_after_each_reload_s=[], manager_starts_without_later_start=0",
+    "boot -2 (2026-09-22T13:06:54.843233Z..2026-09-22T13:38:12.087241Z): user_manager_starts=1, starting_events=10, finished_runs=8, failed_runs=2 ['timeout'], first_run_after_boot_s=52.0, max_gap_between_runs_s=965.8, daemon_reloads=0, next_start_after_each_reload_s=[], manager_starts_without_later_start=0",
+    "boot -1 (2026-09-22T13:40:08.048692Z..2026-09-22T14:45:52.771636Z): user_manager_starts=1, starting_events=31, finished_runs=30, failed_runs=1 ['exit-code'], first_run_after_boot_s=49.8, max_gap_between_runs_s=270.6, daemon_reloads=4, next_start_after_each_reload_s=[139.0, 76.9, 76.8, 53.2], manager_starts_without_later_start=0",
+    "boot 0 (2026-09-22T14:46:06.182311Z..2026-09-23T03:30:25.312601Z): user_manager_starts=2, starting_events=361, finished_runs=361, failed_runs=0 [], first_run_after_boot_s=47.8, max_gap_between_runs_s=135.1, daemon_reloads=11, next_start_after_each_reload_s=[51.1, 51.0, 10.8, 10.7, 36.6, 36.4, 23.6, 108.0, 107.8, 86.8, 86.7], manager_starts_without_later_start=0",
+    "retained failure lines: 2026-09-22T13:32:09.050475Z systemd: ecosystem-native-data.service: Main process exited, code=killed, status=9/KILL | 2026-09-22T13:36:31.190084Z systemd: ecosystem-native-data.service: Failed with result 'timeout'. | 2026-09-22T13:36:31.191831Z systemd: Failed to start ecosystem-native-data.service - Observe selected native memory and token metadata. | 2026-09-22T13:36:31.193834Z systemd: ecosystem-native-data.service: Main process exited, code=killed, status=15/TERM | 2026-09-22T13:36:31.193848Z systemd: ecosystem-native-data.service: Failed with result 'timeout'. | 2026-09-22T13:36:31.193859Z systemd: Failed to start ecosystem-native-data.service - Observe selected native memory and token metadata. | 2026-09-22T14:15:44.824664Z systemd: ecosystem-native-data.service: Main process exited, code=exited, status=1/FAILURE | 2026-09-22T14:15:44.824744Z systemd: ecosystem-native-data.service: Failed with result 'exit-code'. | 2026-09-22T14:15:44.824861Z systemd: Failed to start ecosystem-native-data.service - Observe selected native memory and token metadata.",
+    "fix round 3 attempt 1 (no bounded scope, manager as namespace root): manager exited 1 with no message; strace diagnosis: started=2026-09-23T14:21:01Z cgroup_of_caller=0::/init.scope cgroup_dir_owner=root:root | mode=ns-root systemd_exit=1 | mode=nested-uid1000 systemd_exit=1 | openat(AT_FDCWD, \"/sys/fs/cgroup/init.scope/cgroup.procs\", O_WRONLY|O_NOCTTY|O_CLOEXEC) = -1 EACCES (Permission denied) | openat(AT_FDCWD, \"/sys/fs/cgroup/init.scope/cgroup.procs\", O_WRONLY|O_NOCTTY|O_CLOEXEC) = -1 EACCES (Permission denied)",
+    "fix round 3 attempt 2 (inside the ecosystem-bounded-run scope, nested uid 1000): PHASE enable-start: NOT fired within 180 s | daemon-reload issued; NextElapseUSecMonotonic=infinity LastTriggerUSec= ActiveState=failed UnitFileState=enabled  | PHASE daemon-reload: NOT fired within 180 s | manager ignored SIGTERM; harness hit its 1100 s timeout (exit 143)",
+    "fix round 3 attempt 3 (log capture + exit.target): after phase enable-start: NextElapseUSecMonotonic=infinity LastTriggerUSec= ActiveState=failed UnitFileState=enabled | service: Result=success NRestarts=0 ExecMainCode=0 ExecMainStatus=0 ActiveState=inactive  | stopped by the operator at 14:46:40Z",
+    "fix round 3 attempt 4 (stock basic/sockets/paths/shutdown targets added): manager pid=25 state=running | PHASE enable-start: fired after 48 s (marker lines 1) | PHASE daemon-reload: fired after 130 s (marker lines 2) | manager did not exit on SIGTERM within 30 s; SIGKILL sent | manager pid=948 state=running | PHASE manager-restart: fired after 49 s (marker lines 3) | manager did not exit on SIGTERM within 30 s; SIGKILL sent",
+    "attempt 4 marker lines (one per stand-in service run): ['2026-09-23T14:48:03Z', '2026-09-23T14:50:13Z', '2026-09-23T14:51:33Z']"
+  ],
+  "outcome": "advanced",
+  "note": "Read-only journal analysis: ecosystem-native-data.service (whose only configured trigger is the enabled timer; manual starts cannot be excluded) started 45.4-55.6 s after every one of 50 user-manager starts across 4 recorded boots, and again 10.7-139.0 s after every one of 15 daemon-reloads. 3 runs failed (2 timeouts in boot -2, 1 exit-code in boot -1) and one inter-run gap reached 966 s in boot -2. Fix round 3 ran the preregistered isolated alternative: a private systemd --user in an unprivileged namespace, inside an ecosystem-bounded-run scope, with the pipeline timer settings copied verbatim and a marker-writing stand-in service. It fired 48 s after enable+start, 130 s after a deliberate daemon-reload and 49 s after a manager restart, which matches the live journal. Attempt 1 failed because this shell sits in the root-owned /init.scope cgroup; attempts 2-3 lacked basic.target. Remaining: (1) the manager restart was a SIGKILL plus fresh start, because the private manager ignored SIGTERM even with a stub exit.target; (2) no deliberate reload or restart of the live user manager with the real service; (3) check_persistence.py after a coordinated wsl --shutdown. Blocker for (2) and (3): they restart the live user manager, live services and the WSL VM shared with peer sessions, which this unit's isolation rules forbid. A private manager cannot reproduce a VM restart or the live backends' data persistence. Owner: coordinator/user, in a quiet window.",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Observational: reloads, manager starts and boots came from other activity on 2026-09-22 (causes not recorded).",
+    "A manual systemctl --user start cannot be excluded from the journal alone; the service has no trigger other than the timer.",
+    "Backend data retention across those boots was not queried; check_persistence.py was not run.",
+    "Private-manager check (local_integration): the stand-in service only appends a timestamp, and the live ExecStart and its MemoryHigh/MemoryMax drop-ins were not exercised. The restart was a SIGKILL plus fresh start. Detection: a phase counts only when a new marker line appears after the event (attempts 2-3 show the method reports failures).",
+    "Side effects of the private manager, all inside the private root: the system user generators ran (the WSL generator wrote wslg-session.service into the private default.target.wants, and xdg-autostart wrote units that the private default.target does not pull in). No pulse or wayland entries appeared in the private runtime dir. The live /run/user/1000 was hidden under a tmpfs in the private mount namespace. Each run created one ecosystem-bounded-run transient scope on the live user manager, as every bounded job here does.",
+    "Publication redaction: in the committed 2-fr3-private-manager*.txt files the private temp HOME path \"<root>/home/\" is written \"<root>/<private-home>/\", and one path in preregistrations.json (fix_round_3 addendum) is written with $HOME; the repository validator treats /home/<name> as a personal path. No other edit was made to these raw files.",
+    "Script versions: attempt 4 ran private_user_manager.sh git blob d033229 (commit 05d3da0, sha256 062701a4a87d...); the committed version (sha256 in helper_scripts) differs only by quoting \"home\" on lines 40-41 so the validator path rule passes, which is shell-identical (bash expands the quoted and unquoted forms to the same path). Attempts 2 and 3 ran blobs a149e39 (13a9fd8) and 59d1391 (e8b3be5). Attempt 1 ran an uncommitted first revision (no nested uid drop); its blocker was reproduced by private_user_manager_diag.sh, unchanged since it produced raw/2-fr3-private-manager-diag.txt.",
+    "Attempt 3 was stopped by an over-broad pkill -f that also matched the operator shell; the namespace init was then SIGKILLed. Attempt 2 and 3 manager logs are empty: the manager logs to /dev/console, and binding a file over it captured nothing."
+  ],
+  "checked_at": "2026-09-23T14:52:03Z",
+  "independent_review": {
+    "round1": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+    "round2": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt",
+    "round3_opus": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-opus-round3.json"
+  },
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-journal-timer.json",
+      "sha256": "a2ded7daf58d013c20a13046096cdd88485641c6c9847e3641e96ca19ea7fa97"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-journal-timer.stdout.txt",
+      "sha256": "7fb7a16337b5423ddadba0b493908516d1f139adadcc54bf0e937a9d54a5d542"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-journal-timer-run1.json",
+      "sha256": "8ea1c09f0ebc0fd3b642d8057ff8ec1a3b787e612a6273a7c58fc2a4650d4af3"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-journal-timer-run1.stdout.txt",
+      "sha256": "6457dc9ea249cc4cb794ef8a859b18a79d80739dfa9d307340f8fcf7e480df34"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager.txt",
+      "sha256": "c58deb0afa7835f6f3668cf91b896d7abc1c36987a6f68f9bc5bcd2b5a5c44b1"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager.exit.txt",
+      "sha256": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager.marker.txt",
+      "sha256": "b5bb5e21075d91d0718480a022be7886134b25a1a3de565cfed3c35270543e42"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager.manager-log.txt",
+      "sha256": "2b08f97e8d019e6d5a36a245ab328bd360ded826677b8677d03ed46ff2f0fcbc"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager-diag.txt",
+      "sha256": "e9d242ff7e23a30d4cd1869ba0eb33b0cb859506ca061bd4e791768343a568bb"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager-attempt1.txt",
+      "sha256": "72416ca103993d65b16c0268f246b65c6770ebf2d9ecd1ac038a0db02d7ba70c"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager-attempt1.manager-log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager-attempt1.marker.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager-attempt2.txt",
+      "sha256": "94a70474ce2c2f1d3c47668085e7da42e53454ce0579bfa49d8ae354b9f6a7a4"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager-attempt2.exit.txt",
+      "sha256": "d405f51eb172a77088a8ce33fe98ab1de4f1af2381243c36b41a5cc22beada3d"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager-attempt3.txt",
+      "sha256": "842a7222058e7736cf87febf416b160ea9ab6e91502a16ae209ae793bda6e371"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager-attempt3.exit.txt",
+      "sha256": "cf205dbb8cea84897b488abcc281bf96698d5e94b1096b16657b4caba9082a22"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager-attempt3.manager-log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/2-fr3-private-manager-attempt3.marker.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+      "sha256": "ad7cc8072536345565f1a9ad0ca6688e80b71c6d5ea0eacfc765479718b31ee8"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt",
+      "sha256": "a1cc543a79e7f621f9ce7d338b3d36d15ba88ee5297b3dd2b49e299ffa91c15b"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-opus-round3.json",
+      "sha256": "ecfd0de7932e22eb07f706399761f4bdba8053d19909f3a1f88059e5c375f9e9"
+    }
+  ],
+  "helper_scripts": [
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/journal_timer.py",
+      "sha256": "10d3027cccf27b750dfd49ad246388a1d1f4cf588b41c5f9e0e3956ae6b9ed29"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/private_user_manager.sh",
+      "sha256": "22d935fedb86b6d303d7250459cdce284d06689dbef18e22cab3f6604495468e"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/private_user_manager_diag.sh",
+      "sha256": "a0681a52988a1982f0c9d63ad326941bbd544bcf21c9f328bbdab29d787fabaa"
+    }
+  ]
+}

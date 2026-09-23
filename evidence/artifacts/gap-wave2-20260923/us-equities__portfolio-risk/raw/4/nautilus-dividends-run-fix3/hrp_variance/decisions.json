@@ -1,0 +1,332 @@
+[
+  {
+    "date": "2016-01-12",
+    "native_cash": "1000000.00",
+    "native_equity": "1000000.0000",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 0
+    },
+    "target": {
+      "IWM": 4657,
+      "QQQ": 2060,
+      "SPY": 1494
+    }
+  },
+  {
+    "date": "2016-04-13",
+    "native_cash": "13997.23",
+    "native_equity": "1076264.6900",
+    "native_held": {
+      "IWM": 4657,
+      "QQQ": 2060,
+      "SPY": 1494
+    },
+    "target": {
+      "IWM": 4490,
+      "QQQ": 2087,
+      "SPY": 1585
+    }
+  },
+  {
+    "date": "2016-07-13",
+    "native_cash": "15967.85",
+    "native_equity": "1124180.5400",
+    "native_held": {
+      "IWM": 4490,
+      "QQQ": 2087,
+      "SPY": 1585
+    },
+    "target": {
+      "IWM": 4272,
+      "QQQ": 2259,
+      "SPY": 1638
+    }
+  },
+  {
+    "date": "2016-10-11",
+    "native_cash": "15375.95",
+    "native_equity": "1151764.1300",
+    "native_held": {
+      "IWM": 4272,
+      "QQQ": 2259,
+      "SPY": 1638
+    },
+    "target": {
+      "IWM": 3732,
+      "QQQ": 2422,
+      "SPY": 1874
+    }
+  },
+  {
+    "date": "2017-01-11",
+    "native_cash": "17211.27",
+    "native_equity": "1249316.6900",
+    "native_held": {
+      "IWM": 3732,
+      "QQQ": 2422,
+      "SPY": 1874
+    },
+    "target": {
+      "IWM": 3402,
+      "QQQ": 2515,
+      "SPY": 2041
+    }
+  },
+  {
+    "date": "2017-04-12",
+    "native_cash": "16967.45",
+    "native_equity": "1283292.5600",
+    "native_held": {
+      "IWM": 3402,
+      "QQQ": 2515,
+      "SPY": 2041
+    },
+    "target": {
+      "IWM": 2963,
+      "QQQ": 2773,
+      "SPY": 2166
+    }
+  },
+  {
+    "date": "2017-07-13",
+    "native_cash": "18632.95",
+    "native_equity": "1358302.2700",
+    "native_held": {
+      "IWM": 2963,
+      "QQQ": 2773,
+      "SPY": 2166
+    },
+    "target": {
+      "IWM": 2689,
+      "QQQ": 2534,
+      "SPY": 2482
+    }
+  },
+  {
+    "date": "2017-10-11",
+    "native_cash": "18667.77",
+    "native_equity": "1429438.5200",
+    "native_held": {
+      "IWM": 2689,
+      "QQQ": 2534,
+      "SPY": 2482
+    },
+    "target": {
+      "IWM": 2601,
+      "QQQ": 2269,
+      "SPY": 2703
+    }
+  },
+  {
+    "date": "2018-01-11",
+    "native_cash": "20647.38",
+    "native_equity": "1547162.2500",
+    "native_held": {
+      "IWM": 2601,
+      "QQQ": 2269,
+      "SPY": 2703
+    },
+    "target": {
+      "IWM": 1547,
+      "QQQ": 3274,
+      "SPY": 2727
+    }
+  },
+  {
+    "date": "2018-04-13",
+    "native_cash": "20404.86",
+    "native_equity": "1509954.9400",
+    "native_held": {
+      "IWM": 1547,
+      "QQQ": 3274,
+      "SPY": 2727
+    },
+    "target": {
+      "IWM": 4531,
+      "QQQ": 1767,
+      "SPY": 1931
+    }
+  },
+  {
+    "date": "2018-07-13",
+    "native_cash": "21062.86",
+    "native_equity": "1636902.0400",
+    "native_held": {
+      "IWM": 4531,
+      "QQQ": 1767,
+      "SPY": 1931
+    },
+    "target": {
+      "IWM": 4881,
+      "QQQ": 1635,
+      "SPY": 1822
+    }
+  },
+  {
+    "date": "2018-10-11",
+    "native_cash": "21854.76",
+    "native_equity": "1544619.6700",
+    "native_held": {
+      "IWM": 4881,
+      "QQQ": 1635,
+      "SPY": 1822
+    },
+    "target": {
+      "IWM": 5103,
+      "QQQ": 1588,
+      "SPY": 1748
+    }
+  },
+  {
+    "date": "2019-01-14",
+    "native_cash": "21453.49",
+    "native_equity": "1450211.2000",
+    "native_held": {
+      "IWM": 5103,
+      "QQQ": 1588,
+      "SPY": 1748
+    },
+    "target": {
+      "IWM": 5307,
+      "QQQ": 1536,
+      "SPY": 1693
+    }
+  },
+  {
+    "date": "2019-04-15",
+    "native_cash": "19620.31",
+    "native_equity": "1630121.6700",
+    "native_held": {
+      "IWM": 5307,
+      "QQQ": 1536,
+      "SPY": 1693
+    },
+    "target": {
+      "IWM": 5035,
+      "QQQ": 1513,
+      "SPY": 1866
+    }
+  },
+  {
+    "date": "2019-07-16",
+    "native_cash": "22449.91",
+    "native_equity": "1655578.1200",
+    "native_held": {
+      "IWM": 5035,
+      "QQQ": 1513,
+      "SPY": 1866
+    },
+    "target": {
+      "IWM": 4959,
+      "QQQ": 1540,
+      "SPY": 1906
+    }
+  },
+  {
+    "date": "2019-10-14",
+    "native_cash": "22935.04",
+    "native_equity": "1623507.8700",
+    "native_held": {
+      "IWM": 4959,
+      "QQQ": 1540,
+      "SPY": 1906
+    },
+    "target": {
+      "IWM": 5029,
+      "QQQ": 1607,
+      "SPY": 1849
+    }
+  },
+  {
+    "date": "2020-01-14",
+    "native_cash": "23180.81",
+    "native_equity": "1819984.9500",
+    "native_held": {
+      "IWM": 5029,
+      "QQQ": 1607,
+      "SPY": 1849
+    },
+    "target": {
+      "IWM": 4466,
+      "QQQ": 1801,
+      "SPY": 2019
+    }
+  },
+  {
+    "date": "2020-04-15",
+    "native_cash": "24001.59",
+    "native_equity": "1488077.2600",
+    "native_held": {
+      "IWM": 4466,
+      "QQQ": 1801,
+      "SPY": 2019
+    },
+    "target": {
+      "IWM": 5709,
+      "QQQ": 1836,
+      "SPY": 1497
+    }
+  },
+  {
+    "date": "2020-07-15",
+    "native_cash": "20739.10",
+    "native_equity": "1820955.2200",
+    "native_held": {
+      "IWM": 5709,
+      "QQQ": 1836,
+      "SPY": 1497
+    },
+    "target": {
+      "IWM": 5053,
+      "QQQ": 2001,
+      "SPY": 1669
+    }
+  },
+  {
+    "date": "2020-10-13",
+    "native_cash": "24678.14",
+    "native_equity": "2020502.7300",
+    "native_held": {
+      "IWM": 5053,
+      "QQQ": 2001,
+      "SPY": 1669
+    },
+    "target": {
+      "IWM": 5100,
+      "QQQ": 1891,
+      "SPY": 1751
+    }
+  },
+  {
+    "date": "2021-01-04",
+    "native_cash": "27549.32",
+    "native_equity": "2245055.8200",
+    "native_held": {
+      "IWM": 5100,
+      "QQQ": 1891,
+      "SPY": 1751
+    },
+    "target": {
+      "IWM": 4753,
+      "QQQ": 1976,
+      "SPY": 1874
+    }
+  },
+  {
+    "date": "2021-03-31",
+    "native_cash": "28108.86",
+    "native_equity": "2451559.9800",
+    "native_held": {
+      "IWM": 4753,
+      "QQQ": 1976,
+      "SPY": 1874
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 0
+    }
+  }
+]

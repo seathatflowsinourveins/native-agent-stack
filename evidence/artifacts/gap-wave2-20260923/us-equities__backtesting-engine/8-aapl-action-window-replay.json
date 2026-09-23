@@ -1,0 +1,107 @@
+{
+  "id": "gap-wave2-20260923/us-equities/backtesting-engine/8-aapl-action-window-replay",
+  "gap_index": 8,
+  "gap_text_sha256": "f2cd2409dd7a864b1cadb4f8e101e1fa81869c7e6bbc8c319e3e7ce0c69c8cd5",
+  "preregistration": {
+    "written_at": "2026-09-23T06:21:22Z",
+    "expectation": "advanced: the same retained Alpaca bars allow a replay across both AAPL actions with fills and position/cash reconciliation, but they are daily bars only; quote-based fills need an Alpaca quote acquisition, which needs a credential read this wave forbids.",
+    "criteria": [
+      "settled only if the replay uses quote-based fills over a window with a dividend or split and records fills plus position/cash reconciliation",
+      "advanced if the bar-based replay across both actions completes with an independent position and cash reconciliation"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration.json (committed in 2b93d4d before any check ran)"
+  },
+  "next_check": "Replay AAPL over a window that includes a dividend or split with Alpaca historical bars and quote-based fills, and record the fills and position/cash reconciliation.",
+  "commands": [
+    "NENV=$HOME/.local/share/codex-ecosystem/tools/nautilus-2.0.0rc5; REPO=$HOME/code/nas-wt-g2-backtesting-engine; C=$HOME/.cache/gap-wave2-20260923/backtesting-engine",
+    "bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind $NENV $NENV --ro-bind $REPO /repo --ro-bind $HOME/codex-ecosystem/state/authenticated-data-20260920/alpaca-run-1 /data --bind $C/ca-window /out --chdir /repo --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PYTHONDONTWRITEBYTECODE 1 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 $NENV/bin/python -I /repo/blueprints/gap-wave2-20260923/us-equities__backtesting-engine/ca_window_replay.py --run /data --out /out/native"
+  ],
+  "results": {
+    "shared_run": "Same native run as gap 1 (ca_window_replay.py).",
+    "fills": [
+      {
+        "side": "BUY",
+        "qty": 10,
+        "avg_px": "435.7500",
+        "ts": "2020-08-03T20:00:00Z (16:00 NY), raw close"
+      },
+      {
+        "side": "SELL",
+        "qty": 10,
+        "avg_px": "120.9600",
+        "ts": "2020-09-04T20:00:00Z (16:00 NY), raw close"
+      }
+    ],
+    "account_totals_usd": [
+      "100000.00",
+      "95642.50",
+      "96852.10"
+    ],
+    "position_cash_reconciliation": {
+      "fill_count": true,
+      "fill_BUY_at_raw_close": true,
+      "fill_SELL_at_raw_close": true,
+      "fill_BUY_at_bar_instant": true,
+      "fill_SELL_at_bar_instant": true,
+      "native_final_cash_equals_fill_only_ledger": true,
+      "account_events_equal_fills_plus_initial": true,
+      "one_mark_per_bar": true,
+      "terminal_flat": true,
+      "position_quantity_constant_10_while_held": true,
+      "cash_constant_while_held": true
+    },
+    "economic_reference": {
+      "split_ratio": "4",
+      "dividend_cash_usd": "8.20",
+      "final_cash_usd": "100489.10",
+      "native_minus_economic_usd": "-3637.00",
+      "missing_split_adjustment_usd": "3628.80",
+      "unposted_dividend_usd": "8.20"
+    },
+    "fill_basis": "bar-based: market orders filled at the completed daily bar close (liquidity_side TAKER), no quote data."
+  },
+  "raw_outputs": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-8-ca-window-replay-published.json",
+      "sha256": "7e5aed60c381b07e164e3fe1a8fed7a64a40838eea60f8fe0bc64e6309d822a3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-8-ca-window-replay.stdout.txt",
+      "sha256": "3eb5368f544fa58a74d842b0d8ce9a753b3c2e990881ecc638b378f5655b8979"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-8-ca-window-replay.exit.txt",
+      "sha256": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-8-detection-probe.stdout.txt",
+      "sha256": "1fd85f273b95e1b982d4c6d4b93ce3d29a51343598dab0048d69acd31e04151e"
+    }
+  ],
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "remaining": "Quote-based fills: needs a new authenticated Alpaca quote acquisition for AAPL around 2020-08-07/2020-08-31; this wave forbids credential reads, and no retained Alpaca quote payload exists on this host (only the 25 daily bars and 2 action pages in alpaca-run-1).",
+  "limits": [
+    "Unlimited modeled depth remains (default fill model on bars).",
+    "Corporate actions are not applied by the engine; the reconciliation proves the native ledger equals a fills-only ledger, and the -3637.00 USD gap to the economic reference is the unhandled split plus the 8.20 USD unposted dividend."
+  ],
+  "checked_at": "2026-09-23T07:09:55Z",
+  "fix_round_2": {
+    "preregistration_written_at": "2026-09-23T07:09:27Z",
+    "label": "fix-round 2 preregistration, written after the Codex re-review of faebb70 and before the fix-round-2 rerun",
+    "expectation": "Same as gap 1.",
+    "criteria": [
+      "outcome stays advanced"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration-fix2.json (committed in e1fa1b3 before the fix-round-2 run)"
+  },
+  "fix_round_1": {
+    "preregistration_written_at": "2026-09-23T07:00:03Z",
+    "label": "fix-round 1 preregistration, written after the independent Codex review of c6c7f07/e951e32 and before any fix-round run; the original preregistration.json (2b93d4d) is unchanged",
+    "expectation": "Same hardened rerun as gap 1; bar-based fills reconcile.",
+    "criteria": [
+      "outcome stays advanced (quote-based fills remain)"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration-fix1.json (committed in 43a2f90 before the fix-round runs)"
+  }
+}

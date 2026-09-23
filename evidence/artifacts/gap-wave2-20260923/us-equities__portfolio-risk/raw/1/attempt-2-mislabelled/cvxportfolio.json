@@ -1,0 +1,23 @@
+{
+  "inputs_unchanged": true,
+  "library": "cvxportfolio",
+  "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+  "python": "3.13.15",
+  "result": {
+    "backtest_annualized_return": 0.30981375422660234,
+    "backtest_annualized_volatility": 0.009797698232807621,
+    "backtest_end": "2021-03-30",
+    "backtest_final_value": 1070338.1328127107,
+    "backtest_periods": 60,
+    "backtest_sharpe_ratio": 1.9686420379548093,
+    "backtest_start": "2021-01-04",
+    "execute_cash_weight": 0.0,
+    "execute_time": "2021-01-04 00:00:00",
+    "execute_weights": {
+      "IWM": 1.7203985893485127e-22,
+      "QQQ": 1.7204888877389021e-22,
+      "SPY": 1.0
+    }
+  },
+  "version": "1.5.1"
+}

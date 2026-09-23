@@ -1,0 +1,81 @@
+{
+  "helper": "blueprints/us-equities/workers/native_worker.py",
+  "helper_function_sha256": "9bce397536064e7dbfb64447a2ead6aa6f8e296193e871e843255bae792145e2",
+  "tmpfs_size": "128k",
+  "phases": {
+    "A_baseline": {
+      "written": 5,
+      "in_loki": 5,
+      "seconds_to_all": 2.1
+    },
+    "B_outage": {
+      "collector_stopped_at": "2026-09-23T03:01:34.618277+00:00",
+      "collector_exit": 0,
+      "write_outcomes": {
+        "ok": 27,
+        "enospc": 10
+      },
+      "written_ok": 27,
+      "pending_leftovers": 0,
+      "json_files_in_spool": 32,
+      "free_bytes_when_full": 0,
+      "invalid_json_files": 0,
+      "collector_down_s": 180.0
+    },
+    "C_restore": {
+      "collector_started_at": "2026-09-23T03:04:34.900282+00:00",
+      "expected_distinct": 32,
+      "loki_distinct": 32,
+      "lost_in_loki": [],
+      "loki_duplicates": {},
+      "events_file_distinct": 32,
+      "events_duplicates": {},
+      "seconds_to_all_replayed": 2.0
+    },
+    "D_expiry": {
+      "expiry": {
+        "scanned": 32,
+        "confirmed_known": 32,
+        "deleted": 16,
+        "orphans_removed": 0,
+        "unconfirmed_kept": 0,
+        "oldest_unconfirmed_age_s": null,
+        "free_bytes_before": 0,
+        "free_bytes_after": 0,
+        "dry_run": false
+      },
+      "post_expiry_writes": [
+        "enospc",
+        "enospc",
+        "enospc"
+      ],
+      "post_expiry_in_loki": 0
+    },
+    "E_backend_outage": {
+      "loki_stopped_at": "2026-09-23T03:04:37.097799+00:00",
+      "loki_exit": 0,
+      "written_ok": 8,
+      "in_events_file_during_outage": 8,
+      "loki_down_s": 334.6,
+      "loki_restarted_at": "2026-09-23T03:10:33.069687+00:00",
+      "in_loki_after_restore": 0,
+      "lost_in_loki": 8,
+      "still_in_spool": 8,
+      "seconds_to_all": null,
+      "earlier_receipts_still_in_loki": 32
+    }
+  },
+  "started_at": "2026-09-23T03:01:10.829585+00:00",
+  "collector_log_signals": {
+    "Exporting failed": 1,
+    "Dropping data": 1,
+    "dropped": 1,
+    "no more retries left": 1,
+    "max elapsed time": 0,
+    "Retrying": 0
+  },
+  "collector_log_drop_lines": [
+    "2026-09-22T23:09:30.487-0400\terror\tinternal/queue_sender.go:62\tExporting failed. Dropping data.\t{\"resource\": {\"service.instance.id\": \"<collector-instance-id>\", \"service.name\": \"otelcol-contrib\", \"service.version\": \"0.161.0\"}, \"otelcol.component.id\": \"otlphttp/loki\", \"otelcol.component.kind\": \"exporter\", \"otelcol.signal\": \"logs\", \"error\": \"no more retries left: failed to make an HTTP r"
+  ],
+  "stopped_at": "2026-09-23T03:12:34.806975+00:00"
+}

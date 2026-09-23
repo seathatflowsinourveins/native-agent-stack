@@ -1,0 +1,197 @@
+{
+  "id": "gap-wave2-20260923-us-equities-portfolio-risk-9-matched-four-candidate-runner",
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "gap_index": 9,
+  "gap_text": "No matched execution compares the four candidates on common inputs, temporal boundaries and cost assumptions.",
+  "gap_text_sha256": "677b94f4e67777a0e1fc558f0ef2f89cf4f1d97798958c94f54504a451ce89e8",
+  "next_check": "Write a matched runner that applies skfolio, cvxportfolio, empyrical-reloaded and quantstats to the same plan.json returns, the same 252/63/6 split and the same 20bp cost proxy. Report common metrics per candidate from one preregistered run.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:32:44Z",
+    "expectation": "One preregistered run of matched_runner.py in the hashed candidate-libs venv applies all four candidates to the same plan.json development daily returns, the same skfolio WalkForward(252, 63, purged 6, reduce_test) folds and the same 20bp-per-fold fully-invested round-trip cost proxy: skfolio MeanRisk minimum variance and cvxportfolio SinglePeriodOptimization minimum variance each produce fold weights from the training window only; the resulting out-of-sample net return series (plus an equal-weight control) are scored by skfolio Portfolio measures, empyrical-reloaded and quantstats with common metrics (annualized return, annualized volatility, Sharpe, Sortino, max drawdown), all with 252 periods per year and zero risk-free rate. No winner, promotion or statistical claim.",
+    "criteria": "settled iff the single run exits 0, reports every metric for every (series, library) cell as finite, records fold boundaries showing each weight used only training-window data (train_last < test_first - purged gap), and commits the output with its hash. Cross-library metric differences are reported, not adjudicated. Detection: the runner asserts fold boundaries and metric finiteness and exits non-zero on violation."
+  },
+  "commands": [
+    {
+      "cmd": "env HOME=$CACHE/tmphome LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-libs/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap9_matched.py --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/9/matched-results.json --workdir $CACHE/g9-run/work",
+      "exit": 0,
+      "started_utc": "2026-09-23T06:38:23Z",
+      "development_attempts": "two scratch dry runs before the preregistered run: the first failed at the skfolio max_drawdown call (TypeError) after weights were computed and before any metric was written; the second exited 0 and its output was deleted without being read"
+    },
+    {
+      "cmd": "env HOME=$CACHE/tmphome LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-libs/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap9_matched.py --out $CACHE/g9-determinism/out.json --workdir $CACHE/g9-determinism/work",
+      "exit": 0,
+      "started_utc": "2026-09-23T07:13Z (approximate; exact second not captured)",
+      "purpose": "fix round: determinism check requested by the independent review's single-run finding",
+      "output_sha256": "7170a4c548fcb9acf4ee6a172edcba1f8e584fe2afe0b7daf716fe10d320d4b1",
+      "equals_preregistered_run_output": true
+    }
+  ],
+  "results": {
+    "folds": 20,
+    "first_fold": {
+      "train_first": "2015-01-05",
+      "train_last": "2016-01-04",
+      "test_first": "2016-01-13",
+      "test_last": "2016-04-13",
+      "train_rows": 252,
+      "cvxportfolio_history_rows": 252
+    },
+    "max_abs_weight_difference_skfolio_vs_cvxportfolio": 0.00025192468728589545,
+    "metrics": {
+      "cvxportfolio_spo_min_variance": {
+        "skfolio.measures": {
+          "annualized_return": 0.14101870329522867,
+          "annualized_volatility": 0.19157692614505592,
+          "max_drawdown": -0.34104746704498456,
+          "sharpe": 0.7360944041270077,
+          "sortino": 1.0085086799874634
+        },
+        "empyrical-reloaded": {
+          "annualized_return": 0.13034467231551305,
+          "annualized_volatility": 0.19157692614505592,
+          "max_drawdown": -0.3410474670449846,
+          "sharpe": 0.7360944041270081,
+          "sortino": 1.0089116804750717
+        },
+        "quantstats": {
+          "annualized_return": 0.13034467231551305,
+          "annualized_volatility": 0.19157692614505592,
+          "max_drawdown": -0.34104746704498456,
+          "sharpe": 0.7360944041270077,
+          "sortino": 1.0089116804750717
+        },
+        "observations": 1252,
+        "total_compounded_return": 0.838083445890486
+      },
+      "equal_weight_control": {
+        "skfolio.measures": {
+          "annualized_return": 0.17516415022095164,
+          "annualized_volatility": 0.2036439062041711,
+          "max_drawdown": -0.34421684988050694,
+          "sharpe": 0.8601492354273249,
+          "sortino": 1.1748868469056328
+        },
+        "empyrical-reloaded": {
+          "annualized_return": 0.16673061882808793,
+          "annualized_volatility": 0.20364390620417105,
+          "max_drawdown": -0.3442168498805069,
+          "sharpe": 0.8601492354273239,
+          "sortino": 1.175356332177878
+        },
+        "quantstats": {
+          "annualized_return": 0.16673061882808793,
+          "annualized_volatility": 0.20364390620417105,
+          "max_drawdown": -0.34421684988050694,
+          "sharpe": 0.8601492354273251,
+          "sortino": 1.1753563321778797
+        },
+        "observations": 1252,
+        "total_compounded_return": 1.151428542335386
+      },
+      "skfolio_meanrisk_min_variance": {
+        "skfolio.measures": {
+          "annualized_return": 0.14101979089212605,
+          "annualized_volatility": 0.19157718573448376,
+          "max_drawdown": -0.3410474692891481,
+          "sharpe": 0.7360990837790693,
+          "sortino": 1.008514987134832
+        },
+        "empyrical-reloaded": {
+          "annualized_return": 0.13034584390844106,
+          "annualized_volatility": 0.19157718573448376,
+          "max_drawdown": -0.3410474692891481,
+          "sharpe": 0.7360990837790674,
+          "sortino": 1.008917990142776
+        },
+        "quantstats": {
+          "annualized_return": 0.13034584390844106,
+          "annualized_volatility": 0.19157718573448376,
+          "max_drawdown": -0.3410474692891481,
+          "sharpe": 0.7360990837790693,
+          "sortino": 1.0089179901427787
+        },
+        "observations": 1252,
+        "total_compounded_return": 0.8380929112203759
+      }
+    },
+    "cross_library_notes": "volatility, Sharpe and max drawdown agree across skfolio.measures, empyrical-reloaded and quantstats to 4 decimals; annualized return differs by definition (arithmetic x252 vs CAGR) and Sortino differs in the 4th decimal (downside-deviation convention). Correction: the runner's conventions string calls quantstats CAGR calendar-year based; the retained value 0.13034584390844106 follows observation-count annualization (252/1252), per the independent review.",
+    "versions": {
+      "cvxportfolio": "1.5.1",
+      "empyrical-reloaded": "0.5.12",
+      "quantstats": "0.0.81",
+      "skfolio": "1.2.9"
+    }
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Evidence class (second Opus review, fix round 4): gap9_matched.py is a project-authored integration harness around the skfolio and cvxportfolio optimizers and three metric libraries, so the class is local_integration (was native_proven).",
+    "Why advanced (round-2 independent review): every arm of the next_check ran and the metrics are reported, but the preregistered single-execution condition was broken by a successful scratch dry run whose output was deleted unread; a later identical rerun cannot restore that condition. Remaining: a fresh preregistration whose first execution is the reported run.",
+    "Disclosed deviation from 'one preregistered run': a successful scratch dry run preceded it (output deleted unread). The script and common.py hashes were unchanged between that dry run and the preregistered run, nothing was tuned, and a fix-round rerun reproduced the preregistered output byte for byte (sha256 7170a4c5...), so no run could have been selected among differing results.",
+    "Optimizer candidates are skfolio and cvxportfolio (both minimum variance); empyrical-reloaded and quantstats participate as metric libraries on the same series, so 'common metrics per candidate' means per (series, metric library).",
+    "The cost proxy is the plan's 20bp per fully invested holding, charged once per fold; it is not turnover-based.",
+    "No winner, promotion or significance claim; equal weight had the highest Sharpe on this development span."
+  ],
+  "checked_at": "2026-09-23T06:38:23Z",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/9/matched-results.json",
+      "sha256": "7170a4c548fcb9acf4ee6a172edcba1f8e584fe2afe0b7daf716fe10d320d4b1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/9/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/9/stdout.txt",
+      "sha256": "f60371f7ebcc0e8f2ee727b19e57aec71cf25bdd29cdd45c2cd68b8352df8d09"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap9_matched.py",
+      "sha256": "c2f7d3f737a1cb0ccf1dd412768b3bfa98dc9d25edb35451989c04cdfcd68efc"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "sha256": "143b21745ccc3c0db8a8272a775208d2c62f7c77311ec469afcec2cb0fc684d7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md",
+      "sha256": "8f2096917a932fe40ee73bd26b84a3c34b62c986f752a530adf22a685fa7a4b2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "sha256": "9aae92f05dda99374540121632494936a26067720e522d7c9dfb2106a4bfc888"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "sha256": "565734f27cf8e401468dbd9c04c4d807cb255894d9ccbc43bc098b2ea7f7e510"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "sha256": "82d9e7bbfe289a8774bc54d27692e0e71e65a9aec037fb5dbbc96614353293ba"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "Codex CLI 0.155.1 (gpt-6-astra), codex exec --sandbox read-only --ephemeral, one bounded call",
+    "record": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md"
+    ],
+    "round_2": "round-2: single-run finding still unresolved -> outcome changed to advanced; runner label left unchanged (hash binding)",
+    "findings_and_resolution": "major: single-run criterion vs an earlier unread dry run -> disclosed and determinism rerun matched byte for byte; round 2 judged it still unresolved, so the outcome is advanced; minor: quantstats CAGR convention mislabelled -> corrected in the receipt; the runner string is left unchanged so the committed output stays bound to the executed runner hash",
+    "round_3": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "resolution": "no round-3 finding for this gap"
+    },
+    "round_4": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "resolution": "minor: project-authored matched runner labelled native_proven -> relabelled local_integration"
+    },
+    "round_4_codex": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "reviewer": "Codex CLI (codex exec --sandbox read-only --ephemeral), one bounded call on commits 6ed9709..a4cbcf8",
+      "resolution": "no finding for this gap"
+    }
+  }
+}

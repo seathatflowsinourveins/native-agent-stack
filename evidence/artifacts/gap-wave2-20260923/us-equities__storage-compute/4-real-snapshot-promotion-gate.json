@@ -1,0 +1,122 @@
+{
+  "id": "us-equities__storage-compute-4-real-snapshot-promotion-gate",
+  "gap_index": 4,
+  "layer_id": "storage-compute",
+  "catalog": "us-equities",
+  "gap_text": "The Pandera promotion gate has retained fail-closed outputs only on synthetic 4-row CSV fixtures, run on 2026-09-22. According to blueprints/us-equities/data/README.md lines 119-124, no production bars/universe ingest produces a real snapshot yet.",
+  "gap_text_sha256": "bc4bbd2f105195f6f4f865fdc9704cbff93a1676fd4923f7f1ca99558c012712",
+  "next_check": "Fetch Alpaca IEX daily bars for a small universe, run the existing Pandera promotion gate on that real snapshot, and retain the pass/fail output and the snapshot hash.",
+  "preregistration": {
+    "gap_index": 4,
+    "written_at": "2026-09-23T05:15:15Z",
+    "expectation": "The real Alpaca SIP daily snapshots written by the merged #84 ingest (24 symbols x 20 sessions = 480 rows each) pass all 12 named checks of the pinned promotion gate (pandera 0.33.1) in a freshly built isolated venv, and each gate result's input_sha256 equals the ingest receipt's snapshot_sha256. Detection control: a copy of the real snapshot with one row's high set below its close and one duplicated (symbol, session) row fails high_ge_max_open_close and unique_symbol_session. Supplementary real-data arm: LEAN's bundled AlgoSeek daily bars for 5 symbols over the last 252 sessions (2020-04 to 2021-03) also pass; the full bundled history is run as an unconstrained probe whose result may be pass or fail.",
+    "criteria": "settled if the gate reruns on the real ingest snapshots with status pass and matching hashes and the mutated control fails the two targeted checks, since that closes both clauses of the gap text (real-snapshot gate output retained; a production ingest that produces a real snapshot exists). advanced if only the LEAN real-data arm runs. not_settled if the real snapshot fails or the control does not fail.",
+    "note": "Written before the check's commands were run. While locating evidence (before this file), the two ingest receipts were read and the two snapshot CSVs were sha256-hashed once (hashes matched their receipts); no gate, Parquet or DuckDB command had been run.",
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/prereg/4.json",
+    "file_sha256": "c4e0390d94e565075ff0dd1747649487ed61a5406435a38a476a63a8a147bfb3",
+    "committed_in": "af80671 (before any check command ran)",
+    "fix_round": {
+      "gap_index": 4,
+      "written_at": "2026-09-23T05:52:16Z",
+      "round": 2,
+      "label": "fix-round (late relative to round 1, written before round 2)",
+      "expectation": "Round 2 reruns the real-snapshot checks retaining the full sanitized ingest receipts in raw evidence and adding a precision check (price text cast to DECIMAL(38,12) equals the DECIMAL(18,4) value for every row). Expected: 0 precision-loss rows, gate pass 12/12, controls fail as before.",
+      "criteria": "settled stands only if round 2 reproduces pass/hash and precision loss is 0 and the quoted receipt fields are present in retained raw files.",
+      "note": "Fix-round preregistration, written after round 1 and the Codex gpt-6-astra read-only review of a0f57fa, before any round-2 command ran.",
+      "file": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/prereg/4-fixround.json",
+      "file_sha256": "f474686cfbeb659ff21436122de530186d9e8d4de24625a052706f46edb2833a",
+      "committed_in": "23c9902 (after round 1 and the Codex review, before any round-2 command ran)"
+    }
+  },
+  "commands": [
+    "uv venv --python $HOME/.local/share/codex-ecosystem/python/cpython-3.13-linux-x86_64-gnu/bin/python3.13 venv-gate && uv pip sync --python venv-gate/bin/python --require-hashes blueprints/us-equities/data/requirements.lock   # cwd $HOME/.cache/gap-wave2-20260923/storage-compute, UV_CACHE_DIR there",
+    "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/real_snapshot_checks.py --run-dir $HOME/.cache/gap-wave2-20260923/storage-compute/runs/real-snapshots --gate-python $HOME/.cache/gap-wave2-20260923/storage-compute/venv-gate/bin/python --gate blueprints/us-equities/data/promotion_gate.py --snapshot alpaca-sip-20260922=$HOME/.local/state/native-agent-stack/alpaca-paper/snapshots/20260922/universe-daily.csv:$HOME/.local/state/native-agent-stack/alpaca-paper/snapshots/20260922/ingest-receipt.json --snapshot alpaca-sip-dryrun-20260922=$HOME/.local/state/native-agent-stack/alpaca-paper/trials/dryrun-20260922/universe-daily.csv:$HOME/.local/state/native-agent-stack/alpaca-paper/trials/dryrun-20260922/ingest-receipt.json --lean-daily $HOME/.local/share/codex-ecosystem/tools/lean-985ef30/Data/equity/usa/daily --out evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/real-snapshot-summary.json   # round 1; wrapped in $HOME/codex-ecosystem/bin/ecosystem-bounded-run (ECOSYSTEM_JOB_SECONDS=1200, MEMORY_MAX=4G)",
+    "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/real_snapshot_checks.py --run-dir $HOME/.cache/gap-wave2-20260923/storage-compute/runs/real-snapshots-r2 --gate-python $HOME/.cache/gap-wave2-20260923/storage-compute/venv-gate/bin/python --gate blueprints/us-equities/data/promotion_gate.py --snapshot alpaca-sip-20260922=$HOME/.local/state/native-agent-stack/alpaca-paper/snapshots/20260922/universe-daily.csv:$HOME/.local/state/native-agent-stack/alpaca-paper/snapshots/20260922/ingest-receipt.json --snapshot alpaca-sip-dryrun-20260922=$HOME/.local/state/native-agent-stack/alpaca-paper/trials/dryrun-20260922/universe-daily.csv:$HOME/.local/state/native-agent-stack/alpaca-paper/trials/dryrun-20260922/ingest-receipt.json --lean-daily $HOME/.local/share/codex-ecosystem/tools/lean-985ef30/Data/equity/usa/daily --out evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/real-snapshot-summary-r2.json   # round 2; wrapped in $HOME/codex-ecosystem/bin/ecosystem-bounded-run (ECOSYSTEM_JOB_SECONDS=1200, MEMORY_MAX=4G)"
+  ],
+  "results": [
+    "Round 2 (primary):",
+    "alpaca-sip-20260922: copy sha256 914b7d949b3de201c1e64225a5c9d36e1f5c1d370a49371ef09776537c158c82 == ingest receipt snapshot_sha256 -> True; ingest receipt kind=promotion_gate_snapshot_ingest evidence_class=native_market_data_readonly feed=sip adjustment=raw fetched_at=2026-09-22T21:55:59Z symbols=24 row_count=480 symbols_missing=[] coverage_problems=field absent; gate status=pass row_count=480 failed_checks=[] of 12; Parquet sha256 6bc3038f1f0f370ff87bd5b52fa5f4c6760b5a510fae20edaafc4adc5d39f8e8 mode 0o444 writable=False; precision_loss_rows=0 (max price decimals in text 4; probe '1.23456' detected=True); CSV-vs-Parquet EXCEPT ALL diffs 0/0; DuckDB 1.5.5: rows=480 symbols=24 sessions 2026-08-25..2026-09-22 per-symbol 20-20 null_cells=0 ohlc_inconsistent_rows=0; control gate status=fail failed=['high_ge_max_open_close', 'unique_symbol_session']",
+    "alpaca-sip-dryrun-20260922: copy sha256 ffc988e2e850ed3fb5ea9b13bc4443392a329c4c2f5ccd949b574375a2c9b115 == ingest receipt snapshot_sha256 -> True; ingest receipt kind=promotion_gate_snapshot_ingest evidence_class=native_market_data_readonly feed=sip adjustment=raw fetched_at=2026-09-23T00:33:24Z symbols=24 row_count=480 symbols_missing=field absent coverage_problems={}; gate status=pass row_count=480 failed_checks=[] of 12; Parquet sha256 afb308a708057fccb3ada5789ced533206fedc486dc3c156c57ef43ed5cfac0f mode 0o444 writable=False; precision_loss_rows=0 (max price decimals in text 4; probe '1.23456' detected=True); CSV-vs-Parquet EXCEPT ALL diffs 0/0; DuckDB 1.5.5: rows=480 symbols=24 sessions 2026-08-25..2026-09-22 per-symbol 20-20 null_cells=0 ohlc_inconsistent_rows=0; control gate status=fail failed=['high_ge_max_open_close', 'unique_symbol_session']",
+    "Round 1 (a0f57fa) gave the same gate status, row counts, snapshot hashes and control failures: {\"alpaca-sip-20260922\": [\"pass\", true, [\"high_ge_max_open_close\", \"unique_symbol_session\"]], \"alpaca-sip-dryrun-20260922\": [\"pass\", true, [\"high_ge_max_open_close\", \"unique_symbol_session\"]]}",
+    "lean-five-252: 5 tickers, gate status=pass row_count=1260 failed=[]; precision_loss_rows=0; DuckDB sessions 2020-04-01..2021-03-31 ohlc_inconsistent_rows=0",
+    "lean-all-full: 17 tickers, gate status=pass row_count=70011 failed=[]; precision_loss_rows=0; DuckDB sessions 1998-01-02..2021-03-31 ohlc_inconsistent_rows=0",
+    "Detection method: the mutated control of each real snapshot (row 1 high set to close - 0.01; row 2 duplicated) fails exactly high_ge_max_open_close and unique_symbol_session, so the gate run here can detect the failures it reports absent on the unmodified snapshots. The precision check detects the probe value '1.23456'.",
+    "The production ingest exists at base 41d39b3: blueprints/us-equities/data/ingest_snapshot.py (merged #84) wrote both snapshots; the retained ingest receipts (raw/real-snapshot-summary-r2.json, alpaca_snapshots.*.receipt) carry the fields quoted above."
+  ],
+  "outcome": "settled",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Gate outputs are retained for real Alpaca SIP daily snapshots (feed sip, not the next_check's iex). SIP is the consolidated feed; the gate's checks do not depend on the feed.",
+    "The Alpaca fetch arm was executed by the #84 ingest (2026-09-22/23), not by this unit; this unit reran the pinned gate in a freshly built hash-locked venv (twice) and retained its outputs and the snapshot hashes.",
+    "blueprints/us-equities/data/README.md lines 119-124 still say no production ingest exists; that text is stale relative to #84 and was not edited here (outside this unit's paths).",
+    "The LEAN arms use real AlgoSeek daily bars bundled with LEAN 985ef30 ('DATA PROVIDED BY ALGOSEEK / ALL RIGHTS RESERVED'); their observed_at is the LEAN commit time, not original availability. They are supplementary real-data runs, not a licensed production ingest.",
+    "No snapshot rows are committed; only gate results (no prices), counts and hashes."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/real-snapshot-summary-r2.json",
+      "sha256": "d7bd03cef73017d79f77f78f0789b6ae7a2977c9a0e846fd991e855e7cdf7172"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/real-snapshot-stdout-r2.txt",
+      "sha256": "d1404316a836f2ccbf06368925d4577f295b8030cfcabe96c8f5c794c24bae62"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-20260922-gate-result-r2.json",
+      "sha256": "52099e3cd0b45d5d4b38eb9c590116976a06156ec64a002dcee60d6f753e5d49"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-dryrun-20260922-gate-result-r2.json",
+      "sha256": "8b1d641dcdfc68e4ba1275f497cb0694dd9944e00744aada4c29c324e2a71d8d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-20260922-control-gate-result-r2.json",
+      "sha256": "f14c5c6a46ed4672f57455a8b650d01284b47e0d96c6b3f5286848e5855a1140"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-dryrun-20260922-control-gate-result-r2.json",
+      "sha256": "73f4f3edc20c3d93a3ee7183524e73499188be8a1f9d10eac8f0633af2e53dba"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/lean-five-252-gate-result-r2.json",
+      "sha256": "cff2237f66d30af7dd76a712975ee44c3e6cab61d8f958dd5b06b8b5aca6d261"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/lean-all-full-gate-result-r2.json",
+      "sha256": "ed72b7fc09c69af396e48b904bd83c35b73987c8473cd6109aef87910de84e3f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/real-snapshot-summary.json",
+      "sha256": "f56a278b8f221264f1a981bc4c6676d2c4954f8c6b2163c3e14a8904c415fdae"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/real-snapshot-stdout.txt",
+      "sha256": "d1404316a836f2ccbf06368925d4577f295b8030cfcabe96c8f5c794c24bae62"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-20260922-gate-result.json",
+      "sha256": "c47af2118fac4aa23f93149771b8b64cc18cc89845142a6bdecc6b7303fd67c4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-dryrun-20260922-gate-result.json",
+      "sha256": "843bcca9d6bf411fcd13bc9d1411accaddf450042b1a498eabcb71567419db27"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-20260922-control-gate-result.json",
+      "sha256": "de382d1d6283cc0c74bdf4647e7895271c80b0c0f29067de759df2687017f1fd"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/alpaca-sip-dryrun-20260922-control-gate-result.json",
+      "sha256": "423e60db543fb93d05d99ba66130c732581b130c0559074825a60c89bcb104e1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/lean-five-252-gate-result.json",
+      "sha256": "e11d26a253fb05be267a43346a53f12898d36df5241021e1ff59618b887138f3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/lean-all-full-gate-result.json",
+      "sha256": "86a64a5c82354e561d83161f40133cd5ab53d6241b87faa24ca2faba5b556112"
+    }
+  ],
+  "checked_at": "2026-09-23T06:01:32.948884+00:00"
+}

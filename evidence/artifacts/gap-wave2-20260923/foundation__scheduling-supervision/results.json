@@ -1,0 +1,32 @@
+{
+  "layer_id": "scheduling-supervision",
+  "catalog": "foundation",
+  "wave": "gap-wave2-20260923",
+  "generated_by": "blueprints/gap-wave2-20260923/foundation__scheduling-supervision/make_results.py",
+  "results": {
+    "1": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/1-provider-cancel-broker-exactly-once.json"
+    },
+    "2": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/2-real-workflow-scheduled-recovered.json"
+    },
+    "3": {
+      "outcome": "covered_elsewhere",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/3-dagu-2170-requalify.json"
+    },
+    "4": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/4-challenger-harness.json"
+    },
+    "6": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/6-executed-challenger-comparison.json"
+    },
+    "11": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/11-reboot-real-workload-plus-upstream-retry.json"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+2026-09-23T15:52:24Z
+1146122 absent
+1150075 absent
+1155940 absent
+pgrep [v]llm serve Qwen3-4B:
+none
+pgrep [a]gent-server 28432:
+none
+gpu memory.used:
+5834 MiB
+pid, process_name, used_gpu_memory [MiB]

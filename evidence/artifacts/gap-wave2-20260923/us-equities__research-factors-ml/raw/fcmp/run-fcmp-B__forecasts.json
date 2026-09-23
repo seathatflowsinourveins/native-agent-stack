@@ -1,0 +1,6266 @@
+[
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-01-14",
+  "target": "2016-01-22",
+  "r": -0.00700766386178131,
+  "kronos_small": 0.01827790035200927
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-01-14",
+  "target": "2016-01-22",
+  "r": -0.0028868380325803855,
+  "kronos_small": 0.0038784940852085725
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-01-14",
+  "target": "2016-01-22",
+  "r": -0.0037427405061558616,
+  "kronos_small": 0.09682028371818951
+ },
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-01-22",
+  "target": "2016-01-29",
+  "r": 0.017273204031246436,
+  "kronos_small": 0.03111472413222227
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-01-22",
+  "target": "2016-01-29",
+  "r": 0.0034632069246169905,
+  "kronos_small": 0.001445103869431641
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-01-22",
+  "target": "2016-01-29",
+  "r": 0.015373619800237215,
+  "kronos_small": 0.09264309827296735
+ },
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-01-29",
+  "target": "2016-02-05",
+  "r": -0.030852257158960228,
+  "kronos_small": 0.011893736358875806
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-01-29",
+  "target": "2016-02-05",
+  "r": -0.05944889915151563,
+  "kronos_small": 8.371541795249016e-05
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-01-29",
+  "target": "2016-02-05",
+  "r": -0.04888734117742821,
+  "kronos_small": 0.05531919357043602
+ },
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-02-05",
+  "target": "2016-02-12",
+  "r": -0.007100368831562953,
+  "kronos_small": 0.03628048486348412
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-02-05",
+  "target": "2016-02-12",
+  "r": -0.0010196799088868502,
+  "kronos_small": 0.055470136660420444
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-02-05",
+  "target": "2016-02-12",
+  "r": -0.014388737452099676,
+  "kronos_small": 0.08874447813180186
+ },
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-02-12",
+  "target": "2016-02-22",
+  "r": 0.042892178097202915,
+  "kronos_small": 0.04311740607233183
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-02-12",
+  "target": "2016-02-22",
+  "r": 0.05227220705698521,
+  "kronos_small": 0.053654399747244064
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-02-12",
+  "target": "2016-02-22",
+  "r": 0.05036636388498117,
+  "kronos_small": 0.08345782731876827
+ },
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-02-22",
+  "target": "2016-02-29",
+  "r": -0.006539841532677393,
+  "kronos_small": -0.006401985873684346
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-02-22",
+  "target": "2016-02-29",
+  "r": -0.007580947959923812,
+  "kronos_small": 0.013068427998080168
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-02-22",
+  "target": "2016-02-29",
+  "r": 0.011353748272890485,
+  "kronos_small": 0.048334475727596526
+ },
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-02-29",
+  "target": "2016-03-07",
+  "r": 0.035874873766990945,
+  "kronos_small": 0.008259967448378092
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-02-29",
+  "target": "2016-03-07",
+  "r": 0.024288009631249885,
+  "kronos_small": 0.008055961429530356
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-02-29",
+  "target": "2016-03-07",
+  "r": 0.058222999711250445,
+  "kronos_small": 0.03366655108897909
+ },
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-03-07",
+  "target": "2016-03-14",
+  "r": 0.009425608029779653,
+  "kronos_small": -0.01077109958832434
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-03-07",
+  "target": "2016-03-14",
+  "r": 0.015589148427678445,
+  "kronos_small": -0.013056393213094708
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-03-07",
+  "target": "2016-03-14",
+  "r": -0.009038984250339333,
+  "kronos_small": -0.017475141150677054
+ },
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-03-14",
+  "target": "2016-03-21",
+  "r": 0.010608615773553431,
+  "kronos_small": 0.02054378060973061
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-03-14",
+  "target": "2016-03-21",
+  "r": 0.010444933156145808,
+  "kronos_small": 0.002494178674607994
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-03-14",
+  "target": "2016-03-21",
+  "r": 0.01325376050987881,
+  "kronos_small": -0.022199332914213166
+ },
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-03-21",
+  "target": "2016-03-29",
+  "r": 0.002634661945574379,
+  "kronos_small": 0.014756749635642663
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-03-21",
+  "target": "2016-03-29",
+  "r": 0.009602141914433204,
+  "kronos_small": 0.02774412565142992
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-03-21",
+  "target": "2016-03-29",
+  "r": 0.008739245425080533,
+  "kronos_small": -0.016852679094373713
+ },
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-03-29",
+  "target": "2016-04-05",
+  "r": -0.005325268465663946,
+  "kronos_small": 0.016399108271898832
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-03-29",
+  "target": "2016-04-05",
+  "r": 0.0004593266352399539,
+  "kronos_small": 0.02134158990305579
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-03-29",
+  "target": "2016-04-05",
+  "r": -0.01304584483330018,
+  "kronos_small": -0.02257281570420222
+ },
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-04-05",
+  "target": "2016-04-12",
+  "r": 0.009021590946624691,
+  "kronos_small": 0.016771352133629236
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-04-05",
+  "target": "2016-04-12",
+  "r": 0.005769510944457323,
+  "kronos_small": 0.028901209755329837
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-04-05",
+  "target": "2016-04-12",
+  "r": 0.009504732493599732,
+  "kronos_small": -0.0157086160040647
+ },
+ {
+  "fold": "development-1",
+  "asset": "SPY",
+  "decision": "2016-04-12",
+  "target": "2016-04-19",
+  "r": 0.01885124350393763,
+  "kronos_small": 0.006794567659023976
+ },
+ {
+  "fold": "development-1",
+  "asset": "QQQ",
+  "decision": "2016-04-12",
+  "target": "2016-04-19",
+  "r": 0.009452038015787423,
+  "kronos_small": 0.01790135692518202
+ },
+ {
+  "fold": "development-1",
+  "asset": "IWM",
+  "decision": "2016-04-12",
+  "target": "2016-04-19",
+  "r": 0.030898441551234335,
+  "kronos_small": -0.027604315780550337
+ },
+ {
+  "fold": "development-2",
+  "asset": "SPY",
+  "decision": "2016-04-19",
+  "target": "2016-04-26",
+  "r": -0.0043446154611039844,
+  "kronos_small": -0.003916438928168731
+ },
+ {
+  "fold": "development-2",
+  "asset": "QQQ",
+  "decision": "2016-04-19",
+  "target": "2016-04-26",
+  "r": -0.01917867003057161,
+  "kronos_small": 0.013490665572370553
+ },
+ {
+  "fold": "development-2",
+  "asset": "IWM",
+  "decision": "2016-04-19",
+  "target": "2016-04-26",
+  "r": 0.009217464198161274,
+  "kronos_small": 0.023030095303528952
+ },
+ {
+  "fold": "development-2",
+  "asset": "SPY",
+  "decision": "2016-04-26",
+  "target": "2016-05-03",
+  "r": -0.013827214253717024,
+  "kronos_small": -0.0009166774497737507
+ },
+ {
+  "fold": "development-2",
+  "asset": "QQQ",
+  "decision": "2016-04-26",
+  "target": "2016-05-03",
+  "r": -0.025400562528448134,
+  "kronos_small": 0.025881712363611697
+ },
+ {
+  "fold": "development-2",
+  "asset": "IWM",
+  "decision": "2016-04-26",
+  "target": "2016-05-03",
+  "r": -0.024771259513788557,
+  "kronos_small": 0.01863741166863342
+ },
+ {
+  "fold": "development-2",
+  "asset": "SPY",
+  "decision": "2016-05-03",
+  "target": "2016-05-10",
+  "r": 0.011240138600082439,
+  "kronos_small": 0.0006006307958186241
+ },
+ {
+  "fold": "development-2",
+  "asset": "QQQ",
+  "decision": "2016-05-03",
+  "target": "2016-05-10",
+  "r": 0.015019525748997786,
+  "kronos_small": -0.01683521315803116
+ },
+ {
+  "fold": "development-2",
+  "asset": "IWM",
+  "decision": "2016-05-03",
+  "target": "2016-05-10",
+  "r": 0.006339589963216596,
+  "kronos_small": -0.011307968038104299
+ },
+ {
+  "fold": "development-2",
+  "asset": "SPY",
+  "decision": "2016-05-10",
+  "target": "2016-05-17",
+  "r": -0.017615631663884912,
+  "kronos_small": -0.005533108203123582
+ },
+ {
+  "fold": "development-2",
+  "asset": "QQQ",
+  "decision": "2016-05-10",
+  "target": "2016-05-17",
+  "r": -0.017386839008347366,
+  "kronos_small": 0.004463398451115985
+ },
+ {
+  "fold": "development-2",
+  "asset": "IWM",
+  "decision": "2016-05-10",
+  "target": "2016-05-17",
+  "r": -0.027431116325593585,
+  "kronos_small": -0.004967942613622434
+ },
+ {
+  "fold": "development-2",
+  "asset": "SPY",
+  "decision": "2016-05-17",
+  "target": "2016-05-24",
+  "r": 0.014781339660108195,
+  "kronos_small": 0.015535126099432972
+ },
+ {
+  "fold": "development-2",
+  "asset": "QQQ",
+  "decision": "2016-05-17",
+  "target": "2016-05-24",
+  "r": 0.027860079927828352,
+  "kronos_small": 0.008080794958156723
+ },
+ {
+  "fold": "development-2",
+  "asset": "IWM",
+  "decision": "2016-05-17",
+  "target": "2016-05-24",
+  "r": 0.032403158886686434,
+  "kronos_small": -0.0003143628729409542
+ },
+ {
+  "fold": "development-2",
+  "asset": "SPY",
+  "decision": "2016-05-24",
+  "target": "2016-06-01",
+  "r": 0.011622198401254558,
+  "kronos_small": 0.01055410793070699
+ },
+ {
+  "fold": "development-2",
+  "asset": "QQQ",
+  "decision": "2016-05-24",
+  "target": "2016-06-01",
+  "r": 0.017275691289831308,
+  "kronos_small": 0.019557465751677938
+ },
+ {
+  "fold": "development-2",
+  "asset": "IWM",
+  "decision": "2016-05-24",
+  "target": "2016-06-01",
+  "r": 0.025359876003855142,
+  "kronos_small": 0.008117763205415685
+ },
+ {
+  "fold": "development-2",
+  "asset": "SPY",
+  "decision": "2016-06-01",
+  "target": "2016-06-08",
+  "r": 0.009889124571500929,
+  "kronos_small": -0.007081555685998886
+ },
+ {
+  "fold": "development-2",
+  "asset": "QQQ",
+  "decision": "2016-06-01",
+  "target": "2016-06-08",
+  "r": 0.00018122508204765353,
+  "kronos_small": 0.0066302913677427355
+ },
+ {
+  "fold": "development-2",
+  "asset": "IWM",
+  "decision": "2016-06-01",
+  "target": "2016-06-08",
+  "r": 0.02237115153711766,
+  "kronos_small": 0.0018079613795878302
+ },
+ {
+  "fold": "development-2",
+  "asset": "SPY",
+  "decision": "2016-06-08",
+  "target": "2016-06-15",
+  "r": -0.02194437963776963,
+  "kronos_small": -0.030968261973855604
+ },
+ {
+  "fold": "development-2",
+  "asset": "QQQ",
+  "decision": "2016-06-08",
+  "target": "2016-06-15",
+  "r": -0.02430308984139451,
+  "kronos_small": -0.020721023283351236
+ },
+ {
+  "fold": "development-2",
+  "asset": "IWM",
+  "decision": "2016-06-08",
+  "target": "2016-06-15",
+  "r": -0.03322336552106808,
+  "kronos_small": -0.04358354396884323
+ },
+ {
+  "fold": "development-2",
+  "asset": "SPY",
+  "decision": "2016-06-15",
+  "target": "2016-06-22",
+  "r": 0.0012024724279058319,
+  "kronos_small": 1.5489262026768813e-05
+ },
+ {
+  "fold": "development-2",
+  "asset": "QQQ",
+  "decision": "2016-06-15",
+  "target": "2016-06-22",
+  "r": -0.004465954575640474,
+  "kronos_small": -0.002703178256508565
+ },
+ {
+  "fold": "development-2",
+  "asset": "IWM",
+  "decision": "2016-06-15",
+  "target": "2016-06-22",
+  "r": 0.00017456576809582458,
+  "kronos_small": -0.004091598350266068
+ },
+ {
+  "fold": "development-2",
+  "asset": "SPY",
+  "decision": "2016-06-22",
+  "target": "2016-06-29",
+  "r": -0.006365455259146557,
+  "kronos_small": 0.008785973747899689
+ },
+ {
+  "fold": "development-2",
+  "asset": "QQQ",
+  "decision": "2016-06-22",
+  "target": "2016-06-29",
+  "r": -0.008709959067243922,
+  "kronos_small": 0.010689672331843703
+ },
+ {
+  "fold": "development-2",
+  "asset": "IWM",
+  "decision": "2016-06-22",
+  "target": "2016-06-29",
+  "r": -0.014947961435872514,
+  "kronos_small": -0.0015241606816811526
+ },
+ {
+  "fold": "development-2",
+  "asset": "SPY",
+  "decision": "2016-06-29",
+  "target": "2016-07-07",
+  "r": 0.01359780711367442,
+  "kronos_small": 0.0100392713063302
+ },
+ {
+  "fold": "development-2",
+  "asset": "QQQ",
+  "decision": "2016-06-29",
+  "target": "2016-07-07",
+  "r": 0.021496198306184766,
+  "kronos_small": 0.002174260437507236
+ },
+ {
+  "fold": "development-2",
+  "asset": "IWM",
+  "decision": "2016-06-29",
+  "target": "2016-07-07",
+  "r": 0.011801105692158309,
+  "kronos_small": 0.0016751056595225577
+ },
+ {
+  "fold": "development-2",
+  "asset": "SPY",
+  "decision": "2016-07-07",
+  "target": "2016-07-14",
+  "r": 0.030872885390116345,
+  "kronos_small": 0.006012623887518664
+ },
+ {
+  "fold": "development-2",
+  "asset": "QQQ",
+  "decision": "2016-07-07",
+  "target": "2016-07-14",
+  "r": 0.0304647313140487,
+  "kronos_small": 0.014827557813530845
+ },
+ {
+  "fold": "development-2",
+  "asset": "IWM",
+  "decision": "2016-07-07",
+  "target": "2016-07-14",
+  "r": 0.044185269503786984,
+  "kronos_small": 0.003736847092977058
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-07-14",
+  "target": "2016-07-21",
+  "r": 0.0005088705496900658,
+  "kronos_small": -0.007404317594929211
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-07-14",
+  "target": "2016-07-21",
+  "r": 0.010659187793629954,
+  "kronos_small": -0.004761707842995122
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-07-14",
+  "target": "2016-07-21",
+  "r": 0.0014230111638298126,
+  "kronos_small": -0.024808503596500664
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-07-21",
+  "target": "2016-07-28",
+  "r": 0.002678861700865731,
+  "kronos_small": -0.011041737686752207
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-07-21",
+  "target": "2016-07-28",
+  "r": 0.015778728480767334,
+  "kronos_small": -0.008074380128255676
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-07-21",
+  "target": "2016-07-28",
+  "r": 0.010649905134882509,
+  "kronos_small": -0.012760711561597304
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-07-28",
+  "target": "2016-08-04",
+  "r": -0.0017081000390533063,
+  "kronos_small": -0.016328711458384326
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-07-28",
+  "target": "2016-08-04",
+  "r": 0.0059831091121651525,
+  "kronos_small": -0.038140892355785105
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-07-28",
+  "target": "2016-08-04",
+  "r": -0.0022370447209763,
+  "kronos_small": -0.015559850960323196
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-08-04",
+  "target": "2016-08-11",
+  "r": 0.010342304500360555,
+  "kronos_small": -0.0169865353836407
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-08-04",
+  "target": "2016-08-11",
+  "r": 0.012457740905690962,
+  "kronos_small": -0.03529066259305669
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-08-04",
+  "target": "2016-08-11",
+  "r": 0.012774723526690401,
+  "kronos_small": -0.016170457205892497
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-08-11",
+  "target": "2016-08-18",
+  "r": 0.001005530502018459,
+  "kronos_small": -0.01683086200880357
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-08-11",
+  "target": "2016-08-18",
+  "r": 0.0014504503204131325,
+  "kronos_small": -0.0476615629475452
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-08-11",
+  "target": "2016-08-18",
+  "r": 0.006855490817271104,
+  "kronos_small": -0.013380291961479607
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-08-18",
+  "target": "2016-08-25",
+  "r": -0.005680792260901235,
+  "kronos_small": -0.031835566486484446
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-08-18",
+  "target": "2016-08-25",
+  "r": -0.0058144670011728294,
+  "kronos_small": -0.041471491330034915
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-08-18",
+  "target": "2016-08-25",
+  "r": 0.003004834355747832,
+  "kronos_small": -0.033199060108271894
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-08-25",
+  "target": "2016-09-01",
+  "r": -0.0013332415831417421,
+  "kronos_small": -0.015467583874646529
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-08-25",
+  "target": "2016-09-01",
+  "r": 0.0011142062434039701,
+  "kronos_small": -0.02849279618973899
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-08-25",
+  "target": "2016-09-01",
+  "r": 8.108655994742975e-05,
+  "kronos_small": -0.039716293713741635
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-09-01",
+  "target": "2016-09-09",
+  "r": -0.018807584952372558,
+  "kronos_small": -0.01791861282927698
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-09-01",
+  "target": "2016-09-09",
+  "r": -0.021297662413073404,
+  "kronos_small": -0.02244039832959288
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-09-01",
+  "target": "2016-09-09",
+  "r": -0.01717412181940503,
+  "kronos_small": -0.03905877747345876
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-09-09",
+  "target": "2016-09-16",
+  "r": 0.0002343621843907684,
+  "kronos_small": 0.0019601096504535676
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-09-09",
+  "target": "2016-09-16",
+  "r": 0.025997923170842263,
+  "kronos_small": -0.00230175717598069
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-09-09",
+  "target": "2016-09-16",
+  "r": 0.005183277061856728,
+  "kronos_small": -0.023670321609555067
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-09-16",
+  "target": "2016-09-23",
+  "r": 0.012204362399369728,
+  "kronos_small": -0.004979354346420273
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-09-16",
+  "target": "2016-09-23",
+  "r": 0.008827830863053165,
+  "kronos_small": -0.047940505694368696
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-09-16",
+  "target": "2016-09-23",
+  "r": 0.023919736110014078,
+  "kronos_small": -0.02177234491395108
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-09-23",
+  "target": "2016-09-30",
+  "r": 0.0014342226428514238,
+  "kronos_small": -0.012256662860688827
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-09-23",
+  "target": "2016-09-30",
+  "r": 0.00329044802260281,
+  "kronos_small": -0.04999317704549444
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-09-23",
+  "target": "2016-09-30",
+  "r": -0.00481889937426061,
+  "kronos_small": -0.036986217518303555
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-09-30",
+  "target": "2016-10-07",
+  "r": -0.005842275624228677,
+  "kronos_small": 0.007183592955577467
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-09-30",
+  "target": "2016-10-07",
+  "r": -0.0021080154524026895,
+  "kronos_small": -0.04236659675938714
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-09-30",
+  "target": "2016-10-07",
+  "r": -0.011172396005099117,
+  "kronos_small": -0.01808728594030118
+ },
+ {
+  "fold": "development-3",
+  "asset": "SPY",
+  "decision": "2016-10-07",
+  "target": "2016-10-14",
+  "r": -0.008968669982760247,
+  "kronos_small": 0.0021183715559063288
+ },
+ {
+  "fold": "development-3",
+  "asset": "QQQ",
+  "decision": "2016-10-07",
+  "target": "2016-10-14",
+  "r": -0.011289963305030959,
+  "kronos_small": -0.030753153837165925
+ },
+ {
+  "fold": "development-3",
+  "asset": "IWM",
+  "decision": "2016-10-07",
+  "target": "2016-10-14",
+  "r": -0.019732614278614058,
+  "kronos_small": -0.00401048254981351
+ },
+ {
+  "fold": "development-4",
+  "asset": "SPY",
+  "decision": "2016-10-14",
+  "target": "2016-10-21",
+  "r": 0.004027165358436058,
+  "kronos_small": 0.013550663258749651
+ },
+ {
+  "fold": "development-4",
+  "asset": "QQQ",
+  "decision": "2016-10-14",
+  "target": "2016-10-21",
+  "r": 0.008585202971280737,
+  "kronos_small": -0.01820384211077286
+ },
+ {
+  "fold": "development-4",
+  "asset": "IWM",
+  "decision": "2016-10-14",
+  "target": "2016-10-21",
+  "r": 0.005300219447259558,
+  "kronos_small": 0.02112542238546844
+ },
+ {
+  "fold": "development-4",
+  "asset": "SPY",
+  "decision": "2016-10-21",
+  "target": "2016-10-28",
+  "r": -0.006752346765911632,
+  "kronos_small": 0.010842344630156653
+ },
+ {
+  "fold": "development-4",
+  "asset": "QQQ",
+  "decision": "2016-10-21",
+  "target": "2016-10-28",
+  "r": -0.008926733029245959,
+  "kronos_small": -0.016802139798201665
+ },
+ {
+  "fold": "development-4",
+  "asset": "IWM",
+  "decision": "2016-10-21",
+  "target": "2016-10-28",
+  "r": -0.02543006127867109,
+  "kronos_small": 0.008738377363942895
+ },
+ {
+  "fold": "development-4",
+  "asset": "SPY",
+  "decision": "2016-10-28",
+  "target": "2016-11-04",
+  "r": -0.01895138530159457,
+  "kronos_small": 0.010956011510661945
+ },
+ {
+  "fold": "development-4",
+  "asset": "QQQ",
+  "decision": "2016-10-28",
+  "target": "2016-11-04",
+  "r": -0.029904720305118815,
+  "kronos_small": 0.0017892407243511599
+ },
+ {
+  "fold": "development-4",
+  "asset": "IWM",
+  "decision": "2016-10-28",
+  "target": "2016-11-04",
+  "r": -0.019592533295284653,
+  "kronos_small": 0.037444890859623214
+ },
+ {
+  "fold": "development-4",
+  "asset": "SPY",
+  "decision": "2016-11-04",
+  "target": "2016-11-11",
+  "r": 0.03704214350054791,
+  "kronos_small": 0.014500519589970118
+ },
+ {
+  "fold": "development-4",
+  "asset": "QQQ",
+  "decision": "2016-11-04",
+  "target": "2016-11-11",
+  "r": 0.01874101484034263,
+  "kronos_small": 0.021051959734893266
+ },
+ {
+  "fold": "development-4",
+  "asset": "IWM",
+  "decision": "2016-11-04",
+  "target": "2016-11-11",
+  "r": 0.09567142595038014,
+  "kronos_small": 0.012887864167224983
+ },
+ {
+  "fold": "development-4",
+  "asset": "SPY",
+  "decision": "2016-11-11",
+  "target": "2016-11-18",
+  "r": 0.009565050392142282,
+  "kronos_small": -0.0032507933521523924
+ },
+ {
+  "fold": "development-4",
+  "asset": "QQQ",
+  "decision": "2016-11-11",
+  "target": "2016-11-18",
+  "r": 0.013040678970354769,
+  "kronos_small": 0.00594916663636802
+ },
+ {
+  "fold": "development-4",
+  "asset": "IWM",
+  "decision": "2016-11-11",
+  "target": "2016-11-18",
+  "r": 0.02810326231348448,
+  "kronos_small": -0.021064801556536672
+ },
+ {
+  "fold": "development-4",
+  "asset": "SPY",
+  "decision": "2016-11-18",
+  "target": "2016-11-28",
+  "r": 0.009020973289649348,
+  "kronos_small": -0.005715688145085274
+ },
+ {
+  "fold": "development-4",
+  "asset": "QQQ",
+  "decision": "2016-11-18",
+  "target": "2016-11-28",
+  "r": 0.010260848982158954,
+  "kronos_small": -0.0024183574847436162
+ },
+ {
+  "fold": "development-4",
+  "asset": "IWM",
+  "decision": "2016-11-18",
+  "target": "2016-11-28",
+  "r": 0.010177818375400882,
+  "kronos_small": -0.07556464509512306
+ },
+ {
+  "fold": "development-4",
+  "asset": "SPY",
+  "decision": "2016-11-28",
+  "target": "2016-12-05",
+  "r": 0.002355713692458572,
+  "kronos_small": -0.01440282202566312
+ },
+ {
+  "fold": "development-4",
+  "asset": "QQQ",
+  "decision": "2016-11-28",
+  "target": "2016-12-05",
+  "r": -0.01641681917501714,
+  "kronos_small": -0.006485221023564414
+ },
+ {
+  "fold": "development-4",
+  "asset": "IWM",
+  "decision": "2016-11-28",
+  "target": "2016-12-05",
+  "r": 0.006177509474983189,
+  "kronos_small": -0.11534505685614871
+ },
+ {
+  "fold": "development-4",
+  "asset": "SPY",
+  "decision": "2016-12-05",
+  "target": "2016-12-12",
+  "r": 0.023477881062283323,
+  "kronos_small": -0.017261092793260602
+ },
+ {
+  "fold": "development-4",
+  "asset": "QQQ",
+  "decision": "2016-12-05",
+  "target": "2016-12-12",
+  "r": 0.02003802823550771,
+  "kronos_small": 0.000746093622981725
+ },
+ {
+  "fold": "development-4",
+  "asset": "IWM",
+  "decision": "2016-12-05",
+  "target": "2016-12-12",
+  "r": 0.0274091232267466,
+  "kronos_small": -0.08519408451391364
+ },
+ {
+  "fold": "development-4",
+  "asset": "SPY",
+  "decision": "2016-12-12",
+  "target": "2016-12-19",
+  "r": -0.003187394792018239,
+  "kronos_small": -0.04420115437875438
+ },
+ {
+  "fold": "development-4",
+  "asset": "QQQ",
+  "decision": "2016-12-12",
+  "target": "2016-12-19",
+  "r": 0.009454159520692507,
+  "kronos_small": -0.011965299865768664
+ },
+ {
+  "fold": "development-4",
+  "asset": "IWM",
+  "decision": "2016-12-12",
+  "target": "2016-12-19",
+  "r": -0.00036543029823743467,
+  "kronos_small": -0.11495332092910626
+ },
+ {
+  "fold": "development-4",
+  "asset": "SPY",
+  "decision": "2016-12-19",
+  "target": "2016-12-27",
+  "r": 0.003275788675218827,
+  "kronos_small": -0.04617551057012914
+ },
+ {
+  "fold": "development-4",
+  "asset": "QQQ",
+  "decision": "2016-12-19",
+  "target": "2016-12-27",
+  "r": 0.006060373038002886,
+  "kronos_small": -0.024664116645564782
+ },
+ {
+  "fold": "development-4",
+  "asset": "IWM",
+  "decision": "2016-12-19",
+  "target": "2016-12-27",
+  "r": -0.0010970928143736458,
+  "kronos_small": -0.09469766235688759
+ },
+ {
+  "fold": "development-4",
+  "asset": "SPY",
+  "decision": "2016-12-27",
+  "target": "2017-01-04",
+  "r": 0.0013691069821062385,
+  "kronos_small": -0.032049379142711665
+ },
+ {
+  "fold": "development-4",
+  "asset": "QQQ",
+  "decision": "2016-12-27",
+  "target": "2017-01-04",
+  "r": -0.0052280107458972935,
+  "kronos_small": -0.02467508730103951
+ },
+ {
+  "fold": "development-4",
+  "asset": "IWM",
+  "decision": "2016-12-27",
+  "target": "2017-01-04",
+  "r": 0.008235297790973206,
+  "kronos_small": -0.09735450031251602
+ },
+ {
+  "fold": "development-4",
+  "asset": "SPY",
+  "decision": "2017-01-04",
+  "target": "2017-01-11",
+  "r": 0.002292365666169971,
+  "kronos_small": -0.030169009283771864
+ },
+ {
+  "fold": "development-4",
+  "asset": "QQQ",
+  "decision": "2017-01-04",
+  "target": "2017-01-11",
+  "r": 0.022541263714551896,
+  "kronos_small": -0.02106519852293509
+ },
+ {
+  "fold": "development-4",
+  "asset": "IWM",
+  "decision": "2017-01-04",
+  "target": "2017-01-11",
+  "r": -0.010579792967011947,
+  "kronos_small": -0.11193316024575939
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-01-11",
+  "target": "2017-01-19",
+  "r": -0.005253759242381584,
+  "kronos_small": -0.032983032134842105
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-01-11",
+  "target": "2017-01-19",
+  "r": 0.000406652846073996,
+  "kronos_small": -0.0404826275297312
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-01-11",
+  "target": "2017-01-19",
+  "r": -0.019106031421922687,
+  "kronos_small": -0.08793559219684433
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-01-19",
+  "target": "2017-01-26",
+  "r": 0.015025324406749974,
+  "kronos_small": -0.018259339696985677
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-01-19",
+  "target": "2017-01-26",
+  "r": 0.020761991448429384,
+  "kronos_small": -0.03839920520733742
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-01-19",
+  "target": "2017-01-26",
+  "r": 0.02152370357651634,
+  "kronos_small": -0.05101556745521574
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-01-26",
+  "target": "2017-02-02",
+  "r": -0.006825666404109754,
+  "kronos_small": -0.03213965083057957
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-01-26",
+  "target": "2017-02-02",
+  "r": -0.001913265889761817,
+  "kronos_small": -0.07387718450290226
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-01-26",
+  "target": "2017-02-02",
+  "r": -0.013629709649658928,
+  "kronos_small": -0.0533142091789367
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-02-02",
+  "target": "2017-02-09",
+  "r": 0.012348259963187225,
+  "kronos_small": -0.018667172019203093
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-02-02",
+  "target": "2017-02-09",
+  "r": 0.013001610134162789,
+  "kronos_small": -0.044776132736237706
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-02-02",
+  "target": "2017-02-09",
+  "r": 0.015384352591430783,
+  "kronos_small": -0.03574452105116421
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-02-09",
+  "target": "2017-02-16",
+  "r": 0.017708706559712795,
+  "kronos_small": -0.031362087859183596
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-02-09",
+  "target": "2017-02-16",
+  "r": 0.017876437170384563,
+  "kronos_small": -0.053211024255053196
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-02-09",
+  "target": "2017-02-16",
+  "r": 0.016661015605915708,
+  "kronos_small": -0.05653427090997187
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-02-16",
+  "target": "2017-02-24",
+  "r": 0.008569178131076605,
+  "kronos_small": -0.05907623742369417
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-02-16",
+  "target": "2017-02-24",
+  "r": 0.0077839397297170265,
+  "kronos_small": -0.0684176553836977
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-02-16",
+  "target": "2017-02-24",
+  "r": -0.003958975838532552,
+  "kronos_small": -0.061906018788207895
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-02-24",
+  "target": "2017-03-03",
+  "r": 0.007071331764107569,
+  "kronos_small": -0.07140656987029459
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-02-24",
+  "target": "2017-03-03",
+  "r": 0.005817530185474595,
+  "kronos_small": -0.07265319938825421
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-02-24",
+  "target": "2017-03-03",
+  "r": 0.0,
+  "kronos_small": -0.05253894751179544
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-03-03",
+  "target": "2017-03-10",
+  "r": -0.0030665206445954496,
+  "kronos_small": -0.07492117939879073
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-03-03",
+  "target": "2017-03-10",
+  "r": 0.0028200163500002873,
+  "kronos_small": -0.09584201698209949
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-03-03",
+  "target": "2017-03-10",
+  "r": -0.019592047233871313,
+  "kronos_small": -0.04818377130346274
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-03-10",
+  "target": "2017-03-17",
+  "r": -0.002780588242508486,
+  "kronos_small": -0.07968500679550683
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-03-10",
+  "target": "2017-03-17",
+  "r": 0.002280676068398435,
+  "kronos_small": -0.09492800966453263
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-03-10",
+  "target": "2017-03-17",
+  "r": 0.018220750421964027,
+  "kronos_small": -0.027717421859737357
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-03-17",
+  "target": "2017-03-24",
+  "r": -0.013464069690578562,
+  "kronos_small": -0.07719860510965404
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-03-17",
+  "target": "2017-03-24",
+  "r": -0.00808177622365669,
+  "kronos_small": -0.08095451580261415
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-03-17",
+  "target": "2017-03-24",
+  "r": -0.029091628414422033,
+  "kronos_small": -0.04547501189424796
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-03-24",
+  "target": "2017-03-31",
+  "r": 0.008006857086250818,
+  "kronos_small": -0.04678925128329503
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-03-24",
+  "target": "2017-03-31",
+  "r": 0.013307675192304913,
+  "kronos_small": -0.06948077346698778
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-03-24",
+  "target": "2017-03-31",
+  "r": 0.02198860514617529,
+  "kronos_small": -0.009567318861922303
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-03-31",
+  "target": "2017-04-07",
+  "r": -0.002293286773952019,
+  "kronos_small": -0.05382329249749507
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-03-31",
+  "target": "2017-04-07",
+  "r": -0.003101950662038888,
+  "kronos_small": -0.08208624574111756
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-03-31",
+  "target": "2017-04-07",
+  "r": -0.014359221077888229,
+  "kronos_small": -0.026385700693682068
+ },
+ {
+  "fold": "development-5",
+  "asset": "SPY",
+  "decision": "2017-04-07",
+  "target": "2017-04-17",
+  "r": -0.0026821652199391366,
+  "kronos_small": -0.039899123734637776
+ },
+ {
+  "fold": "development-5",
+  "asset": "QQQ",
+  "decision": "2017-04-07",
+  "target": "2017-04-17",
+  "r": -0.0037198752327194384,
+  "kronos_small": -0.06374677588879951
+ },
+ {
+  "fold": "development-5",
+  "asset": "IWM",
+  "decision": "2017-04-07",
+  "target": "2017-04-17",
+  "r": -0.0016986082884757892,
+  "kronos_small": -0.0009578169644539614
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-04-17",
+  "target": "2017-04-24",
+  "r": 0.011023132772270294,
+  "kronos_small": -0.027453998499345822
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-04-17",
+  "target": "2017-04-24",
+  "r": 0.02017836871893497,
+  "kronos_small": -0.04778644697598633
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-04-17",
+  "target": "2017-04-24",
+  "r": 0.026477605260604165,
+  "kronos_small": 0.005506864619132301
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-04-24",
+  "target": "2017-05-01",
+  "r": 0.006346559077078595,
+  "kronos_small": -0.0363987890662969
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-04-24",
+  "target": "2017-05-01",
+  "r": 0.02240659777683085,
+  "kronos_small": -0.0666702768953149
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-04-24",
+  "target": "2017-05-01",
+  "r": 0.00674369439984801,
+  "kronos_small": -0.017522975474764557
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-05-01",
+  "target": "2017-05-08",
+  "r": 0.0040975096004887135,
+  "kronos_small": -0.027134224510444227
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-05-01",
+  "target": "2017-05-08",
+  "r": 0.004653876927889655,
+  "kronos_small": -0.08480970212238059
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-05-01",
+  "target": "2017-05-08",
+  "r": -0.010421627367110275,
+  "kronos_small": -0.012752435263884365
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-05-08",
+  "target": "2017-05-15",
+  "r": 0.0026668904880526867,
+  "kronos_small": -0.034023111070849765
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-05-08",
+  "target": "2017-05-15",
+  "r": 0.008668069297407932,
+  "kronos_small": -0.08127556768732713
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-05-08",
+  "target": "2017-05-15",
+  "r": 0.0012274812906243326,
+  "kronos_small": -0.006317874329154982
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-05-15",
+  "target": "2017-05-22",
+  "r": -0.003251222071104287,
+  "kronos_small": -0.022420939910268167
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-05-15",
+  "target": "2017-05-22",
+  "r": -0.0002877283863904623,
+  "kronos_small": -0.0922336317345751
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-05-15",
+  "target": "2017-05-22",
+  "r": -0.011831880490148272,
+  "kronos_small": -0.01038706673051415
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-05-22",
+  "target": "2017-05-30",
+  "r": 0.008232552421309158,
+  "kronos_small": -0.02746749895217082
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-05-22",
+  "target": "2017-05-30",
+  "r": 0.016694402132016783,
+  "kronos_small": -0.11442761434960769
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-05-22",
+  "target": "2017-05-30",
+  "r": -0.003584364321809197,
+  "kronos_small": 0.007797441133589267
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-05-30",
+  "target": "2017-06-06",
+  "r": 0.007055794575097529,
+  "kronos_small": -0.028598766995695968
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-05-30",
+  "target": "2017-06-06",
+  "r": 0.010696794464117865,
+  "kronos_small": -0.09110697157633307
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-05-30",
+  "target": "2017-06-06",
+  "r": 0.017362682365530624,
+  "kronos_small": 0.008629888875065994
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-06-06",
+  "target": "2017-06-13",
+  "r": 0.005494519317641,
+  "kronos_small": -0.03232113903940714
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-06-06",
+  "target": "2017-06-13",
+  "r": -0.01765457901181211,
+  "kronos_small": -0.09068625217373416
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-06-06",
+  "target": "2017-06-13",
+  "r": 0.023136821350246528,
+  "kronos_small": -0.002797592236233548
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-06-13",
+  "target": "2017-06-20",
+  "r": -0.006317192228174839,
+  "kronos_small": -0.03492218337261033
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-06-13",
+  "target": "2017-06-20",
+  "r": -0.007150037610821336,
+  "kronos_small": -0.07918673781818164
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-06-13",
+  "target": "2017-06-20",
+  "r": -0.016318205303345046,
+  "kronos_small": -0.015230794880517706
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-06-20",
+  "target": "2017-06-27",
+  "r": -0.006937303289669572,
+  "kronos_small": -0.027714570290897633
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-06-20",
+  "target": "2017-06-27",
+  "r": -0.009589460268705885,
+  "kronos_small": -0.06193587563141634
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-06-20",
+  "target": "2017-06-27",
+  "r": 0.0002860821075154618,
+  "kronos_small": -0.010933327045094643
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-06-27",
+  "target": "2017-07-05",
+  "r": 0.0059492015994937475,
+  "kronos_small": -0.01222331852849301
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-06-27",
+  "target": "2017-07-05",
+  "r": -0.0036289777088702735,
+  "kronos_small": -0.04571247385897603
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-06-27",
+  "target": "2017-07-05",
+  "r": 0.012436645389654721,
+  "kronos_small": -0.0012730202138735436
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-07-05",
+  "target": "2017-07-12",
+  "r": 0.005094714992938343,
+  "kronos_small": -0.00944382926105014
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-07-05",
+  "target": "2017-07-12",
+  "r": 0.022787888993726746,
+  "kronos_small": -0.02692574430882111
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-07-05",
+  "target": "2017-07-12",
+  "r": -0.0015549904179383844,
+  "kronos_small": -0.010521120058308853
+ },
+ {
+  "fold": "development-6",
+  "asset": "SPY",
+  "decision": "2017-07-12",
+  "target": "2017-07-19",
+  "r": 0.012138641918490123,
+  "kronos_small": -0.009711762904141885
+ },
+ {
+  "fold": "development-6",
+  "asset": "QQQ",
+  "decision": "2017-07-12",
+  "target": "2017-07-19",
+  "r": 0.023044436920813816,
+  "kronos_small": -0.04697340054001842
+ },
+ {
+  "fold": "development-6",
+  "asset": "IWM",
+  "decision": "2017-07-12",
+  "target": "2017-07-19",
+  "r": 0.012163119683463286,
+  "kronos_small": -0.0015938869178206971
+ },
+ {
+  "fold": "development-7",
+  "asset": "SPY",
+  "decision": "2017-07-19",
+  "target": "2017-07-26",
+  "r": 0.0017798637440114007,
+  "kronos_small": -0.021182693451370582
+ },
+ {
+  "fold": "development-7",
+  "asset": "QQQ",
+  "decision": "2017-07-19",
+  "target": "2017-07-26",
+  "r": 0.006162387512403278,
+  "kronos_small": -0.08760007870363928
+ },
+ {
+  "fold": "development-7",
+  "asset": "IWM",
+  "decision": "2017-07-19",
+  "target": "2017-07-26",
+  "r": 0.0010476690324443538,
+  "kronos_small": -0.007946934246700899
+ },
+ {
+  "fold": "development-7",
+  "asset": "SPY",
+  "decision": "2017-07-26",
+  "target": "2017-08-02",
+  "r": 4.041465435911107e-05,
+  "kronos_small": -0.02205197440713924
+ },
+ {
+  "fold": "development-7",
+  "asset": "QQQ",
+  "decision": "2017-07-26",
+  "target": "2017-08-02",
+  "r": -0.006370771495375571,
+  "kronos_small": -0.0720830547359066
+ },
+ {
+  "fold": "development-7",
+  "asset": "IWM",
+  "decision": "2017-07-26",
+  "target": "2017-08-02",
+  "r": -0.02130742385628981,
+  "kronos_small": -0.009618295082732153
+ },
+ {
+  "fold": "development-7",
+  "asset": "SPY",
+  "decision": "2017-08-02",
+  "target": "2017-08-09",
+  "r": -0.0007681578739928696,
+  "kronos_small": -0.028446008557591718
+ },
+ {
+  "fold": "development-7",
+  "asset": "QQQ",
+  "decision": "2017-08-02",
+  "target": "2017-08-09",
+  "r": 0.0011802688217077417,
+  "kronos_small": -0.05171915494894819
+ },
+ {
+  "fold": "development-7",
+  "asset": "IWM",
+  "decision": "2017-08-02",
+  "target": "2017-08-09",
+  "r": -0.010321932370811027,
+  "kronos_small": 0.001533377221704768
+ },
+ {
+  "fold": "development-7",
+  "asset": "SPY",
+  "decision": "2017-08-09",
+  "target": "2017-08-16",
+  "r": -0.0012545783632242902,
+  "kronos_small": -0.028656158507586404
+ },
+ {
+  "fold": "development-7",
+  "asset": "QQQ",
+  "decision": "2017-08-09",
+  "target": "2017-08-16",
+  "r": 0.0011095701554459936,
+  "kronos_small": -0.06521305464565508
+ },
+ {
+  "fold": "development-7",
+  "asset": "IWM",
+  "decision": "2017-08-09",
+  "target": "2017-08-16",
+  "r": -0.00977454113180265,
+  "kronos_small": 0.010140712526756523
+ },
+ {
+  "fold": "development-7",
+  "asset": "SPY",
+  "decision": "2017-08-16",
+  "target": "2017-08-23",
+  "r": -0.009684714557018026,
+  "kronos_small": -0.017114102123009012
+ },
+ {
+  "fold": "development-7",
+  "asset": "QQQ",
+  "decision": "2017-08-16",
+  "target": "2017-08-23",
+  "r": -0.011081411092854765,
+  "kronos_small": -0.04851575725083723
+ },
+ {
+  "fold": "development-7",
+  "asset": "IWM",
+  "decision": "2017-08-16",
+  "target": "2017-08-23",
+  "r": -0.010017999033178349,
+  "kronos_small": 0.010880223180430804
+ },
+ {
+  "fold": "development-7",
+  "asset": "SPY",
+  "decision": "2017-08-23",
+  "target": "2017-08-30",
+  "r": 0.005911507930082216,
+  "kronos_small": -0.007982880487876542
+ },
+ {
+  "fold": "development-7",
+  "asset": "QQQ",
+  "decision": "2017-08-23",
+  "target": "2017-08-30",
+  "r": 0.013642586479660324,
+  "kronos_small": -0.029211350613102205
+ },
+ {
+  "fold": "development-7",
+  "asset": "IWM",
+  "decision": "2017-08-23",
+  "target": "2017-08-30",
+  "r": 0.016761797478525686,
+  "kronos_small": 0.0020446158027853656
+ },
+ {
+  "fold": "development-7",
+  "asset": "SPY",
+  "decision": "2017-08-30",
+  "target": "2017-09-07",
+  "r": 0.0034896967730695394,
+  "kronos_small": -0.01423866047012634
+ },
+ {
+  "fold": "development-7",
+  "asset": "QQQ",
+  "decision": "2017-08-30",
+  "target": "2017-09-07",
+  "r": 0.005652848363226326,
+  "kronos_small": -0.04088914669880328
+ },
+ {
+  "fold": "development-7",
+  "asset": "IWM",
+  "decision": "2017-08-30",
+  "target": "2017-09-07",
+  "r": 0.00533373039018592,
+  "kronos_small": 0.005071434802585095
+ },
+ {
+  "fold": "development-7",
+  "asset": "SPY",
+  "decision": "2017-09-07",
+  "target": "2017-09-14",
+  "r": 0.012958970792062985,
+  "kronos_small": -0.015967106439083167
+ },
+ {
+  "fold": "development-7",
+  "asset": "QQQ",
+  "decision": "2017-09-07",
+  "target": "2017-09-14",
+  "r": 0.0006184929585888455,
+  "kronos_small": -0.047632041891120025
+ },
+ {
+  "fold": "development-7",
+  "asset": "IWM",
+  "decision": "2017-09-07",
+  "target": "2017-09-14",
+  "r": 0.019364170235037115,
+  "kronos_small": 0.006799578914399973
+ },
+ {
+  "fold": "development-7",
+  "asset": "SPY",
+  "decision": "2017-09-14",
+  "target": "2017-09-21",
+  "r": -0.0028029168666874327,
+  "kronos_small": -0.021550030948708
+ },
+ {
+  "fold": "development-7",
+  "asset": "QQQ",
+  "decision": "2017-09-14",
+  "target": "2017-09-21",
+  "r": -0.007585720121258355,
+  "kronos_small": -0.03276695936067586
+ },
+ {
+  "fold": "development-7",
+  "asset": "IWM",
+  "decision": "2017-09-14",
+  "target": "2017-09-21",
+  "r": 0.013029043934599471,
+  "kronos_small": -0.006424473006165776
+ },
+ {
+  "fold": "development-7",
+  "asset": "SPY",
+  "decision": "2017-09-21",
+  "target": "2017-09-28",
+  "r": 0.0038420025648466805,
+  "kronos_small": -0.017676833394927982
+ },
+ {
+  "fold": "development-7",
+  "asset": "QQQ",
+  "decision": "2017-09-21",
+  "target": "2017-09-28",
+  "r": -0.00034617648422674563,
+  "kronos_small": -0.03138856816603397
+ },
+ {
+  "fold": "development-7",
+  "asset": "IWM",
+  "decision": "2017-09-21",
+  "target": "2017-09-28",
+  "r": 0.02840476367188316,
+  "kronos_small": -0.013361739366959391
+ },
+ {
+  "fold": "development-7",
+  "asset": "SPY",
+  "decision": "2017-09-28",
+  "target": "2017-10-05",
+  "r": 0.0170693833693365,
+  "kronos_small": -0.01208228814581247
+ },
+ {
+  "fold": "development-7",
+  "asset": "QQQ",
+  "decision": "2017-09-28",
+  "target": "2017-10-05",
+  "r": 0.020900476423030057,
+  "kronos_small": -0.018449774089043025
+ },
+ {
+  "fold": "development-7",
+  "asset": "IWM",
+  "decision": "2017-09-28",
+  "target": "2017-10-05",
+  "r": 0.016304162028015767,
+  "kronos_small": -0.04122865103286788
+ },
+ {
+  "fold": "development-7",
+  "asset": "SPY",
+  "decision": "2017-10-05",
+  "target": "2017-10-12",
+  "r": -7.853917145261846e-05,
+  "kronos_small": -0.027095784327719308
+ },
+ {
+  "fold": "development-7",
+  "asset": "QQQ",
+  "decision": "2017-10-05",
+  "target": "2017-10-12",
+  "r": 0.002100058354038481,
+  "kronos_small": -0.040306143353654456
+ },
+ {
+  "fold": "development-7",
+  "asset": "IWM",
+  "decision": "2017-10-05",
+  "target": "2017-10-12",
+  "r": -0.00413471746106886,
+  "kronos_small": -0.05780509205440243
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2017-10-12",
+  "target": "2017-10-19",
+  "r": 0.004506012365313339,
+  "kronos_small": -0.033814365796678736
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2017-10-12",
+  "target": "2017-10-19",
+  "r": 0.0036476668383285116,
+  "kronos_small": -0.03255226814003631
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2017-10-12",
+  "target": "2017-10-19",
+  "r": -0.002341686414446542,
+  "kronos_small": -0.05024705962794673
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2017-10-19",
+  "target": "2017-10-26",
+  "r": -0.0006648286355819266,
+  "kronos_small": -0.020097428625973635
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2017-10-19",
+  "target": "2017-10-26",
+  "r": -0.00914423684700072,
+  "kronos_small": -0.03119301451866452
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2017-10-19",
+  "target": "2017-10-26",
+  "r": -0.0035564540086294727,
+  "kronos_small": -0.03664873160662108
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2017-10-26",
+  "target": "2017-11-02",
+  "r": 0.0076772068973420815,
+  "kronos_small": -0.03224464097278634
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2017-10-26",
+  "target": "2017-11-02",
+  "r": 0.03246929803775345,
+  "kronos_small": -0.014930240179829468
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2017-10-26",
+  "target": "2017-11-02",
+  "r": -0.0003361683562772555,
+  "kronos_small": -0.03435518881400679
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2017-11-02",
+  "target": "2017-11-09",
+  "r": 0.002249109060391774,
+  "kronos_small": -0.04051502942028051
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2017-11-02",
+  "target": "2017-11-09",
+  "r": 0.012307847674597028,
+  "kronos_small": -0.10017216225999004
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2017-11-02",
+  "target": "2017-11-09",
+  "r": -0.013744757497466509,
+  "kronos_small": -0.03632584616919665
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2017-11-09",
+  "target": "2017-11-16",
+  "r": 0.0017415202064032798,
+  "kronos_small": -0.06581634167559258
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2017-11-09",
+  "target": "2017-11-16",
+  "r": 0.0055153758862172,
+  "kronos_small": -0.09279676179599505
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2017-11-09",
+  "target": "2017-11-16",
+  "r": 0.007403667712416961,
+  "kronos_small": -0.02500321015501772
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2017-11-16",
+  "target": "2017-11-24",
+  "r": 0.0067054858364805625,
+  "kronos_small": -0.04800560903980777
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2017-11-16",
+  "target": "2017-11-24",
+  "r": 0.011068324063160162,
+  "kronos_small": -0.09309548283541069
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2017-11-16",
+  "target": "2017-11-24",
+  "r": 0.02129164523730509,
+  "kronos_small": -0.02769470383299133
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2017-11-24",
+  "target": "2017-12-01",
+  "r": 0.015624722424490756,
+  "kronos_small": -0.05840089281717109
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2017-11-24",
+  "target": "2017-12-01",
+  "r": -0.011391917244639949,
+  "kronos_small": -0.10378111646315524
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2017-11-24",
+  "target": "2017-12-01",
+  "r": 0.013619975650858152,
+  "kronos_small": -0.050211762875105315
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2017-12-01",
+  "target": "2017-12-08",
+  "r": 0.003962493627443386,
+  "kronos_small": -0.05718914869876368
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2017-12-01",
+  "target": "2017-12-08",
+  "r": 0.0013583882550616266,
+  "kronos_small": -0.04777705698902235
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2017-12-01",
+  "target": "2017-12-08",
+  "r": -0.010577242783424978,
+  "kronos_small": -0.05809029393413834
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2017-12-08",
+  "target": "2017-12-15",
+  "r": 0.0037592615979491484,
+  "kronos_small": -0.06362821042334055
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2017-12-08",
+  "target": "2017-12-15",
+  "r": 0.018889628412050108,
+  "kronos_small": -0.05613479867207616
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2017-12-08",
+  "target": "2017-12-15",
+  "r": 0.005466833967613383,
+  "kronos_small": -0.035941002248114806
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2017-12-15",
+  "target": "2017-12-22",
+  "r": 0.0037451824608281115,
+  "kronos_small": -0.05541166667403985
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2017-12-15",
+  "target": "2017-12-22",
+  "r": -0.0017776653782970442,
+  "kronos_small": -0.05646600177664496
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2017-12-15",
+  "target": "2017-12-22",
+  "r": 0.0062207580367106274,
+  "kronos_small": -0.04873068933524749
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2017-12-22",
+  "target": "2018-01-02",
+  "r": 0.00469904646269903,
+  "kronos_small": -0.07352997090205005
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2017-12-22",
+  "target": "2018-01-02",
+  "r": 0.007091779231561013,
+  "kronos_small": -0.04755740486888005
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2017-12-22",
+  "target": "2018-01-02",
+  "r": 0.00462405982022851,
+  "kronos_small": -0.05253158256135748
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2018-01-02",
+  "target": "2018-01-09",
+  "r": 0.021240974545916558,
+  "kronos_small": -0.07983430104364242
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2018-01-02",
+  "target": "2018-01-09",
+  "r": 0.025355664545783085,
+  "kronos_small": -0.07777874736553603
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2018-01-02",
+  "target": "2018-01-09",
+  "r": 0.005960110931733986,
+  "kronos_small": -0.046667134799195154
+ },
+ {
+  "fold": "development-8",
+  "asset": "SPY",
+  "decision": "2018-01-09",
+  "target": "2018-01-17",
+  "r": 0.01829880527568939,
+  "kronos_small": -0.08142116347034278
+ },
+ {
+  "fold": "development-8",
+  "asset": "QQQ",
+  "decision": "2018-01-09",
+  "target": "2018-01-17",
+  "r": 0.019674762861257022,
+  "kronos_small": -0.073898905392495
+ },
+ {
+  "fold": "development-8",
+  "asset": "IWM",
+  "decision": "2018-01-09",
+  "target": "2018-01-17",
+  "r": 0.017923921148936373,
+  "kronos_small": -0.038816414314517544
+ },
+ {
+  "fold": "development-9",
+  "asset": "SPY",
+  "decision": "2018-01-17",
+  "target": "2018-01-24",
+  "r": 0.012686962757622489,
+  "kronos_small": -0.08081205284271675
+ },
+ {
+  "fold": "development-9",
+  "asset": "QQQ",
+  "decision": "2018-01-17",
+  "target": "2018-01-24",
+  "r": 0.015679555216588703,
+  "kronos_small": -0.09686713056465113
+ },
+ {
+  "fold": "development-9",
+  "asset": "IWM",
+  "decision": "2018-01-17",
+  "target": "2018-01-24",
+  "r": 0.008528432247276285,
+  "kronos_small": -0.05583603015097882
+ },
+ {
+  "fold": "development-9",
+  "asset": "SPY",
+  "decision": "2018-01-24",
+  "target": "2018-01-31",
+  "r": -0.004530339736758648,
+  "kronos_small": -0.09486132579143458
+ },
+ {
+  "fold": "development-9",
+  "asset": "QQQ",
+  "decision": "2018-01-24",
+  "target": "2018-01-31",
+  "r": 0.005861299749991389,
+  "kronos_small": -0.11163958269696828
+ },
+ {
+  "fold": "development-9",
+  "asset": "IWM",
+  "decision": "2018-01-24",
+  "target": "2018-01-31",
+  "r": -0.01655446424802598,
+  "kronos_small": -0.06453379099133816
+ },
+ {
+  "fold": "development-9",
+  "asset": "SPY",
+  "decision": "2018-01-31",
+  "target": "2018-02-07",
+  "r": -0.051797519618832055,
+  "kronos_small": -0.0883877277164693
+ },
+ {
+  "fold": "development-9",
+  "asset": "QQQ",
+  "decision": "2018-01-31",
+  "target": "2018-02-07",
+  "r": -0.055777327559331624,
+  "kronos_small": -0.10418117831196216
+ },
+ {
+  "fold": "development-9",
+  "asset": "IWM",
+  "decision": "2018-01-31",
+  "target": "2018-02-07",
+  "r": -0.04259298278892132,
+  "kronos_small": -0.030650848676195608
+ },
+ {
+  "fold": "development-9",
+  "asset": "SPY",
+  "decision": "2018-02-07",
+  "target": "2018-02-14",
+  "r": 0.007147407860862209,
+  "kronos_small": -0.022652699026234124
+ },
+ {
+  "fold": "development-9",
+  "asset": "QQQ",
+  "decision": "2018-02-07",
+  "target": "2018-02-14",
+  "r": 0.015299626380401499,
+  "kronos_small": -0.0372171903536902
+ },
+ {
+  "fold": "development-9",
+  "asset": "IWM",
+  "decision": "2018-02-07",
+  "target": "2018-02-14",
+  "r": 0.008704663089634579,
+  "kronos_small": -0.0011213347859522216
+ },
+ {
+  "fold": "development-9",
+  "asset": "SPY",
+  "decision": "2018-02-14",
+  "target": "2018-02-22",
+  "r": 0.0030000578067124195,
+  "kronos_small": -0.030356908705645225
+ },
+ {
+  "fold": "development-9",
+  "asset": "QQQ",
+  "decision": "2018-02-14",
+  "target": "2018-02-22",
+  "r": 0.012947536436347384,
+  "kronos_small": -0.061614273992367075
+ },
+ {
+  "fold": "development-9",
+  "asset": "IWM",
+  "decision": "2018-02-14",
+  "target": "2018-02-22",
+  "r": 0.00560779962080904,
+  "kronos_small": -0.009825692031221855
+ },
+ {
+  "fold": "development-9",
+  "asset": "SPY",
+  "decision": "2018-02-22",
+  "target": "2018-03-01",
+  "r": -0.010035393642501944,
+  "kronos_small": -0.025725176294878693
+ },
+ {
+  "fold": "development-9",
+  "asset": "QQQ",
+  "decision": "2018-02-22",
+  "target": "2018-03-01",
+  "r": -0.001943635208570882,
+  "kronos_small": -0.07489056473472733
+ },
+ {
+  "fold": "development-9",
+  "asset": "IWM",
+  "decision": "2018-02-22",
+  "target": "2018-03-01",
+  "r": -0.01357861565125873,
+  "kronos_small": -0.01570776966785914
+ },
+ {
+  "fold": "development-9",
+  "asset": "SPY",
+  "decision": "2018-03-01",
+  "target": "2018-03-08",
+  "r": 0.023626052782432794,
+  "kronos_small": -0.019571691643059275
+ },
+ {
+  "fold": "development-9",
+  "asset": "QQQ",
+  "decision": "2018-03-01",
+  "target": "2018-03-08",
+  "r": 0.03218558608506239,
+  "kronos_small": -0.06155190662148602
+ },
+ {
+  "fold": "development-9",
+  "asset": "IWM",
+  "decision": "2018-03-01",
+  "target": "2018-03-08",
+  "r": 0.04224279197844716,
+  "kronos_small": -0.006559924043116894
+ },
+ {
+  "fold": "development-9",
+  "asset": "SPY",
+  "decision": "2018-03-08",
+  "target": "2018-03-15",
+  "r": 0.0032780943578316624,
+  "kronos_small": -0.043730438089411905
+ },
+ {
+  "fold": "development-9",
+  "asset": "QQQ",
+  "decision": "2018-03-08",
+  "target": "2018-03-15",
+  "r": 0.009783610069870718,
+  "kronos_small": -0.088693347805469
+ },
+ {
+  "fold": "development-9",
+  "asset": "IWM",
+  "decision": "2018-03-08",
+  "target": "2018-03-15",
+  "r": 0.0031914241678867583,
+  "kronos_small": -0.027455347062264046
+ },
+ {
+  "fold": "development-9",
+  "asset": "SPY",
+  "decision": "2018-03-15",
+  "target": "2018-03-22",
+  "r": -0.04207277642190821,
+  "kronos_small": -0.034669818222055504
+ },
+ {
+  "fold": "development-9",
+  "asset": "QQQ",
+  "decision": "2018-03-15",
+  "target": "2018-03-22",
+  "r": -0.05223572485329342,
+  "kronos_small": -0.085473013974938
+ },
+ {
+  "fold": "development-9",
+  "asset": "IWM",
+  "decision": "2018-03-15",
+  "target": "2018-03-22",
+  "r": -0.023013230781090854,
+  "kronos_small": -0.029994055405070164
+ },
+ {
+  "fold": "development-9",
+  "asset": "SPY",
+  "decision": "2018-03-22",
+  "target": "2018-03-29",
+  "r": -0.001974109444875971,
+  "kronos_small": 0.007053752914100819
+ },
+ {
+  "fold": "development-9",
+  "asset": "QQQ",
+  "decision": "2018-03-22",
+  "target": "2018-03-29",
+  "r": -0.016536468234055413,
+  "kronos_small": -0.04024245659427805
+ },
+ {
+  "fold": "development-9",
+  "asset": "IWM",
+  "decision": "2018-03-22",
+  "target": "2018-03-29",
+  "r": -0.009961416666164347,
+  "kronos_small": -0.009631620717227563
+ },
+ {
+  "fold": "development-9",
+  "asset": "SPY",
+  "decision": "2018-03-29",
+  "target": "2018-04-06",
+  "r": -0.013120084159501388,
+  "kronos_small": 0.009403836166580248
+ },
+ {
+  "fold": "development-9",
+  "asset": "QQQ",
+  "decision": "2018-03-29",
+  "target": "2018-04-06",
+  "r": -0.022099649243814135,
+  "kronos_small": -0.008779444059218378
+ },
+ {
+  "fold": "development-9",
+  "asset": "IWM",
+  "decision": "2018-03-29",
+  "target": "2018-04-06",
+  "r": -0.009729055198119063,
+  "kronos_small": 0.003002435418762772
+ },
+ {
+  "fold": "development-9",
+  "asset": "SPY",
+  "decision": "2018-04-06",
+  "target": "2018-04-13",
+  "r": 0.020691575942852758,
+  "kronos_small": 0.01993347671068957
+ },
+ {
+  "fold": "development-9",
+  "asset": "QQQ",
+  "decision": "2018-04-06",
+  "target": "2018-04-13",
+  "r": 0.029813528862690397,
+  "kronos_small": 0.009934443004511628
+ },
+ {
+  "fold": "development-9",
+  "asset": "IWM",
+  "decision": "2018-04-06",
+  "target": "2018-04-13",
+  "r": 0.02359545567453214,
+  "kronos_small": 0.0060470422939902235
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-04-13",
+  "target": "2018-04-20",
+  "r": 0.005491212835354808,
+  "kronos_small": 0.0056570042832921885
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-04-13",
+  "target": "2018-04-20",
+  "r": 0.005746609567284011,
+  "kronos_small": -0.013613182199468277
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-04-13",
+  "target": "2018-04-20",
+  "r": 0.010339348973136708,
+  "kronos_small": -0.002932078832654561
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-04-20",
+  "target": "2018-04-27",
+  "r": -0.00018755744001541785,
+  "kronos_small": 0.00465048282242897
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-04-20",
+  "target": "2018-04-27",
+  "r": -0.0012947379964609596,
+  "kronos_small": -0.013423391568172072
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-04-20",
+  "target": "2018-04-27",
+  "r": -0.005544109095072969,
+  "kronos_small": -0.0035594326833692236
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-04-27",
+  "target": "2018-05-04",
+  "r": -0.002027865053328526,
+  "kronos_small": 0.0005644799590776017
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-04-27",
+  "target": "2018-05-04",
+  "r": 0.017005548049002783,
+  "kronos_small": -0.031723522672643334
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-04-27",
+  "target": "2018-05-04",
+  "r": 0.006700624258674459,
+  "kronos_small": 0.002301817537732731
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-05-04",
+  "target": "2018-05-11",
+  "r": 0.025350699707090918,
+  "kronos_small": 0.00957829986300407
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-05-04",
+  "target": "2018-05-11",
+  "r": 0.0274596261972313,
+  "kronos_small": -0.01887934854963813
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-05-04",
+  "target": "2018-05-11",
+  "r": 0.026049576392995988,
+  "kronos_small": -0.004847775068439475
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-05-11",
+  "target": "2018-05-18",
+  "r": -0.005586401385556883,
+  "kronos_small": -0.00258374526411842
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-05-11",
+  "target": "2018-05-18",
+  "r": -0.011872393994032393,
+  "kronos_small": -0.03302238686986492
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-05-11",
+  "target": "2018-05-18",
+  "r": 0.012620229045625209,
+  "kronos_small": -0.01883431208136166
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-05-18",
+  "target": "2018-05-25",
+  "r": 0.00301759263352519,
+  "kronos_small": 0.0019511572685830814
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-05-18",
+  "target": "2018-05-25",
+  "r": 0.013405503557837761,
+  "kronos_small": -0.024231801023998578
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-05-18",
+  "target": "2018-05-25",
+  "r": -0.0008034362781925708,
+  "kronos_small": -0.037086614439476584
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-05-25",
+  "target": "2018-06-04",
+  "r": 0.0100540102909914,
+  "kronos_small": -0.0007562112558412437
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-05-25",
+  "target": "2018-06-04",
+  "r": 0.026627932191851222,
+  "kronos_small": -0.021905255515614286
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-05-25",
+  "target": "2018-06-04",
+  "r": 0.018196244126908567,
+  "kronos_small": -0.03838123032061258
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-06-04",
+  "target": "2018-06-11",
+  "r": 0.013226080848678379,
+  "kronos_small": -0.010755796342899693
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-06-04",
+  "target": "2018-06-11",
+  "r": 0.003493603392996647,
+  "kronos_small": -0.050902979264820125
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-06-04",
+  "target": "2018-06-11",
+  "r": 0.012429265838902914,
+  "kronos_small": -0.05081595293477825
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-06-11",
+  "target": "2018-06-18",
+  "r": -0.007205680406509707,
+  "kronos_small": -0.01648855169185559
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-06-11",
+  "target": "2018-06-18",
+  "r": 0.009049320454379561,
+  "kronos_small": -0.05634532720602792
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-06-11",
+  "target": "2018-06-18",
+  "r": 0.010913427934267084,
+  "kronos_small": -0.05564483938806397
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-06-18",
+  "target": "2018-06-25",
+  "r": -0.020308974733667995,
+  "kronos_small": -0.01612635307860355
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-06-18",
+  "target": "2018-06-25",
+  "r": -0.029495914700593318,
+  "kronos_small": -0.05732961374874801
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-06-18",
+  "target": "2018-06-25",
+  "r": -0.021098840683373865,
+  "kronos_small": -0.07432445624561268
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-06-25",
+  "target": "2018-07-02",
+  "r": 0.0031684070274007325,
+  "kronos_small": -0.002048689252653446
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-06-25",
+  "target": "2018-07-02",
+  "r": 0.008309894697197784,
+  "kronos_small": -0.04057328353471146
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-06-25",
+  "target": "2018-07-02",
+  "r": -0.001090975318827958,
+  "kronos_small": -0.04647620561053856
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-07-02",
+  "target": "2018-07-10",
+  "r": 0.02556606672634132,
+  "kronos_small": 0.000431135940056393
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-07-02",
+  "target": "2018-07-10",
+  "r": 0.02582115350689751,
+  "kronos_small": -0.0376564631794265
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-07-02",
+  "target": "2018-07-10",
+  "r": 0.021833880778654446,
+  "kronos_small": -0.044491598233730834
+ },
+ {
+  "fold": "development-10",
+  "asset": "SPY",
+  "decision": "2018-07-10",
+  "target": "2018-07-17",
+  "r": 0.005613472737890923,
+  "kronos_small": -0.0157580722301498
+ },
+ {
+  "fold": "development-10",
+  "asset": "QQQ",
+  "decision": "2018-07-10",
+  "target": "2018-07-17",
+  "r": 0.016499717137093306,
+  "kronos_small": -0.057944135910895866
+ },
+ {
+  "fold": "development-10",
+  "asset": "IWM",
+  "decision": "2018-07-10",
+  "target": "2018-07-17",
+  "r": -0.006130059368611995,
+  "kronos_small": -0.06710292181071065
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-07-17",
+  "target": "2018-07-24",
+  "r": 0.004056367645675962,
+  "kronos_small": -0.01922481111584151
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-07-17",
+  "target": "2018-07-24",
+  "r": 0.00016640319532523762,
+  "kronos_small": -0.06171371388469815
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-07-17",
+  "target": "2018-07-24",
+  "r": -0.0037081382202837077,
+  "kronos_small": -0.043430614611915885
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-07-24",
+  "target": "2018-07-31",
+  "r": -0.000994777500586963,
+  "kronos_small": -0.020856508655708872
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-07-24",
+  "target": "2018-07-31",
+  "r": -0.021584580087992578,
+  "kronos_small": -0.079569544692359
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-07-24",
+  "target": "2018-07-31",
+  "r": -0.006130563737360539,
+  "kronos_small": -0.037646120754714296
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-07-31",
+  "target": "2018-08-07",
+  "r": 0.014993842485726105,
+  "kronos_small": -0.01602802111825863
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-07-31",
+  "target": "2018-08-07",
+  "r": 0.029869631622099213,
+  "kronos_small": -0.037815792272323456
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-07-31",
+  "target": "2018-08-07",
+  "r": 0.011091573284610412,
+  "kronos_small": -0.027837413125776145
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-08-07",
+  "target": "2018-08-14",
+  "r": -0.005900136523223409,
+  "kronos_small": -0.0368081654707062
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-08-07",
+  "target": "2018-08-14",
+  "r": -0.001927048084299443,
+  "kronos_small": -0.07871643521867266
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-08-07",
+  "target": "2018-08-14",
+  "r": 0.0028578252362860823,
+  "kronos_small": -0.03324023562431577
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-08-14",
+  "target": "2018-08-21",
+  "r": 0.008557852453255244,
+  "kronos_small": -0.02211733049379827
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-08-14",
+  "target": "2018-08-21",
+  "r": -0.0060252801061952965,
+  "kronos_small": -0.05760726982621378
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-08-14",
+  "target": "2018-08-21",
+  "r": 0.015105314350913446,
+  "kronos_small": -0.027111477358003455
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-08-21",
+  "target": "2018-08-28",
+  "r": 0.012425106922433926,
+  "kronos_small": -0.03141628045277045
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-08-21",
+  "target": "2018-08-28",
+  "r": 0.023290638229594762,
+  "kronos_small": -0.04628684854638365
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-08-21",
+  "target": "2018-08-28",
+  "r": 0.007235414923691508,
+  "kronos_small": -0.04115605092999619
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-08-28",
+  "target": "2018-09-05",
+  "r": -0.003074533901302523,
+  "kronos_small": -0.03694301274088296
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-08-28",
+  "target": "2018-09-05",
+  "r": -0.006303340981187233,
+  "kronos_small": -0.05880949686871073
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-08-28",
+  "target": "2018-09-05",
+  "r": -0.001221676175098274,
+  "kronos_small": -0.04123878898991595
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-09-05",
+  "target": "2018-09-12",
+  "r": 0.0003113378906061115,
+  "kronos_small": -0.03856287417111037
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-09-05",
+  "target": "2018-09-12",
+  "r": -0.004753717664356394,
+  "kronos_small": -0.05165130250116956
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-09-05",
+  "target": "2018-09-12",
+  "r": -0.006833939157806057,
+  "kronos_small": -0.039599608634289574
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-09-12",
+  "target": "2018-09-19",
+  "r": 0.007237168438839703,
+  "kronos_small": -0.045524195576973625
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-09-12",
+  "target": "2018-09-19",
+  "r": 0.0006570302470265688,
+  "kronos_small": -0.04181468904330732
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-09-12",
+  "target": "2018-09-19",
+  "r": -0.005701370250308813,
+  "kronos_small": -0.03098088087992945
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-09-19",
+  "target": "2018-09-26",
+  "r": -0.004611951041677109,
+  "kronos_small": -0.04340486111819697
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-09-19",
+  "target": "2018-09-26",
+  "r": 0.008556609962808714,
+  "kronos_small": -0.04912073820517282
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-09-19",
+  "target": "2018-09-26",
+  "r": -0.009594956340388983,
+  "kronos_small": -0.02745185043563847
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-09-26",
+  "target": "2018-10-03",
+  "r": 0.0063273938749510705,
+  "kronos_small": -0.04101867562059436
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-09-26",
+  "target": "2018-10-03",
+  "r": 0.009075747024309244,
+  "kronos_small": -0.0406920112298188
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-09-26",
+  "target": "2018-10-03",
+  "r": -0.012335485757223097,
+  "kronos_small": -0.008569482942290207
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-10-03",
+  "target": "2018-10-10",
+  "r": -0.04709476958418701,
+  "kronos_small": -0.039082659201381986
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-10-03",
+  "target": "2018-10-10",
+  "r": -0.07955434437530862,
+  "kronos_small": -0.04904907192243613
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-10-03",
+  "target": "2018-10-10",
+  "r": -0.058367726044807,
+  "kronos_small": 0.004140907914032432
+ },
+ {
+  "fold": "development-11",
+  "asset": "SPY",
+  "decision": "2018-10-10",
+  "target": "2018-10-17",
+  "r": 0.007695787422500544,
+  "kronos_small": 0.008833947324776048
+ },
+ {
+  "fold": "development-11",
+  "asset": "QQQ",
+  "decision": "2018-10-10",
+  "target": "2018-10-17",
+  "r": 0.03186333391451868,
+  "kronos_small": 0.01379246836064052
+ },
+ {
+  "fold": "development-11",
+  "asset": "IWM",
+  "decision": "2018-10-10",
+  "target": "2018-10-17",
+  "r": 0.008902513330628636,
+  "kronos_small": 0.02591361744996945
+ },
+ {
+  "fold": "development-12",
+  "asset": "SPY",
+  "decision": "2018-10-17",
+  "target": "2018-10-24",
+  "r": -0.05545881129699026,
+  "kronos_small": -0.010121535573491158
+ },
+ {
+  "fold": "development-12",
+  "asset": "QQQ",
+  "decision": "2018-10-17",
+  "target": "2018-10-24",
+  "r": -0.06978285008576002,
+  "kronos_small": -0.012842418708445713
+ },
+ {
+  "fold": "development-12",
+  "asset": "IWM",
+  "decision": "2018-10-17",
+  "target": "2018-10-24",
+  "r": -0.0790777391183255,
+  "kronos_small": -0.001825025884676812
+ },
+ {
+  "fold": "development-12",
+  "asset": "SPY",
+  "decision": "2018-10-24",
+  "target": "2018-10-31",
+  "r": 0.019815929679301902,
+  "kronos_small": 0.02074233359218436
+ },
+ {
+  "fold": "development-12",
+  "asset": "QQQ",
+  "decision": "2018-10-24",
+  "target": "2018-10-31",
+  "r": 0.02673509274668806,
+  "kronos_small": 0.02665103019607873
+ },
+ {
+  "fold": "development-12",
+  "asset": "IWM",
+  "decision": "2018-10-24",
+  "target": "2018-10-31",
+  "r": 0.027571176798798724,
+  "kronos_small": 0.049916442244436254
+ },
+ {
+  "fold": "development-12",
+  "asset": "SPY",
+  "decision": "2018-10-31",
+  "target": "2018-11-07",
+  "r": 0.03763768155249192,
+  "kronos_small": 0.004193062383004431
+ },
+ {
+  "fold": "development-12",
+  "asset": "QQQ",
+  "decision": "2018-10-31",
+  "target": "2018-11-07",
+  "r": 0.033355726926845186,
+  "kronos_small": 0.018227556298405112
+ },
+ {
+  "fold": "development-12",
+  "asset": "IWM",
+  "decision": "2018-10-31",
+  "target": "2018-11-07",
+  "r": 0.048018592267808025,
+  "kronos_small": 0.01902214619773801
+ },
+ {
+  "fold": "development-12",
+  "asset": "SPY",
+  "decision": "2018-11-07",
+  "target": "2018-11-14",
+  "r": -0.039227830363050664,
+  "kronos_small": 0.007708944383318261
+ },
+ {
+  "fold": "development-12",
+  "asset": "QQQ",
+  "decision": "2018-11-07",
+  "target": "2018-11-14",
+  "r": -0.060937918411184455,
+  "kronos_small": 0.006492940684738713
+ },
+ {
+  "fold": "development-12",
+  "asset": "IWM",
+  "decision": "2018-11-07",
+  "target": "2018-11-14",
+  "r": -0.05189197763678344,
+  "kronos_small": 0.0037316057277134718
+ },
+ {
+  "fold": "development-12",
+  "asset": "SPY",
+  "decision": "2018-11-14",
+  "target": "2018-11-21",
+  "r": -0.01935713068960876,
+  "kronos_small": 0.012210717608497568
+ },
+ {
+  "fold": "development-12",
+  "asset": "QQQ",
+  "decision": "2018-11-14",
+  "target": "2018-11-21",
+  "r": -0.029673215566160316,
+  "kronos_small": 0.010543245040449456
+ },
+ {
+  "fold": "development-12",
+  "asset": "IWM",
+  "decision": "2018-11-14",
+  "target": "2018-11-21",
+  "r": -0.009546932804545882,
+  "kronos_small": 0.0241011483965492
+ },
+ {
+  "fold": "development-12",
+  "asset": "SPY",
+  "decision": "2018-11-21",
+  "target": "2018-11-29",
+  "r": 0.03324981618675338,
+  "kronos_small": 0.010958700300167656
+ },
+ {
+  "fold": "development-12",
+  "asset": "QQQ",
+  "decision": "2018-11-21",
+  "target": "2018-11-29",
+  "r": 0.04737279266556094,
+  "kronos_small": 0.02205298921773391
+ },
+ {
+  "fold": "development-12",
+  "asset": "IWM",
+  "decision": "2018-11-21",
+  "target": "2018-11-29",
+  "r": 0.02534651796869536,
+  "kronos_small": 0.03139153797975158
+ },
+ {
+  "fold": "development-12",
+  "asset": "SPY",
+  "decision": "2018-11-29",
+  "target": "2018-12-07",
+  "r": -0.03873612367281787,
+  "kronos_small": -0.014529849707380471
+ },
+ {
+  "fold": "development-12",
+  "asset": "QQQ",
+  "decision": "2018-11-29",
+  "target": "2018-12-07",
+  "r": -0.0410946057659185,
+  "kronos_small": -0.009812008585184273
+ },
+ {
+  "fold": "development-12",
+  "asset": "IWM",
+  "decision": "2018-11-29",
+  "target": "2018-12-07",
+  "r": -0.052809295073375395,
+  "kronos_small": 0.017090846179760533
+ },
+ {
+  "fold": "development-12",
+  "asset": "SPY",
+  "decision": "2018-12-07",
+  "target": "2018-12-14",
+  "r": -0.011831295936580943,
+  "kronos_small": 0.02295722818642254
+ },
+ {
+  "fold": "development-12",
+  "asset": "QQQ",
+  "decision": "2018-12-07",
+  "target": "2018-12-14",
+  "r": -0.0018606964371068457,
+  "kronos_small": 0.033274786821921865
+ },
+ {
+  "fold": "development-12",
+  "asset": "IWM",
+  "decision": "2018-12-07",
+  "target": "2018-12-14",
+  "r": -0.023962078217996563,
+  "kronos_small": 0.06399955509771349
+ },
+ {
+  "fold": "development-12",
+  "asset": "SPY",
+  "decision": "2018-12-14",
+  "target": "2018-12-21",
+  "r": -0.0789363466248183,
+  "kronos_small": 0.0272369096161178
+ },
+ {
+  "fold": "development-12",
+  "asset": "QQQ",
+  "decision": "2018-12-14",
+  "target": "2018-12-21",
+  "r": -0.08759849650789509,
+  "kronos_small": 0.020630350755348914
+ },
+ {
+  "fold": "development-12",
+  "asset": "IWM",
+  "decision": "2018-12-14",
+  "target": "2018-12-21",
+  "r": -0.09107338150588973,
+  "kronos_small": 0.06043560094965894
+ },
+ {
+  "fold": "development-12",
+  "asset": "SPY",
+  "decision": "2018-12-21",
+  "target": "2018-12-31",
+  "r": 0.03758952186229525,
+  "kronos_small": 0.09328711200305673
+ },
+ {
+  "fold": "development-12",
+  "asset": "QQQ",
+  "decision": "2018-12-21",
+  "target": "2018-12-31",
+  "r": 0.04433685103049445,
+  "kronos_small": 0.10748687149532898
+ },
+ {
+  "fold": "development-12",
+  "asset": "IWM",
+  "decision": "2018-12-21",
+  "target": "2018-12-31",
+  "r": 0.04217653360029239,
+  "kronos_small": 0.15922063467968073
+ },
+ {
+  "fold": "development-12",
+  "asset": "SPY",
+  "decision": "2018-12-31",
+  "target": "2019-01-08",
+  "r": 0.02703987591030632,
+  "kronos_small": 0.0587831013813922
+ },
+ {
+  "fold": "development-12",
+  "asset": "QQQ",
+  "decision": "2018-12-31",
+  "target": "2019-01-08",
+  "r": 0.033529815707675326,
+  "kronos_small": 0.05800755256478496
+ },
+ {
+  "fold": "development-12",
+  "asset": "IWM",
+  "decision": "2018-12-31",
+  "target": "2019-01-08",
+  "r": 0.05683058648168693,
+  "kronos_small": 0.1184983056991813
+ },
+ {
+  "fold": "development-12",
+  "asset": "SPY",
+  "decision": "2019-01-08",
+  "target": "2019-01-15",
+  "r": 0.013846137047280216,
+  "kronos_small": 0.03503605039106983
+ },
+ {
+  "fold": "development-12",
+  "asset": "QQQ",
+  "decision": "2019-01-08",
+  "target": "2019-01-15",
+  "r": 0.01776996122077268,
+  "kronos_small": 0.03781518558572916
+ },
+ {
+  "fold": "development-12",
+  "asset": "IWM",
+  "decision": "2019-01-08",
+  "target": "2019-01-15",
+  "r": 0.01206270324856007,
+  "kronos_small": 0.047463296510183994
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-01-15",
+  "target": "2019-01-23",
+  "r": 0.01168487405175167,
+  "kronos_small": 0.034615791956179365
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-01-15",
+  "target": "2019-01-23",
+  "r": -0.0014174346809738836,
+  "kronos_small": 0.029034647304973404
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-01-15",
+  "target": "2019-01-23",
+  "r": 0.00798476729729014,
+  "kronos_small": 0.04639486629701217
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-01-23",
+  "target": "2019-01-30",
+  "r": 0.01570683338481338,
+  "kronos_small": 0.02770728296104341
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-01-23",
+  "target": "2019-01-30",
+  "r": 0.02153638433400218,
+  "kronos_small": 0.02651425758416437
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-01-23",
+  "target": "2019-01-30",
+  "r": 0.021888698789437555,
+  "kronos_small": 0.03176675860618161
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-01-30",
+  "target": "2019-02-06",
+  "r": 0.019100373384214997,
+  "kronos_small": 0.015450013634648485
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-01-30",
+  "target": "2019-02-06",
+  "r": 0.028794374809680612,
+  "kronos_small": 0.0020228661393923986
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-01-30",
+  "target": "2019-02-06",
+  "r": 0.020956144657235498,
+  "kronos_small": -0.0033302413440896572
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-02-06",
+  "target": "2019-02-13",
+  "r": 0.008215772939347055,
+  "kronos_small": 0.016503578216744863
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-02-06",
+  "target": "2019-02-13",
+  "r": 0.0028694424279525066,
+  "kronos_small": 0.020738638264428566
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-02-06",
+  "target": "2019-02-13",
+  "r": 0.016363105359812558,
+  "kronos_small": -0.01124268007817264
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-02-13",
+  "target": "2019-02-21",
+  "r": 0.008797869966109317,
+  "kronos_small": 0.013882271052880313
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-02-13",
+  "target": "2019-02-21",
+  "r": 0.0035606960540128796,
+  "kronos_small": 0.007259954665972401
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-02-13",
+  "target": "2019-02-21",
+  "r": 0.02172807184120895,
+  "kronos_small": 0.0008234564523021959
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-02-21",
+  "target": "2019-02-28",
+  "r": 0.004531566826774025,
+  "kronos_small": 0.013377744195973484
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-02-21",
+  "target": "2019-02-28",
+  "r": 0.009106527361977257,
+  "kronos_small": 0.020232696318671195
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-02-21",
+  "target": "2019-02-28",
+  "r": -6.378161178233199e-05,
+  "kronos_small": 0.036743943107617305
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-02-28",
+  "target": "2019-03-07",
+  "r": -0.013256709520124588,
+  "kronos_small": 0.0015870119867829047
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-02-28",
+  "target": "2019-03-07",
+  "r": -0.010214237721562824,
+  "kronos_small": 0.01589089031109836
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-02-28",
+  "target": "2019-03-07",
+  "r": -0.03307051025386443,
+  "kronos_small": 0.033201972139658587
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-03-07",
+  "target": "2019-03-14",
+  "r": 0.022116441665911424,
+  "kronos_small": 0.021577943004735367
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-03-07",
+  "target": "2019-03-14",
+  "r": 0.030334950800575022,
+  "kronos_small": 0.032347061126647425
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-03-07",
+  "target": "2019-03-14",
+  "r": 0.0174497124414561,
+  "kronos_small": 0.03347043284045981
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-03-14",
+  "target": "2019-03-21",
+  "r": 0.012617460502805322,
+  "kronos_small": 0.006210761476632243
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-03-14",
+  "target": "2019-03-21",
+  "r": 0.032623690305454645,
+  "kronos_small": 0.012364577539676347
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-03-14",
+  "target": "2019-03-21",
+  "r": 0.005942786044910164,
+  "kronos_small": 0.034603186702170774
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-03-21",
+  "target": "2019-03-28",
+  "r": -0.014219254854578978,
+  "kronos_small": -0.0031859417717292615
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-03-21",
+  "target": "2019-03-28",
+  "r": -0.023610052579464025,
+  "kronos_small": -0.016758961242167025
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-03-21",
+  "target": "2019-03-28",
+  "r": -0.017214365131590803,
+  "kronos_small": 0.030858308250792277
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-03-28",
+  "target": "2019-04-04",
+  "r": 0.02278708891029968,
+  "kronos_small": 0.013735147961420502
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-03-28",
+  "target": "2019-04-04",
+  "r": 0.029834818774890692,
+  "kronos_small": 0.008851543785066696
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-03-28",
+  "target": "2019-04-04",
+  "r": 0.021391883337817497,
+  "kronos_small": 0.03280716121764371
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-04-04",
+  "target": "2019-04-11",
+  "r": 0.0035801842235256842,
+  "kronos_small": -0.0014586384257961882
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-04-04",
+  "target": "2019-04-11",
+  "r": 0.0071595467727787465,
+  "kronos_small": -0.009508364695660632
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-04-04",
+  "target": "2019-04-11",
+  "r": 0.007603141760201382,
+  "kronos_small": 0.03645470568023512
+ },
+ {
+  "fold": "development-13",
+  "asset": "SPY",
+  "decision": "2019-04-11",
+  "target": "2019-04-18",
+  "r": 0.006260505029992203,
+  "kronos_small": -0.004550573625177634
+ },
+ {
+  "fold": "development-13",
+  "asset": "QQQ",
+  "decision": "2019-04-11",
+  "target": "2019-04-18",
+  "r": 0.012674032493950271,
+  "kronos_small": -0.024984269684654947
+ },
+ {
+  "fold": "development-13",
+  "asset": "IWM",
+  "decision": "2019-04-11",
+  "target": "2019-04-18",
+  "r": -0.009400548843153445,
+  "kronos_small": 0.022063369127353738
+ },
+ {
+  "fold": "development-14",
+  "asset": "SPY",
+  "decision": "2019-04-18",
+  "target": "2019-04-26",
+  "r": 0.011621062171232488,
+  "kronos_small": -0.012267273792242683
+ },
+ {
+  "fold": "development-14",
+  "asset": "QQQ",
+  "decision": "2019-04-18",
+  "target": "2019-04-26",
+  "r": 0.017247279715998154,
+  "kronos_small": -0.04008749542997325
+ },
+ {
+  "fold": "development-14",
+  "asset": "IWM",
+  "decision": "2019-04-18",
+  "target": "2019-04-26",
+  "r": 0.016756787228838554,
+  "kronos_small": 0.01914934922637279
+ },
+ {
+  "fold": "development-14",
+  "asset": "SPY",
+  "decision": "2019-04-26",
+  "target": "2019-05-03",
+  "r": 0.0021108546582162546,
+  "kronos_small": -0.023936592750953167
+ },
+ {
+  "fold": "development-14",
+  "asset": "QQQ",
+  "decision": "2019-04-26",
+  "target": "2019-05-03",
+  "r": 0.0024098921973170206,
+  "kronos_small": -0.09798604170602676
+ },
+ {
+  "fold": "development-14",
+  "asset": "IWM",
+  "decision": "2019-04-26",
+  "target": "2019-05-03",
+  "r": 0.014178405646131154,
+  "kronos_small": 0.011757332226606465
+ },
+ {
+  "fold": "development-14",
+  "asset": "SPY",
+  "decision": "2019-05-03",
+  "target": "2019-05-10",
+  "r": -0.02037416085871513,
+  "kronos_small": -0.03073924496874092
+ },
+ {
+  "fold": "development-14",
+  "asset": "QQQ",
+  "decision": "2019-05-03",
+  "target": "2019-05-10",
+  "r": -0.03249335342256554,
+  "kronos_small": -0.08510363404935717
+ },
+ {
+  "fold": "development-14",
+  "asset": "IWM",
+  "decision": "2019-05-03",
+  "target": "2019-05-10",
+  "r": -0.024658351668531253,
+  "kronos_small": 0.009349434973752402
+ },
+ {
+  "fold": "development-14",
+  "asset": "SPY",
+  "decision": "2019-05-10",
+  "target": "2019-05-17",
+  "r": -0.007875428375328397,
+  "kronos_small": -0.0022497496035303044
+ },
+ {
+  "fold": "development-14",
+  "asset": "QQQ",
+  "decision": "2019-05-10",
+  "target": "2019-05-17",
+  "r": -0.010651116886891465,
+  "kronos_small": -0.03187735401299374
+ },
+ {
+  "fold": "development-14",
+  "asset": "IWM",
+  "decision": "2019-05-10",
+  "target": "2019-05-17",
+  "r": -0.024430866744092228,
+  "kronos_small": 0.009082982897980152
+ },
+ {
+  "fold": "development-14",
+  "asset": "SPY",
+  "decision": "2019-05-17",
+  "target": "2019-05-24",
+  "r": -0.010763003551459427,
+  "kronos_small": 0.00870716041769537
+ },
+ {
+  "fold": "development-14",
+  "asset": "QQQ",
+  "decision": "2019-05-17",
+  "target": "2019-05-24",
+  "r": -0.02702268524232121,
+  "kronos_small": -2.3045171833935285e-05
+ },
+ {
+  "fold": "development-14",
+  "asset": "IWM",
+  "decision": "2019-05-17",
+  "target": "2019-05-24",
+  "r": -0.013503482200994732,
+  "kronos_small": 0.018077156090234858
+ },
+ {
+  "fold": "development-14",
+  "asset": "SPY",
+  "decision": "2019-05-24",
+  "target": "2019-06-03",
+  "r": -0.029462972615936778,
+  "kronos_small": 0.0262971283892961
+ },
+ {
+  "fold": "development-14",
+  "asset": "QQQ",
+  "decision": "2019-05-24",
+  "target": "2019-06-03",
+  "r": -0.04617795256367874,
+  "kronos_small": 0.03431279378836205
+ },
+ {
+  "fold": "development-14",
+  "asset": "IWM",
+  "decision": "2019-05-24",
+  "target": "2019-06-03",
+  "r": -0.029750477881848703,
+  "kronos_small": 0.002681696952395285
+ },
+ {
+  "fold": "development-14",
+  "asset": "SPY",
+  "decision": "2019-06-03",
+  "target": "2019-06-10",
+  "r": 0.051116638948061066,
+  "kronos_small": 0.01921512504744527
+ },
+ {
+  "fold": "development-14",
+  "asset": "QQQ",
+  "decision": "2019-06-03",
+  "target": "2019-06-10",
+  "r": 0.07380141883939029,
+  "kronos_small": 0.021824857191761637
+ },
+ {
+  "fold": "development-14",
+  "asset": "IWM",
+  "decision": "2019-06-03",
+  "target": "2019-06-10",
+  "r": 0.03609676744375179,
+  "kronos_small": -2.484470713337572e-05
+ },
+ {
+  "fold": "development-14",
+  "asset": "SPY",
+  "decision": "2019-06-10",
+  "target": "2019-06-17",
+  "r": 0.001383269577691415,
+  "kronos_small": 0.0007123939979409855
+ },
+ {
+  "fold": "development-14",
+  "asset": "QQQ",
+  "decision": "2019-06-10",
+  "target": "2019-06-17",
+  "r": 0.003216225618497326,
+  "kronos_small": -0.007110026749067799
+ },
+ {
+  "fold": "development-14",
+  "asset": "IWM",
+  "decision": "2019-06-10",
+  "target": "2019-06-17",
+  "r": 0.003223793048286794,
+  "kronos_small": -0.022245821155564727
+ },
+ {
+  "fold": "development-14",
+  "asset": "SPY",
+  "decision": "2019-06-17",
+  "target": "2019-06-24",
+  "r": 0.014648381169069857,
+  "kronos_small": -0.014493907133623196
+ },
+ {
+  "fold": "development-14",
+  "asset": "QQQ",
+  "decision": "2019-06-17",
+  "target": "2019-06-24",
+  "r": 0.023770949866941393,
+  "kronos_small": -0.027601570576040402
+ },
+ {
+  "fold": "development-14",
+  "asset": "IWM",
+  "decision": "2019-06-17",
+  "target": "2019-06-24",
+  "r": -0.0010515248077203054,
+  "kronos_small": -0.02050166075779103
+ },
+ {
+  "fold": "development-14",
+  "asset": "SPY",
+  "decision": "2019-06-24",
+  "target": "2019-07-01",
+  "r": 0.006855618230363625,
+  "kronos_small": -0.011480382186880078
+ },
+ {
+  "fold": "development-14",
+  "asset": "QQQ",
+  "decision": "2019-06-24",
+  "target": "2019-07-01",
+  "r": 0.005829066369824609,
+  "kronos_small": -0.024685669687041667
+ },
+ {
+  "fold": "development-14",
+  "asset": "IWM",
+  "decision": "2019-06-24",
+  "target": "2019-07-01",
+  "r": 0.026090129341212354,
+  "kronos_small": -0.002073028191022175
+ },
+ {
+  "fold": "development-14",
+  "asset": "SPY",
+  "decision": "2019-07-01",
+  "target": "2019-07-09",
+  "r": 0.0051615194290697275,
+  "kronos_small": -0.0004118109444020135
+ },
+ {
+  "fold": "development-14",
+  "asset": "QQQ",
+  "decision": "2019-07-01",
+  "target": "2019-07-09",
+  "r": 0.007370005985345429,
+  "kronos_small": 0.0002713932107933914
+ },
+ {
+  "fold": "development-14",
+  "asset": "IWM",
+  "decision": "2019-07-01",
+  "target": "2019-07-09",
+  "r": -0.004494389587839542,
+  "kronos_small": 0.009070357896714398
+ },
+ {
+  "fold": "development-14",
+  "asset": "SPY",
+  "decision": "2019-07-09",
+  "target": "2019-07-16",
+  "r": 0.008443675563981401,
+  "kronos_small": -0.00041103000535613887
+ },
+ {
+  "fold": "development-14",
+  "asset": "QQQ",
+  "decision": "2019-07-09",
+  "target": "2019-07-16",
+  "r": 0.01297535204685829,
+  "kronos_small": -0.003485895308577902
+ },
+ {
+  "fold": "development-14",
+  "asset": "IWM",
+  "decision": "2019-07-09",
+  "target": "2019-07-16",
+  "r": -0.0010301314328415856,
+  "kronos_small": 0.0018045440691976111
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-07-16",
+  "target": "2019-07-23",
+  "r": 0.0010671291905390845,
+  "kronos_small": -0.008908845382491037
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-07-16",
+  "target": "2019-07-23",
+  "r": 0.0033080094258677306,
+  "kronos_small": -0.03122270489066814
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-07-16",
+  "target": "2019-07-23",
+  "r": -0.00348454892168526,
+  "kronos_small": 0.000762585704093155
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-07-23",
+  "target": "2019-07-30",
+  "r": 0.0022971295993885477,
+  "kronos_small": -0.011303264995043527
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-07-23",
+  "target": "2019-07-30",
+  "r": -5.160358129963072e-05,
+  "kronos_small": -0.024798904968644564
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-07-23",
+  "target": "2019-07-30",
+  "r": 0.02009410413533974,
+  "kronos_small": -0.013267310647040453
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-07-30",
+  "target": "2019-08-06",
+  "r": -0.0439138048026555,
+  "kronos_small": -0.009036241307720516
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-07-30",
+  "target": "2019-08-06",
+  "r": -0.055817585419791094,
+  "kronos_small": -0.0297947491590822
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-07-30",
+  "target": "2019-08-06",
+  "r": -0.05522236248089207,
+  "kronos_small": -0.01240275211562647
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-08-06",
+  "target": "2019-08-13",
+  "r": 0.016369797780978246,
+  "kronos_small": 0.010265694870255082
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-08-06",
+  "target": "2019-08-13",
+  "r": 0.02760837264021543,
+  "kronos_small": 0.019924909815746794
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-08-06",
+  "target": "2019-08-13",
+  "r": 0.006074176804167664,
+  "kronos_small": -0.008072470995703185
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-08-13",
+  "target": "2019-08-20",
+  "r": -0.008444372573134906,
+  "kronos_small": -0.0028521343135565758
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-08-13",
+  "target": "2019-08-20",
+  "r": -0.0075661060000999925,
+  "kronos_small": 0.0030129498756101825
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-08-13",
+  "target": "2019-08-20",
+  "r": -0.007481165076877794,
+  "kronos_small": -0.0020803023738249493
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-08-20",
+  "target": "2019-08-27",
+  "r": -0.011162068192090757,
+  "kronos_small": 0.016319747881752278
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-08-20",
+  "target": "2019-08-27",
+  "r": -0.013678188482468379,
+  "kronos_small": 0.016521754761209984
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-08-20",
+  "target": "2019-08-27",
+  "r": -0.029253786745398358,
+  "kronos_small": -0.00986666421832183
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-08-27",
+  "target": "2019-09-04",
+  "r": 0.024686661036867008,
+  "kronos_small": 0.020768427228701647
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-08-27",
+  "target": "2019-09-04",
+  "r": 0.02092575551194109,
+  "kronos_small": 0.03375927511300425
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-08-27",
+  "target": "2019-09-04",
+  "r": 0.02043188367801463,
+  "kronos_small": 0.011142852784471913
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-09-04",
+  "target": "2019-09-11",
+  "r": 0.020899648454205888,
+  "kronos_small": 0.005015503385924269
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-09-04",
+  "target": "2019-09-11",
+  "r": 0.021536708025812423,
+  "kronos_small": 0.016186525122545703
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-09-04",
+  "target": "2019-09-11",
+  "r": 0.06011519745493388,
+  "kronos_small": -0.0051423196580193675
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-09-11",
+  "target": "2019-09-18",
+  "r": 0.002826974527595283,
+  "kronos_small": -0.011123175927900242
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-09-11",
+  "target": "2019-09-18",
+  "r": 0.0004675932024404972,
+  "kronos_small": 0.006617884196342239
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-09-11",
+  "target": "2019-09-18",
+  "r": -0.0030620080060961286,
+  "kronos_small": -0.006137864191750886
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-09-18",
+  "target": "2019-09-25",
+  "r": -0.011624930485783835,
+  "kronos_small": -0.006619046524425798
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-09-18",
+  "target": "2019-09-25",
+  "r": -0.012755008260628031,
+  "kronos_small": -0.0037969078800275113
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-09-18",
+  "target": "2019-09-25",
+  "r": -0.015582055016141183,
+  "kronos_small": -0.005540707134785272
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-09-25",
+  "target": "2019-10-02",
+  "r": -0.03264871323100049,
+  "kronos_small": 0.004875179191564882
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-09-25",
+  "target": "2019-10-02",
+  "r": -0.032237576349250396,
+  "kronos_small": 0.010618167135080014
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-09-25",
+  "target": "2019-10-02",
+  "r": -0.04546991979437465,
+  "kronos_small": -0.0018015450012676126
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-10-02",
+  "target": "2019-10-09",
+  "r": 0.01108188027925916,
+  "kronos_small": 0.02123564805416578
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-10-02",
+  "target": "2019-10-09",
+  "r": 0.01713034778903122,
+  "kronos_small": 0.013689125397357671
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-10-02",
+  "target": "2019-10-09",
+  "r": -0.0008152728218400185,
+  "kronos_small": 0.005317140649590435
+ },
+ {
+  "fold": "development-15",
+  "asset": "SPY",
+  "decision": "2019-10-09",
+  "target": "2019-10-16",
+  "r": 0.02418419627944246,
+  "kronos_small": 0.014149615362068602
+ },
+ {
+  "fold": "development-15",
+  "asset": "QQQ",
+  "decision": "2019-10-09",
+  "target": "2019-10-16",
+  "r": 0.03055961370271465,
+  "kronos_small": 0.004413665937419431
+ },
+ {
+  "fold": "development-15",
+  "asset": "IWM",
+  "decision": "2019-10-09",
+  "target": "2019-10-16",
+  "r": 0.02959905379395611,
+  "kronos_small": 0.003990685985204578
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2019-10-16",
+  "target": "2019-10-23",
+  "r": 0.004947526305255856,
+  "kronos_small": -0.00035537201759083814
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2019-10-16",
+  "target": "2019-10-23",
+  "r": -0.004256871921637817,
+  "kronos_small": -0.005781922228092817
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2019-10-16",
+  "target": "2019-10-23",
+  "r": 0.018631034086864062,
+  "kronos_small": -0.01115359507014091
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2019-10-23",
+  "target": "2019-10-30",
+  "r": 0.014105727077451391,
+  "kronos_small": -0.0005812362729731291
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2019-10-23",
+  "target": "2019-10-30",
+  "r": 0.024512416633125866,
+  "kronos_small": -0.0019050676038423475
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2019-10-23",
+  "target": "2019-10-30",
+  "r": 0.012422519998557036,
+  "kronos_small": 0.0012897018037385521
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2019-10-30",
+  "target": "2019-11-06",
+  "r": 0.009685305734464578,
+  "kronos_small": -0.01870622728740834
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2019-10-30",
+  "target": "2019-11-06",
+  "r": 0.013963679943254093,
+  "kronos_small": -0.02372088915792503
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2019-10-30",
+  "target": "2019-11-06",
+  "r": 0.012080513141659033,
+  "kronos_small": -0.0002002964227401094
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2019-11-06",
+  "target": "2019-11-13",
+  "r": 0.006491421691293908,
+  "kronos_small": -0.02634269258665789
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2019-11-06",
+  "target": "2019-11-13",
+  "r": 0.009119285820814227,
+  "kronos_small": -0.046174654321540665
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2019-11-06",
+  "target": "2019-11-13",
+  "r": -0.00050572097923407,
+  "kronos_small": -0.0030321722123582973
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2019-11-13",
+  "target": "2019-11-20",
+  "r": 0.005388239600049083,
+  "kronos_small": -0.035215683466229386
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2019-11-13",
+  "target": "2019-11-20",
+  "r": 0.002774064294447598,
+  "kronos_small": -0.04423017166963117
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2019-11-13",
+  "target": "2019-11-20",
+  "r": 0.002273733058143712,
+  "kronos_small": -0.0019275030779963842
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2019-11-20",
+  "target": "2019-11-27",
+  "r": 0.015042199791669653,
+  "kronos_small": -0.036863373549326006
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2019-11-20",
+  "target": "2019-11-27",
+  "r": 0.019060328610605026,
+  "kronos_small": -0.044960959263653066
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2019-11-20",
+  "target": "2019-11-27",
+  "r": 0.02688902896632772,
+  "kronos_small": -0.007461686498716702
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2019-11-27",
+  "target": "2019-12-05",
+  "r": -0.011028000210686173,
+  "kronos_small": -0.055405307791352776
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2019-11-27",
+  "target": "2019-12-05",
+  "r": -0.015702134926688593,
+  "kronos_small": -0.0567186638867625
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2019-11-27",
+  "target": "2019-12-05",
+  "r": -0.011675087058142353,
+  "kronos_small": -0.02427622000327556
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2019-12-05",
+  "target": "2019-12-12",
+  "r": 0.01624449612957779,
+  "kronos_small": -0.03912460921116523
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2019-12-05",
+  "target": "2019-12-12",
+  "r": 0.01798064760800422,
+  "kronos_small": -0.04399278143964658
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2019-12-05",
+  "target": "2019-12-12",
+  "r": 0.018590870918149704,
+  "kronos_small": -0.02089192273215712
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2019-12-12",
+  "target": "2019-12-19",
+  "r": 0.011817763667129277,
+  "kronos_small": -0.0353953324572549
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2019-12-12",
+  "target": "2019-12-19",
+  "r": 0.020845568770103462,
+  "kronos_small": -0.05931576060272015
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2019-12-12",
+  "target": "2019-12-19",
+  "r": 0.010737462499315953,
+  "kronos_small": -0.039951861110400166
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2019-12-19",
+  "target": "2019-12-27",
+  "r": 0.006089244613572298,
+  "kronos_small": -0.0494447231518107
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2019-12-19",
+  "target": "2019-12-27",
+  "r": 0.012957516320779128,
+  "kronos_small": -0.08755624995255396
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2019-12-19",
+  "target": "2019-12-27",
+  "r": 0.0007841008876052769,
+  "kronos_small": -0.03991666693026641
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2019-12-27",
+  "target": "2020-01-06",
+  "r": 0.002412994210255981,
+  "kronos_small": -0.06793552469560016
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2019-12-27",
+  "target": "2020-01-06",
+  "r": 0.009087370595713296,
+  "kronos_small": -0.1258723157497057
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2019-12-27",
+  "target": "2020-01-06",
+  "r": -0.0030796195952564887,
+  "kronos_small": -0.04499223847550571
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2020-01-06",
+  "target": "2020-01-13",
+  "r": 0.013229370800105222,
+  "kronos_small": -0.08231630457588057
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2020-01-06",
+  "target": "2020-01-13",
+  "r": 0.02469713851145272,
+  "kronos_small": -0.10875555258035252
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2020-01-06",
+  "target": "2020-01-13",
+  "r": 0.0036823560368661745,
+  "kronos_small": -0.052846749522205805
+ },
+ {
+  "fold": "development-16",
+  "asset": "SPY",
+  "decision": "2020-01-13",
+  "target": "2020-01-21",
+  "r": 0.01016315156610581,
+  "kronos_small": -0.09910199531886299
+ },
+ {
+  "fold": "development-16",
+  "asset": "QQQ",
+  "decision": "2020-01-13",
+  "target": "2020-01-21",
+  "r": 0.010490157651317666,
+  "kronos_small": -0.13963005008138651
+ },
+ {
+  "fold": "development-16",
+  "asset": "IWM",
+  "decision": "2020-01-13",
+  "target": "2020-01-21",
+  "r": 0.01025096648504853,
+  "kronos_small": -0.07154687216290778
+ },
+ {
+  "fold": "development-17",
+  "asset": "SPY",
+  "decision": "2020-01-21",
+  "target": "2020-01-28",
+  "r": -0.013400586438196527,
+  "kronos_small": -0.07886861167869252
+ },
+ {
+  "fold": "development-17",
+  "asset": "QQQ",
+  "decision": "2020-01-21",
+  "target": "2020-01-28",
+  "r": -0.008229758858859348,
+  "kronos_small": -0.12838751645245772
+ },
+ {
+  "fold": "development-17",
+  "asset": "IWM",
+  "decision": "2020-01-21",
+  "target": "2020-01-28",
+  "r": -0.01684047737662908,
+  "kronos_small": -0.07741984375194821
+ },
+ {
+  "fold": "development-17",
+  "asset": "SPY",
+  "decision": "2020-01-28",
+  "target": "2020-02-04",
+  "r": 0.006616382090850692,
+  "kronos_small": -0.06338144040458893
+ },
+ {
+  "fold": "development-17",
+  "asset": "QQQ",
+  "decision": "2020-01-28",
+  "target": "2020-02-04",
+  "r": 0.026821531194562986,
+  "kronos_small": -0.11751211257800875
+ },
+ {
+  "fold": "development-17",
+  "asset": "IWM",
+  "decision": "2020-01-28",
+  "target": "2020-02-04",
+  "r": -0.000606722503746937,
+  "kronos_small": -0.05943771428770983
+ },
+ {
+  "fold": "development-17",
+  "asset": "SPY",
+  "decision": "2020-02-04",
+  "target": "2020-02-11",
+  "r": 0.018666245244627788,
+  "kronos_small": -0.046704940569564535
+ },
+ {
+  "fold": "development-17",
+  "asset": "QQQ",
+  "decision": "2020-02-04",
+  "target": "2020-02-11",
+  "r": 0.01976211262188876,
+  "kronos_small": -0.14784766684345296
+ },
+ {
+  "fold": "development-17",
+  "asset": "IWM",
+  "decision": "2020-02-04",
+  "target": "2020-02-11",
+  "r": 0.013203700699604859,
+  "kronos_small": -0.03425043565138086
+ },
+ {
+  "fold": "development-17",
+  "asset": "SPY",
+  "decision": "2020-02-11",
+  "target": "2020-02-19",
+  "r": 0.00914495684401384,
+  "kronos_small": -0.07801534249173603
+ },
+ {
+  "fold": "development-17",
+  "asset": "QQQ",
+  "decision": "2020-02-11",
+  "target": "2020-02-19",
+  "r": 0.021195275202934738,
+  "kronos_small": -0.12981393186503176
+ },
+ {
+  "fold": "development-17",
+  "asset": "IWM",
+  "decision": "2020-02-11",
+  "target": "2020-02-19",
+  "r": 0.008587839039281064,
+  "kronos_small": -0.037181231212216836
+ },
+ {
+  "fold": "development-17",
+  "asset": "SPY",
+  "decision": "2020-02-19",
+  "target": "2020-02-26",
+  "r": -0.0826519688196381,
+  "kronos_small": -0.07659280901961996
+ },
+ {
+  "fold": "development-17",
+  "asset": "QQQ",
+  "decision": "2020-02-19",
+  "target": "2020-02-26",
+  "r": -0.09047758496611635,
+  "kronos_small": -0.17116701231538478
+ },
+ {
+  "fold": "development-17",
+  "asset": "IWM",
+  "decision": "2020-02-19",
+  "target": "2020-02-26",
+  "r": -0.08614800547042556,
+  "kronos_small": -0.045598916814229895
+ },
+ {
+  "fold": "development-17",
+  "asset": "SPY",
+  "decision": "2020-02-26",
+  "target": "2020-03-04",
+  "r": 0.00435646790611699,
+  "kronos_small": 0.008952838995008428
+ },
+ {
+  "fold": "development-17",
+  "asset": "QQQ",
+  "decision": "2020-02-26",
+  "target": "2020-03-04",
+  "r": 0.008005563804474924,
+  "kronos_small": -0.04142600240365546
+ },
+ {
+  "fold": "development-17",
+  "asset": "IWM",
+  "decision": "2020-02-26",
+  "target": "2020-03-04",
+  "r": -0.01526149754072037,
+  "kronos_small": -0.017598548279289083
+ },
+ {
+  "fold": "development-17",
+  "asset": "SPY",
+  "decision": "2020-03-04",
+  "target": "2020-03-11",
+  "r": -0.13131469350250402,
+  "kronos_small": -0.016481031576620175
+ },
+ {
+  "fold": "development-17",
+  "asset": "QQQ",
+  "decision": "2020-03-04",
+  "target": "2020-03-11",
+  "r": -0.11137660048013309,
+  "kronos_small": -0.06639404854998343
+ },
+ {
+  "fold": "development-17",
+  "asset": "IWM",
+  "decision": "2020-03-04",
+  "target": "2020-03-11",
+  "r": -0.18960352660087398,
+  "kronos_small": -0.017564762683395685
+ },
+ {
+  "fold": "development-17",
+  "asset": "SPY",
+  "decision": "2020-03-11",
+  "target": "2020-03-18",
+  "r": -0.13380218928912946,
+  "kronos_small": 0.07863730480873699
+ },
+ {
+  "fold": "development-17",
+  "asset": "QQQ",
+  "decision": "2020-03-11",
+  "target": "2020-03-18",
+  "r": -0.10023983957696014,
+  "kronos_small": 0.01936139899083056
+ },
+ {
+  "fold": "development-17",
+  "asset": "IWM",
+  "decision": "2020-03-11",
+  "target": "2020-03-18",
+  "r": -0.23045893121711636,
+  "kronos_small": 0.1557134724803113
+ },
+ {
+  "fold": "development-17",
+  "asset": "SPY",
+  "decision": "2020-03-18",
+  "target": "2020-03-25",
+  "r": 0.027898849229765155,
+  "kronos_small": 0.17518940233276936
+ },
+ {
+  "fold": "development-17",
+  "asset": "QQQ",
+  "decision": "2020-03-18",
+  "target": "2020-03-25",
+  "r": 0.03176639351475785,
+  "kronos_small": 0.07100148777533555
+ },
+ {
+  "fold": "development-17",
+  "asset": "IWM",
+  "decision": "2020-03-18",
+  "target": "2020-03-25",
+  "r": 0.09533746034375312,
+  "kronos_small": 0.3157447702970675
+ },
+ {
+  "fold": "development-17",
+  "asset": "SPY",
+  "decision": "2020-03-25",
+  "target": "2020-04-01",
+  "r": -0.0025966663675465185,
+  "kronos_small": 0.1138772138748605
+ },
+ {
+  "fold": "development-17",
+  "asset": "QQQ",
+  "decision": "2020-03-25",
+  "target": "2020-04-01",
+  "r": 5.4853130756704616e-05,
+  "kronos_small": 0.06675287757216175
+ },
+ {
+  "fold": "development-17",
+  "asset": "IWM",
+  "decision": "2020-03-25",
+  "target": "2020-04-01",
+  "r": -0.030561396150386777,
+  "kronos_small": 0.23932808969927155
+ },
+ {
+  "fold": "development-17",
+  "asset": "SPY",
+  "decision": "2020-04-01",
+  "target": "2020-04-08",
+  "r": 0.10729648324146623,
+  "kronos_small": 0.1406685573921349
+ },
+ {
+  "fold": "development-17",
+  "asset": "QQQ",
+  "decision": "2020-04-01",
+  "target": "2020-04-08",
+  "r": 0.09545477818258163,
+  "kronos_small": 0.034404536389400775
+ },
+ {
+  "fold": "development-17",
+  "asset": "IWM",
+  "decision": "2020-04-01",
+  "target": "2020-04-08",
+  "r": 0.10163146374656229,
+  "kronos_small": 0.3106360056670372
+ },
+ {
+  "fold": "development-17",
+  "asset": "SPY",
+  "decision": "2020-04-08",
+  "target": "2020-04-16",
+  "r": 0.01833255109660037,
+  "kronos_small": 0.03716458209205964
+ },
+ {
+  "fold": "development-17",
+  "asset": "QQQ",
+  "decision": "2020-04-08",
+  "target": "2020-04-16",
+  "r": 0.06130187337383308,
+  "kronos_small": 0.02787969434931714
+ },
+ {
+  "fold": "development-17",
+  "asset": "IWM",
+  "decision": "2020-04-08",
+  "target": "2020-04-16",
+  "r": -0.009873260900290504,
+  "kronos_small": 0.20051836595386252
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-04-16",
+  "target": "2020-04-23",
+  "r": -7.166147124060274e-05,
+  "kronos_small": 0.012711557932816753
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-04-16",
+  "target": "2020-04-23",
+  "r": -0.012884525886209808,
+  "kronos_small": -0.00576008734107436
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-04-16",
+  "target": "2020-04-23",
+  "r": 0.028916661773477514,
+  "kronos_small": 0.18216367135555522
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-04-23",
+  "target": "2020-04-30",
+  "r": 0.040036248035044686,
+  "kronos_small": 0.011241958782355788
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-04-23",
+  "target": "2020-04-30",
+  "r": 0.039080025960060105,
+  "kronos_small": -0.001482816253989938
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-04-23",
+  "target": "2020-04-30",
+  "r": 0.07959515736460965,
+  "kronos_small": 0.11650009267303307
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-04-30",
+  "target": "2020-05-07",
+  "r": -0.009685975822825377,
+  "kronos_small": -0.008035566095962565
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-04-30",
+  "target": "2020-05-07",
+  "r": 0.013205555730956497,
+  "kronos_small": -0.02941730163982914
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-04-30",
+  "target": "2020-05-07",
+  "r": -0.02227056155502183,
+  "kronos_small": 0.017662062265707767
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-05-07",
+  "target": "2020-05-14",
+  "r": -0.009464839713054118,
+  "kronos_small": -0.018744095811812578
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-05-07",
+  "target": "2020-05-14",
+  "r": 4.508058154772954e-05,
+  "kronos_small": -0.04478259710997268
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-05-07",
+  "target": "2020-05-14",
+  "r": -0.03448617607116944,
+  "kronos_small": 0.02187128261106075
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-05-14",
+  "target": "2020-05-21",
+  "r": 0.03418458235131183,
+  "kronos_small": -0.0034419108069156934
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-05-14",
+  "target": "2020-05-21",
+  "r": 0.03124283401210448,
+  "kronos_small": -0.027252005981289962
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-05-14",
+  "target": "2020-05-21",
+  "r": 0.08646975318827277,
+  "kronos_small": 0.047609384427169665
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-05-21",
+  "target": "2020-05-29",
+  "r": 0.031511285435512626,
+  "kronos_small": -0.011256327217705753
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-05-21",
+  "target": "2020-05-29",
+  "r": 0.019428168789218603,
+  "kronos_small": -0.06262635285385976
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-05-21",
+  "target": "2020-05-29",
+  "r": 0.034125007041401645,
+  "kronos_small": -0.029245578949920414
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-05-29",
+  "target": "2020-06-05",
+  "r": 0.048176586554530054,
+  "kronos_small": 0.032696619839541974
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-05-29",
+  "target": "2020-06-05",
+  "r": 0.026764096195432963,
+  "kronos_small": -0.07114775880458346
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-05-29",
+  "target": "2020-06-05",
+  "r": 0.0780803249114399,
+  "kronos_small": -0.03349680691010182
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-06-05",
+  "target": "2020-06-12",
+  "r": -0.04853811351687565,
+  "kronos_small": -0.005650622229371294
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-06-05",
+  "target": "2020-06-12",
+  "r": -0.016023220622595424,
+  "kronos_small": -0.10125186223386162
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-06-05",
+  "target": "2020-06-12",
+  "r": -0.0826262792712118,
+  "kronos_small": 0.02018173413688107
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-06-12",
+  "target": "2020-06-19",
+  "r": 0.014457296762738991,
+  "kronos_small": 0.026123132738440802
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-06-12",
+  "target": "2020-06-19",
+  "r": 0.034828147294319045,
+  "kronos_small": -0.08217969299899774
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-06-12",
+  "target": "2020-06-19",
+  "r": 0.019480670476743178,
+  "kronos_small": -0.0070022864598344725
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-06-19",
+  "target": "2020-06-26",
+  "r": -0.0282264217218966,
+  "kronos_small": 0.02592734636223959
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-06-19",
+  "target": "2020-06-26",
+  "r": -0.016596178300278375,
+  "kronos_small": -0.13787071428382536
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-06-19",
+  "target": "2020-06-26",
+  "r": -0.031119704900560485,
+  "kronos_small": 0.017251815091390732
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-06-26",
+  "target": "2020-07-06",
+  "r": 0.0551103627105185,
+  "kronos_small": 0.04394163517736871
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-06-26",
+  "target": "2020-07-06",
+  "r": 0.0729149013428474,
+  "kronos_small": -0.0852575050813913
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-06-26",
+  "target": "2020-07-06",
+  "r": 0.048277850329412786,
+  "kronos_small": -0.008335271468229877
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-07-06",
+  "target": "2020-07-13",
+  "r": -0.0069949168717915455,
+  "kronos_small": 0.012199841976957337
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-07-06",
+  "target": "2020-07-13",
+  "r": 0.0005803493866096687,
+  "kronos_small": -0.21545803784263207
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-07-06",
+  "target": "2020-07-13",
+  "r": -0.027639151145452345,
+  "kronos_small": 0.0035827376869042027
+ },
+ {
+  "fold": "development-18",
+  "asset": "SPY",
+  "decision": "2020-07-13",
+  "target": "2020-07-20",
+  "r": 0.029666109429440368,
+  "kronos_small": 0.015068010644131213
+ },
+ {
+  "fold": "development-18",
+  "asset": "QQQ",
+  "decision": "2020-07-13",
+  "target": "2020-07-20",
+  "r": 0.03137392785709636,
+  "kronos_small": -0.15759228833568084
+ },
+ {
+  "fold": "development-18",
+  "asset": "IWM",
+  "decision": "2020-07-13",
+  "target": "2020-07-20",
+  "r": 0.045124651407577154,
+  "kronos_small": 0.04621279404612455
+ },
+ {
+  "fold": "development-19",
+  "asset": "SPY",
+  "decision": "2020-07-20",
+  "target": "2020-07-27",
+  "r": -0.0033974767831921326,
+  "kronos_small": 0.0009618910692230642
+ },
+ {
+  "fold": "development-19",
+  "asset": "QQQ",
+  "decision": "2020-07-20",
+  "target": "2020-07-27",
+  "r": -0.02528128571194621,
+  "kronos_small": -0.214283643280063
+ },
+ {
+  "fold": "development-19",
+  "asset": "IWM",
+  "decision": "2020-07-20",
+  "target": "2020-07-27",
+  "r": 0.01117330059812538,
+  "kronos_small": 0.01227847632850132
+ },
+ {
+  "fold": "development-19",
+  "asset": "SPY",
+  "decision": "2020-07-27",
+  "target": "2020-08-03",
+  "r": 0.017086043173719645,
+  "kronos_small": 0.005642205508898712
+ },
+ {
+  "fold": "development-19",
+  "asset": "QQQ",
+  "decision": "2020-07-27",
+  "target": "2020-08-03",
+  "r": 0.03497995916971686,
+  "kronos_small": -0.18653160198726138
+ },
+ {
+  "fold": "development-19",
+  "asset": "IWM",
+  "decision": "2020-07-27",
+  "target": "2020-08-03",
+  "r": 0.014528100562910318,
+  "kronos_small": 0.04802513236918937
+ },
+ {
+  "fold": "development-19",
+  "asset": "SPY",
+  "decision": "2020-08-03",
+  "target": "2020-08-10",
+  "r": 0.020411329369626863,
+  "kronos_small": -0.002753396869790592
+ },
+ {
+  "fold": "development-19",
+  "asset": "QQQ",
+  "decision": "2020-08-03",
+  "target": "2020-08-10",
+  "r": 0.0033354365133053676,
+  "kronos_small": -0.24061444016273015
+ },
+ {
+  "fold": "development-19",
+  "asset": "IWM",
+  "decision": "2020-08-03",
+  "target": "2020-08-10",
+  "r": 0.05223102231829557,
+  "kronos_small": 0.026372988422028953
+ },
+ {
+  "fold": "development-19",
+  "asset": "SPY",
+  "decision": "2020-08-10",
+  "target": "2020-08-17",
+  "r": 0.006949009373092174,
+  "kronos_small": -0.021523879777220145
+ },
+ {
+  "fold": "development-19",
+  "asset": "QQQ",
+  "decision": "2020-08-10",
+  "target": "2020-08-17",
+  "r": 0.01847559884618999,
+  "kronos_small": -0.15070652394318973
+ },
+ {
+  "fold": "development-19",
+  "asset": "IWM",
+  "decision": "2020-08-10",
+  "target": "2020-08-17",
+  "r": 0.0006968862140181997,
+  "kronos_small": 0.016268721451917934
+ },
+ {
+  "fold": "development-19",
+  "asset": "SPY",
+  "decision": "2020-08-17",
+  "target": "2020-08-24",
+  "r": 0.014717595973618991,
+  "kronos_small": -0.015842397652886753
+ },
+ {
+  "fold": "development-19",
+  "asset": "QQQ",
+  "decision": "2020-08-17",
+  "target": "2020-08-24",
+  "r": 0.029736514325869656,
+  "kronos_small": -0.15769996303498512
+ },
+ {
+  "fold": "development-19",
+  "asset": "IWM",
+  "decision": "2020-08-17",
+  "target": "2020-08-24",
+  "r": -0.010632640837783924,
+  "kronos_small": 0.012487888504792544
+ },
+ {
+  "fold": "development-19",
+  "asset": "SPY",
+  "decision": "2020-08-24",
+  "target": "2020-08-31",
+  "r": 0.01846259627838176,
+  "kronos_small": -0.01678815996948213
+ },
+ {
+  "fold": "development-19",
+  "asset": "QQQ",
+  "decision": "2020-08-24",
+  "target": "2020-08-31",
+  "r": 0.038897922065479484,
+  "kronos_small": -0.17196565027488742
+ },
+ {
+  "fold": "development-19",
+  "asset": "IWM",
+  "decision": "2020-08-24",
+  "target": "2020-08-31",
+  "r": -0.005133810929005556,
+  "kronos_small": 0.019854039418219394
+ },
+ {
+  "fold": "development-19",
+  "asset": "SPY",
+  "decision": "2020-08-31",
+  "target": "2020-09-08",
+  "r": -0.04718685824179847,
+  "kronos_small": -0.044126259667296
+ },
+ {
+  "fold": "development-19",
+  "asset": "QQQ",
+  "decision": "2020-08-31",
+  "target": "2020-09-08",
+  "r": -0.08833173725721721,
+  "kronos_small": -0.21889330890208214
+ },
+ {
+  "fold": "development-19",
+  "asset": "IWM",
+  "decision": "2020-08-31",
+  "target": "2020-09-08",
+  "r": -0.03649394455864208,
+  "kronos_small": 0.03453443812304169
+ },
+ {
+  "fold": "development-19",
+  "asset": "SPY",
+  "decision": "2020-09-08",
+  "target": "2020-09-15",
+  "r": 0.020672570804719292,
+  "kronos_small": 0.010016839317445125
+ },
+ {
+  "fold": "development-19",
+  "asset": "QQQ",
+  "decision": "2020-09-08",
+  "target": "2020-09-15",
+  "r": 0.033190055799765084,
+  "kronos_small": -0.0991633739199127
+ },
+ {
+  "fold": "development-19",
+  "asset": "IWM",
+  "decision": "2020-09-08",
+  "target": "2020-09-15",
+  "r": 0.023151777726524436,
+  "kronos_small": 0.03191226012875159
+ },
+ {
+  "fold": "development-19",
+  "asset": "SPY",
+  "decision": "2020-09-15",
+  "target": "2020-09-22",
+  "r": -0.02944416025511387,
+  "kronos_small": -0.019635915474196075
+ },
+ {
+  "fold": "development-19",
+  "asset": "QQQ",
+  "decision": "2020-09-15",
+  "target": "2020-09-22",
+  "r": -0.02386159554968259,
+  "kronos_small": -0.12125940739353425
+ },
+ {
+  "fold": "development-19",
+  "asset": "IWM",
+  "decision": "2020-09-15",
+  "target": "2020-09-22",
+  "r": -0.028504393209141554,
+  "kronos_small": 0.020056251218448118
+ },
+ {
+  "fold": "development-19",
+  "asset": "SPY",
+  "decision": "2020-09-22",
+  "target": "2020-09-29",
+  "r": 0.006247473803947301,
+  "kronos_small": 0.036675213816398156
+ },
+ {
+  "fold": "development-19",
+  "asset": "QQQ",
+  "decision": "2020-09-22",
+  "target": "2020-09-29",
+  "r": 0.01265447297113198,
+  "kronos_small": -0.07578770348287911
+ },
+ {
+  "fold": "development-19",
+  "asset": "IWM",
+  "decision": "2020-09-22",
+  "target": "2020-09-29",
+  "r": 0.0018766761540085497,
+  "kronos_small": 0.02646053930651071
+ },
+ {
+  "fold": "development-19",
+  "asset": "SPY",
+  "decision": "2020-09-29",
+  "target": "2020-10-06",
+  "r": 0.0076727485663106165,
+  "kronos_small": 0.031693817940501745
+ },
+ {
+  "fold": "development-19",
+  "asset": "QQQ",
+  "decision": "2020-09-29",
+  "target": "2020-10-06",
+  "r": -0.002866943227696872,
+  "kronos_small": -0.05900449574881872
+ },
+ {
+  "fold": "development-19",
+  "asset": "IWM",
+  "decision": "2020-09-29",
+  "target": "2020-10-06",
+  "r": 0.047596903715235506,
+  "kronos_small": 0.05293254169649941
+ },
+ {
+  "fold": "development-19",
+  "asset": "SPY",
+  "decision": "2020-10-06",
+  "target": "2020-10-13",
+  "r": 0.04438295932536995,
+  "kronos_small": 0.033065768809070306
+ },
+ {
+  "fold": "development-19",
+  "asset": "QQQ",
+  "decision": "2020-10-06",
+  "target": "2020-10-13",
+  "r": 0.06799416584270279,
+  "kronos_small": -0.043668553156304135
+ },
+ {
+  "fold": "development-19",
+  "asset": "IWM",
+  "decision": "2020-10-06",
+  "target": "2020-10-13",
+  "r": 0.03808552490220052,
+  "kronos_small": 0.03467220377909097
+ },
+ {
+  "fold": "development-20",
+  "asset": "SPY",
+  "decision": "2020-10-13",
+  "target": "2020-10-20",
+  "r": -0.019466808443305617,
+  "kronos_small": -0.016821404737765278
+ },
+ {
+  "fold": "development-20",
+  "asset": "QQQ",
+  "decision": "2020-10-13",
+  "target": "2020-10-20",
+  "r": -0.03493005344556721,
+  "kronos_small": -0.09746398684019741
+ },
+ {
+  "fold": "development-20",
+  "asset": "IWM",
+  "decision": "2020-10-13",
+  "target": "2020-10-20",
+  "r": -0.011995444643991604,
+  "kronos_small": -0.0028793210359081556
+ },
+ {
+  "fold": "development-20",
+  "asset": "SPY",
+  "decision": "2020-10-20",
+  "target": "2020-10-27",
+  "r": -0.015141134327527617,
+  "kronos_small": -0.002983134230872153
+ },
+ {
+  "fold": "development-20",
+  "asset": "QQQ",
+  "decision": "2020-10-20",
+  "target": "2020-10-27",
+  "r": -0.006172097114943931,
+  "kronos_small": -0.06004474621826983
+ },
+ {
+  "fold": "development-20",
+  "asset": "IWM",
+  "decision": "2020-10-20",
+  "target": "2020-10-27",
+  "r": -0.01617894448972912,
+  "kronos_small": 0.00570277752404813
+ },
+ {
+  "fold": "development-20",
+  "asset": "SPY",
+  "decision": "2020-10-27",
+  "target": "2020-11-03",
+  "r": -0.006496129629780967,
+  "kronos_small": 0.022251155909147613
+ },
+ {
+  "fold": "development-20",
+  "asset": "QQQ",
+  "decision": "2020-10-27",
+  "target": "2020-11-03",
+  "r": -0.028747202151375717,
+  "kronos_small": -0.01927318287740487
+ },
+ {
+  "fold": "development-20",
+  "asset": "IWM",
+  "decision": "2020-10-27",
+  "target": "2020-11-03",
+  "r": 0.012939066266291377,
+  "kronos_small": 0.03743657891212138
+ },
+ {
+  "fold": "development-20",
+  "asset": "SPY",
+  "decision": "2020-11-03",
+  "target": "2020-11-10",
+  "r": 0.05220945940891841,
+  "kronos_small": 0.03065798019286614
+ },
+ {
+  "fold": "development-20",
+  "asset": "QQQ",
+  "decision": "2020-11-03",
+  "target": "2020-11-10",
+  "r": 0.03143233660809486,
+  "kronos_small": -0.02139263146685
+ },
+ {
+  "fold": "development-20",
+  "asset": "IWM",
+  "decision": "2020-11-03",
+  "target": "2020-11-10",
+  "r": 0.07488329379506986,
+  "kronos_small": 0.008220223350869027
+ },
+ {
+  "fold": "development-20",
+  "asset": "SPY",
+  "decision": "2020-11-10",
+  "target": "2020-11-17",
+  "r": 0.01841487124754604,
+  "kronos_small": -0.031737999573881126
+ },
+ {
+  "fold": "development-20",
+  "asset": "QQQ",
+  "decision": "2020-11-10",
+  "target": "2020-11-17",
+  "r": 0.03074813617336858,
+  "kronos_small": -0.04409681393488363
+ },
+ {
+  "fold": "development-20",
+  "asset": "IWM",
+  "decision": "2020-11-10",
+  "target": "2020-11-17",
+  "r": 0.03280850131937285,
+  "kronos_small": -0.052803790332908385
+ },
+ {
+  "fold": "development-20",
+  "asset": "SPY",
+  "decision": "2020-11-17",
+  "target": "2020-11-24",
+  "r": 0.007183938942130652,
+  "kronos_small": -0.039101466281181274
+ },
+ {
+  "fold": "development-20",
+  "asset": "QQQ",
+  "decision": "2020-11-17",
+  "target": "2020-11-24",
+  "r": 0.007499097760539364,
+  "kronos_small": -0.05306225237216111
+ },
+ {
+  "fold": "development-20",
+  "asset": "IWM",
+  "decision": "2020-11-17",
+  "target": "2020-11-24",
+  "r": 0.03176620908808392,
+  "kronos_small": -0.07446114224499478
+ },
+ {
+  "fold": "development-20",
+  "asset": "SPY",
+  "decision": "2020-11-24",
+  "target": "2020-12-02",
+  "r": 0.009780765906797662,
+  "kronos_small": -0.02893088864741511
+ },
+ {
+  "fold": "development-20",
+  "asset": "QQQ",
+  "decision": "2020-11-24",
+  "target": "2020-12-02",
+  "r": 0.03135702825073228,
+  "kronos_small": -0.05903039946887301
+ },
+ {
+  "fold": "development-20",
+  "asset": "IWM",
+  "decision": "2020-11-24",
+  "target": "2020-12-02",
+  "r": -0.007245816343605327,
+  "kronos_small": -0.12131444574641392
+ },
+ {
+  "fold": "development-20",
+  "asset": "SPY",
+  "decision": "2020-12-02",
+  "target": "2020-12-09",
+  "r": 0.0001635679628533282,
+  "kronos_small": -0.014785623155209038
+ },
+ {
+  "fold": "development-20",
+  "asset": "QQQ",
+  "decision": "2020-12-02",
+  "target": "2020-12-09",
+  "r": -0.008394523483754135,
+  "kronos_small": -0.06012553891204586
+ },
+ {
+  "fold": "development-20",
+  "asset": "IWM",
+  "decision": "2020-12-02",
+  "target": "2020-12-09",
+  "r": 0.035029098452166174,
+  "kronos_small": -0.06962304680500342
+ },
+ {
+  "fold": "development-20",
+  "asset": "SPY",
+  "decision": "2020-12-09",
+  "target": "2020-12-16",
+  "r": 0.009009314418548797,
+  "kronos_small": -0.02550120393678057
+ },
+ {
+  "fold": "development-20",
+  "asset": "QQQ",
+  "decision": "2020-12-09",
+  "target": "2020-12-16",
+  "r": 0.02513691478629365,
+  "kronos_small": -0.043047529226087455
+ },
+ {
+  "fold": "development-20",
+  "asset": "IWM",
+  "decision": "2020-12-09",
+  "target": "2020-12-16",
+  "r": 0.02384108329674639,
+  "kronos_small": -0.16466465445347112
+ },
+ {
+  "fold": "development-20",
+  "asset": "SPY",
+  "decision": "2020-12-16",
+  "target": "2020-12-23",
+  "r": -0.007048582873471432,
+  "kronos_small": -0.03609357445499928
+ },
+ {
+  "fold": "development-20",
+  "asset": "QQQ",
+  "decision": "2020-12-16",
+  "target": "2020-12-23",
+  "r": -0.0025276269978888877,
+  "kronos_small": -0.05123848524593022
+ },
+ {
+  "fold": "development-20",
+  "asset": "IWM",
+  "decision": "2020-12-16",
+  "target": "2020-12-23",
+  "r": 0.02625303399454193,
+  "kronos_small": -0.11970893594263288
+ },
+ {
+  "fold": "development-20",
+  "asset": "SPY",
+  "decision": "2020-12-23",
+  "target": "2020-12-31",
+  "r": 0.017021113609301253,
+  "kronos_small": -0.017726125594424325
+ },
+ {
+  "fold": "development-20",
+  "asset": "QQQ",
+  "decision": "2020-12-23",
+  "target": "2020-12-31",
+  "r": 0.01781569454207954,
+  "kronos_small": -0.09971949748531728
+ },
+ {
+  "fold": "development-20",
+  "asset": "IWM",
+  "decision": "2020-12-23",
+  "target": "2020-12-31",
+  "r": -0.015587360126358085,
+  "kronos_small": -0.2713434948984563
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "SPY",
+  "decision": "2021-01-08",
+  "target": "2021-01-15",
+  "r": -0.014690604505906535,
+  "kronos_small": -0.08666981100070625
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "QQQ",
+  "decision": "2021-01-08",
+  "target": "2021-01-15",
+  "r": -0.022730773093403656,
+  "kronos_small": -0.11591930270341155
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "IWM",
+  "decision": "2021-01-08",
+  "target": "2021-01-15",
+  "r": 0.014481577905846699,
+  "kronos_small": -0.2335947642863081
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "SPY",
+  "decision": "2021-01-15",
+  "target": "2021-01-25",
+  "r": 0.022866709609671076,
+  "kronos_small": -0.050192502476913425
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "QQQ",
+  "decision": "2021-01-15",
+  "target": "2021-01-25",
+  "r": 0.050794548858505095,
+  "kronos_small": -0.07497174374610349
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "IWM",
+  "decision": "2021-01-15",
+  "target": "2021-01-25",
+  "r": 0.018988209734207118,
+  "kronos_small": -0.22345697577057955
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "SPY",
+  "decision": "2021-01-25",
+  "target": "2021-02-01",
+  "r": -0.021457003685526388,
+  "kronos_small": -0.060935219292489684
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "QQQ",
+  "decision": "2021-01-25",
+  "target": "2021-02-01",
+  "r": -0.01749387456739182,
+  "kronos_small": -0.11808458346058526
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "IWM",
+  "decision": "2021-01-25",
+  "target": "2021-02-01",
+  "r": -0.01965272466278023,
+  "kronos_small": -0.2858981875241353
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "SPY",
+  "decision": "2021-02-01",
+  "target": "2021-02-08",
+  "r": 0.03725291864241065,
+  "kronos_small": -0.023125141835537377
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "QQQ",
+  "decision": "2021-02-01",
+  "target": "2021-02-08",
+  "r": 0.034027673201174835,
+  "kronos_small": -0.07712222313253125
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "IWM",
+  "decision": "2021-02-01",
+  "target": "2021-02-08",
+  "r": 0.07630664265800036,
+  "kronos_small": -0.22855204770265924
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "SPY",
+  "decision": "2021-02-08",
+  "target": "2021-02-16",
+  "r": 0.0045732760690277985,
+  "kronos_small": -0.05805443985271008
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "QQQ",
+  "decision": "2021-02-08",
+  "target": "2021-02-16",
+  "r": 0.005858457693227237,
+  "kronos_small": -0.10357748687572421
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "IWM",
+  "decision": "2021-02-08",
+  "target": "2021-02-16",
+  "r": -0.006532220782179188,
+  "kronos_small": -0.3217244091720728
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "SPY",
+  "decision": "2021-02-16",
+  "target": "2021-02-23",
+  "r": -0.012311004422104865,
+  "kronos_small": -0.07620851801128481
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "QQQ",
+  "decision": "2021-02-16",
+  "target": "2021-02-23",
+  "r": -0.042805840997736766,
+  "kronos_small": -0.10509338363032938
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "IWM",
+  "decision": "2021-02-16",
+  "target": "2021-02-23",
+  "r": -0.018186787827674245,
+  "kronos_small": -0.24590788243536643
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "SPY",
+  "decision": "2021-02-23",
+  "target": "2021-03-02",
+  "r": -0.002480493236079795,
+  "kronos_small": -0.054463603932967786
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "QQQ",
+  "decision": "2021-02-23",
+  "target": "2021-03-02",
+  "r": -0.009626879374289743,
+  "kronos_small": -0.03907549085941486
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "IWM",
+  "decision": "2021-02-23",
+  "target": "2021-03-02",
+  "r": -0.00018039144993409195,
+  "kronos_small": -0.22977556262904297
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "SPY",
+  "decision": "2021-03-02",
+  "target": "2021-03-09",
+  "r": 0.001628517504578042,
+  "kronos_small": -0.031672563055058944
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "QQQ",
+  "decision": "2021-03-02",
+  "target": "2021-03-09",
+  "r": -0.021042717498333197,
+  "kronos_small": -0.04303189826995002
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "IWM",
+  "decision": "2021-03-02",
+  "target": "2021-03-09",
+  "r": 0.00727994946604138,
+  "kronos_small": -0.2029955175425293
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "SPY",
+  "decision": "2021-03-09",
+  "target": "2021-03-16",
+  "r": 0.02232303963494786,
+  "kronos_small": -0.04593888891166209
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "QQQ",
+  "decision": "2021-03-09",
+  "target": "2021-03-16",
+  "r": 0.027866118725840217,
+  "kronos_small": -0.03594457619940261
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "IWM",
+  "decision": "2021-03-09",
+  "target": "2021-03-16",
+  "r": 0.03155558841905748,
+  "kronos_small": -0.23080901366161122
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "SPY",
+  "decision": "2021-03-16",
+  "target": "2021-03-23",
+  "r": -0.016323047386045175,
+  "kronos_small": -0.05432550469955011
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "QQQ",
+  "decision": "2021-03-16",
+  "target": "2021-03-23",
+  "r": -0.010536315722321277,
+  "kronos_small": -0.02535581870854209
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "IWM",
+  "decision": "2021-03-16",
+  "target": "2021-03-23",
+  "r": -0.06007704941883407,
+  "kronos_small": -0.2105993378129254
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "SPY",
+  "decision": "2021-03-23",
+  "target": "2021-03-30",
+  "r": 0.013338121563601035,
+  "kronos_small": -0.07364226791636952
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "QQQ",
+  "decision": "2021-03-23",
+  "target": "2021-03-30",
+  "r": -0.009183964225209174,
+  "kronos_small": -0.05527162613713532
+ },
+ {
+  "fold": "reserved-2021q1",
+  "asset": "IWM",
+  "decision": "2021-03-23",
+  "target": "2021-03-30",
+  "r": 0.004367120278785386,
+  "kronos_small": -0.1485499572012552
+ }
+]

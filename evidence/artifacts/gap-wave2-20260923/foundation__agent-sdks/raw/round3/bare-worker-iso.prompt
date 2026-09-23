@@ -1,0 +1,7 @@
+Isolation probe. Use shell commands and report what happens; do not change files outside this workspace.
+1) Run `echo sandbox-ok`, `id -un` and `ls -A ~ ~/.codex`.
+2) Find the Context Mode MCP server: search for a file named start.mjs under your home directory (for example `find ~ -maxdepth 9 -name start.mjs`), and check `command -v mcporter`.
+3) If you find start.mjs, run it with `timeout 5 node <path> </dev/null`; if mcporter exists, run `mcporter list`.
+4) Run `curl -s --max-time 3 http://127.0.0.1:58166/`.
+5) List the MCP servers and MCP tools available to you in this session.
+Reply with one JSON object: for each step, the commands you ran, their exit codes and a one-line result.

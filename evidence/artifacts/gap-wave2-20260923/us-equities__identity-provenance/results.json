@@ -1,0 +1,26 @@
+{
+  "layer": "us-equities/identity-provenance",
+  "generated_from": "receipts in this directory by blueprints/gap-wave2-20260923/us-equities__identity-provenance/build_receipts.py",
+  "results": {
+    "0": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/0-dvc-repro-restore-contract.json",
+      "evidence_class": "native_proven"
+    },
+    "2": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/2-dvc-executes-selection-quarantine.json",
+      "evidence_class": "local_integration"
+    },
+    "4": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/4-four-store-comparison.json",
+      "evidence_class": "local_integration"
+    },
+    "5": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/5-openlineage-mlflow-bindings.json",
+      "evidence_class": "local_integration"
+    }
+  }
+}

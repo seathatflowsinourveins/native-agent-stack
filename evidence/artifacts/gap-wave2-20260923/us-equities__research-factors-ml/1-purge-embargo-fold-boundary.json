@@ -1,0 +1,89 @@
+{
+  "id": "gap-wave2-20260923-research-factors-ml-1-purge-embargo-fold-boundary",
+  "layer_id": "research-factors-ml",
+  "catalog": "us-equities",
+  "gap_index": 1,
+  "gap_text_sha256": "5bb5458c48d3bb9240d42517d174b8f71b27d1e5cf1252df57835eb2590477b9",
+  "gap_text": "WalkForward purge and embargo default to zero (packet card limitation). The 6-row gap plus the interval assertions does not establish independent samples, and development labels can cross fold boundaries.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:19:39Z",
+    "written_at_note": "Upper bound: the commit time of the first preregistration commit (4484138). Written between 06:18:35Z and that commit; corrected in the same unpushed commit before any check ran.",
+    "source": "preregistration.json gaps.1",
+    "expectation": "A wrapper (evaluate_purge.py) that imports evaluate.py helpers unchanged runs four arms: Z-check (purged_size=0, embargo=0, existing overlap assertion on) is expected to raise 'training label overlap'; Z-leaky (purged_size=0, embargo=0, overlapping training labels retained, assertion bypassed) is a labelled leaky reference; P6 (plan: purged_size=6, embargo=0) must reproduce the accepted receipt (20 folds, 6605 ledger records, reserved momentum20); P6E5 (purged_size=6, embargo=5 sessions dropped from the tail of each training window, and fold-boundary censoring of evaluation labels whose exit falls after the fold's last test session).",
+    "criteria": [
+      "New assertion: in P6E5 no observed training label exit is on/after the first test decision and none within the embargo; no observed evaluation label has exit after its fold's test_last. Detection is demonstrated by running the same assertion on P6 (expected to fire for fold-crossing evaluation labels) and Z-check (expected to raise).",
+      "Per-fold chosen candidate compared across Z-leaky, P6 and P6E5; report count of differing folds and the reserved selection for each arm.",
+      "Ljung-Box (statsmodels 0.15.0, lags 1-4) on each selection candidate's reserved-training episode net labels reported as a diagnostic only; non-rejection is not evidence of independence.",
+      "Outcome ceiling: advanced, because statistical independence of samples cannot be established by purge/embargo."
+    ],
+    "fix_rounds": [
+      {
+        "written_at": "2026-09-23T07:08:30Z",
+        "label": "fix round 3 (gaps 1 and 5, plus merge metadata), written after an independent Codex review of commit 5516759",
+        "trigger": "The review found: (a) the Z-check arm raised the wrapper's 'incomplete training label' check (the one evaluate.main performs), not evaluate.choose's overlap detector, and the preregistered 'same assertion on P6' was only run in report mode; (b) the ARIMA residual Ljung-Box used model_df=0; (c) the merged forecast metadata recorded the merge CLI's kronos_device default ('cpu').",
+        "change": "(a) Add two arms to evaluate_purge.py and rerun into a new output dir: Z-choose (purge 0, full-segment training panel so overlapping labels are observed, unmodified evaluate.choose) is expected to raise 'training label overlap with evaluation decision'; P6-assert (plan purge 6, embargo 0, no censoring, the P6E5 fold-boundary assertion enforced) is expected to raise AssertionError on the first fold whose evaluation labels cross the fold end. Existing arms are unchanged and must reproduce their earlier results. (b) Add a statsmodels_lb_df2 arm: the same ARIMA(1,1,1) residuals with acorr_ljungbox(model_df=2); report both values. (c) The merge records per-model execution metadata from the source results files; rerun the merge into a new dir, and the metrics must be identical.",
+        "criteria": [
+          "Z-choose raises the overlap ValueError; P6-assert raises AssertionError; Z-check, Z-leaky, P6 and P6E5 outputs are unchanged.",
+          "statsmodels_lb_df2 exits 0; both p-values are reported.",
+          "The merged metrics equal the earlier merge."
+        ]
+      }
+    ]
+  },
+  "commands": [
+    "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-lock/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/evaluate_purge.py --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30 --out $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-purge   # exit 0, 3.8 s",
+    "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-lock/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/evaluate_purge.py --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30 --out $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-purge-r2   # fix round 3 (adds Z-choose and P6-assert), exit 0",
+    "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/ljung_box.py $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-purge/results.json > $HOME/.cache/gap-wave2-20260923/research-factors-ml/logs/ljungbox.json   # exit 0"
+  ],
+  "results": {
+    "arms": "Z-check (purge 0, embargo 0, training labels from the truncated prefix): raised 'ValueError: incomplete training label', the check evaluate.main also performs; this fires before evaluate.choose runs. Z-leaky: 20 folds, 6615 records, reserved momentum20, 120 training labels crossing the test start. P6 (plan): 20 folds, 6605 records, reserved momentum20 with mean_net_cost_proxy_label 0.001184071666615635470939591764; per-fold chosen candidate and test_first equal the accepted receipt for all 20 folds. P6E5 (purge 6, 5-session embargo, fold-boundary censoring): 20 folds, 6500 records, enforced assertions passed (0 crossings, minimum 5 sessions between the last training exit and the cutoff), reserved momentum20 with the same mean.",
+    "fix_round_3_negative_controls": "run-purge-r2: Z-choose (purge 0, full-segment training panel, unmodified evaluate.choose) raised 'ValueError: training label overlap with evaluation decision'; P6-assert (plan P6 with the fold-boundary assertion enforced, no censoring) raised 'AssertionError: development label window crosses a fold boundary: development-1'. Z-check, Z-leaky, P6 and P6E5 outputs are identical to run-purge.",
+    "detector_evidence": "Report-mode audit before censoring found 115 evaluation labels crossing their fold end in P6 and P6E5 and 120 training labels crossing the test start in Z-leaky; P6 minimum training-exit gap was 0 sessions.",
+    "selection_comparison": "Per-fold chosen candidate differs in 0/20 folds between Z-leaky and P6 and 0/20 between P6E5 and P6; reserved selection is momentum20 in all three completed arms.",
+    "ljung_box_reserved_training_labels": "P6E5 (n=49): momentum60 p=0.121/0.0035/0.0052/0.008 at lags 1-4; momentum120 p=0.603/0.0256/0.0436/0.0519; momentum20 p=0.151/0.300/0.105/0.112; cash constant. P6 (n=50) is similar. For momentum60, the null of no serial correlation is rejected at cumulative lags 2-4 at the 1% level."
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "detection_method": "The fold-boundary audit counts label windows crossing the test start, the embargo, or the fold end; it reports 115-120 crossings on arms that have them, so a zero on P6E5 is informative. The enforced assertion raises on P6 (P6-assert), and unmodified evaluate.choose raises its overlap error under zero purge (Z-choose); both were added in fix round 3 after review found that round 1 had shown only report-mode counts and the incomplete-label check.",
+  "remaining": "Independent samples are not established: Ljung-Box rejects no serial correlation for momentum60 at lags 2-4 (p<0.01) and borderline for momentum120, even with purge and embargo. The embargo is implemented as a 5-session training-tail drop, because a post-test embargo is vacuous when training never follows test. The frozen plan.json and evaluate.py were not changed.",
+  "limits": [
+    "Wrapper imports evaluate.py helpers unchanged; the Z-leaky arm bypasses evaluate.choose's overlap check by design.",
+    "Ljung-Box on 49-50 episodes has low power; non-rejection does not show independence."
+  ],
+  "raw_outputs": [
+    {
+      "path": "raw/purge/run-purge__results.json",
+      "committed_sha256": "f9a7696ce7548376b8fb19d520c679e8130c1c9d4961655e5043939e2824f35e",
+      "original_sha256": "f9a7696ce7548376b8fb19d520c679e8130c1c9d4961655e5043939e2824f35e",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/purge/logs__purge.stdout",
+      "committed_sha256": "f454735e53b87ce3f5eef40b53229ac2d2e368efd05c7c6f4d6832283a709903",
+      "original_sha256": "f454735e53b87ce3f5eef40b53229ac2d2e368efd05c7c6f4d6832283a709903",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/purge/logs__ljungbox.json",
+      "committed_sha256": "36012b14ff2ab842ed89d51af21e926bd70fcf26fc77a1ab4a7c062ccdd7a306",
+      "original_sha256": "36012b14ff2ab842ed89d51af21e926bd70fcf26fc77a1ab4a7c062ccdd7a306",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/purge/run-purge-r2__results.json",
+      "committed_sha256": "0511b50293263b15d031314d7a709810348c233000877922b05e5a581030378c",
+      "original_sha256": "0511b50293263b15d031314d7a709810348c233000877922b05e5a581030378c",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/purge/logs__purge-r2.stdout",
+      "committed_sha256": "ff89011c1e40c6941efc1397d1373416084feca2e499f160ad08ab6b07bab334",
+      "original_sha256": "ff89011c1e40c6941efc1397d1373416084feca2e499f160ad08ab6b07bab334",
+      "uuids_redacted": 0
+    }
+  ],
+  "checked_at": "2026-09-23T07:09:07Z",
+  "checked_at_note": "mtime of the last check output, $CACHE/run-fcmp-merged-r2/results.json. Corrected from 07:15:00Z, which post-dated its own commit 01e6054 (07:11:23Z); correction written 2026-09-23 after 13:37Z.",
+  "base_commit": "41d39b3",
+  "branch": "claude/g2-research-factors-ml-20260923"
+}

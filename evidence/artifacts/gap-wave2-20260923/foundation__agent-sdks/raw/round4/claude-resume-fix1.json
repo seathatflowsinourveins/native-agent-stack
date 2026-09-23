@@ -1,0 +1,129 @@
+{
+  "phase": "resume",
+  "pid": 478622,
+  "init": {
+    "model": "qwen3-4b",
+    "tools": [
+      "mcp__vault__vault_lookup"
+    ],
+    "mcp_servers": [
+      {
+        "name": "vault",
+        "status": "connected",
+        "source": "sdk"
+      }
+    ],
+    "permissionMode": "default",
+    "claude_code_version": "2.1.280",
+    "apiKeySource": "ANTHROPIC_API_KEY"
+  },
+  "event_counts": {
+    "SystemMessage:init": 1,
+    "SystemMessage:status": 1,
+    "StreamEvent:message_start": 1,
+    "StreamEvent:content_block_start": 1,
+    "StreamEvent:content_block_delta": 13,
+    "AssistantMessage": 1,
+    "StreamEvent:content_block_stop": 1,
+    "StreamEvent:message_delta": 1,
+    "StreamEvent:message_stop": 1,
+    "ResultMessage": 1
+  },
+  "untyped": [],
+  "final_answer": "vc-57fe4f2d6994",
+  "tool_calls_in_resume": [],
+  "resumed_same_session": true,
+  "answer_contains_turn1_value": true,
+  "answer_contains_decoy": false,
+  "provider_delta": {
+    "vllm:prompt_tokens_total": 696.0,
+    "vllm:generation_tokens_total": 14.0,
+    "finished_by_reason": {
+      "stop": 1.0
+    },
+    "seconds": 1.182
+  },
+  "result": {
+    "subtype": "success",
+    "is_error": false,
+    "num_turns": 1,
+    "stop_reason": "end_turn",
+    "terminal_reason": "completed",
+    "usage": {
+      "input_tokens": 696,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "output_tokens": 14,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard"
+    },
+    "total_cost_usd": 0.008455,
+    "result": "vc-57fe4f2d6994",
+    "model_usage": {
+      "qwen3-4b": {
+        "inputTokens": 1426,
+        "outputTokens": 53,
+        "thinkingTokens": 0,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.008455,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000,
+        "canonicalModel": "qwen3-4b",
+        "provider": "firstParty",
+        "costBasis": "unknown"
+      }
+    }
+  },
+  "resume_recall": true,
+  "tap": {
+    "raw_total": 22,
+    "raw_counts": {
+      "assistant->AssistantMessage": 1,
+      "result:success->ResultMessage": 1,
+      "stream_event->StreamEvent": 18,
+      "system:init->SystemMessage": 1,
+      "system:status->SystemMessage": 1
+    },
+    "dropped_or_untyped": [],
+    "detector": {
+      "unknown_type_dropped_as_none": true
+    }
+  },
+  "session_id_private_in_state": true,
+  "status": "ok",
+  "sdk": "claude-agent-sdk",
+  "started_at": 1790175627.2885046,
+  "finished_at": 1790175628.4811838,
+  "env_keys": [
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_BASE_URL",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL",
+    "ANTHROPIC_SMALL_FAST_MODEL",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS",
+    "CLAUDE_CONFIG_DIR",
+    "DISABLE_AUTOUPDATER",
+    "DISABLE_ERROR_REPORTING",
+    "DISABLE_TELEMETRY",
+    "HOME",
+    "LC_CTYPE",
+    "PATH"
+  ]
+}

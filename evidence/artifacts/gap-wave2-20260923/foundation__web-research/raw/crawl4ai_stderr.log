@@ -1,0 +1,8 @@
+[INIT].... → Crawl4AI 0.9.3 
+[FETCH]... ↓ http://127.0.0.1:8317/greeting.html                                                                  | ✓ | ⏱: 0.30s 
+[SCRAPE].. ◆ http://127.0.0.1:8317/greeting.html                                                                  | ✓ | ⏱: 0.00s 
+[ERROR]... × http://127.0.0.1:8317/greeting.html                | Error: Blocked by anti-bot protection: Structural: minimal_text on small page (500 bytes, 41 chars visible) 
+[COMPLETE] ● http://127.0.0.1:8317/greeting.html                                                                  | ✗ | ⏱: 0.30s 
+[FETCH]... ↓ https://example.com                                                                                  | ✓ | ⏱: 0.29s 
+[SCRAPE].. ◆ https://example.com                                                                                  | ✓ | ⏱: 0.00s 
+[COMPLETE] ● https://example.com                                                                                  | ✓ | ⏱: 0.29s 

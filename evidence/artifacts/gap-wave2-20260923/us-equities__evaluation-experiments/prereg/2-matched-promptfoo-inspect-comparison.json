@@ -1,0 +1,15 @@
+{
+  "gap_index": 2,
+  "slug": "matched-promptfoo-inspect-comparison",
+  "gap_text_sha256": "24b6acc97b1d3449bb11df339c8450c6348d4251d0ba27171877464cc5d4dc59",
+  "next_check": "Use the same two-arm run described under gap 0 on blueprints/native-skill-practice/catalog-cases.json, and retain it as the matched comparison receipt.",
+  "preregistration": {
+    "written_at": "2026-09-23T07:18:31Z",
+    "expectation": "The gap-0 two-arm run on catalog-cases.json is the matched comparison: same 8 cases, same deterministic transform and gate, zero provider calls. Expected: identical scorer outcomes; differences, if any, appear in failure-log fidelity and resume mechanics. No model-quality or selection-win claim is expected to follow, because both arms use the same deterministic baseline.",
+    "criteria": [
+      "Retain a comparison receipt listing, per arm: per-case outcome vector, repeat-to-repeat reproducibility, failure-log fidelity count, resume success, provider calls.",
+      "The receipt states whether the comparison supports keeping inspect-ai selected over promptfoo on these measured properties, or neither.",
+      "Settled only if gap 0's arms all execute."
+    ]
+  }
+}

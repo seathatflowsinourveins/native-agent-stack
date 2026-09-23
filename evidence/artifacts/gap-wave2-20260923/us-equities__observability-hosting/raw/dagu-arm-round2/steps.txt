@@ -1,0 +1,24 @@
+[2026-09-23T07:52:25Z] versions dagu=2.16.6 otel=otelcol-contrib version 0.161.0 prom=prometheus, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610) loki=loki, version 3.7.8 (branch: release-3.7.x, revision: 09e6ce2f) restic=restic 0.19.1 compiled with go1.26.4 on linux/amd64 srt=1.0.0
+[2026-09-23T07:52:50Z] stack pids prom=1867988 loki=1867989 otel=1871974 ready_prom=Prometheus Server is Ready. ready_loki=ready
+[2026-09-23T07:52:50Z] dagu start
+[2026-09-23T07:52:51Z] dagu start exit=1
+[2026-09-23T07:52:51Z] dagu status exit=0
+[2026-09-23T07:53:03Z] before-kill prom={"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"DAG: obsgap"},"value":[1790149983.545,"1"]},{"metric":{"span_name":"Step: risk-check"},"value":[1790149983.545,"1"]},{"metric":{"span_name":"Step: sandboxed-worker"},"value":[1790149983.545,"1"]},{"metric":{"span_name":"Step: fill-log"},"value":[1790149983.545,"1"]}]}}
+[2026-09-23T07:53:03Z] before-kill loki_lines=2
+[2026-09-23T07:53:03Z] srt step output: HTTPSTATUS:000 EXIT:56 [SandboxDebug] Command string mode (-c): sleep 1; curl -sS -m 8 -o /dev/null -w "HTTPSTATUS:%{http_code} EXIT:%{exitcode}\n" https://example.com [SandboxDebug] No matching config rule, denying: example.com:443 curl: (56) CONNECT tunnel failed, response 403 time=2026-09-23T03:52:51.498-04:00 level=ERROR msg="Failed to execute dag-run" err="exit status 56\nrecent stderr (tail):\n not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-2/dagu/data/dag-run-work/obsgap/yxh6vzcoosnj3fyo66y4w2vabq/root/.idea\n[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-2/dagu/data/dag-run-work/obsgap/yxh6vzcoosnj3fyo66y4w2vabq/root/.claude/commands\n[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-2/dagu/data/dag-run-work/obsgap/yxh6vzcoosnj3fyo66y4w2vabq/root/.claude/agents\n[SandboxDebug] [Sandbox Linux] Wrapped command with bwrap (network, filesystem, seccomp(unix-block) restrictions)\n[SandboxDebug] No matching config rule, denying: example.com:443\n[SandboxDebug] Connection blocked to example.com:443\ncurl: (56) CONNECT tunnel failed, response 403\n[SandboxDebug] Sent SIGTERM to HTTP bridge process\n[SandboxDebug] Sent SIGTERM to SOCKS bridge process\n" 
+[2026-09-23T07:53:03Z] kill -9
+[2026-09-23T07:53:28Z] stack pids prom=1874969 loki=1874970 otel=1879259 ready_prom=Prometheus Server is Ready. ready_loki=ready
+[2026-09-23T07:53:36Z] after-restart prom={"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"DAG: obsgap"},"value":[1790150016.549,"1"]},{"metric":{"span_name":"Step: risk-check"},"value":[1790150016.549,"1"]},{"metric":{"span_name":"Step: sandboxed-worker"},"value":[1790150016.549,"1"]},{"metric":{"span_name":"Step: fill-log"},"value":[1790150016.549,"1"]}]}}
+[2026-09-23T07:53:36Z] after-restart loki_lines=4
+[2026-09-23T07:53:36Z] restic hot backup (stack running)
+[2026-09-23T07:53:40Z] backup exit=0
+[2026-09-23T07:53:40Z] check exit=0
+[2026-09-23T07:53:41Z] restore exit=0
+[2026-09-23T07:53:41Z] diff -rq dagu exit=0 lines=0
+[2026-09-23T07:53:41Z] dagu history on restored home exit=0
+[2026-09-23T07:53:41Z] dagu status on restored home exit=0
+[2026-09-23T07:54:03Z] restored prom={"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"DAG: obsgap"},"value":[1790150043.687,"1"]},{"metric":{"span_name":"Step: risk-check"},"value":[1790150043.687,"1"]},{"metric":{"span_name":"Step: sandboxed-worker"},"value":[1790150043.687,"1"]},{"metric":{"span_name":"Step: fill-log"},"value":[1790150043.687,"1"]}]}}
+[2026-09-23T07:54:03Z] restored loki_lines=4
+[2026-09-23T07:54:03Z] stop stack
+[2026-09-23T07:54:27Z] listeners left: 0
+MARK=obsgap-075224

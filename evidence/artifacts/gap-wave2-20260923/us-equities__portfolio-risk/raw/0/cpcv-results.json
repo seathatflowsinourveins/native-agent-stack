@@ -1,0 +1,143 @@
+{
+  "arms": {
+    "meanrisk_empiricalprior_ledoitwolf": {
+      "cpcv_path_annualized_mean": [
+        0.11704767571119003,
+        0.11704789914103793,
+        0.11704768789962516,
+        0.11704795935963888,
+        0.1170477756588076,
+        0.11704822967103008,
+        0.11704771479234545,
+        0.11704765737446919,
+        0.11704785174233649
+      ],
+      "cpcv_path_annualized_sharpe": [
+        0.6349153253721135,
+        0.6349165114204262,
+        0.6349155962058209,
+        0.6349170077772501,
+        0.6349157590617616,
+        0.6349180217407097,
+        0.6349156383963299,
+        0.6349153179977242,
+        0.6349162428291908
+      ],
+      "cpcv_path_annualized_std": [
+        0.18435163089281284,
+        0.18435163842121546,
+        0.18435157145152528,
+        0.18435158914612534,
+        0.18435166238710693,
+        0.18435172047901124,
+        0.1843516015576252,
+        0.1843516041534357,
+        0.1843516417547778
+      ],
+      "cpcv_path_observations": [
+        1510,
+        1510,
+        1510,
+        1510,
+        1510,
+        1510,
+        1510,
+        1510,
+        1510
+      ],
+      "cpcv_paths": 9,
+      "cpcv_sharpe_mean": 0.6349161578668141,
+      "cpcv_sharpe_std": 8.994010541581008e-07,
+      "fitted_covariance_estimator": "LedoitWolf",
+      "fitted_shrinkage": 0.06026012788256681,
+      "reserved_2021q1_daily_observations": 60,
+      "reserved_2021q1_mean_daily_return": 0.0010783440983339297,
+      "reserved_2021q1_std_daily_return": 0.011083863336992263,
+      "reserved_fit_first": "2019-12-26",
+      "reserved_fit_last": "2020-12-22",
+      "reserved_weights": {
+        "IWM": 1.6691749547534352e-06,
+        "QQQ": 0.27994552325561006,
+        "SPY": 0.7200528075694351
+      }
+    },
+    "meanrisk_empiricalprior_shrunkcovariance": {
+      "cpcv_path_annualized_mean": [
+        0.12501190883509933,
+        0.125290734580343,
+        0.12409751382098953,
+        0.12452510477521737,
+        0.12587874851043515,
+        0.12842265393019686,
+        0.12720711830503686,
+        0.11855240243374567,
+        0.12305685960693932
+      ],
+      "cpcv_path_annualized_sharpe": [
+        0.6616549760565164,
+        0.6634559024267813,
+        0.6553371653717041,
+        0.6578707015336512,
+        0.6651658072778389,
+        0.6782668164210104,
+        0.6718447446455199,
+        0.6334031332849854,
+        0.6496125127436216
+      ],
+      "cpcv_path_annualized_std": [
+        0.18893821305504885,
+        0.18884560996752914,
+        0.1893643766573227,
+        0.1892850745365618,
+        0.1892441660908402,
+        0.18933943224266922,
+        0.18934005113362037,
+        0.18716737604202172,
+        0.18943117195697456
+      ],
+      "cpcv_path_observations": [
+        1510,
+        1510,
+        1510,
+        1510,
+        1510,
+        1510,
+        1510,
+        1510,
+        1510
+      ],
+      "cpcv_paths": 9,
+      "cpcv_sharpe_mean": 0.6596235288624032,
+      "cpcv_sharpe_std": 0.013017468574331326,
+      "fitted_covariance_estimator": "ShrunkCovariance",
+      "fitted_shrinkage": 0.1,
+      "reserved_2021q1_daily_observations": 60,
+      "reserved_2021q1_mean_daily_return": 0.001086013079078973,
+      "reserved_2021q1_std_daily_return": 0.011482088141891517,
+      "reserved_fit_first": "2019-12-26",
+      "reserved_fit_last": "2020-12-22",
+      "reserved_weights": {
+        "IWM": 0.03763255686073928,
+        "QQQ": 0.33660294689080716,
+        "SPY": 0.6257644962484535
+      }
+    }
+  },
+  "cv": {
+    "class": "CombinatorialPurgedCV",
+    "embargo_size": 0,
+    "n_folds": 10,
+    "n_splits": 45,
+    "n_test_folds": 2,
+    "n_test_paths": 9,
+    "purged_size": 6
+  },
+  "development_first": "2015-01-05",
+  "development_last": "2020-12-31",
+  "development_observations": 1510,
+  "evaluate_sha256": "2501690da622e2245fac87144d625aff13d8d65e9575b77ce099b86854fc79b4",
+  "inputs_unchanged": true,
+  "numpy": "2.5.3",
+  "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+  "skfolio": "1.2.9"
+}

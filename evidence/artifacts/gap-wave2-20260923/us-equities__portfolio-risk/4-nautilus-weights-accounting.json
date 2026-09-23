@@ -1,0 +1,428 @@
+{
+  "id": "gap-wave2-20260923-us-equities-portfolio-risk-4-nautilus-weights-accounting",
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "gap_index": 4,
+  "gap_text": "The receipt makes no claim about portfolio P&L, total return, dividends, financing, cash, fees or position reconciliation. It uses a fixed 20bp round-trip cost proxy, not fills or liquidity.",
+  "gap_text_sha256": "67abd984217ac647ed855e2fae7e6ee2d64de8e80c6949ffbffdb8246c8efe42",
+  "next_check": "Run the skfolio reserved weights through a NautilusTrader 2.0.0rc5 BacktestEngine on SPY/QQQ/IWM bars that include dividends, using a per-order fee model. Report cash, positions, fees and P&L and reconcile them independently against the weights.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:32:44Z",
+    "expectation": "The skfolio reserved (2021Q1) and development-fold MeanRisk and HRP weights run through a native NautilusTrader 2.0.0rc5 BacktestEngine (CASH account, three Equity instruments on raw LEAN SPY/QQQ/IWM daily bars) with a per-order FixedFeeModel ($1 per order). Rebalancing at each fold's first test session to integer shares, the run reports cash, positions, fees and P&L, and an independent Decimal ledger reconciles every fill price, quantity, fee and cash transition against the weights. Dividend cash for ex-dates in the span is computed from the LEAN factor files as an unmodelled amount. Expected outcome: advanced, because dividend-inclusive bars depend on the dividend simulation module preregistered by peer session sota-workflow-resolution.",
+    "criteria": "advanced iff the native run exits 0 and the independent ledger matches every native fill, fee and account balance exactly and the ending cash plus positions equals initial capital plus realized plus unrealized P&L; settled would additionally need dividend-inclusive accounting, which this unit does not own. not_settled on any unreconciled transition. Detection: per-transition exact Decimal equality; an injected one-cent fee perturbation in the self-test must make the reconciliation fail.",
+    "addendum": {
+      "written_at": "2026-09-23T06:48:07Z",
+      "label": "late addendum, written after the dividend-free run (results known) and before the dividend-inclusive arm ran",
+      "expectation": "Found during this unit: the peer's dividend simulation module (DistributionModule, origin/main 51d66001, PR #103) is merged. Vendoring it unchanged and adding one module per instrument to the same fold-weight run should credit ex-date cash natively; the independent ledger credits shares held x per-share at each ex-date instant and must match every native account transition, fill and decision.",
+      "criteria": "settled iff the dividend-inclusive arm exits 0 for both optimizers with zero module errors, every module emission equals the ledger credit (ex-date, asset, quantity, amount), every native account transition (fills and distributions) equals the ledger sequence, every native decision equity equals the ledger's, and the positions end flat; otherwise the outcome stays advanced."
+    },
+    "fix_round_addendum": {
+      "written_at": "2026-09-23T07:12:07Z",
+      "label": "fix-round preregistration, written after round-1 results and the review, before the fix-round reruns",
+      "text": "Fix round after independent Codex review: the dividend-free runner now also rejects a missing decision list, and mutation self-tests (wrong instrument, 1900 fill time, corrupted cash transition, removed decisions) must each be detected. Rerun into raw/4-10/nautilus-run-fix1. Expected: identical economic results. Outcome judged against the gap text: financing and liquidity/fill realism are not exercised, so advanced unless both are covered."
+    },
+    "fix_round_2_addendum": {
+      "written_at": "2026-09-23T07:22:02Z",
+      "label": "fix-round-2 preregistration, written after the round-2 review and before the fix-round-2 reruns",
+      "text": "Fix round 2 after the round-2 independent review: fill checks now compare the exact New York fill time (16:00 close bars; 09:30 open-print bars) instead of the date only, and a one-hour time-shift mutation must be detected. All Nautilus runners (portfolio, dividend-inclusive portfolio, RiskEngine probe, episodes) rerun into *-fix2 outputs; expected economic results identical to fix round 1."
+    },
+    "fix_round_3_addendum": {
+      "written_at": "2026-09-23T07:31:52Z",
+      "label": "fix-round-3 preregistration, written after the independent Opus review and before the fix-round-3 reruns",
+      "text": "Fix round 3 after the Opus review (dividend arm not mutation-tested): nautilus_portfolio_dividends.py moves its existing comparisons into one check function (same comparisons, plus explicit denial and flat-end checks) and adds mutation self-tests on copies of the native reports: wrong instrument, 1900 fill time, one-hour fill time shift, corrupted first account transition, corrupted first nonzero dividend account transition, removed dividend account row, corrupted emission amount, removed emission, shifted emission ex_date, injected module error, corrupted decision equity and removed decisions; plus a ledger fee +0.01 USD perturbation. Every mutation and the perturbation must be detected, or the runner exits non-zero. Rerun into raw/4/nautilus-dividends-run-fix3. Expected: economic results identical to fix round 2 (ending cash 2207656.15 / 2451556.98). Outcome stays advanced (financing and liquidity not exercised)."
+    }
+  },
+  "commands": [
+    {
+      "cmd": "$HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-lock/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/weights_export.py --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/skfolio-fold-weights.json",
+      "exit": 0
+    },
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_portfolio.py --weights evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/skfolio-fold-weights.json --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run --self-test-fee-perturbation",
+      "exit": 0,
+      "started_utc": "2026-09-23T06:41:44Z",
+      "note": "round 1 dividend-free arm (shared with gap 10); outputs removed from the tree after the fix round, retained in git at b482b86"
+    },
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_portfolio.py --weights evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/skfolio-fold-weights.json --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix1 --self-test-fee-perturbation",
+      "exit": 0,
+      "started_utc": "2026-09-23T07:12:14Z",
+      "note": "fix round 1: decision-count check and mutation self-tests added; identical economic results; outputs in git at 8bab001"
+    },
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_portfolio.py --weights evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/skfolio-fold-weights.json --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2 --self-test-fee-perturbation",
+      "exit": 0,
+      "started_utc": "2026-09-23T07:22:10Z",
+      "note": "fix round 2 (07:22Z, after the round-2 review): exact 16:00/09:30 New York fill times enforced and a one-hour time-shift mutation added; economic results identical to fix round 1; fix-round-1 outputs retained in git at 8bab001"
+    },
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_portfolio_dividends.py --weights evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/skfolio-fold-weights.json --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix2",
+      "exit": 0,
+      "started_utc": "2026-09-23T07:22:11Z",
+      "note": "dividend-inclusive arm, fix round 2 (07:22Z, after the round-2 review): exact 16:00 New York fill times enforced. Correction (Opus review): this runner had no mutation self-test and no fee perturbation at fix round 2, so the round-2 time-shift criterion was not met for this arm until fix round 3. Outputs retained in git at dbcfef1."
+    },
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_portfolio_dividends.py --weights evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/skfolio-fold-weights.json --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3",
+      "exit": 0,
+      "started_utc": "2026-09-23T07:32:41Z",
+      "note": "dividend-inclusive arm, fix round 3 (preregistered 07:31:52Z, after the Opus review): checks moved into one function with explicit denial and flat-end checks; 12 mutation self-tests and a ledger fee +0.01 USD perturbation, each required to be detected (the runner exits non-zero otherwise). Economic summary identical to fix round 2; account.csv, modules.json and decisions.json byte-identical, fills.csv and positions.csv identical after UUID redaction."
+    },
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_portfolio_dividends.py --weights evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/skfolio-fold-weights.json --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run",
+      "exit": 0,
+      "started_utc": "2026-09-23T06:49:18Z",
+      "note": "first dividend-inclusive run; outputs in git at 8bab001",
+      "development_attempts": "attempt 1 exit 1: 63 late_module_emission errors (no engine timestamp at 00:00 ex instants); attempt 2 exit 1: ledger ordered same-instant distributions by asset name while the venue applies them in module order (detected by the transition check); attempt 3 reconciled; see raw/4/development-attempts/NOTE.txt"
+    }
+  ],
+  "results": {
+    "dividend_free_arm": {
+      "hrp_variance": {
+        "orders": 66,
+        "fees_usd": "66",
+        "ending_cash_native": "2279895.57",
+        "ending_cash_ledger": "2279895.57",
+        "total_pnl_usd": "1279895.57",
+        "cash_transitions_matched": 66,
+        "decisions_matched": 22,
+        "unmodelled_dividend_cash_usd": "107478.79",
+        "positions_realized_pnl_sum": "1279895.58"
+      },
+      "meanrisk_min_variance": {
+        "orders": 33,
+        "fees_usd": "33",
+        "ending_cash_native": "2009391.95",
+        "ending_cash_ledger": "2009391.95",
+        "total_pnl_usd": "1009391.95",
+        "cash_transitions_matched": 33,
+        "decisions_matched": 22,
+        "unmodelled_dividend_cash_usd": "132234.25",
+        "positions_realized_pnl_sum": "1009391.94"
+      }
+    },
+    "fee_perturbation_self_test_detected": {
+      "hrp_variance": true,
+      "meanrisk_min_variance": true
+    },
+    "dividend_inclusive_arm": {
+      "hrp_variance": {
+        "fills_matched": 66,
+        "account_transitions_matched": 129,
+        "distribution_credits": 63,
+        "nonzero_distribution_credits": 63,
+        "dividend_cash_usd": "111669.90",
+        "fees_usd": "66",
+        "ending_cash_native": "2451556.98",
+        "ending_cash_ledger": "2451556.98",
+        "total_pnl_usd": "1451556.98",
+        "native_total_return": "1.45155698",
+        "decisions_matched": 22,
+        "open_positions": 0,
+        "final_shares": {
+          "IWM": 0,
+          "QQQ": 0,
+          "SPY": 0
+        }
+      },
+      "meanrisk_min_variance": {
+        "fills_matched": 34,
+        "account_transitions_matched": 97,
+        "distribution_credits": 63,
+        "nonzero_distribution_credits": 30,
+        "dividend_cash_usd": "138948.42",
+        "fees_usd": "34",
+        "ending_cash_native": "2207656.15",
+        "ending_cash_ledger": "2207656.15",
+        "total_pnl_usd": "1207656.15",
+        "native_total_return": "1.20765615",
+        "decisions_matched": 22,
+        "open_positions": 0,
+        "final_shares": {
+          "IWM": 0,
+          "QQQ": 0,
+          "SPY": 0
+        }
+      }
+    },
+    "vendored_distribution_module": {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/vendored/distribution_module.py",
+      "sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+      "source": "origin/main 51d66001205dfe7722555d69b0a3f29d09a2164e blueprints/us-equities/engine-nautilus/spy-parity/distribution_module.py"
+    },
+    "addendum_criteria_check": "both optimizers exit 0, zero module errors, emissions equal ledger credits, every account transition (fills and distributions) and decision equity equal the ledger, flat at the end",
+    "fix_round_mutation_self_tests_detected": {
+      "hrp_variance": {
+        "all_decisions_removed": true,
+        "cash_corrupted_first_transition": true,
+        "fill_time_1900": true,
+        "fill_time_shifted_one_hour": true,
+        "wrong_instrument_first_fill": true
+      },
+      "meanrisk_min_variance": {
+        "all_decisions_removed": true,
+        "cash_corrupted_first_transition": true,
+        "fill_time_1900": true,
+        "fill_time_shifted_one_hour": true,
+        "wrong_instrument_first_fill": true
+      }
+    },
+    "dividend_arm_mutation_self_tests_detected_fix3": {
+      "hrp_variance": {
+        "all_decisions_removed": true,
+        "cash_corrupted_first_transition": true,
+        "decision_equity_off_by_one_cent": true,
+        "dividend_account_row_removed": true,
+        "dividend_account_transition_off_by_one_cent": true,
+        "emission_amount_off_by_one_cent": true,
+        "emission_ex_date_shifted_one_day": true,
+        "emission_removed": true,
+        "fill_time_1900": true,
+        "fill_time_shifted_one_hour": true,
+        "module_error_injected": true,
+        "wrong_instrument_first_fill": true
+      },
+      "meanrisk_min_variance": {
+        "all_decisions_removed": true,
+        "cash_corrupted_first_transition": true,
+        "decision_equity_off_by_one_cent": true,
+        "dividend_account_row_removed": true,
+        "dividend_account_transition_off_by_one_cent": true,
+        "emission_amount_off_by_one_cent": true,
+        "emission_ex_date_shifted_one_day": true,
+        "emission_removed": true,
+        "fill_time_1900": true,
+        "fill_time_shifted_one_hour": true,
+        "module_error_injected": true,
+        "wrong_instrument_first_fill": true
+      }
+    },
+    "dividend_arm_mutation_detection_messages_fix3": {
+      "hrp_variance": {
+        "all_decisions_removed": "decision mismatch",
+        "cash_corrupted_first_transition": "account transitions differ: native 129 rows, ledger 129",
+        "decision_equity_off_by_one_cent": "decision mismatch",
+        "dividend_account_row_removed": "account transitions differ: native 128 rows, ledger 129",
+        "dividend_account_transition_off_by_one_cent": "account transitions differ: native 129 rows, ledger 129",
+        "emission_amount_off_by_one_cent": "distribution emissions differ from ledger credits",
+        "emission_ex_date_shifted_one_day": "distribution emissions differ from ledger credits",
+        "emission_removed": "distribution emissions differ from ledger credits",
+        "fill_time_1900": "fill mismatch",
+        "fill_time_shifted_one_hour": "fill mismatch",
+        "module_error_injected": "distribution module errors: [[\"injected\"], [], []]",
+        "wrong_instrument_first_fill": "fill mismatch"
+      },
+      "meanrisk_min_variance": {
+        "all_decisions_removed": "decision mismatch",
+        "cash_corrupted_first_transition": "account transitions differ: native 97 rows, ledger 97",
+        "decision_equity_off_by_one_cent": "decision mismatch",
+        "dividend_account_row_removed": "account transitions differ: native 96 rows, ledger 97",
+        "dividend_account_transition_off_by_one_cent": "account transitions differ: native 97 rows, ledger 97",
+        "emission_amount_off_by_one_cent": "distribution emissions differ from ledger credits",
+        "emission_ex_date_shifted_one_day": "distribution emissions differ from ledger credits",
+        "emission_removed": "distribution emissions differ from ledger credits",
+        "fill_time_1900": "fill mismatch",
+        "fill_time_shifted_one_hour": "fill mismatch",
+        "module_error_injected": "distribution module errors: [[\"injected\"], [], []]",
+        "wrong_instrument_first_fill": "fill mismatch"
+      }
+    },
+    "dividend_arm_fee_perturbation_detected_fix3": {
+      "hrp_variance": "fill mismatch",
+      "meanrisk_min_variance": "fill mismatch"
+    }
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Remaining (why advanced, per the independent review): the gap text also names financing and liquidity; this run is a long-only CASH account with no financing model exercised, and fills are at the raw close with unlimited modelled depth (no partial fills, spread or impact).",
+    "Timestamp coverage (applied from the Codex round-4 finding on gap 11): the dividend arm's own check compares account balances and emission ex-dates, not account-row or emission timestamps. The gap 14 LEAN comparison (raw/14/lean-parity-compare-fix4b.json) compared every account row of raw/4/nautilus-dividends-run-fix3 as (New York time, balance) against native LEAN, and all 16:00 fill rows and 00:00 dividend instants matched; that is the timestamp evidence for this run.",
+    "Committed Nautilus fills/positions CSVs had engine event UUIDs replaced by 'uuid-redacted' for publication (raw/REDACTIONS.json lists pre/post hashes); summary report_sha256 values refer to the pre-redaction CSVs.",
+    "The late addendum (written 2026-09-23T06:48:07Z, after the dividend-free results and before the dividend-inclusive arm) set a 'settled' criterion for the dividend arm; that criterion is met, but the outcome is advanced because the gap text also names financing and liquidity.",
+    "The dividend arm's checks were first mutation-tested in fix round 3 (07:32Z); the round-1 to round-2 dividend runs used the same comparisons without self-tests. Emission amounts are now compared as Decimal values rather than strings.",
+    "Distribution events come from the vendored peer module's derive_events (LEAN factor files); the ledger shares that derivation, so per-share amounts are cross-checked only through the peer's own accepted external check, not independently here.",
+    "Fills are retrospective at the raw daily close with unlimited modelled depth; no partial fills, spread, impact, halts or broker session rules.",
+    "Native position-level realized_pnl sums differ from the exactly reconciled cash P&L by 0.01 USD in the dividend-free arm (1009391.94 vs 1009391.95; 1279895.58 vs 1279895.57); account cash, fills and fees reconcile exactly.",
+    "Retained public LEAN sample data; not a point-in-time or broker-qualified dataset."
+  ],
+  "checked_at": "2026-09-23T07:32:43Z",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/skfolio-fold-weights.json",
+      "sha256": "30e9b17a989c288357889b4c4d91254450c2b52c97dca509ec20139161f81765"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/hrp_variance/account.csv",
+      "sha256": "b401dad64c5977389042913b1afe3211d16b0710f7c1261affa77b3962a64c91"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/hrp_variance/decisions.json",
+      "sha256": "9de6f48443aa57ef7b5f26685d20615606dc056a89d7c165dd53049d0fd37ed4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/hrp_variance/fills.csv",
+      "sha256": "faba89592902fd38e326c70ae24833b58c88986e67452cf3eb8407ee803409eb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/hrp_variance/positions.csv",
+      "sha256": "b463849eadb16fc33c7563f16c298a419529f94a97304b6b859079d13427e905"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/meanrisk_min_variance/account.csv",
+      "sha256": "e43d1ff20b54c8c9d347012fabfce6d3df0d3c682ff97f9ad869d79b2dd832d4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/meanrisk_min_variance/decisions.json",
+      "sha256": "598e5c703c4eaec210da8fd95bbb2d8f141d5a82375afad72cfb234d2f73f52f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/meanrisk_min_variance/fills.csv",
+      "sha256": "72f101398d58d2d9f851b1eb746262a9be67d679281fdff525b837dd8398efc3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/meanrisk_min_variance/positions.csv",
+      "sha256": "e66d2d01e64314ca3ea1b2efe9faf8128f97554bd6b5a44c835dbfa3c3c95b12"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/summary.json",
+      "sha256": "db256b5efc0e53b31c20f7fab75782b5a3b21977689f10ef5b2441a9bc960640"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/development-run-1/hrp_variance-account.csv",
+      "sha256": "b401dad64c5977389042913b1afe3211d16b0710f7c1261affa77b3962a64c91"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/development-run-1/meanrisk_min_variance-account.csv",
+      "sha256": "e43d1ff20b54c8c9d347012fabfce6d3df0d3c682ff97f9ad869d79b2dd832d4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/development-run-1/summary.json",
+      "sha256": "9be4212dc8fa2ee027a2e636fe00483c5aa58bf1cc61ae66c6739b464902c7a2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/development-attempts/NOTE.txt",
+      "sha256": "0f55d8a771c8294114afddf65acf8909f5e09ba36a98061aaaa59ca1a3f76a57"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/hrp_variance/account.csv",
+      "sha256": "01b2607947228effdddedce1b660659794db4cfe3e9420bd2943c05090199d7b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/hrp_variance/decisions.json",
+      "sha256": "6296c8d6b71a70b55682d5b41278df65701a9995560a59216f5f4edcf7e17231"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/hrp_variance/fills.csv",
+      "sha256": "7ea3d7eb8511424d47092b1aa2ab966811c83d4973b0ae4e565256cb6152b24d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/hrp_variance/modules.json",
+      "sha256": "f3efa8ebbd90848770f47ef6490cef36fbed79a7ba49b00d1fd43f2eb700839d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/hrp_variance/positions.csv",
+      "sha256": "4c4c0ad473e07e756b019eaf262fc7d8356df4e443d0c016b6ef9817167916f5"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/meanrisk_min_variance/account.csv",
+      "sha256": "ff6b2a5544e28a17e753568f42d2e67120fc3523c6bbd3de8d1abd9302367c6f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/meanrisk_min_variance/decisions.json",
+      "sha256": "a764af65adc2f9e8ebe186b368065ac1e7668d5365851c0ee7717aaca43e0d72"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/meanrisk_min_variance/fills.csv",
+      "sha256": "0a20b921d74e0ba7e4848da8bca067ce7dbb6549ea70c93b5da1c08f4b55ee25"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/meanrisk_min_variance/modules.json",
+      "sha256": "e173bdedcd884aced7d6f01118004e0cbbde0eaef856d1043875abfc0d99d33d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/meanrisk_min_variance/positions.csv",
+      "sha256": "530b28ec0543c57d7bc1889bf5ade6c5d6ad564ad1df5cf5e5ae86e5dc658cca"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/summary.json",
+      "sha256": "ac517560d8c8da23f7e75a71181b3e2c091800ec73040a8e62074ead83582f1d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3.stderr.txt",
+      "sha256": "e2b8809886fa8993e96b629f3deaecbe2cb4232793a446abb3ef82c55c32125b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3.stdout.txt",
+      "sha256": "ed8c269af91fb2c2a36a8ef19b63aad74ea3164c2a794f242670d8626a13b3fc"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run.stderr.txt",
+      "sha256": "06ced765d9411a3a1d5ba1ec4f2c709694e97296c3cc8ff53a5d860a4b4b778c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run.stdout.txt",
+      "sha256": "ed8c269af91fb2c2a36a8ef19b63aad74ea3164c2a794f242670d8626a13b3fc"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "sha256": "143b21745ccc3c0db8a8272a775208d2c62f7c77311ec469afcec2cb0fc684d7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md",
+      "sha256": "8f2096917a932fe40ee73bd26b84a3c34b62c986f752a530adf22a685fa7a4b2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "sha256": "9aae92f05dda99374540121632494936a26067720e522d7c9dfb2106a4bfc888"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "sha256": "565734f27cf8e401468dbd9c04c4d807cb255894d9ccbc43bc098b2ea7f7e510"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "sha256": "82d9e7bbfe289a8774bc54d27692e0e71e65a9aec037fb5dbbc96614353293ba"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/weights_export.py",
+      "sha256": "e4381ed0782164ed895050154d512e558de515ee855479e7696bf187e2df4371"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_portfolio.py",
+      "sha256": "51e554e3bf908065015b4a161bb07eeafbd8b2e839b4be3c20a80f364b044da7"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_portfolio_dividends.py",
+      "sha256": "d5a1f14ce891925ba0cee61cee8b082c6635057a4bcbc1ba992e895b188423b0"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/vendored/distribution_module.py",
+      "sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/fix3_prereg.py",
+      "sha256": "9ac50eb3acff85b870349e7530f533b8aa2489cc0e5a212ddad761da58f55c2e"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "Codex CLI 0.155.1 (gpt-6-astra), codex exec --sandbox read-only --ephemeral, one bounded call",
+    "record": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md"
+    ],
+    "round_2": "round-2: wrong-time fills (time of day) not detected -> exact fill times enforced, one-hour shift mutation added, fix round 2 reran",
+    "findings_and_resolution": "major: settled overclaimed (financing and liquidity in gap text) -> outcome advanced; major: nautilus_portfolio.py zip without length check -> count check and mutation self-tests added, fix-round rerun reconciles",
+    "round_3": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "resolution": "major: dividend arm had no mutation or fee self-tests although fix round 2 claimed a time-shift mutation -> fix round 3 added 12 mutations and a fee perturbation to the dividend runner, reran, all detected, economics identical; the fix-round-2 note is corrected; minor: stale 'moved to settled' limit removed"
+    },
+    "round_4": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "resolution": "no round-4 finding for this gap"
+    },
+    "round_4_codex": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "reviewer": "Codex CLI (codex exec --sandbox read-only --ephemeral), one bounded call on commits 6ed9709..a4cbcf8",
+      "resolution": "not raised for gap 4, applied from the gap 11 finding: the dividend arm's own check compares account balances, not timestamps -> disclosed in limits; the gap 14 LEAN comparison checked every account timestamp of this run (16:00 fills, 00:00 dividend instants) against LEAN"
+    }
+  }
+}

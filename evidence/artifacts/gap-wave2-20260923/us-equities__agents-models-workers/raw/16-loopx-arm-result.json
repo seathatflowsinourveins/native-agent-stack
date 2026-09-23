@@ -1,0 +1,52 @@
+{
+ "argv": [
+  "$HOME/.cache/gap-wave2-20260923/agents-models-workers/loopx-venv/bin/loopx",
+  "--registry",
+  "$HOME/.cache/gap-wave2-20260923/agents-models-workers/runs/g16-loopx/project/.loopx/registry.json",
+  "--runtime-root",
+  "$HOME/.cache/gap-wave2-20260923/agents-models-workers/runs/g16-loopx/runtime",
+  "--format",
+  "json",
+  "turn",
+  "run-once",
+  "--goal-id",
+  "g2amw-fact-extraction",
+  "--agent-id",
+  "codex-turn-g2amw",
+  "--turn-instance-id",
+  "g2amw-turn-1",
+  "--host",
+  "codex-cli",
+  "--execution-mode",
+  "isolated-headless",
+  "--project",
+  "$HOME/.cache/gap-wave2-20260923/agents-models-workers/runs/g16-loopx/workspace",
+  "--codex-bin",
+  "$HOME/.cache/gap-wave2-20260923/agents-models-workers/runs/g16-loopx/codex-wrapper.sh",
+  "--codex-sandbox",
+  "read-only",
+  "--codex-model",
+  "gpt-6-astra",
+  "--validation-command-json",
+  "[\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/loopx-venv/bin/python\", \"$HOME/code/nas-wt-g2-agents-models-workers/blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/loopx_validator.py\", \"$HOME/code/nas-wt-g2-agents-models-workers/blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/gold.json\", \"$HOME/.cache/gap-wave2-20260923/agents-models-workers/runs/g16-loopx/validator-stdin.json\"]",
+  "--scan-root",
+  "$HOME/.cache/gap-wave2-20260923/agents-models-workers/runs/g16-loopx",
+  "--no-global-sync",
+  "--timeout-seconds",
+  "300",
+  "--execute"
+ ],
+ "exit": 1,
+ "elapsed_seconds": 40.599,
+ "stdout": "{\n  \"ok\": false,\n  \"schema_version\": \"loopx_turn_execution_v0\",\n  \"mode\": \"run_once\",\n  \"dry_run\": false,\n  \"replayed\": false,\n  \"resume_turn_key\": \"sha256:c87eaf05536fbf3b8ac28e1bc70b12b521bfefd2fb2f396aebfe9d71c6c23332\",\n  \"journal_ref\": \"turn:c87eaf05536fbf3b\",\n  \"status\": \"failed\",\n  \"execution_mode\": \"isolated-headless\",\n  \"host\": {\n    \"executable\": \"built-in\",\n    \"kind\": \"codex-cli\"\n  },\n  \"managed_executor\": {\n    \"schema_version\": \"managed_executor_binding_v0\",\n    \"executor\": \"codex-cli\",\n    \"executor_kind\": \"individual\",\n    \"credential_env\": null,\n    \"endpoint_env\": null,\n    \"execution_profile\": null,\n    \"operator_credential_bound\": false,\n    \"available\": null,\n    \"unavailable_reason\": null,\n    \"unavailable_remediation\": [],\n    \"runtime_probe\": null\n  },\n  \"result_kind\": \"validation_failed\",\n  \"validation\": {\n    \"ok\": false,\n    \"schema_version\": \"loopx_turn_task_validation_v0\",\n    \"status\": \"failed\",\n    \"validator_kind\": \"command\",\n    \"summary\": \"independent task validation command returned non-zero\",\n    \"recovery_kind\": \"repair_required\",\n    \"exit_code\": 9,\n    \"errors\": []\n  },\n  \"receipt\": {\n    \"ok\": true,\n    \"schema_version\": \"loopx_turn_receipt_validation_v0\",\n    \"turn_key\": \"sha256:c87eaf05536fbf3b8ac28e1bc70b12b521bfefd2fb2f396aebfe9d71c6c23332\",\n    \"lineage\": {\n      \"goal_id\": \"g2amw-fact-extraction\",\n      \"agent_id\": \"codex-turn-g2amw\",\n      \"todo_id\": \"todo_g2amwfacts01\"\n    },\n    \"settlement_effect_id\": \"g2amw-fact-extraction:codex-turn-g2amw:todo_g2amwfacts01:g2amw-turn-1\",\n    \"result_kind\": \"validation_failed\",\n    \"completed_phases\": [\n      \"host_execute\",\n      \"typed_result\"\n    ],\n    \"failed_phase\": \"validation\",\n    \"status\": \"failed\",\n    \"next_phase\": \"validation\",\n    \"commit_eligibility\": {\n      \"writeback\": false,\n      \"quota_spend\": false,\n      \"scheduler_ack\": false\n    },\n    \"errors\": []\n  },\n  \"scheduler\": null,\n  \"effects\": {\n    \"host_invoked\": true,\n    \"state_written\": false,\n    \"quota_spent\": false,\n    \"scheduler_acknowledged\": false\n  },\n  \"quota_slot_spend_count\": 0,\n  \"reason\": \"independent task validation command returned non-zero\"\n}\n",
+ "stderr_tail": "",
+ "codex_turn_completed_usage": [
+  {
+   "input_tokens": 41936,
+   "cached_input_tokens": 18688,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 1100,
+   "reasoning_output_tokens": 694
+  }
+ ]
+}

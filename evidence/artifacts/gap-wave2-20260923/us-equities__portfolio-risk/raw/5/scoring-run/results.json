@@ -1,0 +1,143 @@
+{
+  "auxiliary": {
+    "IWM": {
+      "covering_factor_rows": 12,
+      "covering_map_rows": 1,
+      "price_factor_values": 12,
+      "split_factors": [
+        "1"
+      ]
+    },
+    "QQQ": {
+      "covering_factor_rows": 11,
+      "covering_map_rows": 1,
+      "price_factor_values": 11,
+      "split_factors": [
+        "1"
+      ]
+    },
+    "SPY": {
+      "covering_factor_rows": 11,
+      "covering_map_rows": 1,
+      "price_factor_values": 11,
+      "split_factors": [
+        "1"
+      ]
+    }
+  },
+  "consequence": "No tuning, promotion, rerun or alpha claim regardless of p-values.",
+  "freeze_sha256": "18088137344dd98b3c3c9fda5353c2244d5138d924b80c92c1d2052fb380d9f4",
+  "inputs_unchanged": true,
+  "kind": "extended-reserved-raw-price-label-study",
+  "ledger_sha256": "128a150418d05965111cb5c2427704b11edb0e478eeb8dadb95fb90b936025e8",
+  "no_pnl_or_execution_claim": true,
+  "plan_sha256": "a2f698706bb8809f91facf48fc8028c3a374ff4fb9db9edb7b48c5a0d662e38d",
+  "primary_test": {
+    "alpha": 0.05,
+    "mean_difference": 5.221993379946801e-05,
+    "n_pairs": 49,
+    "pvalue": 0.9789563709880422,
+    "reject_null_at_alpha": false,
+    "selected": "momentum20",
+    "t": 0.02651516343730066,
+    "test": "two-sided one-sample t-test on paired net_proxy(selected) - net_proxy(equalweight)"
+  },
+  "reserved_candidates": {
+    "cash": {
+      "censored_episodes": 1,
+      "invested_episodes": 0,
+      "mean_net_cost_proxy_label": "0.000",
+      "mean_raw_price_label": "0",
+      "observed_episodes": 49
+    },
+    "equalweight": {
+      "censored_episodes": 1,
+      "invested_episodes": 49,
+      "mean_net_cost_proxy_label": "0.001817883142223400032523087186",
+      "mean_raw_price_label": "0.003817883142223400032523087182",
+      "observed_episodes": 49
+    },
+    "momentum120": {
+      "censored_episodes": 1,
+      "invested_episodes": 49,
+      "mean_net_cost_proxy_label": "0.002184748958235042508286118880",
+      "mean_raw_price_label": "0.004184748958235042508286118880",
+      "observed_episodes": 49
+    },
+    "momentum20": {
+      "censored_episodes": 1,
+      "invested_episodes": 38,
+      "mean_net_cost_proxy_label": "0.001870103076022868204036480335",
+      "mean_raw_price_label": "0.003421123484186133510158929314",
+      "observed_episodes": 49
+    },
+    "momentum60": {
+      "censored_episodes": 1,
+      "invested_episodes": 43,
+      "mean_net_cost_proxy_label": "-0.0005154478502568742322197106592",
+      "mean_raw_price_label": "0.001239654190559452298392534239",
+      "observed_episodes": 49
+    }
+  },
+  "secondary_per_candidate_vs_zero": {
+    "equalweight": {
+      "holm_pvalue": 1.0,
+      "mean_net_proxy": 0.0018178831422234001,
+      "n": 49,
+      "pvalue": 0.5073007066496829,
+      "t": 0.6680510969710225
+    },
+    "momentum120": {
+      "holm_pvalue": 1.0,
+      "mean_net_proxy": 0.0021847489582350428,
+      "n": 49,
+      "pvalue": 0.44845271533138004,
+      "t": 0.7642607807334552
+    },
+    "momentum20": {
+      "holm_pvalue": 1.0,
+      "mean_net_proxy": 0.0018701030760228683,
+      "n": 49,
+      "pvalue": 0.3693697274290137,
+      "t": 0.9061750778148573
+    },
+    "momentum60": {
+      "holm_pvalue": 1.0,
+      "mean_net_proxy": -0.0005154478502568742,
+      "n": 49,
+      "pvalue": 0.845966569242816,
+      "t": -0.19532042485244172
+    }
+  },
+  "secondary_wilcoxon": {
+    "pvalue": 0.6079896611658668,
+    "statistic": 560.0
+  },
+  "selection": {
+    "chosen": "momentum20",
+    "evaluation_cutoff": "2012-10-01",
+    "id": "reserved-extended",
+    "latest_training_exit": "2012-09-25",
+    "plan_sha256": "a2f698706bb8809f91facf48fc8028c3a374ff4fb9db9edb7b48c5a0d662e38d",
+    "scores": {
+      "cash": "0.000",
+      "momentum120": "-0.000437648807744881051197986178",
+      "momentum20": "0.000819723120623386559660643222",
+      "momentum60": "0.000291675214467413345693376942"
+    },
+    "test_first": "2012-10-01",
+    "test_last": "2013-09-30",
+    "test_sessions": 250,
+    "train_first": "2011-09-22",
+    "train_last": "2012-09-20",
+    "train_sessions": 252,
+    "training_episode_count": 50
+  },
+  "selection_sha256": "52ce16d901c0a801b4824a4d931a66d9fd6c5c6e676a1ee674a6fc4b7dd0342f",
+  "versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "skfolio": "1.2.9"
+  }
+}

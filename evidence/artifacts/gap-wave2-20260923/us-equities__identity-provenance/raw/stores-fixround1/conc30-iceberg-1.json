@@ -1,0 +1,51 @@
+{
+  "arm": "iceberg",
+  "concurrent_writers": {
+    "appends_each": 30,
+    "content": {
+      "batches": 60,
+      "content_ok": true,
+      "decoded_rows": 300,
+      "problems": []
+    },
+    "detector_controls": {
+      "corrupted_row_flagged": true,
+      "dropped_row_flagged": true,
+      "foreign_row_flagged": true
+    },
+    "no_silent_loss": true,
+    "reported_successful_appends": 60,
+    "rows_expected_from_reported_successes": 300,
+    "rows_found": 300,
+    "rows_lost_after_reported_success": 0,
+    "state": {
+      "content": {
+        "batches": 60,
+        "content_ok": true,
+        "decoded_rows": 300,
+        "problems": []
+      },
+      "detector_controls": {
+        "corrupted_row_flagged": true,
+        "dropped_row_flagged": true,
+        "foreign_row_flagged": true
+      },
+      "readable": true,
+      "rows": 300,
+      "snapshots": 60
+    },
+    "stderr_tail": {
+      "a": "Commit failed due to a concurrent update, retrying (1/4) in 110 ms\nCommit failed due to a concurrent update, retrying (2/4) in 216 ms\nCommit failed due to a concurrent update, retrying (1/4) in 104 ms\nCommit failed due to a concurrent update, retrying (1/4) in 102 ms\n",
+      "b": "pdate, retrying (1/4) in 100 ms\nCommit failed due to a concurrent update, retrying (1/4) in 109 ms\nCommit failed due to a concurrent update, retrying (2/4) in 205 ms\nCommit failed due to a concurrent update, retrying (3/4) in 430 ms\nCommit failed due to a concurrent update, retrying (1/4) in 101 ms\n"
+    },
+    "writer_error_counts": {
+      "a": 0,
+      "b": 0
+    },
+    "writer_error_examples": {
+      "a": [],
+      "b": []
+    },
+    "writers": 2
+  }
+}

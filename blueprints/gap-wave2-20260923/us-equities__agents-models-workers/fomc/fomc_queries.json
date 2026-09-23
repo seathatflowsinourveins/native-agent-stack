@@ -1,0 +1,244 @@
+{
+ "queries": [
+  {
+   "id": "monetary20230201a",
+   "gold_date": "2023-02-01",
+   "gold_doc": "monetary20230201a",
+   "gold_target_range": "4-1/2 to 4-3/4",
+   "query": "What target range for the federal funds rate did the FOMC set at its February 2023 meeting?",
+   "filter_month": "2023-02"
+  },
+  {
+   "id": "monetary20230322a",
+   "gold_date": "2023-03-22",
+   "gold_doc": "monetary20230322a",
+   "gold_target_range": "4-3/4 to 5",
+   "query": "What target range for the federal funds rate did the FOMC set at its March 2023 meeting?",
+   "filter_month": "2023-03"
+  },
+  {
+   "id": "monetary20230503a",
+   "gold_date": "2023-05-03",
+   "gold_doc": "monetary20230503a",
+   "gold_target_range": "5 to 5-1/4",
+   "query": "What target range for the federal funds rate did the FOMC set at its May 2023 meeting?",
+   "filter_month": "2023-05"
+  },
+  {
+   "id": "monetary20230614a",
+   "gold_date": "2023-06-14",
+   "gold_doc": "monetary20230614a",
+   "gold_target_range": "5 to 5-1/4",
+   "query": "What target range for the federal funds rate did the FOMC set at its June 2023 meeting?",
+   "filter_month": "2023-06"
+  },
+  {
+   "id": "monetary20230726a",
+   "gold_date": "2023-07-26",
+   "gold_doc": "monetary20230726a",
+   "gold_target_range": "5-1/4 to 5-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its July 2023 meeting?",
+   "filter_month": "2023-07"
+  },
+  {
+   "id": "monetary20230920a",
+   "gold_date": "2023-09-20",
+   "gold_doc": "monetary20230920a",
+   "gold_target_range": "5-1/4 to 5-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its September 2023 meeting?",
+   "filter_month": "2023-09"
+  },
+  {
+   "id": "monetary20231101a",
+   "gold_date": "2023-11-01",
+   "gold_doc": "monetary20231101a",
+   "gold_target_range": "5-1/4 to 5-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its November 2023 meeting?",
+   "filter_month": "2023-11"
+  },
+  {
+   "id": "monetary20231213a",
+   "gold_date": "2023-12-13",
+   "gold_doc": "monetary20231213a",
+   "gold_target_range": "5-1/4 to 5-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its December 2023 meeting?",
+   "filter_month": "2023-12"
+  },
+  {
+   "id": "monetary20240131a",
+   "gold_date": "2024-01-31",
+   "gold_doc": "monetary20240131a",
+   "gold_target_range": "5-1/4 to 5-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its January 2024 meeting?",
+   "filter_month": "2024-01"
+  },
+  {
+   "id": "monetary20240320a",
+   "gold_date": "2024-03-20",
+   "gold_doc": "monetary20240320a",
+   "gold_target_range": "5-1/4 to 5-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its March 2024 meeting?",
+   "filter_month": "2024-03"
+  },
+  {
+   "id": "monetary20240501a",
+   "gold_date": "2024-05-01",
+   "gold_doc": "monetary20240501a",
+   "gold_target_range": "5-1/4 to 5-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its May 2024 meeting?",
+   "filter_month": "2024-05"
+  },
+  {
+   "id": "monetary20240612a",
+   "gold_date": "2024-06-12",
+   "gold_doc": "monetary20240612a",
+   "gold_target_range": "5-1/4 to 5-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its June 2024 meeting?",
+   "filter_month": "2024-06"
+  },
+  {
+   "id": "monetary20240731a",
+   "gold_date": "2024-07-31",
+   "gold_doc": "monetary20240731a",
+   "gold_target_range": "5-1/4 to 5-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its July 2024 meeting?",
+   "filter_month": "2024-07"
+  },
+  {
+   "id": "monetary20240918a",
+   "gold_date": "2024-09-18",
+   "gold_doc": "monetary20240918a",
+   "gold_target_range": "4-3/4 to 5",
+   "query": "What target range for the federal funds rate did the FOMC set at its September 2024 meeting?",
+   "filter_month": "2024-09"
+  },
+  {
+   "id": "monetary20241107a",
+   "gold_date": "2024-11-07",
+   "gold_doc": "monetary20241107a",
+   "gold_target_range": "4-1/2 to 4-3/4",
+   "query": "What target range for the federal funds rate did the FOMC set at its November 2024 meeting?",
+   "filter_month": "2024-11"
+  },
+  {
+   "id": "monetary20241218a",
+   "gold_date": "2024-12-18",
+   "gold_doc": "monetary20241218a",
+   "gold_target_range": "4-1/4 to 4-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its December 2024 meeting?",
+   "filter_month": "2024-12"
+  },
+  {
+   "id": "monetary20250129a",
+   "gold_date": "2025-01-29",
+   "gold_doc": "monetary20250129a",
+   "gold_target_range": "4-1/4 to 4-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its January 2025 meeting?",
+   "filter_month": "2025-01"
+  },
+  {
+   "id": "monetary20250319a",
+   "gold_date": "2025-03-19",
+   "gold_doc": "monetary20250319a",
+   "gold_target_range": "4-1/4 to 4-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its March 2025 meeting?",
+   "filter_month": "2025-03"
+  },
+  {
+   "id": "monetary20250507a",
+   "gold_date": "2025-05-07",
+   "gold_doc": "monetary20250507a",
+   "gold_target_range": "4-1/4 to 4-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its May 2025 meeting?",
+   "filter_month": "2025-05"
+  },
+  {
+   "id": "monetary20250618a",
+   "gold_date": "2025-06-18",
+   "gold_doc": "monetary20250618a",
+   "gold_target_range": "4-1/4 to 4-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its June 2025 meeting?",
+   "filter_month": "2025-06"
+  },
+  {
+   "id": "monetary20250730a",
+   "gold_date": "2025-07-30",
+   "gold_doc": "monetary20250730a",
+   "gold_target_range": "4-1/4 to 4-1/2",
+   "query": "What target range for the federal funds rate did the FOMC set at its July 2025 meeting?",
+   "filter_month": "2025-07"
+  },
+  {
+   "id": "monetary20250917a",
+   "gold_date": "2025-09-17",
+   "gold_doc": "monetary20250917a",
+   "gold_target_range": "4 to 4-1/4",
+   "query": "What target range for the federal funds rate did the FOMC set at its September 2025 meeting?",
+   "filter_month": "2025-09"
+  },
+  {
+   "id": "monetary20251029a",
+   "gold_date": "2025-10-29",
+   "gold_doc": "monetary20251029a",
+   "gold_target_range": "3-3/4 to 4",
+   "query": "What target range for the federal funds rate did the FOMC set at its October 2025 meeting?",
+   "filter_month": "2025-10"
+  },
+  {
+   "id": "monetary20251210a",
+   "gold_date": "2025-12-10",
+   "gold_doc": "monetary20251210a",
+   "gold_target_range": "3-1/2 to 3-3/4",
+   "query": "What target range for the federal funds rate did the FOMC set at its December 2025 meeting?",
+   "filter_month": "2025-12"
+  },
+  {
+   "id": "monetary20260128a",
+   "gold_date": "2026-01-28",
+   "gold_doc": "monetary20260128a",
+   "gold_target_range": "3-1/2 to 3-3/4",
+   "query": "What target range for the federal funds rate did the FOMC set at its January 2026 meeting?",
+   "filter_month": "2026-01"
+  },
+  {
+   "id": "monetary20260318a",
+   "gold_date": "2026-03-18",
+   "gold_doc": "monetary20260318a",
+   "gold_target_range": "3-1/2 to 3-3/4",
+   "query": "What target range for the federal funds rate did the FOMC set at its March 2026 meeting?",
+   "filter_month": "2026-03"
+  },
+  {
+   "id": "monetary20260429a",
+   "gold_date": "2026-04-29",
+   "gold_doc": "monetary20260429a",
+   "gold_target_range": "3-1/2 to 3-3/4",
+   "query": "What target range for the federal funds rate did the FOMC set at its April 2026 meeting?",
+   "filter_month": "2026-04"
+  },
+  {
+   "id": "monetary20260617a",
+   "gold_date": "2026-06-17",
+   "gold_doc": "monetary20260617a",
+   "gold_target_range": "3-1/2 to 3-3/4",
+   "query": "What target range for the federal funds rate did the FOMC set at its June 2026 meeting?",
+   "filter_month": "2026-06"
+  },
+  {
+   "id": "monetary20260729a",
+   "gold_date": "2026-07-29",
+   "gold_doc": "monetary20260729a",
+   "gold_target_range": "3-1/2 to 3-3/4",
+   "query": "What target range for the federal funds rate did the FOMC set at its July 2026 meeting?",
+   "filter_month": "2026-07"
+  },
+  {
+   "id": "monetary20260916a",
+   "gold_date": "2026-09-16",
+   "gold_doc": "monetary20260916a",
+   "gold_target_range": "3-3/4 to 4",
+   "query": "What target range for the federal funds rate did the FOMC set at its September 2026 meeting?",
+   "filter_month": "2026-09"
+  }
+ ]
+}

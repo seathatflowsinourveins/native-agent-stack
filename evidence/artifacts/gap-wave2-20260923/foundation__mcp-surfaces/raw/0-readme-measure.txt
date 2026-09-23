@@ -1,0 +1,9 @@
+measured_at=2026-09-23T04:52:39Z
+file=$HOME/code/agent-lab/README.md
+bytes=2205
+cr_count=15
+sha256=1c8a1d4adf88686820528f5f0beb91686ffe7545db97fe94e5479799a806bd84
+sha256_after_crlf_to_lf=802377ec2ef58029235f917fbe321877a5137d629a6f1c64fe1723e9c0fc95c9
+bytes_after_crlf_to_lf=2190
+git_status_of_file=(empty=unmodified)
+git_log_last_change=e02e6d03a84ff9d764d540b9b7f6a8ae7f4a7a46 2026-09-18T18:28:36-04:00

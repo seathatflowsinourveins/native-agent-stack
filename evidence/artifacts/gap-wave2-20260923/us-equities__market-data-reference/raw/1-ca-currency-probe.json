@@ -1,0 +1,98 @@
+{
+ "alpaca_py": {
+  "CashDividend_fields": [
+   "id",
+   "corporate_action_type",
+   "symbol",
+   "cusip",
+   "rate",
+   "special",
+   "foreign",
+   "process_date",
+   "ex_date",
+   "record_date",
+   "payable_date",
+   "due_bill_on_date",
+   "due_bill_off_date"
+  ],
+  "currency_field": false,
+  "version": "0.44.0"
+ },
+ "currency_schema": {
+  "description": "The ISO 4217 currency code associated with the corporate action.\nEmpty value can mean USD, non-applicable (e.g. for name changes) or unknown\n(can change later to a valid currency).\n",
+  "type": "string"
+ },
+ "docs_html_sha256": "ee3a3fbb730e2a4bec7dc32439f67929b26046bbdbf7ae3ef30c567f36636de8",
+ "positive_control_sse_example_has_currency_key": true,
+ "rest_cash_dividend": {
+  "currency_is_property": true,
+  "currency_is_required": false,
+  "properties": [
+   "currency",
+   "cusip",
+   "due_bill_off_date",
+   "due_bill_on_date",
+   "ex_date",
+   "foreign",
+   "id",
+   "isin",
+   "payable_date",
+   "process_date",
+   "rate",
+   "record_date",
+   "special",
+   "sub_type",
+   "symbol"
+  ],
+  "required": [
+   "id",
+   "symbol",
+   "cusip",
+   "rate",
+   "special",
+   "foreign",
+   "process_date",
+   "ex_date"
+  ]
+ },
+ "retained_capture": {
+  "actions-001.json": {
+   "body_sha256": "39a4bc4aa26ce5bd6258c873ac0215fed1be63de0170912fcb083e119a6bd1e9",
+   "currency_key_present": false,
+   "key_paths": [
+    "/corporate_actions",
+    "/corporate_actions/cash_dividends",
+    "/corporate_actions/cash_dividends/[]/cusip",
+    "/corporate_actions/cash_dividends/[]/ex_date",
+    "/corporate_actions/cash_dividends/[]/foreign",
+    "/corporate_actions/cash_dividends/[]/id",
+    "/corporate_actions/cash_dividends/[]/payable_date",
+    "/corporate_actions/cash_dividends/[]/process_date",
+    "/corporate_actions/cash_dividends/[]/rate",
+    "/corporate_actions/cash_dividends/[]/record_date",
+    "/corporate_actions/cash_dividends/[]/special",
+    "/corporate_actions/cash_dividends/[]/symbol",
+    "/next_page_token"
+   ]
+  },
+  "actions-002.json": {
+   "body_sha256": "87bbcb58969ee80c3dbb0d29b6cc3216fdaade9d29e4ccf2a4bc7250f5aac9be",
+   "currency_key_present": false,
+   "key_paths": [
+    "/corporate_actions",
+    "/corporate_actions/forward_splits",
+    "/corporate_actions/forward_splits/[]/cusip",
+    "/corporate_actions/forward_splits/[]/due_bill_redemption_date",
+    "/corporate_actions/forward_splits/[]/ex_date",
+    "/corporate_actions/forward_splits/[]/id",
+    "/corporate_actions/forward_splits/[]/new_rate",
+    "/corporate_actions/forward_splits/[]/old_rate",
+    "/corporate_actions/forward_splits/[]/payable_date",
+    "/corporate_actions/forward_splits/[]/process_date",
+    "/corporate_actions/forward_splits/[]/record_date",
+    "/corporate_actions/forward_splits/[]/symbol",
+    "/next_page_token"
+   ]
+  }
+ }
+}

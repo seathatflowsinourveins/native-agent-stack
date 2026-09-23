@@ -1,0 +1,6 @@
+time=2026-09-22T23:27:53.957-04:00 level=INFO msg="Creating example DAGs for first-time users" dir=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f2-dagu-sched-1790134073/dagu/sigkill/dagu-home/dags
+time=2026-09-22T23:27:53.971-04:00 level=INFO msg="Example DAGs created successfully. Check the web UI to explore them!"
+time=2026-09-22T23:27:53.978-04:00 level=INFO msg="Executing root dag-run" dag=recovery run-id=recovery-009523a6a8fb9c1d params=""
+time=2026-09-22T23:27:53.996-04:00 level=INFO msg="DAG run started" dag=recovery run-id=recovery-009523a6a8fb9c1d worker-id=local attempt-id=4c8f80 params=[]
+time=2026-09-22T23:27:53.997-04:00 level=INFO msg="Step started" dag=recovery run-id=recovery-009523a6a8fb9c1d worker-id=local attempt-id=4c8f80 step=checkpoint
+time=2026-09-22T23:27:54.056-04:00 level=INFO msg="Step started" dag=recovery run-id=recovery-009523a6a8fb9c1d worker-id=local attempt-id=4c8f80 step=finalize

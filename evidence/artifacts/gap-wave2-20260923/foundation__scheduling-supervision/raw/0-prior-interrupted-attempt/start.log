@@ -1,0 +1,26 @@
+time=2026-09-22T22:07:10.349-04:00 level=INFO msg="Executing root dag-run" dag=real_workflow run-id=realwf-1790129230 params=""
+time=2026-09-22T22:07:10.386-04:00 level=INFO msg="DAG run started" dag=real_workflow run-id=realwf-1790129230 worker-id=local attempt-id=91c05d params=[]
+time=2026-09-22T22:07:10.390-04:00 level=INFO msg="Step started" dag=real_workflow run-id=realwf-1790129230 worker-id=local attempt-id=91c05d step=validate
+time=2026-09-22T22:07:15.278-04:00 level=INFO msg="Step started" dag=real_workflow run-id=realwf-1790129230 worker-id=local attempt-id=91c05d step=ecosystem_check
+time=2026-09-22T22:07:24.194-04:00 level=INFO msg="Stop request received" dag=real_workflow run-id=realwf-1790129230 worker-id=local attempt-id=91c05d
+time=2026-09-22T22:07:24.195-04:00 level=INFO msg="Stopping running child processes" dag=real_workflow run-id=realwf-1790129230 worker-id=local attempt-id=91c05d stop-mode=graceful signal=terminated allow-override=true max-cleanup-time=5s
+time=2026-09-22T22:07:24.197-04:00 level=INFO msg="Requesting step stop" dag=real_workflow run-id=realwf-1790129230 worker-id=local attempt-id=91c05d stop-mode=graceful signal=terminated step=ecosystem_check
+time=2026-09-22T22:07:24.199-04:00 level=INFO msg="All child processes have been terminated" dag=real_workflow run-id=realwf-1790129230 worker-id=local attempt-id=91c05d
+time=2026-09-22T22:07:24.210-04:00 level=INFO msg="DAG run finished" dag=real_workflow run-id=realwf-1790129230 worker-id=local attempt-id=91c05d status=aborted started-at=2026-09-22T22:07:10-04:00 finished-at=2026-09-22T22:07:24-04:00
+Aborted - 2026-09-22T22:07:10-04:00
+
+dag: real_workflow (14.0s)
+├─log: $HOME/.cache/gap-wave2-20260923/scheduling-supervision/dagu-home/logs/real_workflow/dag-run_20260923_020710Z_realwf-1790129230/dag-run_20260922.220710.353.realwf-1.log
+│
+├─validate (5.0s) [succeeded]
+│ ├─python3 scripts/validate.py
+│ │
+│ └─stdout: $HOME/.cache/gap-wave2-20260923/scheduling-supervision/dagu-home/logs/real_workflow/dag-run_20260923_020710Z_realwf-1790129230/run_20260923_020710Z_91c05d/validate.20260922.220710.391.realwf-1.out
+│     {"components": 69, "hashed_files": 2012, "profiles": 4, "receipts": 140,
+│     "status": "passed"}
+│     Integrity and scope checks only; no live provider or GPU execution.
+│ 
+└─ecosystem_check [aborted]
+
+Result: Aborted
+

@@ -1,0 +1,26 @@
+{
+  "id": "2-workflow-crash-deferred",
+  "gap_index": 2,
+  "gap_text_sha256": "0f41f1d03eb01cd0121d895d47375fd96e944a40c82231f3c4e04bd5d68c3b7e",
+  "preregistration": {
+    "written_at": "2026-09-23T01:03:10Z",
+    "expectation": "SIGKILLing a native-Workflow-running Claude Code client mid-stage and relaunching would show what native Workflow state resumes vs. duplicates. That client does not have to be this worker's own process (a separate headless client process could be started and killed instead), so self-termination is not the structural blocker; the real blocker is that starting and SIGKILLing a native Workflow run is itself a Claude multi-agent fan-out, which this run's account-reservation rule defers.",
+    "criteria": "Settled only if a real client process is killed and relaunched with observable before/after state. Deferred with the account-reservation reason if no such run can be dispatched under the current Claude-account reservation.",
+    "timing": "post_hoc fix-round text written at 2026-09-23T01:03:10Z (first-round version written 00:47:23Z). No check ran. The receipt previously showed 01:20:00Z, which is later than the fix-round commit (01:08:43Z) and was not a real time."
+  },
+  "commands": [
+    {
+      "cmd": "(not run — see limits)",
+      "exit": null,
+      "duration_s": 0,
+      "output_excerpt": "n/a",
+      "output_sha256": null
+    }
+  ],
+  "results": "Not run. Deferred, but the superseded receipt's stated reason was wrong and is corrected here: the gap's next_check ('Start a bounded native Workflow, SIGKILL the client process mid-stage, relaunch, and record what resumes and what is duplicated') does not require SIGKILLing this worker's own process. A separate headless Claude Code client process could be started (e.g. `claude -p ... &` running a throwaway Workflow) and that separate process's PID killed instead, without terminating this worker or its ability to record the outcome — so 'self-termination' was never the real structural blocker. The actual blocker is this run's account-reservation rule: starting a native Workflow at all is a Claude multi-agent fan-out (a Workflow run spawns and coordinates multiple Claude-family child agents across phases), and the shared Claude account is reserved for a peer session's long-horizon comparison from 2026-09-23 00:33 UTC. This run is capped at one bounded single call (Codex preferred where the gap allows either family), which a multi-stage Workflow launch does not fit inside, and this gap specifically asks about the native Claude Workflow's own crash/resume behavior, so a Codex substitution would not test the same claim.",
+  "outcome": "deferred",
+  "evidence_class": "source_review",
+  "limits": "Deferred. Owner: whichever session is not subject to the current Claude-account reservation (or this session after the reservation lifts) should start a bounded native Workflow from a separate headless client process, SIGKILL that process mid-stage, relaunch/resume, and record what resumes vs. duplicates, including external side-effect counts. Blocker: Claude multi-agent fan-out under an active account reservation, not self-termination.",
+  "checked_at": "2026-09-23T01:03:10Z",
+  "reconciliation": "reconciliation 2026-09-23T02:21:44Z (no new checks; claims aligned to the transcripts and files on disk, see README 'Reconciliation'): fictitious 01:20:00Z timestamps replaced by the real write time; blocker unchanged (account reservation), reviewer confirmed it."
+}

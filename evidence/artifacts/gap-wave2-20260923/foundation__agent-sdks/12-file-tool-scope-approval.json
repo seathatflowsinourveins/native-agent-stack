@@ -1,0 +1,259 @@
+{
+  "id": "gap-wave2-20260923/foundation/agent-sdks/12-file-tool-scope-approval",
+  "gap_index": 12,
+  "gap_text_sha256": "a677bec97564f309459c91fac1bc15fcd79660b5b85897673a2f7e188d36fcfb",
+  "preregistration": {
+    "written_at": "2026-09-23T03:24:52Z",
+    "expectation": "Rerunning the failing file-tool turn with the file inside the workspace root and non-interactive approval completes without the MCP override.",
+    "criteria": [
+      "ctx_execute_file (or equivalent file tool) call completes; extraction values present; no --context-mode-start override used",
+      "settled if the turn completes without override"
+    ],
+    "fix_round": {
+      "written_at": "2026-09-23T04:22:00Z",
+      "label": "fix-round preregistration, written after the Codex cross-family review (review findings 3-6); not back-dated",
+      "note": "outcome re-evaluated to advanced: the preregistered criterion 'completes without override' failed (review finding 2)"
+    }
+  },
+  "commands": [
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 360s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/c4-ws --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t2.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t2.json --turn-deadline-seconds 300 --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --sandbox workspace-write --approval-mode auto_review",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 360s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/c4-ws --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t3.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t3.json --turn-deadline-seconds 300 --context-mode-start $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/start.mjs --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --sandbox workspace-write --approval-mode auto_review"
+  ],
+  "results": {
+    "without_override": {
+      "file": "c4-t2.json",
+      "status": "completed",
+      "sdk_version": "0.155.1",
+      "thread_mode": "ephemeral",
+      "sandbox": "workspace-write",
+      "approval_mode": "auto_review",
+      "final_response_excerpt": "{\n  \"tool\": \"mcp__context_mode__ctx_execute_file\",\n  \"exit_code\": 1,\n  \"error\": \"ENOENT: no such file or directory, open '$HOME/code/nas-wt-codex-review96/engine-receipt.json'\",\n  \"stopped\": true,\n  \"deerflow_attempted\": false\n}",
+      "tool_items": [
+        {
+          "server": "context-mode",
+          "tool": "ctx_execute_file",
+          "status": "failed"
+        }
+      ],
+      "command_items": {
+        "count": 1,
+        "commands": [
+          {
+            "command": "/bin/bash -lc \"sed -n '1,220p' $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md\"",
+            "exitCode": 0,
+            "status": "completed"
+          }
+        ]
+      },
+      "usage_total": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 39296,
+        "inputTokens": 62297,
+        "outputTokens": 477,
+        "reasoningOutputTokens": 106,
+        "totalTokens": 62774
+      },
+      "extraction_success": false
+    },
+    "with_scoped_override_and_non_interactive_approval": {
+      "file": "c4-t3.json",
+      "status": "completed",
+      "sdk_version": "0.155.1",
+      "thread_mode": "ephemeral",
+      "sandbox": "workspace-write",
+      "approval_mode": "auto_review",
+      "final_response_excerpt": "{\n  \"engine_data_points\": 3943,\n  \"engine_simulated_orders\": 3,\n  \"engine_failed_data_requests\": 0,\n  \"deerflow_upstream_skill_count\": 23,\n  \"acp_configured_model\": \"gpt-6-astra\",\n  \"acp_prompt_calls\": 0,\n  \"tool_used\": \"mcp__context_mode__ctx_execute_file\"\n}",
+      "tool_items": [
+        {
+          "server": "context-mode",
+          "tool": "ctx_execute_file",
+          "status": "completed"
+        },
+        {
+          "server": "context-mode",
+          "tool": "ctx_execute_file",
+          "status": "completed"
+        }
+      ],
+      "command_items": {
+        "count": 1,
+        "commands": [
+          {
+            "command": "/bin/bash -lc \"sed -n '1,220p' $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md\"",
+            "exitCode": 0,
+            "status": "completed"
+          }
+        ]
+      },
+      "usage_total": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 73728,
+        "inputTokens": 85888,
+        "outputTokens": 756,
+        "reasoningOutputTokens": 197,
+        "totalTokens": 86644
+      },
+      "extraction_success": true
+    },
+    "answer": "No: without the override the turn does not complete its extraction (project root bound to another active worktree). With the scoped override, workspace-write and auto_review it completes non-interactively; the 2026-09-19 approval block did not recur."
+  },
+  "raw_outputs": [
+    {
+      "path": "raw/c4-t2.json",
+      "sha256": "a721e434ebac0ced93b4920d3f13e1e33196f83146aa3444757c58f43c640eb0"
+    },
+    {
+      "path": "raw/c4-t3.json",
+      "sha256": "49dc7513e5025475e2fc790a6de22bcecd534fce0e0ab55e05848ef4cc9857a5"
+    },
+    {
+      "path": "raw/c4-t2.prompt",
+      "sha256": "40dcd7a39c3312a580a9249c59ff520c99c6146dea73aad423b265649a51513e"
+    },
+    {
+      "path": "raw/c4-t3.prompt",
+      "sha256": "40dcd7a39c3312a580a9249c59ff520c99c6146dea73aad423b265649a51513e"
+    },
+    {
+      "path": "raw/ctxmode-c4-window.json",
+      "sha256": "537bfa56a4951289da286c936b5b26f38b7a3205dc61ebeb9ef1b8b629fedfba"
+    }
+  ],
+  "outcome": "settled",
+  "evidence_class": "native_proven",
+  "limits": [
+    "The no-override path is shown in an isolated CODEX_HOME, where the worker's persistent rollout is the only recent transcript. In the shared native home the fallback binds to whichever session wrote the most recent rollout (round 1: another worktree), so a shared-home no-override run can still fail; use the scoped --context-mode-start override there (round 1: completes with auto_review).",
+    "Whether auto_review reviewed any request is not visible in the worker receipt; the approval clause is closed in the sense that no approval block recurred.",
+    "The ctxmode staging home also downloaded the provider's remote curated plugins (about 41 MB); the turn called only context-mode tools."
+  ],
+  "checked_at": "2026-09-23T13:01:07Z",
+  "round_3": {
+    "preregistration": {
+      "file": "preregistration-round3.json",
+      "written_at": "2026-09-23T12:56:16Z",
+      "expectation": "The round-1 no-override failure came from the Context Mode most-recent-transcript fallback binding to another session's worktree. In an isolated CODEX_HOME containing the Context Mode plugin (code copied from the installed plugin cache, enabled; hooks off) and a persistent worker thread whose rollout is the only transcript, rerunning the failing c4-t2 prompt with workspace-write and auto_review and without --context-mode-start: ctx_execute_file completes on both workspace files and all six values are extracted.",
+      "criteria": [
+        "no --context-mode-start and no CONTEXT_MODE_PROJECT_DIR reaching the MCP server via config",
+        "mcpToolCall items for context-mode ctx_execute_file complete; extraction values 3943, 3, 0, 23, gpt-6-astra, 0 present",
+        "settled if the turn completes with extraction success without the override; the shared native home's failing path (round 1) stays recorded as a limit"
+      ],
+      "review2_fix": {
+        "written_at": "2026-09-23T13:30:48Z",
+        "label": "written after the second independent Opus review of round 3 (5 minor findings) and before any fix or probe; not back-dated",
+        "plan": "4 (supported): gap-12 values were checked as substrings. Plan: parse the final response as JSON and compare the six fields by name and value; the outcome is re-derived."
+      }
+    },
+    "commands": [
+      "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/round3.py stage",
+      "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/round3.py config",
+      "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/round3.py worker-ctxmode",
+      "pasta --config-net -T none -U none -t none -u none --no-map-gw --quiet -- unshare --mount --pid --fork --mount-proc bash blueprints/gap-wave2-20260923/foundation__agent-sdks/iso_ns.sh STAGE PROFILE -- CMD (issued by round3.py for every in-namespace command)"
+    ],
+    "raw_outputs": [
+      {
+        "path": "raw/round3/step-worker-ctxmode.json",
+        "sha256": "4bbc038a9429e0e9d03b9298384ccb9e1a70922dd7d404adf167d79384ba7c9c"
+      },
+      {
+        "path": "raw/round3/ctxmode-c4-t2-iso.json",
+        "sha256": "4a23e3422810b93456f0e3765f2387ea975549e87b63e44fec8b7118e9006aa2"
+      },
+      {
+        "path": "raw/round3/ctxmode-c4-t2.prompt",
+        "sha256": "40dcd7a39c3312a580a9249c59ff520c99c6146dea73aad423b265649a51513e"
+      },
+      {
+        "path": "raw/round3/ctxmode-config-iso.json",
+        "sha256": "809f2bf306074a714e553cad525f7196f09dba728aa4560b4ceafbf1ca1eaa6b"
+      },
+      {
+        "path": "raw/round3/step-config.json",
+        "sha256": "be4d3b396dd775e9b8fa3528c714afefda1db815fa82be6208e507d38076e0c5"
+      }
+    ],
+    "results": {
+      "configuration": "isolated CODEX_HOME with the Context Mode plugin copied from the installed plugin cache and enabled; hooks off; persistent worker thread; workspace-write; auto_review; no --context-mode-start and no mcp_servers override",
+      "config_overrides": [],
+      "thread_mode": "persistent",
+      "status": "completed",
+      "sandbox": "workspace-write",
+      "approval_mode": "auto_review",
+      "item_types": [
+        "agentMessage",
+        "commandExecution",
+        "mcpToolCall",
+        "userMessage"
+      ],
+      "mcp_tool_items": [
+        {
+          "server": "context-mode",
+          "tool": "ctx_execute_file",
+          "status": "completed"
+        },
+        {
+          "server": "context-mode",
+          "tool": "ctx_execute_file",
+          "status": "completed"
+        }
+      ],
+      "command_items": [
+        {
+          "command": "/bin/bash -lc 'cat $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md'",
+          "exitCode": 0,
+          "status": "completed"
+        }
+      ],
+      "final_response_excerpt": "{\n  \"engine_data_points\": 3943,\n  \"engine_simulated_orders\": 3,\n  \"engine_failed_data_requests\": 0,\n  \"deerflow_upstream_skill_count\": 23,\n  \"acp_configured_model\": \"gpt-6-astra\",\n  \"acp_prompt_calls\": 0,\n  \"tool_used\": \"mcp__context_mode__ctx_execute_file\"\n}",
+      "extraction_success": true,
+      "extraction_field_check": {
+        "engine_data_points": {
+          "expected": 3943,
+          "got": 3943,
+          "match": true
+        },
+        "engine_simulated_orders": {
+          "expected": 3,
+          "got": 3,
+          "match": true
+        },
+        "engine_failed_data_requests": {
+          "expected": 0,
+          "got": 0,
+          "match": true
+        },
+        "deerflow_upstream_skill_count": {
+          "expected": 23,
+          "got": 23,
+          "match": true
+        },
+        "acp_configured_model": {
+          "expected": "gpt-6-astra",
+          "got": "gpt-6-astra",
+          "match": true
+        },
+        "acp_prompt_calls": {
+          "expected": 0,
+          "got": 0,
+          "match": true
+        }
+      },
+      "extraction_detection": "The final response is parsed as JSON and each of the six fields is compared by name and value (review-2 fix; the earlier substring test could not catch a wrong 3/0/0).",
+      "isolated_context_mode_files": [
+        "sessions/stats-pid-691.json",
+        "sessions/stats-pid-82.json"
+      ],
+      "isolated_rollouts": 1,
+      "reading": "The plugin's Context Mode root falls back to the most recent rollout in CODEX_HOME/sessions. In the isolated home that rollout is the worker's own persistent thread, so the root is the workspace and the file tool resolves ./engine-receipt.json without an override."
+    },
+    "checked_at": "2026-09-23T13:01:07Z"
+  },
+  "round_1_outcome": "advanced",
+  "round_1_remaining": "A no-override path in which the plugin's Context Mode root follows the worker workspace (for example an upstream per-thread project-dir setting, or a persistent worker thread that is the most recent transcript), then rerun the file turn.",
+  "round_1_limits": [
+    "The preregistered criterion (completes without the override) failed; outcome re-evaluated from settled to advanced in the fix round.",
+    "Whether auto_review actually reviewed an approval request is not visible in the worker receipt.",
+    "The default root depends on which Codex transcript was most recent; on a host with no concurrent Codex sessions it may coincide with the workspace.",
+    "Side effects: the c4 turns launched the host plugin against the live $HOME/.codex/context-mode state (enumeration and its blind spots in the gap 4 receipt). Conversely, this unit's persistent rollouts in $HOME/.codex/sessions can become the most recent transcript that another concurrent session's Context Mode fallback binds to (cross-session risk, not measured)."
+  ],
+  "settled_scope": "isolated CODEX_HOME whose only recent rollout is the worker's persistent thread; the shared native home without an override is not settled"
+}

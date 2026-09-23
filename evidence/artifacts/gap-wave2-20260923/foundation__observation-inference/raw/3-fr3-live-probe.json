@@ -1,0 +1,57 @@
+{
+ "method": "read-only GETs: Prometheus /api/v1/label/__name__/values and /api/v1/query; Loki /loki/api/v1/query_range",
+ "loki_window": [
+  "2026-09-23T02:50:00Z",
+  "2026-09-23T03:00:00Z"
+ ],
+ "prom_window": [
+  "2026-09-23T02:50:00Z",
+  "2026-09-23T03:05:00Z"
+ ],
+ "prometheus": {
+  "metric_names": [
+   "ecosystem_claude_code_token_usage_tokens_total"
+  ],
+  "per_metric": {
+   "ecosystem_claude_code_token_usage_tokens_total": {
+    "status": "success",
+    "series_with_samples_by_model": {
+     "claude-opus-5-5[1m]": 112,
+     "claude-sonnet-5": 64,
+     "claude-haiku-4-5-20251001": 28
+    }
+   }
+  },
+  "haiku_series_with_samples": 28,
+  "control_opus_series_with_samples": 0,
+  "detection_demonstrated": false,
+  "child_absent": false
+ },
+ "loki": {
+  "control_signature": {
+   "model": "claude-opus-5-5",
+   "input_tokens": "2",
+   "output_tokens": "5",
+   "cache_creation_tokens": "2212",
+   "cache_read_tokens": "26654"
+  },
+  "control_choice": "stream whose first entry is earliest in the window",
+  "events_in_window": 621,
+  "models_in_window": {
+   "claude-sonnet-5": 369,
+   "claude-opus-5-5": 252
+  },
+  "control_signature_matches": 1,
+  "child_signature": {
+   "model": "claude-haiku-4-5-20251001",
+   "input_tokens": 10,
+   "output_tokens": 99,
+   "cache_creation_tokens": 6575,
+   "cache_read_tokens": 0
+  },
+  "child_signature_matches": 0,
+  "detection_demonstrated": true,
+  "child_absent": true
+ },
+ "pass": false
+}

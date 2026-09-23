@@ -1,0 +1,7 @@
+{
+  "gap_index": 0,
+  "written_at": "2026-09-23T05:15:15Z",
+  "expectation": "Advanced, not settled. The Alpaca market-data fetch arm needs the paper credential file and broker data-API contact, which this unit may not use (owner: sota-workflow-resolution). A real, licensed Alpaca SIP snapshot produced by the merged #84 ingest (ingest_snapshot.py) is already on disk with an ingest receipt. Expect: its file hash equals the receipt's snapshot_sha256; converting it to Zstandard Parquet written exclusively and then made read-only reproduces the same rows; DuckDB 1.5.5 bars queries (row count, symbols, sessions per symbol, date range, per-symbol close-to-close aggregate) agree with the receipt's counts (480 rows, 24 symbols, 20 sessions, 2026-08-25..2026-09-22); the pinned Pandera gate passes 12/12 on it.",
+  "criteria": "advanced if the Parquet/DuckDB/Pandera arms run on the real Alpaca snapshot and agree with its receipt; settled is not reachable here because the 1-year IEX fetch and its feed=iex licence-scope record need credentials; not_settled if hashes or counts disagree.",
+  "note": "Written before the check's commands were run. While locating evidence (before this file), the two ingest receipts were read and the two snapshot CSVs were sha256-hashed once (hashes matched their receipts); no gate, Parquet or DuckDB command had been run."
+}

@@ -1,0 +1,11 @@
+{
+ "written_at": "2026-09-23T07:52:09Z",
+ "label": "round-2 addendum, written after round 1 (07:50:08-07:51:43Z) and before round 2 ran",
+ "deviation": "Round 1: Dagu 2.16.6 did not export traces; dagu-start.log: 'traces export: exporter export timeout: rpc error: code = Unavailable desc = invalid target address http://127.0.0.1:34318/v1/traces, error info: address http://127.0.0.1:34318/v1/traces:443: too many colons in address' -- the HTTP-with-path endpoint form that `dagu schema dag` documents was handed to the gRPC exporter. Round 2 changes only the DAG otel block: endpoint 127.0.0.1:34317 (collector OTLP gRPC) and insecure: true. Everything else unchanged.",
+ "expectation": "Round 2: span-metric series for service_name=dagu-obsgap-20260923 appear in Prometheus before kill -9 and are still present after restart; the other sub-checks repeat round 1's passes (Loki marker lines retained across kill -9, restic check/restore clean, restored DAGU_HOME byte-identical and readable by dagu history, srt denial line present).",
+ "criteria": "Same as preregistration-0-dagu-arm.json. Round 1's trace-export failure is kept in the receipt as observed, not replaced.",
+ "addition": {
+  "written_at": "2026-09-23T07:52:24Z",
+  "text": "Added before round 2 ran: start Prometheus and Loki from the restic-restored data dirs on separate loopback ports (39091, 33110) and expect the same span-metric series and marker log lines (restored-store query parity)."
+ }
+}

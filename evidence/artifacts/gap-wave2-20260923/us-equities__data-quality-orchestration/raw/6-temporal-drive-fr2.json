@@ -1,0 +1,439 @@
+{
+  "started_at_utc": "2026-09-23T05:41:49Z",
+  "scenarios": {
+    "happy": {
+      "result": [
+        "step1 done attempt 1",
+        "step2 done"
+      ],
+      "seconds": 2.4,
+      "history": {
+        "exit": 0,
+        "events": [
+          {
+            "id": "1",
+            "type": "WORKFLOW_EXECUTION_STARTED",
+            "attempt": 1
+          },
+          {
+            "id": "2",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "3",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "4",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "5",
+            "type": "ACTIVITY_TASK_SCHEDULED",
+            "activity": "step1"
+          },
+          {
+            "id": "6",
+            "type": "ACTIVITY_TASK_STARTED",
+            "attempt": 1
+          },
+          {
+            "id": "7",
+            "type": "ACTIVITY_TASK_COMPLETED"
+          },
+          {
+            "id": "8",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "9",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "10",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "11",
+            "type": "ACTIVITY_TASK_SCHEDULED",
+            "activity": "step2"
+          },
+          {
+            "id": "12",
+            "type": "ACTIVITY_TASK_STARTED",
+            "attempt": 1
+          },
+          {
+            "id": "13",
+            "type": "ACTIVITY_TASK_COMPLETED"
+          },
+          {
+            "id": "14",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "15",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "16",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "17",
+            "type": "WORKFLOW_EXECUTION_COMPLETED"
+          }
+        ]
+      }
+    },
+    "retry": {
+      "result": [
+        "step1 done attempt 2",
+        "step2 done"
+      ],
+      "seconds": 3.3,
+      "history": {
+        "exit": 0,
+        "events": [
+          {
+            "id": "1",
+            "type": "WORKFLOW_EXECUTION_STARTED",
+            "attempt": 1
+          },
+          {
+            "id": "2",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "3",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "4",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "5",
+            "type": "ACTIVITY_TASK_SCHEDULED",
+            "activity": "step1"
+          },
+          {
+            "id": "6",
+            "type": "ACTIVITY_TASK_STARTED",
+            "attempt": 2,
+            "lastFailure": "injected failure on attempt 1"
+          },
+          {
+            "id": "7",
+            "type": "ACTIVITY_TASK_COMPLETED"
+          },
+          {
+            "id": "8",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "9",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "10",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "11",
+            "type": "ACTIVITY_TASK_SCHEDULED",
+            "activity": "step2"
+          },
+          {
+            "id": "12",
+            "type": "ACTIVITY_TASK_STARTED",
+            "attempt": 1
+          },
+          {
+            "id": "13",
+            "type": "ACTIVITY_TASK_COMPLETED"
+          },
+          {
+            "id": "14",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "15",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "16",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "17",
+            "type": "WORKFLOW_EXECUTION_COMPLETED"
+          }
+        ]
+      }
+    },
+    "fail_hard": {
+      "workflow_failure": "ActivityError",
+      "message": "Activity task failed",
+      "seconds": 0.2,
+      "history": {
+        "exit": 0,
+        "events": [
+          {
+            "id": "1",
+            "type": "WORKFLOW_EXECUTION_STARTED",
+            "attempt": 1
+          },
+          {
+            "id": "2",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "3",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "4",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "5",
+            "type": "ACTIVITY_TASK_SCHEDULED",
+            "activity": "step1"
+          },
+          {
+            "id": "6",
+            "type": "ACTIVITY_TASK_STARTED",
+            "attempt": 1
+          },
+          {
+            "id": "7",
+            "type": "ACTIVITY_TASK_FAILED",
+            "failure": "injected non-retryable failure"
+          },
+          {
+            "id": "8",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "9",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "10",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "11",
+            "type": "WORKFLOW_EXECUTION_FAILED",
+            "failure": "Activity task failed"
+          }
+        ]
+      }
+    },
+    "cancel": {
+      "cancel_cli_exit": 0,
+      "cancel_cli_stdout": "Canceled workflow\n",
+      "result": "CancelledError",
+      "step1_finished_marker": false,
+      "history": {
+        "exit": 0,
+        "events": [
+          {
+            "id": "1",
+            "type": "WORKFLOW_EXECUTION_STARTED",
+            "attempt": 1
+          },
+          {
+            "id": "2",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "3",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "4",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "5",
+            "type": "ACTIVITY_TASK_SCHEDULED",
+            "activity": "step1"
+          },
+          {
+            "id": "6",
+            "type": "WORKFLOW_EXECUTION_CANCEL_REQUESTED"
+          },
+          {
+            "id": "7",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "8",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "9",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "10",
+            "type": "ACTIVITY_TASK_CANCEL_REQUESTED"
+          },
+          {
+            "id": "11",
+            "type": "WORKFLOW_EXECUTION_CANCELED"
+          }
+        ]
+      }
+    },
+    "kill": {
+      "result": [
+        "step1 done attempt 2",
+        "step2 done"
+      ],
+      "seconds_from_kill_to_completion": 24.8,
+      "status_immediately_after_kill": "WORKFLOW_EXECUTION_STATUS_RUNNING",
+      "pending_after_kill": [
+        {
+          "activity": "step1",
+          "state": "PENDING_ACTIVITY_STATE_STARTED",
+          "attempt": 1
+        }
+      ],
+      "second_worker_launched_s_after_kill": 3.1,
+      "kill_at_utc": "2026-09-23T05:42:05Z",
+      "history": {
+        "exit": 0,
+        "events": [
+          {
+            "id": "1",
+            "type": "WORKFLOW_EXECUTION_STARTED",
+            "attempt": 1
+          },
+          {
+            "id": "2",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "3",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "4",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "5",
+            "type": "ACTIVITY_TASK_SCHEDULED",
+            "activity": "step1"
+          },
+          {
+            "id": "6",
+            "type": "ACTIVITY_TASK_STARTED",
+            "attempt": 2,
+            "lastFailure": "activity Heartbeat timeout"
+          },
+          {
+            "id": "7",
+            "type": "ACTIVITY_TASK_COMPLETED"
+          },
+          {
+            "id": "8",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "9",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "10",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "11",
+            "type": "ACTIVITY_TASK_SCHEDULED",
+            "activity": "step2"
+          },
+          {
+            "id": "12",
+            "type": "ACTIVITY_TASK_STARTED",
+            "attempt": 1
+          },
+          {
+            "id": "13",
+            "type": "ACTIVITY_TASK_COMPLETED"
+          },
+          {
+            "id": "14",
+            "type": "WORKFLOW_TASK_SCHEDULED",
+            "attempt": 1
+          },
+          {
+            "id": "15",
+            "type": "WORKFLOW_TASK_STARTED"
+          },
+          {
+            "id": "16",
+            "type": "WORKFLOW_TASK_COMPLETED"
+          },
+          {
+            "id": "17",
+            "type": "WORKFLOW_EXECUTION_COMPLETED"
+          }
+        ]
+      }
+    }
+  },
+  "finished_at_utc": "2026-09-23T05:42:30Z",
+  "markers": {
+    "g2-cancel.step1.started": [
+      "1790142118 attempt=1 pid=674921"
+    ],
+    "g2-fail-hard.step1.started": [
+      "1790142118 attempt=1 pid=674921"
+    ],
+    "g2-happy.step1.finished": [
+      "1790142115 attempt=1 pid=674921"
+    ],
+    "g2-happy.step1.started": [
+      "1790142113 attempt=1 pid=674921"
+    ],
+    "g2-happy.step2.ran": [
+      "1790142115 pid=674921"
+    ],
+    "g2-kill.step1.finished": [
+      "1790142150 attempt=2 pid=678083"
+    ],
+    "g2-kill.step1.started": [
+      "1790142123 attempt=1 pid=674921",
+      "1790142130 attempt=2 pid=678083"
+    ],
+    "g2-kill.step2.ran": [
+      "1790142150 pid=678083"
+    ],
+    "g2-retry.step1.finished": [
+      "1790142118 attempt=2 pid=674921"
+    ],
+    "g2-retry.step1.started": [
+      "1790142115 attempt=1 pid=674921",
+      "1790142116 attempt=2 pid=674921"
+    ],
+    "g2-retry.step2.ran": [
+      "1790142118 pid=674921"
+    ]
+  }
+}

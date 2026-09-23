@@ -1,0 +1,233 @@
+{
+  "evalId": "eval-eXd-2026-09-23T12:50:10",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-09-23T12:50:10.708Z",
+    "prompts": [
+      {
+        "id": "9dac3957c7b8310d371eb931da0cd2ed5a9c5c8416d5aa3c77a6c821cc7ca465",
+        "raw": "NVIDIA's four published retrieval queries and documents (the upstream script owns the inputs)",
+        "label": "NVIDIA's four published retrieval queries and documents (the upstream script owns the inputs)",
+        "provider": "NVIDIA published example via native Python and local vLLM",
+        "metrics": {
+          "score": 0.5,
+          "testPassCount": 0,
+          "testFailCount": 1,
+          "testErrorCount": 0,
+          "assertPassCount": 0,
+          "assertFailCount": 1,
+          "totalLatencyMs": 732,
+          "tokenUsage": {
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "total": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "namedScores": {},
+          "namedScoresCount": {},
+          "namedScoreWeights": {},
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "error": "2/4 NVIDIA published queries ranked the paired document first; winners=[[0],[1],[3],[2]]. Local source-derived assertion on rounded upstream stdout, not a benchmark. Provider token usage is not reported.",
+        "gradingResult": {
+          "pass": false,
+          "score": 0.5,
+          "reason": "2/4 NVIDIA published queries ranked the paired document first; winners=[[0],[1],[3],[2]]. Local source-derived assertion on rounded upstream stdout, not a benchmark. Provider token usage is not reported.",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": false,
+              "score": 0.5,
+              "reason": "2/4 NVIDIA published queries ranked the paired document first; winners=[[0],[1],[3],[2]]. Local source-derived assertion on rounded upstream stdout, not a benchmark. Provider token usage is not reported.",
+              "assertion": {
+                "type": "javascript",
+                "value": "const rows = output.split(/\\r?\\n/)\n  .map(line => line.match(/^q\\[(\\d+)\\]\\s+(.+)$/))\n  .filter(Boolean);\nif (rows.length !== 4) {\n  return {pass: false, score: 0, reason: 'Expected four rows from the upstream example; received ' + rows.length};\n}\nconst best = [];\nlet correct = 0;\nfor (let i = 0; i < rows.length; i++) {\n  const values = rows[i][2].trim().split(/\\s+/).map(Number);\n  if (Number(rows[i][1]) !== i || values.length !== 4 || !values.every(Number.isFinite)) {\n    return {pass: false, score: 0, reason: 'Upstream matrix row has invalid shape or nonfinite values'};\n  }\n  const maximum = Math.max(...values);\n  const winners = values.map((v, j) => v === maximum ? j : -1).filter(j => j >= 0);\n  best.push(winners);\n  if (winners.length === 1 && winners[0] === i) correct++;\n}\nreturn {\n  pass: correct === 4,\n  score: correct / 4,\n  reason: correct + '/4 NVIDIA published queries ranked the paired document first; winners=' + JSON.stringify(best) + '. Local source-derived assertion on rounded upstream stdout, not a benchmark. Provider token usage is not reported.'\n};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 732,
+        "namedScores": {},
+        "prompt": {
+          "raw": "NVIDIA's four published retrieval queries and documents (the upstream script owns the inputs)",
+          "label": "NVIDIA's four published retrieval queries and documents (the upstream script owns the inputs)",
+          "config": {}
+        },
+        "promptId": "9dac3957c7b8310d371eb931da0cd2ed5a9c5c8416d5aa3c77a6c821cc7ca465",
+        "promptIdx": 0,
+        "provider": {
+          "id": "exec:python upstream-example.py",
+          "label": "NVIDIA published example via native Python and local vLLM"
+        },
+        "response": {
+          "output": "Similarity scores:\n          d[0]      d[1]      d[2]      d[3]\nq[0]    0.8110    0.0250   -0.0311    0.0005\nq[1]    0.0445    0.6472    0.0384   -0.0512\nq[2]   -0.0099   -0.0404    0.0999    0.6464\nq[3]   -0.0223    0.0220    0.7688    0.1208"
+        },
+        "score": 0.5,
+        "success": false,
+        "testCase": {
+          "description": "Published four-query retrieval example; local source-derived ranking assertion. Script token usage is UNKNOWN; displayed zero counters mean unavailable.",
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const rows = output.split(/\\r?\\n/)\n  .map(line => line.match(/^q\\[(\\d+)\\]\\s+(.+)$/))\n  .filter(Boolean);\nif (rows.length !== 4) {\n  return {pass: false, score: 0, reason: 'Expected four rows from the upstream example; received ' + rows.length};\n}\nconst best = [];\nlet correct = 0;\nfor (let i = 0; i < rows.length; i++) {\n  const values = rows[i][2].trim().split(/\\s+/).map(Number);\n  if (Number(rows[i][1]) !== i || values.length !== 4 || !values.every(Number.isFinite)) {\n    return {pass: false, score: 0, reason: 'Upstream matrix row has invalid shape or nonfinite values'};\n  }\n  const maximum = Math.max(...values);\n  const winners = values.map((v, j) => v === maximum ? j : -1).filter(j => j >= 0);\n  best.push(winners);\n  if (winners.length === 1 && winners[0] === i) correct++;\n}\nreturn {\n  pass: correct === 4,\n  score: correct / 4,\n  reason: correct + '/4 NVIDIA published queries ranked the paired document first; winners=' + JSON.stringify(best) + '. Local source-derived assertion on rounded upstream stdout, not a benchmark. Provider token usage is not reported.'\n};\n"
+            }
+          ],
+          "vars": {},
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {},
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 1
+      }
+    ],
+    "stats": {
+      "successes": 0,
+      "failures": 1,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "durationMs": 761,
+      "evaluationDurationMs": 761
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "NVIDIA Nemotron upstream retrieval example — live endpoint check; usage not reported",
+    "prompts": [
+      "NVIDIA's four published retrieval queries and documents (the upstream script owns the inputs)"
+    ],
+    "providers": [
+      {
+        "id": "exec:python upstream-example.py",
+        "label": "NVIDIA published example via native Python and local vLLM"
+      }
+    ],
+    "tests": [
+      {
+        "description": "Published four-query retrieval example; local source-derived ranking assertion. Script token usage is UNKNOWN; displayed zero counters mean unavailable.",
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const rows = output.split(/\\r?\\n/)\n  .map(line => line.match(/^q\\[(\\d+)\\]\\s+(.+)$/))\n  .filter(Boolean);\nif (rows.length !== 4) {\n  return {pass: false, score: 0, reason: 'Expected four rows from the upstream example; received ' + rows.length};\n}\nconst best = [];\nlet correct = 0;\nfor (let i = 0; i < rows.length; i++) {\n  const values = rows[i][2].trim().split(/\\s+/).map(Number);\n  if (Number(rows[i][1]) !== i || values.length !== 4 || !values.every(Number.isFinite)) {\n    return {pass: false, score: 0, reason: 'Upstream matrix row has invalid shape or nonfinite values'};\n  }\n  const maximum = Math.max(...values);\n  const winners = values.map((v, j) => v === maximum ? j : -1).filter(j => j >= 0);\n  best.push(winners);\n  if (winners.length === 1 && winners[0] === i) correct++;\n}\nreturn {\n  pass: correct === 4,\n  score: correct / 4,\n  reason: correct + '/4 NVIDIA published queries ranked the paired document first; winners=' + JSON.stringify(best) + '. Local source-derived assertion on rounded upstream stdout, not a benchmark. Provider token usage is not reported.'\n};\n"
+          }
+        ]
+      }
+    ],
+    "env": {},
+    "outputPath": [
+      "$HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/g2/pf-upstream/results-mutant.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.123.1",
+    "nodeVersion": "v24.21.0",
+    "platform": "linux",
+    "arch": "x64",
+    "exportedAt": "2026-09-23T12:50:11.540Z",
+    "evaluationCreatedAt": "2026-09-23T12:50:10.708Z"
+  },
+  "runtimeOptions": {
+    "eventSource": "cli",
+    "showProgressBar": true,
+    "repeat": 1,
+    "maxConcurrency": 1,
+    "cache": false
+  }
+}

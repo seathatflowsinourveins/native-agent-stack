@@ -1,0 +1,53 @@
+{
+  "id": "gap-wave2-20260923-code-navigation-0",
+  "gap_index": 0,
+  "gap_text_sha256": "26c9a01725e7dc9acc9dd7d94f48b02ab974327c560375f80c99dc1efba46319",
+  "preregistration": {
+    "written_at": "2026-09-23T00:45:00Z",
+    "written_at_note": "LABELLED LATE for the gold-set values only: the rg command establishing the 1-definition/3-reference gold set was run before this preregistration text was written (fixed corrections review, 2026-09-22 finding 5), so those specific line numbers were already known when this expectation was recorded rather than predicted in advance. The comparison design (which tools, which operation, what completeness means) was decided before running Serena/jCodeMunch against the same symbol; only the gold-set numbers themselves are post-hoc.",
+    "expectation": "For symbol capture_jcodemunch (defined tools/ecosystem/token_manifest.py:343) in the agent-lab main checkout: rg gold set (excluding nested .claude/worktrees/* duplicate checkouts) finds 1 definition + 3 references (token_manifest.py:461; test_token_manifest.py:27,40). Serena find_referencing_symbols should locate the same-file call (line 461) and, if it resolves cross-file references correctly, the two call sites in test_token_manifest.py. jCodeMunch search/get_ranked_context for the same symbol should return matching hits and a measurable token cost, enabling a completeness (recall against rg gold set) and cost comparison. codebase-memory-mcp is confirmed removed from this host (docs/tasks/2026-09-21-codebase-memory-removal-log.txt) so it is structurally excluded from this arm, not merely skipped.",
+    "criteria": "Completeness = fraction of the 3 gold references each tool returns for this one symbol in this one Python repo. This is a single-symbol, single-language, two-tool bounded probe, not the full preregistered multi-language three-tool benchmark the gap calls for."
+  },
+  "probed_checkout": {
+    "path": "/home/example/code/agent-lab",
+    "note": "This is the canonical agent-lab checkout used read-only for the probe (no writes made), not the isolated worktree this unit commits to. It was on branch codex/native-expansion (not main) with a dirty working tree at probe time; called 'main checkout' loosely in prose below meaning 'the canonical non-worktree checkout', not the main branch.",
+    "commit": "c042ea75e96b66e6ab9abdbf38f4ac4e7e3ca385",
+    "branch": "codex/native-expansion",
+    "dirty": true,
+    "dirty_summary": "9 modified tracked files, 8 untracked paths (git status --porcelain at probe time); none touched by this probe, which only read tools/ecosystem/token_manifest.py and tools/ecosystem/test_token_manifest.py."
+  },
+  "commands": [
+    "rg -n \"capture_jcodemunch\" --glob '!.claude/worktrees' -t py (in /home/example/code/agent-lab)",
+    "mcp__serena__find_referencing_symbols(name_path=\"capture_jcodemunch\", relative_path=\"tools/ecosystem/token_manifest.py\")",
+    "mcp__jcodemunch__order(action=\"search_symbols\", args={\"repo\": \"agent-lab\", \"query\": \"capture_jcodemunch\"})",
+    "sed -n '1,15p' tools/ecosystem/test_token_manifest.py",
+    "sed -n '455,462p' tools/ecosystem/token_manifest.py",
+    "git -C /home/example/code/agent-lab rev-parse HEAD; git -C /home/example/code/agent-lab branch --show-current; git -C /home/example/code/agent-lab status --porcelain"
+  ],
+  "results": {
+    "rg_gold_set": {
+      "definition": "tools/ecosystem/token_manifest.py:343",
+      "references": [
+        "tools/ecosystem/token_manifest.py:461 (bare call capture_jcodemunch(...))",
+        "tools/ecosystem/test_token_manifest.py:27 (m.capture_jcodemunch(...))",
+        "tools/ecosystem/test_token_manifest.py:40 (m.capture_jcodemunch(...))"
+      ],
+      "note": "test_token_manifest.py loads token_manifest.py via importlib.util.spec_from_file_location(\"token_manifest\", ...) and module_from_spec, not a static `import token_manifest`; the module alias is `m`."
+    },
+    "serena_find_referencing_symbols": "{\"tools/ecosystem/token_manifest.py\": {\"Function\": [{\"name_path\": \"refresh\", \"body_location\": {\"start_line\": 435, \"end_line\": 546}, \"content_around_reference\": \"... 459: ledger.snapshot(...)\\n  > 460: capture_jcodemunch(config,ledger,run,commands,issues)\\n... 461: archive_native_events(config,ledger,issues)\"}]}} -- ONE reference found (the same-file bare call); the two cross-file m.capture_jcodemunch(...) call sites in test_token_manifest.py were NOT returned.",
+    "jcodemunch_search_symbols": "10 results returned, headed by the exact definition (@1::capture_jcodemunch#function at tools/ecosystem/token_manifest.py:343) plus name-substring matches (test_jcodemunch_counter_snapshots_keep_scope_and_do_not_sum, test_jcodemunch_invalid_or_failed_result_is_not_good_counter, test_public_jcodemunch_id_uses_existing_ledger_without_duplicates, capture, capture_context, capture_choice_source, capture_json_source, and one unrelated 'operation' constant). ZERO of the 3 gold call-site references were returned: search_symbols is a symbol/definition-name search, not a call-site reference search, so it is not directly comparable to Serena's find_referencing_symbols on this axis.",
+    "codebase_memory_mcp": "Confirmed absent: docs/tasks/2026-09-21-codebase-memory-removal-log.txt (git show e0b8b2e) records the mcporter entry removed on 2026-09-21T20:22:51Z, launcher symlink removed, prefix moved to codebase-memory-mcp-0.11.0.removed-20260921 (reversible but not currently installed/registered). No mcporter server or CLI is currently reachable for it on this host. This arm of the required three-tool benchmark is structurally unavailable, not merely untested."
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Single symbol, single language (Python), single repository (agent-lab main checkout); the gap calls for a preregistered matched benchmark across at least two languages/repositories.",
+    "codebase-memory-mcp could not be included (removed from host 2026-09-21); only two of the three named tools (Serena, jCodeMunch) could be probed at all.",
+    "jCodeMunch's search_symbols and Serena's find_referencing_symbols are not the same operation (definition-name search vs. reference search), so the completeness numbers (0/3 vs 1/3) are suggestive, not a fair apples-to-apples recall comparison; a fair comparison needs jCodeMunch's reference-finding action (not identified/run in this bounded check) or Serena's find_symbol for the definition side.",
+    "No token-cost accounting was captured for the jCodeMunch call in this probe (the tool's compact output format was read directly rather than through a wrapper that records token counts), so the 'total cost' half of the gap's next_check is untested here.",
+    "No rg/LSP gold-set scoring across multiple tasks was attempted; this is one illustrative data point, not a scored benchmark run.",
+    "This check did not use Claude multi-agent fan-out or a long run; consistent with the shared-account reservation constraint.",
+    "Fixed in review round 2: recorded the probed checkout's exact commit (c042ea7) and dirty-working-tree state, and disclosed that the rg gold-set values in the preregistration were established before that preregistration text was written (the comparison design was decided first; the gold-set numbers were not)."
+  ],
+  "checked_at": "2026-09-23T00:52:00Z"
+}

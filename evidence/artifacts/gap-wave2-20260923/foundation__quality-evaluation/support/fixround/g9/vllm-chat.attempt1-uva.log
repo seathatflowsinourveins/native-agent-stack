@@ -1,0 +1,281 @@
+(APIServer pid=2012780) INFO 09-22 22:43:21 [api_utils.py:339] 
+(APIServer pid=2012780) INFO 09-22 22:43:21 [api_utils.py:339]        █     █     █▄   ▄█
+(APIServer pid=2012780) INFO 09-22 22:43:21 [api_utils.py:339]  ▄▄ ▄█ █     █     █ ▀▄▀ █  version 0.25.0
+(APIServer pid=2012780) INFO 09-22 22:43:21 [api_utils.py:339]   █▄█▀ █     █     █     █  model   $HOME/.local/share/codex-ecosystem/models/qwen2.5-7b-instruct-awq-b250375
+(APIServer pid=2012780) INFO 09-22 22:43:21 [api_utils.py:339]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀
+(APIServer pid=2012780) INFO 09-22 22:43:21 [api_utils.py:339] 
+(APIServer pid=2012780) INFO 09-22 22:43:21 [api_utils.py:273] non-default args: {'model_tag': '$HOME/.local/share/codex-ecosystem/models/qwen2.5-7b-instruct-awq-b250375', 'host': '127.0.0.1', 'port': 18431, 'model': '$HOME/.local/share/codex-ecosystem/models/qwen2.5-7b-instruct-awq-b250375', 'max_model_len': 4096, 'enforce_eager': True, 'served_model_name': ['qwen2.5-7b-instruct-awq'], 'gpu_memory_utilization': 0.4, 'max_num_seqs': 4}
+(APIServer pid=2012780) INFO 09-22 22:43:29 [model.py:619] Resolved architecture: Qwen2ForCausalLM
+(APIServer pid=2012780) INFO 09-22 22:43:29 [model.py:1776] Using max model len 4096
+(APIServer pid=2012780) INFO 09-22 22:43:30 [vllm.py:1042] Asynchronous scheduling is enabled.
+(APIServer pid=2012780) WARNING 09-22 22:43:30 [vllm.py:1096] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+(APIServer pid=2012780) WARNING 09-22 22:43:30 [vllm.py:1144] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(APIServer pid=2012780) INFO 09-22 22:43:30 [kernel.py:292] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'])
+(APIServer pid=2012780) INFO 09-22 22:43:30 [vllm.py:1322] Cudagraph is disabled under eager mode
+(APIServer pid=2012780) INFO 09-22 22:43:30 [compilation.py:312] Enabled custom fusions: norm_quant, act_quant
+(EngineCore pid=2015987) INFO 09-22 22:43:37 [core.py:114] Initializing a V1 LLM engine (v0.25.0) with config: model='$HOME/.local/share/codex-ecosystem/models/qwen2.5-7b-instruct-awq-b250375', speculative_config=None, tokenizer='$HOME/.local/share/codex-ecosystem/models/qwen2.5-7b-instruct-awq-b250375', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.float16, max_seq_len=4096, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=False, quantization=auto_awq, quantization_config=None, enforce_eager=True, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=qwen2.5-7b-instruct-awq, enable_prefix_caching=True, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': [], 'compile_ranges_endpoints': [2048], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'size_asserts': False, 'alignment_asserts': False, 'scalar_asserts': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.NONE: 0>, 'cudagraph_num_of_warmups': 0, 'cudagraph_capture_sizes': [], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False}, 'max_cudagraph_capture_size': 0, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': False, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native']), enable_flashinfer_autotune=True, enable_cutedsl_warmup=True, moe_backend='auto', linear_backend='auto')
+(EngineCore pid=2015987) INFO 09-22 22:43:38 [parallel_state.py:1607] world_size=1 rank=0 local_rank=0 distributed_init_method=tcp://<lan-ip>:59256 backend=nccl
+[W922 22:43:48.868086332 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+(EngineCore pid=2015987) INFO 09-22 22:43:48 [parallel_state.py:1942] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank N/A, EPLB rank N/A
+(EngineCore pid=2015987) INFO 09-22 22:43:48 [gpu_worker.py:360] Using V2 Model Runner
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231] EngineCore failed to start.
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231] Traceback (most recent call last):
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/core.py", line 1200, in run_engine_core
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     return func(*args, **kwargs)
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/core.py", line 966, in __init__
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     super().__init__(
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     ~~~~~~~~~~~~~~~~^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         vllm_config,
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         ^^^^^^^^^^^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     ...<3 lines>...
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         internal_dp_balancing,
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         ^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     )
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     ^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/core.py", line 123, in __init__
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     self.model_executor = executor_class(vllm_config)
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]                           ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     return func(*args, **kwargs)
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/executor/abstract.py", line 109, in __init__
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     self._init_executor()
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     ~~~~~~~~~~~~~~~~~~~^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/executor/uniproc_executor.py", line 63, in _init_executor
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     self.driver_worker.init_device()
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/worker/worker_base.py", line 331, in init_device
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     self.worker.init_device()  # type: ignore
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     ~~~~~~~~~~~~~~~~~~~~~~~^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     return func(*args, **kwargs)
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/worker/gpu_worker.py", line 390, in init_device
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     self.model_runner: GPUModelRunner = GPUModelRunnerV2(  # type: ignore
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]                                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         self.vllm_config, self.device
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     )
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     ^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/worker/gpu/model_runner.py", line 213, in __init__
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     self.req_states = RequestState(
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]                       ~~~~~~~~~~~~^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         max_num_reqs=self.max_num_reqs,
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     ...<4 lines>...
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         device=self.device,
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         ^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     )
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     ^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/worker/gpu/states.py", line 33, in __init__
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     self.all_token_ids = StagedWriteTensor(
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]                          ~~~~~~~~~~~~~~~~~^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         (self.max_num_reqs, self.max_model_len),
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     ...<2 lines>...
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         uva_instead_of_gpu=True,
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]         ^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     )
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     ^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/worker/gpu/buffer_utils.py", line 141, in __init__
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     self._uva_buf = UvaBuffer(size, dtype)
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]                     ~~~~~~~~~^^^^^^^^^^^^^
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/worker/gpu/buffer_utils.py", line 47, in __init__
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231]     raise RuntimeError("UVA is not available")
+(EngineCore pid=2015987) ERROR 09-22 22:43:49 [core.py:1231] RuntimeError: UVA is not available
+(EngineCore pid=2015987) Process EngineCore:
+(EngineCore pid=2015987) Traceback (most recent call last):
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/multiprocessing/process.py", line 313, in _bootstrap
+(EngineCore pid=2015987)     self.run()
+(EngineCore pid=2015987)     ~~~~~~~~^^
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/multiprocessing/process.py", line 108, in run
+(EngineCore pid=2015987)     self._target(*self._args, **self._kwargs)
+(EngineCore pid=2015987)     ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/core.py", line 1235, in run_engine_core
+(EngineCore pid=2015987)     raise e
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/core.py", line 1200, in run_engine_core
+(EngineCore pid=2015987)     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2015987)     return func(*args, **kwargs)
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/core.py", line 966, in __init__
+(EngineCore pid=2015987)     super().__init__(
+(EngineCore pid=2015987)     ~~~~~~~~~~~~~~~~^
+(EngineCore pid=2015987)         vllm_config,
+(EngineCore pid=2015987)         ^^^^^^^^^^^^
+(EngineCore pid=2015987)     ...<3 lines>...
+(EngineCore pid=2015987)         internal_dp_balancing,
+(EngineCore pid=2015987)         ^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987)     )
+(EngineCore pid=2015987)     ^
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/core.py", line 123, in __init__
+(EngineCore pid=2015987)     self.model_executor = executor_class(vllm_config)
+(EngineCore pid=2015987)                           ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2015987)     return func(*args, **kwargs)
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/executor/abstract.py", line 109, in __init__
+(EngineCore pid=2015987)     self._init_executor()
+(EngineCore pid=2015987)     ~~~~~~~~~~~~~~~~~~~^^
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/executor/uniproc_executor.py", line 63, in _init_executor
+(EngineCore pid=2015987)     self.driver_worker.init_device()
+(EngineCore pid=2015987)     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/worker/worker_base.py", line 331, in init_device
+(EngineCore pid=2015987)     self.worker.init_device()  # type: ignore
+(EngineCore pid=2015987)     ~~~~~~~~~~~~~~~~~~~~~~~^^
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2015987)     return func(*args, **kwargs)
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/worker/gpu_worker.py", line 390, in init_device
+(EngineCore pid=2015987)     self.model_runner: GPUModelRunner = GPUModelRunnerV2(  # type: ignore
+(EngineCore pid=2015987)                                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987)         self.vllm_config, self.device
+(EngineCore pid=2015987)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987)     )
+(EngineCore pid=2015987)     ^
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/worker/gpu/model_runner.py", line 213, in __init__
+(EngineCore pid=2015987)     self.req_states = RequestState(
+(EngineCore pid=2015987)                       ~~~~~~~~~~~~^
+(EngineCore pid=2015987)         max_num_reqs=self.max_num_reqs,
+(EngineCore pid=2015987)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987)     ...<4 lines>...
+(EngineCore pid=2015987)         device=self.device,
+(EngineCore pid=2015987)         ^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987)     )
+(EngineCore pid=2015987)     ^
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/worker/gpu/states.py", line 33, in __init__
+(EngineCore pid=2015987)     self.all_token_ids = StagedWriteTensor(
+(EngineCore pid=2015987)                          ~~~~~~~~~~~~~~~~~^
+(EngineCore pid=2015987)         (self.max_num_reqs, self.max_model_len),
+(EngineCore pid=2015987)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987)     ...<2 lines>...
+(EngineCore pid=2015987)         uva_instead_of_gpu=True,
+(EngineCore pid=2015987)         ^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2015987)     )
+(EngineCore pid=2015987)     ^
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/worker/gpu/buffer_utils.py", line 141, in __init__
+(EngineCore pid=2015987)     self._uva_buf = UvaBuffer(size, dtype)
+(EngineCore pid=2015987)                     ~~~~~~~~~^^^^^^^^^^^^^
+(EngineCore pid=2015987)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/worker/gpu/buffer_utils.py", line 47, in __init__
+(EngineCore pid=2015987)     raise RuntimeError("UVA is not available")
+(EngineCore pid=2015987) RuntimeError: UVA is not available
+[rank0]:[W922 22:43:50.780863037 ProcessGroupNCCL.cpp:1575] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+(APIServer pid=2012780) Traceback (most recent call last):
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/bin/vllm", line 10, in <module>
+(APIServer pid=2012780)     sys.exit(main())
+(APIServer pid=2012780)              ~~~~^^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/entrypoints/cli/main.py", line 95, in main
+(APIServer pid=2012780)     args.dispatch_function(args)
+(APIServer pid=2012780)     ~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/entrypoints/cli/serve.py", line 148, in cmd
+(APIServer pid=2012780)     uvloop.run(run_server(args))
+(APIServer pid=2012780)     ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/uvloop/__init__.py", line 96, in run
+(APIServer pid=2012780)     return __asyncio.run(
+(APIServer pid=2012780)            ~~~~~~~~~~~~~^
+(APIServer pid=2012780)         wrapper(),
+(APIServer pid=2012780)         ^^^^^^^^^^
+(APIServer pid=2012780)     ...<2 lines>...
+(APIServer pid=2012780)         **run_kwargs
+(APIServer pid=2012780)         ^^^^^^^^^^^^
+(APIServer pid=2012780)     )
+(APIServer pid=2012780)     ^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py", line 196, in run
+(APIServer pid=2012780)     return runner.run(main)
+(APIServer pid=2012780)            ~~~~~~~~~~^^^^^^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py", line 119, in run
+(APIServer pid=2012780)     return self._loop.run_until_complete(task)
+(APIServer pid=2012780)            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+(APIServer pid=2012780)   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/uvloop/__init__.py", line 48, in wrapper
+(APIServer pid=2012780)     return await main
+(APIServer pid=2012780)            ^^^^^^^^^^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/entrypoints/openai/api_server.py", line 698, in run_server
+(APIServer pid=2012780)     await run_server_worker(listen_address, sock, args, **uvicorn_kwargs)
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/entrypoints/openai/api_server.py", line 712, in run_server_worker
+(APIServer pid=2012780)     async with build_async_engine_client(
+(APIServer pid=2012780)                ~~~~~~~~~~~~~~~~~~~~~~~~~^
+(APIServer pid=2012780)         args,
+(APIServer pid=2012780)         ^^^^^
+(APIServer pid=2012780)         client_config=client_config,
+(APIServer pid=2012780)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)     ) as engine_client:
+(APIServer pid=2012780)     ^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/contextlib.py", line 214, in __aenter__
+(APIServer pid=2012780)     return await anext(self.gen)
+(APIServer pid=2012780)            ^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/entrypoints/openai/api_server.py", line 100, in build_async_engine_client
+(APIServer pid=2012780)     async with build_async_engine_client_from_engine_args(
+(APIServer pid=2012780)                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+(APIServer pid=2012780)         engine_args,
+(APIServer pid=2012780)         ^^^^^^^^^^^^
+(APIServer pid=2012780)         usage_context=usage_context,
+(APIServer pid=2012780)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)         client_config=client_config,
+(APIServer pid=2012780)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)     ) as engine:
+(APIServer pid=2012780)     ^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/contextlib.py", line 214, in __aenter__
+(APIServer pid=2012780)     return await anext(self.gen)
+(APIServer pid=2012780)            ^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/entrypoints/openai/api_server.py", line 136, in build_async_engine_client_from_engine_args
+(APIServer pid=2012780)     async_llm = AsyncLLM.from_vllm_config(
+(APIServer pid=2012780)         vllm_config=vllm_config,
+(APIServer pid=2012780)     ...<6 lines>...
+(APIServer pid=2012780)         client_index=client_index,
+(APIServer pid=2012780)     )
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/async_llm.py", line 217, in from_vllm_config
+(APIServer pid=2012780)     return cls(
+(APIServer pid=2012780)         vllm_config=vllm_config,
+(APIServer pid=2012780)     ...<9 lines>...
+(APIServer pid=2012780)         client_index=client_index,
+(APIServer pid=2012780)     )
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/async_llm.py", line 146, in __init__
+(APIServer pid=2012780)     self.engine_core = EngineCoreClient.make_async_mp_client(
+(APIServer pid=2012780)                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+(APIServer pid=2012780)         vllm_config=vllm_config,
+(APIServer pid=2012780)         ^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)     ...<4 lines>...
+(APIServer pid=2012780)         client_index=client_index,
+(APIServer pid=2012780)         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)     )
+(APIServer pid=2012780)     ^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(APIServer pid=2012780)     return func(*args, **kwargs)
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/core_client.py", line 132, in make_async_mp_client
+(APIServer pid=2012780)     return AsyncMPClient(*client_args)
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(APIServer pid=2012780)     return func(*args, **kwargs)
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/core_client.py", line 963, in __init__
+(APIServer pid=2012780)     super().__init__(
+(APIServer pid=2012780)     ~~~~~~~~~~~~~~~~^
+(APIServer pid=2012780)         asyncio_mode=True,
+(APIServer pid=2012780)         ^^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)     ...<3 lines>...
+(APIServer pid=2012780)         client_addresses=client_addresses,
+(APIServer pid=2012780)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)     )
+(APIServer pid=2012780)     ^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/core_client.py", line 573, in __init__
+(APIServer pid=2012780)     with launch_core_engines(
+(APIServer pid=2012780)          ~~~~~~~~~~~~~~~~~~~^
+(APIServer pid=2012780)         vllm_config, executor_class, log_stats, addresses
+(APIServer pid=2012780)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)     ) as (engine_manager, coordinator, addresses, tensor_queue):
+(APIServer pid=2012780)     ^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/contextlib.py", line 148, in __exit__
+(APIServer pid=2012780)     next(self.gen)
+(APIServer pid=2012780)     ~~~~^^^^^^^^^^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/utils.py", line 1213, in launch_core_engines
+(APIServer pid=2012780)     wait_for_engine_startup(
+(APIServer pid=2012780)     ~~~~~~~~~~~~~~~~~~~~~~~^
+(APIServer pid=2012780)         handshake_socket,
+(APIServer pid=2012780)         ^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)     ...<6 lines>...
+(APIServer pid=2012780)         coordinator.proc if coordinator else None,
+(APIServer pid=2012780)         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2012780)     )
+(APIServer pid=2012780)     ^
+(APIServer pid=2012780)   File "$HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/lib/python3.13/site-packages/vllm/v1/engine/utils.py", line 1272, in wait_for_engine_startup
+(APIServer pid=2012780)     raise RuntimeError(
+(APIServer pid=2012780)     ...<3 lines>...
+(APIServer pid=2012780)     )
+(APIServer pid=2012780) RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {}
+exit=1

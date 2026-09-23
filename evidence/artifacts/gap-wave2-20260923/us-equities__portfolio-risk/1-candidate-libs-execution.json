@@ -1,0 +1,291 @@
+{
+  "id": "gap-wave2-20260923-us-equities-portfolio-risk-1-candidate-libs-execution",
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "gap_index": 1,
+  "gap_text": "No adopted candidate has retained execution evidence for the portfolio-optimization, performance-evaluation or legacy-metrics scope terms. c1, c2 and c4 are untested, not failed.",
+  "gap_text_sha256": "314bf17961447bba55c911439b1747b0297242b90f90397f2c2d467c68cd0f34",
+  "next_check": "Create a new uv venv with pinned cvxportfolio, empyrical-reloaded and quantstats, then run each on the frozen SPY/QQQ/IWM plan.json returns: an optimization for cvxportfolio and performance metrics for empyrical-reloaded and quantstats. Retain the commands, exit codes and output hashes.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:32:44Z",
+    "expectation": "A new uv venv (Python 3.13.15) synced with --require-hashes from requirements-libs.lock pinning cvxportfolio==1.5.1, empyrical-reloaded==0.5.12 and quantstats==0.0.81 (plus skfolio 1.2.9) imports all three. On the frozen plan.json SPY/QQQ/IWM raw daily returns: cvxportfolio runs a native SinglePeriodOptimization minimum-variance policy (FullCovariance, LongOnly, LeverageLimit(1)) through policy.execute at 2021-01-04 and a MarketSimulator backtest over 2021Q1; empyrical-reloaded and quantstats compute annual return, annual volatility, Sharpe, Sortino and max drawdown on the equal-weight development return series.",
+    "criteria": "settled iff each of the three library steps exits 0 in its own process, asserts its pinned version via importlib.metadata, produces finite outputs, and its command, exit code and output sha256 are recorded with the output committed. Any non-zero exit is recorded verbatim and that library is not_settled. Detection: separate processes per library, version assertion and math.isfinite checks that raise on NaN/inf.",
+    "fix_round_3_addendum": {
+      "written_at": "2026-09-23T07:31:52Z",
+      "label": "fix-round-3 preregistration, written after the independent Opus review and before the fix-round-3 reruns",
+      "text": "Fix round 3 after the Opus review (runner-hash binding): rerun all three libraries with the committed, unchanged gap1_libs.py (sha256 902d15efbf4dc04a383bed5d9f8193ae052c4e5e9051ccd5527c634faad5bcef) and common.py (sha256 0fe887db31f6cc437129b90aea0d83380b322c5bbde35179b336b8763e6c00cb) into raw/1/fix3-rerun. Expected: each output JSON is byte-identical to the committed raw/1/<lib>.json, which binds the attempt-2 empyrical-reloaded and quantstats outputs to the committed runner by reproduction. Detection: sha256 comparison per file; any difference is reported per library and that committed output is then bound only to the unretained pre-edit runner. Outcome stays settled only if all three reproduce."
+    }
+  },
+  "commands": [
+    {
+      "cmd": "(setup, creation command not retained) uv venv $CACHE/venv-lock and $CACHE/venv-nautilus",
+      "exit": 0,
+      "started_utc": "venv-lock 2026-09-23T06:30:05Z, venv-nautilus 06:30:13Z (directory birth times; before the 06:32:44Z preregistration)",
+      "provenance": "post-hoc (fix round 4): venv-lock's package set equals the pins of blueprints/us-equities/research-evaluation/requirements.lock and venv-nautilus's equals the accepted tools/nautilus-2.0.0rc5 install (raw/setup/package-set-comparison.txt); whether --require-hashes was used for these two is not recorded"
+    },
+    {
+      "cmd": "uv pip compile blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.in --python $PY3_13_15 --generate-hashes --no-header --output-file blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
+      "exit": 0,
+      "started_utc": "about 2026-09-23T06:30:20Z (lock file mtime; exact start not captured; before the preregistration)"
+    },
+    {
+      "cmd": "uv venv --python $PY3_13_15 $CACHE/venv-libs && uv pip sync --python $CACHE/venv-libs/bin/python --require-hashes blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
+      "exit": 0,
+      "started_utc": "2026-09-23T06:30:25Z (venv birth time; libs-sync.stderr written 06:30:26Z; before the preregistration)",
+      "output": "raw/setup/libs-sync.stderr.txt",
+      "network_downloads": "scs 41.2MiB, curl-cffi 12.9MiB, highspy 4.8MiB, cvxpy 4.2MiB from pypi.org (other wheels from the local uv cache)"
+    },
+    {
+      "cmd": "env HOME=$CACHE/tmphome $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-libs/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap1_libs.py --lib <lib> --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/<lib>.json --workdir $CACHE/g1-work-<lib>",
+      "attempt_1_utc": "2026-09-23T06:36:16Z",
+      "attempt_1_exit": {
+        "cvxportfolio": 1,
+        "empyrical-reloaded": 1,
+        "quantstats": 1
+      },
+      "attempt_1_cause": "temporary HOME broke the default LEAN path (FileNotFoundError before any library call); stderr kept in raw/1/attempt-1-failed",
+      "attempt_2_utc": "2026-09-23T06:36:28Z",
+      "attempt_2_exit": {
+        "cvxportfolio": 0,
+        "empyrical-reloaded": 0,
+        "quantstats": 0
+      },
+      "attempt_3_utc": "2026-09-23T06:36:54Z",
+      "attempt_3": "cvxportfolio only, exit 0, after relabelling result.volatility (per-period) and adding result.annualized_volatility; attempt-2 output kept in raw/1/attempt-2-mislabelled",
+      "runner_binding_note": "empyrical-reloaded and quantstats outputs come from attempt 2, before the attempt-3 edit; the pre-edit runner was not retained. Fix round 3 below binds them to the committed runner by reproduction."
+    },
+    {
+      "cmd": "for lib in cvxportfolio empyrical-reloaded quantstats; do env HOME=$CACHE/tmphome LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-libs/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap1_libs.py --lib $lib --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/fix3-rerun/$lib.json --workdir $CACHE/g1-fix3-work-$lib; done",
+      "exit": {
+        "cvxportfolio": 0,
+        "empyrical-reloaded": 0,
+        "quantstats": 0
+      },
+      "started_utc": "2026-09-23T07:32:01Z",
+      "purpose": "fix round 3 (preregistered 07:31:52Z): rerun with the committed runner gap1_libs.py sha256 902d15efbf4dc04a383bed5d9f8193ae052c4e5e9051ccd5527c634faad5bcef and common.py sha256 0fe887db31f6cc437129b90aea0d83380b322c5bbde35179b336b8763e6c00cb",
+      "byte_identical_to_committed": {
+        "cvxportfolio": "5b5c1b7a35f1eb98648248b9c3edc96f5ea37482e3fcc90272595976dde7ccbd",
+        "empyrical-reloaded": "4dd2c430accf3a3217324367662865536954d15aec4f880c5117ca40340fd756",
+        "quantstats": "aad9d74592c89b4bc4fd2dcbd55ae1f84fee9cc06630771f922c91d3e01f339e"
+      },
+      "detection": "per-file sha256 comparison; the retained attempt-2 cvxportfolio.json (sha256 cf369c13...) differs from the final file, so the comparison can report a difference"
+    }
+  ],
+  "results": {
+    "cvxportfolio": {
+      "version": "1.5.1",
+      "result": {
+        "backtest_annualized_return": 0.30981375422660234,
+        "backtest_annualized_volatility": 0.15737433650560592,
+        "backtest_end": "2021-03-30",
+        "backtest_final_value": 1070338.1328127107,
+        "backtest_period_volatility": 0.009797698232807621,
+        "backtest_periods": 60,
+        "backtest_sharpe_ratio": 1.9686420379548093,
+        "backtest_start": "2021-01-04",
+        "execute_cash_weight": 0.0,
+        "execute_time": "2021-01-04 00:00:00",
+        "execute_weights": {
+          "IWM": 1.7203985893485127e-22,
+          "QQQ": 1.7204888877389021e-22,
+          "SPY": 1.0
+        }
+      }
+    },
+    "empyrical-reloaded": {
+      "version": "0.5.12",
+      "result": {
+        "annual_return": 0.1333834965440508,
+        "annual_volatility": 0.197320567606012,
+        "max_drawdown": -0.34421684988050694,
+        "observations": 1510,
+        "series": "equal-weight SPY/QQQ/IWM daily close-to-close raw returns 2015-01-05..2020-12-31",
+        "sharpe_ratio": 0.7341197404624829,
+        "sortino_ratio": 1.003523641792301
+      }
+    },
+    "quantstats": {
+      "version": "0.0.81",
+      "result": {
+        "cagr": 0.1333834965440508,
+        "max_drawdown": -0.34421684988050694,
+        "observations": 1510,
+        "series": "equal-weight SPY/QQQ/IWM daily close-to-close raw returns 2015-01-05..2020-12-31",
+        "sharpe": 0.7341197404624837,
+        "sortino": 1.0035236417923024,
+        "volatility": 0.197320567606012
+      }
+    }
+  },
+  "outcome": "settled",
+  "evidence_class": "native_proven",
+  "limits": [
+    "cvxportfolio is exercised as a minimum-variance SinglePeriodOptimization and a cost-free MarketSimulator backtest on user-provided forward-aligned returns; its transaction/holding cost models and data downloads are not exercised.",
+    "empyrical-reloaded and quantstats compute metrics on the equal-weight development series only; quantstats reports/tear sheets are not generated.",
+    "cvxportfolio is GPL-3.0; adoption is not decided here.",
+    "Disclosed deviation (found by the independent review): the preregistration named LongOnly plus LeverageLimit(1); the runner used LongOnly plus NoCash (full investment) because a pure minimum-variance objective that may hold cash is trivially all cash. No amendment was written before the run. The settled criteria (each pinned library installs hash-locked, runs on the frozen returns, exits 0 and its outputs are recorded) do not depend on the constraint set; the minimum-variance weights reported are for LongOnly plus NoCash only.",
+    "Runner binding (Opus review, fix round 3): the attempt-2 empyrical-reloaded and quantstats outputs were produced by a pre-edit runner that was not retained; the committed runner reproduces all three outputs byte for byte, which binds the committed outputs to it by reproduction, not by the original execution.",
+    "Order of setup (second Opus review, fix round 4): the first step of the next_check (create the pinned venv) and the lock compile ran at about 06:30:20-06:30:26Z, before the 06:32:44Z preregistration; the preregistration therefore preceded the library runs, not the environment setup. Setup timestamps come from file birth/modify times (raw/setup/setup-timeline.txt)."
+  ],
+  "checked_at": "2026-09-23T07:32:01Z (start of the fix-round-3 reproduction the receipt relies on; library runs first executed 06:36:16Z-06:36:54Z)",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/attempt-1-failed/cvxportfolio.stderr.txt",
+      "sha256": "105193bf192df715fade3031854c1e38649faaa6be26660bbdd59682afb0fd12"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/attempt-1-failed/empyrical-reloaded.stderr.txt",
+      "sha256": "105193bf192df715fade3031854c1e38649faaa6be26660bbdd59682afb0fd12"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/attempt-1-failed/quantstats.stderr.txt",
+      "sha256": "105193bf192df715fade3031854c1e38649faaa6be26660bbdd59682afb0fd12"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/attempt-2-mislabelled/cvxportfolio.json",
+      "sha256": "cf369c13c1ee01562ea847227c3fbb7faf9f3a500fba4b52caaa007fa4bf1b30"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/attempt-2-mislabelled/cvxportfolio.stderr.txt",
+      "sha256": "02495f5c1621a81e623ecc63f8c3bc9dec569429086c0369a9aab7fdff9dd36a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/attempt-2-mislabelled/cvxportfolio.stdout.txt",
+      "sha256": "dd6612f475d745f5b1312edf5f1804a00679a8f6d7ac5860bdcaaa06d1178514"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/cvxportfolio.json",
+      "sha256": "5b5c1b7a35f1eb98648248b9c3edc96f5ea37482e3fcc90272595976dde7ccbd"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/cvxportfolio.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/cvxportfolio.stdout.txt",
+      "sha256": "8749b0a42c810ae1e87cff196a5daf0b179f83707166000db2867258d54f7cf9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/empyrical-reloaded.json",
+      "sha256": "4dd2c430accf3a3217324367662865536954d15aec4f880c5117ca40340fd756"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/empyrical-reloaded.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/empyrical-reloaded.stdout.txt",
+      "sha256": "91159d26c95138ccfd2b1d1f846d8ca358ed037f24e5e3bf3d453e3a3ec82c11"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/fix3-rerun/cvxportfolio.json",
+      "sha256": "5b5c1b7a35f1eb98648248b9c3edc96f5ea37482e3fcc90272595976dde7ccbd"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/fix3-rerun/cvxportfolio.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/fix3-rerun/cvxportfolio.stdout.txt",
+      "sha256": "8749b0a42c810ae1e87cff196a5daf0b179f83707166000db2867258d54f7cf9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/fix3-rerun/empyrical-reloaded.json",
+      "sha256": "4dd2c430accf3a3217324367662865536954d15aec4f880c5117ca40340fd756"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/fix3-rerun/empyrical-reloaded.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/fix3-rerun/empyrical-reloaded.stdout.txt",
+      "sha256": "91159d26c95138ccfd2b1d1f846d8ca358ed037f24e5e3bf3d453e3a3ec82c11"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/fix3-rerun/quantstats.json",
+      "sha256": "aad9d74592c89b4bc4fd2dcbd55ae1f84fee9cc06630771f922c91d3e01f339e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/fix3-rerun/quantstats.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/fix3-rerun/quantstats.stdout.txt",
+      "sha256": "7d6bb01292d4379036bd766a48c3a97a8e565683118457d0855b222685cf55e1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/quantstats.json",
+      "sha256": "aad9d74592c89b4bc4fd2dcbd55ae1f84fee9cc06630771f922c91d3e01f339e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/quantstats.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/1/quantstats.stdout.txt",
+      "sha256": "7d6bb01292d4379036bd766a48c3a97a8e565683118457d0855b222685cf55e1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/setup/libs-sync.stderr.txt",
+      "sha256": "a28ff6eb7a0de1ca267e9caa880f01737be96e9a03b3a6d8bd0caa035114c7f5"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/setup/package-set-comparison.txt",
+      "sha256": "e5ae788ea4c707621f62add76ed733a21a976f95844459a737a74bdab889da61"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/setup/setup-timeline.txt",
+      "sha256": "bb86c196e802236d1201718c08b74a927b25c11d22ec035a7e67afe860f2a549"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/setup/tools-nautilus-2.0.0rc5.freeze.txt",
+      "sha256": "9a2c65a6102be63a64f65f2c489ddcdd144bacadeee63a05b119e8e038a67f75"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/setup/venv-libs.freeze.txt",
+      "sha256": "26941e7ed174bae4253bfa57ca28e2e42675e3d1e4b8d304891ce326b7930926"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/setup/venv-lock.freeze.txt",
+      "sha256": "ac8e8d95c94e10a81ec1735bbd134d6c1a2028e4a185ab704d8155f0329731a8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/setup/venv-nautilus.freeze.txt",
+      "sha256": "9a2c65a6102be63a64f65f2c489ddcdd144bacadeee63a05b119e8e038a67f75"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap1_libs.py",
+      "sha256": "902d15efbf4dc04a383bed5d9f8193ae052c4e5e9051ccd5527c634faad5bcef"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.in",
+      "sha256": "305cb82c09a77e1301396903ed2581474ac86d5c90a3528b52a535c973fbc56e"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
+      "sha256": "19067f822ff89f6694445e34b5c78da34cd7e4bbf781d1c352f507066f65a45e"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "Codex CLI 0.155.1 (gpt-6-astra), codex exec --sandbox read-only --ephemeral, one bounded call",
+    "record": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md"
+    ],
+    "round_2": "no round-2 finding for this gap",
+    "findings_and_resolution": "minor: runner used NoCash instead of the preregistered LeverageLimit(1) -> disclosed as a deviation in limits",
+    "round_3": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "resolution": "minor: committed runner hash was not the runner of the attempt-2 empyrical-reloaded/quantstats outputs -> fix round 3 reran all three libraries with the committed runner (902d15ef...); every output is byte-identical to the committed file"
+    },
+    "round_4": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "resolution": "minor: next_check step 1 (venv-libs) and the venv-lock/venv-nautilus/skfolio-clone setup ran 06:30:05Z-06:30:31Z, before the 06:32:44Z preregistration, with no timestamps or creation record -> setup timestamps added from file birth times, post-hoc package-set provenance committed under raw/setup (creation commands of venv-lock and venv-nautilus not retained), README corrected; minor: checked_at moved to the fix-round-3 reproduction it relies on; the NoCash deviation note now states the settled criteria do not depend on the constraint set"
+    },
+    "round_4_codex": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "reviewer": "Codex CLI (codex exec --sandbox read-only --ephemeral), one bounded call on commits 6ed9709..a4cbcf8",
+      "resolution": "no finding for this gap"
+    }
+  }
+}

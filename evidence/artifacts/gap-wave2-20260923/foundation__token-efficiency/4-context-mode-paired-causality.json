@@ -1,0 +1,28 @@
+{
+  "id": "4-context-mode-paired-causality",
+  "gap_index": 4,
+  "gap_text_sha256": "8afeedbea24249c35ae0cb0b82b14d7f0bd64558bf3610645d72747d64f564ca",
+  "preregistration": {
+    "written_at": null,
+    "expectation": "The gap's next_check requires several order-randomized paired sessions per client (Claude and Codex), with and without Context Mode, on fixed tasks, with a cache-busting preamble or cold-cache control, comparing ccusage counters -- i.e. a multi-session, multi-arm, per-client controlled experiment. That is a long/multi-session Claude workload, which the hard rules exclude this run (the shared Claude account is reserved for another session's long-horizon comparison; only one bounded single call is allowed and cannot supply a multi-arm randomized design). No bounded single-call substitute meaningfully advances a claim about causality across randomized order and cache state, so no check was attempted beyond confirming the constraint applies.",
+    "criteria": "N/A -- this receipt records a deferral, not an executed measurement.",
+    "written_at_note": "Reconciliation 2026-09-23: timestamps set to null because the recorded values are impossible or unverifiable. First-pass commit 0699663 was made at 2026-09-23T01:49:24Z yet carried first-pass times as late as 01:57Z; fix-round commit f796901 was made at 02:06:06Z yet carried fix-round times as late as 02:22Z. This preregistration is in first-pass commit 0699663 (01:49:24Z) but carries 01:54Z. The exact time is unknown."
+  },
+  "commands": [],
+  "results": {
+    "hard_rules_review": "The gap's own next_check text calls for 'several order-randomized paired sessions per client... with and without Context Mode... comparing ccusage counters' -- an inherently multi-session, multi-arm design. The task's hard rules state the shared Claude account is reserved for another session's long-horizon comparison and permit only 'one bounded single-call check'; a single call cannot supply randomized order or a cache-state control arm, so no partial substitute was constructed."
+  },
+  "outcome": "not_settled",
+  "evidence_class": "source_review",
+  "limits": [
+    "No commands were run for this gap. The earlier 'grep ... <task hard-rules text>' entry was a placeholder, not an executed command, and is removed."
+  ],
+  "checked_at": null,
+  "not_settled_reason": "Claude arms: blocked by the wave brief's reservation of the shared Claude account (from 2026-09-23 00:33 UTC; brief text not stored in this repository). Codex arms: the receipt named no Codex-specific blocker, and none was attempted. The first version applied the Claude reservation to the Codex half. With both clients required and the Codex half left unattempted without a blocker, this is not a valid deferral. No commands were run for this gap.",
+  "checked_at_note": "Reconciliation 2026-09-23: timestamps set to null because the recorded values are impossible or unverifiable. First-pass commit 0699663 was made at 2026-09-23T01:49:24Z yet carried first-pass times as late as 01:57Z; fix-round commit f796901 was made at 02:06:06Z yet carried fix-round times as late as 02:22Z. This receipt's first version is in commit 0699663 (01:49:24Z) but carried 01:54:30Z.",
+  "reconciliation": [
+    "Outcome changed from deferred to not_settled: the Codex arm had no named blocker.",
+    "The placeholder grep command, which contradicted 'No commands were run', is removed.",
+    "Timestamps set to null."
+  ]
+}

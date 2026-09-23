@@ -1,0 +1,24 @@
+{
+ "clean": {
+  "all_checks_pass": true,
+  "failed_checks": []
+ },
+ "dividend_credit": {
+  "all_checks_pass": false,
+  "failed_checks": [
+   "cash_constant_while_held"
+  ]
+ },
+ "split_quantity": {
+  "all_checks_pass": false,
+  "failed_checks": [
+   "position_quantity_constant_10_while_held"
+  ]
+ },
+ "fill_shift_1ms": {
+  "all_checks_pass": false,
+  "failed_checks": [
+   "fill_BUY_at_bar_instant"
+  ]
+ }
+}

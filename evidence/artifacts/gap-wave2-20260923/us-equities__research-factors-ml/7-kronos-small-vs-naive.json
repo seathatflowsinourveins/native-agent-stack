@@ -1,0 +1,81 @@
+{
+  "id": "gap-wave2-20260923-research-factors-ml-7-kronos-small-vs-naive",
+  "layer_id": "research-factors-ml",
+  "catalog": "us-equities",
+  "gap_index": 7,
+  "gap_text_sha256": "58a7b8b4b48b61066e1be6b13cf131828451d6b35c4b3ca4eedc082ac3fe5615",
+  "gap_text": "Non-adopted c13 (tradermonty/claude-trading-skills) and c16 (shiyu-coder/Kronos) have no evidence_refs in the packet. The c16 note (packet line 486) is a hypothetical overturn condition, not a result, so challenger_preferred stays null.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:19:39Z",
+    "written_at_note": "Upper bound: the commit time of the first preregistration commit (4484138). Written between 06:18:35Z and that commit; corrected in the same unpushed commit before any check ran.",
+    "source": "preregistration.json gaps.7",
+    "expectation": "Kronos-small (HF NeoQuasar/Kronos-small 901c26c1332695a2a8f243eb2f37243a37bea320, tokenizer NeoQuasar/Kronos-Tokenizer-base 0e0117387f39004a9016484a186a908917e22426, source shiyu-coder/Kronos 67b630e67f6a18c9e9be918d9b4337c960db1e9a) runs in the fcmp comparison on OHLCV context (amount derived by the upstream predictor), pred_len=5, T=1.0, top_p=0.9, sample_count=20, torch seed 0, CPU.",
+    "criteria": [
+      "Per-fold MAE for Kronos vs naive on the same origins; bootstrap interval as in gap 6.",
+      "The receipt is the c16 evidence_ref candidate; the packet itself is not edited (layer-verdict artifacts are read-only for this unit).",
+      "Gap 7 also names c13; settled only if the c13 check (gap 14) also executes."
+    ],
+    "fix_rounds": [
+      {
+        "written_at": "2026-09-23T06:48:47Z",
+        "label": "fix round 2 (gaps 5, 6, 7, 13, 14 forecast comparison), written after attempt 1 was stopped",
+        "trigger": "Attempt 1 (single process, all arms, CPU) started 06:22:36Z under ecosystem-bounded-run with a 1200 s limit. The statsforecast, statsmodels and chronos stages finished within about 30 s (Kronos weights were loading by 06:23:05Z), then the Kronos-small CPU stage (sample_count=20, 21 folds) ran until the 1200 s limit stopped the job at about 06:42:36Z; no results.json was written. statsforecast n_jobs=-1 also exhausted the job's 256-task limit (OpenBLAS 'blas_thread_init' and tqdm 'can't start new thread' warnings). Attempt 1 is retained as a stopped attempt, not a result.",
+        "change": "Split into two bounded processes with identical origins, context, target and seeds: (A) naive, statsforecast, statsmodels, chronos on CPU with OPENBLAS_NUM_THREADS=1, OMP_NUM_THREADS=1 and statsforecast n_jobs=4; (B) Kronos-small with the same parameters (pred_len=5, T=1.0, top_p=0.9, sample_count=20, torch seed 0) on the local CUDA GPU instead of CPU, a deviation from the CPU wording of the original preregistration. A merge step computes the preregistered metrics and bootstrap intervals from both forecast files after checking that the (fold, asset, decision) keys and targets are identical. Each process is again bounded to 20 minutes; a Kronos stop at the limit is recorded as not_settled for the Kronos clauses.",
+        "criteria": "Unchanged from the original entries for gaps 6, 7, 13 and 14."
+      }
+    ]
+  },
+  "commands": [
+    "see receipt 6: fcmp part B (--models kronos_small --kronos-device cuda:0) and merge"
+  ],
+  "results": {
+    "kronos_small": "dev mean per-fold MAE 0.043356 vs naive 0.018682 (ratio 2.75); reserved MAE 0.122386 vs 0.020570; Kronos minus naive per-fold MAE diff +0.02467, 95% CI [0.01788, 0.03185], Kronos better in 2/20 folds: naive better (resolved).",
+    "diagnostic": "Kronos 5-session forecasts have mean -0.0229 and sd 0.0575 vs realized sd 0.0281; the largest forecasts are about 0.32 in magnitude on IWM, i.e. strong mean reversion toward the context window mean.",
+    "c16_evidence_ref_candidate": "evidence/artifacts/gap-wave2-20260923/us-equities__research-factors-ml/7-kronos-small-vs-naive.json",
+    "c13": "see receipt 14 (seeded-defect run)."
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "detection_method": "The same bootstrap resolves a difference when one exists; here it does (naive better). Harness review: the predictor call follows the upstream predict_batch (ordered outputs, upstream per-series denormalization).",
+  "remaining": "Receipts for c16 (this one) and c13 (receipt 14) now exist, but the packet's evidence_refs cannot be added here because layer-verdict artifacts are read-only for this unit; the ledger owner must link them. One Kronos configuration only (daily bars, 252 context, sample_count 20, T=1.0, top_p=0.9, no fine-tuning), run on GPU instead of the preregistered CPU (fix round 2).",
+  "limits": [
+    "The GPU device and sampled decoding mean the result is seeded but not bit-reproducible across hardware.",
+    "The daily ETF context may be outside Kronos-small's main training distribution; the result is not a general Kronos verdict."
+  ],
+  "raw_outputs": [
+    {
+      "path": "raw/fcmp/run-fcmp-B__results.json",
+      "committed_sha256": "7e1cae13a9c5d1a03697e4a4a980efba488cbbeae1699aab53e5d2df4a50b425",
+      "original_sha256": "7e1cae13a9c5d1a03697e4a4a980efba488cbbeae1699aab53e5d2df4a50b425",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/run-fcmp-B__forecasts.json",
+      "committed_sha256": "4645fe0ec0927e25bdd911726e2d71337aaa568c3318d43efde6087258a357ec",
+      "original_sha256": "4645fe0ec0927e25bdd911726e2d71337aaa568c3318d43efde6087258a357ec",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/logs__fcmp-B.stdout",
+      "committed_sha256": "81ad496ccd3513174d99a9337bdc9dec61eba8d3be0b3d7d6c9667c972c1e416",
+      "original_sha256": "81ad496ccd3513174d99a9337bdc9dec61eba8d3be0b3d7d6c9667c972c1e416",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/logs__fcmp-B.stderr",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/run-fcmp-merged-r2__results.json",
+      "committed_sha256": "d49339dd07c09cb2367cd8f61a4c8904713399419d9fbea1d0a093365e43975c",
+      "original_sha256": "6c6c030a0d636932dcef280526921c724a14499ef90a910bd92b3d694c7f43df",
+      "uuids_redacted": 0
+    }
+  ],
+  "checked_at": "2026-09-23T07:09:07Z",
+  "checked_at_note": "mtime of the last check output, $CACHE/run-fcmp-merged-r2/results.json. Corrected from 07:15:00Z, which post-dated its own commit 01e6054 (07:11:23Z); correction written 2026-09-23 after 13:37Z.",
+  "base_commit": "41d39b3",
+  "branch": "claude/g2-research-factors-ml-20260923"
+}

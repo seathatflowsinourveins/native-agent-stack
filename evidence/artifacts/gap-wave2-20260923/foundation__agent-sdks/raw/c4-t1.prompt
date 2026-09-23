@@ -1,0 +1,5 @@
+Research task (read-only). The workspace contains engine-receipt.json and deerflow-native-receipt.json.
+Use focused Context Mode extraction (ctx_execute_file or ctx_execute) rather than reading whole files into context.
+Report, as one JSON object with these keys: engine_data_points, engine_simulated_orders, engine_failed_data_requests,
+deerflow_skills (the upstream skill count), acp_configured_model, deerflow_acp_prompt_calls, and a one-sentence
+unproved_alpaca_scope. Cite the file for each value. Do not guess; if a tool fails, say which and why.

@@ -1,0 +1,7 @@
+activity_fail{activityType="step1",namespace="default",operation="RespondActivityTaskFailed",service_name="history",taskqueue="g2dqo_two_step",versioning_behavior="Unspecified",workflowType="TwoStep"} 1
+activity_success{activityType="step1",namespace="default",operation="RespondActivityTaskCompleted",service_name="history",taskqueue="g2dqo_two_step",versioning_behavior="Unspecified",workflowType="TwoStep"} 2
+activity_success{activityType="step2",namespace="default",operation="RespondActivityTaskCompleted",service_name="history",taskqueue="g2dqo_two_step",versioning_behavior="Unspecified",workflowType="TwoStep"} 2
+activity_task_fail{activityType="step1",namespace="default",operation="RespondActivityTaskFailed",service_name="history",taskqueue="g2dqo_two_step",versioning_behavior="Unspecified",workflowType="TwoStep"} 2
+workflow_cancel{namespace="default",namespace_state="active",operation="CompletionStats",service_name="history",taskqueue="g2dqo_two_step",workflowType="TwoStep"} 1
+workflow_failed{namespace="default",namespace_state="active",operation="CompletionStats",service_name="history",taskqueue="g2dqo_two_step",workflowType="TwoStep"} 1
+workflow_success{namespace="default",namespace_state="active",operation="CompletionStats",service_name="history",taskqueue="g2dqo_two_step",workflowType="TwoStep"} 2

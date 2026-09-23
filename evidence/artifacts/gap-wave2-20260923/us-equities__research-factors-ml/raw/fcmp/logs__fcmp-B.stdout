@@ -1,0 +1,16 @@
+{
+ "tasks": 783,
+ "summary": {
+  "kronos_small": {
+   "dev_mean_fold_mae": 0.043356494783533095,
+   "reserved_mae": 0.12238597053200115,
+   "dev_mean_mae_ratio_to_naive": null
+  }
+ },
+ "pairwise": {},
+ "timing_s": {
+  "kronos_small": 116.64602398872375
+ },
+ "inputs_unchanged": true,
+ "results_sha256": "7e1cae13a9c5d1a03697e4a4a980efba488cbbeae1699aab53e5d2df4a50b425"
+}

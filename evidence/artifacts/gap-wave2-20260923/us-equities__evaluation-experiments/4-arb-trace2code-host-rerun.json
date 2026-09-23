@@ -1,0 +1,144 @@
+{
+ "id": "gap-wave2-20260923/us-equities__evaluation-experiments/4-arb-trace2code-host-rerun",
+ "gap_index": 4,
+ "gap_text_sha256": "e244db74d2c9685bef0e553d67f4351eb31bc8f24d362e4c57d577fa113208f9",
+ "next_check": "Rerun the arb-trace2code c7 evaluation on this host from the same pinned source, and compare the per-sample metrics with the Darwin arm64 receipt.",
+ "preregistration": {
+  "written_at": "2026-09-23T07:18:31Z",
+  "expectation": "Rerunning the unmodified ARB v0.2.1 (commit b487f386) lexical and BM25 evaluators on the pinned v2_trace2code archive (sha256 19b252e8...) with a stdlib-only CPython 3.14.7 on this Linux x86_64 host reproduces the Darwin arm64 per-sample detail files byte-for-byte (native_details_sha256 2eb08ad2... lexical, 3c5e5399... bm25) and the same macro metrics; the 15 pinned upstream tests pass. This closes the host clause only: the task remains file-level code retrieval, not financial-document retrieval, answer quality or trading performance.",
+  "criteria": [
+   "Archive sha256 and member inventory match before extraction (39,295,446-byte download disclosed).",
+   "Upstream schema validation: 101 valid, 0 invalid.",
+   "Per-sample details sha256 and macro metrics compared with blueprints/convergence-practice/arb-trace2code/receipt.json; per-sample gold ranks compared with paired-samples.json.",
+   "Upstream tests: tests/test_corpus_baseline.py pass count compared with 15.",
+   "Outcome at most advanced: the domain-scope clauses of the gap cannot be closed by a host rerun."
+  ],
+  "file": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/prereg/4-arb-trace2code-host-rerun.json",
+  "committed_in": "20fbeb6 (2026-09-23T07:18:35Z), before any check ran"
+ },
+ "commands": [
+  "git clone https://github.com/eyuansu62/agent-retrieval-bench.git $HOME/.cache/gap-wave2-20260923/evaluation-experiments/arb/upstream && git -C $HOME/.cache/gap-wave2-20260923/evaluation-experiments/arb/upstream checkout --detach b487f3866cc13dd971819cb902517a6a50282404",
+  "curl -sS --fail --location --max-time 300 -o $HOME/.cache/gap-wave2-20260923/evaluation-experiments/arb/agent_retrieval_bench_v2_trace2code.tar.zst https://huggingface.co/datasets/eyuansu71/agent_retrieval_bench/resolve/5901e1ee3aff048290db72edf9c63bc498b79ea3/releases/v2_trace2code/agent_retrieval_bench_v2_trace2code.tar.zst",
+  "ECOSYSTEM_JOB_SECONDS=1200 $HOME/codex-ecosystem/bin/ecosystem-bounded-run blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/arb_rerun.sh $HOME/.cache/gap-wave2-20260923/evaluation-experiments/arb $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/4",
+  "python3 blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/arb_compare.py . $HOME/.cache/gap-wave2-20260923/evaluation-experiments/arb > $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/4/comparison.json"
+ ],
+ "results": {
+  "runtime": "3.14.7 Linux x86_64",
+  "archive": [
+   "archive ok 19b252e8cfff42107fedc74005dbb6972f2970af33651ce0c1571546819e41c4 120",
+   "extract exit=0"
+  ],
+  "validation": [
+   {
+    "path": "data/benchmark/v2_trace2code/samples.jsonl",
+    "total": 101,
+    "invalid": 0,
+    "errors_by_id": {}
+   }
+  ],
+  "exit_codes": [
+   "validate exit=0",
+   "lexical exit=0 wall=15.203410896",
+   "bm25 exit=0 wall=16.331335067",
+   "pytest exit=0"
+  ],
+  "upstream_tests": "15 passed in 0.08s",
+  "comparison_with_darwin_arm64_receipt": {
+   "rankers": {
+    "lexical": {
+     "local_details_sha256": "2eb08ad2e7f35549ec823f6911bf4150c7ccddb5a037998c3a357a03d2c22cd4",
+     "darwin_details_sha256": "2eb08ad2e7f35549ec823f6911bf4150c7ccddb5a037998c3a357a03d2c22cd4",
+     "details_byte_identical": true,
+     "evaluated": 101,
+     "summary_fields_compared": 85,
+     "summary_fields_differing": [
+      "runtime.wall_time_seconds"
+     ],
+     "differing_fields_all_timing": true,
+     "headline": {
+      "Recall@5": 0.3432343234323432,
+      "Recall@10": 0.48184818481848185,
+      "Recall@20": 0.6963696369636964,
+      "MRR": 0.20745277382862923
+     },
+     "per_sample_gold_rank_mismatches": [],
+     "samples_compared": 101
+    },
+    "bm25": {
+     "local_details_sha256": "3c5e53999c89b48a5df55ef870484a85786e8939b91d6c9ee3a0f29e08c40b87",
+     "darwin_details_sha256": "3c5e53999c89b48a5df55ef870484a85786e8939b91d6c9ee3a0f29e08c40b87",
+     "details_byte_identical": true,
+     "evaluated": 101,
+     "summary_fields_compared": 85,
+     "summary_fields_differing": [
+      "runtime.wall_time_seconds"
+     ],
+     "differing_fields_all_timing": true,
+     "headline": {
+      "Recall@5": 0.22277227722772278,
+      "Recall@10": 0.3217821782178218,
+      "Recall@20": 0.49339933993399343,
+      "MRR": 0.16384832699974178
+     },
+     "per_sample_gold_rank_mismatches": [],
+     "samples_compared": 101
+    }
+   }
+  },
+  "download": "37.5 MiB (39,295,446 bytes) archive from Hugging Face; upstream git clone."
+ },
+ "outcome": "advanced",
+ "outcome_note": "The host clause is closed: on Linux x86_64 with CPython 3.14.7, the unmodified ARB v0.2.1 lexical and BM25 per-sample details are byte-identical to the Darwin arm64 receipt (sha256 2eb08ad2... and 3c5e5399...), all 101 per-sample gold ranks match paired-samples.json, only runtime.wall_time_seconds differs in the summaries, and 15/15 upstream tests pass. What remains: the gap's scope clauses (file-level code retrieval with gin+click at 82/101 samples, not financial-document retrieval, answer quality or net trading performance) cannot be closed by a rerun; they need a financial-document retrieval benchmark with answer-quality judgments.",
+ "evidence_class": "native_proven",
+ "limits": [
+  "Same released subset and algorithms; no new domain, answer quality or trading evidence.",
+  "Wall times (about 15-16 s per ranker) are single observations, not a latency benchmark."
+ ],
+ "raw_outputs": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/4/bm25-details.jsonl",
+   "sha256": "3c5e53999c89b48a5df55ef870484a85786e8939b91d6c9ee3a0f29e08c40b87"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/4/bm25-summary.json",
+   "sha256": "84d72f483f3a6245c6d3812872911973b4cc00c7e76bf6ccbfd915ee2bd24682"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/4/comparison.json",
+   "sha256": "9fd0eb1ece98fb6f16257ddb00d7beac631f744082071e49cb689b0a98a51bd5"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/4/exit-codes.txt",
+   "sha256": "6aec24ba2707d21f1f8108074c3b220806936e47d2042515c6f81fc52b8cf856"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/4/extract.txt",
+   "sha256": "ffc3dc7e2a3377f4fa025b1ecb791393d32487bbb35c76e1b6c38cb3fbcd354e"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/4/lexical-details.jsonl",
+   "sha256": "2eb08ad2e7f35549ec823f6911bf4150c7ccddb5a037998c3a357a03d2c22cd4"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/4/lexical-summary.json",
+   "sha256": "fa513be38598988b6bba011852b2992fc46f536fe64c238a328d7ac5008f03bf"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/4/result-hashes.txt",
+   "sha256": "94af8ef7d618e41e91b5ae90682b4f9d126c07de7484afa6c7272686386b799c"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/4/runtime.txt",
+   "sha256": "d6a1e5ad05e2a259b4b47f141a8bf372eba40f2d610932f142caf12f8d90aa1b"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/4/upstream-tests.txt",
+   "sha256": "1d183bee723cf8f3bb8dff1a768f28892049a01ecb33c1e10cf242eebdd7d1ca"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/4/validate.json",
+   "sha256": "2fdff3fa025e8d82e77ee23756d490a4579cd9d5f5796bf57ced2306dcb2d922"
+  }
+ ],
+ "checked_at": "2026-09-23T13:51:51Z"
+}
