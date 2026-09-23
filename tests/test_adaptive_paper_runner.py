@@ -2080,6 +2080,32 @@ class LeverageMarginEntitlementTests(unittest.TestCase):
                 self.account(pattern_day_trader=True, equity="10000"), self.config(),
                 self.leverage_policy("4"), {"overnight_holds": False})
 
+    def current_schema_account(self, **overrides):
+        # Alpaca's GetAccount schema after FINRA's intraday margin rule: no
+        # daytrading_buying_power, pattern_day_trader or daytrade_count.
+        account = {"multiplier": "4", "buying_power": "40000", "regt_buying_power": "20000", "equity": "10000"}
+        account.update(overrides)
+        return account
+
+    def test_current_alpaca_schema_uses_buying_power(self):
+        mult = runner_module._check_margin_entitlement(self.current_schema_account(), self.config(),
+                                                        self.leverage_policy("4"), {"overnight_holds": False})
+        self.assertEqual(mult, Decimal("4"))
+        self.assertEqual(runner_module.intraday_buying_power(self.current_schema_account()), ("40000", "buying_power"))
+        self.assertEqual(runner_module.intraday_buying_power(self.account()), ("40000", "daytrading_buying_power"))
+
+    def test_current_alpaca_schema_insufficient_buying_power_refused(self):
+        with self.assertRaisesRegex(SafetyErrorAlways, "account_daytrading_buying_power_insufficient"):
+            runner_module._check_margin_entitlement(self.current_schema_account(buying_power="100"), self.config(),
+                                                     self.leverage_policy("4"), {"overnight_holds": False})
+
+    def test_no_intraday_buying_power_field_is_missing(self):
+        account = self.current_schema_account()
+        del account["buying_power"]
+        with self.assertRaisesRegex(SafetyErrorAlways, "account_margin_fields_missing"):
+            runner_module._check_margin_entitlement(account, self.config(), self.leverage_policy("4"),
+                                                     {"overnight_holds": False})
+
     def test_sufficient_account_returns_multiplier(self):
         mult = runner_module._check_margin_entitlement(self.account(), self.config(),
                                                         self.leverage_policy("4"), {"overnight_holds": False})

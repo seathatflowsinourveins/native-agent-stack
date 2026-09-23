@@ -497,6 +497,20 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
             raise SafetyError("promotion_gate_mismatch")
 
 
+def intraday_buying_power(account):
+    """(value, field) for the account's intraday buying power, or None.
+
+    Alpaca's current GetAccount schema has no ``daytrading_buying_power``: FINRA's
+    intraday margin rule ended the pattern-day-trader designation, and the schema
+    documents ``buying_power`` as the day-trade buying power when ``multiplier`` is
+    4 (docs.alpaca.markets/us/reference/getaccount-1, read 2026-09-23). The legacy
+    field is preferred when a broker still reports it."""
+    for field in ("daytrading_buying_power", "buying_power"):
+        if account.get(field) is not None:
+            return str(account[field]), field
+    return None
+
+
 def _check_margin_entitlement(account, config, lev, session_policy):
     """G-e: only called (from validate_preflight, below) when
     ``config.get("_leverage_policy")`` is set -- i.e. `account` was fetched
@@ -506,14 +520,14 @@ def _check_margin_entitlement(account, config, lev, session_policy):
     non-leverage path (validate_preflight never calls this function then).
     """
     need = lev.max_leverage
-    if any(key not in account for key in ("multiplier", "daytrading_buying_power", "regt_buying_power")):
+    if any(key not in account for key in ("multiplier", "regt_buying_power")) or intraday_buying_power(account) is None:
         raise SafetyError("account_margin_fields_missing")
     if account.get("pattern_day_trader") is True and Decimal(account["equity"]) < 25000:
         raise SafetyError("account_restricted")
     mult = Decimal(account["multiplier"])
     if not mult.is_finite() or mult < need:
         raise SafetyError("account_multiplier_below_requested_leverage")
-    if Decimal(account["daytrading_buying_power"]) < Decimal(config["max_gross_exposure_usd"]):
+    if Decimal(intraday_buying_power(account)[0]) < Decimal(config["max_gross_exposure_usd"]):
         raise SafetyError("account_daytrading_buying_power_insufficient")
     if session_policy["overnight_holds"]:
         overnight_cap = Decimal(config["capital_usd"]) * lev.overnight_max_leverage
@@ -1373,7 +1387,8 @@ def main():
             if leverage_policy is not None:
                 summary["margin"] = {
                     "multiplier": str(config["_account_multiplier"]),
-                    "daytrading_buying_power": observation["account"]["daytrading_buying_power"],
+                    "intraday_buying_power": intraday_buying_power(observation["account"])[0],
+                    "intraday_buying_power_field": intraday_buying_power(observation["account"])[1],
                     "regt_buying_power": observation["account"]["regt_buying_power"],
                     "requested_max_leverage": str(leverage_policy.max_leverage),
                     "policy_version": leverage_policy.version}
@@ -1421,7 +1436,8 @@ def main():
     if leverage_policy is not None and config.get("_account_multiplier") is not None:
         summary["margin"] = {
             "multiplier": str(config["_account_multiplier"]),
-            "daytrading_buying_power": observation["account"]["daytrading_buying_power"],
+            "intraday_buying_power": intraday_buying_power(observation["account"])[0],
+            "intraday_buying_power_field": intraday_buying_power(observation["account"])[1],
             "regt_buying_power": observation["account"]["regt_buying_power"],
             "requested_max_leverage": str(leverage_policy.max_leverage),
             "policy_version": leverage_policy.version}
