@@ -21,3 +21,14 @@ updates:
     # option; security updates are exempt). Matches agent-lab's setting.
     cooldown:
       default-days: 7
+  # Deliberately vulnerable positive-control fixture (urllib3 1.26.4, gap
+  # ci-supply-chain[13], tests/test_grype_known_cve_fixture.py). `ignore` also
+  # applies to security updates (exclude-paths and the PR limit do not), so no
+  # PR bumps the pin; alerts still appear and are dismissed as not_used.
+  - package-ecosystem: pip
+    directory: /blueprints/gap-wave2-20260923/grype-known-cve-fixture
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    ignore:
+      - dependency-name: urllib3

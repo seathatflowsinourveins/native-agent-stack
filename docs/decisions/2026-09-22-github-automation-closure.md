@@ -266,6 +266,13 @@ noisy alerts that nobody triages for 30 days.
   ("Bump urllib3 from 1.26.4 to 2.7.0", closed 2026-09-23T04:40:57Z) was
   closed: upgrading urllib3 would destroy the fixture's purpose, and nothing
   installs the file (same reason as the OSV exclusion in section 3).
+- **Fixture kept out of future security PRs.** `.github/dependabot.yml` adds a
+  pip entry scoped to the fixture directory with `open-pull-requests-limit: 0`
+  and `ignore: urllib3`. The Dependabot options reference (read 2026-09-23)
+  marks `ignore` as also applying to security updates, while `exclude-paths`
+  and the PR limit apply to version updates only. New advisories still raise
+  alerts on the fixture; those are dismissed `not_used`. Requested by the
+  gap-resolution session that owns the fixture.
 - **Security updates stay on.** Dependabot security updates are free, gave the
   fastest signal here (#97/#98 within minutes of enabling), and auto-close
   their alerts when a fix lands (alerts 1-6 closed on #99's merge). The cost is

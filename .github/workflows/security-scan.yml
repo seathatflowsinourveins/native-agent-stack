@@ -4,7 +4,8 @@ name: Dependency and workflow security scan
 # .github/osv-scanner-lockfiles.json (tests/test_osv_lockfile_coverage.py fails
 # when a tracked one is missing; its "excluded" list names deliberately vulnerable
 # test fixtures, each with a reason) and fails on any vulnerability not ignored in
-# .github/osv-scanner.toml; its pull_request run is a required check. On push,
+# .github/osv-scanner.toml; its pull_request run becomes a required check once the target ruleset
+# (.github/main-ruleset.json) is applied after merge. On push,
 # schedule and dispatch it also uploads SARIF to code scanning, and
 # zizmor-online adds zizmor's online audits as SARIF (validate.yml keeps the
 # offline zizmor PR gate). See docs/decisions/2026-09-22-github-automation-closure.md.
