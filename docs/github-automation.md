@@ -1116,7 +1116,16 @@ through the step's environment) is not `main`. A PR first judged against
 another branch and then retargeted to `main` therefore cannot merge on its
 earlier green run. The merge commit's first parent, which the gate compares
 with, must also be a commit on `origin/main`, so a merge commit still built on
-a branch that merely contains `main`'s tip fails closed. The job runs the head's own copy of the gate only when the
+a branch that merely contains `main`'s tip fails closed.
+
+After a retarget, the `edited` run checks out the merge commit still built on
+the old base. This was measured on 2026-09-23 with throwaway PR #143, and the
+decision record has the run IDs. The gate therefore fails once, and re-running
+the job cannot help, because a re-run keeps the same commit. Close and reopen
+the pull request, or push a commit, to rebuild the merge commit on `main`; the
+next run judges it.
+
+The job runs the head's own copy of the gate only when the
 base has none and this change adds `scripts/verdict_review_gate.py` (the
 bootstrap PR); a base without the gate otherwise fails closed.
 

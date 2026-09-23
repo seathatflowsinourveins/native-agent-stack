@@ -200,7 +200,7 @@ jobs:
               # branch that merely contains main's tip, such as a merge commit left built against an
               # earlier base: a retargeted PR is otherwise judged against the branch it left.
               if ! git merge-base --is-ancestor "$base" "refs/remotes/origin/$PR_BASE_REF"; then
-                echo "::error::verdict-review-gate: the base $base is not a commit on origin/$PR_BASE_REF; failing closed"
+                echo "::error::verdict-review-gate: the base $base is not a commit on origin/$PR_BASE_REF; failing closed (after a retarget the edited run checks out the merge commit built on the old base: close and reopen the pull request, or push a commit, to rebuild it on $PR_BASE_REF)"
                 exit 1
               fi
               ;;

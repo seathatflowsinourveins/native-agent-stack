@@ -926,7 +926,7 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     `pull_request` event whose base branch (`GITHUB_BASE_REF`, passed as `PR_BASE_REF` through the
     step's `env`, never interpolated into `run:`) is not `main`. Push-to-`main` runs are unchanged.
     Tests: the trigger lists `edited`; the executed step script fails for `develop`, `main-copy` and
-    an empty base ref and runs the gate for `main`. Not reproduced live on GitHub.
+    an empty base ref and runs the gate for `main`. Reproduced live on GitHub below (round 2).
     - Round 2 (low, defence in depth): the step only checked that the payload `base.sha` is an
       ancestor of the merge commit's first parent, so a merge commit still built on a stacked
       branch that contains `main`'s tip would have been judged against that branch. The first
@@ -934,6 +934,27 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
       `actions/checkout` with `fetch-depth: 0`, whose pinned revision fetches
       `+refs/heads/*:refs/remotes/origin/*`), or the job fails closed. Test: a merge of the PR
       head into a stacked branch fails; the merge into `main` runs the gate.
+    - Live on GitHub (hosted runs, 2026-09-23, throwaway draft PR #143). The head was `b241106b`,
+      an empty commit on this branch at `b1bd5e26`. The PR was opened against the stacked
+      branch `claude/h1-live-stacked` (`b1bd5e26`, which contains `main`), then retargeted.
+      1. `opened` against the stacked base: the gate failed closed with "the pull request's
+         base branch is 'claude/h1-live-stacked', not main" (run 35907554093, job 107338919327).
+      2. `gh pr edit --base main`: an `edited` run fired, which confirms that a retarget emits the
+         `edited` type. It checked out `refs/pull/143/merge` at the **stale** merge commit
+         `ca990006` ("Merge b241106b into b1bd5e26"), still built on the old base, while its
+         payload already said `base.ref=main` and `base.sha=3956c924`. The payload base is an
+         ancestor of that first parent, so only the round-2 check stopped it: "the base
+         b1bd5e26… is not a commit on origin/main; failing closed" (run 35907626904, job
+         107339795307).
+         - Without that check the gate would have judged the retargeted PR against the stacked
+           branch. The H1 bypass would have stayed open through the `edited` run, as the round-2
+           reviewer predicted. The check is load-bearing, not only defence in depth.
+         - A re-run keeps the same `GITHUB_SHA`, so it cannot recover.
+      3. Close and reopen: the `reopened` run checked out the rebuilt merge commit `660d58d8`
+         ("Merge b241106b into 3956c924"), and the gate ran and passed (run 35908075608, job
+         107340867643).
+      - The error message now names this recovery: close and reopen, or push a commit.
+      - #143 was then closed and both branches were deleted.
   - *Fixed, medium (M1): the base's newest wave was rewritable by a PR that registers a newer
     wave.* Every wave document holds all rows, and once a wave is no longer current
     `build_verdicts.py --check` checks only its own rows and its registry sha256. When the head
@@ -966,15 +987,25 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     - Round 2 (low, closed by the coordinator): the comparisons of a changed row with what the
       sealed returns derive were still Python `==`, so a type-only rewrite passed them. These are
       the winner fields, the published alternatives, `verdict_overturn_when` and
-      `overturn_protocol`. They now use the same helper. An adjudication judgment's
-      `refuting_votes` must also be an `int` equal to 0, so `false` and `0.0` fail.
-      - Tests: a sealed `overturn_protocol` number rewritten `12` to `12.0` or `true` fails; the
-        sealed value passes; a judgment with `refuting_votes` `false` or `0.0` fails.
-      - Both were mutation-checked.
-      - Residual, outside this PR's paths: `tools/sota-convergence/build_verdicts.py`
-        `check_frozen_rows` still compares frozen rows with `==`. The type-strict wave-document
-        and registry freeze here covers the same frozen rows, because each is bound to its
-        document's sha256. The tooling owner (agent-lab-17) was notified.
+      `overturn_protocol`. They now use the same helper.
+      - Hardening, not a closed bypass: the gate's own two-family check now applies
+        `judge_adjudication`'s integer rule to `refuting_votes`. `false` and `0.0` already failed
+        in `scripts/landscape.py`'s `judge_adjudication`, which the gate also calls.
+      - Tests (synthetic fixtures):
+        - a sealed `overturn_protocol` number rewritten `12` to `12.0` or `true` fails;
+        - a sealed alternative's `why_not_default` rewritten `1` to `1.0` or `true` fails;
+        - the sealed values pass;
+        - a judgment with `refuting_votes` `false` or `0.0` fails the gate's own check.
+      - Each test was mutation-checked.
+      - Not covered by a type-only test: the six winner fields. `scripts/landscape.py` requires
+        a text pin and an exact `(component_id, repository)` set.
+      - Residual, outside this PR's paths: the gate freezes wave documents, not ledger rows. A
+        changed row that names a grandfathered wave is reported and skipped. Only
+        `tools/sota-convergence/build_verdicts.py` `check_frozen_rows` compares such rows with
+        their frozen document, and it uses `!=` after `normalized()`. A type-only rewrite of a
+        number or boolean in a grandfathered row is therefore not caught by this gate. The
+        lane-return schema is all strings, so the exposure is small. The tooling owner
+        (agent-lab-17) was notified to make that comparison type-strict.
   - *Hardening:* the changed-path listings use `git diff -z` and `git ls-files -z`, split on NUL. Test:
     a tracked and an untracked path with a space, a newline and a non-ASCII character are listed as
     themselves.

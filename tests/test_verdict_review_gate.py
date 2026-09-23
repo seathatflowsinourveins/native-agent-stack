@@ -761,6 +761,19 @@ class PublishedFieldTests(GateFixture):
             row["overturn_protocol"] = sealed
             self.assertPasses(self.report())
 
+    def test_published_alternatives_compare_type_strictly(self):
+        with mock.patch.dict(ALTERNATIVE, {"why_not_default": 1}):
+            row = self.record()
+            self.rebase()
+            sealed = [dict(alternative) for alternative in row["alternatives"]]
+            self.assertEqual(sealed[0]["why_not_default"], 1)
+            for rewritten in (1.0, True):
+                with self.subTest(rewritten=rewritten):
+                    row["alternatives"] = [{**sealed[0], "why_not_default": rewritten}, *sealed[1:]]
+                    self.assertFails(self.report(), "alternatives are not the ones record_verdicts.py derives")
+            row["alternatives"] = sealed
+            self.assertPasses(self.report())
+
     def test_pending_row_publishing_alternatives_fails(self):
         row = self.record(claude_keys=("c1",), codex_keys=("c2",), status="pending_lanes", winners=[])
         row["alternatives"] = [{**ALTERNATIVE, "source": "lane:claude"}]
