@@ -59,6 +59,39 @@ def first_step(job_text):
     return match.group(1) if match else ""
 
 
+def step_block(job_text, name_fragment):
+    """The whole text of the step whose ``name:`` line contains ``name_fragment``: from
+    that step's ``      - `` list-item line (so keys written before ``name:``, such as a
+    leading ``- if:``, are included) through the next step boundary or the end of the job."""
+    lines = job_text.splitlines()
+    hit = next(i for i, line in enumerate(lines) if name_fragment in line and re.search(r"\bname:", line))
+    start = next(i for i in range(hit, -1, -1) if re.match(r"^      - ", lines[i]))
+    end = next((i for i in range(hit + 1, len(lines)) if re.match(r"^      - ", lines[i])), len(lines))
+    return "\n".join(lines[start:end])
+
+
+def block_if(block_text):
+    """A step's or job's own ``if:`` value, found anywhere in ``block_text`` (not tied
+    to a fixed line offset, so reordering keys within the block does not defeat the
+    search) and resolved however it is written: a plain one-line scalar, or a ``>``/``|``
+    folded or literal block scalar whose value spans the following more-indented lines.
+    Returns ``None`` if the block has no ``if:`` key of its own."""
+    match = re.search(r"(?m)^([ \t]*(?:- )?)if:[ \t]*(.*)$", block_text)
+    if not match:
+        return None
+    indent, value = len(match.group(1)), match.group(2).strip()
+    folded = not value or value[0] in ">|"
+    parts = [] if folded else [value]
+    # Plain scalars can continue on more-indented lines too, so always collect them.
+    for line in block_text[match.end():].splitlines():
+        if not line.strip():
+            continue
+        if len(line) - len(line.lstrip(" \t")) <= indent or re.match(r"^\s*[\w-]+:(\s|$)", line):
+            break
+        parts.append(line.strip())
+    return " ".join(parts)
+
+
 def permission_blocks(text):
     """Every block-form permissions mapping in a workflow, as {scope: access} dicts."""
     blocks = []
@@ -186,21 +219,22 @@ class SecurityScanTests(unittest.TestCase):
 
     def test_write_scope_is_job_local_and_limited_to_security_events(self):
         self.assertEqual(scopes(self.text.split("\njobs:\n", 1)[0]), [{"contents": "read"}])
-        expected = {"osv-scanner": [{"contents": "read", "security-events": "write"}],
+        expected = {"osv-scanner": [{"contents": "read"}],
+                    "osv-sarif-upload": [{"contents": "read", "security-events": "write"}],
                     "zizmor-online": [{"contents": "read"}],
                     "zizmor-sarif-upload": [{"contents": "read", "security-events": "write"}]}
         self.assertEqual({job_id: scopes(job) for job_id, job in jobs(self.text).items()}, expected)
         self.assertNotRegex(self.text, r"(?m)permissions:[ \t]*[^\s#]", "no inline read-all/write-all form")
 
-    def test_the_zizmor_write_token_never_reaches_an_installed_tool(self):
-        tool = jobs(self.text)["zizmor-online"]
-        upload = jobs(self.text)["zizmor-sarif-upload"]
-        self.assertIn("GH_TOKEN: ${{ github.token }}", tool)
-        self.assertIn("needs: zizmor-online", upload)
-        self.assertNotRegex(upload, r"(?m)^\s+(- )?run:", "the write-scope job runs no shell step")
-        actions = re.findall(r"uses: ([\w.-]+/[\w./-]+)@", upload)
-        self.assertEqual(actions, ["step-security/harden-runner", "actions/checkout",
-                                   "actions/download-artifact", "github/codeql-action/upload-sarif"])
+    def test_the_write_token_never_reaches_an_installed_tool(self):
+        self.assertIn("GH_TOKEN: ${{ github.token }}", jobs(self.text)["zizmor-online"])
+        for tool_job, upload_job in (("osv-scanner", "osv-sarif-upload"), ("zizmor-online", "zizmor-sarif-upload")):
+            upload = jobs(self.text)[upload_job]
+            self.assertIn(f"needs: {tool_job}", upload, upload_job)
+            self.assertNotRegex(upload, r"(?m)^\s+(- )?run:", f"{upload_job} (write scope) runs no shell step")
+            actions = re.findall(r"uses: ([\w.-]+/[\w./-]+)@", upload)
+            self.assertEqual(actions, ["step-security/harden-runner", "actions/checkout",
+                                       "actions/download-artifact", "github/codeql-action/upload-sarif"], upload_job)
 
     def test_osv_scanner_fails_on_findings_and_uploads_sarif_off_pull_requests(self):
         job = jobs(self.text)["osv-scanner"]
@@ -209,8 +243,11 @@ class SecurityScanTests(unittest.TestCase):
         self.assertIn("set +e -u -o pipefail", job)
         self.assertIn('exit "$status"', job)
         self.assertNotIn("continue-on-error", job)
-        upload = job.split("Upload OSV-Scanner SARIF", 1)[1]
-        self.assertIn("github.event_name != 'pull_request'", upload.split("\n", 2)[1])
+        keep = step_block(job, "Keep the OSV-Scanner SARIF for the upload job")
+        self.assertIn("github.event_name != 'pull_request'", block_if(keep))
+        self.assertIn("if-no-files-found: error", keep)
+        upload = jobs(self.text)["osv-sarif-upload"]
+        self.assertIn("github.event_name != 'pull_request'", block_if(upload))
         self.assertIn(UPLOAD_SARIF, upload)
         self.assertIn("category: osv-scanner", upload)
 
@@ -230,6 +267,49 @@ class SecurityScanTests(unittest.TestCase):
         for job_id, job in jobs(self.text).items():
             self.assertIn("persist-credentials: false", job, job_id)
             self.assertRegex(job, r"timeout-minutes: \d+", job_id)
+
+    def test_failure_path_semantics_keep_findings_uploadable(self):
+        # (a) The OSV SARIF upload step must still run when the scan step failed
+        # (a findings exit) so code scanning still receives the report; only a
+        # cancelled run should skip it. block_if() searches the whole step block
+        # rather than a fixed line offset, so this still catches a missing/weakened
+        # guard even if `uses:` were reordered ahead of `if:`.
+        # The artifact step and the downstream upload job both need it.
+        osv_job = jobs(self.text)["osv-scanner"]
+        for label, block in (("OSV SARIF artifact step", step_block(osv_job, "Keep the OSV-Scanner SARIF for the upload job")),
+                             ("osv-sarif-upload job", jobs(self.text)["osv-sarif-upload"])):
+            guard = block_if(block)
+            self.assertIsNotNone(guard, f"the {label} must have its own if: guard")
+            self.assertRegex(guard, r"!\s*cancelled\(\)|always\(\)",
+                              f"the {label}'s if: must keep !cancelled() or always() so a findings "
+                              "exit (the scan step failing) does not skip the upload")
+
+        # (b) The zizmor analyzer step must not have continue-on-error: true, and the
+        # artifact-upload step must have no if: that would let it (and, downstream,
+        # the upload job) run after the analyzer step failed. Without both guards, a
+        # crashed analyzer could still upload a partial or empty SARIF.
+        zizmor_online = jobs(self.text)["zizmor-online"]
+        analyzer_step = step_block(zizmor_online, "Audit GitHub workflows with zizmor's online audits")
+        self.assertNotIn("continue-on-error", analyzer_step,
+                          "the zizmor analyzer step must not continue past a crash "
+                          "(continue-on-error would let a partial/empty SARIF reach the upload)")
+        keep_step = step_block(zizmor_online, "Keep the zizmor SARIF for the upload job")
+        keep_if = block_if(keep_step)  # resolves folded/literal block-scalar if: too
+        self.assertFalse(keep_if and re.search(r"\b(always|cancelled|failure)\s*\(\)", keep_if),
+                         "the artifact-upload step must not force a run after the analyzer "
+                         "step failed; its default (skip-on-failure) behavior is required")
+
+        # (c) The zizmor-sarif-upload job's own if: must not force it to run after a
+        # cancelled or failed zizmor-online run either (it only skips on pull_request).
+        # block_if() also resolves a folded/literal (`>`/`|`) block-scalar if:, which a
+        # fixed single-line slice would read as the literal folding marker and pass
+        # vacuously.
+        upload_job = jobs(self.text)["zizmor-sarif-upload"]
+        job_if = block_if(upload_job)
+        self.assertIsNotNone(job_if, "zizmor-sarif-upload must have its own if: guard")
+        self.assertNotRegex(job_if, r"\b(always|cancelled)\s*\(\)",
+                             "zizmor-sarif-upload's if: must not add always()/!cancelled(); it "
+                             "should only run after zizmor-online actually produced an artifact")
 
 
 class PublishReleaseTests(unittest.TestCase):

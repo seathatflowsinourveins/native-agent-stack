@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "gate_id": "ibkr-local-acceptance",
+  "step": "acceptance-plan 5.1 read-only",
+  "client": "nautilus_trader.adapters.interactive_brokers.HistoricalInteractiveBrokersClient",
+  "host": "127.0.0.1",
+  "port": 4002,
+  "client_id": 76,
+  "generated_at": "2026-09-23T13:24:30.460864+00:00",
+  "status": "refused_no_passed_paper_ibapi_receipt",
+  "evidence_class": "none",
+  "exit_code": 3
+}

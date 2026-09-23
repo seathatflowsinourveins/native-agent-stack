@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "gate_id": "ibkr-local-acceptance",
+  "step": "acceptance-plan 5.1 read-only",
+  "client": "ibapi (official IB API client)",
+  "port": 4002,
+  "client_id": 73,
+  "generated_at": "2026-09-23T13:16:53.647349+00:00",
+  "status": "passed",
+  "evidence_class": "native_paper_readonly",
+  "existing_state": {
+    "positions": 0,
+    "open_orders": 0
+  },
+  "observed": {
+    "paper_accounts": true,
+    "server_time_epoch": 1790169413,
+    "positions": 0,
+    "open_orders": 0,
+    "summary_tags": [],
+    "summary_currency": null,
+    "spy_contract": {
+      "conId": 756733,
+      "secType": "STK",
+      "currency": "USD",
+      "exchange": "SMART",
+      "primaryExchange": "ARCA",
+      "longName": "SS SPDR S&P 500 ETF TRUST-US",
+      "tradingHoursSample": "20260923:0400-20260923:2000;20260924:040"
+    },
+    "market_data_type": "DELAYED",
+    "spy_quote": {
+      "delayed_last": 772.66,
+      "first_tick_local_epoch": 1790169434.3844202,
+      "delayed_bid": 772.64,
+      "delayed_ask": 772.67
+    },
+    "history": {
+      "bars": 156,
+      "first": "1789997400",
+      "last": "1790106900"
+    },
+    "errors": [
+      {
+        "reqId": 9004,
+        "code": 2188,
+        "text": "Up-to-the-second historical data requires additional subscription for the API."
+      }
+    ],
+    "info": [
+      {
+        "reqId": -1,
+        "code": 2104,
+        "text": "Market data farm connection is OK:usfarm"
+      },
+      {
+        "reqId": -1,
+        "code": 2106,
+        "text": "HMDS data farm connection is OK:ushmds"
+      },
+      {
+        "reqId": -1,
+        "code": 2158,
+        "text": "Sec-def data farm connection is OK:secdefil"
+      },
+      {
+        "reqId": 9003,
+        "code": 10167,
+        "text": "Requested market data is not subscribed. Displaying delayed market data."
+      }
+    ],
+    "server_minus_local_s": -0.674
+  },
+  "exit_code": 0,
+  "redaction": "observed.accounts_sha256 removed before publication: a hash of a DU paper id is reversible"
+}

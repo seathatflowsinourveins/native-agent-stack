@@ -1,0 +1,51 @@
+{
+ "protocol_id": "cmp-a-20260923",
+ "arms": [
+  "arm-b94c07e5",
+  "arm-3d8f2a61"
+ ],
+ "incumbent": "arm-3d8f2a61",
+ "challenger": "arm-b94c07e5",
+ "metrics": [
+  "defect_weight",
+  "battery_pass_rate",
+  "requirements_met_rate",
+  "own_suite_pass"
+ ],
+ "closure_rule": {
+  "overturn_if_all": [
+   {
+    "metric": "defect_weight",
+    "arm": "arm-b94c07e5",
+    "cmp": "<",
+    "reference": {
+     "arm": "arm-3d8f2a61"
+    }
+   },
+   {
+    "metric": "battery_pass_rate",
+    "arm": "arm-b94c07e5",
+    "cmp": ">=",
+    "reference": {
+     "arm": "arm-3d8f2a61"
+    }
+   },
+   {
+    "metric": "requirements_met_rate",
+    "arm": "arm-b94c07e5",
+    "cmp": ">=",
+    "reference": {
+     "arm": "arm-3d8f2a61"
+    }
+   },
+   {
+    "metric": "own_suite_pass",
+    "arm": "arm-b94c07e5",
+    "cmp": ">=",
+    "reference": {
+     "arm": "arm-3d8f2a61"
+    }
+   }
+  ]
+ }
+}

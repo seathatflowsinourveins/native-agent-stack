@@ -1,0 +1,24 @@
+{
+  "instrument_elapsed_s": 0.004,
+  "instrument": {
+    "id": "SPY.ARCA",
+    "raw_symbol": "SPY",
+    "price_precision": "2",
+    "price_increment": "0.01",
+    "lot_size": "100",
+    "isin": "None",
+    "ts_event": "1790169490947687740",
+    "ts_init": "1790169490947687740",
+    "info": "{'contract': {'secType': 'STK', 'conId': 756733, 'exchange': 'SMART', 'primaryExchange': 'ARCA', 'symbol': 'SPY', 'localSymbol': 'SPY', 'currency': 'USD', 'tradingClass': 'SPY', 'lastTradeDateOrContractMonth': '', 'multiplier': '', 'strike': 0.0, 'right': None, 'includeExpired': False, 'secIdType': None, 'secId': '', 'description': '', 'issuerId': '', 'comboLegsDescrip': ''}, 'priceMagnifier': 1}"
+  },
+  "con_id_from_provider": "Equity(id=SPY.ARCA, price_precision=2, size_precision=0)",
+  "bar_errors": [
+    "1-DAY-LAST: RuntimeError: [2188] Up-to-the-second historical data requires additional subscription for the API.",
+    "1-DAY-LAST-EXTERNAL: RuntimeError: Invalid bar specification format: 1-DAY-LAST-EXTERNAL",
+    "5-MINUTE-LAST: RuntimeError: [2188] Up-to-the-second historical data requires additional subscription for the API."
+  ],
+  "bar_errors_past_end": [
+    "1-DAY-LAST: RuntimeError: [2188] Up-to-the-second historical data requires additional subscription for the API.",
+    "5-MINUTE-LAST: RuntimeError: [2188] Up-to-the-second historical data requires additional subscription for the API."
+  ]
+}

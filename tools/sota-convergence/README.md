@@ -118,26 +118,43 @@ default reconciliation file. No step here calls a model.
    `assert_no_leak` and refuses to write when a leak survives sanitization --
    applied to both generated outputs, since the handbook table renders field
    values (e.g. `overturn_when`) directly, not only the JSON document.
-   `--check` (the default) recomputes both outputs in memory and exits 1 on
-   any difference from what is checked in, without writing; `--write`
-   recomputes and writes them.
+   **Waves.** Each dated wave document
+   (`catalogs/sota-convergence/layer-verdicts-<run-id>.json`) is registered
+   by sha256 in
+   [`layer-verdict-waves.json`](../../catalogs/sota-convergence/layer-verdict-waves.json)
+   together with its manifest and `checked_at`. A ledger row names its wave
+   through `lanes.sealed_base` (a row without one belongs to the 2026-09-22
+   wave). The *current* wave is the newest run id (lexicographic, so dated
+   `YYYYMMDD` ids sort chronologically) present in the rows or the registry;
+   every older wave is frozen. `--check` (the default, and CI's unchanged
+   `validate.yml` invocation) verifies every registered wave (a) byte for byte
+   against its registered sha256 and (b) against the current rows whose
+   `lanes.sealed_base` names it, fails when a row names a wave that has no
+   registered document, and regenerates only the current wave's document and
+   the handbook's generated block from the current rows. `--check --run-id X`
+   verifies wave X alone. `--write` regenerates the current wave (or
+   `--run-id X` for a new, newer wave), writes the handbook block and
+   registers the new sha256; it refuses to rewrite a frozen wave, and a
+   registered grandfathered wave (`20260922`) is frozen even while it is the
+   newest, so a row that must change is re-recorded under a new `--run-id`
+   instead.
 
    ```sh
-   python3 tools/sota-convergence/build_verdicts.py --write --root .
    python3 tools/sota-convergence/build_verdicts.py --check --root .
    ```
 
-   `--run-id` (default `20260922`) makes a later wave rerunnable without
-   disturbing the sealed 2026-09-22 record: it feeds the `id` field
-   (`layer-verdicts-<run-id>`) and the defaults for `--manifest`
-   (`catalogs/sota-convergence/manifest-<run-id>.json`) and `--out`
-   (`catalogs/sota-convergence/layer-verdicts-<run-id>.json`); either can
-   still be overridden directly. Omitting `--run-id` reproduces today's
+   `--run-id` feeds the `id` field (`layer-verdicts-<run-id>`) and the
+   defaults for `--manifest` (`catalogs/sota-convergence/manifest-<run-id>.json`)
+   and `--out` (`catalogs/sota-convergence/layer-verdicts-<run-id>.json`);
+   either can still be overridden directly, and a registered wave reuses its
+   registered manifest, path and `checked_at` (a new `YYYYMMDD` wave defaults
+   `checked_at` to that date). With the 32 rows still on the 2026-09-22 wave,
+   `--check` reproduces
    `catalogs/sota-convergence/layer-verdicts-20260922.json` and
-   `docs/grand-catalog-handbook.md` byte for byte.
+   `docs/grand-catalog-handbook.md` byte for byte (`--write` refuses that wave).
 
    ```sh
-   python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id 20260923
+   python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id 20260923 --checked-at 2026-09-23
    ```
 
 ## Rules encoded in `build_manifest.py`
@@ -604,6 +621,27 @@ the 32 packets and their `SHA256SUMS` are retained under
 reads still carries those labels in the catalog files, so withholding them from
 the packets alone does not blind a lane; see the handbook's label-exposure limit.
 
+**Popularity and recency are withheld too** (2026-09-23 peer audit: 132
+foundation-packet objects still carried GitHub `stars` and `pushed_at` through
+`candidates[].upstream`). Under `--withhold-labels` every packet -- manifest-mode
+trading packets included -- loses `stars`, `forks`, `watchers`, `pushed_at`,
+`released_at` and any other popularity or timestamp key (`*_at`, or a name
+containing star/fork/watcher/subscriber/download) from every
+`candidates[]` and `sota_components_not_in_candidates[]` copy and its
+`upstream` record; `archived` and `license` are kept only when the packet's
+`requirement` names them (archiv/maintained, licen). Each stripped field is
+listed in the packet's `withheld` list (for example
+`candidates[].upstream.stars`). The latest upstream release is withheld too
+(2026-09-23 re-review: a date-based tag such as inspect_ai's
+`release/2025-11-28` carries a release date): `upstream.latest` is stripped
+always, not only when it is date-shaped (the stricter of the two options; no
+packet requirement names releases, versions or maintenance), together with
+`upstream.prerelease`, which describes that release, and the copy's
+`pin_behind_upstream`, which is derived by comparing the pin with it. The pin
+itself and `upstream.renamed_to` stay. The default mode is byte-identical, so the retained
+2026-09-22 packets still reproduce; they were built before this rule and carry
+those fields.
+
 ```sh
 python3 tools/sota-convergence/lane_packets.py --root . --out /path/to/work-dir
 python3 tools/sota-convergence/lane_packets.py --root . --out /path/to/work-dir --catalog us-equities --seed 20260922
@@ -669,18 +707,24 @@ file, seals the accepted ones as retained evidence and derives the row's
 
 ```sh
 python3 tools/sota-convergence/record_verdicts.py \
-  --root . --work-dir /path/to/work-dir --checked-at YYYY-MM-DD \
+  --root . --work-dir /path/to/work-dir --run-id YYYYMMDD [--checked-at YYYY-MM-DD] \
   [--adjudications /path/to/adjudications] --write
 python3 tools/sota-convergence/record_verdicts.py \
-  --root . --work-dir /path/to/work-dir --checked-at YYYY-MM-DD --check
+  --root . --work-dir /path/to/work-dir --run-id YYYYMMDD [--checked-at YYYY-MM-DD] --check
 ```
+
+`--checked-at` (the date stamped on every re-recorded row) defaults to the
+run id's own date (`--run-id 20260923` stamps `2026-09-23`), like
+`build_verdicts.default_checked_at`; a run id that is not a `YYYYMMDD` date
+needs `--checked-at` explicitly.
 
 `--write` and `--check` are a required, mutually exclusive pair (argparse
 rejects both together and rejects neither) -- there is no silent default
 mode.
 
-`--run-id` (default `20260922`) reruns the pipeline on a new date without
-disturbing the sealed 2026-09-22 record: it is the trailing component of
+`--run-id` is required (there is no default wave) and reruns the pipeline on
+a new date without disturbing the sealed 2026-09-22 record: it is the trailing
+component of
 each recorded `run_id` (`<catalog>-<layer_id>-<run-id>`) and of the sealed
 directory (`evidence/artifacts/layer-verdicts-<run-id>/`). Pass the same
 `--run-id` to `--check` as was used for `--write`. A row recorded under a
@@ -689,8 +733,9 @@ non-default `--run-id` also carries `lanes.sealed_base` (e.g.
 resolves its sealed files from the row itself, not from a hardcoded
 constant; a row recorded (or never re-recorded) under the default omits
 `sealed_base` and `scripts/landscape.py` falls back to the sealed
-2026-09-22 directory, so every already-checked-in row stays valid and the
-default run's output is unaffected byte for byte. `--run-id` is validated
+2026-09-22 directory, so every already-checked-in row stays valid. `--write
+--run-id 20260922` is refused once `--root` holds that wave (see
+*Grandfathered run id* below); `--check --run-id 20260922` still reproduces it. `--run-id` is validated
 against the same character class `scripts/landscape.py` requires of
 `lanes.<lane>.sealed_base` (`[0-9A-Za-z]+`; no `-`, `/` or `..`) before any
 sealed file is written, in both `record_verdicts.py` and
@@ -703,20 +748,140 @@ python3 tools/sota-convergence/record_verdicts.py \
   --run-id 20260923 --write
 ```
 
-**A later wave's `--check` needs its own CI step.** `build_verdicts.py
---check`'s defaults (and CI's `validate.yml` step, which always calls it with
-no `--run-id`) only ever recompute and compare the default 2026-09-22
-catalog/handbook -- they do not know about a later wave's ledger rows or its
-own `catalogs/sota-convergence/layer-verdicts-<run-id>.json`. Once a later
-wave is recorded (`record_verdicts.py --run-id <new> --write`), verify it
-with the matching `build_verdicts.py --check --run-id <new>`; the checked-in
-`layer-verdicts-20260922.json`/handbook section stay a frozen snapshot of
-the rows as they stood before the later wave's `record_verdicts.py --write`
-touched them (its own rows carry `lanes.sealed_base`, so a mismatch there is
-expected, not a break, once a `record_verdicts.py --write` for a later wave
-has run against this checkout). A CI update to also run
-`build_verdicts.py --check --run-id <new>` for an active later wave is not
-included here.
+**A later wave keeps CI green.** After `record_verdicts.py --run-id <new>
+--write`, run `build_verdicts.py --write --run-id <new> --checked-at
+YYYY-MM-DD` once to register the new wave document; CI's unchanged
+`build_verdicts.py --check` then verifies every wave: the frozen
+`layer-verdicts-20260922.json` byte for byte against its registered hash and
+against the rows still naming 2026-09-22, and the new wave (current) by
+regenerating it and the handbook block from the rows. A row still naming a
+frozen wave cannot change without failing that check; re-record it under the
+new run id instead. The simulated second wave is
+`tests/test_layer_verdicts.py` `WaveFreezeTests`.
+
+**Integrity rules outside the grandfathered wave** (2026-09-23 peer audit;
+shared code in `scripts/landscape.py`, applied here at record time and
+re-applied by `scripts/landscape.py` in CI to the sealed files):
+
+- *Grandfathered run id.* `GRANDFATHERED_RUN_IDS = {"20260922"}`. The 32 rows
+  sealed on 2026-09-22 predate these rules: their lane returns declare no
+  `model.family` or `provenance`, their 12 adjudications are Opus-only (both
+  presentation orders, no judge identity), they have no run manifest (their
+  `packets/` and `SHA256SUMS` are retained under the sealed base; a manifest
+  generated now could not list the rejections of that run, so none is
+  fabricated), and their Linux `platform_status` came from the lane's evidence
+  class alone: 13 of their 33 Linux `accepted` winners (six rows:
+  `foundation/ci-supply-chain`, `foundation/hosting-services`,
+  `us-equities/market-data-reference`, `storage-compute`,
+  `research-factors-ml`, `portfolio-risk`) cite no registered `evidence/` file,
+  so `scripts/platform_status.py` would derive `conditional`. Those rows stay valid because the committed wave is
+  frozen, whether or not a later wave exists yet: `record_verdicts.py` has no
+  default `--run-id` and its `--write` refuses a grandfathered id once `--root`
+  holds that wave (its sealed directory or a registered wave document), so it
+  never re-records a row or writes a run manifest there; `build_verdicts.py
+  --write` refuses to regenerate or re-register a registered grandfathered
+  wave even as the newest, and `--check` fails if any row naming 2026-09-22
+  differs from the hash-registered `layer-verdicts-20260922.json`; and
+  `tests/test_layer_verdicts.py` `GrandfatheredWavePinTests` (CI's `python3 -m
+  unittest`) pins that document, its registry entry and the sha256 listing of
+  every file under the sealed 2026-09-22 directory. Every other run id gets
+  every rule below.
+- *Single-family winner.* Claude-only (`codex_absent`) records nothing by
+  default: the row stays `pending_lanes`. `--allow-single-lane PATH` (an
+  existing repository file with a date, `YYYY-MM-DD` or `YYYYMMDD`, in its
+  name) records a `codex_absent` layer from Claude alone only when the record
+  names that layer id as a whole token (`workers` is not named by
+  `agents-models-workers`), and stores the path on the row as
+  `lanes.single_lane_decision`; `scripts/landscape.py` rejects any recorded
+  `codex_absent` row without such a record (this rule has no grandfathering:
+  no 2026-09-22 row is `codex_absent`).
+- *New-wave rows cannot opt out.* `scripts/landscape.py` applies every rule
+  below to a row whose `lanes.sealed_base` or any lane `run_id`
+  (`<catalog>-<layer_id>-<run-id>`) names a non-grandfathered wave, whether or
+  not a lane carries a run id: the run ids must then name that same wave and
+  layer, a lane carries a run id exactly when it carries a sealed hash, and a
+  run id naming a new wave under the grandfathered `sealed_base` is rejected.
+  On every recorded row, `same_winner` and `disagree` need both lanes sealed
+  and `codex_absent` needs the claude lane sealed and the codex lane unsealed.
+- *Identity and family.* Each lane return declares `model.family`: `anthropic`
+  for the claude lane with a name matching
+  `claude-*|opus|sonnet|fable|haiku`, `openai` for the codex lane with a name
+  matching `gpt-*|codex`; the two lanes' families must differ. Every
+  adjudication judgment records `judge: {model, family}` (family anthropic or
+  openai, name matching it) and the `stripped_packet_sha256` its judge saw,
+  which must equal the layer's sealed lane packet (its `packets/SHA256SUMS`
+  entry at record time, its run-manifest `packet_sha256` in CI): hand the
+  judge the `--withhold-labels` packet the lanes judged, not a reduction. A
+  winner is accepted only when judgments from both lane families are present,
+  each family covers both presentation orders, all pick the same lane and none
+  is refuted; otherwise the adjudication is sealed as a split and the row stays
+  `pending_lanes` (a missing family is named in `open_gaps`). `winner_lane` is
+  checked after that two-family rule: a unanimous single-family adjudication is
+  a split whether its `winner_lane` is `null` or names the lane its judges
+  chose. A recorded
+  `disagree` row needs its sealed adjudication in CI as well.
+- *Survivorship.* Every run writes
+  `evidence/artifacts/layer-verdicts-<run-id>/run-manifest.json`: every packet
+  (catalog, layer, packet sha256), each lane's outcome (`sealed` with its run id
+  and sealed sha256, `rejected` with its reasons, or `missing`), rejected
+  adjudications, and the verbatim `packets/SHA256SUMS` text. A reason that would
+  still carry a leak marker is replaced by a fixed note. `scripts/landscape.py`
+  requires every row recorded in a non-grandfathered wave to appear in that
+  manifest exactly once, with both lanes accounted for and its packet hash in
+  the recorded SHA256SUMS text.
+- *Platform status (one shared rule).* `record_verdicts.platform_status_for`
+  calls `scripts/platform_status.py` `platform_status(platform_id, winner,
+  context)` for every platform, with `context = load_context(root)` read once
+  per run; `scripts/landscape.py` and `scripts/component_matrix.py` call the
+  same function. Linux `accepted` needs a qualifying host receipt, or a
+  `native_proven`/`measured_comparison` winner citing a hash-registered
+  `manifests/evidence.json` `files[]` entry under `evidence/`; `macos-arm64`
+  moves off `untested` only through host receipts bound to the winner's pin.
+  Nothing under `evidence/artifacts/layer-verdicts-<run-id>/` counts (packets,
+  lane returns, adjudications and their inputs are lane inputs or opinions).
+  `scripts/landscape.py` holds a new-wave row to this rule on every platform
+  (`declared_status_error`) and a grandfathered row on `ENFORCED_PLATFORMS`
+  only (`macos-arm64`; the re-record widens it to Linux).
+- *Reproducible lanes.* A Claude return carries `provenance: {workflow_path,
+  workflow_sha256, agentlab_commit}` and a Codex return `provenance:
+  {codex_lane_py_sha256, prompt_sha256}`. Both must name lane code listed in
+  the append-only `tools/sota-convergence/lane-provenance.json` (the full
+  `workflow_path` is matched, not its basename), which `scripts/landscape.py`
+  re-checks for every sealed new-wave return in CI. At record time the Claude
+  hash must also equal the current `examples/claude-native/workflows/SHA256SUMS`
+  entry of the vendored copy the registry entry names (the lane workflow is
+  vendored there, pinned in `vendored-lanes.json`), and the Codex hashes this
+  checkout's `codex_lane.py` and `lane-prompt.md`. When any of those files
+  changes, append an entry (never edit one);
+  `tests/test_verdict_lane_vendoring.py` fails until the current bytes are
+  listed. `codex_lane.py` writes its provenance and the whole `model` field
+  itself: `model.name` is the `--model` it passed to `codex exec -m`, else the
+  model name the event stream carried, else `unknown` (never the model's own
+  response text), `model.effort` is `--effort` and `model.family` is
+  `"openai"`; the strict schema it passes to `codex exec` omits `provenance`
+  and `model.family`. The
+  vendored Claude workflow returns only `model {name: "opus", effort: "high"}`
+  and writes no files; `claude_lane.py` is the step that writes
+  `<work-dir>/claude/<catalog>__<layer_id>.json` from the workflow result,
+  adding `model.family: "anthropic"`, the resolved model name and
+  `provenance`. It exits 2 when the agent-lab workflow file differs from that
+  checkout's `HEAD` or from the vendored `SHA256SUMS` entry:
+
+  ```sh
+  python3 tools/sota-convergence/claude_lane.py --result /path/to/lane-result.json \
+    --work-dir /path/to/work-dir --agentlab-root /path/to/agent-lab \
+    --resolved-model claude-opus-5-5
+  ```
+
+**Two-family adjudication is keep-but-compare** (decision
+[`docs/decisions/2026-09-23-verdict-integrity.md`](../../docs/decisions/2026-09-23-verdict-integrity.md)).
+The rule that a disagreement is settled only by unanimous, unrefuted judgments
+from both lane families (Anthropic and OpenAI), each in both presentation
+orders, is the current default, not a proven best judge design: the judges
+share a family with a lane they rule on. Overturn condition: a qualified
+third-family judge (for example the key-free local Qwen3-8B-AWQ worker) clears
+a preregistered judge-agreement bar on the sealed 2026-09-22 and 2026-09-23
+adjudication packets; the rule then moves to (or adds) that judge.
 
 - **Per-lane validation, never aborts the run.** For every layer with at
   least one `<work-dir>/{claude,codex}/<catalog>__<layer_id>.json` file, each
@@ -752,7 +917,7 @@ included here.
   generator here uses, subject to the same `build_manifest.py`
   leak defense) and written to
   `evidence/artifacts/layer-verdicts-<run-id>/<lane>/<catalog>-<layer_id>-<run-id>.json`
-  (`<run-id>` from `--run-id`, default `20260922`); its sha256 becomes the
+  (`<run-id>` from the required `--run-id`); its sha256 becomes the
   row's `lanes.<lane>.sealed_sha256`.
 - **Derived winner `pin`** (never taken from the lane): the packet's own
   manifest-joined `pin`, else the winning candidate's real v1 pin text if
@@ -763,8 +928,9 @@ included here.
 - **Agreement.** Both lanes valid and their winner component-id sets equal
   -> `same_winner` (recorded from Claude's `why_selected`/`overturn_when`, the latter written to
   `verdict_overturn_when`,
-  Codex's `open_gaps` appended); Claude only -> `codex_absent` (recorded,
-  `open_gaps` gets "codex lane absent for this layer"); both valid but
+  Codex's `open_gaps` appended); Claude only -> `codex_absent` (`pending_lanes`
+  unless `--allow-single-lane` names a dated decision record naming the layer;
+  see the integrity rules above); both valid but
   disagreeing -> `disagree`: recorded from the lane an optional
   `--adjudications/<catalog>__<layer_id>.json`
   (`{"winner_lane": "claude"|"codex"|null, "why", "evidence_refs": [...],
@@ -778,6 +944,10 @@ included here.
   the lane every judgment chose with no refuting vote. When the judgments
   split or any was refuted, `winner_lane` must be `null`; the file is still
   sealed and the row stays `pending_lanes` with the tally in `open_gaps`.
+  Outside the grandfathered 2026-09-22 wave each judgment also names its
+  judge (`judge: {model, family}`) and `stripped_packet_sha256` (the layer's
+  sealed packet hash), and a unanimous winner still needs both lane families in both orders, else the
+  row is a sealed split.
   Without an adjudication file the row stays `pending_lanes` with the open
   disagreement recorded
   (`open_gaps` names the two lanes' winner *component_ids* -- the same
@@ -820,7 +990,7 @@ After recording, refresh the generated join and narrative and rerun the
 landscape and publication checks:
 
 ```sh
-python3 tools/sota-convergence/build_verdicts.py --write --root .
+python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id YYYYMMDD --checked-at YYYY-MM-DD
 python3 scripts/landscape.py --root .
 python3 scripts/validate.py
 ```

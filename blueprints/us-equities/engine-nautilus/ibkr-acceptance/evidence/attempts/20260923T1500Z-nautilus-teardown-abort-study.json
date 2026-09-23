@@ -1,0 +1,89 @@
+{
+  "kind": "teardown_abort_study",
+  "utc": "2026-09-23T15:00Z",
+  "client": "nautilus_probe.py (NautilusTrader 2.0.0rc5 HistoricalInteractiveBrokersClient)",
+  "observation": "after writing a passed receipt, the process sometimes aborted during interpreter shutdown (exit 134) with a tokio worker panic",
+  "panic_stderr": [
+    "thread 'tokio-rt-worker' (444669) panicked at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/panicking.rs:225:5:",
+    "panic in a function that cannot unwind",
+    "note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace",
+    "thread caused non-unwinding panic. aborting.",
+    "timeout: the monitored command dumped core"
+  ],
+  "without_explicit_drop": {
+    "runs": [
+      {
+        "run": 1,
+        "status": "passed",
+        "teardown_panic": false
+      },
+      {
+        "run": 2,
+        "status": "passed",
+        "teardown_panic": false
+      },
+      {
+        "run": 3,
+        "status": "passed",
+        "teardown_panic": false
+      },
+      {
+        "run": 4,
+        "status": "passed",
+        "teardown_panic": false
+      },
+      {
+        "run": 5,
+        "status": "passed",
+        "teardown_panic": true
+      }
+    ],
+    "note": "plus the 14:56:48Z run, which also aborted after writing a passed receipt: 2 of 6 observed"
+  },
+  "with_explicit_drop_inside_the_event_loop": {
+    "runs": [
+      {
+        "run": 1,
+        "status": "passed",
+        "teardown_panic": false
+      },
+      {
+        "run": 2,
+        "status": "passed",
+        "teardown_panic": false
+      },
+      {
+        "run": 3,
+        "status": "passed",
+        "teardown_panic": false
+      },
+      {
+        "run": 4,
+        "status": "passed",
+        "teardown_panic": false
+      },
+      {
+        "run": 5,
+        "status": "passed",
+        "teardown_panic": false
+      },
+      {
+        "run": 6,
+        "status": "passed",
+        "teardown_panic": false
+      },
+      {
+        "run": 7,
+        "status": "passed",
+        "teardown_panic": false
+      },
+      {
+        "run": 8,
+        "status": "passed",
+        "teardown_panic": false
+      }
+    ],
+    "note": "del client/provider, gc.collect(), 0.5 s sleep before the loop ends"
+  },
+  "limitation": "small sample; the mitigation is observed, not proven. The receipt is written before the process exits, so an abort after it would make the process exit status differ from the receipt's exit_code."
+}

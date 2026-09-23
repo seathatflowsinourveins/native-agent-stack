@@ -220,7 +220,14 @@ ruleset, use `gh api --method DELETE repos/seathatflowsinourveins/native-agent-s
 leave unrelated settings intact. Reverting the workflow/dependency commit restores
 prior scheduling. Dependabot has no auto-merge; its version PRs still need reviewed
 source/hash updates. The automation maintainer owns the actionlint release/checksum,
-CI lock and ruleset; Dependabot owns only GitHub Actions references.
+CI lock and ruleset; Dependabot owns GitHub Actions references plus, since
+2026-09-22, the `pip` fixture entry in `.github/dependabot.yml`
+(`blueprints/gap-wave2-20260923/grype-known-cve-fixture`, `ignore: urllib3`,
+`open-pull-requests-limit: 0`), which suppresses security-update PRs for that
+pin (`ignore` applies to security updates; `exclude-paths` and the PR limit
+apply only to version updates) while its alerts still appear via the
+dependency graph and are dismissed `not_used`; it owns no real Python or
+binary pin.
 
 [Native artifact attestations](catalog-provenance.md) identify the producing
 workflow and revision for a manually published catalog/evidence archive. The
@@ -484,11 +491,16 @@ generating catalogs and running local scripts.
 
 **Ownership.** The GitHub automation maintainer owns binary pins (actionlint,
 gitleaks, syft, grype, and workflow-declared package pins like
-`nautilus_trader`) and repository rulesets. Dependabot owns only GitHub
-Actions references (`.github/dependabot.yml`, unchanged by this batch) --
-it does not, and per the decision above still does not, own any Python or
-binary pin. (2026-09-22: repository-level security updates may now propose a
-fix for an alerted lock; a maintainer still owns the reviewed relock.)
+`nautilus_trader`) and repository rulesets. Dependabot owns GitHub Actions
+references, plus (since 2026-09-22) the `pip` fixture entry in
+`.github/dependabot.yml` added for the intentionally vulnerable
+`grype-known-cve-fixture` pin (`ignore: urllib3` suppresses security-update
+PRs for that pin; `open-pull-requests-limit: 0` also stops version-update
+PRs; the dependency graph still raises alerts on it regardless, dismissed
+`not_used`) -- it does not, and per the decision above still does
+not, own any real Python or binary pin. (2026-09-22: repository-level
+security updates may now propose a fix for an alerted lock; a maintainer
+still owns the reviewed relock.)
 
 Each decision above names its evidence (the exact filename/permission gap
 checked), the alternative considered (activate now) and the exact
@@ -652,8 +664,12 @@ the full commit SHA of its latest release `v2.21.1`
 (`e14015d583714f6e62063499dc959a02595150a1`, from
 `gh api repos/step-security/harden-runner/releases/latest`), runs as the
 *first* step, before checkout, with `egress-policy: audit` (never `block`),
-on 18 of the 22 `ubuntu-24.04` jobs (2026-09-22, after `security-scan.yml`'s two
-jobs and `publish-catalog.yml`'s `release` job were added). The four exempt jobs are those whose
+on 21 of 25 `ubuntu-24.04` jobs (measured 2026-09-23 at HEAD: every job across
+`.github/workflows/*.yml` whose `runs-on` is a literal `ubuntu-` label, using
+`tests/test_workflow_hardening.py`'s own job/first-step parser -- 25 such jobs
+total, 4 in the hash-frozen exemptions below, and all 21 remaining jobs start
+with `harden-runner` in audit mode, per
+`test_every_ubuntu_job_starts_with_harden_runner_in_audit_mode`). The four exempt jobs are those whose
 workflows are byte-pinned by retained evidence: `source` and `destination`
 (`native-offhost-app-state.yml`, pinned in
 `blueprints/convergence-practice/offhost-app-state/plan.json`'s
@@ -932,15 +948,17 @@ holds the evidence, alternatives and overturn comparison for each item.
   checksum-verified) scans every lockfile and manifest listed in
   `.github/osv-scanner-lockfiles.json` with `--no-resolve` and fails on any
   vulnerability not ignored in `.github/osv-scanner.toml`; it runs on every PR
-  (a required check in the target ruleset) and uploads SARIF (category
-  `osv-scanner`) off PRs. `tests/test_osv_lockfile_coverage.py` fails when a
+  (a required check in branch ruleset 23739774). Off PRs it keeps its SARIF as
+  an artifact that the tool-free `osv-sarif-upload` job uploads (category
+  `osv-scanner`). `tests/test_osv_lockfile_coverage.py` fails when a
   tracked lockfile is missing from the list. Its `excluded` list may name only
   a deliberately vulnerable test fixture, with a reason and an evidence path:
   today only `blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt`
   (urllib3 1.26.4, the grype positive control for gap ci-supply-chain[13];
   OSV-Scanner reports its 9 advisories, exit 1, when scanned on its own). The `zizmor-online` job
   (push/schedule/dispatch) reuses the hash-locked zizmor with its online
-  audits and uploads SARIF (category `zizmor`); findings do not fail it. The
+  audits in a `contents: read` job; the tool-free `zizmor-sarif-upload` job
+  uploads its SARIF (category `zizmor`); findings do not fail it. The
   offline zizmor PR gate in `validate.yml` is unchanged.
 - **Gates.** `dependency-review.yml` fails on high advisories;
   `supply-chain.yml`'s grype scan fails at `--fail-on high` with the reviewed

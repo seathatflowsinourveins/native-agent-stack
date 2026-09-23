@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """Derive a layer winner's per-platform status from recorded evidence: one rule for every caller.
 
-``scripts/landscape.py`` (the ceiling a declared ``platform_status`` may claim) and
-``scripts/component_matrix.py`` (the matrix's e2e state and flip rule) call
-``platform_status()``; ``tools/sota-convergence/record_verdicts.py`` (the status a re-record
-writes) switches to it in agent-lab-17's verdict-integrity change and still writes
-``macos-arm64: untested`` until then, so today a Mac receipt raises the allowed ceiling and a
-row reaches it on that re-record. The inputs are the host receipts under ``evidence/hosts/`` (via
+``scripts/landscape.py`` (the ceiling a declared ``platform_status`` may claim),
+``scripts/component_matrix.py`` (the matrix's e2e state and flip rule) and
+``tools/sota-convergence/record_verdicts.py`` (the status a new-wave record writes, every
+platform) call ``platform_status()``, so a Mac receipt raises the allowed ceiling and a row
+reaches it on its next re-record. The inputs are the host receipts under ``evidence/hosts/`` (via
 ``host_receipts.build_summary``) and the winner's own ``evidence_class`` and
 ``evidence_refs``; nothing here reads a lane's prose.
 
@@ -27,7 +26,9 @@ otherwise ``untested``.
 
 ``linux-wsl2-x86_64``: ``accepted`` needs a qualifying pass, or a ``native_proven`` /
 ``measured_comparison`` winner citing at least one ``evidence/`` file registered in
-``manifests/evidence.json``, and in both cases no blocking fail; ``conditional`` covers the
+``manifests/evidence.json`` (not one the layer-verdict pipeline sealed under
+``evidence/artifacts/layer-verdicts-<run-id>/``: packets, lane returns and adjudications are lane
+inputs or opinions, not execution receipts), and in both cases no blocking fail; ``conditional`` covers the
 same classes otherwise, ``local_integration``, ``synthetic`` and any bound non-``synthetic``
 pass without a standing dissent; otherwise ``not_established``.
 
@@ -82,10 +83,17 @@ normalize_pin = host_receipts.normalize_pin
 pin_matches = host_receipts.pin_matches
 
 
+# What the layer-verdict pipeline itself seals (tools/sota-convergence/record_verdicts.py).
+LAYER_VERDICT_ARTIFACTS = "evidence/artifacts/layer-verdicts-"
+
+
 def registered_evidence_refs(winner: dict, registered_paths) -> tuple[str, ...]:
+    """The winner's refs (a ``#fragment`` ignored) naming a registered ``evidence/`` file that is
+    not a layer-verdict artifact."""
     refs = winner.get("evidence_refs") or []
-    return tuple(ref for ref in refs if isinstance(ref, str)
-                 and ref.split("#", 1)[0].startswith("evidence/") and ref.split("#", 1)[0] in registered_paths)
+    paths = [(ref, ref.split("#", 1)[0]) for ref in refs if isinstance(ref, str)]
+    return tuple(ref for ref, path in paths if path.startswith("evidence/")
+                 and not path.startswith(LAYER_VERDICT_ARTIFACTS) and path in registered_paths)
 
 
 def _platform_receipts(summary: dict, component_id, platform_id: str) -> list[dict]:

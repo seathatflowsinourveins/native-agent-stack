@@ -170,19 +170,38 @@ locally with `GH_TOKEN` set and no `--offline`, using
   enforced by the unit test.
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
-  check. Off PRs, the same scan writes SARIF, uploaded by
-  `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
-  (v4.38.1, annotated tag `c23de5a8…` dereferenced) with category
-  `osv-scanner`. Only that job holds `security-events: write`. CodeQL Action
-  v3 is deprecated in December 2026
+  check. Off PRs, the same scan writes SARIF, which the job keeps as a 1-day
+  artifact; the separate `osv-sarif-upload` job (`needs: osv-scanner`,
+  `!cancelled()` so a findings failure still uploads) downloads it and uploads
+  it with `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
+  (v4.38.1, annotated tag `c23de5a8…` dereferenced), category `osv-scanner`.
+  CodeQL Action v3 is deprecated in December 2026
   ([changelog](https://github.blog/changelog/2025-10-28-upcoming-deprecation-of-codeql-action-v3/)).
+- **Write scope (2026-09-23 split).** Until this change the `osv-scanner` job
+  itself held `security-events: write`, so the token that can dismiss the
+  CodeQL alerts gated by the `code_scanning` rule was present in the job that
+  runs the curl-installed OSV-Scanner binary on every event, PRs included
+  (job-level permissions apply whether or not the upload step runs). It was
+  never the only holder: `git show <c>:.github/workflows/security-scan.yml |
+  grep -c 'security-events: write'` returns 2 at `e4737e5`, `da000f8`,
+  `ad72b16`, `4e4aab0` and the squash merge `4970ba0` (`zizmor-online`, later
+  `zizmor-sarif-upload`, held it too). Now both scan jobs are `contents: read`,
+  and the two upload jobs hold the write scope and run no shell step or
+  installed tool (`tests/test_workflow_hardening.py`
+  `test_the_write_token_never_reaches_an_installed_tool`). The split adds no
+  scan: the job already ran `osv-scanner scan source` twice off PRs (the
+  table run for the exit status, then `--format sarif`).
 - **Alternatives.** Dependency review only (sees only a PR's changes). grype
-  over every lock (it needs SBOMs per ecosystem). A separate upload job, which
-  keeps `security-events: write` off the PR run but scans twice.
-- **Overturn.** OSV-Scanner fixes its version ordering, so resolved results
-  match a pip resolution of the same manifest (then drop `--no-resolve`). Or
-  30 days of PR runs produce only findings that another required check also
-  reports.
+  over every lock (it needs SBOMs per ecosystem). Keep the upload step inside
+  the scan job (rejected on 2026-09-23: it leaves the write-scoped token in the
+  job that runs the installed binary, which the zizmor split in section 4
+  already rejected for the same reason, and splitting costs no extra scan).
+- **Decision.** Scan in a read-only job; upload from a tool-free job.
+- **Overturn.** GitHub adds step-scoped permissions, so the upload step alone
+  can hold the write scope; or OSV-Scanner fixes its version ordering, so
+  resolved results match a pip resolution of the same manifest (then drop
+  `--no-resolve`); or 30 days of PR runs produce only findings that another
+  required check also reports.
 
 ## 4. `security-scan.yml`: zizmor online
 
@@ -210,22 +229,83 @@ locally with `GH_TOKEN` set and no `--offline`, using
   with `bash --noprofile --norc -eo pipefail -c 'set -uo pipefail; false; echo reached'`
   (prints nothing) and guarded by a test assertion that fails if the old line returns.
 - **Result.** 0 online findings on `168a3a8` and on this branch.
+- **Alternatives.** Give `zizmor-online` the write scope directly (rejected:
+  hands a pip-installed analyzer's token the power to dismiss CodeQL alerts,
+  see "Token split" above). Run zizmor online as a PR gate (rejected: online
+  audits need network egress and a token on every PR, and 0 findings on
+  `168a3a8` give no evidence yet that it would not be noisy). Drop online
+  zizmor and keep only `validate.yml`'s offline `regular` gate (rejected:
+  offline analysis covers no online-only audit class, such as impostor
+  commit, known-vulnerable action or ref-confusion checks that need the
+  GitHub API and an advisory database; zizmor's secrets audits, such as
+  `secrets-inherit`, `overprovisioned-secrets` and `unredacted-secrets`, are
+  static and already run offline in `validate.yml`).
+- **Decision.** Keep the two-job split: `zizmor-online` (`contents: read`,
+  push/schedule/dispatch only) produces the SARIF artifact, and
+  `zizmor-sarif-upload` (`security-events: write`, no shell step or
+  installed tool) uploads it, per the "Token split" evidence above.
 - **Overturn.** An online-only finding class (impostor commit, known-vulnerable
   action, ref-version mismatch) appears. Then it becomes a PR gate.
 
 ## 5. Scorecard SARIF
 
-`scorecard.yml` keeps `publish_results: false` and the 5-day artifact. It now
-also uploads `results.sarif` through the same `upload-sarif` SHA. Only the
-`analysis` job has `security-events: write`. Scorecard v5.5.0 and
-scorecard-action v2.4.4 are the latest releases. **Overturn:** duplicate or
-noisy alerts that nobody triages for 30 days.
+- **Evidence.** `scorecard.yml`'s `analysis` job runs
+  `ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc` (v2.4.4,
+  the latest release; Scorecard itself is at v5.5.0) with `results_format:
+  sarif` and `publish_results: false`, then uploads `results.sarif` both as a
+  5-day workflow artifact and, in the same job, through
+  `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
+  (v4.38.1). The upload step and its job-scoped `security-events: write` were
+  added on `main` in commit `4970ba0` (PR #108). The layout matches the example
+  that `ossf/scorecard-action`'s README (pinned SHA
+  `2d1146689b8cda280b9bc96326124645441f03bc`, section "Workflow Example") links:
+  `ossf/scorecard` `.github/workflows/scorecard-analysis.yml` at
+  `d13ba3f3355b958d5d62edc47282a2e7ed9fa7c1`, where the action writes
+  `results_file: results.sarif` and the same job, holding `security-events:
+  write`, uploads it with `github/codeql-action/upload-sarif`. The README's
+  Inputs table (`results_file`, `results_format`) and its list of approved
+  steps say the same, and its private-repository snippet marks
+  `security-events: write` as "Required when publishing results (badge / API /
+  code scanning)". Observed upload: `gh api --paginate
+  "repos/seathatflowsinourveins/native-agent-stack/code-scanning/analyses?ref=refs/heads/main&per_page=100"`
+  lists Scorecard analyses for commit `4970ba0`: `supply-chain/branch-protection`
+  (1 result, analysis 1823007546), `supply-chain/local` (5, 1823007605) and
+  `supply-chain/online-scm` (3, 1823007675), with `osv-scanner` (0, 1823007099)
+  and `zizmor` (0, 1823008464) on the same commit, read 2026-09-23. `analysis` is the only job in
+  the workflow and the only one with `security-events: write`
+  (`tests/test_workflow_hardening.py` `ScorecardTests`). Unlike the two
+  security-scan uploads, it is not split: `ossf/scorecard-action` itself takes
+  `repo_token` (default `github.token`) in that job, as its upstream layout
+  prescribes; a split would need the action to run in a read-only job, which
+  its README does not document. **Keep-but-compare:** measured comparison is a
+  dispatch run with the action in a `contents: read` job plus a separate upload
+  job; if it produces the same analyses, split it.
+- **Alternatives.** Set `publish_results: true` (rejected: publishes to the
+  public `api.scorecard.dev` dataset and badge, which this unit's scope
+  keeps off). Keep the artifact only, with no code-scanning upload (rejected:
+  findings would sit in a 5-day artifact nobody is required to open, instead
+  of surfacing next to CodeQL/OSV/zizmor alerts).
+- **Decision.** Keep `publish_results: false` and the 5-day artifact, and add
+  the code-scanning upload in the same job that already ran Scorecard so no
+  second run or separate job is needed.
+- **Overturn.** Duplicate or noisy alerts that nobody triages for 30 days.
 
 ## 6. Dependency review gate
 
 - **Evidence.** `warn-only: true` "overrid[es] `fail-on-severity`" (`action.yml`
   at `a1d282b3`). The graph has been on since the PR #78 correction. It passed
   on #97 and #98 (12-17 s).
+- **Alternatives.** Keep `warn-only: true` and report-only status (rejected:
+  the graph correction removed the only blocker to gating, and a report-only
+  advisory scan that nobody must act on does not close the gap). Gate at
+  `critical` instead of `high` (rejected: leaves high-severity advisories
+  with a fix available unblocked; #97 and #98 are the only measured samples
+  of the gate running at `high`, and both are Dependabot security-fix PRs
+  that passed in 12-17 s, so they show the gate's latency is low, not that
+  a `high` threshold would stay quiet on a PR introducing a new advisory).
+  Gate at `moderate` (rejected,
+  keep-but-compare: no measured 30-day run at `moderate` exists yet to show
+  its false-positive rate on this repository's dependency set).
 - **Decision.** `fail-on-severity: high`, `warn-only` removed, and
   `dependency-review` is a required check in the target ruleset.
 - **Overturn.** A high-severity block with no fix path that needs an
@@ -298,6 +378,14 @@ noisy alerts that nobody triages for 30 days.
   a fixture).
 - **Overturn.** A Dependabot pip or uv PR passes the recompile-and-diff check on
   a real lock.
+
+- **Stale lane text, recorded here only.** The lane-sourced Dependabot
+  alternative in `catalogs/landscape/foundation.json` (rendered into
+  `catalogs/sota-convergence/layer-verdicts-20260922.json` and the handbook's
+  generated verdict block) still says Dependabot owns only GitHub Actions
+  references. Since the 2026-09-23 fixture entry that is no longer exact. Sealed
+  lane outputs are not edited by hand; the next recorded lane run for that layer
+  replaces the text, and this bullet is the correction until then.
 
 ## 9. Tag-only immutable release
 
@@ -377,9 +465,14 @@ noisy alerts that nobody triages for 30 days.
   Request Alerts" checks passed on #97 and #98. It is not required.
   **Overturn:** remove it if its PR alerts add nothing beyond
   dependency-review across the next 10 PRs.
-- **harden-runner stays audit** on 18 of 22 ubuntu jobs; the other 4 are
-  hash-frozen exemptions. Block mode needs a per-job allow-list backed by
-  audit runs.
+- **harden-runner stays audit** on 21 of 25 ubuntu jobs (measured 2026-09-23
+  at HEAD, counting every job across `.github/workflows/*.yml` whose
+  `runs-on` is a literal `ubuntu-` label with `tests/test_workflow_hardening.py`'s
+  own job/first-step parser); the other 4 are hash-frozen exemptions
+  (`native-offhost-app-state.yml`'s `source` and `destination`,
+  `native-offhost-restore.yml`'s `synthetic-restore`, and
+  `native-token-e2e.yml`'s `native-token-tools`). Block mode needs a per-job
+  allow-list backed by audit runs.
 - **Renovate stays deferred.** No custom-manager gap is shown; Mend's hosted
   app is free, but it would duplicate Dependabot's ownership
   ([comparison](https://docs.renovatebot.com/bot-comparison/)).
@@ -487,3 +580,41 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
 
 - **Related setting, owned elsewhere.** `can_approve_pull_request_reviews` was set to true by
   the bot-PR live test (#95, recorded in #110). It is not part of this change's target.
+
+## Blind comparison (2026-09-23)
+
+- **Why.** Two independent implementations of the same approved
+  GitHub-automation plan existed per repository (the merged one above and an
+  unmerged one built in parallel by a side agent of the same session). The
+  user asked for a blind comparison and to merge the winner.
+- **Protocol.** Preregistered before evaluation (`PREREGISTRATION.md`, with
+  Amendment 1 recorded after the first run and before re-judging: neutral
+  protocol ids after a repository-name leak, two harness defects fixed,
+  frozen per-command results added; metrics, thresholds and closure rule
+  unchanged). Arms had opaque labels; the key stayed sealed. Metrics:
+  `defect_weight` (10/3/1 per confirmed high/medium/low; confirmed = single-arm
+  reviewer claim not refuted by an independent source-reading refuter),
+  `battery_pass_rate` (identical fixed battery emulating the workflows with
+  fake scanners; the agent-lab hermetic check ran under bubblewrap with host
+  paths hidden), `requirements_met_rate` (shared requirement list), and
+  `own_suite_pass`. Closure by `tools/compare/closure.mjs`: the challenger
+  overturns only if better on defects AND not worse on the other three.
+- **Harness validation.** Positive controls reproduced known outcomes (the
+  pre-fix commit's findings-path report loss; the hermetic failure a hosted
+  run had shown).
+- **Results (run `wf_40347d59-2e8`, second pass).** Catalog `cmp-a`:
+  incumbent `defect_weight` 5, battery 1.0 (13/13), requirements 0.90, own
+  suite 1; challenger 10, 0.9231 (fails the analyzer-crash check), 0.8333,
+  1 -> closure "retain". agent-lab `cmp-b`: incumbent 10, 1.0 (8/8),
+  requirements 0.90, own suite 1; challenger 7, 1.0, 0.80, 1 -> closure
+  "retain" (challenger better on defects only). Publication gate passed for
+  both: 3 of 3 blind refuters did not refute, 0 leak votes, judge leak false.
+- **Outcome.** The merged implementation is the winner in both repositories,
+  so nothing is replaced; the winner's confirmed defects are fixed in this
+  change (the preregistered graft rule).
+- **Limitations.** The battery was authored by the coordinator, who had seen
+  earlier review findings on both arms; the challenger branches were built on
+  older bases; one incumbent acceptance-command result was dropped when the
+  packet was built (the battery file shows all 10 commands exit 0, so
+  `own_suite_pass` is unaffected); the completeness critic ran before closure
+  files existed.

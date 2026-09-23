@@ -3009,8 +3009,8 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "1a504bb975f17f5af05f43a17df9d0e90b7ae3177f87d0ae7a6b99f68caf6b73",
-      "bytes": 1292
+      "sha256": "a42818ebdf0eceb6167453cbce129e8b1653a4dca2cf8a54b20440aa053c2e77",
+      "bytes": 1616
     },
     {
       "path": ".github/main-ruleset.json",
@@ -6344,6 +6344,26 @@
       "bytes": 19657
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/README.md",
+      "sha256": "0686e62d04ca2947d7bfa27462aa62528dbcc45b0899c4302260ff0478c9d71a",
+      "bytes": 8191
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/harness.py",
+      "sha256": "af7ce5cd2bd87f8e6d7cf2d07c41be169e1eab65b961deb95ff8427be250283a",
+      "bytes": 24944
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/plan.json",
+      "sha256": "2ce6f6be140826a107826e35e6aaef9f31c55fcf82c98e25ce7ffd1b894e5a84",
+      "bytes": 1878
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
+      "sha256": "28b9db92ecef7ef16e27774f9266d0bf9ddb7f55259d645ee2356c316464099a",
+      "bytes": 5186
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
       "sha256": "049b1eaeee67010e25b553726e201ce9be951c1a0bc67097908a7f9d86ce86c8",
       "bytes": 23995
@@ -6422,6 +6442,36 @@
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
       "sha256": "c75f7db3025200d55a166b8ec2811939d32518861118490ffc1a57eb7ba389fa",
       "bytes": 43907
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
+      "sha256": "cbeef3c63b58e71bfa45f389a7f0a2b5adb3da19c1fd83fb2983d8b207b4ca87",
+      "bytes": 904
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/gate-result.json",
+      "sha256": "1e27dbff389f31fc3c0bea6aec019c6f25732e31c512dfbd24aed9c02298cf5b",
+      "bytes": 1479
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/ingest-receipt.json",
+      "sha256": "bc2e2f9745bc7972cc04bc395d5ed2aa06f660dc9dece9ed526129b1ff20f9e7",
+      "bytes": 630
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/observations.json",
+      "sha256": "8bd766690ce73ee0066c1c90fbd89a9e2b6dc3c7393e95c143b043d23cc4dca0",
+      "bytes": 2511
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/paper-output.json",
+      "sha256": "1f7aea72c256f2f65677688f7c6f80c6c80f87beecf9cd83488807af4d0b6815",
+      "bytes": 11290
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/scheduled-trial.log",
+      "sha256": "b13ecfd314a189185f553291d1b0ae5c15ccaef61fa5fc30e9de6960b655cc7f",
+      "bytes": 553
     },
     {
       "path": "blueprints/us-equities/alpaca-historical/README.md",
@@ -6997,6 +7047,136 @@
       "path": "blueprints/us-equities/engine-nautilus/equity-replay/run.py",
       "sha256": "e036aa9354a478fe270258d3d2f2cb42a5c9c072d688b21313e0a89e715d796e",
       "bytes": 12245
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/README.md",
+      "sha256": "9efbc9a8e92990810234bb72395c2369e9ee850180b23c6d299fea45c9e5fb11",
+      "bytes": 5955
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131151Z-handrolled-protocol-probe.json",
+      "sha256": "69ffa707d3d010771c86b7eb9cc81f2fb949fa547a8df5c3f39e7cc1a6493250",
+      "bytes": 399
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131436Z-handrolled-protocol-probe.json",
+      "sha256": "e4c1b6f79e47e7d668b4e2e306f60c528d2b46bcc0f6b396ea465ccce421ea0b",
+      "bytes": 399
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131604Z-ibapi-draft.json",
+      "sha256": "b65b78cf11ca90923854f6de052aa17b0356b4153ea9392d47e658c1147c0c9b",
+      "bytes": 2054
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131653Z-ibapi-draft.json",
+      "sha256": "1cea3a50c2bb1e5c319ec8c50ed99b39ea16f69f7a5c67068ecc084ecab25388",
+      "bytes": 2015
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T1318Z-nautilus-adhoc.json",
+      "sha256": "75a662ade64629576411456d83c12739cca95f18578af04b0141f8cf713927db",
+      "bytes": 1416
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T132358Z-ibapi.json",
+      "sha256": "b420214bf6e6dadbc0cada74f82fff85fb9246fe5fb7e1c2833cccc6c89dfa72",
+      "bytes": 2074
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T132430Z-nautilus.json",
+      "sha256": "560ddef43cd0a6770daa48b8364b01554db2a5c68587aa2cbca513adc8353eeb",
+      "bytes": 413
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T141300Z-ibapi.json",
+      "sha256": "44dfaa71dabe3585aeb4045d7db7a5514ca3e76ef5981ad1a4767891bbb62d69",
+      "bytes": 1938
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T141311Z-nautilus.json",
+      "sha256": "a79d229be850078af872ccd9f5283c77f2f5b858debdd1758ad22c8f967a6414",
+      "bytes": 1449
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T142801Z-ibapi.json",
+      "sha256": "5868870f113516c2f33fc8816586f063aa44f4d2927acb41a1f2f731529bcb05",
+      "bytes": 2059
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T142803Z-nautilus.json",
+      "sha256": "b12856dac1c55f40461466ac66278d96eb562740c2d9fbfeca1bf2431408e182",
+      "bytes": 1855
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T142819Z-ibapi.json",
+      "sha256": "40b37c9686610ffa7535dd49232c63670a8dda56d5d99963da1561849ff8b4f8",
+      "bytes": 2060
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T142821Z-nautilus.json",
+      "sha256": "590c97af75bfba8800ae8fcaeb692a03d43bfaacc2f05de684afb773ec4e7d1c",
+      "bytes": 1854
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T143249Z-ibapi.json",
+      "sha256": "ccd3ace1a4c8df3dc7280b81cfac97bf1bfb199e7056cf5bc35196aa7edd95ed",
+      "bytes": 2061
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T143251Z-nautilus.json",
+      "sha256": "6d1e3e1ae0f13d9610598e285b8fc721b856704cd28f2bd537ba3b5930eb9b64",
+      "bytes": 1641
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T143550Z-ibapi.json",
+      "sha256": "1e991754850b1ad18b5f8b6caf6510e57c4dc8d3c2ee7eaad6c09d67ac30a008",
+      "bytes": 2060
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T143552Z-nautilus.json",
+      "sha256": "639aa343318e757056d122c0bbdf31b42d4f6074160b1425e33d1c6ef55e25fb",
+      "bytes": 1643
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T145646Z-ibapi.json",
+      "sha256": "1856e3c2af1c97553cc6fe08ef135729ffe3ca97f1e0a15882f7547a8f55c720",
+      "bytes": 2059
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T145648Z-nautilus.json",
+      "sha256": "be8435ea49732968be587483121f715a1a947d23e46ad5247b4eed42d4444a1a",
+      "bytes": 1642
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T1500Z-nautilus-teardown-abort-study.json",
+      "sha256": "b1a242a8d25c2322e6f7cc086fd30a0a6727795e3960e2dce82d3f70d0ba8430",
+      "bytes": 2466
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20260923.json",
+      "sha256": "af4d968cf9d6508883b53ac80f1532d3b888188000c6173fbd3f725447f56756",
+      "bytes": 2060
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/nautilus-readonly-20260923.json",
+      "sha256": "cc9c87daf3cfe58f8a4882b71a19cdc8dc0b5b6c44a36d125c6f3d617720c780",
+      "bytes": 1642
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/ibapi_probe.py",
+      "sha256": "01af076abb97adeece6041770141b59cd21453148475cf486c4ee12a1047f5ca",
+      "bytes": 13001
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/nautilus_probe.py",
+      "sha256": "06fff32db6e55b471da4408661e428d471e756264d734e4116fe9526c34d1305",
+      "bytes": 8362
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/plan.json",
+      "sha256": "edd7fba5a0e5167499eb3f4d2874125f4d50427bed939f01e4375b7e0726b57c",
+      "bytes": 2741
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/observe_quickstart.py",
@@ -8470,8 +8650,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "cdffd15ba27c092792c1dd709bbb86c7a12b2881efea8977b802adc25a87a54d",
-      "bytes": 27680
+      "sha256": "f731218723abd5f22ac72e6aed2843475bb055ef2735666cfd3aaa497324277b",
+      "bytes": 30806
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -8680,8 +8860,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "bee6a10ddbbd42d49eec3f76ae785b3b9da0a108d404ad8824cf284107ddffad",
-      "bytes": 17780
+      "sha256": "29debc2e3261a7d901f3735d2a929953728e57eefb931032be71a7e16872764f",
+      "bytes": 17672
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -8725,8 +8905,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "68742b9b91af2b9ae8d6daa036f0f166db39a5b3ea8669a31393a438ba08854c",
-      "bytes": 32406
+      "sha256": "0eace745964cb3dd3c83a0dd4f5334ff192da9a44b0b857e606e6a77c0fd9c78",
+      "bytes": 41656
     },
     {
       "path": "docs/direct-results.md",
@@ -8835,13 +9015,13 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "0291d8ebdb209f293896bae915ca74a25ae024c6d239a6d5cd90a3cac009f5fc",
-      "bytes": 63228
+      "sha256": "0480471e3546be71ac48189079fa479bc278e54d80aa1f978e9fa7d1092d087b",
+      "bytes": 64405
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "e7aa905f082b1cdd43897b8f7651061bba4e8d9beff9e093db0a0b6bdf9d468e",
-      "bytes": 425236
+      "sha256": "9c6b52f4fe9e2157a0dc08a0403f9311795211b41cbfc29e28e64c26ac222c20",
+      "bytes": 425282
     },
     {
       "path": "docs/harness-defaults.md",
@@ -9157,6 +9337,51 @@
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
       "sha256": "5f989503c33774e3086287d6183ff10e51d5756958fe880d204be3fc0bf5b84e",
       "bytes": 590235
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/PREREGISTRATION.md",
+      "sha256": "6ef62ccf8c72c2f7405ea6af872693efb0f2af6b3f55307b248444f0e257749b",
+      "bytes": 4067
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/README.md",
+      "sha256": "c23f365c29c8443242af0a9244d9a311226c631530d69c5e9f2486521e4d0e31",
+      "bytes": 1655
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/battery_catalog.py",
+      "sha256": "84c2ae1c0f7aa5eb21e9b16c501fcdc6217fdbd08b2a8360b60e94922fe96145",
+      "bytes": 9515
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/closure-cmp-a-20260923.json",
+      "sha256": "0c5ce0ce49aa9a2dc6d718e74f21518bd00c3b31bb309f33f3a72e35c42a2fcf",
+      "bytes": 671
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/judgments-cmp-a-20260923.redacted.json",
+      "sha256": "cbf106603380b661755964724366a8225adfa8127b8ade98a9de27839377e886",
+      "bytes": 8480
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/packet-cmp-a-20260923.json",
+      "sha256": "43a48b2ef0f3b86c55bd65ddca48aebe91c51ff0e84367ddfc8a61a6f195a91f",
+      "bytes": 12730
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/protocol-cmp-a.json",
+      "sha256": "804349c9de90426727afcbf32a7899c588db55efe6cdc59f0be0bae8e8a5b246",
+      "bytes": 866
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/spec-catalog.md",
+      "sha256": "7d70f7a6e36b6ef252946317c7e8b3a3b7e0906a17cae9f2bbb4bf69469f259b",
+      "bytes": 3879
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/wfemu.py",
+      "sha256": "4765600792da23c3e9c3efe598a2052a7e0fa27ff9da4a2b2dbbb45f8d6b7719",
+      "bytes": 11363
     },
     {
       "path": "evidence/artifacts/catalog-clean-install-20260921/04-locked-sdk-sync.log",
@@ -13284,6 +13509,11 @@
       "bytes": 3678
     },
     {
+      "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
+      "sha256": "0d32534357501c011298420c07161c59940929cabd00a9b71d5d7817126f88c9",
+      "bytes": 17126
+    },
+    {
       "path": "evidence/receipts/mac-memory-patch-20260920.json",
       "sha256": "b8d09fda1ad56976d57d938af0eb7076223c79e39b2261ef4521413b15d8a0f1",
       "bytes": 893
@@ -13705,8 +13935,8 @@
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "ab4b14a99f3bab5ce7ba3a6a5389a8caec7f6961c88e04999e79f5aa9e360174",
-      "bytes": 955
+      "sha256": "3e515607fa28c91ca6c3b41c260ffbe494d76f3a5c0458c2fb28e2149c704d02",
+      "bytes": 1129
     },
     {
       "path": "examples/claude-native/workflows/check-syntax.mjs",
@@ -13755,8 +13985,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "42e31e482482f437495bb492327ff1ccc39bef2743886a9a8c37814b41949c0f",
-      "bytes": 44353
+      "sha256": "53e25add00eada875b792ae2179249958ae2d1dc10527c86bf6485ee9bf65251",
+      "bytes": 44508
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",
@@ -14160,8 +14390,8 @@
     },
     {
       "path": "recipes/sota-convergence-practice.md",
-      "sha256": "492ea9a8563bc6e653d7fdb63879d7dad35bcb85e756f5357dbb4eb3cc6c0595",
-      "bytes": 10250
+      "sha256": "806ee98ab02eb699e3e869016942f58c3130d7a24629fb70e113b17b40996d00",
+      "bytes": 10466
     },
     {
       "path": "recipes/tavily.md",
@@ -14195,8 +14425,8 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "c591080145509da25a940e51b160b9d31787303f085b57a43919463ac784cdbf",
-      "bytes": 40702
+      "sha256": "f980960ddac3ce630b12740aeaa50bc4521e830023e938876c56fc58dd19023a",
+      "bytes": 62629
     },
     {
       "path": "scripts/native_token_ci.py",
@@ -14205,8 +14435,8 @@
     },
     {
       "path": "scripts/platform_status.py",
-      "sha256": "8a12682cdbbcfca02db5512110ad21f9e1fecbd9468bad9cfc4cb85f13123c34",
-      "bytes": 9434
+      "sha256": "6cd39c921358cc0c14865610ee07442aebcf76f5cecf8ef84af7363fd1baeec0",
+      "bytes": 9906
     },
     {
       "path": "scripts/recount-tokens.cjs",
@@ -14539,19 +14769,24 @@
       "bytes": 60927
     },
     {
+      "path": "tests/test_ibkr_acceptance.py",
+      "sha256": "2c0f09c5fd86a0125e775fdcd5363a6d25a8f2ff521802a3c6b489b9b21492e7",
+      "bytes": 15483
+    },
+    {
       "path": "tests/test_job_recovery.py",
       "sha256": "a985c9971492a945d8add60abf9fc77c5feab337c7f1fcd413643545024c4c20",
       "bytes": 3534
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "5f8a5e3ab7eec5805ab2978e7e16250efb26862fe6abace6fe15b3fed9d2d36e",
-      "bytes": 39007
+      "sha256": "3e512347df2e56d26d65a65a7ea3e5ee58b5e35f899a5ba3d67332ea2e1b8cfc",
+      "bytes": 57952
     },
     {
       "path": "tests/test_layer_verdicts.py",
-      "sha256": "b33a6795ae280c18d96ba8be7086153e10683d4d954be402607c67d3efcba19a",
-      "bytes": 19009
+      "sha256": "67bb83708593472f08578e76b06187e406b9f939528ee649d71449277419b173",
+      "bytes": 29814
     },
     {
       "path": "tests/test_lifecycle_capture.py",
@@ -14577,6 +14812,11 @@
       "path": "tests/test_native_dashboard_data.py",
       "sha256": "ef502fb8344dda83a9e92c3056b8ffeaeda43d277081337d62da53d42fffe558",
       "bytes": 18097
+    },
+    {
+      "path": "tests/test_native_faults_min.py",
+      "sha256": "c19749376223934720fbf1a4e77b8171f4c25dac46305686f31c6b307aa549ea",
+      "bytes": 20792
     },
     {
       "path": "tests/test_native_maintenance.py",
@@ -14780,8 +15020,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "d3fed20cd7375f93b3e4a7d3c9d05c727d2e051e7c35581b9fd8a5e379010d36",
-      "bytes": 64558
+      "sha256": "23a805932370363a2cd6ae97b507c6a4d92ed61f9cc7471d6179136468da024b",
+      "bytes": 76228
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
@@ -14790,8 +15030,8 @@
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "220e55dafe824a3817541b67887b2db0d3ad9016ba4c9f4b6fd059f87e41cbe5",
-      "bytes": 17212
+      "sha256": "c51e7c3d079f6c695b835e62aa79ac6fc1fe7f74a5fbf9a0b86c5fabb359c4b3",
+      "bytes": 26592
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",

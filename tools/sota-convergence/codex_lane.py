@@ -20,9 +20,18 @@ layer merely because neither was found in a given run.
 ``out.tmp`` (the agent's last message, written by ``-o``) is parsed as one
 JSON object: ``lane`` is always forced to ``"codex"``; ``packet_sha256`` is
 filled from the packet file's own sha256 when the model did not set it;
-``model`` is filled from whatever the event stream carried (else falls back
-to ``{"name": "unknown", "effort": <--effort>}``) only when the model's own
-response did not already set a usable ``model.name``. A failing attempt
+``model`` is runner-owned and never taken from the model's response text
+(2026-09-23 peer audit): ``model.name`` is the runner's own observation -- the
+``--model`` it passed to ``codex exec -m``, else the model name the event stream
+carried, else ``"unknown"`` (which then fails record_verdicts.py's family
+pattern) -- ``model.effort`` is ``--effort``, and ``model.family`` is
+``"openai"`` (``codex exec`` is OpenAI's CLI; a non-OpenAI model name then fails
+record_verdicts.py's family pattern). ``provenance`` is also runner-owned:
+``{codex_lane_py_sha256, prompt_sha256}`` -- the sha256 of this script file and
+of the prompt template it filled. The strict schema copy passed to ``codex
+exec`` omits ``provenance`` and ``model.family``, since Codex strict output
+requires every listed property; whatever ``model`` the response carries is
+replaced. A failing attempt
 (non-zero exit, timeout, missing or unparseable ``out.tmp``) is retried
 exactly once before the layer is recorded as failed and left for the next
 run (resumable). Nothing here validates the full lane-return JSON Schema --
@@ -64,12 +73,19 @@ SCHEMA_MAP_KEYWORDS = frozenset({"properties", "patternProperties", "$defs", "de
 DATA_KEYWORDS = frozenset({"const", "enum", "default", "examples"})
 
 
+def _top_level_lane_schema(schema) -> bool:
+    properties = schema.get("properties") if isinstance(schema, dict) else None
+    return isinstance(properties, dict) and "provenance" in properties and "lane" in properties
+
+
 def strict_output_schema(schema):
     """Return a copy of ``schema`` without keywords Codex strict output rejects."""
     if isinstance(schema, list):
         return [strict_output_schema(value) for value in schema]
     if not isinstance(schema, dict):
         return schema
+    if _top_level_lane_schema(schema):
+        schema = without_runner_owned(json.loads(json.dumps(schema)))
     strict = {}
     for key, value in schema.items():
         if key in STRICT_UNSUPPORTED_KEYWORDS:
@@ -81,6 +97,23 @@ def strict_output_schema(schema):
         else:
             strict[key] = strict_output_schema(value)
     return strict
+
+
+# Written by this runner, never asked of the model: (object path, property).
+RUNNER_OWNED_PROPERTIES = ((), "provenance"), (("model",), "family")
+
+
+def without_runner_owned(schema):
+    """Drop the runner-owned properties (and their ``required`` entries) from a lane schema copy."""
+    for path, name in RUNNER_OWNED_PROPERTIES:
+        node = schema
+        for step in path:
+            node = (node.get("properties") or {}).get(step) if isinstance(node, dict) else None
+        if isinstance(node, dict):
+            (node.get("properties") or {}).pop(name, None)
+            if isinstance(node.get("required"), list):
+                node["required"] = [item for item in node["required"] if item != name]
+    return schema
 
 
 def write_strict_schema(schema_path: Path, codex_dir: Path) -> Path:
@@ -167,9 +200,11 @@ def fill_prompt(template: str, packet_path: Path, repo_root: Path) -> str:
     )
 
 
-def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str, prompt_text: str) -> list:
+def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str, prompt_text: str,
+                  model: str = None) -> list:
     return [
         "codex", "exec",
+        *(["-m", model] if model else []),
         "--sandbox", "read-only",
         "--skip-git-repo-check",
         "--ephemeral",
@@ -281,19 +316,28 @@ def extract_events_summary(events: list):
     return model_name, usage
 
 
+LANE_FAMILY = "openai"
+
+
+def lane_provenance(prompt_path: Path) -> dict:
+    """What produced a return: this runner file's and the filled prompt template's sha256."""
+    return {"codex_lane_py_sha256": sha256_file(Path(__file__).resolve()),
+            "prompt_sha256": sha256_file(Path(prompt_path))}
+
+
 def finalize_lane_return(data: dict, catalog: str, layer_id: str, packet_sha256: str,
-                          event_model_name, effort: str) -> dict:
+                          event_model_name, effort: str, provenance: dict = None,
+                          configured_model: str = None) -> dict:
     data = dict(data)
     data["lane"] = LANE
     if not data.get("packet_sha256"):
         data["packet_sha256"] = packet_sha256
-    model_field = data.get("model")
-    if not (isinstance(model_field, dict) and model_field.get("name")):
-        existing = model_field if isinstance(model_field, dict) else {}
-        data["model"] = {
-            "name": event_model_name or existing.get("name") or "unknown",
-            "effort": existing.get("effort") or effort,
-        }
+    # Runner-owned: the model identity is what this runner configured or observed in the event
+    # stream, never the model's self-declared name, effort, family or provenance.
+    data["model"] = {"name": configured_model or event_model_name or "unknown", "effort": effort,
+                     "family": LANE_FAMILY}
+    if provenance is not None:
+        data["provenance"] = dict(provenance)
     return data
 
 
@@ -304,6 +348,9 @@ def parse_args(argv=None):
     parser.add_argument("--layers", default=None,
                          help="Comma-separated layer ids to run (matched across every catalog); default: all.")
     parser.add_argument("--effort", default=DEFAULT_EFFORT, help="model_reasoning_effort passed via -c.")
+    parser.add_argument("--model", default=None,
+                        help="Model passed to codex exec -m and recorded as the return's model.name "
+                             "(default: Codex's configured model, recorded from the event stream).")
     parser.add_argument("--jobs", type=int, default=1, help="Concurrent codex exec invocations.")
     parser.add_argument("--dry-run", action="store_true", help="Print the command per pending layer; write nothing.")
     parser.add_argument("--prompt", type=Path, default=DEFAULT_PROMPT,
@@ -354,12 +401,13 @@ def main(argv=None) -> int:
         for catalog, layer_id, packet_path, packet_sha256, out_path in pending:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
-            cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text)
+            cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model)
             print(shlex.join(cmd))
         return 0
 
     events_dir.mkdir(parents=True, exist_ok=True)
     strict_schema_path = write_strict_schema(schema_path, codex_dir)
+    provenance = lane_provenance(prompt_path)
     usage_lock = threading.Lock()
     failures: list = []
 
@@ -367,7 +415,7 @@ def main(argv=None) -> int:
         catalog, layer_id, packet_path, packet_sha256, out_path = item
         prompt_text = fill_prompt(template, packet_path.resolve(), repo)
         tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
-        cmd = build_command(repo, strict_schema_path.resolve(), tmp_out, args.effort, prompt_text)
+        cmd = build_command(repo, strict_schema_path.resolve(), tmp_out, args.effort, prompt_text, args.model)
         events_path = events_dir / f"{catalog}__{layer_id}.jsonl"
         events_path.write_text("", encoding="utf-8")
 
@@ -413,7 +461,8 @@ def main(argv=None) -> int:
                 tmp_out.unlink(missing_ok=True)
                 continue
 
-            final = finalize_lane_return(data, catalog, layer_id, packet_sha256, last_model_name, args.effort)
+            final = finalize_lane_return(data, catalog, layer_id, packet_sha256, last_model_name, args.effort,
+                                         provenance, configured_model=args.model)
             out_path.write_text(json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
             tmp_out.unlink(missing_ok=True)
             succeeded = True

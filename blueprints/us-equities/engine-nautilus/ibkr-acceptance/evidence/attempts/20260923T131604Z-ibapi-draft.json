@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "gate_id": "ibkr-local-acceptance",
+  "step": "acceptance-plan 5.1 read-only",
+  "client": "ibapi (official IB API client)",
+  "port": 4002,
+  "client_id": 73,
+  "generated_at": "2026-09-23T13:16:04.243844+00:00",
+  "status": "passed",
+  "evidence_class": "native_paper_readonly",
+  "existing_state": {
+    "positions": 0,
+    "open_orders": 0
+  },
+  "observed": {
+    "paper_accounts": true,
+    "server_time_epoch": 1790169364,
+    "positions": 0,
+    "open_orders": 0,
+    "summary_tags": [],
+    "summary_currency": null,
+    "spy_contract": {
+      "conId": 756733,
+      "secType": "STK",
+      "currency": "USD",
+      "exchange": "SMART",
+      "primaryExchange": "ARCA",
+      "longName": "SS SPDR S&P 500 ETF TRUST-US",
+      "tradingHoursSample": "20260923:0400-20260923:2000;20260924:040"
+    },
+    "market_data_type": "DELAYED",
+    "spy_quote": {
+      "delayed_last": 772.63,
+      "first_tick_local_epoch": 1790169385.259146,
+      "delayed_bid": 772.62,
+      "delayed_ask": 772.65
+    },
+    "history": {
+      "bars": 156,
+      "first": "1789997400",
+      "last": "1790106900"
+    },
+    "errors": [
+      {
+        "reqId": -1,
+        "code": 1790169363945,
+        "text": "Market data farm connection is OK:usfarm"
+      },
+      {
+        "reqId": -1,
+        "code": 1790169363948,
+        "text": "HMDS data farm connection is OK:ushmds"
+      },
+      {
+        "reqId": -1,
+        "code": 1790169363950,
+        "text": "Sec-def data farm connection is OK:secdefil"
+      },
+      {
+        "reqId": 9003,
+        "code": 1790169384000,
+        "text": "Requested market data is not subscribed. Displaying delayed market data."
+      },
+      {
+        "reqId": 9004,
+        "code": 1790169385575,
+        "text": "Up-to-the-second historical data requires additional subscription for the API."
+      }
+    ],
+    "info": [],
+    "server_minus_local_s": -0.371
+  },
+  "exit_code": 0,
+  "redaction": "observed.accounts_sha256 removed before publication: a hash of a DU paper id is reversible"
+}
