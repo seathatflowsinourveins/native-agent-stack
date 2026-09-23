@@ -1,0 +1,5 @@
+mcporter 0.14.0 — Listing 3 server(s) (per-server timeout: 30s)
+- context-mode (Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched., 0.0s)
+- ai-memory (23 tools, 0.1s)
+- socraticode (26 tools, 0.5s)
+✔ Listed 3 servers (2 healthy; 1 errors).

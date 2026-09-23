@@ -1,0 +1,68 @@
+[SandboxDebug] Initializing sandbox...
+[SandboxDebug] [SeccompFilter] Looking for apply-seccomp binary for architecture: x64
+[SandboxDebug] [SeccompFilter] Found apply-seccomp binary: <host-home>/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/lib/node_modules/@anthropic-ai/sandbox-runtime/vendor/seccomp/x64/apply-seccomp (x64)
+[SandboxDebug] mux: HTTP backend listening on /tmp/srt-mux-3888100-0.sock
+[SandboxDebug] Mux proxy (HTTP+SOCKS) listening on localhost:58320
+[SandboxDebug] Starting HTTP bridge: socat UNIX-LISTEN:/tmp/claude-http-e7823edc327bd545.sock,fork,reuseaddr TCP:localhost:58320,keepalive,keepidle=10,keepintvl=5,keepcnt=3
+[SandboxDebug] Linux bridges ready after 3 attempts
+[SandboxDebug] Network infrastructure initialized
+[SandboxDebug] Command string mode (-c): sleep 1; curl -sS -m 8 -o /dev/null -w "HTTPSTATUS:%{http_code} EXIT:%{exitcode}\n" https://api.github.com; echo CURL_EXIT=$?
+[SandboxDebug] {
+  "allowedHosts": [
+    "example.com"
+  ]
+}
+[SandboxDebug] [Sandbox Linux] Applying seccomp filter for Unix socket blocking
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/stdout -> /dev/stdout
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/stdout
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/stderr -> /dev/stderr
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/stderr
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/null -> /dev/null
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/null
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/tty -> /dev/tty
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/tty
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/dtracehelper -> /dev/dtracehelper
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/dtracehelper
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/autofs_nowait -> /dev/autofs_nowait
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/autofs_nowait
+[SandboxDebug] [Sandbox Linux] Processing write path: /tmp/claude -> /tmp/claude
+[SandboxDebug] [Sandbox Linux] Skipping non-existent write path: /tmp/claude
+[SandboxDebug] [Sandbox Linux] Processing write path: /private/tmp/claude -> /private/tmp/claude
+[SandboxDebug] [Sandbox Linux] Skipping non-existent write path: /private/tmp/claude
+[SandboxDebug] [Sandbox Linux] Processing write path: <host-home>/.npm/_logs -> <host-home>/.npm/_logs
+[SandboxDebug] [Sandbox Linux] Processing write path: <host-home>/.claude/debug -> <host-home>/.claude/debug
+[SandboxDebug] [Sandbox Linux] Processing write path: . -> <owned-worktree>
+[SandboxDebug] [Sandbox Linux] Mounted /dev/null at <owned-worktree>/.gitconfig to block creation of <owned-worktree>/.gitconfig
+[SandboxDebug] [Sandbox Linux] Mounted /dev/null at <owned-worktree>/.gitmodules to block creation of <owned-worktree>/.gitmodules
+[SandboxDebug] [Sandbox Linux] Mounted /dev/null at <owned-worktree>/.bashrc to block creation of <owned-worktree>/.bashrc
+[SandboxDebug] [Sandbox Linux] Mounted /dev/null at <owned-worktree>/.bash_profile to block creation of <owned-worktree>/.bash_profile
+[SandboxDebug] [Sandbox Linux] Mounted /dev/null at <owned-worktree>/.zshrc to block creation of <owned-worktree>/.zshrc
+[SandboxDebug] [Sandbox Linux] Mounted /dev/null at <owned-worktree>/.zprofile to block creation of <owned-worktree>/.zprofile
+[SandboxDebug] [Sandbox Linux] Mounted /dev/null at <owned-worktree>/.profile to block creation of <owned-worktree>/.profile
+[SandboxDebug] [Sandbox Linux] Mounted /dev/null at <owned-worktree>/.ripgreprc to block creation of <owned-worktree>/.ripgreprc
+[SandboxDebug] [Sandbox Linux] Mounted /dev/null at <owned-worktree>/.mcp.json to block creation of <owned-worktree>/.mcp.json
+[SandboxDebug] [Sandbox Linux] Mounted /dev/null at <owned-worktree>/.vscode to block creation of <owned-worktree>/.vscode
+[SandboxDebug] [Sandbox Linux] Mounted /dev/null at <owned-worktree>/.idea to block creation of <owned-worktree>/.idea
+[SandboxDebug] [Sandbox Linux] Mounted empty dir at <owned-worktree>/.claude to block creation of <owned-worktree>/.claude/commands
+[SandboxDebug] [Sandbox Linux] Reusing the mount point at <owned-worktree>/.claude to block creation of <owned-worktree>/.claude/agents
+[SandboxDebug] [Sandbox Linux] Wrapped command with bwrap (network, filesystem, seccomp(unix-block) restrictions)
+[SandboxDebug] No matching config rule, denying: api.github.com:443
+[SandboxDebug] Connection blocked to api.github.com:443
+curl: (56) CONNECT tunnel failed, response 403
+HTTPSTATUS:000 EXIT:56
+CURL_EXIT=56
+[SandboxDebug] [Sandbox Linux] Cleaned up bwrap mount point (file): <owned-worktree>/.gitconfig
+[SandboxDebug] [Sandbox Linux] Cleaned up bwrap mount point (file): <owned-worktree>/.gitmodules
+[SandboxDebug] [Sandbox Linux] Cleaned up bwrap mount point (file): <owned-worktree>/.bashrc
+[SandboxDebug] [Sandbox Linux] Cleaned up bwrap mount point (file): <owned-worktree>/.bash_profile
+[SandboxDebug] [Sandbox Linux] Cleaned up bwrap mount point (file): <owned-worktree>/.zshrc
+[SandboxDebug] [Sandbox Linux] Cleaned up bwrap mount point (file): <owned-worktree>/.zprofile
+[SandboxDebug] [Sandbox Linux] Cleaned up bwrap mount point (file): <owned-worktree>/.profile
+[SandboxDebug] [Sandbox Linux] Cleaned up bwrap mount point (file): <owned-worktree>/.ripgreprc
+[SandboxDebug] [Sandbox Linux] Cleaned up bwrap mount point (file): <owned-worktree>/.mcp.json
+[SandboxDebug] [Sandbox Linux] Cleaned up bwrap mount point (file): <owned-worktree>/.vscode
+[SandboxDebug] [Sandbox Linux] Cleaned up bwrap mount point (file): <owned-worktree>/.idea
+[SandboxDebug] [Sandbox Linux] Cleaned up bwrap mount point (dir): <owned-worktree>/.claude
+[SandboxDebug] [Sandbox Linux] Cleaned up the empty-directory mount source: /tmp/claude-empty-t0gP2m
+[SandboxDebug] Sent SIGTERM to HTTP bridge process
+[SandboxDebug] Sent SIGTERM to SOCKS bridge process

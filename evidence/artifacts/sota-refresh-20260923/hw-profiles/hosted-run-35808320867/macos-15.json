@@ -1,0 +1,29 @@
+{
+  "limits": [
+    "Presence/threshold measurement only; no model, service, or GPU workload is actually run.",
+    "nvidia-smi absence yields gpu=null even when a GPU is present but the driver/tool is unavailable.",
+    ".wslconfig detection is a best-effort read of /mnt/<drive>/Users/*/.wslconfig; a non-default Windows user profile path or drive letter is not searched, and on a multi-user Windows PC the alphabetically-first profile with a .wslconfig is used (see wslconfig_other_candidates for the rest).",
+    "WSL effective_ram_gb uses /proc/meminfo (native_proven) rather than .wslconfig's configured ceiling (source_review); wslconfig_memory_gb is still reported for visibility.",
+    "macOS unified-memory VRAM is scaled by a declared, labelled macos_unified_gpu_working_set_fraction (adoption/hardware-profiles.json), not measured Metal working-set behavior on this run.",
+    "The local generation and embedding/semantic-RAG tiers on a unified-memory host are independent, sequential-use budgets; see concurrent_use_warning when both are non-trivial on the same host."
+  ],
+  "measured": {
+    "arm64": true,
+    "cores": 3,
+    "cpu_brand": "Apple M1 (Virtual)",
+    "effective_ram_gb": 7.0,
+    "evidence_class": "native_proven",
+    "platform": "macos",
+    "unified_memory_gb": 7.0
+  },
+  "profiles_source": "adoption/hardware-profiles.json",
+  "recommended": {
+    "concurrent_use_warning": null,
+    "ecosystem_job_memory_high_gb": 4.0,
+    "ecosystem_job_memory_max_gb": 6,
+    "embedding_semantic_rag_tier": "unsupported",
+    "local_generation_model_tier": "cpu-only",
+    "workflow_concurrency_cap": 1
+  },
+  "schema": "hardware-profile-report-v1"
+}

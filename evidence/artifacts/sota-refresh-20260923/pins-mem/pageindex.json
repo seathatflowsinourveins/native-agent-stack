@@ -1,0 +1,39 @@
+{
+  "id": "sota-refresh-20260923-pins-mem-pageindex",
+  "component": "pageindex",
+  "repository": "https://github.com/vectifyai/pageindex",
+  "from_pin": "0.2.18",
+  "to_version": "0.2.19",
+  "release_published_at": "2026-09-21T04:49:29Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:26:45Z",
+    "note": "LATE, not prior: written after running the check below (its written_at and this receipt's original checked_at were both rounded to the same 00:27:00Z, which an independent review correctly flagged as looking reconstructed rather than measured). Target version was resolved via `gh api repos/vectifyai/pageindex/releases` (confirmed v0.2.19 is the newest non-prerelease; v0.3.0.dev3 is an unreleased dev tag) before this note was written, but the pass/fail criteria were fixed in the operator's head before interpreting the result, not committed to this file first.",
+    "expectation": "docs/grand-catalog-handbook.md:1641 and the catalog packets record pageindex as source-review only: 'the packet cites upstream README and release URLs and no local execution.' No retained receipt runs a native pageindex install, index build or retrieval query on this host. The only reasonable re-run is confirming the package installs and imports cleanly at the new version -- there is no functional baseline to reproduce.",
+    "criteria": "qualified/native_proven-for-import-only: pip install pageindex==0.2.19 succeeds and `import pageindex` (plus its local_api submodule) succeeds with no exception. not_comparable: if no prior functional receipt exists to compare against (which rg over evidence/, blueprints/, catalogs/ confirmed is the case), the verdict cannot be 'qualified' in the sense of matching a reproduced functional result -- it is qualified only for install/import, and not_comparable for behavior."
+  },
+  "acceptance_check_ref": "None found: rg over evidence/, blueprints/, catalogs/ for pageindex located only catalog citations (catalogs/us-equities/decision-index.json, catalogs/landscape/upstream-snapshot.json, evidence/artifacts/layer-verdicts-20260922/packets/us-equities__agents-models-workers.json) and one explicit note that it is source-review only (docs/grand-catalog-handbook.md:1641: 'foundation-pageindex (unqualified) -- The evidence is source review only ... The pin (v0.2.18) is behind upstream (v0.2.19). No document-tree retrieval run on financial or code sources is retained.'). There is no retained native execution receipt to re-run.",
+  "isolation": {
+    "prefix": "$HOME/.cache/sota-refresh-20260923/pins-mem/venvs/pageindex-0.2.19",
+    "install": "uv venv + uv pip install pageindex==0.2.19 into a unit-owned venv; no PageIndex Cloud API key was used or read (PageIndexCloudClient was not instantiated), consistent with the 'no paid API' constraint"
+  },
+  "commands": [
+    "gh api repos/vectifyai/pageindex/releases",
+    "uv venv $HOME/.cache/sota-refresh-20260923/pins-mem/venvs/pageindex-0.2.19 --python 3.13",
+    "ecosystem-bounded-run uv pip install --python <venv>/bin/python pageindex==0.2.19",
+    "<venv>/bin/python -c \"import pageindex; print(dir(pageindex))\"",
+    "<venv>/bin/python -c \"import pageindex.local_api as m; print(m.__name__)\""
+  ],
+  "results": {
+    "release_check": "v0.2.19 published 2026-09-21T04:49:29Z is the newest non-prerelease (v0.3.0.dev3 tag exists but has no corresponding non-prerelease GitHub Release).",
+    "install": "uv pip install pageindex==0.2.19 succeeded, pulling tiktoken, uvicorn, sse-starlette, starlette, etc. (local/CLI-capable extras, no cloud credentials required at install time).",
+    "import_check": "`import pageindex` succeeded and exposed PageIndexClient, PageIndexCloudClient, PageIndexLocalClient, local_api, cloud_api, mcp_bridge, page_index, page_index_flash, etc. `import pageindex.local_api` succeeded standalone. No document-tree build, index or retrieval query was run -- doing so meaningfully requires either a local LLM/embedding backend or the PageIndexCloudClient (paid API), the latter explicitly out of scope for this unit."
+  },
+  "verdict": "not_comparable",
+  "evidence_class": "source_review",
+  "limits": [
+    "No retained receipt in evidence/, blueprints/ or catalogs/ runs pageindex functionally on this host; the catalog's own audit (docs/grand-catalog-handbook.md:1641) already labels the component 'unqualified' and 'source review only'. This unit therefore cannot compare a new functional run against an old one -- there is nothing to compare against, hence not_comparable rather than qualified or regression.",
+    "The install+import check performed here is new evidence (native_proven for import only), not a re-run of an existing acceptance check; it is reported separately from the verdict/evidence_class fields above, which describe the version-qualification question the task asked (compare against a retained receipt).",
+    "No local-model or cloud retrieval run was attempted: PageIndexLocalClient needs a configured embedding/LLM backend and PageIndexCloudClient needs a paid API key, both out of scope per the task's isolation constraints."
+  ],
+  "checked_at": "2026-09-23T00:27:00Z"
+}
