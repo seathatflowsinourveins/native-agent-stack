@@ -312,15 +312,22 @@ jobs:
             echo ""
             echo "This PR is report-only; no selection or pin changed; pin bumps require a qualified receipt under evidence/artifacts/*/."
           } > "$body_file"
-          existing="$(gh pr list --head automation/catalog-freshness --base main --state open --json number --jq '.[0].number // empty')"
-          if [ -n "$existing" ]; then
-            gh pr edit "$existing" --body-file "$body_file"
-            pr_url="$(gh pr view "$existing" --json url --jq '.url')"
-          else
-            pr_url="$(gh pr create --base main --head automation/catalog-freshness \
-              --title "Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))" \
-              --body-file "$body_file")"
+          title="Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))"
+          find_open_pr() {
+            gh pr list --head automation/catalog-freshness --base main --state open --json number --jq '.[0].number // empty'
+          }
+          existing="$(find_open_pr)"
+          if [ -z "$existing" ] && ! gh pr create --base main --head automation/catalog-freshness \
+              --title "$title" --body-file "$body_file" >/dev/null; then
+            # An overlapping run may have created the PR between the list and the create
+            # (gh refuses a second PR for the same head); fall through to updating it.
+            existing="$(find_open_pr)"
+            [ -n "$existing" ] || { echo "gh pr create failed and no open PR exists" >&2; exit 1; }
           fi
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "$title" --body-file "$body_file"
+          fi
+          pr_url="$(gh pr view automation/catalog-freshness --json url --jq '.url')"
           echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
       - name: Note that this PR's own checks need write-access approval
         env:

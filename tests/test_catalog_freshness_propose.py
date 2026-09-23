@@ -917,6 +917,25 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertNotIn("RECEIPT_PATH", pr_step)
         self.assertNotIn("current_sha", pr_step)
         self.assertIn("current head of", pr_step)
+        body_block = pr_step[pr_step.index('body_file="$RUNNER_TEMP/freshness/pr-body.md"'):pr_step.index('} > "$body_file"')]
+        for run_specific in ("GITHUB_RUN_ID", "github.run_id", "RUN_URL", "drift.md\"", "$(date"):
+            self.assertNotIn(run_specific, body_block)
+
+    def test_pr_create_race_falls_back_to_updating_the_existing_pr(self):
+        """Codex verification of 250adae: two overlapping runs can both list no open PR;
+        the second `gh pr create` then fails. It must fall back to updating the PR,
+        and every update refreshes the dated title."""
+        body = self._job_body("propose")
+        self.assertIn('if [ -z "$existing" ] && ! gh pr create', body)
+        self.assertIn('existing="$(find_open_pr)"', body)
+        self.assertIn('gh pr edit "$existing" --title "$title" --body-file "$body_file"', body)
+
+    def test_unfetched_wording_says_pin_changes_are_still_drift(self):
+        report = fp.render_drift_markdown(
+            "published.json", "rebuilt.json", {"counts": {}}, {"counts": {}},
+            [("skills-ref", "0.1.0", "0.1.1", None, None, False, None)], ["skills-ref"], [])
+        self.assertIn("a pin change on such a row is still", report)
+        self.assertNotIn("are excluded from the drift count above", report)
 
     def test_propose_job_states_the_correct_approval_ui_path(self):
         # N3: approval happens on the PR itself -- the GITHUB_TOKEN page's banner in the

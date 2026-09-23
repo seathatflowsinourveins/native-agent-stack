@@ -379,3 +379,11 @@ results are in the unit's final report.
 ## Codex verification of 52d136a (2026-09-23): run-independent PR description
 
 The branch-head check narrowed the overlap race without closing it. One ordering still leaves a mismatch: A checks the head, then B pushes and writes its body, then A writes its body. The check has therefore been removed. The PR description now embeds no run-specific report or receipt. It points at the evidence the branch head carries: the drift report and receipt in the PR's diff, with the run linked from the receipt. Overlapping manual and scheduled runs can no longer leave the description describing an older commit. The skip path and its misleading "PR opened" summary are gone with the check. The drift report wording now says that a pin change on an unfetched row is still listed as drift.
+
+## Codex verification of 250adae (2026-09-23): pass-with-findings, closed
+
+- **Create race.** Two overlapping runs could both list no open PR, and the second `gh pr create` then failed the job. A failed create now looks the open PR up again and updates it. The job fails only if no open PR exists.
+- **Stale title.** Every update now refreshes the dated title as well as the body.
+- **Contradictory receipt prose.** The receipt's limitations now say that a pin change on an unfetched row is still reported as drift.
+- **Tests.** The body block must contain no run-specific value (run id, run URL, drift file or date). New tests cover the create-race fallback and the drift wording.
+- **Known limitation, accepted.** An older run that observes the branch after a newer run has pushed can still replace the newer evidence: `--force-with-lease` rejects only changes made after observation, not chronology. Both runs start from main and report the same day's freshness, so the replaced evidence differs only by fetch time. The next scheduled run refreshes it.

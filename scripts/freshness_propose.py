@@ -366,8 +366,9 @@ def build_receipt(receipt_id: str, component_ids: list[str], drifted_component_c
             "component_ids lists only this run's drifted rows whose id is also a manifests/stack.json "
             "component; it is not a claim that every drifted id in the full drift report was reviewed.",
             "Components with no reliable upstream data this run (an unfinished/bounded fetch, or a "
-            "releases/tags/commit fetch problem for that repository) are excluded from the drift count "
-            "and from component_ids; they are not claimed to have been checked. A component fetched "
+            "releases/tags/commit fetch problem for that repository) have their upstream comparison "
+            "excluded; a pin change on such a row is still reported as drift (the pin comes from the "
+            "local catalogs), with its fresh upstream fields empty. A component fetched "
             "successfully but with no GitHub release or tag at all is also not counted as drift.",
             "The rebuilt manifest and drift table are read from this run's own catalog-freshness "
             "workflow artifact; this receipt does not independently re-fetch upstream sources.",
