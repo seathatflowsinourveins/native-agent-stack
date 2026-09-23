@@ -151,6 +151,10 @@ def withhold_popularity(packet: dict) -> dict:
                 stripped[collection].add(key)
             upstream = item.get("upstream")
             if isinstance(upstream, dict):
+                # build_candidate and the unclaimed list copy a reference to the loaded manifest's
+                # upstream record, shared by every packet naming that component: strip a private
+                # copy, so an earlier packet cannot remove a field a later packet's requirement keeps.
+                upstream = item["upstream"] = dict(upstream)
                 for key in [key for key in upstream if is_popularity_or_recency_key(key) or key in gated]:
                     del upstream[key]
                     stripped[collection].add(f"upstream.{key}")

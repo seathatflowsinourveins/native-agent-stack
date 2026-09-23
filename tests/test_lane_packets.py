@@ -667,6 +667,24 @@ class WithholdPopularityAndRecencyTests(LanePacketsFixture):
         self.assertNotIn("candidates[].upstream.license", packet["withheld"])
         self.assertNotIn("stars", json.dumps(uploads))
 
+    def test_a_shared_upstream_record_keeps_license_in_a_later_packet_that_names_it(self):
+        # Review finding: withhold_popularity deleted keys in place from the manifest's upstream
+        # dict, which build_candidate shares across packets, so a later packet whose requirement
+        # names licensing silently lost upstream.license (order-dependent, never listed in withheld).
+        shared = {"latest": "1.0", "stars": 10, "pushed_at": "2026-09-01", "license": "MIT", "archived": False}
+
+        def packet(requirement):
+            return {"requirement": requirement, "withheld": [],
+                    "candidates": [{"key": "c1", "upstream": shared}],
+                    "sota_components_not_in_candidates": [{"id": "x", "upstream": shared}]}
+
+        lane_packets.withhold_popularity(packet("Run the tool."))
+        later = lane_packets.withhold_popularity(packet("Use a permissively licensed, maintained tool."))
+        for copy_ in (later["candidates"][0], later["sota_components_not_in_candidates"][0]):
+            self.assertEqual(copy_["upstream"], {"latest": "1.0", "license": "MIT", "archived": False})
+        self.assertNotIn("candidates[].upstream.license", later["withheld"])
+        self.assertEqual(shared["stars"], 10, "the loaded manifest record itself is never mutated")
+
     def test_default_mode_keeps_upstream_metadata_byte_identical(self):
         plain = self.build()
         self.assertEqual(plain, self.build(withhold=False))

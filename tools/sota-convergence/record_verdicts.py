@@ -75,7 +75,7 @@ if str(REPO_ROOT) not in sys.path:
 # contract for every generator under tools/sota-convergence/; build_verdicts.py
 # owns which two files are the landscape ledger.
 from build_manifest import assert_no_leak, sanitize_value  # noqa: E402
-from build_verdicts import LEDGER_FILES  # noqa: E402
+from build_verdicts import LEDGER_FILES, WAVE_REGISTRY, load_registry  # noqa: E402
 
 # scripts/landscape.py owns the layer-verdict schema v2 enums and the sealed-
 # file path convention (evidence/artifacts/layer-verdicts-20260922/<lane>/
@@ -85,8 +85,9 @@ from build_verdicts import LEDGER_FILES  # noqa: E402
 # tempdir that only carries the data files these tools operate on.
 from scripts.landscape import (  # noqa: E402
     DISPOSITIONS, WINNER_EVIDENCE_CLASSES, OVERTURN_MARKERS, https_url,
-    DATED_NAME, RUN_MANIFEST_NAME, is_grandfathered_run, judge_adjudication,
-    lane_model_issue, lane_provenance_issue, PLATFORM_IDS,
+    DATED_NAME, RUN_MANIFEST_NAME, is_grandfathered_run, judge_adjudication, names_layer_id,
+    lane_model_issue, lane_provenance_issue, PLATFORM_IDS, load_lane_provenance_registry,
+    lane_provenance_registry_issue, registered_provenance_entry,
 )
 # Platform-status adapter (2026-09-23 peer audit, item 6). Catalog PR #117 owns the shared
 # scripts/platform_status.py; once it is merged, this one import line becomes
@@ -130,6 +131,22 @@ SCHEMA_PATH = Path(__file__).resolve().parent / "lane-return.schema.json"
 # provenance.workflow_sha256 must equal this SHA256SUMS entry for its workflow file, so the lane
 # a verdict came from can be rerun from the catalog alone.
 VENDORED_WORKFLOW_SUMS = "examples/claude-native/workflows/SHA256SUMS"
+VENDORED_WORKFLOW_DIR = "examples/claude-native/workflows/"
+# The Codex lane code a new-wave return's provenance must hash to, in the checkout being recorded.
+CODEX_LANE_FILES = {"codex_lane_py_sha256": "tools/sota-convergence/codex_lane.py",
+                    "prompt_sha256": "tools/sota-convergence/lane-prompt.md"}
+
+
+def load_lane_code(root: Path) -> dict:
+    """What a new-wave return's provenance is checked against at record time: the registered
+    lane code (scripts/landscape.py LANE_PROVENANCE_REGISTRY, which CI re-checks), the vendored
+    workflow SHA256SUMS and this checkout's current codex_lane.py / lane-prompt.md hashes."""
+    current = {}
+    for field, relative in CODEX_LANE_FILES.items():
+        path = root / relative
+        current[field] = hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+    return {"registry": load_lane_provenance_registry(root),
+            "vendored_sums": parse_sha256sums(root / VENDORED_WORKFLOW_SUMS), "codex_current": current}
 
 
 def _schema_properties():
@@ -229,15 +246,17 @@ def load_packet(packet_path: Path):
 
 def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_key,
                           packet_sha256sums, packet_filename, grandfathered=True,
-                          vendored_workflows=None) -> dict:
+                          lane_code=None) -> dict:
     """Full structural + "rules beyond the JSON schema" validation of one
     lane-return file. Raises LaneRejected on the first failing rule; the
     caller treats that lane as absent for this layer and never aborts.
 
     Outside the grandfathered 2026-09-22 wave (``grandfathered=False``) the return must also
     declare ``model.family`` matching its lane (claude: anthropic, codex: openai) with a model
-    name matching that family, and carry its ``provenance``; a Claude return's workflow hash
-    must be the vendored one (``vendored_workflows``: file name -> sha256)."""
+    name matching that family, and carry its ``provenance``, which must name registered lane
+    code (``lane_code``: load_lane_code(root)): a Claude return's (workflow_path,
+    workflow_sha256) a registry entry whose vendored file's current SHA256SUMS entry is that
+    hash; a Codex return the current codex_lane.py and lane-prompt.md hashes of this checkout."""
     try:
         data = load_json(path)
     except (OSError, UnicodeError, ValueError) as error:
@@ -267,11 +286,23 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
         provenance = data.get("provenance")
         issue = lane_provenance_issue(lane, provenance)
         require_lane(issue is None, str(issue))
+        code = lane_code or {"registry": {}, "vendored_sums": {}, "codex_current": {}}
+        issue = lane_provenance_registry_issue(lane, provenance, code["registry"])
+        require_lane(issue is None, str(issue))
         if lane == "claude":
-            workflow = provenance["workflow_path"].rsplit("/", 1)[-1]
-            require_lane((vendored_workflows or {}).get(workflow) == provenance["workflow_sha256"],
-                         f"provenance.workflow_sha256 is not the {VENDORED_WORKFLOW_SUMS} entry for {workflow}: "
-                         "the lane must run the vendored workflow bytes")
+            entry = registered_provenance_entry(lane, provenance, code["registry"])
+            vendored = entry.get("vendored_path")
+            require_lane(isinstance(vendored, str) and vendored.startswith(VENDORED_WORKFLOW_DIR)
+                         and code["vendored_sums"].get(vendored[len(VENDORED_WORKFLOW_DIR):])
+                         == provenance["workflow_sha256"],
+                         f"provenance.workflow_sha256 is not the {VENDORED_WORKFLOW_SUMS} entry of the vendored "
+                         f"copy the registry names for {provenance['workflow_path']}: the lane must run the "
+                         "currently vendored workflow bytes")
+        else:
+            for field, relative in CODEX_LANE_FILES.items():
+                require_lane(code["codex_current"].get(field) == provenance[field],
+                             f"provenance.{field} is not the sha256 of this checkout's {relative}: the return "
+                             "was produced by other codex lane code")
 
     winner_keys = data.get("winner_keys")
     require_lane(isinstance(winner_keys, list) and 1 <= len(winner_keys) <= 3
@@ -564,12 +595,13 @@ def choose_overturn_protocol(valid: dict) -> dict:
     return claude["overturn_protocol"]
 
 
-def load_adjudication(adjudications_dir, catalog, layer_id, issues: list = None, *, grandfathered=True):
+def load_adjudication(adjudications_dir, catalog, layer_id, issues: list = None, *, grandfathered=True,
+                      packet_sha256=None):
     """Return the adjudication for one layer, or None. A file that exists but is
     malformed is reported through ``issues`` (never silently ignored). The rules live in
     scripts/landscape.py judge_adjudication, which CI re-applies to the sealed copy: outside the
-    grandfathered wave every judgment names its judge (model, family) and stripped-packet hash,
-    and a winner needs both lane families in both presentation orders (else a split)."""
+    grandfathered wave every judgment names its judge (model, family) and a stripped-packet hash
+    equal to ``packet_sha256`` (this layer's packets/SHA256SUMS entry), and a winner needs both lane families in both presentation orders (else a split)."""
     if adjudications_dir is None:
         return None
     path = Path(adjudications_dir) / f"{catalog}__{layer_id}.json"
@@ -585,7 +617,7 @@ def load_adjudication(adjudications_dir, catalog, layer_id, issues: list = None,
         raw = load_json(path)
     except (OSError, UnicodeError, ValueError) as error:
         return reject(f"unreadable or invalid JSON: {error}")
-    issue, result = judge_adjudication(raw, grandfathered=grandfathered)
+    issue, result = judge_adjudication(raw, grandfathered=grandfathered, packet_sha256=packet_sha256)
     if issue is not None:
         return reject(issue)
     return {"raw": raw, **result}
@@ -632,7 +664,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                  adjudications_dir, identities: set, aliases: dict, sha256sums: dict, rejections: list,
                  lane_roots=(), run_date: str = VERDICT_DATE, sealed_base: str = SEALED_BASE,
                  outcomes: dict = None, single_lane_decision: str = None, status_context=None,
-                 vendored_workflows=None) -> list:
+                 lane_code=None) -> list:
     """Mutate ``row`` in place with whatever the valid lane returns for this
     layer establish; return the list of (absolute path, text) sealed/
     adjudication files this row's processing needs written. Returns an empty
@@ -676,7 +708,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
             valid[lane] = validate_lane_return(
                 path, lane=lane, catalog=catalog, layer_id=layer_id, candidates_by_key=candidates_by_key,
                 packet_sha256sums=sha256sums, packet_filename=packet_filename, grandfathered=grandfathered,
-                vendored_workflows=vendored_workflows)
+                lane_code=lane_code)
         except LaneRejected as error:
             reject_lane(lane, str(error))
 
@@ -747,7 +779,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
         decision_text = None
         if single_lane_decision:
             decision_text = (root / single_lane_decision).read_text(encoding="utf-8", errors="replace")
-        if decision_text is not None and layer_id in decision_text:
+        if decision_text is not None and names_layer_id(decision_text, layer_id):
             chosen_lane = "claude"
             for gap in valid["claude"].get("open_gaps") or []:
                 add_gap(gap)
@@ -767,7 +799,8 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
         ids_text = (f"claude={','.join(sorted(component_ids_for(valid['claude'], candidates_by_key)))}; "
                     f"codex={','.join(sorted(component_ids_for(valid['codex'], candidates_by_key)))}")
         adjudication = load_adjudication(adjudications_dir, catalog, layer_id, rejections,
-                                         grandfathered=grandfathered)
+                                         grandfathered=grandfathered,
+                                         packet_sha256=sha256sums.get(packet_filename))
         adjudication_text = None
         if adjudication is not None:
             try:
@@ -937,11 +970,12 @@ def parse_args(argv=None):
     parser.add_argument("--root", type=Path, default=REPO_ROOT)
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--checked-at", default="2026-09-22")
-    parser.add_argument("--run-id", default=VERDICT_DATE,
-                        help="Run id suffix for a new wave's run_id (<catalog>-<layer_id>-<run-id>) and its "
-                             "sealed evidence directory (evidence/artifacts/layer-verdicts-<run-id>/); default "
-                             "reproduces the sealed 2026-09-22 wave byte for byte. Pass the same value to "
-                             "--check as was used for --write.")
+    parser.add_argument("--run-id", required=True,
+                        help="Run id suffix for a wave's run_id (<catalog>-<layer_id>-<run-id>) and its "
+                             "sealed evidence directory (evidence/artifacts/layer-verdicts-<run-id>/). Required: "
+                             "there is no default wave. A grandfathered run id (20260922) can be --check'ed, but "
+                             "--write refuses it once --root holds that wave (its sealed directory or a "
+                             "registered wave document). Pass the same value to --check as was used for --write.")
     parser.add_argument("--adjudications", type=Path, default=None)
     parser.add_argument("--allow-single-lane", default=None, metavar="PATH",
                         help="Repository-relative dated decision record (YYYY-MM-DD or YYYYMMDD in its file "
@@ -976,9 +1010,15 @@ def main(argv=None) -> int:
     sha256sums = parse_sha256sums(work_dir / "packets" / "SHA256SUMS")
     run_date = validate_run_id(args.run_id)
     sealed_base = sealed_base_for(run_date)
+    grandfathered = is_grandfathered_run(run_date)
+    if write_mode and grandfathered and ((root / sealed_base).exists() or run_date in load_registry(root)):
+        # A grandfathered wave predates the integrity rules and is frozen as committed: never
+        # re-record it (or add a run manifest to it), whether or not a later wave exists yet.
+        raise SystemExit(f"--run-id {run_date} is a grandfathered wave already held under --root "
+                         f"({sealed_base} or {WAVE_REGISTRY}); it is frozen -- record under a new --run-id")
     single_lane_decision = validate_single_lane_decision(root, args.allow_single_lane)
     status_context = load_context(root)
-    vendored_workflows = parse_sha256sums(root / VENDORED_WORKFLOW_SUMS)
+    lane_code = load_lane_code(root)
 
     rejections: list = []
     sealed_writes: list = []
@@ -995,14 +1035,16 @@ def main(argv=None) -> int:
                 identities, aliases, sha256sums, rejections, tuple(args.lane_repo_root),
                 run_date=run_date, sealed_base=sealed_base, outcomes=outcomes,
                 single_lane_decision=single_lane_decision, status_context=status_context,
-                vendored_workflows=vendored_workflows))
+                lane_code=lane_code))
         new_text = json.dumps(document, indent=2, ensure_ascii=False) + "\n"
         ledger_outputs[catalog] = (path, new_text, new_text != original_text)
 
     # Survivorship: every packet of the run and each lane's outcome (sealed, rejected with its
     # reasons, or missing) is sealed next to the returns, so a dropped dissent leaves a trace.
-    sealed_writes.append((root / sealed_base / RUN_MANIFEST_NAME,
-                          run_manifest_text(work_dir, run_date, sealed_base, outcomes, rejections)))
+    # A grandfathered wave gets none: its manifest could not list that run's rejections.
+    if not grandfathered:
+        sealed_writes.append((root / sealed_base / RUN_MANIFEST_NAME,
+                              run_manifest_text(work_dir, run_date, sealed_base, outcomes, rejections)))
 
     ok = not rejections
     if write_mode:

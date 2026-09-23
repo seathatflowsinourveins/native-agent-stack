@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from scripts.landscape import MANIFEST, build_landscape
+from scripts.landscape import MANIFEST, build_landscape, registered_evidence_paths
 
 
 # Bytes the fixture writes for the sealed runs (self.write serializes with json.dumps).
@@ -22,6 +22,13 @@ NEW_WAVE_PROVENANCE = {
     "claude": {"workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
                "workflow_sha256": "a" * 64, "agentlab_commit": "b" * 40},
     "codex": {"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64},
+}
+# The fixture's tools/sota-convergence/lane-provenance.json: the lane code above is registered.
+NEW_WAVE_REGISTRY = {
+    "claude": [{"workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+                "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+                "workflow_sha256": "a" * 64}],
+    "codex": [{"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64}],
 }
 
 class LandscapeTests(unittest.TestCase):
@@ -425,6 +432,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         if register_receipt:
             self.write("manifests/evidence.json", {"schema_version": 1, "receipts": [{"path": "receipt.json"}],
                                                    "files": []})
+        self.write("tools/sota-convergence/lane-provenance.json", {"schema_version": 1, **NEW_WAVE_REGISTRY})
         return lanes
 
     def test_recorded_verdict_with_full_evidence_passes(self):
@@ -603,7 +611,12 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         self.layer["lanes"]["single_lane_decision"] = "decisions/2026-09-23-single-lane.md"
         with self.assertRaisesRegex(ValueError, "must name the layer"):
             self.build()
-        (self.root / "decisions/2026-09-23-single-lane.md").write_text("Record retrieval alone\n", encoding="utf-8")
+        # A record naming only a longer layer id (retrieval-2, `x-retrieval`) does not name retrieval.
+        (self.root / "decisions/2026-09-23-single-lane.md").write_text("Record retrieval-2 and x-retrieval\n",
+                                                                     encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "must name the layer"):
+            self.build()
+        (self.root / "decisions/2026-09-23-single-lane.md").write_text("Record `retrieval` alone\n", encoding="utf-8")
         self.build()
 
     def test_new_wave_row_with_full_integrity_evidence_passes(self):
@@ -650,7 +663,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         self.layer["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "conditional"
         self.build()
 
-    def write_adjudication(self, base, run_id, families, winner_lane="claude"):
+    def write_adjudication(self, base, run_id, families, winner_lane="claude", stripped_packet_sha256="a" * 64):
         judgments = []
         for family in families:
             for claude_position in ("A", "B"):
@@ -659,7 +672,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                 if family is not None:
                     judgment["judge"] = {"model": {"anthropic": "claude-opus-5-5", "openai": "gpt-6-astra"}[family],
                                          "family": family}
-                    judgment["stripped_packet_sha256"] = "e" * 64
+                    judgment["stripped_packet_sha256"] = stripped_packet_sha256
                 judgments.append(judgment)
         self.write(f"{base}/adjudication/{run_id}.json",
                    {"winner_lane": winner_lane, "why": "Retained receipt decides it.",
@@ -676,6 +689,45 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
             self.build()
         self.write_adjudication(NEW_WAVE_BASE, lanes["claude"]["run_id"], ("anthropic", "openai"))
         self.build()
+
+    # --- Review findings (2026-09-23 fix round) -------------------------------------
+    def test_new_wave_accepted_linux_status_cannot_cite_a_layer_verdict_artifact(self):
+        # A lane's sealed return or a packet is a lane opinion or input, not an execution receipt,
+        # even when manifests/evidence.json hash-registers it.
+        lanes = self.seal_new_wave(register_receipt=False)
+        sealed = f"{NEW_WAVE_BASE}/claude/{lanes['claude']['run_id']}.json"
+        packet = "evidence/artifacts/layer-verdicts-20260922/packets/foundation__retrieval.json"
+        self.write(packet, {"layer_id": "retrieval"})
+        self.write("manifests/evidence.json", {"schema_version": 1, "receipts": [{"path": packet}],
+                                               "files": [{"path": sealed}, {"path": packet}]})
+        fields = self.recorded_fields(lanes=lanes)
+        fields["winners"][0]["evidence_refs"] = [sealed, packet]
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "registered receipt"):
+            self.build()
+        self.assertEqual(registered_evidence_paths(json.loads(
+            (self.root / "manifests/evidence.json").read_text(encoding="utf-8"))), set())
+
+    def test_new_wave_sealed_provenance_must_be_registered_lane_code(self):
+        forged = {"claude": NEW_WAVE_PROVENANCE["claude"],
+                  "codex": {"codex_lane_py_sha256": "9" * 64, "prompt_sha256": "d" * 64}}
+        self.layer.update(self.recorded_fields(lanes=self.seal_new_wave(provenance=forged)))
+        with self.assertRaisesRegex(ValueError, "not listed in tools/sota-convergence/lane-provenance.json"):
+            self.build()
+        moved = {"claude": dict(NEW_WAVE_PROVENANCE["claude"], workflow_path="elsewhere/layer-verdict-lane.js"),
+                 "codex": NEW_WAVE_PROVENANCE["codex"]}
+        self.layer.update(self.recorded_fields(lanes=self.seal_new_wave(provenance=moved)))
+        with self.assertRaisesRegex(ValueError, "claude.*not listed"):
+            self.build()
+
+    def test_new_wave_judgments_must_name_the_rows_sealed_packet(self):
+        lanes = self.seal_new_wave()
+        lanes["agreement"] = "disagree"
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        self.write_adjudication(NEW_WAVE_BASE, lanes["claude"]["run_id"], ("anthropic", "openai"),
+                                stripped_packet_sha256="e" * 64)
+        with self.assertRaisesRegex(ValueError, "sealed packet sha256"):
+            self.build()
 
     def test_grandfathered_disagree_row_keeps_the_single_family_two_order_rule(self):
         self.seal_claude_run()

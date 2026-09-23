@@ -41,5 +41,51 @@ class VendoredLaneWorkflowTests(unittest.TestCase):
         self.assertTrue((ROOT / "tools" / "sota-convergence" / "lane-prompt.md").is_file())
 
 
+TOOLS = ROOT / "tools" / "sota-convergence"
+
+
+def sha256(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+class LaneProvenanceRegistryTests(unittest.TestCase):
+    """Review finding: provenance was format-checked only (the Codex hashes were never compared
+    with codex_lane.py / lane-prompt.md, the Claude hash was looked up by basename, and CI never
+    re-checked either). tools/sota-convergence/lane-provenance.json is the append-only list both
+    record_verdicts.py and scripts/landscape.py check against; it must cover the current bytes."""
+
+    def registry(self):
+        return json.loads((TOOLS / "lane-provenance.json").read_text(encoding="utf-8"))
+
+    def test_the_current_codex_lane_code_is_registered(self):
+        current = {"codex_lane_py_sha256": sha256(TOOLS / "codex_lane.py"),
+                   "prompt_sha256": sha256(TOOLS / "lane-prompt.md")}
+        listed = [{key: entry[key] for key in current} for entry in self.registry()["codex"]]
+        self.assertIn(current, listed, "append the current codex_lane.py/lane-prompt.md hashes to "
+                                       "tools/sota-convergence/lane-provenance.json")
+
+    def test_every_vendored_lane_workflow_is_registered_under_its_source_and_vendored_paths(self):
+        pin = json.loads((WORKFLOWS / "vendored-lanes.json").read_text(encoding="utf-8"))
+        claude = self.registry()["claude"]
+        for item in pin["files"]:
+            vendored = f"examples/claude-native/workflows/{item['path']}"
+            for workflow_path in (item["source_path"], vendored):
+                self.assertIn({"workflow_path": workflow_path, "vendored_path": vendored,
+                               "workflow_sha256": sums()[item["path"]]},
+                              [{key: entry[key] for key in ("workflow_path", "vendored_path", "workflow_sha256")}
+                               for entry in claude])
+
+    def test_registry_entries_are_well_formed_and_unique(self):
+        registry = self.registry()
+        for lane, fields in (("claude", ("workflow_path", "workflow_sha256")),
+                             ("codex", ("codex_lane_py_sha256", "prompt_sha256"))):
+            keys = [tuple(entry[field] for field in fields) for entry in registry[lane]]
+            self.assertEqual(len(keys), len(set(keys)), lane)
+            for entry in registry[lane]:
+                for field in fields:
+                    if field.endswith("sha256"):
+                        self.assertRegex(entry[field], r"^[a-f0-9]{64}$")
+
+
 if __name__ == "__main__":
     unittest.main()

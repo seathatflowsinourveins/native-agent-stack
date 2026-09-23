@@ -486,8 +486,8 @@ To rerun the verdicts against a later landscape, follow the
    anonymized returns in both presentation orders and record every judgment in the
    file's `judgments`; the tool rejects a winner that any order or refuter
    contradicts, and seals a split with the row left `pending_lanes`.
-6. Regenerate this page's tables with `build_verdicts.py --write` and check with
-   `--check`.
+6. Register the new wave and regenerate this page's tables with
+   `build_verdicts.py --write --run-id <run-id>`, then check with `--check`.
 
 Reopen a layer on a demonstrated gap, a changed requirement, relevant upstream
 behavior or a challenger result. A new release, a star count or reviewer

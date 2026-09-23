@@ -48,6 +48,11 @@ if str(HERE) not in sys.path:
 # every generator under tools/sota-convergence/.
 from build_manifest import assert_no_leak, sanitize_value  # noqa: E402
 
+if str(HERE.parent.parent) not in sys.path:
+    sys.path.insert(0, str(HERE.parent.parent))
+# The grandfathered run ids are defined once, next to the rules they exempt (scripts/landscape.py).
+from scripts.landscape import GRANDFATHERED_RUN_IDS  # noqa: E402
+
 # Same character class scripts/landscape.py requires of lanes.<lane>.sealed_base
 # (re.fullmatch(r"evidence/artifacts/layer-verdicts-[0-9A-Za-z]+", ...)) and
 # record_verdicts.RUN_ID_PATTERN enforces on its own --run-id -- kept here as an
@@ -480,6 +485,11 @@ def main(argv=None) -> int:
 
     if write_mode:
         run_id = requested or current
+        if run_id in GRANDFATHERED_RUN_IDS and run_id in registry:
+            # Frozen whether or not a later wave exists yet: a grandfathered wave predates the
+            # integrity rules, so its registered document is never regenerated or re-registered.
+            raise SystemExit(f"layer-verdicts wave {run_id} is grandfathered and already registered in "
+                             f"{WAVE_REGISTRY}; it is never rewritten -- record changed rows under a new --run-id")
         if run_id < current:
             raise SystemExit(f"layer-verdicts wave {run_id} is frozen (the current wave is {current}); "
                              "re-record changed rows under a new --run-id instead of rewriting it")

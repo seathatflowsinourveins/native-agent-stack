@@ -51,9 +51,18 @@ DEFAULT_SEALED_BASE = SEALED_BASE_PREFIX + "20260922"
 # declare no model family or provenance, their adjudications are Opus-only (both presentation
 # orders, no judge identity), they have no run manifest (their packets/ and SHA256SUMS are
 # retained under the sealed base instead), and ci-supply-chain and hosting-services carry linux
-# "accepted" without citing a registered receipt. That wave is frozen: build_verdicts.py --check
-# compares every row naming it with its hash-registered layer-verdicts-20260922.json, so a row
-# cannot be re-recorded under this run id without failing CI. Every other run id gets every rule.
+# "accepted" without citing a registered receipt. The exemption covers only the committed wave,
+# which is frozen independently of whether a later wave exists yet:
+# - record_verdicts.py has no default --run-id and its --write refuses a grandfathered id once
+#   --root holds that wave (its sealed directory or a registered wave document), so it never
+#   re-records a row or adds a run manifest there;
+# - build_verdicts.py --write refuses to regenerate or re-register a registered grandfathered
+#   wave, and --check compares every row still naming it with the hash-registered
+#   layer-verdicts-20260922.json;
+# - tests/test_layer_verdicts.py GrandfatheredWavePinTests (run by CI's python3 -m unittest) pins
+#   the bytes of that document, its registry entry and every file under the sealed 20260922
+#   directory, and asserts it holds no run-manifest.json.
+# Every other run id gets every rule.
 GRANDFATHERED_RUN_IDS = frozenset({"20260922"})
 LANES = ("claude", "codex")
 LANE_FAMILIES = {"claude": "anthropic", "codex": "openai"}
@@ -73,6 +82,13 @@ LANE_OUTCOMES = {"sealed", "rejected", "missing"}
 DATED_NAME = re.compile(r"(?<![0-9])20[0-9]{2}-?(?:0[1-9]|1[0-2])-?(?:0[1-9]|[12][0-9]|3[01])(?![0-9])")
 ACCEPTED_EVIDENCE_CLASSES = {"native_proven", "measured_comparison"}
 EVIDENCE_MANIFEST = "manifests/evidence.json"
+# Append-only list of the lane code a new-wave return may name in its provenance: the Claude
+# lane's (workflow_path, workflow_sha256) and the Codex lane's (codex_lane_py_sha256,
+# prompt_sha256). tests/test_verdict_lane_vendoring.py keeps it covering the current
+# codex_lane.py, lane-prompt.md and vendored workflow bytes.
+LANE_PROVENANCE_REGISTRY = "tools/sota-convergence/lane-provenance.json"
+LANE_PROVENANCE_KEYS = {"claude": ("workflow_path", "workflow_sha256"),
+                        "codex": ("codex_lane_py_sha256", "prompt_sha256")}
 
 
 def run_id_of(sealed_base):
@@ -120,13 +136,43 @@ def lane_provenance_issue(lane, provenance):
     return None
 
 
-def judge_adjudication(raw, *, grandfathered):
+def load_lane_provenance_registry(root):
+    """lane -> list of registered provenance entries (empty when the registry is absent)."""
+    path = Path(root) / LANE_PROVENANCE_REGISTRY
+    if not path.is_file():
+        return {lane: [] for lane in LANES}
+    document = json.loads(path.read_text(encoding="utf-8"))
+    return {lane: [entry for entry in document.get(lane) or [] if isinstance(entry, dict)] for lane in LANES}
+
+
+def registered_provenance_entry(lane, provenance, registry):
+    """The registry entry naming this return's lane code, or None."""
+    if not isinstance(provenance, dict):
+        return None
+    fields = LANE_PROVENANCE_KEYS[lane]
+    for entry in registry.get(lane) or []:
+        if all(entry.get(field) == provenance.get(field) for field in fields):
+            return entry
+    return None
+
+
+def lane_provenance_registry_issue(lane, provenance, registry):
+    if registered_provenance_entry(lane, provenance, registry) is None:
+        fields = ", ".join(f"{field}={(provenance or {}).get(field)!r}" for field in LANE_PROVENANCE_KEYS[lane])
+        return f"provenance ({fields}) names {lane} lane code not listed in {LANE_PROVENANCE_REGISTRY}"
+    return None
+
+
+def judge_adjudication(raw, *, grandfathered, packet_sha256=None):
     """Validate an adjudication record. Returns ``(issue, result)``; ``issue`` is a rejection
     reason or None. ``result['winner_lane']`` is the lane the adjudication establishes, or None
     for a split. A new wave establishes a winner only when judgments from BOTH lane families
     are present, each family covers both presentation orders, all pick the same lane and none
-    is refuted; otherwise it is a split with ``split_reason``. The grandfathered 2026-09-22
-    rule is the older one: both orders, all the same lane, none refuted, no judge identity."""
+    is refuted; otherwise it is a split with ``split_reason``. Each new-wave judgment's
+    ``stripped_packet_sha256`` must be ``packet_sha256``, the layer's sealed lane packet (the
+    --withhold-labels packet both lanes judged, listed in packets/SHA256SUMS): the judge is shown
+    that packet, not a private reduction of it. The grandfathered 2026-09-22 rule is the older
+    one: both orders, all the same lane, none refuted, no judge identity."""
     if not isinstance(raw, dict):
         return "adjudication must be a JSON object", None
     winner_lane = raw.get("winner_lane")
@@ -158,6 +204,11 @@ def judge_adjudication(raw, *, grandfathered):
             if not (isinstance(judgment.get("stripped_packet_sha256"), str)
                     and SHA256_TEXT.fullmatch(judgment["stripped_packet_sha256"])):
                 return "each judgment needs the stripped_packet_sha256 of the packet its judge saw", None
+            if not (isinstance(packet_sha256, str) and SHA256_TEXT.fullmatch(packet_sha256)):
+                return "the layer's sealed packet sha256 is unknown, so no judgment can be bound to it", None
+            if judgment["stripped_packet_sha256"] != packet_sha256:
+                return ("a judgment's stripped_packet_sha256 is not the layer's sealed packet sha256 "
+                        f"({packet_sha256}): its judge saw a packet this wave did not seal"), None
     if {judgment["claude_position"] for judgment in judgments} != {"A", "B"}:
         return "adjudication judgments must cover both presentation orders", None
     lanes = {judgment["preferred_lane"] for judgment in judgments}
@@ -184,7 +235,10 @@ def judge_adjudication(raw, *, grandfathered):
 def registered_evidence_paths(evidence_document):
     """Repository paths a linux "accepted" winner may cite: every receipt listed in
     manifests/evidence.json receipts[], and every hash-registered files[] artifact under
-    evidence/ (receipts, artifacts, host receipts). Docs and catalogs are not receipts."""
+    evidence/ (receipts, artifacts, host receipts). Docs and catalogs are not receipts, and
+    neither is anything the layer-verdict pipeline itself sealed
+    (evidence/artifacts/layer-verdicts-<run-id>/: packets, lane returns, adjudications and
+    their inputs are lane inputs or opinions, not execution receipts)."""
     paths = set()
     if not isinstance(evidence_document, dict):
         return paths
@@ -194,7 +248,7 @@ def registered_evidence_paths(evidence_document):
     for entry in evidence_document.get("files") or []:
         if isinstance(entry, dict) and isinstance(entry.get("path"), str) and entry["path"].startswith("evidence/"):
             paths.add(entry["path"])
-    return paths
+    return {path for path in paths if not path.startswith(SEALED_BASE_PREFIX)}
 
 
 def cited_registered_refs(evidence_refs, registered):
@@ -251,6 +305,12 @@ def linux_rule_platform_status(platform_id, winner, context):
     return PlatformStatus(status, reason, refs if status == "accepted" else ())
 
 
+def names_layer_id(text, layer_id):
+    """True when ``text`` names ``layer_id`` as a whole token: ``workers`` is not named by a
+    record that only names ``agents-models-workers``."""
+    return isinstance(text, str) and re.search(rf"(?<![\w-]){re.escape(layer_id)}(?![\w-])", text) is not None
+
+
 def single_lane_decision_issue(root, path, layer_id):
     """A single-lane (codex_absent) recorded row names a dated decision record that names its layer."""
     if not isinstance(path, str) or not path.strip():
@@ -263,7 +323,7 @@ def single_lane_decision_issue(root, path, layer_id):
         return f"lanes.single_lane_decision {path!r} is not a confined repository path"
     if not record.is_file():
         return f"lanes.single_lane_decision {path!r} does not exist"
-    if layer_id not in record.read_text(encoding="utf-8", errors="replace"):
+    if not names_layer_id(record.read_text(encoding="utf-8", errors="replace"), layer_id):
         return f"lanes.single_lane_decision {path!r} must name the layer id {layer_id!r}"
     return None
 
@@ -336,7 +396,7 @@ def https_url(value):
 
 
 def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recipe_map, sota_pins,
-                         registered=frozenset()):
+                         registered=frozenset(), lane_registry=None):
     """Layer-verdict schema v2 checks for a single landscape row. ``evidence``
     is the confined evidence()/track() helper already bound to this run; a
     winner/alternative's ``evidence_refs`` may be an empty list (schema v2
@@ -409,6 +469,10 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
             require(issue is None, str(key) + f".lanes.{lane_name}: {issue}")
             issue = lane_provenance_issue(lane_name, sealed_return.get("provenance"))
             require(issue is None, str(key) + f".lanes.{lane_name}: {issue}")
+            issue = lane_provenance_registry_issue(lane_name, sealed_return["provenance"],
+                                                   lane_registry if lane_registry is not None
+                                                   else load_lane_provenance_registry(root))
+            require(issue is None, str(key) + f".lanes.{lane_name}: {issue}")
             families.append(sealed_return["model"]["family"])
         require(len(families) == len(set(families)), str(key) + ".lanes must come from two different model families")
         # Survivorship: the row must be accounted for in its wave's run manifest.
@@ -416,9 +480,13 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         manifest_file = safe_file(root, manifest_path)
         require(manifest_file.is_file(), str(key) + f" was recorded in wave {wave} but its run manifest "
                                                   f"{manifest_path} is missing")
-        issue = run_manifest_row_issue(json.loads(manifest_file.read_text(encoding="utf-8")), wave,
-                                       key[0], key[1], lanes_field)
+        run_manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
+        issue = run_manifest_row_issue(run_manifest, wave, key[0], key[1], lanes_field)
         require(issue is None, str(key) + ": " + str(issue))
+        packet_sha256 = next(entry["packet_sha256"] for entry in run_manifest["packets"]
+                             if isinstance(entry, dict) and (entry.get("catalog"), entry.get("layer_id")) == (key[0], key[1]))
+    else:
+        packet_sha256 = None
 
     open_gaps = row.get("open_gaps")
     require(isinstance(open_gaps, list) and all(isinstance(gap, str) and gap.strip() for gap in open_gaps),
@@ -513,7 +581,7 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
             require(adjudication_file.is_file(),
                     str(key) + f" disagree verdict needs its sealed adjudication {adjudication_path}")
             issue, result = judge_adjudication(json.loads(adjudication_file.read_text(encoding="utf-8")),
-                                               grandfathered=grandfathered)
+                                               grandfathered=grandfathered, packet_sha256=packet_sha256)
             require(issue is None, str(key) + f" adjudication {adjudication_path}: {issue}")
             require(result["winner_lane"] is not None,
                     str(key) + f" adjudication {adjudication_path} is a split and cannot record a winner"
@@ -559,6 +627,7 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
     recipe_map = read("adoption/manifest.json").get("recipe_map", {})
     registered = (registered_evidence_paths(read(EVIDENCE_MANIFEST))
                   if safe_file(root, EVIDENCE_MANIFEST).is_file() else set())
+    lane_registry = load_lane_provenance_registry(root)
     # Per-layer, not a single flattened map: a component id can recur across
     # layers with a different pin in each (tools/sota-convergence/build_verdicts.py's
     # sota_layer_index keeps the same per-layer scope for its own join, so the
@@ -609,7 +678,8 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 require(group is None, str(key) + ".group is only used for trading rows")
             validate_verdict_row(row, key, root=root, identities=identities, aliases=aliases,
                                   evidence=evidence, recipe_map=recipe_map,
-                                  sota_pins=sota_pins_by_layer.get(key[1], {}), registered=registered)
+                                  sota_pins=sota_pins_by_layer.get(key[1], {}), registered=registered,
+                                  lane_registry=lane_registry)
             source_links = evidence(row.get("evidence_refs"), str(key))
             candidates, candidate_ids = [], set()
             require(isinstance(row.get("candidates"), list) and row["candidates"], "layer needs candidates")

@@ -83,13 +83,15 @@ python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo .
 # 4. Record: validate every lane file (a rejected file is reported and
 #    treated as absent, never aborts the run), seal the accepted ones, and
 #    write the ledger rows.
+#    --run-id is required; the grandfathered 20260922 wave is never re-recorded.
 python3 tools/sota-convergence/record_verdicts.py \
-  --root . --work-dir "$WORK_DIR" --checked-at "$(date +%Y-%m-%d)" --write
+  --root . --work-dir "$WORK_DIR" --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --write
 python3 tools/sota-convergence/record_verdicts.py \
-  --root . --work-dir "$WORK_DIR" --checked-at "$(date +%Y-%m-%d)" --check
+  --root . --work-dir "$WORK_DIR" --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --check
 
-# 5. Refresh the generated join/narrative and rerun the standing checks.
-python3 tools/sota-convergence/build_verdicts.py --write --root .
+# 5. Register the new wave document, refresh the narrative and rerun the standing checks.
+python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id "$(date +%Y%m%d)" \
+  --checked-at "$(date +%Y-%m-%d)"
 python3 scripts/landscape.py --root .
 python3 scripts/validate.py
 python3 -m unittest
