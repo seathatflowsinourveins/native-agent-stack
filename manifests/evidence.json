@@ -6425,7 +6425,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "7c7320fabf108ab4dba63e65953268ffc0101f8e01c369feb45ceff00ebeed1b",
+      "sha256": "00e9490c28f7c7a1e46588bbdc425062d0746dba5718a431de29d3f560d7888e",
       "bytes": 4661
     },
     {
@@ -6440,13 +6440,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "c75f7db3025200d55a166b8ec2811939d32518861118490ffc1a57eb7ba389fa",
-      "bytes": 43907
+      "sha256": "e1a2d1ebd72397b81d66fe73144f58e01f6700a710b266c25f4a25764d678a89",
+      "bytes": 45132
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
-      "sha256": "cbeef3c63b58e71bfa45f389a7f0a2b5adb3da19c1fd83fb2983d8b207b4ca87",
-      "bytes": 904
+      "sha256": "fb009000371ac692617bf3710d9b7c1e6b3e84b66596f594e4bd95606e383225",
+      "bytes": 1327
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/gate-result.json",
@@ -6472,6 +6472,51 @@
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/scheduled-trial.log",
       "sha256": "b13ecfd314a189185f553291d1b0ae5c15ccaef61fa5fc30e9de6960b655cc7f",
       "bytes": 553
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/README.md",
+      "sha256": "3bc91eea9c638218d4664a5aa30b1f9540eab3786239a8b5fd25e2c878cc75d7",
+      "bytes": 1409
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/gate-result.json",
+      "sha256": "d6c03339b8cf41e8cbd4d1a35315b175f668bec2a3f65f9e565c9c88037a3143",
+      "bytes": 1479
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/ingest-receipt.json",
+      "sha256": "8adb99fccd3d8c61fded3ba627d0dce9badb9b01f83fdcf9a0b98d91325f0756",
+      "bytes": 630
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/measure_quote_validity.py",
+      "sha256": "cc872bdc93a5cb522dbce4a446a059f3883eb91b0c008651453019d1eca0ad78",
+      "bytes": 3088
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/observations.json",
+      "sha256": "49a4570a314069e22d3897358763e71c278814912aa69a8f565613c020c9ec09",
+      "bytes": 2025
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/paper-output.json",
+      "sha256": "6cce37cdfb341f3c6c8a8c8f8ab25086634c93ab5e2c0322ddff6cdf1e42efe7",
+      "bytes": 14377
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/quote-validity-1e2c96a-transport.json",
+      "sha256": "76b242c915adb5b81b28bc09ece6f81c0877718c394e18725b6d6a2aabf1eb06",
+      "bytes": 600
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/quote-validity-fixed-transport.json",
+      "sha256": "279987e7360a3cd4d9eeb73762a4256f2e5e7b013f110648fc33e73d65a201b1",
+      "bytes": 610
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/scheduled-trial.log",
+      "sha256": "1eabfc9cacc3835354aac77a3cbd1e20dd4a305c3de33cf9d6805fb4de583e04",
+      "bytes": 549
     },
     {
       "path": "blueprints/us-equities/alpaca-historical/README.md",
@@ -8650,8 +8695,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "f731218723abd5f22ac72e6aed2843475bb055ef2735666cfd3aaa497324277b",
-      "bytes": 30806
+      "sha256": "05b34add0f2d2edd7db4bd021a67f6e70e641170cd82f3ea090930bfce454b61",
+      "bytes": 31631
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -14570,8 +14615,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "b4aee7d58fe7ae44cab81d2f4ff5db8afce7960980c6e02172ee0ce103f08262",
-      "bytes": 35086
+      "sha256": "0c204ffc2669476996b974bef23b06409c11e81b79d9389e806150576729ed02",
+      "bytes": 37615
     },
     {
       "path": "tests/test_adoption_bootstrap.py",

@@ -1,0 +1,31 @@
+{
+  "kind": "streamed_quote_validity",
+  "feed": "sip",
+  "symbols": 24,
+  "window_seconds": 60.0,
+  "started_unix": 1790177695.678,
+  "transport_sha256": "e1a2d1ebd72397b81d66fe73144f58e01f6700a710b266c25f4a25764d678a89",
+  "counts": {
+    "total": 50633,
+    "untradable:crossed": 1
+  },
+  "rejected_by_symbol": {
+    "AAPL": 1
+  },
+  "examples": [
+    {
+      "S": "AAPL",
+      "bp": 336.2,
+      "ap": 336.19,
+      "bs": 160,
+      "as": 40,
+      "bx": "U",
+      "ax": "Q",
+      "c": [
+        "R"
+      ],
+      "z": "C",
+      "t": "Timestamp(seconds=1790177731, nanoseconds=412479643)"
+    }
+  ]
+}

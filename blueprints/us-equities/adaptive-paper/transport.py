@@ -34,6 +34,15 @@ class TransportError(RuntimeError):
     """Sanitized transport failure; never includes provider response bodies."""
 
 
+class InvalidQuote(TransportError):
+    """A streamed quote that is a legitimate but untradable market state (a crossed
+    book or a one-sided zero price). It is dropped and counted, never fatal."""
+
+    def __init__(self, reason):
+        super().__init__("invalid quote: " + reason)
+        self.reason = reason
+
+
 class AmbiguousSubmission(TransportError):
     pass
 
@@ -126,18 +135,29 @@ def normalize_order(raw):
 QUOTE_HALT_CONDITION_CODES = frozenset({"H"})
 
 
+def _quote_price(value):
+    try:
+        if value is not None and Decimal(str(value)) == 0:
+            raise InvalidQuote("one_sided")
+    except (InvalidOperation, ValueError):
+        pass  # malformed text stays a TransportError below
+    return decimal_string(value, positive=True)
+
+
 def normalize_quote(raw, symbol=None):
     conditions = raw.get("c") or raw.get("cond") or raw.get("conditions") or []
     result = {"symbol": symbol or raw.get("S") or raw.get("symbol"),
-              "bid": decimal_string(raw.get("bp", raw.get("bid")), positive=True),
-              "ask": decimal_string(raw.get("ap", raw.get("ask")), positive=True),
+              "bid": _quote_price(raw.get("bp", raw.get("bid"))),
+              "ask": _quote_price(raw.get("ap", raw.get("ask"))),
               "bid_size": decimal_string(raw.get("bs", raw.get("bid_size", 0))),
               "ask_size": decimal_string(raw.get("as", raw.get("ask_size", 0))),
               "ts_ns": timestamp_ns(raw.get("t", raw.get("timestamp"))),
               "halted": bool(raw.get("halted")) or bool(QUOTE_HALT_CONDITION_CODES & set(conditions))}
-    if (Decimal(result["bid"]) > Decimal(result["ask"]) or result["ts_ns"] <= 0
-            or min(Decimal(result["bid_size"]), Decimal(result["ask_size"])) < 0):
+    if result["ts_ns"] <= 0 or min(Decimal(result["bid_size"]), Decimal(result["ask_size"])) < 0:
         raise TransportError("invalid quote")
+    if Decimal(result["bid"]) > Decimal(result["ask"]):
+        # SIP publishes brief crossed books (measured 2026-09-23: 9 of 56,855 quotes in 60 s).
+        raise InvalidQuote("crossed")
     return result
 
 
@@ -464,6 +484,7 @@ class AlpacaPaperTransport:
         self._events = queue.Queue(maxsize=queue_size)
         self._state_lock = threading.RLock()
         self._reasons = set()
+        self._dropped_quotes = {}
         self._auth = {"orders": False, "quotes": False}
         self._acks = dict(self._auth)
         self._ever_acks = dict(self._auth)
@@ -511,7 +532,7 @@ class AlpacaPaperTransport:
                     "frozen": bool(self._reasons), "reasons": sorted(self._reasons),
                     "authenticated": dict(self._auth), "subscriptions": dict(self._acks),
                     "fresh_quotes": fresh, "required_quote_symbols": list(self.required_quote_symbols),
-                    "queue_size": self._events.qsize()}
+                    "queue_size": self._events.qsize(), "dropped_quotes": dict(self._dropped_quotes)}
 
     @property
     def ready(self):
@@ -635,7 +656,14 @@ class AlpacaPaperTransport:
                 continue
             try:
                 if kind == "quote":
-                    quote = normalize_quote(raw)
+                    try:
+                        quote = normalize_quote(raw)
+                    except InvalidQuote as exc:
+                        # Untradable, not corrupt: drop it and keep the last valid quote until
+                        # it goes stale. Malformed data still fails the transport below.
+                        with self._state_lock:
+                            self._dropped_quotes[exc.reason] = self._dropped_quotes.get(exc.reason, 0) + 1
+                        continue
                     if quote["symbol"] not in self.symbols:
                         raise TransportError("unexpected quote symbol")
                     age = (time.time_ns() - quote["ts_ns"]) / 1e9
