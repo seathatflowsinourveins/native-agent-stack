@@ -2973,6 +2973,26 @@
         "The rebuilt manifest and drift table are read from this run's own catalog-freshness workflow artifact; this receipt does not independently re-fetch upstream sources."
       ],
       "path": "evidence/receipts/catalog-freshness-20260923.json"
+    },
+    {
+      "id": "memory-scheduled-lifecycle-20260923",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "socraticode",
+        "qmd"
+      ],
+      "claim": "Actual daily heartbeat received and bounded native memory/RAG observations returned; existing hourly learning scheduler applied two pages with MCP and store readback, while a later failed learning attempt is retained.",
+      "limitations": [
+        "Scheduler provenance is the native task's heartbeat envelope; no separate scheduler dispatch database or restart evidence was available.",
+        "Two applied pages establish completed writes and retrieval, not improved future answers or causal token savings.",
+        "One later native learning attempt failed with HTTP response decoding; it has a scheduler claim and no persisted learning run. The root cause and retry recovery remain unqualified.",
+        "The current native memory setup decision still describes the original one-project deployment; current observer sees two scheduler scopes. This turn retrieved only the explicitly adopted agent-lab scope.",
+        "One exact RAG excerpt and QMD document matched current source; no broad retrieval benchmark or new cross-client comparison was performed.",
+        "Existing upstream component tests and dated both-client/recovery results were not rerun or relabeled as current execution.",
+        "No runtime upgrade, restart, account/model/scope/configuration change, manual learning/consolidation invocation, broker order or new monitor occurred."
+      ],
+      "path": "observability/memory-scheduled-20260923.json"
     }
   ],
   "files": [
@@ -8879,8 +8899,8 @@
     },
     {
       "path": "docs/native-memory-rag-lifecycle.md",
-      "sha256": "1b587d2415ca1812850b0bbaf53e3fd3e329cb70d8395b89f788ae1ac99a1747",
-      "bytes": 7880
+      "sha256": "6247eee887593412a55b36a468f25100c4ffe8c11550e417fa79b9b191e7e5e8",
+      "bytes": 8572
     },
     {
       "path": "docs/native-returned-results.md",
@@ -14014,8 +14034,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "cddaec827e3a55124b5474e24b2bbc3c8ddff5e58d86dd3318b3f9f49c2c290e",
-      "bytes": 10468
+      "sha256": "7af8466a97a3d4677b805cd8775da82569c06872c1c7cecee4918afd96c1a97f",
+      "bytes": 10763
     },
     {
       "path": "observability/native-data/README.md",
@@ -14771,6 +14791,16 @@
       "path": "tools/token-report/token_manifest.py",
       "sha256": "7b1c0511e9a56f587392309330e447bb190e5c819950892997a44065f2714e33",
       "bytes": 50793
+    },
+    {
+      "path": "observability/memory-scheduled-results-20260923.json",
+      "bytes": 24855,
+      "sha256": "2893695fe5319cc59949f375b71f70065dff878dcf213fc2a868d3cd3a3acf89"
+    },
+    {
+      "path": "observability/memory-scheduled-20260923.json",
+      "bytes": 15847,
+      "sha256": "86ae722cc2bf6dadfff7c7fbbf05e9fdb16abac7614e1b494c0b4725a71a8f95"
     }
   ],
   "convergence_records": [

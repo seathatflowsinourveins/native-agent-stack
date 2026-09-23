@@ -1,0 +1,147 @@
+[
+  {
+    "command": "memory_read_page",
+    "arguments": {
+      "path": "decisions/native-memory-learning-maintenance.md",
+      "workspace": "agent-lab",
+      "project": "agent-lab"
+    },
+    "returned": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"path\": \"decisions/native-memory-learning-maintenance.md\",\n  \"title\": \"Native memory learning and bounded outcome capture\",\n  \"body\": \"# Native memory learning and bounded outcome capture\\n\\n**Status:** accepted\\n\\n## Context\\nThe earlier [[decisions/native-codex-memory-consolidation]] qualified local embeddings and native Codex consolidation but kept scheduled learning disabled. The September 21, 2026 source review and native qualification now support activating the existing upstream maintenance path.\\n\\n## Decision\\nRetain ai-memory 2.3.2 as the shared agent-lab/agent-lab memory of record, with the existing local 384-dimensional MiniLM embeddings, native Codex gpt-5.6-luna provider and medium effort. Preserve repository-allowlisted capture and disabled historical backfill. Enable the upstream hourly learning scheduler with one eligible session per project per tick and a ten-minute age minimum. The scheduler includes every database project; this deployment currently has one adopted scope.\\n\\nEnable sanitized assistant Stop excerpts in native Claude, native Codex and the Desktop WSL hook profile. Both server and client opt-ins are configured. Native Codex trust was applied through the normal hooks interface. Claude's pre-existing prompt-capture opt-out remains unchanged. Excerpts are capped at 2,000 bytes; oversized final messages above 64 KiB are dropped.\\n\\nUse daily rule-based lint and hourly local embedding backfill. Scheduled page/observation forgetting is disabled; upstream hollow-project cleanup still runs. Retain session-end consolidation.\\n\\n## Consequences\\nActual Codex and Claude answers were captured and independently read back; native consolidation completed. Two accelerated scheduler ticks each skipped an ineligible historical session without a model call. A separate manual review rejected insufficient durable evidence and applied no proposal. This establishes working capture and maintenance paths, not improved future answer quality or measured token savings. Final hourly cadence is configured; a later hourly tick, physical reboot and hot reload of an already-running Desktop task remain unproved. Learning claims are once per native session, including admission skips.\\n\\nBasic Memory, Graphiti, Mem0, Hindsight, Claude-mem, Letta/Letta Code and Supermemory remain workload-specific alternatives, not additional automatic capture stores. The portable selection, source pins, commands and returned evidence are in https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/memory-landscape-maintenance.md.\\n\",\n  \"frontmatter\": {\n    \"tags\": [\n      \"memory\",\n      \"native-maintenance\"\n    ],\n    \"pinned\": true,\n    \"tier\": \"semantic\",\n    \"type\": \"Decision\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-21T14:58:56Z\"\n    }\n  }\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "command": "codebase_status",
+    "arguments": {
+      "projectPath": "$PROJECT"
+    },
+    "returned": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Project: $PROJECT\nCollection: codebase_72cfa87c5abf\nStatus: green\nIndexed chunks: 1215\n\nLast operation: Incremental update — completed\n  Files: 0, Chunks: 0\n  64s ago (took 0.4s)\n\nFile watcher: active (watched by another process)\n\nCode graph: 93 files, 73 edges\n  Last built: 286s ago"
+        }
+      ]
+    }
+  },
+  {
+    "command": "codebase_search",
+    "arguments": {
+      "projectPath": "$PROJECT",
+      "query": "native memory RAG local embedding Qdrant setup",
+      "limit": 1
+    },
+    "returned": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Search results for \"native memory RAG local embedding Qdrant setup\" (1 matches):\n\n--- tools/ecosystem/e2e-upstream-commands.json (lines 336-370) [json] score: 0.6429 ---\n          \"curl -sf -m 30 http://127.0.0.1:8231/v1/embeddings -H 'Content-Type: application/json' -d '{\\\"model\\\":\\\"nvidia/Nemotron-3-Embed-1B-BF16\\\",\\\"input\\\":\\\"query: native e2e embedding probe\\\"}' | python3 -c 'import json,sys,math;d=json.load(sys.stdin);v=d[\\\"data\\\"][0][\\\"embedding\\\"];print(json.dumps({\\\"model\\\":d.get(\\\"model\\\"),\\\"dimensions\\\":len(v),\\\"norm\\\":round(math.sqrt(sum(x*x for x in v)),6),\\\"prompt_tokens\\\":d.get(\\\"usage\\\",{}).get(\\\"prompt_tokens\\\")}))'\"\n        ]\n      ],\n      \"evidence_class\": \"functional (local /v1/embeddings call returned a vector)\",\n      \"prior_observation\": \"Superseded 2026-09-21: the earlier probe queried :8000 and an `|| echo` fallback turned the failure into exit 0 with the text 'models endpoint not on :8000'; that row was wrongly labelled functional. The configured endpoint is 127.0.0.1:8231 (SocratiCode LMSTUDIO_URL). Earlier results retained in docs/evidence/native-e2e-20260921.superseded-labels.json.\"\n    },\n    {\n      \"id\": \"ai-memory\",\n      \"layer\": \"durable memory\",\n      \"repo\": \"https://github.com/akitaonrails/ai-memory\",\n      \"pin\": \"v2.3.2\",\n      \"verdict\": \"keep-but-compare (memory of record)\",\n      \"commands\": [\n        [\n          \"ai-memory\",\n          \"--version\"\n        ],\n        [\n          \"ai-memory\",\n          \"--data-dir\",\n          \"$LOCAL_HOME/.local/share/ai-memory\",\n          \"status\"\n        ]\n      ],\n      \"evidence_class\": \"readiness\",\n      \"accepted_receipts\": [\n        \"docs/tasks/2026-09-21-native-workflow-alignment.md (session observations read for probe session 404076fd)\"\n      ]\n    },\n    {\n      \"id\": \"dagu\",\n      \"layer\": \"scheduling\",\n      \"repo\": \"https://github.com/dagucloud/dagu\",\n      \"pin\": \"v2.16.6 (v2.17.0 released 2026-09-21)\",\n      \"verdict\": \"keep-but-compare\",\n"
+        }
+      ]
+    }
+  },
+  {
+    "command": "ai-memory auto-improve-report --workspace agent-lab --project agent-lab --json",
+    "returned": {
+      "chunk_id": "ec3c1c",
+      "wall_time_seconds": 0.0000115,
+      "exit_code": 0,
+      "original_token_count": 1356,
+      "output": "{\n  \"workspace\": \"agent-lab\",\n  \"project\": \"agent-lab\",\n  \"generated_at\": \"2026-09-23T13:02:08.178606265Z\",\n  \"since_created_at\": 1787576528178606,\n  \"summary\": \"42 run(s), 2 terminal learning proposal(s), 100.0% approved in the last 30 day(s).\",\n  \"params\": {\n    \"since_days\": 30,\n    \"top_limit\": 10\n  },\n  \"aggregate\": {\n    \"run_count\": 42,\n    \"runs_with_learning_proposals\": 1,\n    \"proposals_by_status\": [\n      {\n        \"key\": \"approved\",\n        \"count\": 2\n      }\n    ],\n    \"proposals_by_operation\": [\n      {\n        \"key\": \"create\",\n        \"count\": 2\n      }\n    ],\n    \"proposals_by_edit_mode\": [\n      {\n        \"key\": \"full_page\",\n        \"count\": 2\n      }\n    ],\n    \"proposals_by_kind\": [\n      {\n        \"key\": \"concept\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"gotcha\",\n        \"count\": 1\n      }\n    ],\n    \"maintenance_proposals_by_kind\": [],\n    \"top_targets\": [\n      {\n        \"key\": \"concepts/evidence-receipt-qualification.md\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"gotchas/prompt-cache-is-not-token-savings.md\",\n        \"count\": 1\n      }\n    ],\n    \"rejections_by_reason\": [\n      {\n        \"key\": \"too_few_observations\",\n        \"count\": 24\n      },\n      {\n        \"key\": \"session_too_short\",\n        \"count\": 14\n      },\n      {\n        \"key\": \"insufficient_durable_evidence\",\n        \"count\": 3\n      },\n      {\n        \"key\": \"input_budget_sampled\",\n        \"count\": 2\n      },\n      {\n        \"key\": \"broad_catalog_activity_is_not_a_durable_lesson\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"credentials_and_account_setup_are_sensitive_and_transient\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"dashboard_and_login_activity_is_not_a_reusable_lesson\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"duplicate_or_not_new\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"not_durable_project_knowledge\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"not_project_policy\",\n        \"count\": 1\n      }\n    ],\n    \"repeated_rejection_fingerprints\": [\n      {\n        \"key\": \"ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db\",\n        \"count\": 10\n      },\n      {\n        \"key\": \"ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0\",\n        \"count\": 8\n      },\n      {\n        \"key\": \"125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1\",\n        \"count\": 4\n      },\n      {\n        \"key\": \"683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9\",\n        \"count\": 2\n      }\n    ],\n    \"rejected_targets\": [\n      {\n        \"key\": \"3 observations below configured minimum 8\",\n        \"count\": 10\n      },\n      {\n        \"key\": \"4 observations below configured minimum 8\",\n        \"count\": 8\n      },\n      {\n        \"key\": \"6 observations below configured minimum 8\",\n        \"count\": 4\n      },\n      {\n        \"key\": \"9s below configured minimum 120s\",\n        \"count\": 2\n      },\n      {\n        \"key\": \"102s below configured minimum 120s\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"14s below configured minimum 120s\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"18s below configured minimum 120s\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"2 observations below configured minimum 8\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"22s below configured minimum 120s\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"24s below configured minimum 120s\",\n        \"count\": 1\n      }\n    ]\n  },\n  \"terminal_rates\": {\n    \"denominator\": 2,\n    \"approved_rate\": 1.0,\n    \"rejected_rate\": 0.0,\n    \"conflict_rate\": 0.0,\n    \"failed_rate\": 0.0\n  },\n  \"findings\": [\n    {\n      \"kind\": \"repeated_rejection_fingerprint\",\n      \"severity\": \"warning\",\n      \"message\": \"Rejection fingerprint ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db appeared 10 times.\",\n      \"detail\": {\n        \"fingerprint\": \"ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db\",\n        \"count\": 10\n      }\n    },\n    {\n      \"kind\": \"repeated_rejection_fingerprint\",\n      \"severity\": \"warning\",\n      \"message\": \"Rejection fingerprint ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0 appeared 8 times.\",\n      \"detail\": {\n        \"fingerprint\": \"ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0\",\n        \"count\": 8\n      }\n    },\n    {\n      \"kind\": \"repeated_rejection_fingerprint\",\n      \"severity\": \"warning\",\n      \"message\": \"Rejection fingerprint 125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1 appeared 4 times.\",\n      \"detail\": {\n        \"fingerprint\": \"125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1\",\n        \"count\": 4\n      }\n    },\n    {\n      \"kind\": \"repeated_rejection_fingerprint\",\n      \"severity\": \"warning\",\n      \"message\": \"Rejection fingerprint 683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9 appeared 2 times.\",\n      \"detail\": {\n        \"fingerprint\": \"683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9\",\n        \"count\": 2\n      }\n    }\n  ],\n  \"blind_spots\": [\n    \"Provider/LLM errors before a run is staged may not appear in proposal or rejection counts.\",\n    \"Eval-gate rejection reasons are counted, but eval success rates and score deltas are not persisted in this schema.\",\n    \"Terminal rates use learning proposals only; pending and maintenance/report proposals are excluded from the denominator.\"\n  ]\n}\n"
+    }
+  },
+  {
+    "command": "memory_read_session_observations",
+    "arguments": {
+      "workspace": "agent-lab",
+      "project": "agent-lab",
+      "kinds": [
+        "session-end",
+        "stop"
+      ],
+      "limit": 3,
+      "body_max_chars": 200,
+      "order": "desc"
+    },
+    "returned": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"session\": {\n    \"session_id\": \"LOCAL_ID_1\",\n    \"cwd\": \"$PROJECT/.claude/worktrees/gh-automation-closure\",\n    \"agent_kind\": \"codex\",\n    \"started_at\": \"2026-09-23T05:29:41.029078Z\",\n    \"ended_at\": \"2026-09-23T05:32:15.451771Z\",\n    \"observation_count\": 23,\n    \"actor_user\": null\n  },\n  \"observations\": [\n    {\n      \"id\": \"LOCAL_ID_2\",\n      \"session_id\": \"LOCAL_ID_1\",\n      \"kind\": \"session-end\",\n      \"title\": \"session-end\",\n      \"body\": \"\",\n      \"importance\": 7,\n      \"created_at\": \"2026-09-23T05:32:14.812356Z\",\n      \"extension\": null,\n      \"source_event\": null\n    }\n  ],\n  \"total\": 1,\n  \"offset\": 0,\n  \"limit\": 3,\n  \"order\": \"desc\",\n  \"elided_other_scope\": 0,\n  \"body_max_chars\": 200\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "command": "memory_read_page",
+    "arguments": {
+      "workspace": "agent-lab",
+      "project": "agent-lab",
+      "path": "concepts/evidence-receipt-qualification.md"
+    },
+    "returned": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"path\": \"concepts/evidence-receipt-qualification.md\",\n  \"title\": \"Evidence receipts must separate integrity, qualification, and execution\",\n  \"body\": \"# Evidence receipts must separate integrity, qualification, and execution\\n\\nA passing receipt verifies only the claims it explicitly measures. Record these dimensions separately:\\n\\n- **Integrity:** hashes, sizes, schema checks, reproducibility, and receipt consistency.\\n- **Qualification:** which sources, observations, dates, and capabilities were actually available and supported.\\n- **Execution scope:** offline fixture, historical simulation, native provider call, paper trading, or production execution.\\n\\nDo not promote a receipt that passes integrity checks into a claim of complete source coverage, profitable strategy behavior, live-market validity, broker execution, or unattended production readiness. Preserve unsupported and unavailable-source statuses in the receipt so later reviewers can distinguish a bounded result from a complete qualification.\",\n  \"frontmatter\": {\n    \"kind\": \"concept\",\n    \"title\": \"Evidence receipts must separate integrity, qualification, and execution\",\n    \"auto_improve_proposal_id\": \"LOCAL_ID_3\",\n    \"auto_improve_run_id\": \"LOCAL_ID_4\",\n    \"type\": \"Concept\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-23T10:04:49Z\"\n    }\n  }\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "command": "memory_read_page",
+    "arguments": {
+      "workspace": "agent-lab",
+      "project": "agent-lab",
+      "path": "gotchas/prompt-cache-is-not-token-savings.md"
+    },
+    "returned": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"path\": \"gotchas/prompt-cache-is-not-token-savings.md\",\n  \"title\": \"Prompt-cache share is not the same as net token savings\",\n  \"body\": \"# Prompt-cache share is not the same as net token savings\\n\\nA high cached-input percentage describes how provider accounting classified input; it does not by itself demonstrate lower total tokens, lower cost, shorter prompts, or better task efficiency.\\n\\nWhen evaluating caching, compare a frozen task under equivalent uncached and cached conditions and report at least:\\n\\n- total input, cached input, output, and total tokens;\\n- request count and repeated-context size;\\n- latency and failure/retry behavior; and\\n- the provider's billing treatment of cached tokens.\\n\\nUse the measured baseline and the controlled comparison, not cache share alone, to claim savings.\",\n  \"frontmatter\": {\n    \"kind\": \"gotcha\",\n    \"title\": \"Prompt-cache share is not the same as net token savings\",\n    \"auto_improve_proposal_id\": \"LOCAL_ID_5\",\n    \"auto_improve_run_id\": \"LOCAL_ID_4\",\n    \"type\": \"Gotcha\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-23T10:04:49Z\"\n    }\n  }\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "command": "journalctl --user -u ai-memory.service --since '2026-09-23 00:00:00 UTC' --grep 'consolidat|auto.improv|scheduler' -n 12 --no-pager -o cat",
+    "returned": {
+      "chunk_id": "30bad7",
+      "wall_time_seconds": 0.0000125,
+      "exit_code": 0,
+      "original_token_count": 1075,
+      "output": "2026-09-23T12:05:03.292445Z  INFO ai_memory_cli::commands::serve: scheduled auto-improve tick completed scopes=2 scopes_with_candidates=1 reviewed=1 skipped=0 errors=0 elapsed_ms=2\n2026-09-23T12:05:03.292208Z  INFO ai_memory_consolidate::auto_improve_schedule: scheduled auto-improve completed workspace=agent-lab project=agent-lab session_id=LOCAL_ID_6 run_id=LOCAL_ID_7 proposals=0 approved=0 pending=0 conflicts=0 skipped=0\n2026-09-23T11:05:03.289576Z  INFO ai_memory_cli::commands::serve: scheduled auto-improve tick completed scopes=2 scopes_with_candidates=1 reviewed=0 skipped=0 errors=1 elapsed_ms=13504\n2026-09-23T11:05:03.281205Z  WARN ai_memory_consolidate::auto_improve_schedule: scheduled auto-improve failed workspace=agent-lab project=agent-lab session_id=LOCAL_ID_8 error=http: error decoding response body\n2026-09-23T10:04:49.783951Z  INFO ai_memory_cli::commands::serve: scheduled auto-improve tick completed scopes=2 scopes_with_candidates=1 reviewed=1 skipped=0 errors=0 elapsed_ms=30741\n2026-09-23T10:04:49.783629Z  INFO ai_memory_consolidate::auto_improve_schedule: scheduled auto-improve completed workspace=agent-lab project=agent-lab session_id=LOCAL_ID_9 run_id=LOCAL_ID_4 proposals=2 approved=2 pending=0 conflicts=0 skipped=0\n2026-09-23T09:45:18.463616Z  INFO ai_memory_consolidate::consolidator: session consolidated via LLM session=LOCAL_ID_10 page=LOCAL_ID_11\n2026-09-23T09:04:19.040835Z  INFO ai_memory_cli::commands::serve: scheduled auto-improve tick completed scopes=2 scopes_with_candidates=1 reviewed=1 skipped=0 errors=0 elapsed_ms=10\n2026-09-23T09:04:19.040604Z  INFO ai_memory_consolidate::auto_improve_schedule: scheduled auto-improve completed workspace=agent-lab project=agent-lab session_id=LOCAL_ID_12 run_id=LOCAL_ID_13 proposals=0 approved=0 pending=0 conflicts=0 skipped=0\n2026-09-23T08:04:19.029531Z  INFO ai_memory_cli::commands::serve: scheduled auto-improve tick completed scopes=2 scopes_with_candidates=1 reviewed=1 skipped=0 errors=0 elapsed_ms=4\n2026-09-23T08:04:19.029221Z  INFO ai_memory_consolidate::auto_improve_schedule: scheduled auto-improve completed workspace=agent-lab project=agent-lab session_id=LOCAL_ID_14 run_id=LOCAL_ID_15 proposals=0 approved=0 pending=0 conflicts=0 skipped=0\n2026-09-23T07:41:57.621071Z  INFO ai_memory_consolidate::consolidator: session consolidated via LLM session=LOCAL_ID_16 page=LOCAL_ID_17\n"
+    }
+  },
+  {
+    "command": "Read-only SQLite inspection of specific observed native session and learning IDs",
+    "classification": "Local independent observation using actual upstream BLOB identifiers; no mutations",
+    "returned": {
+      "chunk_id": "8d8013",
+      "wall_time_seconds": 0.0000173,
+      "exit_code": 0,
+      "original_token_count": 646,
+      "output": "{\n  \"latest_completed\": {\n    \"session\": {\n      \"agent_kind\": \"codex\",\n      \"started_at\": \"2026-09-23T05:29:41.029078+00:00\",\n      \"ended_at\": \"2026-09-23T05:32:15.451771+00:00\",\n      \"ended_observation_count\": 23,\n      \"summary_page_present\": true\n    },\n    \"job\": {\n      \"generation\": 23,\n      \"state\": \"completed\",\n      \"requested_at\": \"2026-09-23T05:32:15.511861+00:00\",\n      \"started_at\": \"2026-09-23T05:32:23.148405+00:00\",\n      \"completed_at\": \"2026-09-23T05:32:39.163124+00:00\",\n      \"attempts\": 1,\n      \"last_error\": null\n    },\n    \"scheduler_claims\": [],\n    \"learning_runs\": []\n  },\n  \"learned_source\": {\n    \"session\": {\n      \"agent_kind\": \"codex\",\n      \"started_at\": \"2026-09-19T04:49:55.394822+00:00\",\n      \"ended_at\": \"2026-09-20T06:49:02.084831+00:00\",\n      \"ended_observation_count\": 14982,\n      \"summary_page_present\": true\n    },\n    \"job\": null,\n    \"scheduler_claims\": [\n      \"2026-09-23T10:04:19.042606+00:00\"\n    ],\n    \"learning_runs\": [\n      {\n        \"provider\": \"codex\",\n        \"model\": \"gpt-5.6-luna\",\n        \"created_at\": \"2026-09-23T10:04:49.742504+00:00\",\n        \"proposals\": [\n          {\n            \"status\": \"approved\",\n            \"operation\": \"create\",\n            \"target_path\": \"concepts/evidence-receipt-qualification.md\",\n            \"applied_page_present\": true\n          },\n          {\n            \"status\": \"approved\",\n            \"operation\": \"create\",\n            \"target_path\": \"gotchas/prompt-cache-is-not-token-savings.md\",\n            \"applied_page_present\": true\n          }\n        ]\n      }\n    ]\n  },\n  \"failed_scheduler_source\": {\n    \"session\": {\n      \"agent_kind\": \"codex\",\n      \"started_at\": \"2026-09-20T01:33:53.448865+00:00\",\n      \"ended_at\": \"2026-09-20T08:03:51.982662+00:00\",\n      \"ended_observation_count\": 3156,\n      \"summary_page_present\": true\n    },\n    \"job\": null,\n    \"scheduler_claims\": [\n      \"2026-09-23T11:04:49.786051+00:00\"\n    ],\n    \"learning_runs\": []\n  },\n  \"consolidated_source\": {\n    \"session\": {\n      \"agent_kind\": \"codex\",\n      \"started_at\": \"2026-09-21T19:53:29.168828+00:00\",\n      \"ended_at\": \"2026-09-23T01:07:58.144710+00:00\",\n      \"ended_observation_count\": 1993,\n      \"summary_page_present\": true\n    },\n    \"job\": {\n      \"generation\": 1767,\n      \"state\": \"completed\",\n      \"requested_at\": \"2026-09-22T09:00:50.126810+00:00\",\n      \"started_at\": \"2026-09-22T09:07:32.357366+00:00\",\n      \"completed_at\": \"2026-09-22T09:08:13.837022+00:00\",\n      \"attempts\": 1,\n      \"last_error\": null\n    },\n    \"scheduler_claims\": [],\n    \"learning_runs\": []\n  }\n}\n"
+    }
+  },
+  {
+    "command": "qmd --index agent-lab-docs get qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-lifecycle.md",
+    "returned": {
+      "chunk_id": "dfbb37",
+      "wall_time_seconds": 0.007422342,
+      "exit_code": 0,
+      "original_token_count": 396,
+      "output": "qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-lifecycle.md  #cdb6f4\n---\n\n1: # Current native memory and RAG\n2: \n3: Current setup, September 21, 2026: ai-memory 2.3.2 has local embeddings, native\n4: Codex consolidation, bounded assistant capture and hourly learning configured.\n5: Earlier notes saying the LLM or scheduler is disabled describe superseded\n6: configurations. The adopted scope remains agent-lab/agent-lab.\n7: \n8: SocratiCode 1.14.0, Qdrant 1.19.1, qualified vLLM 0.25.0/Nemotron, Serena and QMD\n9: remain installed. Both native clients completed real memory and code retrieval.\n10: The new Claude reply was captured exactly and its consolidation completed on\n11: attempt 1. Current native project watchers run automatically; the one-shot\n12: MCPorter reporting profile intentionally disables watching and auto-resume.\n13: \n14: The existing two-minute native-data timer publishes current inventory to Loki.\n15: The existing daily task follow-up now checks scoped retrieval and lifecycle\n16: outcomes; this configuration update is not proof of its next scheduled run.\n17: \n18: Use the canonical [native lifecycle handbook](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/native-memory-rag-lifecycle.md)\n19: and [memory selection guide](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/memory-landscape-maintenance.md).\n20: They contain supported commands, source pins, original-result references and\n21: unknowns. Exact memory savings, broad retrieval quality and physical-PC reboot\n22: remain unestablished.\n23: \n"
+    }
+  }
+]
