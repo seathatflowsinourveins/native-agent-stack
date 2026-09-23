@@ -7,11 +7,17 @@ real drift artifact) and confirm the resulting publication passes
 touched, and that neither `manifests/evidence.json`'s `files[]`/`receipts[]`
 order nor `docs/ecosystem/index.html`'s tracked/untracked state is assumed.
 
-`RebuildExplorerSubprocessTests` runs the module as a real subprocess (not an
-in-process call) against a throwaway git-tracked copy of this repository, to
-reproduce and guard the fix for the H1 finding from the 2026-09-23 fix round
-(docs/decisions/2026-09-23-bot-pr-dispatch.md): scripts/build_ecosystem.py's own
-stdout must never land inside main()'s single-JSON-document stdout contract.
+`RebuildExplorerSubprocessTests` and `TrackedExplorerSubprocessTests` run the
+module as a real subprocess (not an in-process call) against a throwaway
+git-initialized copy of this repository, to reproduce and guard the fix for
+the H1 finding from the 2026-09-23 fix round
+(docs/decisions/2026-09-23-bot-pr-dispatch.md): scripts/build_ecosystem.py's
+own stdout must never land inside main()'s single-JSON-document stdout
+contract. The former uses the plain, untracked-explorer copy that matches
+main's real state since #96 (docs/decisions/2026-09-23-generated-explorer-
+sorted-manifest.md); the latter additionally force-tracks a locally built
+explorer to keep exercising rebuild_explorer()'s branch even though it is
+presently unreachable from a checkout of main.
 
 The workflow-text tests below are text-level, like
 `tests/test_catalog_freshness_pins.py`: they check the `propose` job's trigger
