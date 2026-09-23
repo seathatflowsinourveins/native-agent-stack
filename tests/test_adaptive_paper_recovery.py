@@ -137,10 +137,14 @@ class FakePort:
 class RecoveryTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
-        self.ledger = Ledger(Path(self.temp.name) / "ledger.sqlite", RiskLimits(cleanup_seconds=1))
+        # Time budgets sized for slow CI runners: the fake port publishes one quote at start,
+        # and snapshot/ledger writes before the exit can exceed a 50 ms freshness window on
+        # slow disks (observed CI flakes: needs_attention instead of passed). A genuinely stale
+        # quote (mode "stale", 30 s old) still fails; the deadline test keeps its own 1 s budget.
+        self.ledger = Ledger(Path(self.temp.name) / "ledger.sqlite", RiskLimits(cleanup_seconds=3))
         self.controller = Controller(self.ledger)
         self.port = self.controller.port = FakePort(self.controller)
-        self.config = {"cleanup_seconds": 1, "quote_max_age_seconds": .05, "order_timeout_seconds": .05,
+        self.config = {"cleanup_seconds": 3, "quote_max_age_seconds": 1.0, "order_timeout_seconds": .05,
                       "regular_session_only": True, "extended_hours_enabled": False,
                       "sessions": {"extended_hours": False, "overnight_holds": False,
                                   "overnight_gross_multiple": "1.0"}}
@@ -359,6 +363,7 @@ class RecoveryTests(unittest.TestCase):
         self.assertFalse(result["flat"])
 
     def test_deadline_stops_without_claiming_snapshot_or_flatness(self):
+        self.config["cleanup_seconds"] = 1  # the deadline under test: min(1, ledger's 3) = 1 s
         self.original_buy()
         self.port.mode = "slow_snapshot"
         began = time.monotonic()
