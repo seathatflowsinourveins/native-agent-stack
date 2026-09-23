@@ -1073,7 +1073,10 @@ wave is the only one that may change, and only while the PR registers no newer
 wave: a PR that registers a newer wave must leave the base's newest wave's
 registry entry (its sha256 included) and document byte for byte as they are,
 because once that wave is no longer current `build_verdicts.py --check` checks
-only its own rows and sha256 while its document holds every row. Frozen values
+only its own rows and sha256 while its document holds every row. For the same
+reason a PR registers at most one new wave, and it must be the head's newest
+and newer than every base wave, so the only new wave is always the current one
+that `build_verdicts.py --check` regenerates. Frozen values
 compare type-strictly (`1`, `1.0` and `true` differ), and changed paths are
 listed NUL-separated, so a path with a space, newline or non-ASCII byte is not
 lost to git's quoting. A PR that changes a verdict row, a wave
@@ -1111,7 +1114,9 @@ three, so a PR whose base branch changes runs again, and the job fails closed
 on any `pull_request` event whose base branch (`GITHUB_BASE_REF`, passed
 through the step's environment) is not `main`. A PR first judged against
 another branch and then retargeted to `main` therefore cannot merge on its
-earlier green run. The job runs the head's own copy of the gate only when the
+earlier green run. The merge commit's first parent, which the gate compares
+with, must also be a commit on `origin/main`, so a merge commit still built on
+a branch that merely contains `main`'s tip fails closed. The job runs the head's own copy of the gate only when the
 base has none and this change adds `scripts/verdict_review_gate.py` (the
 bootstrap PR); a base without the gate otherwise fails closed.
 

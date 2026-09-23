@@ -1238,6 +1238,32 @@ def wave_freeze_violations(base, head, base_waves, head_waves):
     return violations
 
 
+def new_wave_violations(base_waves, head_waves):
+    """Review of #135, round 2: build_verdicts.py --check regenerates and compares only the current
+    wave (the newest registered run id); a registered wave that is not current is checked only
+    against its own rows and registry sha256, while every wave document holds all rows. So a wave
+    registered first at the head must become the current one: at most one new run id, and it is
+    both the head's newest and newer than every base wave. Otherwise a second new wave, or a
+    backdated one, could publish an arbitrary document that no check regenerates."""
+    added = sorted(run_id for run_id in head_waves if run_id not in base_waves)
+    if not added:
+        return []
+    violations = []
+    if len(added) > 1:
+        violations.append({"row": "waves", "message": (
+            f"this change registers {len(added)} new waves ({', '.join(added)}); register one wave per change, "
+            "since only the current (newest) wave is regenerated and compared by build_verdicts.py --check")})
+    base_newest = max(base_waves) if base_waves else None
+    head_newest = max(head_waves)
+    for run_id in added:
+        if run_id != head_newest or (base_newest is not None and run_id <= base_newest):
+            violations.append({"row": f"wave {run_id}", "message": (
+                f"the newly registered wave {run_id} is not the current wave (the head's newest is {head_newest}, "
+                f"the base's newest is {base_newest}); a new wave must be newer than every registered wave, "
+                "since only the current wave is regenerated and compared by build_verdicts.py --check")})
+    return violations
+
+
 def registered_manifest(run_id, entry):
     """The SOTA manifest a registry entry names (build_verdicts.py's default when it names none)."""
     manifest = entry.get("manifest") if isinstance(entry, dict) else None
@@ -1405,6 +1431,7 @@ def evaluate(root, base, head_root=None, *, validators=run_repo_validators):
     removed = [label(key) for key in sorted(set(base_rows) - set(head_rows), key=lambda k: tuple(map(str, k)))]
     violations.extend(row_continuity_violations(base_rows, head_rows, head_waves))
     violations.extend(wave_freeze_violations(base_side, head_side, base_waves, head_waves))
+    violations.extend(new_wave_violations(base_waves, head_waves))
     violations.extend(sota_manifest_violations(base_side, head_side, base_waves, head_waves))
     # Compared on parsed values (finding 3): a regenerated wave document or registry that only
     # changes formatting (and the document sha256 it records) is not a wave change.

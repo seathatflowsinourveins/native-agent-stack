@@ -196,6 +196,13 @@ jobs:
                 echo "::error::verdict-review-gate: neither the merge commit's first parent nor the payload base is available"
                 exit 1
               fi
+              # The base must be a commit on main itself (full history fetches origin/main), not a
+              # branch that merely contains main's tip, such as a merge commit left built against an
+              # earlier base: a retargeted PR is otherwise judged against the branch it left.
+              if ! git merge-base --is-ancestor "$base" "refs/remotes/origin/$PR_BASE_REF"; then
+                echo "::error::verdict-review-gate: the base $base is not a commit on origin/$PR_BASE_REF; failing closed"
+                exit 1
+              fi
               ;;
             push)
               base="${PUSH_BEFORE_SHA:-}"

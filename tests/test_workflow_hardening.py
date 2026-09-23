@@ -487,6 +487,17 @@ class VerdictReviewGateTests(unittest.TestCase):
         git("checkout", "--quiet", "--detach", commits["base"])
         git("merge", "--quiet", "--no-ff", "-m", "merge", commits["pr2"])
         commits["merge"] = git("rev-parse", "HEAD")
+        # actions/checkout with fetch-depth: 0 fetches +refs/heads/*:refs/remotes/origin/*.
+        git("update-ref", "refs/remotes/origin/main", commits["base"])
+        # A stacked branch on main's tip and a merge of the PR head into it: a merge commit left
+        # built against the branch a retargeted PR came from.
+        git("checkout", "--quiet", "-b", "stack", commits["base"])
+        (repository / "stack.txt").write_text("stack")
+        git("add", "-A")
+        git("commit", "--quiet", "-m", "stack")
+        git("merge", "--quiet", "--no-ff", "-m", "merge into stack", commits["pr2"])
+        commits["stack_merge"] = git("rev-parse", "HEAD")
+        git("checkout", "--quiet", "--detach", commits["merge"])
         self.commits = commits
         return repository
 
@@ -519,6 +530,21 @@ class VerdictReviewGateTests(unittest.TestCase):
         passed = self.run_gate_step(repository, merge, pr2, base_ref="main")
         self.assertEqual(passed.returncode, 0, passed.stdout + passed.stderr)
         self.assertIn("gate-invoked", passed.stdout)
+
+    def test_a_merge_commit_built_on_another_branch_fails_closed(self):
+        # Review of #135, round 2: the payload base.sha being an ancestor of HEAD^1 is not enough; a
+        # merge commit whose first parent is a stacked branch containing main's tip would be judged
+        # against that branch. HEAD^1 must be a commit on origin/main.
+        repository = self.make_pull_request_repository()
+        failed = self.run_gate_step(repository, self.commits["stack_merge"], self.commits["pr2"])
+        self.assertEqual(failed.returncode, 1, failed.stdout + failed.stderr)
+        self.assertIn("is not a commit on origin/main; failing closed", failed.stdout)
+        self.assertNotIn("gate-invoked", failed.stdout)
+        passed = self.run_gate_step(repository, self.commits["merge"], self.commits["pr2"])
+        self.assertEqual(passed.returncode, 0, passed.stdout + passed.stderr)
+        run = self.run_script()
+        pull_request = run.split("pull_request)", 1)[1].split(";;", 1)[0]
+        self.assertIn('git merge-base --is-ancestor "$base" "refs/remotes/origin/$PR_BASE_REF"', pull_request)
 
     def test_the_base_gate_runs_when_the_base_has_one(self):
         repository = self.make_pull_request_repository(gate="base")
