@@ -2,10 +2,13 @@
 
 **Decided by:** unit `catalog-refresh-pr-20260923`, catalog worktree branch
 `claude/catalog-refresh-pr-20260923`; the coordinator integrates it into
-`agent-lab`'s tracked native-agent-stack checkout. Revised the same day after
-an independent Opus review (H1/H2/M1/L1-L6/T1-T3 findings) and a Codex
-cross-family review (P1: the original dispatch design is refuted by primary
-GitHub documentation) -- see "Corrected claim" below.
+`agent-lab`'s tracked native-agent-stack checkout. Revised twice the same
+day: first after an independent Opus review (H1/H2/M1/L1-L6/T1-T3 findings)
+and a Codex cross-family review (P1: the original dispatch design is
+refuted by primary GitHub documentation -- see "Corrected claim" below);
+then after a second Opus pass-with-findings review (N1-N4) and a Codex
+re-review (two reproductions of N1/N2, plus P2-3: a pending opt-in run can
+be silently discarded) -- see "Second fix round" at the end.
 
 **Scope:** `.github/workflows/catalog-freshness.yml`'s new `propose` job and
 `scripts/freshness_propose.py` only. It never writes
@@ -64,17 +67,17 @@ personal access token. The job:
 - pushes with `--force-with-lease=automation/catalog-freshness:<observed-sha>`
   against the remote branch tip it just observed with `git ls-remote`, not a
   plain `--force`, so a concurrent run's push is rejected rather than
-  silently overwritten; the workflow's single `${{ github.workflow }}`
-  concurrency group (`cancel-in-progress: false`, no `event_name` in the
-  group key) already serializes every run of this workflow regardless of
-  trigger, and the lease is a second, independent guard against the same
-  race, not the only one;
+  silently overwritten -- this is the actual data-safety guard against a
+  race; a job-scoped `concurrency:` group on `propose` (keyed on manual vs.
+  scheduled, see "Second fix round") additionally queues most overlapping
+  runs so they do not even attempt to race in the first place;
 - writes a `scripts/validate.py`-shaped receipt whose claim states plainly
   that the run is report-only and that a pin bump needs its own separately
-  qualified receipt, with `component_ids` limited to this run's drifted ids
-  that are real `manifests/stack.json` components -- raising (no PR, no
-  branch push) rather than falling back to an unrelated fixed component set
-  when none match; and
+  qualified receipt, with `component_ids` limited to this run's actually-
+  drifted ids that are real `manifests/stack.json` components -- raising (no
+  PR, no branch push) rather than falling back to an unrelated fixed
+  component set when none match (see "Second fix round" for the corrected
+  drift-vs-unfetched-vs-no-release classification this depends on); and
 - does **not** dispatch any other workflow. Instead, it relies on the PR's
   own `pull_request`-triggered runs and prints the PR URL plus an explicit
   note that a write-access collaborator must approve them (see "Corrected
@@ -83,19 +86,20 @@ personal access token. The job:
 ## Evidence
 
 [GitHub's `GITHUB_TOKEN` reference](https://docs.github.com/en/actions/concepts/security/github_token)
-states: "When you use the repository's `GITHUB_TOKEN` to perform tasks,
-events triggered by the `GITHUB_TOKEN`, with the exception of
-`workflow_dispatch` and `repository_dispatch`, will not create a new
-workflow run" -- confirming `propose`'s push/PR alone does not itself
-produce a `pull_request`-triggered `validate`/`token-report`/`secret-scan`
-run. The same document additionally states, for the specific case of a PR
-created by a `GITHUB_TOKEN`-driven workflow: "the resulting `pull_request`
-event creates workflow runs in an **approval-required** state ... a user
-with write access to the repository can start the runs by selecting
-**Approve workflows to run**." So the PR's own `pull_request` runs *are*
-created (unlike a naive reading of the first sentence alone might suggest),
-but they wait for a write-access approval rather than running immediately.
-This is the mechanism `propose` now relies on instead of dispatching.
+states (current wording as fetched 2026-09-23; the first version of this
+record quoted an older paraphrase, "with the exception of `workflow_dispatch`
+and `repository_dispatch`," corrected here to the exact current text):
+"events triggered by the `GITHUB_TOKEN` will not create a new workflow run,
+with the following exceptions:" followed by a list including
+"`workflow_dispatch` and `repository_dispatch` events always create workflow
+runs" and "`pull_request` events with the `opened`, `synchronize`, or
+`reopened` activity types: when a workflow using `GITHUB_TOKEN` creates or
+updates a pull request, the resulting `pull_request` event creates workflow
+runs in an **approval-required** state." So the PR's own `pull_request` runs
+*are* created (unlike a naive reading of only the lead sentence might
+suggest), but they wait for a write-access approval rather than running
+immediately. This is the mechanism `propose` now relies on instead of
+dispatching.
 
 [Troubleshooting required status checks](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks)
 (quoted in full under "Corrected claim") is why dispatching a separate
@@ -112,9 +116,16 @@ branch, not a fork PR, so **this documentation does not establish that this
 endpoint (or any documented endpoint) covers approving a GITHUB_TOKEN-created
 same-repo PR's pending run.** Rather than assume it works and script an
 automatic approval call that might 404 or silently no-op, `propose` prints
-the PR URL and instructs a human to use the Actions tab's "Approve and run
-workflow" UI action instead -- documented, unambiguous, and the same
-mechanism GitHub's own fork-PR guidance describes for the UI path.
+the PR URL and instructs a human to use the documented UI path instead: per
+[GitHub's fork-PR approval guidance](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/approve-runs-from-forks)
+(the same UI flow it also documents for a non-fork GITHUB_TOKEN-created PR's
+approval-required runs), a collaborator with write access opens the pull
+request, clicks the **"Awaiting approval"** button near the merge box to
+open the merge status panel, and selects **"Approve workflows to run"**
+there -- not the Actions tab directly. The same page states that "workflow
+runs that have been awaiting approval for more than 30 days are
+automatically deleted," so an evidence PR left unreviewed that long needs a
+fresh `propose` run before its checks can run.
 
 [GitHub's repository Actions settings documentation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#preventing-github-actions-from-creating-or-approving-pull-requests)
 documents the separate, one-time repository setting this job depends on:
@@ -222,3 +233,139 @@ dispatch of this job:
   approval-required flow has not been exercised against a real pending run.
   That first live run is the concrete gap the overturn condition above
   names.
+
+## Second fix round (Opus N1-N4, Codex P2-3), 2026-09-23
+
+An independent Opus re-review of the first fix round returned
+**pass-with-findings** (every earlier H/M/L/T finding closed) but raised
+four new findings (N1, N2, N2b, N3, N4); a Codex cross-family re-review
+independently reproduced N1 and N2 with concrete fixtures and raised one
+new finding, P2-3.
+
+**N1/N2 bug (medium): `compute_drift` hid real pin changes and mislabeled
+legitimate no-release repositories.** The prior `compute_drift` skipped a
+row entirely whenever the *rebuilt* row's `upstream.latest` was `None`,
+before ever comparing `pin`. This had two failure modes, both reproduced as
+regression tests in `tests/test_catalog_freshness_propose.py`:
+
+- **N1** (Opus, reproduced by Codex by changing `skills-ref`'s pin from
+  `0.1.0` to `0.1.1`): a repository with no GitHub releases or tags at all
+  (`upstream.latest` is `None` on both sides) has real fetch data --
+  `upstream.pushed_at` is set -- and 7 such rows already exist in
+  `catalogs/sota-convergence/manifest-20260922.json` (`tavily-cli`,
+  `skills-ref`, `poppler`, and 4 others). A pin bump on one of these was
+  silently invisible to the drift report.
+- **N2** (Opus, reproduced by Codex with a synthetic `503` on the releases
+  endpoint followed by a successful tags-endpoint fallback): when a
+  repository's releases fetch fails but its tags fetch succeeds,
+  `github_freshness.py` records the failure in `partial_errors` but still
+  populates `upstream.latest` from the tag fallback. The prior code treated
+  this as ordinary, reliable data (since `latest` was not `None`), so a
+  transient-failure-derived value could silently read as either drift or a
+  clean match.
+
+Fixed by giving `compute_drift()` three buckets instead of two -- `drifted`,
+`unfetched`, `no_release` -- documented in that function's own docstring and
+in `docs/github-automation.md`. `pin` is now always compared regardless of
+`latest`. A row is `unfetched` only when the rebuilt row lacks fetch
+evidence (`upstream.pushed_at is None`) *or* its raw `github-freshness.json`
+record shows a fetch problem (`error` or `partial_errors`, matched by exact
+URL or normalized GitHub slug -- `_freshness_record_has_error()`, mirroring
+`build_manifest.py`'s own `compute_upstream()` matching, independently
+reimplemented for the same reason that module's own copy is independent of
+`github_freshness.py`'s). Everything else with a known `latest` of `None` on
+both sides is `no_release`: fetched reliably, genuinely has no release/tag,
+not drift.
+
+**N2 (job-level gate): `partial_errors` was not gated at all.** Per-row
+exclusion (above) keeps a single flaky repository's row out of the drift
+table, but nothing previously stopped `propose` from opening a PR when
+*any* repository had a partial fetch problem this run. `freshness` now also
+emits a `partial_errors` job output (`scripts/freshness_propose.py`'s
+`upstream_partial_error_count()`, reading the same top-level count
+`github_freshness.py` already writes), and `propose`'s `if:` requires
+`needs.freshness.outputs.partial_errors == '0'` alongside the existing
+`upstream_errors == '0'` check.
+
+**N2b: fail closed, not zero, on a missing/broken freshness document.** The
+prior `upstream_error_count()` returned `0` (a false "no problems" signal)
+when `github-freshness.json` was missing or malformed. `_load_freshness_document()`
+now raises `FreshnessProposeError` in that case (missing file, unreadable,
+not a JSON object, or a non-integer `errors`/`partial_errors` field),
+covered by `tests/test_catalog_freshness_propose.py`'s
+`LoadFreshnessDocumentTests`/`IntFieldTests` (or equivalent) fail-closed
+tests.
+
+**N3: the approval instructions and GITHUB_TOKEN quote were wrong/outdated.**
+Corrected in `catalog-freshness.yml`, `docs/github-automation.md` and this
+record: the current `GITHUB_TOKEN` docs phrase the exceptions as "...will
+not create a new workflow run, with the following exceptions: ..." (not
+"with the exception of ... will not create"), and the actual UI path to
+approve a pending run is on the pull request itself -- the **"Awaiting
+approval"** button near the merge box opens the merge status panel, which
+holds **"Approve workflows to run"** -- not the repository's Actions tab.
+Runs left awaiting approval for more than 30 days are automatically
+deleted (also now stated in the workflow's job summary and in
+`docs/github-automation.md`).
+
+**N4: an absolute `$RUNNER_TEMP` path was being written into committed
+evidence.** `render_drift_markdown()` received the full rebuilt-manifest
+path (`work_dir / "manifest-*.json"`, an absolute, host-specific path under
+the runner's temp directory) and embedded it verbatim in `drift.md`, which
+`propose` then commits. Fixed by passing only `rebuilt_path.name` (the
+published-manifest path stays a safe, relative repository path and is kept
+in full, since it is genuinely useful for a reader to click through).
+
+**P2-3 (Codex): a pending opt-in run could be silently discarded.** The
+first fix round's single workflow-level `${{ github.workflow }}`
+concurrency group with `cancel-in-progress: false` relies on GitHub's
+default concurrency `queue: single`: "at most one job or workflow run can
+be `pending` in the concurrency group. When a new job or workflow run is
+queued, any existing `pending` job or workflow run in the same group is
+canceled and replaced" ([Control workflow concurrency](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency),
+fetched 2026-09-23). Sequence: an in-progress run, then a manual
+`open_pr: true` dispatch queues behind it, then an ordinary scheduled
+activation queues too -- and *replaces* the manual request's pending slot,
+so the opt-in run never executes at all. `queue: max` ("up to 100 jobs or
+workflow runs can be `pending`") is the documented fix, but is rejected by
+this repository's pinned `actionlint` 1.7.12 (`unexpected key "queue" for
+"concurrency" section` -- checked directly, not assumed) -- and `queue: max`
+with `cancel-in-progress: true` is independently documented as a validation
+error, which was never this workflow's combination anyway.
+
+**Chosen fix:** move the concurrency group off the workflow level entirely
+and onto the `propose` job only (`freshness` reads/reports only and is safe
+to run in parallel across overlapping triggers), keyed on manual vs.
+scheduled: `${{ github.workflow }}-propose-${{ inputs.open_pr == true &&
+'manual' || 'scheduled' }}`. A manual and a scheduled run are now in
+different groups and can never replace each other's pending slot; two runs
+*within* the same category can still replace each other, an accepted,
+lower-stakes loss (the later same-category request already supersedes the
+earlier one, and a lost duplicate report-only run is not a lost user
+request). This reintroduces the possibility that a manual and a scheduled
+run execute `propose` concurrently in the rare case both are triggered
+close together -- `--force-with-lease` (already in place from the first fix
+round) is the actual data-safety guard for that case; the concurrency group
+is a queueing optimization, not the correctness mechanism. Alternatives
+considered: keeping the workflow-level group and accepting the discard risk
+(rejected -- silently dropping a human's explicit request is worse than the
+now-only-theoretical concurrent-push race `--force-with-lease` already
+covers); re-checking `queue` support on every future actionlint upgrade and
+switching to it then (recorded as a live follow-up, not implemented, since
+it is not needed for correctness once keyed-by-category queuing is in
+place).
+
+**Overturn condition (additive to the one above):** if a future actionlint
+release (checked directly, not assumed) accepts the `queue` key, re-adopt
+`queue: max` at the workflow level (simpler, and closes the residual
+same-category replacement gap) and drop the per-job keying.
+
+**Evidence class (second fix round):** `local_integration` / static
+analysis only, same as above. `tests/test_catalog_freshness_propose.py`
+gained regression tests for the exact N1 (`skills-ref`-style pin change with
+`latest=None`) and N2 (`partial_errors`-with-tag-fallback) reproductions,
+the N2b fail-closed behavior, the N4 relative-path fix, and a text-level
+test asserting the job-scoped, category-keyed concurrency group. Full
+`python3 -m unittest`, all validators, `zizmor`, `actionlint` and the
+guarded `gitleaks` scans were re-run after this round; exact counts and
+results are in the unit's final report.

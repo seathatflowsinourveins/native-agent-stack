@@ -47,7 +47,11 @@ FORBIDDEN_CATALOG_PREFIXES = (
 EXPECTED_PROPOSE_IF = (
     "github.ref == 'refs/heads/main' && needs.freshness.outputs.drift == 'true' && "
     "(inputs.max_repos || 0) == 0 && needs.freshness.outputs.upstream_errors == '0' && "
+    "needs.freshness.outputs.partial_errors == '0' && "
     "(inputs.open_pr == true || (github.event_name == 'schedule' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))"
+)
+EXPECTED_PROPOSE_CONCURRENCY_GROUP = (
+    "${{ github.workflow }}-propose-${{ inputs.open_pr == true && 'manual' || 'scheduled' }}"
 )
 
 
@@ -95,36 +99,127 @@ class MdCellTests(unittest.TestCase):
 
 
 class ComputeDriftTests(unittest.TestCase):
-    def _row(self, pin, latest, behind):
-        return {"pin": pin, "upstream": {"latest": latest}, "pin_behind_upstream": behind}
+    """Regression coverage for the 2026-09-23 second fix round (N1/N2): a pin
+    change must never be hidden just because upstream.latest is None, and a
+    row is "unfetched" only when it genuinely lacks reliable data -- not
+    merely whenever it has no release/tag."""
+
+    def _row(self, pin, latest, behind=False, pushed_at="2026-09-01",
+             repository="https://github.com/example/example"):
+        return {"pin": pin, "repository": repository,
+                "upstream": {"latest": latest, "pushed_at": pushed_at}, "pin_behind_upstream": behind}
 
     def test_pin_change_is_drift(self):
-        published = {"gitleaks": self._row("8.30.0", "v8.30.0", False)}
-        rebuilt = {"gitleaks": self._row("8.30.1", "v8.30.0", False)}
-        drifted, unfetched = fp.compute_drift(published, rebuilt)
+        published = {"gitleaks": self._row("8.30.0", "v8.30.0")}
+        rebuilt = {"gitleaks": self._row("8.30.1", "v8.30.0")}
+        drifted, unfetched, no_release = fp.compute_drift(published, rebuilt)
         self.assertEqual([row[0] for row in drifted], ["gitleaks"])
         self.assertEqual(unfetched, [])
+        self.assertEqual(no_release, [])
 
     def test_no_change_is_not_drift(self):
-        row = self._row("8.30.1", "v8.30.1", False)
-        drifted, unfetched = fp.compute_drift({"gitleaks": row}, {"gitleaks": dict(row)})
+        row = self._row("8.30.1", "v8.30.1")
+        drifted, unfetched, no_release = fp.compute_drift({"gitleaks": row}, {"gitleaks": dict(row)})
         self.assertEqual(drifted, [])
         self.assertEqual(unfetched, [])
-
-    def test_unfetched_upstream_latest_is_excluded_from_drift(self):
-        """A rebuilt row with upstream.latest=None (github_freshness.py never fetched
-        it this run -- a bounded --max-repos run or an API error) must not be reported
-        as drift just because it differs from a real prior value."""
-        published = {"gitleaks": self._row("8.30.0", "v8.30.0", False)}
-        rebuilt = {"gitleaks": self._row("8.30.0", None, False)}
-        drifted, unfetched = fp.compute_drift(published, rebuilt)
-        self.assertEqual(drifted, [])
-        self.assertEqual(unfetched, ["gitleaks"])
+        self.assertEqual(no_release, [])
 
     def test_component_absent_from_published_is_ignored(self):
-        drifted, unfetched = fp.compute_drift({}, {"new-thing": self._row("1.0", "v1.0", False)})
+        drifted, unfetched, no_release = fp.compute_drift({}, {"new-thing": self._row("1.0", "v1.0")})
         self.assertEqual(drifted, [])
         self.assertEqual(unfetched, [])
+        self.assertEqual(no_release, [])
+
+    def test_no_fetch_evidence_is_unfetched_not_drift(self):
+        """pushed_at=None (github_freshness.py never fetched it this run -- a bounded
+        --max-repos run or a full fetch failure) must not be reported as drift just
+        because it differs from a real prior value."""
+        published = {"gitleaks": self._row("8.30.0", "v8.30.0")}
+        rebuilt = {"gitleaks": self._row("8.30.0", None, pushed_at=None)}
+        drifted, unfetched, no_release = fp.compute_drift(published, rebuilt)
+        self.assertEqual(drifted, [])
+        self.assertEqual(unfetched, ["gitleaks"])
+        self.assertEqual(no_release, [])
+
+    def test_n1_pin_change_is_not_hidden_when_latest_is_none_on_both_sides(self):
+        """Exact N1 reproduction (Opus, reproduced by Codex): skills-ref has no GitHub
+        releases or tags at all (upstream.latest is None on both sides) but does have
+        real fetch data (upstream.pushed_at set) -- catalogs/sota-convergence/
+        manifest-20260922.json already has 7 such rows (tavily-cli, skills-ref,
+        poppler, ...). A pin bump on one of these must still show as drift; the prior
+        implementation skipped straight to "unfetched" whenever latest was None,
+        without ever comparing pin, and hid this exact case.
+        """
+        published = {"skills-ref": self._row("0.1.0", None, pushed_at="2026-08-09")}
+        rebuilt = {"skills-ref": self._row("0.1.1", None, pushed_at="2026-08-09")}
+        drifted, unfetched, no_release = fp.compute_drift(published, rebuilt)
+        self.assertEqual([row[0] for row in drifted], ["skills-ref"])
+        self.assertEqual(drifted[0][1:3], ("0.1.0", "0.1.1"))
+        self.assertEqual(unfetched, [])
+        self.assertEqual(no_release, [])
+
+    def test_fetched_with_no_release_and_no_change_is_its_own_category(self):
+        """A component reliably fetched this run (pushed_at set, no recorded fetch
+        problem) but with no GitHub release or tag on either side, and no pin change,
+        is neither drift nor "unfetched" -- it was genuinely, successfully observed."""
+        published = {"tavily-cli": self._row("1.0.0", None, pushed_at="2026-09-21")}
+        rebuilt = {"tavily-cli": self._row("1.0.0", None, pushed_at="2026-09-21")}
+        drifted, unfetched, no_release = fp.compute_drift(published, rebuilt)
+        self.assertEqual(drifted, [])
+        self.assertEqual(unfetched, [])
+        self.assertEqual(no_release, ["tavily-cli"])
+
+    def test_n2_partial_error_with_tag_fallback_is_excluded_from_drift(self):
+        """Exact N2 reproduction (Opus finding, reproduced by Codex): a 503 on the
+        releases endpoint, worked around by a successful fallback to the tags
+        endpoint, still populates upstream.latest with a real-looking value --
+        github_freshness.py records this as a "partial_errors" entry, not a full
+        "error". That value must not be trusted as clean drift-comparison data just
+        because it is not None.
+        """
+        raw_repositories = {
+            "https://github.com/example/flaky": {
+                "slug": "example/flaky",
+                "latest_tag": "v1.2.0",
+                "partial_errors": {"releases": "503 Service Unavailable"},
+            },
+        }
+        published = {"flaky": self._row("1.1.0", "v1.1.0", pushed_at="2026-09-01",
+                                         repository="https://github.com/example/flaky")}
+        rebuilt = {"flaky": self._row("1.1.0", "v1.2.0", pushed_at="2026-09-20",
+                                       repository="https://github.com/example/flaky")}
+        drifted, unfetched, no_release = fp.compute_drift(published, rebuilt, raw_repositories)
+        self.assertEqual(drifted, [])
+        self.assertEqual(unfetched, ["flaky"])
+        self.assertEqual(no_release, [])
+
+    def test_full_error_record_is_unfetched_even_with_pushed_at_from_a_prior_run(self):
+        """A raw record with a top-level "error" (the repos/{slug} call itself
+        failed) must be treated as unfetched even if a retained pushed_at value from
+        an earlier successful run is still present in the rebuilt row."""
+        raw_repositories = {"https://github.com/example/down": {"slug": "example/down", "error": "404"}}
+        published = {"down": self._row("1.0.0", "v1.0.0", pushed_at="2026-08-01",
+                                        repository="https://github.com/example/down")}
+        rebuilt = {"down": self._row("1.0.0", "v1.0.0", pushed_at="2026-08-01",
+                                      repository="https://github.com/example/down")}
+        drifted, unfetched, no_release = fp.compute_drift(published, rebuilt, raw_repositories)
+        self.assertEqual(drifted, [])
+        self.assertEqual(unfetched, ["down"])
+        self.assertEqual(no_release, [])
+
+    def test_error_record_matched_by_slug_not_just_exact_url(self):
+        """_freshness_record_has_error() must also match via the raw record's own
+        normalized slug, the same fallback build_manifest.py's compute_upstream() uses,
+        not only an exact dict-key URL match."""
+        raw_repositories = {
+            "https://github.com/Example/Flaky.git": {
+                "slug": "example/flaky", "partial_errors": {"releases": "503"},
+            },
+        }
+        self.assertTrue(fp._freshness_record_has_error("https://github.com/example/flaky", raw_repositories))
+        self.assertFalse(fp._freshness_record_has_error("https://github.com/example/other", raw_repositories))
+        self.assertFalse(fp._freshness_record_has_error(None, raw_repositories))
+        self.assertFalse(fp._freshness_record_has_error("https://github.com/example/flaky", None))
 
 
 class DriftedComponentIdsTests(unittest.TestCase):
@@ -163,13 +258,29 @@ class BuildDriftReportTests(unittest.TestCase):
         import os
         os.chdir(self.temporary.name)
         self.addCleanup(os.chdir, self._original_cwd)
+        # build_drift_report() requires github-freshness.json to exist and be
+        # well-formed (N2b, fail closed); a clean, error-free default here keeps
+        # every test below focused on its own scenario. Tests exercising N2b or
+        # N2 override or remove this file explicitly.
+        self._write_freshness_document({"errors": 0, "partial_errors": 0, "repositories": {}})
+
+    def _write_freshness_document(self, document):
+        (self.work_dir / "github-freshness.json").write_text(json.dumps(document), encoding="utf-8")
 
     def _write_manifest(self, path, rows):
+        """`rows` is a list of (component_id, pin, latest, behind) or
+        (component_id, pin, latest, behind, pushed_at) 5-tuples; pushed_at
+        defaults to a fixed non-None date, i.e. "reliably fetched", unless a
+        test explicitly passes None to represent no fetch evidence."""
+        components = []
+        for row in rows:
+            component_id, pin, latest, behind, *rest = row
+            pushed_at = rest[0] if rest else "2026-09-01"
+            components.append({"id": component_id, "pin": pin,
+                                "upstream": {"latest": latest, "pushed_at": pushed_at},
+                                "pin_behind_upstream": behind})
         path.write_text(json.dumps({
-            "foundation": [{"components": [
-                {"id": component_id, "pin": pin, "upstream": {"latest": latest}, "pin_behind_upstream": behind}
-                for component_id, pin, latest, behind in rows
-            ]}],
+            "foundation": [{"components": components}],
             "trading": [], "counts": {"foundation_layers": 1},
         }), encoding="utf-8")
 
@@ -191,24 +302,151 @@ class BuildDriftReportTests(unittest.TestCase):
         self._write_manifest(self.published_dir / "manifest-20260922.json",
                               [("gitleaks", "8.30.0", "v8.30.0", False)])
         self._write_manifest(self.work_dir / "manifest-20260923.json",
-                              [("gitleaks", "8.30.0", None, False)])
+                              [("gitleaks", "8.30.0", None, False, None)])
         result = fp.build_drift_report(self.work_dir)
         self.assertEqual(result["drifted"], [])
         self.assertEqual(result["unfetched"], ["gitleaks"])
         self.assertEqual((self.work_dir / "drift-status.txt").read_text().strip(), "false")
 
-    def test_upstream_error_count_defaults_to_zero_when_file_absent(self):
-        self._write_manifest(self.published_dir / "manifest-20260922.json", [])
-        self._write_manifest(self.work_dir / "manifest-20260923.json", [])
-        fp.build_drift_report(self.work_dir)
-        self.assertEqual((self.work_dir / "upstream-errors.txt").read_text().strip(), "0")
+    def test_n1_skills_ref_pin_change_survives_build_drift_report(self):
+        """Exact N1 reproduction at the build_drift_report() level: a real
+        catalogs/sota-convergence-shaped manifest pair for a no-release repository
+        whose pin changed must show up in drift.md's table, not be silently
+        absorbed into the "no reliable upstream data" section."""
+        self._write_manifest(self.published_dir / "manifest-20260922.json",
+                              [("skills-ref", "0.1.0", None, False, "2026-08-09")])
+        self._write_manifest(self.work_dir / "manifest-20260923.json",
+                              [("skills-ref", "0.1.1", None, False, "2026-08-09")])
+        result = fp.build_drift_report(self.work_dir)
+        self.assertEqual(result["drifted"], ["skills-ref"])
+        self.assertEqual(result["unfetched"], [])
+        drift_text = (self.work_dir / "drift.md").read_text()
+        self.assertIn(fp.md_cell("skills-ref"), drift_text)
+        self.assertIn(fp.md_cell("0.1.0"), drift_text)
+        self.assertIn(fp.md_cell("0.1.1"), drift_text)
+
+    def test_n2_partial_errors_surface_as_their_own_output_and_exclude_the_row(self):
+        """Exact N2 reproduction at the build_drift_report() level: a 503 on the
+        releases endpoint with a tag-endpoint fallback (partial_errors, not error)
+        must both (a) exclude that component's row from drift, and (b) make
+        upstream-partial-errors.txt nonzero so propose's job condition can refuse
+        to run on this data."""
+        self._write_freshness_document({
+            "errors": 0, "partial_errors": 1,
+            "repositories": {
+                "https://github.com/example/flaky": {
+                    "slug": "example/flaky", "latest_tag": "v1.2.0",
+                    "partial_errors": {"releases": "503 Service Unavailable"},
+                },
+            },
+        })
+        self._write_manifest(self.published_dir / "manifest-20260922.json",
+                              [("flaky", "1.1.0", "v1.1.0", False)])
+        rebuilt_row = {"id": "flaky", "pin": "1.1.0", "repository": "https://github.com/example/flaky",
+                       "upstream": {"latest": "v1.2.0", "pushed_at": "2026-09-20"}, "pin_behind_upstream": False}
+        (self.work_dir / "manifest-20260923.json").write_text(
+            json.dumps({"foundation": [{"components": [rebuilt_row]}], "trading": [], "counts": {}}),
+            encoding="utf-8",
+        )
+        result = fp.build_drift_report(self.work_dir)
+        self.assertEqual(result["drifted"], [])
+        self.assertEqual(result["unfetched"], ["flaky"])
+        self.assertEqual((self.work_dir / "upstream-partial-errors.txt").read_text().strip(), "1")
+
+    def test_no_release_components_are_reported_but_not_counted_as_drift(self):
+        self._write_manifest(self.published_dir / "manifest-20260922.json",
+                              [("tavily-cli", "1.0.0", None, False)])
+        self._write_manifest(self.work_dir / "manifest-20260923.json",
+                              [("tavily-cli", "1.0.0", None, False)])
+        result = fp.build_drift_report(self.work_dir)
+        self.assertEqual(result["drifted"], [])
+        self.assertEqual(result["unfetched"], [])
+        self.assertEqual(result["no_release"], ["tavily-cli"])
+        self.assertEqual((self.work_dir / "drift-status.txt").read_text().strip(), "false")
+        self.assertIn(fp.md_cell("tavily-cli"), (self.work_dir / "drift.md").read_text())
 
     def test_upstream_error_count_reads_the_freshness_document(self):
+        self._write_freshness_document({"errors": 3, "partial_errors": 0, "repositories": {}})
         self._write_manifest(self.published_dir / "manifest-20260922.json", [])
         self._write_manifest(self.work_dir / "manifest-20260923.json", [])
-        (self.work_dir / "github-freshness.json").write_text(json.dumps({"errors": 3}), encoding="utf-8")
         fp.build_drift_report(self.work_dir)
         self.assertEqual((self.work_dir / "upstream-errors.txt").read_text().strip(), "3")
+
+    def test_n4_drift_md_never_contains_the_absolute_work_dir_path(self):
+        """N4: render_drift_markdown() must be given only rebuilt_path.name, never
+        the full path -- work_dir here stands in for $RUNNER_TEMP/freshness, an
+        absolute, host-specific path that must never land in committed evidence."""
+        self._write_manifest(self.published_dir / "manifest-20260922.json",
+                              [("gitleaks", "8.30.0", "v8.30.0", False)])
+        self._write_manifest(self.work_dir / "manifest-20260923.json",
+                              [("gitleaks", "8.30.1", "v8.30.1", False)])
+        fp.build_drift_report(self.work_dir)
+        drift_text = (self.work_dir / "drift.md").read_text()
+        self.assertNotIn(str(self.work_dir), drift_text)
+        self.assertIn("manifest-20260923.json", drift_text)
+
+    def test_missing_freshness_document_raises_fail_closed(self):
+        (self.work_dir / "github-freshness.json").unlink()
+        self._write_manifest(self.published_dir / "manifest-20260922.json", [])
+        self._write_manifest(self.work_dir / "manifest-20260923.json", [])
+        with self.assertRaises(fp.FreshnessProposeError):
+            fp.build_drift_report(self.work_dir)
+
+
+class LoadFreshnessDocumentTests(unittest.TestCase):
+    """N2b: a missing or broken github-freshness.json must fail closed (raise),
+    never silently read as "zero errors"."""
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.work_dir = Path(self.temporary.name)
+
+    def test_raises_when_file_is_missing(self):
+        with self.assertRaises(fp.FreshnessProposeError):
+            fp._load_freshness_document(self.work_dir)
+
+    def test_raises_on_malformed_json(self):
+        (self.work_dir / "github-freshness.json").write_text("not json", encoding="utf-8")
+        with self.assertRaises(fp.FreshnessProposeError):
+            fp._load_freshness_document(self.work_dir)
+
+    def test_raises_when_document_is_not_an_object(self):
+        (self.work_dir / "github-freshness.json").write_text("[1, 2, 3]", encoding="utf-8")
+        with self.assertRaises(fp.FreshnessProposeError):
+            fp._load_freshness_document(self.work_dir)
+
+    def test_loads_a_well_formed_document(self):
+        (self.work_dir / "github-freshness.json").write_text(
+            json.dumps({"errors": 0, "partial_errors": 0}), encoding="utf-8",
+        )
+        document = fp._load_freshness_document(self.work_dir)
+        self.assertEqual(document, {"errors": 0, "partial_errors": 0})
+
+
+class IntFieldTests(unittest.TestCase):
+    def test_upstream_error_count_reads_a_valid_int(self):
+        self.assertEqual(fp.upstream_error_count({"errors": 5}), 5)
+
+    def test_upstream_error_count_raises_on_missing_field(self):
+        with self.assertRaises(fp.FreshnessProposeError):
+            fp.upstream_error_count({})
+
+    def test_upstream_error_count_raises_on_non_int_field(self):
+        with self.assertRaises(fp.FreshnessProposeError):
+            fp.upstream_error_count({"errors": "3"})
+
+    def test_upstream_error_count_raises_on_bool_field(self):
+        # bool is a subclass of int in Python; must not silently pass as an int.
+        with self.assertRaises(fp.FreshnessProposeError):
+            fp.upstream_error_count({"errors": True})
+
+    def test_upstream_partial_error_count_reads_a_valid_int(self):
+        self.assertEqual(fp.upstream_partial_error_count({"partial_errors": 2}), 2)
+
+    def test_upstream_partial_error_count_raises_on_missing_field(self):
+        with self.assertRaises(fp.FreshnessProposeError):
+            fp.upstream_partial_error_count({})
 
 
 class SelectReceiptComponentIdsTests(unittest.TestCase):
@@ -562,9 +800,10 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         )
         self.assertIsNotNone(match, "workflow_dispatch.inputs.open_pr must be a boolean defaulting to false")
 
-    def test_freshness_job_exposes_drift_and_upstream_errors_outputs(self):
+    def test_freshness_job_exposes_drift_upstream_and_partial_errors_outputs(self):
         self.assertRegex(self.text, r"(?m)^\s+outputs:\s*\n\s+drift:\s*\$\{\{\s*steps\.diff\.outputs\.drift\s*\}\}")
         self.assertRegex(self.text, r"upstream_errors:\s*\$\{\{\s*steps\.diff\.outputs\.upstream_errors\s*\}\}")
+        self.assertRegex(self.text, r"partial_errors:\s*\$\{\{\s*steps\.diff\.outputs\.partial_errors\s*\}\}")
 
     def test_diff_step_no_longer_hardcodes_a_dated_manifest_filename(self):
         self.assertNotIn("manifest-20260922.json", self.text)
@@ -575,13 +814,33 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         # T3: the header text must not also be hand-duplicated in the YAML.
         self.assertNotIn("upstream latest (published)", body)
 
-    def test_single_concurrency_group_without_event_name_and_no_cancel(self):
-        match = re.search(r"(?m)^concurrency:\n((?:  [^\n]*\n)+)", self.text)
-        self.assertIsNotNone(match)
+    def test_no_top_level_workflow_concurrency_group(self):
+        # P2-3 (Codex): a workflow-level group with the default queue:single would let
+        # a plain scheduled activation silently replace a pending manual open_pr:true
+        # request. Concurrency now lives only on the `propose` job (see below), keyed
+        # so that can never happen; `freshness` itself carries no concurrency
+        # restriction at all (it only reads/reports, so parallel runs are harmless).
+        top_level = self.text.split("\njobs:\n", 1)[0]
+        self.assertNotRegex(top_level, r"(?m)^concurrency:")
+
+    def test_propose_job_concurrency_is_job_scoped_and_keyed_on_opt_in(self):
+        body = self._job_body("propose")
+        match = re.search(r"(?m)^    concurrency:\n((?:      [^\n]*\n)+)", body)
+        self.assertIsNotNone(match, "propose job needs its own concurrency block")
         block = match.group(1)
-        self.assertIn("group: ${{ github.workflow }}", block)
-        self.assertNotIn("github.event_name", block)
+        self.assertIn(f"group: {EXPECTED_PROPOSE_CONCURRENCY_GROUP}", block)
         self.assertIn("cancel-in-progress: false", block)
+        # queue: max is the documented fix for the same problem, but this
+        # repository's pinned actionlint 1.7.12 rejects that key (checked
+        # directly -- docs/decisions/2026-09-23-bot-pr-dispatch.md); it must not
+        # be reintroduced as an actual concurrency key without re-verifying
+        # actionlint support first (the surrounding prose may still *mention*
+        # `queue:` to explain why it is not used).
+        active_keys = [
+            line.strip().split(":", 1)[0] for line in block.splitlines()
+            if line.strip() and not line.strip().startswith("#")
+        ]
+        self.assertEqual(sorted(active_keys), sorted(["group", "cancel-in-progress"]))
 
     def test_propose_job_condition_matches_the_full_normalized_expression(self):
         match = re.search(r"(?m)^  propose:\n(?:.*?\n)*?    if:\s*>-\n((?:      .*\n)+)", self.text)
@@ -632,6 +891,35 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertEqual(invocations, [])
         self.assertIn("approval-required", body)
         self.assertIn("https://docs.github.com/en/actions/concepts/security/github_token", body)
+
+    def test_propose_job_states_the_correct_approval_ui_path(self):
+        # N3: approval happens on the PR itself (an "Awaiting approval" button near
+        # the merge box opens the merge status panel, which holds "Approve workflows
+        # to run"), not via the repository's Actions tab.
+        body = self._job_body("propose")
+        self.assertIn("Awaiting approval", body)
+        self.assertIn("Approve workflows to run", body)
+        self.assertIn("merge box", body)
+        self.assertNotIn("Approve and run workflow", body)
+        self.assertIn("30 days", body)
+
+    def test_propose_job_cites_the_current_github_token_exception_wording(self):
+        # N3: the older paraphrase ("with the exception of workflow_dispatch and
+        # repository_dispatch, will not create") must not reappear; the current
+        # docs phrase it as "... will not create a new workflow run, with the
+        # following exceptions: ...".
+        body = self._job_body("propose")
+        self.assertIn("with the following exceptions", body)
+        outdated = [line for line in body.splitlines() if "with the exception of" in line]
+        self.assertEqual(outdated, [])
+
+    def test_force_create_branch_step_documents_that_it_discards_prior_commits(self):
+        body = self._job_body("propose")
+        branch_step_match = re.search(
+            r"(?ms)^      - name: Observe the remote evidence branch.*?(?=^      - name:|\Z)", body,
+        )
+        self.assertIsNotNone(branch_step_match, "force-create-branch step not found")
+        self.assertIn("discard", branch_step_match.group(0).lower())
 
     def test_propose_job_uses_force_with_lease_not_plain_force(self):
         body = self._job_body("propose")

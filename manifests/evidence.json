@@ -3008,8 +3008,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "e99f3808a2806b43dbf3e50810d9673a7c01a555949df2adde2e1b4a4bdc8c54",
-      "bytes": 16918
+      "sha256": "8a5fb5e713f4fd3911065443e7a644b66924402d23a78307de80c3c73d414356",
+      "bytes": 19072
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -8039,8 +8039,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "45217fbd61f2c56d9efbec1734c273a5009d41439cd4616dbe50d4cc47708de0",
-      "bytes": 49992
+      "sha256": "793219a132775ad779acd719bfe9588939f558e65c6aebdaf8c86b4bfb00a224",
+      "bytes": 52998
     },
     {
       "path": "docs/grand-catalog-handbook.md",

@@ -56,6 +56,11 @@ _DRIFT_ROW = re.compile(r"^\|\s*([^|]+?)\s*\|.*\|$")
 _SEPARATOR_ROW = re.compile(r"\A\|[\s:|-]+\|\Z")
 EXPLORER_PATH = "docs/ecosystem/index.html"
 PUBLISHED_MANIFEST_DIR = "catalogs/sota-convergence"
+# Mirrors tools/sota-convergence/build_manifest.py's github_repo_slug() (kept
+# independent here, the same way that module's own copy mirrors
+# github_freshness.py's, so this module has no import-time dependency on a
+# sibling script -- see that function's docstring).
+_GITHUB_URL_RE = re.compile(r"^https?://github\.com/([^/\s]+)/([^/\s#?]+)")
 
 
 class FreshnessProposeError(ValueError):
@@ -93,28 +98,78 @@ def manifest_component_rows(manifest: dict) -> dict[str, dict]:
     return rows
 
 
-def compute_drift(published_rows: dict, rebuilt_rows: dict):
+def _github_repo_slug(url) -> str | None:
+    match = _GITHUB_URL_RE.match(url or "")
+    if not match:
+        return None
+    owner, repo = match.group(1), match.group(2)
+    if repo.lower().endswith(".git"):
+        repo = repo[: -len(".git")]
+    return f"{owner}/{repo}".lower()
+
+
+def _freshness_record_has_error(repository, raw_repositories: dict) -> bool:
+    """True if github-freshness.json's raw per-repo record for ``repository``
+    (github-freshness.json's "repositories" field, keyed by URL, each record
+    optionally carrying its own "slug") shows a fetch problem: either the
+    top-level ``repos/{slug}`` call itself failed (``record["error"]``), or a
+    releases/tags/commit sub-call failed and was worked around
+    (``record["partial_errors"]``) -- for example a 503 on the releases
+    endpoint whose fallback to the tags endpoint still populated a value.
+    Matches by exact URL first, then by normalized GitHub slug, the same two
+    ways ``build_manifest.py``'s own ``compute_upstream()`` resolves a
+    repository to its freshness record.
+    """
+    if not repository or not isinstance(raw_repositories, dict):
+        return False
+    record = raw_repositories.get(repository)
+    if record is None:
+        slug = _github_repo_slug(repository)
+        if slug:
+            for candidate in raw_repositories.values():
+                if isinstance(candidate, dict) and (candidate.get("slug") or "").lower() == slug:
+                    record = candidate
+                    break
+    if not isinstance(record, dict):
+        return False
+    return bool(record.get("error")) or bool(record.get("partial_errors"))
+
+
+def compute_drift(published_rows: dict, rebuilt_rows: dict, raw_repositories: dict | None = None):
     """Compare two manifest_component_rows() outputs.
 
-    Returns ``(drifted, unfetched)``. ``drifted`` is a list of
-    ``(id, old_pin, new_pin, old_latest, new_latest, old_behind, new_behind)``
-    tuples for a real pin/upstream change. ``unfetched`` lists ids whose
-    rebuilt row's ``upstream.latest`` is ``None`` -- ``build_manifest.py``'s
-    ``compute_upstream()`` returns ``latest=None`` when
-    ``github_freshness.py`` never fetched that repository this run (for
-    example because ``--max-repos`` bounded the run, or the API call
-    errored), so comparing that missing value against a real prior value
-    would report every such repository as "drifted" even though nothing was
-    actually observed to change. Those ids are excluded from ``drifted`` and
-    reported separately instead.
+    Returns ``(drifted, unfetched, no_release)``.
+
+    - ``drifted``: ``(id, old_pin, new_pin, old_latest, new_latest,
+      old_behind, new_behind)`` tuples. ``pin`` is always compared,
+      regardless of whether either side's ``upstream.latest`` is known --
+      a pin bump is real drift even for a repository with no GitHub
+      releases or tags at all.
+    - ``unfetched``: ids the fresh manifest has no reliable data for this
+      run -- ``upstream.pushed_at`` is ``None`` (``github_freshness.py``
+      never fetched that repository this run, e.g. a bounded ``--max-repos``
+      run or a full fetch failure) or the raw freshness record shows a
+      fetch problem for it (see ``_freshness_record_has_error``, e.g. a
+      releases-endpoint error papered over by a tags-endpoint fallback).
+      These are excluded from both ``drifted`` and ``no_release`` since
+      nothing reliable was observed either way.
+    - ``no_release``: ids that *were* reliably fetched this run
+      (``pushed_at`` present, no recorded fetch problem) but whose
+      ``upstream.latest`` is genuinely ``None`` on both sides -- the
+      repository simply has no GitHub release or tag (for example
+      ``tavily-cli``, ``skills-ref``, ``poppler`` in the 2026-09-22
+      manifest). Not drift, and not "unfetched" either.
     """
-    drifted, unfetched = [], []
+    drifted, unfetched, no_release = [], [], []
     for component_id, new in sorted(rebuilt_rows.items()):
         old = published_rows.get(component_id)
         if old is None:
             continue
-        new_latest = (new.get("upstream") or {}).get("latest")
-        if new_latest is None:
+        new_upstream = new.get("upstream") or {}
+        new_latest = new_upstream.get("latest")
+        if new_upstream.get("pushed_at") is None or _freshness_record_has_error(
+            new.get("repository"), raw_repositories,
+        ):
             unfetched.append(component_id)
             continue
         old_latest = (old.get("upstream") or {}).get("latest")
@@ -123,15 +178,17 @@ def compute_drift(published_rows: dict, rebuilt_rows: dict):
             drifted.append((component_id, old.get("pin"), new.get("pin"),
                              old_latest, new_latest,
                              old.get("pin_behind_upstream"), new.get("pin_behind_upstream")))
-    return drifted, unfetched
+        elif new_latest is None:
+            no_release.append(component_id)
+    return drifted, unfetched, no_release
 
 
-def render_drift_markdown(published_path, rebuilt_path, published: dict, rebuilt: dict,
-                           drifted: list, unfetched: list) -> str:
+def render_drift_markdown(published_path, rebuilt_name: str, published: dict, rebuilt: dict,
+                           drifted: list, unfetched: list, no_release: list) -> str:
     lines = [
         "# Catalog freshness drift", "",
         f"Published manifest: `{published_path}` (counts: {published.get('counts')})",
-        f"Rebuilt manifest: `{rebuilt_path}` (counts: {rebuilt.get('counts')})", "",
+        f"Rebuilt manifest: `{rebuilt_name}` (counts: {rebuilt.get('counts')})", "",
         "This diff is report-only; it changes no catalog selection.", "",
     ]
     if drifted:
@@ -143,35 +200,66 @@ def render_drift_markdown(published_path, rebuilt_path, published: dict, rebuilt
     if unfetched:
         lines += [
             "",
-            f"{len(unfetched)} component(s) had no fetched upstream 'latest' this run (an "
-            "unfinished/bounded fetch or an API error, not an observed change) and are excluded "
-            "from the drift count above:",
+            f"{len(unfetched)} component(s) have no reliable upstream data this run (an "
+            "unfinished/bounded fetch, or a releases/tags/commit fetch problem for that repository) "
+            "and are excluded from the drift count above:",
             "",
             ", ".join(md_cell(component_id) for component_id in sorted(unfetched)),
+        ]
+    if no_release:
+        lines += [
+            "",
+            f"{len(no_release)} component(s) were fetched successfully this run but have no GitHub "
+            "release or tag at all; this is not drift:",
+            "",
+            ", ".join(md_cell(component_id) for component_id in sorted(no_release)),
         ]
     return "\n".join(lines) + "\n"
 
 
-def upstream_error_count(work_dir: Path) -> int:
-    """The ``errors`` count ``github_freshness.py`` records in its own output
-    document, or 0 if that file is absent or malformed. Never treated as a
-    hard failure here; ``propose``'s own job condition decides what a
-    nonzero count means for whether it may run."""
+def _load_freshness_document(work_dir: Path) -> dict:
+    """Load github-freshness.json, failing closed (N2b): raises rather than
+    returning an empty/zero-like default when the file is missing,
+    unreadable, or not a JSON object, so a broken or absent freshness
+    document can never be silently treated as "zero errors" downstream."""
     freshness_path = work_dir / "github-freshness.json"
-    if not freshness_path.is_file():
-        return 0
     try:
         document = json.loads(freshness_path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, ValueError):
-        return 0
-    count = document.get("errors") if isinstance(document, dict) else None
-    return count if isinstance(count, int) and not isinstance(count, bool) else 0
+    except (OSError, UnicodeError, ValueError) as error:
+        raise FreshnessProposeError(f"could not read {freshness_path}: {error}") from error
+    if not isinstance(document, dict):
+        raise FreshnessProposeError(f"{freshness_path}: expected a JSON object")
+    return document
+
+
+def _int_field(document: dict, field: str, source_hint: str) -> int:
+    value = document.get(field)
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise FreshnessProposeError(f"{source_hint}: missing or invalid integer {field!r} field")
+    return value
+
+
+def upstream_error_count(document: dict) -> int:
+    """The ``errors`` count from an already-loaded github-freshness.json
+    document (see ``_load_freshness_document``). Fails closed (N2b): raises
+    rather than defaulting to 0 when the field is missing or not an int."""
+    return _int_field(document, "errors", "github-freshness.json")
+
+
+def upstream_partial_error_count(document: dict) -> int:
+    """The ``partial_errors`` count from an already-loaded
+    github-freshness.json document. A nonzero count means at least one
+    repository's releases/tags/commit sub-fetch failed and was worked
+    around with a fallback (N2) -- ``propose``'s job condition treats this
+    the same as a full fetch error: it must be 0 before a PR is opened."""
+    return _int_field(document, "partial_errors", "github-freshness.json")
 
 
 def build_drift_report(work_dir: Path) -> dict:
-    """Rebuild ``drift.md``, ``drift-status.txt`` and ``upstream-errors.txt``
-    from the newest rebuilt manifest in ``work_dir`` and the newest published
-    manifest in the checkout (current working directory).
+    """Rebuild ``drift.md``, ``drift-status.txt``, ``upstream-errors.txt``
+    and ``upstream-partial-errors.txt`` from the newest rebuilt manifest in
+    ``work_dir``, the newest published manifest in the checkout (current
+    working directory), and ``work_dir``'s ``github-freshness.json``.
 
     Called both by ``catalog-freshness.yml``'s "Diff the rebuilt manifest"
     step (imported directly from a small inline script, not reimplemented
@@ -191,14 +279,29 @@ def build_drift_report(work_dir: Path) -> dict:
     published_path = published_candidates[-1]
     published = json.loads(published_path.read_text(encoding="utf-8"))
 
-    drifted, unfetched = compute_drift(manifest_component_rows(published), manifest_component_rows(rebuilt))
-    markdown = render_drift_markdown(published_path, rebuilt_path, published, rebuilt, drifted, unfetched)
+    freshness_document = _load_freshness_document(work_dir)
+    raw_repositories = freshness_document.get("repositories")
+    if not isinstance(raw_repositories, dict):
+        raw_repositories = {}
+
+    drifted, unfetched, no_release = compute_drift(
+        manifest_component_rows(published), manifest_component_rows(rebuilt), raw_repositories,
+    )
+    # rebuilt_path.name only (N4): rebuilt_path lives under $RUNNER_TEMP, an
+    # absolute, host-specific path that must never be written into committed
+    # evidence; published_path is already a safe, relative repository path.
+    markdown = render_drift_markdown(published_path, rebuilt_path.name, published, rebuilt,
+                                      drifted, unfetched, no_release)
     (work_dir / "drift.md").write_text(markdown, encoding="utf-8")
     (work_dir / "drift-status.txt").write_text("true\n" if drifted else "false\n", encoding="utf-8")
-    (work_dir / "upstream-errors.txt").write_text(f"{upstream_error_count(work_dir)}\n", encoding="utf-8")
+    (work_dir / "upstream-errors.txt").write_text(f"{upstream_error_count(freshness_document)}\n", encoding="utf-8")
+    (work_dir / "upstream-partial-errors.txt").write_text(
+        f"{upstream_partial_error_count(freshness_document)}\n", encoding="utf-8",
+    )
     return {
         "drifted": [row[0] for row in drifted],
         "unfetched": unfetched,
+        "no_release": no_release,
         "published_path": published_path.as_posix(),
         "rebuilt_path": rebuilt_path.as_posix(),
     }
@@ -250,9 +353,10 @@ def build_receipt(receipt_id: str, component_ids: list[str], drifted_component_c
             "changes no catalog selection file.",
             "component_ids lists only this run's drifted rows whose id is also a manifests/stack.json "
             "component; it is not a claim that every drifted id in the full drift report was reviewed.",
-            "Components with no fetched upstream 'latest' this run (an unfinished/bounded fetch or an "
-            "API error) are excluded from the drift count and from component_ids; they are not claimed "
-            "to have been checked.",
+            "Components with no reliable upstream data this run (an unfinished/bounded fetch, or a "
+            "releases/tags/commit fetch problem for that repository) are excluded from the drift count "
+            "and from component_ids; they are not claimed to have been checked. A component fetched "
+            "successfully but with no GitHub release or tag at all is also not counted as drift.",
             "The rebuilt manifest and drift table are read from this run's own catalog-freshness "
             "workflow artifact; this receipt does not independently re-fetch upstream sources.",
         ],
