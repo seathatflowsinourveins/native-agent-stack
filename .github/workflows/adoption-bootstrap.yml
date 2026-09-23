@@ -102,7 +102,14 @@ jobs:
   # native client. A green run here never flips adoption/manifest.json's
   # macos-arm64 platform profile out of drafted_not_accepted, and never flips
   # scripts/adoption_status.py's platform.supported, which stays false because
-  # supported_platforms pins linux/x86_64 only.
+  # supported_platforms pins linux/x86_64 only. Round 3h added the embedding
+  # acceptance check (tools/adoption/embed_acceptance.py against a live
+  # llama-embed launchd agent): this is HOSTED-RUNNER EVIDENCE ONLY -- a
+  # GitHub-hosted macOS Apple Silicon runner is CPU-only, not a real Mac
+  # workstation with Metal actually engaged, so a green run here establishes
+  # the endpoint, the model and the request/response shape, never the Metal
+  # backend a real Mac would use; see "Record which backend llama-server's
+  # own log reports" below and adoption/platforms/macos-arm64.md.
   bootstrap-macos:
     runs-on: macos-15
     timeout-minutes: 30
@@ -215,6 +222,78 @@ jobs:
           export ECO_INSTALL_ROOT="$RUNNER_TEMP/eco"
           bash adoption/launchd/launchd-agents.sh render
           bash adoption/launchd/launchd-agents.sh lint
+      # Round 3h (2026-09-23 readiness audit): the llama-embed launchd
+      # agent's template ran with no model argument at all, so nothing had
+      # ever proven the endpoint serves the pinned model correctly. Cached
+      # by its own sha256 (adoption/pins-macos-arm64.json's models[0]), not
+      # a version tag, so a changed pin -- a different hash -- always misses
+      # the cache and re-downloads, rather than silently reusing a stale
+      # cached file under a reused key.
+      - name: Cache the pinned embedding model
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/eco/state/models/embeddinggemma-300M-Q8_0.gguf
+          key: macos-embed-model-b5ce9d77a3fc4b3b39ccb5643c36777911cc4eb46a66962eadfa3f5f60490d63
+      - name: Bootstrap the llama-embed launchd agent, run the embedding acceptance check, then boot it out
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ECO_INSTALL_ROOT="$RUNNER_TEMP/eco"
+          # The bootstrap step above already downloaded and sha256-verified
+          # the model into this exact path via install_embed_model; the
+          # cache step above may also have restored it there already
+          # (fetch() is idempotent: it checks an existing destination's own
+          # checksum before ever downloading again), so this is never a
+          # second, redundant fetch either way.
+          bash adoption/launchd/launchd-agents.sh install --label com.native-stack.llama-embed
+          healthy=0
+          for _ in $(seq 1 30); do
+            if curl --fail --silent --show-error http://127.0.0.1:8232/health >/dev/null 2>&1; then
+              healthy=1
+              break
+            fi
+            sleep 1
+          done
+          acceptance_exit=0
+          if [ "$healthy" -eq 1 ]; then
+            python3 tools/adoption/embed_acceptance.py http://127.0.0.1:8232 \
+              evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json \
+              > "$RUNNER_TEMP/embed-acceptance-result.json" || acceptance_exit=$?
+            cat "$RUNNER_TEMP/embed-acceptance-result.json"
+          else
+            echo "llama-embed launchd agent never answered http://127.0.0.1:8232/ within 30s." >&2
+            acceptance_exit=1
+          fi
+          cp "$ECO_INSTALL_ROOT/state/logs/com.native-stack.llama-embed.err.log" \
+            "$RUNNER_TEMP/llama-embed-startup.log" 2>/dev/null || true
+          bash adoption/launchd/launchd-agents.sh remove --label com.native-stack.llama-embed
+          exit "$acceptance_exit"
+      - name: Record which backend llama-server's own log reports
+        if: always()
+        shell: bash
+        run: |
+          set -uo pipefail
+          log="$RUNNER_TEMP/llama-embed-startup.log"
+          if [ ! -f "$log" ]; then
+            echo "No llama-embed startup log was captured (the agent likely never started); nothing to report."
+            exit 0
+          fi
+          # This runner is CPU-only (no discrete GPU, and GitHub's macOS
+          # Apple Silicon runners do not expose Metal to a sandboxed
+          # process the way a real Mac workstation does); a real Mac run is
+          # what would show Metal actually engaging. Best-effort only --
+          # never fails the job on its own, and never asserts a specific
+          # backend: llama.cpp's own startup log wording is not a stable
+          # API this project should assume without checking (see the
+          # launchctl(1) caveat in adoption/platforms/macos-arm64.md's
+          # untested-boundary note for the same reasoning applied there).
+          if grep -qi 'metal' "$log"; then
+            echo "Backend reported in the startup log: Metal (see the uploaded llama-embed-startup.log for the exact line)."
+          elif grep -qi -E 'cpu|blas' "$log"; then
+            echo "Backend reported in the startup log: CPU (see the uploaded llama-embed-startup.log for the exact line)."
+          else
+            echo "Backend not identified from a fixed keyword search; inspect the uploaded llama-embed-startup.log directly."
+          fi
       - name: Bootstrap the qdrant launchd agent, health-check it, then boot it out
         shell: bash
         run: |
@@ -256,7 +335,8 @@ jobs:
         run: |
           set -uo pipefail
           mkdir -p macos-status
-          for file in status.json sw_vers.txt "$RUNNER_TEMP/eco/installed-versions.txt" "$RUNNER_TEMP/qdrant-health.json"; do
+          for file in status.json sw_vers.txt "$RUNNER_TEMP/eco/installed-versions.txt" "$RUNNER_TEMP/qdrant-health.json" \
+                      "$RUNNER_TEMP/embed-acceptance-result.json" "$RUNNER_TEMP/llama-embed-startup.log"; do
             if [ -f "$file" ]; then
               cp "$file" macos-status/
             else

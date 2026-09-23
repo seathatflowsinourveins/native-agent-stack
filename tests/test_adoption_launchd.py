@@ -37,6 +37,7 @@ FIXTURE_VALUES = {
     "HOME": "/Users/example",
     "ECO_ROOT": "/Users/example/.local/share/codex-ecosystem",
     "AI_MEMORY_URL": "127.0.0.1:49374",
+    "EMBED_MODEL_PATH": "/Users/example/.local/share/codex-ecosystem/state/models/embeddinggemma-300M-Q8_0.gguf",
 }
 
 
@@ -126,6 +127,18 @@ class TemplateRenderAndSchemaTests(unittest.TestCase):
         self.assertIn("--port", arguments)
         self.assertEqual(arguments[arguments.index("--port") + 1], "8232")
 
+    def test_llama_embed_names_the_model_file_via_m_flag(self):
+        # Round 3h (2026-09-23 readiness audit defect): the template used to
+        # run llama-server with no model argument at all -- KeepAlive would
+        # restart it in a loop forever, never actually serving embeddings.
+        rendered = string.Template(self.templates["com.native-stack.llama-embed.plist"].read_text()) \
+            .substitute(FIXTURE_VALUES)
+        data = plistlib.loads(rendered.encode("utf-8"))
+        arguments = data["ProgramArguments"]
+        self.assertIn("-m", arguments)
+        self.assertEqual(arguments[arguments.index("-m") + 1], FIXTURE_VALUES["EMBED_MODEL_PATH"])
+        self.assertTrue(arguments[arguments.index("-m") + 1].endswith("embeddinggemma-300M-Q8_0.gguf"))
+
     def test_qdrant_declares_a_working_directory_under_state(self):
         rendered = string.Template(self.templates["com.native-stack.qdrant.plist"].read_text()) \
             .substitute(FIXTURE_VALUES)
@@ -199,7 +212,8 @@ class RenderLaunchdScriptTests(unittest.TestCase):
                 [sys.executable, str(RENDER_SCRIPT), "--out", str(out_dir),
                  "--set", "HOME=/Volumes/R&D/home",
                  "--set", "ECO_ROOT=/Volumes/R&D/eco",
-                 "--set", "AI_MEMORY_URL=127.0.0.1:49374"],
+                 "--set", "AI_MEMORY_URL=127.0.0.1:49374",
+                 "--set", "EMBED_MODEL_PATH=/Volumes/R&D/eco/state/models/embeddinggemma-300M-Q8_0.gguf"],
                 capture_output=True, text=True, timeout=30,
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -218,7 +232,8 @@ class RenderLaunchdScriptTests(unittest.TestCase):
                 [sys.executable, str(RENDER_SCRIPT), "--out", str(out_dir),
                  "--set", "HOME=/Users/example",
                  "--set", "ECO_ROOT=/Users/example/.local/share/codex-ecosystem",
-                 "--set", "AI_MEMORY_URL=127.0.0.1:49374"],
+                 "--set", "AI_MEMORY_URL=127.0.0.1:49374",
+                 "--set", "EMBED_MODEL_PATH=/Users/example/.local/share/codex-ecosystem/state/models/embeddinggemma-300M-Q8_0.gguf"],
                 capture_output=True, text=True, timeout=30,
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -1139,6 +1154,7 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             host_file = ROOT / "adoption" / "hosts" / "test-launchd-other-host.json"
             host_file.write_text(json.dumps({
                 "HOME": str(fake_home), "ECO_ROOT": str(other_root), "AI_MEMORY_URL": "127.0.0.1:49374",
+                "EMBED_MODEL_PATH": str(other_root / "state" / "models" / "embeddinggemma-300M-Q8_0.gguf"),
             }))
             self.addCleanup(host_file.unlink, missing_ok=True)
             log = tmp_path / "launchctl.log"

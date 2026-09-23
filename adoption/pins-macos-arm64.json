@@ -138,5 +138,19 @@
       "checksum_ref": "npm view socraticode@1.14.0 dist.integrity read 2026-09-23; the tarball was downloaded to a scratch directory and independently sha256- and sha512-hashed, both matching",
       "install_note": "Not part of adoption/pins-linux-x86_64.json: recipes/README.md documents socraticode 1.14.0 with --ignore-scripts as a manual Linux install recipe rather than a pins-file entry (`npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.14.0\" --ignore-scripts socraticode@1.14.0`). This pin brings macOS the same reviewed version and --ignore-scripts convention, so socraticode is no longer a documented, unpinned skip on this platform. AGPL-3.0-only; --ignore-scripts (this pin's own ignore_scripts:true field, read by install_npm) skips native postinstall/build steps exactly like the Linux recipe. Only a reviewed archive hash, not a claim of a working native codebase-index handshake on macOS."
     }
+  ],
+  "models": [
+    {
+      "id": "embeddinggemma-300M-Q8_0",
+      "hf_repo": "ggml-org/embeddinggemma-300M-GGUF",
+      "hf_revision": "0f741b5a6585bd53aeb15cd1372c56f2a0f65e12",
+      "file": "embeddinggemma-300M-Q8_0.gguf",
+      "url": "https://huggingface.co/ggml-org/embeddinggemma-300M-GGUF/resolve/0f741b5a6585bd53aeb15cd1372c56f2a0f65e12/embeddinggemma-300M-Q8_0.gguf",
+      "sha256": "b5ce9d77a3fc4b3b39ccb5643c36777911cc4eb46a66962eadfa3f5f60490d63",
+      "size": 333590944,
+      "checksum_source": "huggingface_lfs_oid_plus_local_rehash",
+      "checksum_ref": "Hugging Face tree API lfs.oid for ggml-org/embeddinggemma-300M-GGUF@0f741b5a6585bd53aeb15cd1372c56f2a0f65e12/embeddinggemma-300M-Q8_0.gguf, equal to a local sha256sum, read 2026-09-23",
+      "install_note": "Round 3h: the llama-embed launchd agent had no -m flag at all (it would restart in a loop, never serving embeddings). Downloaded and verified by bootstrap-macos.sh's dedicated install_embed_model step (not the generic tools[] dispatch above: this is a single raw GGUF file, never an archive to extract) into $ECO_INSTALL_ROOT/state/models/embeddinggemma-300M-Q8_0.gguf. The llama-embed template's -m flag names this same path via EMBED_MODEL_PATH (adoption/hosts/<host>.json or --set). Kept in this separate models[] section, not tools[], so it is never swept into adoption/manifest.json profile-component coverage."
+    }
   ]
 }

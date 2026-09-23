@@ -59,6 +59,10 @@ repo_root="$(cd -- "$script_dir/../.." >/dev/null 2>&1 && pwd -P)"
 
 eco_root="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
 ai_memory_url="${AI_MEMORY_URL:-127.0.0.1:49374}"
+# Round 3h: the path install_embed_model (adoption/bootstrap-macos.sh)
+# downloads and sha256-verifies the pinned embedding model to; the
+# llama-embed template's own -m flag names this same path.
+embed_model_path="${EMBED_MODEL_PATH:-$eco_root/state/models/embeddinggemma-300M-Q8_0.gguf}"
 state_dir="$eco_root/state/launchd"
 default_render_dir="$state_dir/rendered"
 launch_agents_dir="$HOME/Library/LaunchAgents"
@@ -304,7 +308,8 @@ cmd_render() {
   if [[ -n "$host" ]]; then
     render_args+=(--host "$host")
   else
-    render_args+=(--set "HOME=$HOME" --set "ECO_ROOT=$eco_root" --set "AI_MEMORY_URL=$ai_memory_url")
+    render_args+=(--set "HOME=$HOME" --set "ECO_ROOT=$eco_root" --set "AI_MEMORY_URL=$ai_memory_url" \
+                  --set "EMBED_MODEL_PATH=$embed_model_path")
   fi
   python3 "$repo_root/tools/adoption/render_launchd.py" "${render_args[@]}"
 }

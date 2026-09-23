@@ -210,8 +210,12 @@ That is not a workstation acceptance:
 - launchd remains unrun. No agent in the table below has been bootstrapped,
   kickstarted or booted out on any Mac, hosted or otherwise.
 - The embedding acceptance below (port 8232, 768-dimension response, ≥ 0.99
-  cosine against a Linux reference vector) remains unrun, and a sandboxed
-  runner is exactly the context where Metal may be unavailable.
+  cosine against a Linux reference vector, now captured -- see "Acceptance
+  test for the 24 GB default" below) remains unrun on any Mac; a hosted
+  runner step exists (round 3h, `.github/workflows/adoption-bootstrap.yml`)
+  but a sandboxed CPU-only runner is exactly the context where Metal may be
+  unavailable, so it establishes the endpoint and the model, not the Metal
+  backend.
 - Native sign-in for Codex, Claude and GitHub cannot happen on a hosted runner.
 
 Until a real Mac produces a receipt, this profile stays
@@ -267,10 +271,36 @@ must return a 768-dimension vector, and its cosine similarity must be **≥
 embeddinggemma-300M-Q8_0 model through llama.cpp **on a Linux host** for the
 same fixed string (not against the Linux profile's 2048-dim Nemotron
 response, which is a different model and dimension and cannot be compared by
-cosine similarity at all). No such Linux reference vector has been captured
-and no such run has occurred on macOS; this is the test to run, not a result.
-The 48 GB Nemotron upgrade, if ever activated, would instead compare against
-the existing 2048-dim Linux Nemotron reference at 8231.
+cosine similarity at all). The 48 GB Nemotron upgrade, if ever activated,
+would instead compare against the existing 2048-dim Linux Nemotron
+reference at 8231.
+
+**The Linux reference vector now exists** (2026-09-23):
+[`evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json`](../../evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json)
+-- llama.cpp b11057 (commit `59657a613`), the `ubuntu-x64` CPU build, running
+the identical pinned `embeddinggemma-300M-Q8_0.gguf`
+(`adoption/pins-macos-arm64.json`'s own `models[0]`, same sha256), captured
+against the exact request body this reference records, L2-normalized,
+repeat cosine 1.0 (i.e. the same request run twice against the same model
+returns the identical vector, establishing the comparison itself is
+deterministic before ever comparing across hosts). This is a Linux-side
+capture, never a macOS observation, and it does not by itself establish
+what a real Mac's Metal backend would return. The one command a real Mac
+(or the hosted CI step below) runs against a live `llama-server` on port
+8232 is:
+
+```sh
+python3 tools/adoption/embed_acceptance.py http://127.0.0.1:8232 \
+  evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json
+```
+
+It sends the reference's own exact request body, checks the response's
+dimension and its cosine similarity against the reference's own embedding,
+and prints a JSON result (`"passed": true`/`false`, the actual cosine, and
+which backend to record separately from `llama-server`'s own startup log --
+this script cannot itself tell Metal from CPU). Exit 0 on a pass, 1
+otherwise, in both cases with the numbers in the JSON, never a bare
+pass/fail with nothing to inspect.
 
 ### Considered and not activated
 

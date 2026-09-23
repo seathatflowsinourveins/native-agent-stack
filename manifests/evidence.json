@@ -3018,8 +3018,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "aed4f261b5e143b5b17d6803c037466c865f21482215b03085b6013e7d193752",
-      "bytes": 18407
+      "sha256": "07bd394e0e78c303a0de0cd0a5ba37bdff998d92e0d56a4a85e4771b383acf27",
+      "bytes": 23200
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -3123,8 +3123,8 @@
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "fb391dcca6c48f8316981473a11d39dd60d0e679f58c3eb7459849a41cd08617",
-      "bytes": 49394
+      "sha256": "34e0d78936ffb7521cf9bae2a462886db2f6994155a0e4a67b4bd535c3501218",
+      "bytes": 51796
     },
     {
       "path": "adoption/bootstrap.md",
@@ -3148,8 +3148,8 @@
     },
     {
       "path": "adoption/hosts/macos-example.json",
-      "sha256": "703c991f61a78d403386596bbb08d43419791e08c71adb445dc8b034e00f19dc",
-      "bytes": 474
+      "sha256": "4f73e4e2ec963e69f44b08dc386c33e3a348280de937d5d3fdcbd8bfe3a7f9b2",
+      "bytes": 586
     },
     {
       "path": "adoption/launchd/com.native-stack.ai-memory.plist.template",
@@ -3158,8 +3158,8 @@
     },
     {
       "path": "adoption/launchd/com.native-stack.llama-embed.plist.template",
-      "sha256": "4401c18ea2f57b51128c16c484fccdc310be5464c01fc302256a5e9ff09840d1",
-      "bytes": 2062
+      "sha256": "dc6f09818861f2e190e8ed5b65a828494d12bd2116400210b14a305b34195c52",
+      "bytes": 2511
     },
     {
       "path": "adoption/launchd/com.native-stack.qdrant.plist.template",
@@ -3168,8 +3168,8 @@
     },
     {
       "path": "adoption/launchd/launchd-agents.sh",
-      "sha256": "ef33fe03a054f91d47701080ba875144a9fb609d6e17ac78d9dc865267c9be38",
-      "bytes": 28554
+      "sha256": "f20b5a8ab5522c37c14d1cb451d0555c5d857074bc14e76eeb8b4718acc2fd31",
+      "bytes": 28907
     },
     {
       "path": "adoption/lifecycle.md",
@@ -3218,8 +3218,8 @@
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "82be4ffd2125f887de73658d59ad896ff2ee9f820de029d2c41b9825a8474623",
-      "bytes": 17784
+      "sha256": "c5f6d5bb506a53c575f24d6b358a12fb8705cfa6609d3b88a8c6003769169287",
+      "bytes": 19197
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -3228,8 +3228,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "4d56bcfc57602f16d9ebaebc0a3d38a6fea116b19f860bf59e4f6fd89d4ea4a0",
-      "bytes": 26962
+      "sha256": "5f6d3e43595502049f943da43f17f700c4b3b1e4b3164dd1e7665c1779e464e6",
+      "bytes": 28675
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -11028,6 +11028,11 @@
       "bytes": 16887
     },
     {
+      "path": "evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json",
+      "sha256": "c07177bccb5cc2eabaab8910616cce33f2b49fd76f048411a47d3e83fd7c164a",
+      "bytes": 20209
+    },
+    {
       "path": "evidence/artifacts/memory-landscape-20260921/catalog-memory-guide.png",
       "sha256": "bca87e44e3375122ac2078115a82d5c69fd574335ca0408394a46cfaeb5c5ab7",
       "bytes": 125442
@@ -14309,8 +14314,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "419b5063f027d606896636ff4a056ee562d8ffd700621ab62c9d5b03c988a6fe",
-      "bytes": 121382
+      "sha256": "1ca445bb48a9d42530c1a66a2fe68b28db134d609b02ccc89eb2f06375de2ffb",
+      "bytes": 137179
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -14324,8 +14329,8 @@
     },
     {
       "path": "tests/test_adoption_launchd.py",
-      "sha256": "5f70d5dff779ec01b1424bb2007efc0cdf670ea7f691c181e1763ab6f050e0fa",
-      "bytes": 73847
+      "sha256": "034a9dbc91910f3929cb7e995da830a7895e3242412136e9797ce778fdee298a",
+      "bytes": 75087
     },
     {
       "path": "tests/test_adoption_status.py",
@@ -14711,6 +14716,11 @@
       "path": "tests/test_zizmor_negative_control.py",
       "sha256": "fa0bcd820eb59cfb7b806d440fa5c1abaa4b576062fdcc9190f4ed3f427ee4a3",
       "bytes": 7469
+    },
+    {
+      "path": "tools/adoption/embed_acceptance.py",
+      "sha256": "d69f73eb2aacc6165dde092c2a00274815bb71e420585fab1560d283f55be73d",
+      "bytes": 6886
     },
     {
       "path": "tools/adoption/render_config.py",

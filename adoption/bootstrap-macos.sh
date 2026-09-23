@@ -903,6 +903,49 @@ os.replace(sys.argv[1], sys.argv[2])
   [[ "$linked" == 1 ]] || printf 'Note: %s (%s) published no bin/ executable; installed for its library only.\n' "$id" "$package" >&2
 }
 
+# Round 3h (2026-09-23 readiness audit): the llama-embed launchd agent's
+# template ran llama-server with no model argument at all -- KeepAlive
+# would restart it in a loop forever, never actually serving embeddings.
+# Downloads and sha256-verifies the one pinned embedding model this
+# profile needs, failing closed on a digest mismatch exactly like every
+# other pin (reuses fetch(), the same download-then-verify-then-rename
+# helper install_pin's own install_* functions use). Deliberately NOT
+# routed through install_pin/the tools[] dispatch below: a single raw GGUF
+# file, never an archive to extract, kept in pins-macos-arm64.json's own
+# separate "models" section (not "tools") so it is never swept into
+# adoption/manifest.json's profile-component coverage. The destination
+# path this writes to is exactly what the launchd-agents.sh-rendered
+# plist's EMBED_MODEL_PATH must resolve to (adoption/hosts/<host>.json, or
+# an explicit override) for the model this downloads and the model the
+# plist's own -m flag names to actually be the same file.
+install_embed_model() {
+  local entry
+  entry="$(jq -c '.models[0] // empty' "$pins_path")"
+  if [[ -z "$entry" ]]; then
+    printf 'No embedding model pin in %s; skipping.\n' "$pins_path" >&2
+    return 0
+  fi
+  local id file url sha256 size
+  id="$(jq -r '.id' <<<"$entry")"
+  file="$(jq -r '.file' <<<"$entry")"
+  url="$(jq -r '.url' <<<"$entry")"
+  sha256="$(jq -r '.sha256' <<<"$entry")"
+  size="$(jq -r '.size' <<<"$entry")"
+  if [[ "$sha256" == "null" || -z "$sha256" ]]; then
+    printf 'Refusing to install embedding model %s: pin has no verified sha256.\n' "$id" >&2
+    exit 1
+  fi
+  if [[ "$plan_mode" == 1 ]]; then
+    printf 'plan %-13s %-10s %-9s %s sha256=%s size=%s\n' "$id" model gguf "$file" "$sha256" "$size"
+    return 0
+  fi
+  local models_dir="$ecosystem_root/state/models"
+  mkdir -p "$models_dir"
+  local destination="$models_dir/$file"
+  fetch "$url" "$sha256" "$destination"
+  printf 'Installed embedding model %s (%s bytes, sha256 verified) at %s\n' "$id" "$size" "$destination"
+}
+
 install_pin() {
   local id="$1"
   local entry
@@ -950,6 +993,13 @@ for id in ${component_ids[@]+"${component_ids[@]}"}; do
   esac
   install_pin "$id"
 done
+
+# Round 3h: not gated on component_ids (the embedding model is not a
+# "component" adoption/manifest.json's profile system knows about at all,
+# by design -- see install_embed_model's own comment); this profile always
+# needs it. install_embed_model handles plan_mode internally, the same way
+# install_pin does.
+install_embed_model
 
 if [[ "$plan_mode" == 1 ]]; then
   printf 'Plan only for profile %s on macOS %s: nothing was downloaded or installed.\n' "$profile_id" "$macos_version"

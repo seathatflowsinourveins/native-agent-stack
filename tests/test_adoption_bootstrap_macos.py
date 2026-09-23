@@ -15,6 +15,7 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -202,6 +203,57 @@ class PinsSchemaTests(unittest.TestCase):
         self.assertIn("UNPINNED", note)
         self.assertIn("rolldown", note)
         self.assertIn("@rolldown/binding-darwin-arm64", note)
+
+
+class EmbeddingModelPinTests(unittest.TestCase):
+    """Round 3h (2026-09-23 readiness audit defect): the llama-embed agent
+    had no model file at all. pins-macos-arm64.json's own separate
+    "models" section (never "tools", so it is never swept into
+    ProfileCoverageTests' manifest.json cross-check) carries the pin
+    install_embed_model (adoption/bootstrap-macos.sh) downloads and
+    verifies."""
+
+    def setUp(self):
+        self.pins = load(PINS_PATH)
+
+    def test_models_section_exists_with_exactly_one_pinned_embedding_model(self):
+        self.assertIn("models", self.pins)
+        self.assertIsInstance(self.pins["models"], list)
+        self.assertEqual(len(self.pins["models"]), 1, self.pins["models"])
+
+    def test_embedding_model_has_required_fields_and_a_verified_sha256(self):
+        model = self.pins["models"][0]
+        for field in ("id", "hf_repo", "hf_revision", "file", "url", "sha256",
+                      "size", "checksum_source", "checksum_ref", "install_note"):
+            self.assertIn(field, model, f"missing {field}")
+        self.assertIsNotNone(model["sha256"])
+        self.assertRegex(model["sha256"], SHA256_HEX, "sha256 is not 64 lowercase hex chars")
+        self.assertIsInstance(model["size"], int)
+        self.assertGreater(model["size"], 0)
+        self.assertEqual(model["checksum_source"], "huggingface_lfs_oid_plus_local_rehash")
+        self.assertTrue(model["checksum_ref"].strip())
+        self.assertTrue(model["install_note"].strip())
+
+    def test_embedding_model_url_matches_its_own_hf_repo_and_revision(self):
+        model = self.pins["models"][0]
+        self.assertTrue(model["url"].startswith("https://huggingface.co/"))
+        expected_url = (
+            f"https://huggingface.co/{model['hf_repo']}/resolve/{model['hf_revision']}/{model['file']}"
+        )
+        self.assertEqual(model["url"], expected_url)
+
+    def test_embedding_model_id_matches_the_documented_file_stem(self):
+        model = self.pins["models"][0]
+        self.assertEqual(model["id"], "embeddinggemma-300M-Q8_0")
+        self.assertEqual(model["file"], "embeddinggemma-300M-Q8_0.gguf")
+
+    def test_embedding_model_never_appears_in_the_tools_section(self):
+        # A "model" is not a manifest.json profile "component"; keeping it
+        # entirely separate from tools[] means it is never swept into
+        # ProfileCoverageTests' profile/pin cross-check, and never needs a
+        # kind ("tarball"/"zip"/"npm") that does not fit a single raw file.
+        tool_ids = {tool["id"] for tool in self.pins["tools"]}
+        self.assertNotIn(self.pins["models"][0]["id"], tool_ids)
 
 
 class ProfileCoverageTests(unittest.TestCase):
@@ -671,6 +723,157 @@ class LlamaWrapperQuotingTests(unittest.TestCase):
 
 
 NPM = shutil.which("npm")
+
+
+class EmbeddingModelInstallTests(unittest.TestCase):
+    """install_embed_model (round 3h), extracted verbatim from the script
+    and run with a real, unmodified fetch() -- only `curl` itself is
+    shimmed (a tiny script that copies a local fixture in place of the
+    real network call), so the checksum verification under test is
+    fetch's own real code, not a test-only reimplementation of it."""
+
+    def _fixture(self, tmp_path: Path, content: bytes) -> tuple[Path, str]:
+        fixture = tmp_path / "fixture-model.gguf"
+        fixture.write_bytes(content)
+        return fixture, hashlib.sha256(content).hexdigest()
+
+    def _curl_shim(self, tmp_path: Path, fixture: Path) -> Path:
+        shim = tmp_path / "curl-shim"
+        shim.mkdir()
+        (shim / "curl").write_text(
+            "#!/bin/sh\n"
+            'out=""\n'
+            'prev=""\n'
+            'for arg in "$@"; do\n'
+            '  if [ "$prev" = "--output" ]; then out="$arg"; fi\n'
+            '  prev="$arg"\n'
+            "done\n"
+            f'cp {str(fixture)!r} "$out"\n'
+            "exit 0\n"
+        )
+        (shim / "curl").chmod(0o755)
+        return shim
+
+    def _run_install_embed_model(self, tmp_path: Path, pins: dict, curl_shim: Path):
+        eco_root = tmp_path / "eco"
+        eco_root.mkdir(exist_ok=True)
+        pins_path = tmp_path / "pins.json"
+        pins_path.write_text(json.dumps(pins))
+        harness = tmp_path / "install-embed-model-harness.sh"
+        harness.write_text(
+            "set -Eeuo pipefail\n"
+            + _shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_embed_model")
+            + f'pins_path={json.dumps(str(pins_path))}\n'
+            + f'ecosystem_root={json.dumps(str(eco_root))}\n'
+            + "plan_mode=0\n"
+            + "install_embed_model\n"
+        )
+        result = subprocess.run(
+            ["bash", str(harness)], capture_output=True, text=True, timeout=30,
+            env={**os.environ, "PATH": f"{curl_shim}{os.pathsep}{os.environ['PATH']}"},
+        )
+        return result, eco_root
+
+    def test_bootstrap_verifies_the_digest_and_fails_closed_on_a_mismatch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            fixture, real_sha256 = self._fixture(tmp_path, b"not the real gguf content")
+            curl_shim = self._curl_shim(tmp_path, fixture)
+            pins = {
+                "models": [{
+                    "id": "embeddinggemma-300M-Q8_0",
+                    "file": "embeddinggemma-300M-Q8_0.gguf",
+                    "url": "https://huggingface.co/example/resolve/main/embeddinggemma-300M-Q8_0.gguf",
+                    # Deliberately wrong: real_sha256 is the fixture's ACTUAL
+                    # hash; this pin claims a different one, standing in for
+                    # a corrupted download, an MITM'd response or a stale pin.
+                    "sha256": "0" * 64,
+                    "size": len(b"not the real gguf content"),
+                }]
+            }
+            result, eco_root = self._run_install_embed_model(tmp_path, pins, curl_shim)
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Checksum mismatch", result.stderr)
+            installed = eco_root / "state" / "models" / "embeddinggemma-300M-Q8_0.gguf"
+            self.assertFalse(installed.exists(), "a digest mismatch must never leave the file in place")
+
+    def test_bootstrap_installs_the_model_once_the_digest_matches(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            content = b"a small stand-in for the real 333MB gguf, hashed for real"
+            fixture, real_sha256 = self._fixture(tmp_path, content)
+            curl_shim = self._curl_shim(tmp_path, fixture)
+            pins = {
+                "models": [{
+                    "id": "embeddinggemma-300M-Q8_0",
+                    "file": "embeddinggemma-300M-Q8_0.gguf",
+                    "url": "https://huggingface.co/example/resolve/main/embeddinggemma-300M-Q8_0.gguf",
+                    "sha256": real_sha256,
+                    "size": len(content),
+                }]
+            }
+            result, eco_root = self._run_install_embed_model(tmp_path, pins, curl_shim)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Installed embedding model", result.stdout)
+            installed = eco_root / "state" / "models" / "embeddinggemma-300M-Q8_0.gguf"
+            self.assertTrue(installed.is_file())
+            self.assertEqual(installed.read_bytes(), content)
+            self.assertEqual(hashlib.sha256(installed.read_bytes()).hexdigest(), real_sha256)
+
+    def test_a_null_sha256_pin_refuses_before_any_download(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            fixture, _ = self._fixture(tmp_path, b"irrelevant")
+            curl_shim = self._curl_shim(tmp_path, fixture)
+            pins = {
+                "models": [{
+                    "id": "embeddinggemma-300M-Q8_0",
+                    "file": "embeddinggemma-300M-Q8_0.gguf",
+                    "url": "https://huggingface.co/example/resolve/main/embeddinggemma-300M-Q8_0.gguf",
+                    "sha256": None,
+                    "size": 0,
+                }]
+            }
+            result, eco_root = self._run_install_embed_model(tmp_path, pins, curl_shim)
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("no verified sha256", result.stderr)
+            self.assertFalse((eco_root / "state" / "models").exists())
+
+    def test_plan_mode_prints_the_pin_without_downloading(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            fixture, real_sha256 = self._fixture(tmp_path, b"content")
+            curl_shim = self._curl_shim(tmp_path, fixture)
+            eco_root = tmp_path / "eco"
+            eco_root.mkdir()
+            pins_path = tmp_path / "pins.json"
+            pins_path.write_text(json.dumps({
+                "models": [{
+                    "id": "embeddinggemma-300M-Q8_0",
+                    "file": "embeddinggemma-300M-Q8_0.gguf",
+                    "url": "https://huggingface.co/example/resolve/main/embeddinggemma-300M-Q8_0.gguf",
+                    "sha256": real_sha256,
+                    "size": len(b"content"),
+                }]
+            }))
+            harness = tmp_path / "harness.sh"
+            harness.write_text(
+                "set -Eeuo pipefail\n"
+                + _shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_embed_model")
+                + f'pins_path={json.dumps(str(pins_path))}\n'
+                + f'ecosystem_root={json.dumps(str(eco_root))}\n'
+                + "plan_mode=1\n"
+                + "install_embed_model\n"
+            )
+            result = subprocess.run(
+                ["bash", str(harness)], capture_output=True, text=True, timeout=30,
+                env={**os.environ, "PATH": f"{curl_shim}{os.pathsep}{os.environ['PATH']}"},
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("plan", result.stdout)
+            self.assertIn(real_sha256, result.stdout)
+            self.assertFalse((eco_root / "state" / "models").exists(),
+                              "plan mode must never touch the network or the filesystem")
 
 
 class RealNpmLockfileEvidenceTests(unittest.TestCase):
@@ -2103,6 +2306,120 @@ class PrerequisitesBeforeAndAfterBrewTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertNotIn("Missing prerequisites", result.stderr)
+
+
+EMBED_ACCEPTANCE_SCRIPT = ROOT / "tools" / "adoption" / "embed_acceptance.py"
+EMBED_REFERENCE_PATH = ROOT / "evidence" / "artifacts" / "macos-embed-reference-20260923" \
+    / "macos-embed-reference-20260923.json"
+
+
+class EmbedAcceptanceScriptTests(unittest.TestCase):
+    """tools/adoption/embed_acceptance.py (round 3h) against a local stdlib
+    HTTP server standing in for llama-server, and the real, committed
+    reference vector -- never a live network call, and never a claim that
+    a real llama-server produced any of these responses."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.reference = json.loads(EMBED_REFERENCE_PATH.read_text())
+
+    def _serve(self, response_body: bytes, status: int = 200):
+        import http.server
+        import threading
+
+        reference = self.reference
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_POST(self):  # noqa: N802 (BaseHTTPRequestHandler's own naming)
+                length = int(self.headers.get("Content-Length", 0))
+                sent = json.loads(self.rfile.read(length)) if length else {}
+                if sent != reference["request"]["body"]:
+                    self.send_response(400)
+                    self.end_headers()
+                    return
+                self.send_response(status)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(response_body)))
+                self.end_headers()
+                self.wfile.write(response_body)
+
+            def log_message(self, *args):
+                pass
+
+        server = http.server.HTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        self.addCleanup(server.shutdown)
+        self.addCleanup(server.server_close)
+        return f"http://127.0.0.1:{server.server_address[1]}"
+
+    def _run(self, url: str, extra_args: list[str] | None = None):
+        return subprocess.run(
+            [sys.executable, str(EMBED_ACCEPTANCE_SCRIPT), url, str(EMBED_REFERENCE_PATH), *(extra_args or [])],
+            capture_output=True, text=True, timeout=30,
+        )
+
+    def test_the_exact_reference_embedding_passes_with_cosine_1(self):
+        # The identical request body is asserted server-side (_serve above
+        # returns 400 on any mismatch), directly proving this script sends
+        # the EXACT body the reference recorded, not an approximation.
+        body = json.dumps({"data": [{"embedding": self.reference["embedding"], "index": 0}]}).encode()
+        url = self._serve(body)
+        result = self._run(url)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertTrue(payload["passed"])
+        self.assertEqual(payload["cosine"], 1.0)
+        self.assertEqual(payload["dimension_actual"], self.reference["dimension"])
+
+    def test_native_llama_cpp_embedding_shape_is_also_understood(self):
+        # llama.cpp's native /embedding response (not /v1/embeddings, but
+        # exercised here for the shape: a list of objects, each embedding
+        # itself one row per pooled token) nests one level deeper than the
+        # OpenAI-compatible shape; extract_embedding must unwrap either.
+        body = json.dumps([{"embedding": [self.reference["embedding"]]}]).encode()
+        url = self._serve(body)
+        result = self._run(url)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue(json.loads(result.stdout)["passed"])
+
+    def test_a_dimension_mismatch_fails_with_a_clear_json_error(self):
+        body = json.dumps({"data": [{"embedding": [0.1, 0.2, 0.3]}]}).encode()
+        url = self._serve(body)
+        result = self._run(url)
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertFalse(payload["passed"])
+        self.assertEqual(payload["dimension_actual"], 3)
+        self.assertIn("dimension mismatch", payload["error"])
+
+    def test_a_low_cosine_fails_even_with_the_right_dimension(self):
+        # A different, but same-dimension, vector: cosine similarity to the
+        # reference is well below the 0.99 threshold.
+        wrong = [0.0] * self.reference["dimension"]
+        wrong[0] = 1.0
+        body = json.dumps({"data": [{"embedding": wrong}]}).encode()
+        url = self._serve(body)
+        result = self._run(url)
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertFalse(payload["passed"])
+        self.assertLess(payload["cosine"], 0.99)
+
+    def test_a_connection_failure_reports_json_not_a_traceback(self):
+        result = self._run("http://127.0.0.1:1", extra_args=["--timeout", "2"])
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(result.stderr, "", "a network failure must be a reported JSON result, not a traceback")
+        payload = json.loads(result.stdout)
+        self.assertFalse(payload["passed"])
+        self.assertIn("error", payload)
+
+    def test_reference_artifact_matches_the_pinned_model_and_is_registered_evidence(self):
+        model = json.loads(PINS_PATH.read_text())["models"][0]
+        self.assertEqual(self.reference["model"]["sha256"], model["sha256"])
+        self.assertEqual(self.reference["model"]["hf_revision"], model["hf_revision"])
+        self.assertEqual(self.reference["dimension"], 768)
+        self.assertEqual(self.reference["acceptance"]["threshold"], 0.99)
 
 
 class PlatformPageTests(unittest.TestCase):
