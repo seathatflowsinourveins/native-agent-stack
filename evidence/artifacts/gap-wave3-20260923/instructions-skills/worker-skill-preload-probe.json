@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "id": "worker-skill-preload-probe",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": [
+    "instructions-skills"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "instructions-skills",
+      "gap_index": 4
+    }
+  ],
+  "purpose": "Establish whether a lean workflow/Agent child whose agent definition declares a skill in frontmatter receives that skill in its initial context (listing and full SKILL.md body) without reading it from disk, against a child whose definition declares no skill.",
+  "preregistered": "Written before dispatch: if the declared child quotes the SKILL.md first heading and a distinctive body sentence verbatim with zero tool uses, and the control child reports no skill, worker-level preloading of declared skills is established on this host and Claude Code version; if the declared child reports only a name/description or nothing, it is refuted for this configuration.",
+  "commands": [
+    {
+      "cmd": "Agent(subagent_type=semantic-evidence-reviewer, prompt=context-introspection probe, no tools allowed)",
+      "exit": 0,
+      "duration_s": 12.5,
+      "output_excerpt": "body_present=true; body_first_heading='# Build with TypeSafe'; body_sentence='Code owns the workflow; the model supplies programmable common sense where ordinary code needs semantic understanding.'; mechanism: body injected at start with 'Base directory for this skill: ~/.claude/skills/typesafe-ai'; tool_uses=0",
+      "output_sha256": "1200db90cfb527826b5a29ff50316bc3b56b0eed59e0c198d4dd6ea3c383c3a7"
+    },
+    {
+      "cmd": "Agent(subagent_type=source-scout, same probe, control: no skills declared)",
+      "exit": 0,
+      "duration_s": 1.4,
+      "output_excerpt": "typesafe_listed=false; body_present=false; no skill mechanism in context; tool_uses=0",
+      "output_sha256": "ecb53f3bf67f65ab5124285b3df6682f75880e798296b3e4e15b743a7fe65b95"
+    },
+    {
+      "cmd": "grep -n '^# \\|Code owns the workflow' ~/.claude/skills/typesafe-ai/SKILL.md",
+      "exit": 0,
+      "duration_s": 0.01,
+      "output_excerpt": "16:# Build with TypeSafe; 23-24: 'Code owns the workflow; the model / supplies programmable common sense where ordinary code needs semantic understanding.' (quotes match verbatim across the line break)",
+      "output_sha256": "n/a-short-console-capture"
+    }
+  ],
+  "tool_versions": {
+    "claude-code": "2.1.280",
+    "semantic-evidence-reviewer.md sha256": "2254f69be7bdff7438ec09311cdfa67c8c616d2eba5cc0f78768c2c8a90e1b4b",
+    "source-scout.md sha256": "2d5f5d9465a535d376a0c570a5d24105a939ad6771e504c8dde358469acbbad4",
+    "installed SKILL.md sha256": "71ea90d7906c6554c4f4c460ef7361b2d26f59116ccdae986dc6d997b9389f52"
+  },
+  "installs": [],
+  "model_calls": [
+    {
+      "client": "claude-code Agent",
+      "model": "claude-opus-5-5 (declared child, self-reported)",
+      "effort": "high",
+      "count": 1,
+      "input_tokens": null,
+      "output_tokens": null
+    },
+    {
+      "client": "claude-code Agent",
+      "model": "sonnet (control child)",
+      "effort": "medium",
+      "count": 1,
+      "input_tokens": null,
+      "output_tokens": null
+    }
+  ],
+  "result": "The child whose definition declares `skills: [typesafe-ai]` received the full SKILL.md body at start without any tool use: it quoted the first heading and a body sentence that match the installed file verbatim, and reported the body was injected with the user-installed copy's base directory (~/.claude/skills/typesafe-ai), not the project copy (.agents/skills/typesafe-ai). It saw no skills-list section. The control child with no declared skill had no skill listing or body. Worker-level preloading of declared skills is established for this Claude Code version on this host.",
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Confirms the incumbent practice (declare skills per agent in frontmatter) delivers the skill body to workers; it also shows the user-installed copy, not the project copy, is what loads, which matters for version pinning."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Self-reported context introspection by the child models: the quoted text is checkable against the file (it matches), but the mechanism description is the model's reading of its own context.",
+    "One declared/control pair on Claude Code 2.1.280; Codex workers are not covered.",
+    "The loaded copy is the user-installed skill. At probe time it is byte-identical to the project copy (.agents/skills/typesafe-ai/SKILL.md, sha256 71ea90d7…), so no drift; if they diverge, the worker gets the user copy."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "~/codex-ecosystem/state/gap-wave3-20260923/probe/declared.json",
+      "sha256": "1200db90cfb527826b5a29ff50316bc3b56b0eed59e0c198d4dd6ea3c383c3a7"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave3-20260923/probe/control.json",
+      "sha256": "ecb53f3bf67f65ab5124285b3df6682f75880e798296b3e4e15b743a7fe65b95"
+    }
+  ]
+}
