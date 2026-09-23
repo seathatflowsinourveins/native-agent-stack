@@ -43,7 +43,7 @@ print("qdrant down:", not log["qdrant_reachable_immediately_after_kill"])
 # Restart qdrant with the SAME config (same port/data dir) -- no client reconfiguration.
 RAGOPS_DIR = os.path.dirname(__file__)
 qproc = subprocess.Popen(
-    ["~/.local/share/codex-ecosystem/tools/qdrant-1.19.1/qdrant",
+    [os.path.expanduser("~/.local/share/codex-ecosystem/tools/qdrant-1.19.1/qdrant"),
      "--config-path", os.path.join(RAGOPS_DIR, "qdrant-disposable.yaml")],
     cwd=RAGOPS_DIR,
     stdout=open(os.path.join(RAGOPS_DIR, "qdrant-disposable-restart.log"), "w"),

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Reuse the minimal MCP stdio client for code-memory."""
 import sys, os
-sys.path.insert(0, "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops")
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "watcher-kill-restart-recovery"))
 from mcp_client import McpProc
 
-CM_BIN = "~/.local/share/codex-ecosystem/tools/code-memory-5a8db16-w2/.venv/bin/code-memory"
+CM_BIN = os.path.expanduser("~/.local/share/codex-ecosystem/tools/code-memory-5a8db16-w2/.venv/bin/code-memory")
 
 def spawn_cm(cwd, extra_env=None):
     env = os.environ.copy()

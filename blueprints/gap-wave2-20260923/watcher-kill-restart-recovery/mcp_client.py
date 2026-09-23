@@ -109,8 +109,8 @@ def build_env(qdrant_url, home_dir, watcher="auto"):
     })
     return env
 
-NODE = "~/.local/share/codex-ecosystem/bin/node"
-SC = "~/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"
+NODE = os.path.expanduser("~/.local/share/codex-ecosystem/bin/node")
+SC = os.path.expanduser("~/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js")
 
 def spawn(qdrant_url, home_dir, cwd, watcher="auto"):
     env = build_env(qdrant_url, home_dir, watcher)

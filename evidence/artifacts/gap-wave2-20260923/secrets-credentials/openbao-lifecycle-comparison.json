@@ -41,14 +41,14 @@
       "output_sha256": "version-output-not-hashed"
     },
     {
-      "cmd": "nohup ./bao server -dev -dev-listen-address=127.0.0.1:18300 -dev-root-token-id=w2-dummy-root -log-level=info > server.log 2>&1 &",
+      "cmd": "nohup ./bao server -dev -dev-listen-address=127.0.0.1:18300 -dev-root-token-id=<dev-root-token> -log-level=info > server.log 2>&1 &",
       "exit": 0,
       "duration_s": 3.0,
-      "output_excerpt": "==> OpenBao server started! ... Unseal Key: REDACTED / Root Token: w2-dummy-root",
+      "output_excerpt": "==> OpenBao server started! ... Unseal Key: REDACTED / Root Token: <dev-root-token>",
       "output_sha256": "ef8effbb454117ebda6b33c1a4d5ffb280449f03f180d0eb335a974e0d963720"
     },
     {
-      "cmd": "BAO_ADDR=http://127.0.0.1:18300 BAO_TOKEN=w2-dummy-root bao status",
+      "cmd": "BAO_ADDR=http://127.0.0.1:18300 BAO_TOKEN=<dev-root-token> bao status",
       "exit": 0,
       "duration_s": 0.1,
       "output_excerpt": "Initialized true / Sealed false / Storage Type inmem",
@@ -125,7 +125,7 @@
     }
   ],
   "model_calls": [],
-  "result": "OpenBao v2.6.2 installed cleanly into a new, isolated prefix from a checksum-verified pinned release. A dev-mode server on disposable loopback port 18300 with a synthetic in-memory backend ran the full requested credential lifecycle successfully: store (kv put, version 1), read (kv get returns the stored dummy values), rotate (a second kv put creates version 2, distinct from version 1, and reads return the new value), and revoke (kv metadata delete removes all versions; a subsequent read returns 'No value found', confirming the credential is gone, not merely soft-hidden). The dummy credential values never appeared anywhere inside the git checkout (grep -rl returned no match). Setup-step comparison against the native-login policy (adoption/manifest.json: authentication_transfer='native_login_on_target_only'): native login requires no local server, no new binary, and no manual unseal/root-token handling -- the OS-native CLI login flow (Claude/Codex/gh device or browser OAuth) writes a mode-600 credential file directly, with no intermediate plaintext echo. OpenBao's setup is materially heavier and has a different, real leak surface: standing up even a synthetic dev server requires installing a ~187MB binary, starting a background process, and its dev mode INTENTIONALLY prints the root token and unseal key in plaintext to its own stdout/log (server.log:82-83, 'Unseal Key: ...' / 'Root Token: w2-dummy-root') -- a documented dev-mode convenience that is explicitly NOT how a production Vault/OpenBao deployment would be configured, but is a genuine difference from native OAuth login, which does not print a reusable full token to a terminal or log file during normal use. For a secret-management gap that native login and gitleaks do not already cover (per decisions.json's next_gap text), this run's evidence is: OpenBao adds a credential-lifecycle capability (rotation with retained version history, explicit multi-step revocation) that native per-service OAuth logins do not provide in this catalog today, at the cost of standing up and operating an additional service with its own token-handling surface.",
+  "result": "OpenBao v2.6.2 installed cleanly into a new, isolated prefix from a checksum-verified pinned release. A dev-mode server on disposable loopback port 18300 with a synthetic in-memory backend ran the full requested credential lifecycle successfully: store (kv put, version 1), read (kv get returns the stored dummy values), rotate (a second kv put creates version 2, distinct from version 1, and reads return the new value), and revoke (kv metadata delete removes all versions; a subsequent read returns 'No value found', confirming the credential is gone, not merely soft-hidden). The dummy credential values never appeared anywhere inside the git checkout (grep -rl returned no match). Setup-step comparison against the native-login policy (adoption/manifest.json: authentication_transfer='native_login_on_target_only'): native login requires no local server, no new binary, and no manual unseal/root-token handling -- the OS-native CLI login flow (Claude/Codex/gh device or browser OAuth) writes a mode-600 credential file directly, with no intermediate plaintext echo. OpenBao's setup is materially heavier and has a different, real leak surface: standing up even a synthetic dev server requires installing a ~187MB binary, starting a background process, and its dev mode INTENTIONALLY prints the root token and unseal key in plaintext to its own stdout/log (server.log:82-83, 'Unseal Key: ...' / 'Root Token: <dev-root-token>') -- a documented dev-mode convenience that is explicitly NOT how a production Vault/OpenBao deployment would be configured, but is a genuine difference from native OAuth login, which does not print a reusable full token to a terminal or log file during normal use. For a secret-management gap that native login and gitleaks do not already cover (per decisions.json's next_gap text), this run's evidence is: OpenBao adds a credential-lifecycle capability (rotation with retained version history, explicit multi-step revocation) that native per-service OAuth logins do not provide in this catalog today, at the cost of standing up and operating an additional service with its own token-handling surface.",
   "settles_gap": "partially",
   "verdict_impact": {
     "could_change_verdict": false,
@@ -140,7 +140,8 @@
     "A `gitleaks dir` scan of the fixture's raw JSON/log artifacts under ~/codex-ecosystem/state/gap-wave2-20260923/secrets-credentials/openbao-fixture/ was preregistered but could not be run in this pass because the guarded gitleaks per-user lock was held by a concurrent session's scan for this unit's full runtime; it is recorded as undone, not fabricated or skipped silently.",
     "No security review of OpenBao's production hardening guide, TLS/mTLS configuration, or auto-unseal integrations was performed; this receipt is a functional lifecycle and setup-step comparison only, not a security qualification.",
     "The comparison to the native-login policy is a factual leak-surface/setup-step observation, not a recommendation; adopting OpenBao would need a concrete secret-management gap native login and gitleaks do not already cover, per decisions.json's own next_gap text, which this receipt does not itself supply.",
-    "FIX ROUND: this receipt's `preregistered` field was written in the same working session as its results rather than strictly before running the commands; see PREREGISTRATION-NOTE.md in this same directory. The underlying commands, exit codes, and output were not re-run or altered."
+    "FIX ROUND: this receipt's `preregistered` field was written in the same working session as its results rather than strictly before running the commands; see PREREGISTRATION-NOTE.md in this same directory. The underlying commands, exit codes, and output were not re-run or altered.",
+    "The disposable dev server's root token (a fixed dummy chosen with -dev-root-token-id) is redacted as <dev-root-token> for publication hygiene (Codex review of PR #101); the server was shut down after the run."
   ],
   "raw_artifacts": [
     {

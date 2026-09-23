@@ -18,6 +18,7 @@ end to end on this host with this database.
 """
 
 import json
+import os
 import shutil
 import subprocess
 import unittest
@@ -40,9 +41,17 @@ class GrypeKnownCveFixtureTests(unittest.TestCase):
         self.assertIn(f"{EXPECTED_PACKAGE}=={EXPECTED_VERSION}", text)
 
     def test_grype_detects_the_published_cve_in_the_fixture(self) -> None:
+        # Offline and read-only: never check for app updates, never download or update the
+        # vulnerability database, and skip when no local database exists.
+        env = dict(os.environ, GRYPE_CHECK_FOR_APP_UPDATE="false", GRYPE_DB_AUTO_UPDATE="false",
+                   GRYPE_DB_VALIDATE_AGE="false")
+        status = subprocess.run([GRYPE, "db", "status"], capture_output=True, text=True,
+                                timeout=60, check=False, env=env)
+        if status.returncode != 0:
+            self.skipTest("no local grype vulnerability database; this test never downloads one")
         result = subprocess.run(
             [GRYPE, f"dir:{FIXTURE_DIR}", "-o", "json"],
-            capture_output=True, text=True, timeout=120, check=False,
+            capture_output=True, text=True, timeout=120, check=False, env=env,
         )
         self.assertEqual(result.returncode, 0, result.stderr[:2000])
         try:

@@ -3,8 +3,15 @@
   "id": "lockfile-audit",
   "date": "2026-09-23",
   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
-  "layer_ids": ["ci-supply-chain"],
-  "gap_refs": [{"layer_id": "ci-supply-chain", "gap_index": 12}],
+  "layer_ids": [
+    "ci-supply-chain"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "ci-supply-chain",
+      "gap_index": 12
+    }
+  ],
   "purpose": "Enumerate every language-runtime dependency manifest in this repository (requirements.txt, pyproject.toml/uv.lock, package.json/pnpm-lock.yaml, Cargo.toml/Cargo.lock), check each for a hash-pinned lockfile and a Dependabot updater entry for its package ecosystem, and record which runtimes are unlocked and/or unowned.",
   "preregistered": "manifests/stack.json's components[] are installed CLI tools, not in-repository language runtimes with dependency manifests, so the actual runtime surface is the concrete manifest files found by repository walk. If every found manifest has both a hash-pinned lockfile and a matching .github/dependabot.yml package-ecosystem entry, that would refute the gap (locking and update ownership are established). If any manifest lacks a lockfile or lacks an assigned updater, that supports the gap's claim and the specific unlocked/unowned runtimes are recorded by name, settling this (non-time-gated) half of gap 12 either way. FIX ROUND CORRECTION (2026-09-23): the 'CLI tools, not runtimes' framing for manifests/stack.json is wrong -- its components[] include externally-installed Python/runtime packages (pandas, skfolio, alpaca-py, edgartools, exchange-calendars, vllm, headroom, llama-cpp, nextjs etc.), not only CLI tools, and this script's in-repository-manifest walk does not audit their lock/update status at all. 'Across every runtime' is therefore not established; settles_gap is corrected to partially. Separately, the committed script's requirements*.txt glob was found to also match blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt (a check fixture added by a sibling unit, not a real runtime manifest), producing 5 manifests instead of the originally recorded 4; the script is corrected here to exclude the blueprints/gap-wave2-20260923/ check-tooling subtree, restoring the original 4-manifest, byte-identical result (verified by rerunning the corrected script and comparing sha256 to the originally retained output). No check was re-run to fish for a different substantive outcome; this is a script-scoping fix that reproduces the original recorded numbers.",
   "commands": [
@@ -23,7 +30,9 @@
       "output_sha256": "0a8c9f6c7be0e60ece12916b2161bcf121594a09476f488d273309456d1e16bb"
     }
   ],
-  "tool_versions": {"python3": "3.12.3"},
+  "tool_versions": {
+    "python3": "3.12.3"
+  },
   "installs": [],
   "model_calls": [],
   "result": "Found 4 dependency manifests in the repository: blueprints/convergence-practice/application-delivery/pyproject.toml (has uv.lock, hash-pinned, 212 `hash =` entries), blueprints/convergence-practice/application-delivery/package.json (has pnpm-lock.yaml, `integrity:` hash-pinned), blueprints/us-equities/adaptive-paper/requirements.txt (plain `==` pins, zero `--hash` entries, no lockfile), blueprints/us-equities/workers/requirements.txt (plain `==` pins, zero `--hash` entries, no lockfile). .github/dependabot.yml's only package-ecosystem entry is `github-actions`; it has no `pip`, `npm` or `uv` entries at all. So 2 of 4 in-repository manifests have a hash-pinned lockfile (application-delivery's Python and Node runtimes) and 2 do not (both requirements.txt files in the us-equities blueprints), while 0 of 4 have any assigned Dependabot updater for their actual package ecosystem -- Dependabot in this repository currently updates only GitHub Actions pins, never Python/npm dependencies. FIX ROUND CORRECTION: this enumeration covers in-repository dependency manifests only. manifests/stack.json's components[] additionally list externally-installed Python/runtime packages actually used by this stack (pandas 3.0.6, skfolio 1.2.9, alpaca-py 0.44.0, edgartools 5.58.0, exchange-calendars 4.13.2, vllm 0.25.0, headroom, llama-cpp, nextjs, among 69 components) whose own lock/update status (e.g. whether their installing environment is pinned by hash, and who updates them) was not audited here at all -- the original claim that this script covers 'every runtime' was wrong; it covers only the 4 in-repository application manifests.",
@@ -39,10 +48,17 @@
     "Does not check whether uv.lock/pnpm-lock.yaml are actually enforced in CI (e.g. `uv sync --locked` / `pnpm install --frozen-lockfile`); only that the lockfiles exist and contain hash/integrity fields.",
     "Dependabot's actual scheduled-update behavior (weekly timing, grouped minor/patch PRs) remains unobserved and is explicitly out of scope here (gap 4, time-gated, not part of this unit's assigned gaps).",
     "This is a static Python walk over repository files (glob + text search), not execution of an external native tool; evidence_class is local_integration, not native_proven.",
-    "The script's requirements*.txt glob previously also matched a sibling unit's check fixture (blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt), producing a 5-manifest result that did not match this receipt's claims. The script now excludes the blueprints/gap-wave2-20260923/ check-tooling subtree; this was verified to reproduce the original 4-manifest output byte-for-byte (same sha256) rather than changing the substantive result."
+    "The script's requirements*.txt glob previously also matched a sibling unit's check fixture (blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt), producing a 5-manifest result that did not match this receipt's claims. The script now excludes the blueprints/gap-wave2-20260923/ check-tooling subtree; this was verified to reproduce the original 4-manifest output byte-for-byte (same sha256) rather than changing the substantive result.",
+    "Dated measurement: the four-manifest count and output hash describe the tree at the run's base. Later main added tools/mlx-smoke/requirements.lock.txt (#99), so re-running the committed audit on a newer tree reports five manifests and a different hash; the finding (no manifest has both a hash-pinned lock and a Dependabot entry) is unchanged by that addition only if re-measured."
   ],
   "raw_artifacts": [
-    {"path": "<scratch>/lockfile-audit-output.json", "sha256": "0a8c9f6c7be0e60ece12916b2161bcf121594a09476f488d273309456d1e16bb"},
-    {"path": "<scratch>/lockfile-audit-output-v2.json", "sha256": "0a8c9f6c7be0e60ece12916b2161bcf121594a09476f488d273309456d1e16bb"}
+    {
+      "path": "<scratch>/lockfile-audit-output.json",
+      "sha256": "0a8c9f6c7be0e60ece12916b2161bcf121594a09476f488d273309456d1e16bb"
+    },
+    {
+      "path": "<scratch>/lockfile-audit-output-v2.json",
+      "sha256": "0a8c9f6c7be0e60ece12916b2161bcf121594a09476f488d273309456d1e16bb"
+    }
   ]
 }

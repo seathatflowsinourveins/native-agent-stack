@@ -7,7 +7,8 @@ wave uses <catalog>__<layer_id>), and writes a ledger plus a summary page:
   python3 tools/sota-convergence/gap_wave_ledger.py --wave gap-wave2-20260923 --owner gap-resolution [--check]
 
 Status per crosswalk gap: settled / advanced / not_settled from the receipts' settles_gap
-(true / partially / false), best over the receipts that name the gap. A receipt naming several
+(true / partially / false), or from a receipt's per_gap_settles entry ("<layer>:<index>") when it
+has one, best over the receipts that name the gap. A receipt naming several
 gaps carries one settles_gap value, so it credits each named gap at most "advanced": only a
 single-gap receipt can settle a gap. Gaps the owner was assigned but no receipt names are
 "not_run". Nothing here changes a verdict.
@@ -41,12 +42,17 @@ def load_receipts(root, wave):
             if not isinstance(data, dict) or "gap_refs" not in data:
                 continue
             refs = [(g["layer_id"], g["gap_index"]) for g in data["gap_refs"]]
+            per_gap = {k: settle_key(v) for k, v in (data.get("per_gap_settles") or {}).items()}
+            for key in per_gap:
+                if key not in {f"{l}:{i}" for l, i in refs}:
+                    raise SystemExit(f"{path}: per_gap_settles names {key}, which is not in gap_refs")
             vi = data.get("verdict_impact") or {}
             calls = data.get("model_calls") or []
             out.append({
                 "path": str(path.relative_to(root)), "id": data.get("id"),
                 "source_revision": data.get("source_revision"), "gap_refs": [list(r) for r in refs],
                 "settles_gap": data.get("settles_gap"), "settles_key": settle_key(data.get("settles_gap")),
+                "per_gap_settles": per_gap,
                 "direction": vi.get("direction"), "evidence_class": data.get("evidence_class"),
                 "model_calls": sum(int(c.get("count", 0) or 0) for c in calls if isinstance(c, dict)),
             })
@@ -62,10 +68,10 @@ def build(root, wave, owner):
             raise SystemExit(f"{r['path']}: source_revision {r['source_revision']} is not the crosswalk's {rev}")
     by_gap = {}
     for r in receipts:
-        credit = SETTLES[r["settles_key"]]
-        if len(r["gap_refs"]) > 1 and credit == "settled":
-            credit = "advanced"
         for layer, index in r["gap_refs"]:
+            credit = SETTLES[r["per_gap_settles"].get(f"{layer}:{index}", r["settles_key"])]
+            if len(r["gap_refs"]) > 1 and credit == "settled":
+                credit = "advanced"
             by_gap.setdefault((layer, index), []).append((r["path"], credit))
     known = {(l["layer_id"], g["index"]) for l in crosswalk["layers"] for g in l["gaps"]}
     unknown = sorted(k for k in by_gap if k not in known)
@@ -93,7 +99,8 @@ def build(root, wave, owner):
                  "credit settled/advanced/not_settled, but a receipt naming several gaps credits each at most "
                  "advanced; not_run means no receipt names the gap. No verdict changes here."),
         "counts": dict(sorted(counts.items())), "layers": layers,
-        "receipts": sorted(({k: v for k, v in r.items() if k != "settles_key"} for r in receipts), key=lambda r: r["path"]),
+        "receipts": sorted(({k: v for k, v in r.items() if k != "settles_key" and not (k == "per_gap_settles" and not v)}
+                             for r in receipts), key=lambda r: r["path"]),
     }
     return doc
 

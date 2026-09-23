@@ -12,7 +12,7 @@ import re
 import subprocess
 from pathlib import Path
 
-REPO = Path(os.path.expanduser('~/code/agent-lab'))
+REPO = Path(os.path.expanduser(os.path.expanduser('~/code/agent-lab')))
 THIS_DIR = Path(__file__).resolve().parent
 INCLUDE = ['tools', '.claude/workflows', 'tests', 'docs']
 STOPWORDS = {
@@ -96,7 +96,7 @@ def main():
     n = len(qs)
     result = {'baseline': 'rg_keyword', 'n_questions': n, 'recall_at_5': hits5 / n, 'recall_at_5_hits': hits5, 'mrr': mrr_sum / n, 'detail': detail}
     print(json.dumps({k: v for k, v in result.items() if k != 'detail'}))
-    with open(os.path.expanduser('~/codex-ecosystem/state/gap-wave2-20260923/rag-bench/rg_baseline_eval.json'), 'w') as f:
+    with open(os.path.expanduser(os.path.expanduser('~/codex-ecosystem/state/gap-wave2-20260923/rag-bench/rg_baseline_eval.json')), 'w') as f:
         json.dump(result, f, indent=2)
 
 

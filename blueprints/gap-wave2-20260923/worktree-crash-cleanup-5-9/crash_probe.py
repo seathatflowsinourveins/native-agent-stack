@@ -17,7 +17,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-WT = os.path.expanduser('~/.local/share/codex-ecosystem/tools/worktrunk-0.79.0/wt')
+WT = os.path.expanduser(os.path.expanduser('~/.local/share/codex-ecosystem/tools/worktrunk-0.79.0/wt'))
 
 
 def sha(data):

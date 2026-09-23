@@ -2,7 +2,7 @@ import sys, json, time, os
 sys.path.insert(0, os.path.dirname(__file__))
 from cm_client import spawn_cm
 
-PROJ = "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project"
+PROJ = os.path.expanduser("~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project")
 log = {}
 
 t0 = time.time()

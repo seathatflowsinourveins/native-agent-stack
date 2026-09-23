@@ -9,8 +9,8 @@ Rule: status is the best credit over the receipts naming the gap; settles_gap tr
 | Status | Gaps |
 | --- | ---: |
 | settled | 9 |
-| advanced | 54 |
-| not_settled | 3 |
+| advanced | 52 |
+| not_settled | 5 |
 | not_run | 3 |
 
 Receipts: 53; native model calls recorded: 39.
@@ -29,13 +29,13 @@ Receipts: 53; native model calls recorded: 39.
 | native-clients | 12 | not_run | none |
 | native-clients | 13 | settled | [mcporter-context-mode-bridge-recovery](../evidence/artifacts/gap-wave2-20260923/native-clients/mcporter-context-mode-bridge-recovery.json) |
 | instructions-skills | 0 | advanced | [frozen-skill-arm-ab](../evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json) |
-| instructions-skills | 1 | advanced | [frozen-skill-arm-ab](../evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json) |
+| instructions-skills | 1 | not_settled | [frozen-skill-arm-ab](../evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json) |
 | instructions-skills | 2 | advanced | [skill-sync-and-closure-reconciliation](../evidence/artifacts/gap-wave2-20260923/instructions-skills/skill-sync-and-closure-reconciliation.json) |
 | instructions-skills | 3 | advanced | [ecc-trigger-activation-test](../evidence/artifacts/gap-wave2-20260923/instructions-skills/ecc-trigger-activation-test.json) |
 | instructions-skills | 4 | not_settled | [worker-skill-declaration-documented-behavior](../evidence/artifacts/gap-wave2-20260923/instructions-skills/worker-skill-declaration-documented-behavior.json) |
 | instructions-skills | 5 | advanced | [gh-fix-ci-failing-path-trial](../evidence/artifacts/gap-wave2-20260923/instructions-skills/gh-fix-ci-failing-path-trial.json) |
 | instructions-skills | 6 | advanced | [security-best-practices-reference-drift](../evidence/artifacts/gap-wave2-20260923/instructions-skills/security-best-practices-reference-drift.json) |
-| instructions-skills | 7 | advanced | [frozen-skill-arm-ab](../evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json) |
+| instructions-skills | 7 | not_settled | [frozen-skill-arm-ab](../evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json) |
 | instructions-skills | 8 | settled | [ecc-shan-pin-diff](../evidence/artifacts/gap-wave2-20260923/instructions-skills/ecc-shan-pin-diff.json) |
 | instructions-skills | 9 | settled | [claude-code-templates-source-review](../evidence/artifacts/gap-wave2-20260923/instructions-skills/claude-code-templates-source-review.json) |
 | semantic-rag | 0 | advanced | [held-out-recall-benchmark](../evidence/artifacts/gap-wave2-20260923/semantic-rag/held-out-recall-benchmark.json) |

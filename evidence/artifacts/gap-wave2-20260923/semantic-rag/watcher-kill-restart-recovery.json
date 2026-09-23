@@ -114,7 +114,9 @@
     },
     {
       "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/mcp_client.py",
-      "sha256": "8e9ce267c0368559a562278180c3ff6c3a4c7a4c46c564db9fa29b8667a84351"
+      "sha256": "8e9ce267c0368559a562278180c3ff6c3a4c7a4c46c564db9fa29b8667a84351",
+      "published_sha256": "b2cc59cc27ee89e2cc678d952120f9850068d8783405ec26c6b68c62b4aaa8b8",
+      "published_note": "Published copy differs from the run's file: home paths were sanitized to ~/ at publication, and the coordinator then made helper paths expand at run time (review of PR #101). sha256 is the file as run; published_sha256 is the committed file."
     },
     {
       "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_watcher_recovery.py",

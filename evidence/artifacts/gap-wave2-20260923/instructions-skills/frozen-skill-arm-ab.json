@@ -3,11 +3,22 @@
   "id": "frozen-skill-arm-ab",
   "date": "2026-09-23",
   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
-  "layer_ids": ["instructions-skills"],
+  "layer_ids": [
+    "instructions-skills"
+  ],
   "gap_refs": [
-    {"layer_id": "instructions-skills", "gap_index": 0},
-    {"layer_id": "instructions-skills", "gap_index": 1},
-    {"layer_id": "instructions-skills", "gap_index": 7}
+    {
+      "layer_id": "instructions-skills",
+      "gap_index": 0
+    },
+    {
+      "layer_id": "instructions-skills",
+      "gap_index": 1
+    },
+    {
+      "layer_id": "instructions-skills",
+      "gap_index": 7
+    }
   ],
   "purpose": "Gap 0: no retained fixture measures skill-arm task performance. Gap 1: no winner (ECC, OpenAI skills, TypeSafe) has a measured improvement in task quality or provider cost versus no-skill. Gap 7: TypeSafe's 7/8 result covers eight selected cases against a weak literal-containment baseline, not a native coding-agent baseline. Freeze a new 6-case labeled set (blueprints/gap-wave2-20260923/skill-arm-ab/cases.json, separate from catalog-cases.json/cases.json and the 8-case TypeSafe diagnostic), run matched with-skill/without-skill claude -p arms (N=1 per case per arm), and score.",
   "preregistered": "Recorded in blueprints/gap-wave2-20260923/skill-arm-ab/cases.json BEFORE any arm ran: 6 cases (2 ECC search-first/iterative-retrieval, 2 OpenAI security-best-practices, 2 TypeSafe semantic-judgment), each with a 2-point rubric and, for the TypeSafe cases, a frozen expected label. Each case run twice: with_skill (Skill tool allowed) and without_skill (Skill tool explicitly disallowed via --disallowedTools), same prompt and model otherwise. Expectation stated before running: if with_skill scores materially higher than without_skill across cases, that is new evidence of a measured quality improvement (closing part of gap 1); if scores are indistinguishable, that is a genuine null result worth recording, not proof the skills are worthless, since a null result could reflect either 'the skill adds nothing here' or 'the skill was never actually invoked' -- the transcript is checked directly for a Skill tool_use event to distinguish those two explanations, not inferred from the score alone.",
@@ -34,11 +45,35 @@
       "output_sha256": "n/a"
     }
   ],
-  "tool_versions": {"claude": "2.1.280 (claude-opus-5-5[1m])"},
+  "tool_versions": {
+    "claude": "2.1.280 (claude-opus-5-5[1m])"
+  },
   "installs": [],
   "model_calls": [
-    {"client": "claude", "model": "claude-opus-5-5[1m]", "effort": "medium (flag passed on all 12 calls)", "count": 6, "arm": "with_skill", "input_tokens": 16, "output_tokens": 3587, "cache_creation_input_tokens": 121080, "cache_read_input_tokens": 136480, "total_cost_usd": 1.06774},
-    {"client": "claude", "model": "claude-opus-5-5[1m]", "effort": "medium (flag passed on all 12 calls)", "count": 6, "arm": "without_skill", "input_tokens": 18, "output_tokens": 3487, "cache_creation_input_tokens": 90501, "cache_read_input_tokens": 178935, "total_cost_usd": 0.829607}
+    {
+      "client": "claude",
+      "model": "claude-opus-5-5[1m]",
+      "effort": "medium (flag passed on all 12 calls)",
+      "count": 6,
+      "arm": "with_skill",
+      "input_tokens": 16,
+      "output_tokens": 3587,
+      "cache_creation_input_tokens": 121080,
+      "cache_read_input_tokens": 136480,
+      "total_cost_usd": 1.06774
+    },
+    {
+      "client": "claude",
+      "model": "claude-opus-5-5[1m]",
+      "effort": "medium (flag passed on all 12 calls)",
+      "count": 6,
+      "arm": "without_skill",
+      "input_tokens": 18,
+      "output_tokens": 3487,
+      "cache_creation_input_tokens": 90501,
+      "cache_read_input_tokens": 178935,
+      "total_cost_usd": 0.829607
+    }
   ],
   "result": "Scored totals (blueprints/gap-wave2-20260923/skill-arm-ab/scored-results.json): with_skill 10/12, without_skill 10/12, difference 0. Per-case breakdown: C1 (search-first) 2/2 both arms; C2 (iterative-retrieval) 2/2 both arms; C3 (security-best-practices, SQL injection) 2/2 both arms; C4 (security-best-practices, command injection) 2/2 both arms; C5 and C6 (typesafe-ai) 1/2 both arms -- both arms answered 'Insufficient' rather than the frozen 'supported' label, with materially identical reasoning quality between arms. CORRECTED 2026-09-23: 4 of the 6 cases (C1-C4) hit the 2/2 ceiling in both arms and therefore cannot discriminate between arms by construction, regardless of whether a skill was used; only C5/C6 have any scoring headroom, and their frozen labels are contestable (below), so in practice zero of the 6 cases provide a case that could show a with-vs-without difference even in principle. Mechanically, the Skill tool was never invoked in any of the 12 runs, including all 6 with_skill trials where it was explicitly allowed and the relevant skill (search-first, iterative-retrieval, or typesafe-ai) was installed and discoverable. This resolves the ambiguity the preregistration called out (the zero score difference reflects the skill never being loaded/used, not that it was tried and added nothing) but does not answer the underlying quality question either way. Per-arm usage (corrected: previously reported as a single combined figure with input_tokens misreported as 0 and no cache_read at all): with_skill cost $1.068 (output 3587, cache_creation 121080, cache_read 136480) vs without_skill cost $0.830 (output 3487, cache_creation 90501, cache_read 178935) -- with_skill cost about 29% more, but every case ran with_skill first and without_skill second (verified by file mtimes), so without_skill's larger cache_read and smaller cache_creation are at least partly a cache-warmth artifact of run order, not an effect attributable to the skill option itself; this confound means the cost comparison cannot be attributed to 'with skill' vs 'without skill' and gap 1's cost question is not answered by this data. On reflection after scoring, C5/C6's frozen 'supported' label is contestable: a stated numeric range does not, on a strict reading, establish a specific point figure, and 'discontinued support' could plausibly mean more than 'stopped taking new requests' -- both arms' 'Insufficient' answers are defensible, and this is recorded as a preregistration weakness in this receipt rather than silently rescored.",
   "settles_gap": "partially",
@@ -57,22 +92,74 @@
     "This receipt does NOT close gap 7. Re-examining the original 8-case set's C4 disagreement and running an actual TypeSafe-API arm against a native coding-agent baseline on an extended case set both remain open; attempting them was assessed as exceeding this unit's remaining claude -p budget and time and is recorded in the coordinator handoff as undone.",
     "This receipt does NOT include the codex exec arm that gap 0's next_check explicitly asks for; it is claude -p only and is recorded as undone for the codex-exec half.",
     "All 12 calls used --effort medium as instructed; the stream-json output does not expose a provider-confirmed resolved effort level, so 'medium' reflects the flag passed, not an independently verified resolution.",
-    "This entry was corrected in a fix round on 2026-09-23 after independent review found it overclaimed settlement of gaps 0 and 1, misreported usage (input_tokens as 0, no cache_read, combined instead of per-arm), and falsely claimed scored-results.json held transcripts/hashes. The original 12 claude -p calls were not re-run; per-arm usage was recomputed from the already-retained transcripts' final 'result' events (a new, additive computation, not a rerun of any model call), and settles_gap/verdict_impact/result were rewritten to remove the overclaim."
+    "This entry was corrected in a fix round on 2026-09-23 after independent review found it overclaimed settlement of gaps 0 and 1, misreported usage (input_tokens as 0, no cache_read, combined instead of per-arm), and falsely claimed scored-results.json held transcripts/hashes. The original 12 claude -p calls were not re-run; per-arm usage was recomputed from the already-retained transcripts' final 'result' events (a new, additive computation, not a rerun of any model call), and settles_gap/verdict_impact/result were rewritten to remove the overclaim.",
+    "per_gap_settles added by the coordinator after the Codex review of PR #101: the receipt's own explanation says gap 1 was not measured (the Skill tool was never invoked; cost confounded by order) and gap 7 was not advanced (TypeSafe inference never ran), so only gap 0 is credited as advanced."
   ],
   "raw_artifacts": [
-    {"path": "blueprints/gap-wave2-20260923/skill-arm-ab/cases.json", "sha256": "see manifests/evidence.json files[] entry"},
-    {"path": "blueprints/gap-wave2-20260923/skill-arm-ab/scored-results.json", "sha256": "see manifests/evidence.json files[] entry"},
-    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C1_with_skill.jsonl", "sha256": "56cab28b0bf5d4924ce6b919faaee6230fdd6314d1a33ff44f4272c012c4042e"},
-    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C1_without_skill.jsonl", "sha256": "c201c68c616a3eb512e3ebcbcded6fa85c093a21737ac3275e619bc7fd590746"},
-    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C2_with_skill.jsonl", "sha256": "dbf0b21090663f5be8a25459395eee95c8f7efb57b6036920f1b0745e2e373f4"},
-    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C2_without_skill.jsonl", "sha256": "41ff5d48513c84e3513b58b4f64842a1fe4e12dfa558d91246cf304099738026"},
-    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C3_with_skill.jsonl", "sha256": "1d80694c1d7bec2492cf8d3c31f44ac0b2fd4e721b7d4285ed39e4c3a63499cd"},
-    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C3_without_skill.jsonl", "sha256": "ec7d581e49dae3806186e60b61e4bee367a857a58a0ec75de22cae793bd50036"},
-    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C4_with_skill.jsonl", "sha256": "335f967b7a581eda5056c0e1bd4a99fcbea45b50511e293dc69ef5315c0ef874"},
-    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C4_without_skill.jsonl", "sha256": "125a0037cf48faf752a9f844a2c223a52561aaa121257ae9da7f0708aaa8f61a"},
-    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C5_with_skill.jsonl", "sha256": "d85670ad6547984f3814b2532ae5f28fe7b64fc7024e8e1689e6a15625f6f3ac"},
-    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C5_without_skill.jsonl", "sha256": "f6739523d4a346546af8d599919fac98cfd0b7a31fd149aeb463d4a57d26c595"},
-    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C6_with_skill.jsonl", "sha256": "28fe82a5cab0b6fbed7c549c1b1ed9b92e6be9de7a45bc12fd7ddd9f1f611926"},
-    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C6_without_skill.jsonl", "sha256": "23aff79c07622cf34e8706181bb30b20a154cb3a3e40be149017200a62804b78"}
-  ]
+    {
+      "path": "blueprints/gap-wave2-20260923/skill-arm-ab/cases.json",
+      "sha256": "see manifests/evidence.json files[] entry",
+      "published_sha256": "3ec43a162c62762f0a289f854c3152f80ad3d4425f8339113d0f22c8f7491965",
+      "published_note": "Published copy differs from the run's file: home paths were sanitized to ~/ at publication, and the coordinator then made helper paths expand at run time (review of PR #101). sha256 is the file as run; published_sha256 is the committed file."
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/skill-arm-ab/scored-results.json",
+      "sha256": "see manifests/evidence.json files[] entry",
+      "published_sha256": "99478e481871fe14da5cdf13a14d5d71be963b3f885ecac3875b66c330dda395",
+      "published_note": "Published copy differs from the run's file: home paths were sanitized to ~/ at publication, and the coordinator then made helper paths expand at run time (review of PR #101). sha256 is the file as run; published_sha256 is the committed file."
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C1_with_skill.jsonl",
+      "sha256": "56cab28b0bf5d4924ce6b919faaee6230fdd6314d1a33ff44f4272c012c4042e"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C1_without_skill.jsonl",
+      "sha256": "c201c68c616a3eb512e3ebcbcded6fa85c093a21737ac3275e619bc7fd590746"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C2_with_skill.jsonl",
+      "sha256": "dbf0b21090663f5be8a25459395eee95c8f7efb57b6036920f1b0745e2e373f4"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C2_without_skill.jsonl",
+      "sha256": "41ff5d48513c84e3513b58b4f64842a1fe4e12dfa558d91246cf304099738026"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C3_with_skill.jsonl",
+      "sha256": "1d80694c1d7bec2492cf8d3c31f44ac0b2fd4e721b7d4285ed39e4c3a63499cd"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C3_without_skill.jsonl",
+      "sha256": "ec7d581e49dae3806186e60b61e4bee367a857a58a0ec75de22cae793bd50036"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C4_with_skill.jsonl",
+      "sha256": "335f967b7a581eda5056c0e1bd4a99fcbea45b50511e293dc69ef5315c0ef874"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C4_without_skill.jsonl",
+      "sha256": "125a0037cf48faf752a9f844a2c223a52561aaa121257ae9da7f0708aaa8f61a"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C5_with_skill.jsonl",
+      "sha256": "d85670ad6547984f3814b2532ae5f28fe7b64fc7024e8e1689e6a15625f6f3ac"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C5_without_skill.jsonl",
+      "sha256": "f6739523d4a346546af8d599919fac98cfd0b7a31fd149aeb463d4a57d26c595"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C6_with_skill.jsonl",
+      "sha256": "28fe82a5cab0b6fbed7c549c1b1ed9b92e6be9de7a45bc12fd7ddd9f1f611926"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/ab/C6_without_skill.jsonl",
+      "sha256": "23aff79c07622cf34e8706181bb30b20a154cb3a3e40be149017200a62804b78"
+    }
+  ],
+  "per_gap_settles": {
+    "instructions-skills:0": "partially",
+    "instructions-skills:1": "false",
+    "instructions-skills:7": "false"
+  }
 }

@@ -37,6 +37,12 @@ class GapWaveLedgerTests(unittest.TestCase):
                     credits = []
                     for entry in gap["receipts"]:
                         receipt = receipts[entry["path"]]
+                        override = (receipt.get("per_gap_settles") or {}).get(f"{layer['layer_id']}:{gap['index']}")
+                        if override:
+                            base = {"true": "settled", "partially": "advanced", "false": "not_settled"}[override]
+                            if len(receipt["gap_refs"]) > 1 and base == "settled":
+                                base = "advanced"
+                            self.assertEqual(entry["credit"], base)
                         self.assertTrue((ROOT / entry["path"]).is_file())
                         self.assertIn([layer["layer_id"], gap["index"]], receipt["gap_refs"])
                         if len(receipt["gap_refs"]) > 1:
@@ -54,6 +60,22 @@ class GapWaveLedgerTests(unittest.TestCase):
     def test_every_receipt_names_the_crosswalk_revision(self):
         for receipt in self.doc["receipts"]:
             self.assertTrue(self.doc["source_revision"].startswith(receipt["source_revision"][:7]), receipt["path"])
+
+    def test_repo_raw_artifacts_match_their_recorded_hash(self):
+        import hashlib
+        for path in sorted((ROOT / "evidence/artifacts/gap-wave2-20260923").rglob("*.json")):
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(data, dict):
+                continue
+            for artifact in data.get("raw_artifacts") or []:
+                if not isinstance(artifact, dict) or not artifact.get("sha256"):
+                    continue
+                rel = artifact.get("path", "")
+                if rel.startswith(("~", "/", "<")) or not (ROOT / rel).is_file():
+                    continue  # host-side or scratch artifact, recorded by hash only
+                with self.subTest(receipt=path.name, artifact=rel):
+                    actual = hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
+                    self.assertEqual(actual, artifact.get("published_sha256", artifact["sha256"]))
 
     def test_no_host_paths_or_session_identifiers(self):
         text = LEDGER.read_text(encoding="utf-8")

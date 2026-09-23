@@ -5444,8 +5444,8 @@
     },
     {
       "path": "blueprints/gap-wave2-20260923/code-memory-comparison/cm_client.py",
-      "sha256": "14d9e53bd4cb5205ce752887c0b9ac8d1a1807bce27e4b7b045780cfea9d7fd6",
-      "bytes": 738
+      "sha256": "b730563f015b96ecda487970cd3155e6e04e536450313804bedb144f28d68ce1",
+      "bytes": 801
     },
     {
       "path": "blueprints/gap-wave2-20260923/code-memory-comparison/comparison_result.json",
@@ -5454,23 +5454,23 @@
     },
     {
       "path": "blueprints/gap-wave2-20260923/code-memory-comparison/run_comparison.py",
-      "sha256": "193368f1bd022f7f38032991aceed2fae18b9e05b265cfad22d4c31ec31fe31a",
-      "bytes": 2050
+      "sha256": "ce49e07a1de71c52128497d2248c8951407f7c421bd64afa05908b0dfa1a5fa1",
+      "bytes": 2070
     },
     {
       "path": "blueprints/gap-wave2-20260923/code-memory-comparison/search_only.py",
-      "sha256": "6f297878fc63c332719af9192e0919fc20b266f4660c029e39e4c0cbcd0a92dd",
-      "bytes": 696
+      "sha256": "9ab16c6551f96733c9e37671dcd0941f269caa02518007233d8d864a91015c69",
+      "bytes": 716
     },
     {
       "path": "blueprints/gap-wave2-20260923/coordinated-snapshot-restore/sc_restored_check.py",
-      "sha256": "e04b3673b22c3bd780ec746c2448d226b9889a7f882a7f68d490db3010bb7902",
-      "bytes": 591
+      "sha256": "98fe4272269bdfb3bd569dee8f27c26690f2254ba047fa90b02f67ea91782482",
+      "bytes": 674
     },
     {
       "path": "blueprints/gap-wave2-20260923/coordinated-snapshot-restore/sc_restored_query.py",
-      "sha256": "3c33aa807a6636fa09c3e05c2cbbc514a6f1163becd090ad85109c80114381c7",
-      "bytes": 529
+      "sha256": "18424bef4d84989be40c1215dfe7476a90daf69eb97e17c1553f91204ce7634f",
+      "bytes": 612
     },
     {
       "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/build_packets.py",
@@ -5704,8 +5704,8 @@
     },
     {
       "path": "blueprints/gap-wave2-20260923/qdrant-restart-reconnect/gap9_qdrant_restart.py",
-      "sha256": "b91d1be6606be12317b904b3cc4c586e5e20b58a5da56392ca866309f777092b",
-      "bytes": 3889
+      "sha256": "18588ad20ac6cb04b1bbf4c57f674487c72dda4019c4a62798c1efb4b2d25343",
+      "bytes": 3909
     },
     {
       "path": "blueprints/gap-wave2-20260923/rag-bench-eval/SEALED_AT.txt",
@@ -5739,8 +5739,8 @@
     },
     {
       "path": "blueprints/gap-wave2-20260923/rag-bench-eval/rg_baseline.py",
-      "sha256": "39a25f2b8f3443158d813c870bbda22d32bfc173c7f4c829c41ec9e40a0fabcc",
-      "bytes": 3642
+      "sha256": "23a32a000b7f506a743fd5c1569bf63a3906b683e423d7def03df93d1809c0df",
+      "bytes": 3682
     },
     {
       "path": "blueprints/gap-wave2-20260923/restic-mtime-sparse-uid/extend_fixture.py",
@@ -5779,8 +5779,8 @@
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/run_arm.sh",
-      "sha256": "c8a1313ccc17de95c14e7b9aa0ecdd6b6658eef247b8d30bae4b313c38e92946",
-      "bytes": 1314
+      "sha256": "e5618899a85e1e17594d6c3f70297b2080df36762a9e76607d46869288cd67f4",
+      "bytes": 1322
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_1.stdout",
@@ -5859,8 +5859,8 @@
     },
     {
       "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/mcp_client.py",
-      "sha256": "8e9ce267c0368559a562278180c3ff6c3a4c7a4c46c564db9fa29b8667a84351",
-      "bytes": 4007
+      "sha256": "b2cc59cc27ee89e2cc678d952120f9850068d8783405ec26c6b68c62b4aaa8b8",
+      "bytes": 4047
     },
     {
       "path": "blueprints/gap-wave2-20260923/worktree-challenger-6/git_worktree_challenger.py",
@@ -5874,18 +5874,18 @@
     },
     {
       "path": "blueprints/gap-wave2-20260923/worktree-crash-cleanup-5-9/crash_probe.py",
-      "sha256": "984932e12341aded212f3c23d572d26de94de8579732e018192989bfadb4362e",
-      "bytes": 11951
+      "sha256": "62b26f9fb529bcca7620fecbaf2624670fd22fd87091548b7de437cb3edf1b8e",
+      "bytes": 11971
     },
     {
       "path": "blueprints/gap-wave2-20260923/worktree-crash-cleanup-5-9/hooks_and_umask_probe.py",
-      "sha256": "c199ed3d8511714d6e745743a93e9decd2dd776d6bc28f964219edaa22855d6d",
-      "bytes": 6245
+      "sha256": "3a07e131dce8cfa97808dff8aba59afc58c7e501ad1911a53de53d30b1f73019",
+      "bytes": 6285
     },
     {
       "path": "blueprints/gap-wave2-20260923/worktree-e2e-8/e2e_compare.py",
-      "sha256": "e5a64992952888b7578ab2cf5eed22fc584391668a460d1a3391ca6277d35ec8",
-      "bytes": 7480
+      "sha256": "5f7bab0ad983e13967be0e3db04e3d803271674f061737f933e263665aa21660",
+      "bytes": 7520
     },
     {
       "path": "blueprints/gap-wave2-20260923/zizmor-negative-control/multi-job-no-job-permissions.yml.txt",
@@ -7934,8 +7934,8 @@
     },
     {
       "path": "catalogs/landscape/gap-wave2-20260923--gap-resolution.json",
-      "sha256": "624983af31b93a4e1fa2a195d0c6cc2b36e25784e3f40aeeb478fc2be456ff61",
-      "bytes": 69717
+      "sha256": "c7c9e05bdacc5263d370333fd4679ee9c7599f16445c7c75a07dffaf9291b801",
+      "bytes": 69876
     },
     {
       "path": "catalogs/landscape/hosting-practice.json",
@@ -8514,8 +8514,8 @@
     },
     {
       "path": "docs/gap-wave2-20260923--gap-resolution.md",
-      "sha256": "d5e367975dd0111d5e4e826d7772eb0734282cd2533be640910cb60d027ba0fa",
-      "bytes": 12542
+      "sha256": "d55375ed6fe901b42516f091532e252f5e157d07d4ce1b0e6b20748344769bdc",
+      "bytes": 12548
     },
     {
       "path": "docs/github-automation-evidence.json",
@@ -9714,8 +9714,8 @@
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/lockfile-audit.json",
-      "sha256": "3b71b1b3b15f3e4d9407e95f2ff769e550d9f6edc6688f80ccca8b4796bfd516",
-      "bytes": 8189
+      "sha256": "c80b1cc4c9f36440899cd4e2a9de42b18e3f07c53e477863f81056f2ddce414a",
+      "bytes": 8655
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/publish-catalog-dispatch-attestation.json",
@@ -9834,8 +9834,8 @@
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json",
-      "sha256": "8b41b5b89dc8c90e8a7b0644a5ee93b9fc1388945b2883cb73396148d78d05be",
-      "bytes": 14921
+      "sha256": "c3ff5c66274487c6154b9fcdfbaeb02656aa817cf04cecd2a2f7b5f0ad74a6fa",
+      "bytes": 16546
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/gh-fix-ci-failing-path-trial.json",
@@ -9929,18 +9929,18 @@
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/openbao-lifecycle-comparison.json",
-      "sha256": "3922ee66bca0f515a7e550d633c6fded8eeaf3e87f3917ba54aeaa5cee81897c",
-      "bytes": 14860
+      "sha256": "c41f6309ca67dc21a05c1d9c73c45f60ab771487ea02809399e85996a99c2dd7",
+      "bytes": 15088
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/code-memory-comparison.json",
-      "sha256": "f8099a6dc8bb830f358d24ef48d37ac36d9acd85956c3c85bd7cc88108394e06",
-      "bytes": 14080
+      "sha256": "19a87a4087600a5844f7eeabe6c25c3978e19c2b1b274c4a498f8bbaaeb31792",
+      "bytes": 15527
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/coordinated-snapshot-restore.json",
-      "sha256": "526cce915cefeb74356a32f48f22c1b312adf5dfb66f0b6dbecceefaa66fccf4",
-      "bytes": 15305
+      "sha256": "8a73745d83a8f2994e613f6d516e349770f1efc395c5d9495f687f82d9d44f54",
+      "bytes": 16803
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/held-out-recall-benchmark.json",
@@ -9949,8 +9949,8 @@
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/qdrant-restart-reconnect.json",
-      "sha256": "38db313dd2028872455035a53a1fbe0f5faae5c21410ab18af9be495d805b6ad",
-      "bytes": 5453
+      "sha256": "acc96d04ada904d2580f9b24ca0f5d6e572a53d038a770bab6cc681f47b5ea93",
+      "bytes": 5816
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/arm_a_index_result.json",
@@ -10014,8 +10014,8 @@
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-token-comparison.json",
-      "sha256": "26eda8b8a6700774510c3bc8cac98b017b2fecfe28a18b4dca705ab8bc007d66",
-      "bytes": 15111
+      "sha256": "a5eddee147e890c4e66c42c80ba7ad865d1f80cfa854cf8ae7b1ebd8ce7c8769",
+      "bytes": 15474
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-vs-baselines.json",
@@ -10024,13 +10024,13 @@
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/vllm-0.30.0-acceptance-batch.json",
-      "sha256": "47a8559af7ae73340a575b6bf51e40c838ccc736d5d5cf75a0de890e0eec4ccd",
-      "bytes": 12439
+      "sha256": "aad2959a257a9974a0e2a6d5a9a92c6efce9c18ebfcc8e6553683c0e641a9dff",
+      "bytes": 12890
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/watcher-kill-restart-recovery.json",
-      "sha256": "ada189426894c6042771434081fc6b4ef4922248db5e257d635ded1d286810b7",
-      "bytes": 18800
+      "sha256": "1702356a6e2ee2db38b4bf38daa8a7caf14df71efb802635153616a8d7e2e120",
+      "bytes": 19163
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
@@ -14099,8 +14099,8 @@
     },
     {
       "path": "tests/test_gap_wave_ledger.py",
-      "sha256": "0da3d30b0bd1404e2ea4bb3803c20f57c5af0b047cddf46b42b9cf832ac5ff24",
-      "bytes": 2755
+      "sha256": "1ce3ed5fb281a4bca2a316e0c5db473f29c7a0b97d3773df7fdb118c03f2a883",
+      "bytes": 4174
     },
     {
       "path": "tests/test_gitleaks_config.py",
@@ -14119,8 +14119,8 @@
     },
     {
       "path": "tests/test_grype_known_cve_fixture.py",
-      "sha256": "7d805b28734071e0c796f96c7f304acbbdc56130861f07770e74077b1e612d27",
-      "bytes": 3337
+      "sha256": "4d0bd971c4f32167a1ea154b6d2b79c4a151fa1e50c22d950cf428668e3e5dff",
+      "bytes": 3956
     },
     {
       "path": "tests/test_historical_comparison.py",
@@ -14379,8 +14379,8 @@
     },
     {
       "path": "tools/sota-convergence/gap_wave_ledger.py",
-      "sha256": "ea46cb84b1d5403d104a15ddabc916f628a431ba255054322b30b2c71ca70289",
-      "bytes": 8129
+      "sha256": "6dc6ec19d3c8db944371cbde86f8c7b0dcced125f38b4b14f8ff9fcf455f652b",
+      "bytes": 8675
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",

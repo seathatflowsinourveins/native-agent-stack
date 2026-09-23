@@ -12,7 +12,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-WT = os.path.expanduser('~/.local/share/codex-ecosystem/tools/worktrunk-0.79.0/wt')
+WT = os.path.expanduser(os.path.expanduser('~/.local/share/codex-ecosystem/tools/worktrunk-0.79.0/wt'))
 PROJECT_CONFIG = ('pre-start = "touch pre_start_ran.marker"\n'
                    'pre-remove = "touch ../pre_remove_ran.marker"\n')
 
@@ -93,7 +93,7 @@ def main(base: Path):
                                 'group_or_other_bits_set': group_or_other_perm != 0})
             resolved = p.resolve()
             if not resolved.is_relative_to(base) and not resolved.is_relative_to(Path(os.path.expanduser(
-                    '~/.local/share/codex-ecosystem/tools/worktrunk-0.79.0'))):
+                    os.path.expanduser('~/.local/share/codex-ecosystem/tools/worktrunk-0.79.0')))):
                 escaped_paths.append(str(resolved))
         receipt['umask_result'] = {
             'umask_used': '0o077',

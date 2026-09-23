@@ -101,7 +101,9 @@
   "raw_artifacts": [
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/run_arm.sh",
-      "sha256": "c8a1313ccc17de95c14e7b9aa0ecdd6b6658eef247b8d30bae4b313c38e92946"
+      "sha256": "c8a1313ccc17de95c14e7b9aa0ecdd6b6658eef247b8d30bae4b313c38e92946",
+      "published_sha256": "e5618899a85e1e17594d6c3f70297b2080df36762a9e76607d46869288cd67f4",
+      "published_note": "Published copy differs from the run's file: home paths were sanitized to ~/ at publication, and the coordinator then made helper paths expand at run time (review of PR #101). sha256 is the file as run; published_sha256 is the committed file."
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/question.txt",

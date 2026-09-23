@@ -8,9 +8,9 @@
  "crosswalk_sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8",
  "rule": "status is the best credit over the receipts naming the gap; settles_gap true/partially/false credit settled/advanced/not_settled, but a receipt naming several gaps credits each at most advanced; not_run means no receipt names the gap. No verdict changes here.",
  "counts": {
-  "advanced": 54,
+  "advanced": 52,
   "not_run": 3,
-  "not_settled": 3,
+  "not_settled": 5,
   "settled": 9
  },
  "layers": [
@@ -137,11 +137,11 @@
      "index": 1,
      "text": "No winner has a measured improvement in task quality or provider cost. community-practice-20260920.json records none, and native-practice.json lines 53, 93 and 149 say the same.",
      "next_check": "Run a matched A/B on the frozen case set for each winner (ECC, OpenAI skills, TypeSafe) versus a no-skill baseline, recording task-quality scores and full provider usage including failed attempts, and update native-practice.json lines 53, 93 and 149 only if a measured difference appears.",
-     "status": "advanced",
+     "status": "not_settled",
      "receipts": [
       {
        "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json",
-       "credit": "advanced"
+       "credit": "not_settled"
       }
      ]
     },
@@ -209,11 +209,11 @@
      "index": 7,
      "text": "The TypeSafe 7/8 result covers eight selected cases. C4 disagrees with its frozen label, and the comparison baseline is weak literal containment, not a native coding-agent baseline.",
      "next_check": "Extend the frozen label set beyond eight cases, re-examine C4's label, and run TypeSafe against a native `claude -p`/`codex exec` baseline arm on the same cases, reporting per-arm accuracy and cost.",
-     "status": "advanced",
+     "status": "not_settled",
      "receipts": [
       {
        "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json",
-       "credit": "advanced"
+       "credit": "not_settled"
       }
      ]
     },
@@ -1306,6 +1306,11 @@
     ]
    ],
    "settles_gap": "partially",
+   "per_gap_settles": {
+    "instructions-skills:0": "partially",
+    "instructions-skills:1": "false",
+    "instructions-skills:7": "false"
+   },
    "direction": "inconclusive",
    "evidence_class": "native_proven",
    "model_calls": 12

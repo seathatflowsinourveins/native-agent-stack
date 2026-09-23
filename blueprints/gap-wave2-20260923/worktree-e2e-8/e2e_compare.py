@@ -12,8 +12,8 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-WT = os.path.expanduser('~/.local/share/codex-ecosystem/tools/worktrunk-0.79.0/wt')
-DIFFT = os.path.expanduser('~/.local/share/codex-ecosystem/bin/difft')
+WT = os.path.expanduser(os.path.expanduser('~/.local/share/codex-ecosystem/tools/worktrunk-0.79.0/wt'))
+DIFFT = os.path.expanduser(os.path.expanduser('~/.local/share/codex-ecosystem/bin/difft'))
 
 SCRIPTED_CHANGE_BEFORE = '''def compute_total(items):
     total = 0
