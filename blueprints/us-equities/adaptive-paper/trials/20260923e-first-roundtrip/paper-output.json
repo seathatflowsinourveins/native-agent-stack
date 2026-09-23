@@ -1,0 +1,920 @@
+{
+  "accounting": {
+    "cash_delta_usd": "-120.4",
+    "cumulative_realized_loss_usd": "0",
+    "drawdown_usd": "0.01",
+    "gross_exposure_usd": "120.4",
+    "gross_loss_usd": "0.01",
+    "halted_reason": null,
+    "held_symbols": 1,
+    "outstanding_orders": 0,
+    "peak_pnl_usd": "0",
+    "pending_buy_notional_usd": "0",
+    "realized_pnl_usd": "0",
+    "unrealized_pnl_usd": "-0.01"
+  },
+  "adapter_errors": [
+    "order_ValueError",
+    "unknown_cancel:ValueError"
+  ],
+  "boundary_receipts": [],
+  "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+  "decision_exit": {
+    "cleanup_deadline_reached": false,
+    "duration_completed": false,
+    "elapsed_seconds": 43.2858224639931,
+    "reason": "adapter_error",
+    "transport_health": {
+      "authenticated": {
+        "orders": true,
+        "quotes": true
+      },
+      "fresh_quotes": true,
+      "frozen": false,
+      "ready": true,
+      "reasons": [],
+      "subscriptions": {
+        "orders": true,
+        "quotes": true
+      }
+    }
+  },
+  "dropped_quotes": {
+    "by_reason": {},
+    "by_symbol": {}
+  },
+  "elapsed_seconds": 43.59940500599623,
+  "engine": "NautilusTrader LiveNode 2.0.0rc5",
+  "events": [
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178861.6667075,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178863.6930501,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178865.775322,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178867.7844915,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178869.8644247,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178871.869592,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178873.9382784,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178875.9655519,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178877.9934883,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178880.0509791,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178882.0794284,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178884.0867662,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178886.159175,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178888.2461855,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178890.3349476,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178892.3687148,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178894.462683,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178896.4809215,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178898.5834413,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790178900.664972,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.012041,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 6.7976220068910465,
+          "family": "relative_strength",
+          "score": 6.7976220068910465,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 1
+      },
+      "timestamp": 1790178902.7414892,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-adaptive-20260923e-0000001",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "INTC",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "INTC": "trial_end"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 5.592915857764447,
+          "family": "relative_strength",
+          "score": 5.592915857764447,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {},
+      "timestamp": 1790178903.8854182,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "INTC": "trial_end"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 5.592915857764447,
+          "family": "relative_strength",
+          "score": 5.592915857764447,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {},
+      "timestamp": 1790178903.9899116,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {
+        "INTC": "trial_end"
+      },
+      "gap_bps": {},
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 5.592915857764447,
+          "family": "relative_strength",
+          "score": 5.592915857764447,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {},
+      "timestamp": 1790178904.0945897,
+      "type": "decision"
+    },
+    {
+      "client_id": "rec-adaptive-20260923e-0000001",
+      "reason": "owned_residual_exit",
+      "side": "sell",
+      "strategy": "recovery",
+      "symbol": "INTC",
+      "type": "intent"
+    }
+  ],
+  "feed": "sip",
+  "flat": true,
+  "mode": "adaptive_paper",
+  "native_fill_events": 0,
+  "native_quotes": 24804,
+  "native_rejections": 0,
+  "policy_selections": {
+    "defensive_cash": 0,
+    "mean_reversion": 0,
+    "range_breakout": 0,
+    "relative_strength": 1,
+    "trend_momentum": 0
+  },
+  "preflight": {
+    "account_status": "ACTIVE",
+    "asset_count": 24,
+    "capital_available": true,
+    "clock": {
+      "is_open": true,
+      "next_close_ns": 1790193600000000000,
+      "next_open_ns": 1790256600000000000,
+      "received_at_ns": 1790178859804962086,
+      "timestamp_ns": 1790178859686861694
+    },
+    "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+    "endpoint": "https://paper-api.alpaca.markets",
+    "feed": "sip",
+    "http": [
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790178859"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790178859"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790178860"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790178860"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790178860"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790178861"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790178861"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790178861"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "192",
+          "x-ratelimit-reset": "1790178862"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "191",
+          "x-ratelimit-reset": "1790178862"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "190",
+          "x-ratelimit-reset": "1790178862"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "189",
+          "x-ratelimit-reset": "1790178863"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "188",
+          "x-ratelimit-reset": "1790178863"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "187",
+          "x-ratelimit-reset": "1790178863"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "186",
+          "x-ratelimit-reset": "1790178864"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "186",
+          "x-ratelimit-reset": "1790178864"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "185",
+          "x-ratelimit-reset": "1790178864"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "184",
+          "x-ratelimit-reset": "1790178864"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "183",
+          "x-ratelimit-reset": "1790178865"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "182",
+          "x-ratelimit-reset": "1790178865"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "181",
+          "x-ratelimit-reset": "1790178865"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "180",
+          "x-ratelimit-reset": "1790178866"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "179",
+          "x-ratelimit-reset": "1790178866"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "178",
+          "x-ratelimit-reset": "1790178866"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "177",
+          "x-ratelimit-reset": "1790178867"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "176",
+          "x-ratelimit-reset": "1790178867"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "175",
+          "x-ratelimit-reset": "1790178867"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "174",
+          "x-ratelimit-reset": "1790178868"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "10000",
+          "x-ratelimit-remaining": "9999",
+          "x-ratelimit-reset": "1790178860"
+        },
+        "kind": "data_read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "177",
+          "x-ratelimit-reset": "1790178868"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "176",
+          "x-ratelimit-reset": "1790178868"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "175",
+          "x-ratelimit-reset": "1790178868"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "174",
+          "x-ratelimit-reset": "1790178869"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790178890"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790178891"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790178891"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790178891"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790178902"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790178904"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790178904"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790178905"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790178905"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790178905"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790178906"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790178906"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790178907"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790178907"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790178907"
+        },
+        "kind": "read",
+        "status": 200
+      }
+    ],
+    "observed_at": "2026-09-23T15:54:20.400467+00:00",
+    "open_order_count": 0,
+    "orders_submitted": 0,
+    "position_count": 0,
+    "quote_count": 24,
+    "quote_errors": {}
+  },
+  "reconciliation": null,
+  "recovery": {
+    "broker_positions_last_observed": [],
+    "buy_submissions": 0,
+    "cancel_attempt_client_ids": [],
+    "errors": [],
+    "exit_attempt_client_ids": [
+      "rec-adaptive-20260923e-0000001"
+    ],
+    "flat": true,
+    "mode": "official_sdk_recovery",
+    "native_engine_resumed": false,
+    "order_deadline_seconds": 120.0,
+    "positions": [],
+    "reconciliation": {
+      "cash_delta_usd": "-0.01",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+    },
+    "status": "passed",
+    "unresolved_orders": []
+  },
+  "requests": [
+    {
+      "kind": "read",
+      "timestamp": 1790178861.4266245
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178861.5119038
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178861.532352
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178861.5527754
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178890.645624
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178890.6686149
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178890.687008
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178890.707092
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790178902.7490857
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178903.8914392
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178904.6537337
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178904.7585998
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178904.7818224
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178904.808642
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790178904.8368025
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178905.6268296
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178905.6464283
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178905.6687613
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790178905.692714
+    }
+  ],
+  "session_policy": {
+    "extended_hours": false,
+    "overnight_holds": false
+  },
+  "shutdown_failure": null,
+  "startup_reconciliation": null,
+  "status": "needs_attention",
+  "status_before_recovery": "needs_attention"
+}

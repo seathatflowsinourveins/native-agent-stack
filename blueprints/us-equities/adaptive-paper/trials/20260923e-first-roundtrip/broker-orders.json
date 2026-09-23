@@ -1,0 +1,38 @@
+{
+  "kind": "broker_order_readback",
+  "endpoint": "paper",
+  "source": "alpaca-py TradingClient.get_orders, read-only, 15:54Z-15:56Z",
+  "orders": [
+    {
+      "client_order_id": "rec-adaptive-20260923e-0000001",
+      "broker_order_id_length": 36,
+      "symbol": "INTC",
+      "side": "sell",
+      "type": "limit",
+      "time_in_force": "day",
+      "qty": "1",
+      "limit_price": "120.37",
+      "status": "filled",
+      "filled_qty": "1",
+      "filled_avg_price": "120.39",
+      "submitted_at": "2026-09-23T15:55:04.746153+00:00",
+      "filled_at": "2026-09-23T15:55:05.481403+00:00"
+    },
+    {
+      "client_order_id": "adp-adaptive-20260923e-0000001",
+      "broker_order_id_length": 36,
+      "symbol": "INTC",
+      "side": "buy",
+      "type": "limit",
+      "time_in_force": "day",
+      "qty": "1",
+      "limit_price": "120.43",
+      "status": "filled",
+      "filled_qty": "1",
+      "filled_avg_price": "120.4",
+      "submitted_at": "2026-09-23T15:55:02.656216+00:00",
+      "filled_at": "2026-09-23T15:55:03.720315+00:00"
+    }
+  ],
+  "note": "Orders only; positions were not read back here because the next trial (20260923f) was running at readback time. The trial's own paper-output reconciliation reports flat."
+}

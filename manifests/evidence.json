@@ -6365,8 +6365,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
-      "sha256": "049b1eaeee67010e25b553726e201ce9be951c1a0bc67097908a7f9d86ce86c8",
-      "bytes": 23995
+      "sha256": "d88408adb268b9283adb6538c20f2cb21ac9b923a827178bfc48bea2f2889bfe",
+      "bytes": 24326
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
@@ -6425,7 +6425,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "7b8bc74f73cef276a383326532e3884e0f935741613da64538ba8f3260d4ba32",
+      "sha256": "be53f21bf7676f5fd1dbe2af798b7a91b723d0b6add0c348ed1ec05bc0d1b871",
       "bytes": 4661
     },
     {
@@ -6577,6 +6577,41 @@
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/trial-c-scheduled-trial.log",
       "sha256": "386fe84724195883ef94e5015f1360da4f8dab264628edf47f77c150c6b545f9",
       "bytes": 550
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923e-first-roundtrip/README.md",
+      "sha256": "68ee97cb2e531c6b499d13d88bfebd6af3bf2ba6a5d9dbb31b2d76faaccd695d",
+      "bytes": 1317
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923e-first-roundtrip/broker-orders.json",
+      "sha256": "27baabccea5cf26ee250bf44c15b4e72ad9fd74dbbcad30fb99714598c8ad18b",
+      "bytes": 1246
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923e-first-roundtrip/frozen-885663a.SHA256SUMS",
+      "sha256": "939e5c5c73715cc7edd0af2e64bcc398a669653bffa780e58818694e8cefb48f",
+      "bytes": 41428
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923e-first-roundtrip/gate-result.json",
+      "sha256": "d74721fea6c33d7624f6eb0c4831e22c4a06c53f2570230bac21df194218c7c6",
+      "bytes": 1479
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923e-first-roundtrip/ingest-receipt.json",
+      "sha256": "1476c3a32c344fdea9d6591c93b93da41dc4260ae7fe7db31e867a049c12051b",
+      "bytes": 630
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923e-first-roundtrip/paper-output.json",
+      "sha256": "e1c170a9852c7a9fed3dc48c1024c7d977d2397cdf2f9db416359bc279f0c166",
+      "bytes": 21520
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923e-first-roundtrip/scheduled-trial.log",
+      "sha256": "7f37d8f22a05a6f27e69d1ced35b2feab3287b09688ceb0acee4e2f69e8200c1",
+      "bytes": 645
     },
     {
       "path": "blueprints/us-equities/alpaca-historical/README.md",
@@ -8755,8 +8790,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "1627ae58fe4aae96314917e363ebd372dc2a53d0a2bd32c3437002d07b349b22",
-      "bytes": 31963
+      "sha256": "59d1ab1887781390dc2a91957ac09cdd8591b98c3c5b1d7a39cc0e48f090f0ee",
+      "bytes": 32386
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -14650,8 +14685,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_native.py",
-      "sha256": "82aaac99388368d86af62d839de6503368bcee6ec76896f7496ff861112a05f6",
-      "bytes": 17835
+      "sha256": "ef22d629740344962639d7c4ec8424dfa65c7202b7a0e871d7753b73c50ac398",
+      "bytes": 19404
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
