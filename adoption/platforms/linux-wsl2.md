@@ -2,18 +2,27 @@
 
 ## Get the catalog
 
-Clone the catalog and check out its pinned commit before running any step
-below:
+Clone the catalog and check out its attested release tag before running any
+step below (see [`adoption/bootstrap.md`](../bootstrap.md) step 0 for the
+full detail, including `gh attestation verify` for a downloaded release
+archive):
 
 ```sh
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack
-git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['baseline_commit'])")"
+git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 ```
 
-That checkout target is `adoption/manifest.json` `source.baseline_commit`,
-the same field [`scripts/adoption_status.py`](../../scripts/adoption_status.py)
-compares the working tree's revision against.
+That checkout target is `adoption/manifest.json` `source.release_tag`
+(`v2026.09.22.1` or a later tag, at `source.release_commit`, published with
+SLSA build provenance by `.github/workflows/publish-catalog.yml`). Do
+**not** check out `source.baseline_commit`: that field predates `adoption/`
+and `tools/adoption/` entirely and is never a checkout target (Codex
+cross-family review finding, `codex-review-64`);
+[`scripts/adoption_status.py`](../../scripts/adoption_status.py) uses
+`baseline_commit` only as the comparison point for its
+`baseline_matches`/`baseline_differs` `git` result, never as something a
+reader should check out.
 
 `platform_profiles` entry `linux-wsl2-x86_64` in [`adoption/manifest.json`](../manifest.json),
 evidence at [`adoption/receipt.json`](../receipt.json). This is the initial and

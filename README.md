@@ -187,7 +187,7 @@ The public source fixture removes personal path literals and independently recou
 
 ## Start here
 
-0. Clone the catalog and check out the pinned commit: `git clone https://github.com/seathatflowsinourveins/native-agent-stack.git && cd native-agent-stack`, then `git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['baseline_commit'])")"` — the `adoption/manifest.json` `source.baseline_commit` field. `scripts/adoption_status.py` compares the checked-out revision against this same field and reports `baseline_matches` or `baseline_differs` (see its `git` result block).
+0. Clone the catalog and check out the attested release tag: `git clone https://github.com/seathatflowsinourveins/native-agent-stack.git && cd native-agent-stack`, then `git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"` — the `adoption/manifest.json` `source.release_tag` field (`v2026.09.22.1` or a later tag, at `source.release_commit`, published with SLSA build provenance by `.github/workflows/publish-catalog.yml`). Do **not** check out `source.baseline_commit`: that field predates `adoption/` and `tools/adoption/` entirely and is never a checkout target (Codex cross-family review finding, `codex-review-64`); `scripts/adoption_status.py` uses it only as the comparison point for its `baseline_matches`/`baseline_differs` `git` result. See [`adoption/bootstrap.md`](adoption/bootstrap.md) step 0 for the full detail, including `gh attestation verify` for a downloaded release archive.
 1. Start with [new-machine adoption](adoption/README.md), the [continuation manifest](adoption/manifest.json) and [future update protocol](adoption/update.md). The SDK now has a native uv hash lock and fresh-prefix acceptance; historical results remain scoped to their original host.
 2. Follow the [native installation and workflows](recipes/README.md). Choose the profile appropriate to your project; use your own native client login and project paths.
 3. Adopt the inactive [examples](examples/) deliberately. They contain no credentials, blanket trust settings or active machine-specific configuration.
@@ -203,7 +203,7 @@ python3 -m unittest discover -s tests -v
 
 ```bash
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git && cd native-agent-stack
-git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['baseline_commit'])")"
+git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 bash adoption/bootstrap-linux.sh --profile foundation-cpu
 export PATH="$HOME/.local/share/codex-ecosystem/bin:$PATH"
 python3 scripts/adoption_status.py --profile foundation-cpu --json
@@ -225,7 +225,7 @@ what is currently accepted.
 
 ```bash
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git && cd native-agent-stack
-git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['baseline_commit'])")"
+git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation
 export PATH="$HOME/.local/share/codex-ecosystem/bin:$PATH"
 python3 scripts/adoption_status.py --profile macos-arm64-foundation --json

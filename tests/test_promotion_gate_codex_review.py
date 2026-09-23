@@ -12,6 +12,19 @@ Codex cross-family review recorded in
    like `-1e-400` (underflows to `-0.0`, reads as non-negative/integral) and
    `9007199254740992.5` (loses its fractional part past float64 precision).
 
+Plus one follow-up finding from a second-round blind Codex cross-family
+review of the fix for (1) above (`codex-review-72`, 0a6ab80 parent commit):
+
+3. The fix for (1) changed `_summarize()`'s per-check `count` to
+   `len(subset)` -- the raw number of pandera `failure_cases` ROWS for that
+   check name. Pandera emits more than one failure-case row per failed
+   index for a dataframe-level check (one row per referenced column) and for
+   `unique=[...]` multi-field-uniqueness checks (one row per field), so
+   `len(subset)` overcounts distinct failed rows and falsely appends
+   "row index unavailable" even when every case has an index. `count` must
+   instead be the number of distinct non-null indices plus the number of
+   failure cases that truly have no index.
+
 Kept separate from `tests/test_promotion_gate.py` (owned by another session);
 mirrors its structure: pure-stdlib tests (no pandas/numpy import, matching
 `promotion_gate.py`'s own lazy-import discipline) always run; anything that
@@ -133,6 +146,56 @@ class SummarizeNullIndexPurePython(unittest.TestCase):
         self.assertNotIn("row index unavailable", by_name["valid_trading_session"]["detail"])
 
 
+class SummarizeDuplicateIndexPurePython(unittest.TestCase):
+    """Finding 3 (second-round review, `codex-review-72`): pandera can emit
+    more than one `failure_cases` row for the SAME index -- one row per
+    referenced column for a dataframe-level check (`high_ge_max_open_close`,
+    `low_le_min_open_close`), or one row per field for a multi-field
+    `unique=[...]` check (`unique_symbol_session`). `_summarize()` must count
+    each distinct index once, not once per failure-case row, and must only
+    say "row index unavailable" when a failure case truly has no index."""
+
+    def _failure_cases(self, rows):
+        return SummarizeNullIndexPurePython._FakeFailureCases(rows)
+
+    def test_duplicate_index_rows_counted_once_no_unavailable_note(self):
+        # Two failure-case rows share index 3 (e.g. touching both `open`
+        # and `close`), plus one row for a distinct index 5. A buggy
+        # `count = len(subset)` would report 3 failed rows here and wrongly
+        # append "row index unavailable" even though every case has an
+        # index.
+        rows = [
+            {"check": "high_ge_max_open_close", "index": 3},
+            {"check": "high_ge_max_open_close", "index": 3},
+            {"check": "high_ge_max_open_close", "index": 5},
+        ]
+        checks = g._summarize(self._failure_cases(rows), row_count=6)
+        by_name = {c["name"]: c for c in checks}
+        detail = by_name["high_ge_max_open_close"]["detail"]
+        self.assertEqual(by_name["high_ge_max_open_close"]["status"], "fail")
+        self.assertIn("2 of 6 rows failed", detail)
+        self.assertIn("example row indices [3, 5]", detail)
+        self.assertNotIn("row index unavailable", detail)
+
+    def test_duplicate_index_rows_plus_genuine_null_index_row(self):
+        # One duplicated index (2 rows -> 1 distinct) plus one genuinely
+        # index-less failure case: count must be
+        # len(distinct indices) + null-index case count = 1 + 1 = 2, and
+        # the detail must still flag the unavailable index.
+        rows = [
+            {"check": "unique_symbol_session", "index": 1},
+            {"check": "unique_symbol_session", "index": 1},
+            {"check": "unique_symbol_session", "index": None},
+        ]
+        checks = g._summarize(self._failure_cases(rows), row_count=3)
+        by_name = {c["name"]: c for c in checks}
+        detail = by_name["unique_symbol_session"]["detail"]
+        self.assertEqual(by_name["unique_symbol_session"]["status"], "fail")
+        self.assertIn("2 of 3 rows failed", detail)
+        self.assertIn("example row indices [1]", detail)
+        self.assertIn("row index unavailable", detail)
+
+
 class VolumeDecimalPurePython(unittest.TestCase):
     """Finding 2, pure stdlib: `_volume_cell_fails` must Decimal-parse the
     exact raw string form, not a lossy float conversion, and must not
@@ -243,6 +306,23 @@ class FixtureGateRuns(unittest.TestCase):
             "print(json.dumps(g._raw_volume_failure_indices(frame)))\n")
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertEqual(json.loads(proc.stdout), [0, 1])
+
+    def test_bad_fixture_detail_counts_match_distinct_row_indices(self):
+        """Finding 3: `bad.csv` fails `high_ge_max_open_close` for exactly
+        one row (index 3, which fails on both the `high >= open` and
+        `high >= close` comparisons touching the same row) and
+        `unique_symbol_session` for exactly two rows (indices 0 and 1,
+        each producing one `failure_cases` row per uniqueness field). A
+        buggy `count = len(subset)` (Codex `codex-review-72`) would report
+        more failed rows than exist and a spurious "row index unavailable"
+        even though every case here has an index."""
+        code, result = self._run("bad.csv")
+        self.assertEqual(code, 1)
+        by_name = {c["name"]: c for c in result["checks"]}
+        self.assertEqual(by_name["high_ge_max_open_close"]["detail"],
+                          "1 of 4 rows failed; example row indices [3]")
+        self.assertEqual(by_name["unique_symbol_session"]["detail"],
+                          "2 of 4 rows failed; example row indices [0, 1]")
 
     def test_load_frame_preserves_exact_volume_text_from_csv(self):
         """The CSV loader must hand `volume` to `_raw_volume_failure_indices`

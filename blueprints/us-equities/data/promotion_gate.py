@@ -272,8 +272,20 @@ def _summarize(failure_cases, row_count: int, extra_failures: dict | None = None
         renamed["check"] = renamed["check"].replace({"multiple_fields_uniqueness": "unique_symbol_session"})
         for name in sorted(renamed["check"].unique()):
             subset = renamed[renamed["check"] == name]
-            failing[name] = {"count": int(len(subset)),
-                              "indices": sorted({int(index) for index in subset["index"].dropna()})}
+            # pandera can emit more than one failure-case row per failed
+            # index (e.g. one row per column for a dataframe-level check, or
+            # one row per field for a multi-field uniqueness check), so
+            # `len(subset)` overcounts distinct failed rows and falsely
+            # implies a missing row index (Codex cross-family review
+            # finding). Count distinct non-null indices once each, and add
+            # one for every failure case that truly has no row index (e.g.
+            # an element-wise check that raised before pandera could attach
+            # one); those cannot be deduplicated against each other.
+            non_null_index_values = subset["index"].dropna()
+            distinct_indices = sorted({int(index) for index in non_null_index_values})
+            null_index_count = len(subset) - len(non_null_index_values)
+            failing[name] = {"count": len(distinct_indices) + null_index_count,
+                              "indices": distinct_indices}
     for name, indices in extra_failures.items():
         entry = failing.setdefault(name, {"count": 0, "indices": []})
         merged = sorted(set(entry["indices"]) | set(indices))

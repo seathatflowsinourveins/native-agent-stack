@@ -23,6 +23,7 @@ class).
 """
 
 import json
+import re
 import shutil
 import subprocess
 import tempfile
@@ -226,6 +227,53 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 "even though the identical value under 'next_page_token' is legitimately suppressed",
             )
 
+    def test_c4_narrative_commit_id_and_unrelated_api_key_sharing_one_line_the_api_key_is_still_detected(self):
+        r"""Second-round Codex cross-family review finding (codex-review-72,
+        .gitleaks.toml prose-narrative allowlist, duplicated under both
+        rules that match it -- see .gitleaks.toml's "[[rules]] id" lines):
+        whole-line anchoring (test_c2 above) is not enough for this
+        allowlist, because its `.*?`/
+        `.*` (any char, including `"`) can cross the closing quote of the
+        JSON string holding the commit reference and reach a SECOND
+        key:value pair later on the same physical line -- e.g.
+        `{"detail": "pinned commit <hex>", "api_key": "<value>"}` on one
+        compact line. The allowlist regex now uses `(?:[^\"\\\\]|\\\\.)*`
+        instead of `.*`, so it cannot leave the JSON string holding the
+        commit reference; a second key:value pair on the same line is
+        outside that string and the line no longer matches the allowlist as
+        a whole, so gitleaks's own finding for the unrelated key is not
+        exempted. Uses `api_key`/HEX64 rather than the ghp_-shaped value: the
+        GitHub PAT shape is caught by gitleaks's own dedicated `github-pat`
+        rule, which never had this allowlist attached and so would pass
+        regardless of this fix; HEX64 under `api_key` is caught by the same
+        `generic-api-key` rule this narrative allowlist is scoped under
+        (matching test_c2's technique above), so this only passes for the
+        right reason. The two fields must NOT be compacted onto a line that
+        also holds the JSON object's opening `{`: gitleaks's `regexTarget =
+        "line"` allowlist match is against the exact physical line, and this
+        allowlist's own `^\s*"..."` anchor already fails to match a line
+        starting with `{` regardless of the crossing-quote bug being tested
+        here -- that would make the assertion pass for the wrong reason (a
+        pre-existing brace-anchoring mismatch, not this fix). Mirrors how
+        the real files actually look (pretty-printed, each JSON object's
+        `{`/`}` on its own line, fields following on later lines)."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            allow_dir = target / "evidence" / "artifacts" / "blind-catalog-convergence-20260921"
+            allow_dir.mkdir(parents=True)
+            (allow_dir / "claude-coverage-review.json").write_text(
+                "{\n"
+                f'  "detail": "pinned commit {HEX40}", "api_key": "{HEX64}"\n'
+                "}\n"
+            )
+            findings = self._scan(target)
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(
+                HEX64, secrets,
+                f"the api_key finding co-located with an allowlisted commit-narrative field on "
+                f"the same line must still be detected, got: {findings}",
+            )
+
     def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):
         """`--exit-code 0` must return process exit code 0 even when real leaks are found.
 
@@ -264,6 +312,86 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 f"(got {proc.returncode}); a nonzero code here means the earlier mis-recorded "
                 "exit-code finding could recur",
             )
+
+
+class GitleaksNarrativeAllowlistRegexTests(unittest.TestCase):
+    """Pure-regex regression coverage for the prose-narrative commit-id
+    allowlist (codex-review-72), independent of the installed gitleaks
+    binary or its per-user lock -- gitleaks's own `generic-api-key` rule
+    never fires on these two files' CURRENT content in the first place (no
+    field name here matches its own access/auth/api/credential/creds/key/
+    password/secret/token keyword list), so an end-to-end `dir`-mode
+    positive control using only real file content would be vacuous; this
+    tests the allowlist regex itself directly against real lines plus a
+    constructed mixed line, complementing test_c4's end-to-end proof above
+    (which uses a fixture line engineered to also satisfy the base rule)."""
+
+    NARRATIVE_FILES = (
+        ROOT / "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        ROOT / "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+    )
+    # The allowlist regex exactly as it read before the codex-review-72 fix,
+    # frozen here for comparison; .gitleaks.toml no longer contains this form.
+    PRE_FIX_REGEX = (
+        r'''(?i)^\s*"[A-Za-z0-9_]+":\s*".*?(?:@\s*|\b(?:pin|pinned|commit|tree|'''
+        r'''source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b.*"\s*,?\s*$'''
+    )
+
+    def _current_allowlist_regexes(self):
+        import tomllib
+        with open(CONFIG_PATH, "rb") as f:
+            data = tomllib.load(f)
+        found = []
+        for rule in data.get("rules", []):
+            for allowlist in rule.get("allowlists", []):
+                if any("blind-catalog-convergence" in p for p in allowlist.get("paths", [])):
+                    found.extend(allowlist.get("regexes", []))
+        return found
+
+    def test_config_no_longer_contains_the_crossing_quote_regex(self):
+        raw = CONFIG_PATH.read_text()
+        self.assertNotIn(
+            self.PRE_FIX_REGEX, raw,
+            "the pre-fix `.*?`/`.*` form of the prose-narrative allowlist regex "
+            "(which can cross a JSON string's closing quote) is still present",
+        )
+
+    def test_fixed_regex_rejects_mixed_line_but_keeps_every_real_narrative_match(self):
+        regexes = self._current_allowlist_regexes()
+        self.assertEqual(
+            len(regexes), 2,
+            "expected one copy of the narrative allowlist under generic-api-key "
+            "and an identical copy under the other matching rule",
+        )
+        self.assertEqual(regexes[0], regexes[1], "the two rule-scoped copies must stay identical")
+        current = re.compile(regexes[0])
+        pre_fix = re.compile(self.PRE_FIX_REGEX)
+
+        hexid = "1bf6df330b056ef93ab283083afdcce642387949"
+        mixed_line = f'  "detail": "pinned commit {hexid}", "api_key": "{hexid}deadbeefdeadbeef"'
+        self.assertTrue(
+            pre_fix.match(mixed_line),
+            "sanity check: the pre-fix regex must match this mixed line (it is the reported bug)",
+        )
+        self.assertFalse(
+            current.match(mixed_line),
+            "the fixed regex must not exempt a second key:value pair on the same physical line",
+        )
+
+        real_matches_before = 0
+        for path in self.NARRATIVE_FILES:
+            for line in path.read_text().splitlines():
+                if pre_fix.match(line):
+                    real_matches_before += 1
+                    self.assertTrue(
+                        current.match(line),
+                        f"fixed regex regressed a real, previously-allowlisted narrative line: {line[:160]}",
+                    )
+        self.assertGreater(
+            real_matches_before, 0,
+            "the two narrative files must contain at least one real line the pre-fix regex "
+            "matched, or this comparison is not exercising real content",
+        )
 
 
 class GitleaksBranchAncestryHistoryTests(unittest.TestCase):

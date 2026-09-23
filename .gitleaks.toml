@@ -61,6 +61,38 @@
 # `"next_page_token"` field name, so an unrelated `api_key` value of the same shape
 # is not incidentally exempted. Regression coverage for both fixes is in
 # tests/test_gitleaks_config.py.
+#
+# 2026-09-22, second-round Codex cross-family review finding (codex-review-72):
+# whole-line anchoring alone was insufficient for the "Git commit/tree ids
+# referenced in blind-catalog-convergence review narrative" allowlist
+# (duplicated under generic-api-key and sourcegraph-access-token): its `.*?`
+# before the context word and `.*` before the closing-quote anchor both use
+# `.` (matches any char, including `"`), so they can cross the closing quote
+# of the JSON string holding the commit reference and reach a SECOND
+# key:value pair later on the same physical line -- e.g.
+# `"note": "pinned commit <40-hex>", "api_key": "<40-hex>"` was wrongly
+# exempted in full, silently suppressing the unrelated `api_key` value.
+# Whole-line anchoring only stops an allowlist regex from matching a
+# SUBSTRING; it does nothing to stop `.` within that regex from itself
+# spanning multiple JSON values on the anchored line. Both occurrences now
+# use `(?:[^"\\]|\\.)*?`/`(?:[^"\\]|\\.)*` (matches any char OR a backslash
+# escape, but never an unescaped `"`) instead of `.*?`/`.*`, so the context
+# word, hex id and surrounding prose must all stay inside the SAME JSON
+# string as the opening `"[A-Za-z0-9_]+": "` -- the same JSON-string-safe
+# technique the corpus_files allowlist below already used (`[^"]+`).
+# Verified (Python `re`, not the gitleaks binary) against the 53 lines this
+# allowlist actually matches in the two narrative files: the fix changes 0
+# of those real matches, and rejects both a
+# `"note": "...commit <hex>", "api_key": "<hex>"` line and the same pair in
+# reversed key order. This does NOT close every variant: a single JSON
+# string value that itself narrates both a commit id AND an unrelated
+# secret-shaped substring (no second key:value pair, nothing to anchor
+# against) can still be exempted -- that is inherent to any allowlist scoped
+# to free-text narrative rather than a fixed field shape, and tightening the
+# trailing character class to close it breaks real narrative lines that
+# legitimately continue for hundreds of characters past the hex id (see the
+# real matches above). Regression coverage for the two-key-value-pair case
+# is in tests/test_gitleaks_config.py.
 # After this config, `gitleaks git . --config .gitleaks.toml --max-target-megabytes 2`
 # restricted to this branch's own ancestry (--log-opts="HEAD") scanned 392 commits
 # (~915 MB) and produced 0 findings (re-measured 2026-09-22, codex-review-64 fix
@@ -202,7 +234,7 @@ paths = [
 ]
 regexTarget = "line"
 regexes = [
-  '''(?i)^\s*"[A-Za-z0-9_]+":\s*".*?(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b.*"\s*,?\s*$''',
+  '''(?i)^\s*"[A-Za-z0-9_]+":\s*"(?:[^"\\]|\\.)*?(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b(?:[^"\\]|\\.)*"\s*,?\s*$''',
 ]
 
 # Opaque Alpaca pagination cursor retained in one historical-bars receipt. Anchored
@@ -299,5 +331,5 @@ paths = [
 ]
 regexTarget = "line"
 regexes = [
-  '''(?i)^\s*"[A-Za-z0-9_]+":\s*".*?(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b.*"\s*,?\s*$''',
+  '''(?i)^\s*"[A-Za-z0-9_]+":\s*"(?:[^"\\]|\\.)*?(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b(?:[^"\\]|\\.)*"\s*,?\s*$''',
 ]

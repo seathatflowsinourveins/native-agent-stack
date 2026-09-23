@@ -149,6 +149,45 @@ class AdoptionContractTests(unittest.TestCase):
                 "checking it out in step 0 and this test (and the doc fix it guards) should be reviewed",
             )
 
+    def test_no_doc_entry_point_checks_out_the_pre_adoption_baseline(self):
+        """Second-round Codex cross-family review finding (codex-review-72):
+        the fix above only patched `adoption/bootstrap.md` step 0 and only
+        inspected its first 1500 characters, so it missed three other
+        checkout instructions using `source.baseline_commit` as the checkout
+        target -- README.md's "Start here" step 0, its "Fresh WSL2 x86_64"
+        and "Fresh macOS arm64" quick-start blocks, and
+        `adoption/platforms/linux-wsl2.md` (which `adoption/bootstrap.md`
+        tells readers to read "before starting"). Every one of those would
+        fail identically to the original bootstrap.md bug: `baseline_commit`
+        predates `adoption/` and `tools/adoption/`, so nothing after that
+        checkout works. Scan every doc entry point, not just the first 1500
+        characters of one file, for the literal checkout-target pattern."""
+        checkout_target_pattern = re.compile(
+            r"git checkout \"\$\(python3 -c \"import json;print\(json\.load\(open\('adoption/manifest\.json'\)\)"
+            r"\['source'\]\['baseline_commit'\]\)\"\)\""
+        )
+        candidate_docs = [ROOT / 'README.md'] + sorted((ROOT / 'adoption').rglob('*.md'))
+        offenders = []
+        for doc in candidate_docs:
+            text = doc.read_text()
+            if checkout_target_pattern.search(text):
+                offenders.append(str(doc.relative_to(ROOT)))
+        self.assertEqual(
+            offenders, [],
+            f"these docs still tell a reader to `git checkout` "
+            f"source.baseline_commit (a revision with no adoption/ or "
+            f"tools/adoption/ directory) instead of source.release_tag: {offenders}",
+        )
+        # A positive control: the pattern above must actually match the
+        # known-broken form, so a change to the doc's exact wording doesn't
+        # silently make this test vacuous.
+        broken_example = (
+            'git checkout "$(python3 -c "import json;'
+            "print(json.load(open('adoption/manifest.json'))"
+            "['source']['baseline_commit'])\")\""
+        )
+        self.assertRegex(broken_example, checkout_target_pattern)
+
 
 if __name__ == '__main__':
     unittest.main()

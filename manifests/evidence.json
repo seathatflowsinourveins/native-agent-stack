@@ -3063,8 +3063,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "3da1c244edf1b3a29e3ddb63eca70bbd0b01c42bcc2da890337759dc3365dfad",
-      "bytes": 21858
+      "sha256": "1a16211e2271db8dfeee648506f4bbd5c1274654b0a3bf3b664581bce01b2000",
+      "bytes": 24118
     },
     {
       "path": "AGENTS.md",
@@ -3083,8 +3083,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "493ee6c0f962a863b0428c0744aaf9fc9ce3563df29bf4f3e2e2e292e689827f",
-      "bytes": 21362
+      "sha256": "1ef2a912917e32b6fd7cc874d9c0e48df6d25748e318488db30394a0bb8b76c1",
+      "bytes": 21797
     },
     {
       "path": "SECURITY.md",
@@ -3173,8 +3173,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "facbb9a5111a047cde34881e5e1aeca4963d6b780446fade7a3af85d9aaf081e",
-      "bytes": 4224
+      "sha256": "94dbbe4bd59497b5001b5fb407f775102d5ebbfcb9d9392cf1c25cba7ec8f668",
+      "bytes": 4803
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -5999,8 +5999,8 @@
     },
     {
       "path": "blueprints/us-equities/data/promotion_gate.py",
-      "sha256": "ac87c217b610a95da18f8d43aea939fc19bb3ac737a61f94c5e39e572810c7bc",
-      "bytes": 18943
+      "sha256": "a6189cd081d59d8e221eba5231a03491030dec764a47942f3cbb4db50f39a7e2",
+      "bytes": 19803
     },
     {
       "path": "blueprints/us-equities/data/receipt.json",
@@ -11514,8 +11514,8 @@
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "5eb6580f4cc5ccdd8cfc8e2d395405c1f4d53d75a9a2c67e2bea86b371438d45",
-      "bytes": 8715
+      "sha256": "141c9d5815d168147627da652f725ab5532467f6e10b77dd9aab79874c695fcf",
+      "bytes": 10945
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
@@ -11634,8 +11634,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "d94ab0982ad2aaed4132f85464e4ace5bfebb170cb9979046649316b324281bc",
-      "bytes": 18172
+      "sha256": "b5413c3dbadaedbfb9930b3be81e0029139e210f70d97a89917555127802f170",
+      "bytes": 25045
     },
     {
       "path": "tests/test_gpu_inference.py",
@@ -12114,8 +12114,8 @@
     },
     {
       "path": "tests/test_promotion_gate_codex_review.py",
-      "sha256": "1be6900128f60f9146d38522ec64ddec8a739758138f704a0141f4eb69d96af7",
-      "bytes": 12284
+      "sha256": "782370297740ec117d98dc8ae7307b4564946751cf75ca08bb568fad3b5db55c",
+      "bytes": 16770
     },
     {
       "path": "blueprints/us-equities/data/fixtures/null-index-session.csv",
