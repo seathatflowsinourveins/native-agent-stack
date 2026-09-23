@@ -30,6 +30,15 @@ $ <exact command>
 Path to the dated decision record for this change (if any), naming the
 evidence, alternatives considered and the comparison that would overturn it:
 
+### Host evidence
+
+Only relevant when this PR adds or changes files under `evidence/hosts/`. See
+[`docs/contributing-evidence.md`](../docs/contributing-evidence.md).
+
+- [ ] `python3 scripts/host_receipts.py validate` passes for every new/changed receipt.
+- [ ] Independent review is recorded (`scripts/host_receipts.py review`) or explicitly requested in this PR.
+- [ ] No `platform_status` change is made from a host receipt alone; a platform status flip still needs the matrix rule in `docs/component-evidence-matrix.md`.
+
 ### Checklist
 
 - [ ] New/changed GitHub Actions are pinned to a full commit SHA with a

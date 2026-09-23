@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "wsl-authoring-20260923--shellcheck--use--20260923",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "wsl-authoring-20260923",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "8edf4dceed62985ad1834c79ecc82e713c78eec5",
+  "component_id": "shellcheck",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "shellcheck fixtures/example.sh",
+      "exit": 0,
+      "duration_s": 0.007,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_excerpt": ""
+    }
+  ],
+  "tool_versions": {
+    "shellcheck": "0.11.0"
+  },
+  "observed_at_utc": "2026-09-23T01:05:31Z",
+  "result": "pass",
+  "claim": "On the catalog's authoring WSL host, shellcheck's documented use command ran against the tracked example fixture.",
+  "limitations": [
+    "Covers only 'shellcheck fixtures/example.sh' on this host; no other script, config or second physical machine is exercised.",
+    "Runs against this repository's own tracked fixture (fixtures/example.sh), not an external real-world script; per docs/contributing-evidence.md Section 2 this is local_integration, not native_proven."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-23T01:05:31Z"
+    }
+  ]
+}
