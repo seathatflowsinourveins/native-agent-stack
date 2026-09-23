@@ -728,6 +728,33 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   `claude/verdict-integrity-2-20260923` at 238c754) overlaid in a scratch worktree, the 92 tests
   also pass, including the constant-name comparison. This is a local integration check of the
   unmerged branch, not of its merged form.
+- **Third review of the gate (2026-09-23).** A third independent review raised one medium
+  and four low findings. All are closed except the second, which is recorded as documented scope.
+  - **Finding 1 (relabelled status, medium).** A recorded newest-wave row could be relabelled
+    `pending_lanes` or `no_selection` with its winners, alternatives and overturn text cleared,
+    and it passed, because nothing derived `verdict_status` from the sealed evidence. The gate
+    now derives the status `record_verdicts.py` writes (`recorded` for agreeing lanes, an
+    adjudicated disagreement or an authorized single lane, unless no indexed alternative remains;
+    `pending_lanes` otherwise) and fails a row with any other status. A new-wave row is never
+    `no_selection`. Negative controls: an agreeing row relabelled `pending_lanes` and relabelled
+    `no_selection`, an adjudicated disagreement relabelled `pending_lanes`, a single-lane row
+    relabelled `pending_lanes` with its decision hash dropped, an added `no_selection` row, and a
+    `recorded` row with no remaining alternative.
+  - **Finding 2 (free-form published fields, low).** `open_gaps` text and the wave document's
+    `title`, `group`, `overturn_when` and `checked_at` are not re-derived within the newest wave.
+    This is now stated in `docs/github-automation.md`; frozen waves are compared whole.
+  - **Finding 3 (fail-open git error, low).** A failing `git diff` or `git ls-files` while
+    listing changed paths raises a read error (exit 2) instead of counting as no change.
+  - **Finding 4 (duplicate JSON keys, low).** Every parse in the gate uses
+    `catalog_decisions.unique_json`; a duplicate key is not equivalent and a malformed ledger or
+    registry exits 2.
+  - **Finding 5 (empty name-alignment test, low).** #124's constant values at 238c754 are
+    pinned as literals and asserted unconditionally; the comparison with `scripts/landscape.py`
+    skips with a reason until #124 defines the names there.
+  - *Residual.* A `codex_absent` row relabelled `pending_lanes` with `lanes.single_lane_decision`
+    removed is what `record_verdicts.py` writes without `--allow-single-lane`, and the run manifest
+    does not record the decision, so it cannot be told apart and passes. It withdraws a
+    single-family verdict; it cannot add one.
 - **Accepted residual: the PR's own workflow can disable the job (finding 2, 2026-09-23).** A
   `pull_request` run takes the job definition from the PR's `validate.yml`. A PR that edits the
   `verdict-review-gate` job so that it no longer runs the base's gate is therefore not blocked by

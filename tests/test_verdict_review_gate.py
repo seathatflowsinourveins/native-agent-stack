@@ -17,6 +17,7 @@ import os
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from scripts import verdict_review_gate as gate
@@ -878,13 +879,139 @@ class ToolingAlignmentTests(GateFixture):
         del row["lanes"]["single_lane_decision_sha256"]
         self.assertFails(self.report(), "lanes.single_lane_decision_sha256 is absent")
 
+    # #124's values at origin/claude/verdict-integrity-2-20260923 238c754 (scripts/landscape.py lines
+    # 99-126), pinned so the comparison asserts something before #124 merges.
+    TOOLING_OWNER_NAMES_238C754 = {
+        "RETAINED_PACKETS_DIR": "packets",
+        "POPULARITY_RECENCY_FIELDS": ("stars", "forks", "watchers", "pushed_at", "released_at"),
+        "POPULARITY_TOKENS": ("star", "fork", "watcher", "subscriber", "download", "popular", "trending"),
+        "UPSTREAM_RELEASE_FIELDS": ("latest", "prerelease", "latest_flag"),
+        "COPY_WITHHELD_FIELDS": ("pin_behind_upstream", "newcomer", "note"),
+        "WITHHELD_KEY_TOKENS": ("latest", "release", "newcomer", "pin_behind"),
+        "PACKET_OWN_KEYS": ("checked_at",),
+        "SINGLE_LANE_DECISION_DIR": "docs/decisions/",
+    }
+
+    def test_names_match_the_tooling_owners_pinned_values(self):
+        for name, value in self.TOOLING_OWNER_NAMES_238C754.items():
+            self.assertEqual(getattr(gate, name), value, name)
+
     def test_names_match_the_tooling_owners_landscape_once_it_defines_them(self):
         from scripts import landscape
-        for name in ("RETAINED_PACKETS_DIR", "POPULARITY_RECENCY_FIELDS", "POPULARITY_TOKENS",
-                     "UPSTREAM_RELEASE_FIELDS", "COPY_WITHHELD_FIELDS", "WITHHELD_KEY_TOKENS", "PACKET_OWN_KEYS",
-                     "SINGLE_LANE_DECISION_DIR"):
-            if hasattr(landscape, name):
-                self.assertEqual(getattr(gate, name), getattr(landscape, name), name)
+        defined = [name for name in self.TOOLING_OWNER_NAMES_238C754 if hasattr(landscape, name)]
+        if not defined:
+            self.skipTest("scripts/landscape.py defines none of #124's names yet (#124 unmerged); "
+                          "test_names_match_the_tooling_owners_pinned_values pins them")
+        for name in defined:
+            self.assertEqual(getattr(gate, name), getattr(landscape, name), name)
+
+
+class StatusDerivationTests(GateFixture):
+    """Third review of #123, finding 1: verdict_status is the one record_verdicts.py writes for the
+    sealed evidence, so a recorded verdict cannot be withdrawn by relabelling its row."""
+
+    def withdraw(self, row, status, open_gaps=()):
+        row.update(verdict_status=status, winners=[], alternatives=[], verdict_overturn_when="",
+                   open_gaps=list(open_gaps))
+
+    def test_agreeing_row_relabelled_pending_lanes_fails(self):
+        row = self.record()
+        self.rebase()
+        self.withdraw(row, "pending_lanes")
+        report = self.report()
+        self.assertEqual(report["changes"][0]["kind"], "changed")
+        self.assertFails(report, "verdict_status is 'pending_lanes' but record_verdicts.py writes 'recorded'")
+
+    def test_agreeing_row_relabelled_no_selection_fails(self):
+        row = self.record()
+        self.rebase()
+        self.withdraw(row, "no_selection", ["withdrawn"])
+        self.assertFails(self.report(), "a new-wave row cannot be 'no_selection'")
+
+    def test_added_no_selection_row_fails(self):
+        row = self.record(claude_keys=("c1",), codex_keys=("c2",), status="pending_lanes", winners=[])
+        row.update(verdict_status="no_selection", open_gaps=["nothing fits"])
+        self.assertFails(self.report(), "a new-wave row cannot be 'no_selection'")
+
+    def test_adjudicated_disagreement_relabelled_pending_lanes_fails(self):
+        row = self.record(claude_keys=("c1",), codex_keys=("c2",), judged=adjudication())
+        self.rebase()
+        self.withdraw(row, "pending_lanes")
+        self.assertFails(self.report(), "verdict_status is 'pending_lanes' but record_verdicts.py writes 'recorded'")
+
+    def test_single_lane_row_relabelled_pending_lanes_fails_even_without_its_hash(self):
+        self.decision("single-lane-authorization: foundation/beta\n")
+        row = self.record(codex=False, single_lane=DECISION)
+        self.rebase()
+        self.withdraw(row, "pending_lanes")
+        del row["lanes"]["single_lane_decision_sha256"]
+        self.assertFails(self.report(), "verdict_status is 'pending_lanes' but record_verdicts.py writes 'recorded'")
+
+    def test_unadjudicated_disagreement_pending_lanes_passes(self):
+        self.record(claude_keys=("c1",), codex_keys=("c2",), status="pending_lanes", winners=[])
+        self.assertPasses(self.report())
+
+    def test_split_adjudication_pending_lanes_passes(self):
+        judged = adjudication([judgment("anthropic", "A"), judgment("anthropic", "B"),
+                               judgment("openai", "A", "codex"), judgment("openai", "B", "codex")], winner_lane=None)
+        self.record(claude_keys=("c1",), codex_keys=("c2",), judged=judged, status="pending_lanes", winners=[])
+        self.assertPasses(self.report())
+
+    def test_single_lane_row_without_a_decision_pending_lanes_passes(self):
+        self.record(codex=False, status="pending_lanes", winners=[])
+        self.assertPasses(self.report())
+
+    def test_recorded_row_with_no_remaining_alternative_fails(self):
+        # Both lanes name only the winner as an alternative: record_verdicts.py defers the verdict.
+        with mock.patch.dict(ALTERNATIVE, {"repository": PACKET["candidates"][0]["repository"]}):
+            row = self.record()
+            row["alternatives"] = []
+            self.assertFails(self.report(), "verdict_status is 'recorded' but record_verdicts.py writes 'pending_lanes'")
+
+
+class FailClosedTests(GateFixture):
+    """Third review of #123, findings 3 and 4: git failures and duplicate JSON keys fail closed."""
+
+    def test_git_failure_listing_changed_paths_is_a_read_error(self):
+        for function in (gate.changed_verdict_paths, gate.changed_trust_paths):
+            with self.assertRaises(gate.ReadError):
+                function(self.root, "0" * 40)
+
+    def test_stubbed_ls_files_failure_is_a_read_error_and_exits_2(self):
+        real = gate.git
+
+        def failing(root, *args, check=True):
+            if args and args[0] == "ls-files":
+                return subprocess.CompletedProcess(args, 128, b"", b"fatal: stubbed failure")
+            return real(root, *args, check=check)
+
+        with mock.patch.object(gate, "git", failing), contextlib.redirect_stdout(io.StringIO()) as output:
+            code = gate.main(["--root", str(self.root), "--base", self.base])
+        self.assertEqual(code, 2, output.getvalue())
+        self.assertIn("git ls-files failed", output.getvalue())
+
+    def test_duplicate_keys_are_not_equivalent(self):
+        self.assertTrue(gate.json_equivalent(b'{"a": 2}', b'{\n "a": 2\n}\n'))
+        self.assertFalse(gate.json_equivalent(b'{"a": 2}', b'{"a": 1, "a": 2}'))
+        self.assertFalse(gate.registry_equivalent(b'{"waves": []}', b'{"waves": [1], "waves": []}'))
+
+    def test_frozen_wave_document_rewritten_with_an_earlier_duplicate_key_fails(self):
+        self.add_wave("20260923", b'{"wave": "20260923"}\n')
+        self.rebase()
+        path = "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        self.write(path, b'{"wave": "rewritten", "wave": "20260922"}\n')
+        self.waves["20260922"]["sha256"] = sha((self.root / path).read_bytes())
+        report = self.report()
+        self.assertFails(report, "the frozen wave document catalogs/sota-convergence/layer-verdicts-20260922.json "
+                                 "was rewritten")
+        self.assertIn(path, report["value_changed_paths"])
+
+    def test_ledger_with_a_duplicate_key_is_a_read_error(self):
+        self.flush()
+        data = (self.root / LEDGERS["foundation"]).read_bytes()
+        self.write(LEDGERS["foundation"], data.replace(b'"schema_version": 2', b'"layers": [], "schema_version": 2', 1))
+        with self.assertRaises(gate.ReadError):
+            gate.evaluate(self.root, self.base, self.root, validators=lambda _root: [])
 
 
 class TrustPathDerivationTests(unittest.TestCase):

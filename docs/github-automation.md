@@ -985,7 +985,14 @@ when all of these hold at the head:
   entry's `adjudication` `{outcome: sealed, sha256}`;
 - a recorded `codex_absent` row names a `docs/decisions/` record that carries
   `single-lane-authorization: <catalog>/<layer_id>`, and stores that record's
-  sha256 in `lanes.single_lane_decision_sha256`.
+  sha256 in `lanes.single_lane_decision_sha256`;
+- the row's `verdict_status` is the one `record_verdicts.py` writes for that
+  evidence: `recorded` for agreeing lanes, for a disagreement whose sealed
+  adjudication chooses a lane and for a `codex_absent` row whose named decision
+  record authorizes it, unless no indexed alternative remains; `pending_lanes`
+  otherwise. A new-wave row is never `no_selection`. A recorded verdict
+  therefore cannot be withdrawn by relabelling its row and clearing its
+  winners.
 
 If any of these `lanes` hashes is absent, the row fails.
 
@@ -1006,14 +1013,26 @@ land together with its regenerated documents. Sealed artifacts count by their
 bytes.
 
 Any change of a row field value in a non-grandfathered wave needs a new
-recorded wave. The gate checks each value it re-derives against the wave's
-sealed returns, packet, adjudication and run manifest, so a changed value
-those files do not derive fails. Two kinds of change are checked instead of
-re-derived: a `platform_status` value must be the one the registered receipts
-derive, and `open_gaps` text is re-checked with the row. The gate does not
-stop a PR from rewriting the newest wave's sealed files together with their
-registrations, so a new recorded wave remains a rule for the author rather
-than a byte-level block.
+recorded wave. The gate re-derives `verdict_status`, `winners` (apart from
+`platform_status`), `alternatives`, `verdict_overturn_when`,
+`overturn_protocol` and `lanes.agreement` from the wave's sealed returns,
+packet, adjudication and run manifest, so a changed value of those fields
+that those files do not derive fails. A `platform_status` value is checked
+against the registered receipts instead. The remaining fields are free-form
+within the newest wave and are not checked: `open_gaps` text (a change still
+counts as a row change and triggers the checks above, but its text is not
+re-derived), and the wave document's `title`, `group`, `overturn_when` (the
+handbook fallback) and `checked_at`, which are layer metadata outside
+`VERDICT_FIELDS`. A frozen wave's document is compared whole, so these fields
+cannot change there. The gate does not stop a PR from rewriting the newest
+wave's sealed files together with their registrations, so a new recorded
+wave remains a rule for the author rather than a byte-level block.
+
+Rows, wave documents, the registry and sealed files are parsed without
+duplicate object keys: a duplicate is not equivalent to anything and fails a
+frozen document comparison, and a ledger, landscape manifest or registry with
+one exits 2. A git command that fails while listing changed paths also exits
+2 instead of counting as "no changed paths".
 
 Every changed `platform_status` value must be the one
 `scripts/platform_status.py` derives; a change to `platform_status` alone

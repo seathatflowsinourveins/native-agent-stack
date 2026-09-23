@@ -35,7 +35,11 @@ For each changed row outside ``GRANDFATHERED_RUN_IDS`` it requires, at the head:
   bound by ``lanes.adjudication_sha256`` and by the run manifest entry's ``adjudication``;
 - a recorded ``codex_absent`` row: a ``docs/decisions/`` record carrying the line
   ``single-lane-authorization: <catalog>/<layer_id>`` and bound by
-  ``lanes.single_lane_decision_sha256`` (review finding 2).
+  ``lanes.single_lane_decision_sha256`` (review finding 2);
+- a ``verdict_status`` equal to the one ``record_verdicts.py`` writes for that evidence
+  (``recorded`` for agreeing lanes, an adjudicated disagreement or an authorized single lane,
+  unless no indexed alternative remains; else ``pending_lanes``; never ``no_selection``), so a
+  recorded verdict cannot be withdrawn by relabelling its row (third review, finding 1).
 
 Each winner's ``repository``, ``recipe_ref``, ``evidence_class``, ``why_selected`` and packet ``pin``
 must be what ``record_verdicts.build_winners`` copies from the chosen lane and the packet; the
@@ -48,7 +52,8 @@ row of the base keeps a row at the head whose run id is not older, never moves f
 to the grandfathered one and changes only to the newest registered wave (review of #123, finding 1).
 Every wave registry entry at the base except the newest, and every grandfathered entry, must be
 unchanged at the head, with its document (review finding 4). Rows, wave documents and the registry
-are compared on parsed values, so a pure reformat is not a change (finding 3). When a row, a wave or any path under
+are compared on parsed values without duplicate keys, so a pure reformat is not a change
+(finding 3). When a row, a wave or any path under
 ``VERDICT_PATHSPECS`` changed, ``scripts/landscape.py`` and ``tools/sota-convergence/build_verdicts.py
 --check`` then run on the head.
 
@@ -57,7 +62,8 @@ against the head checkout (``--root``), and a change to a verdict row, wave or s
 when the same comparison also changes a ``TRUST_PATHS`` file, so a weakening of the rules has to land
 (and be seen) in its own pull request first. Exit 0 prints one line when nothing of that changed;
 otherwise every violation is printed with its row key and the exit code is 1 (2 for an unresolvable
-revision or an unreadable or malformed base or head ledger, manifest or wave registry).
+revision, an unreadable or malformed base or head ledger, manifest or wave registry, or a git
+command that fails while listing the changed paths).
 """
 
 from __future__ import annotations
@@ -84,7 +90,7 @@ from scripts.landscape import (  # noqa: E402
     SEALED_BASE_PREFIX, judge_adjudication, lane_model_issue, run_id_of, run_manifest_row_issue,
 )
 from scripts import platform_status as platform_evidence  # noqa: E402
-from scripts.catalog_decisions import safe_file  # noqa: E402
+from scripts.catalog_decisions import safe_file, unique_json  # noqa: E402
 from scripts.host_receipts import evidence_files  # noqa: E402
 from build_manifest import sanitize_value  # noqa: E402
 from build_verdicts import LEDGER_FILES, WAVE_REGISTRY  # noqa: E402
@@ -214,12 +220,12 @@ class Side:
         return target.read_bytes() if target.is_file() else None
 
     def json(self, path):
-        """The parsed file, None when absent; a file that exists but is not JSON raises ReadError."""
+        """The parsed file, None when absent; a file that exists but is not JSON (or repeats an object key) raises ReadError."""
         data = self.read(path)
         if data is None:
             return None
         try:
-            return json.loads(data)
+            return strict_json(data)
         except ValueError as error:
             where = self.commit[:12] if self.commit is not None else "the head"
             raise ReadError(f"{path} at {where} is not JSON ({error})") from None
@@ -385,7 +391,7 @@ def sealed_packet(head, sealed_base, catalog, layer_id, manifest=None, manifest_
     if sums_bytes.decode("utf-8", errors="replace") != manifest.get(RUN_MANIFEST_PACKET_SUMS):
         return (f"{directory}/{PACKET_SUMS_NAME} is not the run manifest's {RUN_MANIFEST_PACKET_SUMS}"), None, None
     try:
-        packet = json.loads(packet_bytes)
+        packet = strict_json(packet_bytes)
     except ValueError:
         return f"{path} is not JSON", None, None
     if not isinstance(packet, dict):
@@ -479,6 +485,7 @@ class RowCheck:
             candidates = None
         if returns:
             self.check_overturn_protocol(returns)
+        self.check_status(status, recomputed, returns, candidates, sealed_base, packet_sha256)
         if status != "recorded":
             if self.row.get("winners"):
                 self.fail(f"a {status!r} row carries winners; only a recorded verdict names winners")
@@ -511,6 +518,80 @@ class RowCheck:
         self.check_winner_fields(returns[chosen], chosen, winners, candidates)
         self.check_published_alternatives(returns, chosen, winners)
 
+    def check_status(self, status, recomputed, returns, candidates, sealed_base, packet_sha256):
+        """Review of #123 (third round), finding 1: the row's verdict_status must be the one
+        record_verdicts.py writes for the sealed evidence, so a row the evidence supports as recorded
+        cannot be relabelled pending_lanes (or no_selection) with its winners cleared. record_verdicts.py
+        never writes no_selection for a new wave."""
+        if status == "no_selection":
+            self.fail("a new-wave row cannot be 'no_selection': record_verdicts.py never writes it (it writes "
+                      "'recorded' or 'pending_lanes' from the sealed evidence)")
+            return
+        expected, reason = self.expected_status(recomputed, returns, candidates, sealed_base, packet_sha256)
+        if expected is not None and status != expected:
+            self.fail(f"verdict_status is {status!r} but record_verdicts.py writes {expected!r} for the sealed "
+                      f"evidence ({reason})")
+
+    def expected_status(self, recomputed, returns, candidates, sealed_base, packet_sha256):
+        """(status record_verdicts.py writes, why), derived from the sealed evidence alone; (None, why)
+        when the evidence is too broken to derive it (that is already a violation)."""
+        if recomputed is None:
+            return None, "the agreement cannot be recomputed"
+        if recomputed == "pending":
+            return "pending_lanes", "no sealed claude lane return"
+        if recomputed == "same_winner":
+            chosen, why = "claude", "both lanes name the same winners"
+        elif recomputed == "codex_absent":
+            if self.single_lane_issues(binding=False):
+                return "pending_lanes", "codex lane absent and no single-lane decision record names this layer"
+            chosen, why = "claude", "codex lane absent, single-lane decision record names this layer"
+        else:
+            chosen, why = self.adjudicated_lane(sealed_base, packet_sha256, set(returns))
+            if chosen is None:
+                return "pending_lanes", why
+        if candidates is None or chosen not in returns:
+            return None, "the sealed packet cannot be resolved"
+        keys = returns[chosen].get("winner_keys") or []
+        if any(key not in candidates for key in keys):
+            return None, "the chosen lane's winner_keys are not all packet candidates"
+        repositories = [candidates[key].get("repository") for key in keys]
+        try:
+            remaining = self.derived_alternatives(returns, repositories)
+        except (OSError, KeyError, TypeError, ValueError):
+            return None, "the canonical repository index cannot be loaded"
+        if not remaining:
+            return "pending_lanes", f"{why}, but no indexed alternative remains"
+        return "recorded", why
+
+    def adjudicated_lane(self, sealed_base, packet_sha256, sealed_lanes):
+        """(winner lane, why) of the disagree row's sealed adjudication; (None, why) when there is none,
+        it is a split, or it does not meet judge_adjudication and the two-family rule."""
+        claude_run = (self.lanes.get("claude") or {}).get("run_id") if isinstance(self.lanes.get("claude"), dict) else None
+        data = self.head.read(f"{sealed_base}/adjudication/{claude_run}.json")
+        if data is None:
+            return None, "the lanes disagree and no sealed adjudication exists"
+        try:
+            raw = strict_json(data)
+        except ValueError:
+            return None, "the sealed adjudication is not valid JSON"
+        issue, result = judge_adjudication(raw, grandfathered=False, packet_sha256=packet_sha256)
+        if issue or result.get("winner_lane") is None:
+            return None, "the sealed adjudication is a split or invalid"
+        issue, winner = two_family_adjudication_issue(raw, sealed_lanes)
+        if issue or winner != result["winner_lane"]:
+            return None, "the sealed adjudication does not meet the two-family rule"
+        return winner, f"the sealed adjudication chooses the {winner} lane"
+
+    def derived_alternatives(self, returns, winner_repositories):
+        """The alternatives record_verdicts.py publishes: build_alternatives over the sealed returns,
+        without any that is (canonically) one of the winners."""
+        identities, aliases = load_canonical_index(self.head.root)
+        computed, _gaps = build_alternatives(returns, identities, aliases, None, None)
+        winner_ids = {canonical(safe_identity(repository), aliases) for repository in winner_repositories
+                      if safe_identity(repository)}
+        return [alternative for alternative in sanitize_value(computed)
+                if canonical(safe_identity(alternative["repository"]), aliases) not in winner_ids]
+
     def check_winner_fields(self, sealed_return, lane, winners, candidates):
         """The fields record_verdicts.build_winners copies from the chosen lane and the packet."""
         chosen = {derive_component_id(candidates[key]): candidates[key]
@@ -541,15 +622,10 @@ class RowCheck:
         """The alternatives and verdict_overturn_when record_verdicts.py derives from the sealed
         returns, compared on the fields the wave document publishes."""
         try:
-            identities, aliases = load_canonical_index(self.head.root)
+            expected = self.derived_alternatives(returns, [winner.get("repository") for winner in winners])
         except (OSError, KeyError, TypeError, ValueError) as error:
             self.fail(f"the canonical repository index cannot be loaded to derive the alternatives ({error!r})")
             return
-        computed, _gaps = build_alternatives(returns, identities, aliases, None, None)
-        winner_ids = {canonical(safe_identity(winner.get("repository")), aliases) for winner in winners
-                      if safe_identity(winner.get("repository"))}
-        expected = [alternative for alternative in sanitize_value(computed)
-                    if canonical(safe_identity(alternative["repository"]), aliases) not in winner_ids]
 
         def published(alternatives):
             return [{field: alternative.get(field) for field in PUBLISHED_ALTERNATIVE_FIELDS}
@@ -599,7 +675,7 @@ class RowCheck:
         elif stored != sha256(data):
             self.fail(f"lanes.{RUN_MANIFEST_SHA256_FIELD} {stored} is not the sha256 of {path} ({sha256(data)})")
         try:
-            manifest = json.loads(data)
+            manifest = strict_json(data)
         except ValueError:
             self.fail(f"{path} is not JSON")
             return None, None
@@ -673,7 +749,7 @@ class RowCheck:
             if self.registered_file(path, f"the sealed {lane} lane return") is None:
                 continue
             try:
-                sealed_return = json.loads(data)
+                sealed_return = strict_json(data)
             except ValueError:
                 self.fail(f"the sealed {lane} lane return {path} is not JSON")
                 continue
@@ -729,7 +805,7 @@ class RowCheck:
         if data is None:
             return None
         try:
-            raw = json.loads(data)
+            raw = strict_json(data)
         except ValueError:
             self.fail(f"{path} is not JSON")
             return None
@@ -747,37 +823,45 @@ class RowCheck:
             return None
         return winner
 
-    def check_single_lane(self):
+    def single_lane_issues(self, binding=True):
+        """Why the row's lanes.single_lane_decision does not authorize a single-lane verdict ([] when
+        it does): a docs/decisions/ record carrying the line
+        ``single-lane-authorization: <catalog>/<layer_id>``, bound by lanes.single_lane_decision_sha256
+        (checked only with ``binding``; a row cannot escape its recorded status by dropping the hash)."""
         catalog, layer_id, _ = self.key
         path = self.lanes.get("single_lane_decision")
         if not isinstance(path, str) or not path:
-            self.fail("a recorded codex_absent row needs lanes.single_lane_decision")
-            return
+            return ["a recorded codex_absent row needs lanes.single_lane_decision"]
         posix = PurePosixPath(path)
         name = posix.name
         if (path.startswith(SEALED_BASE_PREFIX) or path.startswith(WAVE_DOCUMENT_PREFIX)
                 or path in {entry.get("path") for entry in self.waves.values()}
                 or (name.startswith("layer-verdicts-") and name.endswith(".json")) or name == RUN_MANIFEST_NAME):
-            self.fail(f"lanes.single_lane_decision {path!r} is a wave document, run manifest or sealed verdict "
-                      "artifact, not a decision record")
-            return
+            return [f"lanes.single_lane_decision {path!r} is a wave document, run manifest or sealed verdict "
+                    "artifact, not a decision record"]
         if (posix.is_absolute() or ".." in posix.parts or path != posix.as_posix()
                 or not path.startswith(SINGLE_LANE_DECISION_DIR)):
-            self.fail(f"lanes.single_lane_decision {path!r} must be a file under {SINGLE_LANE_DECISION_DIR}")
-            return
+            return [f"lanes.single_lane_decision {path!r} must be a file under {SINGLE_LANE_DECISION_DIR}"]
         data = self.head.read(path)
         if data is None:
-            self.fail(f"lanes.single_lane_decision {path!r} does not exist")
-            return
+            return [f"lanes.single_lane_decision {path!r} does not exist"]
+        issues = []
         stored = self.lanes.get(SINGLE_LANE_DECISION_SHA256_FIELD)
-        if stored is None:
-            self.fail(f"lanes.{SINGLE_LANE_DECISION_SHA256_FIELD} is absent; a recorded codex_absent row binds its "
-                      f"decision record {path} ({sha256(data)})")
+        if not binding:
+            pass
+        elif stored is None:
+            issues.append(f"lanes.{SINGLE_LANE_DECISION_SHA256_FIELD} is absent; a recorded codex_absent row binds "
+                          f"its decision record {path} ({sha256(data)})")
         elif stored != sha256(data):
-            self.fail(f"lanes.{SINGLE_LANE_DECISION_SHA256_FIELD} {stored} does not match {path} ({sha256(data)})")
+            issues.append(f"lanes.{SINGLE_LANE_DECISION_SHA256_FIELD} {stored} does not match {path} ({sha256(data)})")
         wanted = f"{SINGLE_LANE_MARKER} {catalog}/{layer_id}"
         if wanted not in (line.strip() for line in data.decode("utf-8", errors="replace").splitlines()):
-            self.fail(f"{path} has no line {wanted!r} authorizing this row alone")
+            issues.append(f"{path} has no line {wanted!r} authorizing this row alone")
+        return issues
+
+    def check_single_lane(self):
+        for issue in self.single_lane_issues():
+            self.fail(issue)
 
 
 def platform_status_violations(key, old, new, context):
@@ -800,15 +884,23 @@ def platform_status_violations(key, old, new, context):
     return violations
 
 
+def strict_json(data):
+    """json.loads that rejects a duplicate object key (catalog_decisions.unique_json raises a
+    ValueError): json.loads alone keeps the last value, so a rewrite that adds an earlier duplicate
+    holding other content would still compare equal."""
+    return json.loads(data, object_pairs_hook=unique_json)
+
+
 def json_equivalent(before, after):
-    """True when two file contents are equal as bytes, or both parse as JSON to equal values (review
-    of #123, finding 3: a pure formatting change of a generated document is not a value change)."""
+    """True when two file contents are equal as bytes, or both parse as JSON, without duplicate
+    keys, to equal values (review of #123, finding 3: a pure formatting change of a generated
+    document is not a value change)."""
     if before == after:
         return True
     if before is None or after is None:
         return False
     try:
-        return json.loads(before) == json.loads(after)
+        return strict_json(before) == strict_json(after)
     except ValueError:
         return False
 
@@ -822,7 +914,7 @@ def registry_equivalent(before, after):
     """json_equivalent for the wave registry, ignoring each entry's document sha256 (the entries'
     sha256 against their documents is checked by wave_freeze_violations and build_verdicts.py)."""
     def values(data):
-        document = json.loads(data)
+        document = strict_json(data)
         if isinstance(document, dict) and isinstance(document.get("waves"), list):
             document = {**document, "waves": [registry_values(entry) for entry in document["waves"]]}
         return document
@@ -921,22 +1013,29 @@ def row_continuity_violations(base_rows, head_rows, head_waves):
     return violations
 
 
+def changed_paths(head_root, base, pathspecs):
+    """Paths matching ``pathspecs`` that differ between ``base`` and the head checkout (tracked
+    changes and untracked files). A git command that fails raises ReadError (exit 2): an unlisted
+    change must not pass for "nothing changed" and skip the trust-base rule or the validators."""
+    lines = set()
+    for arguments in (("diff", "--name-only", "--no-renames", base), ("ls-files", "--others", "--exclude-standard")):
+        result = git(head_root, *arguments, "--", *pathspecs, check=False)
+        if result.returncode != 0:
+            raise ReadError(f"git {arguments[0]} failed in {head_root} (exit {result.returncode}): "
+                            f"{result.stderr.decode(errors='replace').strip()}")
+        lines.update(line for line in result.stdout.decode().splitlines() if line)
+    return sorted(lines)
+
+
 def changed_verdict_paths(head_root, base):
-    """Paths under VERDICT_PATHSPECS that differ between ``base`` and the head checkout (tracked
-    changes and untracked files)."""
-    specs = [f":(glob){spec}**" if spec.endswith("/") else f":(glob){spec}/**" for spec in VERDICT_PATHSPECS]
-    tracked = git(head_root, "diff", "--name-only", "--no-renames", base, "--", *specs, check=False)
-    untracked = git(head_root, "ls-files", "--others", "--exclude-standard", "--", *specs, check=False)
-    return sorted({line for result in (tracked, untracked) if result.returncode == 0
-                   for line in result.stdout.decode().splitlines() if line})
+    """Paths under VERDICT_PATHSPECS that differ between ``base`` and the head checkout."""
+    return changed_paths(head_root, base, [f":(glob){spec}**" if spec.endswith("/") else f":(glob){spec}/**"
+                                           for spec in VERDICT_PATHSPECS])
 
 
 def changed_trust_paths(head_root, base):
     """TRUST_PATHS files that differ between ``base`` and the head checkout."""
-    tracked = git(head_root, "diff", "--name-only", "--no-renames", base, "--", *TRUST_PATHS, check=False)
-    untracked = git(head_root, "ls-files", "--others", "--exclude-standard", "--", *TRUST_PATHS, check=False)
-    return sorted({line for result in (tracked, untracked) if result.returncode == 0
-                   for line in result.stdout.decode().splitlines() if line})
+    return changed_paths(head_root, base, TRUST_PATHS)
 
 
 def run_repo_validators(head_root):
