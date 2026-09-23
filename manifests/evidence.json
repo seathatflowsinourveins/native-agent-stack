@@ -8468,6 +8468,11 @@
       "bytes": 4241
     },
     {
+      "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
+      "sha256": "e71a63db7692ddf497ebdcb6ec4c3e979f3afaf61944731efbee35c28f982b6b",
+      "bytes": 11943
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -8514,8 +8519,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "516cce6c31a76ffe7d75ea75ee575e5bf3f185be2bb08722b57c4f8b62275d1e",
-      "bytes": 102997
+      "sha256": "de95e0e075204efe5ade37aa11daad625035b3a2747eb89f1c2aec5ab61cdb55",
+      "bytes": 103223
     },
     {
       "path": "docs/evidence.md",
@@ -13849,8 +13854,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "cc8ef0795733e74bcefb802d93c6162299b12eed4eb4a32484e7d3e39a6a69e3",
-      "bytes": 48546
+      "sha256": "0a84a2c596512eac0f7e470cd287b9dcbea2c0c2998e14e0f98a2f71160fd150",
+      "bytes": 49805
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -14099,8 +14104,8 @@
     },
     {
       "path": "tests/test_claude_repository_evidence.py",
-      "sha256": "36e2b158789e765614e5376565727fd7678b9769c8695c617bed4bc45c2d97d6",
-      "bytes": 10269
+      "sha256": "bc84e4527cbbd894ad524981ee5c90230552a42cb53e7088699ee9a0d2730093",
+      "bytes": 11326
     },
     {
       "path": "tests/test_component_matrix.py",
@@ -14129,8 +14134,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "b5e847263c742924ca96773e4eded4dca9d0255c3245a4209744ec588f8c054f",
-      "bytes": 56250
+      "sha256": "9468971db76fab5c185d1710f4d19e06d1b2a2c80121c65dc916023579cafdfd",
+      "bytes": 58693
     },
     {
       "path": "tests/test_execution_realism.py",
@@ -14214,8 +14219,8 @@
     },
     {
       "path": "tests/test_lifecycle_capture.py",
-      "sha256": "ab76bdda7d8df777ed5efbf740a0456f18358a3e2cd19603e2e59a80c68757b2",
-      "bytes": 6656
+      "sha256": "266554101a1fe59e709a81003ed472b0f70b2feb4029efdd5e95e4931f1a3d28",
+      "bytes": 6812
     },
     {
       "path": "tests/test_lifecycle_sample.py",
