@@ -68,44 +68,52 @@ def _refs(data, default_layer, path):
     return refs
 
 
-def load_receipts(root, wave, dir_style="layer"):
+def iter_receipt_files(root, wave, dir_style="layer"):
+    """(path, default layer_id) for every candidate receipt file: top-level *.json in each layer
+    dir, minus per-layer indexes and preregistration records. Subdirectories (raw/, bench-out/...)
+    hold raw captures and are never read."""
     base = root / "evidence/artifacts" / wave
-    out = []
     for directory, default_layer in _receipt_dirs(base, dir_style):
         for path in sorted(directory.glob("*.json")):
             if path.name in ("results.json", "_index.json") or path.name.startswith("preregistration"):
-                continue  # per-layer indexes and preregistration records, not receipts
-            data = json.loads(path.read_text(encoding="utf-8"))
-            if dir_style == "catalog__layer":
-                # Every top-level JSON here except results.json is a receipt: fail loudly, never skip.
-                if not isinstance(data, dict) or ("gap_refs" not in data and "gap_index" not in data):
-                    raise SystemExit(f"{path}: not a receipt (needs gap_refs or gap_index)")
-                if "gap_refs" not in data:
-                    gi = data["gap_index"]
-                    data = {**data, "gap_refs": gi if isinstance(gi, list) else [gi]}
-                if "settles_gap" not in data:
-                    outcome = data.get("outcome")
-                    if outcome not in OUTCOME_TO_SETTLES:
-                        raise SystemExit(f"{path}: needs settles_gap or an outcome in {sorted(OUTCOME_TO_SETTLES)}")
-                    data = {**data, "settles_gap": OUTCOME_TO_SETTLES[outcome]}
-            elif not isinstance(data, dict) or "gap_refs" not in data:
                 continue
-            refs = _refs(data, default_layer, path)
-            per_gap = {k: settle_key(v) for k, v in (data.get("per_gap_settles") or {}).items()}
-            for key in per_gap:
-                if key not in {f"{l}:{i}" for l, i in refs}:
-                    raise SystemExit(f"{path}: per_gap_settles names {key}, which is not in gap_refs")
-            vi = data.get("verdict_impact") or {}
-            calls = data.get("model_calls") or []
-            out.append({
-                "path": str(path.relative_to(root)), "id": data.get("id"),
-                "source_revision": data.get("source_revision"), "gap_refs": [list(r) for r in refs],
-                "outcome": data.get("outcome"),
-                "settles_gap": data.get("settles_gap"), "settles_key": settle_key(data.get("settles_gap")),
-                "per_gap_settles": per_gap,
-                "direction": vi.get("direction"), "evidence_class": data.get("evidence_class"),
-                "model_calls": sum(int(c.get("count", 0) or 0) for c in calls if isinstance(c, dict)),
-            })
+            yield path, default_layer
+
+
+def load_receipts(root, wave, dir_style="layer"):
+    out = []
+    for path, default_layer in iter_receipt_files(root, wave, dir_style):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if dir_style == "catalog__layer":
+            # Every top-level JSON here except results.json is a receipt: fail loudly, never skip.
+            if not isinstance(data, dict) or ("gap_refs" not in data and "gap_index" not in data):
+                raise SystemExit(f"{path}: not a receipt (needs gap_refs or gap_index)")
+            if "gap_refs" not in data:
+                gi = data["gap_index"]
+                data = {**data, "gap_refs": gi if isinstance(gi, list) else [gi]}
+            if "settles_gap" not in data:
+                outcome = data.get("outcome")
+                if outcome not in OUTCOME_TO_SETTLES:
+                    raise SystemExit(f"{path}: needs settles_gap or an outcome in {sorted(OUTCOME_TO_SETTLES)}")
+                data = {**data, "settles_gap": OUTCOME_TO_SETTLES[outcome]}
+        elif not isinstance(data, dict) or "gap_refs" not in data:
+            continue
+        refs = _refs(data, default_layer, path)
+        per_gap = {k: settle_key(v) for k, v in (data.get("per_gap_settles") or {}).items()}
+        for key in per_gap:
+            if key not in {f"{l}:{i}" for l, i in refs}:
+                raise SystemExit(f"{path}: per_gap_settles names {key}, which is not in gap_refs")
+        vi = data.get("verdict_impact") or {}
+        calls = data.get("model_calls") or []
+        out.append({
+            "path": str(path.relative_to(root)), "id": data.get("id"),
+            "source_revision": data.get("source_revision"), "gap_refs": [list(r) for r in refs],
+            "outcome": data.get("outcome"),
+            "settles_gap": data.get("settles_gap"), "settles_key": settle_key(data.get("settles_gap")),
+            "per_gap_settles": per_gap,
+            "direction": vi.get("direction"), "evidence_class": data.get("evidence_class"),
+            "model_calls": sum(int(c.get("count", 0) or 0) for c in calls if isinstance(c, dict)),
+        })
     return out
 
 

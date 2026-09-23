@@ -106,6 +106,17 @@ class GapWaveLedgerTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 self.tool.load_receipts(Path(tmp), "wave-y", "catalog__layer")
 
+    def test_receipt_selector_never_reads_raw_capture_subdirs(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            layer = Path(tmp) / "evidence/artifacts/wave-z/foundation__document-retrieval"
+            (layer / "raw/bench-out").mkdir(parents=True)
+            (layer / "raw/bench-out/run-cold-1.json").write_text("")  # empty capture of a failed run
+            (layer / "r.json").write_text(json.dumps({"gap_index": 1, "outcome": "advanced"}))
+            names = [p.name for p, _ in self.tool.iter_receipt_files(Path(tmp), "wave-z", "catalog__layer")]
+            self.assertEqual(names, ["r.json"])
+            self.assertEqual(len(self.tool.load_receipts(Path(tmp), "wave-z", "catalog__layer")), 1)
+
     def test_rank_keeps_deferral_below_any_executed_outcome(self):
         rank = self.tool.RANK
         self.assertLess(rank["not_run"], rank["deferred"])
@@ -118,7 +129,9 @@ class GapWaveLedgerTests(unittest.TestCase):
 
     def test_repo_raw_artifacts_match_their_recorded_hash(self):
         import hashlib
-        for path in sorted((ROOT / "evidence/artifacts/gap-wave2-20260923").rglob("*.json")):
+        files = [p for style in ("layer", "catalog__layer")
+                 for p, _ in self.tool.iter_receipt_files(ROOT, "gap-wave2-20260923", style)]
+        for path in files:  # the same receipt selector the ledger uses; raw captures are never parsed
             data = json.loads(path.read_text(encoding="utf-8"))
             if not isinstance(data, dict):
                 continue
