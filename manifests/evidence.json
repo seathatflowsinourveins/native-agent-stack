@@ -6614,6 +6614,41 @@
       "bytes": 645
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923f-first-passed/README.md",
+      "sha256": "8bd72394d1c2c8bafd474d7e5c05ee4827fe1fefd443755a080b437673ea02e7",
+      "bytes": 1874
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923f-first-passed/broker-orders.json",
+      "sha256": "a7febb5abe90160d15688285ab16afbe7e4a1f776c1e1ba5bb87cca6b1029164",
+      "bytes": 3615
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923f-first-passed/frozen-5e1d512.SHA256SUMS",
+      "sha256": "b5b36bf7a0d1e82b4a37d6d5b416f89d744f07b1c057831720276672f2dbf21f",
+      "bytes": 41428
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923f-first-passed/gate-result.json",
+      "sha256": "38caa552408a92e4bbd484a7ff9ee580d5fe2adbdac6f542c88c4c57c9321412",
+      "bytes": 1479
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923f-first-passed/ingest-receipt.json",
+      "sha256": "8b23b868add25f0f58ef5ebb341ff3db16594c2752586f302b71c16dfb15b4bc",
+      "bytes": 630
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923f-first-passed/paper-output.json",
+      "sha256": "fd86ded8a2f05d6ddb60e0f2831d7e22386eb5940b99ec71c23b4d25ab02ad9c",
+      "bytes": 62912
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923f-first-passed/scheduled-trial.log",
+      "sha256": "4cb9edeaa4d9119432f038097b31a02dd9f2658e49a04e27e1cbe09e20c086c8",
+      "bytes": 540
+    },
+    {
       "path": "blueprints/us-equities/alpaca-historical/README.md",
       "sha256": "09d916f81d869a242e9c6d174f55d651deb7812e2e9d8cd6d108b00c6834576e",
       "bytes": 9126
@@ -8790,8 +8825,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "59d1ab1887781390dc2a91957ac09cdd8591b98c3c5b1d7a39cc0e48f090f0ee",
-      "bytes": 32386
+      "sha256": "3ced34cdb4e86a1c65b00fc9da20da8dab0d19ea9f5c62bb54557c221d506bad",
+      "bytes": 32922
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
