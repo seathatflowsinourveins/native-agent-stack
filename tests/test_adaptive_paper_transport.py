@@ -255,6 +255,43 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
     async def asyncTearDown(self):
         await self.port.stop()
 
+    async def test_callback_failure_keeps_only_bounded_stage_and_exception_type(self):
+        async def reject(_):
+            raise ValueError("private payload and account details must not be retained")
+
+        self.port.adopt_intents([intent()])
+        for stage in ("quote_normalization", "on_quote", "order_normalization", "observe", "on_order"):
+            with self.subTest(stage=stage):
+                self.port._reasons.clear()
+                self.port._callback_failure = None
+                self.port._on_quote = reject if stage == "on_quote" else lambda _: None
+                self.port._on_order = reject if stage == "on_order" else lambda _: None
+                kind = "quote" if stage in ("quote_normalization", "on_quote") else "order"
+                payload = ({"S": "SPY", "bp": "100", "ap": "100.01", "t": t.datetime.now().astimezone()}
+                           if kind == "quote" else {"order": order()})
+                if stage in ("quote_normalization", "order_normalization"):
+                    payload = {}
+                observer = (AsyncMock(side_effect=LookupError("private observation"))
+                            if stage == "observe" else self.port._observe)
+                with patch.object(self.port, "_observe", observer):
+                    self.port._enqueue(kind, payload)
+                    consumer = asyncio.create_task(self.port._consume_events())
+                    try:
+                        for _ in range(100):
+                            if "callback_failure" in self.port.health["reasons"]:
+                                break
+                            await asyncio.sleep(.001)
+                        self.assertTrue(self.port.health["frozen"])
+                        detail = self.port.health.get("callback_failure")
+                        self.assertIsNotNone(detail)
+                        self.assertEqual(detail["stage"], stage)
+                        self.assertEqual(set(detail), {"stage", "exception_type"})
+                        self.assertRegex(detail["exception_type"], r"^[A-Za-z_][A-Za-z0-9_]{0,79}$")
+                        self.assertNotIn("private", json.dumps(self.port.health))
+                    finally:
+                        consumer.cancel()
+                        await asyncio.gather(consumer, return_exceptions=True)
+
     async def test_metadata_journaled_not_sent_and_replay_has_one_post(self):
         calls = []
         def request(method, url, **kwargs):

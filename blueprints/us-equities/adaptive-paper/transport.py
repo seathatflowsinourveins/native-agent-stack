@@ -449,6 +449,7 @@ class AlpacaPaperTransport:
         self._events = queue.Queue(maxsize=queue_size)
         self._state_lock = threading.RLock()
         self._reasons = set()
+        self._callback_failure = None
         self._auth = {"orders": False, "quotes": False}
         self._acks = dict(self._auth)
         self._ever_acks = dict(self._auth)
@@ -496,7 +497,8 @@ class AlpacaPaperTransport:
                     "frozen": bool(self._reasons), "reasons": sorted(self._reasons),
                     "authenticated": dict(self._auth), "subscriptions": dict(self._acks),
                     "fresh_quotes": fresh, "required_quote_symbols": list(self.required_quote_symbols),
-                    "queue_size": self._events.qsize()}
+                    "queue_size": self._events.qsize(),
+                    "callback_failure": dict(self._callback_failure) if self._callback_failure else None}
 
     @property
     def ready(self):
@@ -619,6 +621,7 @@ class AlpacaPaperTransport:
                 await asyncio.sleep(0.01)
                 continue
             try:
+                stage = "quote_normalization" if kind == "quote" else "order_normalization"
                 if kind == "quote":
                     quote = normalize_quote(raw)
                     if quote["symbol"] not in self.symbols:
@@ -630,6 +633,7 @@ class AlpacaPaperTransport:
                         continue
                     self._quote_seen[quote["symbol"]] = time.monotonic()
                     self._quote_values[quote["symbol"]] = quote
+                    stage = "on_quote"
                     await self._invoke(self._on_quote, quote)
                 else:
                     payload = raw.get("data", raw)
@@ -640,9 +644,16 @@ class AlpacaPaperTransport:
                             order[key] = str(payload[source])
                     self._stream_seen.add(order["client_order_id"])
                     self._pending_stream.pop(order["client_order_id"], None)
+                    stage = "observe"
                     order = await self._observe(order)
+                    stage = "on_order"
                     await self._invoke(self._on_order, order)
-            except Exception:
+            except Exception as exc:
+                name = type(exc).__name__
+                name = name if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,79}", name) else "Exception"
+                with self._state_lock:
+                    if self._callback_failure is None:
+                        self._callback_failure = {"stage": stage, "exception_type": name}
                 self.freeze_health("callback_failure")
 
     async def _watchdog(self):

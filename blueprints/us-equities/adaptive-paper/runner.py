@@ -728,6 +728,28 @@ class Controller:
         return port
 
 
+_NORMAL_DECISION_EXITS = {"duration_completed", "session_boundary"}
+
+
+def _diagnostic_code(value):
+    """Keep bounded machine codes, never exception messages or provider payloads."""
+    return value if isinstance(value, str) and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_:]{0,95}", value) else "unclassified"
+
+
+def _decision_transport_health(port):
+    health = getattr(port, "health", {})
+    result = {key: bool(health.get(key, False)) for key in ("ready", "frozen", "fresh_quotes")}
+    result["reasons"] = [_diagnostic_code(reason) for reason in health.get("reasons", [])[:16]]
+    for key in ("authenticated", "subscriptions"):
+        source = health.get(key, {})
+        result[key] = {channel: bool(source.get(channel, False)) for channel in ("orders", "quotes")}
+    failure = health.get("callback_failure")
+    if isinstance(failure, dict):
+        result["callback_failure"] = {key: _diagnostic_code(failure.get(key))
+                                      for key in ("stage", "exception_type")}
+    return result
+
+
 async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation"):
     from native_adapter import build_node
     from native_strategy import AdaptiveStrategy
@@ -766,6 +788,21 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     last_reconciliation = started
     cleanup_started = None
     reconciliation = None
+    decision_exit = None
+    shutdown_failure = None
+
+    def record_exit(reason, detail=None):
+        nonlocal decision_exit
+        # Preserve the first fault, but a later fault must supersede a normal
+        # duration/session stop. Capture before cleanup mutates stop/readiness.
+        if (decision_exit is None or
+                (decision_exit["reason"] in _NORMAL_DECISION_EXITS and reason not in _NORMAL_DECISION_EXITS)):
+            elapsed = time.monotonic() - started
+            decision_exit = {"reason": reason, "elapsed_seconds": elapsed,
+                             "duration_completed": elapsed >= config["duration_seconds"],
+                             "transport_health": _decision_transport_health(port)}
+            if detail is not None:
+                decision_exit["detail"] = _diagnostic_code(detail)
     boundary_receipts = []
     ledger_adopted = False  # D1: one-shot seed of the local ledger from the
     # adapter's accepted broker snapshot, once native startup has actually
@@ -788,6 +825,12 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
         while time.monotonic() - started < config["duration_seconds"] + config["cleanup_seconds"]:
             now = time.time()
             if task.done():
+                if task.cancelled():
+                    record_exit("native_task_cancelled")
+                elif task.exception() is not None:
+                    record_exit("native_task_failed", type(task.exception()).__name__)
+                else:
+                    record_exit("native_task_completed")
                 break
             elapsed = time.monotonic() - started
             # D1: seed the local ledger from the broker snapshot the adapter
@@ -802,9 +845,23 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                 session.reconciliation["ledger_delta"] = ledger_delta
                 ledger_adopted = True
             state = controller.ledger.accounting()
-            force_exit = (controller.stop or DEFAULT_STOP.exists() or bool(session.errors)
+            stop_file = DEFAULT_STOP.exists()
+            force_exit = (controller.stop or stop_file or bool(session.errors)
                           or bool(state.halted_reason) or elapsed >= config["duration_seconds"]
                           or controller.close - now <= config["cleanup_seconds"])
+            if force_exit:
+                if session.errors:
+                    record_exit("adapter_error")
+                elif state.halted_reason:
+                    record_exit("risk_halt", state.halted_reason)
+                elif stop_file:
+                    record_exit("stop_file")
+                elif controller.stop:
+                    record_exit("controller_stop")
+                elif elapsed >= config["duration_seconds"]:
+                    record_exit("duration_completed")
+                else:
+                    record_exit("session_boundary")
             if force_exit and cleanup_started is None:
                 cleanup_started = time.monotonic()
             # A connection or integrity gap ends this bounded run. Quote silence
@@ -812,6 +869,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
             health = getattr(port, "health", {})
             serious_gap = any("stale" not in str(reason) for reason in health.get("reasons", []))
             if strategy.started and serious_gap:
+                record_exit("transport_gap")
                 controller.stop = True
                 force_exit = True
             strategy.enabled = (strategy.started and port.ready and not force_exit
@@ -823,6 +881,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
             except SafetyError as exc:
                 strategy.enabled = False
                 if str(exc) != "held_position_mark_stale":
+                    record_exit("mark_to_market_refused", str(exc))
                     controller.stop = True
                     force_exit = True
             if (strategy.started and not force_exit and time.monotonic() - last_reconciliation >= 30
@@ -853,6 +912,9 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
             if force_exit and not controller.ledger.unresolved() and not controller.ledger.positions() and not strategy.pending:
                 break
             await asyncio.sleep(.1)
+        if decision_exit is None:
+            record_exit("cleanup_deadline")
+        decision_exit["cleanup_deadline_reached"] = time.monotonic() - started >= config["duration_seconds"] + config["cleanup_seconds"]
         strategy.enabled = False
         controller.stop = True
         # Native lifecycle has to settle before a read-only final comparison.
@@ -865,9 +927,12 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
         session.stop()
         try:
             await asyncio.wait_for(task, 20)
-        except (asyncio.TimeoutError, asyncio.CancelledError):
+        except (asyncio.TimeoutError, asyncio.CancelledError) as exc:
+            shutdown_failure = {"stage": "native_task_shutdown", "exception_type": _diagnostic_code(type(exc).__name__)}
             task.cancel()
             await asyncio.gather(task, return_exceptions=True)
+        except Exception as exc:
+            shutdown_failure = {"stage": "native_task_shutdown", "exception_type": _diagnostic_code(type(exc).__name__)}
         await port.stop()
     state = asdict(controller.ledger.accounting())
     is_flat = not controller.ledger.positions() and not controller.ledger.unresolved()
@@ -880,6 +945,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
               "session_policy": {"extended_hours": session_policy["extended_hours"],
                                  "overnight_holds": session_policy["overnight_holds"]},
               "boundary_receipts": boundary_receipts,
+              "decision_exit": decision_exit, "shutdown_failure": shutdown_failure,
               "elapsed_seconds": time.monotonic() - started}
     outcome["status"] = _run_native_status(reconciliation, session.errors, strategy.native_fills,
                                            outcome, session_policy, time.time())
@@ -888,9 +954,11 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
 
 def _run_native_status(reconciliation, session_errors, native_fills, outcome, session_policy, now):
     """D1: status is decided by exactly one authority, factored out so it is
-    directly testable without driving a full native node/port. A clean,
-    reconciled, flat end is "passed"/"completed_no_signals" regardless of
-    overnight_holds. Any other non-flat end is "held_overnight" only when
+    directly testable without driving a full native node/port. An interrupted
+    decision loop stays "needs_attention" even when cleanup proves flat.
+    A clean duration/session completion which reconciles flat is
+    "passed"/"completed_no_signals" regardless of overnight_holds.
+    Any other non-flat end is "held_overnight" only when
     _honest_overnight_hold agrees it is a genuine, reconciled,
     error/halt-free session-boundary hold -- main() reuses this status for
     is_final_boundary (``_final_boundary_from_run_status``) instead of
@@ -915,6 +983,11 @@ def _run_native_status(reconciliation, session_errors, native_fills, outcome, se
     unconditionally, and never allowed to outrank a failed liquidation's
     real outcome.
     """
+    decision = outcome.get("decision_exit")
+    if (outcome.get("shutdown_failure") or (outcome.get("accounting") or {}).get("halted_reason")
+            or (decision is not None and (decision.get("reason") not in _NORMAL_DECISION_EXITS
+                or (decision.get("reason") == "duration_completed" and decision.get("duration_completed") is not True)))):
+        return "needs_attention"
     if reconciliation and reconciliation["positions"] == 0 and reconciliation["open_orders"] == 0 and not session_errors:
         return "passed" if native_fills else "completed_no_signals"
     if _honest_overnight_hold(outcome, session_policy, now):
