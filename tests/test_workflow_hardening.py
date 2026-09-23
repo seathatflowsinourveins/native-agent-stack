@@ -12,7 +12,10 @@ a full commit SHA.
 from datetime import date
 from pathlib import Path
 import hashlib
+import os
 import re
+import subprocess
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -365,9 +368,236 @@ class TargetRulesetTests(unittest.TestCase):
     def test_target_requires_the_security_gates_from_github_actions(self):
         (checks,) = self.rule("required_status_checks")
         contexts = {check["context"]: check.get("integration_id") for check in checks["parameters"]["required_status_checks"]}
-        for context in ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner"):
+        for context in ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner",
+                        "verdict-review-gate"):
             self.assertEqual(contexts.get(context), 15368, context)
         self.assertEqual(len(self.rule("code_scanning")), 1)
+
+
+class VerdictReviewGateTests(unittest.TestCase):
+    """The required verdict-review-gate job (docs/decisions/2026-09-22-github-automation-closure.md,
+    "verdict-review-gate (2026-09-23)")."""
+
+    text = (WORKFLOWS / "validate.yml").read_text(encoding="utf-8")
+    job = jobs(text)["verdict-review-gate"]
+
+    def test_runs_on_every_pull_request_without_a_path_filter(self):
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\n", 1)[0]
+        self.assertRegex(trigger, r"(?m)^  pull_request:[ \t]*$")
+        self.assertNotIn("paths", trigger)
+        self.assertNotIn("branches", trigger.split("pull_request:", 1)[1].split("workflow_dispatch:", 1)[0])
+        self.assertIn("push:", trigger)
+        self.assertIsNone(block_if(self.job), "a required check must run on every event")
+
+    def test_read_only_hardened_and_without_persisted_credentials(self):
+        self.assertEqual(scopes(self.job), [{"contents": "read"}])
+        step = first_step(self.job)
+        self.assertIn(HARDEN, step)
+        self.assertIn("egress-policy: audit", step)
+        checkout = step_block(self.job, "Check out repository")
+        self.assertIn("persist-credentials: false", checkout)
+        self.assertIn("fetch-depth: 0", checkout)
+        self.assertRegex(self.job, r"timeout-minutes: \d+")
+
+    def test_pull_request_re_runs_when_its_base_branch_changes(self):
+        # Review of #135, H1: without the edited type a retargeted PR kept its earlier green run.
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\n", 1)[0]
+        pull_request = trigger.split("pull_request:", 1)[1].split("workflow_dispatch:", 1)[0]
+        (types,) = re.findall(r"(?m)^    types: \[([^\]]*)\]$", pull_request)
+        self.assertEqual([item.strip() for item in types.split(",")], ["opened", "synchronize", "reopened", "edited"])
+
+    def run_script(self):
+        return step_block(self.job, "Require sealed cross-family review").split("run: |", 1)[1]
+
+    def test_event_values_reach_the_gate_through_env_only(self):
+        gate = step_block(self.job, "Require sealed cross-family review")
+        self.assertIn("EVENT_NAME: ${{ github.event_name }}", gate)
+        self.assertIn("PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}", gate)
+        self.assertIn("PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}", gate)
+        self.assertIn("PUSH_BEFORE_SHA: ${{ github.event.before }}", gate)
+        self.assertIn("PR_BASE_REF: ${{ github.base_ref }}", gate)
+        self.assertNotIn("${{", self.run_script(), "no expression is interpolated into the shell script")
+        self.assertNotIn("continue-on-error", gate)
+
+    def test_pull_request_base_is_the_merge_commits_first_parent_cross_checked(self):
+        # Review of #123, finding 5: the base is HEAD^1 of the checked-out merge commit; the payload's
+        # base.sha must be its ancestor; with neither available the job fails closed.
+        run = self.run_script()
+        pull_request = run.split("pull_request)", 1)[1].split(";;", 1)[0]
+        self.assertIn("first_parent=\"$(git rev-parse --verify --quiet 'HEAD^1^{commit}' || true)\"", pull_request)
+        self.assertIn('git merge-base --is-ancestor "$payload" "$first_parent"', pull_request)
+        self.assertIn('base="$first_parent"', pull_request)
+        self.assertRegex(pull_request, r"\n +else\n +echo \"::error::verdict-review-gate: neither the merge commit's "
+                                       r"first parent nor the payload base is available\"\n +exit 1\n +fi")
+        self.assertRegex(pull_request, r"is not an ancestor of the merge commit's first parent \$first_parent\"\n"
+                                       r" +exit 1\n")
+
+    def test_pull_request_head_must_be_the_merge_commit_of_the_payload_head(self):
+        # Fourth review, G4: HEAD^1 is the base only when HEAD is the PR merge commit; assert it.
+        pull_request = self.run_script().split("pull_request)", 1)[1].split(";;", 1)[0]
+        assertion = pull_request.split("first_parent=", 1)[0]
+        self.assertIn("second_parent=\"$(git rev-parse --verify --quiet 'HEAD^2^{commit}' || true)\"", assertion)
+        self.assertIn('[ "$second_parent" != "$PR_HEAD_SHA" ]', assertion)
+        self.assertIn("git rev-parse --verify --quiet 'HEAD^3^{commit}'", assertion)
+        self.assertRegex(assertion, r"failing closed\"\n +exit 1\n +fi")
+
+    def run_gate_step(self, repository, head, pr_head, event="pull_request", base_ref="main"):
+        """Execute the step's script in ``repository`` checked out at ``head``, with a stub python3
+        that records the gate invocation instead of running it."""
+        subprocess.run(["git", "-C", str(repository), "checkout", "--quiet", "--detach", head], check=True)
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(subprocess.run, ["rm", "-rf", str(scratch)])
+        (scratch / "bin").mkdir()
+        stub = scratch / "bin" / "python3"
+        stub.write_text('#!/bin/sh\necho "gate-invoked $*"\n')
+        stub.chmod(0o755)
+        environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+        environment.update(PATH=f"{scratch / 'bin'}:{environment['PATH']}", EVENT_NAME=event,
+                           PR_BASE_SHA=self.commits["base"], PR_HEAD_SHA=pr_head, PUSH_BEFORE_SHA="",
+                           PR_BASE_REF=base_ref,
+                           RUNNER_TEMP=str(scratch), GITHUB_WORKSPACE=str(repository),
+                           GITHUB_STEP_SUMMARY=str(scratch / "summary.md"))
+        return subprocess.run(["bash", "-c", self.run_script()], cwd=repository, env=environment,
+                              capture_output=True, text=True)
+
+    def make_pull_request_repository(self, gate="added"):
+        """base -> pr1 -> pr2 on branch pr, and the merge of pr2 into base. ``gate`` places
+        scripts/verdict_review_gate.py: "added" by pr1 (the PR that adds the gate), "base" already at
+        the base, None nowhere."""
+        repository = Path(tempfile.mkdtemp())
+        self.addCleanup(subprocess.run, ["rm", "-rf", str(repository)])
+
+        def git(*args):
+            return subprocess.run(["git", "-C", str(repository), "-c", "user.name=fixture",
+                                   "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false", *args],
+                                  check=True, capture_output=True, text=True).stdout.strip()
+
+        git("init", "--quiet", "--initial-branch=main")
+        commits = {}
+        for name, branch in (("base", None), ("pr1", "pr"), ("pr2", None)):
+            if branch:
+                git("checkout", "--quiet", "-b", branch)
+            (repository / f"{name}.txt").write_text(name)
+            if (gate, name) in (("added", "pr1"), ("base", "base")):
+                (repository / "scripts").mkdir()
+                (repository / "scripts" / "verdict_review_gate.py").write_text("# gate\n")
+            git("add", "-A")
+            git("commit", "--quiet", "-m", name)
+            commits[name] = git("rev-parse", "HEAD")
+        git("checkout", "--quiet", "--detach", commits["base"])
+        git("merge", "--quiet", "--no-ff", "-m", "merge", commits["pr2"])
+        commits["merge"] = git("rev-parse", "HEAD")
+        # actions/checkout with fetch-depth: 0 fetches +refs/heads/*:refs/remotes/origin/*.
+        git("update-ref", "refs/remotes/origin/main", commits["base"])
+        # A stacked branch on main's tip and a merge of the PR head into it: a merge commit left
+        # built against the branch a retargeted PR came from.
+        git("checkout", "--quiet", "-b", "stack", commits["base"])
+        (repository / "stack.txt").write_text("stack")
+        git("add", "-A")
+        git("commit", "--quiet", "-m", "stack")
+        git("merge", "--quiet", "--no-ff", "-m", "merge into stack", commits["pr2"])
+        commits["stack_merge"] = git("rev-parse", "HEAD")
+        git("checkout", "--quiet", "--detach", commits["merge"])
+        self.commits = commits
+        return repository
+
+    def test_the_merge_commit_assertion_executes(self):
+        repository = self.make_pull_request_repository()
+        merge, pr1, pr2, base = (self.commits[name] for name in ("merge", "pr1", "pr2", "base"))
+        passed = self.run_gate_step(repository, merge, pr2)
+        self.assertEqual(passed.returncode, 0, passed.stdout + passed.stderr)
+        self.assertIn(f"gate-invoked scripts/verdict_review_gate.py --root {repository} --base {base}", passed.stdout)
+        for head, pr_head, case in ((pr2, pr2, "the PR head checked out instead of the merge commit"),
+                                    (merge, pr1, "a merge commit of another PR head"),
+                                    (merge, "", "no PR head in the payload")):
+            with self.subTest(case):
+                failed = self.run_gate_step(repository, head, pr_head)
+                self.assertEqual(failed.returncode, 1, failed.stdout + failed.stderr)
+                self.assertIn("HEAD is not the merge commit of the PR head", failed.stdout)
+                self.assertNotIn("gate-invoked", failed.stdout)
+
+    def test_a_pull_request_into_another_branch_fails_closed(self):
+        # Review of #135, H1: a PR judged against another branch and then retargeted to main must not
+        # carry a green gate; the edited run fails closed until the base is main.
+        repository = self.make_pull_request_repository()
+        merge, pr2 = self.commits["merge"], self.commits["pr2"]
+        for base_ref in ("develop", "main-copy", ""):
+            with self.subTest(base_ref=base_ref):
+                failed = self.run_gate_step(repository, merge, pr2, base_ref=base_ref)
+                self.assertEqual(failed.returncode, 1, failed.stdout + failed.stderr)
+                self.assertIn(f"the pull request's base branch is '{base_ref}', not main", failed.stdout)
+                self.assertNotIn("gate-invoked", failed.stdout)
+        passed = self.run_gate_step(repository, merge, pr2, base_ref="main")
+        self.assertEqual(passed.returncode, 0, passed.stdout + passed.stderr)
+        self.assertIn("gate-invoked", passed.stdout)
+
+    def test_a_merge_commit_built_on_another_branch_fails_closed(self):
+        # Review of #135, round 2: the payload base.sha being an ancestor of HEAD^1 is not enough; a
+        # merge commit whose first parent is a stacked branch containing main's tip would be judged
+        # against that branch. HEAD^1 must be a commit on origin/main.
+        repository = self.make_pull_request_repository()
+        failed = self.run_gate_step(repository, self.commits["stack_merge"], self.commits["pr2"])
+        self.assertEqual(failed.returncode, 1, failed.stdout + failed.stderr)
+        self.assertIn("is not a commit on origin/main; failing closed", failed.stdout)
+        self.assertNotIn("gate-invoked", failed.stdout)
+        passed = self.run_gate_step(repository, self.commits["merge"], self.commits["pr2"])
+        self.assertEqual(passed.returncode, 0, passed.stdout + passed.stderr)
+        run = self.run_script()
+        pull_request = run.split("pull_request)", 1)[1].split(";;", 1)[0]
+        self.assertIn('git merge-base --is-ancestor "$base" "refs/remotes/origin/$PR_BASE_REF"', pull_request)
+
+    def test_the_base_gate_runs_when_the_base_has_one(self):
+        repository = self.make_pull_request_repository(gate="base")
+        passed = self.run_gate_step(repository, self.commits["merge"], self.commits["pr2"])
+        self.assertEqual(passed.returncode, 0, passed.stdout + passed.stderr)
+        self.assertRegex(passed.stdout, r"gate-invoked \S+/gate-base/scripts/verdict_review_gate\.py --root ")
+        self.assertNotIn("bootstrap", passed.stdout)
+
+    def test_the_bootstrap_copy_runs_only_for_the_change_that_adds_the_gate(self):
+        # Review of #135, L4: the head's own copy runs only when base...HEAD adds the file (A).
+        repository = self.make_pull_request_repository(gate="added")
+        passed = self.run_gate_step(repository, self.commits["merge"], self.commits["pr2"])
+        self.assertEqual(passed.returncode, 0, passed.stdout + passed.stderr)
+        self.assertIn("this change adds the gate; running this checkout's copy (bootstrap)", passed.stdout)
+        self.assertIn(f"gate-invoked scripts/verdict_review_gate.py --root {repository}", passed.stdout)
+        repository = self.make_pull_request_repository(gate=None)
+        failed = self.run_gate_step(repository, self.commits["merge"], self.commits["pr2"])
+        self.assertEqual(failed.returncode, 1, failed.stdout + failed.stderr)
+        self.assertIn("has no scripts/verdict_review_gate.py and this change does not add it; failing closed",
+                      failed.stdout)
+        self.assertNotIn("gate-invoked", failed.stdout)
+
+    def test_push_to_main_executes_the_gate_and_fails_closed_without_a_previous_commit(self):
+        # Review of #123, finding 2 (accepted residual): the push-to-main run re-checks after merge.
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\n", 1)[0]
+        self.assertRegex(trigger, r"(?m)^  push:\n    branches: \[main\]$")
+        self.assertIsNone(block_if(self.job))
+        self.assertIsNone(block_if(step_block(self.job, "Require sealed cross-family review")))
+        run = self.run_script()
+        push = run.split("push)", 1)[1].split(";;", 1)[0]
+        self.assertIn('base="${PUSH_BEFORE_SHA:-}"', push)
+        self.assertIn('if [ -z "$base" ] || [ -z "${base//0/}" ]; then', push)
+        self.assertIn("exit 1", push)
+        # Every event reaches the gate invocation: no branch of the case exits 0 or skips it.
+        self.assertNotIn("exit 0", run)
+        self.assertTrue(run.rstrip().endswith('python3 "$gate" --root "$GITHUB_WORKSPACE" --base "$base" '
+                                              '| tee -a "$GITHUB_STEP_SUMMARY"'))
+
+    def test_the_gate_that_runs_is_the_base_commits_copy(self):
+        # Review of #123, finding 2: a pull request must not be judged by a gate it edited.
+        run = self.run_script()
+        self.assertIn('git worktree add --quiet --detach "$RUNNER_TEMP/gate-base" "$base"', run)
+        self.assertIn('gate="$RUNNER_TEMP/gate-base/$gate"', run)
+        self.assertIn('if git cat-file -e "$base:$gate"', run)
+        self.assertIn('python3 "$gate" --root "$GITHUB_WORKSPACE" --base "$base"', run)
+        self.assertIn("set -euo pipefail", run.split('python3 "$gate"', 1)[0])
+
+    def test_no_dangerous_trigger_is_added_for_the_residual(self):
+        # The accepted residual (the PR's own validate.yml can disable the job) is not closed with a
+        # privileged trigger: zizmor's dangerous-triggers audit runs with --no-config --no-ignores.
+        for workflow in WORKFLOWS.glob("*.yml"):
+            text = workflow.read_text(encoding="utf-8")
+            self.assertNotRegex(text, r"(?m)^\s*(pull_request_target|workflow_run):", workflow.name)
 
 
 class SupplyChainGateTests(unittest.TestCase):

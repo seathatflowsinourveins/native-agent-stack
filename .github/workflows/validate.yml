@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+    # The default three plus edited, which fires when a pull request's base branch changes: a
+    # retargeted PR must be judged again against its new base, not keep an earlier green run.
+    types: [opened, synchronize, reopened, edited]
   workflow_dispatch:
 
 permissions:
@@ -122,6 +125,115 @@ jobs:
         run: python3 -m unittest
       - name: Test semantic evidence contract boundaries
         run: node --test blueprints/native-skill-practice/test-contract.cjs
+
+  verdict-review-gate:
+    # Required check (docs/decisions/2026-09-22-github-automation-closure.md, "verdict-review-gate
+    # (2026-09-23)"): with one maintainer and zero required approvals, a PR that changes a
+    # layer-verdict row merges only when the row is consistent with the sealed cross-family lane
+    # returns its wave registers (the returns are self-attested; see the record's residual). It has
+    # no path filter so it reports on every pull request and can be required.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+        # Full history: the gate reads the base commit's ledger and wave registry with git show.
+      - name: Require sealed cross-family review for changed verdict rows
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          # The pull request's base branch (GITHUB_BASE_REF): the gate judges only pull requests into main.
+          PR_BASE_REF: ${{ github.base_ref }}
+          # Cross-check only: the base is the checked-out merge commit's first parent.
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          # The checked-out HEAD must be the merge commit whose second parent is this PR head.
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          # The pushed range's previous commit on main.
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          case "$EVENT_NAME" in
+            pull_request)
+              # A pull request into another branch is not judged against main, and retargeting it to
+              # main later re-runs this job (the edited type): fail closed rather than pass a base the
+              # gate does not protect.
+              if [ "${PR_BASE_REF:-}" != "main" ]; then
+                echo "::error::verdict-review-gate: the pull request's base branch is '${PR_BASE_REF:-}', not main; the gate judges only pull requests into main (retarget it to main); failing closed"
+                exit 1
+              fi
+              # actions/checkout checks out the PR merge commit; its first parent is the base-branch
+              # commit the PR is merged into, which is what the gate must compare with. Assert that
+              # premise: HEAD has exactly two parents and the second is the payload's PR head, or
+              # HEAD^1 could be the PR's own previous commit and the gate would judge only the last one.
+              second_parent="$(git rev-parse --verify --quiet 'HEAD^2^{commit}' || true)"
+              if [ -z "${PR_HEAD_SHA:-}" ] || [ "$second_parent" != "$PR_HEAD_SHA" ] \
+                || git rev-parse --verify --quiet 'HEAD^3^{commit}' >/dev/null; then
+                echo "::error::verdict-review-gate: HEAD is not the merge commit of the PR head '${PR_HEAD_SHA:-}' (second parent '$second_parent'); failing closed"
+                exit 1
+              fi
+              first_parent="$(git rev-parse --verify --quiet 'HEAD^1^{commit}' || true)"
+              payload="${PR_BASE_SHA:-}"
+              if [ -n "$first_parent" ] && [ -n "$payload" ]; then
+                if ! git merge-base --is-ancestor "$payload" "$first_parent"; then
+                  echo "::error::verdict-review-gate: the payload base $payload is not an ancestor of the merge commit's first parent $first_parent"
+                  exit 1
+                fi
+                base="$first_parent"
+              elif [ -n "$first_parent" ]; then
+                base="$first_parent"
+              elif [ -n "$payload" ]; then
+                base="$payload"
+              else
+                echo "::error::verdict-review-gate: neither the merge commit's first parent nor the payload base is available"
+                exit 1
+              fi
+              # The base must be a commit on main itself (full history fetches origin/main), not a
+              # branch that merely contains main's tip, such as a merge commit left built against an
+              # earlier base: a retargeted PR is otherwise judged against the branch it left.
+              if ! git merge-base --is-ancestor "$base" "refs/remotes/origin/$PR_BASE_REF"; then
+                echo "::error::verdict-review-gate: the base $base is not a commit on origin/$PR_BASE_REF; failing closed (after a retarget the edited run checks out the merge commit built on the old base: close and reopen the pull request, or push a commit, to rebuild it on $PR_BASE_REF)"
+                exit 1
+              fi
+              ;;
+            push)
+              base="${PUSH_BEFORE_SHA:-}"
+              # A branch-creating push has an all-zero before: there is no base to judge against.
+              if [ -z "$base" ] || [ -z "${base//0/}" ]; then
+                echo "::error::verdict-review-gate: the push has no previous commit (before is '$base'); failing closed"
+                exit 1
+              fi
+              ;;
+            *)
+              # workflow_dispatch has no base in its payload: compare with the parent.
+              base="$(git rev-parse --verify 'HEAD^1^{commit}')"
+              ;;
+          esac
+          # The rules come from the base: run the base commit's gate (and the code it imports) against
+          # this checkout, so a pull request cannot weaken the gate that judges it. Only the pull
+          # request that adds the gate (git diff reports it as A against the base) finds none at its
+          # base and runs its own copy; any other base without the gate fails closed.
+          gate="scripts/verdict_review_gate.py"
+          if git cat-file -e "$base:$gate" 2>/dev/null; then
+            git worktree add --quiet --detach "$RUNNER_TEMP/gate-base" "$base"
+            gate="$RUNNER_TEMP/gate-base/$gate"
+          else
+            added="$(git diff --no-renames --name-status -z "$base...HEAD" -- "$gate" | tr '\0' '\n')"
+            if [ "$added" != $'A\n'"$gate" ]; then
+              echo "::error::verdict-review-gate: the base $base has no $gate and this change does not add it; failing closed"
+              exit 1
+            fi
+            echo "verdict-review-gate: this change adds the gate; running this checkout's copy (bootstrap)"
+          fi
+          python3 "$gate" --root "$GITHUB_WORKSPACE" --base "$base" | tee -a "$GITHUB_STEP_SUMMARY"
 
   secret-scan:
     runs-on: ubuntu-24.04

@@ -3014,8 +3014,8 @@
     },
     {
       "path": ".github/main-ruleset.json",
-      "sha256": "6c7f79c59b1e667531e71b5b2981626d24bd3f0d3c28ce39d98525450b23caac",
-      "bytes": 1562
+      "sha256": "fedbe641236d9089c6d5e5f417efc8f63af7409a579458d41c98f87e00776b8f",
+      "bytes": 1633
     },
     {
       "path": ".github/pull_request_template.md",
@@ -3089,8 +3089,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "12eb6dbf689a7e9302bb0639f49416d2d0f665c04a3268067801f51352101d88",
-      "bytes": 9801
+      "sha256": "9efab8fdab0c762ad785f751e7f267a8874f75180971463447bc13265cb21d84",
+      "bytes": 16743
     },
     {
       "path": ".gitignore",
@@ -9135,8 +9135,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "0eace745964cb3dd3c83a0dd4f5334ff192da9a44b0b857e606e6a77c0fd9c78",
-      "bytes": 41656
+      "sha256": "cf9939856f8ede9cd9efe45e024581c317a7ffef17d54a1c1e18d9a9258cc0b9",
+      "bytes": 78761
     },
     {
       "path": "docs/direct-results.md",
@@ -9250,8 +9250,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "0480471e3546be71ac48189079fa479bc278e54d80aa1f978e9fa7d1092d087b",
-      "bytes": 64405
+      "sha256": "26f6519cd72f376f2e21d4159d62c05be1a3fab1c8fa746904629f89cd5f9f2e",
+      "bytes": 78428
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -28150,8 +28150,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "3085c8952788857a4178b4692f7327f71f675feb062689d5b751baba024f28a0",
-      "bytes": 23081
+      "sha256": "13928d7689e1796be5ef78c5d897700db0d4f2837fb171849253dc3374a2619b",
+      "bytes": 38080
     },
     {
       "path": "tests/test_workflow_security.py",
