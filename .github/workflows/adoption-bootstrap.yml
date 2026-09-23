@@ -603,17 +603,20 @@ jobs:
           tests.test_adoption_contract tests.test_adoption_status
           tests.test_render_config tests.test_workflow_hardening
           tests.test_workflow_security_coverage
-      - name: Run the full test suite (recorded, not gating on macOS)
+      - name: Run the full test suite (gating on macOS)
         id: full_suite
-        continue-on-error: true
         shell: bash
         run: |
+          # Gating since PR #126: the full suite passed on macos-15 (run
+          # 35898879109: 3156 tests OK, skipped=435) once the path-safety and
+          # platform-specific fixes landed. The log is still uploaded below.
           set +e
           python3 -m unittest -v >full-suite-macos.log 2>&1
           code=$?
           set -e
-          echo "Full python3 -m unittest exit code on macOS: $code (recorded as an artifact; this step never fails the job)"
-          exit 0
+          echo "Full python3 -m unittest exit code on macOS: $code"
+          tail -n 5 full-suite-macos.log
+          exit "$code"
       - name: Upload the full test suite result
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

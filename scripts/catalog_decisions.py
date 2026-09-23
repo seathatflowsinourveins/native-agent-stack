@@ -61,6 +61,11 @@ def safe_file(root: Path, relative: str) -> Path:
             and all(part not in {".", "..", ".git"} for part in parts.parts)
             and not any(ord(char) < 32 or char in "\\:?#" for char in relative),
             "source path must be canonical and confined to the repository")
+    # Canonicalise root the same way the containment check below canonicalises path:
+    # an unresolved root (e.g. a raw tempdir path under macOS's symlinked /var or
+    # /tmp, or a caller that skipped .resolve()) must not make a legitimate path
+    # look like it escapes just because only one side followed ancestor symlinks.
+    root = Path(root).resolve()
     path = root
     for part in parts.parts:
         path /= part

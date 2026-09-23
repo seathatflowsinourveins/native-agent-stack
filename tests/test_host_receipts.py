@@ -508,6 +508,10 @@ class RecorderRoundTripTests(unittest.TestCase):
                 "record", "--root", str(self.root),
                 "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64",
+                # host.os/architecture are auto-detected unless overridden; pin them to
+                # match the linux-wsl2-x86_64 platform_id so this test's later
+                # cmd_validate() cross-check is consistent on every host OS/arch.
+                "--os", "linux", "--architecture", "x86_64",
                 "--component-id", "widget",
                 "--stage", "use",
                 "--evidence-class", "synthetic",
@@ -552,6 +556,9 @@ class RecorderRoundTripTests(unittest.TestCase):
                 "record", "--root", str(self.root),
                 "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64",
+                # See test_record_writes_a_valid_registered_receipt: pin host.os/
+                # architecture so cmd_validate()'s cross-check is host-independent.
+                "--os", "linux", "--architecture", "x86_64",
                 "--component-id", "vendor/tool",
                 "--stage", "use",
                 "--evidence-class", "synthetic",
@@ -592,6 +599,9 @@ class RecorderRoundTripTests(unittest.TestCase):
                 "record", "--root", str(self.root),
                 "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64",
+                # See test_record_writes_a_valid_registered_receipt: pin host.os/
+                # architecture so cmd_validate()'s cross-check is host-independent.
+                "--os", "linux", "--architecture", "x86_64",
                 "--component-id", "candidate:cli-cli",
                 "--stage", "use",
                 "--evidence-class", "synthetic",
@@ -675,6 +685,9 @@ class RecorderRoundTripTests(unittest.TestCase):
                 "record", "--root", str(self.root),
                 "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64",
+                # See test_record_writes_a_valid_registered_receipt: pin host.os/
+                # architecture so cmd_validate()'s cross-check is host-independent.
+                "--os", "linux", "--architecture", "x86_64",
                 "--component-id", "widget",
                 "--stage", "use",
                 "--evidence-class", "synthetic",
@@ -1210,6 +1223,11 @@ class QualifiedModelRecordTests(unittest.TestCase):
                 "record", "--root", str(self.root),
                 "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64",
+                # host.os/architecture are auto-detected unless overridden; pin them
+                # to match linux-wsl2-x86_64 so test_qualified_model_flag_is_recorded_
+                # and_validates' cmd_validate() cross-check is host-independent (see
+                # test_record_writes_a_valid_registered_receipt for the same fix).
+                "--os", "linux", "--architecture", "x86_64",
                 "--component-id", "widget",
                 "--stage", "use",
                 "--evidence-class", "synthetic",

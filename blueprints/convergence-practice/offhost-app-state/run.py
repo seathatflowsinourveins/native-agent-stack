@@ -43,6 +43,7 @@ def module(name, path):
 
 transfer = module('app_transfer', HERE.parent / 'offhost-restore/verify.py')
 memory = module('app_memory', MEMORY / 'run.py')
+path_safety = module('path_safety', CHECKOUT / 'scripts/path_safety.py')
 sha = transfer.digest
 load = transfer.load
 
@@ -71,8 +72,11 @@ def proof_files(raw, secrets):
 
 
 def validate_source(folder, identity, plan_sha256, record_sha256):
-    folder = Path(folder)
-    if folder.resolve() != folder or {p.name for p in folder.iterdir()} != {'source.json', 'manifest.json', 'repository.json'}:
+    # See scripts/path_safety.py: a symlink is tolerated only when it is a
+    # trusted OS-level boundary link (root-owned, not group/world-writable,
+    # e.g. macOS's /tmp -> /private/tmp); $TMPDIR grants no exemption.
+    folder = path_safety.refuse_untrusted_symlinks(folder, 'unexpected transfer artifact members')
+    if {p.name for p in folder.iterdir()} != {'source.json', 'manifest.json', 'repository.json'}:
         raise ValueError('unexpected transfer artifact members')
     if any(not stat.S_ISREG(p.lstat().st_mode) for p in folder.iterdir()):
         raise ValueError('transfer artifact contains unsupported member type')
@@ -96,8 +100,19 @@ def validate_source(folder, identity, plan_sha256, record_sha256):
 
 def owned_root(path):
     path = Path(path).absolute()
-    if (path.parent != Path('/tmp') or not re.fullmatch(r'native-offhost-app\.[A-Za-z0-9_]+', path.name)
-            or path.resolve() != path or not path.is_dir() or path.stat().st_uid != os.getuid()):
+    # /tmp itself is a symlink on macOS (-> /private/tmp); path.parent must be
+    # the literal /tmp or its literal resolved form -- never some OTHER
+    # symlink (owned by anyone, even root) that merely resolves to /tmp, since
+    # that other symlink could be repointed elsewhere after this check and
+    # before this root is actually used (TOCTOU). path.resolve() landing
+    # exactly at <resolved /tmp>/<this name> is a second, independent check on
+    # the same requirement; path.is_symlink() -- not a resolve() comparison on
+    # path itself -- catches an owned-looking leaf that is actually a symlink.
+    real_tmp = Path('/tmp').resolve()
+    if (path.parent not in (Path('/tmp'), real_tmp)
+            or not re.fullmatch(r'native-offhost-app\.[A-Za-z0-9_]+', path.name)
+            or path.resolve() != real_tmp / path.name
+            or path.is_symlink() or not path.is_dir() or path.stat().st_uid != os.getuid()):
         raise ValueError('expected this job-owned real /tmp root')
     return path
 
@@ -259,8 +274,14 @@ class Trial:
 
     def password(self):
         path = self.root / 'private/password'
-        if (not stat.S_ISREG(path.lstat().st_mode) or stat.S_IMODE(path.stat().st_mode) != 0o600
-                or path.resolve() != path or path.stat().st_uid != os.getuid()):
+        # self.root is already the vetted, literal owned_root(); comparing the
+        # whole path's resolve() to itself always differs once /tmp itself is
+        # a symlink (macOS's /tmp -> /private/tmp) even with nothing wrong.
+        # stat.S_ISREG(path.lstat().st_mode) already refuses the leaf itself
+        # being a symlink (lstat reports S_IFLNK, never S_IFREG, for one); the
+        # one remaining gap is the intermediate 'private' directory.
+        if (path.parent.is_symlink() or not stat.S_ISREG(path.lstat().st_mode)
+                or stat.S_IMODE(path.stat().st_mode) != 0o600 or path.stat().st_uid != os.getuid()):
             raise ValueError('fixture password must be owned regular 0600 file')
         value = path.read_text().strip()
         if not value or len(value) > 256: raise ValueError('missing or malformed fixture password')
@@ -672,7 +693,11 @@ def seal(trial):
 
 def cleanup(trial):
     private = trial.root / 'private'
-    if private.exists() and private.resolve() != private:
+    # trial.root is already the vetted, literal (unresolved) owned_root(); do
+    # not compare its resolve() to itself -- /tmp's own resolved form (macOS's
+    # /tmp -> /private/tmp) would always differ from the literal path even
+    # with nothing wrong. Only the leaf itself must not be a symlink.
+    if private.exists() and private.is_symlink():
         raise ValueError('private cleanup directory is not owned real path')
     key = private / 'password'
     if key.exists():

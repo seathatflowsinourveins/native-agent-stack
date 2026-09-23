@@ -6,7 +6,9 @@ measured load justifies. The per-layer list of what to install is generated in
 [`adoption/bootstrap.md`](../adoption/bootstrap.md); recording what ran is
 [`contributing-evidence.md`](contributing-evidence.md). For the exact ordered commands
 (measure, record, refresh the derived views, check for a possible verdict flip, validate),
-see [`contributing-evidence.md`'s "The new-host loop, in one place"](contributing-evidence.md#0-the-new-host-loop-in-one-place).
+see [`contributing-evidence.md`'s "The new-host loop, in one place"](contributing-evidence.md#0-the-new-host-loop-in-one-place);
+moving a set-up host to a later release is
+[moving a host to a new release](../adoption/update.md#moving-a-host-to-a-new-release).
 
 ## Machine roles (recommendation, not a measurement)
 
@@ -64,8 +66,13 @@ and treat the projection as superseded guidance rather than looking for it to ha
 
 ## macOS (64 GB) next steps
 
-1. Pinned clone, then `adoption/bootstrap-macos.sh` (the macOS clean-install work in progress adds
-   Homebrew prerequisites, launchd agents and darwin pins).
+1. Pinned clone, then `adoption/bootstrap-macos.sh`. The Homebrew prerequisite install, the
+   `socraticode`, darwin-binary and embedding-model pins, the launchd agents and the embedding
+   acceptance script all came in #94, after `v2026.09.23`: at that tag the script brews only `jq`
+   and installs 7 of the 8 `macos-arm64-foundation` components, and the launchd and embedding steps
+   run from a default-branch clone, as the [macOS page](../adoption/platforms/macos-arm64.md) marks.
+   A release cut after #94 and re-pinned ([moving a host to a new release](../adoption/update.md#moving-a-host-to-a-new-release))
+   removes these differences.
 2. `python3 scripts/hardware_profile.py --record-host <host-id>` and the MLX smoke; this writes
    and registers the measured profile.
 3. `macos-arm64-foundation` profile; re-qualify any local model on MLX or llama.cpp Metal: a vLLM

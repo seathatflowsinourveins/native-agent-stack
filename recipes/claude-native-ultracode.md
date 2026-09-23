@@ -95,9 +95,17 @@ token-saving switch. In a `-p` run, load this opted-in settings file or pass
 
 ## Assign models by task and verify the assignment
 
+**2026-09-23: Opus 5.5 now leads this table.** The live host's coordinator
+model is `claude-opus-5-5` (via `modelSettings.claude-opus-5-5.effortLevel:
+xhigh`, since a USER-scope top-level `effortLevel` no longer covers Opus 5.5
+and later; see `recipes/claude-native-profile.md`'s 2026-09-23 correction).
+Fable 5.1 is the escalation path when a task specifically needs the prior
+coordinator's demonstrated multi-agent-graph behavior (below) rather than the
+new default.
+
 | Role | Starting choice | Qualification |
 | --- | --- | --- |
-| Requirements, decomposition, integration and hard judgments | Fable, Ultracode for substantial graphs | Coordinator observed as Fable 5.1/xhigh |
+| Requirements, decomposition, integration and hard judgments | Opus 5.5, Ultracode for substantial graphs; escalate to Fable 5.1 for a task needing its previously demonstrated graph-coordination behavior | Coordinator observed as Opus 5.5/xhigh on this host as of 2026-09-23; Fable 5.1/xhigh's own multi-agent-graph coordination (Sonnet 5 and Opus 5 workers) remains the escalation's own qualification below |
 | Exact extraction, inventories, running acceptance commands | `source-scout` (Sonnet, medium; four built-in tools, no project instructions) | First prompt 8,048 tokens versus 42,396 for the default child on one identical task; ran the inventory stage of eight native reviews and the readers of two readiness audits (one deployed, one in the scratch adoption); the recheck stage exists since the eighth review and ran there and in the three scratch-adoption reviews |
 | Implementation from a clear contract | `isolated-builder` (Sonnet, medium, own worktree, named MCP tools behind ToolSearch) | One real task: a manifest probe implemented, checked and committed from its own worktree (first prompt 17,864) |
 | Independent review from source and recorded evidence | `evidence-reviewer` (Opus, high; read-only named MCP tools behind ToolSearch, no Bash/Edit/Write) | Eight native review runs; first prompt 12,164 for the deferred shape versus 42,220 with bare server grants |

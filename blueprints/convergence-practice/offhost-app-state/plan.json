@@ -77,7 +77,7 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/run.py",
-      "sha256": "d5eddb06d7fc86218b98e11e84b70edd7ee7f72cdc31caeab454112bd1b2b950"
+      "sha256": "a5c7e8a9a542b5365dcb045787b77c09a84d136f249c2126b92d0aa32653f2c5"
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/upstream.json",
@@ -85,7 +85,7 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/verify.py",
-      "sha256": "fd51bb5c2ccdea21134b03848e53130bb0cf7dcf53840f988424533fa4bc772f"
+      "sha256": "a3363192e027e7521fda0e03e5a0a2acc9f149abee304d57d6460166bdeae260"
     },
     {
       "path": "blueprints/convergence-practice/wsl-memory-maintenance/config.toml",
@@ -104,8 +104,12 @@
       "sha256": "243d7174ab90d3cac7667a6af74bb2062c9f0fc3275aa2b447b25afa870f3c07"
     },
     {
+      "path": "scripts/path_safety.py",
+      "sha256": "228edf3968176c04c557078c59502b2d90141e000e1acf2917e87cc67316e703"
+    },
+    {
       "path": "tests/test_offhost_app_state.py",
-      "sha256": "a763c8ed4d707bbe447a4af97c7545faabd75866f5ffea320d232285a9a0162c"
+      "sha256": "b00b8335a3e6bf902442f0a3b4319611a5433dd85063c104c606c43c917e5cdc"
     }
   ]
 }

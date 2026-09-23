@@ -7,6 +7,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import shutil
 import sys
 import tempfile
 import unittest
@@ -51,6 +52,21 @@ class CiphertextTests(unittest.TestCase):
     def test_existing_destination_refused(self):
         (self.root/'repository').mkdir()
         with self.assertRaises(FileExistsError): verify.decode_repository(self.bundle, self.expected, self.root/'repository')
+
+    def test_dotdot_target_refused(self):
+        # Round-2 security review: the old target.resolve() != target.absolute()
+        # check incidentally caught a '..' component (resolve() collapses it,
+        # absolute() does not); replacing it with the shared symlink-ancestor
+        # walk dropped that catch, since '..' is not itself a symlink. Uses
+        # self.root's own (existing) parent so a dropped check would actually
+        # succeed in creating the escaped directory, not merely raise some
+        # unrelated filesystem error. Must fail on c1f30cb where the explicit
+        # '..' refusal was dropped and pass with it restored.
+        target = self.root / '..' / (self.root.name + '-escaped-repository')
+        self.addCleanup(lambda: target.exists() and shutil.rmtree(target))
+        with self.assertRaises(ValueError):
+            verify.decode_repository(self.bundle, self.expected, target)
+        self.assertFalse(target.exists())
 
     def test_symlink_destination_and_extra_files_refused(self):
         (self.root/'outside').mkdir(); (self.root/'repository').symlink_to(self.root/'outside',target_is_directory=True)

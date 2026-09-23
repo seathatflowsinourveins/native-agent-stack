@@ -10,6 +10,10 @@ import stat
 
 HERE = Path(__file__).resolve().parent
 BASELINE = HERE.parent / 'wsl-restore'
+_PATH_SAFETY_SPEC = importlib.util.spec_from_file_location(
+    "path_safety", HERE.parents[2] / "scripts/path_safety.py")
+_path_safety = importlib.util.module_from_spec(_PATH_SAFETY_SPEC)
+_PATH_SAFETY_SPEC.loader.exec_module(_path_safety)
 OBJECT = re.compile(r'(?:config|data/[0-9a-f]{2}/[0-9a-f]{64}|(?:index|keys|snapshots)/[0-9a-f]{64})\Z')
 
 
@@ -71,9 +75,13 @@ def decode_repository(bundle, expected, target):
         decoded[name] = raw
     if set(decoded) != set(indexed):
         raise ValueError('missing ciphertext object')
-    target = Path(target)
-    if target.resolve() != target.absolute():
+    target = Path(target).absolute()
+    if '..' in target.parts:
         raise ValueError('repository target traverses a symlink')
+    # See scripts/path_safety.py: a symlink is tolerated only when it is a
+    # trusted OS-level boundary link (root-owned, not group/world-writable,
+    # e.g. macOS's /tmp -> /private/tmp); $TMPDIR grants no exemption.
+    _path_safety.refuse_untrusted_symlinks(target, 'repository target traverses a symlink')
     target.mkdir(mode=0o700)  # Existing targets, including symlinks, are refused.
     for name, raw in decoded.items():
         path = target / name

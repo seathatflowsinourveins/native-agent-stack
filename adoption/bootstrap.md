@@ -6,17 +6,40 @@ entry or component it uses instead of repeating its command. Read
 native verification tiers; this page only sequences the steps for a machine
 that has never run this stack.
 
-**Step 0, before anything below: get the catalog at its attested release tag.** After checkout, follow the documents in your checkout: main may already describe steps that are not released yet (`python3 scripts/release_due.py` lists them).
+**Step 0, before anything below: get the catalog at its attested release tag.**
+Read the pin and run the release check on the default branch, before the
+checkout: the release's own `adoption/manifest.json` names the release before
+it (a commit cannot contain its own hash), and the pinned tag may predate
+`scripts/release_due.py` itself.
 ```sh
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack
-git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
+python3 scripts/release_due.py   # on the default branch (added after v2026.09.23): steps main documents that the pinned release lacks
+tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
+commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
+git checkout "$tag"
+if test "$(git rev-parse HEAD)" = "$commit"; then echo "at $tag ($commit)"; else echo "error: $tag is not the pinned release commit $commit" >&2; false; fi
 ```
-This checks out `adoption/manifest.json` `source.release_tag` (or a later
-tag) at the commit that tag names — read `source.release_commit` from the
-manifest you actually cloned rather than trusting a commit pasted into this
-prose, which a later re-pin would leave stale — published with SLSA build
-provenance by `.github/workflows/publish-catalog.yml`. Do **not** check out
+This checks out `adoption/manifest.json` `source.release_tag` (or a later tag)
+and confirms it resolves to `source.release_commit` (read from the manifest you actually
+cloned, never from a commit pasted into prose, which a later re-pin would leave
+stale), published with SLSA build
+provenance by `.github/workflows/publish-catalog.yml`. `scripts/release_due.py`
+was added after `v2026.09.23`, so it runs here, on the default branch, before
+the checkout. After checkout, follow the documents in your checkout.
+
+The pages here name the release a step was written against. "Added after
+`vT`" means release `vT` lacks the file that step uses (a path in
+`release_due.py`'s `due` list); "changed after `vT`" means the file exists at
+`vT` but behaves as the note says there, not as main documents it. If your
+checkout is `vT`, follow the note: run that step from a separate clone of the
+default branch (never the pinned one you install from; a result from it is
+main-only evidence) or wait for the next re-pin. If your checkout is a later
+release, the note is history and the step is in your checkout (`test -e
+<path>` confirms). See
+[moving a host to a new release](update.md#moving-a-host-to-a-new-release).
+
+Do **not** check out
 `source.baseline_commit`: that field records the parent publication
 immediately *before* this `adoption/` directory (and `tools/adoption/`) were
 added, so every step below it on this page would fail with a missing file
@@ -37,7 +60,8 @@ Read the platform page for the chosen
 [`platform_profiles`](manifest.json) entry before starting:
 [Linux/WSL2 x86_64](platforms/linux-wsl2.md) (`status: accepted`) or
 [macOS arm64](platforms/macos-arm64.md) (`status: drafted_not_accepted` —
-nothing on that page has been executed on a Mac; see
+nothing on that page has been executed on a Mac workstation, only on a
+GitHub-hosted macOS runner; see
 [the acceptance evidence policy](../docs/acceptance-evidence-policy.md)).
 
 1. **Host prerequisites.** Confirm the OS/architecture matches a
@@ -49,9 +73,11 @@ nothing on that page has been executed on a Mac; see
    drafted, not accepted.
 
 2. **Run the platform bootstrap script.** `adoption/bootstrap-linux.sh --profile <id>
-   [--skip-system-packages] [--allow-unpinned <id,id,...>]` on Linux/WSL2, or
+   [--skip-system-packages] [--allow-unpinned <id,id,...>]
+   [--configure-claude-user-profile]` on Linux/WSL2, or
    `adoption/bootstrap-macos.sh --profile <id> [--skip-system-packages]
-   [--allow-unpinned <id,id,...>] [--plan]` on macOS (`ECO_INSTALL_ROOT` env,
+   [--allow-unpinned <id,id,...>] [--plan] [--configure-claude-user-profile]`
+   on macOS (`ECO_INSTALL_ROOT` env,
    default `$HOME/.local/share/codex-ecosystem`; writes
    `$ECO_INSTALL_ROOT/installed-versions.txt`; both scripts exit 2 usage,
    1 guard/refusal, 0 success, 3 when a selected component has no pin and was
@@ -62,6 +88,32 @@ nothing on that page has been executed on a Mac; see
    null `sha256`) — installs the selected profile's components
    using each entry's `recipe_map` path. Inspect the script before running it
    on a new host; it installs only what the chosen `--profile` selects.
+
+   The scripts install only components that have a pin in
+   [`pins-linux-x86_64.json`](pins-linux-x86_64.json) or
+   [`pins-macos-arm64.json`](pins-macos-arm64.json). On main that covers
+   `foundation-cpu` on Linux/WSL2 and `macos-arm64-foundation` on macOS in
+   full; every other profile is partly or wholly unpinned (the "Linux pins" and
+   "macOS pins" columns of [the profile table](README.md#choose-a-small-starting-profile),
+   which also give the pinned release's coverage where it differs).
+   For a partly pinned profile the script first exits 3 and prints the
+   unpinned ids. Rerun it as `bootstrap-<os>.sh --profile <id> --allow-unpinned
+   <the ids it printed>`: that installs the pinned components with SHA-256
+   verification (plus the `node`, `uv` and `gh` every run installs) and skips
+   the named ones. Then install each skipped id through
+   its `recipe_map` page (the SDK lock for `research-runtime`). A profile with
+   "none of N" pinned installs none of its own components through the script
+   (only the `node`, `uv` and `gh` every run installs); use the recipes.
+
+   The macOS script and pins changed after `v2026.09.23`. At `v2026.09.23`,
+   `adoption/bootstrap-macos.sh` installs only a missing `jq` through Homebrew
+   (install the other formulae on
+   [the macOS page](platforms/macos-arm64.md#prerequisites) yourself first),
+   `adoption/pins-macos-arm64.json` has no `socraticode` pin (the script skips
+   it by default, so `macos-arm64-foundation` installs 7 of 8), no pinned
+   darwin binary for Codex or Claude Code (npm resolves those unverified) and
+   no embedding-model pin. Linux/WSL2's script and pins are the same at
+   `v2026.09.23` as on main.
 
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
@@ -112,12 +164,68 @@ nothing on that page has been executed on a Mac; see
    false` means none of that state should be read as re-qualifying the new
    host's own acceptance evidence.
 
+4a. **Claude user-scope profile.** After step 3's native `claude` sign-in
+   (this step is a no-op, not a failure, without it -- the MCP registration
+   sub-step below needs a working `claude` binary), install this catalog's
+   Claude Code user-scope assets with
+   [`tools/adoption/install_claude_profile.py`](../tools/adoption/install_claude_profile.py):
+   ```sh
+   python3 tools/adoption/install_claude_profile.py            # guard + agents + MCP servers
+   python3 tools/adoption/install_claude_profile.py --dry-run   # report only, write/register nothing
+   python3 tools/adoption/install_claude_profile.py --only mcp  # just the MCP step
+   ```
+   Both platform bootstrap scripts also accept
+   `--configure-claude-user-profile` to run this automatically as their own
+   last step (still only meaningful after sign-in; run it manually
+   afterward otherwise, exactly as the script's own closing message says).
+   Three idempotent sub-steps, each safe to re-run:
+   - **guard hook**: copies [`adoption/hooks/claude/effort-default-guard.py`](hooks/claude/effort-default-guard.py)
+     to `~/.claude/hooks/effort-default-guard.py`, refusing to install unless
+     its sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS);
+     skipped if the installed copy already matches.
+   - **agents**: copies the five [`adoption/agents/claude/*.md`](agents/claude/)
+     files verbatim to `~/.claude/agents/`; skipped per-file when already
+     byte-identical.
+   - **MCP servers**: for each entry in
+     [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
+     http, `jcodemunch` and `serena` stdio), renders its `${HOME}` and
+     `${ECO_ROOT}` placeholders (`--eco-root`, default `$ECO_INSTALL_ROOT` or
+     `~/.local/share/codex-ecosystem`), then runs `claude mcp add --scope user
+     <name> [-e KEY=VALUE ...] -- <command> [args...]`; skipped when `claude
+     mcp get <name>` already reports a matching transport, command/URL, args
+     and env variable names (values are not compared -- the running host owns
+     them). A same-named server with a different config is reported and left
+     unchanged unless `--replace-mcp` is given.
+   Then apply the settings template itself (model, effort, ultracode,
+   workflow env, hooks) into the live `~/.claude/settings.json` with
+   [`tools/adoption/apply_claude_settings.py`](../tools/adoption/apply_claude_settings.py),
+   after rendering it for this host with step 4's `render_config.py --out`:
+   ```sh
+   python3 tools/adoption/apply_claude_settings.py --template "$RUN_DIR/rendered/settings.json"
+   python3 tools/adoption/apply_claude_settings.py --template "$RUN_DIR/rendered/settings.json" --dry-run
+   ```
+   Backs up the current file (`settings.json.bak.<UTC timestamp>`, with a
+   counter suffix rather than overwriting an earlier backup) before
+   writing, refuses to operate through a symlink, deep-merges (template
+   scalars win; nested objects such as `modelSettings`, `env`, `permissions`
+   and `enabledPlugins` merge per key and lists union, so host-only rules
+   are kept; `hooks` combine per event, de-duplicated across the event by
+   each command's shell words; everything else in the live file that the
+   template does not mention is kept), writes atomically and
+   preserves the original file's mode bits. Never touches `~/.claude.json`
+   or any credential store.
+   The profile installer, the apply tool and their assets
+   (`adoption/hooks/claude/`, `adoption/agents/claude/`,
+   `adoption/mcp/claude-user.json`) were added after `v2026.09.23`; at that
+   tag, merge the rendered settings by hand.
+
 5. **Services.** Start only the selected profile's services using the native
    process-lifecycle guide in [`adoption/lifecycle.md`](lifecycle.md#native-client-integration-and-process-lifecycle):
    `systemctl --user` on Linux/WSL2 (owned units only; never stop the shared
    MCPorter daemon to "clean up" another component), `launchctl` on macOS
-   (table in [the macOS page](platforms/macos-arm64.md#launchd-services); not
-   yet exercised on a Mac). For the portable guarded runner wrappers used by
+   (table in [the macOS page](platforms/macos-arm64.md#launchd-services); run
+   only on a hosted runner, not yet on a Mac workstation; its launchd
+   templates were added after `v2026.09.23`). For the portable guarded runner wrappers used by
    these services, see `adoption/tools/README.md`.
 
 6. **Prerequisite report.** `python3 scripts/adoption_status.py --profile <id> --json`
@@ -134,7 +242,8 @@ nothing on that page has been executed on a Mac; see
    has neither. `scripts/host_receipts.py` (this same step's own recording
    tool, plus `scripts/component_matrix.py`, `scripts/new_host_grand_list.py`,
    `tools/sota-convergence/build_verdicts.py`,
-   `scripts/validate_convergence.py` and `scripts/release_due.py`) needs
+   `scripts/validate_convergence.py` and `scripts/release_due.py`, which was
+   added after `v2026.09.23`) needs
    **Python 3.9 or newer**: every one of those scripts parses under the
    Python 3.9 grammar and uses `from __future__ import annotations`, and this
    is exercised directly, not merely declared -- a macOS CI job runs the

@@ -85,6 +85,7 @@ def default_sota_manifest_path(run_id: str) -> str:
 SOTA_MANIFEST_PATH = default_sota_manifest_path(DEFAULT_MANIFEST_RUN_ID)
 ADOPTION_MANIFEST_PATH = "adoption/manifest.json"
 FOUNDATION_DECISIONS_PATH = "catalogs/foundation/decisions.json"
+EVIDENCE_MANIFEST_PATH = "manifests/evidence.json"
 PACKET_SCHEMA_VERSION = 1
 DEFAULT_SEED = "20260922"
 DEFAULT_CHECKED_AT = "2026-09-22"
@@ -425,6 +426,34 @@ def build_packet(row: dict, *, catalog: str, sota_components: list, recipe_map: 
     return packet
 
 
+def registered_receipts_by_component(root: Path) -> dict:
+    """component_id -> [{id, kind, path}] from manifests/evidence.json ``receipts`` (the registered receipt
+    list that scripts/platform_status.py and component_matrix.py read), sorted by path. A packet otherwise
+    carries only the ledger's evidence_refs, so a lane cannot see, cite or judge a registered native receipt
+    the ledger row never named (2026-09-23 re-record)."""
+    index: dict = {}
+    for receipt in load_json(root / EVIDENCE_MANIFEST_PATH).get("receipts") or []:
+        entry = {"id": receipt["id"], "kind": receipt["kind"], "path": receipt["path"]}
+        for component_id in receipt.get("component_ids") or []:
+            index.setdefault(component_id, []).append(entry)
+    return {component_id: sorted(entries, key=lambda item: item["path"]) for component_id, entries in index.items()}
+
+
+REGISTERED_RECEIPTS_NOTE = ("registered_receipts lists, for each candidate and component, the receipts "
+                            "manifests/evidence.json registers for its component id. They are evidence to open "
+                            "and judge like evidence_refs: a receipt's kind and content, not its presence, "
+                            "decide the evidence class.")
+
+
+def attach_registered_receipts(packet: dict, index: dict) -> dict:
+    for item in packet.get("candidates") or []:
+        item["registered_receipts"] = list(index.get(item.get("component_id"), []))
+    for item in packet.get("sota_components_not_in_candidates") or []:
+        item["registered_receipts"] = list(index.get(item.get("id"), []))
+    packet["registered_receipts_note"] = REGISTERED_RECEIPTS_NOTE
+    return packet
+
+
 def serialize(document: dict) -> str:
     sanitized = sanitize_value(document)
     text = json.dumps(sanitized, indent=1, sort_keys=True)
@@ -457,7 +486,7 @@ def withhold_labels(packet: dict) -> dict:
 
 def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                       trading_candidates: str = "ledger", withhold: bool = False,
-                      manifest: str = None) -> dict:
+                      manifest: str = None, registered_receipts: bool = False) -> dict:
     """Returns {filename: serialized packet text}, fully built and leak-
     checked in memory before any file is written. ``manifest`` overrides the
     dated sota manifest joined in (default reproduces the 2026-09-22
@@ -472,6 +501,7 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
     manifest_mode = trading_candidates == "manifest"
     cards = trading_cards_by_id(root) if manifest_mode else {}
     trading_layers = {layer["layer"]: layer for layer in sota_doc.get("trading", [])}
+    receipts_index = registered_receipts_by_component(root) if registered_receipts else None
 
     packets = {}
     for catalog in catalogs:
@@ -498,6 +528,8 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 # Every packet, manifest-mode trading packets included, loses popularity and
                 # recency signals; the default (no --withhold-labels) build is unchanged.
                 packet = withhold_popularity(packet)
+            if receipts_index is not None:
+                packet = attach_registered_receipts(packet, receipts_index)
             packets[packet_filename(catalog, row["layer_id"])] = serialize(packet)
     return packets
 
@@ -530,6 +562,10 @@ def parse_args(argv=None):
                              "and any key naming a release) at any depth of every candidate and component copy "
                              "of every packet; each stripped field is listed in the packet's withheld list. Off by "
                              "default so the 2026-09-22 packets reproduce.")
+    parser.add_argument("--registered-receipts", action="store_true",
+                        help="Attach to every candidate and component its receipts registered in "
+                             "manifests/evidence.json (id, kind, path), so a lane can open and cite them. Off "
+                             "by default so the 2026-09-22 packets reproduce.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
                         help="Candidate source for us-equities packets: the ledger row's group-wide list "
                              "(default; reproduces the 2026-09-22 packets) or the sota manifest's own entries "
@@ -544,7 +580,8 @@ def main(argv=None) -> int:
 
     packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at,
                                 trading_candidates=args.trading_candidates, withhold=args.withhold_labels,
-                                manifest=str(args.manifest) if args.manifest else None)
+                                manifest=str(args.manifest) if args.manifest else None,
+                                registered_receipts=args.registered_receipts)
 
     out_dir = args.out / "packets"
     out_dir.mkdir(parents=True, exist_ok=True)

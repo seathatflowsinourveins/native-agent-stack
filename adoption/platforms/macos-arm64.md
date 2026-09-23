@@ -15,20 +15,95 @@ and `evidence_ref: null`. `adoption/manifest.json` `supported_platforms` stays
 Linux/x86_64/Python 3.13 only; this profile does not change that. The `macos-arm64-foundation`
 adoption profile lists the components this page assumes.
 
+## Get the catalog
+
+Clone the catalog and check out its attested release tag before any step
+below ([`adoption/bootstrap.md`](../bootstrap.md) step 0 has the detail,
+including `gh attestation verify` for a downloaded release archive). A fresh
+Mac's `/usr/bin/python3` is 3.9 from the Command Line Tools; that is enough for
+these one-liners and `scripts/release_due.py`.
+
+```sh
+git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
+cd native-agent-stack
+python3 scripts/release_due.py   # on the default branch (added after v2026.09.23): steps main documents that the pinned release lacks
+tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
+commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
+git checkout "$tag"
+if test "$(git rev-parse HEAD)" = "$commit"; then echo "at $tag ($commit)"; else echo "error: $tag is not the pinned release commit $commit" >&2; false; fi
+```
+
+Read both values before the checkout, as above: the release's own manifest
+names the release before it. `scripts/release_due.py` was added after
+`v2026.09.23`, so it runs on the default branch.
+
+This page describes main, and much of the macOS install path is newer than
+`v2026.09.23`. A section whose file release `vT` lacks says "added after
+`vT`"; one whose file exists at `vT` but behaves differently there says
+"changed after `vT`" and states the difference. If your checkout is `vT`,
+follow the note: run an "added after" step from a separate clone of the
+default branch (never the pinned one you install from; a result from it is
+main-only evidence), or wait for the next re-pin. If your checkout is a later
+release, the note is history and the step is in your checkout (`test -e
+<path>` confirms).
+
+## Ordered steps for a new macOS host
+
+1. Prerequisites and target hardware (the next two sections), then
+   `python3 scripts/hardware_profile.py` to measure this Mac against
+   [`adoption/hardware-profiles.json`](../hardware-profiles.json).
+2. `bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation`
+   (usage and exit codes below). Use `macos-arm64-foundation`, not
+   `foundation-cpu`: `qmd` and `rtk` have no macOS pin, so `foundation-cpu`
+   exits 3 here. The script and `adoption/pins-macos-arm64.json` changed after
+   `v2026.09.23`: at that tag the script installs only a missing `jq` through
+   Homebrew, so run the `brew install` line under "Prerequisites" yourself
+   first, and it skips `socraticode` (no pin there), installing 7 of the 8
+   components; install `socraticode` through its recipe.
+3. Native sign-in and config rendering: [`adoption/bootstrap.md`](../bootstrap.md)
+   steps 3–4 (Codex, Claude and GitHub device flows; `tools/adoption/render_config.py`
+   with this host's own `adoption/hosts/<host>.json`).
+4. launchd services and the embedding acceptance ("launchd services" and
+   "Embedding backend decision" below). `adoption/launchd/launchd-agents.sh`
+   and `tools/adoption/embed_acceptance.py` were added after `v2026.09.23`, and
+   so were their inputs: at that tag `bootstrap-macos.sh` neither downloads the
+   embedding model (`models[0]` in main's darwin pins) into `state/models` nor
+   writes `config/qdrant.yaml`, which the qdrant and llama-embed agents need.
+   **Until main is re-pinned to a release that contains the macOS clean install
+   (#94), run this page from step 2 onward from a default-branch clone** and
+   record the receipts with that clone's `catalog_revision` (main-only
+   evidence, labelled as such).
+5. `python3 scripts/adoption_status.py --profile macos-arm64-foundation --json`,
+   then the per-host receipt ([`adoption/bootstrap.md`](../bootstrap.md) steps 6–7).
+6. Contribute what ran: record host receipts with `scripts/host_receipts.py`
+   (`--platform-id macos-arm64`, and `--second-physical-machine` on a real Mac
+   workstation) from a branch of current `main`, refresh the generated matrix
+   and grand list, and open a PR, following
+   [`docs/contributing-evidence.md`](../../docs/contributing-evidence.md).
+7. When a newer release is pinned, follow
+   [moving a host to a new release](../update.md#moving-a-host-to-a-new-release).
+
 ## Target hardware
 
 Apple Silicon with **24 GB unified memory** as the default target, with a
-**recorded 48 GB upgrade path** (below). Both sizes are candidates for a
-first real qualification run; neither has one yet.
+**recorded 48 GB upgrade path** (below) that also covers larger machines. The
+64 GB Mac that [`docs/next-host-stages.md`](../../docs/next-host-stages.md)
+plans for is the labelled projection `macos-arm64-64gb-projected` in
+[`adoption/hardware-profiles.json`](../hardware-profiles.json) (about 38 GB of
+unified memory as the generation budget, `full` semantic-RAG tier, both drawn
+from one shared pool); for this page's embedding choice it follows the 48 GB
+rules. None of these sizes has a real qualification run yet.
 
 ## Prerequisites
 
 Homebrew, for six formulae this profile still leaves floating: jq,
-python@3.13, ripgrep, coreutils, restic and shellcheck. As of this draft,
+python@3.13, ripgrep, coreutils, restic and shellcheck. On main,
 [`adoption/bootstrap-macos.sh`](../bootstrap-macos.sh) installs these itself
 (the equivalent of running the command below), one `brew list --versions
 <formula>` check per formula, installing only the ones actually missing —
-manually running it first is no longer required, only still possible:
+manually running it first is no longer required, only still possible. That
+changed after `v2026.09.23`: the script at that tag installs only a missing
+`jq`, so at that tag run this command yourself before the bootstrap:
 
 ```sh
 brew install jq python@3.13 ripgrep coreutils restic shellcheck
@@ -91,8 +166,12 @@ acceptance — remains unrun.
 | 3 | A selected component has no pin at all in [`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json) and was not named in `--allow-unpinned`. Checked before anything is installed, and in `--plan` too; `--allow-unpinned <id,id,...>` skips the named ids instead and echoes them to the run log. |
 | 4 | A prerequisite (`curl`, `git`, `tar`, `shasum`, `unzip`, `jq`, `mktemp`) is still missing after the Homebrew step. With `--skip-system-packages` no `brew install` is attempted and the check lists what is missing. |
 
-Every selected `macos-arm64-foundation` component, including `socraticode`
-(below), now has a pin, so the shipped profile needs no `--allow-unpinned`.
+On main every selected `macos-arm64-foundation` component, including
+`socraticode` (below), has a pin, so the shipped profile needs no
+`--allow-unpinned`. The script and pins changed after `v2026.09.23`: at that
+tag `socraticode` has no pin and the script skips it by default
+(`documented_unpinned_ids=(socraticode)`), so the profile exits 0 with 7 of 8
+components installed and `socraticode` left to its recipe.
 Exit codes 3 and 4 and the `--allow-unpinned` flag mirror
 [`adoption/bootstrap-linux.sh`](../bootstrap-linux.sh). One difference is
 disclosed rather than hidden: the script keeps a `documented_unpinned_ids=()`
@@ -119,7 +198,7 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `uv` | 0.12.17 | `uv-aarch64-apple-darwin.tar.gz` | `85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b` | `publisher_checksum_sidecar` |
 | `gh` | 2.101.0 | `gh_2.101.0_macOS_arm64.zip` | `e4303e39d8f07141c4bad4b99b01079f05029c59b27076e8fbc825c985ecdd8b` | `publisher_checksum_file` |
 | `codex` | 0.155.1 | `codex-0.155.1.tgz` | `fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66` | `npm_registry_integrity_crosscheck` |
-| `claude-code` | 2.1.278 | `claude-code-2.1.278.tgz` | `08c6dfcf3dafcfd30e09b2926c596e274f0fa20844a5801ada7f1c8e6227157e` | `npm_registry_integrity_crosscheck` |
+| `claude-code` | 2.1.280 | `darwin-arm64/claude` (native, not npm) | `387a5c5dcdbb815085edf0baf79591f9d8894efe922bceaf3d75b1b08055229d` | `manifest_crosscheck` |
 | `mcporter` | 0.13.13 | `mcporter-0.13.13.tgz` | `ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d` | `npm_registry_integrity_crosscheck` |
 | `context-mode` | 1.0.169 | `context-mode-1.0.169.tgz` | `09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c` | `npm_registry_integrity_crosscheck` |
 | `ai-memory` | 2.3.2 | `ai-memory-macos-aarch64.tar.gz` | `e0f07ad28938f3ed98a5feb21d11917245d77501764e0005049e7d9c1c16f28a` | `publisher_checksum_sidecar` |
@@ -131,24 +210,27 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 `ignore_scripts: true` field, read by the script's `install_npm`), the same
 convention [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions)
 documents for the Linux recipe; it has no `adoption/pins-linux-x86_64.json`
-entry of its own there, only that documented manual recipe. Not in this table:
+entry of its own there, only that documented manual recipe. The `socraticode`
+row, both `platform_dependency` pins below and the `models[0]` embedding-model
+pin were added to `adoption/pins-macos-arm64.json`, which changed after
+`v2026.09.23`: at that tag npm resolves the Codex and Claude Code darwin
+binaries unverified and the embedding model is not downloaded by the
+bootstrap. Not in this table:
 `gitleaks`, `syft` and `dagu`, which are not in the `macos-arm64-foundation`
 component list.
 
-Two pins carry an additional `platform_dependency`, not covered by the hash
-above. The `@openai/codex` and `@anthropic-ai/claude-code` npm tarballs are
-byte-identical to the Linux pins, but on Apple Silicon npm additionally
-resolves `@openai/codex-darwin-arm64` and `@anthropic-ai/claude-code-darwin-arm64`
-— the packages carrying the real binaries. A `npm install` of the wrapper
-alone auto-fetches this platform package too, unverified (measured directly:
-`--omit=optional`, `--no-optional` and `NPM_CONFIG_OMIT=optional` do not
-suppress it, and this install path has no lockfile to omit from in the first
-place). `adoption/bootstrap-macos.sh`'s `install_platform_dependency` does
-not trust that fetch or try to read it back: each pin instead records the
-platform package's own `name`, `resolved_package`, `version` and independent
-`sha256` (plus, for `claude-code`, a `postinstall_binary_check` naming the
-exact files its `install.cjs` postinstall copies from it), and the function
-(1) installs the wrapper with `--ignore-scripts`, deferring its lifecycle
+One pin, `codex`, still carries an additional `platform_dependency`, not
+covered by the hash above. The `@openai/codex` npm tarball is byte-identical
+to the Linux pin, but on Apple Silicon npm additionally resolves
+`@openai/codex-darwin-arm64` — the package carrying the real binary. A `npm
+install` of the wrapper alone auto-fetches this platform package too,
+unverified (measured directly: `--omit=optional`, `--no-optional` and
+`NPM_CONFIG_OMIT=optional` do not suppress it, and this install path has no
+lockfile to omit from in the first place). `adoption/bootstrap-macos.sh`'s
+`install_platform_dependency` does not trust that fetch or try to read it
+back: the pin instead records the platform package's own `name`,
+`resolved_package`, `version` and independent `sha256`, and the function (1)
+installs the wrapper with `--ignore-scripts`, deferring its lifecycle
 scripts; (2) asks Node's own `require.resolve`, scoped to the wrapper's
 directory, exactly where it would resolve this dependency from, trusting and
 deleting that path only when it is an EXACT canonicalized-path match for the
@@ -159,17 +241,29 @@ the prefix otherwise; (3) extracts the independently sha256-verified tarball
 there instead; (4) re-verifies resolution, the resolved package.json's
 `version` against the pin, and its `name` against `resolved_package`, fail
 closed (exit 1) on any mismatch; and (5) runs `npm rebuild` for the wrapper
-so its deferred lifecycle scripts run against the now-verified copy, then
-(when the pin names one) confirms the `postinstall_binary_check` files are
-byte-identical. Every path this compares is canonicalized first
-(`canonical_path`, in the script), because Node realpath-resolves symlinks
-by default when it locates a module and a real Mac's `/var` is a symlink to
-`/private/var`. Unlike the `@anthropic-ai/claude-code-darwin-arm64` package,
-`@openai/codex-darwin-arm64` is not itself a published package name: `npm
-view @openai/codex@0.155.1 optionalDependencies` shows it as an `npm:` alias
-to `@openai/codex@0.155.1-darwin-arm64`, the same `@openai/codex` package
-name at a platform-suffixed version, and the pin's `resolved_package`/
-`version` fields record that distinction.
+so its deferred lifecycle scripts run against the now-verified copy. Every
+path this compares is canonicalized first (`canonical_path`, in the script),
+because Node realpath-resolves symlinks by default when it locates a module
+and a real Mac's `/var` is a symlink to `/private/var`. `@openai/codex-darwin-arm64`
+is not itself a published package name: `npm view @openai/codex@0.155.1
+optionalDependencies` shows it as an `npm:` alias to
+`@openai/codex@0.155.1-darwin-arm64`, the same `@openai/codex` package name
+at a platform-suffixed version, and the pin's `resolved_package`/`version`
+fields record that distinction.
+
+**2026-09-23: `claude-code` moved off this npm + `platform_dependency` +
+postinstall-copy design entirely.** It is now a `kind: native` pin (see the
+table above): `adoption/bootstrap-macos.sh`'s `install_native` downloads the
+per-version `darwin-arm64/claude` binary directly from
+`downloads.claude.ai`, verifies its sha256 against the pin, and runs `"$bin"
+install 2.1.280`, exactly mirroring `adoption/pins-linux-x86_64.json`'s own
+`claude-code` pin and `~/codex-ecosystem/bin/bootstrap-linux.sh`'s
+existing claude-code step. There is no more nested platform package, no
+`install.cjs` postinstall to defer, and no `postinstall_binary_check`; the
+native binary manages its own version directory and launcher and keeps
+auto-updating on the latest channel afterward. Both claude-code pins
+(this page's and `adoption/pins-linux-x86_64.json`'s) changed after `v2026.09.23`;
+at that tag they are npm pins.
 
 `llama-server` is a profile `required_command`, so llama.cpp is pinned rather
 than left to `brew install llama.cpp`. The macOS asset holds every executable
@@ -188,6 +282,8 @@ The `platform_profiles` row for `macos-arm64` names a hosted smoke job
 `75a6e0d` (PR #94, `workflow_dispatch`, runner label `macos-15`, macOS
 15.7.9 build 24G830), every job green, recorded in
 [`evidence/receipts/adoption-macos-hosted-smoke-20260923.json`](../../evidence/receipts/adoption-macos-hosted-smoke-20260923.json).
+That run and its receipt were added after `v2026.09.23`: they exercise the
+#94 script and pins, not the ones in that tag.
 Earlier runs (`35753384567`/`585032a`, `35753801691`/`9d9ce2b`, both
 recorded in the retired 2026-09-22 receipt) predate the round-3g through
 3i redesign covered here and are superseded by this one; they are not
@@ -227,13 +323,17 @@ This run's bounded claim is still hosted-runner evidence,
   a throwaway checkout copy all passed -- **on both `actions/setup-python`
   3.13.15 and the runner's own system `/usr/bin/python3` 3.9.6**, the
   exact two-interpreter claim "Recording and verdict scripts" above
-  describes. The non-gating full `python3 -m unittest` ran 2929 tests
-  with 29 failures and 95 errors (recorded as an artifact, not claimed as
-  passing); most trace to macOS's symlinked temp directories
-  (`/var/folders`, `/tmp` resolving to `/private/...`) tripping
-  repository path-containment checks written against Linux's own
-  symlink layout, plus Linux-only tests not yet skipped on macOS -- a
-  tracked follow-up, not a claim these pass on macOS today.
+  describes. On that run the full `python3 -m unittest`, then non-gating,
+  ran 2929 tests with 29 failures and 95 errors. Most came from macOS's
+  symlinked temp directories (`/var/folders`, `/tmp` resolving to
+  `/private/...`) tripping repository path-containment checks, plus
+  Linux-only tests not skipped on macOS. PR #126 fixed them: a shared
+  `scripts/path_safety.py` tolerates only root-owned links directly under
+  `/`, and platform-specific tests are skipped where they do not apply.
+  Hosted run 35898879109 then passed the full suite on macos-15 (3156
+  tests, `OK`, skipped=435), and the full suite is now a **gating** step
+  of `validate-macos`. This is still hosted-runner evidence, not a Mac
+  workstation.
 
 Still bounded, exactly as before:
 
@@ -271,8 +371,10 @@ native_proven` -- a green hosted job is real execution for exactly what it
 ran, never a workstation acceptance receipt; see "What a hosted run proves"
 above) inside a **throwaway copy** of the checkout (`$RUNNER_TEMP/rec`, never
 the real one, so nothing is ever committed from this step), then re-runs
-`host_receipts.py validate`, `component_matrix.py --write --check` and
-`new_host_grand_list.py --write --check` in that same copy. This proves the
+`host_receipts.py validate`, `component_matrix.py --write`, then
+`component_matrix.py --check`, and `new_host_grand_list.py --write`, then
+`new_host_grand_list.py --check` (separate invocations: `--write` and
+`--check` are mutually exclusive) in that same copy. This proves the
 recording path works under macOS Python, BSD userland and the system `git`,
 never that this ONE receipt establishes any platform-status change (it does
 not carry `second_physical_machine: true`, and it is discarded with the
@@ -292,6 +394,11 @@ whichever happened. This is still hosted-runner evidence, not a workstation
 observation: it establishes that these scripts run under a real macOS
 Python 3.9 interpreter as installed by Apple on this runner image, not that
 every real Mac's system Python matches it forever.
+
+`scripts/release_due.py` was added after `v2026.09.23`; that does not block a
+host, because recording runs on a branch of current `main`
+([`docs/contributing-evidence.md`](../../docs/contributing-evidence.md) step 1)
+and step 0 runs the check on the default branch before the checkout.
 
 ## Embedding backend decision
 
@@ -359,7 +466,8 @@ deterministic before ever comparing across hosts). This is a Linux-side
 capture, never a macOS observation, and it does not by itself establish
 what a real Mac's Metal backend would return. The one command a real Mac
 (or the hosted CI step below) runs against a live `llama-server` on port
-8232 is:
+8232 is (`tools/adoption/embed_acceptance.py` and this reference vector were
+added after `v2026.09.23`; at that tag run it from a default-branch clone):
 
 ```sh
 python3 tools/adoption/embed_acceptance.py http://127.0.0.1:8232 \
@@ -391,7 +499,7 @@ pass/fail with nothing to inspect.
 
 Linux/WSL2 uses `systemd --user`; macOS has no such manager. Table below
 mirrors [`adoption/lifecycle.md`](../lifecycle.md#native-client-integration-and-process-lifecycle)'s
-systemd table for the launchd equivalent — drafted, not run:
+systemd table for the launchd equivalent — drafted, not run on a Mac workstation:
 
 | systemd --user (Linux/WSL2) | launchd (macOS, drafted) |
 | --- | --- |
@@ -428,9 +536,16 @@ currently loaded from that same destination path, rename into place,
 `launchctl enable` + `launchctl bootstrap`), `status` (`launchctl print`) and
 `remove` (bootout, then delete the plist, again only ever acting on a label
 confirmed loaded from its own destination path, or not loaded at all with a
-file present to clean up). None of the three agents has been bootstrapped,
-kickstarted or booted out on any Mac, hosted or otherwise; this stays true
-after this update.
+file present to clean up). On the hosted runner (run `35875188590`, "What a
+hosted run proves" above) `launchd-agents.sh` bootstrapped and booted out the
+`qdrant` and `llama-embed` agents; `ai-memory` has not run, and none of the
+three has run on a Mac workstation.
+
+**Added after `v2026.09.23`.** The three templates, `launchd-agents.sh`,
+`tools/adoption/render_launchd.py`, `adoption/hosts/macos-example.json` and
+`tests/test_adoption_launchd.py` are not in that tag (`python3
+scripts/release_due.py` on the default branch lists them while it is pinned);
+a host at that tag runs this section from a default-branch clone.
 
 **2026-09-23 decision: brew-services semantics, no backup or reconcile.**
 

@@ -12,6 +12,7 @@ usage() {
   printf '%s\n' \
     'Usage: bash bootstrap-macos.sh --profile <id> [--skip-system-packages]' \
     '                               [--allow-unpinned <id,id,...>] [--plan]' \
+    '                               [--configure-claude-user-profile]' \
     '' \
     'Installs the tools pinned in adoption/pins-macos-arm64.json for the' \
     "given profile's component_ids (from adoption/manifest.json) under" \
@@ -41,6 +42,7 @@ profile_id=""
 skip_system=0
 plan_mode=0
 allow_unpinned_ids=()
+configure_claude_user_profile=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --profile)
@@ -69,6 +71,17 @@ while [[ $# -gt 0 ]]; do
       ;;
     --plan)
       plan_mode=1
+      shift
+      ;;
+    --configure-claude-user-profile)
+      # Opt-in, run only after this script prints the native-sign-in
+      # reminder below: installs adoption/hooks/claude/effort-default-guard.py
+      # (sha256-checked), adoption/agents/claude/*.md, and the user-scope MCP
+      # servers in adoption/mcp/claude-user.json via `claude mcp add --scope
+      # user` (tools/adoption/install_claude_profile.py; idempotent, and
+      # requires a signed-in `claude` for the MCP step to do anything but a
+      # skip). See adoption/bootstrap.md.
+      configure_claude_user_profile=1
       shift
       ;;
     --help|-h)
@@ -999,6 +1012,41 @@ EOF
   printf 'Provisioned default qdrant config at %s\n' "$config_path"
 }
 
+# Native self-installing binary (e.g. claude-code 2.1.280+): download, verify
+# sha256, then hand off to the binary's own installer, which manages its own
+# version directory and launcher and keeps auto-update working. Mirrors
+# ~/codex-ecosystem/bin/bootstrap-linux.sh (round 2026-09-22, lines
+# 158-171) and adoption/bootstrap-linux.sh's own install_native: fetch the
+# exact per-version download, chmod it executable, run `"$bin" install
+# <version>`, and leave the binary's own auto-update in control from there
+# (no DISABLE_AUTOUPDATER opt-out). This replaces claude-code's prior
+# npm + platform_dependency + postinstall-copy pin design (round 3d/3h
+# above): the native installer needs none of that verified-copy machinery.
+install_native() {
+  # $5 is the command the native installer creates (the pin's `bin`, e.g.
+  # claude-code installs ~/.local/bin/claude); it defaults to the pin id.
+  local id="$1" version="$2" url="$3" sha256="$4" bin_name="${5:-$1}"
+  local download="$cache_dir/${id}-${version}-native"
+  fetch "$url" "$sha256" "$download"
+  chmod 0755 "$download"
+  "$download" install "$version"
+  # When bin_dir is the installer's own ~/.local/bin, its launcher (a symlink
+  # into ~/.local/share/claude/versions) already provides the command; writing
+  # ours there would replace it with a script that execs itself.
+  if [[ "$(cd "$bin_dir" && pwd -P)" == "$(cd "$HOME/.local/bin" 2>/dev/null && pwd -P)" ]]; then
+    return 0
+  fi
+  # Remove first so the redirect never writes through an existing symlink.
+  rm -f "$bin_dir/$bin_name"
+  {
+    printf '#!/usr/bin/env bash\n'
+    printf '# Native auto-updating launcher (installed by %s install); the ecosystem no longer pins a snapshot.\n' "$id"
+    # shellcheck disable=SC2016
+    printf 'exec "$HOME/.local/bin/%s" "$@"\n' "$bin_name"
+  } > "$bin_dir/$bin_name"
+  chmod 0755 "$bin_dir/$bin_name"
+}
+
 install_pin() {
   local id="$1"
   local entry
@@ -1029,6 +1077,7 @@ install_pin() {
     llama-cpp-tarball) install_llama_cpp "$version" "$url" "$sha256" ;;
     *-tarball) install_single_binary_tarball "$id" "$version" "$url" "$sha256" ;;
     *-npm) install_npm "$id" "$version" "$url" "$sha256" "$ignore_scripts" ;;
+    *-native) install_native "$id" "$version" "$url" "$sha256" "$(jq -r '.bin // .id' <<<"$entry")" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
   esac
   printf 'Installed %s %s (%s)\n' "$id" "$version" "$kind"
@@ -1092,3 +1141,13 @@ printf '\nInstallation finished. Add %q to PATH to use it in this shell.\n' "$bi
 printf '%s\n' 'Next: sign into Codex, Claude, and GitHub using their native browser login flows.' \
   'launchd agents, the llama.cpp Metal embedding endpoint and every acceptance test remain unrun on this platform.' \
   'No model request, project migration, shell-profile change, or account sign-in was performed.'
+
+if [[ "$configure_claude_user_profile" == 1 ]]; then
+  command -v python3 >/dev/null || { printf 'python3 is required for --configure-claude-user-profile.\n' >&2; exit 1; }
+  printf '\nConfiguring the Claude Code user-scope profile (guard hook, agents, MCP servers)...\n'
+  python3 "$repo_root/tools/adoption/install_claude_profile.py" --claude-bin "$bin_dir/claude" --eco-root "$ecosystem_root"
+else
+  printf '\nAfter native Claude sign-in, run:\n'
+  printf '  python3 %q/tools/adoption/install_claude_profile.py --eco-root %q --claude-bin %q\n' "$repo_root" "$ecosystem_root" "$bin_dir/claude"
+  printf 'to install the guard hook, agents and user-scope MCP servers (or re-run this script with --configure-claude-user-profile).\n'
+fi
