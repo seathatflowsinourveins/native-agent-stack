@@ -7812,7 +7812,7 @@
    {
     "slug": "snyk/agent-scan",
     "category": "protocol-sdks",
-    "result": "local offline arm: no findings on 14 skills and two controls; Snyk-connected arm blocked by the public tier's daily limit at about 22:2xZ, 23:11Z and 00:06Z, one timed retry scheduled",
+    "result": "local offline arm: no findings on 14 skills and two controls; Snyk-connected arm blocked by the public tier's daily limit at 22:22-22:27Z, 23:11Z and 00:06Z, one timed retry scheduled",
     "effect": "no disposition change"
    }
   ]
