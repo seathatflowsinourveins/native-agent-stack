@@ -104,6 +104,7 @@ for _path in (ROOT, TOOL_DIR):
 from scripts.landscape import (  # noqa: E402
     DEFAULT_SEALED_BASE, GRANDFATHERED_RUN_IDS, LANE_FAMILIES, LANES, MANIFEST, RUN_MANIFEST_NAME,
     SEALED_BASE_PREFIX, judge_adjudication, lane_model_issue, run_id_of, run_manifest_row_issue,
+    withheld_packet_keys,
 )
 from scripts import platform_status as platform_evidence  # noqa: E402
 from scripts.catalog_decisions import identity, safe_file, unique_json  # noqa: E402
@@ -128,18 +129,11 @@ PACKET_SUMS_NAME = "SHA256SUMS"
 RUN_MANIFEST_RETAINED_PACKETS = "retained_packets"
 RUN_MANIFEST_PACKET_SUMS = "packets_sha256sums"
 RUN_MANIFEST_ADJUDICATION = "adjudication"
-# #124's withheld-key policy (scripts/landscape.py is_withheld_packet_key): at any depth of a sealed
-# packet a key is withheld when it is a popularity/recency key (one of POPULARITY_RECENCY_FIELDS,
-# any key ending in _at, or one naming a POPULARITY_TOKENS signal), an UPSTREAM_RELEASE_FIELDS or
-# COPY_WITHHELD_FIELDS key, or names a WITHHELD_KEY_TOKENS token (latest, release, newcomer,
-# pin_behind). Only the packet's own top-level checked_at (its build date, PACKET_OWN_KEYS) is kept.
-# #124's requirement-gated archived/license keys and label checks stay with scripts/landscape.py.
-POPULARITY_RECENCY_FIELDS = ("stars", "forks", "watchers", "pushed_at", "released_at")
-POPULARITY_TOKENS = ("star", "fork", "watcher", "subscriber", "download", "popular", "trending")
-UPSTREAM_RELEASE_FIELDS = ("latest", "prerelease", "latest_flag")
-COPY_WITHHELD_FIELDS = ("pin_behind_upstream", "newcomer", "note")
-WITHHELD_KEY_TOKENS = ("latest", "release", "newcomer", "pin_behind")
-PACKET_OWN_KEYS = ("checked_at",)
+# #124's withheld-key policy is imported from the base's scripts/landscape.py (withheld_packet_keys),
+# not copied: every depth of a sealed packet, the top-level current_choice/decision/rationale (and any
+# key the tooling owner adds to TOP_LEVEL_WITHHELD_KEYS), the disposition labels on candidate copies,
+# the requirement-gated archived/license keys and the withheld[] policy labels. A copy here drifted
+# from it once (2026-09-23, tooling owner's note), so the gate now reports what the validator reports.
 # The row fields #124's record_verdicts.py writes under lanes: the sha256 of the wave's run manifest,
 # of a sealed adjudication (a disagree row) and of the single-lane decision record (review finding 2).
 RUN_MANIFEST_SHA256_FIELD = "run_manifest_sha256"
@@ -404,38 +398,6 @@ def change_kind(old, new):
             and same_value(without_platform_status(old.get("winners")), without_platform_status(new.get("winners")))):
         return "platform_status"
     return "changed"
-
-
-def is_withheld_packet_key(key):
-    """Whether #124's --withhold-labels policy withholds ``key`` at any depth of a sealed packet."""
-    lowered = key.lower() if isinstance(key, str) else ""
-    return (lowered in POPULARITY_RECENCY_FIELDS or lowered.endswith("_at")
-            or any(token in lowered for token in POPULARITY_TOKENS)
-            or lowered in UPSTREAM_RELEASE_FIELDS or lowered in COPY_WITHHELD_FIELDS or lowered == "notes"
-            or any(token in lowered for token in WITHHELD_KEY_TOKENS))
-
-
-def withheld_packet_keys(packet):
-    """Labels ("candidates[].upstream.stars", ...) of every withheld key the packet carries, at any
-    depth; the packet's own top-level PACKET_OWN_KEYS are kept."""
-    found = set()
-
-    def walk(value, label):
-        if isinstance(value, dict):
-            for key, item in value.items():
-                path = f"{label}.{key}" if label else str(key)
-                if not label and isinstance(key, str) and key.lower() in PACKET_OWN_KEYS:
-                    continue
-                if is_withheld_packet_key(key):
-                    found.add(path)
-                    continue
-                walk(item, path)
-        elif isinstance(value, list):
-            for item in value:
-                walk(item, f"{label}[]")
-
-    walk(packet, "")
-    return sorted(found)
 
 
 def retained_packet_name(manifest, packet_sha256, catalog, layer_id):
