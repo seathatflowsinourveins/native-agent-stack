@@ -231,3 +231,29 @@ trading outside regular hours:
 - A refusal receipt that cannot be written prints `incomplete` rather than the refusal status. Nothing was placed at
   IB on those paths.
 - SIGKILL cannot run cleanup or the flat proof. Only the provisional receipt, which names the run prefix, remains.
+
+## Runs, 2026-09-23 (read-only frozen copy of `c23525e6`, hashes in `evidence/frozen-c23525e6.SHA256SUMS`)
+
+`c23525e6` was the harness commit before the branch was rebased onto main. It became `5bf177c0` with byte-identical
+`run.py` and `plan.json`. The receipts' `harness_sha256` and `plan_sha256` equal those files' hashes on this branch.
+
+- 12:45 ET, `evidence/receipt-20260923-refused-read-only-api.json`: `incomplete` with `node_start_timeout`. The Gateway
+  API was in Read-Only mode (IB 321), so the execution client could not reconcile and the node never started. No
+  order was created, and the flat proof passed.
+- 13:53 ET, after the user unticked Read-Only API, `evidence/receipt-20260923-passed.json`: **passed** (exit 0, 11.5 s)
+  through NautilusTrader 1.231.0's own IB execution engine on the paper Gateway:
+
+  | Case | Nautilus events | Result |
+  |---|---|---|
+  | C1 resting buy, SPY 1 at half the bid | Initialized, Submitted, Updated, Accepted | accepted |
+  | C2 cancel | PendingCancel, Canceled | canceled |
+  | C3 marketable buy | through Filled | filled 768.56, commission 1.00 USD |
+  | C4 flatten | through Filled | filled 768.50, commission 1.02 USD |
+
+  - Gross −0.06 USD and net −2.08 USD against the 5 USD round-trip bound; Nautilus realized PnL agrees.
+  - 3 of 6 orders were used. No cleanup, unconfirmed or duplicate events.
+  - The independent official-ibapi flat proof found 0 positions and 0 open orders.
+
+These runs cover acceptance-plan section 5: step 1 (in the pre-check), and from step 3 submit/acknowledge, cancel,
+fill and flat. They do not cover reconnect with an open order, restart reconciliation, or the step 4 kill-switch
+exercise. 1.231.0 is not the pinned 2.0.0rc5 destination.
