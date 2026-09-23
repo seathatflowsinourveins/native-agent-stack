@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "frozen_at": "2026-09-23T00:00:00Z",
+  "purpose": "Wave 3, gap instructions-skills[1]. Narrower than wave 2's 6-case set per this unit's instruction ('for TypeSafe (typesafe-ai) and one ECC skill whose trigger matches the frozen cases'): only security-best-practices (ECC) and typesafe-ai are in scope this wave, not search-first/iterative-retrieval. Reuses C3-C6 verbatim from blueprints/gap-wave2-20260923/skill-arm-ab/cases.json (frozen there on 2026-09-23, before any wave-2 arm ran) and adds 4 NEW cases (C7-C10), frozen below BEFORE any wave-3 arm runs, chosen to avoid wave 2's two failure modes: (a) C1-C4 all hit a 2/2 ceiling in both arms and could not discriminate arms by construction; C7/C8 use a less-obvious vulnerability class (deserialization, SSRF) than C3/C4's SQL/command injection, to leave headroom for a partial/generic answer; (b) C5/C6's frozen labels were contestable on reflection; C9/C10 use a plain numeric contradiction and a plain entity-mismatch insufficiency, which do not depend on a contestable paraphrase/range judgment.",
+  "budget_note": "Unit budget caps claude -p calls at 20 shared between gap[1] and gap[7]'s native-baseline arm. This receipt allocates 8 cases x 2 arms = 16 calls to gap[1] (down from the unit text's 'plus 4 new cases' read as generously as budget allows: 4 new cases were in fact added, but only 4 of wave 2's original 6 (C3-C6) are reused, not all 6, to stay inside the shared 20-call cap while also funding gap[7]'s 4-call native baseline).",
+  "cases": [
+    {
+      "id": "C3",
+      "skill": "security-best-practices",
+      "reused_from": "blueprints/gap-wave2-20260923/skill-arm-ab/cases.json",
+      "prompt": "Review this FastAPI route for security issues and name the single most serious one:\n\n@app.get(\"/users\")\ndef get_user(name: str, db: Session = Depends(get_db)):\n    query = f\"SELECT * FROM users WHERE name = '{name}'\"\n    return db.execute(query).fetchall()",
+      "rubric": {
+        "point_a": "Names SQL injection specifically (not just 'input validation' generically).",
+        "point_b": "Recommends parameterized queries / an ORM query builder as the fix, not string sanitization alone."
+      },
+      "max_score": 2
+    },
+    {
+      "id": "C4",
+      "skill": "security-best-practices",
+      "reused_from": "blueprints/gap-wave2-20260923/skill-arm-ab/cases.json",
+      "prompt": "Review this Next.js API route for security issues and name the single most serious one:\n\nexport async function GET(req) {\n  const { searchParams } = new URL(req.url);\n  const file = searchParams.get('file');\n  const { stdout } = await exec(`cat /data/reports/${file}`);\n  return Response.json({ output: stdout });\n}",
+      "rubric": {
+        "point_a": "Names command injection specifically (not just 'path traversal' alone, though path traversal may also be mentioned).",
+        "point_b": "Recommends avoiding shell interpolation entirely (allowlist, execFile with array args, or no shell) rather than only escaping the string."
+      },
+      "max_score": 2
+    },
+    {
+      "id": "C5",
+      "skill": "typesafe-ai",
+      "reused_from": "blueprints/gap-wave2-20260923/skill-arm-ab/cases.json",
+      "prompt": "Claim: \"The company's Q3 revenue guidance of $50M is supported by the SEC filing.\"\nSource text: \"The filing states the company expects Q3 revenue between $45M and $55M.\"\nIs the claim supported, contradicted, or insufficiently evidenced by the source? Answer with one word, then one sentence of reasoning.",
+      "rubric": {
+        "point_a": "Answers 'supported' (frozen label; $50M lies within the stated $45M-$55M range, a semantic containment judgment, not literal text match).",
+        "point_b": "Reasoning cites the numeric range relationship, not just word overlap."
+      },
+      "max_score": 2,
+      "frozen_label": "supported"
+    },
+    {
+      "id": "C6",
+      "skill": "typesafe-ai",
+      "reused_from": "blueprints/gap-wave2-20260923/skill-arm-ab/cases.json",
+      "prompt": "Claim: \"The vendor discontinued support for the legacy API in 2026.\"\nSource text: \"As of 2026 the legacy API no longer receives new support requests from the vendor.\"\nIs the claim supported, contradicted, or insufficiently evidenced by the source? Answer with one word, then one sentence of reasoning.",
+      "rubric": {
+        "point_a": "Answers 'supported' (frozen label; this is a paraphrase with no literal word-match on 'discontinued', requiring semantic equivalence judgment rather than weak literal containment).",
+        "point_b": "Reasoning explicitly notes the paraphrase relationship (not literal wording) between 'discontinued support' and 'no longer receives new support requests'."
+      },
+      "max_score": 2,
+      "frozen_label": "supported",
+      "note": "This label is contestable per wave 2's honest reflection; retained verbatim rather than silently rescored, and scored the same way in wave 3 with the same caveat repeated in limitations."
+    },
+    {
+      "id": "C7",
+      "skill": "security-best-practices",
+      "new_in": "wave3",
+      "prompt": "Review this Flask route for security issues and name the single most serious one:\n\n@app.route('/import', methods=['POST'])\ndef import_job():\n    payload = request.get_data()\n    job = pickle.loads(payload)\n    return jsonify(job.run())",
+      "rubric": {
+        "point_a": "Names insecure/unsafe deserialization (pickle of untrusted input enabling arbitrary code execution), not just 'validate the input' generically.",
+        "point_b": "Recommends a safe serialization format (e.g. JSON with an explicit schema) or a signed/allowlisted deserializer instead of unpickling arbitrary untrusted bytes."
+      },
+      "max_score": 2
+    },
+    {
+      "id": "C8",
+      "skill": "security-best-practices",
+      "new_in": "wave3",
+      "prompt": "Review this Express route for security issues and name the single most serious one:\n\napp.get('/fetch-preview', async (req, res) => {\n  const target = req.query.url;\n  const resp = await fetch(target);\n  const body = await resp.text();\n  res.send(body);\n});",
+      "rubric": {
+        "point_a": "Names server-side request forgery (SSRF) specifically, not just 'unvalidated input' generically.",
+        "point_b": "Recommends an allowlist of permitted hosts/schemes or blocking internal/metadata addresses, not just generic URL validation."
+      },
+      "max_score": 2
+    },
+    {
+      "id": "C9",
+      "skill": "typesafe-ai",
+      "new_in": "wave3",
+      "prompt": "Claim: \"The pilot reduced median latency by 40%.\"\nSource text: \"The pilot reduced median latency from 200ms to 180ms.\"\nIs the claim supported, contradicted, or insufficiently evidenced by the source? Answer with one word, then one sentence of reasoning.",
+      "rubric": {
+        "point_a": "Answers 'contradicted' (frozen label; 200ms to 180ms is a 10% reduction, not 40%, a computable numeric mismatch, not a paraphrase or ambiguous-range judgment).",
+        "point_b": "Reasoning states or implies the actual percentage (10%) or otherwise shows the arithmetic disagrees with the claimed 40%."
+      },
+      "max_score": 2,
+      "frozen_label": "contradicted"
+    },
+    {
+      "id": "C10",
+      "skill": "typesafe-ai",
+      "new_in": "wave3",
+      "prompt": "Claim: \"Vendor B's outage lasted three hours.\"\nSource text: \"Vendor A reported a three-hour outage affecting its checkout service.\"\nIs the claim supported, contradicted, or insufficiently evidenced by the source? Answer with one word, then one sentence of reasoning.",
+      "rubric": {
+        "point_a": "Answers 'insufficient' (frozen label; the source names Vendor A, not Vendor B — an entity mismatch, not evidence about Vendor B at all).",
+        "point_b": "Reasoning explicitly names the entity mismatch (Vendor A vs Vendor B), not just 'not enough detail'."
+      },
+      "max_score": 2,
+      "frozen_label": "insufficient"
+    }
+  ],
+  "arms": {
+    "with_skill_forced": "Skill tool allowed (--allowedTools includes Skill) AND the prompt is prefixed with an explicit instruction to invoke the named skill via the Skill tool before answering. The receipt verifies a Skill tool_use event naming the case's skill actually appears in the transcript; if it does not, the arm is recorded as invalid for that case, not silently scored as a null result.",
+    "without_skill": "Skill tool explicitly disallowed (--disallowedTools Skill); no other change to the underlying task prompt (the forced-invocation prefix is omitted, since there is no skill to invoke)."
+  },
+  "order": "Counterbalanced by case index to avoid wave 2's confound (every wave-2 case ran with_skill first): even-indexed cases (C3, C5, C7, C9) run without_skill first then with_skill_forced; odd-indexed cases (C4, C6, C8, C10) run with_skill_forced first then without_skill.",
+  "scoring_note": "Scored 0-2 per case per arm by this receipt's author (the acting agent) reading the transcript against the frozen rubric above, written before any wave-3 arm ran. Single-rater diagnostic scoring, not blinded or independently adjudicated; recorded as a limitation."
+}

@@ -14696,6 +14696,31 @@
       "path": "tools/token-report/token_manifest.py",
       "sha256": "7b1c0511e9a56f587392309330e447bb190e5c819950892997a44065f2714e33",
       "bytes": 50793
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/forced-skill-ab/cases.json",
+      "sha256": "b40d720fc5831deae3035829eaeab7e59f22c8744a1bb521c6d4011ce5a579a0",
+      "bytes": 9193
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/forced-skill-ab/scored-results.json",
+      "sha256": "a94c29379c9a0185916333a26f245c8b3f758c05767776bc4b95fb56c03de7c3",
+      "bytes": 2887
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/typesafe-extended/cases.json",
+      "sha256": "7adef5c4578f4636a1596ff3e67f5dab43c051f6015c1d0e477f071579168462",
+      "bytes": 16076
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/forced-skill-arm-ab.json",
+      "sha256": "64cd19ab64d8b2aa464b8e93cf1e06b4e3525fa6ee1504f9b5add9bde80553d6",
+      "bytes": 17731
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/typesafe-extended-label-set.json",
+      "sha256": "50494d641afaec49f351c5952a4fb4d0c06b017e3ac91d6ebd65378c729fcd01",
+      "bytes": 21655
     }
   ],
   "convergence_records": [
