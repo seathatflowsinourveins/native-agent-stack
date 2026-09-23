@@ -444,3 +444,46 @@ recorded inputs and the online zizmor run. The hosted CodeQL analyses of
 `168a3a8` are GitHub's own runs. No hosted run of `security-scan.yml`, the
 Scorecard upload, the dependency-review gate on a failing PR or the release
 job exists yet. They follow merge and the next `v*` tag.
+
+## Post-merge verification (2026-09-23)
+
+Hosted and live results after merge. Evidence class: hosted runs and GitHub API readbacks.
+
+- **CodeQL alerts (#104, merged `7dc8317`).** Alerts 1, 3, 4, 5 and 8 are `fixed` on main.
+  Alerts 2, 6, 7, 9 and 10 are dismissed with recorded reasons. An independent second triage
+  of all ten ran 20 adversarial refutation votes and refuted none of them.
+  Open CodeQL alerts: 0.
+- **This change (#108, merged `4970ba0`).** The first push runs on `4970ba0` succeeded:
+  - `security-scan.yml`: the OSV-Scanner SARIF has 0 results and the zizmor SARIF has 0 results,
+    and both analyses appear under code scanning;
+  - the supply-chain grype `--fail-on high` gate;
+  - Scorecard, with its SARIF uploaded;
+  - CodeQL;
+  - validate.
+- **Target ruleset applied.** Ruleset 23739774 was updated at 2026-09-23T05:42:42Z after the
+  owner of the other open PRs confirmed they had rebased.
+  - Required checks: `validate`, `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`.
+  - `code_scanning` rule: CodeQL, `high_or_higher` / `errors`. The API accepted this rule on a
+    personal public repository.
+  - `strict` is off, and there is no `required_signatures` rule.
+- **Release job.** Tag `v2026.09.23` on `4970ba0` ran publish-catalog run 35823698627, and
+  both the `publish` and `release` jobs succeeded. The release has `isDraft: false`,
+  `isImmutable: true` and exactly two assets, the archive and the SPDX SBOM, each with its
+  sha256 digest. `gh attestation verify` on the downloaded archive exited 0.
+- **Dependabot.** 0 open alerts: 1-6 were fixed by #99, and 7-15 are the fixture alerts,
+  dismissed as `not_used`.
+- **Scorecard after (dispatch run 35824151483 plus the open Scorecard alerts).**
+
+  | Check | Score | Cause |
+  | --- | --- | --- |
+  | SAST | 4 (was 0) | Rises as newly analysed commits replace the unanalysed history |
+  | Vulnerabilities | 1 | All 9 advisories are the deliberate grype positive-control fixture. The remedy, a fixture-local `osv-scanner.toml`, belongs to the fixture owner |
+  | Branch-Protection | 3 | Solo repository, so there are no approvals or code-owner reviews |
+  | Code-Review | 0 | Same reason |
+  | Maintained | 0 | The repository is under 90 days old |
+  | CII-Best-Practices | 0 | Optional registration by the user |
+  | Fuzzing | 0 | Not applicable yet |
+  | Pinned-Dependencies | 9 | `npm install` in the bootstrap scripts, part of the macOS PR's scope |
+
+- **Related setting, owned elsewhere.** `can_approve_pull_request_reviews` was set to true by
+  the bot-PR live test (#95, recorded in #110). It is not part of this change's target.
