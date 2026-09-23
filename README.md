@@ -268,3 +268,5 @@ The actual provider/GPU runs are opt-in native workflows requiring your own acco
 - The observability profile retains local metrics/logs and local notifications. It does not add a trace database, external alert destination, paid cloud host or connected broker. A [fresh SDK follow-up](observability/session-e2e.md) resolved the earlier missing native histogram; its receipt and metrics represent the same usage and must not be added together. Explicit loopback OTLP settings are not a claim that all native client telemetry is local.
 
 See the [evidence manifest](manifests/evidence.json), [complete component manifest](manifests/stack.json), and [native replay guide](docs/evidence.md). Original project glue and publication files use the MIT license; upstream products, dependencies, models and any attributed material retain their own licenses. See [licensing](licenses/README.md).
+
+<!-- scratch/w2-gh-flow-20260923: docs-only no-op marker for gh PR-flow acceptance check, removed on PR close -->
