@@ -1,0 +1,36 @@
+{
+  "id": "6-token-savings-deferred",
+  "gap_index": 6,
+  "gap_text_sha256": "8dc1bad9b7f036363ca2a8f0191dda04bf915393d409f477f6dcf724a6add716",
+  "preregistration": {
+    "written_at": "2026-09-23T01:16:49Z",
+    "late": true,
+    "late_reason": "First written by gen_receipts.py at 01:16:49Z; the late label was added by the fix round at about 01:31:46Z. No preregistration preceded any run because none ran.",
+    "expectation": "The next_check requires paired native Claude sessions (with vs. without ai-memory retrieval/briefing) on the same handoff-dependent task, with full provider usage recorded via child-usage.mjs. This needs multiple long-horizon native Claude runs, which the assignment explicitly reserves.",
+    "criteria": "Settled only by an executed paired comparison with recorded child-usage.mjs output for both arms.",
+    "timestamp_note": "Timestamps reconciled on 2026-09-23T02:30:41Z from the unit workers' session transcripts (tool-call times, listed in raw/INDEX.json). The earlier value 2026-09-23T01:20:00Z was shared by every receipt, fell after the first-pass commit (01:19:05Z) and matched no recorded event."
+  },
+  "commands": [
+    {
+      "cmd": "n/a — deferred before execution per model-run constraint",
+      "exit": null,
+      "output_excerpt": "Not run: the assignment states 'the shared Claude account is reserved for another session's long-horizon comparison from 2026-09-23 00:33 UTC. A gap needing a Claude multi-agent fan-out or a long Claude run is deferred with that reason.' A paired same-task with/without-memory native Claude comparison is exactly such a long/multi-run comparison, not a single bounded call."
+    }
+  ],
+  "results": "Deferred without execution. The next_check requires two paired native Claude session runs to measure token deltas; that is a multi-run Claude comparison, not the one bounded single-call check this worker is allowed. Routing to the Codex account does not fit either, since the gap specifically concerns Claude+ai-memory session token accounting (the deployed harness for this project).",
+  "outcome": "deferred",
+  "evidence_class": "source_review",
+  "limits": [
+    "No execution attempted.",
+    "Blocker: paired native Claude session comparison exceeds the one-bounded-single-call allowance during the account reservation window."
+  ],
+  "checked_at": null,
+  "checked_at_note": "No command was run for this gap, so there is no check time.",
+  "reconciliation": {
+    "reconciled_at": "2026-09-23T02:30:41Z",
+    "new_checks_run": false,
+    "changes": [
+      "Real written_at; checked_at set to null because no command ran."
+    ]
+  }
+}

@@ -1,0 +1,3 @@
+DataFrame.equals False
+values_equal True index_equal True columns_equal True
+assert_frame_equal passed

@@ -1,0 +1,342 @@
+{
+  "backtest_financing_modules_available": [
+    "FXRolloverInterestModule",
+    "CfdSwapModule"
+  ],
+  "candidates": {
+    "cash": {
+      "cases": {
+        "fixed": {
+          "note": "no invested episode; engine not needed",
+          "orders": 0
+        },
+        "fixed_one_tick_slippage": {
+          "note": "no invested episode; engine not needed",
+          "orders": 0
+        },
+        "per_share": {
+          "note": "no invested episode; engine not needed",
+          "orders": 0
+        }
+      },
+      "episodes": 260,
+      "invested_episodes": 0,
+      "mean_gross_price_label": "0",
+      "mean_net_cost_proxy_label": "0.000",
+      "unmodelled_dividend_cash_usd": "0.00"
+    },
+    "equalweight": {
+      "cases": {
+        "fixed": {
+          "account_rows": 1561,
+          "ending_cash_native_equals_ledger": "1096785.31",
+          "fees_usd": "1560",
+          "fills_reconciled": 1560,
+          "mean_effective_cost_vs_gross_label": "0.000069042486451262408791383092",
+          "mean_native_minus_net_proxy": "0.001930957513548737591208616906",
+          "mean_native_net_return_per_episode": "0.003722511923076923076923076923",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 1561, ledger 1560, ending native 1096785.31 ledger 1096785.31",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}"
+          },
+          "orders": 1560,
+          "report_sha256": {
+            "account": "67bdef4b6fdd5adb206d558f71290f83d184e293facb2cfd6842c08717bd5eb8",
+            "fills": "86ecc066628a5f5f277adbad440b47216930d83fdb7dfcfc1b58d70363b97eac"
+          },
+          "total_pnl_usd": "96785.31"
+        },
+        "fixed_one_tick_slippage": {
+          "account_rows": 1561,
+          "ending_cash_native_equals_ledger": "1096757.01",
+          "fees_usd": "1560",
+          "fills_reconciled": 1560,
+          "mean_effective_cost_vs_gross_label": "0.000070130947989723947252921553",
+          "mean_native_minus_net_proxy": "0.001929869052010276052747078445",
+          "mean_native_net_return_per_episode": "0.003721423461538461538461538462",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 1561, ledger 1560, ending native 1096757.01 ledger 1096757.01",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}"
+          },
+          "orders": 1560,
+          "report_sha256": {
+            "account": "30ebae6deece51d019bfa656539b2853ae7330918ec8b31ce512051f01f17c8f",
+            "fills": "081147a81bc89ce9da2ddf154c1d5334e474553dfdc03af354ab3d565d3cf87d"
+          },
+          "total_pnl_usd": "96757.01"
+        },
+        "per_share": {
+          "account_rows": 1561,
+          "ending_cash_native_equals_ledger": "1095421.59",
+          "fees_usd": "2923.72",
+          "fills_reconciled": 1560,
+          "mean_effective_cost_vs_gross_label": "0.000121493255682031639560613861",
+          "mean_native_minus_net_proxy": "0.001878506744317968360439386137",
+          "mean_native_net_return_per_episode": "0.003670061153846153846153846154",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 1561, ledger 1560, ending native 1095421.59 ledger 1095421.59",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}"
+          },
+          "orders": 1560,
+          "report_sha256": {
+            "account": "88d35601ed81eeb3304aa69d3ce22b42665c6d139b8413f7afb9c0fdc083a53a",
+            "fills": "a02d81d16e00f83daee7c4a2ecf79168842e4ebd98fdf1e6bdb7d3c7b86af0dc"
+          },
+          "total_pnl_usd": "95421.59"
+        }
+      },
+      "episodes": 260,
+      "invested_episodes": 260,
+      "mean_gross_price_label": "0.003791554409528185485714460015",
+      "mean_net_cost_proxy_label": "0.001791554409528185485714460017",
+      "unmodelled_dividend_cash_usd": "7157.64"
+    },
+    "momentum120": {
+      "cases": {
+        "fixed": {
+          "account_rows": 455,
+          "ending_cash_native_equals_ledger": "1094896.26",
+          "fees_usd": "454",
+          "fills_reconciled": 454,
+          "mean_effective_cost_vs_gross_label": "0.000019557069012072154956206080",
+          "mean_native_minus_net_proxy": "0.001726596777141773998889947766",
+          "mean_native_net_return_per_episode": "0.003649856153846153846153846154",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 455, ledger 454, ending native 1094896.26 ledger 1094896.26",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}"
+          },
+          "orders": 454,
+          "report_sha256": {
+            "account": "620c8c0192447b8f3b0343eb0fc54be8b7e70652d76bceb87738d6f28c42afcc",
+            "fills": "ec8feaec8e9ca29f997f7a99edb529a956694b422339ec7a083c2416a5258e95"
+          },
+          "total_pnl_usd": "94896.26"
+        },
+        "fixed_one_tick_slippage": {
+          "account_rows": 455,
+          "ending_cash_native_equals_ledger": "1094869.86",
+          "fees_usd": "454",
+          "fills_reconciled": 454,
+          "mean_effective_cost_vs_gross_label": "0.000020572453627456770340821465",
+          "mean_native_minus_net_proxy": "0.001725581392526389383505332381",
+          "mean_native_net_return_per_episode": "0.003648840769230769230769230769",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 455, ledger 454, ending native 1094869.86 ledger 1094869.86",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}"
+          },
+          "orders": 454,
+          "report_sha256": {
+            "account": "f900b1268f5aa2a1622675dc389cbd687a82273889fab9c9c315c317195f97e1",
+            "fills": "d6b05a9fbb2b48403b544a170061a7ca986d5e6a78fc06bcbe3bf83f3ab8ad37"
+          },
+          "total_pnl_usd": "94869.86"
+        },
+        "per_share": {
+          "account_rows": 455,
+          "ending_cash_native_equals_ledger": "1092695.78",
+          "fees_usd": "2654.48",
+          "fills_reconciled": 454,
+          "mean_effective_cost_vs_gross_label": "0.000104190915165918308802359926",
+          "mean_native_minus_net_proxy": "0.001641962930987927845043793920",
+          "mean_native_net_return_per_episode": "0.003565222307692307692307692308",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 455, ledger 454, ending native 1092695.78 ledger 1092695.78",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}"
+          },
+          "orders": 454,
+          "report_sha256": {
+            "account": "07c44b3f6da5125d202d415fb6ec112cb973aca1b4aab0b853639251408a53f2",
+            "fills": "11314a550d7693d8b665d2d203f8ff5c484416aadc2c68b95a89be98646415f8"
+          },
+          "total_pnl_usd": "92695.78"
+        }
+      },
+      "episodes": 260,
+      "invested_episodes": 227,
+      "mean_gross_price_label": "0.003669413222858226001110052234",
+      "mean_net_cost_proxy_label": "0.001923259376704379847263898388",
+      "unmodelled_dividend_cash_usd": "5219.07"
+    },
+    "momentum20": {
+      "cases": {
+        "fixed": {
+          "account_rows": 413,
+          "ending_cash_native_equals_ledger": "1067827.60",
+          "fees_usd": "412",
+          "fills_reconciled": 412,
+          "mean_effective_cost_vs_gross_label": "0.000017062194072722144644687541",
+          "mean_native_minus_net_proxy": "0.001567553190542662470739927844",
+          "mean_native_net_return_per_episode": "0.002608753846153846153846153846",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 413, ledger 412, ending native 1067827.60 ledger 1067827.60",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}"
+          },
+          "orders": 412,
+          "report_sha256": {
+            "account": "23466a70306c0977585d4fb5237efb6806dd07b1c3586dcac4a3f2536028d2a6",
+            "fills": "c73e12d5c4ba8572590a2f625f0f756a20427a63c061a6fdbb25e915e1be0138"
+          },
+          "total_pnl_usd": "67827.60"
+        },
+        "fixed_one_tick_slippage": {
+          "account_rows": 413,
+          "ending_cash_native_equals_ledger": "1067802.08",
+          "fees_usd": "412",
+          "fills_reconciled": 412,
+          "mean_effective_cost_vs_gross_label": "0.000018043732534260606183149079",
+          "mean_native_minus_net_proxy": "0.001566571652081124009201466306",
+          "mean_native_net_return_per_episode": "0.002607772307692307692307692308",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 413, ledger 412, ending native 1067802.08 ledger 1067802.08",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}"
+          },
+          "orders": 412,
+          "report_sha256": {
+            "account": "ecc00b49cb8b0684eb1166e823d28fd1ccab6947a5bc4764f8c0685ca22341a3",
+            "fills": "37ae4bc78ba2f719a8809ca30d93e2e634c766ac6630e0fb0e31e4dd0cf85777"
+          },
+          "total_pnl_usd": "67802.08"
+        },
+        "per_share": {
+          "account_rows": 413,
+          "ending_cash_native_equals_ledger": "1065684.54",
+          "fees_usd": "2555.06",
+          "fills_reconciled": 412,
+          "mean_effective_cost_vs_gross_label": "0.000099487578688106760029302925",
+          "mean_native_minus_net_proxy": "0.001485127805927277855355312460",
+          "mean_native_net_return_per_episode": "0.002526328461538461538461538462",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 413, ledger 412, ending native 1065684.54 ledger 1065684.54",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}"
+          },
+          "orders": 412,
+          "report_sha256": {
+            "account": "ca30a2ff5ea1bf7b4f1fd8bab000b4adbcfddfc893c6a4e62beac2c782bd2e6f",
+            "fills": "ddd0a8575e3870db7727a0cc42c9b508f09545a793eac9f7a84d50782adf6510"
+          },
+          "total_pnl_usd": "65684.54"
+        }
+      },
+      "episodes": 260,
+      "invested_episodes": 206,
+      "mean_gross_price_label": "0.002625816040226568298490841387",
+      "mean_net_cost_proxy_label": "0.001041200655611183683106226002",
+      "unmodelled_dividend_cash_usd": "5176.01"
+    },
+    "momentum60": {
+      "cases": {
+        "fixed": {
+          "account_rows": 425,
+          "ending_cash_native_equals_ledger": "1068833.59",
+          "fees_usd": "424",
+          "fills_reconciled": 424,
+          "mean_effective_cost_vs_gross_label": "0.000017708977663035197774427176",
+          "mean_native_minus_net_proxy": "0.001613060253106195571456342055",
+          "mean_native_net_return_per_episode": "0.002647445769230769230769230769",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 425, ledger 424, ending native 1068833.59 ledger 1068833.59",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}"
+          },
+          "orders": 424,
+          "report_sha256": {
+            "account": "edcf6df2325dff8fa719ec53027254c3a7a53bdc39544ed7a562ecdb4ade2ad0",
+            "fills": "1a5647770dc5fa8cb60eb8b4446224442dde974527b6450a12fe3038622c66a6"
+          },
+          "total_pnl_usd": "68833.59"
+        },
+        "fixed_one_tick_slippage": {
+          "account_rows": 425,
+          "ending_cash_native_equals_ledger": "1068807.83",
+          "fees_usd": "424",
+          "fills_reconciled": 424,
+          "mean_effective_cost_vs_gross_label": "0.000018699746893804428543657945",
+          "mean_native_minus_net_proxy": "0.001612069483875426340687111286",
+          "mean_native_net_return_per_episode": "0.002646455",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 425, ledger 424, ending native 1068807.83 ledger 1068807.83",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}"
+          },
+          "orders": 424,
+          "report_sha256": {
+            "account": "440f51da09b1c8cad172d797f7f59d926e29abc207dde62cdd458b60fe93aa96",
+            "fills": "e2219dd1e0ecaf29a505ee868d0d195ff9aefd40a0884e7e4a00d1ac6450bdb8"
+          },
+          "total_pnl_usd": "68807.83"
+        },
+        "per_share": {
+          "account_rows": 425,
+          "ending_cash_native_equals_ledger": "1066674.45",
+          "fees_usd": "2583.14",
+          "fills_reconciled": 424,
+          "mean_effective_cost_vs_gross_label": "0.000100752823816881351620581022",
+          "mean_native_minus_net_proxy": "0.001530016406952349417610188209",
+          "mean_native_net_return_per_episode": "0.002564401923076923076923076923",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 425, ledger 424, ending native 1066674.45 ledger 1066674.45",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}"
+          },
+          "orders": 424,
+          "report_sha256": {
+            "account": "f492af6e2e8a76a6aa962e0f3e7ff6e099ca87f56c2ea913a2481da4d8ed5ffc",
+            "fills": "aebfb286a771f8dfa3c00608fbc9a4d7ba3f8280346fb477ed778b3c969434c8"
+          },
+          "total_pnl_usd": "66674.45"
+        }
+      },
+      "episodes": 260,
+      "invested_episodes": 212,
+      "mean_gross_price_label": "0.002665154746893804428543657945",
+      "mean_net_cost_proxy_label": "0.001034385516124573659312888714",
+      "unmodelled_dividend_cash_usd": "4858.55"
+    }
+  },
+  "cases": {
+    "fixed": {
+      "kind": "FixedFeeModel",
+      "slippage_ticks": 0,
+      "usd": "1"
+    },
+    "fixed_one_tick_slippage": {
+      "kind": "FixedFeeModel",
+      "slippage_ticks": 1,
+      "usd": "1"
+    },
+    "per_share": {
+      "kind": "PerContractFeeModel",
+      "slippage_ticks": 0,
+      "usd": "0.01"
+    }
+  },
+  "engine": "2.0.0rc5",
+  "financing": "explicit zero: CASH account, long only, no borrowing",
+  "first_entry": "2016-01-15",
+  "inputs_unchanged": true,
+  "last_exit": "2021-03-31",
+  "ledger_sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672",
+  "notional_usd": "100000",
+  "runner_sha256": "7d34d52ac5b9f7666e9378c1e59e68557e7f2b873bb9d4aecc7783a338628fbe"
+}

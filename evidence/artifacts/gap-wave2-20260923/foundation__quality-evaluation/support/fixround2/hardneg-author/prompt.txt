@@ -1,0 +1,16 @@
+You are writing a held-out test set for evaluating text-embedding retrieval models. Do not use any tools; answer from your own knowledge.
+
+Write exactly 30 cases. Each case has:
+- id: "H01" to "H30".
+- query: a natural user question (8-20 words).
+- correct: one passage (2-3 sentences, 35-70 words) that directly answers the query.
+- distractors: exactly 3 hard-negative passages (2-3 sentences, 35-70 words each). Each distractor must be on the same topic as the query, reuse several of its key terms, and look relevant at a glance, but must NOT answer the query. Typical hard negatives: the same entity but a different attribute, a closely related but different procedure, the opposite condition, or a neighbouring concept that is often confused with the asked one.
+
+Rules:
+- Exactly one passage per case answers the query; a careful human reader must agree on which one without doubt.
+- Cover 30 different subjects spread across health, law and finance, software engineering, science, history, geography, cooking, travel, sports, home repair and consumer products. No two cases on the same subject.
+- Passages must be factually accurate. Do not copy text from any benchmark dataset.
+- Do not put the answer passage first by habit in your own reasoning; order does not matter, because the evaluator shuffles candidates.
+- Do not mention retrieval, embeddings, distractors or this task inside any passage.
+
+Return only JSON matching the provided schema.

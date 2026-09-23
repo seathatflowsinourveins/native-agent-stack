@@ -1,0 +1,26 @@
+{
+  "1": {
+    "outcome": "covered_elsewhere",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/1-paired-model-dag.json"
+  },
+  "2": {
+    "outcome": "settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/2-dashboard-auth-mode.json"
+  },
+  "3": {
+    "outcome": "covered_elsewhere",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/3-dagu-2170-hosting-checks.json"
+  },
+  "5": {
+    "outcome": "settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/5-duckdb-gate-input.json"
+  },
+  "6": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/6-temporal-local-execution.json"
+  },
+  "7": {
+    "outcome": "settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/7-dagu-vs-temporal-kill-compare.json"
+  }
+}

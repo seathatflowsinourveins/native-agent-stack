@@ -1,0 +1,25 @@
+# llama.cpp b11057 CUDA 13.3 runtime install record (gap 8)
+downloaded_at: 2026-09-23T02:59:26Z..02:59:31Z via ecosystem-bounded-run (149,142,938 + 410,248,824 bytes)
+sha256 7f8d89f2dcdf110265ef1cde8e67065d089d9bea727832d526cd2e00027f3141  llama-b11057-bin-ubuntu-cuda-13.3-x64.tar.gz
+sha256 7a6ea3a0971055b41195ae92e6098842b5369995d360069fc06e392f64ea18f2  cudart-llama-b11057-bin-ubuntu-cuda-13.3-x64.tar.gz
+expected (plan/preflight): 7f8d89f2dcdf110265ef1cde8e67065d089d9bea727832d526cd2e00027f3141 / 7a6ea3a0971055b41195ae92e6098842b5369995d360069fc06e392f64ea18f2
+## gh attestation verify llama-b11057-bin-ubuntu-cuda-13.3-x64.tar.gz --repo ggml-org/llama.cpp --deny-self-hosted-runners --source-digest 59657a613ab0fa4ab327d6c790123dff30bfbd67
+exit=0
+## gh attestation verify cudart-llama-b11057-bin-ubuntu-cuda-13.3-x64.tar.gz --repo ggml-org/llama.cpp --deny-self-hosted-runners --source-digest 59657a613ab0fa4ab327d6c790123dff30bfbd67
+exit=0
+llama-server sha256: 7740775d5a9e418340c44b8152eb3481f47407b0eec9306443df528915c67315 (plan server_sha256 7740775d5a9e418340c44b8152eb3481f47407b0eec9306443df528915c67315)
+## llama-server --version / --list-devices
+version: 0.4.1-dev (build 11057, commit 59657a613)
+built with GNU 13.3.0 for Linux x86_64
+Available devices:
+  CUDA0: NVIDIA GeForce RTX 5090 Laptop GPU (24462 MiB, 23119 MiB free)
+nvidia driver: 610.47, NVIDIA GeForce RTX 5090 Laptop GPU
+## attestation json summary llama-b11057-bin-ubuntu-cuda-13.3-x64.tar.gz
+{"subjectAlternativeName": "https://github.com/ggml-org/llama.cpp/.github/workflows/release.yml@refs/heads/master", "sourceRepositoryDigest": "59657a613ab0fa4ab327d6c790123dff30bfbd67", "runnerEnvironment": "github-hosted", "githubWorkflowName": "Release"}
+## attestation json summary cudart-llama-b11057-bin-ubuntu-cuda-13.3-x64.tar.gz
+{"subjectAlternativeName": "https://github.com/ggml-org/llama.cpp/.github/workflows/release.yml@refs/heads/master", "sourceRepositoryDigest": "59657a613ab0fa4ab327d6c790123dff30bfbd67", "runnerEnvironment": "github-hosted", "githubWorkflowName": "Release"}
+## model download
+url: https://huggingface.co/ggml-org/Qwen3.8-27B-GGUF/resolve/efbb3b1f70a21d97fd4495240648405f7228554f/Qwen3.8-27B-Q4_K_M.gguf
+via: ecosystem-bounded-run curl (ECOSYSTEM_JOB_SECONDS=1500), started 2026-09-23T02:59:46Z finished 2026-09-23T03:17:32Z, rc=0
+bytes: 18973870528 (plan 18973870528)
+sha256: c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747 (plan c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747)

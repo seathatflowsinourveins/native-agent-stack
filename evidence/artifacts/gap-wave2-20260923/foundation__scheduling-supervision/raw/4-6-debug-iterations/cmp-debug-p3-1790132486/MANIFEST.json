@@ -1,0 +1,14 @@
+{
+  "source_dir": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-debug-p3-1790132486",
+  "substitution": "host home path -> $HOME; UUID-shaped identifiers -> <uuid-N> (same id, same N)",
+  "files": [
+    {
+      "source": "result.json",
+      "committed_as": "result.json",
+      "raw_sha256": "b12c885edcb705169f62d5e84adf5198376a98abc2ee2190c3e357c02067dd3c",
+      "committed_sha256": "2f8028a4516278ce417cfd7f8f938b5ab76ac14c6fcc235ec61a12e90afa6c6c",
+      "bytes": 11448
+    }
+  ],
+  "uuid_placeholders": 2
+}

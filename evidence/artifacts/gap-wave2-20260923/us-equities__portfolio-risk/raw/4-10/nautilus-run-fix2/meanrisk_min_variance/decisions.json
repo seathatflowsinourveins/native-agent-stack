@@ -1,0 +1,332 @@
+[
+  {
+    "date": "2016-01-12",
+    "native_cash": "1000000.00",
+    "native_equity": "1000000.0000",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 0
+    },
+    "target": {
+      "IWM": 1788,
+      "QQQ": 0,
+      "SPY": 4154
+    }
+  },
+  {
+    "date": "2016-04-13",
+    "native_cash": "10083.00",
+    "native_equity": "1075073.5600",
+    "native_held": {
+      "IWM": 1788,
+      "QQQ": 0,
+      "SPY": 4154
+    },
+    "target": {
+      "IWM": 220,
+      "QQQ": 0,
+      "SPY": 4996
+    }
+  },
+  {
+    "date": "2016-07-13",
+    "native_cash": "10997.72",
+    "native_equity": "1111023.0000",
+    "native_held": {
+      "IWM": 220,
+      "QQQ": 0,
+      "SPY": 4996
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5117
+    }
+  },
+  {
+    "date": "2016-10-11",
+    "native_cash": "11224.19",
+    "native_equity": "1103345.5000",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5117
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5117
+    }
+  },
+  {
+    "date": "2017-01-11",
+    "native_cash": "11224.19",
+    "native_equity": "1173294.8900",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5117
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5114
+    }
+  },
+  {
+    "date": "2017-04-12",
+    "native_cash": "11904.49",
+    "native_equity": "1208733.9100",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5114
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5113
+    }
+  },
+  {
+    "date": "2017-07-13",
+    "native_cash": "12137.52",
+    "native_equity": "1261856.9800",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5113
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5111
+    }
+  },
+  {
+    "date": "2017-10-11",
+    "native_cash": "12625.36",
+    "native_equity": "1316032.5800",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5111
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5108
+    }
+  },
+  {
+    "date": "2018-01-11",
+    "native_cash": "13389.42",
+    "native_equity": "1423810.3800",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5108
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5104
+    }
+  },
+  {
+    "date": "2018-04-13",
+    "native_cash": "14492.90",
+    "native_equity": "1367818.5000",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 5104
+    },
+    "target": {
+      "IWM": 308,
+      "QQQ": 0,
+      "SPY": 4928
+    }
+  },
+  {
+    "date": "2018-07-13",
+    "native_cash": "13740.70",
+    "native_equity": "1443125.5800",
+    "native_held": {
+      "IWM": 308,
+      "QQQ": 0,
+      "SPY": 4928
+    },
+    "target": {
+      "IWM": 1992,
+      "QQQ": 0,
+      "SPY": 3916
+    }
+  },
+  {
+    "date": "2018-10-11",
+    "native_cash": "14748.50",
+    "native_equity": "1386477.6600",
+    "native_held": {
+      "IWM": 1992,
+      "QQQ": 0,
+      "SPY": 3916
+    },
+    "target": {
+      "IWM": 2742,
+      "QQQ": 0,
+      "SPY": 3495
+    }
+  },
+  {
+    "date": "2019-01-14",
+    "native_cash": "14152.57",
+    "native_equity": "1303815.0700",
+    "native_held": {
+      "IWM": 2742,
+      "QQQ": 0,
+      "SPY": 3495
+    },
+    "target": {
+      "IWM": 2325,
+      "QQQ": 0,
+      "SPY": 3729
+    }
+  },
+  {
+    "date": "2019-04-15",
+    "native_cash": "13237.22",
+    "native_equity": "1459955.6000",
+    "native_held": {
+      "IWM": 2325,
+      "QQQ": 0,
+      "SPY": 3729
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 4984
+    }
+  },
+  {
+    "date": "2019-07-16",
+    "native_cash": "14743.12",
+    "native_equity": "1508497.7600",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 4984
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 4982
+    }
+  },
+  {
+    "date": "2019-10-14",
+    "native_cash": "15341.54",
+    "native_equity": "1489764.4400",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 4982
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 4983
+    }
+  },
+  {
+    "date": "2020-01-14",
+    "native_cash": "15044.59",
+    "native_equity": "1646727.9400",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 4983
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 4978
+    }
+  },
+  {
+    "date": "2020-04-15",
+    "native_cash": "16680.84",
+    "native_equity": "1399370.1200",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 4978
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 4987
+    }
+  },
+  {
+    "date": "2020-07-15",
+    "native_cash": "14180.00",
+    "native_equity": "1619245.9500",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 4987
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 1950,
+      "SPY": 3399
+    }
+  },
+  {
+    "date": "2020-10-13",
+    "native_cash": "16520.80",
+    "native_equity": "1780926.6700",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 1950,
+      "SPY": 3399
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 434,
+      "SPY": 4670
+    }
+  },
+  {
+    "date": "2021-01-04",
+    "native_cash": "17995.89",
+    "native_equity": "1874485.7300",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 434,
+      "SPY": 4670
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 274,
+      "SPY": 4801
+    }
+  },
+  {
+    "date": "2021-03-31",
+    "native_cash": "19172.00",
+    "native_equity": "2009393.9500",
+    "native_held": {
+      "IWM": 0,
+      "QQQ": 274,
+      "SPY": 4801
+    },
+    "target": {
+      "IWM": 0,
+      "QQQ": 0,
+      "SPY": 0
+    }
+  }
+]

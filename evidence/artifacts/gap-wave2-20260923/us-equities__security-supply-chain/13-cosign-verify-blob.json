@@ -1,0 +1,82 @@
+{
+  "id": "gap-wave2-20260923/us-equities/security-supply-chain/13",
+  "gap_index": 13,
+  "gap_text": "Checksum matching does not establish artifact signer identity or build provenance; native Cosign verification remains unestablished.",
+  "gap_text_sha256": "bb5d926ccee9a44beb3c22224df219d4bff6a841b2781fd0fc849003b6b15f6a",
+  "next_check": "Run `cosign verify-blob --certificate-identity-regexp <upstream workflow> --certificate-oidc-issuer https://token.actions.githubusercontent.com` on each installed tool archive and record the results.",
+  "preregistration": {
+    "written_at": "2026-09-23T08:13:16Z",
+    "expectation": "cosign verify-blob with --certificate-identity-regexp for the upstream release workflow and issuer https://token.actions.githubusercontent.com exits 0 for syft and grype checksum files; gitleaks has no cosign signature to verify.",
+    "criteria": [
+      "settled only if every installed tool archive gets a successful verify-blob",
+      "advanced if syft and grype verify and gitleaks has no upstream signature (absence recorded from the release asset list)",
+      "negative control: tampered blob must fail"
+    ]
+  },
+  "commands": [
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/verify_signatures.sh",
+    "cosign verify-blob --certificate syft_1.52.0_checksums.txt.pem --signature syft_1.52.0_checksums.txt.sig --certificate-identity https://github.com/anchore/syft/.github/workflows/release.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com --certificate-github-workflow-sha <syft gitCommit 02ba369d13b4\u2026, full value in raw/signatures/signatures.log> syft_1.52.0_checksums.txt",
+    "cosign verify-blob ... --certificate-identity-regexp '^https://github\\.com/anchore/syft/\\.github/workflows/.+' ...",
+    "(same two for grype 0.119.0, workflow sha b6f519453774\u2026, full value in raw/signatures/signatures.log)",
+    "negative controls: verify-blob on a checksum file with one appended byte; verify-blob with identity anchore/other",
+    "sha256sum --ignore-missing -c <tool>_checksums.txt; sha256sum of each installed binary vs the binary extracted from the verified archive",
+    "curl https://api.github.com/repos/gitleaks/gitleaks/releases/tags/v8.30.1  # asset list",
+    "curl https://api.github.com/repos/gitleaks/gitleaks/attestations/sha256:551f6fc8...  # attestation lookup",
+    "curl https://api.github.com/repos/cli/cli/attestations/sha256:9bca2d1c...  # positive control for the lookup method (gh 2.101.0 archive)"
+  ],
+  "results": [
+    "syft verify-blob exact identity exit=0; identity regexp exit=0; NEGATIVE tampered blob exit=1; NEGATIVE wrong identity exit=1; archive checksum in signed list exit=0",
+    "grype verify-blob exact identity exit=0; identity regexp exit=0; NEGATIVE tampered blob exit=1; NEGATIVE wrong identity exit=1; archive checksum in signed list exit=0",
+    "installed vs archive binary sha256: syft 15a52d01... == 15a52d01...; grype e02ba256... == e02ba256...; gitleaks 88f91962... == 88f91962...",
+    "gitleaks archive checksum in unsigned list exit=0",
+    "gitleaks v8.30.1 assets: checksums.txt plus platform archives only; no .sig, .pem, .sigstore.json or .intoto asset",
+    "gitleaks attestation lookup: {\"message\": \"Not Found\", \"status\": \"404\"} http_status=404",
+    "positive control (cli/cli, gh_2.101.0_linux_amd64.tar.gz digest): http_status=200, attestations 2",
+    "cosign v3.1.3 binary sha256 4629c757...7f71 equals the GitHub release asset digest and cosign_checksums.txt entry (cosign itself is checksum-verified only)"
+  ],
+  "outcome": "advanced",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Same limits as gap 2."
+  ],
+  "checked_at": "2026-09-23T17:01:14Z",
+  "outcome_note": "Native cosign verify-blob with --certificate-identity(-regexp) and the GitHub OIDC issuer succeeded for the syft and grype releases (tampered blob and wrong identity fail). Remains: gitleaks has no upstream signature to verify.",
+  "raw_outputs": [
+    {
+      "path": "raw/signatures/signatures.log",
+      "sha256": "4b672b5cf5bb7c30fe9f130b497679edaf1a946bc67b47d8cb9d1a585194873e"
+    },
+    {
+      "path": "raw/signatures/gh-attestation-positive-control.json",
+      "sha256": "a39eb2e99cb5bc50c7847bb8f164a7200ffc16231bd0f93f36cd1fd1b994bf29"
+    },
+    {
+      "path": "raw/signatures/gh-attestation-positive-control.cmd",
+      "sha256": "c61db38f5fe40fdd959ac1a06571aee78b41c895df470c1d98fbb3fa7b7c7618"
+    }
+  ],
+  "helper_scripts": [
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/classify_findings.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/collect_raw.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_fix_round.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/grype_sdk.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/inventory_diff.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_install.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_lifecycle.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg_fix_round.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/scanner_comparison.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/syft_binary_coverage.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/verify_signatures.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/worker_env_check.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/write_receipts.py"
+  ],
+  "timeline": {
+    "preregistration_written_at": "2026-09-23T08:13:16Z",
+    "first_pass": "2026-09-23T08:13:24Z..08:27:10Z (same unit, earlier session)",
+    "this_pass": "2026-09-23T16:26Z..2026-09-23T17:01:14Z",
+    "post_preregistration_additions": "all-refs gitleaks scan, oversized-file dir scan, SDK interpreter and IB Gateway scans, B2/B3 sandbox policy arms, and the attestation-lookup positive control were added after preregistration as stronger checks of the same claims",
+    "fix_round": "after the independent Opus review: fix_round_preregistration written 2026-09-23T16:56:53Z (commit d67f77a) before the oversized-blob, merge first-parent and control scans (16:58Z..17:00Z) and the osv/inventory re-analysis"
+  }
+}

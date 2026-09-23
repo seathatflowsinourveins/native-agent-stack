@@ -1,0 +1,12 @@
+{"gap_index": 6, "written_at": "2026-09-23T07:52:54Z", "written_before_results": true,
+ "label": "fix-round preregistration, written after the first-round receipt and an independent review; covers only the new fix-round runs",
+ "reason": "Review: first-round gap-6 claims had no committed raw outputs; the CLI calls did not point AI_MEMORY_SERVER_URL at an isolated server this unit started; the upstream-test arm was skipped although an isolated Rust toolchain under the unit cache was allowed.",
+ "arms": {
+  "R1 raw surface": "Start isolated ai-memory 2.4.0 serve (temp --data-dir, temp HOME, 127.0.0.1:27375) and isolated 2.3.2 serve (27374). With AI_MEMORY_SERVER_URL set to the matching server, capture --version, --help, backfill --help, init into fresh temp data dirs, status (provider lines), and a disposable lifecycle (write-page, search, read-page, handoff begin/list, status); commit redacted outputs and the non-comment config diff with sha256.",
+  "R2 upstream tests": "Install rustup (minimal profile, toolchain per the repo's rust-toolchain file or stable) with RUSTUP_HOME/CARGO_HOME under $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust; git clone --depth 1 --branch v2.4.0 https://github.com/akitaonrails/ai-memory; run the upstream 'cargo test' (workspace, locked if a lockfile exists) through ecosystem-bounded-run with a 20-minute cap; tests that need network models or external services are reported as observed, not skipped silently."},
+ "expectation": "R1: 2.3.2 and 2.4.0 share the backfill/bootstrap/embed/briefing/consolidate surface and identical default non-comment config; status shows the embedding provider line. R2: the build either completes and the suite passes (possibly with ignored network tests), or exceeds the 20-minute cap and is recorded not run to completion.",
+ "criteria": [
+  "Every ai-memory call carries --data-dir under the unit cache and AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 (2.3.2) or :27375 (2.4.0); detection: server logs show the requests, and the live port 49374 is not referenced.",
+  "Settled only if R2's upstream suite runs to completion with its pass/fail counts recorded AND the pin-text correction is done; the pin text is in coordinator-owned catalog files, so the outcome stays at most advanced.",
+  "Downloads (rustup toolchain, crates, git clone, any model files) are disclosed with sizes."
+ ]}

@@ -38,7 +38,7 @@ separate from the paper runtime:
 ```sh
 uv venv "$GATE_TOOL_DIR/.venv"
 uv pip install --python "$GATE_TOOL_DIR/.venv/bin/python3" \
-  pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow
+  pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5
 "$GATE_TOOL_DIR/.venv/bin/python3" promotion_gate.py \
   --input snapshot.parquet --out gate-result.json [--calendar XNYS]
 ```
@@ -47,12 +47,18 @@ Resolved versions from the actual native install used to build and test this
 gate: `pandera==0.33.1`, `pandas==3.0.6`, `pyarrow==25.0.1`,
 `exchange_calendars==4.13.2`, on CPython 3.13.15 (`uv` resolved `pandas` and
 `pyarrow` to their current majors; only `pandera` and `exchange_calendars`
-were pinned by the caller).
+were pinned by the caller). The hash-locked install is
+`uv pip sync --require-hashes requirements.lock`; `duckdb==1.5.5` was added
+to `requirements.in` and the lock recompiled with uv 0.12.17, which moved no
+other pin.
 
 It validates `--input` (a `.parquet` file, a `.csv` file, or a
-`duckdb://<db-path>#<table>` spec -- the `duckdb` package is optional and not
-part of the pinned install above, so that path is source-only until a caller
-adds the dependency) against a pandera schema plus two checks computed
+`duckdb://<db-path>#<table>` spec; `duckdb==1.5.5` is pinned in
+`requirements.lock` since 2026-09-23; the wave-2 receipt reproduced five CSV
+fixtures through DuckDB tables, see
+[the wave-2 receipt](../../../evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/5-duckdb-gate-input.json),
+and `DuckdbInputRuns` in `tests/test_promotion_gate.py` now also covers
+`lossy-volume-conversion.csv` with an exactly stored `volume`) against a pandera schema plus two checks computed
 outside pandera: the snapshot has at least one row (`rows_present`; a
 0-row snapshot with every required column present fails closed instead of
 reporting `status: "pass", row_count: 0`), rows unique on `(symbol, session)`;
@@ -90,8 +96,22 @@ exact either way and goes through `Decimal(int(...))`, never a float. A
 Parquet `volume` column stores a typed float/int at write time, so this
 exactness guarantee is CSV-only -- a lossy Parquet float `volume` cell falls
 back to `Decimal(repr(value))`, a best-effort check on whatever precision the
-Parquet writer already kept, not the source-text guarantee CSV gets. It
-writes `gate-result.json`:
+Parquet writer already kept, not the source-text guarantee CSV gets.
+
+A `duckdb://<db-path>#<table>` input (changed 2026-09-23 after Codex review of
+PR #132) must name a BASE TABLE stored in the database file, checked through
+`system.information_schema.tables.table_type` before any row is read (and a `<db-path>.wal` is checked again after the read): `input_sha256`
+hashes only that file, so a view such as `SELECT * FROM
+read_parquet('current.parquet')`, whose rows come from a mutable external
+file, fails closed with `duckdb_relation_not_base_table`, and a pending
+`<db-path>.wal`, whose changes a read-only open replays but the hashed file
+lacks, fails closed with `duckdb_wal_present`. The gate reads the `volume`
+column as DuckDB's exact VARCHAR rendering instead of `fetch_df()`'s float64:
+a DECIMAL `9007199254740992.5` used to round to `9007199254740992.0` and pass.
+A DECIMAL or VARCHAR `volume` therefore keeps the CSV exactness guarantee. The guarantee covers `volume` only: DECIMAL `open`, `high`, `low` and `close` values are read as float64, as the CSV path reads them. A
+DOUBLE `volume`, including the type DuckDB's `read_csv` auto-detects for a
+fractional column, has lost precision at write time, as a Parquet float has.
+It writes `gate-result.json`:
 `{status: "pass"|"fail", input_sha256, row_count, checks: [{name, status,
 detail}], versions, checked_at}`. Any exception -- schema failure or an
 unreadable/malformed input, a missing dependency, an unknown calendar code --

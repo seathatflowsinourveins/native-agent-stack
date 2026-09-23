@@ -11,9 +11,10 @@ Usage:
         [--calendar XNYS]
 
 `--input` accepts a `.parquet` file, a `.csv` file, or a `duckdb://<db-path>#<table>`
-table spec (the `duckdb` package is optional and only imported for that path;
-this venv's pinned install does not include it, so the duckdb path is source
-code only until a caller adds that dependency).
+table spec (the `duckdb` package is only imported for that path; it is pinned
+as duckdb==1.5.5 in requirements.lock). A DuckDB relation must be a BASE TABLE
+stored in the hashed file (views and a pending `.wal` are rejected), and its
+`volume` column is read as exact text; see `_load_duckdb_frame`.
 
 Required columns: symbol, session, open, high, low, close, volume, observed_at.
 `session` must be an ISO date (YYYY-MM-DD) that is a valid session on the
@@ -76,6 +77,70 @@ def _snapshot_path(input_spec: str) -> Path:
     return Path(input_spec)
 
 
+def _quote_identifier(name: str) -> str:
+    return '"' + name.replace('"', '""') + '"'
+
+
+def _load_duckdb_frame(db_path: str, table: str):
+    """Read one DuckDB relation so the rows validated are the rows hashed.
+
+    `input_sha256` hashes only the `.duckdb` file, so the relation must be a
+    BASE TABLE stored in that file. A view (e.g. `SELECT * FROM
+    read_parquet('current.parquet')`) reads mutable external bytes the hash
+    does not cover, and a pending `<db>.wal` can add rows that are not in the
+    hashed file either; both are rejected before any row is read.
+
+    `volume` is selected as DuckDB's exact VARCHAR rendering: `fetch_df()`
+    materializes DECIMAL (and HUGEINT) columns as float64, which rounds e.g.
+    DECIMAL 9007199254740992.5 to 9007199254740992.0 before
+    `_volume_cell_fails()` can see the fractional part. As text, the value
+    goes through the same canonical Decimal parse as a CSV cell. The other
+    columns keep their DuckDB types; `_prepare()` casts them as before.
+    """
+    parts = table.split(".")
+    if len(parts) > 3 or any(not part for part in parts):
+        raise ValueError("duckdb_table_name_rejected")
+    if Path(db_path + ".wal").exists():
+        raise ValueError("duckdb_wal_present: the write-ahead log holds changes that are not in the hashed "
+                         "database file; checkpoint the database before running the gate")
+    import duckdb  # only needed for this input path; pinned in requirements.lock
+    connection = duckdb.connect(str(Path(db_path)), read_only=True)
+    try:
+        catalog, schema = connection.execute("SELECT current_database(), current_schema()").fetchone()
+        if len(parts) == 3:
+            catalog, schema, name = parts
+        elif len(parts) == 2:
+            schema, name = parts
+        else:
+            (name,) = parts
+        rows = connection.execute(
+            "SELECT table_catalog, table_schema, table_name, table_type FROM system.information_schema.tables "
+            "WHERE lower(table_catalog) = lower(?) AND lower(table_schema) = lower(?) "
+            "AND lower(table_name) = lower(?)", [catalog, schema, name]).fetchall()
+        if len(rows) != 1:
+            raise ValueError(f"duckdb_relation_not_found: {table}")
+        found_catalog, found_schema, found_name, table_type = rows[0]
+        if table_type != "BASE TABLE":
+            raise ValueError(f"duckdb_relation_not_base_table: {table} is {table_type}; input_sha256 covers "
+                             "only rows stored in the database file")
+        qualified = ".".join(_quote_identifier(part) for part in (found_catalog, found_schema, found_name))
+        columns = [row[0] for row in connection.execute(
+            "SELECT column_name FROM system.information_schema.columns WHERE table_catalog = ? AND table_schema = ? "
+            "AND table_name = ?", [found_catalog, found_schema, found_name]).fetchall()]
+        select = "*"
+        if "volume" in columns:
+            select = '* REPLACE (CAST("volume" AS VARCHAR) AS "volume")'
+        frame = connection.execute(f"SELECT {select} FROM {qualified}").fetch_df()  # noqa: S608 (resolved via information_schema)
+    finally:
+        connection.close()
+    # A writer that crashed between the first check and the read-only open would leave a log the open
+    # replayed: check again once the connection is closed.
+    if Path(db_path + ".wal").exists():
+        raise ValueError("duckdb_wal_present: a write-ahead log appeared while the gate read the database; "
+                         "checkpoint the database and run the gate again")
+    return frame
+
+
 def _load_frame(input_spec: str):
     import pandas as pd
 
@@ -86,12 +151,7 @@ def _load_frame(input_spec: str):
         db_path, table = remainder.split("#", 1)
         if not DUCKDB_TABLE_RE.match(table):
             raise ValueError("duckdb_table_name_rejected")
-        import duckdb  # optional dependency; not part of this venv's pinned install
-        connection = duckdb.connect(str(Path(db_path)), read_only=True)
-        try:
-            return connection.execute(f"SELECT * FROM {table}").fetch_df()  # noqa: S608 (table validated above)
-        finally:
-            connection.close()
+        return _load_duckdb_frame(db_path, table)
     path = Path(input_spec)
     suffix = path.suffix.lower()
     if suffix == ".parquet":
@@ -106,7 +166,9 @@ def _load_frame(input_spec: str):
         # `9007199254740992.5` losing its fractional part) -- see that
         # function. Parquet's typed columns cannot offer this: a Parquet
         # `volume` column already stores a float/int at write time, so this
-        # exactness guarantee is CSV-only (documented in README.md).
+        # exactness guarantee does not extend to it (documented in README.md).
+        # A DuckDB DECIMAL/VARCHAR `volume` keeps it: `_load_duckdb_frame`
+        # reads that column as text.
         return pd.read_csv(path, dtype=str)
     raise ValueError(f"unsupported_input_format: {suffix or '(none)'}")
 

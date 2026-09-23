@@ -1,0 +1,28 @@
+{
+  "at": 1790133827.09894,
+  "windows": {
+    "primary": {
+      "usedPercent": 12,
+      "resetsAt": 1790719654,
+      "windowDurationMins": 10080
+    }
+  },
+  "ordinaryUsageAllowed": true,
+  "status": "ok",
+  "isolation_overrides": [
+    "features.hooks=false",
+    "features.plugin_hooks=false",
+    "otel.exporter=\"none\"",
+    "otel.metrics_exporter=\"none\"",
+    "analytics.enabled=false",
+    "plugins.\"context-mode@context-mode\".enabled=false"
+  ],
+  "sdk": "openai-codex",
+  "started_at": 1790133826.2766256,
+  "finished_at": 1790133827.1145113,
+  "python_env_keys": [
+    "HOME",
+    "LC_CTYPE",
+    "PATH"
+  ]
+}

@@ -218,5 +218,24 @@
     "successful_research_tasks": 1,
     "blocked_file_extraction_tasks": 2,
     "paired_net_provider_savings": null
+  },
+  "version_requalification_20260923": {
+    "status": "completed_matching_versions",
+    "packages": {
+      "openai-codex": "0.155.1",
+      "openai-codex-cli-bin": "0.155.1",
+      "native-codex": "0.155.1"
+    },
+    "fresh_prefix": "new uv venv, CPython 3.13.15, same WSL host",
+    "outcomes": {
+      "inspect": "discovery_complete",
+      "c4_research_turn_cwd_only": "completed turn; extraction failed ('Extraction failed'; Context Mode root bound to another active worktree). The 2026-09-19 research turn (0.154.0, original prompt; the rerun prompt is a reconstruction) succeeded, so this is a regression relative to that run on this host. Its observed cause is the root binding, not shown to be the SDK version.",
+      "c4_research_turn_root_scoped": "completed; six values extracted",
+      "c4_file_turn_cwd_only": "completed turn; extraction failed (Context Mode root bound to another active worktree)",
+      "c4_file_turn_root_scoped_auto_review": "completed; six values extracted",
+      "persistent_then_resumed_turn": "completed; custom lookup tool called in turn 1 (persistent thread) and its value recalled in turn 2 by a new process resuming the thread (committed native_worker.py, --lookup-tool)"
+    },
+    "evidence": "evidence/artifacts/gap-wave2-20260923/foundation__agent-sdks/6-sdk-0155-requalification.json",
+    "note": "Historical fields above stay as recorded on 2026-09-19 (SDK 0.154.0). The adoption lock still pins 0.154.0; pin changes follow evidence/artifacts/sota-refresh-20260923/."
   }
 }

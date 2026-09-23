@@ -1,0 +1,8 @@
+time=2026-09-22T22:48:51.171-04:00 level=INFO msg="Executing root dag-run" dag=cancelprobe run-id=cancelprobe-ba0a1b8f27ff params=""
+time=2026-09-22T22:48:51.191-04:00 level=INFO msg="DAG run started" dag=cancelprobe run-id=cancelprobe-ba0a1b8f27ff worker-id=local attempt-id=3150e7 params=[]
+time=2026-09-22T22:48:51.192-04:00 level=INFO msg="Step started" dag=cancelprobe run-id=cancelprobe-ba0a1b8f27ff worker-id=local attempt-id=3150e7 step=provider_call
+time=2026-09-22T22:48:56.546-04:00 level=INFO msg="Stop request received" dag=cancelprobe run-id=cancelprobe-ba0a1b8f27ff worker-id=local attempt-id=3150e7
+time=2026-09-22T22:48:56.548-04:00 level=INFO msg="Stopping running child processes" dag=cancelprobe run-id=cancelprobe-ba0a1b8f27ff worker-id=local attempt-id=3150e7 stop-mode=graceful signal=terminated allow-override=true max-cleanup-time=5s
+time=2026-09-22T22:48:56.550-04:00 level=INFO msg="Requesting step stop" dag=cancelprobe run-id=cancelprobe-ba0a1b8f27ff worker-id=local attempt-id=3150e7 stop-mode=graceful signal=terminated step=provider_call
+time=2026-09-22T22:48:56.553-04:00 level=INFO msg="All child processes have been terminated" dag=cancelprobe run-id=cancelprobe-ba0a1b8f27ff worker-id=local attempt-id=3150e7
+time=2026-09-22T22:48:56.560-04:00 level=INFO msg="DAG run finished" dag=cancelprobe run-id=cancelprobe-ba0a1b8f27ff worker-id=local attempt-id=3150e7 status=aborted started-at=2026-09-22T22:48:51-04:00 finished-at=2026-09-22T22:48:56-04:00

@@ -1,0 +1,214 @@
+{
+  "id": "gap-wave2-20260923-us-equities-portfolio-risk-10-nautilus-optimizer-pnl",
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "gap_index": 10,
+  "gap_text": "Native skfolio acceptance establishes WalkForward-based raw-price label evaluation, not portfolio optimizer performance or reconciled portfolio P&L.",
+  "gap_text_sha256": "b62d03a9a92ae1b474281aa15a7f37c1da692903650c9fd96513a2f7d18ba1be",
+  "next_check": "Run MeanRisk/HRP weights through a NautilusTrader 2.0.0rc5 backtest with a fee model and report reconciled portfolio P&L beside the optimizer's descriptive returns.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:32:44Z",
+    "expectation": "Same native NautilusTrader run as gap 4: MeanRisk and HRP fold weights, FixedFeeModel $1/order, reconciled portfolio P&L reported beside skfolio's descriptive (daily-rebalanced, cost-free) fold returns over the same sessions.",
+    "criteria": "settled iff for both optimizers the native run exits 0, every native fill, fee and account balance equals the independent ledger exactly, ending equity equals initial capital plus reconciled P&L, and the descriptive skfolio return is reported beside the reconciled Nautilus return with the difference decomposed into rebalancing convention, integer-share residual cash and fees. Detection as in gap 4.",
+    "fix_round_addendum": {
+      "written_at": "2026-09-23T07:12:07Z",
+      "label": "fix-round preregistration, written after round-1 results and the review, before the fix-round reruns",
+      "text": "Fix round after independent Codex review: same runner changes as gap 4; rerun into raw/4-10/nautilus-run-fix1; settled only if reconciliation and every mutation self-test pass."
+    },
+    "fix_round_2_addendum": {
+      "written_at": "2026-09-23T07:22:02Z",
+      "label": "fix-round-2 preregistration, written after the round-2 review and before the fix-round-2 reruns",
+      "text": "Fix round 2 after the round-2 independent review: fill checks now compare the exact New York fill time (16:00 close bars; 09:30 open-print bars) instead of the date only, and a one-hour time-shift mutation must be detected. All Nautilus runners (portfolio, dividend-inclusive portfolio, RiskEngine probe, episodes) rerun into *-fix2 outputs; expected economic results identical to fix round 1."
+    }
+  },
+  "commands": [
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_portfolio.py --weights evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/skfolio-fold-weights.json --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2 --self-test-fee-perturbation",
+      "exit": 0,
+      "started_utc": "2026-09-23T07:22:10Z",
+      "fix_round_2": "fix round 2 (07:22Z, after the round-2 review): exact 16:00/09:30 New York fill times enforced and a one-hour time-shift mutation added; economic results identical to fix round 1; fix-round-1 outputs retained in git at 8bab001",
+      "history": "round 1 at 06:41:44Z (outputs in git at b482b86) and an earlier scratch run (development-run-1) gave identical economic results and a byte-identical account.csv; the fix round added the decision-count check and mutation self-tests"
+    }
+  ],
+  "results": {
+    "hrp_variance": {
+      "orders": 66,
+      "fees_usd": "66",
+      "reconciled_total_pnl_usd": "1279895.57",
+      "native_total_return": "1.27989557",
+      "skfolio_descriptive_total_return_daily_rebalanced_cost_free": "1.327499155268176563006856958",
+      "frictionless_fractional_buy_and_hold_total_return": "1.297305868630022657402159042",
+      "cash_transitions_matched": 66,
+      "fills_matched": 66
+    },
+    "meanrisk_min_variance": {
+      "orders": 33,
+      "fees_usd": "33",
+      "reconciled_total_pnl_usd": "1009391.95",
+      "native_total_return": "1.00939195",
+      "skfolio_descriptive_total_return_daily_rebalanced_cost_free": "1.052380565851879817881153792",
+      "frictionless_fractional_buy_and_hold_total_return": "1.022587074738642738990100006",
+      "cash_transitions_matched": 33,
+      "fills_matched": 33
+    },
+    "decomposition": "descriptive (daily rebalanced, cost free) -> fractional buy-and-hold within folds at the same rebalance closes isolates the rebalancing convention (and the 2020-12-31..2021-01-04 session skfolio skips); fractional -> native isolates integer shares, the 1% cash buffer and 1 USD fees",
+    "span": "rebalance closes 2016-01-12 .. 2021-01-04, liquidation 2021-03-31 close; 20 development folds plus the reserved 2021Q1 weights",
+    "mutation_self_tests_detected": {
+      "hrp_variance": {
+        "all_decisions_removed": true,
+        "cash_corrupted_first_transition": true,
+        "fill_time_1900": true,
+        "fill_time_shifted_one_hour": true,
+        "wrong_instrument_first_fill": true
+      },
+      "meanrisk_min_variance": {
+        "all_decisions_removed": true,
+        "cash_corrupted_first_transition": true,
+        "fill_time_1900": true,
+        "fill_time_shifted_one_hour": true,
+        "wrong_instrument_first_fill": true
+      }
+    },
+    "fee_perturbation_self_test_detected": {
+      "hrp_variance": true,
+      "meanrisk_min_variance": true
+    }
+  },
+  "outcome": "settled",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Raw prices: dividends are not credited in this arm (unmodelled 132234.25 / 107478.79 USD); the dividend-inclusive version is gap 4's second arm.",
+    "Daily-close fills with unlimited modelled depth; not an execution-quality claim.",
+    "Position-level realized_pnl sums differ from the cash P&L by 0.01 USD (native rounding); cash, fills and fees reconcile exactly.",
+    "Descriptive, not a performance claim: no significance testing or promotion."
+  ],
+  "checked_at": "2026-09-23T07:22:10Z",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/development-run-1/hrp_variance-account.csv",
+      "sha256": "b401dad64c5977389042913b1afe3211d16b0710f7c1261affa77b3962a64c91"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/development-run-1/meanrisk_min_variance-account.csv",
+      "sha256": "e43d1ff20b54c8c9d347012fabfce6d3df0d3c682ff97f9ad869d79b2dd832d4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/development-run-1/summary.json",
+      "sha256": "9be4212dc8fa2ee027a2e636fe00483c5aa58bf1cc61ae66c6739b464902c7a2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix1.stderr.txt",
+      "sha256": "c5d725396602894c45810cc5caf711e11ad0cc4307dd08aa560e0dbc11885936"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix1.stdout.txt",
+      "sha256": "117425732bbe621ff3d278965559b0d1c672dc8661e02643a941edc4d3e92900"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/hrp_variance/account.csv",
+      "sha256": "b401dad64c5977389042913b1afe3211d16b0710f7c1261affa77b3962a64c91"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/hrp_variance/decisions.json",
+      "sha256": "9de6f48443aa57ef7b5f26685d20615606dc056a89d7c165dd53049d0fd37ed4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/hrp_variance/fills.csv",
+      "sha256": "faba89592902fd38e326c70ae24833b58c88986e67452cf3eb8407ee803409eb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/hrp_variance/positions.csv",
+      "sha256": "b463849eadb16fc33c7563f16c298a419529f94a97304b6b859079d13427e905"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/meanrisk_min_variance/account.csv",
+      "sha256": "e43d1ff20b54c8c9d347012fabfce6d3df0d3c682ff97f9ad869d79b2dd832d4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/meanrisk_min_variance/decisions.json",
+      "sha256": "598e5c703c4eaec210da8fd95bbb2d8f141d5a82375afad72cfb234d2f73f52f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/meanrisk_min_variance/fills.csv",
+      "sha256": "72f101398d58d2d9f851b1eb746262a9be67d679281fdff525b837dd8398efc3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/meanrisk_min_variance/positions.csv",
+      "sha256": "e66d2d01e64314ca3ea1b2efe9faf8128f97554bd6b5a44c835dbfa3c3c95b12"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/summary.json",
+      "sha256": "db256b5efc0e53b31c20f7fab75782b5a3b21977689f10ef5b2441a9bc960640"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2.stderr.txt",
+      "sha256": "c5d725396602894c45810cc5caf711e11ad0cc4307dd08aa560e0dbc11885936"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2.stdout.txt",
+      "sha256": "117425732bbe621ff3d278965559b0d1c672dc8661e02643a941edc4d3e92900"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run.stderr.txt",
+      "sha256": "c5d725396602894c45810cc5caf711e11ad0cc4307dd08aa560e0dbc11885936"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run.stdout.txt",
+      "sha256": "117425732bbe621ff3d278965559b0d1c672dc8661e02643a941edc4d3e92900"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/skfolio-fold-weights.json",
+      "sha256": "30e9b17a989c288357889b4c4d91254450c2b52c97dca509ec20139161f81765"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/weights_export.py",
+      "sha256": "e4381ed0782164ed895050154d512e558de515ee855479e7696bf187e2df4371"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_portfolio.py",
+      "sha256": "51e554e3bf908065015b4a161bb07eeafbd8b2e839b4be3c20a80f364b044da7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "sha256": "143b21745ccc3c0db8a8272a775208d2c62f7c77311ec469afcec2cb0fc684d7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md",
+      "sha256": "8f2096917a932fe40ee73bd26b84a3c34b62c986f752a530adf22a685fa7a4b2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "sha256": "9aae92f05dda99374540121632494936a26067720e522d7c9dfb2106a4bfc888"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "sha256": "565734f27cf8e401468dbd9c04c4d807cb255894d9ccbc43bc098b2ea7f7e510"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "sha256": "82d9e7bbfe289a8774bc54d27692e0e71e65a9aec037fb5dbbc96614353293ba"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "Codex CLI 0.155.1 (gpt-6-astra), codex exec --sandbox read-only --ephemeral, one bounded call",
+    "record": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md"
+    ],
+    "round_2": "round-2: same exact-time fix as gap 4; fix round 2 reran",
+    "findings_and_resolution": "major (shared with gap 4): decisions zip without length check -> fixed; fix-round rerun reconciles with every mutation detected",
+    "round_3": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "resolution": "no round-3 finding for this gap"
+    },
+    "round_4": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "resolution": "no round-4 finding for this gap"
+    },
+    "round_4_codex": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "reviewer": "Codex CLI (codex exec --sandbox read-only --ephemeral), one bounded call on commits 6ed9709..a4cbcf8",
+      "resolution": "no finding for this gap"
+    }
+  }
+}

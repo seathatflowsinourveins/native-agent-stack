@@ -1,0 +1,58 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-17",
+  "gap_index": 17,
+  "gap_text_sha256": "2da6cc73afe45599f5f6200f3109c48bdf61a041cf4aeac68868e373f298bff2",
+  "checked_at": "2026-09-23T01:05:30.714Z",
+  "outcome": "not_settled",
+  "note": "Outcome changed from deferred to not_settled. The blocker named earlier (the tarball omits conmon; newuidmap/newgidmap need a privileged install) was not established (see gap 10). The comparison needs a working rootless Podman first; the untried isolated routes are listed in gap 10.",
+  "evidence_class": "source_review",
+  "commands": [
+    "See gap 10 receipt for the blocker."
+  ],
+  "results": [
+    "Not run: no working `podman info` was reached (gap 10), so no container-side fixture ran."
+  ],
+  "preregistration": {
+    "written_at": "2026-09-23T01:35:12.489Z",
+    "late": true,
+    "late_note": "Written at 2026-09-23T01:35:12.489Z by fix#59, after the evidence it covers was produced (2026-09-23T00:44:56.111Z to 2026-09-23T01:05:30.714Z). The previously recorded written_at '2026-09-23T02:20:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps.",
+    "expectation": "This gap depends entirely on gap 10's Podman availability; whatever blocker gap 10 finds applies here too.",
+    "criteria": "See gap 10's corrected receipt."
+  },
+  "limits": [
+    "Depends entirely on gap 10."
+  ],
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:44:56.111Z to 2026-09-23T01:05:30.714Z. The previous value '2026-09-23T00:53:20.715653+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#48",
+        "original#49"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/fix-session-tool-calls.txt",
+      "sha256": "b1a1bce670082262521365455849b1618b460a9bbd53fdec5d6d0337523d8899",
+      "calls": [
+        "fix#33",
+        "fix#34",
+        "fix#35",
+        "fix#36",
+        "fix#37"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Outcome changed deferred -> not_settled because the deferral rested on gap 10's unestablished blocker. Timestamps corrected."
+    ]
+  }
+}

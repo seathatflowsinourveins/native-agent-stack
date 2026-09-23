@@ -1,0 +1,111 @@
+{
+ "id": "gap-wave2-20260923/us-equities__market-data-reference/18-rossod4-quantlab-disposition",
+ "gap_index": 18,
+ "layer_id": "market-data-reference",
+ "catalog": "us-equities",
+ "gap_text": "unindexed alternative rossod4/quantlab https://github.com/Rossod4/quantlab",
+ "gap_text_sha256": "9b7b707681cae957cee821c3358b4d2b5d1cfd7785a5203b6e634737f9eb6c7b",
+ "next_check": "Run `gh api repos/Rossod4/quantlab` plus a release, license and activity lookup, review its data-reference scope, and record a catalog disposition.",
+ "preregistration": {
+  "written_at": "2026-09-23T04:22:33Z",
+  "expectation": "Rossod4/quantlab is a small personal project with little activity and no data-reference scope beyond what the catalog already covers; disposition: do not adopt.",
+  "criteria": "settled if repo metadata, releases, license, recent activity and README/tree are retrieved and a disposition recorded; if the repository is missing, record that fact as the disposition evidence.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration.json",
+  "committed_in": "c6846f1"
+ },
+ "fix_round_preregistration": null,
+ "fix_round2_preregistration": null,
+ "fix_round3_preregistration": null,
+ "eol_fix_preregistration": null,
+ "independent_review_round3": null,
+ "independent_review_round2": {
+  "reviewer": "independent Opus review of fe8b66e (findings relayed by the coordinator)",
+  "findings_for_this_gap": "minor: catalog-write standard inconsistent with gap 1 - outcome changed settled -> advanced (ledger write not executed by this unit)"
+ },
+ "independent_review": {
+  "reviewer": "codex exec --sandbox read-only --ephemeral (codex-cli 0.155.1); invocation 1 stalled reading stdin and was stopped without output, invocation 2 (stdin from /dev/null) completed, 62,448 tokens",
+  "output": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/review-codex-round1.txt",
+  "findings_for_this_gap": "none (helpers for this gap were not in the review scope)"
+ },
+ "commands": [
+  "bash blueprints/gap-wave2-20260923/us-equities__market-data-reference/repo_review.sh Rossod4/quantlab evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh",
+  "gh api repos/Rossod4/quantlab/contents/{plans/M01-data-providers.md,pyproject.toml,src/quantlab/data/pit.py}"
+ ],
+ "results": [
+  "repo: 'Bias-free systematic equity research platform (in progress): point-in-time data layer, SEC EDGAR fundamentals, survivorship measurement'; license null and /license 404 (no license file -> all rights reserved); 0 stars, 0 forks; created 2026-08-07, pushed 2026-09-12; single contributor Rossod4 (40 commits); no releases (releases/latest 404), no tags; /readme 404",
+  "data-reference scope (tree + files): src/quantlab/data/{pit.py, corporate_actions.py, adjustment.py, survivorship.py, cache.py, quality.py}, providers {yfinance_prices, edgar_fundamentals, sp500_constituents, norgate_prices (stub)}; pyproject depends on exchange-calendars and yfinance; PITDataContext hard-binds strategy data access to one asof date and filters future-dated rows",
+  "Disposition: not adopted. No license (code cannot be reused), no releases, one contributor, 5 weeks old; its data path relies on yfinance (unofficial Yahoo scraping with unclear redistribution rights) and Wikipedia-style S&P 500 membership, which do not add a qualified data source beyond the catalog's Alpaca/EDGAR/LEAN path. The PITDataContext invariant (single asof-bound accessor that filters future rows) is recorded as a design idea only; overturn: an OSI license plus a native run showing a capability the adopted stack lacks."
+ ],
+ "detection_method": "gh api exit codes and 404 bodies retained (18-gh-*.err) so missing license/README/release are evidence, not silence.",
+ "outcome": "advanced",
+ "evidence_class": "source_review",
+ "limits": [
+  "No install or test run of quantlab (unlicensed; nothing to adopt).",
+  "Outcome advanced, not settled (fix round 2, same standard as gap 1): the next_check's 'record a catalog disposition' arm is not executed. The disposition is drafted in this receipt only; this unit may not edit catalogs/landscape/*.json, so the alternative stays unindexed until the coordinator writes the disposition to the ledger."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-repo.json",
+   "sha256": "40f68d5c2cc2395ed82c5cc5898ce47d605887daf11d093de36155ad3f8f6aeb"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-release-latest.json",
+   "sha256": "d9e37600354c1839f6b22cebde497e9d14750d2401a06c9a51b1619baf991613"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-release-latest.err",
+   "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-releases.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-tags.json",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-license.json",
+   "sha256": "6c0109c2ac75f1f264b61da6aff1737f7bc7eac254e6396710ff81a4139f32b1"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-license.err",
+   "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-commits.json",
+   "sha256": "dffcdf7f1099fe9fb29d289c9a1d5c6e9349cf90caf748664af5092ff945e8ca"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-readme.json",
+   "sha256": "cd06f5cb22929a0bc5fb340149daaab49796a37572df0b2fcb8ac3dfafbae4c9"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-readme.err",
+   "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-tree.json",
+   "sha256": "3ec72bef87aba06e86a12d47d5f2193e04813325c0eeb4c2a24c72585c07c8df"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-contributors.json",
+   "sha256": "601d68a661d3f4ab20ed8693e9813ca4ffc3dca6982815bca6674fc4465a2e4f"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-contents-plans_M01-data-providers.md.json",
+   "sha256": "f32deee373987052c884e0114a43378f359e96946d433f2bcadfb529458a8732"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-contents-pyproject.toml.json",
+   "sha256": "db8adb4ea364eb562d73aba2f5c5fdeabf5d5b3c97efd8f977879139b281a169"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-contents-src_quantlab_data_pit.py.json",
+   "sha256": "0e755b9031c81414483bb377c2b274670cbdab5a1f274fceb517a2a0826611fa"
+  }
+ ],
+ "checked_at": "2026-09-23T04:32:12Z",
+ "checked_at_source": "UTC mtime of the latest raw output the receipt cites (sed path-redaction can postdate the run by seconds)",
+ "host_paths": "host paths are written as $HOME; private Alpaca payloads stay outside the repository"
+}

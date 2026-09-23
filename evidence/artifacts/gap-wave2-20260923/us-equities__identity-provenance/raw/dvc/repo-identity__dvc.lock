@@ -1,0 +1,122 @@
+schema: '2.0'
+stages:
+  id_capture:
+    cmd: mkdir -p data && python stages/stage.py id-capture --code code 
+      --out-dir data/id_capture --out data/id_capture.json
+    deps:
+    - path: code/alpaca-historical/collect.py
+      hash: md5
+      md5: 1532e2c385b7429691841f117bdeb60a
+      size: 25735
+    - path: code/security-identity/plan.json
+      hash: md5
+      md5: 06665971dd05da3693347831b46b4616
+      size: 1627
+    - path: code/security-identity/probe.py
+      hash: md5
+      md5: bca1a26413803d2576786fb549ca970b
+      size: 19108
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: data/id_capture
+      hash: md5
+      md5: d38abd99e192d41172ab73044a1afe75.dir
+      size: 71068
+      nfiles: 19
+    - path: data/id_capture.json
+      hash: md5
+      md5: 5eebd21993a3735962da99a618daf032
+      size: 2196
+  id_quality:
+    cmd: python stages/stage.py id-quality --code code --capture data/id_capture
+      --capture-json data/id_capture.json --out-dir data/id_quality --out 
+      data/id_quality.json
+    deps:
+    - path: code/security-identity/quality.py
+      hash: md5
+      md5: 60afa4c33afc60d6e52bc02a2ebd7028
+      size: 18496
+    - path: data/id_capture
+      hash: md5
+      md5: d38abd99e192d41172ab73044a1afe75.dir
+      size: 71068
+      nfiles: 19
+    - path: data/id_capture.json
+      hash: md5
+      md5: 5eebd21993a3735962da99a618daf032
+      size: 2196
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: data/id_quality
+      hash: md5
+      md5: fbdb85f957fbadd10acfcc69a6d2a1fa.dir
+      size: 158111
+      nfiles: 25
+    - path: data/id_quality.json
+      hash: md5
+      md5: cee0766b2368eaef3abfd8906606f3f7
+      size: 324
+  id_ledger:
+    cmd: python stages/stage.py id-ledger --code code --quality data/id_quality 
+      --quality-json data/id_quality.json --out-dir data/id_ledger --out 
+      data/id_ledger.json
+    deps:
+    - path: code/security-identity/ledger.py
+      hash: md5
+      md5: b757bf85baf7da07afa92604b3487420
+      size: 14979
+    - path: code/security-identity/select.sql
+      hash: md5
+      md5: db7722f7e747703d85679a24d024591b
+      size: 377
+    - path: data/id_quality
+      hash: md5
+      md5: fbdb85f957fbadd10acfcc69a6d2a1fa.dir
+      size: 158111
+      nfiles: 25
+    - path: data/id_quality.json
+      hash: md5
+      md5: cee0766b2368eaef3abfd8906606f3f7
+      size: 324
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: data/id_ledger
+      hash: md5
+      md5: c7dde3d00250d08d00c4c971a73e6adc.dir
+      size: 257051
+      nfiles: 34
+    - path: data/id_ledger.json
+      hash: md5
+      md5: f1d69a7e0523bf3bd57564ebbe1e859a
+      size: 4067
+  id_select:
+    cmd: python stages/stage.py id-select --code code --ledger data/id_ledger 
+      --ledger-json data/id_ledger.json --out out/id_select.json
+    deps:
+    - path: data/id_ledger
+      hash: md5
+      md5: c7dde3d00250d08d00c4c971a73e6adc.dir
+      size: 257051
+      nfiles: 34
+    - path: data/id_ledger.json
+      hash: md5
+      md5: f1d69a7e0523bf3bd57564ebbe1e859a
+      size: 4067
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: out/id_select.json
+      hash: md5
+      md5: c996fd42c190d62954dd9670949a6d18
+      size: 3888

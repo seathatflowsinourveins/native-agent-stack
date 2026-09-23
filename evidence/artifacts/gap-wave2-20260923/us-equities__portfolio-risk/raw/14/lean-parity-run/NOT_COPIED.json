@@ -1,0 +1,41 @@
+{
+  "source": "$HOME/.cache/gap-wave2-20260923/portfolio-risk/lean-parity-attempt1",
+  "reason": "binary or LEAN full result JSON (charts) over 1 MB; kept in the cache",
+  "files": [
+    {
+      "path": "build/WeightScheduleParity.dll",
+      "bytes": 12800,
+      "sha256": "a320288dc396a072f96a5e309cad76dbf361dfa6fc9e4c7493852d376400c47a"
+    },
+    {
+      "path": "control_fee2/hrp_variance/WeightScheduleParityAlgorithm.json",
+      "bytes": 1435702,
+      "sha256": "736d0279c4540f16bc94c7cf792f66d5e6836cf22b44379bd12da07e9711e6be"
+    },
+    {
+      "path": "control_fee2/meanrisk_min_variance/WeightScheduleParityAlgorithm.json",
+      "bytes": 1291447,
+      "sha256": "f03a4693c3a117101badff7de8dc84d3f96faabf3b77dd62d974b49e341dfe6b"
+    },
+    {
+      "path": "dividends/hrp_variance/WeightScheduleParityAlgorithm.json",
+      "bytes": 1439299,
+      "sha256": "311680c6b708b1d67f9d247012cbd0ffc1cb2c3cf15dd5c7e2d51e0cf5444cdb"
+    },
+    {
+      "path": "dividends/meanrisk_min_variance/WeightScheduleParityAlgorithm.json",
+      "bytes": 1287841,
+      "sha256": "c153944aa01d16a141d1454ce2d966d891cfb18a9f3e32df64679cdc839d8a35"
+    },
+    {
+      "path": "no_dividends/hrp_variance/WeightScheduleParityAlgorithm.json",
+      "bytes": 1435921,
+      "sha256": "d25e1ad8f120943aff05c0d211ed35853948987dfa10fa7af961dc390e7dbfd3"
+    },
+    {
+      "path": "no_dividends/meanrisk_min_variance/WeightScheduleParityAlgorithm.json",
+      "bytes": 1291774,
+      "sha256": "0938693cd4b3bfb05a5c915d1cb5a25238974b41f6a1dd08b85398e7c396c4d0"
+    }
+  ]
+}

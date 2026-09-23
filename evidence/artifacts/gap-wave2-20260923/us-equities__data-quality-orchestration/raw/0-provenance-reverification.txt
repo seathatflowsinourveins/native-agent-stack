@@ -1,0 +1,23 @@
+provenance re-verification started 2026-09-23T05:42:46Z (post-hoc: the same files downloaded/used at 05:17-05:22Z)
+09a0326a51db84d02735e53542b9ebd8c4758daf47482a9ab0abce15844e60d5  temporal_cli_1.9.1_linux_amd64.tar.gz
+temporal_cli_1.9.1_linux_amd64.tar.gz: OK
+temporal_cli_1.9.1_linux_amd64.tar.gz 45298806 bytes mtime 2026-09-23 01:16:24.502979003 -0400
+checksums.txt 836 bytes mtime 2026-09-23 01:16:24.722979738 -0400
+temporal 156328098 bytes mtime 2026-09-14 17:42:47.000000000 -0400
+712217694cac9f786a72d4b6c876cd15f3dcf1bf31434d9fed6af25242a327a0  temporal
+temporal version 1.9.1 (Server 1.32.0, UI 2.54.1)
+06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717  dagu_2.16.6_linux_amd64.tar.gz
+dagu_2.16.6_linux_amd64.tar.gz: OK
+dagu_2.16.6_linux_amd64.tar.gz 50466314 bytes mtime 2026-09-23 01:18:35.739900774 -0400
+20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7  x/dagu
+20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7  $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/bin/dagu-2.16.6/dagu
+71cf450a52133823a0719691961396cbf7b78698c947d6489a2c6cbccbdb4d80  $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/bin/dagu-2.17.0/dagu
+2.16.6
+2.17.0
+sota-refresh-20260923 dagu.json records the checksum-verified 2.17.0 extraction sha256 71cf450a52133823a0719691961396cbf7b78698c947d6489a2c6cbccbdb4d80
+modal client version: 1.5.5
+opentelemetry-api                  1.44.0
+opentelemetry-sdk                  1.44.0
+temporalio                         1.33.0
+modal             1.5.5
+finished 2026-09-23T05:42:47Z

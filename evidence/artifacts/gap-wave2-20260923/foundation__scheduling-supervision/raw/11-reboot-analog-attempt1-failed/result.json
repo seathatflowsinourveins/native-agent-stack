@@ -1,0 +1,108 @@
+{
+  "both_oracles_passed": false,
+  "completed_at_utc": "2026-09-23T02:52:51.432606+00:00",
+  "frozen": {
+    "dagu_binary_sha256": "20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7",
+    "inputs": {
+      "codex_cancel_probe.py": "7ca7838a3f41e3388a40197a35bc56744ccb59ca6640bd1328334b0777b6da49",
+      "dagu_common.py": "1ce91e2b253a36611e08f4de5897b889df671aaf4d0735c3111d357c56610d7d",
+      "ns_init.py": "7e3a459eb43da7cf6332f0fa3b2e766bf3f4743993fe67266add77d0aba11ad8",
+      "real_scheduled_recovery.py": "44057b5facf2fefcf598d4d305cebb2d25e427c79845b8df763ed486c30587c8",
+      "real_steps.py": "fe8787054a719222b1a6aeb3570f6cadd665a06e0ba84fdb0c4dd4bd385bc7a7",
+      "reboot_analog.py": "caeea56080d4e3f212e7f13ab3f783825a97229f0bfd813f5b60e875aee7eb79"
+    }
+  },
+  "platform": "Linux 6.18.33.2-microsoft-standard-WSL2",
+  "python_version": "3.12.3",
+  "real_workflow_restart_analog": {
+    "boot1_shutdown": {
+      "orderly_seconds": 0.05,
+      "pids_at_shutdown": [
+        2,
+        20,
+        21,
+        22
+      ],
+      "pids_left_for_kernel_kill": [],
+      "shutdown_requested": true,
+      "start_exit": 0,
+      "start_exit_before_shutdown": null
+    },
+    "boot2_service": null,
+    "boot_identities": [
+      {
+        "at": 1790131965.9975455,
+        "boot_token": "97f265dcfac7ef49",
+        "phase": "boot1",
+        "pid_in_namespace": 1,
+        "pid_namespace": "pid:[4026532246]"
+      },
+      {
+        "at": 1790131971.3925216,
+        "boot_token": "8a51434035b165d3",
+        "phase": "boot2",
+        "pid_in_namespace": 1,
+        "pid_namespace": "pid:[4026532246]"
+      }
+    ],
+    "checks": {
+      "after_retry_succeeded_same_run_id": false,
+      "boot1_processes_retired": true,
+      "boot2_retry_exit_zero": false,
+      "boot_identity_changed": false,
+      "checkpoint_unchanged_count_one": false,
+      "ecosystem_equals_reference": false,
+      "no_completed_effect_before_boot2": true,
+      "running_before_shutdown": true,
+      "status_after_shutdown": "aborted",
+      "validate_equals_reference": false
+    },
+    "command_exit_codes": {
+      "history-after-boot2": 0,
+      "history-after-shutdown": 0,
+      "history-before-shutdown": 0,
+      "validate": 0,
+      "version": 0
+    },
+    "native_attempts": [
+      {
+        "attempt_dir": "a_20260923_025246_025Z_7e5bc9",
+        "status": 3,
+        "triggerType": 2
+      }
+    ],
+    "reference": {
+      "ecosystem": "{\"bytes\": 12918618, \"sha256\": \"693c295e2e2e6d7d20443ecd0ef3e18d8404450f1687c0e0ff7933019b1da66e\", \"status\": \"passed\"}",
+      "validate": "{\"components\": 69, \"hashed_files\": 2012, \"profiles\": 4, \"receipts\": 140, \"status\": \"passed\"}"
+    },
+    "run_id": "realboot-07593aa5c2353d0f",
+    "snapshot": {
+      "archive_sha256": "25dd92d1ebef69c44ebbd396485778ff47a4d5c9418c7bb9368289478d4340aa",
+      "commit": "41d39b3"
+    },
+    "status": "failed",
+    "timeline_utc": {
+      "boot1_exited": "2026-09-23T02:52:51.340490+00:00",
+      "boot2_exited": "2026-09-23T02:52:51.403997+00:00",
+      "finalize_ready": "2026-09-23T02:52:51.185536+00:00",
+      "shutdown_requested": "2026-09-23T02:52:51.226661+00:00"
+    }
+  },
+  "started_at_utc": "2026-09-23T02:51:41.129294+00:00",
+  "upstream_retry_tests": {
+    "archive_sha256": "8f4b1095a88bb037b582f8b5e337360b1702879f1abb9cfc319643ef1a775746",
+    "command": "go test -count=1 -run '^TestRetryCommand($|_)' -timeout 12m -v ./internal/cmd",
+    "exit_code": 0,
+    "fail_records": 0,
+    "final_line": "ok  \tgithub.com/dagucloud/dagu/v2/internal/cmd\t6.630s",
+    "go_version": "go version go1.27.0 linux/amd64",
+    "report_sha256": "977c36affdfc930b076bbaafc6fb058031c5358597df6534fd761149fb7cf01b",
+    "seconds": 56.6,
+    "skip_records": 0,
+    "source_files": 3261,
+    "source_revision": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+    "source_unchanged": true,
+    "subtest_pass": 12,
+    "top_level_pass": 3
+  }
+}

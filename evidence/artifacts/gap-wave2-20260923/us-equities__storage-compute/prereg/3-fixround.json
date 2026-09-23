@@ -1,0 +1,9 @@
+{
+  "gap_index": 3,
+  "written_at": "2026-09-23T05:52:16Z",
+  "round": 2,
+  "label": "fix-round (late relative to round 1, written before round 2)",
+  "expectation": "Round 2 reruns all four stores with the same dataset and phases, and replaces the aggregate query digests with full canonical Q2/Q3/Q4 result rows compared across stores (exact for keys and integer counts, relative tolerance 1e-9 for floats). Expected: every store's full results agree with DuckDB; load and phase numbers stay within the same order of magnitude as round 1.",
+  "criteria": "settled if round 2 completes for all four stores and the full-row comparison passes; advanced if any store's full results disagree or any phase is missing.",
+  "note": "Fix-round preregistration, written after round 1 and the Codex gpt-6-astra read-only review of a0f57fa, before any round-2 command ran."
+}

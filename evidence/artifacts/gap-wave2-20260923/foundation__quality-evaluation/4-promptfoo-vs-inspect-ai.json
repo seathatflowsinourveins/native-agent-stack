@@ -1,0 +1,42 @@
+{
+ "id": "foundation__quality-evaluation__gap4",
+ "gap_index": 4,
+ "gap_text_sha256": "28e3c42cda20d62dd59b0e3e8c7420aa4114ea122a5db8827c62ed8de8f96e44",
+ "preregistration": {
+  "written_at": "2026-09-23T02:42:37Z",
+  "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+  "expectation": "In a fresh prefix with inspect-ai==0.3.268 and mlflow==3.16.1 pinned at install, the same frozen cases.json (sha256 checked) run through promptfoo and inspect gives identical per-case predictions (30/30 agreement) and 26/30 for both; runtime is recorded for both; token usage is recorded for both from the endpoint's billed_units, from each harness's own usage fields, and from vLLM prompt_tokens_total snapshots.",
+  "criteria": "pinned install command; per-case agreement table; wall-clock runtime per harness; harness-reported token fields quoted (including zero/empty); vLLM metric deltas with a quiet control interval; Inspect log retained as JSON.",
+  "committed_in": "ebf6ac1 (preregistrations-fixround.json), before any fix-round command"
+ },
+ "original_round_preregistration": {
+  "written_at": null,
+  "note": "Round 1 recorded written_at 2026-09-23T02:00:00Z, a value reconstructed after its runs (raw-output mtimes and eval ids precede it). It is labelled late and superseded; the round-1 artifacts are at commit b37df23."
+ },
+ "commands": [
+  "UV_CACHE_DIR=$HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/uv-cache ecosystem-bounded-run bash -c \"uv venv --python 3.12 .../fixround/pinned-venv && uv pip install --python .../fixround/pinned-venv/bin/python 'inspect-ai==0.3.268' 'mlflow==3.16.1' 'openai' 'jsonschema'\"",
+  "bash blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_g0_g4_g7.sh $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/g047 $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/g047-out $HOME/.cache/gap-wave2-20260923/quality-evaluation/promptfoo-heldout/cases.json $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/upstream4 $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/pinned-venv"
+ ],
+ "results": {
+  "pinned_install": "inspect-ai==0.3.268, mlflow==3.16.1 pinned in the install command; 'Resolved 141 packages ... Installed 141 packages' into a new venv (g4-g9-pinned-install.log)",
+  "same_frozen_cases": "both harnesses read cases.json sha256 124e29b0... through the same heldout_common.load_cases (seed-42 shuffle)",
+  "scores": "promptfoo 26/30 (86.67%); Inspect accuracy 0.867 (inspect-heldout.stdout)",
+  "per_case_agreement": "30/30 identical predictions; the same 4 failures, case-07/09/13/24 (per-case-agreement.json)",
+  "runtime": "wall clock: promptfoo 12728 ms, Inspect 4219 ms (*.wall_ms); promptfoo durationMs 1560; Inspect 'total time: 0:00:02'",
+  "token_usage": {
+   "promptfoo_harness": "stats.tokenUsage total 2040, numRequests 30 (from the provider's billed_units)",
+   "inspect_harness": "stats.model_usage {} (no Inspect model provider involved); per-sample billed_input_tokens in score metadata sums to 2040",
+   "endpoint_meter": "vllm:prompt_tokens_total +2040 during each harness window; +0 over both 15 s quiet control intervals (vllm-metrics.txt)"
+  },
+  "cost": "neither harness reports a monetary cost for the local endpoint (promptfoo cost 0 placeholder)"
+ },
+ "outcome": "settled",
+ "evidence_class": "local_integration",
+ "limits": "Both harnesses ran the same custom embedding-retrieval scorer, not each tool's own LLM-graded workflow, so this compares harness mechanics on identical inputs, not grader quality. Inspect's native usage field is empty because no Inspect model provider was used; its token figure comes from task-recorded endpoint metadata. Wall-clock includes harness start-up. The round-1 comparison used an unpinned install and only aggregate scores; it is superseded. Fix-round-2 note: both harnesses used the single-request call without input_type; with the model card's call the same 30 cases score 30/30 (gap 0), so 26/30 reflects that call, not model quality. The harness comparison stands because both harnesses shared the call.",
+ "checked_at": "2026-09-23T02:48:49Z",
+ "artifacts": [
+  "support/fixround/g4-g9-pinned-install.log",
+  "support/fixround/g0-g4-g7/{per-case-agreement.json,inspect-logs/*,inspect-heldout.*,pf-heldout*,vllm-metrics.txt}",
+  "blueprints/gap-wave2-20260923/foundation__quality-evaluation/{inspect_heldout_task.py,heldout_common.py}"
+ ]
+}

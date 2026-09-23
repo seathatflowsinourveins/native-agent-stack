@@ -1,0 +1,23 @@
+receivers:
+  otlp:
+    protocols: {grpc: {endpoint: 127.0.0.1:34317}, http: {endpoint: 127.0.0.1:34318}}
+  filelog:
+    include: ["$HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1/dagu/logs/**/*.out", "$HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1/dagu/logs/**/*.err"]
+    start_at: beginning
+    include_file_path: true
+connectors:
+  spanmetrics: {metrics_flush_interval: 2s}
+exporters:
+  prometheusremotewrite: {endpoint: "http://127.0.0.1:39090/api/v1/write"}
+  otlphttp/loki: {logs_endpoint: "http://127.0.0.1:33100/otlp/v1/logs", tls: {insecure: true}}
+  debug: {verbosity: basic}
+processors:
+  batch: {timeout: 1s}
+  resource/dagulogs:
+    attributes: [{key: service.name, value: dagu-obsgap-20260923, action: upsert}]
+service:
+  telemetry: {metrics: {level: none}}
+  pipelines:
+    traces: {receivers: [otlp], processors: [batch], exporters: [spanmetrics, debug]}
+    metrics: {receivers: [otlp, spanmetrics], processors: [batch], exporters: [prometheusremotewrite]}
+    logs: {receivers: [filelog], processors: [resource/dagulogs, batch], exporters: [otlphttp/loki]}

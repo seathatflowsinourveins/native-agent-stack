@@ -1,0 +1,13 @@
+{
+ "gap_index": 7,
+ "slug": "winner-readiness-today",
+ "written_at": "2026-09-23T07:23:05Z",
+ "written_before_results": true,
+ "expectation": "Today's native readiness can be re-observed for codex-native-sdk (model list + account/rateLimits/read via the SDK inspect path, then one real task), SocratiCode (index + search in a disposable Qdrant), and native memory_status through Codex MCP and Claude MCP clients pointed at an isolated ai-memory 2.3.2 server (the live server is out of bounds).",
+ "criteria": [
+  "Record UTC timestamps, client/tool versions and every quota/readiness error verbatim.",
+  "memory_status must return from each MCP client (Codex via url MCP registration override, Claude via one bounded claude -p call with --strict-mcp-config).",
+  "desktop-direct-rag.json date: derive from git history (first commit date) and state that it is a commit date, not an execution date.",
+  "settled only if all four observations complete today; live-store readiness itself is not re-observed (isolation rule), which is stated as a limit."
+ ]
+}

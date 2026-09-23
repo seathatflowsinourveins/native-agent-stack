@@ -1,0 +1,4 @@
+time=2026-09-22T23:27:53.811-04:00 level=INFO msg="Dag-run retry initiated" dag=recovery run-id=recovery-9b635241c9f95a5a step=finalize file=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f2-dagu-sched-1790134073/dagu/stop-retry/dagu-home/logs/recovery/dag-run_20260923_032753Z_recovery-9b635241c9f95a5a/dag-run_20260922.232753.523.recovery.log
+time=2026-09-22T23:27:53.825-04:00 level=INFO msg="DAG run retry started" dag=recovery run-id=recovery-9b635241c9f95a5a worker-id=local attempt-id=73d614 retry-target-attempt-id=8a784e
+time=2026-09-22T23:27:53.826-04:00 level=INFO msg="Step started" dag=recovery run-id=recovery-9b635241c9f95a5a worker-id=local attempt-id=73d614 step=finalize
+time=2026-09-22T23:27:53.887-04:00 level=INFO msg="DAG run finished" dag=recovery run-id=recovery-9b635241c9f95a5a worker-id=local attempt-id=73d614 status=succeeded started-at=2026-09-22T23:27:53-04:00 finished-at=2026-09-22T23:27:53-04:00

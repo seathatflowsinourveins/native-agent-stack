@@ -1,0 +1,82 @@
+{
+ "spec_sha256": "94b2b03220a2687e2d06d05dc12292c0841a34dea573b5c8787ce28a106dc2c6",
+ "fixture_sha256": "4f606a21fa10ccc8a6fd9209204baefdc004a985d040321dcd67a973920dd9b7",
+ "runs": [
+  {
+   "run": "control-1",
+   "arm": "control",
+   "exit": 0,
+   "duration_s": 140.3,
+   "parse": "ok",
+   "model": "gpt-6-astra",
+   "last_message_sha256": "19908d571f470a99d64221ab70a28ce7920d651aef7e8f4b314af0011def3056",
+   "detected": {
+    "D1": true,
+    "D2": true,
+    "D3": true,
+    "D4": true,
+    "D5": true
+   },
+   "detected_count": 5,
+   "findings": 14,
+   "out_of_range": 7
+  },
+  {
+   "run": "skill-1",
+   "arm": "skill",
+   "exit": 0,
+   "duration_s": 192.4,
+   "parse": "ok",
+   "model": "gpt-6-astra",
+   "last_message_sha256": "4af784a2808f9cb6bb5b4b4113020f0a86fac1d5da2b3debeb7d7cd814aab9ed",
+   "detected": {
+    "D1": true,
+    "D2": true,
+    "D3": true,
+    "D4": true,
+    "D5": true
+   },
+   "detected_count": 5,
+   "findings": 11,
+   "out_of_range": 4
+  },
+  {
+   "run": "control-2",
+   "arm": "control",
+   "exit": 0,
+   "duration_s": 121.2,
+   "parse": "ok",
+   "model": "gpt-6-astra",
+   "last_message_sha256": "0894d94f53cab6a199577bd9877337b3b135a32df30d0916e819c50008bfd7a1",
+   "detected": {
+    "D1": true,
+    "D2": true,
+    "D3": true,
+    "D4": true,
+    "D5": true
+   },
+   "detected_count": 5,
+   "findings": 14,
+   "out_of_range": 6
+  },
+  {
+   "run": "skill-2",
+   "arm": "skill",
+   "exit": 0,
+   "duration_s": 147.0,
+   "parse": "ok",
+   "model": "gpt-6-astra",
+   "last_message_sha256": "fce5f8c3d4782eba9a3612896c70131db6e115394b938f31c6b61e47a11d1ac7",
+   "detected": {
+    "D1": true,
+    "D2": true,
+    "D3": true,
+    "D4": true,
+    "D5": true
+   },
+   "detected_count": 5,
+   "findings": 13,
+   "out_of_range": 6
+  }
+ ]
+}

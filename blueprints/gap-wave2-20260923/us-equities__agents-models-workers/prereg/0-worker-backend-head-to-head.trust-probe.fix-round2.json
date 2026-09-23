@@ -1,0 +1,15 @@
+{"gap_index": 0, "written_at": "2026-09-23T16:17:16Z", "written_before_results": true,
+ "label": "fix-round-2 preregistration, written after the second independent review; covers only the trust-persistence probe, not the gap-0 arms",
+ "reason": "Review: the DeerFlow/codex-acp arm left [projects.\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/runs/g0-deerflow/runtime/acp-workspace\"] trust_level = \"trusted\" in the shared $HOME/.codex/config.toml; the receipt called the writer undetermined.",
+ "source_facts_before_probe": [
+  "codex-acp 1.12.0 dist/index.js createSessionConfig() merges projects: {<each session root>: {trust_level: 'trusted'}} into the session config.",
+  "The committed redacted adapter log line 30 shows that config sent in thread/start to the native codex 0.155.1 app-server with CODEX_HOME=$HOME/.codex.",
+  "$HOME/.codex/config.toml mtime 07:28:59Z lies in the arm window; the 2026-09-19 DeerFlow run left the same kind of entry for its own acp-workspace."],
+ "arms": {
+  "T1 override": "Isolated CODEX_HOME (empty temp dir under the unit cache), native codex 0.155.1 'app-server' over stdio: initialize, initialized, thread/start with config.projects={ws: {trust_level: trusted}} and cwd=ws; no turn/start (no inference). Then read the temp config.toml.",
+  "T0 control": "Same with no projects key in thread/start config."},
+ "expectation": "T1 writes a [projects.\"<ws>\"] trust_level = \"trusted\" table to the temp config.toml; T0 does not. That would identify the app-server's handling of the codex-acp session-config trust override as the writer.",
+ "criteria": [
+  "Detection method: byte comparison of the temp CODEX_HOME config.toml before/after each arm (absent before); the control arm shows the probe does not report a write that thread/start makes unconditionally.",
+  "No credential is read or copied; the temp CODEX_HOME has no auth, so thread/start may fail. If it fails before any write, the mechanism stays inferred from source and the result is reported as inconclusive, not as proof.",
+  "The live $HOME/.codex/config.toml is not edited by this unit; removal of the stale entry is the coordinator's decision."]}

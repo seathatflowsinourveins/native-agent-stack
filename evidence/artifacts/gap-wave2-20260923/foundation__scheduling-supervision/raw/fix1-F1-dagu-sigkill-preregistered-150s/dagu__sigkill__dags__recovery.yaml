@@ -1,0 +1,10 @@
+type: graph
+timeout_sec: 600
+max_active_runs: 1
+working_dir: "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f1-dagu-prereg-1790134073/dagu/sigkill"
+steps:
+  - id: checkpoint
+    run: "/usr/bin/python3 -B $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f1-dagu-prereg-1790134073/dagu/sigkill/fixture.py checkpoint $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f1-dagu-prereg-1790134073/dagu/sigkill"
+  - id: finalize
+    depends: [checkpoint]
+    run: "/usr/bin/python3 -B $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f1-dagu-prereg-1790134073/dagu/sigkill/fixture.py finalize $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f1-dagu-prereg-1790134073/dagu/sigkill"

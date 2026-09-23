@@ -1,0 +1,244 @@
+Cache is disabled.
+Starting evaluation eval-Jjb-2026-09-23T12:47:28
+Running 30 test cases (up to 1 at a time)...
+
+[90m┌────────────────────────────────────────[39m[90m┬────────────────────────────────────────[39m[90m┬────────────────────────────────────────┐[39m
+[90m│[39m[1m[34m payload                                [39m[22m[90m│[39m[1m[34m label                                  [39m[22m[90m│[39m[1m[34m [Nemotron-3-Embed-1B, model-card       [39m[22m[90m│[39m
+[90m│[39m[1m[34m                                        [39m[22m[90m│[39m[1m[34m                                        [39m[22m[90m│[39m[1m[34m input_type query/document] {{payload}} [39m[22m[90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The nearest train      [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m station is two blocks north of the     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m main office.","Our return policy       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m allows refunds within 30 days of       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m purchase.","Photosynthesis converts    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m sunlight into chemical energy in       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m plants.","To reset your password,      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m click For...                           [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["A standard chess board [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m has 64 squares.","Shakespeare wrote    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Hamlet in the early 1600s.","Water     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m boils at 100 degrees Celsius (212      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Fahrenheit) at sea level atmospheric   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m pressure.","The capital of Australia   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m is Canberra, not Sydney."],"q...       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The Great Wall of      [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m China is visible from space is a       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m common myth.","Bees communicate        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m through a waggle dance.","Mount        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Everest is the tallest mountain above  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m sea level.","Go to Account Settings,   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m select Billing, and click Cancel       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Subscrip...                            [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The stock market       [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m closes at 4pm Eastern time on          [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m weekdays.","Dogs have a much stronger  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m sense of smell than humans.","Rainbows [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m form when sunlight is refracted,       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m reflected, and dispersed by water      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m droplets in the atmosphere.","The      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m French...                              [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The human heart has    [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m four chambers.","Volcanoes form at     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m tectonic plate boundaries.","The       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Olympics are held every four           [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m years.","Open printer settings, select [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Add Printer, choose the wireless       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m network printer, and confirm the       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m connectio...                           [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Jupiter is the largest [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m planet in our solar system.","A leap   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m year occurs every four years to keep   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m the calendar aligned.","The Eiffel     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Tower was completed in 1889.","Health  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m guidelines generally recommend about 2 [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m to 3 liters of water p...              [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Sharks have existed    [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m for hundreds of millions of            [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m years.","The Amazon rainforest         [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m produces a large share of Earth's      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m oxygen.","Multiply the Celsius         [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m temperature by 9/5 and then add 32 to  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m get Fahrenheit.","The speed of light   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m is approxima...                        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Penguins are           [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m flightless birds found mostly in the   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Southern Hemisphere.","Coral reefs     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m support a quarter of all marine        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m species.","Contact the airline         [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m immediately for rebooking, check       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m refund eligibility, and request        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m compensation docum...                  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Compound interest is   [90m│[39m 0                                      [90m│[39m [PASS] pred=0                          [90m│[39m
+[90m│[39m calculated on the initial principal    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m plus previously accumulated interest,  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m growing balances over time.","The      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Pacific Ocean is the largest ocean on  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Earth.","Elephants are the largest     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m living land animals.","Vincen...       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Antarctica is the      [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m coldest continent on Earth.","The      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m printing press was invented by         [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Gutenberg around 1440.","File Form     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m 4868 with the IRS before the original  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m deadline to receive an automatic       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m six-month extension.","The human body  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m has ...                                [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Honey never spoils if  [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m stored properly.","The Sahara is the   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m largest hot desert in the world.","The [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Titanic sank in 1912 after hitting an  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m iceberg.","Go to Security Settings,    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m enable Two-Factor Authentication, and  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m link an authenticator...               [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The Berlin Wall fell   [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m in 1989.","Octopuses have three hearts [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m and blue blood.","The Statue of        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Liberty was a gift from France to the  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m United States.","Weather describes     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m short-term atmospheric conditions,     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m while climate describes long-te...     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Tokyo is the most      [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m populous metropolitan area in the      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m world.","The Nile is often cited as    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m the longest river in the world.","Add  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m insulation, seal air leaks, upgrade to [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m energy-efficient windows, and use      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m programmable thermostats.","Ches...    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Saturn's rings are     [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m made mostly of ice and rock            [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m particles.","The Louvre in Paris is    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m the world's most visited museum.","The [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Wright brothers achieved powered       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m flight in 1903.","Common symptoms      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m include thirst, dark urine, fatigue,   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m dizzi...                               [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Install a cloud        [90m│[39m 0                                      [90m│[39m [PASS] pred=0                          [90m│[39m
+[90m│[39m storage app, sign in, select folders   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m to sync, and enable automatic          [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m backup.","The blue whale is the        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m largest animal to have ever            [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m existed.","Coffee is one of the most   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m traded commodities in the world.","The [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Magna Carta ...                        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The Colosseum in Rome  [90m│[39m 1                                      [90m│[39m [PASS] pred=1                          [90m│[39m
+[90m│[39m could hold tens of thousands of        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m spectators.","Blot the stain, apply    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m cold water and salt or a stain         [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m remover, then wash as usual before it  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m dries.","Beethoven composed nine       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m symphonies.","The moon causes tides    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m thr...                                 [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The Andes is the       [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m longest mountain range in the          [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m world.","The first modern Olympics     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m were held in Athens in                 [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m 1896.","Peacocks are known for their   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m colorful tail feathers.","Hybrid cars  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m combine a gasoline engine with an      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m electric motor, u...                   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Giraffes have the same [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m number of neck vertebrae as            [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m humans.","Leonardo da Vinci painted    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m the Mona Lisa in the early             [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m 1500s.","Turn off electricity to the   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m area, remove water with a pump, and    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m identify and fix the source of the     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m leak.","T...                           [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The Suez Canal         [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m connects the Mediterranean and Red     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Seas.","Mozart began composing music   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m at a very young age.","The Grand       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Canyon was carved by the Colorado      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m River over millions of                 [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m years.","Vaccines train the immune     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m system to recognize...                 [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Connect positive to    [90m│[39m 0                                      [90m│[39m [PASS] pred=0                          [90m│[39m
+[90m│[39m positive, then negative to an          [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m unpainted metal surface on the dead    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m car, avoiding sparks near the          [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m battery.","The kangaroo is native to   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Australia and known for hopping.","The [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Panama Canal opened to shipping        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m traffic...                             [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Place the egg in       [90m│[39m 0                                      [90m│[39m [PASS] pred=0                          [90m│[39m
+[90m│[39m water; a fresh egg sinks and lies      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m flat, while a bad egg floats due to    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m gas buildup.","Wolves live and hunt in [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m coordinated packs.","The Berlin        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Marathon is one of the six World       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Marathon Majors.","The Hubble Space    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Tele...                                [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Trim the stems and     [90m│[39m 0                                      [90m│[39m [PASS] pred=0                          [90m│[39m
+[90m│[39m place basil in a glass of water at     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m room temperature, away from direct     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m sunlight.","Tennis originated in       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m France before spreading to             [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m England.","Roman aqueducts transported [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m water across long distances.","The     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Andromed...                            [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The Sistine Chapel     [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m ceiling was painted by                 [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Michelangelo.","The Trans-Siberian     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Railway is one of the longest railway  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m lines in the world.","Antibiotics are  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m ineffective against viral              [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m infections.","Divide your weight in    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m kilograms by you...                    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The Ottoman Empire     [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m lasted for several centuries.","Maple  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m syrup is primarily produced in Canada  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m and the northeastern US.","A firewall  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m monitors and controls incoming and     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m outgoing network traffic based on      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m security rules to block unaut...       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Origami is the         [90m│[39m 1                                      [90m│[39m [PASS] pred=1                          [90m│[39m
+[90m│[39m traditional Japanese art of paper      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m folding.","Do light aerobic activity   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m followed by dynamic stretches          [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m targeting the legs and hips before     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m racing.","The Amazon River discharges  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m more water than any other river.","The [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Ber...                                 [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m└────────────────────────────────────────[39m[90m┴────────────────────────────────────────[39m[90m┴────────────────────────────────────────┘[39m
+... 5 more rows not shown ...
+
+✓ Eval complete (ID: eval-Jjb-2026-09-23T12:47:28)
+
+» View results: promptfoo view
+» Share with your team: https://promptfoo.app
+» Feedback: https://promptfoo.dev/feedback
+
+Total Tokens: 2,432
+  Provider: 2,432 (2,432 prompt)
+
+Results:
+  ✓ 30 passed (100%)
+  0 failed (0%)
+  0 errors (0%)
+Duration: 3s (concurrency: 1)
+
+Writing output to $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/g0/easy/typed-results.json

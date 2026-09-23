@@ -1,0 +1,43 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 browser/ledger.spec.ts:4:5 › create and update a recorded run through the production UI (6.2s)
+
+
+  1) browser/ledger.spec.ts:4:5 › create and update a recorded run through the production UI ───────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByTestId('run-row').filter({ has: getByRole('heading', { name: 'Release acceptance <uuid-redacted>', exact: true }) })
+    Expected substring: "Revision 2 · 2 recorded changes"
+    Received string:    "Release acceptance <uuid-redacted>Revision 2 · 1 recorded changesStatus for Release acceptance <uuid-redacted>plannedrunningpassedfailed"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByTestId('run-row').filter({ has: getByRole('heading', { name: 'Release acceptance <uuid-redacted>', exact: true }) }) with timeout 5000ms
+      - waiting for getByTestId('run-row').filter({ has: getByRole('heading', { name: 'Release acceptance <uuid-redacted>', exact: true }) })
+        14 × locator resolved to <li data-testid="run-row">…</li>
+           - unexpected value "Release acceptance <uuid-redacted>Revision 2 · 1 recorded changesStatus for Release acceptance <uuid-redacted>plannedrunningpassedfailed"
+
+
+      14 |   await expect(row).toContainText('Revision 1 · 1 recorded changes');
+      15 |   await row.getByRole('combobox').selectOption('passed');
+    > 16 |   await expect(row).toContainText('Revision 2 · 2 recorded changes');
+         |                     ^
+      17 |   await page.reload();
+      18 |   await expect(row.getByRole('combobox')).toHaveValue('passed');
+      19 |   await expect(row).toContainText('Revision 2 · 2 recorded changes');
+        at $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/app/application-delivery/browser/ledger.spec.ts:16:21
+
+    Error Context: test-results/ledger-create-and-update-a-c37b5-n-through-the-production-UI/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ledger-create-and-update-a-c37b5-n-through-the-production-UI/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/ledger-create-and-update-a-c37b5-n-through-the-production-UI/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    browser/ledger.spec.ts:4:5 › create and update a recorded run through the production UI ────────

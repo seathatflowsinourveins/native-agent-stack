@@ -1,0 +1,12 @@
+{
+ "gap_index": 6,
+ "slug": "ai-memory-pin-and-features",
+ "written_at": "2026-09-23T07:23:05Z",
+ "written_before_results": true,
+ "expectation": "The v2.4.0 install, isolated lifecycle and status provider lines are already recorded by sota-refresh-20260923/pins-mem/ai-memory.json (merged in #87); upstream tests were not run there. This unit will check the 2.4.0 CLI surface for briefing, consolidation and backfill commands against an isolated data dir only, and will not edit catalog pin text (catalog ledgers are out of bounds for this unit).",
+ "criteria": [
+  "Cite the sota-refresh receipt for install/lifecycle/status.",
+  "Any 2.4.0 command runs only with --data-dir under this unit's cache and AI_MEMORY_SERVER_URL set to an isolated loopback server.",
+  "Outcome at most advanced: upstream test suite and catalog pin correction remain."
+ ]
+}

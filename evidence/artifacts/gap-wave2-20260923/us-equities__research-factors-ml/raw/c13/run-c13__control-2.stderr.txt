@@ -1,0 +1,185 @@
+OpenAI Codex v0.155.1
+--------
+workdir: $HOME/.cache/gap-wave2-20260923/research-factors-ml/c13-work
+model: gpt-6-astra
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: ultra
+reasoning summaries: none
+session id: <uuid-redacted>
+--------
+user
+You are reviewing a Python backtest for methodological defects that would make its reported results misleading. Read the file momentum_backtest.py (line-numbered below). Report every defect you find. Output ONLY a JSON array; each element is {"line": <int line number where the defect is most directly located>, "category": <one of ["look_ahead", "survivorship", "transaction_costs", "in_sample_selection", "overfitting_multiple_testing", "label_leakage_cv", "data_quality", "risk_metric_error", "position_sizing", "other"]>, "explanation": <one sentence>}. Do not run any commands.
+
+momentum_backtest.py:
+  1  """Daily cross-sectional momentum backtest for US large caps (review fixture)."""
+  2  import itertools
+  3  
+  4  import numpy as np
+  5  import pandas as pd
+  6  
+  7  
+  8  def load_prices(path):
+  9      prices = pd.read_csv(path, index_col=0, parse_dates=True)
+ 10      prices = prices.sort_index()
+ 11      if prices.index.has_duplicates:
+ 12          raise ValueError("duplicate session")
+ 13      return prices
+ 14  
+ 15  
+ 16  def load_universe(path):
+ 17      # Tickers that are in the S&P 500 as of the download date (2026-09-01).
+ 18      members = pd.read_csv(path)
+ 19      return sorted(members["ticker"].unique())
+ 20  
+ 21  
+ 22  def momentum_signal(prices, lookback):
+ 23      score = prices / prices.shift(lookback) - 1
+ 24      ranks = score.rank(axis=1, ascending=False)
+ 25      return (ranks <= 10).astype(float) / 10
+ 26  
+ 27  
+ 28  def forward_labels(prices, horizon):
+ 29      return prices.shift(-horizon) / prices - 1
+ 30  
+ 31  
+ 32  def run_backtest(prices, lookback):
+ 33      weights = momentum_signal(prices, lookback)
+ 34      daily_returns = prices.pct_change()
+ 35      strategy = (weights * daily_returns).sum(axis=1)
+ 36      return strategy
+ 37  
+ 38  
+ 39  def sharpe(returns):
+ 40      returns = returns.dropna()
+ 41      if returns.std() == 0:
+ 42          return 0.0
+ 43      return float(np.sqrt(252) * returns.mean() / returns.std())
+ 44  
+ 45  
+ 46  def max_drawdown(returns):
+ 47      equity = (1 + returns.fillna(0)).cumprod()
+ 48      peak = equity.cummax()
+ 49      return float((equity / peak - 1).min())
+ 50  
+ 51  
+ 52  def train_classifier(prices, horizon=20):
+ 53      from sklearn.linear_model import LogisticRegression
+ 54      from sklearn.model_selection import KFold
+ 55      features = prices.pct_change(5).stack().to_frame("ret5")
+ 56      labels = (forward_labels(prices, horizon).stack() > 0).astype(int)
+ 57      frame = features.join(labels.rename("up")).dropna()
+ 58      scores = []
+ 59      for train, test in KFold(n_splits=5, shuffle=True, random_state=0).split(frame):
+ 60          model = LogisticRegression().fit(frame.iloc[train][["ret5"]], frame.iloc[train]["up"])
+ 61          scores.append(model.score(frame.iloc[test][["ret5"]], frame.iloc[test]["up"]))
+ 62      return float(np.mean(scores))
+ 63  
+ 64  
+ 65  def main(price_path, universe_path):
+ 66      prices = load_prices(price_path)
+ 67      universe = load_universe(universe_path)
+ 68      prices = prices[[t for t in universe if t in prices.columns]]
+ 69      results = {}
+ 70      for lookback in [20, 60, 120, 250]:
+ 71          results[lookback] = sharpe(run_backtest(prices, lookback))
+ 72      best = max(results, key=results.get)
+ 73      oos = run_backtest(prices, best)
+ 74      print("best lookback", best)
+ 75      print("out-of-sample sharpe", sharpe(oos))
+ 76      print("max drawdown", max_drawdown(oos))
+ 77      print("classifier accuracy", train_classifier(prices))
+ 78  
+ 79  
+ 80  if __name__ == "__main__":
+ 81      import sys
+ 82      main(sys.argv[1], sys.argv[2])
+
+hook: SessionStart
+hook: SessionStart
+hook: SessionStart Completed
+hook: SessionStart Completed
+hook: UserPromptSubmit
+hook: UserPromptSubmit
+hook: UserPromptSubmit Completed
+hook: UserPromptSubmit Completed
+codex
+[
+  {
+    "line": 17,
+    "category": "survivorship",
+    "explanation": "Using the September 2026 constituent list throughout history excludes former constituents and includes future entrants before their admission, biasing the historical universe."
+  },
+  {
+    "line": 25,
+    "category": "position_sizing",
+    "explanation": "Average ranks can admit more than ten tied securities, so assigning each a 10% weight can create unintended leverage."
+  },
+  {
+    "line": 25,
+    "category": "risk_metric_error",
+    "explanation": "Unavailable lookback signals become zero positions, causing reported Sharpe ratios to include different amounts of artificial warm-up cash history for different lookbacks."
+  },
+  {
+    "line": 35,
+    "category": "look_ahead",
+    "explanation": "Weights calculated using the current session's closing price are applied to returns ending at that same close, crediting the strategy with returns earned before its signal was available."
+  },
+  {
+    "line": 35,
+    "category": "transaction_costs",
+    "explanation": "The daily rebalanced portfolio incurs no commissions, bid-ask spread, slippage, or market impact, overstating implementable returns."
+  },
+  {
+    "line": 35,
+    "category": "data_quality",
+    "explanation": "Summation skips missing returns and produces zero for wholly missing rows, silently treating unavailable returns as zero contributions instead of resolving missing quotes or delisting outcomes."
+  },
+  {
+    "line": 42,
+    "category": "risk_metric_error",
+    "explanation": "Returning zero whenever volatility is zero misrepresents undefined or infinite Sharpe ratios, including those of constant nonzero returns."
+  },
+  {
+    "line": 43,
+    "category": "risk_metric_error",
+    "explanation": "The reported Sharpe uses raw returns rather than excess returns, implicitly assuming a zero risk-free rate throughout the sample."
+  },
+  {
+    "line": 48,
+    "category": "risk_metric_error",
+    "explanation": "The running peak excludes initial capital before the first return, so drawdowns beginning with an initial loss can be understated."
+  },
+  {
+    "line": 59,
+    "category": "label_leakage_cv",
+    "explanation": "Shuffled cross-validation trains on future observations when evaluating earlier observations, so accuracy does not measure chronological forecasting performance."
+  },
+  {
+    "line": 59,
+    "category": "label_leakage_cv",
+    "explanation": "Splitting individual stock-date rows without date grouping or purging places contemporaneous observations and overlapping forward-label periods in both training and test sets."
+  },
+  {
+    "line": 68,
+    "category": "survivorship",
+    "explanation": "Silently excluding universe members without price columns introduces an additional data-availability selection bias that can remove failed or delisted securities."
+  },
+  {
+    "line": 72,
+    "category": "overfitting_multiple_testing",
+    "explanation": "Selecting the maximum Sharpe across four tested lookbacks and reporting the winner without independent evaluation introduces selection optimism."
+  },
+  {
+    "line": 73,
+    "category": "in_sample_selection",
+    "explanation": "The purported out-of-sample backtest reuses the exact price history used to select its lookback, leaving no held-out performance evaluation."
+  }
+]
+hook: Stop
+hook: Stop
+hook: Stop Completed
+hook: Stop Completed
+tokens used
+11,970

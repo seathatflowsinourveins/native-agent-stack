@@ -1,0 +1,67 @@
+[
+  {
+    "line": 17,
+    "category": "survivorship",
+    "explanation": "Using September 2026 index constituents throughout historical testing excludes former constituents and includes stocks before their actual admission, introducing survivorship and future-membership bias."
+  },
+  {
+    "line": 25,
+    "category": "position_sizing",
+    "explanation": "Dividing selections by ten without resolving ranking ties or checking the number of eligible stocks can produce unintended cash allocations or exposure exceeding 100%."
+  },
+  {
+    "line": 34,
+    "category": "data_quality",
+    "explanation": "On pandas versions whose pct_change default forward-fills missing prices, this call and the classifier's equivalent call manufacture stale-price returns instead of preserving missing observations."
+  },
+  {
+    "line": 35,
+    "category": "look_ahead",
+    "explanation": "Weights calculated using today's closing price receive today's close-to-close return, allowing information from the completed return interval to determine exposure to that interval."
+  },
+  {
+    "line": 35,
+    "category": "transaction_costs",
+    "explanation": "Portfolio returns omit commissions, spreads, slippage and market impact despite the turnover required to maintain the daily target weights."
+  },
+  {
+    "line": 35,
+    "category": "data_quality",
+    "explanation": "Summation silently skips missing asset returns and produces zero for entirely missing rows, concealing unavailable valuations without an explicit missing-price or delisting policy."
+  },
+  {
+    "line": 43,
+    "category": "risk_metric_error",
+    "explanation": "The reported Sharpe ratio uses raw returns without subtracting risk-free returns or declaring a zero-rate assumption, overstating excess-return performance when cash yields are positive."
+  },
+  {
+    "line": 48,
+    "category": "risk_metric_error",
+    "explanation": "The running peak excludes initial capital, so a loss on the first return observation understates drawdown, although the current strategy's initial zero-return warm-up masks this defect."
+  },
+  {
+    "line": 59,
+    "category": "label_leakage_cv",
+    "explanation": "Shuffling stacked stock-date observations trains on future observations relative to validation dates and splits individual sessions across folds, invalidating the score as a chronological forecasting assessment."
+  },
+  {
+    "line": 59,
+    "category": "label_leakage_cv",
+    "explanation": "Training observations are not purged when their forward-label intervals overlap validation intervals, allowing shared future outcomes across folds to contaminate validation."
+  },
+  {
+    "line": 68,
+    "category": "data_quality",
+    "explanation": "Silently excluding universe members absent from the price file makes coverage depend on data availability and can hide nonrandom omissions that bias performance."
+  },
+  {
+    "line": 72,
+    "category": "overfitting_multiple_testing",
+    "explanation": "Selecting the largest historical Sharpe across four lookbacks without accounting for the search makes the winning estimate optimistically biased."
+  },
+  {
+    "line": 73,
+    "category": "in_sample_selection",
+    "explanation": "The purported out-of-sample evaluation reuses the entire price history used to select the winning lookback, providing no independent validation."
+  }
+]

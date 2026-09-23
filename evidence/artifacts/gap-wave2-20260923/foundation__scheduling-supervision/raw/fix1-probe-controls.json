@@ -1,0 +1,35 @@
+{
+  "listener_positive": {
+    "control_port": 57640,
+    "detected": true,
+    "rows": [
+      "LISTEN 0 1 127.0.0.1:57640 0.0.0.0:* users:((\"python3\",pid=2797814,fd=3))"
+    ]
+  },
+  "listener_negative": {
+    "pid": 2797818,
+    "rows": []
+  },
+  "codex_matcher_positive": {
+    "argv": [
+      "codex",
+      "exec",
+      "-F"
+    ],
+    "counted": true
+  },
+  "codex_matcher_negative_wrapper": {
+    "argv": [
+      "timeout",
+      "30",
+      "codex",
+      "exec",
+      "-F"
+    ],
+    "counted": false
+  },
+  "other_real_codex_exec_now": 1,
+  "all_controls_behaved": true,
+  "ran_at": "2026-09-22T23:32:16.903279-04:00",
+  "pid": 2797814
+}

@@ -1,0 +1,3 @@
+./g2k2166b-kill/dag-runs/2026/09/23/dag-run_20260923_052618Z_g2k2166b-kill-1/a_20260923_052618_304Z_5f76b3/status.jsonl: status 2 attemptId 5f76b3 startedAt 2026-09-23T01:26:18-04:00 finishedAt 2026-09-23T01:30:10-04:00 [('step1', 2), ('step2', 2)]
+./g2k2166b-kill/dag-runs/2026/09/23/dag-run_20260923_052618Z_g2k2166b-kill-1/a_20260923_053011_057Z_b421b7/status.jsonl: status 4 attemptId b421b7 startedAt 2026-09-23T01:30:11-04:00 finishedAt 2026-09-23T01:30:31-04:00 [('step1', 4), ('step2', 4)]
+# stored status codes, checked against this unit's hosting-check records: 2 failed, 3 aborted, 4 succeeded

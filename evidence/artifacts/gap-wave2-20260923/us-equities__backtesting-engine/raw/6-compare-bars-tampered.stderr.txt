@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "$HOME/code/nas-wt-g2-backtesting-engine/blueprints/us-equities/engine-nautilus/spy-parity/compare.py", line 492, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "$HOME/code/nas-wt-g2-backtesting-engine/blueprints/us-equities/engine-nautilus/spy-parity/compare.py", line 475, in main
+    bars = load_bars(args.bars, args.lean_data, receipt, manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/code/nas-wt-g2-backtesting-engine/blueprints/us-equities/engine-nautilus/spy-parity/compare.py", line 133, in load_bars
+    raise ValueError("converted_rows_sha256_mismatch")
+ValueError: converted_rows_sha256_mismatch

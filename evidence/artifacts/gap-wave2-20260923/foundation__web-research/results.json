@@ -1,0 +1,30 @@
+{
+ "0": {
+  "outcome": "advanced",
+  "receipt": "0-agent-browser-vs-playwright-cli.json"
+ },
+ "1": {
+  "outcome": "settled",
+  "receipt": "1-agent-browser-fixture-version-uname.json"
+ },
+ "2": {
+  "outcome": "advanced",
+  "receipt": "2-session-recovery-and-site-compat.json"
+ },
+ "3": {
+  "outcome": "deferred",
+  "receipt": "3-tavily-target-hit-rate.json"
+ },
+ "4": {
+  "outcome": "deferred",
+  "receipt": "4-tavily-gold-labelled-benchmark.json"
+ },
+ "5": {
+  "outcome": "advanced",
+  "receipt": "5-openresearch-discovery-and-currency.json"
+ },
+ "6": {
+  "outcome": "advanced",
+  "receipt": "6-crawl4ai-browseruse-fixture.json"
+ }
+}

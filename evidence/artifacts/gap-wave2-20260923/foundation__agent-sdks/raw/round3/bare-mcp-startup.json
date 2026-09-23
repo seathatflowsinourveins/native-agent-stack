@@ -1,0 +1,27 @@
+{
+  "model_inference_submitted": false,
+  "startup_status": [
+    {
+      "error": null,
+      "failureReason": null,
+      "name": "openai-api-key-local-confirmation",
+      "status": "starting",
+      "threadId": "redacted-id:334d84bc1390c7b4"
+    },
+    {
+      "error": null,
+      "failureReason": null,
+      "name": "openai-api-key-local-confirmation",
+      "status": "ready",
+      "threadId": "redacted-id:334d84bc1390c7b4"
+    }
+  ],
+  "global_methods": [
+    "mcpServer/startupStatus/updated",
+    "remoteControl/status/changed",
+    "thread/started"
+  ],
+  "mcp_status_after_thread_start": [
+    "openai-api-key-local-confirmation"
+  ]
+}

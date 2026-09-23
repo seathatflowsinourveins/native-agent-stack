@@ -1,0 +1,38 @@
+{
+ "0": {
+  "outcome": "settled",
+  "receipt": "0-promptfoo-heldout-30case.json"
+ },
+ "1": {
+  "outcome": "settled",
+  "receipt": "1-playwright-upstream-todomvc.json"
+ },
+ "2": {
+  "outcome": "settled",
+  "receipt": "2-mutation-catch-three-winners.json"
+ },
+ "3": {
+  "outcome": "settled",
+  "receipt": "3-shellcheck-difft-content-assert.json"
+ },
+ "4": {
+  "outcome": "settled",
+  "receipt": "4-promptfoo-vs-inspect-ai.json"
+ },
+ "5": {
+  "outcome": "advanced",
+  "receipt": "5-typesafe-c4-expansion.json"
+ },
+ "7": {
+  "outcome": "advanced",
+  "receipt": "7-independent-queries-tokenusage.json"
+ },
+ "9": {
+  "outcome": "advanced",
+  "receipt": "9-inspect-mlflow-local-vllm.json"
+ },
+ "10": {
+  "outcome": "advanced",
+  "receipt": "10-typesafe-c4-agreement.json"
+ }
+}

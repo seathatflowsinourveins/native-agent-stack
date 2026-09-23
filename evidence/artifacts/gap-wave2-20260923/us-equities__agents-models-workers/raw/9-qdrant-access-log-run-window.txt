@@ -1,0 +1,8 @@
+2026-09-23T07:35:57.509676Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/g2amw_codebase_780df9a835e7 HTTP/1.1" 200 556 "-" "qdrant-js/1.18.0" 0.000607
+2026-09-23T07:35:57.762505Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/g2amw_codebase_780df9a835e7/points/query HTTP/1.1" 200 5948 "-" "qdrant-js/1.18.0" 0.004434
+2026-09-23T07:36:28.447633Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/g2amw_codebase_780df9a835e7 HTTP/1.1" 200 557 "-" "qdrant-js/1.18.0" 0.000529
+2026-09-23T07:36:28.642300Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/g2amw_codebase_780df9a835e7/points/query HTTP/1.1" 200 5457 "-" "qdrant-js/1.18.0" 0.001989
+2026-09-23T07:36:36.006812Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/g2amw_codebase_780df9a835e7 HTTP/1.1" 200 554 "-" "qdrant-js/1.18.0" 0.000534
+2026-09-23T07:36:36.161906Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/g2amw_codebase_780df9a835e7/points/query HTTP/1.1" 200 6659 "-" "qdrant-js/1.18.0" 0.001763
+2026-09-23T07:36:36.165804Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/g2amw_codebase_780df9a835e7 HTTP/1.1" 200 554 "-" "qdrant-js/1.18.0" 0.000507
+2026-09-23T07:36:36.286421Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/g2amw_codebase_780df9a835e7/points/query HTTP/1.1" 200 5719 "-" "qdrant-js/1.18.0" 0.001448

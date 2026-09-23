@@ -1,0 +1,189 @@
+{
+  "id": "gap-wave2-20260923-foundation-observation-inference-3",
+  "gap_index": 3,
+  "gap_text_sha256": "75590ce7afdd5b26059f48a8099f880ddc52737083ce0638a22838bc0f4a94e6",
+  "gap_text": "Missing task attribution: the Prometheus counters before the task already held another Claude process's usage, so only the after-snapshot match per category is established (native-telemetry-resolution.md lines 47-49; telemetry-resolution-20260921.json line 344).",
+  "next_check": "Rerun the usage reconciliation with no other Claude process active (or filter the counters by session.id), capturing before and after snapshots so that the task delta per category can be attributed.",
+  "arms": [
+    {
+      "arm": "rerun the usage reconciliation with no other Claude process active (or filter the counters by session.id)",
+      "status": "executed",
+      "detail": "isolated collector that only the child exported to, plus a session.id side pipeline"
+    },
+    {
+      "arm": "capture before and after snapshots",
+      "status": "executed",
+      "detail": "before empty (0 series); after equals native usage"
+    },
+    {
+      "arm": "attribute the task delta per category",
+      "status": "executed",
+      "detail": "all four categories"
+    },
+    {
+      "arm": "preregistered extra: probe the live pipeline for leaked export of the child",
+      "status": "executed (fix round, read-only)",
+      "detail": "session.id detector had no detection power (live Loki has no session_id field); a late token-signature detector found 0 child events among 621 live api_request events"
+    },
+    {
+      "arm": "preregistered 02:46:44Z: query live Prometheus read-only for the child (fresh-series check)",
+      "status": "not run in rounds 1-2 (undisclosed until fix round 3); executed in fix round 3, preregistered detector failed its positive control",
+      "detail": "series-with-samples detector: haiku series 28 (cumulative counters from earlier haiku use keep being scraped, so this cannot isolate the child), exact-name control 'claude-opus-5-5' 0 (live label is 'claude-opus-5-5[1m]')"
+    },
+    {
+      "arm": "fix round 3: positive control for the Loki signature matcher",
+      "status": "executed",
+      "detail": "known live event signature matched 1; child signature matched 0 of 621"
+    }
+  ],
+  "preregistration": {
+    "written_at": "2026-09-23T02:46:44Z",
+    "expectation": "With an isolated collector/Prometheus pair receiving telemetry only from the single child Claude process, the before snapshot will be empty and the after-minus-before delta per category will equal the native result usage; an attribution side pipeline will show exactly one session.id equal to the --session-id passed to the child.",
+    "criteria": "Pass = before snapshot has no ecosystem_claude_code_token_usage_tokens_total series; after snapshot per type equals the child's stream-json usage; the attribution file shows only the child's session.id. Live Prometheus is queried read-only for that session's absence as a leak detector (the repo pipeline strips session.id, so detection there uses a fresh-series check limited to what is observable).",
+    "late": false,
+    "committed_in": "1a59606 (2026-09-23T02:46:44Z, before any check ran)",
+    "fix_round_outcome_rule": "Fix-round criterion: child-session hits == 0 AND positive-control hits > 0, otherwise gap 3 stays advanced. Positive-control hits were 0, so the outcome is advanced.",
+    "fix_round_late_note": "The signature detector in live_session_probe.py was added after the preregistered session_id detector returned 0 hits for its positive control (03:29:36Z); it ran at 03:30:01Z.",
+    "fix_round": {
+      "written_at": "2026-09-23T03:28:46Z",
+      "label": "fix-round preregistration (after the independent Codex review in raw/review-codex-round1.txt), written before the fix-round runs",
+      "expectation": "A read-only query of the live Loki (no writes) for the child session.id over 02:53-02:56Z returns no entries, while the same query for this worker's own session.id in the same window returns entries (positive control that the live logs pipeline keeps session.id and the query can detect export).",
+      "criteria": "child-session hit count == 0 and positive-control hit count > 0; otherwise gap 3 stays advanced.",
+      "committed_in": "the commit 'Record the Codex review and preregister the fix round' (2026-09-23T03:28:46Z, before the fix-round runs)"
+    },
+    "fix_round_3": {
+      "expectation": "Read-only GETs to the live stores show no sign of the child (02:54:02-02:54:39Z) in the live pipeline, and both detectors now demonstrate detection power: (a) live Prometheus (127.0.0.1:19090) has no ecosystem_claude_code token-usage series with a haiku model sampled in 02:50-03:05Z, while the same query for model claude-opus-5-5 returns samples (positive control); (b) the Loki api_request signature matcher in live_session_probe.py, given the field values of a known live api_request event from the same window (deterministic choice: the stream whose first entry is earliest), returns >= 1 match (positive control), while the child signature returns 0.",
+      "criteria": "Pass = (a) haiku series with samples in window == 0 AND opus control > 0, AND (b) control-signature matches >= 1 AND child-signature matches == 0. Pass closes the item left open by the earlier round (a live-leak probe with demonstrated detection power, preregistered before it runs) and gap 3 becomes settled; any failure or a positive control of 0 keeps it advanced; haiku samples in window from other live sessions = inconclusive, advanced. Disclosed: the child-signature Loki result (0 of 621) was already observed at 03:30:01Z; only the positive-control arm and the Prometheus arm are new. The originally preregistered live-Prometheus check (02:46:44Z) was not run in earlier rounds; this is its first execution.",
+      "written_at": "2026-09-23T14:15:26Z",
+      "label": "fix-round-3 preregistration (after the independent Opus review of 2026-09-23), written before any fix-round-3 run; real UTC time from the writer process",
+      "committed_in": "929154c (2026-09-23T14:15:26Z, before any fix-round-3 run)"
+    }
+  },
+  "commands": [
+    "cd $HOME/code/nas-wt-g2-observation-inference && python3 blueprints/gap-wave2-20260923/foundation__observation-inference/reconcile_usage.py --out evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-reconcile-usage.json",
+    "child (inside the script): claude -p --output-format stream-json --verbose --max-turns 1 --model haiku --tools  --setting-sources local --settings <settings JSON: env above + disableAllHooks> --strict-mcp-config --mcp-config {\"mcpServers\":{}} --session-id <child-claude-session-id> --no-session-persistence -- Reply with exactly the two characters OK and nothing else.  [env -i; cwd = fresh temp dir; OTLP env pointed at the isolated collector]",
+    "cd $HOME/code/nas-wt-g2-observation-inference && python3 blueprints/gap-wave2-20260923/foundation__observation-inference/reconcile_usage.py --evaluate evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-reconcile-usage.json   (fix round: strict verdict applied to the retained result; no model call)",
+    "cd $HOME/code/nas-wt-g2-observation-inference && timeout 300 python3 blueprints/gap-wave2-20260923/foundation__observation-inference/live_probe_fr3.py --start 2026-09-23T02:50:00Z --end 2026-09-23T03:00:00Z --prom-end 2026-09-23T03:05:00Z --child-signature '{\"model\": \"claude-haiku-4-5-20251001\", \"input_tokens\": 10, \"output_tokens\": 99, \"cache_creation_tokens\": 6575, \"cache_read_tokens\": 0}' > evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/3-fr3-live-probe.json   (fix round 3, 14:17:22Z, exit 1; read-only GETs to live Prometheus 127.0.0.1:19090 and Loki 127.0.0.1:13100)",
+    "cd $HOME/code/nas-wt-g2-observation-inference && timeout 300 python3 blueprints/gap-wave2-20260923/foundation__observation-inference/live_probe_fr3_posthoc.py --start 2026-09-23T02:50:00Z --end 2026-09-23T03:05:00Z > evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/3-fr3-live-prom-posthoc-detail.txt   (POST-HOC, not preregistered, 14:18:08Z; an earlier counts-only invocation of the same script at 14:17:44Z was superseded by this version and not kept)",
+    "cd $HOME/code/nas-wt-g2-observation-inference && python3 blueprints/gap-wave2-20260923/foundation__observation-inference/live_session_probe.py --child <child-claude-session-id> --control <this worker's session id> --start 2026-09-23T02:50:00Z --end 2026-09-23T03:00:00Z --signature '{\"model\": \"claude-haiku-4-5-20251001\", \"input_tokens\": 10, \"output_tokens\": 99, \"cache_creation_tokens\": 6575, \"cache_read_tokens\": 0}'   (read-only GETs to the live Loki; first invocation without --signature at 03:29:36Z also retained)"
+  ],
+  "results": [
+    "before snapshot: {} (series count 0); no ecosystem_claude_code_* series before the task",
+    "input: before='absent', after=10.0, delta=10.0, native_result_usage=10, equal=True",
+    "output: before='absent', after=99.0, delta=99.0, native_result_usage=99, equal=True",
+    "cacheRead: before='absent', after=0.0, delta=0.0, native_result_usage=0, equal=True",
+    "cacheCreation: before='absent', after=6575.0, delta=6575.0, native_result_usage=6575, equal=True",
+    "attribution side pipeline distinct session.id values: ['<child-claude-session-id>']; only the child's: True; stream-json init session_id matched: True",
+    "Loki events carrying that session.id (isolated Loki): {\"api_request\": 1, \"assistant_response\": 1, \"managed_settings_resolved\": 1, \"plugin_loaded\": 2, \"user_prompt\": 1}",
+    "live Loki probe: session_id query hits child=0, positive control=0 (no detection power: live records carry no session_id field, see field list in raw/3-live-loki-probe.txt)",
+    "live Loki probe, signature detector: live_api_request_events_in_window=621 (models {'claude-sonnet-5': 369, 'claude-opus-5-5': 252}), live_events_matching_child_signature=0; its key signature_detection_demonstrated=true only means events were returned (see raw/3-live-loki-probe.annotation.txt)",
+    "fix round 3, live Prometheus (preregistered): {\"ecosystem_claude_code_token_usage_tokens_total\": {\"status\": \"success\", \"series_with_samples_by_model\": {\"claude-opus-5-5[1m]\": 112, \"claude-sonnet-5\": 64, \"claude-haiku-4-5-20251001\": 28}}}; haiku_series_with_samples=28, control_opus_series_with_samples=0, detection_demonstrated=False",
+    "fix round 3, live Loki matcher positive control: control_signature={\"model\": \"claude-opus-5-5\", \"input_tokens\": \"2\", \"output_tokens\": \"5\", \"cache_creation_tokens\": \"2212\", \"cache_read_tokens\": \"26654\"} matches=1; child matches=0; pass=False",
+    "POST-HOC live Prometheus change check (not preregistered): haiku series changed in window=2 (delta {\"input\": 118692.0, \"output\": 4518.0}), first seen in window=4; opus[1m] control changed=23; haiku series whose value or window delta equals the child's (10 input / 99 output / 6575 cacheCreation): 0"
+  ],
+  "outcome": "advanced",
+  "note": "With telemetry routed to an isolated collector that only this child exported to, the before snapshot was empty and the per-category delta equals the task usage; a side pipeline saw one session.id, the child's. Outcome stays advanced under the fix-round preregistered rule: the preregistered live-leak detector (session_id) returned 0 hits for its positive control, so it had no detection power. Fix round 3 ran the live-Prometheus leak check preregistered at 02:46:44Z, which rounds 1-2 had not run or disclosed, and a positive control for the Loki signature matcher. The Loki matcher now has demonstrated detection power (a known live event matched 1; the child 0 of 621). The preregistered Prometheus detector failed: its exact-name control returned 0 because the live label is claude-opus-5-5[1m], and counting series with samples cannot separate the child from older cumulative haiku counters (28 series). The fix-round-3 pass rule therefore keeps gap 3 advanced. A post-hoc change check found haiku counters that moved in the window only on another live instance (auxiliary query source), plus four unscoped auxiliary haiku series first sampled at 02:50:00Z, before the child started at 02:54:02Z (values 917/12/0/0). None has a value or window delta equal to the child's usage. Remaining: a live-Prometheus change/new-series detector with a correct control label, preregistered before it runs. Side finding: live Loki records in that window carried no session_id field, so live logs, like live metrics, cannot be attributed per task.",
+  "evidence_class": "native_proven",
+  "limits": [
+    "One bounded native Claude call (haiku, one turn, no tools, no MCP, hooks disabled, user settings not loaded); total_cost_usd reported 0.013655.",
+    "The child still loaded the built-in plugins ['agents-md@builtin', 'telemetry@builtin'] and 18 skills (raw/1-3-child-init-summary.json); no user-installed plugins, hooks or MCP servers.",
+    "Isolated collector/Prometheus/Loki with the repository collector.yaml; the live exporter configuration in user settings was not exercised.",
+    "The child created an empty auto-memory project directory under ~/.claude/projects for its temp cwd; it held 0 files and was removed after the run.",
+    "Publication redaction: the child session UUID is replaced by <child-claude-session-id> in committed files (repository validator rule); equality checks were computed on the unredacted private output before redaction.",
+    "The strict verdict (result-usage equality, empty before snapshot, only the child session.id) was added to the script after the run, on review; it was applied to the retained result and to two tampered copies (both rejected), with no second model call.",
+    "The preregistered live detector (session_id) had no detection power; the token-signature detector was designed after that result (late). It would miss a child event whose token fields were altered in transit.",
+    "Fix round 3: the child-signature Loki result (0 of 621) was already known at 03:30:01Z; only its positive control and the Prometheus arm were new. The post-hoc Prometheus change check is descriptive and was designed after seeing the preregistered detector fail; it does not change the outcome.",
+    "The live Prometheus and Loki were queried with read-only GETs only; the live instance id in the post-hoc output is replaced by <live-instance-id>.",
+    "Attribution is by isolation plus session.id; the live pipeline cannot attribute per task (metrics strip session.id; live logs lack it)."
+  ],
+  "checked_at": "2026-09-23T14:18:08Z",
+  "independent_review": {
+    "round1": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+    "round2": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt",
+    "round3_opus": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-opus-round3.json"
+  },
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-reconcile-usage.json",
+      "sha256": "bc88ee98609a4d147944b71d238292a04555bb97601f98aabda20e87ed3ba52a"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-reconcile-usage.stdout.txt",
+      "sha256": "a037a8a3643783a35e87d5d98dd146c64ab8d8602dafe68c914013f497401085"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-reconcile-usage.exit.txt",
+      "sha256": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-reconcile-verdict.txt",
+      "sha256": "5dbc4b24e91017e6afd5198defd07a2a69034f0e29bbed2f17c7e9cf425808ff"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-child-init-summary.json",
+      "sha256": "12ddc5a8deb62cec93cfb00869279d8ea88ab71f938dab48489022fb87b65ca4"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/3-live-loki-probe.txt",
+      "sha256": "7e9ccc51d846b59b58fac24062bea6c72dcb6251f89f280a5fd7a8bcb5fbf186"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/3-live-loki-probe.annotation.txt",
+      "sha256": "c3fa243daeb877f45f79ffe6e1e17c16f9e2f074f6665de55f27dc54e164ce78"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/3-fr3-live-probe.json",
+      "sha256": "1e1f48945fea32984a9039e2a236ab9f5213cfedd55e4d58564adb5724583b98"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/3-fr3-live-probe.started.txt",
+      "sha256": "01ded309bf8924fd92f7ef1a73424f395338cf5d6cb297a8658ab00060f9f135"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/3-fr3-live-probe.exit.txt",
+      "sha256": "4403fc9730bff91f5abc3beb77111c66e20a01f3dd5c8d87cd85e519f3a52fce"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/3-fr3-live-probe.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/3-fr3-live-prom-posthoc-detail.txt",
+      "sha256": "ae59bcd5ed3cbbc1ae5ba51cd5850bc7e624e695791185bdff0b104324c89dcc"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+      "sha256": "ad7cc8072536345565f1a9ad0ca6688e80b71c6d5ea0eacfc765479718b31ee8"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt",
+      "sha256": "a1cc543a79e7f621f9ce7d338b3d36d15ba88ee5297b3dd2b49e299ffa91c15b"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-opus-round3.json",
+      "sha256": "ecfd0de7932e22eb07f706399761f4bdba8053d19909f3a1f88059e5c375f9e9"
+    }
+  ],
+  "helper_scripts": [
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/isostack.py",
+      "sha256": "0fe3cb2014d707aef0d0dfeafa4e2175a43ee44a78da31906ee6f04b0e3ee9e9"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/reconcile_usage.py",
+      "sha256": "5de0b1982f50a854f6ada00257e00b90bfa3168a5f6466014508484b0c407289"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/live_session_probe.py",
+      "sha256": "406b5de6f1a08599d0d3ac051bdac84b415b81ace3e3ed7a06dee19d57d80e77"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/live_probe_fr3.py",
+      "sha256": "b1b7171bb95b6f3a56c5f7342657c6048e26854a1b416efe8072f7ec171c8563"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/live_probe_fr3_posthoc.py",
+      "sha256": "b88778b5afacea59b98e43da6a8b9e211d94dcb6d2874fe2d185a5c21e611157"
+    }
+  ]
+}

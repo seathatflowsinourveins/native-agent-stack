@@ -1,0 +1,110 @@
+{
+  "started_at": "2026-09-23T04:38:29Z",
+  "worker_sha256": "084f82399cf4104996488210440581c7759a6d5a05d2b6abe202b8789cdba74f",
+  "slot_checks": [
+    {
+      "at": "2026-09-23T04:38:29Z",
+      "real_codex_exec": 1
+    },
+    {
+      "at": "2026-09-23T04:38:49Z",
+      "real_codex_exec": 1
+    }
+  ],
+  "t1": {
+    "exit_code": 0,
+    "seconds": 19.89,
+    "stdout": "{\"status\": \"completed\", \"model_inference_submitted\": true, \"observation_status\": \"not_configured\"}\n",
+    "stderr_tail_lines": 0
+  },
+  "t2": {
+    "exit_code": 0,
+    "seconds": 4.5,
+    "stdout": "{\"status\": \"completed\", \"model_inference_submitted\": true, \"observation_status\": \"not_configured\"}\n",
+    "stderr_tail_lines": 0
+  },
+  "side_effects": {
+    "context-mode": {
+      "added": [
+        "sessions/7189e576128969a3__7189e576.db-shm",
+        "sessions/7189e576128969a3__7189e576.db-wal"
+      ],
+      "removed": [],
+      "changed": [
+        "sessions/028c193dfec1d953__028c193d.db-shm",
+        "sessions/0aeb5caf49c0d576__0aeb5caf.db-shm",
+        "sessions/0e789e8ce9c7c1e8__0e789e8c.db-shm",
+        "sessions/0e7bdfc035ad6d17.db-shm",
+        "sessions/10448b3085788302__10448b30.db-shm",
+        "sessions/1431dd8cbe3e23d0__1431dd8c.db-shm",
+        "sessions/15f70e6bfd0282bb__15f70e6b.db",
+        "sessions/15f70e6bfd0282bb__15f70e6b.db-shm",
+        "sessions/15f70e6bfd0282bb__15f70e6b.db-wal",
+        "sessions/1a15719d4c7ffef6__1a15719d.db-shm",
+        "sessions/1b1c33a73394883f__1b1c33a7.db-shm",
+        "sessions/30f5c9489cb07f65__30f5c948.db-shm",
+        "sessions/3a2682bfb072cb24__3a2682bf.db-shm",
+        "sessions/413e6c367aca4e5a__413e6c36.db-shm",
+        "sessions/4abddaf1cc0e501a__4abddaf1.db-shm",
+        "sessions/4e23565888f3d8cf.db-shm",
+        "sessions/5420458c0c755bed__5420458c.db-shm",
+        "sessions/548956aa0c4ea15c__548956aa.db-shm",
+        "sessions/56633a7e630d4f5b.db-shm",
+        "sessions/576151073a778255.db-shm",
+        "sessions/58a3cbec10df1d37__58a3cbec.db-shm",
+        "sessions/5f19bade0a098cc1.db-shm",
+        "sessions/65a262c30a51d28f__65a262c3.db-shm",
+        "sessions/676688c859aa5a34__676688c8.db-shm",
+        "sessions/6893d703d87108e1__6893d703.db-shm",
+        "sessions/6ce921d3a291b486__6ce921d3.db-shm",
+        "sessions/6ea1fd54779f1c24__6ea1fd54.db-shm",
+        "sessions/72cfa87c5abf3ac5.db-shm",
+        "sessions/73151dd13ccaab64.db-shm",
+        "sessions/7323e2e4cdbaff64__7323e2e4.db-shm",
+        "sessions/7b9b1d464a2f4040.db-shm",
+        "sessions/82758c5e71c478de__82758c5e.db-shm",
+        "sessions/87c73930bd046f25.db-shm",
+        "sessions/8c031cbbbc4b1044.db-shm",
+        "sessions/95a885fcb6e0bbb9__95a885fc.db-shm",
+        "sessions/adf5c01616e86c96.db-shm",
+        "sessions/b213d4e4485c71c2__b213d4e4.db-shm",
+        "sessions/b81c5faace65c1d6__b81c5faa.db-shm",
+        "sessions/bae117664d21d4a2__bae11766.db-shm",
+        "sessions/c7ad58f51a19ea3d.db-shm",
+        "sessions/ca1d739591cce3d0__ca1d7395.db-shm",
+        "sessions/ccfb60b5b9bba96f__ccfb60b5.db-shm",
+        "sessions/d519b9f1e0b4f11f.db-shm",
+        "sessions/d762e3b70f7ea65b.db-shm",
+        "sessions/d794e78a6a1f8014__d794e78a.db-shm",
+        "sessions/e277e272288a8a22__e277e272.db-shm",
+        "sessions/e74b10fa750d775a.db-shm",
+        "sessions/e9671acd244849c5.db-shm",
+        "sessions/eb87a0dc9ad939f2__eb87a0dc.db-shm",
+        "sessions/f3e3d6df545a2b17.db-shm",
+        "sessions/f538cd0439cc99b4__f538cd04.db-shm",
+        "sessions/fcdc07301927c7cb__fcdc0730.db-shm",
+        "sessions/stats-pid-1224272.json",
+        "sessions/stats-pid-1707499.json",
+        "sessions/stats-pid-2194330.json",
+        "sessions/stats-pid-2525925.json",
+        "sessions/stats-pid-2621277.json",
+        "sessions/stats-pid-2908173.json",
+        "sessions/stats-pid-3812245.json"
+      ]
+    },
+    "sessions": {
+      "added": [
+        "2026/09/23/rollout-2026-09-23T00-38-30-redacted-id:92d6ac9147cf5fb6.jsonl"
+      ],
+      "removed": [],
+      "changed": [
+        "2026/09/23/rollout-2026-09-23T00-36-33-redacted-id:0981fea4c6677d5a.jsonl",
+        "2026/09/23/rollout-2026-09-23T00-37-08-redacted-id:522fd5db52d5ec67.jsonl"
+      ]
+    }
+  },
+  "own_rollout_files": 1,
+  "t2_prompt_contains_value": false,
+  "t2_final_matches_t1_value": true,
+  "finished_at": "2026-09-23T04:38:53Z"
+}

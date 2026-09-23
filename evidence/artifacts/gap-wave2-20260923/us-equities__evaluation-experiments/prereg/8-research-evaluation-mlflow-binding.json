@@ -1,0 +1,16 @@
+{
+  "gap_index": 8,
+  "slug": "research-evaluation-mlflow-binding",
+  "gap_text_sha256": "f52679ff2d826b229c8a09cf091f9dc7d8e5a71bd421ccb1f9645a625457bc73",
+  "next_check": "Run tests/test_research_evaluation.py's evaluation under a local MLflow tracking store, log params, metrics and dataset hashes, then read the run back with `mlflow.search_runs` to verify the binding.",
+  "preregistration": {
+    "written_at": "2026-09-23T07:18:31Z",
+    "expectation": "The unchanged research-evaluation/evaluate.py runs in its hash-locked skfolio 1.2.9 venv inside an MLflow 3.16.1 run on a temp sqlite tracking store; params (plan fields), metrics (reserved-candidate means, fold count, ledger records) and dataset hashes (9 input sha256 via mlflow.log_input and tags) are logged; mlflow.search_runs reads them back equal to results.json. The replay is expected to reproduce the 2026-09-19 receipt (20 folds, 21 selections, 6,605 ledger records, reserved selection momentum20, ledger sha256 08ea5309...). The 12 focused unit tests pass.",
+    "criteria": [
+      "python3 -m unittest tests/test_research_evaluation.py passes 12 tests.",
+      "Runner exit 0; results compared with blueprints/us-equities/research-evaluation/receipt.json.",
+      "mlflow.search_runs returns exactly one run with every logged param/metric equal to the source values; dataset inputs read back via MlflowClient.get_run with the 9 digests.",
+      "A negative probe: a changed metric in results.json must be reported as a mismatch by the same readback comparison (detection method)."
+    ]
+  }
+}

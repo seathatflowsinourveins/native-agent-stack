@@ -1,0 +1,7 @@
+{
+  "gap_index": 4,
+  "written_at": "2026-09-23T05:15:15Z",
+  "expectation": "The real Alpaca SIP daily snapshots written by the merged #84 ingest (24 symbols x 20 sessions = 480 rows each) pass all 12 named checks of the pinned promotion gate (pandera 0.33.1) in a freshly built isolated venv, and each gate result's input_sha256 equals the ingest receipt's snapshot_sha256. Detection control: a copy of the real snapshot with one row's high set below its close and one duplicated (symbol, session) row fails high_ge_max_open_close and unique_symbol_session. Supplementary real-data arm: LEAN's bundled AlgoSeek daily bars for 5 symbols over the last 252 sessions (2020-04 to 2021-03) also pass; the full bundled history is run as an unconstrained probe whose result may be pass or fail.",
+  "criteria": "settled if the gate reruns on the real ingest snapshots with status pass and matching hashes and the mutated control fails the two targeted checks, since that closes both clauses of the gap text (real-snapshot gate output retained; a production ingest that produces a real snapshot exists). advanced if only the LEAN real-data arm runs. not_settled if the real snapshot fails or the control does not fail.",
+  "note": "Written before the check's commands were run. While locating evidence (before this file), the two ingest receipts were read and the two snapshot CSVs were sha256-hashed once (hashes matched their receipts); no gate, Parquet or DuckDB command had been run."
+}

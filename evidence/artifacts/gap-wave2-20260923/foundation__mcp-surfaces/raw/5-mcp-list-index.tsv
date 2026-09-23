@@ -1,0 +1,10 @@
+label	cli	exit	started	ended	cwd
+project	claude	0	2026-09-23T04:22:41Z	2026-09-23T04:22:42Z	$HOME/code/agent-lab
+scratch-empty	claude	0	2026-09-23T04:22:42Z	2026-09-23T04:22:42Z	$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/mcplist-20260923T042241Z/scratch-empty
+scratch-config	claude	0	2026-09-23T04:22:42Z	2026-09-23T04:22:42Z	$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/mcplist-20260923T042241Z/scratch-config
+project	codex	0	2026-09-23T04:22:42Z	2026-09-23T04:22:42Z	$HOME/code/agent-lab
+scratch-empty	codex	0	2026-09-23T04:22:42Z	2026-09-23T04:22:42Z	$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/mcplist-20260923T042241Z/scratch-empty
+scratch-config	codex	0	2026-09-23T04:22:42Z	2026-09-23T04:22:42Z	$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/mcplist-20260923T042241Z/scratch-config
+project-untrusted	codex	0	2026-09-23T04:22:42Z	2026-09-23T04:22:42Z	$HOME/code/agent-lab
+project-approved	claude	0	2026-09-23T04:23:13Z	2026-09-23T04:23:14Z	$HOME/code/agent-lab
+scratch-config-approved	claude	0	2026-09-23T04:23:14Z	2026-09-23T04:23:15Z	$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/mcplist-20260923T042313Z/scratch-config

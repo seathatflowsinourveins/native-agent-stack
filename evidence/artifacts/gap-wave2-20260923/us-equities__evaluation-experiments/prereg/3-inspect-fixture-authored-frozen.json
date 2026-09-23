@@ -1,0 +1,16 @@
+{
+  "gap_index": 3,
+  "slug": "inspect-fixture-authored-frozen",
+  "gap_text_sha256": "d44f22cda08a594c3e94090832c936bccba8ecd2874a153337c3700ef07e9001",
+  "next_check": "Author an inspect-ai mock-model task over catalog-cases.json with the deterministic scorer, commit it with a hash, and run `inspect eval` once to confirm it executes.",
+  "preregistration": {
+    "written_at": "2026-09-23T07:18:31Z",
+    "expectation": "An inspect-ai mock-model task over catalog-cases.json is authored under blueprints/, committed with sha256 hashes before its first scored run, and one `inspect eval` run exits 0 with 8 scored samples and zero provider calls.",
+    "criteria": [
+      "Task source files committed and hashed in a freeze record before the first scored run (commit order is the proof).",
+      "The scorer calls the unmodified blueprints/native-skill-practice/gate.cjs through node and evaluates the same three assertions as promptfooconfig.yaml.",
+      "The model is local and deterministic (no network): the same exact-text containment transform as the promptfoo echo provider.",
+      "`inspect eval` exits 0 with 8 samples scored in the retained JSON log."
+    ]
+  }
+}

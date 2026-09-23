@@ -1,0 +1,401 @@
+{
+  "id": "gap-wave2-20260923/foundation/agent-sdks/9-matched-sdk-comparison",
+  "gap_index": 9,
+  "gap_text_sha256": "872690fabbf8d6ec003cf85cd336e5743a398ae50bcfc661d30b9f405f2a1c9d",
+  "preregistration": {
+    "written_at": "2026-09-23T03:24:52Z",
+    "expectation": "Codex arm of the matched task (same custom tool, interrupt, resume) is executable; the Claude arm needs several Claude calls and is deferred under the account reservation.",
+    "criteria": [
+      "preregistered checklist: structured events typed, custom-tool round trip, mid-turn interrupt status, resume recall",
+      "settled only if both SDKs are scored; advanced if Codex only"
+    ]
+  },
+  "commands": [
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 300 $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/codex_probe.py tool-turn --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/tool-turn.json --state $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/tool-state.json --deadline 180",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 300 $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/codex_probe.py resume-turn --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/resume-turn.json --state $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/tool-state.json --deadline 180",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 400 $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/codex_probe.py cancel --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/cancel-streaming.json --deadline 120 --interrupt-after 90 --settle 30 --effort low",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 240 $HOME/.cache/gap-wave2-20260923/agent-sdks/claude-sdk/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/claude_probe.py --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-claude --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/claude-interrupt.json"
+  ],
+  "results": {
+    "checklist": {
+      "structured_events_typed": {
+        "codex": true,
+        "claude": "partial (one interrupted query only)"
+      },
+      "custom_tool_round_trip": {
+        "codex": true,
+        "claude": "not run"
+      },
+      "mid_turn_interrupt": {
+        "codex": "interrupted",
+        "claude": "aborted_streaming"
+      },
+      "resume_recall": {
+        "codex": true,
+        "claude": "not run"
+      }
+    },
+    "codex_event_types": [
+      "item/agentMessage/delta",
+      "item/completed",
+      "item/started",
+      "thread/tokenUsage/updated",
+      "turn/completed",
+      "turn/started"
+    ],
+    "claude_event_types": {
+      "SystemMessage:init": 1,
+      "SystemMessage:status": 1,
+      "RateLimitEvent": 1,
+      "StreamEvent:message_start": 1,
+      "StreamEvent:content_block_start": 2,
+      "SystemMessage:thinking_tokens": 2,
+      "StreamEvent:content_block_delta": 68,
+      "AssistantMessage": 2,
+      "StreamEvent:content_block_stop": 1,
+      "UserMessage": 1,
+      "ResultMessage": 1
+    }
+  },
+  "raw_outputs": [
+    {
+      "path": "raw/tool-turn.json",
+      "sha256": "90e6125e799907067c571bb5801f0c41b1a503f974a70f27c19ca1e342969962"
+    },
+    {
+      "path": "raw/resume-turn.json",
+      "sha256": "e9773ec026504f2b5680a95f76445aba4a12dd19b529d205bef56fe5bf38a065"
+    },
+    {
+      "path": "raw/cancel-streaming.json",
+      "sha256": "b9e107bbff9042291d1f5c0ac3c3c91f09fc17a6b8e5d0a4b4aadebe8e7f8c3f"
+    },
+    {
+      "path": "raw/claude-interrupt.json",
+      "sha256": "edb4fca8670353452d37f6ea0aad066613925e0a0494e7cfd053e9e059d000e4"
+    }
+  ],
+  "outcome": "settled",
+  "evidence_class": "local_integration",
+  "rule_deviations": [
+    {
+      "rule": "wait while 2 or more real codex exec processes run",
+      "status": "unresolved",
+      "observed": "The first Codex SDK model call (tool-turn.json, 03:24:59Z) started while pgrep counted 3 processes matching 'codex exec'. A substring count can include processes that are not codex exec runs (at 04:37Z a similar substring filter matched two codex-linux-sandbox helpers); the 3 were never classified, so the rule may have been broken for this call. Later calls waited; the fix-round-2 driver classifies by argv (worker-tool-runs.json slot_checks: 1 real codex exec before each call)."
+    }
+  ],
+  "checked_at": "2026-09-23T15:00:28Z",
+  "round_3_note": "The Claude Agent SDK resume in a new process now ran (gap 13 round 3, raw/round3/claude-resume.json), on a different task. The matched run still lacks the Claude custom tool and interrupt on the same fixed task and the checklist scoring.",
+  "round_4": {
+    "preregistration": {
+      "file": "preregistration-round4.json",
+      "written_at": null,
+      "written_window": {
+        "not_before": "2026-09-23T14:11:57Z",
+        "not_after": "2026-09-23T14:12:27Z"
+      },
+      "written_at_note": "Written between 14:11:57Z (a date call just before writing) and 14:12:27Z (commit 1ce3105 time); the first draft carried 14:13:00Z, which was later than its own commit and is corrected here in an amended commit. Written before the round-4 model download, before the local vLLM server started and before any round-4 inference.",
+      "expectation": "One fixed task (vault_lookup custom tool returning a random value, a long-essay turn interrupted mid-stream, then a new-process resume asking for the stored value) runs through both SDKs against the same local model and provider. The Codex SDK registers the tool as a thread dynamicTool; the Claude Agent SDK registers it through create_sdk_mcp_server. Both are scored on the checklist carried over from round 1: structured events typed, custom-tool round trip, mid-turn interrupt status, resume recall in a new process.",
+      "criteria": [
+        "custom-tool round trip: the host-side handler is called with key alpha and the model's final answer contains the handler's value",
+        "interrupt: the SDK reports an interrupted/aborted terminal state and the provider shows the request ended (num_requests_running 0)",
+        "resume: a new OS process resumes the same thread/session id and returns the turn-1 value without calling the tool (a decoy handler value must not appear)",
+        "structured events: every received event is a typed SDK object (Codex: not UnknownNotification; Claude: SDK message classes)",
+        "settled only if both SDKs complete all four items on the same task; model-quality failures of the small local model are recorded as such and leave the gap advanced",
+        "scope stated in the receipt: SDK-level comparison with one open-weight model; hosted gpt/claude models are not part of this arm"
+      ]
+    },
+    "commands": [
+      "ECOSYSTEM_JOB_SECONDS=1200 $HOME/codex-ecosystem/bin/ecosystem-bounded-run env -u HF_TOKEN HF_HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/hf HF_HUB_DISABLE_TELEMETRY=1 $HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/bin/python -c \"from huggingface_hub import snapshot_download; snapshot_download('Qwen/Qwen3-4B-Instruct-2507-FP8', revision='8591804019c8b22094c3b5b4454e0edc05dffc98')\"  # 4.9 GB download from huggingface.co",
+      "ECOSYSTEM_JOB_MEMORY_HIGH=10G ECOSYSTEM_JOB_MEMORY_MAX=14G ECOSYSTEM_JOB_SECONDS=10800 ECOSYSTEM_JOB_TASKS_MAX=1024 $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/serve.sh  # contents in raw/round4/serve.sh (pasta netns, only 127.0.0.1:28431 forwarded); three earlier launches failed or were replaced, logs retained",
+      "kill -TERM <vllm api-server pid inside the pasta namespace>  # stop at 14:37:38Z; nvidia-smi before/after in raw/round4/gpu-before.txt, gpu-after.txt",
+      "(review fix round) the same serve.sh restarted at about 14:56:36Z and stopped the same way at 15:03:19Z; gpu-before-fix.txt, gpu-after-fix.txt",
+      "(second review fix) blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_fix2_remote.sh restarted it at 15:46:08Z; its stop step failed and the api-server was stopped by pid at 15:49:59Z (see receipt 8, round_4.results.provider_stop_rule_gpu)",
+      "$HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_codex.py session --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/codex-home --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-codex --state $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/private/codex-state.json --out $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/codex-session.json  # and -rep2/-rep3 with their own state files",
+      "env -i PATH=/usr/bin:/bin HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/claude-home CLAUDE_CONFIG_DIR=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/claude-home/.claude ANTHROPIC_BASE_URL=http://127.0.0.1:28431 ANTHROPIC_API_KEY=dummy-local ANTHROPIC_DEFAULT_HAIKU_MODEL=qwen3-4b ANTHROPIC_DEFAULT_SONNET_MODEL=qwen3-4b ANTHROPIC_DEFAULT_OPUS_MODEL=qwen3-4b ANTHROPIC_SMALL_FAST_MODEL=qwen3-4b CLAUDE_CODE_MAX_OUTPUT_TOKENS=8192 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 DISABLE_TELEMETRY=1 DISABLE_AUTOUPDATER=1 DISABLE_ERROR_REPORTING=1 $HOME/.cache/gap-wave2-20260923/agent-sdks/claude-sdk/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_claude.py session --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-claude --state $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/private/claude-state.json --out $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/claude-session.json  # and -rep2/-rep3",
+      "(fix round) the same two commands with --tap, state codex-state-fix<i>.json / claude-state-fix<i>.json and outputs codex-session-fix<i>.json / claude-session-fix<i>.json for i = 1, 2, 3",
+      "$HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_codex.py resume --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/codex-home --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-codex --state $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/private/codex-state.json --out $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/codex-resume.json",
+      "env -i PATH=/usr/bin:/bin HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/claude-home CLAUDE_CONFIG_DIR=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/claude-home/.claude ANTHROPIC_BASE_URL=http://127.0.0.1:28431 ANTHROPIC_API_KEY=dummy-local ANTHROPIC_DEFAULT_HAIKU_MODEL=qwen3-4b ANTHROPIC_DEFAULT_SONNET_MODEL=qwen3-4b ANTHROPIC_DEFAULT_OPUS_MODEL=qwen3-4b ANTHROPIC_SMALL_FAST_MODEL=qwen3-4b CLAUDE_CODE_MAX_OUTPUT_TOKENS=8192 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 DISABLE_TELEMETRY=1 DISABLE_AUTOUPDATER=1 DISABLE_ERROR_REPORTING=1 $HOME/.cache/gap-wave2-20260923/agent-sdks/claude-sdk/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_claude.py resume --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-claude --state $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/private/claude-state.json --out $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/claude-resume.json",
+      "(fix round) the same two resume commands with --tap, state *-state-fix1.json, outputs codex-resume-fix1.json and claude-resume-fix1.json"
+    ],
+    "raw_outputs": [
+      {
+        "path": "raw/round4/codex-session.json",
+        "sha256": "c12325246e4a9961e41224dabc4f4992cb1782dede19c3a9317f19f2fdf5510c"
+      },
+      {
+        "path": "raw/round4/codex-session-rep2.json",
+        "sha256": "f65d47e65ed1659b4b76ab6a94c7f536e1947ab707152616e20fd8536788192f"
+      },
+      {
+        "path": "raw/round4/codex-session-rep3.json",
+        "sha256": "fe4f3b101d6bdab16f7a6cbe2716368df2b9890af9f71abadcc1e873a2da2752"
+      },
+      {
+        "path": "raw/round4/codex-session-fix1.json",
+        "sha256": "ef7afbfa18eeb983ace11cb23788724033901ee79ccd176ceeb5f3a199bd0536"
+      },
+      {
+        "path": "raw/round4/codex-session-fix2.json",
+        "sha256": "90e331ca667699cbd37b7305d4a158f6ec5945c00782374fb52af4ecc057c519"
+      },
+      {
+        "path": "raw/round4/codex-session-fix3.json",
+        "sha256": "c310a4b8e36e0c0edf7390f15c4f5e2f3a99ef82ec3e6e5d989583dc3bed3024"
+      },
+      {
+        "path": "raw/round4/claude-session.json",
+        "sha256": "01ee25e5b5ff83c7960b4e27b234f2a9348b7ccdd1a8aa62083086930a0efb7f"
+      },
+      {
+        "path": "raw/round4/claude-session-rep2.json",
+        "sha256": "55f01c937b6c00ee17de4b31dc1e7cab44f07e016efc4d1785bde6480bd8e150"
+      },
+      {
+        "path": "raw/round4/claude-session-rep3.json",
+        "sha256": "454a9c310e1407f1c347b1aa85e428c70adfc15cf3ae331a626f23d249c9b64c"
+      },
+      {
+        "path": "raw/round4/claude-session-fix1.json",
+        "sha256": "9fd3608ac79c4d78c526f63814ac344caadbae4b8cb3b1b734472694deddc156"
+      },
+      {
+        "path": "raw/round4/claude-session-fix2.json",
+        "sha256": "f53995364deb22b0207a18f21be77f2e30bbf0e1d4e91ac54b202f314c8262f3"
+      },
+      {
+        "path": "raw/round4/claude-session-fix3.json",
+        "sha256": "6182042b77db39337ed5f0bbc47e0acf4a7f3cc20191c47740b9ee19031795ee"
+      },
+      {
+        "path": "raw/round4/codex-resume.json",
+        "sha256": "349f722d0ca8341419c95f23937531f62b8e673e1715c9651145b739948ac301"
+      },
+      {
+        "path": "raw/round4/claude-resume.json",
+        "sha256": "dffd915c8970c971123fac84e381f91143fc93ce9f74e5d8fac196d387f7fe13"
+      },
+      {
+        "path": "raw/round4/claude-resume.stderr",
+        "sha256": "d6ea829309809e5a147c0a85ce99fd0694869d096802d495ab6f164c38b12064"
+      },
+      {
+        "path": "raw/round4/codex-resume-fix1.json",
+        "sha256": "b32fd5045eba506c72d83fa2411f3832dd29f17174625775d4cd8fdbfdd3fcd4"
+      },
+      {
+        "path": "raw/round4/claude-resume-fix1.json",
+        "sha256": "d23058f2264cc5fe20227046da76d9f48db23db9ef112e16d776ef9cb0eab1df"
+      },
+      {
+        "path": "raw/round4/claude-fix.stderr",
+        "sha256": "31bdb188781944cffbcbe792ed42fafa98c712c979a408ad754e784ac5628b11"
+      },
+      {
+        "path": "raw/round4/codex-home__config.toml",
+        "sha256": "5d9129ef0c3417b33c06a1880602a00583069119d1dc2b38ae7c79de656d0b58"
+      }
+    ],
+    "results": {
+      "checklist": {
+        "structured_events_typed": {
+          "method": "fix round: every Codex notification tapped before routing (MessageRouter.route_notification) and every raw Claude CLI message tapped before parsing (message_parser.parse_message); untyped = UnknownNotification (Codex) or dropped as None (Claude)",
+          "codex": true,
+          "claude": true,
+          "detectors_fire": {
+            "codex": true,
+            "claude": true
+          },
+          "tapped_totals": {
+            "codex": {
+              "codex-session-fix1.json": 161,
+              "codex-session-fix2.json": 179,
+              "codex-session-fix3.json": 139,
+              "codex-resume-fix1.json": 29
+            },
+            "claude": {
+              "claude-session-fix1.json": 183,
+              "claude-session-fix2.json": 140,
+              "claude-session-fix3.json": 131,
+              "claude-resume-fix1.json": 22
+            }
+          },
+          "claude_raw_kinds": [
+            "assistant->AssistantMessage",
+            "result:error_during_execution->ResultMessage",
+            "result:success->ResultMessage",
+            "stream_event->StreamEvent",
+            "system:init->SystemMessage",
+            "system:status->SystemMessage",
+            "user->UserMessage"
+          ],
+          "first_pass_turn_routed_only": {
+            "codex_untyped": [],
+            "claude_untyped": [],
+            "note": "first-pass collectors saw only turn-routed Codex notifications and only messages the Claude SDK yielded (the review's finding 2); kept for reference, not used for the outcome"
+          }
+        },
+        "custom_tool_round_trip": {
+          "codex": true,
+          "claude": true,
+          "trials": {
+            "codex": [
+              true,
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "claude": [
+              true,
+              true,
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        },
+        "mid_turn_interrupt": {
+          "codex": [
+            "interrupted",
+            "interrupted",
+            "interrupted",
+            "interrupted",
+            "interrupted",
+            "interrupted"
+          ],
+          "claude": [
+            "aborted_streaming",
+            "aborted_streaming",
+            "aborted_streaming",
+            "aborted_streaming",
+            "aborted_streaming",
+            "aborted_streaming"
+          ],
+          "provider_request_ended": true
+        },
+        "resume_recall_new_process": {
+          "codex": true,
+          "claude": true,
+          "runs": {
+            "codex": [
+              true,
+              true
+            ],
+            "claude": [
+              true,
+              true
+            ]
+          },
+          "detail": {
+            "codex": {
+              "resumed_same_thread": true,
+              "answer_contains_turn1_value": true,
+              "answer_contains_decoy": false,
+              "tool_calls_in_resume": []
+            },
+            "claude": {
+              "resumed_same_session": true,
+              "answer_contains_turn1_value": true,
+              "answer_contains_decoy": false,
+              "tool_calls_in_resume": []
+            },
+            "new_process": {
+              "codex": true,
+              "claude": true
+            }
+          }
+        }
+      },
+      "all_items_pass_both_sdks": true,
+      "task": "one fixed task for both SDKs: turn 1 calls vault_lookup(key=alpha) and replies with its random value; turn 2 asks for a long listing and is interrupted about 4 s after the first text delta; a new process resumes the thread/session with a decoy tool value and asks for the turn-1 value",
+      "registration": {
+        "codex": "thread/start dynamicTools (item/tool/call answered by the SDK approval handler)",
+        "claude": "create_sdk_mcp_server in-process tool, allowed_tools=['mcp__vault__vault_lookup'], tools=[] (no built-in tools), setting_sources=[]"
+      },
+      "event_type_counts": {
+        "codex_turn1": {
+          "turn/started": 1,
+          "item/started": 3,
+          "item/completed": 3,
+          "thread/tokenUsage/updated": 2,
+          "item/agentMessage/delta": 12,
+          "turn/completed": 1
+        },
+        "codex_turn2": {
+          "turn/started": 1,
+          "item/started": 2,
+          "item/completed": 1,
+          "item/agentMessage/delta": 127,
+          "thread/tokenUsage/updated": 1,
+          "turn/completed": 1
+        },
+        "claude_turn1": {
+          "SystemMessage:init": 1,
+          "SystemMessage:status": 2,
+          "StreamEvent:message_start": 2,
+          "StreamEvent:content_block_start": 2,
+          "StreamEvent:content_block_delta": 18,
+          "AssistantMessage": 2,
+          "StreamEvent:content_block_stop": 2,
+          "StreamEvent:message_delta": 2,
+          "StreamEvent:message_stop": 2,
+          "UserMessage": 1,
+          "ResultMessage": 1
+        },
+        "claude_turn2": {
+          "SystemMessage:init": 1,
+          "SystemMessage:status": 1,
+          "StreamEvent:message_start": 1,
+          "StreamEvent:content_block_start": 1,
+          "StreamEvent:content_block_delta": 150,
+          "AssistantMessage": 1,
+          "UserMessage": 1,
+          "ResultMessage": 1
+        }
+      },
+      "claude_init": {
+        "model": "qwen3-4b",
+        "tools": [
+          "mcp__vault__vault_lookup"
+        ],
+        "mcp_servers": [
+          {
+            "name": "vault",
+            "status": "connected",
+            "source": "sdk"
+          }
+        ],
+        "permissionMode": "default",
+        "claude_code_version": "2.1.280",
+        "apiKeySource": "ANTHROPIC_API_KEY"
+      },
+      "observations": [
+        "Claude's init listed only the SDK tool and the in-process 'vault' server (no account MCP server, unlike round 1 on the native sign-in).",
+        "The Claude CLI printed '[claude-code:unrecognized_model]' for qwen3-4b (claude-resume.stderr) and proceeded.",
+        "Both SDKs' completed-request usage equals the provider counters (receipt 1, round_4.detector)."
+      ]
+    },
+    "evidence_class": "local_integration",
+    "limits": [
+      "The provider is an open-weight model (Qwen3-4B-Instruct-2507-FP8) on a vLLM server this unit started; neither the hosted OpenAI nor the hosted Anthropic service was involved, so hosted-model behaviour and hosted billing are not shown.",
+      "Tool round trip and interrupt ran in six trials per SDK (three tapped); resume ran twice per SDK (one tapped).",
+      "The Claude tap sees the message stream the SDK parses; the CLI's control-protocol messages are handled before parsing and are not part of it.",
+      "The checklist is the round-1 checklist (typed events, custom-tool round trip, interrupt status, resume recall); it does not score latency or cost."
+    ],
+    "checked_at": "2026-09-23T15:00:28Z"
+  },
+  "pre_round_4_outcome": "advanced",
+  "pre_round_4_remaining": "Run the Claude Agent SDK arm (SDK MCP custom tool, interrupt, resume in a new process) on the same task when the Claude account is free, then score both on the checklist.",
+  "pre_round_4_limits": [
+    "Only the Codex arm ran the full checklist. The Claude arm needs a custom-tool query, an interrupt and a resumed query (three or more calls); the unit may make one bounded Claude call, spent on the interrupt."
+  ],
+  "limits": [
+    "The provider is an open-weight model (Qwen3-4B-Instruct-2507-FP8) on a vLLM server this unit started; neither the hosted OpenAI nor the hosted Anthropic service was involved, so hosted-model behaviour and hosted billing are not shown. Hosted-model pairings (gpt-6-astra with Codex, a Claude model with the Claude Agent SDK) are not compared here; round 1's hosted Codex arm and single hosted Claude interrupt remain the only hosted observations.",
+    "Claude Code 2.1.280 flags the model as unrecognized; features that depend on Claude model identity (thinking blocks, for example) are not exercised."
+  ],
+  "pre_round_4_evidence_class": "native_proven",
+  "settled_scope": "SDK-level comparison on one fixed task with the same open-weight model and loopback provider for both SDKs; hosted-model pairings not compared"
+}

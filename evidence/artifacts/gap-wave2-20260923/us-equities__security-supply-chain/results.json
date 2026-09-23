@@ -1,0 +1,67 @@
+{
+  "layer": "us-equities/security-supply-chain",
+  "generated_at": "2026-09-23T17:01:14Z",
+  "generated_by": "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/write_receipts.py --results",
+  "gaps": {
+    "0": {
+      "outcome": "settled",
+      "receipt": "0-grype-sdk-sbom.json",
+      "receipt_sha256": "5cd90301374c00361e00b3925091341de635119bdb37ab256e2ea3ceba0a525b"
+    },
+    "2": {
+      "outcome": "advanced",
+      "receipt": "2-signature-provenance.json",
+      "receipt_sha256": "125878f28bbc2bcdfd333aa9fce350d0dba44f4c2ee5c54065974a3ab8e205be"
+    },
+    "3": {
+      "outcome": "advanced",
+      "receipt": "3-syft-binary-os-coverage.json",
+      "receipt_sha256": "b6d04ede58147bfcef7d27c1b28db6004894204ecdff8b27c630d19d739f3054"
+    },
+    "5": {
+      "outcome": "advanced",
+      "receipt": "5-gitleaks-current-history.json",
+      "receipt_sha256": "26a80c556225fa955e35e29f89f1d3e42ce4229359e6c4c55d1ec9648f43178c"
+    },
+    "6": {
+      "outcome": "advanced",
+      "receipt": "6-openbao-secret-lifecycle.json",
+      "receipt_sha256": "99842263bd520b0e9174929e54c700058ea1ab45ca065f18499a357af0c25121"
+    },
+    "7": {
+      "outcome": "settled",
+      "receipt": "7-scanner-comparison.json",
+      "receipt_sha256": "2dd5e2a62f4f50d72c6368945ae448ddc32221981a1887704c417621ecaa0ecd"
+    },
+    "8": {
+      "outcome": "advanced",
+      "receipt": "8-research-worker-broker-authority.json",
+      "receipt_sha256": "9671cca39334f2f369957c54c92e9a5dd9fa1734cdac4d92667c8110c250400a"
+    },
+    "9": {
+      "outcome": "advanced",
+      "receipt": "9-syft-root-binary-coverage.json",
+      "receipt_sha256": "7493d0f5e5619ebc202688257c1996ba254dae1d0003c837bf718536a05346c0"
+    },
+    "10": {
+      "outcome": "settled",
+      "receipt": "10-grype-sdk-readme-correction.json",
+      "receipt_sha256": "26f6f93133c53051f083c90cd874355d60e8f90c009544cd7b0546f43a22c090"
+    },
+    "12": {
+      "outcome": "advanced",
+      "receipt": "12-gitleaks-full-history-types.json",
+      "receipt_sha256": "d288e3d2196c12193f0c6f2b49a4b71dce114d360a4fc38a63f906db7b50e3f7"
+    },
+    "13": {
+      "outcome": "advanced",
+      "receipt": "13-cosign-verify-blob.json",
+      "receipt_sha256": "da1f5b0be852689f8eb9ffa42096b8317e6a2e03bf03e4fca5336ddf6dae1853"
+    },
+    "14": {
+      "outcome": "advanced",
+      "receipt": "14-openbao-and-worker-denial.json",
+      "receipt_sha256": "22c8b5e3edb9daa6d7adb01ef0506bb741bdcbffe4226119704b1b409edaa18f"
+    }
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "id": "gap-wave2-20260923-us-equities-data-quality-orchestration-2-dashboard-auth-mode",
+  "gap_index": 2,
+  "gap_text_sha256": "282367893e05d8649871e693bef68ddf0f6745cc0216ab0f726ca4b8ff72e9d4",
+  "gap_text": "The two Dagu records disagree on dashboard authentication. The hosting receipt (2026-09-19) records basic auth with anonymous 401 and authenticated 200 after restart. The current hosting README says the dashboard now uses upstream auth.mode none, with anonymous API reads returning 200. No retained receipt covers the current auth mode.",
+  "next_check": "Against the running dagu-equities service, send an anonymous and an authenticated `curl -s -o /dev/null -w '%{http_code}'` request to the dashboard API. Record the configured auth.mode and both status codes in a dated hosting receipt that supersedes the conflicting README or receipt statement.",
+  "preregistration": {
+    "written_at": "2026-09-23T05:16:19Z",
+    "expectation": "The running dagu-equities service (127.0.0.1:18525) uses auth.mode none: an anonymous GET to its DAG-list API returns 200 and a GET carrying a dummy Basic header also returns 200. A loopback control instance of the same 2.16.6 binary with auth.mode basic (dummy generated credentials, disposable DAGU_HOME) returns 401 anonymous and 200 authenticated, proving the probe can detect basic auth.",
+    "criteria": "settled iff (a) the configured auth.mode line of the service's config is recorded without printing any other key, (b) both live status codes are recorded, (c) the control instance with auth.mode basic returns 401 anonymous and 200 authenticated and the control with auth.mode none returns 200 anonymous, all using the same curl command form, and (d) the hosting README gains a dated pointer to this receipt as superseding the 2026-09-19 basic-auth statement. Only GET requests reach the live service; it is never restarted or reconfigured."
+  },
+  "commands": [
+    "round 1 (05:19:16Z): bash $H/dashboard_auth_probe.sh $C/bin/dagu-2.16.6/dagu $C/auth-work 18525",
+    "fix round 2 (05:40:59Z): the same script with UTC start/finish lines, work dir $C/auth-work-fr2",
+    "fix round 3 (05:48:51Z, cited): the same script with the Basic credential passed through curl --config on stdin, work dir $C/auth-work-fr3",
+    "(inside) anonymous: curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:<port>/api/v1/dags; Basic: printf 'user = \"%s\"\\n' <user:password> | curl -s -o /dev/null -w '%{http_code}' --config - <url> (a random dummy password on the controls, the literal dummy probe:not-a-real-credential on the live service); served mode: curl -s <base>/ | grep -o -E 'authMode: \"[a-z]+\"'",
+    "(inside) systemctl --user show dagu-equities.service -p ActiveState -p SubState -p ExecMainStartTimestamp  (read-only, before and after)",
+    "fix round 4 (05:59:57Z): bash $H/auth_none_with_basic_block.sh $C/bin/dagu-2.16.6/dagu $C/auth-work-fr4b 18635 (attempt 1 at 05:57:19Z on port 18634, work dir $C/auth-work-fr4, was killed by timeout 120 while curl without --max-time blocked on the closed loopback port; the script now bounds every curl with --max-time 2)"
+  ],
+  "results": {
+    "control_none": "served=[authMode: \"none\"]; anonymous GET /api/v1/dags -> 200; WWW-Authenticate: []; basic(correct) -> 200; basic(wrong) -> 200",
+    "control_basic": "served=[authMode: \"basic\"]; anonymous GET /api/v1/dags -> 401; WWW-Authenticate: [Www-Authenticate: Basic realm=\"restricted\"]; basic(correct) -> 200; basic(wrong) -> 401",
+    "live_service": "ExecMainStartTimestamp=Tue 2026-09-22 10:52:37 EDT ActiveState=active SubState=running; live served=[authMode: \"none\"]; live anonymous GET /api/v1/dags -> 200; live anonymous WWW-Authenticate: []; live dummy-basic GET /api/v1/dags -> 200; live anonymous GET / -> 200; after probe: same ExecMainStartTimestamp, ActiveState=active",
+    "configured_auth_mode": "none (as served by the running server in its dashboard bootstrap: authMode: \"none\")",
+    "supersedes": "blueprints/us-equities/hosting/receipt.json acceptance.http_after_restart {\"anonymous\": 401, \"authenticated\": 200} and service.auth \"basic; ...\" (2026-09-19). The hosting README now carries a dated pointer to this receipt.",
+    "detection_method": "The same curl forms against a loopback control instance of the same binary configured with auth.mode basic returned 401 anonymous, a Basic challenge header, and 401 for a wrong password, so the probe detects basic auth when present. Under none, a correct or wrong Basic header is ignored (200).",
+    "fix_round_2": "probe started 2026-09-23T05:40:59Z; control none 200/200/200 served authMode none; control basic anonymous 401 with \"Www-Authenticate: Basic realm=\\\"restricted\\\"\", correct 200, wrong 401; live served=[authMode: \"none\"], anonymous 200, WWW-Authenticate [], dummy-basic 200, GET / 200; ExecMainStartTimestamp unchanged (Tue 2026-09-22 10:52:37 EDT); probe finished 2026-09-23T05:41:02Z. Identical codes to round 1.",
+    "chronology": "Round 1 output mtime 2026-09-23 05:19:18Z (raw/0-first-round-mtimes.txt) after the preregistration at 05:16:19Z; fix round 2 carries its own timestamps.",
+    "fix_round_3": "probe started 2026-09-23T05:48:51Z; identical codes to rounds 1 and 2: control none 200/200/200 with authMode none; control basic anonymous 401 with \"Www-Authenticate: Basic realm=\\\"restricted\\\"\", correct 200, wrong 401; live served authMode none, anonymous 200, WWW-Authenticate [], dummy-basic 200, GET / 200; ExecMainStartTimestamp unchanged; probe finished 2026-09-23T05:48:53Z.",
+    "fix_round_4": "Loopback control with auth.mode none plus an auth.basic block: \"server alive: no; exit status 1\"; log: \"Error: initialization error: failed to build config: auth.basic credentials are set but auth.mode is \\\"none\\\"; set auth.mode to 'basic' or remove the auth.basic section\"; \"stopped: port answers 000\". Attempt 1's server.log holds the same error. So the hosting README's 'upstream rejects Basic credentials under none' is config validation of an auth.basic block, while request-level Basic headers under none are ignored (200 in rounds 1-3). Detection: had the server started, the script prints 'server alive: yes' and the status codes; the none control of rounds 1-3 started with the same config form minus the basic block."
+  },
+  "outcome": "settled",
+  "evidence_class": "native_proven",
+  "limits": [
+    "The configured mode is taken from the running server's own dashboard bootstrap (authMode) and its HTTP behavior; the private config.yaml was not read, to avoid reading any credential material. Under auth.mode none there is no credential, so the \"authenticated\" arm on the live service is a dummy Basic header, which upstream ignores.",
+    "Only GET requests reached the live service; it was not restarted or reconfigured (ExecMainStartTimestamp unchanged).",
+    "Controls used disposable DAGU_HOMEs on 127.0.0.1:18632/18633 with a random dummy password that was never printed; their config files were deleted after the run and both control servers were stopped (port answered 000).",
+    "Single host, single observation at 2026-09-23T05:19Z; the mode can change if the private config changes.",
+    "Fix round 4 checked config validation on the 2.16.6 binary only (the live service's version); the config-rejection behavior on 2.17.0 was not checked."
+  ],
+  "checked_at": "2026-09-23T06:00:02Z",
+  "command_variables": {
+    "C": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration",
+    "R": "worktree root (claude/g2-data-quality-orchestration-20260923)",
+    "H": "R/blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration"
+  },
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/2-dashboard-auth-fr3.txt",
+      "original_sha256": "ea560b8863ccce6e00e3045348b604fe504828ec0c765d2178f158247647d4c3",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/2-dashboard-auth-fr3.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "ea560b8863ccce6e00e3045348b604fe504828ec0c765d2178f158247647d4c3",
+      "bytes": 979
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/2-dashboard-auth-fr2.txt",
+      "original_sha256": "6a43bc8552c24af17632d3ed255e07641c1889497c25db78a9bc01c5e623d55d",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/2-dashboard-auth-fr2.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "6a43bc8552c24af17632d3ed255e07641c1889497c25db78a9bc01c5e623d55d",
+      "bytes": 979
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/2-dashboard-auth-r1.txt",
+      "original_sha256": "58e78d0e7459793083d7a59643c69616c915de5dfc638a703d04037f0ad7f391",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/2-dashboard-auth.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "58e78d0e7459793083d7a59643c69616c915de5dfc638a703d04037f0ad7f391",
+      "bytes": 908
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-first-round-mtimes.txt",
+      "original_sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/0-first-round-mtimes.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce",
+      "bytes": 923
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+      "original_sha256": "765352de082804501782e86a64029211bf1504edbf823d3aba4f8ae77753b7c8",
+      "source": "<ephemeral session scratchpad>/g2dqo-review.md",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "dd0283b76a5c85ea9aff1c3506538b1aa02fc7f221fd12b8f361d9576ca254f4",
+      "bytes": 3926
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/2-auth-none-basic-block-fr4.txt",
+      "original_sha256": "dbd7cff7f8f0cbf92801b2ac15e2569fc9a564c271ae24d2ecb6b232996ceffd",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/2-auth-none-basic-block-fr4.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "dbd7cff7f8f0cbf92801b2ac15e2569fc9a564c271ae24d2ecb6b232996ceffd",
+      "bytes": 375
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/2-auth-none-basic-block-fr4-attempt1.txt",
+      "original_sha256": "7488c91de4cb0bc4cb3335ce44905df98ba766ccdcc00eaf9956724b5cb81d0e",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/2-auth-none-basic-block-fr4-attempt1.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "7488c91de4cb0bc4cb3335ce44905df98ba766ccdcc00eaf9956724b5cb81d0e",
+      "bytes": 306
+    }
+  ],
+  "fixround2_preregistration": {
+    "written_at": "2026-09-23T05:40:45Z",
+    "label": "fix round 2, written after the independent review and before the reruns",
+    "reason": "Independent Codex review (codex exec --sandbox read-only --ephemeral, 2026-09-23) found: base64 Temporal payloads still carried the host home path; *.jsonl raw files were gitignored and so not committed; several provenance claims (checksum verification, archive size, modal version, fresh --require-hashes sync, installed versions) had no retained raw output; raw outputs lacked capture timestamps; and the Temporal harness hardcoded the second-worker launch delay as 3 s.",
+    "expectation": "Rerun the same probe script, now printing UTC start/finish timestamps, against the same live service (GET only) and fresh loopback controls. Expect the same codes as the first run: live 200/200 with authMode none; control basic 401/200/401; control none 200.",
+    "criteria": "The fix-round output replaces the first run as the cited raw file only if it reproduces the same codes; a difference is reported, not hidden."
+  },
+  "review": {
+    "reviewer": "one codex exec --sandbox read-only --ephemeral call (Codex account) with blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration/review_prompt.md; output retained as raw/0-codex-review-r1.md",
+    "raw": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+    "findings_for_this_receipt": "Finding 6: the round-1 output had no capture timestamp. Resolved: fix-round-2 rerun prints UTC start/finish and reproduced every code; round-1 mtime recorded. Fix round 3: the repository gitleaks ancestry test flagged the curl user:password command form; the script now uses curl --config on stdin and the rerun reproduced every code.",
+    "second_review_fix_round_4": "Independent Opus review, findings 3 and 5. Finding 3 (criterion (a) substitution only in limits): resolved by the explicit preregistration_deviations entry. Finding 5 (README sentence read as contradicting the dummy-Basic 200): a preregistered loopback check showed dagu 2.16.6 refuses to start when an auth.basic block is set under auth.mode none; the hosting README now says config validation rejects that block and request-level Basic headers are ignored under none."
+  },
+  "fixround3_preregistration": {
+    "written_at": "2026-09-23T05:48:47Z",
+    "label": "fix round 3, written after the repository unit suite flagged the probe script and before the rerun",
+    "reason": "tests.test_gitleaks_config.GitleaksBranchAncestryHistoryTests failed: gitleaks rule curl-auth-user matched the curl command form that passes a user and password with the -u flag in dashboard_auth_probe.sh and in this receipt's command text. The script now passes the Basic credential through curl --config on stdin, so no user:password pair appears on a curl command line.",
+    "expectation": "Same codes as rounds 1 and 2: live 200 anonymous and 200 with a dummy Basic credential, served authMode none; control basic 401 anonymous with a Basic challenge, 200 correct, 401 wrong; control none 200.",
+    "criteria": "The fix-round-3 output becomes the cited raw file only if the codes are unchanged; a difference is reported."
+  },
+  "fixround4_preregistration": {
+    "written_at": "2026-09-23T05:57:08Z",
+    "label": "fix round 4 (after the second independent Opus review); written before the check it governs",
+    "expectation": "The pre-existing hosting README sentence 'upstream rejects Basic credentials under none' refers to configuration, not requests: a loopback dagu 2.16.6 control whose config has auth.mode none plus an auth.basic block either fails to start or logs a configuration error/warning, whereas request-level Basic headers under none are ignored (200, already observed in rounds 1-3).",
+    "criteria": "The README wording is changed to whatever the control shows: if the server refuses to start or reports a config error, say config validation rejects an auth.basic block under none; if it starts silently, drop the 'rejects' claim and say only that request Basic headers are ignored under none. Either way the README states that request-level Basic headers are ignored under none. No change to the gap-2 outcome, which does not depend on this sentence. Detection: the control reports server exit status, whether the port answers, and greps its log for error/warn/basic lines."
+  },
+  "preregistration_deviations": [
+    "Criterion (a) required recording 'the configured auth.mode line of the service's config'. It was replaced, not met as written: the unit did not read the private config.yaml (it can hold credential material) and instead recorded the effective mode the running server serves in its dashboard bootstrap (authMode: \"none\"), corroborated by its HTTP behavior against controls that detect basic auth. The settled outcome rests on this substituted criterion; the literal config line remains unrecorded. The deviation was first stated explicitly in fix round 4 (second independent review)."
+  ]
+}

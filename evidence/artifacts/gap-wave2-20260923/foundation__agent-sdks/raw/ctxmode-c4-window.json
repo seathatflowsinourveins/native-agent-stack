@@ -1,0 +1,159 @@
+{
+  "generated_at": "2026-09-23T04:39:58Z",
+  "window_utc": [
+    "2026-09-23T03:31:30.000Z",
+    "2026-09-23T03:38:00.000Z"
+  ],
+  "name_listing_03_31_35Z_to_03_35_03Z": {
+    "added": [
+      "stats-pid-2792946.json",
+      "stats-pid-2814784.json",
+      "stats-pid-2820499.json"
+    ],
+    "removed": []
+  },
+  "run_receipt_written_at": {
+    "c4-t1.json": "2026-09-23T03:33:55.519Z",
+    "c4-t2.json": "2026-09-23T03:34:19.964Z",
+    "c4-t3.json": "2026-09-23T03:34:57.427Z",
+    "c4-t1-root.json": "2026-09-23T03:37:16.510Z"
+  },
+  "receipt_mcp_tool_calls": {
+    "c4-t1.json": 2,
+    "c4-t2.json": 1,
+    "c4-t3.json": 2,
+    "c4-t1-root.json": 3
+  },
+  "mtime_window_files": [
+    {
+      "path": "content/c8dec9624e21bd03.db",
+      "bytes": 4288512,
+      "mtime": "2026-09-23T03:35:44.202Z"
+    },
+    {
+      "path": "sessions/stats-pid-2779837.json",
+      "bytes": 504,
+      "mtime": "2026-09-23T03:35:44.193Z",
+      "stats": {
+        "session_start": 1790134255811,
+        "updated_at": 1790134544170,
+        "uptime_ms": 288359,
+        "total_calls": 14,
+        "bytes_indexed": 554254,
+        "by_tool": {
+          "ctx_execute": {
+            "calls": 12,
+            "bytes": 155417
+          },
+          "ctx_search": {
+            "calls": 2,
+            "bytes": 21304
+          }
+        }
+      },
+      "candidate_runs_by_interval": [
+        "c4-t1-root.json"
+      ]
+    },
+    {
+      "path": "sessions/stats-pid-2792946.json",
+      "bytes": 523,
+      "mtime": "2026-09-23T03:33:55.487Z",
+      "stats": {
+        "session_start": 1790134257000,
+        "updated_at": 1790134435488,
+        "uptime_ms": 178488,
+        "total_calls": 6,
+        "bytes_indexed": 0,
+        "by_tool": {
+          "ctx_execute": {
+            "calls": 3,
+            "bytes": 67901
+          },
+          "ctx_search": {
+            "calls": 1,
+            "bytes": 12758
+          },
+          "ctx_execute_file": {
+            "calls": 2,
+            "bytes": 952
+          }
+        }
+      },
+      "candidate_runs_by_interval": [
+        "c4-t1.json"
+      ]
+    },
+    {
+      "path": "sessions/stats-pid-2814784.json",
+      "bytes": 527,
+      "mtime": "2026-09-23T03:34:19.947Z",
+      "stats": {
+        "session_start": 1790134257000,
+        "updated_at": 1790134459950,
+        "uptime_ms": 202950,
+        "total_calls": 15,
+        "bytes_indexed": 0,
+        "by_tool": {
+          "ctx_execute": {
+            "calls": 9,
+            "bytes": 149774
+          },
+          "ctx_execute_file": {
+            "calls": 4,
+            "bytes": 2589
+          },
+          "ctx_search": {
+            "calls": 2,
+            "bytes": 21304
+          }
+        }
+      },
+      "candidate_runs_by_interval": [
+        "c4-t2.json"
+      ]
+    },
+    {
+      "path": "sessions/stats-pid-2820499.json",
+      "bytes": 441,
+      "mtime": "2026-09-23T03:34:57.391Z",
+      "stats": {
+        "session_start": 1790134461245,
+        "updated_at": 1790134497392,
+        "uptime_ms": 36147,
+        "total_calls": 2,
+        "bytes_indexed": 0,
+        "by_tool": {
+          "ctx_execute_file": {
+            "calls": 2,
+            "bytes": 1420
+          }
+        }
+      },
+      "candidate_runs_by_interval": [
+        "c4-t3.json"
+      ]
+    },
+    {
+      "path": "sessions/stats-pid-2832580.json",
+      "bytes": 442,
+      "mtime": "2026-09-23T03:36:46.766Z",
+      "stats": {
+        "session_start": 1790134540623,
+        "updated_at": 1790134606767,
+        "uptime_ms": 66144,
+        "total_calls": 3,
+        "bytes_indexed": 0,
+        "by_tool": {
+          "ctx_execute_file": {
+            "calls": 3,
+            "bytes": 5091
+          }
+        }
+      },
+      "candidate_runs_by_interval": [
+        "c4-t1-root.json"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+ "note": "Derived extract; the private adapter log stays outside the repository (it carries local account/session metadata).",
+ "private_log_sha256": "beafe372a0911bb25c261a897bea0150893337ef6a11188b19398bca007b06e0",
+ "private_log_bytes": 152882,
+ "method_histogram": {
+  "initialize": 1,
+  "remoteControl/status/changed": 1,
+  "account/read": 3,
+  "config/read": 1,
+  "skills/list": 3,
+  "thread/start": 2,
+  "model/list": 1,
+  "thread/started": 1,
+  "mcpServer/startupStatus/updated": 6,
+  "turn/start": 1,
+  "thread/settings/updated": 1,
+  "thread/status/changed": 2,
+  "turn/started": 1,
+  "item/started": 4,
+  "item/completed": 4,
+  "item/agentMessage/delta": 72,
+  "thread/tokenUsage/updated": 2,
+  "account/rateLimits/updated": 2,
+  "turn/completed": 1
+ },
+ "hook_notifications_seen": 0,
+ "sandbox_policies": [
+  "\"sandboxPolicy\":{\"type\":\"workspaceWrite\",\"writableRoots\":[],\"networkAccess\":false,\"excludeTmpdirEnvVar\":false,\"excludeSlashTmp\":false}"
+ ],
+ "approval_policies": [
+  "\"approvalPolicy\":\"never\"",
+  "\"approvalPolicy\":\"on-request\""
+ ],
+ "commands": [
+  "/bin/bash -lc 'head -c 24000 -- worker-receipt.json acp-research-receipt.json'"
+ ],
+ "token_usage_notification_count": 2
+}

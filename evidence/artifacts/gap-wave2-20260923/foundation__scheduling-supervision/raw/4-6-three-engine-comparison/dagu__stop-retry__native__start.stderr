@@ -1,0 +1,11 @@
+time=2026-09-22T23:03:46.508-04:00 level=INFO msg="Creating example DAGs for first-time users" dir=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-run-1790132622/dagu/stop-retry/dagu-home/dags
+time=2026-09-22T23:03:46.524-04:00 level=INFO msg="Example DAGs created successfully. Check the web UI to explore them!"
+time=2026-09-22T23:03:46.533-04:00 level=INFO msg="Executing root dag-run" dag=recovery run-id=recovery-8ab1458b1edffaf9 params=""
+time=2026-09-22T23:03:46.552-04:00 level=INFO msg="DAG run started" dag=recovery run-id=recovery-8ab1458b1edffaf9 worker-id=local attempt-id=43b53e params=[]
+time=2026-09-22T23:03:46.554-04:00 level=INFO msg="Step started" dag=recovery run-id=recovery-8ab1458b1edffaf9 worker-id=local attempt-id=43b53e step=checkpoint
+time=2026-09-22T23:03:46.624-04:00 level=INFO msg="Step started" dag=recovery run-id=recovery-8ab1458b1edffaf9 worker-id=local attempt-id=43b53e step=finalize
+time=2026-09-22T23:03:46.785-04:00 level=INFO msg="Stop request received" dag=recovery run-id=recovery-8ab1458b1edffaf9 worker-id=local attempt-id=43b53e
+time=2026-09-22T23:03:46.786-04:00 level=INFO msg="Stopping running child processes" dag=recovery run-id=recovery-8ab1458b1edffaf9 worker-id=local attempt-id=43b53e stop-mode=graceful signal=terminated allow-override=true max-cleanup-time=5s
+time=2026-09-22T23:03:46.787-04:00 level=INFO msg="Requesting step stop" dag=recovery run-id=recovery-8ab1458b1edffaf9 worker-id=local attempt-id=43b53e stop-mode=graceful signal=terminated step=finalize
+time=2026-09-22T23:03:46.789-04:00 level=INFO msg="All child processes have been terminated" dag=recovery run-id=recovery-8ab1458b1edffaf9 worker-id=local attempt-id=43b53e
+time=2026-09-22T23:03:46.795-04:00 level=INFO msg="DAG run finished" dag=recovery run-id=recovery-8ab1458b1edffaf9 worker-id=local attempt-id=43b53e status=aborted started-at=2026-09-22T23:03:46-04:00 finished-at=2026-09-22T23:03:46-04:00

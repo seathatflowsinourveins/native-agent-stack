@@ -1,0 +1,39 @@
+{
+  "environment": "backtesting",
+  "live-mode": false,
+  "algorithm-type-name": "WeightScheduleParityAlgorithm",
+  "algorithm-language": "CSharp",
+  "algorithm-location": "/run/build/WeightScheduleParity.dll",
+  "composer-dll-directory": "/engine",
+  "data-folder": "/data",
+  "results-destination-folder": "/run/control_fee2/meanrisk_min_variance",
+  "object-store-root": "/run/control_fee2/meanrisk_min_variance/storage",
+  "parameters": {
+    "fee-usd": "2",
+    "capital": "1000000",
+    "schedule-path": "/run/build/meanrisk_min_variance.csv",
+    "final-close": "2021-03-31",
+    "ledger-path": "/run/control_fee2/meanrisk_min_variance/parity-ledger.csv"
+  },
+  "log-handler": "QuantConnect.Logging.CompositeLogHandler",
+  "messaging-handler": "QuantConnect.Messaging.Messaging",
+  "job-queue-handler": "QuantConnect.Queues.JobQueue",
+  "api-handler": "QuantConnect.Api.Api",
+  "map-file-provider": "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider",
+  "factor-file-provider": "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider",
+  "data-provider": "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider",
+  "data-channel-provider": "DataChannelProvider",
+  "object-store": "QuantConnect.Lean.Engine.Storage.LocalObjectStore",
+  "data-aggregator": "QuantConnect.Lean.Engine.DataFeeds.AggregationManager",
+  "setup-handler": "QuantConnect.Lean.Engine.Setup.BacktestingSetupHandler",
+  "result-handler": "QuantConnect.Lean.Engine.Results.BacktestingResultHandler",
+  "data-feed-handler": "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed",
+  "real-time-handler": "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler",
+  "history-provider": [
+    "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider"
+  ],
+  "transaction-handler": "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler",
+  "close-automatically": true,
+  "job-user-id": "0",
+  "api-access-token": ""
+}

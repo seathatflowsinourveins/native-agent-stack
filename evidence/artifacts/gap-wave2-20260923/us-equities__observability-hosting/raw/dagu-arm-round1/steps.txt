@@ -1,0 +1,22 @@
+[2026-09-23T07:50:09Z] versions dagu=2.16.6 otel=otelcol-contrib version 0.161.0 prom=prometheus, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610) loki=loki, version 3.7.8 (branch: release-3.7.x, revision: 09e6ce2f) restic=restic 0.19.1 compiled with go1.26.4 on linux/amd64 srt=1.0.0
+[2026-09-23T07:50:34Z] stack pids prom=1842920 loki=1842921 otel=1847097 ready_prom=Prometheus Server is Ready. ready_loki=ready
+[2026-09-23T07:50:34Z] dagu start
+[2026-09-23T07:50:45Z] dagu start exit=1
+[2026-09-23T07:50:45Z] dagu status exit=0
+[2026-09-23T07:50:57Z] before-kill prom={"status":"success","data":{"resultType":"vector","result":[]}}
+[2026-09-23T07:50:57Z] before-kill loki_lines=2
+[2026-09-23T07:50:57Z] srt step output: time=2026-09-23T03:50:45.516-04:00 level=ERROR msg="Failed to execute dag-run" err="exit status 56\nrecent stderr (tail):\n not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1/dagu/data/dag-run-work/obsgap/nqwlxuk6l52gu4j5l2ykku3jdy/root/.idea\n[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1/dagu/data/dag-run-work/obsgap/nqwlxuk6l52gu4j5l2ykku3jdy/root/.claude/commands\n[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1/dagu/data/dag-run-work/obsgap/nqwlxuk6l52gu4j5l2ykku3jdy/root/.claude/agents\n[SandboxDebug] [Sandbox Linux] Wrapped command with bwrap (network, filesystem, seccomp(unix-block) restrictions)\n[SandboxDebug] No matching config rule, denying: example.com:443\n[SandboxDebug] Connection blocked to example.com:443\ncurl: (56) CONNECT tunnel failed, response 403\n[SandboxDebug] Sent SIGTERM to HTTP bridge process\n[SandboxDebug] Sent SIGTERM to SOCKS bridge process\n" [SandboxDebug] Command string mode (-c): sleep 1; curl -sS -m 8 -o /dev/null -w "HTTPSTATUS:%{http_code} EXIT:%{exitcode}\n" https://example.com [SandboxDebug] No matching config rule, denying: example.com:443 curl: (56) CONNECT tunnel failed, response 403 HTTPSTATUS:000 EXIT:56 
+[2026-09-23T07:50:57Z] kill -9
+[2026-09-23T07:51:22Z] stack pids prom=1851810 loki=1851811 otel=1855697 ready_prom=Prometheus Server is Ready. ready_loki=ready
+[2026-09-23T07:51:30Z] after-restart prom={"status":"success","data":{"resultType":"vector","result":[]}}
+[2026-09-23T07:51:30Z] after-restart loki_lines=4
+[2026-09-23T07:51:30Z] restic hot backup (stack running)
+[2026-09-23T07:51:34Z] backup exit=0
+[2026-09-23T07:51:34Z] check exit=0
+[2026-09-23T07:51:35Z] restore exit=0
+[2026-09-23T07:51:35Z] diff -rq dagu exit=0 lines=0
+[2026-09-23T07:51:35Z] dagu history on restored home exit=0
+[2026-09-23T07:51:35Z] dagu status on restored home exit=0
+[2026-09-23T07:51:35Z] stop stack
+[2026-09-23T07:51:43Z] listeners left: 0
+MARK=obsgap-075008

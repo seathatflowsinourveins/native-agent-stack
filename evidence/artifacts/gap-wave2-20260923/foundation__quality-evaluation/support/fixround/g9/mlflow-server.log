@@ -1,0 +1,50 @@
+Registry store URI not provided. Using backend store URI.
+2026/09/22 22:51:22 INFO mlflow.store.db.utils: Creating initial MLflow database tables...
+2026/09/22 22:51:22 INFO mlflow.store.db.utils: Updating database tables
+[MLflow] Security middleware enabled with default settings (localhost-only). To allow connections from other hosts, use --host 0.0.0.0 and configure --allowed-hosts and --cors-allowed-origins.
+$HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/pinned-venv/lib/python3.12/site-packages/mlflow/server/fastapi_app.py:23: StarletteDeprecationWarning: starlette.middleware.wsgi is deprecated and will be removed in a future release. Please refer to https://github.com/abersheeran/a2wsgi as a replacement.
+  from starlette.middleware.wsgi import WSGIResponder, build_environ
+2026/09/22 22:51:28 INFO:     Started server process [2093669]
+2026/09/22 22:51:28 INFO:     Waiting for application startup.
+2026/09/22 22:51:28 INFO:     Application startup complete.
+2026/09/22 22:51:28 INFO:     Uvicorn running on http://127.0.0.1:15005 (Press CTRL+C to quit)
+2026/09/22 22:51:30 INFO:     127.0.0.1:57223 - "GET /health HTTP/1.1" 200 OK
+2026/09/22 22:51:30 INFO:     127.0.0.1:57225 - "GET /health HTTP/1.1" 200 OK
+2026/09/22 22:51:30 INFO mlflow.server.jobs.utils: Registered online_scoring_scheduler periodic task (runs every 1 minute)
+2026/09/22 22:51:30 INFO mlflow.server.jobs.utils: Registered trace_archival_scheduler periodic task (polls every 1 minute and no-ops when trace archival is disabled or unconfigured)
+2026/09/22 22:51:31 INFO:     127.0.0.1:57235 - "GET /api/2.0/mlflow/experiments/get-by-name?experiment_name=gap-wave2-quality-evaluation HTTP/1.1" 404 Not Found
+2026/09/22 22:51:31 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/experiments/create HTTP/1.1" 200 OK
+2026/09/22 22:51:31 INFO:     127.0.0.1:57235 - "GET /api/2.0/mlflow/experiments/get?experiment_id=1 HTTP/1.1" 200 OK
+2026/09/22 22:51:31 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/create HTTP/1.1" 200 OK
+2026/09/22 22:51:31 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-batch HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-metric HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-metric HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-metric HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-metric HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-metric HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "GET /api/2.0/mlflow/runs/get?run_uuid=2d1037033bff45b5ba8970b90ebd9d10&run_id=2d1037033bff45b5ba8970b90ebd9d10 HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "GET /api/2.0/mlflow/runs/get?run_uuid=2d1037033bff45b5ba8970b90ebd9d10&run_id=2d1037033bff45b5ba8970b90ebd9d10 HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/update HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/create HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-batch HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-metric HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-metric HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-metric HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-metric HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-metric HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "GET /api/2.0/mlflow/runs/get?run_uuid=4b176a82717c4de79d631d2aeae7efca&run_id=4b176a82717c4de79d631d2aeae7efca HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "GET /api/2.0/mlflow/runs/get?run_uuid=4b176a82717c4de79d631d2aeae7efca&run_id=4b176a82717c4de79d631d2aeae7efca HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/update HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/create HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-batch HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/log-metric HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "GET /api/2.0/mlflow/runs/get?run_uuid=c2c725db27ef4b488101f86e759e47c4&run_id=c2c725db27ef4b488101f86e759e47c4 HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "GET /api/2.0/mlflow/runs/get?run_uuid=c2c725db27ef4b488101f86e759e47c4&run_id=c2c725db27ef4b488101f86e759e47c4 HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57235 - "POST /api/2.0/mlflow/runs/update HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57243 - "GET /api/2.0/mlflow/runs/get?run_id=2d1037033bff45b5ba8970b90ebd9d10 HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57245 - "GET /api/2.0/mlflow/runs/get?run_id=4b176a82717c4de79d631d2aeae7efca HTTP/1.1" 200 OK
+2026/09/22 22:51:32 INFO:     127.0.0.1:57251 - "GET /api/2.0/mlflow/runs/get?run_id=c2c725db27ef4b488101f86e759e47c4 HTTP/1.1" 200 OK
+2026/09/22 22:51:33 INFO:     Shutting down
+2026/09/22 22:51:33 INFO:     Waiting for application shutdown.
+2026/09/22 22:51:33 INFO:     Application shutdown complete.
+2026/09/22 22:51:33 INFO:     Finished server process [2093669]

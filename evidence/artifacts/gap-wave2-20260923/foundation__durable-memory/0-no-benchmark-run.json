@@ -1,0 +1,40 @@
+{
+  "id": "0-no-benchmark-run",
+  "gap_index": 0,
+  "gap_text_sha256": "1c2e9d49f37a2b84129dc4fa775c3a2893021a89ca2c1e3491e7bf4caa66bac4",
+  "preregistration": {
+    "written_at": "2026-09-23T01:30:56Z",
+    "late": true,
+    "late_reason": "No preregistration was written before the grep ran (01:28:14Z); this text was written by the fix round at 01:30:56Z.",
+    "expectation": "This host-bounded worker cannot build a labelled agent-lab question set, stand up a second alternative memory server, and run a matched recall@k/MRR comparison inside a single 20-minute time-boxed check; the check was expected to remain deferred unless a materially smaller bounded variant was substituted.",
+    "criteria": "Settled only by an executed, scored recall@k/MRR comparison between ai-memory and at least one alternative on the same labelled query set.",
+    "timestamp_note": "Timestamps reconciled on 2026-09-23T02:30:41Z from the unit workers' session transcripts (tool-call times, listed in raw/INDEX.json). The earlier value 2026-09-23T01:20:00Z was shared by every receipt, fell after the first-pass commit (01:19:05Z) and matched no recorded event."
+  },
+  "commands": [
+    {
+      "cmd": "grep -rl 'recall@' evidence/artifacts/ 2>/dev/null; grep -rl 'MRR' evidence/artifacts/memory-* 2>/dev/null",
+      "exit": 0,
+      "output_excerpt": "Matched files exist (e.g. evidence/artifacts/foundation-rd-20260921/qmd-comparison.json, evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/foundation__document-retrieval.json, evidence/artifacts/layer-verdicts-20260922/codex/foundation-document-retrieval-20260922.json, evidence/artifacts/layer-verdicts-20260922/claude/foundation-document-retrieval-20260922.json, evidence/artifacts/layer-verdicts-20260922/claude/us-equities-agents-models-workers-20260922.json, evidence/artifacts/claude-repository-evidence-20260921/results.json, evidence/artifacts/catalog-runtime-review-20260921/frozen-20-layer-packet.json and two more), but none of these is a matched ai-memory-vs-alternative recall/MRR run: they are document-retrieval or unrelated adjudication artifacts that happen to contain the strings 'recall@' or 'MRR'. blueprints/memory-lifecycle-probe/README.md's three-note lexical probe (cited by the gap) remains the only comparative durable-memory artifact and it ranks nothing (no scored recall@k/MRR numbers).",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-gap0-gap8-grep.txt",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "results": "Source review only; no benchmark executed this session or in this fix round. Building a labelled agent-lab question set and installing/running a second alternative memory server for a matched recall@k/MRR comparison is multi-hour work that exceeds this check's 20-minute time-box; no existing artifact substitutes for it despite several superficial string matches.",
+  "outcome": "deferred",
+  "evidence_class": "source_review",
+  "limits": [
+    "No new execution.",
+    "Named blocker: constructing a labelled question set and installing/running a second alternative memory server is multi-hour work that exceeds a single 20-minute check's time-box; this is a scope/time-box blocker, not a caution call left over from gap 11's incident.",
+    "The grep did return matching files; none of them qualifies as the matched comparison the gap requires (corrected in this fix round -- the prior version implied no matches existed at all)."
+  ],
+  "checked_at": "2026-09-23T01:28:14Z",
+  "checked_at_note": "Time of the recorded grep (fix-round transcript Bash call [30]).",
+  "reconciliation": {
+    "reconciled_at": "2026-09-23T02:30:41Z",
+    "new_checks_run": false,
+    "changes": [
+      "Real written_at/checked_at from the transcript; raw grep output committed."
+    ]
+  }
+}

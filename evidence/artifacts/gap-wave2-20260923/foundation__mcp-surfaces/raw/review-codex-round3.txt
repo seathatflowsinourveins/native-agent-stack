@@ -1,0 +1,5 @@
+round2-finding 1: resolved - `wong2_pty_list.py:60–65` scrolls 45 times; `raw/wong2-interactive-list.json` matches Inspector tool identities for four servers in all three repetitions. Receipts 6/12 correctly report 4/5 lists and 11/13 operations. Three jcodemunch crashes remain; `raw/6-jcodemunch-method-probe.txt` supports the resource-template failure explanation.
+
+round2-finding 2: resolved - `wong2_pty_list.py:57–58,83–84` separates readiness from scrolling/teardown duration. Receipts 6/12 readiness medians match raw evidence; receipt 6 explicitly acknowledges unmatched CLI timing boundaries.
+
+none

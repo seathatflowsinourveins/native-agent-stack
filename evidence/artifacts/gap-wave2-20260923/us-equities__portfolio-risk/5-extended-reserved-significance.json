@@ -1,0 +1,172 @@
+{
+  "id": "gap-wave2-20260923-us-equities-portfolio-risk-5-extended-reserved-significance",
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "gap_index": 5,
+  "gap_text": "Only 11 completed reserved episodes per candidate. The receipt disclaims any statistical alpha, superiority or promotion claim, and the 2021Q1 segment has now been inspected, so it is no longer untouched.",
+  "gap_text_sha256": "179208a822700ea1233820a2e78ab2a1d314d75243a88085c2a43fcff3c31ab0",
+  "next_check": "Preregister a longer reserved period that has not been inspected (confirm it was not used by the broad-universe study) with at least 30 episodes per candidate, and run evaluate.py once with a predeclared significance test.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:32:44Z",
+    "expectation": "A new frozen plan (plan-extended.json) reserves 2012-10-01..2013-09-30 on the same bundled LEAN SPY/QQQ/IWM data (data_start 2011-03-23, after the QQQQ->QQQ map change; warm-up 120 sessions; selector trained on the last 252 decision sessions before a six-session exclusion). This window precedes the research-evaluation study's 2014 data start, precedes the broad-universe protocol's 2016-01-04 warm-up, and ends before the 2013-10-07..11 week used by the LEAN engine samples. evaluate.py's unchanged label/choose/summaries functions (imported, file hash recorded) score it exactly once, giving at least 30 completed episodes per candidate. Predeclared test: primary two-sided one-sample t-test (scipy.stats.ttest_1samp) on paired per-episode differences net_proxy(selected rule) - net_proxy(equal-weight control), alpha 0.05; secondary two-sided Wilcoxon signed-rank on the same differences; descriptive one-sample t-tests of each invested candidate's net_proxy mean against 0 with Holm correction. No promotion, tuning or rerun follows from any result.",
+    "criteria": "settled iff the frozen plan and this preregistration are committed before the single scoring run, the run exits 0 with >=30 completed episodes per candidate, and the predeclared test statistics and p-values are reported. A second scoring run is forbidden; a failed run is reported as not_settled with its error. Detection: the runner refuses an existing output directory and writes its freeze before parsing prices; the episode count check raises below 30."
+  },
+  "commands": [
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-lock/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap5_extended.py --out $CACHE/g5-harness-test --harness-test-plan $CACHE/harness-test-plan.json",
+      "exit": 0,
+      "note": "harness test on the already-inspected 2016-10..2017-09 development window before the frozen run; output kept in raw/5/harness-test"
+    },
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-lock/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap5_extended.py --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/5/scoring-run",
+      "exit": 0,
+      "started_utc": "2026-09-23T06:44:25Z",
+      "note": "the single scoring run; driver and plan committed at 1c6d261 (06:44:20Z) before it"
+    }
+  ],
+  "results": {
+    "selected_from_training": "momentum20",
+    "train": [
+      "2011-09-22",
+      "2012-09-20"
+    ],
+    "reserved": [
+      "2012-10-01",
+      "2013-09-30"
+    ],
+    "completed_episodes_per_candidate": {
+      "cash": 49,
+      "equalweight": 49,
+      "momentum120": 49,
+      "momentum20": 49,
+      "momentum60": 49
+    },
+    "mean_net_cost_proxy_label": {
+      "cash": "0.000",
+      "equalweight": "0.001817883142223400032523087186",
+      "momentum120": "0.002184748958235042508286118880",
+      "momentum20": "0.001870103076022868204036480335",
+      "momentum60": "-0.0005154478502568742322197106592"
+    },
+    "primary_test": {
+      "alpha": 0.05,
+      "mean_difference": 5.221993379946801e-05,
+      "n_pairs": 49,
+      "pvalue": 0.9789563709880422,
+      "reject_null_at_alpha": false,
+      "selected": "momentum20",
+      "t": 0.02651516343730066,
+      "test": "two-sided one-sample t-test on paired net_proxy(selected) - net_proxy(equalweight)"
+    },
+    "secondary_wilcoxon": {
+      "pvalue": 0.6079896611658668,
+      "statistic": 560.0
+    },
+    "secondary_per_candidate_vs_zero": {
+      "equalweight": {
+        "holm_pvalue": 1.0,
+        "mean_net_proxy": 0.0018178831422234001,
+        "n": 49,
+        "pvalue": 0.5073007066496829,
+        "t": 0.6680510969710225
+      },
+      "momentum120": {
+        "holm_pvalue": 1.0,
+        "mean_net_proxy": 0.0021847489582350428,
+        "n": 49,
+        "pvalue": 0.44845271533138004,
+        "t": 0.7642607807334552
+      },
+      "momentum20": {
+        "holm_pvalue": 1.0,
+        "mean_net_proxy": 0.0018701030760228683,
+        "n": 49,
+        "pvalue": 0.3693697274290137,
+        "t": 0.9061750778148573
+      },
+      "momentum60": {
+        "holm_pvalue": 1.0,
+        "mean_net_proxy": -0.0005154478502568742,
+        "n": 49,
+        "pvalue": 0.845966569242816,
+        "t": -0.19532042485244172
+      }
+    },
+    "not_used_by_broad_universe": "broad-universe protocol.json chronology starts its warm-up at 2016-01-04 (development 2017-2021, validation 2022-2023, reserved 2024-2026-08-14)",
+    "repository_scan": "rg over the repository found no SPY/QQQ/IWM use of 2012-10..2013-09; the only hits were FOXA/NWSA minute files in execution-realism inputs; the LEAN engine sample week 2013-10-07..11 lies after the window"
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Remaining (why advanced, per the Opus review): the next_check says 'run evaluate.py once'. evaluate.py's main() is hard-wired to plan.json, so its unchanged label/choose/summaries/check functions are imported by a new driver that re-implements panel loading, the anchor, the training index and episode selection. That is an equivalent substitute, not a stronger check. This window may not be scored again (the preregistration forbids a second scoring), so settling needs a plan-path-parameterised evaluate.py run once on a fresh unused window, or a preregistered equivalence proof of the driver against evaluate.py on already-inspected data.",
+    "The window precedes the development period (selector trained on 2011-09..2012-09); public bundled data is not demonstrated globally unseen, and only session dates (not prices) were counted before the freeze.",
+    "The primary test fails to reject (p=0.979); 49 non-overlapping five-session episodes per candidate on three ETFs cannot support an alpha, superiority or promotion claim.",
+    "Raw-price labels with the 20bp proxy; no dividends, fills or financing.",
+    "The frozen plan-extended.json inherited corporate_action_policy text naming 2014-01-02..2021-03-31 (stale copy); the executed check_auxiliary used the plan's data_start..reserved_end (2011-03-23..2013-09-30)."
+  ],
+  "checked_at": "2026-09-23T06:44:25Z",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/5/harness-test/harness-test-plan.json",
+      "sha256": "546c334a9b653c9c4812421cbd35b86bed3225145f54ce739f9e576219a431b9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/5/harness-test/results.json",
+      "sha256": "15029cb49da8739c879e7b2996cd57a874054a3678dedf37fede6719507d9649"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/5/scoring-run/candidate-ledger.json",
+      "sha256": "128a150418d05965111cb5c2427704b11edb0e478eeb8dadb95fb90b936025e8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/5/scoring-run/freeze.json",
+      "sha256": "18088137344dd98b3c3c9fda5353c2244d5138d924b80c92c1d2052fb380d9f4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/5/scoring-run/reserved-extended.selection.json",
+      "sha256": "52ce16d901c0a801b4824a4d931a66d9fd6c5c6e676a1ee674a6fc4b7dd0342f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/5/scoring-run/results.json",
+      "sha256": "1d781574e0aec8fe9054bee144f3af4391822e9bdcbca20447c2233e3b43d12c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/5/scoring-run.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/5/scoring-run.stdout.txt",
+      "sha256": "08e84910727f4757a41046af40b29c0e280686fcd9ab1cb7dfdee9cb07f4c847"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap5_extended.py",
+      "sha256": "060dc10ec39042468008d0936d55a3c6a9ac255cad127df1722b25d2966e5f8b"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/plan-extended.json",
+      "sha256": "a2f698706bb8809f91facf48fc8028c3a374ff4fb9db9edb7b48c5a0d662e38d"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "Codex CLI 0.155.1 (gpt-6-astra), codex exec --sandbox read-only --ephemeral, one bounded call",
+    "record": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md"
+    ],
+    "round_2": "no round-2 finding for this gap",
+    "findings_and_resolution": "minor: plan-extended.json inherited stale 2014-2021 corporate-action text -> disclosed (plan is frozen, not edited)",
+    "round_3": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "resolution": "minor: a new driver is an equivalent substitute for 'run evaluate.py once', not a stronger check -> outcome downgraded to advanced; no rescoring (the preregistration forbids a second scoring of the window)"
+    },
+    "round_4": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "resolution": "no round-4 finding for this gap"
+    },
+    "round_4_codex": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "reviewer": "Codex CLI (codex exec --sandbox read-only --ephemeral), one bounded call on commits 6ed9709..a4cbcf8",
+      "resolution": "no finding for this gap"
+    }
+  }
+}

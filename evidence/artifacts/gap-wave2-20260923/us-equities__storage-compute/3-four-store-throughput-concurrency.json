@@ -1,0 +1,903 @@
+{
+  "id": "us-equities__storage-compute-3-four-store-throughput-concurrency",
+  "gap_index": 3,
+  "layer_id": "storage-compute",
+  "catalog": "us-equities",
+  "gap_text": "No throughput, concurrency or multi-writer measurement exists for DuckDB or any server or lake alternative (QuestDB, ClickHouse, Iceberg).",
+  "gap_text_sha256": "ab944b8e2cf4c5b7c4cff924838e26c33f82ac4eb6a12f8b8d58472d91b95425",
+  "next_check": "Install pinned QuestDB, ClickHouse and pyiceberg (SQL catalog) in new prefixes. Generate a fixed-seed OHLCV dataset of about 50M rows and measure bulk-load throughput, query latency, and 1/4/8 concurrent writers/readers against DuckDB 1.5.5. Retain raw timings and versions.",
+  "preregistration": {
+    "gap_index": 3,
+    "written_at": "2026-09-23T05:15:15Z",
+    "expectation": "A fixed-seed OHLCV dataset of 50,000,000 rows (seed 20260923) loads into DuckDB 1.5.5, ClickHouse v26.8.11.7-lts server, QuestDB 10.0.1 (bundled JRE) and pyiceberg 0.12.0 with a SQLite SQL catalog. Expected ordering (prior, not a result): DuckDB and ClickHouse bulk-load fastest (tens of millions of rows/s from Parquet), QuestDB ILP slower (a few million rows/s), pyiceberg bounded by Parquet writing. DuckDB cannot accept a second writer process on the same file (lock error) but accepts concurrent in-process writer threads; pyiceberg concurrent appends through the SQL catalog produce optimistic-commit conflicts that need retries; ClickHouse and QuestDB accept 1/4/8 concurrent writers without errors.",
+    "criteria": "settled only if all four stores complete bulk load, the fixed query set with repeated latency samples, and writers-only and readers-only phases at 1, 4 and 8 clients, with raw timings and resolved versions retained. advanced if at least one store or phase is missing (named). not_settled if the harness cannot complete within 20 minutes per store.",
+    "note": "Written before the check's commands were run.",
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/prereg/3.json",
+    "file_sha256": "9021e29890fbb0a2dd9a87021542d0110bcbadd8ae9d72dcb14909418d3a927e",
+    "committed_in": "af80671 (before any check command ran)",
+    "fix_round": {
+      "gap_index": 3,
+      "written_at": "2026-09-23T05:52:16Z",
+      "round": 2,
+      "label": "fix-round (late relative to round 1, written before round 2)",
+      "expectation": "Round 2 reruns all four stores with the same dataset and phases, and replaces the aggregate query digests with full canonical Q2/Q3/Q4 result rows compared across stores (exact for keys and integer counts, relative tolerance 1e-9 for floats). Expected: every store's full results agree with DuckDB; load and phase numbers stay within the same order of magnitude as round 1.",
+      "criteria": "settled if round 2 completes for all four stores and the full-row comparison passes; advanced if any store's full results disagree or any phase is missing.",
+      "note": "Fix-round preregistration, written after round 1 and the Codex gpt-6-astra read-only review of a0f57fa, before any round-2 command ran.",
+      "file": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/prereg/3-fixround.json",
+      "file_sha256": "9476cb7723a978c13639497545d81c596675787214f03573f307ae0b73e83379",
+      "committed_in": "23c9902 (after round 1 and the Codex review, before any round-2 command ran)"
+    }
+  },
+  "commands": [
+    "curl -fsSL -o questdb-10.0.1-rt-linux-x86-64.tar.gz https://github.com/questdb/questdb/releases/download/10.0.1/questdb-10.0.1-rt-linux-x86-64.tar.gz   # 98,016,278 bytes; sha256 38a736c253c3ac4c795aca1db35d6bf6f479e2788fcd88b9001693844682db86 equals the GitHub asset digest",
+    "curl -fsSL -o clickhouse-common-static-26.8.11.7-amd64.tgz https://github.com/ClickHouse/ClickHouse/releases/download/v26.8.11.7-lts/clickhouse-common-static-26.8.11.7-amd64.tgz && sha512sum -c clickhouse-common-static-26.8.11.7-amd64.tgz.sha512   # 235,732,763 bytes, 'OK'; both downloads inside ecosystem-bounded-run",
+    "uv venv --python ...python3.13 venv-bench && uv pip install --python venv-bench/bin/python duckdb==1.5.5 'pyiceberg[sql-sqlite,pyarrow]==0.12.0' pyarrow numpy pandas clickhouse-connect questdb 'psycopg[binary]' psutil",
+    "$HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py gen --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store duckdb --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/w-duckdb --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/duckdb.json   # round 1; default 256-task cgroup limit",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store clickhouse --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/w-clickhouse --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/clickhouse.json --ch-bin $HOME/.cache/gap-wave2-20260923/storage-compute/clickhouse-26.8.11.7/clickhouse-common-static-26.8.11.7/usr/bin/clickhouse   # round 1",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store questdb --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/w-questdb --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/questdb.json --qdb-home $HOME/.cache/gap-wave2-20260923/storage-compute/questdb-10.0.1/questdb-10.0.1-rt-linux-x86-64   # round 1",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store iceberg --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/w-iceberg --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/iceberg.json   # round 1",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store duckdb --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/w-duckdb --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/duckdb.json --ch-bin $HOME/.cache/gap-wave2-20260923/storage-compute/clickhouse-26.8.11.7/clickhouse-common-static-26.8.11.7/usr/bin/clickhouse --qdb-home $HOME/.cache/gap-wave2-20260923/storage-compute/questdb-10.0.1/questdb-10.0.1-rt-linux-x86-64   # round 2",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store clickhouse --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/w-clickhouse --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/clickhouse.json --ch-bin $HOME/.cache/gap-wave2-20260923/storage-compute/clickhouse-26.8.11.7/clickhouse-common-static-26.8.11.7/usr/bin/clickhouse --qdb-home $HOME/.cache/gap-wave2-20260923/storage-compute/questdb-10.0.1/questdb-10.0.1-rt-linux-x86-64   # round 2",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store questdb --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/w-questdb --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/questdb.json --ch-bin $HOME/.cache/gap-wave2-20260923/storage-compute/clickhouse-26.8.11.7/clickhouse-common-static-26.8.11.7/usr/bin/clickhouse --qdb-home $HOME/.cache/gap-wave2-20260923/storage-compute/questdb-10.0.1/questdb-10.0.1-rt-linux-x86-64   # round 2",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store iceberg --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/w-iceberg --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/iceberg.json --ch-bin $HOME/.cache/gap-wave2-20260923/storage-compute/clickhouse-26.8.11.7/clickhouse-common-static-26.8.11.7/usr/bin/clickhouse --qdb-home $HOME/.cache/gap-wave2-20260923/storage-compute/questdb-10.0.1/questdb-10.0.1-rt-linux-x86-64   # round 2",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store duckdb --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/w-duckdb --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/duckdb.json   # round 3",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store clickhouse --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/w-clickhouse --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/clickhouse.json --ch-bin $HOME/.cache/gap-wave2-20260923/storage-compute/clickhouse-26.8.11.7/clickhouse-common-static-26.8.11.7/usr/bin/clickhouse   # round 3",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store questdb --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/w-questdb --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/questdb.json --qdb-home $HOME/.cache/gap-wave2-20260923/storage-compute/questdb-10.0.1/questdb-10.0.1-rt-linux-x86-64   # round 3",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store iceberg --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/w-iceberg --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/iceberg.json   # round 3"
+  ],
+  "results": [
+    "Dataset: 50000000 rows, 50 Zstandard Parquet files, combined sha256 9ddbbf7b15caaa441170a093b799d7ac09d2e3c311bf163624bff52af7875e1f.",
+    "Round 3 full-row cross-store agreement on Q1-Q4 (keys and integer counts exact, floats rel_tol 1e-9) against DuckDB: {\"duckdb\": {\"Q1\": true, \"Q2\": true, \"Q3\": true, \"Q4\": true}, \"clickhouse\": {\"Q1\": true, \"Q2\": true, \"Q3\": true, \"Q4\": true}, \"questdb\": {\"Q1\": true, \"Q2\": true, \"Q3\": true, \"Q4\": true}, \"iceberg\": {\"Q1\": true, \"Q2\": true, \"Q3\": true, \"Q4\": true}} -> True.",
+    "duckdb {\"duckdb\": \"1.5.5\"} (round 3): bulk load 2.164 s = 23104018 rows/s (row_count_ok True); query medians {\"Q1\": 0.0011, \"Q2\": 0.0014, \"Q3\": 0.0176, \"Q4\": 0.0023}; writers-only W1/W4/W8 batch p50/p95/p99 s [[0.0057, 0.0072, 0.0293], [0.0112, 0.0388, 0.044], [0.023, 0.0547, 0.0703]], errors [0, 0, 0]; readers-only R1/R4/R8 Q2 p50/p95/p99 s [[0.0014, 0.0018, 0.0018], [0.0018, 0.0024, 0.0025], [0.0032, 0.0048, 0.0058]]; earlier rounds: {\"round1\": {\"bulk_load_rows_per_s\": 11730077, \"query_median_s\": {\"Q1\": 0.008, \"Q2\": 0.0081, \"Q3\": 0.0414, \"Q4\": 0.0063}, \"loadavg_start\": 19.451171875}, \"round2\": {\"bulk_load_rows_per_s\": 21371290, \"query_median_s\": {\"Q1\": 0.0011, \"Q2\": 0.0022, \"Q3\": 0.022, \"Q4\": 0.0033}, \"loadavg_start\": 12.94140625}}",
+    "clickhouse {\"clickhouse\": \"ClickHouse local version 26.8.11.7 (official build).\", \"clickhouse_connect\": \"1.9.0\"} (round 3): bulk load 14.105 s = 3544798 rows/s (row_count_ok True); query medians {\"Q1\": 0.0014, \"Q2\": 0.0049, \"Q3\": 0.0825, \"Q4\": 0.0143}; writers-only W1/W4/W8 batch p50/p95/p99 s [[0.0601, 0.0698, 0.0787], [0.1805, 0.2121, 0.2199], [0.1909, 0.1966, 0.208]], errors [0, 0, 0]; readers-only R1/R4/R8 Q2 p50/p95/p99 s [[0.0043, 0.0057, 0.0059], [0.0045, 0.0052, 0.0053], [0.0046, 0.0054, 0.0055]]; earlier rounds: {\"round1\": {\"bulk_load_rows_per_s\": 1684187, \"query_median_s\": {\"Q1\": 0.0052, \"Q2\": 0.017, \"Q3\": 0.116, \"Q4\": 0.0294}, \"loadavg_start\": 32.43603515625}, \"round2\": {\"bulk_load_rows_per_s\": 3081787, \"query_median_s\": {\"Q1\": 0.0014, \"Q2\": 0.006, \"Q3\": 0.087, \"Q4\": 0.0155}, \"loadavg_start\": 12.46533203125}}",
+    "questdb {\"questdb\": \"10.0.1 (questdb-10.0.1-rt-linux-x86-64)\", \"bundled_java\": \"openjdk version \\\"25.0.2\\\" 2026-01-20\", \"questdb_python_client\": \"5.0.0\"} (round 3): bulk load 26.267 s = 1903560 rows/s (row_count_ok True); query medians {\"Q1\": 0.0013, \"Q2\": 0.0025, \"Q3\": 0.0326, \"Q4\": 0.0037}; writers-only W1/W4/W8 batch p50/p95/p99 s [[0.0096, 0.0161, 0.0305], [0.0114, 0.0243, 0.0447], [0.0096, 0.0162, 0.0244]], errors [0, 0, 0]; readers-only R1/R4/R8 Q2 p50/p95/p99 s [[0.006, 0.0098, 0.0436], [0.0052, 0.0109, 0.071], [0.0038, 0.0233, 0.1348]]; earlier rounds: {\"round1\": {\"bulk_load_rows_per_s\": 856615, \"query_median_s\": {\"Q1\": 0.0055, \"Q2\": 0.0047, \"Q3\": 0.0609, \"Q4\": 0.0077}, \"loadavg_start\": 26.34619140625}, \"round2\": {\"bulk_load_rows_per_s\": 1501861, \"query_median_s\": {\"Q1\": 0.0013, \"Q2\": 0.0015, \"Q3\": 0.0357, \"Q4\": 0.0046}, \"loadavg_start\": 9.349609375}}",
+    "iceberg {\"pyiceberg\": \"0.12.0\", \"catalog\": \"SqlCatalog (sqlite)\", \"sqlalchemy\": \"2.0.54\", \"pyarrow\": \"25.0.1\"} (round 3): bulk load 9.495 s = 5265812 rows/s (row_count_ok True); query medians {\"Q1\": 0.0365, \"Q2\": 0.0557, \"Q3\": 0.2603, \"Q4\": 0.0574}; writers-only W1/W4/W8 batch p50/p95/p99 s [[0.0345, 0.076, 0.0982], [0.0482, 0.4305, 1.8847], [0.2152, 2.0441, 3.6983]], errors [0, 0, 0]; readers-only R1/R4/R8 Q2 p50/p95/p99 s [[0.2194, 0.2777, 0.3671], [0.2497, 0.3497, 0.3522], [0.2849, 0.3924, 0.4334]]; earlier rounds: {\"round1\": {\"bulk_load_rows_per_s\": 4172232, \"query_median_s\": {\"Q1\": 0.0426, \"Q2\": 0.0601, \"Q3\": 0.2605, \"Q4\": 0.0582}, \"loadavg_start\": 33.77099609375}, \"round2\": {\"bulk_load_rows_per_s\": 4391731, \"query_median_s\": {\"Q1\": 0.0394, \"Q2\": 0.0674, \"Q3\": 0.2765, \"Q4\": 0.0607}, \"loadavg_start\": 13.10302734375}}",
+    "DuckDB second process while the harness holds the file: IOException: IO Error: Could not set lock on file \"$HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/w-duckdb/bench.duckdb\": Conflicting lock is held in ",
+    "pyiceberg SqlCatalog concurrent appends (round 3): internal commit retries W1/W4/W8 = [0, 26, 220], CommitFailedException after pyiceberg's retries then retried by the harness = [0, 2, 13]; W8 batches ok 160, rows visible ok True."
+  ],
+  "outcome": "settled",
+  "evidence_class": "local_integration",
+  "store_summaries": {
+    "duckdb": {
+      "versions": {
+        "duckdb": "1.5.5"
+      },
+      "bulk_load_s": 2.164,
+      "bulk_load_rows_per_s": 23104018,
+      "query_median_s": {
+        "Q1": 0.0011,
+        "Q2": 0.0014,
+        "Q3": 0.0176,
+        "Q4": 0.0023
+      },
+      "phases": {
+        "W1": {
+          "write_p50_p95_p99_s": [
+            0.0057,
+            0.0072,
+            0.0293
+          ],
+          "read_p50_p95_p99_s": null,
+          "write_batches_ok": 20,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 1283555
+        },
+        "W4": {
+          "write_p50_p95_p99_s": [
+            0.0112,
+            0.0388,
+            0.044
+          ],
+          "read_p50_p95_p99_s": null,
+          "write_batches_ok": 80,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 2303011
+        },
+        "W8": {
+          "write_p50_p95_p99_s": [
+            0.023,
+            0.0547,
+            0.0703
+          ],
+          "read_p50_p95_p99_s": null,
+          "write_batches_ok": 160,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 2650292
+        },
+        "R1": {
+          "write_p50_p95_p99_s": null,
+          "read_p50_p95_p99_s": [
+            0.0014,
+            0.0018,
+            0.0018
+          ],
+          "write_batches_ok": 0,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": null,
+          "wall_rows_per_s": null
+        },
+        "R4": {
+          "write_p50_p95_p99_s": null,
+          "read_p50_p95_p99_s": [
+            0.0018,
+            0.0024,
+            0.0025
+          ],
+          "write_batches_ok": 0,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": null,
+          "wall_rows_per_s": null
+        },
+        "R8": {
+          "write_p50_p95_p99_s": null,
+          "read_p50_p95_p99_s": [
+            0.0032,
+            0.0048,
+            0.0058
+          ],
+          "write_batches_ok": 0,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": null,
+          "wall_rows_per_s": null
+        },
+        "M1": {
+          "write_p50_p95_p99_s": [
+            0.0066,
+            0.0074,
+            0.0109
+          ],
+          "read_p50_p95_p99_s": [
+            0.0019,
+            0.0037,
+            0.0072
+          ],
+          "write_batches_ok": 20,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 1381066
+        },
+        "M4": {
+          "write_p50_p95_p99_s": [
+            0.0116,
+            0.0457,
+            0.0512
+          ],
+          "read_p50_p95_p99_s": [
+            0.0025,
+            0.0067,
+            0.0093
+          ],
+          "write_batches_ok": 80,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 2162032
+        },
+        "M8": {
+          "write_p50_p95_p99_s": [
+            0.0233,
+            0.0559,
+            0.0727
+          ],
+          "read_p50_p95_p99_s": [
+            0.0068,
+            0.0121,
+            0.0137
+          ],
+          "write_batches_ok": 160,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 2470976
+        }
+      },
+      "earlier_rounds": {
+        "round1": {
+          "bulk_load_rows_per_s": 11730077,
+          "query_median_s": {
+            "Q1": 0.008,
+            "Q2": 0.0081,
+            "Q3": 0.0414,
+            "Q4": 0.0063
+          },
+          "loadavg_start": 19.451171875
+        },
+        "round2": {
+          "bulk_load_rows_per_s": 21371290,
+          "query_median_s": {
+            "Q1": 0.0011,
+            "Q2": 0.0022,
+            "Q3": 0.022,
+            "Q4": 0.0033
+          },
+          "loadavg_start": 12.94140625
+        }
+      }
+    },
+    "clickhouse": {
+      "versions": {
+        "clickhouse": "ClickHouse local version 26.8.11.7 (official build).",
+        "clickhouse_connect": "1.9.0"
+      },
+      "bulk_load_s": 14.105,
+      "bulk_load_rows_per_s": 3544798,
+      "query_median_s": {
+        "Q1": 0.0014,
+        "Q2": 0.0049,
+        "Q3": 0.0825,
+        "Q4": 0.0143
+      },
+      "phases": {
+        "W1": {
+          "write_p50_p95_p99_s": [
+            0.0601,
+            0.0698,
+            0.0787
+          ],
+          "read_p50_p95_p99_s": null,
+          "write_batches_ok": 20,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 118346
+        },
+        "W4": {
+          "write_p50_p95_p99_s": [
+            0.1805,
+            0.2121,
+            0.2199
+          ],
+          "read_p50_p95_p99_s": null,
+          "write_batches_ok": 80,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 197909
+        },
+        "W8": {
+          "write_p50_p95_p99_s": [
+            0.1909,
+            0.1966,
+            0.208
+          ],
+          "read_p50_p95_p99_s": null,
+          "write_batches_ok": 160,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 354426
+        },
+        "R1": {
+          "write_p50_p95_p99_s": null,
+          "read_p50_p95_p99_s": [
+            0.0043,
+            0.0057,
+            0.0059
+          ],
+          "write_batches_ok": 0,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": null,
+          "wall_rows_per_s": null
+        },
+        "R4": {
+          "write_p50_p95_p99_s": null,
+          "read_p50_p95_p99_s": [
+            0.0045,
+            0.0052,
+            0.0053
+          ],
+          "write_batches_ok": 0,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": null,
+          "wall_rows_per_s": null
+        },
+        "R8": {
+          "write_p50_p95_p99_s": null,
+          "read_p50_p95_p99_s": [
+            0.0046,
+            0.0054,
+            0.0055
+          ],
+          "write_batches_ok": 0,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": null,
+          "wall_rows_per_s": null
+        },
+        "M1": {
+          "write_p50_p95_p99_s": [
+            0.0602,
+            0.1503,
+            0.1845
+          ],
+          "read_p50_p95_p99_s": [
+            0.0047,
+            0.0057,
+            0.0063
+          ],
+          "write_batches_ok": 20,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 98288
+        },
+        "M4": {
+          "write_p50_p95_p99_s": [
+            0.2104,
+            0.2186,
+            0.2197
+          ],
+          "read_p50_p95_p99_s": [
+            0.0049,
+            0.0058,
+            0.006
+          ],
+          "write_batches_ok": 80,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 203162
+        },
+        "M8": {
+          "write_p50_p95_p99_s": [
+            0.1915,
+            0.1988,
+            0.2004
+          ],
+          "read_p50_p95_p99_s": [
+            0.0061,
+            0.0098,
+            0.0161
+          ],
+          "write_batches_ok": 160,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 329832
+        }
+      },
+      "earlier_rounds": {
+        "round1": {
+          "bulk_load_rows_per_s": 1684187,
+          "query_median_s": {
+            "Q1": 0.0052,
+            "Q2": 0.017,
+            "Q3": 0.116,
+            "Q4": 0.0294
+          },
+          "loadavg_start": 32.43603515625
+        },
+        "round2": {
+          "bulk_load_rows_per_s": 3081787,
+          "query_median_s": {
+            "Q1": 0.0014,
+            "Q2": 0.006,
+            "Q3": 0.087,
+            "Q4": 0.0155
+          },
+          "loadavg_start": 12.46533203125
+        }
+      }
+    },
+    "questdb": {
+      "versions": {
+        "questdb": "10.0.1 (questdb-10.0.1-rt-linux-x86-64)",
+        "bundled_java": "openjdk version \"25.0.2\" 2026-01-20",
+        "questdb_python_client": "5.0.0"
+      },
+      "bulk_load_s": 26.267,
+      "bulk_load_rows_per_s": 1903560,
+      "query_median_s": {
+        "Q1": 0.0013,
+        "Q2": 0.0025,
+        "Q3": 0.0326,
+        "Q4": 0.0037
+      },
+      "phases": {
+        "W1": {
+          "write_p50_p95_p99_s": [
+            0.0096,
+            0.0161,
+            0.0305
+          ],
+          "read_p50_p95_p99_s": null,
+          "write_batches_ok": 20,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 316164
+        },
+        "W4": {
+          "write_p50_p95_p99_s": [
+            0.0114,
+            0.0243,
+            0.0447
+          ],
+          "read_p50_p95_p99_s": null,
+          "write_batches_ok": 80,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 977732
+        },
+        "W8": {
+          "write_p50_p95_p99_s": [
+            0.0096,
+            0.0162,
+            0.0244
+          ],
+          "read_p50_p95_p99_s": null,
+          "write_batches_ok": 160,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 2088719
+        },
+        "R1": {
+          "write_p50_p95_p99_s": null,
+          "read_p50_p95_p99_s": [
+            0.006,
+            0.0098,
+            0.0436
+          ],
+          "write_batches_ok": 0,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": null,
+          "wall_rows_per_s": null
+        },
+        "R4": {
+          "write_p50_p95_p99_s": null,
+          "read_p50_p95_p99_s": [
+            0.0052,
+            0.0109,
+            0.071
+          ],
+          "write_batches_ok": 0,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": null,
+          "wall_rows_per_s": null
+        },
+        "R8": {
+          "write_p50_p95_p99_s": null,
+          "read_p50_p95_p99_s": [
+            0.0038,
+            0.0233,
+            0.1348
+          ],
+          "write_batches_ok": 0,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": null,
+          "wall_rows_per_s": null
+        },
+        "M1": {
+          "write_p50_p95_p99_s": [
+            0.0095,
+            0.0119,
+            0.013
+          ],
+          "read_p50_p95_p99_s": [
+            0.0013,
+            0.0016,
+            0.0351
+          ],
+          "write_batches_ok": 20,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 359223
+        },
+        "M4": {
+          "write_p50_p95_p99_s": [
+            0.0085,
+            0.0177,
+            0.023
+          ],
+          "read_p50_p95_p99_s": [
+            0.0017,
+            0.0073,
+            0.0862
+          ],
+          "write_batches_ok": 80,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 1121329
+        },
+        "M8": {
+          "write_p50_p95_p99_s": [
+            0.013,
+            0.0339,
+            0.0612
+          ],
+          "read_p50_p95_p99_s": [
+            0.0087,
+            0.0407,
+            0.1791
+          ],
+          "write_batches_ok": 160,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 1535948
+        }
+      },
+      "earlier_rounds": {
+        "round1": {
+          "bulk_load_rows_per_s": 856615,
+          "query_median_s": {
+            "Q1": 0.0055,
+            "Q2": 0.0047,
+            "Q3": 0.0609,
+            "Q4": 0.0077
+          },
+          "loadavg_start": 26.34619140625
+        },
+        "round2": {
+          "bulk_load_rows_per_s": 1501861,
+          "query_median_s": {
+            "Q1": 0.0013,
+            "Q2": 0.0015,
+            "Q3": 0.0357,
+            "Q4": 0.0046
+          },
+          "loadavg_start": 9.349609375
+        }
+      }
+    },
+    "iceberg": {
+      "versions": {
+        "pyiceberg": "0.12.0",
+        "catalog": "SqlCatalog (sqlite)",
+        "sqlalchemy": "2.0.54",
+        "pyarrow": "25.0.1"
+      },
+      "bulk_load_s": 9.495,
+      "bulk_load_rows_per_s": 5265812,
+      "query_median_s": {
+        "Q1": 0.0365,
+        "Q2": 0.0557,
+        "Q3": 0.2603,
+        "Q4": 0.0574
+      },
+      "phases": {
+        "W1": {
+          "write_p50_p95_p99_s": [
+            0.0345,
+            0.076,
+            0.0982
+          ],
+          "read_p50_p95_p99_s": null,
+          "write_batches_ok": 20,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 126494,
+          "pyiceberg_internal_commit_retries": 0,
+          "commit_failed_after_internal_retries_then_harness_retry": 0
+        },
+        "W4": {
+          "write_p50_p95_p99_s": [
+            0.0482,
+            0.4305,
+            1.8847
+          ],
+          "read_p50_p95_p99_s": null,
+          "write_batches_ok": 80,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 170225,
+          "pyiceberg_internal_commit_retries": 26,
+          "commit_failed_after_internal_retries_then_harness_retry": 2
+        },
+        "W8": {
+          "write_p50_p95_p99_s": [
+            0.2152,
+            2.0441,
+            3.6983
+          ],
+          "read_p50_p95_p99_s": null,
+          "write_batches_ok": 160,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 120030,
+          "pyiceberg_internal_commit_retries": 220,
+          "commit_failed_after_internal_retries_then_harness_retry": 13
+        },
+        "R1": {
+          "write_p50_p95_p99_s": null,
+          "read_p50_p95_p99_s": [
+            0.2194,
+            0.2777,
+            0.3671
+          ],
+          "write_batches_ok": 0,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": null,
+          "wall_rows_per_s": null,
+          "pyiceberg_internal_commit_retries": 0,
+          "commit_failed_after_internal_retries_then_harness_retry": 0
+        },
+        "R4": {
+          "write_p50_p95_p99_s": null,
+          "read_p50_p95_p99_s": [
+            0.2497,
+            0.3497,
+            0.3522
+          ],
+          "write_batches_ok": 0,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": null,
+          "wall_rows_per_s": null,
+          "pyiceberg_internal_commit_retries": 0,
+          "commit_failed_after_internal_retries_then_harness_retry": 0
+        },
+        "R8": {
+          "write_p50_p95_p99_s": null,
+          "read_p50_p95_p99_s": [
+            0.2849,
+            0.3924,
+            0.4334
+          ],
+          "write_batches_ok": 0,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": null,
+          "wall_rows_per_s": null,
+          "pyiceberg_internal_commit_retries": 0,
+          "commit_failed_after_internal_retries_then_harness_retry": 0
+        },
+        "M1": {
+          "write_p50_p95_p99_s": [
+            0.1178,
+            0.174,
+            0.1924
+          ],
+          "read_p50_p95_p99_s": [
+            0.2317,
+            0.267,
+            0.3578
+          ],
+          "write_batches_ok": 20,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 36970,
+          "pyiceberg_internal_commit_retries": 0,
+          "commit_failed_after_internal_retries_then_harness_retry": 0
+        },
+        "M4": {
+          "write_p50_p95_p99_s": [
+            0.1607,
+            2.0867,
+            4.5277
+          ],
+          "read_p50_p95_p99_s": [
+            0.2824,
+            0.3189,
+            0.4155
+          ],
+          "write_batches_ok": 80,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 63392,
+          "pyiceberg_internal_commit_retries": 62,
+          "commit_failed_after_internal_retries_then_harness_retry": 6
+        },
+        "M8": {
+          "write_p50_p95_p99_s": [
+            0.4248,
+            4.8194,
+            6.0886
+          ],
+          "read_p50_p95_p99_s": [
+            0.4777,
+            0.6299,
+            0.6607
+          ],
+          "write_batches_ok": 160,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 54935,
+          "pyiceberg_internal_commit_retries": 355,
+          "commit_failed_after_internal_retries_then_harness_retry": 37
+        }
+      },
+      "earlier_rounds": {
+        "round1": {
+          "bulk_load_rows_per_s": 4172232,
+          "query_median_s": {
+            "Q1": 0.0426,
+            "Q2": 0.0601,
+            "Q3": 0.2605,
+            "Q4": 0.0582
+          },
+          "loadavg_start": 33.77099609375
+        },
+        "round2": {
+          "bulk_load_rows_per_s": 4391731,
+          "query_median_s": {
+            "Q1": 0.0394,
+            "Q2": 0.0674,
+            "Q3": 0.2765,
+            "Q4": 0.0607
+          },
+          "loadavg_start": 13.10302734375
+        }
+      }
+    }
+  },
+  "limits": [
+    "Three runs per store (round 1 at a0f57fa, round 2 after the first review, round 3 after the second review) on a shared WSL2 host (24 CPUs) while other sessions ran heavy jobs; 1-minute load average at store start 19-34 / 9-13 / 4-5 in rounds 1/2/3. Absolute numbers are noisy (DuckDB bulk load 11730077 / 21371290 / 23104018 rows/s across rounds); no confidence intervals.",
+    "Python harness: ClickHouse via clickhouse-connect HTTP, QuestDB via ILP/HTTP (questdb 5.0.0 client) and /exec, pyiceberg scans materialised to Arrow with pyarrow compute. Client serialisation is inside every latency. Phase wall_rows_per_s includes spawn start-up for process-based clients (not for DuckDB threads); per-batch percentiles do not.",
+    "Load paths differ by store's native client: DuckDB read_parquet CTAS, ClickHouse one sequential Parquet HTTP insert per file, QuestDB ILP dataframe flushes of 100k rows, pyiceberg one append per 1M-row file. ClickHouse loaded far below the preregistered 'tens of millions rows/s' expectation with this single sequential client.",
+    "DuckDB concurrency is in-process threads (one cursor each) because a second process cannot open the file while a writer holds it (retained IOException, including for a read_only second process).",
+    "Retained failed attempt: the first round-1 ClickHouse run under the default 256-task cgroup limit lost its writer process ('std::system_error: Resource temporarily unavailable') and hung; it was stopped, its data deleted, and the store rerun with ECOSYSTEM_JOB_TASKS_MAX=4096 (raw/bench-clickhouse.attempt1-tasksmax256.stdout.txt). A dead-worker guard was added to the harness before the rerun.",
+    "Data are synthetic fixed-seed minute bars (seed 20260923, 500 symbols x 100,000 minutes = 50,000,000 rows, combined sha256 9ddbbf7b15caaa441170a093b799d7ac09d2e3c311bf163624bff52af7875e1f); the dataset itself stays in the private cache, only its manifest is committed.",
+    "Round 1 compared only aggregate query digests (Codex review finding); rounds 2 and 3 compare full canonical Q1-Q4 result rows (round 2 agreement: True). Round-1 kill checks were aggregate only; round 2 added per-batch verification; round 3 added the engine-call marker that proves an engine-level write was interrupted (second Codex review finding). Round 3 is primary."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-dataset-manifest.json",
+      "sha256": "450acfeb77fc441c023d21035e8710ae17a7e3d96509e62be80417683907012a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-duckdb.json",
+      "sha256": "46530242d57b25a1086d22cd81b63abb72c372c94a2447d365cfa6d9e19c3047"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-clickhouse.json",
+      "sha256": "f62e818c956b845e084cbee26e7b848f6c571cf37c47ea9d290e65eaa55dea9d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-questdb.json",
+      "sha256": "b00c24a83fc0805425bf1b029a7e960f393718d02e17dbbb427bc6631510371a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-iceberg.json",
+      "sha256": "b068aaad6bc83061747a61583cfc5f11ac785daefb56295212379e5d509570b5"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-duckdb.stdout.txt",
+      "sha256": "2236ecf0bd99e10a274929450374fd9bda2a4a3e29d4a9fccafa3b715e833b52"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-clickhouse.stdout.txt",
+      "sha256": "57470ddd3b47f083a074e64684b3b63e61058ccc964ff6b03e904826394a1da7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-questdb.stdout.txt",
+      "sha256": "008e04338e1d844fad48812efe9521aaf875387b1d1030304ffced1805753fde"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-iceberg.stdout.txt",
+      "sha256": "fe7f1e124a76115ee6fcc06dc6e8c04cad067847299e8b34dbeda5ea36f50336"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-duckdb.json",
+      "sha256": "0d69cb47406d579bb6ebb473070d2046d985fb7df491fb8d4d8982170866af30"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-clickhouse.json",
+      "sha256": "1c1bd8138fdad29fec8094811cedf3fee9291e116c2eafbafa7e276a964028d7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-questdb.json",
+      "sha256": "3a4277e35568bc29f85f47bd1cb8a1a1988fb283079ec0e674ee78f3e166d157"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-iceberg.json",
+      "sha256": "5a570c439fb4f3cb0dd58ba872e15d767d02d46caa84727ddef59e65c48245a6"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-duckdb.stdout.txt",
+      "sha256": "023f30d06d0edc512d600654610539ef73abea07f6d899cc54b668ae9b55c3b7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-clickhouse.stdout.txt",
+      "sha256": "686a8e04ed1075cdeac4d3b1036a770dbc06a32dc0e5c1fe5ab91760f9cf92ac"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-questdb.stdout.txt",
+      "sha256": "6f88051436ca38fab4a40d476cfd6da250769c6c78b16b7dbbc705b0bd317370"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-iceberg.stdout.txt",
+      "sha256": "95b9a53dc1b9c3b7de3aa68dd867b4a3d861f42cd3a5f62a0bc2dbb4067b4ae7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-duckdb.json",
+      "sha256": "1c0bd2df862af9b416fb226733cc912071fd19db1b331af935b877abad0c3df8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-clickhouse.json",
+      "sha256": "7da28d426717baad4a306fe8b2c63029269b4580da84b37883da412337ab9b6d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-questdb.json",
+      "sha256": "b2813d21ca9b64bb82698a26e636840c8de2531a4936dcf62a08d5178dcd5987"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-iceberg.json",
+      "sha256": "a89c82dddcf483e110042a75fd317016910ff043b92f9c15816c6f723b52a2e9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-duckdb.stdout.txt",
+      "sha256": "a8b14a455383d1bca12b823730cc888fefb156bf5567a4494894860c5ef4e57e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-clickhouse.stdout.txt",
+      "sha256": "fa9165e0c4827113fd3d3eb7d9259bb01a312c1bad684f22eed191e3f3567061"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-questdb.stdout.txt",
+      "sha256": "8d9b8ab18f8ca7085897e1409b8cbc1ea476f5a23d6aa6730a52b275c33e6fff"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-iceberg.stdout.txt",
+      "sha256": "224daa7dfbe776d0bc75184cff87a5a1a0fef42f9619317b4097ab64488b01ef"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-clickhouse.attempt1-tasksmax256.stdout.txt",
+      "sha256": "7e29455cb638969f90aa0ca174a885f0f92b9380757fc938260a5eab468258ed"
+    }
+  ],
+  "checked_at": "2026-09-23T06:15:37.841836+00:00"
+}

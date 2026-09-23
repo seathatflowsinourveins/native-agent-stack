@@ -1,0 +1,124 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-5",
+  "gap_index": 5,
+  "gap_text_sha256": "12ac5e1a8473a0313b50ca157487b2858a6ff111b746f70838b4b3dd5e1deb17",
+  "checked_at": "2026-09-23T01:37:15.799Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:53:17.012Z",
+    "late": true,
+    "late_note": "Written at 2026-09-23T00:53:17.012Z by original#68 (Write of $SCRATCHPAD/write_receipts2.py; receipts written by original#69 at 00:53:20Z), after the first-pass commands it describes had run (original-session calls 2026-09-23T00:46:14.975Z to 2026-09-23T00:50:23.743Z); any fix-round evidence in this receipt came later and has its own fix-round preregistration where one exists. The previously recorded written_at '2026-09-23T01:35:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps.",
+    "expectation": "Installing a pinned rustup toolchain in an isolated prefix and running `cargo test` at the exact Worktrunk v0.79.0 git tag will exercise the upstream Rust test suite that the earlier qualification skipped for lack of cargo/rustc.",
+    "criteria": "rustup/cargo installed into a cache-scoped prefix (no PATH replacement); `cargo test --locked` run against a fresh clone at tag v0.79.0; pass/fail counts recorded verbatim."
+  },
+  "commands": [
+    "original#60 [2026-09-23T00:46:14.975Z]: mkdir -p $HOME/.cache/gap-wave2-20260923/isolation/rust\nexport RUSTUP_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/rustup\nexport CARGO_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/cargo\ntimeout 180 bash -c '\ncurl --proto \"=https\" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain stable --profile minimal\n' 2>&1 | tail -30\necho \"install_exit=$?\"",
+    "original#61 [2026-09-23T00:46:27.890Z]: export RUSTUP_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/rustup\nexport CARGO_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/cargo\nexport PATH=$CARGO_HOME/bin:$PATH\nrustc --version\ncargo --version\ncd $HOME/.cache/gap-wave2-20260923/isolation/rust\ntimeout 60 git clone --quiet --depth 1 --branch v0.79.0 https://github.com/max-sixty/worktrunk.git 2>&1\necho clone_exit=$?\nls worktrunk 2>&1 | head",
+    "original#62 [2026-09-23T00:46:32.275Z]: export RUSTUP_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/rustup\nexport CARGO_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/cargo\nexport PATH=$CARGO_HOME/bin:$PATH\ncd $HOME/.cache/gap-wave2-20260923/isolation/rust/worktrunk\ngit log -1 --format=\"%H %d\"\ntimeout 900 cargo test --locked 2>&1 | tail -100\necho \"cargo_test_exit=$?\"",
+    "original#63 [2026-09-23T00:48:23.137Z]: export RUSTUP_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/rustup\nexport CARGO_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/cargo\nexport PATH=$CARGO_HOME/bin:$PATH\ncd $HOME/.cache/gap-wave2-20260923/isolation/rust/worktrunk\ncargo test --locked 2>&1 | grep -E \"test result|running\" | head -20\necho \"---binary diff check---\"\nwhich wt\ndiff <(cargo build --release --locked 2>&1 | tail -5) /dev/null 2>&1 | tail -5",
+    "fix#18 [2026-09-23T01:03:30.257Z]: set -e\ncd /tmp/gapfix && rm -rf wtlifecycle && mkdir wtlifecycle && cd wtlifecycle\n# bare remote\ngit init --bare remote.git -q\ngit clone remote.git main-repo -q\ncd main-repo\ngit config user.email test@example.com; git config user.name test\necho one > file.txt; git add file.txt; git commit -q -m init\ngit push -q origin HEAD:master 2>&1 || git push -q origin HEAD:main 2>&1\ngit branch -a\nwt --version\necho \"== create feature branch worktree ==\"\nwt -y switch --create feat-merge\nls -la ../main-repo.feat-merge 2>&1 || find .. -maxdepth 1 -type d",
+    "fix#19 [2026-09-23T01:03:34.457Z]: cd /tmp/gapfix/wtlifecycle\nwt config shell install 2>&1 | head -20\necho ---\ncat ~/.bashrc | grep -A3 -i \"wt \" | tail -20 2>&1\necho \"== shell integration snippet check ==\"\ngrep -n \"wt()\" ~/.bashrc 2>&1 | head -5",
+    "fix#20 [2026-09-23T01:03:40.158Z]: wt config shell --help 2>&1; echo ---; wt config shell install --help 2>&1; echo ---; wt config --help 2>&1",
+    "fix#21 [2026-09-23T01:03:47.881Z]: cd /tmp/gapfix/wtlifecycle\necho \"== shell integration: init (isolated, no home config touched) ==\"\nwt config shell init bash 2>&1 | head -30\necho \"== dry-run install into isolated HOME ==\"\nmkdir -p /tmp/gapfix/isohome\nHOME=/tmp/gapfix/isohome wt config shell install bash --dry-run 2>&1\necho \"== actual install into isolated HOME (not the real user HOME) ==\"\nHOME=/tmp/gapfix/isohome wt -y config shell install bash 2>&1\nls -la /tmp/gapfix/isohome/ 2>&1\ncat /tmp/gapfix/isohome/.bashrc 2>&1 | tail -10",
+    "fix#22 [2026-09-23T01:03:54.268Z]: cd /tmp/gapfix/wtlifecycle/main-repo\necho \"== cd behavior via sourced integration (isolated HOME, subshell) ==\"\nHOME=/tmp/gapfix/isohome bash -c '\nsource /tmp/gapfix/isohome/.bashrc\ncd /tmp/gapfix/wtlifecycle/main-repo\nwt switch feat-merge\npwd\n'\necho \"=== merge ===\"\ncd /tmp/gapfix/wtlifecycle/main-repo.feat-merge 2>&1 || cd /tmp/gapfix/wtlifecycle/main-repo\npwd\necho second-commit >> file.txt\ngit -C /tmp/gapfix/wtlifecycle/main-repo.feat-merge add -A\ngit -C /tmp/gapfix/wtlifecycle/main-repo.feat-merge -c user.email=t@e.com -c user.name=t commit -q -m \"feat: add second line\"\nwt -y -C /tmp/gapfix/wtlifecycle/main-repo.feat-merge merge 2>&1\necho \"exit=$?\"\ngit -C /tmp/gapfix/wtlifecycle/main-repo log --oneline -3\nwt list -C /tmp/gapfix/wtlifecycle/main-repo 2>&1",
+    "fix#23 [2026-09-23T01:04:00.655Z]: cd /tmp/gapfix/wtlifecycle/main-repo\nwt -y switch --create feat-unmerged 2>&1\necho scratch > /tmp/gapfix/wtlifecycle/main-repo.feat-unmerged/scratch.txt\ngit -C /tmp/gapfix/wtlifecycle/main-repo.feat-unmerged add -A\ngit -C /tmp/gapfix/wtlifecycle/main-repo.feat-unmerged -c user.email=t@e.com -c user.name=t commit -q -m \"wip: unmerged change\"\necho \"== plain remove refuses unmerged ==\"\nwt -y -C /tmp/gapfix/wtlifecycle/main-repo.feat-unmerged remove 2>&1; echo exit=$?\necho \"== force-delete unmerged branch ==\"\nwt -y -C /tmp/gapfix/wtlifecycle/main-repo.feat-unmerged remove -D 2>&1; echo exit=$?\nwt list -C /tmp/gapfix/wtlifecycle/main-repo 2>&1\ngit -C /tmp/gapfix/wtlifecycle/main-repo branch -a",
+    "fix#24 [2026-09-23T01:04:06.502Z]: cd /tmp/gapfix/wtlifecycle/main-repo\necho \"== force-delete the now-branch-only unmerged feat-unmerged ==\"\nwt -y remove -D feat-unmerged 2>&1; echo exit=$?\ngit branch -a",
+    "fix#26 [2026-09-23T01:04:20.306Z]: mkdir -p $HOME/.cache/gap-wave2-20260923/isolation/rust\ncd /tmp/gapfix && rm -rf rust-rerun && mkdir rust-rerun && cd rust-rerun\ncurl -sSf https://sh.rustup.rs -o rustup-init.sh\necho \"download ok: $(wc -c < rustup-init.sh) bytes\"",
+    "fix#27 [2026-09-23T01:04:24.895Z]: cd /tmp/gapfix/rust-rerun\nexport ECOSYSTEM_JOB_MEMORY_HIGH=4G ECOSYSTEM_JOB_MEMORY_MAX=6G ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=256\nRUSTUP_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/rustup \\\nCARGO_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/cargo \\\n$HOME/codex-ecosystem/bin/ecosystem-bounded-run sh rustup-init.sh -y --no-modify-path --default-toolchain stable --profile minimal > install.log 2>&1\necho \"install exit=$?\"\ntail -20 install.log",
+    "fix#28 [2026-09-23T01:04:41.030Z]: export RUSTUP_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/rustup\nexport CARGO_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/cargo\nexport PATH=\"$CARGO_HOME/bin:$PATH\"\nrustc --version; cargo --version\ncd /tmp/gapfix/rust-rerun\nrm -rf worktrunk\ngit clone --depth 1 --branch v0.79.0 https://github.com/max-sixty/worktrunk.git 2>&1 | tail -5\ncd worktrunk && git log -1 --format='%H %d'",
+    "fix#29 [2026-09-23T01:04:46.989Z]: cd /tmp/gapfix/rust-rerun/worktrunk\nexport RUSTUP_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/rustup\nexport CARGO_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/cargo\nexport PATH=\"$CARGO_HOME/bin:$PATH\"\nexport ECOSYSTEM_JOB_MEMORY_HIGH=6G ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=512\nnohup $HOME/codex-ecosystem/bin/ecosystem-bounded-run cargo test --locked > /tmp/gapfix/rust-rerun/cargo-test.log 2>&1 &\necho \"started pid $!\"",
+    "fix#38 [2026-09-23T01:05:37.120Z]: jobs -l; ps aux | grep -E \"cargo|rustc\" | grep -v grep | head; tail -5 /tmp/gapfix/rust-rerun/cargo-test.log 2>&1",
+    "fix#39 [2026-09-23T01:05:50.033Z]: for i in 1 2 3 4 5 6 7 8 9 10; do\n  if ! kill -0 449579 2>/dev/null && ! pgrep -f \"cargo test --locked\" >/dev/null; then\n    echo \"job finished after $((i*60))s check\"; break\n  fi\n  sleep 60\ndone\ntail -30 /tmp/gapfix/rust-rerun/cargo-test.log",
+    "fix#40 [2026-09-23T01:15:58.331Z]: grep -c \"^test .* FAILED\" /tmp/gapfix/rust-rerun/cargo-test.log\ngrep \"^test result:\" /tmp/gapfix/rust-rerun/cargo-test.log\ngrep -B2 \"panicked at\" /tmp/gapfix/rust-rerun/cargo-test.log | head -40",
+    "fix#41 [2026-09-23T01:16:01.192Z]: grep -A3 \"src/testing/mod.rs:1446\" /tmp/gapfix/rust-rerun/cargo-test.log | head -10\necho ---\ngrep -A5 \"panicked at src/testing/mod.rs:1843\" /tmp/gapfix/rust-rerun/cargo-test.log | head -10",
+    "fix#42 [2026-09-23T01:16:11.166Z]: nproc\ngrep -i \"tasks.max\\|apply-seccomp\\|WouldBlock\" /tmp/gapfix/rust-rerun/cargo-test.log | sort | uniq -c | head -10",
+    "fix#43 [2026-09-23T01:16:16.804Z]: cd /tmp/gapfix/rust-rerun/worktrunk\nexport RUSTUP_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/rustup\nexport CARGO_HOME=$HOME/.cache/gap-wave2-20260923/isolation/rust/cargo\nexport PATH=\"$CARGO_HOME/bin:$PATH\"\nexport ECOSYSTEM_JOB_MEMORY_HIGH=8G ECOSYSTEM_JOB_MEMORY_MAX=10G ECOSYSTEM_JOB_SECONDS=900 ECOSYSTEM_JOB_TASKS_MAX=4096\nnohup $HOME/codex-ecosystem/bin/ecosystem-bounded-run cargo test --locked -- --test-threads=8 > /tmp/gapfix/rust-rerun/cargo-test-2.log 2>&1 &\necho \"started pid $!\"",
+    "fix#44 [2026-09-23T01:16:19.789Z]: date -u +%Y-%m-%dT%H:%M:%S.%6N+00:00",
+    "fix#54 [2026-09-23T01:28:38.056Z]: pgrep -f \"cargo test --locked\" >/dev/null && echo STILL_RUNNING || echo DONE; tail -15 /tmp/gapfix/rust-rerun/cargo-test-2.log",
+    "fix#64 [2026-09-23T01:36:01.015Z]: pgrep -f \"cargo test --locked\" >/dev/null && echo STILL_RUNNING || echo DONE\ngrep \"^test result:\" /tmp/gapfix/rust-rerun/cargo-test-2.log\ntail -20 /tmp/gapfix/rust-rerun/cargo-test-2.log",
+    "fix#67 [2026-09-23T01:37:15.525Z]: grep \"^test result:\" /tmp/gapfix/rust-rerun/cargo-test-2.log\necho \"---count---\"\ngrep -c \"^test result:\" /tmp/gapfix/rust-rerun/cargo-test-2.log\necho \"---failed check---\"\ngrep -i \"FAILED\\|error:\" /tmp/gapfix/rust-rerun/cargo-test-2.log | head -10\necho \"---tail---\"\ntail -10 /tmp/gapfix/rust-rerun/cargo-test-2.log\nrustc --version 2>&1 || true\ncat /tmp/gapfix/rust-rerun/worktrunk/rust-toolchain.toml 2>&1"
+  ],
+  "results": [
+    "First pass (original#60-#63, not wrapped in ecosystem-bounded-run): rustup-init piped from https://sh.rustup.rs installed stable (`rustc 1.98.1`); clone at `5ba6f148e8505c20794f2d8bc706aa4f26335c95  (grafted, HEAD, tag: v0.79.0)`; `cargo test --locked` shown by the RTK hook as `cargo test: 4798 passed, 16 ignored (10 suites, 34.92s)`, `cargo_test_exit=0`. A second unwrapped `cargo test` plus `cargo build --release --locked` (original#63) was moved to the background; its per-suite lines are in raw/original63-background-output.txt. These unwrapped runs broke the heavy-job rule and are superseded below.",
+    "Fix round, install (fix#26, fix#27): `curl -sSf https://sh.rustup.rs -o rustup-init.sh` (`download ok: 29915 bytes`), then `ecosystem-bounded-run sh rustup-init.sh -y --no-modify-path --default-toolchain stable --profile minimal` with TasksMax=256: `install exit=0`. Clone again at tag v0.79.0 (fix#28).",
+    "Toolchain pin: the clone's rust-toolchain.toml has `channel = \"1.97.0\"` with rustfmt and clippy (fix#67); the attempt-1 process list shows `.../rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin/cargo test --locked` (fix#38), so rustup fetched and used 1.97.0 for the tests.",
+    "Attempt 1 (fix#29): `ECOSYSTEM_JOB_TASKS_MAX=512` (the earlier receipt said 256; 256 was the install step), MemoryMax 8G, 1200 s. The integration suite ended `test result: FAILED. 1808 passed; 391 failed; 1 ignored; 0 measured; 0 filtered out; finished in 82.89s` (fix#39); the preceding suites printed `ok. 1541 passed`, `ok. 1008 passed`, `ok. 1 passed` (fix#40). Panics include `Os { code: 11, kind: WouldBlock, message: \"Resource temporarily unavailable\" }` from `failed to spawn thread` and `failed to build collect thread pool` (fix#41, fix#42, raw/rtk-recall-a6ffea92b169.txt); `nproc` printed 24. This matches task-limit exhaustion; the cgroup pids counter itself was not read.",
+    "Attempt 2 (fix#43): `ECOSYSTEM_JOB_TASKS_MAX=4096`, MemoryMax 10G, 900 s, `cargo test --locked -- --test-threads=8`. All ten `test result:` lines (fix#64, fix#67), verbatim: `ok. 1541 passed; 0 failed; 0 ignored`, `ok. 1008 passed; 0 failed; 0 ignored`, `ok. 1 passed; 0 failed; 0 ignored`, `ok. 2199 passed; 0 failed; 1 ignored`, `ok. 11 passed; 0 failed; 0 ignored`, `ok. 1 passed; 0 failed; 0 ignored`, `ok. 10 passed; 0 failed; 0 ignored`, `ok. 26 passed; 0 failed; 14 ignored`, `ok. 1 passed; 0 failed; 0 ignored`, `ok. 0 passed; 0 failed; 1 ignored`. Totals: 4798 passed, 16 ignored, 0 failed. The job had finished by fix#54 (01:28:38Z). The wrapper exit status was not captured; the later STILL_RUNNING lines came from `pgrep -f \"cargo test --locked\"` matching the agent's own waiting loops.",
+    "Merge, unmerged-branch deletion and shell integration (fix#18-#24, disposable repo with a local bare remote at /tmp/gapfix/wtlifecycle; the recorded order is below). fix#18: bare remote, clone, push, `wt v0.79.0`, `wt -y switch --create feat-merge`. fix#19: `wt config shell install` under the real HOME without -y printed `Install shell integration? [y/N/?] \u2717 Cancelled by user`; the following grep of ~/.bashrc for `wt ` and `wt()` printed nothing. fix#21: `wt config shell init bash` printed the integration; HOME=/tmp/gapfix/isohome `--dry-run` then `-y config shell install bash` created an 87-byte .bashrc in that isolated HOME.",
+    "fix#22, in order: (1) with the isolated .bashrc sourced, `wt switch feat-merge` printed `\u25cb Switched to worktree for feat-merge @ /tmp/gapfix/wtlifecycle/main-repo.feat-merge` and `pwd` printed that path. This ran BEFORE the merge, while the feat-merge worktree still existed. (2) After a commit in feat-merge, `wt -y -C .../main-repo.feat-merge merge` printed `\u25ce Merging 1 commit to master @ 5117a69 (no commit/squash/rebase needed)`, `\u2713 Merged to master (1 commit, 1 file, +1)`, `\u25ce Removing feat-merge worktree & branch in background`, exit=0; `wt list` then showed only master. Only the fast-forward path ran; no squash or rebase occurred.",
+    "fix#23: `wt -y switch --create feat-unmerged` plus a commit; plain `wt -y -C .../main-repo.feat-unmerged remove` printed `\u25ce Removing feat-unmerged worktree in background` and `\u21b3 Branch unmerged; to delete, run wt remove -D feat-unmerged`, exit=0 (worktree removed, branch kept). The next command, `wt -y -C .../main-repo.feat-unmerged remove -D`, failed: `\u2717 Failed to remove worktree` / `fatal: not a git repository`, exit=1, because that directory was already gone. fix#24: `wt -y remove -D feat-unmerged` printed `\u25cb No worktree found for branch feat-unmerged` and `\u2713 Removed branch feat-unmerged (--force-delete)`, exit=0; `git branch -a` then showed only master."
+  ],
+  "outcome": "advanced",
+  "note": "Worktrunk v0.79.0's bundled Rust suite passed at the pinned 1.97.0 toolchain through ecosystem-bounded-run (4798 passed, 16 ignored, 0 failed; the attempt-1 failures are recorded). Merge (fast-forward only), unmerged-branch deletion and bash shell integration were exercised in a disposable repository with a local bare remote. The outcome stays advanced because the gap text also names the interactive picker and user-repository workflows, which no receipt exercised, and the hooks-enabled and squash/rebase merge paths were not run.",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Interactive picker (`wt switch` with no argument) not exercised; it needs a terminal.",
+    "Only the fast-forward merge path ran; squash and rebase did not occur.",
+    "Only bash integration was installed, and only into an isolated HOME. fix#19 did attempt `wt config shell install` against the real HOME; it was cancelled at the prompt, and the check afterwards covered ~/.bashrc only.",
+    "Network downloads (sizes not recorded unless stated): rustup-init.sh 29,915 bytes; the rustup stable minimal toolchain and the 1.97.0 toolchain with rustfmt and clippy; two shallow Worktrunk clones; crates for `cargo test --locked`. The first pass downloaded the same set without the wrapper. The per-run logs (/tmp/gapfix/rust-rerun/*.log) were deleted at teardown (fix#72); only the excerpts in the raw record remain.",
+    "TasksMax sensitivity was observed on one 24-core host; the threshold between 512 and 4096 was not measured."
+  ],
+  "fix_round_preregistration": {
+    "written_at": "2026-09-23T01:37:47.567Z",
+    "expectation": "The original run did not wrap rustup-init.sh or cargo test in ecosystem-bounded-run, violating the hard rule that heavy jobs go through that wrapper. Rerunning both under the wrapper should reproduce the same 4798 passed / 16 ignored / 0 failed result. A risk to check for: the wrapper's default TasksMax (256) may be too low for a 24-core cargo test run that itself forks many git/hook subprocesses, which could produce spurious resource-exhaustion failures unrelated to Worktrunk's own code.",
+    "criteria": "Both the toolchain install and cargo test run under ecosystem-bounded-run; if the first attempt fails with EAGAIN/WouldBlock-style errors, that is diagnosed as a TasksMax sizing issue (not a code defect) and rerun with a larger TasksMax and/or --test-threads before concluding pass/fail.",
+    "late": true,
+    "label": "fix-round preregistration, written after the fix-round commands it describes",
+    "late_note": "Written at 2026-09-23T01:37:47.567Z by fix#68; fix-round commands ran fix#4-fix#46 (01:01:10Z-01:27:09Z); cargo attempt 2 had finished by fix#54 (01:28:38Z). The previously recorded written_at '2026-09-23T01:15:00+00:00' was a placeholder, not the time this block was written, and it was not written before its sub-check ran.",
+    "criteria_as_run_note": "Attempt 1 actually used ECOSYSTEM_JOB_TASKS_MAX=512 (fix#29), not 256."
+  },
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:46:14.975Z to 2026-09-23T01:37:15.799Z. The previous value '2026-09-23T00:53:20.715653+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#60",
+        "original#61",
+        "original#62",
+        "original#63"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/fix-session-tool-calls.txt",
+      "sha256": "b1a1bce670082262521365455849b1618b460a9bbd53fdec5d6d0337523d8899",
+      "calls": [
+        "fix#18",
+        "fix#19",
+        "fix#20",
+        "fix#21",
+        "fix#22",
+        "fix#23",
+        "fix#24",
+        "fix#26",
+        "fix#27",
+        "fix#28",
+        "fix#29",
+        "fix#38",
+        "fix#39",
+        "fix#40",
+        "fix#41",
+        "fix#42",
+        "fix#43",
+        "fix#44",
+        "fix#54",
+        "fix#64",
+        "fix#67"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Review finding 3 (sequence) and finding 4 (placement): the merge, unmerged-deletion and shell-integration evidence now lives in this receipt, which is the gap whose next_check asks for it, in the order recorded in fix#18-#24. The shell-integration switch ran before the merge, not after it.",
+      "Review finding 3 (overclaim): recorded that only a fast-forward merge ran (`no commit/squash/rebase needed`).",
+      "Recorded the failed `remove -D` via -C (exit=1) and the real-HOME install attempt that was cancelled (fix#19).",
+      "Review finding 10 (quote): the ten per-suite `test result:` lines are now quoted verbatim instead of a summed expression. Corrected attempt 1's TasksMax from 256 to 512.",
+      "Disclosed the network downloads and the unwrapped second cargo test and release build of the first pass (original#63). Timestamps corrected. Outcome kept advanced."
+    ]
+  }
+}

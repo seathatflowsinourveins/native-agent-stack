@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"Step: hot-backup"},"value":[1790180418.631,"1"]},{"metric":{"span_name":"DAG: obsgap-paper"},"value":[1790180418.631,"1"]},{"metric":{"span_name":"Step: paper-runtime"},"value":[1790180418.631,"1"]}]}}

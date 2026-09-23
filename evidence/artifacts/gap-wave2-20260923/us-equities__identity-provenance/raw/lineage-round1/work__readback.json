@@ -1,0 +1,124 @@
+{
+  "all_ok": true,
+  "detector_control_flagged": true,
+  "detector_control_problems": [
+    "uuid-redacted-04 COMPLETE input version 0000000000000000000000000000000000000000000000000000000000000000 != snapshot_sha256",
+    "uuid-redacted-04 COMPLETE cutoff facet 2025-02-01T21:00:00.000000200Z/1 differs"
+  ],
+  "event_count": 4,
+  "event_file_sha256": "0b9975c2b84b57954dbdd5875fc8cc1da5ec9fce61d171c7ccd6305903f23c69",
+  "event_types": [
+    [
+      "01a0ccb4",
+      "nanosecond-replay.materialize",
+      "START"
+    ],
+    [
+      "01a0ccb4",
+      "nanosecond-replay.materialize",
+      "COMPLETE"
+    ],
+    [
+      "01a0ccb4",
+      "nanosecond-replay.select",
+      "START"
+    ],
+    [
+      "01a0ccb4",
+      "nanosecond-replay.select",
+      "COMPLETE"
+    ]
+  ],
+  "mlflow_inputs": {
+    "materialize": [
+      {
+        "digest": "c36188b4",
+        "name": "fixture.observations",
+        "source": "$HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/nanosecond-replay/fixture.json",
+        "source_type": "local",
+        "tags": {
+          "file_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+          "mlflow.data.context": "materialize_source"
+        }
+      },
+      {
+        "digest": "7526bc37",
+        "name": "fixture.universe",
+        "source": "$HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/nanosecond-replay/fixture.json",
+        "source_type": "local",
+        "tags": {
+          "file_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+          "mlflow.data.context": "materialize_source"
+        }
+      }
+    ],
+    "select": [
+      {
+        "digest": "7332d160",
+        "name": "observations",
+        "source": "$HOME/.cache/gap-wave2-20260923/identity-provenance/runs/lineage-20260923T051940Z/work/materialized/observations.parquet",
+        "source_type": "local",
+        "tags": {
+          "file_sha256": "0cf15579cd80a02b1c5411bdda50483808e2b2948126da659ecca596bb3821f3",
+          "mlflow.data.context": "replay_select_input",
+          "snapshot_sha256": "b9eae52ab9751d77f0f9dd2afff8a615c6bcb3ca819115856ef3caa0b7f0d591"
+        }
+      },
+      {
+        "digest": "7252fbe9",
+        "name": "universe",
+        "source": "$HOME/.cache/gap-wave2-20260923/identity-provenance/runs/lineage-20260923T051940Z/work/materialized/universe.parquet",
+        "source_type": "local",
+        "tags": {
+          "file_sha256": "b0785843154bdabb234de6ef9b105ee937c40703d4aa87343b7dfae9b07a2c2c",
+          "mlflow.data.context": "replay_select_input",
+          "snapshot_sha256": "b9eae52ab9751d77f0f9dd2afff8a615c6bcb3ca819115856ef3caa0b7f0d591"
+        }
+      }
+    ]
+  },
+  "mlflow_params": {
+    "materialize": {},
+    "select": {
+      "cutoff": "2025-02-01T21:00:00.000000200Z",
+      "feed": "fixture-feed",
+      "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af",
+      "universe_id": "fixture-universe"
+    }
+  },
+  "mlflow_problems": [],
+  "mlflow_tags": {
+    "materialize": {
+      "knowledge_horizon": "2025-02-01T21:00:00.000000201Z",
+      "knowledge_horizon_ns": "1738443600000000201",
+      "openlineage.run_id": "uuid-redacted-03",
+      "snapshot_sha256": "b9eae52ab9751d77f0f9dd2afff8a615c6bcb3ca819115856ef3caa0b7f0d591"
+    },
+    "select": {
+      "knowledge_cutoff": "2025-02-01T21:00:00.000000200Z",
+      "knowledge_cutoff_ns": "1738443600000000200",
+      "openlineage.materialize_run_id": "uuid-redacted-03",
+      "openlineage.select_run_id": "uuid-redacted-04",
+      "snapshot_sha256": "b9eae52ab9751d77f0f9dd2afff8a615c6bcb3ca819115856ef3caa0b7f0d591"
+    }
+  },
+  "openlineage_consistency_problems": [],
+  "openlineage_schema_validation": {
+    "all_valid": true,
+    "checked": true,
+    "detector_control_errors": [
+      "{'eventType': 'START', 'inputs': [{'facets': {'version': {'_producer': 'https://github.com/OpenLineage/OpenLineage/tree/1.53.0/client/python', '_schemaURL': 'ht",
+      "'eventTime' is a required property",
+      "'not-a-uuid' is not a 'uuid'"
+    ],
+    "detector_control_flagged": true,
+    "errors_by_event": {
+      "0": [],
+      "1": [],
+      "2": [],
+      "3": []
+    },
+    "spec_id": "https://openlineage.io/spec/2-0-2/OpenLineage.json",
+    "spec_sha256": "69f68bee00b9beac88a87059c0102410e7bb05f3f43c46d02a0409831eceb0d2"
+  }
+}

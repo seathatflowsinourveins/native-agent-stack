@@ -1,0 +1,12 @@
+{
+ "gap_index": 15,
+ "slug": "artifact-reduction-whole-task",
+ "written_at": "2026-09-23T07:23:05Z",
+ "written_before_results": true,
+ "expectation": "Deferred for the Claude arm (child-usage.mjs measures Claude workflow children; the shared Claude account is reserved). A bounded Codex-only arm (same tasks with and without the Context Mode MCP) may be run if Codex capacity allows; it would give whole-task native usage including failed attempts for Codex only.",
+ "criteria": [
+  "If run: >=2 tasks x 2 arms, same prompts, same model, sequential, with every attempt's usage summed (including failed/retried turns).",
+  "Answer correctness checked against gold computed outside the model.",
+  "Outcome at most advanced because the child-usage.mjs Claude arm is not executed."
+ ]
+}

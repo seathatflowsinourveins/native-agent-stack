@@ -1789,5 +1789,16 @@
     "candidate_ledger_records_verified": 6605,
     "focused_tests_passed": 12,
     "blocking_findings": []
-  }
+  },
+  "later_checks": [
+    {
+      "added_utc": "2026-09-23T16:09:34Z",
+      "check": "WalkForward source hash comparison (catalog gap us-equities/portfolio-risk #2)",
+      "result": "match: installed skfolio 1.2.9 skfolio/model_selection/_walk_forward.py, this receipt's walkforward_source_sha256 and git show c99fcf71349e2df4a7a1033ee85ca2e9ced9abee:src/skfolio/model_selection/_walk_forward.py (tag v1.2.9) all hash to f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397; a negative-control revision (b500f88~1) differs",
+      "checked_utc": "2026-09-23T06:33Z",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/2-walkforward-source-hash-match.json",
+      "raw": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/2/hash-compare.txt",
+      "review": "reviewed in the gap-wave-2 independent reviews (Codex rounds 1-2; an Opus review independently reproduced two of the three hashes); the independent_review block above is the original review (receipt observed_utc 2026-09-19T22:59:04Z) and is left unchanged"
+    }
+  ]
 }

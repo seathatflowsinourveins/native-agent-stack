@@ -1,0 +1,323 @@
+{
+  "phase": "session",
+  "pid": 474435,
+  "init": {
+    "model": "qwen3-4b",
+    "tools": [
+      "mcp__vault__vault_lookup"
+    ],
+    "mcp_servers": [
+      {
+        "name": "vault",
+        "status": "connected",
+        "source": "sdk"
+      }
+    ],
+    "permissionMode": "default",
+    "claude_code_version": "2.1.280",
+    "apiKeySource": "ANTHROPIC_API_KEY"
+  },
+  "turn1": {
+    "event_counts": {
+      "SystemMessage:init": 1,
+      "SystemMessage:status": 2,
+      "StreamEvent:message_start": 2,
+      "StreamEvent:content_block_start": 2,
+      "StreamEvent:content_block_delta": 19,
+      "AssistantMessage": 2,
+      "StreamEvent:content_block_stop": 2,
+      "StreamEvent:message_delta": 2,
+      "StreamEvent:message_stop": 2,
+      "UserMessage": 1,
+      "ResultMessage": 1
+    },
+    "tool_host_calls": [
+      {
+        "at": 1790175597.536494,
+        "arguments": {
+          "key": "alpha"
+        }
+      }
+    ],
+    "final_answer": "vc-6e6744ea525c",
+    "answer_contains_value": true,
+    "provider_delta": {
+      "vllm:prompt_tokens_total": 730.0,
+      "vllm:generation_tokens_total": 39.0,
+      "finished_by_reason": {
+        "stop": 2.0
+      },
+      "seconds": 1.969
+    },
+    "result": {
+      "subtype": "success",
+      "is_error": false,
+      "num_turns": 2,
+      "stop_reason": "end_turn",
+      "terminal_reason": "completed",
+      "usage": {
+        "input_tokens": 730,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "output_tokens": 39,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "",
+        "iterations": [],
+        "speed": "standard"
+      },
+      "total_cost_usd": 0.004625000000000001,
+      "result": "vc-6e6744ea525c",
+      "model_usage": {
+        "qwen3-4b": {
+          "inputTokens": 730,
+          "outputTokens": 39,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.004625000000000001,
+          "contextWindow": 200000,
+          "maxOutputTokens": 32000,
+          "thinkingTokens": 0,
+          "canonicalModel": "qwen3-4b",
+          "provider": "firstParty",
+          "costBasis": "unknown"
+        }
+      }
+    },
+    "untyped": [],
+    "tool_round_trip": true
+  },
+  "turn2_interrupt": {
+    "streaming_observed_before_interrupt": true,
+    "interrupt_requested_at": 1790175602.504153,
+    "event_counts": {
+      "SystemMessage:init": 1,
+      "SystemMessage:status": 1,
+      "StreamEvent:message_start": 1,
+      "StreamEvent:content_block_start": 1,
+      "StreamEvent:content_block_delta": 88,
+      "AssistantMessage": 1,
+      "UserMessage": 1,
+      "ResultMessage": 1
+    },
+    "untyped": [],
+    "result": {
+      "subtype": "error_during_execution",
+      "is_error": true,
+      "num_turns": 2,
+      "stop_reason": null,
+      "terminal_reason": "aborted_streaming",
+      "usage": {
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "output_tokens": 0,
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "",
+        "iterations": [],
+        "speed": "standard"
+      },
+      "total_cost_usd": 0.004625000000000001,
+      "result": "",
+      "model_usage": {
+        "qwen3-4b": {
+          "inputTokens": 730,
+          "outputTokens": 39,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.004625000000000001,
+          "contextWindow": 200000,
+          "maxOutputTokens": 32000,
+          "thinkingTokens": 0,
+          "canonicalModel": "qwen3-4b",
+          "provider": "firstParty",
+          "costBasis": "unknown"
+        }
+      }
+    },
+    "stream_usage_events": [
+      {
+        "input_tokens": 486,
+        "output_tokens": 0
+      },
+      {
+        "input_tokens": 486,
+        "output_tokens": 0
+      }
+    ],
+    "events_after_interrupt": 3,
+    "samples": {
+      "before": {
+        "at": 1790175598.241987,
+        "vllm:num_requests_running": 0.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 99768.0,
+        "vllm:generation_tokens_total": 813.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 12.0,
+          "length": 0.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      },
+      "at_interrupt": {
+        "at": 1790175602.5037246,
+        "vllm:num_requests_running": 1.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 100254.0,
+        "vllm:generation_tokens_total": 901.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 12.0,
+          "length": 0.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      },
+      "after_result_1s": {
+        "at": 1790175602.52724,
+        "vllm:num_requests_running": 1.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 100254.0,
+        "vllm:generation_tokens_total": 901.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 12.0,
+          "length": 0.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      },
+      "settle1": {
+        "at": 1790175612.5485291,
+        "vllm:num_requests_running": 0.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 100254.0,
+        "vllm:generation_tokens_total": 901.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 12.0,
+          "length": 0.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      },
+      "settle2": {
+        "at": 1790175622.5962453,
+        "vllm:num_requests_running": 0.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 100254.0,
+        "vllm:generation_tokens_total": 901.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 12.0,
+          "length": 0.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      }
+    },
+    "provider_delta_before_to_interrupt": {
+      "vllm:prompt_tokens_total": 486.0,
+      "vllm:generation_tokens_total": 88.0,
+      "finished_by_reason": {},
+      "seconds": 4.262
+    },
+    "provider_delta_before_to_settle1": {
+      "vllm:prompt_tokens_total": 486.0,
+      "vllm:generation_tokens_total": 88.0,
+      "finished_by_reason": {},
+      "seconds": 14.307
+    },
+    "provider_delta_settle1_to_settle2": {
+      "vllm:prompt_tokens_total": 0.0,
+      "vllm:generation_tokens_total": 0.0,
+      "finished_by_reason": {},
+      "seconds": 10.048
+    },
+    "running_at_settle1": 0.0,
+    "consumption_stopped": true
+  },
+  "session_log": {
+    "session_jsonl_found": true,
+    "lines": 23,
+    "final_usage_per_message": [
+      {
+        "stop_reason": "tool_use",
+        "input_tokens": 331,
+        "output_tokens": 25
+      },
+      {
+        "stop_reason": "end_turn",
+        "input_tokens": 399,
+        "output_tokens": 14
+      },
+      {
+        "stop_reason": null,
+        "input_tokens": 486,
+        "output_tokens": 0
+      }
+    ]
+  },
+  "tap": {
+    "raw_total": 131,
+    "raw_counts": {
+      "assistant->AssistantMessage": 3,
+      "result:error_during_execution->ResultMessage": 1,
+      "result:success->ResultMessage": 1,
+      "stream_event->StreamEvent": 119,
+      "system:init->SystemMessage": 2,
+      "system:status->SystemMessage": 3,
+      "user->UserMessage": 2
+    },
+    "dropped_or_untyped": [],
+    "detector": {
+      "unknown_type_dropped_as_none": true
+    }
+  },
+  "status": "ok",
+  "sdk": "claude-agent-sdk",
+  "started_at": 1790175595.961326,
+  "finished_at": 1790175622.6428516,
+  "env_keys": [
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_BASE_URL",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL",
+    "ANTHROPIC_SMALL_FAST_MODEL",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS",
+    "CLAUDE_CONFIG_DIR",
+    "DISABLE_AUTOUPDATER",
+    "DISABLE_ERROR_REPORTING",
+    "DISABLE_TELEMETRY",
+    "HOME",
+    "LC_CTYPE",
+    "PATH"
+  ]
+}

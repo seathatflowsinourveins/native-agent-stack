@@ -1,0 +1,17 @@
+test_cycle_in_disconnected_component (test_planner.PlannerAcceptance.test_cycle_in_disconnected_component) ... ok
+test_dependency_before_alphabetic_name (test_planner.PlannerAcceptance.test_dependency_before_alphabetic_name) ... ok
+test_diamond (test_planner.PlannerAcceptance.test_diamond) ... ok
+test_duplicate_dependencies (test_planner.PlannerAcceptance.test_duplicate_dependencies) ... ok
+test_empty (test_planner.PlannerAcceptance.test_empty) ... ok
+test_input_unchanged (test_planner.PlannerAcceptance.test_input_unchanged) ... ok
+test_mapping_insertion_order_does_not_matter (test_planner.PlannerAcceptance.test_mapping_insertion_order_does_not_matter) ... ok
+test_multi_node_cycle (test_planner.PlannerAcceptance.test_multi_node_cycle) ... ok
+test_one (test_planner.PlannerAcceptance.test_one) ... ok
+test_ready_ties_are_lexicographic (test_planner.PlannerAcceptance.test_ready_ties_are_lexicographic) ... ok
+test_self_cycle (test_planner.PlannerAcceptance.test_self_cycle) ... ok
+test_unknown_dependency (test_planner.PlannerAcceptance.test_unknown_dependency) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.000s
+
+OK

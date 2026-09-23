@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "layer": "us-equities/identity-provenance",
+  "label": "fix-round preregistration (written after the first results and after the Codex read-only review of 2026-09-23T05:23-05:29Z)",
+  "written_at": "2026-09-23T05:30:25Z",
+  "written_at_note": "approximate: between the 05:30:19Z shell stamp and the 05:30:35Z commit",
+  "note": "Written and committed before the fix-round reruns of gaps 4 and 5. The original preregistration.json stays unchanged. Its criteria that were unmet as literally worded are recorded as unmet in the receipts.",
+  "review_findings_addressed": [
+    "P1 gap 4: baseline recovery and concurrency derived rows as committed_versions*5 without decoding Parquet, so rows % 5 could not fail",
+    "P1 gap 5: check_events accepted missing or renamed dataset bindings",
+    "P1 gap 5: original C5.2 says every event's output carries version facets; the materialize START output carries none",
+    "P2 gap 4: lineage counts treated caller-supplied text (DVC commit subject, baseline provenance prose) as native fields",
+    "P2 gap 4: storage measured as a Python file-length sum, not the preregistered du -sb, and outcome text called totals medians",
+    "P2 gap 0: outcome text said every criterion passed although the literal C0.3 full-tree diff exited 1",
+    "P2 gap 5: the OpenLineage event file was published as .jsonl, which .gitignore excludes"
+  ],
+  "gaps": {
+    "4": {
+      "criteria": [
+        "F4.1 Every arm's recovery and concurrency inspection decodes the stored rows (baseline: Parquet bytes of every hash-verified snapshot; DVC: Parquet files after checkout of the committed .dvc; Iceberg: scan; ArcticDB: read). Content check: every row_id occurs the same number of times, and every occurrence equals the fixture row. Row count = decoded rows, not a derived product.",
+        "F4.2 Detector control per arm: inject one foreign or corrupted row into a copy of the decoded rows and confirm the content check fails, so the check can see a wrong batch.",
+        "F4.3 Storage: record both `du -sb` (apparent size, preregistered) and the regular-file byte sum, labelled as totals.",
+        "F4.4 Lineage: classify each of the six fields per arm as native, caller_annotation or absent. Count native fields only.",
+        "Outcome rule: settled if F4.1-F4.3 pass for all four arms and the remaining preregistered metrics stand; otherwise advanced."
+      ]
+    },
+    "5": {
+      "criteria": [
+        "F5.1 Lifecycle-aware facet rule (amends original C5.2, which was unmet for the materialize START event): START events must carry the input dataset with its version facet and the declared output dataset by name. COMPLETE events must carry the output (materialize) or input (select) 'materialized' dataset with a version facet equal to snapshot_sha256 and file hashes equal to the manifest. The cutoff/horizon run facet must be identical across START and COMPLETE of each run.",
+        "F5.2 Presence is required: every expected (event, role, dataset name) triple must exist; missing or renamed datasets are violations.",
+        "F5.3 Detector controls, each of which must be flagged: (a) tampered version and cutoff, (b) removal of the materialize COMPLETE output, (c) removal of the select START input, (d) renaming of the materialize COMPLETE output, (e) schema control (missing eventTime, bad runId).",
+        "F5.4 Publish the event file as .ndjson so git tracks it.",
+        "Outcome rule: settled only if F5.1-F5.3 pass on a fresh emit and readback and the MLflow checks (original C5.3/C5.4) still pass; the unmet literal original C5.2 is recorded in the receipt."
+      ]
+    }
+  }
+}

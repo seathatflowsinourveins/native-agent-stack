@@ -1,0 +1,108 @@
+{
+  "id": "gap-wave2-20260923-foundation-observation-inference-1",
+  "gap_index": 1,
+  "gap_text_sha256": "87ad867c230760815c964ce93c7bad7063f835b3ef9528290a1c921ab0bd9537",
+  "gap_text": "No script or test in the repository re-runs the native usage reconciliation end to end. It exists only as retained commands in docs/native-telemetry-resolution.md lines 22-30 and observability/backends/telemetry-resolution-20260921.json lines 207-211 and 269-306.",
+  "next_check": "Convert the commands in docs/native-telemetry-resolution.md lines 22-30 into a script that runs one bounded native task and compares native usage with the Prometheus counter delta. Run it and retain the result.",
+  "arms": [
+    {
+      "arm": "convert the commands in docs/native-telemetry-resolution.md lines 22-30 into a script",
+      "status": "executed",
+      "detail": "reconcile_usage.py"
+    },
+    {
+      "arm": "run one bounded native task",
+      "status": "executed",
+      "detail": "one claude -p call, exit 0"
+    },
+    {
+      "arm": "compare native usage with the Prometheus counter delta",
+      "status": "executed",
+      "detail": "all four categories equal"
+    },
+    {
+      "arm": "run it and retain the result",
+      "status": "executed",
+      "detail": "raw/1-3-reconcile-usage.json"
+    }
+  ],
+  "preregistration": {
+    "written_at": "2026-09-23T02:46:44Z",
+    "expectation": "A script can run one bounded native Claude -p task against an isolated collector/Prometheus pair and reproduce per-category equality between the stream-json result usage and the Prometheus counter delta for input, output, cacheRead and cacheCreation.",
+    "criteria": "Script exists under blueprints/, runs exactly one claude -p call (bounded max-turns, no tools, no MCP, hooks disabled, user settings not loaded so telemetry goes only to the isolated collector), captures before and after Prometheus snapshots, and prints a per-category comparison. Pass = every category's delta equals the native result usage; mismatch or missing series is reported as such, not coerced.",
+    "late": false,
+    "committed_in": "1a59606 (2026-09-23T02:46:44Z, before any check ran)"
+  },
+  "commands": [
+    "cd $HOME/code/nas-wt-g2-observation-inference && python3 blueprints/gap-wave2-20260923/foundation__observation-inference/reconcile_usage.py --out evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-reconcile-usage.json",
+    "child (inside the script): claude -p --output-format stream-json --verbose --max-turns 1 --model haiku --tools  --setting-sources local --settings <settings JSON: env above + disableAllHooks> --strict-mcp-config --mcp-config {\"mcpServers\":{}} --session-id <child-claude-session-id> --no-session-persistence -- Reply with exactly the two characters OK and nothing else.  [env -i; cwd = fresh temp dir; OTLP env pointed at the isolated collector]",
+    "cd $HOME/code/nas-wt-g2-observation-inference && python3 blueprints/gap-wave2-20260923/foundation__observation-inference/reconcile_usage.py --evaluate evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-reconcile-usage.json   (fix round: strict verdict applied to the retained result; no model call)"
+  ],
+  "results": [
+    "claude_exit_code=0, native_result={\"subtype\": \"success\", \"is_error\": false, \"num_turns\": 1, \"duration_ms\": 1423, \"duration_api_ms\": 1367, \"total_cost_usd\": 0.013655}",
+    "native_usage={\"input\": 10, \"output\": 99, \"cacheRead\": 0, \"cacheCreation\": 6575}; native_model_usage={\"claude-haiku-4-5-20251001\": {\"input\": 10, \"output\": 99, \"cacheRead\": 0, \"cacheCreation\": 6575}}",
+    "input: before='absent', after=10.0, delta=10.0, native_result_usage=10, equal=True",
+    "output: before='absent', after=99.0, delta=99.0, native_result_usage=99, equal=True",
+    "cacheRead: before='absent', after=0.0, delta=0.0, native_result_usage=0, equal=True",
+    "cacheCreation: before='absent', after=6575.0, delta=6575.0, native_result_usage=6575, equal=True",
+    "all_categories_match_result_usage=True, all_categories_match_model_usage_sum=True",
+    "independent cross-check, Loki api_request event for the session: {\"input_tokens\": 10, \"output_tokens\": 99, \"cache_read_tokens\": 0, \"cache_creation_tokens\": 6575} over 1 event",
+    "strict verdict on the retained result (raw/1-3-reconcile-verdict.txt): { \"checks\": { \"result_usage_equal_all_categories\": true, \"before_empty\": true, \"only_child_session_id\": true, \"claude_exit_zero\": true }, \"passed\": true } exit=0 negative-check (tampered copy) passed= False negative-check attribution passed= False"
+  ],
+  "outcome": "settled",
+  "note": "The retained commands in docs/native-telemetry-resolution.md lines 22-30 are now a script that runs one bounded native Claude task and compares its stream-json usage with the Prometheus counter delta per category. In the recorded run all four categories matched exactly, and the Loki api_request event agreed.",
+  "evidence_class": "native_proven",
+  "limits": [
+    "One bounded native Claude call (haiku, one turn, no tools, no MCP, hooks disabled, user settings not loaded); total_cost_usd reported 0.013655.",
+    "The child still loaded the built-in plugins ['agents-md@builtin', 'telemetry@builtin'] and 18 skills (raw/1-3-child-init-summary.json); no user-installed plugins, hooks or MCP servers.",
+    "Isolated collector/Prometheus/Loki with the repository collector.yaml; the live exporter configuration in user settings was not exercised.",
+    "The child created an empty auto-memory project directory under ~/.claude/projects for its temp cwd; it held 0 files and was removed after the run.",
+    "Publication redaction: the child session UUID is replaced by <child-claude-session-id> in committed files (repository validator rule); equality checks were computed on the unredacted private output before redaction.",
+    "The strict verdict (result-usage equality, empty before snapshot, only the child session.id) was added to the script after the run, on review; it was applied to the retained result and to two tampered copies (both rejected), with no second model call."
+  ],
+  "checked_at": "2026-09-23T02:54:39.090566+00:00",
+  "independent_review": {
+    "round1": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+    "round2": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt"
+  },
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-reconcile-usage.json",
+      "sha256": "bc88ee98609a4d147944b71d238292a04555bb97601f98aabda20e87ed3ba52a"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-reconcile-usage.stdout.txt",
+      "sha256": "a037a8a3643783a35e87d5d98dd146c64ab8d8602dafe68c914013f497401085"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-reconcile-usage.exit.txt",
+      "sha256": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-reconcile-verdict.txt",
+      "sha256": "5dbc4b24e91017e6afd5198defd07a2a69034f0e29bbed2f17c7e9cf425808ff"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/1-3-child-init-summary.json",
+      "sha256": "12ddc5a8deb62cec93cfb00869279d8ea88ab71f938dab48489022fb87b65ca4"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+      "sha256": "ad7cc8072536345565f1a9ad0ca6688e80b71c6d5ea0eacfc765479718b31ee8"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt",
+      "sha256": "a1cc543a79e7f621f9ce7d338b3d36d15ba88ee5297b3dd2b49e299ffa91c15b"
+    }
+  ],
+  "helper_scripts": [
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/isostack.py",
+      "sha256": "0fe3cb2014d707aef0d0dfeafa4e2175a43ee44a78da31906ee6f04b0e3ee9e9"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/reconcile_usage.py",
+      "sha256": "5de0b1982f50a854f6ada00257e00b90bfa3168a5f6466014508484b0c407289"
+    }
+  ]
+}

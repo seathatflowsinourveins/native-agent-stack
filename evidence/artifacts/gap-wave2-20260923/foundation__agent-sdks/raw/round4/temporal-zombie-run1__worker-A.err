@@ -1,0 +1,23 @@
+Completing activity as failed ({'activity_id': '1', 'activity_type': 'apply_effect', 'attempt': 1, 'namespace': 'default', 'task_queue': 'gap11-zombie-queue', 'workflow_id': 'gap11-zombie-wf', 'workflow_run_id': 'redacted-id:22af89e4c373ca7e', 'workflow_type': 'ZombieWorkflow'})
+Traceback (most recent call last):
+  File "$HOME/.cache/gap-wave2-20260923/agent-sdks/temporal/lib/python3.13/site-packages/temporalio/worker/_activity.py", line 351, in _handle_start_activity_task
+    result = await self._execute_activity(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        start, running_activity, task_token, data_converter
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "$HOME/.cache/gap-wave2-20260923/agent-sdks/temporal/lib/python3.13/site-packages/temporalio/worker/_activity.py", line 681, in _execute_activity
+    return await impl.execute_activity(input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/.cache/gap-wave2-20260923/agent-sdks/temporal/lib/python3.13/site-packages/temporalio/worker/_activity.py", line 884, in execute_activity
+    return await loop.run_in_executor(input.executor, func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "$HOME/.cache/gap-wave2-20260923/agent-sdks/temporal/lib/python3.13/site-packages/temporalio/worker/_activity.py", line 951, in _execute_sync_activity
+    return fn(*args)
+  File "$HOME/code/nas-wt-g2-agent-sdks/blueprints/gap-wave2-20260923/foundation__agent-sdks/temporal_zombie.py", line 64, in apply_effect
+    con.execute("INSERT INTO writes(attempt, pid, keyed_applied, at) VALUES (?,?,?,?)", (info.attempt, os.getpid(), int(applied), time.time()))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+temporalio.exceptions.CancelledError: Cancelled

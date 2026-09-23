@@ -1,0 +1,28 @@
+{
+  "mode": "inspect",
+  "model_inference_submitted": false,
+  "usage": null,
+  "usage_status": "not_requested",
+  "sdk_version": "0.155.1",
+  "sandbox": "read-only",
+  "approval_mode": "deny_all",
+  "config_overrides": [
+    "features.hooks=false",
+    "features.plugin_hooks=false",
+    "features.apps=false"
+  ],
+  "readiness": {
+    "model": "gpt-6-astra",
+    "model_available": true,
+    "ordinary_usage_allowed": true,
+    "windows": {
+      "primary": {
+        "usedPercent": 17,
+        "resetsAt": 1790719654,
+        "windowDurationMins": 10080
+      }
+    },
+    "ready": true
+  },
+  "status": "discovery_complete"
+}

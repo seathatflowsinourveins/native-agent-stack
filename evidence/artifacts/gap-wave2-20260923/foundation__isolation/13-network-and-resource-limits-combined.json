@@ -1,0 +1,84 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-13",
+  "gap_index": 13,
+  "gap_text_sha256": "c7c9e0780ff577cc2ac4cf4422022c915787c64fbde75be9b84ce4de71d15e53",
+  "checked_at": "2026-09-23T01:28:19.283Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:53:17.012Z",
+    "expectation": "This gap restates gaps 0 and 4 together (TLS/SOCKS/DNS-rebinding/IPv6/remote-host coverage plus resource limits); the same executed evidence applies to both halves.",
+    "criteria": "See gap 0 and gap 4 receipts.",
+    "late": true,
+    "late_note": "Written at 2026-09-23T00:53:17.012Z by original#68 (Write of $SCRATCHPAD/write_receipts2.py; receipts written by original#69 at 00:53:20Z), after the first-pass commands it describes had run (original-session calls 2026-09-23T00:40:04.958Z to 2026-09-23T00:44:45.226Z); any fix-round evidence in this receipt came later and has its own fix-round preregistration where one exists. The previously recorded written_at '2026-09-23T02:20:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps."
+  },
+  "commands": [
+    "No separate commands; this gap is the union of gaps 0 and 4. See 0-network-fixture-extension.json and 4-resource-limit-workloads.json and their raw_evidence calls."
+  ],
+  "results": [
+    "Network half (gap 0): TLS opaque tunnel, SOCKS5 raw TCP and a public remote host have allow and deny transcripts; IPv6 loopback has allow only; DNS rebinding was not tested live, because no loopback or private encoding resolved through this host resolver, for an undetermined cause.",
+    "Resource half (gap 4): srt alone applied no memory or fork limit to small workloads, and its JavaScript has no rlimit/cgroup code by keyword search (native helpers not searched); the outer wrapper stopped a memory hog (exit 137) and a CPU loop (runtime limit); the TasksMax=20 case failed during srt startup; disk-fill and CPU-rate limits were not exercised."
+  ],
+  "outcome": "advanced",
+  "note": "Union of gaps 0 and 4; both are advanced, so this is advanced. Remaining: IPv6 deny, live DNS rebinding, general escape resistance, disk quota, CPU-rate limits, a fork case that reaches the workload.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Inherits the limits recorded in gap 0's and gap 4's receipts."
+  ],
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:40:04.958Z to 2026-09-23T01:28:19.283Z. The previous value '2026-09-23T00:53:20.715653+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#15",
+        "original#16",
+        "original#17",
+        "original#18",
+        "original#19",
+        "original#20",
+        "original#21",
+        "original#22",
+        "original#23",
+        "original#24",
+        "original#25",
+        "original#26",
+        "original#27",
+        "original#28",
+        "original#30",
+        "original#31",
+        "original#32",
+        "original#33",
+        "original#39",
+        "original#43",
+        "original#44",
+        "original#45",
+        "original#46",
+        "original#47"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/fix-session-tool-calls.txt",
+      "sha256": "b1a1bce670082262521365455849b1618b460a9bbd53fdec5d6d0337523d8899",
+      "calls": [
+        "fix#4",
+        "fix#5",
+        "fix#6",
+        "fix#7",
+        "fix#8",
+        "fix#9",
+        "fix#51",
+        "fix#52"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "References updated to the corrected gap 0 (DNS cause undetermined, IPv6 allow only) and gap 4 (grep scope, TasksMax=20 startup failure). Timestamps corrected. Outcome kept advanced."
+    ]
+  }
+}

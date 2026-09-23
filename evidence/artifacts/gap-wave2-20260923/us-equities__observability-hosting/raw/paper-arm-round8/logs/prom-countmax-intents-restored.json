@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"job":"paper-obsgap-20260923","otel_scope_name":"github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector"},"value":[1790180879.059,"16"]}]}}

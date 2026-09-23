@@ -1,0 +1,368 @@
+{
+  "generated_by": "store_raw.py during the 2026-09-23 reconciliation round (copies existing files only; no check re-run)",
+  "mtime_note": "source_mtime_utc is the file's last-modification time on this host, used as the only surviving wall-clock evidence of when each step wrote its output.",
+  "files": [
+    {
+      "gap_index": 0,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/bench-out/run-cold-1.json",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_bytes": 0,
+      "source_mtime_utc": "2026-09-23T01:02:47.266257Z",
+      "committed_path": "raw/bench-out/run-cold-1.json.txt",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 0,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/bench-out/run-cold-1.stderr",
+      "source_sha256": "220de70ac8297c9599a8d8955e28f448142b3a26122ac2d96e45f23c5816a363",
+      "source_bytes": 1078,
+      "source_mtime_utc": "2026-09-23T01:02:47.370258Z",
+      "committed_path": "raw/bench-out/run-cold-1.stderr",
+      "committed_sha256": "220de70ac8297c9599a8d8955e28f448142b3a26122ac2d96e45f23c5816a363",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 0,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/bench-out/run-cold-2.json",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_bytes": 0,
+      "source_mtime_utc": "2026-09-23T01:02:47.370258Z",
+      "committed_path": "raw/bench-out/run-cold-2.json.txt",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 0,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/bench-out/run-cold-2.stderr",
+      "source_sha256": "70707faa6b84d5347d58b7f4e8c6a391157c530320fd80fd84f6e646b26401a3",
+      "source_bytes": 1077,
+      "source_mtime_utc": "2026-09-23T01:02:47.478258Z",
+      "committed_path": "raw/bench-out/run-cold-2.stderr",
+      "committed_sha256": "70707faa6b84d5347d58b7f4e8c6a391157c530320fd80fd84f6e646b26401a3",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 0,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/bench-out/run-cold-3.json",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_bytes": 0,
+      "source_mtime_utc": "2026-09-23T01:02:47.478258Z",
+      "committed_path": "raw/bench-out/run-cold-3.json.txt",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 0,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/bench-out/run-cold-3.stderr",
+      "source_sha256": "7c35a265a1b8a292d91238cd31dc58e52b01894c299f57cc24ce1290984b7ac7",
+      "source_bytes": 1077,
+      "source_mtime_utc": "2026-09-23T01:02:47.582258Z",
+      "committed_path": "raw/bench-out/run-cold-3.stderr",
+      "committed_sha256": "7c35a265a1b8a292d91238cd31dc58e52b01894c299f57cc24ce1290984b7ac7",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 0,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/bench-out/nocol.json",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_bytes": 0,
+      "source_mtime_utc": "2026-09-23T01:03:09.626508Z",
+      "committed_path": "raw/bench-out/nocol.json.txt",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 0,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/bench-out/nocol.stderr",
+      "source_sha256": "13288b07c056da327436eb703fcae7b999c61dcd581f3cab6abc7798c76bb159",
+      "source_bytes": 157,
+      "source_mtime_utc": "2026-09-23T01:03:09.726439Z",
+      "committed_path": "raw/bench-out/nocol.stderr",
+      "committed_sha256": "13288b07c056da327436eb703fcae7b999c61dcd581f3cab6abc7798c76bb159",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 2,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/freshness-corpus/doc1.md",
+      "source_sha256": "c487484406e06ab23469332e591e372c840cdc793727ded3086d16028543056a",
+      "source_bytes": 93,
+      "source_mtime_utc": "2026-09-23T01:03:38.857275Z",
+      "committed_path": "raw/freshness-corpus/doc1.md",
+      "committed_sha256": "c487484406e06ab23469332e591e372c840cdc793727ded3086d16028543056a",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 2,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/freshness-corpus/doc2.md",
+      "source_sha256": "12c630843353ff109e35328e5bd0bc3df2e79b4902509a7b636f4457086964be",
+      "source_bytes": 142,
+      "source_mtime_utc": "2026-09-23T01:03:48.638786Z",
+      "committed_path": "raw/freshness-corpus/doc2.md",
+      "committed_sha256": "12c630843353ff109e35328e5bd0bc3df2e79b4902509a7b636f4457086964be",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 2,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/freshness-corpus/doc3.md",
+      "source_sha256": "1f3adf0578b0af16f8e6b7a0fa6a095785d4e8ffdf36f18c82d1f957669ec6ba",
+      "source_bytes": 92,
+      "source_mtime_utc": "2026-09-23T01:03:38.860085Z",
+      "committed_path": "raw/freshness-corpus/doc3.md",
+      "committed_sha256": "1f3adf0578b0af16f8e6b7a0fa6a095785d4e8ffdf36f18c82d1f957669ec6ba",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 2,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/freshness-corpus/doc4.md",
+      "source_sha256": "429edd6c61e1fbaebf9d8837ece237c668d308f8412779408e86c635eeeb4297",
+      "source_bytes": 86,
+      "source_mtime_utc": "2026-09-23T01:03:38.861133Z",
+      "committed_path": "raw/freshness-corpus/doc4.md",
+      "committed_sha256": "429edd6c61e1fbaebf9d8837ece237c668d308f8412779408e86c635eeeb4297",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 2,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/freshness-corpus/doc5-epsilon.md",
+      "source_sha256": "824832dbc8a19524fc683b46e39d10e7dea795c6405aeeedbb7eadaac4c6256d",
+      "source_bytes": 100,
+      "source_mtime_utc": "2026-09-23T01:03:48.458783Z",
+      "committed_path": "raw/freshness-corpus/doc5-epsilon.md",
+      "committed_sha256": "824832dbc8a19524fc683b46e39d10e7dea795c6405aeeedbb7eadaac4c6256d",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 3,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/pdf-fixtures/make_multicol.py",
+      "source_sha256": "f67fc443bef9521ae16c8d6ce9a41d9c594ccabc653a5d5d11f801e9413316df",
+      "source_bytes": 731,
+      "source_mtime_utc": "2026-09-23T01:04:22.941394Z",
+      "committed_path": "raw/pdf-fixtures/make_multicol.py",
+      "committed_sha256": "f67fc443bef9521ae16c8d6ce9a41d9c594ccabc653a5d5d11f801e9413316df",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 3,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/pdf-fixtures/multicol-layout.txt",
+      "source_sha256": "4700b58c692e56fd90aa48a82f2b129f972af455961f98d33717374c9732bd79",
+      "source_bytes": 266,
+      "source_mtime_utc": "2026-09-23T01:04:27.252471Z",
+      "committed_path": "raw/pdf-fixtures/multicol-layout.txt",
+      "committed_sha256": "4700b58c692e56fd90aa48a82f2b129f972af455961f98d33717374c9732bd79",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 3,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/pdf-fixtures/multicol-plain.txt",
+      "source_sha256": "2891f97093b23a4011d067e669e520be5d860255622b1836ed6ca5f8d9fa9cb4",
+      "source_bytes": 256,
+      "source_mtime_utc": "2026-09-23T01:04:27.265658Z",
+      "committed_path": "raw/pdf-fixtures/multicol-plain.txt",
+      "committed_sha256": "2891f97093b23a4011d067e669e520be5d860255622b1836ed6ca5f8d9fa9cb4",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 3,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/pdf-fixtures/scanned-only.txt",
+      "source_sha256": "ef6cbd2161eaea7943ce8693b9824d23d1793ffb1c0fca05b600d3899b44c977",
+      "source_bytes": 1,
+      "source_mtime_utc": "2026-09-23T01:04:39.601172Z",
+      "committed_path": "raw/pdf-fixtures/scanned-only.txt",
+      "committed_sha256": "ef6cbd2161eaea7943ce8693b9824d23d1793ffb1c0fca05b600d3899b44c977",
+      "sanitized": {
+        "home_path_to_$HOME": false,
+        "uuid_session_ids_redacted": 0
+      }
+    },
+    {
+      "gap_index": 5,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/e2e-blind/arm-noretrieval.out",
+      "source_sha256": "c17840c8357581b4e9e6abca26f2e9f413c9ceda1311c3d953c70fe904d7ce25",
+      "source_bytes": 1347,
+      "source_mtime_utc": "2026-09-23T01:06:32.080131Z",
+      "committed_path": "raw/e2e-blind/arm-noretrieval.out",
+      "committed_sha256": "ff2e19d1954b822b71d4683eaa3c52f2e951c3be37fd743d4c986aea9e1721c5",
+      "sanitized": {
+        "home_path_to_$HOME": true,
+        "uuid_session_ids_redacted": 1
+      }
+    },
+    {
+      "gap_index": 5,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/e2e-blind/arm-withretrieval.out",
+      "source_sha256": "805df678d28f2ea886f1c97a474bd17f80246e397969a9524b9e4a12257b2fc5",
+      "source_bytes": 1610,
+      "source_mtime_utc": "2026-09-23T01:06:51.167976Z",
+      "committed_path": "raw/e2e-blind/arm-withretrieval.out",
+      "committed_sha256": "bacbe127cced2334b9dc84cdc26d92dc36edef2596bbc3d504a3cdd5878c9dc8",
+      "sanitized": {
+        "home_path_to_$HOME": true,
+        "uuid_session_ids_redacted": 1
+      }
+    },
+    {
+      "gap_index": 3,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/pdf-fixtures/annual-report-layout.txt",
+      "committed_path": "raw/pdf-fixtures/annual-report-layout.excerpt.txt",
+      "committed_sha256": "abe8e84e38a4a2741b2c629afa1aa06466e20320bf075c9e8bee5bfe2fcfd341",
+      "note": "excerpt only: table lines 1-8 and 64-65 plus the two phrase-matching lines; remaining third-party text not committed"
+    },
+    {
+      "gap_index": 0,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/qmd-disposable/catalog-snapshot.sqlite",
+      "source_sha256": "d738ccc6a34a1933111d7539824f00fd4e893064ee53a5b4b051fca860948e50",
+      "source_bytes": 1699840,
+      "source_mtime_utc": "2026-09-23T01:00:07.322665Z",
+      "committed_path": null,
+      "not_committed_reason": "1.7 MB copy of the sealed snapshot; sealed original stays outside the repo"
+    },
+    {
+      "gap_index": 3,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/pdf-fixtures/multicol.pdf",
+      "source_sha256": "ef09fb8f87a104224103018cbf1d09fb612ecc28bf50652eeee0ca7779aebf96",
+      "source_bytes": 1540,
+      "source_mtime_utc": "2026-09-23T01:04:23.136591Z",
+      "committed_path": null,
+      "not_committed_reason": "PDF; repository validator requires a PDF review record for committed PDFs"
+    },
+    {
+      "gap_index": 3,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/pdf-fixtures/lumen-qualification.pdf",
+      "source_sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5",
+      "source_bytes": 5845,
+      "source_mtime_utc": "2026-09-23T01:04:39.073714Z",
+      "committed_path": null,
+      "not_committed_reason": "copy of checked-in blueprints/convergence-practice/document-ingestion/corpus/lumen-qualification.pdf"
+    },
+    {
+      "gap_index": 3,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/pdf-fixtures/scanpage-1.png",
+      "source_sha256": "dbd6112b56518f1ca6430388d0e9c088fb38900aa11b5b9458298c3207c64efa",
+      "source_bytes": 120259,
+      "source_mtime_utc": "2026-09-23T01:04:39.255205Z",
+      "committed_path": null,
+      "not_committed_reason": "render of the checked-in lumen PDF page 1"
+    },
+    {
+      "gap_index": 3,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/pdf-fixtures/scanpage-2.png",
+      "source_sha256": "111f0523029de48ffac6e32adb75c3bb59ce0055b69979e149b16255c90254c8",
+      "source_bytes": 120203,
+      "source_mtime_utc": "2026-09-23T01:04:39.367205Z",
+      "committed_path": null,
+      "not_committed_reason": "render of the checked-in lumen PDF page 2"
+    },
+    {
+      "gap_index": 3,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/pdf-fixtures/scanned-only.pdf",
+      "source_sha256": "3816e960e77ff966c0b161f6b34d8500b6d776385b220ec7bf4acaa1bdd67840",
+      "source_bytes": 125188,
+      "source_mtime_utc": "2026-09-23T01:04:39.575206Z",
+      "committed_path": null,
+      "not_committed_reason": "PDF; image-only wrap of scanpage-1.png; validator requires a PDF review record"
+    },
+    {
+      "gap_index": 3,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/pdf-fixtures/annual-report.pdf",
+      "source_sha256": "a99f263003295b177e8c50ec34f2307093857a357276527e98d5a6205e21a908",
+      "source_bytes": 55589,
+      "source_mtime_utc": "2026-09-23T01:04:55.167333Z",
+      "committed_path": null,
+      "not_committed_reason": "third-party copyrighted PDF (Berkshire Hathaway 2022 letter); public URL in receipt"
+    },
+    {
+      "gap_index": 3,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/pdf-fixtures/annual-report-layout.txt",
+      "source_sha256": "8781387f4a4aadda2792cbe07e43ff0159ef98a7f14d94be3abc0dfb77ca9d80",
+      "source_bytes": 35545,
+      "source_mtime_utc": "2026-09-23T01:04:59.787761Z",
+      "committed_path": null,
+      "not_committed_reason": "full pdftotext output of third-party copyrighted text; only the cited lines are committed as annual-report-layout.excerpt.txt"
+    },
+    {
+      "gap_index": 4,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/mk-fixtures/fixture.docx",
+      "source_sha256": "e7b24c3b4018a0437acebccde7f24672bb3d152a02637fa32bd997b8cd56d61c",
+      "source_bytes": 36816,
+      "source_mtime_utc": "2026-09-23T01:05:22.951562Z",
+      "committed_path": null,
+      "not_committed_reason": "binary; validator scans committed evidence as UTF-8"
+    },
+    {
+      "gap_index": 4,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/mk-fixtures/fixture.xlsx",
+      "source_sha256": "27cae036e817ba7c2575df2ddc467de716f1d741cff99b59bcfd83f02da0c012",
+      "source_bytes": 4864,
+      "source_mtime_utc": "2026-09-23T01:05:23.595272Z",
+      "committed_path": null,
+      "not_committed_reason": "binary; validator scans committed evidence as UTF-8"
+    },
+    {
+      "gap_index": 4,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/mk-fixtures/fixture.pptx",
+      "source_sha256": "075c61833666d73310c4db6ccf29b9956b11561cc2946359ebd8d95da04c06c0",
+      "source_bytes": 28270,
+      "source_mtime_utc": "2026-09-23T01:05:24.014837Z",
+      "committed_path": null,
+      "not_committed_reason": "binary; validator scans committed evidence as UTF-8"
+    },
+    {
+      "gap_index": 4,
+      "source": "$HOME/.cache/gap-wave2-20260923/document-retrieval/mk-fixtures/fixture.pdf",
+      "source_sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5",
+      "source_bytes": 5845,
+      "source_mtime_utc": "2026-09-23T01:05:28.457637Z",
+      "committed_path": null,
+      "not_committed_reason": "copy of checked-in lumen-qualification.pdf"
+    }
+  ]
+}

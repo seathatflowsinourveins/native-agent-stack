@@ -1,0 +1,45 @@
+{
+ "id": "foundation__quality-evaluation__gap9",
+ "gap_index": 9,
+ "gap_text_sha256": "8df6e47c75880df21c9cd6ce099faa2665b7f306726fe53872297eb83a1d8c52",
+ "preregistration": {
+  "written_at": "2026-09-23T02:42:37Z",
+  "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+  "expectation": "A probe shows the resident vLLM on 8231 serves only the embedding model (/v1/chat/completions 404). A temporary loopback vLLM serving the local Qwen2.5-7B-Instruct-AWQ model lets an unmodified upstream Inspect example (examples/ from the inspect_ai repo at the tag matching 0.3.268) run against local vLLM from a fresh pinned prefix, logged to a temporary loopback MLflow server; run IDs, exit codes and FINISHED status retrieved by REST; both servers stopped and verified down. CI failure repair and security finding quality stay untested, so expected outcome: advanced.",
+  "criteria": "exit codes in files; MLflow runs/get JSON retained; Inspect log retained as JSON; post-stop connection-refused checks retained.",
+  "committed_in": "ebf6ac1 (preregistrations-fixround.json), before any fix-round command"
+ },
+ "original_round_preregistration": {
+  "written_at": null,
+  "note": "Round 1 recorded written_at 2026-09-23T02:35:00Z, a value reconstructed after its runs (raw-output mtimes and eval ids precede it). It is labelled late and superseded; the round-1 artifacts are at commit b37df23."
+ },
+ "commands": [
+  "UV_CACHE_DIR=$HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/uv-cache ecosystem-bounded-run bash -c \"uv venv --python 3.12 .../fixround/pinned-venv && uv pip install --python .../fixround/pinned-venv/bin/python 'inspect-ai==0.3.268' 'mlflow==3.16.1' 'openai' 'jsonschema'\"",
+  "git clone --depth 1 --branch 0.3.268 --filter=blob:none --sparse https://github.com/UKGovernmentBEIS/inspect_ai.git inspect-src && git sparse-checkout set examples (HEAD f9837f6c577da1bf89223f0575d4cb218940a79f)",
+  "VLLM_USE_FLASHINFER_SAMPLER=0 VLLM_USE_V2_MODEL_RUNNER=0 HF_HUB_OFFLINE=1 VLLM_CACHE_ROOT=.../fixround/vllm-cache XDG_CACHE_HOME=.../fixround/xdg-cache ecosystem-bounded-run <existing vllm-0.25.0 python> vllm serve $HOME/.local/share/codex-ecosystem/models/qwen2.5-7b-instruct-awq-b250375 --served-model-name qwen2.5-7b-instruct-awq --host 127.0.0.1 --port 18431 --max-model-len 4096 --max-num-seqs 4 --gpu-memory-utilization 0.40 --enforce-eager --no-enable-log-requests (attempt 3; attempts 1-2 failed: 'UVA is not available', then FlashInfer JIT 'Could not find nvcc')",
+  "bash blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_g9.sh .../fixround/g9 .../fixround/g9-out .../fixround/pinned-venv .../fixround/inspect-src/examples <gap-4 heldout inspect log>  (inspect eval hello_world.py / security_guide.py --model vllm/qwen2.5-7b-instruct-awq with VLLM_BASE_URL=http://127.0.0.1:18431/v1; mlflow server --host 127.0.0.1 --port 15005 with a temp sqlite store; log_inspect_to_mlflow.py; REST runs/get; kill)",
+  "kill <vllm pid on 18431>; ss -ltn | grep -c ':18431 '"
+ ],
+ "results": {
+  "chat_probe": "resident 8231 models ['nvidia/Nemotron-3-Embed-1B-BF16'], POST /v1/chat/completions status 404; temporary 18431 models ['qwen2.5-7b-instruct-awq'], status 200 (chat-endpoint-probe.txt)",
+  "upstream_examples_unmodified": "hello_world.py and security_guide.py sha256 in upstream-example.sha256 (sparse checkout, no edits)",
+  "inspect_exit_codes": "hello_world 0, security_guide 0 (inspect-*.exit)",
+  "inspect_results": "hello_world exact mean 1.000, 37 tokens [I: 34, O: 3]; security_guide model_graded_fact accuracy 0.688 (stderr 0.120), 9,510 tokens [I: 5,590, O: 3,920]",
+  "mlflow_runs": {
+   "2d1037033bff45b5ba8970b90ebd9d10": "hello_world FINISHED",
+   "4b176a82717c4de79d631d2aeae7efca": "security_guide FINISHED",
+   "c2c725db27ef4b488101f86e759e47c4": "heldout_retrieval (gap 4 log) FINISHED"
+  },
+  "mlflow_retrieval": "status and metrics from /api/2.0/mlflow/runs/get (mlflow-run-*.json); mlflow-log exit 0",
+  "servers_stopped": "MLflow: 0 listeners on :15005 and no mlflow server process. vLLM chat: 0 listeners on :18431; GPU memory back to 5540 MiB (mlflow-stop-verification.txt). Connect probes (reconciliation restatement): at 02:52Z a curl http connect to 127.0.0.1:15005 timed out (curl exit 28, mlflow-after-stop.txt) and Python socket connects to 15005 and to the unused control port 15999 raised TimeoutError, whereas the earlier gap-2 curl https check of the stopped mirror on closed port 18443 was refused (curl exit 7, g2-mirror-after-stop.txt). The note inside mlflow-stop-verification.txt that any closed loopback port times out on this host is contradicted by that refusal and is withdrawn; the cause of the timeouts (port, timing or other host state) was not determined. Shutdown rests on the listener counts and the process recheck, not on the connect probes."
+ },
+ "outcome": "advanced",
+ "evidence_class": "native_proven",
+ "limits": "The next_check arms are all executed: fresh pinned prefix, one upstream Inspect example (two were run) against local vLLM, MLflow logging, run IDs and exit codes. The gap text also names CI failure repair and security finding quality, which this check does not exercise. They remain unestablished, so the outcome is advanced. The local chat model is the pre-existing Qwen2.5-7B-Instruct-AWQ copy under the ecosystem models directory (read only). security_guide grades with the same model it evaluates. A temporary second vLLM ran on loopback beside the resident embedding service and was stopped. The resident service was not touched apart from a read-only /v1/models, 404 chat probe and /metrics reads.",
+ "checked_at": "2026-09-23T02:52:39Z",
+ "artifacts": [
+  "support/fixround/g9/*",
+  "support/fixround/g4-g9-pinned-install.log",
+  "blueprints/gap-wave2-20260923/foundation__quality-evaluation/{run_g9.sh,log_inspect_to_mlflow.py}"
+ ]
+}

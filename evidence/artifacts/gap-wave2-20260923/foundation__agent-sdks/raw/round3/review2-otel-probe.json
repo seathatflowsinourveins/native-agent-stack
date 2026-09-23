@@ -1,0 +1,138 @@
+{
+  "started_at": "2026-09-23T13:31:23Z",
+  "codex_bin_sha256": "0753dfe1d8b87a52436deb13eb1c549661ef4c84fee2c5aa688385eebeccb761",
+  "flush_seconds_after_exit": 8.0,
+  "listener": "127.0.0.1:58608 (ephemeral, started and stopped by this probe)",
+  "parent_sequence": {
+    "arm": "parent_sequence",
+    "codex_home": "$HOME/.codex",
+    "config_overrides": [
+      "features.hooks=false",
+      "features.plugin_hooks=false",
+      "otel.exporter={otlp-http={endpoint=\"http://127.0.0.1:58608/v1/logs\",protocol=\"binary\"}}",
+      "otel.metrics_exporter={otlp-http={endpoint=\"http://127.0.0.1:58608/v1/metrics\",protocol=\"binary\"}}"
+    ],
+    "started_at": "2026-09-23T13:31:23Z",
+    "effective": {
+      "otel": {
+        "exporter": {
+          "otlp-http": {
+            "endpoint": "http://127.0.0.1:58608/v1/logs",
+            "headers": {},
+            "protocol": "binary",
+            "tls": null
+          }
+        },
+        "metrics_exporter": {
+          "otlp-http": {
+            "endpoint": "http://127.0.0.1:58608/v1/metrics",
+            "headers": {},
+            "protocol": "binary",
+            "tls": null
+          }
+        }
+      },
+      "features": {
+        "hooks": false,
+        "plugin_hooks": false,
+        "plugins": null,
+        "apps": null
+      }
+    },
+    "hooks_listed": 0,
+    "hooks_enabled_flags": [],
+    "calls": {
+      "config/read": true,
+      "hooks/list": true,
+      "skills/list": true
+    },
+    "process_seconds": 0.35,
+    "hits": [
+      {
+        "t": 1790170283.8815565,
+        "method": "POST",
+        "path": "/v1/metrics",
+        "bytes": 13797,
+        "content_type": "application/x-protobuf",
+        "t_rel": 0.29
+      },
+      {
+        "t": 1790170283.884642,
+        "method": "POST",
+        "path": "/v1/logs",
+        "bytes": 344,
+        "content_type": "application/x-protobuf",
+        "t_rel": 0.29
+      }
+    ],
+    "exported": true,
+    "finished_at": "2026-09-23T13:31:31Z"
+  },
+  "positive_control": {
+    "arm": "positive_control",
+    "codex_home": "$HOME/.cache/gap-wave2-20260923/agent-sdks/review2/codex-home-zdszeyrh",
+    "config_overrides": [
+      "otel.exporter={otlp-http={endpoint=\"http://127.0.0.1:58608/v1/logs\",protocol=\"binary\"}}",
+      "otel.metrics_exporter={otlp-http={endpoint=\"http://127.0.0.1:58608/v1/metrics\",protocol=\"binary\"}}"
+    ],
+    "started_at": "2026-09-23T13:31:31Z",
+    "effective": {
+      "otel": {
+        "exporter": {
+          "otlp-http": {
+            "endpoint": "http://127.0.0.1:58608/v1/logs",
+            "headers": {},
+            "protocol": "binary",
+            "tls": null
+          }
+        },
+        "metrics_exporter": {
+          "otlp-http": {
+            "endpoint": "http://127.0.0.1:58608/v1/metrics",
+            "headers": {},
+            "protocol": "binary",
+            "tls": null
+          }
+        }
+      },
+      "features": {
+        "hooks": false,
+        "plugin_hooks": false,
+        "plugins": false,
+        "apps": false
+      }
+    },
+    "calls": {
+      "config/read": true,
+      "thread/start": true
+    },
+    "process_seconds": 0.41,
+    "hits": [
+      {
+        "t": 1790170292.305371,
+        "method": "POST",
+        "path": "/v1/logs",
+        "bytes": 3034,
+        "content_type": "application/x-protobuf",
+        "t_rel": 0.36
+      }
+    ],
+    "exported": true,
+    "finished_at": "2026-09-23T13:31:40Z",
+    "temp_home_entries": [
+      ".sandbox_migration",
+      "config.toml",
+      "goals_1.sqlite",
+      "installation_id",
+      "logs_2.sqlite",
+      "memories_1.sqlite",
+      "queue_1.sqlite",
+      "shell_snapshots",
+      "skills",
+      "state_5.sqlite",
+      "thread-writer-locks",
+      "tmp"
+    ]
+  },
+  "finished_at": "2026-09-23T13:31:40Z"
+}

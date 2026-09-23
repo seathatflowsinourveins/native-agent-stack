@@ -1,0 +1,14 @@
+{
+ "gap_index": 0,
+ "slug": "worker-backend-head-to-head",
+ "written_at": "2026-09-23T07:23:05Z",
+ "written_before_results": true,
+ "expectation": "codex-native-sdk and DeerFlow/codex-acp both complete one identical read-only fact-extraction task (same two input files copied into each arm's own workspace, same instruction to read them only with `head -c 24000`) and return all gold facts; cumulative provider tokens are of the same order (tens of thousands) and differ mainly by per-backend prompt overhead. OmniRoute is expected NOT to be runnable here: no Linux-side gateway with a Codex OAuth connection exists on this host (the recorded gateway ran on Windows at port 20128 and is not listening).",
+ "criteria": [
+  "Task, input files, gold facts and the scoring script are committed before any arm runs.",
+  "Per arm record: facts correct / total (mechanical match against gold), blocked or failed tool calls, cumulative native usage (input, cached input, output, total) from the owning SDK/adapter event, wall time, sandbox policy.",
+  "Arms run sequentially, one Codex call at a time, with native hooks disabled (-c features.hooks=false, features.plugin_hooks=false) so no ai-memory hook call reaches the live store.",
+  "settled only if all three named backends ran; with OmniRoute blocked the best outcome is advanced.",
+  "A backend whose returned facts cannot be scored or whose usage is unavailable is reported as such, not imputed."
+ ]
+}

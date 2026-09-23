@@ -1,0 +1,10 @@
+type: graph
+timeout_sec: 120
+max_active_runs: 1
+working_dir: "$HOME/code/nas-wt-g2-scheduling-supervision"
+steps:
+  - id: validate
+    run: "python3 scripts/validate.py"
+  - id: ecosystem_check
+    depends: [validate]
+    run: "bash -c 'sleep 25 && python3 scripts/build_ecosystem.py --check'"

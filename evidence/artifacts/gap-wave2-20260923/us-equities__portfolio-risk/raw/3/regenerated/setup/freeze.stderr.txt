@@ -1,0 +1,1 @@
+Using Python 3.13.15 environment at: $HOME/.cache/gap-wave2-20260923/portfolio-risk/g3-wave/venv

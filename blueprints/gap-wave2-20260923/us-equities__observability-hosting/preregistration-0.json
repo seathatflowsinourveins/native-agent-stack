@@ -1,0 +1,13 @@
+{
+ "written_at": "2026-09-23T07:41:33Z",
+ "gap_index": 0,
+ "gap_text_sha256": "ef9876f6df1b08c4523d9edbd058ef1d2c6ab554ecf2663432eaf5e1b407d9a6",
+ "gap_text": "lanes disagreed: claude=loki,opentelemetry-collector-contrib,prometheus; codex=opentelemetry-collector-contrib,restic,sandbox-runtime; the counterbalanced adjudication did not agree (claude 2, codex 2, 0 refuted; evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json); an executed comparison must decide it",
+ "next_check": "Run both candidate sets in new prefixes against the same Dagu and paper-runtime telemetry and backup workload. Compare log and metric retention and query, snapshot restore fidelity, and sandbox isolation outcomes, then record the executed comparison receipt.",
+ "expectation": "The dispatch directs this gap to covered_elsewhere via the executed observability-hosting comparison merged in #87 (evidence/artifacts/sota-refresh-20260923/obs-compare/). Expected: the cited receipt is on origin/main unchanged from 43bb931, runs both contested candidate sets (c14 common; c5 prometheus, c6 loki; c8 restic, c3 sandbox-runtime) natively, and covers log/metric retention and query, snapshot restore fidelity and sandbox isolation; expected NOT covered: a Dagu workload and paper-runtime telemetry (synthetic trading-shaped OTLP emitter instead), and the landscape row still pending_lanes (re-judgement is a ledger change this unit may not make).",
+ "criteria": {
+  "covered_elsewhere": "cited files present on origin/main with sha256 identical to 43bb931, all five contested candidates have an executed native_proven per-component verdict, and the retention/query, restore-fidelity and sandbox-isolation clauses each have an executed result in the receipt",
+  "residual_reporting": "any next_check clause with no detected coverage (probe: case-insensitive term search over the full receipt JSON and README, with a positive control on a term known present, 'restic', and the absent-term result reported verbatim) is listed as a residual with its owner, not claimed",
+  "not_settled": "cited evidence missing, altered, or lacking an executed result for one of the five candidates"
+ }
+}

@@ -1,0 +1,103 @@
+[
+  {
+    "record": "fix-f1-dagu-prereg-1790134073/result.json",
+    "key": "inputs",
+    "file": "compare.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f1-dagu-prereg-1790134073/result.json",
+    "key": "inputs",
+    "file": "dagu_common.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f1-dagu-prereg-1790134073/result.json",
+    "key": "inputs",
+    "file": "prefect_ctl.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f1-dagu-prereg-1790134073/result.json",
+    "key": "inputs",
+    "file": "prefect_flow.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f1-dagu-prereg-1790134073/result.json",
+    "key": "inputs",
+    "file": "temporal_worker.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f2-dagu-sched-1790134073/result.json",
+    "key": "inputs",
+    "file": "compare.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f2-dagu-sched-1790134073/result.json",
+    "key": "inputs",
+    "file": "dagu_common.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f2-dagu-sched-1790134073/result.json",
+    "key": "inputs",
+    "file": "prefect_ctl.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f2-dagu-sched-1790134073/result.json",
+    "key": "inputs",
+    "file": "prefect_flow.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f2-dagu-sched-1790134073/result.json",
+    "key": "inputs",
+    "file": "temporal_worker.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f3-g2-real-1790134079/freeze.json",
+    "file": "config.yaml",
+    "status": "not a committed helper"
+  },
+  {
+    "record": "fix-f3-g2-real-1790134079/freeze.json",
+    "key": "inputs",
+    "file": "dagu_common.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f3-g2-real-1790134079/freeze.json",
+    "key": "inputs",
+    "file": "real_scheduled_recovery.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f3-g2-real-1790134079/freeze.json",
+    "key": "inputs",
+    "file": "real_steps.py",
+    "status": "identical",
+    "compared_with": "working tree"
+  },
+  {
+    "record": "fix-f3-g2-real-1790134079/freeze.json",
+    "file": "realmaint.yaml",
+    "status": "not a committed helper"
+  }
+]

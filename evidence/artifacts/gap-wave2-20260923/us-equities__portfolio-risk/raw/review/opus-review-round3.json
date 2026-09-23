@@ -1,0 +1,18 @@
+{
+  "reviewer": "independent Opus review (read-only), relayed by the workflow coordinator in the fix-round-3 task text on 2026-09-23",
+  "note": "Findings as relayed; worktree paths shortened to $WT. Resolutions are recorded in each receipt's independent_review.round_3 field.",
+  "findings": [
+    {"severity": "major", "location": "$WT/.../4-nautilus-weights-accounting.json commands[4].note and preregistration.fix_round_2_addendum; nautilus_portfolio_dividends.py",
+     "finding": "The dividend-inclusive arm was described as rerun in fix round 2 with a one-hour time-shift mutation, but the dividend runner had no mutation self-test and no fee-perturbation test; the fix-round-2 preregistration's mutation criterion was not met for this arm."},
+    {"severity": "minor", "location": "4-nautilus-weights-accounting.json limits[2]",
+     "finding": "A stale limit said the outcome moved to 'settled' through the late addendum while the receipt outcome is 'advanced'."},
+    {"severity": "minor", "location": "README.md row 11 and the gap 11 handoff note",
+     "finding": "'All 1300 observed study episodes ran in native Nautilus' overclaims: the cash candidate's 260 episodes never reached the engine; 905 invested episodes across 4 candidates were executed."},
+    {"severity": "minor", "location": "14-parity-and-paper.json; README.md row 14",
+     "finding": "The LEAN arm (same weight schedule through Nautilus and LEAN) was not run and no blocker was named; the peer's parity is a SPY fixture, so the arm should be labelled 'not run (executable here)' rather than covered."},
+    {"severity": "minor", "location": "1-candidate-libs-execution.json commands[2] and raw_artifacts (gap1_libs.py)",
+     "finding": "The committed runner hash is not the runner that produced the empyrical-reloaded and quantstats outputs (attempt 2, before the cvxportfolio relabel edit); the output JSONs carry no runner hash."},
+    {"severity": "minor", "location": "5-extended-reserved-significance.json",
+     "finding": "Marked settled although the next_check says 'run evaluate.py once'; a new driver re-implements panel loading, anchor, train-index and episode selection. It is an equivalent substitute, not a stronger check; confirm or downgrade to advanced."}
+  ]
+}

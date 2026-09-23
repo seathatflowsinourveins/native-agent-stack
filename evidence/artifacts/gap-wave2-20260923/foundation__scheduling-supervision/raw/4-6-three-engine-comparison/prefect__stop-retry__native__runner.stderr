@@ -1,0 +1,20 @@
+23:07:05.939 | INFO    | Flow run 'discerning-inchworm' - Beginning flow run 'discerning-inchworm' for flow 'recovery'
+23:07:05.943 | INFO    | Flow run 'discerning-inchworm' - View at http://127.0.0.1:57430/runs/flow-run/<uuid-1>
+23:07:06.020 | INFO    | Task run 'checkpoint-852' - Finished in state Completed()
+23:07:06.812 | ERROR   | Task run 'finalize-97b' - Crash detected! Execution was aborted by a termination signal.
+23:07:06.813 | ERROR   | Task run 'finalize-97b' - Finished in state Crashed('Execution was aborted by a termination signal.')
+23:07:07.122 | INFO    | Flow run 'discerning-inchworm' - Flow run was cancelled.
+23:07:07.122 | INFO    | Flow run 'discerning-inchworm' - Finished in state Running()
+23:07:07.124 | INFO    | prefect.engine - Execution of flow run '<uuid-1>' was terminated.
+23:07:09.840 | INFO    | prefect.runner.cancellation_manager - Cancelled flow run 'discerning-inchworm'
+23:07:15.108 | INFO    | Flow run 'discerning-inchworm' - Beginning flow run 'discerning-inchworm' for flow 'recovery'
+23:07:15.113 | INFO    | Flow run 'discerning-inchworm' - View at http://127.0.0.1:57430/runs/flow-run/<uuid-1>
+23:07:15.130 | INFO    | Task run 'checkpoint-5f6' - Finished in state Cached(type=COMPLETED)
+23:07:15.190 | INFO    | Task run 'finalize-d9c' - Finished in state Completed()
+23:07:16.292 | INFO    | Flow run 'discerning-inchworm' - Finished in state Completed()
+23:07:16.960 | INFO    | prefect.runner - SIGTERM received, initiating graceful shutdown...
+$HOME/.cache/gap-wave2-20260923/scheduling-supervision/challengers/prefect-3.8.6/lib/python3.13/site-packages/prefect/runner/runner.py:596: RuntimeWarning: coroutine 'Runner.astop' was never awaited
+  self.stop()
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+23:07:16.962 | INFO    | prefect.runner - Pausing all deployments...
+23:07:16.976 | INFO    | prefect.runner - All deployments have been paused!

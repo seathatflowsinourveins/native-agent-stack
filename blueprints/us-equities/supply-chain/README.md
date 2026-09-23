@@ -48,8 +48,18 @@ build:   2026-09-17T14:32:25Z, go1.26.3, linux/amd64
 Release publication was September 17, 2026, 14:38:17 UTC. The executable is
 statically linked. No existing executable was replaced; a new versioned tool
 directory and previously absent `syft` link were created in the adopted local
-tools layout. Signature verification was **not** performed. Matching checksums
-does not independently establish publisher identity or build provenance.
+tools layout. Signature verification was **not** performed at installation.
+Matching checksums does not independently establish publisher identity or
+build provenance. On September 23, 2026, `cosign verify-blob` (v3.1.3) checked
+the Syft and Grype checksum files against their keyless signatures and exited
+0. The signer identity was each repository's
+`.github/workflows/release.yaml@refs/heads/main`, with issuer
+`https://token.actions.githubusercontent.com`. The workflow commit matched each
+binary's `gitCommit`. A tampered blob and a wrong identity each failed with
+exit 1. The installed binaries are byte-identical to the verified archives.
+Gitleaks 8.30.1 publishes neither a signature nor a GitHub attestation, so it
+remains checksum-only. The details are in the gap-wave-2 receipts for gaps 2
+and 13.
 
 Set these variables to explicit absolute paths. `NEW_DOWNLOAD_DIR` and
 `NEW_INSTALL_DIR` must not exist; the target link must also be absent.
@@ -138,10 +148,14 @@ not a security verdict.
 
 ## Vulnerability scan — pinned NautilusTrader 2.0.0rc5 runtime and Alpaca adapter, September 22, 2026
 
-This closes the previously missing vulnerability scan of the SDK inventoried
-above. Upstream **Syft 1.52.0** (already installed for the inventory above)
-generated SBOMs for two targets, and newly installed upstream **Grype 0.119.0**
-matched both against its vulnerability database:
+This scan targeted the NautilusTrader rc5 runtime, **not** the 36-package
+`equity-worker-sdk` inventoried above. Packages such as `openai 3.16.2`,
+`openai-codex 0.154.0` and `exchange-calendars 4.13.2` are in the SDK
+inventory only. The SDK's own vulnerability scan was run separately on
+September 23, 2026 (see the next section). Upstream **Syft 1.52.0**, already
+installed for the inventory above, generated SBOMs for two targets. Newly
+installed upstream **Grype 0.119.0** matched both against its vulnerability
+database:
 
 1. The installed Python `site-packages` of the pinned uv-managed runtime venv
    used for `adaptive-paper` NautilusTrader 2.0.0rc5 + Alpaca paper operation
@@ -192,3 +206,23 @@ This scan result establishes only what its evidence class states
 Grype run against a fresh database build found no known match for these
 exact package versions on this date. It says nothing about NautilusTrader,
 Alpaca adapter, or broker-side runtime safety.
+
+## Vulnerability scan of the September 19 equity-worker-sdk SBOM, September 23, 2026
+
+Upstream **Grype 0.119.0** was run against the exact September 19 Syft SBOM of
+`equity-worker-sdk`. The SBOM's SHA-256 `6912fc52…12b210fc` matches the value
+recorded in [receipt.json](receipt.json). Grype used an isolated, freshly
+downloaded database: schema v6.1.9, built 2026-09-23T06:31:39Z.
+
+| Native result | Observed value |
+| --- | ---: |
+| Packages ingested by Grype (CycloneDX library components) | 36 |
+| Grype matches | 0 |
+| Positive control: the same SBOM with `requests` changed to 2.19.0 | 5 matches |
+| Positive control: PURLs `requests@2.19.0` and `urllib3@1.24.1` | 17 matches |
+
+The two positive controls show that this database and this SBOM input path can
+report matches. As with the runtime scan above, zero matches is not a safety
+guarantee. The receipt, commands and sanitized raw outputs are in
+`evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/`
+(gaps 0 and 10).

@@ -1,0 +1,202 @@
+{
+  "id": "gap-wave2-20260923/us-equities/security-supply-chain/5",
+  "gap_index": 5,
+  "gap_text": "The gitleaks evidence is dated 2026-09-19 and covers 22 commits with approximate byte counts. It is not current coverage of later history and does not certify that no secrets exist.",
+  "gap_text_sha256": "956ac9f631c246562ca3881c2233df573ae74118da7f330363f7dfd7468297e6",
+  "next_check": "Run the guarded `gitleaks git` over the full current commit range of the repository, then record the commit count, exit code and any size- or depth-based exclusions as coverage limits.",
+  "preregistration": {
+    "written_at": "2026-09-23T08:13:16Z",
+    "expectation": "Guarded gitleaks git over the full HEAD history of this repository (base 41d39b3) exits 0 with zero findings, or reports findings (redacted) with exit 1.",
+    "criteria": [
+      "advanced/settled decision: the currency clause is closed if the guarded scan covers every commit reachable from HEAD (commit count cross-checked against git rev-list --count) with exit code, and limits (decode depth 5, archive depth 0, no size cap) recorded",
+      "the clause 'does not certify that no secrets exist' cannot be closed by any pattern scanner; if it is the only remainder, record it as a permanent limit",
+      "positive control: a temp repo with a synthetic secret-shaped string must yield a finding, proving the scan can detect"
+    ]
+  },
+  "commands": [
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh control   # 6 synthetic secret-shaped files generated at runtime in a temp repo",
+    "gitleaks-guarded git --no-banner --redact=100 --report-format json <temp control repo>             # default rules",
+    "gitleaks-guarded git ... --config .gitleaks.toml <temp control repo>                                 # repo config",
+    "gitleaks-guarded git ... --config .gitleaks.toml --log-opts=HEAD .                                   # first pass, uncapped",
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh head2mb",
+    "gitleaks-guarded git ... --config .gitleaks.toml --max-target-megabytes 2 --log-opts=HEAD .",
+    "git rev-list --objects HEAD | git cat-file --batch-check  # list blobs > 2 MB (the cap's exclusions)",
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh oversized   # gitleaks-guarded dir --config .gitleaks.toml docs/ecosystem/index.html (HEAD version)",
+    "gitleaks-guarded dir --redact=0 ... docs/ecosystem/index.html -> private cache file (umask 077), classified by shape and by other tracked files containing the value, then deleted",
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh allrefs   # --max-target-megabytes 2 --log-opts=--all",
+    "FIX ROUND: bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_fix_round.sh controls   # oversized-blob and merge-resolution detection controls (runtime-generated synthetic github-pat tokens)",
+    "FIX ROUND: bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_fix_round.sh oversized   # git cat-file every blob > 2 MB reachable from HEAD d67f77a into a 0700 temp dir; gitleaks-guarded dir --redact=0 --config .gitleaks.toml <batch dir> (5 batches of <= 40 blobs)",
+    "FIX ROUND: bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_fix_round.sh merges   # gitleaks-guarded git --config .gitleaks.toml --max-target-megabytes 2 '--log-opts=--merges --diff-merges=first-parent HEAD' .",
+    "FIX ROUND: python3 blueprints/gap-wave2-20260923/us-equities__security-supply-chain/classify_findings.py <private dir> <out> <repo>   # per finding: rule, value shape, count of other HEAD-tracked files containing the value (git grep -F -f <private pattern file>); values never written; private dir deleted"
+  ],
+  "results": [
+    "control-default-rules exit=1: 6 findings (aws-access-token, generic-api-key x2 [config.py, alpaca.env], github-pat, private-key, slack-bot-token)",
+    "control-repo-config exit=1: the same 6 findings under .gitleaks.toml (the repo allowlists do not suppress these shapes)",
+    "head-repo-config (uncapped, first pass) exit=143 seconds=600: stopped by the guard's 600 s limit; no report",
+    "head commits: 502 head=ba3e7c2b1c66 (full id in raw/gitleaks/exits.log) (402 non-merge + 100 merge commits)",
+    "blobs over 2 MB reachable from HEAD: 163, all versions of docs/ecosystem/index.html",
+    "head-repo-config-2mb exit=0 seconds=63: '402 commits scanned.' 'scanned ~973880469 bytes (973.88 MB) in 1m3.1s' 'no leaks found'",
+    "oversized-head-index exit=1: 'scanned ~12918618 bytes (12.92 MB)' 'leaks found: 11' -> 1 generic-api-key (hex64 under openapi_sha256, also in 3 other tracked files) + 10 sourcegraph-access-token (hex40 values also present in catalogs/us-equities/star-audit.json or catalogs/*/trading-sources.json); all content-digest shaped",
+    "FIX ROUND oversized-control exit=1: unmodified.html 11 findings, planted.html 12 (the extra one is the synthetic github-pat) -> dir-mode scan of a 13 MB blob detects an appended token",
+    "FIX ROUND merge-control (4 commits, 1 merge whose resolution alone adds a synthetic token): merge-control-default exit=0 0 findings (default git scan misses resolution content); merge-control-first-parent exit=1 1 finding (github-pat)",
+    "FIX ROUND oversized: 'blobs over 2 MB reachable from HEAD: 164' (the 163 listed at ba3e7c2 plus 43164e4bcd4a, the index.html rebuilt in 888793d); 'blobs written: 164 in 5 batches'; batch exits b00=1 b01=1 b02=1 b03=0 b04=0 (no 75/143); scanned bytes per batch 469628803+305991536+173984590+142676318+10780263 = 1103061510 = sum of listed blob sizes",
+    "FIX ROUND oversized findings: 521 in 87 of 164 blobs (sourcegraph-access-token 434 hex40, generic-api-key 87 hex64 under openapi_sha256); unclassified 0: every value is digest-shaped and occurs in other HEAD-tracked files (e.g. catalogs/us-equities/star-audit.json, catalogs/us-equities/architecture/trading-sources.json, docs/native-dashboards.md)",
+    "FIX ROUND merges: 'merge commits: 100'; merges-first-parent-2mb exit=0 seconds=22: '100 commits scanned.' 'scanned ~479562184 bytes (479.56 MB)' 'no leaks found'",
+    "allrefs-repo-config-2mb exit=1 seconds=68: 'all-ref commits: 1216', '1047 commits scanned', 'leaks found: 7'; all 7 are on commits NOT in this branch's ancestry: 4x generic-api-key observability/memory-scheduled-20260923.json @b801fe474 (codex/memory-scheduled-evidence-20260923), 2x generic-api-key evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/*.txt @711187171 (claude/g2-durable-memory-20260923), 1x generic-api-key tests/test_lane_packets.py @34fc51bea (claude/gc-pr5-packets); not triaged here (other owners)"
+  ],
+  "outcome": "advanced",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Size exclusion (closed in the fix round): the 2 MB-capped history scan skipped 163 versions of docs/ecosystem/index.html; the fix round scanned all 164 blobs > 2 MB reachable from HEAD d67f77a as whole files in dir mode (byte totals match the listed sizes). Uncapped `gitleaks git` over history exceeded the guard's 600 s limit (exit 143) and the limit was not raised. Blob scans cover content, not the diff/commit metadata of those versions.",
+    "Merge commits (closed in the fix round): the default `git log -p` walk shows no diff for the 100 merge commits; the fix round scanned each merge against its first parent (a superset of resolution-only content), with a control showing the default walk misses and the first-parent walk finds resolution-only content. That scan kept the 2 MB cap; index.html versions produced by merges are among the 164 blobs scanned whole.",
+    "Classification of the 521 historical findings is by value shape and presence in other tracked files (content digests / commit ids in catalogs); it is not a manual review of each occurrence.",
+    "Decode depth 5 and archive depth 0 (gitleaks defaults) applied; nested archives are not traversed.",
+    "The history scan is of HEAD ba3e7c2 ancestry and the fix-round scans of HEAD d67f77a; later commits on this branch (these receipts) are covered by the post-commit range scan reported in the handoff, not by this receipt.",
+    "Pattern scanning cannot certify that no secrets exist or that every secret type is detectable; the control shows only that the 6 planted shapes are detected."
+  ],
+  "checked_at": "2026-09-23T17:01:14Z",
+  "outcome_note": "Guarded gitleaks over the full HEAD ancestry (502 commits; 402 non-merge commits with diffs) exited 0 with no findings under the repo config and a 2 MB cap. Fix round: all 164 blobs > 2 MB reachable from HEAD (every docs/ecosystem/index.html version) were scanned whole (521 findings, all digest-shaped values present in other tracked files), and the 100 merge commits were scanned against their first parent (0 findings), each method with a detection control. Commit count, exit codes and the remaining limits are recorded. Remains only the clause no pattern scanner can close: certifying that no secrets exist (permanent limit, so the outcome stays advanced per the fix-round preregistration).",
+  "raw_outputs": [
+    {
+      "path": "raw/gitleaks/exits.log",
+      "sha256": "289057b00055a8101ba0aa3ace980563de36992854c756a340146e7dbd7d7f96"
+    },
+    {
+      "path": "raw/gitleaks/control-default-rules.json",
+      "sha256": "d60f72a6deb3cba3d70909b0cbc694ac759d141c6131d3fda2eef00b5516178d"
+    },
+    {
+      "path": "raw/gitleaks/control-default-rules.stderr",
+      "sha256": "742fd30ce913f530ca29051cf8f9af974d43b195974c1b1a7f1d2290dea92eb9"
+    },
+    {
+      "path": "raw/gitleaks/control-repo-config.json",
+      "sha256": "1c7023e11432e7ee0e597d2d91d90191c8fd2701b01030eecdf7937f49b8be04"
+    },
+    {
+      "path": "raw/gitleaks/control-repo-config.stderr",
+      "sha256": "6d7b29c6a13a54c405167644a1a9d59972656ceed0b58c7cea8498f12acf79c6"
+    },
+    {
+      "path": "raw/gitleaks/head-repo-config.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "raw/gitleaks/head-repo-config-2mb.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "raw/gitleaks/head-repo-config-2mb.stderr",
+      "sha256": "053bebf5f9d962ecf02b116b6530019a0f74c253ed6326d9343ec0f6c232e6ca"
+    },
+    {
+      "path": "raw/gitleaks/head-blobs-over-2mb.txt",
+      "sha256": "7c52c748d417356e707ad8d25365500b69ed2b7219ce0e18b0a2c1d89e0f8bc0"
+    },
+    {
+      "path": "raw/gitleaks/oversized-head-index.json",
+      "sha256": "c989d83697ff00deea33428d0a2d6b06354fd1da9931a50443e87e1f497397dd"
+    },
+    {
+      "path": "raw/gitleaks/oversized-head-index.stderr",
+      "sha256": "7a7ef368285c8a0859061c75aba9e6159fa12d1e5268397cdbcd23b1f3c21974"
+    },
+    {
+      "path": "raw/gitleaks/oversized-classification.txt",
+      "sha256": "fc80ce5e2b4c719ebbcbf9bbe7679bf0a33ae04235d32dd85a1b74a4254f6db7"
+    },
+    {
+      "path": "raw/gitleaks/allrefs-repo-config-2mb.json",
+      "sha256": "317ba64d9b5e2b35f9fcfabc0c91d6a9174843085bf6586064aa85911bc44dae"
+    },
+    {
+      "path": "raw/gitleaks/allrefs-repo-config-2mb.stderr",
+      "sha256": "f3b3a50fdba677b6fe7ffbfb77e9b6a7549ca4afdce32d8b5b91b592f6d3662d"
+    },
+    {
+      "path": "raw/gitleaks-fix/exits.log",
+      "sha256": "7f75941d3cd442745376f35ec4b7997413db68c1b0c049382413ba96f3a2f146"
+    },
+    {
+      "path": "raw/gitleaks-fix/oversized-blobs-now.txt",
+      "sha256": "6ac80b3ac29cceb6bdd4b8bd6006324fbe1f5977d8f3bd77f19c2517e84a8ccd"
+    },
+    {
+      "path": "raw/gitleaks-fix/classified.json",
+      "sha256": "1f1ff312998e362c7cf2babcc98c10a99aa235901f77d554a8496b5adc68088d"
+    },
+    {
+      "path": "raw/gitleaks-fix/oversized-control.stderr",
+      "sha256": "af9996eb8353e612bd3a3ab149129724ae2cc1d24e9ce3bcbef291ae2fd6ad0e"
+    },
+    {
+      "path": "raw/gitleaks-fix/merge-control-default.stderr",
+      "sha256": "3d40c2bba6034d57e88621af22769eb5d03628503d8e136f795583878d86cf5c"
+    },
+    {
+      "path": "raw/gitleaks-fix/merge-control-first-parent.stderr",
+      "sha256": "658358ea789b2cd592988e662ac032d1b387d2d553e9dc3726df9c2304bc18df"
+    },
+    {
+      "path": "raw/gitleaks-fix/oversized-b00.stderr",
+      "sha256": "6f5501235f4cc6d8b567b8875ce5f44ce7bc8059648fbfe17d1fac7a01525f58"
+    },
+    {
+      "path": "raw/gitleaks-fix/oversized-b01.stderr",
+      "sha256": "c26da1799dd6aa99c83b01410e7b36c3acd9fb9ff7c6903ef333703d6acd4284"
+    },
+    {
+      "path": "raw/gitleaks-fix/oversized-b02.stderr",
+      "sha256": "69605ca46bb8a9cce81f5222049beaeafcc33a0c12bb8b31e0b0200f9c6abe95"
+    },
+    {
+      "path": "raw/gitleaks-fix/oversized-b03.stderr",
+      "sha256": "59f7fbe0b66da9b7793de5bb951540bc437f37ac38110e71ebcba834cf8c26ce"
+    },
+    {
+      "path": "raw/gitleaks-fix/oversized-b04.stderr",
+      "sha256": "3feecb0905710f5d4a317f7b9486944e2a18add039e547c2adca7469eb6b188d"
+    },
+    {
+      "path": "raw/gitleaks-fix/merges-first-parent-2mb.stderr",
+      "sha256": "24ddee086f0c5c18a27872b7a32fc6699afa0a0daf7086e6eb0564676e0ccc5c"
+    }
+  ],
+  "helper_scripts": [
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/classify_findings.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/collect_raw.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_fix_round.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/grype_sdk.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/inventory_diff.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_install.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_lifecycle.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg_fix_round.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/scanner_comparison.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/syft_binary_coverage.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/verify_signatures.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/worker_env_check.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/write_receipts.py"
+  ],
+  "timeline": {
+    "preregistration_written_at": "2026-09-23T08:13:16Z",
+    "first_pass": "2026-09-23T08:13:24Z..08:27:10Z (same unit, earlier session)",
+    "this_pass": "2026-09-23T16:26Z..2026-09-23T17:01:14Z",
+    "post_preregistration_additions": "all-refs gitleaks scan, oversized-file dir scan, SDK interpreter and IB Gateway scans, B2/B3 sandbox policy arms, and the attestation-lookup positive control were added after preregistration as stronger checks of the same claims",
+    "fix_round": "after the independent Opus review: fix_round_preregistration written 2026-09-23T16:56:53Z (commit d67f77a) before the oversized-blob, merge first-parent and control scans (16:58Z..17:00Z) and the osv/inventory re-analysis"
+  },
+  "fix_round_preregistration": {
+    "written_at": "2026-09-23T16:56:53Z",
+    "label": "fix round after independent Opus review; written before the fix-round checks ran",
+    "expectation": "(1) Every blob larger than 2 MB reachable from HEAD (the 163 docs/ecosystem/index.html versions skipped by the 2 MB cap at ba3e7c2, plus any added since) is written with git cat-file into a private temp directory and scanned with gitleaks-guarded dir --config .gitleaks.toml in batches that stay under the guard's 600 s limit. Expected findings are content-digest-shaped values (hex40/hex64) that also occur in other tracked files, as in the HEAD version. (2) Merge-resolution content is scanned with gitleaks-guarded git --log-opts '--merges --diff-merges=first-parent HEAD' --max-target-megabytes 2, which shows each merge's diff against its first parent (a superset of resolution-only content); expected exit 0 or only findings already classified.",
+    "criteria": [
+      "size exclusion closed only if every listed blob is scanned (batch exit 0 or 1, never a final 75/143) and the scanned count equals the listed count",
+      "each finding is classified by rule, value shape and whether the value occurs in HEAD-tracked files other than docs/ecosystem/index.html; any finding that is not digest-shaped or not found elsewhere is reported as unclassified and keeps the exclusion open",
+      "oversized-blob detection method: a copy of one listed blob with an appended runtime-generated synthetic token (github-pat shape) must yield one more finding than the unmodified blob",
+      "merge-resolution detection method: a temp repo whose merge resolution alone introduces a runtime-generated synthetic token; the default gitleaks git scan is expected to miss it and the --diff-merges=first-parent scan must find it",
+      "merge-resolution exclusion closed only if the first-parent merge scan covers every merge commit reachable from HEAD (count cross-checked with git rev-list --merges --count HEAD) and its findings are classified",
+      "the clauses 'does not certify that no secrets exist' (gap 5) and 'detection of every secret type' (gap 12) cannot be closed by a pattern scanner; if they are the only remainder the outcome stays advanced and names them as permanent limits"
+    ]
+  }
+}

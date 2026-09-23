@@ -1,0 +1,22 @@
+{
+  "0": {
+    "outcome": "advanced",
+    "receipt": "0-alpaca-snapshot-parquet-duckdb-gate.json"
+  },
+  "3": {
+    "outcome": "settled",
+    "receipt": "3-four-store-throughput-concurrency.json"
+  },
+  "4": {
+    "outcome": "settled",
+    "receipt": "4-real-snapshot-promotion-gate.json"
+  },
+  "6": {
+    "outcome": "covered_elsewhere",
+    "receipt": "6-paired-astra-claude-covered.json"
+  },
+  "10": {
+    "outcome": "settled",
+    "receipt": "10-four-store-latency-recovery-footprint.json"
+  }
+}

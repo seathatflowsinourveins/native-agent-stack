@@ -1,0 +1,20 @@
+oversized-control lock busy (75), retry 1
+oversized-control exit=1 seconds=22
+merge-control commits: 4 merges: 1
+merge-control-default exit=0 seconds=0
+merge-control-first-parent exit=1 seconds=0
+oversized head=d67f77a88d17b83abf566ce2bfa0f3928d7d77cf
+blobs over 2 MB reachable from HEAD: 164
+blobs written: 164 in 5 batches
+oversized-b00 exit=1 seconds=18
+oversized-b00 files=40
+oversized-b01 exit=1 seconds=12
+oversized-b01 files=40
+oversized-b02 exit=1 seconds=8
+oversized-b02 files=40
+oversized-b03 exit=0 seconds=7
+oversized-b03 files=40
+oversized-b04 exit=0 seconds=1
+oversized-b04 files=4
+merges head=d67f77a88d17b83abf566ce2bfa0f3928d7d77cf merge commits: 100
+merges-first-parent-2mb exit=0 seconds=22

@@ -1,0 +1,7 @@
+{
+ "written_at": "2026-09-23T08:15:25Z",
+ "label": "round-4 addendum, written after round 3 was stopped (08:15:12Z) and before round 4 ran",
+ "deviation": "Round 3 (started 08:04:53Z) confirmed all run listeners on 127.0.0.1 ('listeners initial: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:39090') but its first Loki query_range hung for ~10 minutes: Loki's query frontend advertised the host interface address while its gRPC listener was bound to loopback (loki.log: 'frontend=<lan-ip>:33101 msg=\"error notifying frontend about finished query\" ... dial tcp <lan-ip>:33101: connect: connection refused'). Round 3 was stopped manually and is recorded as aborted. Round 4 adds only `frontend: {address: 127.0.0.1}` to the Loki config.",
+ "expectation": "Same as round 3: all listeners loopback, all PASS lines, zero processes left, round-2 results reproduced.",
+ "criteria": "As round 3."
+}

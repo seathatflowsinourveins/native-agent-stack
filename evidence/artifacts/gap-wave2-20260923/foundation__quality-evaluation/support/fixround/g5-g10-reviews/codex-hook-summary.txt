@@ -1,0 +1,5 @@
+# sensitivity probe (sid 2197926) caught: 3
+# real codex exec processes before call: 0
+# call session id: 2198009
+# ai-memory hook processes in the call's session: 0
+# ai-memory hook process samples from other sessions on this host (not attributed): 15

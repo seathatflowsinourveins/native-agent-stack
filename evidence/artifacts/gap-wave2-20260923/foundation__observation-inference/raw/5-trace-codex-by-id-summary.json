@@ -1,0 +1,182 @@
+[
+ {
+  "trace_id": "239356db2d0567727f3f4f8c61c5b333",
+  "spans": 2,
+  "root_spans": [
+   "environments.snapshot"
+  ],
+  "thread_id_attr_keys": [],
+  "home_path_attr_keys": [],
+  "resource_attr_keys": [
+   "env",
+   "service.name",
+   "service.version",
+   "telemetry.sdk.language",
+   "telemetry.sdk.name",
+   "telemetry.sdk.version"
+  ]
+ },
+ {
+  "trace_id": "33adc7e3da1b3ecb6b8561b94b177d87",
+  "spans": 198,
+  "root_spans": [
+   "plugins_for_config"
+  ],
+  "thread_id_attr_keys": [],
+  "home_path_attr_keys": [],
+  "resource_attr_keys": [
+   "env",
+   "service.name",
+   "service.version",
+   "telemetry.sdk.language",
+   "telemetry.sdk.name",
+   "telemetry.sdk.version"
+  ]
+ },
+ {
+  "trace_id": "34c92129e93d03f7f02ccdba355508b0",
+  "spans": 1,
+  "root_spans": [
+   "codex.exec"
+  ],
+  "thread_id_attr_keys": [
+   "thread.id"
+  ],
+  "home_path_attr_keys": [],
+  "resource_attr_keys": [
+   "env",
+   "service.name",
+   "service.version",
+   "telemetry.sdk.language",
+   "telemetry.sdk.name",
+   "telemetry.sdk.version"
+  ]
+ },
+ {
+  "trace_id": "3df66994852bad1b85b4bd22432f8c1c",
+  "spans": 4,
+  "root_spans": [
+   "session_loop"
+  ],
+  "thread_id_attr_keys": [
+   "thread_id"
+  ],
+  "home_path_attr_keys": [],
+  "resource_attr_keys": [
+   "env",
+   "service.name",
+   "service.version",
+   "telemetry.sdk.language",
+   "telemetry.sdk.name",
+   "telemetry.sdk.version"
+  ]
+ },
+ {
+  "trace_id": "4a64e006dc91dc417995844f60624efa",
+  "spans": 2,
+  "root_spans": [
+   "thread/unsubscribe"
+  ],
+  "thread_id_attr_keys": [
+   "key"
+  ],
+  "home_path_attr_keys": [],
+  "resource_attr_keys": [
+   "env",
+   "service.name",
+   "service.version",
+   "telemetry.sdk.language",
+   "telemetry.sdk.name",
+   "telemetry.sdk.version"
+  ]
+ },
+ {
+  "trace_id": "4f8cdac35da0cba74b9164fce950afde",
+  "spans": 4,
+  "root_spans": [
+   "transport_worker"
+  ],
+  "thread_id_attr_keys": [],
+  "home_path_attr_keys": [],
+  "resource_attr_keys": [
+   "env",
+   "service.name",
+   "service.version",
+   "telemetry.sdk.language",
+   "telemetry.sdk.name",
+   "telemetry.sdk.version"
+  ]
+ },
+ {
+  "trace_id": "76146a2e1bf217a6447a68a2be50f9b3",
+  "spans": 1,
+  "root_spans": [
+   "recommended_plugins_mode_for_config"
+  ],
+  "thread_id_attr_keys": [],
+  "home_path_attr_keys": [],
+  "resource_attr_keys": [
+   "env",
+   "service.name",
+   "service.version",
+   "telemetry.sdk.language",
+   "telemetry.sdk.name",
+   "telemetry.sdk.version"
+  ]
+ },
+ {
+  "trace_id": "844703bed776b005c5205245c16d28e5",
+  "spans": 1,
+  "root_spans": [
+   "auth"
+  ],
+  "thread_id_attr_keys": [],
+  "home_path_attr_keys": [],
+  "resource_attr_keys": [
+   "env",
+   "service.name",
+   "service.version",
+   "telemetry.sdk.language",
+   "telemetry.sdk.name",
+   "telemetry.sdk.version"
+  ]
+ },
+ {
+  "trace_id": "878fcc2fb6e44df41a69903c415bf84f",
+  "spans": 183,
+  "root_spans": [
+   "turn/start"
+  ],
+  "thread_id_attr_keys": [
+   "key"
+  ],
+  "home_path_attr_keys": [
+   "cwd"
+  ],
+  "resource_attr_keys": [
+   "env",
+   "service.name",
+   "service.version",
+   "telemetry.sdk.language",
+   "telemetry.sdk.name",
+   "telemetry.sdk.version"
+  ]
+ },
+ {
+  "trace_id": "8d4e69d7aea5184f7805d1002d3f8236",
+  "spans": 1,
+  "root_spans": [
+   "auth"
+  ],
+  "thread_id_attr_keys": [],
+  "home_path_attr_keys": [],
+  "resource_attr_keys": [
+   "env",
+   "service.name",
+   "service.version",
+   "telemetry.sdk.language",
+   "telemetry.sdk.name",
+   "telemetry.sdk.version"
+  ]
+ }
+]

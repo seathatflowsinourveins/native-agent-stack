@@ -1,0 +1,62 @@
+[2026-09-23T16:15:11Z] versions dagu=2.16.6 otel=otelcol-contrib version 0.161.0 prom=prometheus, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610) loki=loki, version 3.7.8 (branch: release-3.7.x, revision: 09e6ce2f) restic=restic 0.19.1 compiled with go1.26.4 on linux/amd64 srt=1.0.0 py=3.12.3 2.0.0rc5
+[2026-09-23T16:15:36Z] stack pids prom=1490770 loki=1490771 otel=1496538 ready_prom=Prometheus Server is Ready. ready_loki=ready
+[2026-09-23T16:15:36Z] listeners initial: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:39090 
+[2026-09-23T16:15:36Z] dagu start
+[2026-09-23T16:15:52Z] dagu start exit=1
+[2026-09-23T16:15:52Z] dagu status exit=0
+[2026-09-23T16:16:04Z] before-kill spans={"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"Step: paper-runtime"},"value":[1790180164.102,"1"]},{"metric":{"span_name":"Step: hot-backup"},"value":[1790180164.102,"1"]},{"metric":{"span_name":"DAG: obsgap-paper"},"value":[1790180164.102,"1"]}]}}
+[2026-09-23T16:16:04Z] before-kill count={"status":"success","data":{"resultType":"vector","result":[]}}
+[2026-09-23T16:16:04Z] before-kill loki_lines=0
+[2026-09-23T16:16:04Z] step output: HOT_BACKUP_OK 
+[2026-09-23T16:16:04Z] controls (unsandboxed; must succeed)
+CONTROL egress HTTPSTATUS:200 EXIT:0
+[2026-09-23T16:16:04Z] CONTROL write_outside rc=0
+[2026-09-23T16:16:04Z] CONTROL read_decoy rc=0
+[2026-09-23T16:16:04Z] kill -9
+[2026-09-23T16:16:29Z] stack pids prom=1499966 loki=1499967 otel=1505611 ready_prom=Prometheus Server is Ready. ready_loki=ready
+[2026-09-23T16:16:29Z] listeners after-restart: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:39090 
+[2026-09-23T16:16:37Z] after-restart spans={"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"Step: paper-runtime"},"value":[1790180197.418,"1"]},{"metric":{"span_name":"Step: hot-backup"},"value":[1790180197.418,"1"]},{"metric":{"span_name":"DAG: obsgap-paper"},"value":[1790180197.418,"1"]}]}}
+[2026-09-23T16:16:37Z] after-restart count={"status":"success","data":{"resultType":"vector","result":[]}}
+[2026-09-23T16:16:37Z] after-restart loki_lines=0
+[2026-09-23T16:16:37Z] restic backup (stack running, workload finished)
+[2026-09-23T16:16:41Z] backup exit=0
+[2026-09-23T16:16:41Z] check exit=0
+[2026-09-23T16:16:42Z] restore exit=0
+[2026-09-23T16:16:43Z] hot check exit=0
+[2026-09-23T16:16:44Z] hot restore exit=0
+[2026-09-23T16:16:44Z] diff -rq work exit=0 lines=0
+[2026-09-23T16:16:44Z] diff -rq dagu exit=0 lines=0
+[2026-09-23T16:16:44Z] dagu status on restored home exit=0
+{"cold": {"error": "OperationalError('no such table: intents')"}, "hot": {"error": "OperationalError('no such table: intents')"}}
+[2026-09-23T16:17:06Z] restored spans={"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"Step: paper-runtime"},"value":[1790180226.149,"1"]},{"metric":{"span_name":"Step: hot-backup"},"value":[1790180226.149,"1"]},{"metric":{"span_name":"DAG: obsgap-paper"},"value":[1790180226.149,"1"]}]}}
+[2026-09-23T16:17:06Z] restored count={"status":"success","data":{"resultType":"vector","result":[]}}
+[2026-09-23T16:17:06Z] restored loki_lines=0
+[2026-09-23T16:17:06Z] listeners restored: 127.0.0.1:33110 127.0.0.1:33111 127.0.0.1:39091 
+FAIL paper runtime passed flat with fills None
+FAIL paper step rc 0
+FAIL sandboxed egress denied
+FAIL sandboxed write outside allowWrite denied
+FAIL sandboxed decoy read denied
+PASS unsandboxed controls succeed
+PASS hot backup during the run
+PASS prom span names before-kill ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']
+FAIL prom paper log-record count before-kill {}
+PASS prom span names after-restart ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']
+FAIL prom paper log-record count after-restart {}
+PASS prom span names restored ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']
+FAIL prom paper log-record count restored {}
+FAIL loki MARK lines before kill vs step-log MARK lines 0 0
+FAIL loki pre-kill timestamps present after-restart 0
+FAIL loki pre-kill timestamps present restored 0
+PASS backup exit=0
+PASS check exit=0
+PASS restore exit=0
+PASS hot check exit=0
+PASS hot restore exit=0
+PASS diff -rq work exit=0
+PASS diff -rq dagu exit=0
+FAIL cold-restored journal integrity and counts {'error': "OperationalError('no such table: intents')"}
+FAIL hot-snapshot journal integrity {'error': "OperationalError('no such table: intents')"}
+[2026-09-23T16:17:06Z] stop stack
+[2026-09-23T16:17:30Z] processes left for scratch path: 3
+[2026-09-23T16:17:30Z] listeners left: 0

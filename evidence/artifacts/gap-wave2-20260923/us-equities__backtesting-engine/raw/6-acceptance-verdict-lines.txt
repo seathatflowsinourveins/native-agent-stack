@@ -1,0 +1,4 @@
+bars: BLOCKED True 4 ['distributions_and_cash', 'market_on_open_proxy'] [] [] []
+bars-fresh-receipt: BLOCKED True 4 ['distributions_and_cash', 'market_on_open_proxy'] [] [] []
+lean-data: BLOCKED True 4 ['distributions_and_cash', 'market_on_open_proxy'] [] [] []
+neither: FAIL False 4 [] ['entry_fill.fill_price_usd#12', 'exit_fill.fill_price_usd#16', 'end_cash.reconciled_end_cash_usd#21', 'native_end_cash.native_end_cash_usd#22'] ['attribution_evidence.converted_bars#30'] []

@@ -1,0 +1,38 @@
+{
+  "0": {
+    "outcome": "deferred",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__workers/0-head-to-head-comparison-deferred.json"
+  },
+  "1": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__workers/1-wt-model-child-dispatch.json"
+  },
+  "2": {
+    "outcome": "deferred",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__workers/2-workflow-crash-deferred.json"
+  },
+  "3": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__workers/3-child-usage-accounting-advanced.json"
+  },
+  "4": {
+    "outcome": "deferred",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__workers/4-restricted-role-recovery-deferred.json"
+  },
+  "5": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__workers/5-worktrunk-dirty-sibling-crash-probe.json"
+  },
+  "6": {
+    "outcome": "deferred",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__workers/6-review-workflow-project-settings-deferred.json"
+  },
+  "7": {
+    "outcome": "deferred",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__workers/7-sealed-oracle-deferred.json"
+  },
+  "8": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__workers/8-beads-kill-restart-integrity.json"
+  }
+}

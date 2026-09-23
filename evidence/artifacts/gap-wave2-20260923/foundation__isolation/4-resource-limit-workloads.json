@@ -1,0 +1,83 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-4",
+  "gap_index": 4,
+  "gap_text_sha256": "5fa6a52cd7144ef9917fc439fb88ee8a05624e8e529ad0df71ac4e328aa1f599",
+  "checked_at": "2026-09-23T01:28:19.283Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:52:08.551Z",
+    "expectation": "sandbox-runtime (proxy+bubblewrap based) will not itself cap memory, fork count, or CPU rate; only the outer ecosystem-bounded-run systemd cgroup (MemoryMax, TasksMax, RuntimeMaxSec) will stop bounded hostile workloads. No CPUQuota is configured anywhere, so a CPU-bound loop will only be stopped by the wall-clock timeout, not throttled.",
+    "criteria": "A memory hog, a fork loop, and a CPU-bound loop are each run (a) inside srt alone and (b) inside ecosystem-bounded-run wrapping srt, with the limiting layer identified per case.",
+    "late": true,
+    "late_note": "Written at 2026-09-23T00:52:08.551Z by original#66 (Write of $SCRATCHPAD/write_receipts.py; receipts written by original#67 at 00:52:11Z), after the first-pass commands it describes had run (original-session calls 2026-09-23T00:43:57.913Z to 2026-09-23T00:44:45.226Z); any fix-round evidence in this receipt came later and has its own fix-round preregistration where one exists. The previously recorded written_at '2026-09-23T01:20:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps."
+  },
+  "commands": [
+    "original#43 [2026-09-23T00:43:57.913Z]: mkdir -p $HOME/.cache/gap-wave2-20260923/isolation/reslimit\ncd $HOME/.cache/gap-wave2-20260923/isolation/reslimit\ncat > settings.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"],\"denyRead\":[],\"denyWrite\":[]},\"network\":{\"allowedDomains\":[],\"deniedDomains\":[]}}\nEOF\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\nEBR=$HOME/codex-ecosystem/bin/ecosystem-bounded-run\n\necho \"== memory hog bounded to 300M via ecosystem-bounded-run(cap 300M), inside srt ==\"\nECOSYSTEM_JOB_MEMORY_HIGH=300M ECOSYSTEM_JOB_MEMORY_MAX=300M ECOSYSTEM_JOB_SECONDS=30 \"$EBR\" \"$SRT\" --settings settings.json -c \"python3 -c \\\"\nb=bytearray()\ntry:\n    for i in range(2000):\n        b += bytearray(10*1024*1024)\n    print('ALLOCATED_ALL', len(b))\nexcept MemoryError:\n    print('MEMORYERROR', len(b))\n\\\"\"\necho \"exit=$?\"",
+    "original#44 [2026-09-23T00:44:05.716Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/reslimit\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\necho \"== memory hog inside srt alone (no outer cap), bounded self-limit to 150MB alloc for safety ==\"\ntimeout 15 \"$SRT\" --settings settings.json -c \"python3 -c \\\"\nb=bytearray()\nfor i in range(15):\n    b += bytearray(10*1024*1024)\nprint('ALLOCATED_OK_NO_CAP_HIT', len(b))\n\\\"\"\necho \"exit=$?\"\necho \"== fork bomb bounded attempt: srt alone, TasksMax not enforced by srt itself; cap forks to 50 and count ==\"\ntimeout 10 \"$SRT\" --settings settings.json -c \"python3 -c \\\"\nimport os\nn=0\ntry:\n    for i in range(80):\n        pid=os.fork()\n        if pid==0:\n            os._exit(0)\n        else:\n            n+=1\n    print('FORKED', n)\nexcept OSError as e:\n    print('FORK_FAILED_AT', n, e)\n\\\"\"\necho \"exit=$?\"",
+    "original#45 [2026-09-23T00:44:13.791Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/reslimit\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\nEBR=$HOME/codex-ecosystem/bin/ecosystem-bounded-run\necho \"== fork bomb bounded via outer TasksMax=20 ==\"\nECOSYSTEM_JOB_TASKS_MAX=20 ECOSYSTEM_JOB_SECONDS=15 \"$EBR\" \"$SRT\" --settings settings.json -c \"python3 -c \\\"\nimport os\nn=0\ntry:\n    for i in range(200):\n        pid=os.fork()\n        if pid==0:\n            import time; time.sleep(5); os._exit(0)\n        else:\n            n+=1\n    print('FORKED_ALL', n)\nexcept OSError as e:\n    print('FORK_FAILED_AT', n, e)\n\\\"\"\necho \"exit=$?\"\n\necho \"== disk-fill bounded (write into cwd, capped at 50MB by dd count, no outer disk quota available via cgroup memory-only tool; record filesystem free-space delta) ==\"\ndf -h . | tail -1\ntimeout 10 \"$SRT\" --settings settings.json -c \"dd if=/dev/zero of=fillfile bs=1M count=50 2>&1; echo dd_exit=\\$?\"\nls -la fillfile 2>&1\nrm -f fillfile",
+    "original#46 [2026-09-23T00:44:31.356Z]: grep -n \"CPUQuota\\|CPUWeight\\|property=\" $HOME/codex-ecosystem/bin/ecosystem-bounded-run",
+    "original#47 [2026-09-23T00:44:39.887Z]: cd $HOME/.cache/gap-wave2-20260923/isolation/reslimit\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\nEBR=$HOME/codex-ecosystem/bin/ecosystem-bounded-run\necho \"== CPU-bound busy loop, outer RuntimeMaxSec=5, no CPUQuota set anywhere ==\"\nstart=$(date +%s)\nECOSYSTEM_JOB_SECONDS=5 \"$EBR\" \"$SRT\" --settings settings.json -c \"python3 -c \\\"\nimport time\nt0=time.time()\nx=0\nwhile time.time()-t0 < 30:\n    x+=1\nprint('LOOP_COMPLETED', x)\n\\\"\"\nec=$?\nend=$(date +%s)\necho \"exit=$ec elapsed=$((end-start))s\"",
+    "fix#51 [2026-09-23T01:28:14.916Z]: find / -maxdepth 0 2>/dev/null; find $HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77 -iname \"*.js\" 2>/dev/null | xargs grep -liE \"rlimit|setrlimit|memory.*limit|RLIMIT\" 2>/dev/null | head -10",
+    "fix#52 [2026-09-23T01:28:18.840Z]: find $HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77 -iname \"*.js\" 2>/dev/null | wc -l\ngrep -rliE \"cgroup|memory.max|pids.max\" $HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77 2>/dev/null | head -5"
+  ],
+  "results": [
+    "Memory, outer cap (original#43): with ECOSYSTEM_JOB_MEMORY_MAX=300M the job ended with exit=137 and bash reported `ecosystem-bounded-run: line 64: ... Killed /usr/bin/systemd-run --user --scope ... --property=MemoryMax=$job_max ... --property=OOMPolicy=kill`. Neither ALLOCATED_ALL nor MEMORYERROR was printed. The kill is consistent with the MemoryMax OOM policy; no OOM event log was captured.",
+    "Memory, srt alone (original#44): `ALLOCATED_OK_NO_CAP_HIT 157286400`, exit=0.",
+    "Fork, srt alone (original#44): `FORKED 80`, exit=0.",
+    "Fork, outer TasksMax=20 (original#45): `apply-seccomp: fork(worker): Resource temporarily unavailable`, exit=1, and the Python loop printed nothing. The limit was hit while srt itself was starting (its apply-seccomp helper could not fork), before the workload ran, so this shows the outer cap binds srt startup; it does not show the cap stopping the workload's own fork loop.",
+    "CPU, outer RuntimeMaxSec=5 (original#47): `exit=0 elapsed=6s`, and LOOP_COMPLETED was not printed, so the 30 s loop was cut short at about the runtime limit; the wrapper sets no CPUQuota, so CPU-rate throttling was not exercised.",
+    "Disk (original#45): 50 MB dd inside srt succeeded (`52428800 bytes ... copied`, dd_exit=0) with 826G free; no quota existed to hit.",
+    "Source search (fix#51, fix#52): `find ...sandbox-runtime-0.0.77 -iname \"*.js\" | xargs grep -liE \"rlimit|setrlimit|memory.*limit|RLIMIT\"` printed nothing; `find ... -iname \"*.js\" | wc -l` printed 188; `grep -rliE \"cgroup|memory.max|pids.max\"` over the whole tree matched only node_modules/node-forge/lib/aesCipherSuites.js. The first search covered .js files only, so the native apply-seccomp helper and other non-JS files were not searched for rlimit/setrlimit."
+  ],
+  "outcome": "advanced",
+  "note": "sandbox-runtime 0.0.77 applied no memory or fork limit to small workloads (150 MB, 80 forks) and its JavaScript contains no rlimit/cgroup code by keyword search. The outer ecosystem-bounded-run scope stopped a memory hog (exit 137) and a CPU loop (runtime limit); the TasksMax=20 case failed during srt startup, so it does not show the workload being stopped. Remaining: disk-fill against a real quota, CPU-rate limiting, a fork case with a TasksMax large enough for srt to start, the native helper binaries, and VM-boundary or hostile-workload probes.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "ecosystem-bounded-run does not set CPUQuota, so CPU-rate limiting was not exercised at all (only wall-clock RuntimeMaxSec).",
+    "Disk-fill was not bounded by any quota; only a small (50MB) uncapped write was observed against 826G free space.",
+    "VM-boundary / hostile-workload testing beyond memory/fork/CPU/disk was not attempted (e.g. no syscall-fuzzing or privilege-escalation probes).",
+    "The fork-limit claim is weaker than previously stated: the TasksMax=20 run never reached the workload."
+  ],
+  "fix_round_preregistration": {
+    "written_at": "2026-09-23T01:28:33.819Z",
+    "expectation": "Grepping the installed sandbox-runtime 0.0.77 source tree for rlimit/cgroup/memory-cap keywords will find no match, corroborating the workload-based finding that sandbox-runtime sets no resource limits of its own, with a source citation rather than only small-workload behavior.",
+    "criteria": "A recursive case-insensitive grep across every .js file in the installed package for rlimit, setrlimit, RLIMIT, cgroup, memory.max, pids.max; any hit is inspected for relevance (a coincidental substring match in an unrelated vendored dependency does not count).",
+    "late": true,
+    "label": "fix-round preregistration, written after the fix-round commands it describes",
+    "late_note": "Written at 2026-09-23T01:28:33.819Z by fix#53; fix-round commands ran fix#4-fix#46 (01:01:10Z-01:27:09Z); cargo attempt 2 had finished by fix#54 (01:28:38Z). The previously recorded written_at '2026-09-23T01:25:00+00:00' was a placeholder, not the time this block was written, and it was not written before its sub-check ran."
+  },
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:43:57.913Z to 2026-09-23T01:28:19.283Z. The previous value '2026-09-23T00:52:11.952018+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#43",
+        "original#44",
+        "original#45",
+        "original#46",
+        "original#47"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/fix-session-tool-calls.txt",
+      "sha256": "b1a1bce670082262521365455849b1618b460a9bbd53fdec5d6d0337523d8899",
+      "calls": [
+        "fix#51",
+        "fix#52"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Review finding 10 (grep claim): replaced the single combined grep with the three commands that actually ran and their outputs; stated that the rlimit search covered .js files only and not the native apply-seccomp helper.",
+      "Corrected the TasksMax=20 result (the limit stopped srt startup, not the fork loop), the CPU result (exit=0, no LOOP_COMPLETED) and the memory attribution (no OOM log captured).",
+      "Timestamps corrected; exact commands and raw_evidence added. Outcome kept advanced."
+    ]
+  }
+}

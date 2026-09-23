@@ -1,0 +1,300 @@
+{
+  "started_at": "2026-09-23T05:16:59.189592+00:00",
+  "alpaca_snapshots": {
+    "alpaca-sip-20260922": {
+      "receipt": {
+        "kind": "promotion_gate_snapshot_ingest",
+        "feed": "sip",
+        "adjustment": "raw",
+        "timeframe": "1Day",
+        "fetched_at_utc": "2026-09-22T21:55:59Z",
+        "sessions_requested": 20,
+        "symbols": 24,
+        "row_count": 480,
+        "sessions_range": [
+          "2026-08-25",
+          "2026-09-22"
+        ],
+        "snapshot_sha256": "914b7d949b3de201c1e64225a5c9d36e1f5c1d370a49371ef09776537c158c82",
+        "alpaca_py": "0.44.0",
+        "coverage_problems": null,
+        "expected_latest_session": null
+      },
+      "copy_sha256": "914b7d949b3de201c1e64225a5c9d36e1f5c1d370a49371ef09776537c158c82",
+      "copy_matches_receipt": true,
+      "gate": {
+        "exit": 0,
+        "status": "pass",
+        "row_count": 480,
+        "input_sha256": "914b7d949b3de201c1e64225a5c9d36e1f5c1d370a49371ef09776537c158c82",
+        "input_sha256_matches_file": true,
+        "failed_checks": [],
+        "checks_total": 12,
+        "versions": {
+          "exchange_calendars": "4.13.2",
+          "pandas": "3.0.6",
+          "pandera": "0.33.1",
+          "pyarrow": "25.0.1",
+          "python": "3.13.15"
+        },
+        "gate_result_file": "alpaca-sip-20260922-gate-result.json",
+        "gate_result_sha256": "c47af2118fac4aa23f93149771b8b64cc18cc89845142a6bdecc6b7303fd67c4"
+      },
+      "parquet_duckdb": {
+        "duckdb": "1.5.5",
+        "parquet_sha256": "6bc3038f1f0f370ff87bd5b52fa5f4c6760b5a510fae20edaafc4adc5d39f8e8",
+        "parquet_bytes": 9598,
+        "parquet_mode": "0o444",
+        "parquet_writable_after_chmod": false,
+        "csv_minus_parquet_rows": 0,
+        "parquet_minus_csv_rows": 0,
+        "queries": {
+          "rows": 480,
+          "symbols": 24,
+          "first_session": "2026-08-25",
+          "last_session": "2026-09-22",
+          "sessions_per_symbol_min": 20,
+          "sessions_per_symbol_max": 20,
+          "symbols_with_full_range": 24,
+          "null_cells": 0,
+          "ohlc_inconsistent_rows": 0,
+          "return_aggregate_rows": 24,
+          "return_aggregate_sha256": "55aa99c43fd9837dd9f8c082eb5bfa093f6f622905bb31caa02b559641a46593"
+        }
+      },
+      "detection_control": {
+        "mutations": [
+          "row 1 high set to close - 0.01",
+          "row 2 duplicated"
+        ],
+        "gate": {
+          "exit": 1,
+          "status": "fail",
+          "row_count": 481,
+          "input_sha256": "3a0b4587f0a2dca30add5284e258f7c4928f8f704af47473885522000cd748f2",
+          "input_sha256_matches_file": true,
+          "failed_checks": [
+            "high_ge_max_open_close",
+            "unique_symbol_session"
+          ],
+          "checks_total": 12,
+          "versions": {
+            "exchange_calendars": "4.13.2",
+            "pandas": "3.0.6",
+            "pandera": "0.33.1",
+            "pyarrow": "25.0.1",
+            "python": "3.13.15"
+          },
+          "gate_result_file": "alpaca-sip-20260922-control-gate-result.json",
+          "gate_result_sha256": "de382d1d6283cc0c74bdf4647e7895271c80b0c0f29067de759df2687017f1fd"
+        }
+      }
+    },
+    "alpaca-sip-dryrun-20260922": {
+      "receipt": {
+        "kind": "promotion_gate_snapshot_ingest",
+        "feed": "sip",
+        "adjustment": "raw",
+        "timeframe": "1Day",
+        "fetched_at_utc": "2026-09-23T00:33:24Z",
+        "sessions_requested": 20,
+        "symbols": 24,
+        "row_count": 480,
+        "sessions_range": [
+          "2026-08-25",
+          "2026-09-22"
+        ],
+        "snapshot_sha256": "ffc988e2e850ed3fb5ea9b13bc4443392a329c4c2f5ccd949b574375a2c9b115",
+        "alpaca_py": "0.44.0",
+        "coverage_problems": {},
+        "expected_latest_session": "2026-09-22"
+      },
+      "copy_sha256": "ffc988e2e850ed3fb5ea9b13bc4443392a329c4c2f5ccd949b574375a2c9b115",
+      "copy_matches_receipt": true,
+      "gate": {
+        "exit": 0,
+        "status": "pass",
+        "row_count": 480,
+        "input_sha256": "ffc988e2e850ed3fb5ea9b13bc4443392a329c4c2f5ccd949b574375a2c9b115",
+        "input_sha256_matches_file": true,
+        "failed_checks": [],
+        "checks_total": 12,
+        "versions": {
+          "exchange_calendars": "4.13.2",
+          "pandas": "3.0.6",
+          "pandera": "0.33.1",
+          "pyarrow": "25.0.1",
+          "python": "3.13.15"
+        },
+        "gate_result_file": "alpaca-sip-dryrun-20260922-gate-result.json",
+        "gate_result_sha256": "843bcca9d6bf411fcd13bc9d1411accaddf450042b1a498eabcb71567419db27"
+      },
+      "parquet_duckdb": {
+        "duckdb": "1.5.5",
+        "parquet_sha256": "afb308a708057fccb3ada5789ced533206fedc486dc3c156c57ef43ed5cfac0f",
+        "parquet_bytes": 9634,
+        "parquet_mode": "0o444",
+        "parquet_writable_after_chmod": false,
+        "csv_minus_parquet_rows": 0,
+        "parquet_minus_csv_rows": 0,
+        "queries": {
+          "rows": 480,
+          "symbols": 24,
+          "first_session": "2026-08-25",
+          "last_session": "2026-09-22",
+          "sessions_per_symbol_min": 20,
+          "sessions_per_symbol_max": 20,
+          "symbols_with_full_range": 24,
+          "null_cells": 0,
+          "ohlc_inconsistent_rows": 0,
+          "return_aggregate_rows": 24,
+          "return_aggregate_sha256": "55aa99c43fd9837dd9f8c082eb5bfa093f6f622905bb31caa02b559641a46593"
+        }
+      },
+      "detection_control": {
+        "mutations": [
+          "row 1 high set to close - 0.01",
+          "row 2 duplicated"
+        ],
+        "gate": {
+          "exit": 1,
+          "status": "fail",
+          "row_count": 481,
+          "input_sha256": "21a4a021e3731fb4e6c9ae91dffec898072a593b3cba62a8b155259905e74931",
+          "input_sha256_matches_file": true,
+          "failed_checks": [
+            "high_ge_max_open_close",
+            "unique_symbol_session"
+          ],
+          "checks_total": 12,
+          "versions": {
+            "exchange_calendars": "4.13.2",
+            "pandas": "3.0.6",
+            "pandera": "0.33.1",
+            "pyarrow": "25.0.1",
+            "python": "3.13.15"
+          },
+          "gate_result_file": "alpaca-sip-dryrun-20260922-control-gate-result.json",
+          "gate_result_sha256": "423e60db543fb93d05d99ba66130c732581b130c0559074825a60c89bcb104e1"
+        }
+      }
+    }
+  },
+  "lean": {
+    "lean-five-252": {
+      "tickers": [
+        "AAPL",
+        "SPY",
+        "IBM",
+        "BAC",
+        "AIG"
+      ],
+      "last_n_sessions": 252,
+      "csv_sha256": "f39e816f9b28af46ddcf6663a445265e67b46f3ab24e6f3dad7caefdd490ae3e",
+      "gate": {
+        "exit": 0,
+        "status": "pass",
+        "row_count": 1260,
+        "input_sha256": "f39e816f9b28af46ddcf6663a445265e67b46f3ab24e6f3dad7caefdd490ae3e",
+        "input_sha256_matches_file": true,
+        "failed_checks": [],
+        "checks_total": 12,
+        "versions": {
+          "exchange_calendars": "4.13.2",
+          "pandas": "3.0.6",
+          "pandera": "0.33.1",
+          "pyarrow": "25.0.1",
+          "python": "3.13.15"
+        },
+        "gate_result_file": "lean-five-252-gate-result.json",
+        "gate_result_sha256": "e11d26a253fb05be267a43346a53f12898d36df5241021e1ff59618b887138f3"
+      },
+      "parquet_duckdb": {
+        "duckdb": "1.5.5",
+        "parquet_sha256": "9bd40a6f0755ce80a0c2e67d3511f2b789e4df86ab9c7ecb48f2f355c46e59d8",
+        "parquet_bytes": 21784,
+        "parquet_mode": "0o444",
+        "parquet_writable_after_chmod": false,
+        "csv_minus_parquet_rows": 0,
+        "parquet_minus_csv_rows": 0,
+        "queries": {
+          "rows": 1260,
+          "symbols": 5,
+          "first_session": "2020-04-01",
+          "last_session": "2021-03-31",
+          "sessions_per_symbol_min": 252,
+          "sessions_per_symbol_max": 252,
+          "symbols_with_full_range": 5,
+          "null_cells": 0,
+          "ohlc_inconsistent_rows": 0,
+          "return_aggregate_rows": 5,
+          "return_aggregate_sha256": "a59ec724ec30033fa85a83200f1061aa24ec342cd16ee3697709a2733b746610"
+        }
+      }
+    },
+    "lean-all-full": {
+      "tickers": [
+        "AAA",
+        "AAPL",
+        "AIG",
+        "BAC",
+        "BNO",
+        "EEM",
+        "FB",
+        "GOOG",
+        "GOOGL",
+        "IBM",
+        "IWM",
+        "QQQ",
+        "SPY",
+        "USO",
+        "UW",
+        "WM",
+        "WMI"
+      ],
+      "last_n_sessions": null,
+      "csv_sha256": "589d618c3fe1ccd66d179cfd3fc1b803d9dd26b69da17fdc169ae1ae581b38b9",
+      "gate": {
+        "exit": 0,
+        "status": "pass",
+        "row_count": 70011,
+        "input_sha256": "589d618c3fe1ccd66d179cfd3fc1b803d9dd26b69da17fdc169ae1ae581b38b9",
+        "input_sha256_matches_file": true,
+        "failed_checks": [],
+        "checks_total": 12,
+        "versions": {
+          "exchange_calendars": "4.13.2",
+          "pandas": "3.0.6",
+          "pandera": "0.33.1",
+          "pyarrow": "25.0.1",
+          "python": "3.13.15"
+        },
+        "gate_result_file": "lean-all-full-gate-result.json",
+        "gate_result_sha256": "86a64a5c82354e561d83161f40133cd5ab53d6241b87faa24ca2faba5b556112"
+      },
+      "parquet_duckdb": {
+        "duckdb": "1.5.5",
+        "parquet_sha256": "cf254a71354a6adfaca3deb4c2eb4e847c0db7fdfec9afc7ac93487e83858006",
+        "parquet_bytes": 1100949,
+        "parquet_mode": "0o444",
+        "parquet_writable_after_chmod": false,
+        "csv_minus_parquet_rows": 0,
+        "parquet_minus_csv_rows": 0,
+        "queries": {
+          "rows": 70011,
+          "symbols": 17,
+          "first_session": "1998-01-02",
+          "last_session": "2021-03-31",
+          "sessions_per_symbol_min": 135,
+          "sessions_per_symbol_max": 5849,
+          "symbols_with_full_range": 7,
+          "null_cells": 0,
+          "ohlc_inconsistent_rows": 0,
+          "return_aggregate_rows": 17,
+          "return_aggregate_sha256": "c4f6bc7daec2567b85f15a2d8ea8b85abbe7fae8b04d1b400d85ae318fcdd306"
+        }
+      }
+    }
+  },
+  "finished_at": "2026-09-23T05:17:10.072348+00:00"
+}

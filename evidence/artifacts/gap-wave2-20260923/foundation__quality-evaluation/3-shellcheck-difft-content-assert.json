@@ -1,0 +1,35 @@
+{
+ "id": "foundation__quality-evaluation__gap3",
+ "gap_index": 3,
+ "gap_text_sha256": "6b79e41d39a21718de4c0df45affd6bab29038d274def1709301dbe960c74658",
+ "preregistration": {
+  "written_at": "2026-09-23T02:42:37Z",
+  "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+  "expectation": "shellcheck exits 1 with SC2086 on the warning fixture and 0 on a clean fixture; difft --exit-code exits 1 on a changed file with the changed token in stdout, and 0 with no changed token on identical files.",
+  "criteria": "exit codes captured to files; a content assertion (grep of the changed token) run and its exit captured for both difft cases.",
+  "committed_in": "ebf6ac1 (preregistrations-fixround.json), before any fix-round command"
+ },
+ "original_round_preregistration": {
+  "written_at": null,
+  "note": "Round 1 recorded written_at 2026-09-23T02:25:00Z, a value reconstructed after its runs (raw-output mtimes and eval ids precede it). It is labelled late and superseded; the round-1 artifacts are at commit b37df23."
+ },
+ "commands": [
+  "bash blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_g1_g2_g3.sh $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/g123 $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/g123-out  (gap-3 steps: shellcheck -f json bad.sh / clean.sh; difft --color never --exit-code a/file.sh b/file.sh and a/file.sh a/file.sh; grep -q 'there' on each difft stdout)"
+ ],
+ "results": {
+  "shellcheck_bad": "exit 1 (g3-shellcheck-bad.exit), codes [2086] (g3-shellcheck-bad.codes)",
+  "shellcheck_clean": "exit 0, [] (g3-shellcheck-clean.exit/.json)",
+  "difft_changed": "exit 1; stdout: '3 echo \"world\"               3 echo \"there\"' (g3-difft-changed.stdout)",
+  "difft_identical": "exit 0; stdout: 'a/file.sh --- Bash / No changes.' (g3-difft-identical.stdout)",
+  "content_assertions": "grep for the changed token 'there': exit 0 on the changed-file output, exit 1 on the identical-file output (g3-assert-*.exit)",
+  "versions": "ShellCheck 0.11.0, Difftastic 0.71.0 (versions.txt)"
+ },
+ "outcome": "settled",
+ "evidence_class": "local_integration",
+ "limits": "The fixtures are minimal single-file synthetic cases written for this check. The content assertion is a token grep, not a structural parse of difft output.",
+ "checked_at": "2026-09-23T02:46:00Z",
+ "artifacts": [
+  "support/fixround/g1-g2-g3/g3-*",
+  "support/fixround/g1-g2-g3/versions.txt"
+ ]
+}

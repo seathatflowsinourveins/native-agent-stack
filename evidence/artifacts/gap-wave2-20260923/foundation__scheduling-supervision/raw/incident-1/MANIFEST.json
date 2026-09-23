@@ -1,0 +1,47 @@
+{
+  "source_dir": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/incident-1",
+  "substitution": "host home path -> $HOME; UUID-shaped identifiers -> <uuid-N> (same id, same N); host username -> <user>; host name -> <host> (privacy sweep 2026-09-23)",
+  "files": [
+    {
+      "source": "background-shell-output.txt",
+      "committed_as": "background-shell-output.txt",
+      "raw_sha256": "8c7c6e643c855c7d55bd51da6ed8c4cd47e093ac1aa7e5b0a63c34750cfc1afe",
+      "committed_sha256": "626b01eb137810522feb9f7adf7a262fa87be0b05f9d69bccdb0858743d5a783",
+      "bytes": 3181
+    },
+    {
+      "source": "damage-assessment-tool-results.txt",
+      "committed_as": "damage-assessment-tool-results.txt",
+      "raw_sha256": "4bc52f25ab64a458174a563c23d7fb637b251d3fadc5d7ac9111a7d0fd606ff8",
+      "committed_sha256": "c53879ff5ad14af30a243a79eaca6d4eb669c25f1e3310172b9f8e8715d5109d",
+      "bytes": 42523,
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "source": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-round-2/incident-observe.txt",
+      "committed_as": "fix-round-2-incident-observe.txt",
+      "raw_sha256": "c256ef50859a4b4849044415ec030b1a3b68a24dc8b1484a020766ece40cd815",
+      "committed_sha256": "2162432fb3752f9d22c160c30f497e4e28100d427fd79a109dd94ac1f8f06bdf",
+      "bytes": 7442,
+      "produced_by": "blueprints/gap-wave2-20260923/foundation__scheduling-supervision/incident_observe.sh (fix round 2, read-only)"
+    },
+    {
+      "source": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-round-2/equities-and-helpers.txt",
+      "committed_as": "fix-round-2-equities-store-and-helper-revisions.txt",
+      "raw_sha256": "eaa4884f62a0fd48aba4998cd8bdd83dfe6e79e20786920a3e0c9c414c591477",
+      "committed_sha256": "928e7915f422fa7b9b51d337d5d001c6d8b267d32082b2d6aeee110458a1905a",
+      "bytes": 2359,
+      "produced_by": "fix round 2 inline read-only commands (find -newermt over the dagu-equities tree; git show/sha256sum of helpers); command text is in the file's section headers and the incident record"
+    },
+    {
+      "source": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-round-2/default-home-tree.txt",
+      "committed_as": "fix-round-2-default-home-tree.txt",
+      "raw_sha256": "4d4617719f60480702ded6ef7477ff9c98cea471fdeb32401d50af08665ef2a7",
+      "committed_sha256": "9a3e96d753a84ac66e79733ebb9ea961f8227876556e54be2be89195a4227fac",
+      "bytes": 1885,
+      "produced_by": "fix round 2 read-only find over the default Dagu data directory"
+    }
+  ],
+  "uuid_placeholders": 3
+}

@@ -1,0 +1,55 @@
+{
+  "id": "gap-wave2-20260923-foundation-document-retrieval-0",
+  "gap_index": 0,
+  "gap_text_sha256": "c26db510e4d3616483da7df24ab2e43c63e512369aafb6a90021e08fd4175a84",
+  "preregistration": {
+    "written_at": null,
+    "expectation": "Copying the sealed catalog-snapshot.sqlite (sha256 d738ccc6...) into a disposable qmd index and running `qmd bench` against it (per the gap's own next_check) will either (a) succeed and produce repeated cold/warm latency plus recall across QMD's modes, settling the gap, or (b) reproduce the CLI limitation already reported in evidence/artifacts/gap-resolution-20260922/document-retrieval/cite-executed-retrieval.json (bench cannot target a disposable snapshot), which would confirm rather than settle the gap.",
+    "criteria": "settled only if qmd bench (or an equivalent qmd invocation) runs to completion against the copied sealed sqlite and returns per-mode recall plus at least 3 cold + 3 warm latency samples without registering a collection whose filesystem re-indexing mutates the copied snapshot away from its sealed hash.",
+    "late": true,
+    "timestamp_note": "Actual write time unknown, so written_at is null. The first round recorded 2026-09-23T00:00:00Z, a round-number placeholder that was never a captured time. This preregistration was first committed in b78ed96 (2026-09-23T01:14:48Z, the only upper bound) together with its results, so it is late: it is not shown to precede the check. The fix round (f366da1) only labelled it late; this reconciliation round replaced the placeholder with null."
+  },
+  "commands": [
+    "sha256sum ~/codex-ecosystem/state/retrieval-evaluation-20260919/20260919T182816Z-b6a2de96/catalog-snapshot.sqlite",
+    "cp <sealed sqlite> ~/.cache/gap-wave2-20260923/document-retrieval/qmd-disposable/catalog-snapshot.sqlite",
+    "cp <copy> ~/.cache/qmd/gap-wave2-doc-retrieval-20260923-disposable.sqlite",
+    "qmd --index gap-wave2-doc-retrieval-20260923-disposable status",
+    "3x /usr/bin/time -v timeout 60 qmd --index gap-wave2-doc-retrieval-20260923-disposable bench blueprints/us-equities/retrieval-evaluation/fixture.json -c us-equities-foundation --json (stdout -> raw/bench-out/run-cold-{1,2,3}.json, all empty; stderr -> raw/bench-out/run-cold-{1,2,3}.stderr, each 'Collection not found', exit 1)",
+    "qmd --index gap-wave2-doc-retrieval-20260923-disposable bench blueprints/us-equities/retrieval-evaluation/fixture.json --json (stdout -> raw/bench-out/nocol.json.txt, empty; stderr -> raw/bench-out/nocol.stderr)",
+    "qmd --index gap-wave2-doc-retrieval-20260923-disposable collection add ~/.cache/gap-wave2-20260923/document-retrieval/empty-collection-dir --name us-equities-foundation",
+    "sha256sum ~/.cache/qmd/gap-wave2-doc-retrieval-20260923-disposable.sqlite (after collection add)",
+    "rm -f ~/.cache/qmd/gap-wave2-doc-retrieval-20260923-disposable.sqlite* ~/.config/qmd/gap-wave2-doc-retrieval-20260923-disposable.yml (cleanup)"
+  ],
+  "results": [
+    "sha256sum of ~/codex-ecosystem/state/retrieval-evaluation-20260919/20260919T182816Z-b6a2de96/catalog-snapshot.sqlite = d738ccc6a34a1933111d7539824f00fd4e893064ee53a5b4b051fca860948e50 (matches the gap's cited hash; located the previously-referenced sealed snapshot, which was not present in this git worktree).",
+    "qmd --index gap-wave2-doc-retrieval-20260923-disposable status on the fresh copy: 'Documents Total: 33 files indexed, Vectors: 0 embedded, Pending: 33 need embedding' -- the sealed snapshot has zero embedded vectors, so vec/hybrid/hyde modes have no vector data to score even if bench could target it.",
+    "qmd bench ... -c us-equities-foundation --json -> stderr: 'Collection not found: us-equities-foundation\\nRun \\'qmd ls\\' to see available collections.' exit=1",
+    "qmd bench ... --json (no -c flag; fixture itself names collection us-equities-foundation) -> same 'Collection not found' error, exit=1. Confirms bench resolves collections via the index's separate YAML config (auto-created empty at ~/.config/qmd/<index>.yml), not by reading collection tags already present inside the copied sqlite's FTS rows.",
+    "qmd collection add <empty dir> --name us-equities-foundation (attempt to register the collection name without re-supplying files) -> 'Indexed: 0 new, 0 updated, 0 unchanged, 18 removed' -- qmd treated the empty directory as authoritative and deleted the 18 previously-indexed foundation-collection rows from the DISPOSABLE COPY.",
+    "sha256sum after collection add: f78b48d8a7d444b45d24eca8eac3478615677fccb1c8a294f36ab8dd15265d09 (changed from d738ccc6...); qmd status afterward: 'Total: 15 files indexed' (down from 33). The original sealed source file and the untouched cache copy both still hash to d738ccc6... (verified separately), so only the disposable working copy was mutated."
+  ],
+  "outcome": "not_settled",
+  "evidence_class": "local_integration",
+  "limits": [
+    "This reproduces the CLI limitation already reported in the prior 2026-09-22 receipt (bench could not target a disposable snapshot copy) rather than settling the gap: in qmd 2.8.3, `qmd bench -c <name>` resolved collections through the index's YAML config, not through collection tags inside the copied sqlite, so bench failed with 'Collection not found'. The one registration route tried, `qmd collection add` on an empty directory, deleted the 18 rows that did not match it. No other route was tried, so this shows only that this CLI route is destructive, not that every route is.",
+    "No cold/warm latency series or per-mode (lex/vec/hyde) recall was produced because bench never ran successfully against the sealed content.",
+    "The sealed snapshot has 0 embedded vectors, so the vec/hybrid/hyde modes cannot be measured on the sealed content as it stands; embedding a copy would measure a derived artifact with a different hash. This is a second, independent reason the four-mode claim is not settled by this artifact. No claim is made that upstream tooling changes are required; the untried routes in limits[5] might make a non-destructive bench possible.",
+    "Did not attempt to fix the qmd binary or file an upstream patch; only the installed 2.8.3 CLI was exercised, within the time-box.",
+    "The sealed original (~/codex-ecosystem/state/retrieval-evaluation-20260919/20260919T182816Z-b6a2de96/catalog-snapshot.sqlite) and the copy under this unit's cache dir (~/.cache/gap-wave2-20260923/document-retrieval/qmd-disposable/catalog-snapshot.sqlite) were both verified unchanged (d738ccc6...) after the run. Isolation breach, disclosed: `qmd --index gap-wave2-doc-retrieval-20260923-disposable` wrote outside the unit's cache dir, to ~/.cache/qmd/gap-wave2-doc-retrieval-20260923-disposable.sqlite (the shared qmd cache directory) and to ~/.config/qmd/gap-wave2-doc-retrieval-20260923-disposable.yml (auto-created). The hard isolation rule prohibits writing to ~/.config. Both files were deleted by the cleanup command. In the 2026-09-23 reconciliation round, listing ~/.config/qmd/ and ~/.cache/qmd/ showed no gap-wave2-* entry; the listing would have shown a surviving file by name. Whether other entries in those directories were changed was not checked (no before-listing was taken), so 'no other index was modified' is unverified.",
+    "Only one registration route was tried (`qmd collection add` on an empty directory, which reindexed and deleted 18 rows). Untried routes that might avoid destructive re-registration: qmd's own SDK (node_modules/@tobilu/qmd/dist/index.js createStore({dbPath, config}) with an inline config object, which calls syncConfigToDb to write collection metadata into the existing sqlite without a filesystem re-scan) and hand-writing a YAML config file under a temporary QMD_CONFIG_DIR pointed at the copied index. Neither was attempted within the time-box, so the 'genuine upstream-tooling gap, not a missed command' framing in this receipt's first-round limits/README overclaimed (limits[0] and limits[2] were rewritten in the reconciliation round to match); the correct framing is that the CLI-only registration path tried here is destructive, not that no non-destructive path exists.",
+    "The gap's next_check called for running the bench through ~/codex-ecosystem/bin/ecosystem-bounded-run; no command in this receipt used it. The bench invocations here ran directly."
+  ],
+  "checked_at": null,
+  "checked_at_note": "The first round's checked_at was an invented round-number placeholder and was removed. Surviving wall-clock evidence: retained raw outputs for this gap have file mtimes 2026-09-23T01:00:07Z to 2026-09-23T01:03:09Z UTC (see raw/raw-manifest.json); the `qmd collection add` and after-hash steps left no retained file, so their times are unknown. All steps precede the b78ed96 commit at 2026-09-23T01:14:48Z.",
+  "raw_outputs": [
+    "raw/bench-out/run-cold-1.json.txt",
+    "raw/bench-out/run-cold-1.stderr",
+    "raw/bench-out/run-cold-2.json.txt",
+    "raw/bench-out/run-cold-2.stderr",
+    "raw/bench-out/run-cold-3.json.txt",
+    "raw/bench-out/run-cold-3.stderr",
+    "raw/bench-out/nocol.json.txt",
+    "raw/bench-out/nocol.stderr"
+  ],
+  "raw_outputs_manifest": "raw/raw-manifest.json (source and committed sha256, host paths as $HOME, session UUIDs redacted; binary and third-party files hash-only)"
+}

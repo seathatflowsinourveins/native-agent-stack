@@ -1,0 +1,19 @@
+Resuming evaluation eval-jFU-2026-09-23T07:26:48...
+Cache is disabled.
+Running at concurrency=1 because 1500ms delay was requested between API calls
+Starting evaluation eval-jFU-2026-09-23T07:26:48
+Resuming: skipping 2 previously completed cases
+Running 6 test cases (up to 1 at a time)...
+✓ Eval complete (ID: eval-jFU-2026-09-23T07:26:48)
+
+» View results: promptfoo view
+» Feedback: https://promptfoo.dev/feedback
+
+
+Results:
+  ✓ 3 passed (37.50%)
+  ✗ 5 failed (62.50%)
+  0 errors (0%)
+Duration: 18s (concurrency: 1)
+
+Writing output to $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/pf-int/results-interrupted.json

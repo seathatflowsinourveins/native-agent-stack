@@ -1,0 +1,11 @@
+{
+  "snapshot_sha256": "b40e5a36dde375bd126a8794545b53136fe1ff72db3333b8fea115c8de8951ff",
+  "source_sha256": "f5d0ebf62889db580fdfd5e2f774c1ada9d01434dcba904019247f23f8ac2f3a",
+  "counts": {
+    "observations": 7,
+    "universe": 5
+  },
+  "synthetic": true,
+  "duckdb_version": "1.5.5",
+  "entitlement_verified": false
+}

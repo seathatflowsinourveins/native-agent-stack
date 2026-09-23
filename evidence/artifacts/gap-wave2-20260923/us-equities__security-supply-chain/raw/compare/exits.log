@@ -1,0 +1,27 @@
+download trivy_0.74.0_Linux-64bit.tar.gz exit=0 seconds=1
+download trivy_0.74.0_Linux-64bit.tar.gz.sigstore.json exit=0 seconds=0
+download trivy_0.74.0_checksums.txt exit=0 seconds=1
+trivy-asset-digest exit=0 seconds=0
+trivy-checksum-list exit=0 seconds=0
+trivy-cosign-verify exit=0 seconds=0
+download-osv exit=0 seconds=1
+download-osv-sums exit=0 seconds=0
+osv-asset-digest exit=0 seconds=0
+osv-checksum-list exit=0 seconds=0
+pip-audit-venv exit=1 seconds=0
+pip-audit-install exit=127 seconds=0
+trivy-asset-digest exit=0 seconds=0
+trivy-checksum-list exit=0 seconds=0
+trivy-cosign-verify exit=0 seconds=0
+osv-asset-digest exit=0 seconds=0
+osv-checksum-list exit=0 seconds=0
+pip-audit-venv exit=0 seconds=0
+pip-audit-install exit=0 seconds=0
+syft-venv exit=0 seconds=4
+trivy-rootfs exit=0 seconds=4
+trivy-positive exit=0 seconds=0
+grype-venv exit=0 seconds=2
+osv-venv exit=0 seconds=1
+osv-positive exit=1 seconds=6
+pip-audit-venv-scan exit=0 seconds=2
+pip-audit-positive exit=1 seconds=0

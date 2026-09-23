@@ -1,0 +1,1019 @@
+{
+ "engine": "NautilusTrader LiveNode 2.0.0rc5",
+ "native_quotes": 1314,
+ "native_fill_events": 16,
+ "native_rejections": 0,
+ "policy_selections": {
+  "trend_momentum": 0,
+  "range_breakout": 0,
+  "mean_reversion": 0,
+  "relative_strength": 8,
+  "defensive_cash": 0
+ },
+ "accounting": {
+  "realized_pnl_usd": "6.32",
+  "unrealized_pnl_usd": "0",
+  "cumulative_realized_loss_usd": "0",
+  "gross_loss_usd": "0",
+  "cash_delta_usd": "6.32",
+  "gross_exposure_usd": "0",
+  "pending_buy_notional_usd": "0",
+  "peak_pnl_usd": "6.36",
+  "drawdown_usd": "0.04",
+  "outstanding_orders": 0,
+  "held_symbols": 0,
+  "halted_reason": null
+ },
+ "reconciliation": {
+  "positions_match": true,
+  "cash_match": true,
+  "cash_delta_usd": "6.32",
+  "open_orders": 0,
+  "positions": 0
+ },
+ "startup_reconciliation": null,
+ "adapter_errors": [],
+ "flat": true,
+ "requests": [
+  {
+   "timestamp": 1790179966.4651446,
+   "kind": "read"
+  },
+  {
+   "timestamp": 1790179966.5867448,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179966.6155329,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179966.7979543,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179966.8189762,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179967.117832,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179967.1434793,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179967.331449,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179967.3474824,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179967.555493,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179967.593147,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179967.752655,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179967.7714982,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179967.9791217,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179967.9914954,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179968.203525,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179968.219453,
+   "kind": "submit"
+  },
+  {
+   "timestamp": 1790179971.5295212,
+   "kind": "read"
+  }
+ ],
+ "events": [
+  {
+   "type": "decision",
+   "timestamp": 1790179966.5415308,
+   "regime": "range",
+   "targets": {
+    "AAPL": 1,
+    "MSFT": 1
+   },
+   "exits": {},
+   "effective_leverage": 0.020082,
+   "signals": [
+    {
+     "symbol": "AAPL",
+     "family": "relative_strength",
+     "edge_bps": 20.972729160273484,
+     "score": 20.972729160273484
+    },
+    {
+     "symbol": "MSFT",
+     "family": "relative_strength",
+     "edge_bps": 20.972729160273484,
+     "score": 20.972729160273484
+    },
+    {
+     "symbol": "AAPL",
+     "family": "range_breakout",
+     "edge_bps": 9.970089730806375,
+     "score": 9.970089730806375
+    },
+    {
+     "symbol": "MSFT",
+     "family": "range_breakout",
+     "edge_bps": 9.970089730806375,
+     "score": 9.970089730806375
+    }
+   ],
+   "gap_bps": {}
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000001",
+   "symbol": "AAPL",
+   "side": "buy",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "relative_strength"
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000002",
+   "symbol": "MSFT",
+   "side": "buy",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "relative_strength"
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179966.667152,
+   "regime": "unavailable",
+   "targets": {
+    "AAPL": "1",
+    "MSFT": "1"
+   },
+   "exits": {},
+   "effective_leverage": 0.020162,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179966.7707756,
+   "regime": "range",
+   "targets": {},
+   "exits": {
+    "AAPL": "take_profit",
+    "MSFT": "take_profit"
+   },
+   "effective_leverage": 0.0,
+   "signals": [
+    {
+     "symbol": "AAPL",
+     "family": "relative_strength",
+     "edge_bps": 20.72988953930377,
+     "score": 20.72988953930377
+    },
+    {
+     "symbol": "MSFT",
+     "family": "relative_strength",
+     "edge_bps": 20.72988953930377,
+     "score": 20.72988953930377
+    },
+    {
+     "symbol": "AAPL",
+     "family": "range_breakout",
+     "edge_bps": 9.88142292490446,
+     "score": 9.88142292490446
+    },
+    {
+     "symbol": "MSFT",
+     "family": "range_breakout",
+     "edge_bps": 9.88142292490446,
+     "score": 9.88142292490446
+    }
+   ],
+   "gap_bps": {}
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000003",
+   "symbol": "AAPL",
+   "side": "sell",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "take_profit"
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000004",
+   "symbol": "MSFT",
+   "side": "sell",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "take_profit"
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179966.8851159,
+   "regime": "unavailable",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179966.9966762,
+   "regime": "unavailable",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179967.1008656,
+   "regime": "range",
+   "targets": {
+    "AAPL": 1,
+    "MSFT": 1
+   },
+   "exits": {},
+   "effective_leverage": 0.020522,
+   "signals": [
+    {
+     "symbol": "AAPL",
+     "family": "relative_strength",
+     "edge_bps": 20.387187642798565,
+     "score": 20.387187642798565
+    },
+    {
+     "symbol": "MSFT",
+     "family": "relative_strength",
+     "edge_bps": 20.387187642798565,
+     "score": 20.387187642798565
+    },
+    {
+     "symbol": "AAPL",
+     "family": "range_breakout",
+     "edge_bps": 9.756097560975618,
+     "score": 9.756097560975618
+    },
+    {
+     "symbol": "MSFT",
+     "family": "range_breakout",
+     "edge_bps": 9.756097560975618,
+     "score": 9.756097560975618
+    }
+   ],
+   "gap_bps": {}
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000005",
+   "symbol": "AAPL",
+   "side": "buy",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "relative_strength"
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000006",
+   "symbol": "MSFT",
+   "side": "buy",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "relative_strength"
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179967.2095273,
+   "regime": "unavailable",
+   "targets": {
+    "AAPL": "1",
+    "MSFT": "1"
+   },
+   "exits": {},
+   "effective_leverage": 0.020602000000000002,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179967.3167465,
+   "regime": "range",
+   "targets": {},
+   "exits": {
+    "AAPL": "take_profit",
+    "MSFT": "take_profit"
+   },
+   "effective_leverage": 0.0,
+   "signals": [
+    {
+     "symbol": "AAPL",
+     "family": "relative_strength",
+     "edge_bps": 20.155345888770437,
+     "score": 20.155345888770437
+    },
+    {
+     "symbol": "MSFT",
+     "family": "relative_strength",
+     "edge_bps": 20.155345888770437,
+     "score": 20.155345888770437
+    },
+    {
+     "symbol": "AAPL",
+     "family": "range_breakout",
+     "edge_bps": 9.671179883945502,
+     "score": 9.671179883945502
+    },
+    {
+     "symbol": "MSFT",
+     "family": "range_breakout",
+     "edge_bps": 9.671179883945502,
+     "score": 9.671179883945502
+    }
+   ],
+   "gap_bps": {}
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000007",
+   "symbol": "AAPL",
+   "side": "sell",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "take_profit"
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000008",
+   "symbol": "MSFT",
+   "side": "sell",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "take_profit"
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179967.4250576,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [
+    {
+     "symbol": "AAPL",
+     "family": "relative_strength",
+     "edge_bps": 20.05369041380156,
+     "score": 20.05369041380156
+    },
+    {
+     "symbol": "MSFT",
+     "family": "relative_strength",
+     "edge_bps": 20.05369041380156,
+     "score": 20.05369041380156
+    },
+    {
+     "symbol": "AAPL",
+     "family": "range_breakout",
+     "edge_bps": 9.633911368014392,
+     "score": 9.633911368014392
+    },
+    {
+     "symbol": "MSFT",
+     "family": "range_breakout",
+     "edge_bps": 9.633911368014392,
+     "score": 9.633911368014392
+    }
+   ],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179967.5298452,
+   "regime": "range",
+   "targets": {
+    "AAPL": 1,
+    "MSFT": 1
+   },
+   "exits": {},
+   "effective_leverage": 0.020881999999999998,
+   "signals": [
+    {
+     "symbol": "AAPL",
+     "family": "relative_strength",
+     "edge_bps": 19.927798738341718,
+     "score": 19.927798738341718
+    },
+    {
+     "symbol": "MSFT",
+     "family": "relative_strength",
+     "edge_bps": 19.927798738341718,
+     "score": 19.927798738341718
+    },
+    {
+     "symbol": "AAPL",
+     "family": "range_breakout",
+     "edge_bps": 9.587727708533222,
+     "score": 9.587727708533222
+    },
+    {
+     "symbol": "MSFT",
+     "family": "range_breakout",
+     "edge_bps": 9.587727708533222,
+     "score": 9.587727708533222
+    }
+   ],
+   "gap_bps": {}
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000009",
+   "symbol": "AAPL",
+   "side": "buy",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "relative_strength"
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000010",
+   "symbol": "MSFT",
+   "side": "buy",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "relative_strength"
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179967.6382518,
+   "regime": "unavailable",
+   "targets": {
+    "AAPL": "1",
+    "MSFT": "1"
+   },
+   "exits": {},
+   "effective_leverage": 0.020922,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179967.742864,
+   "regime": "range",
+   "targets": {},
+   "exits": {
+    "AAPL": "take_profit",
+    "MSFT": "take_profit"
+   },
+   "effective_leverage": 0.0,
+   "signals": [
+    {
+     "symbol": "AAPL",
+     "family": "relative_strength",
+     "edge_bps": 19.7537144508364,
+     "score": 19.7537144508364
+    },
+    {
+     "symbol": "MSFT",
+     "family": "relative_strength",
+     "edge_bps": 19.7537144508364,
+     "score": 19.7537144508364
+    },
+    {
+     "symbol": "AAPL",
+     "family": "range_breakout",
+     "edge_bps": 9.523809523808158,
+     "score": 9.523809523808158
+    },
+    {
+     "symbol": "MSFT",
+     "family": "range_breakout",
+     "edge_bps": 9.523809523808158,
+     "score": 9.523809523808158
+    }
+   ],
+   "gap_bps": {}
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000011",
+   "symbol": "AAPL",
+   "side": "sell",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "take_profit"
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000012",
+   "symbol": "MSFT",
+   "side": "sell",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "take_profit"
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179967.84761,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [
+    {
+     "symbol": "AAPL",
+     "family": "relative_strength",
+     "edge_bps": 19.63088881092423,
+     "score": 19.63088881092423
+    },
+    {
+     "symbol": "MSFT",
+     "family": "relative_strength",
+     "edge_bps": 19.63088881092423,
+     "score": 19.63088881092423
+    },
+    {
+     "symbol": "AAPL",
+     "family": "range_breakout",
+     "edge_bps": 9.478672985780978,
+     "score": 9.478672985780978
+    },
+    {
+     "symbol": "MSFT",
+     "family": "range_breakout",
+     "edge_bps": 9.478672985780978,
+     "score": 9.478672985780978
+    }
+   ],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179967.956539,
+   "regime": "range",
+   "targets": {
+    "AAPL": 1,
+    "MSFT": 1
+   },
+   "exits": {},
+   "effective_leverage": 0.021222,
+   "signals": [
+    {
+     "symbol": "AAPL",
+     "family": "relative_strength",
+     "edge_bps": 19.509309284981846,
+     "score": 19.509309284981846
+    },
+    {
+     "symbol": "MSFT",
+     "family": "relative_strength",
+     "edge_bps": 19.509309284981846,
+     "score": 19.509309284981846
+    },
+    {
+     "symbol": "AAPL",
+     "family": "range_breakout",
+     "edge_bps": 9.433962264151496,
+     "score": 9.433962264151496
+    },
+    {
+     "symbol": "MSFT",
+     "family": "range_breakout",
+     "edge_bps": 9.433962264151496,
+     "score": 9.433962264151496
+    }
+   ],
+   "gap_bps": {}
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000013",
+   "symbol": "AAPL",
+   "side": "buy",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "relative_strength"
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000014",
+   "symbol": "MSFT",
+   "side": "buy",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "relative_strength"
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179968.067174,
+   "regime": "range",
+   "targets": {
+    "AAPL": "1",
+    "MSFT": "1"
+   },
+   "exits": {},
+   "effective_leverage": 0.021302,
+   "signals": [
+    {
+     "symbol": "AAPL",
+     "family": "relative_strength",
+     "edge_bps": 19.41293078680406,
+     "score": 19.41293078680406
+    },
+    {
+     "symbol": "MSFT",
+     "family": "relative_strength",
+     "edge_bps": 19.41293078680406,
+     "score": 19.41293078680406
+    },
+    {
+     "symbol": "AAPL",
+     "family": "range_breakout",
+     "edge_bps": 9.398496240600185,
+     "score": 9.398496240600185
+    },
+    {
+     "symbol": "MSFT",
+     "family": "range_breakout",
+     "edge_bps": 9.398496240600185,
+     "score": 9.398496240600185
+    }
+   ],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179968.1747227,
+   "regime": "range",
+   "targets": {},
+   "exits": {
+    "AAPL": "take_profit",
+    "MSFT": "take_profit"
+   },
+   "effective_leverage": 0.0,
+   "signals": [
+    {
+     "symbol": "AAPL",
+     "family": "relative_strength",
+     "edge_bps": 19.293549238561525,
+     "score": 19.293549238561525
+    },
+    {
+     "symbol": "MSFT",
+     "family": "relative_strength",
+     "edge_bps": 19.293549238561525,
+     "score": 19.293549238561525
+    },
+    {
+     "symbol": "AAPL",
+     "family": "range_breakout",
+     "edge_bps": 9.3545369504211,
+     "score": 9.3545369504211
+    },
+    {
+     "symbol": "MSFT",
+     "family": "range_breakout",
+     "edge_bps": 9.3545369504211,
+     "score": 9.3545369504211
+    }
+   ],
+   "gap_bps": {}
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000015",
+   "symbol": "AAPL",
+   "side": "sell",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "take_profit"
+  },
+  {
+   "type": "intent",
+   "client_id": "adp-obsgap-0000016",
+   "symbol": "MSFT",
+   "side": "sell",
+   "strategy": "ADAPTIVE-001-A",
+   "reason": "take_profit"
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179968.2877562,
+   "regime": "unavailable",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179968.398305,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179968.5131297,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179968.626352,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179968.7437162,
+   "regime": "unavailable",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179968.8637903,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179968.9704902,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179969.0788503,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179969.1852171,
+   "regime": "unavailable",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179969.2918143,
+   "regime": "unavailable",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179969.4022264,
+   "regime": "unavailable",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179969.5084355,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179969.6214948,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179969.7301664,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179969.8527248,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179969.959478,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179970.0642836,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179970.168631,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179970.281976,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179970.3944268,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179970.510307,
+   "regime": "unavailable",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179970.6290407,
+   "regime": "unavailable",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179970.7395942,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179970.8571155,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179970.9687226,
+   "regime": "unavailable",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179971.0844731,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179971.1896367,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179971.2969294,
+   "regime": "unavailable",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179971.4094532,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  },
+  {
+   "type": "decision",
+   "timestamp": 1790179971.5244515,
+   "regime": "range",
+   "targets": {},
+   "exits": {},
+   "effective_leverage": 0.0,
+   "signals": [],
+   "gap_bps": {}
+  }
+ ],
+ "session_policy": {
+  "extended_hours": false,
+  "overnight_holds": false
+ },
+ "boundary_receipts": [],
+ "elapsed_seconds": 5.331604342994979,
+ "status": "passed"
+}

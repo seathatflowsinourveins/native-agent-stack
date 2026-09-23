@@ -1,0 +1,176 @@
+{
+ "id": "gap-wave2-20260923-foundation-mcp-surfaces-9",
+ "gap_index": 9,
+ "gap_text_sha256": "2af1d031c3a57b5f77ad10b40753927d20ecd3fd2b95ac83079d8430d7138db3",
+ "gap_text": "mcporter recovery required intervention after stale metadata refusal and a startup timeout; automatic recovery was not established.",
+ "next_check": "On an owned disposable mcporter daemon (0.13.13 and 0.14.0), induce stale metadata and a startup timeout, and record whether the next call recovers without manual intervention.",
+ "preregistration": {
+  "written_at": "2026-09-23T03:54:03Z",
+  "expectation": "On owned daemons for both 0.13.13 and 0.14.0: after SIGKILL (stale metadata) the next call is refused with no replacement launched; after a SIGSTOPped (unresponsive) daemon the next call times out; neither recovers without manual intervention (archiving metadata / killing the stopped process). Daemon client code is byte-identical, so both versions behave the same.",
+  "criteria": "settled if both inductions were run on both versions and the next-call behavior plus the minimal manual step were recorded; the answer to 'automatic recovery' is whatever is observed.",
+  "source": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/preregistrations.json",
+  "addenda": [
+   {
+    "written_at": "2026-09-23T04:14:45Z",
+    "label": "added arm, written after the first lifecycle runs (04:09-04:14Z) and before this arm ran",
+    "expectation": "With the daemon stopped and daemon/user.json.lock held by a live owned process (sleep), a call launches a daemon whose host blocks in withFileLock (dist/fs-json.js, DEFAULT_LOCK_TIMEOUT_MS 30000) so the client readiness wait fails; after the holder exits the lock is recoverable (dead pid) and the next call starts a daemon with no manual step, unless the failed start left metadata behind, in which case the stale-metadata refusal applies.",
+    "criteria": "Record the first call's exit/elapsed/stderr and whether the next call after the holder exits succeeds without any manual step. Run on 0.13.13 and 0.14.0."
+   },
+   {
+    "written_at": "2026-09-23T04:36:13Z",
+    "label": "FIX ROUND 1, written after the round-1 independent review (raw/review-codex-round1.txt, received 04:35:13Z) and before the fix-round runs",
+    "expectation": "Re-running the bridge matrix, both lifecycle fixtures and the unmodified-config arm inside unshare -rnm with an empty tmpfs mounted over $HOME/.mcporter (the shared daemon's socket path does not exist there) gives the same outcomes. A connect probe to the shared socket path inside the namespace returns ENOENT, while the same probe against the owned daemon socket connects. That owned control shows the probe detects a reachable socket. wong2 interactive listing is executed x3 for all 5 servers and renders at most one page (10 tools). With a lock holder that EXITS ON ITS OWN (sleep with a fixed lifetime, no harness kill), a call made while the lock is held times out after 45 s, a second call while still held also fails, and the first call after the holder exits succeeds with no step taken by the harness or the operator.",
+    "criteria": "Gap 10 and the no-contact claim in the other receipts are settled only by the enforced (tmpfs + netns) runs with the probe and owned control recorded. Gap 12/6: settled only if every wong2 list arm executed (interactive), with incompleteness reported as a result. Gap 9: the startup-timeout conclusion is restated to match what the natural-expiry arm shows."
+   }
+  ]
+ },
+ "checked_at": "2026-09-23T13:09:10Z",
+ "arms": [
+  {
+   "arm": "owned disposable daemon 0.13.13: induce stale metadata and a startup timeout (plus an unresponsive daemon); record whether the next call recovers without manual intervention",
+   "status": "executed",
+   "detail": {
+    "stale_metadata_sigkill": {
+     "induction": "harness SIGKILLs the owned daemon",
+     "next_call_exit": 1,
+     "second_call_exit": 1,
+     "auto_recovered": false,
+     "manual_steps": [
+      "archived daemon/user.json only (key and config kept)"
+     ],
+     "after_manual_exit": 0
+    },
+    "unresponsive_daemon_sigstop": {
+     "induction": "harness SIGSTOPs the owned daemon",
+     "next_call_exit": 1,
+     "next_call_wall_s": 60.3,
+     "second_call_exit": 1,
+     "auto_recovered": false,
+     "harness_intervention": "the harness then SIGKILLs the stopped daemon (simulated crash)",
+     "after_daemon_killed_auto_recovered": false,
+     "manual_steps": [
+      "archived daemon/user.json only"
+     ],
+     "after_manual_exit": 0
+    },
+    "startup_timeout_held_lock": {
+     "induction": "daemon/user.json.lock held by an owned `sleep 95` that exits on its own",
+     "first_call_exit": 1,
+     "first_call_wall_s": 45.4,
+     "holder_alive_at_second_call": true,
+     "second_call_exit": 1,
+     "second_call_wall_s": 45.3,
+     "holder_exit_after_s": 95.0,
+     "holder_returncode": 0,
+     "harness_interventions": [],
+     "next_call_after_natural_exit_exit": 0,
+     "auto_recovered_after_holder_exit": true,
+     "manual_steps": []
+    }
+   }
+  },
+  {
+   "arm": "owned disposable daemon 0.14.0: induce stale metadata and a startup timeout (plus an unresponsive daemon); record whether the next call recovers without manual intervention",
+   "status": "executed",
+   "detail": {
+    "stale_metadata_sigkill": {
+     "induction": "harness SIGKILLs the owned daemon",
+     "next_call_exit": 1,
+     "second_call_exit": 1,
+     "auto_recovered": false,
+     "manual_steps": [
+      "archived daemon/user.json only (key and config kept)"
+     ],
+     "after_manual_exit": 0
+    },
+    "unresponsive_daemon_sigstop": {
+     "induction": "harness SIGSTOPs the owned daemon",
+     "next_call_exit": 1,
+     "next_call_wall_s": 60.3,
+     "second_call_exit": 1,
+     "auto_recovered": false,
+     "harness_intervention": "the harness then SIGKILLs the stopped daemon (simulated crash)",
+     "after_daemon_killed_auto_recovered": false,
+     "manual_steps": [
+      "archived daemon/user.json only"
+     ],
+     "after_manual_exit": 0
+    },
+    "startup_timeout_held_lock": {
+     "induction": "daemon/user.json.lock held by an owned `sleep 95` that exits on its own",
+     "first_call_exit": 1,
+     "first_call_wall_s": 45.4,
+     "holder_alive_at_second_call": true,
+     "second_call_exit": 1,
+     "second_call_wall_s": 45.3,
+     "holder_exit_after_s": 95.0,
+     "holder_returncode": 0,
+     "harness_interventions": [],
+     "next_call_after_natural_exit_exit": 0,
+     "auto_recovered_after_holder_exit": true,
+     "manual_steps": []
+    }
+   }
+  }
+ ],
+ "commands": [
+  "python3 blueprints/gap-wave2-20260923/foundation__mcp-surfaces/enforce.py evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/lifecycle-mcporter-0.13.13.enforce.json -- python3 blueprints/gap-wave2-20260923/foundation__mcp-surfaces/run_lifecycle.py mcporter-0.13.13 evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/lifecycle-mcporter-0.13.13.json",
+  "python3 blueprints/gap-wave2-20260923/foundation__mcp-surfaces/enforce.py evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/lifecycle-mcporter-0.14.0.enforce.json -- python3 blueprints/gap-wave2-20260923/foundation__mcp-surfaces/run_lifecycle.py mcporter-0.14.0 evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/lifecycle-mcporter-0.14.0.json",
+  "(inside) kill -KILL <owned daemon> | kill -STOP <owned daemon> | daemon/user.json.lock <- pid of an owned `sleep 95`, then mcporter call context-mode.ctx_execute"
+ ],
+ "results": [
+  "stale metadata: { \"server\": \"context-mode\", \"tool\": \"ctx_execute\", \"error\": \"Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched.\", \"issue\"",
+  "unresponsive daemon: { \"server\": \"context-mode\", \"tool\": \"ctx_execute\", \"error\": \"Call to context-mode.ctx_execute timed out after 60000ms. Override MCPORTER_CALL_TIMEOUT or pass --timeout to adjust.\", \"issue\": { \"kind\": ",
+  "startup timeout (lock held): { \"server\": \"context-mode\", \"tool\": \"ctx_execute\", \"error\": \"MCPorter daemon did not become ready within 45 seconds. Run 'mcporter daemon start --foreground --log' to diagnose startup.\", \"issue\": { \"k",
+  "per version: {'0.13.13': {'stale_metadata_sigkill': {'induction': 'harness SIGKILLs the owned daemon', 'next_call_exit': 1, 'second_call_exit': 1, 'auto_recovered': False, 'manual_steps': ['archived daemon/user.json only (key and config kept)'], 'after_manual_exit': 0}, 'unresponsive_daemon_sigstop': {'induction': 'harness SIGSTOPs the owned daemon', 'next_call_exit': 1, 'next_call_wall_s': 60.3, 'second_call_exit': 1, 'auto_recovered': False, 'harness_intervention': 'the harness then SIGKILLs the stopped daemon (simulated crash)', 'after_daemon_killed_auto_recovered': False, 'manual_steps': ['archived daemon/user.json only'], 'after_manual_exit': 0}, 'startup_timeout_held_lock': {'induction': 'daemon/user.json.lock held by an owned `sleep 95` that exits on its own', 'first_call_exit': 1, 'first_call_wall_s': 45.4, 'holder_alive_at_second_call': True, 'second_call_exit': 1, 'second_call_wall_s': 45.3, 'holder_exit_after_s': 95.0, 'holder_returncode': 0, 'harness_interventions': [], 'next_call_after_natural_exit_exit': 0, 'auto_recovered_after_holder_exit': True, 'manual_steps': []}}, '0.14.0': {'stale_metadata_sigkill': {'induction': 'harness SIGKILLs the owned daemon', 'next_call_exit': 1, 'second_call_exit': 1, 'auto_recovered': False, 'manual_steps': ['archived daemon/user.json only (key and config kept)'], 'after_manual_exit': 0}, 'unresponsive_daemon_sigstop': {'induction': 'harness SIGSTOPs the owned daemon', 'next_call_exit': 1, 'next_call_wall_s': 60.3, 'second_call_exit': 1, 'auto_recovered': False, 'harness_intervention': 'the harness then SIGKILLs the stopped daemon (simulated crash)', 'after_daemon_killed_auto_recovered': False, 'manual_steps': ['archived daemon/user.json only'], 'after_manual_exit': 0}, 'startup_timeout_held_lock': {'induction': 'daemon/user.json.lock held by an owned `sleep 95` that exits on its own', 'first_call_exit': 1, 'first_call_wall_s': 45.4, 'holder_alive_at_second_call': True, 'second_call_exit': 1, 'second_call_wall_s': 45.3, 'holder_exit_after_s': 95.0, 'holder_returncode': 0, 'harness_interventions': [], 'next_call_after_natural_exit_exit': 0, 'auto_recovered_after_holder_exit': True, 'manual_steps': []}}}"
+ ],
+ "outcome": "settled",
+ "note": "Both inductions ran on owned daemons for 0.13.13 and 0.14.0, with identical results. Stale metadata after SIGKILL is refused on every following call, and one manual step (archiving daemon/user.json) is required: no automatic recovery. Startup timeout: while daemon/user.json.lock is held by a live process, two consecutive calls each fail after about 45 s ('did not become ready within 45 seconds'). The holder has a fixed lifetime and exits on its own (fix round 1: the harness does not kill it). The first call after that succeeds with no harness or operator step. So mcporter recovers automatically once a startup obstruction clears, but never from stale metadata. The SIGSTOP arm is disclosed separately: calls time out after 60 s, and the harness then kills the stopped daemon, which leaves the stale-metadata case.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "Servers ran with owned state only (temp HOME/XDG, MCPORTER_DAEMON_DIR under $HOME/.cache/gap-wave2-20260923, owned ai-memory --data-dir and Qdrant storage). Fix round 1 runs are ENFORCED: unshare -rnm with an empty tmpfs over $HOME/.mcporter and a fresh network namespace (enforce.py / ns_exact.py). Inside, an AF_UNIX connect to the shared daemon socket path returned 'FileNotFoundError: No such file or directory' and TCP 49374/16333 returned 'ConnectionRefusedError: Connection refused', while the same AF_UNIX probe against each owned daemon socket returned ['connected'] (owned control, so the probe can detect a reachable socket). Round-1 runs (raw/round1/) set only environment-level isolation; their stat() of the shared daemon (pid, socket inode, metadata mtime) could not detect a client connection, so they are not cited for the no-contact claim.",
+  "/tmp was not isolated; SocratiCode reported another process watching the agent-lab checkout, i.e. it read host watcher state.",
+  "The startup-timeout arm was added by addendum at 04:14:45Z and changed in fix round 1 (04:36:13Z) so that the lock holder exits by itself; round-1 files are in raw/round1/.",
+  "Inductions are SIGKILL, SIGSTOP and a held lock; the WSL-reboot incident of 2026-09-19 was not reproduced."
+ ],
+ "raw_evidence": [
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/lifecycle-mcporter-0.13.13.json",
+   "sha256": "c567d2ca04b7ccc41d7b42ca536804687cfc268232b8407dfccd8b83ab88feef"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/lifecycle-mcporter-0.14.0.json",
+   "sha256": "25b1c43384284ef164daac3d7da61b5ee999fc60f831580ef3f2e257be0700ec"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/lifecycle-mcporter-0.13.13.enforce.json",
+   "sha256": "a0e4d2a664aaa16a2556eada08014300af6a73937713f14898169178f15dae6c"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/lifecycle-mcporter-0.14.0.enforce.json",
+   "sha256": "e9120e5111e07ac06c49afffbaa8a914d66f1b26810a149a2c74d28d05a24d97"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/round1/lifecycle-mcporter-0.13.13.json",
+   "sha256": "ccba0e501ca08527b535d2b5a29aae88926876266ad3f3855f61e4def6633425"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/round1/lifecycle-mcporter-0.14.0.json",
+   "sha256": "a092246f4d9448d726d7ec0d929808b99f6d08b280f33266c86f76a5d876453a"
+  }
+ ],
+ "helper_scripts": [
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/iso.py",
+   "sha256": "29677ff5175f71676feb6ea379fdb255f48f1a8fb69d7f3e909ddc66a6b28560"
+  },
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/enforce.py",
+   "sha256": "64ea85756615270fb848351797b680115ba54f91a10405e805716b6983bd0833"
+  },
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/run_lifecycle.py",
+   "sha256": "c6883ea1b43ba51cf8f6aa22f8a02a5911b1888906f5cedfa091b5fe31074bf9"
+  }
+ ]
+}

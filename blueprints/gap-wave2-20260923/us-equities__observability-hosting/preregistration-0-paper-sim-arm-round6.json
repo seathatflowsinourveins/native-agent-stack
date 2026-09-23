@@ -1,0 +1,7 @@
+{
+ "written_at": "2026-09-23T16:17:50Z",
+ "label": "round-6 addendum, written after round 5 failed (run 16:15:21Z-16:17:30Z) and before round 6 ran",
+ "deviation": "Round 5 exported TMPDIR=<scratch>/work for the whole script; srt 0.0.77 places its HTTP bridge Unix socket under TMPDIR and the resulting path (about 110 bytes) exceeds the 108-byte sun_path limit, so srt exited before running the workload ('HTTP bridge process exited with code 1' / 'Error: Failed to create bridge sockets after 5 attempts'). Consequently the paper step, probes, count metrics, Loki lines and journal checks all FAILed and the hot snapshot held an empty work dir. Round 6 changes only: TMPDIR is no longer exported by the script (set to the work dir only inside the sandboxed step script), and the leftover-process count excludes the script's own ancestor chain (round 5 counted 3 = the invoking wrapper, timeout and script, which carry the scratch path in their command lines).",
+ "expectation": "As the round-5 preregistration (preregistration-0-paper-sim-arm.json).",
+ "criteria": "As round 5."
+}

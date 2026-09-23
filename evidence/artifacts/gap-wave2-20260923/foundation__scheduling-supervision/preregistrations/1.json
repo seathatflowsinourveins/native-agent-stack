@@ -1,0 +1,6 @@
+{
+  "gap_index": 1,
+  "written_at": "2026-09-22T22:42:40-04:00",
+  "expectation": "Arm A (executable here): run one bounded `codex exec --json --sandbox read-only --ephemeral` streaming request as the only step of a Dagu 2.16.6 DAG in an isolated DAGU_HOME, issue native `dagu stop` a few seconds after the stream has emitted `turn.started` but before `turn.completed`, and capture every JSONL event the CLI emitted. Expect: Dagu history reports aborted; the codex process tree is gone; no `turn.completed` event and therefore no provider-returned usage object is surfaced for the aborted request. Arm B (broker exactly-once with an Alpaca paper order and a fixed client_order_id) is NOT run: broker/paper-account calls belong to peer session sota-workflow-resolution. Billing cessation is unverifiable without provider console access.",
+  "criteria": "Arm A counts as executed iff Dagu reports aborted, the stream had started (turn.started seen) before stop, and the full event log is retained. Detection method for usage: parse every JSONL line and search recursively for any `usage` key; the detector is validated on the gap-2 run's completed codex call, which must show a `usage` object in `turn.completed`. Outcome can be at most `advanced` because the broker arm is deferred (owner: sota-workflow-resolution) and billing cessation stays unverified."
+}

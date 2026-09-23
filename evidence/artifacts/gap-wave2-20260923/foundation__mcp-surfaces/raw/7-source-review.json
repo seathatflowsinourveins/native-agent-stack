@@ -1,0 +1,152 @@
+{
+ "concrete_gap": "mcporter 0.13.13/0.14.0 refuses to launch a replacement daemon after its daemon dies ('Previous daemon exited unexpectedly ... No replacement was launched', dist/daemon/client.js ensureDaemon); recovery needs a manual metadata archive (observed in raw/lifecycle-mcporter-*.json stale_metadata_sigkill).",
+ "list": {
+  "repo": "https://github.com/punkpeye/awesome-mcp-servers",
+  "commit": "fbc52bcf301a3468954f6ee4fd12b75b853c93cf",
+  "committed_at": "2026-09-22T19:20:15-07:00",
+  "section_rule": "Aggregators section (README lines 138-279) entries that host local stdio servers persistently, i.e. could own the daemon/recovery role; plus the CLI testers listed under Other Tools and Integrations.",
+  "entry_lines": {
+   "1mcp-app/agent": 150,
+   "ni-c/mcp-hub": 231,
+   "smart-mcp-proxy/mcpproxy-go": 248,
+   "chrishayuk/mcp-cli": 4527,
+   "wong2/mcp-cli": 4667
+  }
+ },
+ "candidates": {
+  "1mcp-app/agent": {
+   "commit": [
+    "c147b07b8499d2d90bb42fc6b57860bbfa3bbe84",
+    "2026-09-22T23:59:53+08:00"
+   ],
+   "version": "0.39.0-beta.0 (package.json)",
+   "citations": [
+    {
+     "file": "src/core/server/runtimeLifecycle.ts",
+     "lines": "147-197",
+     "text": "export async function discoverScopedRuntime(\n  configDir: string,\n  readinessProbe: ReadinessProbe = probeReadiness,\n  options: { cleanupStale?: boolean } = {},\n): Promise<ScopedRuntime> {\n  let info: ServerPidInfo | null;\n  try {\n    info = readPidFile(configDir);\n  } catch (error) {\n    if (error instanceof PidFileReadError) {\n      logger.error(error.message);\n      return { status: 'error', info: null, error: error.message };\n    }\n    throw error;\n  }\n\n  if (!info) {\n    if (fs.existsSync(getPidFilePath(configDir))) {\n      return { status: 'error', info: null, error: 'Runtime PID metadata is malformed; retained for manual recovery.' };\n    }\n    return { status: 'not-running', info: null };\n  }\n\n  // Tier 1: dead process → delete the stale PID file, report not-running.\n  // Delete only if the file still records this dead PID: a newer runtime may\n  // have replaced it between the read above and here, and we must not strand it.\n  const identityStatus = inspectProcessIdentity(info.pid, info.processIdentity);\n  if (identityStatus === 'unknown') {\n    return {\n      status: 'error',\n      info: null,\n      error: processIdentityRecoveryMessage(info.pid, info.processIdentity),\n    };\n  }\n  if (identityStatus === 'dead') {\n    if (options.cleanupStale !== false) {\n      logger.warn(`PID file points to dead process (PID: ${info.pid}); removing stale PID file`);\n      cleanupPidFileIfMatches(configDir, info);\n    }\n    return { status: 'not-running', info: null };\n  }\n\n  // Tier 2: alive but unreachable → retain the PID file, report not-usable.\n  const reachable = await readinessProbe(info);\n  if (!reachable) {\n    return { status: 'unreachable', info };\n  }\n\n  return { status: 'running', info };\n}"
+    },
+    {
+     "file": "src/core/server/backendStdioSupervisor.ts",
+     "lines": "93-108",
+     "text": "\n  public handleUnexpectedExit(exit: BackendExitFacts): void {\n    if (this.state === 'stopped' || !this.policy.restartOnExit) {\n      return;\n    }\n\n    const generation = this.beginNewOperation();\n    this.currentPid = null;\n    this.lastExit = {\n      code: exit.code,\n      signal: exit.signal,\n      pid: exit.pid ?? null,\n      at: exit.at ? new Date(exit.at) : this.now(),\n    };\n    this.lastError = null;\n    this.scheduleNextAttempt(generation);"
+    },
+    {
+     "file": "src/commands/run/index.ts",
+     "lines": "6-16",
+     "text": "export function setupRunCommand(yargs: Argv): Argv {\n  return yargs.command(\n    'run <tool>',\n    'Run an MCP tool against a running 1MCP serve instance',\n    (commandYargs) =>\n      commandYargs\n        .options(globalOptions || {})\n        .positional('tool', {\n          describe: 'Tool reference in the format <server>/<tool>',\n          type: 'string',\n        })"
+    }
+   ],
+   "finding": "Tier-1 stale PID handling: a PID file whose process is dead (identity-checked) is removed automatically and the runtime reported not-running; a live-but-unreachable owner keeps its PID file (tier 2). Backend stdio servers restart on unexpected exit with backoff when restartOnExit is set. `1mcp run <server>/<tool>` calls tools against a RUNNING serve instance; it does not launch one.",
+   "disposition": "keep-but-compare: closest match to the gap (automatic stale-PID cleanup without the manual archive step, at the cost of mcporter's transport-retirement proof). Not adopted: no executed comparison yet.",
+   "overturn": "An owned 1mcp serve + kill -9 + `1mcp run` fixture that recovers without a manual step while leaving no orphaned backend would make it a measured alternative for the recovery role."
+  },
+  "ni-c/mcp-hub": {
+   "commit": [
+    "8c393a17bd2dd6d169bc880ef176bd81d48ac3b3",
+    "2026-09-20T09:53:26+00:00"
+   ],
+   "version": "0.11.3 (package.json)",
+   "citations": [
+    {
+     "file": "src/supervisor.ts",
+     "lines": "119-130",
+     "text": "  /** Sleep when idle, wake on use, give up restarting a crashed server nobody asks for. */\n  onDemand?: boolean;\n  /** Idle window after which an on-demand server is put to sleep. */\n  idleMs?: number;\n  /** Called with fresh serverInfo/capabilities/tools worth caching. */\n  persist?: (server: ManagedServer) => void;\n  /** How long wake() blocks a request before giving up. */\n  wakeTimeoutMs?: number;\n  /** Failed restarts without any use before the hub gives up until the next wake. */\n  maxUnusedRestarts?: number;\n  /** Test hook: initial restart backoff. */\n  backoffInitialMs?: number;"
+    },
+    {
+     "file": "src/sandbox/container-spec.ts",
+     "lines": "14-19",
+     "text": " * Everything that could only ever weaken the sandbox is fixed here rather than\n * taken from the config: capabilities are always dropped, no-new-privileges is\n * always set, privileged is always false, and there is never a restart policy\n * (the hub supervises, and a Docker-level restart would resurrect a container\n * whose stdio stream nobody is holding).\n */"
+    }
+   ],
+   "finding": "Supervises child stdio servers (sleep when idle, backoff restart, give up after unused restarts) and publishes them over HTTPS/Streamable HTTP from one container. The cited container spec deliberately gives sandboxed children no Docker restart policy because the hub itself supervises them; recovery of the hub process's own state was not found in the reviewed files (not searched exhaustively).",
+   "disposition": "rejected for this gap: a container HTTP hub, not a per-user CLI bridge; it does not address recovery of a local bridge daemon's own stale state.",
+   "overturn": "A deployment that must expose these servers to remote HTTP clients would make it relevant for a different role."
+  },
+  "smart-mcp-proxy/mcpproxy-go": {
+   "commit": [
+    "0600d4d98a444b241006154ba04ad08eb74a2519",
+    "2026-09-22T18:54:02+03:00"
+   ],
+   "citations": [
+    {
+     "file": "cmd/mcpproxy-tray/main.go",
+     "lines": "1694-1698",
+     "text": "\n// handleDBLockedError handles database locked errors\nfunc (cpl *CoreProcessLauncher) handleDBLockedError() {\n\tcpl.logger.Warn(\"Core failed due to database lock\")\n\t// Could implement automatic stale lock cleanup here"
+    },
+    {
+     "file": "internal/upstream/managed/client.go",
+     "lines": "1826-1840",
+     "text": "func (mc *Client) tryReconnect() {\n\tif mc.IsUserLoggedOut() {\n\t\tmc.logger.Info(\"Skipping reconnection attempt - user explicitly logged out\",\n\t\t\tzap.String(\"server\", mc.GetConfig().Name))\n\t\treturn\n\t}\n\n\t// CRITICAL FIX: Prevent concurrent reconnection attempts to avoid duplicate containers\n\tmc.reconnectMu.Lock()\n\tif mc.reconnectInProgress {\n\t\tmc.reconnectMu.Unlock()\n\t\tmc.logger.Debug(\"Reconnection already in progress, skipping duplicate attempt\",\n\t\t\tzap.String(\"server\", mc.GetConfig().Name))\n\t\treturn\n\t}"
+    }
+   ],
+   "finding": "Reconnects upstream servers (managed client tryReconnect with in-progress guard); its own core database-lock failure has no automatic stale-lock cleanup ('Could implement automatic stale lock cleanup here'). Ships a tray, web UI and self-update path (AUTOUPDATE.md).",
+   "disposition": "rejected for this gap: upstream reconnect is not the missing piece, and its own stale-lock recovery is explicitly unimplemented.",
+   "overturn": "A release that implements and tests automatic stale core-lock recovery."
+  },
+  "wong2/mcp-cli": {
+   "commit": [
+    "7d12b4648b1c3e2a7341113407002c1b0f700d1b",
+    "2026-06-08T15:07:02+08:00"
+   ],
+   "version": "2.0.0 (package.json; src/cli.js and src/mcp.js byte-identical to the npm 2.0.0 tarball used in the run)",
+   "citations": [
+    {
+     "file": "src/cli.js",
+     "lines": "9-20",
+     "text": "  `\n\tUsage\n    $ mcp-cli\n    $ mcp-cli --config [config.json]\n    $ mcp-cli [--pass-env] npx <package-name> <args>\n    $ mcp-cli [--pass-env] node path/to/server/index.js args...\n    $ mcp-cli --url http://localhost:8000/mcp\n    $ mcp-cli --sse http://localhost:8000/sse\n    $ mcp-cli purge\n    $ mcp-cli [--config config.json] call-tool <server_name>:<tool_name> [--args '{\"key\":\"value\"}']\n    $ mcp-cli [--config config.json] read-resource <server_name>:<resource_uri>\n    $ mcp-cli [--config config.json] get-prompt <server_name>:<prompt_name> [--args '{\"key\":\"value\"}']"
+    },
+    {
+     "file": "src/mcp.js",
+     "lines": "189-207",
+     "text": "export async function runWithConfigNonInteractive(configPath, serverName, command, target, argsString) {\n  try {\n    const defaultConfigFile = getClaudeConfigPath()\n    const config = await readConfig(configPath || defaultConfigFile, { silent: true })\n    if (!config.mcpServers || isEmpty(config.mcpServers)) {\n      throw new Error('No mcp servers found in config')\n    }\n\n    const serverConfig = config.mcpServers[serverName]\n    if (!serverConfig) {\n      throw new Error(`Server '${serverName}' not found in config`)\n    }\n\n    if (serverConfig.env) {\n      serverConfig.env = { ...serverConfig.env, PATH: process.env.PATH }\n    }\n\n    const transport = new StdioClientTransport(serverConfig)\n    const client = await createClient()"
+    }
+   ],
+   "finding": "CLI tester. Non-interactive mode supports call-tool/read-resource/get-prompt only, always through a StdioClientTransport built from the config entry (an HTTP entry cannot be called non-interactively); listing exists only inside the interactive autocomplete prompt. No daemon: every call spawns the server.",
+   "disposition": "used as the reviewed registry alternative in the executed comparison (gaps 6 and 12); not a replacement.",
+   "overturn": "A release with non-interactive list and HTTP call support, re-run on the same call set."
+  },
+  "chrishayuk/mcp-cli": {
+   "commit": [
+    "6d806241be6a4b28186c95cb6e7144864b7cf5d7",
+    "2026-07-30T12:46:48+01:00"
+   ],
+   "version": "0.20.1 (pyproject.toml)",
+   "citations": [
+    {
+     "file": "src/mcp_cli/run_command.py",
+     "lines": "151-173",
+     "text": "async def run_command(\n    async_command: Callable[..., Any],\n    *,\n    config_file: str,\n    servers: list[str],\n    extra_params: dict[str, Any | None],\n) -> Any:\n    \"\"\"\n    Initialise the ToolManager and context, then call *async_command(...)*.\n\n    The *async_command* may itself be `async` **or** synchronous – both work.\n    The ToolManager is always closed, even when the callable raises.\n    \"\"\"\n    tm = None\n    try:\n        server_names = (extra_params or {}).get(\"server_names\")\n        init_timeout = (extra_params or {}).get(\"init_timeout\", 120.0)\n\n        # ------------------------------------------------------------------\n        # build ToolManager  (patch-friendly, see helper)\n        # ------------------------------------------------------------------\n        tm = await _init_tool_manager(\n            config_file, servers, server_names, init_timeout or 120.0"
+    },
+    {
+     "file": "src/mcp_cli/run_command.py",
+     "lines": "205-224",
+     "text": "        # Remove tool_manager and context from call_kwargs since commands get it from context\n        call_kwargs = {}\n\n        # Pass all extra_params to the command\n        if extra_params:\n            call_kwargs.update(extra_params)\n\n        maybe_coro = async_command(**call_kwargs)\n\n        # support sync callables transparently\n        if asyncio.iscoroutine(maybe_coro):\n            return await maybe_coro\n        else:\n            loop = asyncio.get_running_loop()\n            # run in default executor so we don't block the event-loop\n            return await loop.run_in_executor(None, lambda: maybe_coro)\n    finally:\n        if tm:\n            await _safe_close(tm)\n"
+    },
+    {
+     "file": "src/mcp_cli/tools/manager.py",
+     "lines": "218-223",
+     "text": "    async def _initialize_stream_manager(self, namespace: str) -> bool:\n        \"\"\"Initialize StreamManager with detected transport type.\n\n        ENHANCED: Initializes different transport types in parallel for faster startup.\n        \"\"\"\n        self.stream_manager = StreamManager()"
+    },
+    {
+     "file": "src/mcp_cli/tools/manager.py",
+     "lines": "786-800",
+     "text": "        except Exception as e:\n            error_msg = str(e)\n            logger.error(f\"Tool execution failed: {error_msg}\")\n\n            # Classify error for better diagnostics\n            if self._is_connection_error(error_msg):\n                server_name = namespace or await self.get_server_for_tool(tool_name)\n                diag = await self._diagnose_server(server_name)\n                logger.warning(\n                    f\"Connection error for tool {tool_name} \"\n                    f\"(server: {server_name or 'unknown'}). {diag}\"\n                )\n                if diag:\n                    error_msg += f\" ({diag})\"\n"
+    },
+    {
+     "file": "src/mcp_cli/config/defaults.py",
+     "lines": "133-137",
+     "text": "DEFAULT_RECONNECT_ON_FAILURE = True\n\"\"\"Attempt to reconnect when a tool execution fails with a connection error.\"\"\"\n\nDEFAULT_MAX_RECONNECT_ATTEMPTS = 3\n\"\"\"Maximum number of reconnection attempts before giving up.\"\"\""
+    }
+   ],
+   "reconnect_constant_references_in_src": [
+    "src/mcp_cli/config/defaults.py:133",
+    "src/mcp_cli/config/defaults.py:136"
+   ],
+   "reconnect_search_method": "every *.py under src/ scanned case-insensitively for reconnect_on_failure / max_reconnect_attempts; the scan finds the definitions themselves, so it can detect a use site if one exists",
+   "finding": "Python CLI tester/chat client. Each command builds an in-process ToolManager/StreamManager that starts the configured servers and is always closed in `finally` when the command ends; there is no persistent bridge daemon, pid file or socket to go stale. A tool call that fails with a connection error is diagnosed with a health check and the status appended to the error; it is not reconnected. DEFAULT_RECONNECT_ON_FAILURE / DEFAULT_MAX_RECONNECT_ATTEMPTS are defined in config/defaults.py but have no other reference in src/ (outside src/ only examples/safety/tier2_efficiency_demo.py prints them).",
+   "disposition": "rejected for this gap: no persistent daemon, so no stale daemon state to recover; like wong2/mcp-cli it trades recovery for a fresh spawn per invocation. Not used in the executed comparison (wong2 was the reviewed CLI alternative there).",
+   "overturn": "A release that keeps servers alive across invocations (daemon or session reuse) with automatic recovery of that state, or that wires the declared reconnect defaults into the tool-call path."
+  }
+ }
+}

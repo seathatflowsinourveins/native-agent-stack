@@ -1,0 +1,72 @@
+[
+  {
+    "line": 17,
+    "category": "survivorship",
+    "explanation": "Using the September 2026 constituent list throughout history excludes former constituents and includes future entrants before their admission, biasing the historical universe."
+  },
+  {
+    "line": 25,
+    "category": "position_sizing",
+    "explanation": "Average ranks can admit more than ten tied securities, so assigning each a 10% weight can create unintended leverage."
+  },
+  {
+    "line": 25,
+    "category": "risk_metric_error",
+    "explanation": "Unavailable lookback signals become zero positions, causing reported Sharpe ratios to include different amounts of artificial warm-up cash history for different lookbacks."
+  },
+  {
+    "line": 35,
+    "category": "look_ahead",
+    "explanation": "Weights calculated using the current session's closing price are applied to returns ending at that same close, crediting the strategy with returns earned before its signal was available."
+  },
+  {
+    "line": 35,
+    "category": "transaction_costs",
+    "explanation": "The daily rebalanced portfolio incurs no commissions, bid-ask spread, slippage, or market impact, overstating implementable returns."
+  },
+  {
+    "line": 35,
+    "category": "data_quality",
+    "explanation": "Summation skips missing returns and produces zero for wholly missing rows, silently treating unavailable returns as zero contributions instead of resolving missing quotes or delisting outcomes."
+  },
+  {
+    "line": 42,
+    "category": "risk_metric_error",
+    "explanation": "Returning zero whenever volatility is zero misrepresents undefined or infinite Sharpe ratios, including those of constant nonzero returns."
+  },
+  {
+    "line": 43,
+    "category": "risk_metric_error",
+    "explanation": "The reported Sharpe uses raw returns rather than excess returns, implicitly assuming a zero risk-free rate throughout the sample."
+  },
+  {
+    "line": 48,
+    "category": "risk_metric_error",
+    "explanation": "The running peak excludes initial capital before the first return, so drawdowns beginning with an initial loss can be understated."
+  },
+  {
+    "line": 59,
+    "category": "label_leakage_cv",
+    "explanation": "Shuffled cross-validation trains on future observations when evaluating earlier observations, so accuracy does not measure chronological forecasting performance."
+  },
+  {
+    "line": 59,
+    "category": "label_leakage_cv",
+    "explanation": "Splitting individual stock-date rows without date grouping or purging places contemporaneous observations and overlapping forward-label periods in both training and test sets."
+  },
+  {
+    "line": 68,
+    "category": "survivorship",
+    "explanation": "Silently excluding universe members without price columns introduces an additional data-availability selection bias that can remove failed or delisted securities."
+  },
+  {
+    "line": 72,
+    "category": "overfitting_multiple_testing",
+    "explanation": "Selecting the maximum Sharpe across four tested lookbacks and reporting the winner without independent evaluation introduces selection optimism."
+  },
+  {
+    "line": 73,
+    "category": "in_sample_selection",
+    "explanation": "The purported out-of-sample backtest reuses the exact price history used to select its lookback, leaving no held-out performance evaluation."
+  }
+]

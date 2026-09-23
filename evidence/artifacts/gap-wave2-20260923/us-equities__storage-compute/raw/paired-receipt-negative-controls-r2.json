@@ -1,0 +1,16 @@
+[
+ {
+  "control": "bytes",
+  "exit": 1,
+  "failing_checks": [
+   "astra_report_hash_matches_file"
+  ]
+ },
+ {
+  "control": "handoff",
+  "exit": 1,
+  "failing_checks": [
+   "claude_prompt_embeds_accepted_astra_report"
+  ]
+ }
+]

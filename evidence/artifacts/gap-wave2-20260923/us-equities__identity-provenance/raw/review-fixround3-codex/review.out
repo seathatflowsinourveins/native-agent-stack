@@ -1,0 +1,12 @@
+- **P2 — [verify_lineage_fixround3.py:57]($HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/verify_lineage_fixround3.py:57):** `"for o, p in zip(orig, pub)"` assumes publication preserves events and identities. In-memory probes still passed after removing the published select COMPLETE event or collapsing every published run ID. Check event counts and a consistent one-to-one redaction mapping. The retained file itself is correct.
+
+- **P3 — [store_arms.py:678]($HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/store_arms.py:678):** `"t.count(\"CommitFailedException\")"` examines stderr, but the writer catches exceptions into its progress file. An injected commit failure therefore returned zero exception lines. Count progress errors too. Current runs separately record zero writer errors, supporting their results.
+
+All cited raw files and hashes match; quoted results and `results.json` agree with receipts. Preregistrations precede their runs, and late amendments are labelled. The separate `next_check` text was unavailable; judgments below cover retained gap texts and preregistered criteria.
+
+gap 0: agree settled  
+gap 2: agree advanced  
+gap 4: agree settled  
+gap 5: agree settled
+exit=0
+2026-09-23T15:15:43Z

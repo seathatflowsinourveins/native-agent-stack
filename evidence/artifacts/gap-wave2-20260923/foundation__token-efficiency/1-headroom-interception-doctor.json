@@ -1,0 +1,38 @@
+{
+  "id": "1-headroom-interception-doctor",
+  "gap_index": 1,
+  "gap_text_sha256": "c64e0ced1338b0459723122ed92fa48a9c06bb1b3233b020163a498d1f17a76c",
+  "fix_round_disclosure": "Supersedes the first version, which labelled the outcome 'not_settled' even though the routed-interception half of the next_check was never attempted, and which did not disclose that the plain `headroom doctor` call it did run had already contacted the live ~/.headroom store: post-hoc inspection shows $HOME/.headroom/update_check.json's mtime (2026-09-23T01:44:37Z) falls inside this unit's own first-pass run, consistent with `headroom doctor` performing an online update check against the live default store rather than an isolated one. That is disclosed here since it was not disclosed before. The fix round did not attempt the interception half; it recorded a credential blocker that reconciliation found contradicted by Headroom's source (see reconciliation).",
+  "preregistration": {
+    "written_at": null,
+    "expectation": "Start `headroom proxy` with HEADROOM_WORKSPACE_DIR pointed at a disposable directory, then route one bounded model call through it via the documented client-routing env vars (ANTHROPIC_BASE_URL for Claude, OPENAI_BASE_URL for OpenAI-compatible clients per `headroom proxy --help`), then re-run `headroom doctor` (with the same isolated workspace) and check whether it now reports a routed client and nonzero intercepted calls. The Claude account is reserved for another session's long-horizon comparison, so the bounded single call would need to go through Codex instead; check what that requires before attempting it.",
+    "criteria": "Settle only if doctor (against the isolated workspace) shows a routed client with nonzero intercepted calls after one real call through the proxy. If routing turns out to require a resource this session may not use (paid API credential or the reserved Claude account), record deferred with the exact blocker rather than attempting a partial or unsafe workaround.",
+    "written_at_note": "Reconciliation 2026-09-23: timestamps set to null because the recorded values are impossible or unverifiable. First-pass commit 0699663 was made at 2026-09-23T01:49:24Z yet carried first-pass times as late as 01:57Z; fix-round commit f796901 was made at 02:06:06Z yet carried fix-round times as late as 02:22Z. This receipt's file was last written at 02:04:38Z, before the recorded 02:05Z."
+  },
+  "commands": [
+    "headroom proxy --help  (confirms proxy usage: 'ANTHROPIC_BASE_URL=... claude' for Claude, 'OPENAI_BASE_URL=.../v1 your-app' for OpenAI-compatible clients)",
+    "which codex; codex --version  -> codex-cli 0.155.1, present",
+    "env | grep -iE 'OPENAI_API_KEY|ANTHROPIC_API_KEY'  -> no output (neither key is set in this shell)",
+    "stat -c '%Y %n' $HOME/.headroom/ccr_store.db $HOME/.headroom/update_check.json  (baseline check, read-only; used to confirm this receipt's own commands do not touch the live store again)"
+  ],
+  "results": {
+    "proxy_help": "Withdrawn as tool output: the earlier text was a paraphrase, and the `headroom proxy --help` output was not saved. The installed 0.38.0 source shows the usage lines 'Claude Code: ANTHROPIC_BASE_URL=http://{host}:{port} claude' and 'Codex / OpenAI: OPENAI_BASE_URL=http://{host}:{port}/v1 your-app' (headroom/cli/proxy.py:1658-1659), with no upstream key in either line.",
+    "codex_auth": "Withdrawn: the claim that the proxy needs its own upstream API key to forward a ChatGPT-OAuth Codex call is contradicted by the installed Headroom 0.38.0 source. headroom/proxy/auth_policy.py lists 'codex-cli/' and 'claude-code/' in SUBSCRIPTION_UA_PREFIXES and classifies 'sk-ant-oat' or JWT-shaped bearer tokens as AuthMode.OAUTH, i.e. it forwards the client's own subscription credential. headroom/cli/wrap.py:3046-3051 documents that ChatGPT-plan Codex is routed through the proxy by overriding `openai_base_url`; for one call this can be passed with `codex exec -c openai_base_url=...` without a config write.",
+    "no_key_present": "Confirmed no OPENAI_API_KEY or ANTHROPIC_API_KEY is set in this shell; nothing to read or use even inadvertently."
+  },
+  "outcome": "not_settled",
+  "evidence_class": "source_review",
+  "limits": [
+    "No proxy was started and no client call was routed in either pass.",
+    "The earlier `headroom doctor` call in this unit's first pass ran against the live default store: $HOME/.headroom/update_check.json has mtime 2026-09-23T01:44:37Z, before first-pass commit 0699663 (01:49:24Z). The single `stat` of that store in the fix round is a read; the stat outputs were not saved.",
+    "Source citations were re-read from the installed tree at $HOME/.local/share/codex-ecosystem/tools/headroom-ai-0.38.0/uv-tool-dir/headroom-ai/lib/python3.13/site-packages/headroom/ during reconciliation (reading, not executing)."
+  ],
+  "checked_at": null,
+  "not_settled_reason": "The interception half of the next_check (nonzero intercepted calls in the native ledger plus exact retrieve) was runnable here and was not run: one read-only, ephemeral `codex exec` call with a per-invocation `-c openai_base_url=http://127.0.0.1:<port>/v1` override against a loopback proxy started with an isolated HEADROOM_WORKSPACE_DIR. The wave allowed one bounded single call, so 'Claude is excluded' was also too strong. The stated credential blocker was wrong (see results.codex_auth). The matched no-proxy comparison needs a second session. No new check was run during reconciliation.",
+  "checked_at_note": "Reconciliation 2026-09-23: timestamps set to null because the recorded values are impossible or unverifiable. First-pass commit 0699663 was made at 2026-09-23T01:49:24Z yet carried first-pass times as late as 01:57Z; fix-round commit f796901 was made at 02:06:06Z yet carried fix-round times as late as 02:22Z. The recorded 02:08Z is after this file's last write (02:04:38Z) and after commit f796901 (02:06:06Z).",
+  "reconciliation": [
+    "Outcome changed from deferred to not_settled: the credential blocker is contradicted by Headroom 0.38.0 source (auth_policy.py, wrap.py, cli/proxy.py), and the one-call interception check was executable.",
+    "proxy_help was a paraphrase presented as tool output; replaced by exact source-line citations and marked not retained.",
+    "Timestamps set to null with bounds."
+  ]
+}

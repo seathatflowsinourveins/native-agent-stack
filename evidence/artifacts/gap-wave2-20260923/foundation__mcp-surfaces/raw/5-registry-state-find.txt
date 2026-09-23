@@ -1,0 +1,3 @@
+T=$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/mcplist-20260923T042241Z
+T=$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/mcplist-20260923T042313Z
+(end; empty list = no plugin/marketplace state)

@@ -1,0 +1,116 @@
+{
+  "id": "gap-wave2-20260923-scheduling-supervision-6",
+  "gap_index": 6,
+  "gap_text_sha256": "ef99728ab19371ac7799ffd71d89ce00c1717880b75eacec73e3dfc5c0ab4681",
+  "preregistration": {
+    "written_at": "2026-09-22T22:42:40-04:00",
+    "expectation": "Using the same harness as gap 4, run the frozen job-recovery cases on Dagu 2.16.6, Prefect 3.8.6 and a Temporal dev server through one shared oracle and record per-case pass/fail plus setup steps (installs, downloads, processes started) and operational steps (commands to stop/retry/recover).",
+    "criteria": "Settled iff one invocation produced a per-engine per-case pass/fail table for all three engines with setup and operational steps recorded. Dagster and Restate are not in the next_check; they remain unexecuted and are named in limits. Partial table -> advanced.",
+    "committed_before_running": "git commit 7802cab (preregistrations/6.json)"
+  },
+  "commands": [
+    "uv venv $HOME/.cache/gap-wave2-20260923/scheduling-supervision/challengers/prefect-3.8.6 && uv pip install --python .../prefect-3.8.6/bin/python 'prefect==3.8.6'   # network download (PyPI wheel tree)",
+    "uv venv .../challengers/temporalio-1.33.0 && uv pip install --python .../temporalio-1.33.0/bin/python 'temporalio==1.33.0'   # network download (~14 MB wheel + deps)",
+    "curl -sSfL -o temporal_cli_1.9.1_linux_amd64.tar.gz https://github.com/temporalio/cli/releases/download/v1.9.1/temporal_cli_1.9.1_linux_amd64.tar.gz; curl -sSfL -o checksums.txt .../v1.9.1/checksums.txt; sha256sum; tar -xzf   # 45,298,806 B download",
+    "python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/challenger/compare.py --engines temporal --window 60 --work .../cmp-debug-t-1790132113   # development iteration",
+    "python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/challenger/compare.py --engines prefect --window 60 --work .../cmp-debug-p-1790132148   # development iteration: exposed zombie-counting and executor-helper scoping defects in the harness",
+    "python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/challenger/compare.py --engines prefect --window 45 --work .../cmp-debug-p2-1790132347   # development iteration",
+    "python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/challenger/compare.py --engines prefect,dagu --window 30 --work .../cmp-debug-p3-1790132486   # development iteration",
+    "python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/challenger/compare.py --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-run-1790132622 --window 270   # the reported run (all three engines, one invocation)",
+    "fix round 1 (preregistrations/fix-round-1.json (written about 23:26-04:00, after the review of b7aec6b; committed in fdaf6f4 before any rerun)): python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/challenger/compare.py --engines dagu --dagu-recovery none --window 150 --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f1-dagu-prereg-1790134073   # the preregistered Dagu SIGKILL protocol (no scheduler, 150 s)",
+    "fix round 1: python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/challenger/compare.py --engines dagu --dagu-recovery scheduler --window 270 --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f2-dagu-sched-1790134073   # post-hoc scheduler variant, private config scheduler.port 0, listener sampling",
+    "fix round 1: python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/challenger/bound_table.py original-three-engine-run=raw/4-6-three-engine-comparison/result.json fix1-F1-dagu-preregistered=raw/fix1-F1-dagu-sigkill-preregistered-150s/result.json fix1-F2-dagu-scheduler-variant=raw/fix1-F2-dagu-sigkill-scheduler-variant/result.json > raw/fix1-case-table-both-bounds.json"
+  ],
+  "results": [
+    "reported run: started 03:03:46Z, completed 03:12:44Z (raw/4-6-three-engine-comparison/result.json); every case used a fresh copy of the unchanged job-recovery fixture.py (sha256 identical across engines), the unchanged planner and 12-test oracle; checkpoint sha256 59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0 in every engine (the same value as the accepted 2.16.6 receipts)",
+    "case table of the original run, POST-HOC variant (Dagu scheduler started after the kill, 270 s window; not the preregistered protocol, see DEVIATION below; under the preregistered protocol and 150 s bound Dagu sigkill is false) (pass=true): dagu {stop: true, retry: true, checkpoint_reuse: true, sigkill: true}; prefect {stop: true, retry: true, checkpoint_reuse: true, sigkill: false}; temporal {stop: true, retry: true, checkpoint_reuse: true, sigkill: true}",
+    "Dagu 2.16.6: stop -> 'aborted', `dagu retry --run-id --step finalize` -> 'succeeded' (same run id), 4 run-scoped processes retired; SIGKILL (original run, post-hoc variant, see DEVIATION): history stayed 'running'; 11 manual retries refused ('already running. dag-run ID=... socket=/tmp/@dagu_recovery_....sock'); the scheduler started after the kill logged 'Proc entry appears stale' at stale_count 1 and 2, then 'Confirmed zombie DAG run, updated to failed status' 180 s after it started; the 12th retry succeeded; recovery 181.4 s",
+    "Prefect 3.8.6: `prefect flow-run cancel` -> CANCELLED, run-scoped flow subprocess and fixture retired (the runner's multiprocessing resource_tracker helper is excluded as not run-scoped and listed); `prefect flow-run retry <id>` -> COMPLETED on the same flow-run id (run_count 2); task runs: checkpoint Completed + checkpoint Cached (no re-execution; fixture claim count 1), finalize Crashed (cancelled attempt) + finalize Completed. SIGKILL: flow run stayed RUNNING for 287.7 s after restarting the serve runner; 10 `prefect flow-run retry` attempts all refused: \"Flow run '<uuid>' is in state 'RUNNING' and cannot be retried. Only flow runs in terminal states (COMPLETED, FAILED, CANCELLED, CRASHED) can be retried.\"; no completed effect, checkpoint still executed once",
+    "Temporal (CLI 1.9.1 / Server 1.32.0, temporalio 1.33.0): `temporal workflow cancel` -> CANCELED (the adapter's activity terminated the fixture subprocess on cancellation); retry = `temporal workflow reset --event-id 10` (first WorkflowTaskCompleted after the checkpoint ActivityTaskCompleted, event 7) -> COMPLETED with a new run id under the same workflow id; SIGKILL of the worker tree: starting a new worker was the only operational step; the server retried the finalize activity after its 5 s heartbeat timeout; COMPLETED 15.1 s after recovery began; checkpoint once",
+    "setup observations: Prefect server healthy after 7.0 s (loopback, sqlite under the work dir); Temporal dev server healthy after 2.3 s (loopback, --headless, sqlite file); Dagu needs no server for stop/retry and a scheduler process for zombie reclamation",
+    "helper integrity: raw/executed-vs-committed-helpers.json shows each committed challenger script is identical to the executed one, or identical after the inverse of the post-run home-path substitution (compare.py)",
+    "DEVIATION (late label, fix round 1): preregistrations/4.json bounded the SIGKILL recovery attempt at 150 s and expected Dagu's recovery to be refused without a scheduler. The original reported run instead started a Dagu scheduler after the kill and used --window 270 (then the compare.py default). The scheduler was already in the harness at the first Dagu debug iteration (cmp-debug-p3, window 30: Dagu sigkill=false, run still 'running' at 30.3 s), so it was not chosen after a Dagu result but departs from the preregistration; the 270 s window was chosen after cmp-debug-p3 had been seen. The original receipts labelled neither change. Dagu's original SIGKILL pass (181.4 s) depends on both changes.",
+    "case table under the PREREGISTERED protocol and 150 s bound (raw/fix1-case-table-both-bounds.json): dagu {stop: true, retry: true, checkpoint_reuse: true, sigkill: false} (fix-round F1: no scheduler; all 10 `dagu retry --step finalize` attempts over 150.8 s refused with 'already running. dag-run ID=recovery-a0235d718230f171, socket=/tmp/@dagu_recovery_fc5812.sock'; status stayed 'running'; checkpoint executed once, no completed effect); prefect {stop: true, retry: true, checkpoint_reuse: true, sigkill: false} (original run: not recovered at 287.7 s, so also not within 150 s); temporal {stop: true, retry: true, checkpoint_reuse: true, sigkill: true} (original run: recovered in 15.1 s)",
+    "case table under the POST-HOC variant (Dagu scheduler started after the kill, 270 s window): dagu sigkill true in the original run (181.4 s) and again in fix-round F2 (182.6 s; scheduler logged 'Proc entry appears stale' at 23:29:26 and 23:30:11, 'Confirmed zombie DAG run, updated to failed status' at 23:30:56, 180 s after it started; retries 1-11 exit 1, retry 12 exit 0 -> succeeded; checkpoint once, 12/12 tests, completed effect matches); both Dagu recoveries are beyond the preregistered 150 s bound; prefect false; temporal true",
+    "fix-round isolation (F2): scheduler log 'Health check server disabled service=scheduler port=0', no 'Starting health check server'; 36 `ss -Hltnp` samples of the scheduler tree every 5 s across the whole recovery window listed 0 listening sockets; detection validated by a positive control (loopback listener 127.0.0.1:57380 opened by the driver was reported) and raw/fix1-probe-controls.json",
+    "fix-round F1 and F2 also re-scored Dagu stop/retry/checkpoint_reuse: all true in both (same as the original run)",
+    "operational steps per engine: Dagu -- stop: `dagu stop --run-id`; retry: `dagu retry --run-id --step finalize`; SIGKILL: bare retries are refused ('already running') until the stale run is reclaimed; with a `dagu scheduler` running (post-hoc variant) the zombie was confirmed about 180 s after the scheduler started, then retry. Prefect -- run `prefect server start` + a `flow.serve()` runner; stop: `prefect flow-run cancel`; retry: `prefect flow-run retry`; SIGKILL: as configured here (no zombie-flow automation), no recovery path within 270 s without a manual state change. Temporal -- run `temporal server start-dev` + a worker; stop: `temporal workflow cancel`; retry: `temporal workflow show` to find the reset event, then `temporal workflow reset --event-id`; SIGKILL: start a new worker (the 5 s activity heartbeat timeout configured in the adapter drives the retry)."
+  ],
+  "outcome": "advanced",
+  "outcome_detail": "An executed comparison now exists for Dagu 2.16.6, Prefect 3.8.6 and Temporal through one shared oracle, with per-case pass/fail and setup/operational steps. All three passed stop, retry and checkpoint reuse. SIGKILL under the preregistered protocol and 150 s bound: Temporal passed (15 s, by starting a new worker, with the adapter's 5 s activity heartbeat timeout), Dagu failed (no scheduler: retries refused for the whole bound), Prefect failed (run stayed RUNNING). In a post-hoc variant labelled as a deviation (a Dagu scheduler started after the kill, 270 s window), Dagu recovered in about 182 s (twice: 181.4 s and 182.6 s), still beyond the preregistered bound. The recovery setups were not equivalent: Temporal was given its heartbeat timeout and Dagu (in the variant) its scheduler, but Prefect was not given its documented zombie-flow detection (heartbeats plus an automation), so Prefect's SIGKILL failure reflects this configuration, not Prefect's best available recovery. The observed result does not support excluding Temporal on recovery behaviour; its exclusion now rests on the observed operational burden (a server and worker processes, adapter code for subprocess cancellation, reset-based retry), not on an observed failure. Remaining: Dagster and Restate were not executed, so their exclusion still rests on source review; Prefect's SIGKILL case with zombie-flow detection configured is unexecuted.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "One run per engine per scenario for Prefect and Temporal on one WSL2 host; Dagu SIGKILL ran three times (see results). Prefect's zombie-flow detection was not configured (see outcome_detail).",
+    "Protocol deviation: the original run's Dagu scheduler (present from the first Dagu debug iteration) and its 270 s window (chosen after cmp-debug-p3 was seen) were not preregistered; labelled late in fix round 1, which also executed the preregistered protocol. The fix-round preregistration was written after the review and is labelled as such.",
+    "The Temporal port needs adapter code to stop a subprocess on cancellation (heartbeat-driven); Dagu and Prefect stop step processes natively. Temporal's retry is a history reset that creates a new run id under the same workflow id; the oracle's same_native_run_id is recorded by workflow id and the run ids are listed.",
+    "The original run's Dagu scheduler bound its /health server on :8090 on all interfaces for about 3 minutes (and for 30 s in debug iteration cmp-debug-p3, 23:03:05-23:03:35-04:00), departing from the loopback-only rule; fix round 1 disabled it (scheduler.port 0) and verified no listener.",
+    "Four development iterations preceded the original reported run (raw/4-6-debug-iterations/); besides harness defects, the SIGKILL window was raised from 30 s to 270 s after cmp-debug-p3's Dagu result was seen (see the deviation result).",
+    "No model calls, no broker, no paid API; every started process was stopped.",
+    "Unit-level isolation (fix round 2 cross-reference): this receipt's isolation statements cover this gap's own runs only. During fix round 1, between the fix-round preregistration and the F1/F2/F3 reruns, an unquoted heredoc started an unintended `dagu scheduler` (PATH dagu, default config) that wrote state into the default Dagu home $HOME/.local/share/dagu/data and bound :8090 on all interfaces for about 2 min 15 s, and an unintended `codex exec` that was killed while waiting for stdin. Fix round 2 verified that the running host `dagu server` (pid 366, the dagu-equities service) uses DAGU_HOME=$HOME/.local/share/codex-ecosystem/dagu-equities, a different store. See incidents/2026-09-22-fix-round-heredoc-substitution.json.",
+    "Resource rule (fix round 3): the Prefect 3.8.6 tree (104 distributions, 207.9 MB installed including run-time __pycache__) was installed with a plain `uv pip install`, not through ecosystem-bounded-run. The installed size is above the 200 MB figure and the tree is large, so the wave's heavy-build rule applied and was not followed; the compressed download was probably smaller, but its size was not recorded. The temporalio tree is 5 distributions, 56.6 MB installed. Both resolved sets are now recorded (resolved_dependency_sets; raw/fix3/venv-*-freeze.txt), so the environments can be rebuilt with `uv pip install -r` of the freeze files.",
+    "Helper change after execution (fix round 3): dagu_common.py was edited after this receipt's runs. codex_gate() now raises CodexGateTimeout instead of returning when 2 or more other `codex exec` processes still run at max_wait, and codex_exec_processes() also counts `codex <global options> exec` and the `e` alias. The executed revisions named in this receipt are unchanged and remain the ones that ran. Only one gated model call was made in the whole unit (fix-round F3, gap 2); it waited 0 s with 0 other processes counted by the old matcher, so the timeout path was not reached. Whether the broader matcher would have counted more processes at that time cannot be re-observed. Synthetic test: raw/fix3/codex-gate-test.txt."
+  ],
+  "raw_outputs": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/4-6-three-engine-comparison/, evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/4-6-debug-iterations/, evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/executed-vs-committed-helpers.json, raw/fix1-F1-dagu-sigkill-preregistered-150s/, raw/fix1-F2-dagu-sigkill-scheduler-variant/, raw/fix1-case-table-both-bounds.json, raw/fix1-probe-controls.json, raw/fix1-executed-vs-committed-helpers.json",
+  "checked_at": "2026-09-22T23:33:22-04:00",
+  "fix_round_1": {
+    "preregistration": "preregistrations/fix-round-1.json (written about 23:26-04:00, after the review of b7aec6b; committed in fdaf6f4 before any rerun)",
+    "edited_at": "2026-09-22T23:33:22-04:00",
+    "review_findings_addressed": [
+      2,
+      3,
+      6
+    ],
+    "outcome_changed": false
+  },
+  "reconciliation_1": {
+    "edited_at": "2026-09-22T23:42:58-04:00",
+    "review_finding": "minor: the first case-table line reported Dagu sigkill true without naming the post-hoc variant",
+    "change": "the first case-table line and the Dagu SIGKILL line are now labelled as the original run under the post-hoc variant; outcome unchanged; no command was re-run"
+  },
+  "fix_round_2": {
+    "edited_at": "2026-09-23T08:50:58-04:00",
+    "changes": "Receipt text only; no check re-run. Added the unit-level isolation cross-reference."
+  },
+  "resolved_dependency_sets": {
+    "prefect-3.8.6": {
+      "freeze": "raw/fix3/venv-prefect-3.8.6-freeze.txt",
+      "distributions": 104,
+      "installed_bytes_venv": 207874834,
+      "installed_bytes_site_packages": 207823400
+    },
+    "temporalio-1.33.0": {
+      "freeze": "raw/fix3/venv-temporalio-1.33.0-freeze.txt",
+      "distributions": 5,
+      "installed_bytes_venv": 56551093,
+      "installed_bytes_site_packages": 56520872
+    },
+    "recorded_at": "2026-09-23T10:16:13-04:00",
+    "method": "uv 0.12.17 `uv pip freeze --python <venv>/bin/python`, `du -sb`, and `stat` of every *.dist-info directory",
+    "set_is_the_executed_set": "The raw files print three unlabelled epoch lines under a heading that says 'dist-info birth min/max and mtime max (epoch + iso)'; no ISO value is printed. Prefect: 1790131910 on all three lines (2026-09-22T22:51:50-04:00). temporalio: 1790131911 on all three lines (22:51:51-04:00). pyvenv.cfg was born 22:51:49.6 (prefect) and 22:51:50.6 (temporalio). So the dist-info directories were born 22:51:50-22:51:51, the install. The frozen set is the executed set because a reinstall or added package would create a dist-info directory with a later birth, and the newest dist-info birth equals the install time; the comparison started at 23:03 and the first debug iteration at 22:55:13. The separate check headed 'any file in venv modified after newest dist-info birth + 600 s' printed nothing, but its exit status, file filter (whether .pyc was excluded) and a detection control were not recorded, and its 600 s grace window (to about 23:01:51) covers the first debug iterations (cmp-debug-t-1790132113 = 22:55:13). It therefore does not show that no file changed after the install; it adds nothing beyond the dist-info birth argument.",
+    "download_bytes": "Not recorded at install time and not recoverable: the uv cache stores unpacked archives. The installed sizes include __pycache__ written when the engines ran, so they are an upper-bound proxy, not a measured download."
+  },
+  "fix_round_3": {
+    "edited_at": "2026-09-23T10:18:07-04:00",
+    "preregistration": "preregistrations/fix-round-3.json (written 2026-09-23T10:15:57-04:00, before the fix-round-3 observations)",
+    "review_findings_addressed": [
+      3,
+      4
+    ],
+    "changes": "Recorded the resolved dependency sets and installed sizes of the Prefect and temporalio venvs, disclosed that the Prefect install did not go through ecosystem-bounded-run, and added the helper-change limit. No check re-run; outcome unchanged.",
+    "raw_output": [
+      "raw/fix3/venv-prefect-3.8.6-freeze.txt",
+      "raw/fix3/venv-temporalio-1.33.0-freeze.txt",
+      "raw/fix3/MANIFEST.json"
+    ]
+  },
+  "reconciliation_after_review_4": {
+    "edited_at": "2026-09-23T10:26:30-04:00",
+    "review_head": "a5cc403",
+    "finding": "minor: install-time wording and the 600 s modification check overstated",
+    "changes": "Corrected resolved_dependency_sets.set_is_the_executed_set: the dist-info births are 22:51:50 (prefect) and 22:51:51 (temporalio), the raw heading's 'epoch + iso' prints epoch only, and the empty 600 s modification section has no recorded exit status, filter or detection control and its window covers the first debug iterations. The executed-set conclusion rests on the dist-info birth argument alone. No check re-run; outcome unchanged.",
+    "raw_output": [
+      "raw/fix3/venv-prefect-3.8.6-freeze.txt",
+      "raw/fix3/venv-temporalio-1.33.0-freeze.txt"
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "gap_index": 7,
+  "slug": "river-delayed-progressive-validation",
+  "gap_text_sha256": "98cbff30c8450ee30390a648f13b719f8509586da8cc510379c7137e9a7e42d8",
+  "next_check": "Install river in a new prefix, run `evaluate.progressive_val_score` with a label delay on a retained free data stream, and emit a validation report artifact.",
+  "preregistration": {
+    "written_at": "2026-09-23T07:18:31Z",
+    "expectation": "river 0.26.1 in a new uv venv runs evaluate.progressive_val_score over a retained free stream (the hash-pinned bundled LEAN SPY/QQQ/IWM daily files already used by research-evaluation/plan.json) with labels revealed only after the label horizon (delay), and a second run with no delay; a JSON validation report is emitted with checkpoints and final metrics. Expected: both runs exit 0; delayed and immediate metrics differ, showing the delay changes what the model has learned at prediction time.",
+    "criteria": [
+      "Input hashes verified against research-evaluation/plan.json before parsing.",
+      "Stream: one sample per session from 2014-2021Q1; features are trailing close returns known at close t; target is the sign of the open(t+1)->open(t+6) raw-price return (the plan's label); moment = session date; delay = the date of t+6 minus date t (label known at exit). A probe verifies river actually delays: a model whose learn_one records the moment it is called must never learn a label before its delay has elapsed.",
+      "Report: validation-report.json with checkpoints, final metric, sample counts and the delayed-vs-immediate comparison.",
+      "No trading-performance claim: this is a progressive-validation mechanics check."
+    ]
+  }
+}

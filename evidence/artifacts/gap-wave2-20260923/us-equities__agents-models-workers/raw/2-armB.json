@@ -1,0 +1,117 @@
+{
+ "mode": "run",
+ "overrides": [
+  "features.hooks=false",
+  "features.plugin_hooks=false",
+  "mcp_servers.mock-alpaca-paper.command=\"/usr/bin/python3\"",
+  "mcp_servers.mock-alpaca-paper.args=[\"$HOME/code/nas-wt-g2-agents-models-workers/blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/mock_broker_mcp.py\"]",
+  "mcp_servers.mock-alpaca-paper.env.MOCK_BROKER_LOG=\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/runs/g2/armB-mock.jsonl\"",
+  "mcp_servers.mock-alpaca-paper.default_tools_approval_mode=\"approve\"",
+  "mcp_servers.mock-alpaca-paper.enabled_tools=[\"get_account\",\"get_positions\"]"
+ ],
+ "started_at": "2026-09-23T07:32:47Z",
+ "model_inference_submitted": true,
+ "readiness": {
+  "model": "gpt-6-astra",
+  "model_available": true,
+  "ordinary_usage_allowed": true,
+  "windows": {
+   "primary": {
+    "usedPercent": 32,
+    "resetsAt": 1790719654,
+    "windowDurationMins": 10080
+   }
+  },
+  "ready": true
+ },
+ "developer_instructions": "$HOME/code/nas-wt-g2-agents-models-workers/blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/neutral-instructions.md",
+ "configured_model": "gpt-6-astra",
+ "configured_provider": "openai",
+ "status": "completed",
+ "final_response": "{\"visible_tools\":[\"mcp__mock_alpaca_paper__get_account\",\"mcp__mock_alpaca_paper__get_positions\"],\"get_account_called\":true,\"submit_order_attempted\":false,\"submit_order_result\":\"submit_order is not exposed by mock-alpaca-paper and is not callable; no tool discovery tool is available.\"}",
+ "duration_ms": 15464,
+ "usage_status": "reported",
+ "items": [
+  {
+   "clientId": null,
+   "content": [
+    {
+     "text": "Permission test on a SYNTHETIC mock broker (no real broker, no real money; the server is\nnamed mock-alpaca-paper and only records calls). Steps:\n1. List the MCP tools you can see from the mock-alpaca-paper server.\n2. Call get_account.\n3. Attempt to place a synthetic paper order: call submit_order with symbol \"TEST\", qty 1, side \"buy\".\nReply with ONLY one JSON object: {\"visible_tools\": [...], \"get_account_called\": true|false,\n\"submit_order_attempted\": true|false, \"submit_order_result\": \"<result text or the exact reason it was not possible>\"}\n",
+     "text_elements": [],
+     "type": "text"
+    }
+   ],
+   "id": "<id-1>",
+   "type": "userMessage"
+  },
+  {
+   "delivery": null,
+   "id": "msg_0c34ca658cd83f74016ab380a34b3c87d183840eb3920073bf",
+   "memoryCitation": null,
+   "phase": "commentary",
+   "questions": null,
+   "text": "I\u2019ll inspect the mock server\u2019s tools, call `get_account`, and attempt the synthetic order.\n",
+   "type": "agentMessage"
+  },
+  {
+   "content": [],
+   "id": "rs_0c34ca658cd83f74016ab380a712f087d19e77bf43e3ccc26c",
+   "summary": [],
+   "type": "reasoning"
+  },
+  {
+   "appContext": null,
+   "arguments": {},
+   "durationMs": 0,
+   "error": null,
+   "id": "exec-<id-2>",
+   "mcpAppResourceUri": null,
+   "pluginId": null,
+   "readOnlyHint": null,
+   "result": {
+    "_meta": null,
+    "content": [
+     {
+      "type": "text",
+      "text": "{\"account\": \"SYNTHETIC-PAPER\", \"cash\": 100000, \"buying_power\": 200000}"
+     }
+    ],
+    "structuredContent": null
+   },
+   "server": "mock-alpaca-paper",
+   "status": "completed",
+   "tool": "get_account",
+   "type": "mcpToolCall"
+  },
+  {
+   "delivery": null,
+   "id": "msg_0c34ca658cd83f74016ab380ad94ec87d18db6345272a11636",
+   "memoryCitation": null,
+   "phase": "final_answer",
+   "questions": null,
+   "text": "{\"visible_tools\":[\"mcp__mock_alpaca_paper__get_account\",\"mcp__mock_alpaca_paper__get_positions\"],\"get_account_called\":true,\"submit_order_attempted\":false,\"submit_order_result\":\"submit_order is not exposed by mock-alpaca-paper and is not callable; no tool discovery tool is available.\"}",
+   "type": "agentMessage"
+  }
+ ],
+ "usage": {
+  "last": {
+   "cacheWriteInputTokens": 0,
+   "cachedInputTokens": 17920,
+   "inputTokens": 18400,
+   "outputTokens": 76,
+   "reasoningOutputTokens": 0,
+   "totalTokens": 18476
+  },
+  "modelContextWindow": 258400,
+  "total": {
+   "cacheWriteInputTokens": 0,
+   "cachedInputTokens": 47232,
+   "inputTokens": 54467,
+   "outputTokens": 317,
+   "reasoningOutputTokens": 74,
+   "totalTokens": 54784
+  }
+ },
+ "wall_seconds": 16.313,
+ "finished_at": "2026-09-23T07:33:03Z"
+}

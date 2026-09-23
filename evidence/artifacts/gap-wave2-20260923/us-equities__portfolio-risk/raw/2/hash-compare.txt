@@ -1,0 +1,13 @@
+installed_path=$HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-lock/lib/python3.13/site-packages/skfolio/model_selection/_walk_forward.py
+installed_sha256=f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397
+installed_dist=1.2.9
+receipt_walkforward_source_sha256=f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397
+upstream_repo_head_fetched=9032831cb7a38998c175cd3ab842767c5aa23dc3
+git_show[c99fcf71349e2df4a7a1033ee85ca2e9ced9abee]_sha256=f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397
+git_show[v1.3.0]_sha256=f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397
+git_show[b500f88~1]_sha256=0a881afbbd320f102c7f873d0c2e29b1e31e325b7025079775d92f6dd863a3cc
+c99fcf71_is_tag=v1.2.9
+diff_installed_vs_c99fcf71:
+identical
+diff_installed_vs_b500f88~1 (negative control):
+8

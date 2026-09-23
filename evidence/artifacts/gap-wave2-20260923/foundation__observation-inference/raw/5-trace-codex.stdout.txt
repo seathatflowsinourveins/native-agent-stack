@@ -1,0 +1,137 @@
+{
+ "codex_exit_code": 0,
+ "services_after": [
+  "codex_exec"
+ ],
+ "search_spans": 681,
+ "search_trace_ids": [
+  "239356db2d0567727f3f4f8c61c5b333",
+  "33adc7e3da1b3ecb6b8561b94b177d87",
+  "34c92129e93d03f7f02ccdba355508b0",
+  "3df66994852bad1b85b4bd22432f8c1c",
+  "4a64e006dc91dc417995844f60624efa",
+  "4f8cdac35da0cba74b9164fce950afde",
+  "76146a2e1bf217a6447a68a2be50f9b3",
+  "844703bed776b005c5205245c16d28e5",
+  "878fcc2fb6e44df41a69903c415bf84f",
+  "8d4e69d7aea5184f7805d1002d3f8236",
+  "9240f4c6346986d9844ccb176d7bc59f",
+  "ad895f1f3c94c594970daf889f48a5a1",
+  "b5c1ec14aa17e8604cdcadeb003ddc37",
+  "baf266a46172da8a98c3d20b759437e5",
+  "c333860486cc55531ba1105802a81db1",
+  "c5317dafa1f1e6c797fa5c521c4ebb5f",
+  "d2de6e44d5f3ce27ef958fc869ff1748"
+ ],
+ "fetched_by_id": [
+  {
+   "trace_id": "239356db2d0567727f3f4f8c61c5b333",
+   "v3_http": 200,
+   "v3_spans": 2,
+   "legacy_http": 200,
+   "legacy_spans": 2,
+   "attribute_keys": [
+    "busy_ns",
+    "code.file.path",
+    "code.line.number",
+    "code.module.name",
+    "environment_count",
+    "environment_id",
+    "idle_ns",
+    "non_blocking",
+    "target",
+    "thread.id",
+    "thread.name"
+   ],
+   "contains_codex_thread_id": false
+  },
+  {
+   "trace_id": "33adc7e3da1b3ecb6b8561b94b177d87",
+   "v3_http": 200,
+   "v3_spans": 198,
+   "legacy_http": 200,
+   "legacy_spans": 198,
+   "attribute_keys": [
+    "busy_ns",
+    "code.file.path",
+    "code.line.number",
+    "code.module.name",
+    "idle_ns",
+    "plugins_enabled",
+    "sandboxed",
+    "target",
+    "thread.id",
+    "thread.name"
+   ],
+   "contains_codex_thread_id": false
+  },
+  {
+   "trace_id": "34c92129e93d03f7f02ccdba355508b0",
+   "v3_http": 200,
+   "v3_spans": 1,
+   "legacy_http": 200,
+   "legacy_spans": 1,
+   "attribute_keys": [
+    "busy_ns",
+    "code.file.path",
+    "code.line.number",
+    "code.module.name",
+    "idle_ns",
+    "target",
+    "thread.id",
+    "thread.name",
+    "turn.id"
+   ],
+   "contains_codex_thread_id": true
+  },
+  {
+   "trace_id": "3df66994852bad1b85b4bd22432f8c1c",
+   "v3_http": 200,
+   "v3_spans": 4,
+   "legacy_http": 200,
+   "legacy_spans": 4,
+   "attribute_keys": [
+    "busy_ns",
+    "code.file.path",
+    "code.line.number",
+    "code.module.name",
+    "codex.op",
+    "idle_ns",
+    "submission.id",
+    "target",
+    "thread.id",
+    "thread.name",
+    "thread_id"
+   ],
+   "contains_codex_thread_id": true
+  },
+  {
+   "trace_id": "4a64e006dc91dc417995844f60624efa",
+   "v3_http": 200,
+   "v3_spans": 2,
+   "legacy_http": 200,
+   "legacy_spans": 2,
+   "attribute_keys": [
+    "@jaeger@warnings",
+    "app_server.api_version",
+    "app_server.client_name",
+    "app_server.client_version",
+    "app_server.connection_id",
+    "busy_ns",
+    "code.file.path",
+    "code.line.number",
+    "code.module.name",
+    "idle_ns",
+    "key",
+    "rpc.method",
+    "rpc.request_id",
+    "rpc.system",
+    "rpc.transport",
+    "target",
+    "thread.id",
+    "thread.name"
+   ],
+   "contains_codex_thread_id": true
+  },
+  {
+   "trace_id": "

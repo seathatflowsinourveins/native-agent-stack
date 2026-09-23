@@ -1,0 +1,46 @@
+{
+ "written_at": "2026-09-23T04:22:33Z",
+ "note": "Preregistrations written before any check in this unit ran; committed before results.",
+ "gaps": {
+  "1": {
+   "expectation": "Alpaca's public corporate-actions contract (OpenAPI/docs) and the alpaca-py CashDividend model expose no currency field; the retained 2026-09-20 private actions bodies also carry no currency key. A fresh credentialed AAPL request cannot run in this unit (credential reads and broker/paper contact belong to sota-workflow-resolution).",
+   "criteria": "settled only if a fresh credentialed raw AAPL capture is retained AND the currency result or a USD assumption is recorded in the catalog; advanced if public schema + installed-model + retained-capture key inspection establish the field result and a documented USD assumption is drafted for coordinator integration; detection method: key-name scan of JSON (recursive) that reports every key, so a present 'currency' key would be listed."
+  },
+  "12": {
+   "expectation": "Same evidence as gap 1 (shared capture).",
+   "criteria": "Same as gap 1; outcome mirrors gap 1."
+  },
+  "4": {
+   "expectation": "Latest alpaca-py on PyPI is newer than 0.44.0. Unchanged tests: the three native-seam tests fail with alpaca_sdk_version_mismatch (pin guard works). With the version pin lifted in a temp copy only, _session is still a requests.Session, _retry still exists, and all tests in tests/test_alpaca_historical.py pass.",
+   "criteria": "settled if the latest version is installed in a new prefix, the unchanged suite result is recorded, the pin-lifted copy runs every test with 0 skips and the seams resolve by attribute inspection; the 429/302 single-attempt test is the detection method for a retry seam that no longer disables retries (a retried 429 adds a capture and fails the assertion). not_settled if any seam test fails on the latest SDK."
+  },
+  "5": {
+   "expectation": "A new parameterized comparator (provider, symbols, session range) reproduces the original compare.py AAPL 25-session output field-for-field (bars 25/25 equal, max diff 0.00; actions numeric 2, unknown_currency 1) and scores a second symbol from the retained broad-market Alpaca raw daily parquet against LEAN's bundled raw daily data.",
+   "criteria": "settled if (a) the AAPL result JSON equals original compare.py output except the comparison_code hash, (b) a second symbol is scored with nonzero compared sessions, and (c) a provider-neutral normalized-file arm exists so a Databento/Massive export needs no new code; negative control: perturbing one close must flip status to differences (detection)."
+  },
+  "6": {
+   "expectation": "exchange_calendars and pandas_market_calendars agree on XNAS/NASDAQ and ARCX (NYSE Arca uses the NYSE holiday schedule) sessions 2016-2027; pmc NYSE pre/post extended schedule yields 04:00-09:30 and 16:00-20:00 ET boundaries; NYSE's published holiday page lists 2026-2028 holidays that match both libraries. Halts are not modelled by either library.",
+   "criteria": "advanced (not settled) expected because security-specific halts cannot be covered by calendar libraries; settled only if venues, extended hours, future schedules AND halts are all covered with evidence."
+  },
+  "14": {
+   "expectation": "Both libraries include the ad-hoc closures 2018-12-05 and 2025-01-09; NYSE published page corroborates future holidays/early closes; pmc pre/post boundaries recorded. Security-specific halts remain uncovered.",
+   "criteria": "advanced unless halts are also covered; detection: each ad-hoc closure date is tested for absence from each library's session list and a date known to be a session is used as a positive control."
+  },
+  "7": {
+   "expectation": "Alpaca's customer agreement / market data terms contain a non-redistribution or personal-use clause for market data; SEC states sec.gov information is public and may be copied/redistributed, subject to fair-access (rate limit, User-Agent) rules.",
+   "criteria": "settled if dated fetches of both parties' primary documents are retained (sha256) and the storage and redistribution clauses are quoted; advanced if either party's clause cannot be located in a primary document."
+  },
+  "8": {
+   "expectation": "Feast installs in a new prefix and a local offline-store point-in-time join fixture returns the as-of feature value (never a future value). Alpaca news fetch is deferred (credentials/broker lane owned by sota-workflow-resolution). Macro-vintage, stream-ingestion and server-store terms remain without native evidence.",
+   "criteria": "advanced if the Feast PIT fixture passes with a leakage negative control (a feature row timestamped after the entity event must not be joined); settled only if news, macro-vintage, stream, server-store AND PIT all get native evidence."
+  },
+  "17": {
+   "expectation": "SEC-API-io/sec-api-python is an MIT-licensed thin client for the commercial sec-api.io paid API; disposition: reject/keep-out for the SEC acquisition requirement because EdgarTools/direct EDGAR are free primary sources and sec-api requires a paid key.",
+   "criteria": "settled if repo metadata, latest release/tag, license and README are retrieved and a disposition with reasons is recorded; otherwise advanced."
+  },
+  "18": {
+   "expectation": "Rossod4/quantlab is a small personal project with little activity and no data-reference scope beyond what the catalog already covers; disposition: do not adopt.",
+   "criteria": "settled if repo metadata, releases, license, recent activity and README/tree are retrieved and a disposition recorded; if the repository is missing, record that fact as the disposition evidence."
+  }
+ }
+}

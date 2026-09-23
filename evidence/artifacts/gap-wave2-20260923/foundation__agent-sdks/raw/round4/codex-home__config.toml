@@ -1,0 +1,30 @@
+# Round 4: fresh CODEX_HOME, no auth.json; the only model provider is the loopback vLLM.
+model = "qwen3-4b"
+model_provider = "localvllm"
+approval_policy = "never"
+web_search = "disabled"
+
+[model_providers.localvllm]
+name = "local vLLM (loopback)"
+base_url = "http://127.0.0.1:28431/v1"
+wire_api = "responses"
+
+[features]
+hooks = false
+plugins = false
+remote_plugin = false
+apps = false
+skill_mcp_dependency_install = false
+
+[analytics]
+enabled = false
+
+[otel]
+exporter = "none"
+metrics_exporter = "none"
+
+[projects."$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-codex-events"]
+trust_level = "trusted"
+
+[projects."$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-codex-events2"]
+trust_level = "trusted"

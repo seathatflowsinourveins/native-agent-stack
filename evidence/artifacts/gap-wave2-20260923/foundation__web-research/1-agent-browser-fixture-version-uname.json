@@ -1,0 +1,38 @@
+{
+ "id": "gap1-agent-browser-fixture-version-uname",
+ "gap_index": 1,
+ "gap_text_sha256": "9d69ac9fcba15af7a8586461461284b7480f7637a0692c4db82d45e92f4ca66c",
+ "preregistration": {
+  "written_at": "2026-09-23T01:40:00Z",
+  "expectation": "Rerunning the existing desktop-cli-workflows agent-browser fixture (fixtures/greeting.html) in this environment with `agent-browser --version` and `uname -srm` captured in the same log will close the missing-version gap.",
+  "criteria": "The rerun reproduces the fixture's original outcome (status text 'Hello, <name>!') with all commands exit 0, and both version and host OS strings are present in the same artifact.",
+  "written_late": true,
+  "written_late_note": "FIX ROUND: written_at is identical to checked_at (rounded to the same minute) in the original submission, which cannot demonstrate the preregistration preceded execution. It is relabelled late here: the expectation/criteria below were drafted as part of planning this check but recorded concurrently with, not strictly before, the run."
+ },
+ "commands": [
+  "agent-browser --version",
+  "uname -srm",
+  "agent-browser open file://.../fixtures/greeting.html",
+  "agent-browser snapshot -i",
+  "agent-browser fill '#name' 'Gap Wave 2'",
+  "agent-browser click '#greet'",
+  "agent-browser get text '#status'",
+  "agent-browser close"
+ ],
+ "results": {
+  "version": "agent-browser 0.38.1",
+  "host_os": "Linux 6.18.33.2-microsoft-standard-WSL2 x86_64",
+  "final_status_text": "Hello, Gap Wave 2!",
+  "all_exit_codes_zero": true,
+  "full_log_excerpt": "=== agent-browser --version ===\nagent-browser 0.38.1\n=== uname -srm ===\nLinux 6.18.33.2-microsoft-standard-WSL2 x86_64\n=== open ===\n[agent-browser] launched browser\n\u2713 Local browser command check\n  file://~/code/nas-wt-g2-web-research/fixtures/greeting.html\nexit=0\n=== snapshot ===\n- heading \"Local browser command check\" [level=1, ref=e1]\n- textbox \"Name\" [ref=e2]\n- button \"Greet\" [ref=e3]\nexit=0\n=== fill ===\n\u2713 Done\nexit=0\n=== click ===\n\u2713 Done\nexit=0\n=== get text ===\nHello, Gap Wave 2!\nexit=0\n=== close ===\n\u2713 Browser closed\nexit=0\n",
+  "full_log_excerpt_redaction_note": "FIX ROUND: this excerpt is REDACTED, not a verbatim quote. The raw log (raw/gap1-agent-browser-rerun.log, itself redacted the same way for publication) has `file://<home>/code/nas-wt-g2-web-research/fixtures/greeting.html` on the 'open' line, where `<home>` was this host's absolute home directory; it was rewritten here to `file://~/code/...` for privacy, which is not a syntactically valid file URL. The functional content (exit codes, version, OS string, status text) is unchanged by the redaction."
+ },
+ "outcome": "settled",
+ "outcome_detail": "The fixture was rerun end to end with all operations exit 0, and the same receipt now carries the tool version (0.38.1, matching the pin) and host OS (Linux 6.18.33.2-microsoft-standard-WSL2 x86_64) alongside the functional result.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "Confirms the pin matches this host's installed binary; does not re-verify the pin against upstream's latest release.",
+  "The full_log_excerpt's file:// path was redacted for privacy (see full_log_excerpt_redaction_note) and is not a byte-for-byte quote of the raw log."
+ ],
+ "checked_at": "2026-09-23T01:40:00Z"
+}

@@ -1,0 +1,137 @@
+{
+  "built": {
+    "counts": {
+      "assets": 1,
+      "bars": 9
+    },
+    "eligibility": {
+      "at_first_observation": {
+        "case_id": null,
+        "count": 2,
+        "cutoff_ns": "1789905600000000101",
+        "historical_universe_eligible": false,
+        "qualified_count": 2,
+        "quarantined_count": 0,
+        "selected_rows_sha256": "f70cd630e4f49693c47e920823ef6c9d15db4a84c2ae2ce6e5d141a2973d7540"
+      },
+      "at_last_observation": {
+        "case_id": null,
+        "count": 9,
+        "cutoff_ns": "1789905600000000601",
+        "historical_universe_eligible": false,
+        "qualified_count": 8,
+        "quarantined_count": 1,
+        "selected_rows_sha256": "c5e7ff2514494ac124e64da2419b21e7ceb3bd4bd4fccff44ded3191dec0ace0"
+      },
+      "before_first_observation": {
+        "case_id": null,
+        "count": 0,
+        "cutoff_ns": "1789905600000000100",
+        "historical_universe_eligible": false,
+        "qualified_count": 0,
+        "quarantined_count": 0,
+        "selected_rows_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      },
+      "historical": {
+        "case_id": null,
+        "count": 0,
+        "cutoff_ns": "1654905600000000000",
+        "historical_universe_eligible": false,
+        "qualified_count": 0,
+        "quarantined_count": 0,
+        "selected_rows_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      },
+      "historical_replay": {
+        "case_id": null,
+        "count": 0,
+        "cutoff_ns": "1654905600000000000",
+        "historical_universe_eligible": false,
+        "qualified_count": 0,
+        "quarantined_count": 0,
+        "selected_rows_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      }
+    },
+    "historical_identity_established": false,
+    "manifest_sha256": "93dbc5312fdd80e8f3ac5181f2a46fc22576967549a066e0f24b809e2616ae02",
+    "provider_revision_availability_established": false,
+    "source_statuses": {
+      "fb_mapped": {
+        "normalization_status": "passed",
+        "source_status": "complete",
+        "status": "complete",
+        "summary": {
+          "documentation_discrepancy_rows": 0,
+          "pages": 2,
+          "qualified_rows": 3,
+          "quarantined_rows": 0,
+          "query_complete": true,
+          "rows": 3,
+          "session_dates": [
+            "2022-06-08",
+            "2022-06-09",
+            "2022-06-10"
+          ]
+        }
+      },
+      "fb_unmapped": {
+        "normalization_status": "passed",
+        "source_status": "complete",
+        "status": "complete",
+        "summary": {
+          "documentation_discrepancy_rows": 0,
+          "pages": 1,
+          "qualified_rows": 1,
+          "quarantined_rows": 0,
+          "query_complete": true,
+          "rows": 1,
+          "session_dates": [
+            "2022-06-08"
+          ]
+        }
+      },
+      "meta_current": {
+        "status": "complete",
+        "summary": {
+          "pages": 1,
+          "rows": 1
+        }
+      },
+      "meta_mapped": {
+        "normalization_status": "passed",
+        "source_status": "complete",
+        "status": "complete",
+        "summary": {
+          "documentation_discrepancy_rows": 0,
+          "pages": 2,
+          "qualified_rows": 3,
+          "quarantined_rows": 0,
+          "query_complete": true,
+          "rows": 3,
+          "session_dates": [
+            "2022-06-08",
+            "2022-06-09",
+            "2022-06-10"
+          ]
+        }
+      },
+      "meta_unmapped": {
+        "normalization_status": "passed",
+        "source_status": "failed",
+        "status": "partial",
+        "summary": {
+          "documentation_discrepancy_rows": 1,
+          "pages": 1,
+          "qualified_rows": 1,
+          "quarantined_rows": 1,
+          "query_complete": false,
+          "rows": 2,
+          "session_dates": [
+            "2022-06-08",
+            "2022-06-09"
+          ]
+        }
+      }
+    }
+  },
+  "manifest_sha256": "93dbc5312fdd80e8f3ac5181f2a46fc22576967549a066e0f24b809e2616ae02"
+}

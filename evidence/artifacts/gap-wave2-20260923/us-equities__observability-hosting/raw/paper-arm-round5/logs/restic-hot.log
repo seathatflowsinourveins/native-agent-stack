@@ -1,0 +1,13 @@
+using temporary cache in $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/work/restic-check-cache-1572747307
+create exclusive lock for repository
+load indexes
+check all packs
+check snapshots, trees and blobs
+[0:00] 100.00%  1 / 1 snapshots
+read all data
+[0:00] 100.00%  1 / 1 packs
+no errors were found
+restoring snapshot 71ee12e6 of [$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/work] at 2026-09-23 12:15:51.317571559 -0400 EDT by <user>@<host> to $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/restore-hot
+Summary: Restored 7 files/dirs (0 B) in 0:00
+verifying files in $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/restore-hot
+finished verifying 0 files in $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/restore-hot (took 0s)

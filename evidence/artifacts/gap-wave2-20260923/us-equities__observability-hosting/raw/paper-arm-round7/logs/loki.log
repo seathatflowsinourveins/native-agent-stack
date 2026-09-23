@@ -1,0 +1,218 @@
+level=info ts=2026-09-23T16:22:21.512484515Z caller=main.go:146 msg="Starting Loki" version="(version=3.7.8, branch=release-3.7.x, revision=09e6ce2f)"
+level=info ts=2026-09-23T16:22:21.512519109Z caller=main.go:147 msg="Loading configuration file" filename=$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/cfg/loki.yml
+level=info ts=2026-09-23T16:22:21.553979483Z caller=server.go:397 msg="server listening on addresses" http=127.0.0.1:33100 grpc=127.0.0.1:33101
+level=info ts=2026-09-23T16:22:21.576151839Z caller=table_manager.go:136 index-store=tsdb-2024-01-01 msg="uploading tables"
+level=info ts=2026-09-23T16:22:21.57621063Z caller=table_manager.go:300 index-store=tsdb-2024-01-01 msg="query readiness setup completed" duration=1.7µs distinct_users_len=0 distinct_users=
+level=info ts=2026-09-23T16:22:21.576232726Z caller=shipper.go:165 index-store=tsdb-2024-01-01 msg="starting index shipper in RW mode"
+level=info ts=2026-09-23T16:22:21.576767041Z caller=head_manager.go:313 index-store=tsdb-2024-01-01 component=tsdb-head-manager msg="loaded wals by period" groups=0
+level=info ts=2026-09-23T16:22:21.576785538Z caller=manager.go:86 index-store=tsdb-2024-01-01 component=tsdb-manager msg="loaded leftover local indices" err=null successful=true buckets=0 indices=0 failures=0
+level=info ts=2026-09-23T16:22:21.576793936Z caller=head_manager.go:313 index-store=tsdb-2024-01-01 component=tsdb-head-manager msg="loaded wals by period" groups=0
+level=info ts=2026-09-23T16:22:21.578297696Z caller=worker.go:134 component=querier msg="Starting querier worker using query-scheduler and scheduler ring for addresses"
+level=info ts=2026-09-23T16:22:21.579364925Z caller=mapper.go:47 msg="cleaning up mapped rules directory" path=$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/data/loki/rules-temp
+level=info ts=2026-09-23T16:22:22.697277551Z caller=module_service.go:82 msg=starting module=server
+level=info ts=2026-09-23T16:22:22.697273951Z caller=module_service.go:82 msg=starting module=cache-generation-loader
+level=info ts=2026-09-23T16:22:22.697307146Z caller=module_service.go:82 msg=starting module=memberlist-kv
+level=info ts=2026-09-23T16:22:22.697317144Z caller=module_service.go:82 msg=starting module=query-frontend-tripperware
+level=info ts=2026-09-23T16:22:22.69734204Z caller=module_service.go:82 msg=starting module=store
+level=info ts=2026-09-23T16:22:22.697363337Z caller=module_service.go:82 msg=starting module=ring
+level=info ts=2026-09-23T16:22:22.697359837Z caller=module_service.go:82 msg=starting module=query-scheduler-ring
+level=info ts=2026-09-23T16:22:22.697444724Z caller=ring.go:390 msg="ring doesn't exist in KV store yet"
+level=info ts=2026-09-23T16:22:22.697465421Z caller=ring.go:390 msg="ring doesn't exist in KV store yet"
+level=info ts=2026-09-23T16:22:22.697476119Z caller=module_service.go:82 msg=starting module=analytics
+level=info ts=2026-09-23T16:22:22.697480818Z caller=basic_lifecycler.go:324 msg="instance not found in the ring" instance=<host> ring=scheduler
+level=info ts=2026-09-23T16:22:22.697492816Z caller=module_service.go:82 msg=starting module=ingester-querier
+level=info ts=2026-09-23T16:22:22.697493816Z caller=basic_lifecycler_delegates.go:63 msg="not loading tokens from file, tokens file path is empty"
+level=info ts=2026-09-23T16:22:22.697589601Z caller=module_service.go:82 msg=starting module=rule-evaluator
+level=info ts=2026-09-23T16:22:22.697602499Z caller=module_service.go:82 msg=starting module=ruler
+level=info ts=2026-09-23T16:22:22.697616796Z caller=ruler.go:536 msg="ruler up and running"
+level=info ts=2026-09-23T16:22:22.697670288Z caller=ringmanager.go:186 msg="waiting until scheduler is JOINING in the ring"
+level=info ts=2026-09-23T16:22:22.697676787Z caller=ringmanager.go:190 msg="scheduler is JOINING in the ring"
+level=info ts=2026-09-23T16:22:22.697681986Z caller=module_service.go:82 msg=starting module=distributor
+level=info ts=2026-09-23T16:22:22.697691784Z caller=ringmanager.go:199 msg="waiting until scheduler is ACTIVE in the ring"
+level=info ts=2026-09-23T16:22:22.697697883Z caller=module_service.go:82 msg=starting module=compactor
+level=info ts=2026-09-23T16:22:22.69771718Z caller=module_service.go:82 msg=starting module=ingester
+level=info ts=2026-09-23T16:22:22.697732478Z caller=ingester.go:571 component=ingester msg="recovering from checkpoint"
+level=error ts=2026-09-23T16:22:22.697722979Z caller=ratestore.go:110 msg="error getting ingester clients" err="empty ring"
+level=info ts=2026-09-23T16:22:22.697744576Z caller=basic_lifecycler.go:324 component=distributor msg="instance not found in the ring" instance=<host> ring=distributor
+level=info ts=2026-09-23T16:22:22.697773571Z caller=ring.go:390 msg="ring doesn't exist in KV store yet"
+level=info ts=2026-09-23T16:22:22.697768372Z caller=ring.go:390 component=distributor msg="ring doesn't exist in KV store yet"
+level=info ts=2026-09-23T16:22:22.697748575Z caller=checkpoint.go:549 msg="tmp checkpoint cleanup starting"
+level=info ts=2026-09-23T16:22:22.697790869Z caller=basic_lifecycler.go:324 msg="instance not found in the ring" instance=<host> ring=compactor
+level=info ts=2026-09-23T16:22:22.697809066Z caller=basic_lifecycler_delegates.go:63 msg="not loading tokens from file, tokens file path is empty"
+level=info ts=2026-09-23T16:22:22.697826063Z caller=checkpoint.go:554 msg="tmp checkpoint cleanup done" duration=40.593µs success=true
+level=info ts=2026-09-23T16:22:22.69784456Z caller=recovery.go:45 component=ingester msg="no checkpoint found, treating as no-op"
+level=info ts=2026-09-23T16:22:22.697880754Z caller=compactor.go:420 msg="waiting until compactor is JOINING in the ring"
+level=info ts=2026-09-23T16:22:22.697980338Z caller=ingester.go:587 component=ingester msg="recovered WAL checkpoint recovery finished" elapsed=250.56µs errors=false
+level=info ts=2026-09-23T16:22:22.697990737Z caller=ingester.go:593 component=ingester msg="recovering from WAL"
+level=info ts=2026-09-23T16:22:22.698114517Z caller=ingester.go:609 component=ingester msg="WAL segment recovery finished" elapsed=379.439µs errors=false
+level=info ts=2026-09-23T16:22:22.698119816Z caller=ingester.go:557 component=ingester msg="closing recoverer"
+level=info ts=2026-09-23T16:22:22.698124515Z caller=ingester.go:565 component=ingester msg="WAL recovery finished" time=395.136µs
+level=info ts=2026-09-23T16:22:22.698169008Z caller=lifecycler.go:694 component=ingester msg="not loading tokens from file, tokens file path is empty"
+level=info ts=2026-09-23T16:22:22.698174607Z caller=wal.go:173 msg=started component=wal
+level=info ts=2026-09-23T16:22:22.698187905Z caller=lifecycler.go:721 component=ingester msg="instance not found in ring, adding with no tokens" ring=ingester
+level=info ts=2026-09-23T16:22:22.698225699Z caller=lifecycler.go:562 component=ingester msg="auto-joining cluster after timeout" ring=ingester
+level=info ts=2026-09-23T16:22:22.69834588Z caller=ingester.go:778 component=ingester msg="sleeping for initial delay before starting periodic flushing" delay=17.865059404s
+level=info ts=2026-09-23T16:22:22.814124209Z caller=ringmanager.go:203 msg="scheduler is ACTIVE in the ring"
+level=info ts=2026-09-23T16:22:22.8141826Z caller=module_service.go:82 msg=starting module=query-scheduler
+level=info ts=2026-09-23T16:22:22.814234991Z caller=module_service.go:82 msg=starting module=querier
+level=info ts=2026-09-23T16:22:22.81424149Z caller=module_service.go:82 msg=starting module=query-frontend
+level=info ts=2026-09-23T16:22:22.835288833Z caller=compactor.go:424 msg="compactor is JOINING in the ring"
+level=info ts=2026-09-23T16:22:22.835418512Z caller=compactor.go:434 msg="waiting until compactor is ACTIVE in the ring"
+level=info ts=2026-09-23T16:22:23.035637178Z caller=compactor.go:438 msg="compactor is ACTIVE in the ring"
+level=info ts=2026-09-23T16:22:23.035702467Z caller=loki.go:615 msg="Loki started" startup_time=6.323677172s
+level=info ts=2026-09-23T16:22:25.814772153Z caller=scheduler.go:658 msg="this scheduler is in the ReplicationSet, will now accept requests."
+level=info ts=2026-09-23T16:22:25.814801352Z caller=worker.go:235 component=querier msg="adding connection" addr=127.0.0.1:33101
+level=info ts=2026-09-23T16:22:28.035907744Z caller=compactor.go:497 msg="this instance has been chosen to run the compactor, starting compactor"
+level=info ts=2026-09-23T16:22:28.035985741Z caller=tables_manager.go:70 msg="waiting 10m0s for ring to stay stable and previous compactions to finish before starting compactor"
+level=info ts=2026-09-23T16:22:32.815144868Z caller=frontend_scheduler_worker.go:106 msg="adding connection to scheduler" addr=127.0.0.1:33101
+level=info ts=2026-09-23T16:22:52.698350054Z caller=recalculate_owned_streams.go:49 msg="starting recalculate owned streams job"
+level=info ts=2026-09-23T16:22:52.698386354Z caller=recalculate_owned_streams.go:63 msg="detected ring changes, re-evaluating streams ownership"
+level=info ts=2026-09-23T16:22:52.698393254Z caller=recalculate_owned_streams.go:52 msg="completed recalculate owned streams job"
+level=info ts=2026-09-23T16:23:21.576268425Z caller=table_manager.go:136 index-store=tsdb-2024-01-01 msg="uploading tables"
+level=info ts=2026-09-23T16:23:22.698334272Z caller=recalculate_owned_streams.go:49 msg="starting recalculate owned streams job"
+level=info ts=2026-09-23T16:23:22.698361672Z caller=recalculate_owned_streams.go:52 msg="completed recalculate owned streams job"
+level=info ts=2026-09-23T16:23:25.154344019Z caller=roundtrip.go:412 org_id=fake msg="executing query" type=range query="{service_name=\"paper-obsgap-20260923\"} |= \"obsgap-paper-162216\"" start=2026-09-23T15:23:25Z end=2026-09-23T16:23:25.15420692Z start_delta=1h0m0.154339519s end_delta=132.699µs length=1h0m0.15420692s step=14000 query_hash=2313442636
+level=info ts=2026-09-23T16:23:25.156018109Z caller=table_manager.go:195 index-store=tsdb-2024-01-01 msg="get or create table" found=false table=index_20719 wait_for_lock=300ns
+level=info ts=2026-09-23T16:23:25.156013009Z caller=table_manager.go:195 index-store=tsdb-2024-01-01 msg="get or create table" found=false table=index_20719 wait_for_lock=11.4µs
+level=info ts=2026-09-23T16:23:25.156031908Z caller=table_manager.go:205 index-store=tsdb-2024-01-01 msg="downloading all files for table" table=index_20719
+ts=2026-09-23T16:23:25.156336107Z caller=spanlogger.go:152 table-name=index_20719 user=fake level=info msg="init index set" duration=80.1µs success=true
+ts=2026-09-23T16:23:25.156346907Z caller=spanlogger.go:152 table-name=index_20719 user=fake level=info msg="downloaded index set at query time" duration=80.1µs
+ts=2026-09-23T16:23:25.156454606Z caller=spanlogger.go:152 table-name=index_20719 user-id=fake user=fake level=info msg="init index set" duration=59.8µs success=true
+ts=2026-09-23T16:23:25.156462506Z caller=spanlogger.go:152 table-name=index_20719 user-id=fake user=fake level=info msg="downloaded index set at query time" duration=59.8µs
+level=info ts=2026-09-23T16:23:25.157070002Z caller=metrics.go:457 org_id=fake latency=fast query_type=stats start=2026-09-23T11:59:30-04:00 end=2026-09-23T12:23:25-04:00 start_delta=23m55.157063702s end_delta=157.063902ms length=23m55s duration=1.234092ms status=200 query="{service_name=\"paper-obsgap-20260923\"}" query_hash=1922443343 total_entries=1
+level=info ts=2026-09-23T16:23:25.157137102Z caller=metrics.go:457 org_id=fake latency=fast query_type=stats start=2026-09-23T11:22:55-04:00 end=2026-09-23T12:00:00-04:00 start_delta=1h0m30.157134402s end_delta=23m25.157134602s length=37m5s duration=1.175793ms status=200 query="{service_name=\"paper-obsgap-20260923\"}" query_hash=1922443343 total_entries=1
+level=info ts=2026-09-23T16:23:25.159534587Z caller=engine.go:274 component=querier org_id=fake msg="executing query" query="{service_name=\"paper-obsgap-20260923\"} |= \"obsgap-paper-162216\"" query_hash=2313442636 type=range length=23m25.15420692s step=14s
+level=info ts=2026-09-23T16:23:25.159580886Z caller=engine.go:274 component=querier org_id=fake msg="executing query" query="{service_name=\"paper-obsgap-20260923\"} |= \"obsgap-paper-162216\"" query_hash=2313442636 type=range length=36m35s step=14s
+level=info ts=2026-09-23T16:23:25.160766879Z caller=table_manager.go:195 index-store=tsdb-2024-01-01 msg="get or create table" found=true table=index_20719 wait_for_lock=800ns
+level=info ts=2026-09-23T16:23:25.160994078Z caller=table_manager.go:195 index-store=tsdb-2024-01-01 msg="get or create table" found=true table=index_20719 wait_for_lock=1.6µs
+level=info ts=2026-09-23T16:23:25.161086077Z caller=metrics.go:285 component=querier org_id=fake latency=fast query="{service_name=\"paper-obsgap-20260923\"} |= \"obsgap-paper-162216\"" query_hash=2313442636 query_type=filter range_type=range length=36m35s start_delta=1h0m0.161053077s end_delta=23m25.161053177s step=14s duration=1.444391ms status=200 limit=1000 returned_lines=0 throughput=0B total_bytes=0B total_bytes_structured_metadata=0B lines_per_second=0 total_lines=0 post_filter_lines=0 total_entries=0 store_chunks_download_time=0s queue_time=238.199µs querier_exec_time=1.444391ms splits=0 shards=0 query_referenced_structured_metadata=false pipeline_wrapper_filtered_lines=0 chunk_refs_fetch_time=102.7µs cache_chunk_req=0 cache_chunk_hit=0 cache_chunk_bytes_stored=0 cache_chunk_bytes_fetched=0 cache_chunk_download_time=0s cache_index_req=0 cache_index_hit=0 cache_index_download_time=0s cache_stats_results_req=0 cache_stats_results_hit=0 cache_stats_results_download_time=0s cache_volume_results_req=0 cache_volume_results_hit=0 cache_volume_results_download_time=0s cache_result_req=0 cache_result_hit=0 cache_result_download_time=0s cache_result_query_length_served=0s ingester_chunk_refs=0 ingester_chunk_downloaded=0 ingester_chunk_matches=0 ingester_requests=1 ingester_recv_wait_time=620.396µs ingester_chunk_head_bytes=0B ingester_chunk_compressed_bytes=0B ingester_chunk_decompressed_bytes=0B ingester_post_filter_lines=0 congestion_control_latency=0s index_total_chunks=0 index_post_bloom_filter_chunks=0 index_bloom_filter_ratio=0.00 index_used_bloom_filters=false index_shard_resolver_duration=0s index_bloom_filter_time=0s index_chunk_refs_lookup_time=0s disable_pipeline_wrappers=false has_labelfilter_before_parser=false approx_result_size=2B result_streams_count=0 result_lines_count=0
+level=info ts=2026-09-23T16:23:25.164796354Z caller=metrics.go:285 component=querier org_id=fake latency=fast query="{service_name=\"paper-obsgap-20260923\"} |= \"obsgap-paper-162216\"" query_hash=2313442636 query_type=filter range_type=range length=23m25.15420692s start_delta=23m25.164782654s end_delta=10.575834ms step=14s duration=5.213367ms status=200 limit=1000 returned_lines=312 throughput=19MB total_bytes=101kB total_bytes_structured_metadata=9.2kB lines_per_second=73464 total_lines=383 post_filter_lines=312 total_entries=312 store_chunks_download_time=0s queue_time=14.6µs querier_exec_time=5.213367ms splits=0 shards=0 query_referenced_structured_metadata=false pipeline_wrapper_filtered_lines=0 chunk_refs_fetch_time=93.599µs cache_chunk_req=0 cache_chunk_hit=0 cache_chunk_bytes_stored=0 cache_chunk_bytes_fetched=0 cache_chunk_download_time=0s cache_index_req=0 cache_index_hit=0 cache_index_download_time=0s cache_stats_results_req=0 cache_stats_results_hit=0 cache_stats_results_download_time=0s cache_volume_results_req=0 cache_volume_results_hit=0 cache_volume_results_download_time=0s cache_result_req=0 cache_result_hit=0 cache_result_download_time=0s cache_result_query_length_served=0s ingester_chunk_refs=0 ingester_chunk_downloaded=0 ingester_chunk_matches=1 ingester_requests=1 ingester_recv_wait_time=4.307073ms ingester_chunk_head_bytes=101kB ingester_chunk_compressed_bytes=0B ingester_chunk_decompressed_bytes=0B ingester_post_filter_lines=312 congestion_control_latency=0s index_total_chunks=0 index_post_bloom_filter_chunks=0 index_bloom_filter_ratio=0.00 index_used_bloom_filters=false index_shard_resolver_duration=0s index_bloom_filter_time=0s index_chunk_refs_lookup_time=0s disable_pipeline_wrappers=false has_labelfilter_before_parser=false approx_result_size=200kB result_streams_count=1 result_lines_count=312
+level=info ts=2026-09-23T16:23:25.168057433Z caller=metrics.go:285 component=frontend org_id=fake latency=fast query="{service_name=\"paper-obsgap-20260923\"} |= \"obsgap-paper-162216\"" query_hash=2313442636 query_type=filter range_type=range length=1h0m0.15420692s start_delta=1h0m0.168016734s end_delta=13.809814ms step=14s duration=13.366616ms status=200 limit=1000 returned_lines=312 throughput=7.5MB total_bytes=101kB total_bytes_structured_metadata=9.2kB lines_per_second=28653 total_lines=383 post_filter_lines=312 total_entries=312 store_chunks_download_time=0s queue_time=253µs querier_exec_time=19.039623ms splits=2 shards=2 query_referenced_structured_metadata=false pipeline_wrapper_filtered_lines=0 chunk_refs_fetch_time=196.299µs cache_chunk_req=0 cache_chunk_hit=0 cache_chunk_bytes_stored=0 cache_chunk_bytes_fetched=0 cache_chunk_download_time=0s cache_index_req=0 cache_index_hit=0 cache_index_download_time=0s cache_stats_results_req=1 cache_stats_results_hit=0 cache_stats_results_download_time=13.2µs cache_volume_results_req=0 cache_volume_results_hit=0 cache_volume_results_download_time=0s cache_result_req=0 cache_result_hit=0 cache_result_download_time=0s cache_result_query_length_served=0s ingester_chunk_refs=0 ingester_chunk_downloaded=0 ingester_chunk_matches=1 ingester_requests=2 ingester_recv_wait_time=4.927ms ingester_chunk_head_bytes=101kB ingester_chunk_compressed_bytes=0B ingester_chunk_decompressed_bytes=0B ingester_post_filter_lines=312 congestion_control_latency=0s index_total_chunks=0 index_post_bloom_filter_chunks=0 index_bloom_filter_ratio=0.00 index_used_bloom_filters=false index_shard_resolver_duration=0s index_bloom_filter_time=0s index_chunk_refs_lookup_time=0s disable_pipeline_wrappers=false has_labelfilter_before_parser=false approx_result_size=94kB result_streams_count=1 result_lines_count=312
+level=info ts=2026-09-23T16:23:30.001410419Z caller=main.go:146 msg="Starting Loki" version="(version=3.7.8, branch=release-3.7.x, revision=09e6ce2f)"
+level=info ts=2026-09-23T16:23:30.001445818Z caller=main.go:147 msg="Loading configuration file" filename=$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/cfg/loki.yml
+level=info ts=2026-09-23T16:23:30.037170269Z caller=server.go:397 msg="server listening on addresses" http=127.0.0.1:33100 grpc=127.0.0.1:33101
+level=info ts=2026-09-23T16:23:30.059907365Z caller=table_manager.go:456 index-store=tsdb-2024-01-01 msg="loading local table index_20719"
+level=info ts=2026-09-23T16:23:30.059918365Z caller=table_manager.go:136 index-store=tsdb-2024-01-01 msg="uploading tables"
+level=info ts=2026-09-23T16:23:30.060074361Z caller=table_manager.go:300 index-store=tsdb-2024-01-01 msg="query readiness setup completed" duration=2.3µs distinct_users_len=0 distinct_users=
+level=info ts=2026-09-23T16:23:30.06009506Z caller=shipper.go:165 index-store=tsdb-2024-01-01 msg="starting index shipper in RW mode"
+level=info ts=2026-09-23T16:23:30.060381153Z caller=head_manager.go:313 index-store=tsdb-2024-01-01 component=tsdb-head-manager msg="loaded wals by period" groups=0
+level=info ts=2026-09-23T16:23:30.060405352Z caller=manager.go:86 index-store=tsdb-2024-01-01 component=tsdb-manager msg="loaded leftover local indices" err=null successful=true buckets=0 indices=0 failures=0
+level=info ts=2026-09-23T16:23:30.060563648Z caller=head_manager.go:313 index-store=tsdb-2024-01-01 component=tsdb-head-manager msg="loaded wals by period" groups=1
+level=info ts=2026-09-23T16:23:30.062553195Z caller=mapper.go:47 msg="cleaning up mapped rules directory" path=$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/data/loki/rules-temp
+level=info ts=2026-09-23T16:23:30.063001283Z caller=worker.go:134 component=querier msg="Starting querier worker using query-scheduler and scheduler ring for addresses"
+level=info ts=2026-09-23T16:23:31.203925703Z caller=module_service.go:82 msg=starting module=server
+level=info ts=2026-09-23T16:23:31.203927903Z caller=module_service.go:82 msg=starting module=cache-generation-loader
+level=info ts=2026-09-23T16:23:31.203950203Z caller=module_service.go:82 msg=starting module=memberlist-kv
+level=info ts=2026-09-23T16:23:31.203965903Z caller=module_service.go:82 msg=starting module=store
+level=info ts=2026-09-23T16:23:31.203972003Z caller=module_service.go:82 msg=starting module=ring
+level=info ts=2026-09-23T16:23:31.204002802Z caller=module_service.go:82 msg=starting module=query-scheduler-ring
+level=info ts=2026-09-23T16:23:31.204011702Z caller=module_service.go:82 msg=starting module=query-frontend-tripperware
+level=info ts=2026-09-23T16:23:31.204037702Z caller=ring.go:390 msg="ring doesn't exist in KV store yet"
+level=info ts=2026-09-23T16:23:31.204056702Z caller=ring.go:390 msg="ring doesn't exist in KV store yet"
+level=info ts=2026-09-23T16:23:31.204091402Z caller=module_service.go:82 msg=starting module=analytics
+level=info ts=2026-09-23T16:23:31.204099602Z caller=module_service.go:82 msg=starting module=ingester-querier
+level=info ts=2026-09-23T16:23:31.204211901Z caller=basic_lifecycler.go:324 msg="instance not found in the ring" instance=<host> ring=scheduler
+level=info ts=2026-09-23T16:23:31.204241301Z caller=module_service.go:82 msg=starting module=ingester
+level=info ts=2026-09-23T16:23:31.204235201Z caller=basic_lifecycler_delegates.go:63 msg="not loading tokens from file, tokens file path is empty"
+level=info ts=2026-09-23T16:23:31.2042784Z caller=ingester.go:571 component=ingester msg="recovering from checkpoint"
+level=info ts=2026-09-23T16:23:31.2042794Z caller=module_service.go:82 msg=starting module=compactor
+level=info ts=2026-09-23T16:23:31.2042894Z caller=checkpoint.go:549 msg="tmp checkpoint cleanup starting"
+level=info ts=2026-09-23T16:23:31.2043597Z caller=ring.go:390 msg="ring doesn't exist in KV store yet"
+level=info ts=2026-09-23T16:23:31.2043141Z caller=module_service.go:82 msg=starting module=distributor
+level=info ts=2026-09-23T16:23:31.2043733Z caller=module_service.go:82 msg=starting module=rule-evaluator
+level=info ts=2026-09-23T16:23:31.2043857Z caller=module_service.go:82 msg=starting module=ruler
+level=info ts=2026-09-23T16:23:31.2044012Z caller=ruler.go:536 msg="ruler up and running"
+level=info ts=2026-09-23T16:23:31.2044091Z caller=checkpoint.go:554 msg="tmp checkpoint cleanup done" duration=92.2µs success=true
+level=info ts=2026-09-23T16:23:31.204435899Z caller=recovery.go:45 component=ingester msg="no checkpoint found, treating as no-op"
+level=info ts=2026-09-23T16:23:31.204449599Z caller=ringmanager.go:186 msg="waiting until scheduler is JOINING in the ring"
+level=error ts=2026-09-23T16:23:31.204436199Z caller=ratestore.go:110 msg="error getting ingester clients" err="empty ring"
+level=info ts=2026-09-23T16:23:31.204538899Z caller=ingester.go:587 component=ingester msg="recovered WAL checkpoint recovery finished" elapsed=268.198µs errors=false
+level=info ts=2026-09-23T16:23:31.204551199Z caller=ingester.go:593 component=ingester msg="recovering from WAL"
+level=info ts=2026-09-23T16:23:31.204575198Z caller=basic_lifecycler.go:324 component=distributor msg="instance not found in the ring" instance=<host> ring=distributor
+level=info ts=2026-09-23T16:23:31.204724097Z caller=basic_lifecycler.go:324 msg="instance not found in the ring" instance=<host> ring=compactor
+level=info ts=2026-09-23T16:23:31.204735697Z caller=basic_lifecycler_delegates.go:63 msg="not loading tokens from file, tokens file path is empty"
+level=info ts=2026-09-23T16:23:31.204785697Z caller=compactor.go:420 msg="waiting until compactor is JOINING in the ring"
+level=info ts=2026-09-23T16:23:31.20582389Z caller=ingester.go:609 component=ingester msg="WAL segment recovery finished" elapsed=1.553689ms errors=false
+level=info ts=2026-09-23T16:23:31.20583419Z caller=ingester.go:557 component=ingester msg="closing recoverer"
+level=info ts=2026-09-23T16:23:31.20583949Z caller=ingester.go:565 component=ingester msg="WAL recovery finished" time=1.569389ms
+level=info ts=2026-09-23T16:23:31.20585429Z caller=wal.go:173 msg=started component=wal
+level=info ts=2026-09-23T16:23:31.205901789Z caller=lifecycler.go:694 component=ingester msg="not loading tokens from file, tokens file path is empty"
+level=info ts=2026-09-23T16:23:31.205920089Z caller=lifecycler.go:721 component=ingester msg="instance not found in ring, adding with no tokens" ring=ingester
+level=info ts=2026-09-23T16:23:31.205907089Z caller=ingester.go:778 component=ingester msg="sleeping for initial delay before starting periodic flushing" delay=20.541935082s
+level=info ts=2026-09-23T16:23:31.205948489Z caller=lifecycler.go:562 component=ingester msg="auto-joining cluster after timeout" ring=ingester
+level=info ts=2026-09-23T16:23:31.321406897Z caller=ringmanager.go:190 msg="scheduler is JOINING in the ring"
+level=info ts=2026-09-23T16:23:31.321499696Z caller=ringmanager.go:199 msg="waiting until scheduler is ACTIVE in the ring"
+level=info ts=2026-09-23T16:23:31.388849734Z caller=compactor.go:424 msg="compactor is JOINING in the ring"
+level=info ts=2026-09-23T16:23:31.388961234Z caller=compactor.go:434 msg="waiting until compactor is ACTIVE in the ring"
+level=info ts=2026-09-23T16:23:31.508885611Z caller=ringmanager.go:203 msg="scheduler is ACTIVE in the ring"
+level=info ts=2026-09-23T16:23:31.50897311Z caller=module_service.go:82 msg=starting module=query-scheduler
+level=info ts=2026-09-23T16:23:31.50904871Z caller=module_service.go:82 msg=starting module=querier
+level=info ts=2026-09-23T16:23:31.50909541Z caller=module_service.go:82 msg=starting module=query-frontend
+level=info ts=2026-09-23T16:23:31.524090207Z caller=compactor.go:438 msg="compactor is ACTIVE in the ring"
+level=info ts=2026-09-23T16:23:31.524340705Z caller=loki.go:615 msg="Loki started" startup_time=6.201873336s
+level=info ts=2026-09-23T16:23:34.509583684Z caller=worker.go:235 component=querier msg="adding connection" addr=127.0.0.1:33101
+level=info ts=2026-09-23T16:23:34.509678684Z caller=scheduler.go:658 msg="this scheduler is in the ReplicationSet, will now accept requests."
+level=info ts=2026-09-23T16:23:36.524525791Z caller=compactor.go:497 msg="this instance has been chosen to run the compactor, starting compactor"
+level=info ts=2026-09-23T16:23:36.524601989Z caller=tables_manager.go:70 msg="waiting 10m0s for ring to stay stable and previous compactions to finish before starting compactor"
+level=info ts=2026-09-23T16:23:41.510094913Z caller=frontend_scheduler_worker.go:106 msg="adding connection to scheduler" addr=127.0.0.1:33101
+level=info ts=2026-09-23T16:23:58.730872908Z caller=roundtrip.go:412 org_id=fake msg="executing query" type=range query="{service_name=\"paper-obsgap-20260923\"} |= \"obsgap-paper-162216\"" start=2026-09-23T15:23:58Z end=2026-09-23T16:23:58.730709409Z start_delta=1h0m0.730869708s end_delta=160.399µs length=1h0m0.730709409s step=14000 query_hash=2313442636
+level=info ts=2026-09-23T16:23:58.732363998Z caller=table_manager.go:195 index-store=tsdb-2024-01-01 msg="get or create table" found=true table=index_20719 wait_for_lock=900ns
+level=info ts=2026-09-23T16:23:58.732436798Z caller=table_manager.go:195 index-store=tsdb-2024-01-01 msg="get or create table" found=true table=index_20719 wait_for_lock=1.9µs
+level=info ts=2026-09-23T16:23:58.733053094Z caller=metrics.go:457 org_id=fake latency=fast query_type=stats start=2026-09-23T11:59:30-04:00 end=2026-09-23T12:23:58-04:00 start_delta=24m28.733049994s end_delta=733.050094ms length=24m28s duration=807.695µs status=200 query="{service_name=\"paper-obsgap-20260923\"}" query_hash=1922443343 total_entries=1
+level=info ts=2026-09-23T16:23:58.733140893Z caller=metrics.go:457 org_id=fake latency=fast query_type=stats start=2026-09-23T11:23:28-04:00 end=2026-09-23T12:00:00-04:00 start_delta=1h0m30.733138893s end_delta=23m58.733138993s length=36m32s duration=800.094µs status=200 query="{service_name=\"paper-obsgap-20260923\"}" query_hash=1922443343 total_entries=1
+level=info ts=2026-09-23T16:23:58.735824075Z caller=engine.go:274 component=querier org_id=fake msg="executing query" query="{service_name=\"paper-obsgap-20260923\"} |= \"obsgap-paper-162216\"" query_hash=2313442636 type=range length=36m2s step=14s
+level=info ts=2026-09-23T16:23:58.736166773Z caller=engine.go:274 component=querier org_id=fake msg="executing query" query="{service_name=\"paper-obsgap-20260923\"} |= \"obsgap-paper-162216\"" query_hash=2313442636 type=range length=23m58.730709409s step=14s
+level=info ts=2026-09-23T16:23:58.736837569Z caller=table_manager.go:195 index-store=tsdb-2024-01-01 msg="get or create table" found=true table=index_20719 wait_for_lock=700ns
+level=info ts=2026-09-23T16:23:58.737156567Z caller=metrics.go:285 component=querier org_id=fake latency=fast query="{service_name=\"paper-obsgap-20260923\"} |= \"obsgap-paper-162216\"" query_hash=2313442636 query_type=filter range_type=range length=36m2s start_delta=1h0m0.737145367s end_delta=23m58.737145467s step=14s duration=1.293392ms status=200 limit=1000 returned_lines=0 throughput=0B total_bytes=0B total_bytes_structured_metadata=0B lines_per_second=0 total_lines=0 post_filter_lines=0 total_entries=0 store_chunks_download_time=0s queue_time=313.898µs querier_exec_time=1.293392ms splits=0 shards=0 query_referenced_structured_metadata=false pipeline_wrapper_filtered_lines=0 chunk_refs_fetch_time=107.099µs cache_chunk_req=0 cache_chunk_hit=0 cache_chunk_bytes_stored=0 cache_chunk_bytes_fetched=0 cache_chunk_download_time=0s cache_index_req=0 cache_index_hit=0 cache_index_download_time=0s cache_stats_results_req=0 cache_stats_results_hit=0 cache_stats_results_download_time=0s cache_volume_results_req=0 cache_volume_results_hit=0 cache_volume_results_download_time=0s cache_result_req=0 cache_result_hit=0 cache_result_download_time=0s cache_result_query_length_served=0s ingester_chunk_refs=0 ingester_chunk_downloaded=0 ingester_chunk_matches=0 ingester_requests=1 ingester_recv_wait_time=532.897µs ingester_chunk_head_bytes=0B ingester_chunk_compressed_bytes=0B ingester_chunk_decompressed_bytes=0B ingester_post_filter_lines=0 congestion_control_latency=0s index_total_chunks=0 index_post_bloom_filter_chunks=0 index_bloom_filter_ratio=0.00 index_used_bloom_filters=false index_shard_resolver_duration=0s index_bloom_filter_time=0s index_chunk_refs_lookup_time=0s disable_pipeline_wrappers=false has_labelfilter_before_parser=false approx_result_size=2B result_streams_count=0 result_lines_count=0
+level=info ts=2026-09-23T16:23:58.737192066Z caller=table_manager.go:195 index-store=tsdb-2024-01-01 msg="get or create table" found=true table=index_20719 wait_for_lock=600ns
+level=info ts=2026-09-23T16:23:58.740415945Z caller=metrics.go:285 component=querier org_id=fake latency=fast query="{service_name=\"paper-obsgap-20260923\"} |= \"obsgap-paper-162216\"" query_hash=2313442636 query_type=filter range_type=range length=23m58.730709409s start_delta=23m58.740404545s end_delta=9.695236ms step=14s duration=4.208172ms status=200 limit=1000 returned_lines=312 throughput=24MB total_bytes=101kB total_bytes_structured_metadata=9.2kB lines_per_second=91013 total_lines=383 post_filter_lines=312 total_entries=312 store_chunks_download_time=0s queue_time=523.997µs querier_exec_time=4.208172ms splits=0 shards=0 query_referenced_structured_metadata=false pipeline_wrapper_filtered_lines=0 chunk_refs_fetch_time=67.799µs cache_chunk_req=0 cache_chunk_hit=0 cache_chunk_bytes_stored=0 cache_chunk_bytes_fetched=0 cache_chunk_download_time=0s cache_index_req=0 cache_index_hit=0 cache_index_download_time=0s cache_stats_results_req=0 cache_stats_results_hit=0 cache_stats_results_download_time=0s cache_volume_results_req=0 cache_volume_results_hit=0 cache_volume_results_download_time=0s cache_result_req=0 cache_result_hit=0 cache_result_download_time=0s cache_result_query_length_served=0s ingester_chunk_refs=0 ingester_chunk_downloaded=0 ingester_chunk_matches=1 ingester_requests=1 ingester_recv_wait_time=3.712676ms ingester_chunk_head_bytes=101kB ingester_chunk_compressed_bytes=0B ingester_chunk_decompressed_bytes=0B ingester_post_filter_lines=312 congestion_control_latency=0s index_total_chunks=0 index_post_bloom_filter_chunks=0 index_bloom_filter_ratio=0.00 index_used_bloom_filters=false index_shard_resolver_duration=0s index_bloom_filter_time=0s index_chunk_refs_lookup_time=0s disable_pipeline_wrappers=false has_labelfilter_before_parser=false approx_result_size=200kB result_streams_count=1 result_lines_count=312
+level=info ts=2026-09-23T16:23:58.742869629Z caller=metrics.go:285 component=frontend org_id=fake latency=fast query="{service_name=\"paper-obsgap-20260923\"} |= \"obsgap-paper-162216\"" query_hash=2313442636 query_type=filter range_type=range length=1h0m0.730709409s start_delta=1h0m0.742858029s end_delta=12.14862ms step=14s duration=11.619023ms status=200 limit=1000 returned_lines=312 throughput=8.7MB total_bytes=101kB total_bytes_structured_metadata=9.2kB lines_per_second=32963 total_lines=383 post_filter_lines=312 total_entries=312 store_chunks_download_time=0s queue_time=838µs querier_exec_time=17.50592ms splits=2 shards=2 query_referenced_structured_metadata=false pipeline_wrapper_filtered_lines=0 chunk_refs_fetch_time=174.898µs cache_chunk_req=0 cache_chunk_hit=0 cache_chunk_bytes_stored=0 cache_chunk_bytes_fetched=0 cache_chunk_download_time=0s cache_index_req=0 cache_index_hit=0 cache_index_download_time=0s cache_stats_results_req=1 cache_stats_results_hit=0 cache_stats_results_download_time=16.5µs cache_volume_results_req=0 cache_volume_results_hit=0 cache_volume_results_download_time=0s cache_result_req=0 cache_result_hit=0 cache_result_download_time=0s cache_result_query_length_served=0s ingester_chunk_refs=0 ingester_chunk_downloaded=0 ingester_chunk_matches=1 ingester_requests=2 ingester_recv_wait_time=4.246ms ingester_chunk_head_bytes=101kB ingester_chunk_compressed_bytes=0B ingester_chunk_decompressed_bytes=0B ingester_post_filter_lines=312 congestion_control_latency=0s index_total_chunks=0 index_post_bloom_filter_chunks=0 index_bloom_filter_ratio=0.00 index_used_bloom_filters=false index_shard_resolver_duration=0s index_bloom_filter_time=0s index_chunk_refs_lookup_time=0s disable_pipeline_wrappers=false has_labelfilter_before_parser=false approx_result_size=94kB result_streams_count=1 result_lines_count=312
+level=info ts=2026-09-23T16:24:01.206019805Z caller=recalculate_owned_streams.go:49 msg="starting recalculate owned streams job"
+level=info ts=2026-09-23T16:24:01.206065705Z caller=recalculate_owned_streams.go:63 msg="detected ring changes, re-evaluating streams ownership"
+level=info ts=2026-09-23T16:24:01.206079004Z caller=recalculate_owned_streams.go:82 msg="fixed limit has been updated" tenant=fake old=2147483647 new=5000
+level=info ts=2026-09-23T16:24:01.206084604Z caller=recalculate_owned_streams.go:52 msg="completed recalculate owned streams job"
+level=info ts=2026-09-23T16:24:27.342906784Z caller=signals.go:62 msg="=== received SIGINT/SIGTERM ===\n*** exiting"
+level=info ts=2026-09-23T16:24:27.343258882Z caller=manager.go:273 msg="stopping user managers"
+level=info ts=2026-09-23T16:24:27.343269682Z caller=basic_lifecycler.go:265 msg="ring lifecycler is shutting down" ring=compactor
+level=info ts=2026-09-23T16:24:27.343277882Z caller=manager.go:287 msg="all user managers stopped"
+level=info ts=2026-09-23T16:24:27.343281882Z caller=mapper.go:47 msg="cleaning up mapped rules directory" path=$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/data/loki/rules-temp
+level=info ts=2026-09-23T16:24:27.343300981Z caller=module_service.go:120 msg="module stopped" module=ruler
+level=info ts=2026-09-23T16:24:27.343309681Z caller=module_service.go:120 msg="module stopped" module=rule-evaluator
+level=info ts=2026-09-23T16:24:27.34342998Z caller=basic_lifecycler.go:442 msg="unregistering instance from ring" ring=compactor
+level=info ts=2026-09-23T16:24:27.34346248Z caller=basic_lifecycler.go:305 msg="instance removed from the ring" ring=compactor
+level=error ts=2026-09-23T16:24:27.34346918Z caller=scheduler_processor.go:111 component=querier msg="error processing requests from scheduler" err="rpc error: code = Canceled desc = context canceled" addr=127.0.0.1:33101
+level=error ts=2026-09-23T16:24:27.34347228Z caller=scheduler_processor.go:111 component=querier msg="error processing requests from scheduler" err="rpc error: code = Canceled desc = context canceled" addr=127.0.0.1:33101
+level=error ts=2026-09-23T16:24:27.34348378Z caller=scheduler_processor.go:111 component=querier msg="error processing requests from scheduler" err="rpc error: code = Canceled desc = context canceled" addr=127.0.0.1:33101
+level=info ts=2026-09-23T16:24:27.34349538Z caller=basic_lifecycler.go:265 component=distributor msg="ring lifecycler is shutting down" ring=distributor
+level=info ts=2026-09-23T16:24:27.34349848Z caller=compactor.go:479 msg="compactor exiting"
+level=info ts=2026-09-23T16:24:27.34351908Z caller=module_service.go:120 msg="module stopped" module=compactor
+level=error ts=2026-09-23T16:24:27.34350448Z caller=scheduler_processor.go:111 component=querier msg="error processing requests from scheduler" err="rpc error: code = Canceled desc = context canceled" addr=127.0.0.1:33101
+level=info ts=2026-09-23T16:24:27.34356578Z caller=basic_lifecycler.go:442 component=distributor msg="unregistering instance from ring" ring=distributor
+level=info ts=2026-09-23T16:24:27.343587579Z caller=basic_lifecycler.go:305 component=distributor msg="instance removed from the ring" ring=distributor
+level=info ts=2026-09-23T16:24:27.343603479Z caller=module_service.go:120 msg="module stopped" module=distributor
+level=info ts=2026-09-23T16:24:27.344280474Z caller=module_service.go:120 msg="module stopped" module=querier
+level=info ts=2026-09-23T16:24:27.344310874Z caller=module_service.go:120 msg="module stopped" module=ingester-querier
+level=info ts=2026-09-23T16:24:27.351475123Z caller=wal.go:157 msg=stopped component=wal
+level=info ts=2026-09-23T16:24:27.351505223Z caller=lifecycler.go:612 component=ingester msg="lifecycler loop() exited gracefully" ring=ingester
+level=info ts=2026-09-23T16:24:27.351522923Z caller=lifecycler.go:997 component=ingester msg="changing instance state from" old_state=ACTIVE new_state=LEAVING ring=ingester
+level=info ts=2026-09-23T16:24:27.351590922Z caller=lifecycler.go:1083 component=ingester msg="transfers are disabled"
+level=info ts=2026-09-23T16:24:27.351605822Z caller=lifecycler.go:1100 component=ingester msg="lifecycler entering final sleep before shutdown" final_sleep=0s
+level=info ts=2026-09-23T16:24:27.351633622Z caller=lifecycler.go:665 component=ingester msg="instance removed from the KV store" ring=ingester
+level=info ts=2026-09-23T16:24:27.351731321Z caller=module_service.go:120 msg="module stopped" module=ingester
+level=info ts=2026-09-23T16:24:27.352216018Z caller=table_manager.go:77 index-store=tsdb-2024-01-01 msg="stopping table manager"
+level=info ts=2026-09-23T16:24:27.352231418Z caller=table_manager.go:136 index-store=tsdb-2024-01-01 msg="uploading tables"
+level=info ts=2026-09-23T16:24:27.352259417Z caller=module_service.go:120 msg="module stopped" module=store
+level=info ts=2026-09-23T16:24:27.8441189Z caller=module_service.go:120 msg="module stopped" module=query-frontend
+level=info ts=2026-09-23T16:24:27.844173299Z caller=module_service.go:120 msg="module stopped" module=query-frontend-tripperware
+level=info ts=2026-09-23T16:24:27.844229799Z caller=module_service.go:120 msg="module stopped" module=query-scheduler
+level=info ts=2026-09-23T16:24:27.844262299Z caller=module_service.go:120 msg="module stopped" module=analytics
+level=info ts=2026-09-23T16:24:27.844276199Z caller=basic_lifecycler.go:265 msg="ring lifecycler is shutting down" ring=scheduler
+level=info ts=2026-09-23T16:24:27.844324898Z caller=module_service.go:120 msg="module stopped" module=cache-generation-loader
+level=info ts=2026-09-23T16:24:27.844391298Z caller=basic_lifecycler.go:442 msg="unregistering instance from ring" ring=scheduler
+level=info ts=2026-09-23T16:24:27.844422498Z caller=basic_lifecycler.go:305 msg="instance removed from the ring" ring=scheduler
+level=info ts=2026-09-23T16:24:27.844508997Z caller=module_service.go:120 msg="module stopped" module=query-scheduler-ring
+level=info ts=2026-09-23T16:24:27.941054606Z caller=module_service.go:120 msg="module stopped" module=ring
+level=info ts=2026-09-23T16:24:27.941096806Z caller=module_service.go:120 msg="module stopped" module=memberlist-kv
+level=info ts=2026-09-23T16:24:27.941815601Z caller=modules.go:2677 msg="server stopped"
+level=info ts=2026-09-23T16:24:27.941831001Z caller=module_service.go:120 msg="module stopped" module=server
+level=info ts=2026-09-23T16:24:27.941846301Z caller=loki.go:615 msg="Loki stopped" running_time=1m2.619378632s

@@ -1,0 +1,1 @@
+{"network":{"allowedDomains":[],"deniedDomains":["*"]},"filesystem":{"allowWrite":["allowed"],"denyWrite":["protected"],"denyRead":["$HOME/.cache/gap-wave2-20260923/isolation"],"allowRead":["."]}}

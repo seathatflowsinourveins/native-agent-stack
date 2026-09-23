@@ -1,0 +1,101 @@
+{
+ "mode": "run",
+ "overrides": [
+  "features.hooks=false",
+  "features.plugin_hooks=false"
+ ],
+ "started_at": "2026-09-23T07:28:14Z",
+ "model_inference_submitted": true,
+ "readiness": {
+  "model": "gpt-6-astra",
+  "model_available": true,
+  "ordinary_usage_allowed": true,
+  "windows": {
+   "primary": {
+    "usedPercent": 32,
+    "resetsAt": 1790719654,
+    "windowDurationMins": 10080
+   }
+  },
+  "ready": true
+ },
+ "configured_model": "gpt-6-astra",
+ "configured_provider": "openai",
+ "status": "completed",
+ "final_response": "{\"sdk_run_duration_ms\":58410,\"sdk_run_total_tokens\":135311,\"sdk_blocked_file_extraction_tasks\":2,\"acp_native_turn_duration_ms\":31027,\"acp_cumulative_total_tokens\":42345,\"acp_sandbox_policy_type\":\"workspaceWrite\"}",
+ "duration_ms": 8831,
+ "usage_status": "reported",
+ "items": [
+  {
+   "clientId": null,
+   "content": [
+    {
+     "text": "Read-only fact extraction. Two JSON files are in the current working directory:\nworker-receipt.json and acp-research-receipt.json.\n\nRead them with exactly one shell command and no other file-reading method:\n\n    head -c 24000 -- worker-receipt.json acp-research-receipt.json\n\nDo not use any MCP tool, do not write files, do not use the network. Then reply\nwith ONLY one JSON object (no code fence, no prose) with these keys and values\ntaken from the files:\n\n- \"sdk_run_duration_ms\": worker-receipt.json run.duration_ms (integer)\n- \"sdk_run_total_tokens\": worker-receipt.json run.usage.total.totalTokens (integer)\n- \"sdk_blocked_file_extraction_tasks\": worker-receipt.json all_three_native_turns.blocked_file_extraction_tasks (integer)\n- \"acp_native_turn_duration_ms\": acp-research-receipt.json result.native_turn_duration_ms (integer)\n- \"acp_cumulative_total_tokens\": acp-research-receipt.json result.usage_cumulative.totalTokens (integer)\n- \"acp_sandbox_policy_type\": acp-research-receipt.json result.sandbox_policy.type (string)\n",
+     "text_elements": [],
+     "type": "text"
+    }
+   ],
+   "id": "<id-1>",
+   "type": "userMessage"
+  },
+  {
+   "delivery": null,
+   "id": "msg_0302c28ce4f76244016ab37f9220a087d191e450c21ec7ea20",
+   "memoryCitation": null,
+   "phase": "commentary",
+   "questions": null,
+   "text": "I\u2019ll read both files with the exact command and extract the six values.\n",
+   "type": "agentMessage"
+  },
+  {
+   "aggregatedOutput": "==> worker-receipt.json <==\n{\n  \"schema_version\": 1,\n  \"recorded_date\": \"2026-09-19\",\n  \"kind\": \"native_model_e2e\",\n  \"packages\": {\n    \"openai-codex\": \"0.154.0\",\n    \"native-codex\": \"0.155.1\",\n    \"openai\": \"3.16.2\",\n    \"alpaca-py\": \"0.44.0\",\n    \"duckdb\": \"1.5.5\",\n    \"exchange-calendars\": \"4.13.2\"\n  },\n  \"authentication\": \"Native interactive Codex login completed; no credential store copied or inspected.\",\n  \"before_login\": {\n    \"model_discovered\": \"gpt-6-astra\",\n    \"ordinary_usage_allowed\": false,\n    \"weekly_used_percent\": 100,\n    \"inference_submitted\": false\n  },\n  \"after_login\": {\n    \"ordinary_usage_allowed\": true,\n    \"weekly_used_percent_at_discovery\": 25\n  },\n  \"run\": {\n    \"status\": \"completed\",\n    \"model_inference_submitted\": true,\n    \"configured_model\": \"gpt-6-astra\",\n    \"configured_provider\": \"openai\",\n    \"duration_ms\": 58410,\n    \"usage\": {\n      \"last\": {\n        \"cacheWriteInputTokens\": 0,\n        \"cachedInputTokens\": 24448,\n        \"inputTokens\": 25096,\n        \"outputTokens\": 286,\n        \"reasoningOutputTokens\": 0,\n        \"totalTokens\": 25382\n      },\n      \"modelContextWindow\": 258400,\n      \"total\": {\n        \"cacheWriteInputTokens\": 0,\n        \"cachedInputTokens\": 119424,\n        \"inputTokens\": 133839,\n        \"outputTokens\": 1472,\n        \"reasoningOutputTokens\": 117,\n        \"totalTokens\": 135311\n      }\n    }\n  },\n  \"task\": \"Read the two public engine/DeerFlow receipts using focused Context Mode extraction and report the exact counts and unproved Alpaca scope.\",\n  \"result\": {\n    \"engine_data_points\": 3943,\n    \"engine_simulated_orders\": 3,\n    \"engine_failed_data_requests\": 0,\n    \"deerflow_skills\": 23,\n    \"acp_configured_model\": \"gpt-6-astra\",\n    \"deerflow_acp_prompt_calls\": 0\n  },\n  \"tools\": [\n    {\n      \"server\": \"context-mode\",\n      \"tool\": \"ctx_execute\",\n      \"status\": \"completed\"\n    },\n    {\n      \"server\": \"context-mode\",\n      \"tool\": \"ctx_execute\",\n      \"status\": \"completed\"\n    },\n    {\n      \"server\": \"context-mode\",\n      \"tool\": \"ctx_stats\",\n      \"status\": \"completed\"\n    },\n    {\n      \"server\": \"context-mode\",\n      \"tool\": \"ctx_execute_file\",\n      \"status\": \"failed\"\n    },\n    {\n      \"server\": \"context-mode\",\n      \"tool\": \"ctx_execute\",\n      \"status\": \"completed\"\n    }\n  ],\n  \"cache_measurement\": {\n    \"cached_input_share_percent\": 89.23,\n    \"input_minus_cached\": 14415,\n    \"paired_net_provider_savings\": null\n  },\n  \"context_mode_checkpoint\": {\n    \"calls\": 2,\n    \"context_entered_display\": \"9.5 KB\",\n    \"estimated_tokens_saved\": 0,\n    \"scope\": \"Early checkpoint before later extraction calls; not a final-turn total.\"\n  },\n  \"native_primitives\": [\n    \"initialize\",\n    \"model/list\",\n    \"account/rateLimits/read\",\n    \"thread/start\",\n    \"thread/read\",\n    \"turn/start\",\n    \"turn.run\"\n  ],\n  \"command\": \"$SDK_ENV/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin \\\"$NATIVE_CODEX_BIN\\\" --codex-home \\\"$NATIVE_CODEX_HOME\\\" --workspace \\\"$RESEARCH_WORKSPACE\\\" --receipt \\\"$PRIVATE_RUN_DIR/astra-research.json\\\" --prompt \\\"$PROMPT_FILE\\\" --deadline-seconds 180\",\n  \"limitations\": [\n    \"Executed wrapper used --deadline-seconds; reviewed replay renames it --turn-deadline-seconds to make its scope explicit and labels unavailable failure usage. The SDK invocation is unchanged.\",\n    \"SDK configured model/provider are verified, not independent per-request provider attestation; model-reroute notifications were not collected.\",\n    \"Read-only filesystem mode does not restrict external MCP mutations; the recorded environment supplied no broker keys or broker tools.\",\n    \"One ctx_execute_file attempt failed the server project-root restriction; ctx_execute extraction completed. No global scope change was made.\",\n    \"No Alpaca account, order, paid API, DeerFlow inference or new hosting deployment was exercised.\",\n    \"Scoped native MCP override was accepted by discovery but requires normal tool approval; deny_all blocked it. No trust or permission bypass was attempted, and no further trial was launched.\"\n  ],\n  \"private_fingerprints\": [\n    {\n      \"name\": \"astra-research.json\",\n      \"sha256\": \"17130c7a25c3bfed4e6a61496a651409f3e17cdce01ca69479c4f29f08777782\",\n      \"distributed\": false\n    },\n    {\n      \"name\": \"post-login-inspect.json\",\n      \"sha256\": \"5598ec7d9265168a1bf1d9f5fd9848c12dfcb05ab7abefa1a285f73bebd8d9e6\",\n      \"distributed\": false\n    },\n    {\n      \"name\": \"research-prompt.txt\",\n      \"sha256\": \"a02178b7046892c2564ce11d02b1367c068257b4ad5fde36ffd1beb3cbf67499\",\n      \"distributed\": false\n    }\n  ],\n  \"follow_up_scope_checks\": [\n    {\n      \"stage\": \"parent_environment_scope_attempt\",\n      \"native_turn_status\": \"completed\",\n      \"extraction_task_succeeded\": false,\n      \"configured_model\": \"gpt-6-astra\",\n      \"configured_provider\": \"openai\",\n      \"duration_ms\": 11797,\n      \"usage\": {\n        \"last\": {\n          \"cacheWriteInputTokens\": 0,\n          \"cachedInputTokens\": 16768,\n          \"inputTokens\": 17296,\n          \"outputTokens\": 33,\n          \"reasoningOutputTokens\": 0,\n          \"totalTokens\": 17329\n        },\n        \"modelContextWindow\": 258400,\n        \"total\": {\n          \"cacheWriteInputTokens\": 0,\n          \"cachedInputTokens\": 28288,\n          \"inputTokens\": 34228,\n          \"outputTokens\": 240,\n          \"reasoningOutputTokens\": 0,\n          \"totalTokens\": 34468\n        }\n      },\n      \"result\": \"The extraction failed because Context Mode rejected the file path as outside its project root; no counts were retrieved, and I stopped without using another tool.\",\n      \"tools\": [\n        {\n          \"server\": \"context-mode\",\n          \"tool\": \"ctx_execute_file\",\n          \"status\": \"failed\"\n        }\n      ],\n      \"private_sha256\": \"17ec3b2dcc346c3e2e416909a9ed5e40e981ad1382fb982c5d0907829ec0c6dd\",\n      \"private_record_distributed\": false\n    },\n    {\n      \"stage\": \"native_mcp_scope_override_attempt\",\n      \"native_turn_status\": \"completed\",\n      \"extraction_task_succeeded\": false,\n      \"configured_model\": \"gpt-6-astra\",\n      \"configured_provider\": \"openai\",\n      \"duration_ms\": 9735,\n      \"usage\": {\n        \"last\": {\n          \"cacheWriteInputTokens\": 0,\n          \"cachedInputTokens\": 16768,\n          \"inputTokens\": 17165,\n          \"outputTokens\": 34,\n          \"reasoningOutputTokens\": 0,\n          \"totalTokens\": 17199\n        },\n        \"modelContextWindow\": 258400,\n        \"total\": {\n          \"cacheWriteInputTokens\": 0,\n          \"cachedInputTokens\": 28288,\n          \"inputTokens\": 34097,\n          \"outputTokens\": 215,\n          \"reasoningOutputTokens\": 0,\n          \"totalTokens\": 34312\n        }\n      },\n      \"result\": \"The extraction failed because the tool requires approval, but the approval policy is \\u201cnever\\u201d; no counts were retrieved, and I stopped without using another tool.\",\n      \"tools\": [\n        {\n          \"server\": \"context-mode\",\n          \"tool\": \"ctx_execute_file\",\n          \"status\": \"failed\"\n        }\n      ],\n      \"private_sha256\": \"3549598c5f43bec51fdd7ad2b9f938802ebf5d2abf608ca2c8f4720816d06fcb\",\n      \"private_record_distributed\": false\n    }\n  ],\n  \"all_three_native_turns\": {\n    \"usage\": {\n      \"inputTokens\": 202164,\n      \"cachedInputTokens\": 176000,\n      \"cacheWriteInputTokens\": 0,\n      \"outputTokens\": 1927,\n      \"reasoningOutputTokens\": 117,\n      \"totalTokens\": 204091\n    },\n    \"cached_input_share_percent\": 87.06,\n    \"successful_research_tasks\": 1,\n    \"blocked_file_extraction_tasks\": 2,\n    \"paired_net_provider_savings\": null\n  }\n}\n\n==> acp-research-receipt.json <==\n{\n  \"schema_version\": 1,\n  \"id\": \"deerflow-native-acp-research\",\n  \"kind\": \"native_model_e2e\",\n  \"recorded_at_utc\": \"2026-09-19T12:47:50+00:00\",\n  \"component_ids\": [\n    \"deerflow\",\n    \"codex-acp\"\n  ],\n  \"claim\": \"The unmodified pinned DeerFlow invoke_acp_agent tool completed one native Astra evidence-review task through maintained Codex ACP; the task read two public receipts and returned correct counts.\",\n  \"limitations\": [\n    \"Embedded tool invocation, not a complete DeerFlow planner/UI/scheduler or hosted service.\",\n    \"ACP 1.12.0 mode ID read-only actually maps to workspaceWrite, networkAccess=false, approvalPolicy=on-request. This task performed only reads, but strict filesystem read-only enforcement is not established.\",\n    \"DeerFlow returns text and discards ACP completion/usage; completion and cumulative usage below were selected from private native adapter logs.\",\n    \"Reported native model/provider identity is not independent provider attestation. No reroute event was observed.\",\n    \"Input/cache/output counters are observed native usage, not net token savings, billed dollars or a comparison against an alternative workflow.\",\n    \"No broker connectivity, paper order, live data entitlement, profitability, durable recovery, memory/RAG integration or general inference-quality benchmark was exercised.\",\n    \"Configured native MCP servers can still be discovered. Local sandboxing does not remove remote-tool authority. No MCP tool call was observed in this task.\",\n    \"Raw adapter logs include local session/account metadata and remain private. The public selected fields are sanitized; a private log hash does not make that log independently public.\"\n  ],\n  \"versions\": {\n    \"deerflow_commit\": \"42334f26d7025d905678f9075b079fc65f9beaf9\",\n    \"deerflow_backend\": \"2.1.0-rc0\",\n    \"codex_acp\": \"1.12.0\",\n    \"native_codex\": \"0.155.1\"\n  },\n  \"readiness\": {\n    \"model\": \"gpt-6-astra\",\n    \"model_available\": true,\n    \"ordinary_usage_allowed\": true,\n    \"windows\": {\n      \"primary\": {\n        \"usedPercent\": 50,\n        \"resetsAt\": 1790398209,\n        \"windowDurationMins\": 10080\n      }\n    },\n    \"ready\": true\n  },\n  \"native_workflow\": [\n    {\n      \"command\": \"\\\"$WORKER_PYTHON\\\" \\\"$STACK_REPO/blueprints/us-equities/workers/native_worker.py\\\" inspect --codex-bin \\\"$CODEX_PATH\\\" --codex-home \\\"$CODEX_HOME\\\" --workspace \\\"$STACK_REPO\\\" --receipt \\\"$PRIVATE_RUN/readiness.json\\\"\",\n      \"exit_code\": 0,\n      \"model_inference_submitted\": false\n    },\n    {\n      \"command\": \"\\\"$DEERFLOW_HOME/backend/.venv/bin/python\\\" \\\"$STACK_REPO/blueprints/us-equities/deerflow/native-research.py\\\" --node \\\"$ACP_NODE\\\" --adapter \\\"$ACP_ENTRYPOINT\\\" --codex-bin \\\"$CODEX_PATH\\\" --codex-home \\\"$CODEX_HOME\\\" --state-dir \\\"$PRIVATE_RUN/research-1\\\" --readiness \\\"$PRIVATE_RUN/readiness.json\\\"\",\n      \"exit_code\": 0,\n      \"tool\": \"deerflow.tools.builtins.invoke_acp_agent_tool.build_invoke_acp_agent_tool(...).ainvoke\",\n      \"prompt_calls\": 1\n    },\n    {\n      \"native_agent_command\": \"head -c 24000 -- engine-receipt.json deerflow-discovery.json\",\n      \"exit_code\": 0\n    }\n  ],\n  \"result\": {\n    \"status\": \"completed\",\n    \"native_turn_duration_ms\": 31027,\n    \"helper_elapsed_seconds\": 33.469,\n    \"model\": \"gpt-6-astra\",\n    \"provider\": \"openai\",\n    \"reasoning_effort\": \"high\",\n    \"mode_id\": \"read-only\",\n    \"approval_policy\": \"on-request\",\n    \"sandbox_policy\": {\n      \"type\": \"workspaceWrite\",\n      \"writableRoots\": [],\n      \"networkAccess\": false,\n      \"excludeTmpdirEnvVar\": false,\n      \"excludeSlashTmp\": false\n    },\n    \"permission_auto_approval\": false,\n    \"model_reroute_events\": 0,\n    \"usage_cumulative\": {\n      \"totalTokens\": 42345,\n      \"inputTokens\": 41737,\n      \"cachedInputTokens\": 24320,\n      \"cacheWriteInputTokens\": 0,\n      \"outputTokens\": 608,\n      \"reasoningOutputTokens\": 53\n    },\n    \"usage_last_request\": {\n      \"totalTokens\": 24164,\n      \"inputTokens\": 23628,\n      \"cachedInputTokens\": 12160,\n      \"cacheWriteInputTokens\": 0,\n      \"outputTokens\": 536,\n      \"reasoningOutputTokens\": 53\n    },\n    \"model_context_window\": 258400,\n    \"usage_semantics\": \"Use cumulative totals once. cachedInputTokens is included in inputTokens; reasoningOutputTokens is included in outputTokens. last is the final request, not this entire multi-request turn.\",\n    \"native_command_count\": 1,\n    \"native_mcp_tool_call_count\": 0,\n    \"hooks_completed\": [\n      {\n        \"event\": \"sessionStart\",\n        \"status\": \"completed\",\n        \"count\": 2\n      },\n      {\n        \"event\": \"userPromptSubmit\",\n        \"status\": \"completed\",\n        \"count\": 2\n      },\n      {\n        \"event\": \"preToolUse\",\n        \"status\": \"completed\",\n        \"count\": 2\n      },\n      {\n        \"event\": \"postToolUse\",\n        \"status\": \"completed\",\n        \"count\": 2\n      },\n      {\n        \"event\": \"stop\",\n        \"status\": \"completed\",\n        \"count\": 2\n      }\n    ],\n    \"returned_facts\": {\n      \"lean_data_points\": 3943,\n      \"lean_simulated_orders\": 3,\n      \"lean_failed_data_requests\": 0,\n      \"historical_deerflow_models\": 0,\n      \"historical_deerflow_skills\": 23,\n      \"historical_acp_prompts\": 0\n    },\n    \"processes_exited\": true,\n    \"listening_service_started\": false,\n    \"returned_text\": \"blueprints/us-equities/deerflow/research-result.md\",\n    \"returned_text_sha256\": \"4aa4f228b0a976353c61adeb2d9f51d030081f3b359b2bfc8c388fbdc0b9d613\"\n  },\n  \"input_files\": [\n    {\n      \"path\": \"blueprints/us-equities/engine/receipt.json\",\n      \"sha256\": \"f74599195cbb51ad6c1112dc5af61ccd27bd6aa37f622ed874148f7616f5ede2\"\n    },\n    {\n      \"path\": \"blueprints/us-equities/deerflow/native-receipt.json\",\n      \"sha256\": \"7cbe9e489ff57c47619302e0cae728bfc451539d5370dd7278eca4058d6f5fb3\"\n    }\n  ],\n  \"private_evidence_sha256\": {\n    \"app_server_log\": \"28982baedc4f1bc4fdf157f0f338681a04419ea00ac99e9cc645210976c12a2d\",\n    \"helper_receipt\": \"42d7b589ed24201e8920cd099bad1050a72a77815ed98d9f04003ffba0ee1dc1\",\n    \"readiness\": \"dffefbf4b85188746dae90552a719230e5dd65dabd000a3238f837d4f72875a3\"\n  },\n  \"sources\": [\n    \"https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/backend/packages/harness/deerflow/tools/builtins/invoke_acp_agent_tool.py\",\n    \"https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/backend/packages/harness/deerflow/config/acp_config.py\",\n    \"https://github.com/agentclientprotocol/codex-acp/tree/v1.12.0\",\n    \"https://github.com/agentclientprotocol/codex-acp/blob/v1.12.0/src/AgentMode.ts\",\n    \"https://github.com/agentclientprotocol/codex-acp/blob/v1.12.0/src/Logger.ts\"\n  ]\n}\n",
+   "command": "/bin/bash -lc 'head -c 24000 -- worker-receipt.json acp-research-receipt.json'",
+   "commandActions": [
+    {
+     "command": "head -c 24000 -- worker-receipt.json acp-research-receipt.json",
+     "type": "unknown"
+    }
+   ],
+   "cwd": "$HOME/.cache/gap-wave2-20260923/agents-models-workers/ws/g0-sdk",
+   "durationMs": 0,
+   "exitCode": 0,
+   "id": "exec-<id-2>",
+   "pluginId": null,
+   "processId": "2578",
+   "scriptPath": null,
+   "source": "unifiedExecStartup",
+   "status": "completed",
+   "type": "commandExecution"
+  },
+  {
+   "delivery": null,
+   "id": "msg_0302c28ce4f76244016ab37f96021887d18629a99880136572",
+   "memoryCitation": null,
+   "phase": "final_answer",
+   "questions": null,
+   "text": "{\"sdk_run_duration_ms\":58410,\"sdk_run_total_tokens\":135311,\"sdk_blocked_file_extraction_tasks\":2,\"acp_native_turn_duration_ms\":31027,\"acp_cumulative_total_tokens\":42345,\"acp_sandbox_policy_type\":\"workspaceWrite\"}",
+   "type": "agentMessage"
+  }
+ ],
+ "usage": {
+  "last": {
+   "cacheWriteInputTokens": 0,
+   "cachedInputTokens": 18176,
+   "inputTokens": 22507,
+   "outputTokens": 61,
+   "reasoningOutputTokens": 0,
+   "totalTokens": 22568
+  },
+  "modelContextWindow": 258400,
+  "total": {
+   "cacheWriteInputTokens": 0,
+   "cachedInputTokens": 29696,
+   "inputTokens": 40904,
+   "outputTokens": 135,
+   "reasoningOutputTokens": 0,
+   "totalTokens": 41039
+  }
+ },
+ "wall_seconds": 9.71,
+ "finished_at": "2026-09-23T07:28:24Z"
+}

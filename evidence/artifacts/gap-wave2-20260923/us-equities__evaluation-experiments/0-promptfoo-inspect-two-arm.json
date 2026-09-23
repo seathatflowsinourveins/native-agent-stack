@@ -1,0 +1,419 @@
+{
+ "id": "gap-wave2-20260923/us-equities__evaluation-experiments/0-promptfoo-inspect-two-arm",
+ "gap_index": 0,
+ "gap_text_sha256": "5a655b079b32df47121484b0da94fdb99843be24a7927e4d8621c961cd694159",
+ "next_check": "Run `node --test test-contract.cjs` in blueprints/native-skill-practice/. Author and freeze an inspect-ai 0.3.266 mock-model task using the same scorer, then run both arms on catalog-cases.json with bounded concurrency and retries, including an interrupt-and-resume. Compare scorer reproducibility, failure-log fidelity and resume success.",
+ "preregistration": {
+  "written_at": "2026-09-23T07:18:31Z",
+  "expectation": "Contract check passes (6 node tests). Both arms score the frozen 8 cases (catalog-cases.json sha256 7cc28c50...) with zero provider calls and produce identical per-case verdict/eligible/disposition vectors, because arm 2 applies the same containment transform and invokes the same gate.cjs plus the same three assertions. The exact-text baseline is expected to match 3/8 frozen verdict labels (as recorded in blueprints/native-skill-practice/README.md), so promptfoo is expected to exit 100 (assertion failures) rather than 0. Two clean repeats of each arm are expected to be identical. Both harnesses are expected to resume an interrupted run to 8 complete results.",
+  "criteria": [
+   "node --test test-contract.cjs exits 0 with 6 passing tests before any arm runs.",
+   "Frozen case file sha256 equals 7cc28c50afb9842de3d8dc923e80159bf99d0f0e9acd643684a99b61b3ad3a40 before and after the runs.",
+   "Zero provider calls: both arms run inside an unshare -rn network namespace (only an unconfigured loopback), TYPESAFE_API_KEY absent; promptfoo filtered to provider label exact-text-baseline-v1. Detection: any HTTP provider attempt in the namespace would fail and surface as an ERROR result or sample error, and promptfoo results would list a second provider; both are checked.",
+   "Bounded concurrency: promptfoo --max-concurrency 1; inspect --max-samples 1 --max-connections 1. Bounded retries: promptfoo HTTP maxRetries 0 is unchanged (echo provider makes no retry); inspect --retry-on-error 1. A fault-injection diagnostic (separately labelled, derived config/task) raises one transient error in case C3 on its first attempt in each arm and checks that the error text is retained and the bounded retry path recovers it (promptfoo via eval --retry-errors, inspect via retry-on-error).",
+   "Failure-log fidelity: for each arm, the retained output must identify each failed case, which assertion failed and the observed verdict, and must retain the injected error text. Scored per arm as the count of the 8 cases whose failure detail is recoverable from the retained log alone.",
+   "Interrupt and resume: each arm run with a per-case delay and concurrency 1, SIGINT after at least 2 but fewer than 8 cases complete, then resumed with the native command (promptfoo eval --resume; inspect eval-retry). Success = final result has exactly 8 cases, no duplicates, outcome vector equal to the uninterrupted run, and the pre-interrupt completed cases were not re-executed (checked by result ids/timestamps).",
+   "Settled only if every arm above executes; any arm not executed makes the outcome advanced."
+  ],
+  "file": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/prereg/0-promptfoo-inspect-two-arm.json",
+  "committed_in": "20fbeb6 (2026-09-23T07:18:35Z), before any check ran"
+ },
+ "commands": [
+  "cd blueprints/native-skill-practice && node --test test-contract.cjs",
+  "ECOSYSTEM_JOB_SECONDS=900 $HOME/codex-ecosystem/bin/ecosystem-bounded-run blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/run_two_arm.sh $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run",
+  "  arm 1 (per run): cd blueprints/native-skill-practice && PROMPTFOO_CONFIG_DIR=<run>/home unshare -rn promptfoo eval -c promptfooconfig.yaml --filter-providers exact-text-baseline-v1 --no-cache --no-share --no-table -j 1 -o <run>/results.json",
+  "  arm 2 (per run): cd blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm && HOME=<run>/home unshare -rn inspect eval catalog_task.py --max-samples 1 --max-connections 1 --retry-on-error 1 --log-format json --log-dir <run>/logs",
+  "  fault diagnostic: arm 1 with derived config (C3 transform throws when INJECT_FAIL=1), then promptfoo eval --retry-errors; arm 2 with -T fail_once_case=C3 (retry-on-error 1) and again with --retry-on-error 0",
+  "  interrupt/resume: arm 1 with --delay 1500, SIGINT after 5.5 s, then promptfoo eval --resume; arm 2 with -T delay=1.5, SIGINT after 7 s, then inspect eval-retry <cancelled log> --max-samples 1 --max-connections 1 --retry-on-error 1",
+  "python3 blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/compare_two_arm.py $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run . > $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/comparison.json",
+  "detection control: cd blueprints/native-skill-practice && env -u TYPESAFE_API_KEY PROMPTFOO_CONFIG_DIR=<ctl>/home REQUEST_TIMEOUT_MS=5000 timeout 120 unshare -rn promptfoo eval -c promptfooconfig.yaml --no-cache --no-share --no-table -j 1 -o <ctl>/results.json"
+ ],
+ "results": {
+  "contract_test": [
+   "\u2139 tests 6",
+   "\u2139 pass 6",
+   "\u2139 fail 0",
+   "exit=0"
+  ],
+  "timeline": [
+   "2026-09-23T07:26:37.134Z sha catalog-cases 7cc28c50afb9842de3d8dc923e80159bf99d0f0e9acd643684a99b61b3ad3a40",
+   "2026-09-23T07:26:38.081Z pf-clean-1 exit=100",
+   "2026-09-23T07:26:39.833Z in-clean-1 exit=0",
+   "2026-09-23T07:26:40.796Z pf-clean-2 exit=100",
+   "2026-09-23T07:26:42.528Z in-clean-2 exit=0",
+   "2026-09-23T07:26:43.524Z pf-fault first exit=100",
+   "2026-09-23T07:26:44.442Z pf-fault retry-errors exit=100",
+   "2026-09-23T07:26:46.279Z in-fault exit=0",
+   "2026-09-23T07:26:47.892Z in-fault-noretry exit=0",
+   "2026-09-23T07:26:53.396Z pf-int SIGINT pid=1529123",
+   "2026-09-23T07:26:54.867Z pf-int first exit=0",
+   "2026-09-23T07:27:13.840Z pf-int resume exit=100",
+   "2026-09-23T07:27:20.862Z in-int SIGINT pid=1534214",
+   "2026-09-23T07:27:21.266Z in-int first exit=0",
+   "2026-09-23T07:27:30.400Z in-int resume exit=0",
+   "2026-09-23T07:27:30.403Z sha catalog-cases 7cc28c50afb9842de3d8dc923e80159bf99d0f0e9acd643684a99b61b3ad3a40"
+  ],
+  "label_matches": {
+   "promptfoo": 3,
+   "inspect": 3,
+   "cases": 8
+  },
+  "outcome_vector_promptfoo": {
+   "C1": [
+    "insufficient",
+    true,
+    "advisory_insufficient",
+    false,
+    [
+     false,
+     true,
+     false
+    ]
+   ],
+   "C2": [
+    "insufficient",
+    true,
+    "advisory_insufficient",
+    true,
+    [
+     true,
+     true,
+     true
+    ]
+   ],
+   "C3": [
+    "insufficient",
+    true,
+    "advisory_insufficient",
+    false,
+    [
+     false,
+     true,
+     false
+    ]
+   ],
+   "C4": [
+    "insufficient",
+    true,
+    "advisory_insufficient",
+    true,
+    [
+     true,
+     true,
+     true
+    ]
+   ],
+   "C5": [
+    "insufficient",
+    true,
+    "advisory_insufficient",
+    false,
+    [
+     false,
+     true,
+     false
+    ]
+   ],
+   "C6": [
+    "insufficient",
+    false,
+    "reject_evidence",
+    false,
+    [
+     false,
+     true,
+     true
+    ]
+   ],
+   "C7": [
+    "insufficient",
+    true,
+    "advisory_insufficient",
+    false,
+    [
+     false,
+     true,
+     false
+    ]
+   ],
+   "C8": [
+    "insufficient",
+    true,
+    "advisory_insufficient",
+    true,
+    [
+     true,
+     true,
+     true
+    ]
+   ]
+  },
+  "reproducibility": {
+   "promptfoo_repeat_identical": true,
+   "inspect_repeat_identical": true,
+   "cross_arm_identical": true,
+   "differing_cases": []
+  },
+  "gate_source_hash_summary": {
+   "promptfoo_equal_frozen": [
+    "C3",
+    "C4",
+    "C5",
+    "C6",
+    "C7",
+    "C8"
+   ],
+   "inspect_equal_frozen": [
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5",
+    "C6",
+    "C7",
+    "C8"
+   ]
+  },
+  "provider_calls": {
+   "promptfoo_provider_labels": [
+    "exact-text-baseline-v1"
+   ],
+   "promptfoo_error_rows_clean": 0,
+   "inspect_model": "mockllm/model",
+   "inspect_model_usage": {
+    "mockllm/model": {
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   "inspect_sample_errors_clean": 0,
+   "network": "all arms under unshare -rn (loopback down, no route); any HTTP attempt would error"
+  },
+  "detection_control_unfiltered_in_netns": {
+   "counts": {
+    "exact-text-baseline-v1 failureReason=1": 5,
+    "typesafe-jev-1.13.0-evidence-v1 failureReason=2": 8,
+    "exact-text-baseline-v1 failureReason=0": 3
+   },
+   "typesafe_error_first_line": "Error: Request failed after 0 retries: TypeError: fetch failed (Cause: Error: getaddrinfo EAI_AGAIN api.typesafe.ai)"
+  },
+  "failure_log_fidelity": {
+   "promptfoo": {
+    "failed_cases": [
+     "C1",
+     "C3",
+     "C5",
+     "C6",
+     "C7"
+    ],
+    "failed_with_per_assertion_detail": [
+     "C1",
+     "C3",
+     "C5",
+     "C6",
+     "C7"
+    ],
+    "injected_error": {
+     "first_run_db_row_failure_reason": [
+      2
+     ],
+     "after_retry_db_row_failure_reason": [
+      1
+     ],
+     "db_row_id_replaced_on_retry": true,
+     "final_output_has_error_row": false,
+     "retained_error_log_files_with_text": [
+      "promptfoo-error-2026-09-23_07-26-43-274Z.log"
+     ],
+     "retry_recovered_outcome_equals_clean": true,
+     "output_file_overwritten_by_retry": true
+    }
+   },
+   "inspect": {
+    "failed_cases": [
+     "C1",
+     "C3",
+     "C5",
+     "C6",
+     "C7"
+    ],
+    "failed_with_per_assertion_detail": [
+     "C1",
+     "C3",
+     "C5",
+     "C6",
+     "C7"
+    ],
+    "injected_error": {
+     "final_log_status": "success",
+     "C3_error_retries_in_final_log": [
+      "RuntimeError('injected transient failure for C3 (first attempt)')"
+     ],
+     "retry_recovered_outcome_equals_clean": true,
+     "no_retry_log_status": "error",
+     "no_retry_error_message": "RuntimeError('injected transient failure for C3 (first attempt)')",
+     "no_retry_samples_in_log": 4
+    }
+   }
+  },
+  "interrupt_resume": {
+   "promptfoo": {
+    "evals_before": 1,
+    "evals_after": 1,
+    "same_eval_id": true,
+    "rows_before_resume": 2,
+    "rows_after_resume": 8,
+    "duplicate_test_idx_after": false,
+    "pre_interrupt_rows_preserved": true,
+    "final_outcome_equals_clean": true
+   },
+   "inspect": {
+    "interrupted_log_status": "cancelled",
+    "completed_before": [
+     "C1",
+     "C2",
+     "C3"
+    ],
+    "cancelled_samples": [
+     "C4"
+    ],
+    "resumed_log_status": "success",
+    "samples_after": 8,
+    "completed_samples_reused_not_rerun": true,
+    "final_outcome_equals_clean": true
+   }
+  },
+  "superseded_attempts": [
+   "attempt 1 (07:22:15Z): inspect rejected the absolute task path (NotImplementedError: Non-relative patterns are unsupported); no inspect sample was scored; runner fixed to cd into the task directory (frozen task files unchanged).",
+   "attempt 2 (07:23:36Z): all clean and fault runs scored; the background inspect run ignored SIGINT (inherited SIG_IGN) and ran to completion, and eval-retry rejected --log-format; runner fixed.",
+   "attempt 3 (07:24:56Z): all checks passed, but the promptfoo fault first-run and retry stdout shared one file; runner fixed to capture them separately and snapshot the DB before and after the retry.",
+   "attempt 4 (07:26:37Z): retained run; all results in this receipt come from it."
+  ]
+ },
+ "outcome": "settled",
+ "outcome_note": "Every arm executed: contract check 6/6; both arms scored the frozen 8 cases with zero provider calls under unshare -rn; bounded concurrency 1 and bounded retries (inspect retry-on-error 1, promptfoo --retry-errors; HTTP maxRetries 0 untouched); retained failure logs; SIGINT interrupt then native resume to 8/8 in both arms. Scorer outcomes identical across repeats and arms (3/8 label matches, promptfoo exit 100). Differences: promptfoo compacts the JSON-valued C1/C2 source vars (gate source_sha256 differs from the frozen bytes for C1/C2; inspect matches all 8), and promptfoo's --retry-errors replaces the errored DB row and overwrites the original -o file, keeping the injected error only in its separate error log, whereas inspect keeps it in the final eval log's error_retries.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "Deterministic exact-text baseline only: no model or TypeSafe inference, so nothing about semantic accuracy, latency or cost follows.",
+  "Fault injection used a derived promptfoo config (transform throws for C3 when INJECT_FAIL=1) and task args for inspect; the unmodified config was used for all other arm-1 runs.",
+  "One interrupt timing per arm (promptfoo after 2 of 8, inspect after 3 of 8 with C4 in flight); other interruption points untested.",
+  "Arm 2's mock model evaluates the promptfoo transform expression via node and the scorer runs gate.cjs via node; it is a locally authored adapter, not an upstream inspect example.",
+  "SIGINT for background runs required restoring the default SIGINT disposition (non-interactive bash ignores it in background jobs). Superseded attempts are listed in results.superseded_attempts; only attempt 4 is retained."
+ ],
+ "raw_outputs": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/contract-test.txt",
+   "sha256": "864735072b546fb3be107c2219c7364895803a01aac6885e1e447ea61cd9cee1"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/comparison.json",
+   "sha256": "ba06cc9d57180c6f9cf326e2cb5f85498b0dfbd4e70d70a1dda217b77b6f0aab"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/timeline.txt",
+   "sha256": "d7a347b7fcacb31e4bf36df5a128045f885bea270687143b489d62bfb0cb322d"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/control/stdout.txt",
+   "sha256": "e90f89e67478db0b8ff794451df5966fc9c9995dbfbf532a581596124de997da"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/control/results.json",
+   "sha256": "eb515c03877d6eccf495bcf606ec046864c2bdbf5c22f4b57d2a9f283c75c995"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-clean-1/results.json",
+   "sha256": "db4160a6dbc87bd6dbea6aa0c70e52268f0ef8f636abc1513ab6689e87172a6b"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-clean-2/results.json",
+   "sha256": "a21b4ea593fe546e96ab5568cdaad217dbbc073a6a2bef6cd650cfaea73c6b2a"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/in-clean-1/logs/2026-09-23T07-26-38-00-00_catalog-cases_dvpzjs6ojajkGw3tzkejww.json",
+   "sha256": "79fc9e111b1b6fa0221cb25e7fe8cbb46db91b06b3b22ee980d17007d4a6e100"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/in-clean-2/logs/2026-09-23T07-26-41-00-00_catalog-cases_inJDdMdvmNcwrKGM2mkvxb.json",
+   "sha256": "acbf636ee7b94adc7fcadfcff947c539bcecbba9178caf2f765269a52bcae29b"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-fault/db-after-first.json",
+   "sha256": "c548e60da7016a051a496cb0d4b65f9d94c8f935d9c4816563ff5f7adaab1445"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-fault/db-after-retry.json",
+   "sha256": "55ef6227eea86d18fc1369aee4402d270f11f4303a7314b3961af78ed5bc7df3"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-fault/results.json",
+   "sha256": "2d388ec88b4d375842072305fc40bb981d654eb17589cb7406701f0f6cfd0ce5"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-fault/promptfooconfig.fault.yaml",
+   "sha256": "892cc998295ffafe959500474c8ea31c4c18a3b4c09feef1aa86da8bb061a7ba"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-fault/stdout.txt",
+   "sha256": "a1f24e5058a2093ea85d8e788859d676d4a2388da8c5de45d5d9cd9c3306cd4b"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-fault/cfg-home/logs/promptfoo-error-2026-09-23_07-26-43-274Z.log",
+   "sha256": "3e4496b4ad6706fbd6481427bf1c48d547127d829a9c21681817538e0ed12f47"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-fault/cfg-home/logs/promptfoo-error-2026-09-23_07-26-44-255Z.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-fault-retry/stdout.txt",
+   "sha256": "dcaa8340cb6ec5d9b2c11a498e5c0718af71338bc0bd25a2a450e43feeb5ec16"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/in-fault/logs/2026-09-23T07-26-45-00-00_catalog-cases_j9YdzchYvn3uVfdwgwLSxh.json",
+   "sha256": "8da829e107efa0240eccbd308b9c7fd6dc136b804fb96ded92086a69768cdded"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/in-fault-noretry/logs/2026-09-23T07-26-47-00-00_catalog-cases_NgsEgbVGEphcnFjoaMRzeW.json",
+   "sha256": "478be19de0692ba561170feaf300bdbd563aade00b5bffb445501161a8009746"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-int/db-after-interrupt.json",
+   "sha256": "1cd026cf3fdef925388df55d5e7feae9f772d7776e399dd64403ca31b0b144cd"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-int/db-after-resume.json",
+   "sha256": "003e69841da0e7ac8f5e62bd20a8cf5b98315dca19e7bc72717b648714d91ec5"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-int/results-interrupted.json",
+   "sha256": "0ae9d0b51fcdf9da9f2976e6e4dcf75b5c3f3ea896c3c58226897c4df9287f9e"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-int/stdout-1.txt",
+   "sha256": "646c09dfc2c13e2d463d68b619353e8985233069449c3f6947b4944d1c3b1906"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/pf-int/stdout-2.txt",
+   "sha256": "a5f067b89e5f4e2c359a27004f8bb9a7f5a947cae4aa9d8756d5311be3675dae"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/in-int/logs/2026-09-23T07-27-14-00-00_catalog-cases_joNnUqqfENjtgsJDox2Bhn.json",
+   "sha256": "05f23f9cdf8140353317dcfb68215f2af021945ed810b0d116c2fbfc79d8b367"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/in-int/logs/2026-09-23T07-27-22-00-00_catalog-cases_joNnUqqfENjtgsJDox2Bhn.json",
+   "sha256": "8852e8289c95e3f1db66f004c1d08a6ad33934894bc1873040e1bcb399ded6ca"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/in-int/stdout-1.txt",
+   "sha256": "82c9d8d2e70d90f83ba9d143eaf1b3a745dd28e866b52e8aadae48981fdcef56"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/in-int/stdout-2.txt",
+   "sha256": "992a0cfde8e1af102d6c079ee8fb5d93ffcd8b7281a2dc1b6d44ee950990a8c5"
+  }
+ ],
+ "checked_at": "2026-09-23T13:51:51Z"
+}

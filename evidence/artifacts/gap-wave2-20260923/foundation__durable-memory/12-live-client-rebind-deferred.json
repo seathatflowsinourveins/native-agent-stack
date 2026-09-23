@@ -1,0 +1,59 @@
+{
+  "id": "12-live-client-rebind-deferred",
+  "gap_index": 12,
+  "gap_text_sha256": "e51555ccda8d0d274f5f73d180acdeb88e265d82ba7eb423ad0092f074617406",
+  "preregistration": {
+    "written_at": "2026-09-23T01:30:10Z",
+    "late": true,
+    "late_reason": "Both halves' text was written by the fix round at 01:30:10Z, after half (b) ran; no preregistration preceded the run. The previous claim that half (b) was 'preregistered and executed together' is withdrawn.",
+    "expectation": "This gap has two independent halves and this fix round scopes them separately (per review): (a) rebinding a native client's MCP config and AI_MEMORY_SERVER_URL to a restored/disposable instance, which the fix round assumed required editing a live client's configuration file (see the reconciliation note: a temporary --mcp-config file does not); (b) a concurrent write-page load against a fully disposable, network-namespace-isolated ai-memory instance (the protocol validated in this unit's gap-14 receipt), with a mid-flight raw filesystem snapshot compared against the final wiki/DB state for consistency. (b) needs no live-client rebinding and no live-store contact, so it is attempted here.",
+    "criteria": "Half (a) settled only by verifying memory_status/memory_query against a restored-and-rebound instance from an actual native client session with its config safely restorable afterward -- out of this worker's authorized scope. Half (b) settled/advanced by demonstrating (or failing to demonstrate) a torn/inconsistent state between the wiki markdown tree and the pages table under a raw copy taken during concurrent writes.",
+    "timestamp_note": "Timestamps reconciled on 2026-09-23T02:30:41Z from the unit workers' session transcripts (tool-call times, listed in raw/INDEX.json). The earlier value 2026-09-23T01:20:00Z was shared by every receipt, fell after the first-pass commit (01:19:05Z) and matched no recorded event."
+  },
+  "commands": [
+    {
+      "cmd": "n/a -- half (a) not attempted; would require editing this or another session's live MCP client configuration under ~/.config or an equivalent live-settings path",
+      "exit": null,
+      "output_excerpt": "Not run. The recorded blockers do not hold: a single bounded `claude -p --mcp-config <temp file> --strict-mcp-config` call reads a temporary MCP config and does not touch ~/.config, and the assignment allowed one bounded single-call Claude check during the account reservation."
+    },
+    {
+      "cmd": "D=$HOME/.cache/gap-wave2-20260923/durable-memory/snap-probe; SNAP=$D-copy; timeout 35 unshare -rn bash -c \"set -u; ip link set lo up; ai-memory init --data-dir $D; sed -i 's/bind = \\\"127.0.0.1:49374\\\"/bind = \\\"127.0.0.1:49592\\\"/' $D/config.toml; export AI_MEMORY_EMBEDDING_PROVIDER=none; export AI_MEMORY_SERVER_URL=http://127.0.0.1:49592; ai-memory serve --data-dir $D --transport http --bind 127.0.0.1:49592 --no-watcher & sleep 1.2; for i in 1..8: timeout 6 ai-memory write-page --data-dir $D --path scratch/concurrent-$i.md ... & ; sleep 0.05; cp -r $D $SNAP; wait writers; ai-memory status --data-dir $D | grep pages; ...\" | grep -E 'RESULT|pages:|error|Error' (abridged; exact text in raw, transcript call [27])",
+      "exit": 0,
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-gap12b-attempts.txt",
+      "output_excerpt": "RESULT_STATUS:\n  pages:        8 (all versions: 8)\n(the other RESULT_ sections printed nothing through the grep filter; sqlite3 is not installed)\nwp-1..wp-8: ✓ wrote scratch/concurrent-N.md ... under disposable-ws/disposable-proj",
+      "note": "AI_MEMORY_SERVER_URL was exported inside the namespace shell, so the client calls used it (the previous receipt text implied it was set only on serve). Earlier attempts: call [19] was killed by timeout (exit 143, no output); call [20] exited 144 and left no output file; call [26] was a single-write smoke test. Call [27] is the only concurrent attempt that produced data.",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "find $D/wiki / $SNAP/wiki -iname 'concurrent-*.md' | wc -l (call [28]); python3 sqlite3 read-only count + integrity_check on $D and $SNAP (call [29])",
+      "exit": 0,
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-gap12b-attempts.txt",
+      "output_excerpt": "source files: 8; snap files: 0; source concurrent_rows= 8 integrity= ok; snapshot concurrent_rows= 0 integrity= ok",
+      "note": "The post-write state was read directly from the source dir $D, not from a second snapshot. One snapshot was taken, and it predates every write.",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "results": "Half (a), live-client rebinding: not run, and its recorded blockers do not hold (a temporary --mcp-config needs no ~/.config edit; one bounded single-call Claude check was allowed). Half (b): one concurrent attempt produced data, run in a disposable data dir inside unshare -rn with AI_MEMORY_SERVER_URL exported. The single raw copy, taken 50 ms after the 8 writers were launched, held 0 wiki files and 0 page rows. The source dir, read directly after the writers finished, held 8 and 8, with integrity_check ok on both. No torn state was caught because the copy predates every write, so atomic wiki/database consistency is neither shown nor refuted.",
+  "outcome": "not_settled",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Half (a) not executed; remaining: restore a snapshot to a new dir and loopback port, then one bounded `claude -p --mcp-config <temp> --strict-mcp-config` call checking memory_status and memory_query against it.",
+    "Half (b): one data-producing attempt and one snapshot; remaining: copies taken while writes are in flight (for example a larger batch, or several staggered copies) compared file-by-row.",
+    "sqlite3 CLI absent; counts came from Python's sqlite3 module in read-only mode on the disposable copies.",
+    "raw/gap12-half2-probe.sh is the script version that exited 144 without output (port 49591); the data came from the inline command in call [27] (port 49592)."
+  ],
+  "checked_at": "2026-09-23T01:27:41Z",
+  "checked_at_note": "Time of the only data-producing concurrent-write attempt (fix-round transcript Bash call [27]); the Python sqlite read of both copies ran at 01:28:01Z (call [29]).",
+  "reconciliation": {
+    "reconciled_at": "2026-09-23T02:30:41Z",
+    "new_checks_run": false,
+    "changes": [
+      "'every attempt' and 'post-write snapshot' corrected: one data-producing attempt, one snapshot, post-write state read from the source dir.",
+      "Half (a) deferral reasons shown not to hold (temp --mcp-config; single-call allowance).",
+      "AI_MEMORY_SERVER_URL export recorded as it actually ran.",
+      "Real timestamps; late label kept; raw outputs committed."
+    ]
+  }
+}

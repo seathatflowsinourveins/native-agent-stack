@@ -1,0 +1,16 @@
+[
+ {
+  "task": "crawl_fixture",
+  "success": false,
+  "ms": 312,
+  "status_code": 200,
+  "markdown_snippet": "# Local browser command check\nNameGreet\nReady\n"
+ },
+ {
+  "task": "crawl_public_site",
+  "success": true,
+  "ms": 301,
+  "status_code": 200,
+  "markdown_snippet": "# Example Domain\nThis domain is for use in documentation examples without needing permission. Avoid use in operations.\n[Learn more](https://iana.org/domains/example)\n"
+ }
+]

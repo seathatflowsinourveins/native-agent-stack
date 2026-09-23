@@ -1,0 +1,192 @@
+{
+ "schema_validation": {
+  "codex": "valid",
+  "claude": "valid"
+ },
+ "per_case": {
+  "C1": {
+   "frozen_label": "supported",
+   "codex_blind": "supported",
+   "claude_blind": "supported",
+   "typesafe_2026_09_21": "supported",
+   "prior_codex_review": "supported",
+   "prior_claude_review": "supported"
+  },
+  "C2": {
+   "frozen_label": "insufficient",
+   "codex_blind": "insufficient",
+   "claude_blind": "contradicted",
+   "typesafe_2026_09_21": "insufficient",
+   "prior_codex_review": "insufficient",
+   "prior_claude_review": "insufficient"
+  },
+  "C3": {
+   "frozen_label": "supported",
+   "codex_blind": "supported",
+   "claude_blind": "supported",
+   "typesafe_2026_09_21": "supported",
+   "prior_codex_review": "supported",
+   "prior_claude_review": "supported"
+  },
+  "C4": {
+   "frozen_label": "insufficient",
+   "codex_blind": "insufficient",
+   "claude_blind": "contradicted",
+   "typesafe_2026_09_21": "contradicted",
+   "prior_codex_review": "insufficient",
+   "prior_claude_review": "insufficient"
+  },
+  "C5": {
+   "frozen_label": "contradicted",
+   "codex_blind": "contradicted",
+   "claude_blind": "contradicted",
+   "typesafe_2026_09_21": "contradicted",
+   "prior_codex_review": "contradicted",
+   "prior_claude_review": "contradicted"
+  },
+  "C6": {
+   "frozen_label": "supported",
+   "codex_blind": "supported",
+   "claude_blind": "supported",
+   "typesafe_2026_09_21": "supported",
+   "prior_codex_review": "supported",
+   "prior_claude_review": "supported"
+  },
+  "C7": {
+   "frozen_label": "contradicted",
+   "codex_blind": "contradicted",
+   "claude_blind": "contradicted",
+   "typesafe_2026_09_21": "contradicted",
+   "prior_codex_review": "contradicted",
+   "prior_claude_review": "contradicted"
+  },
+  "C8": {
+   "frozen_label": "insufficient",
+   "codex_blind": "insufficient",
+   "claude_blind": "insufficient",
+   "typesafe_2026_09_21": "insufficient",
+   "prior_codex_review": "insufficient",
+   "prior_claude_review": "insufficient"
+  },
+  "C9": {
+   "frozen_label": "supported",
+   "codex_blind": "supported",
+   "claude_blind": "supported",
+   "typesafe_2026_09_21": null,
+   "prior_codex_review": null,
+   "prior_claude_review": null
+  },
+  "C10": {
+   "frozen_label": "contradicted",
+   "codex_blind": "contradicted",
+   "claude_blind": "contradicted",
+   "typesafe_2026_09_21": null,
+   "prior_codex_review": null,
+   "prior_claude_review": null
+  },
+  "C11": {
+   "frozen_label": "contradicted",
+   "codex_blind": "contradicted",
+   "claude_blind": "contradicted",
+   "typesafe_2026_09_21": null,
+   "prior_codex_review": null,
+   "prior_claude_review": null
+  },
+  "C12": {
+   "frozen_label": "supported",
+   "codex_blind": "supported",
+   "claude_blind": "supported",
+   "typesafe_2026_09_21": null,
+   "prior_codex_review": null,
+   "prior_claude_review": null
+  },
+  "C13": {
+   "frozen_label": "insufficient",
+   "codex_blind": "insufficient",
+   "claude_blind": "insufficient",
+   "typesafe_2026_09_21": null,
+   "prior_codex_review": null,
+   "prior_claude_review": null
+  },
+  "C14": {
+   "frozen_label": "contradicted",
+   "codex_blind": "contradicted",
+   "claude_blind": "contradicted",
+   "typesafe_2026_09_21": null,
+   "prior_codex_review": null,
+   "prior_claude_review": null
+  },
+  "C15": {
+   "frozen_label": "supported",
+   "codex_blind": "supported",
+   "claude_blind": "supported",
+   "typesafe_2026_09_21": null,
+   "prior_codex_review": null,
+   "prior_claude_review": null
+  },
+  "C16": {
+   "frozen_label": "insufficient",
+   "codex_blind": "insufficient",
+   "claude_blind": "insufficient",
+   "typesafe_2026_09_21": null,
+   "prior_codex_review": null,
+   "prior_claude_review": null
+  },
+  "C17": {
+   "frozen_label": "contradicted",
+   "codex_blind": "contradicted",
+   "claude_blind": "contradicted",
+   "typesafe_2026_09_21": null,
+   "prior_codex_review": null,
+   "prior_claude_review": null
+  },
+  "C18": {
+   "frozen_label": "supported",
+   "codex_blind": "supported",
+   "claude_blind": "supported",
+   "typesafe_2026_09_21": null,
+   "prior_codex_review": null,
+   "prior_claude_review": null
+  },
+  "C19": {
+   "frozen_label": "contradicted",
+   "codex_blind": "contradicted",
+   "claude_blind": "contradicted",
+   "typesafe_2026_09_21": null,
+   "prior_codex_review": null,
+   "prior_claude_review": null
+  },
+  "C20": {
+   "frozen_label": "insufficient",
+   "codex_blind": "insufficient",
+   "claude_blind": "contradicted",
+   "typesafe_2026_09_21": null,
+   "prior_codex_review": null,
+   "prior_claude_review": null
+  }
+ },
+ "agreement": {
+  "codex_blind": {
+   "vs_frozen_label_C1_C8": "8/8",
+   "vs_typesafe_C1_C8": "7/8",
+   "vs_frozen_label_C9_C20": "12/12",
+   "vs_frozen_label_all_20": "20/20"
+  },
+  "claude_blind": {
+   "vs_frozen_label_C1_C8": "6/8",
+   "vs_typesafe_C1_C8": "7/8",
+   "vs_frozen_label_C9_C20": "11/12",
+   "vs_frozen_label_all_20": "17/20"
+  },
+  "codex_blind_vs_claude_blind_all_20": "17/20",
+  "typesafe_vs_frozen_label_C1_C8": "7/8"
+ },
+ "C4": {
+  "frozen_label": "insufficient",
+  "codex_blind": "insufficient",
+  "claude_blind": "contradicted",
+  "typesafe_2026_09_21": "contradicted",
+  "prior_codex_review": "insufficient",
+  "prior_claude_review": "insufficient"
+ }
+}

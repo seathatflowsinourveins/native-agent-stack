@@ -1,0 +1,96 @@
+{
+  "id": "gap-wave2-20260923/foundation__agent-sdks/preregistration-round4",
+  "written_at": null,
+  "written_at_note": "Written between 14:11:57Z (a date call just before writing) and 14:12:27Z (commit 1ce3105 time); the first draft carried 14:13:00Z, which was later than its own commit and is corrected here in an amended commit. Written before the round-4 model download, before the local vLLM server started and before any round-4 inference.",
+  "context": "Round 4 re-dispatch on base 41d39b3; rounds 1-3 are already on this branch. Round 4 targets the gaps still marked advanced (0, 1, 8, 9, 10, 11) using an isolated alternative not tried before: a loopback-only local model provider (vLLM 0.25.0 from the ecosystem install, run as a new process on 127.0.0.1:28431, model Qwen/Qwen3-4B-Instruct-2507-FP8 at revision 8591804019c8b22094c3b5b4454e0edc05dffc98, weights downloaded into $HOME/.cache/gap-wave2-20260923/agent-sdks/hf through ecosystem-bounded-run). Both SDKs are pointed at it: the Codex SDK through a custom model_provider (wire_api responses) in a fresh CODEX_HOME with no auth.json, and the Claude Agent SDK through ANTHROPIC_BASE_URL with a dummy key, a temp HOME and a temp CLAUDE_CONFIG_DIR. Neither the shared Claude account nor the Codex account is used by those arms, and no credential file is read. The provider's Prometheus /metrics counters give a provider-side token count that the hosted accounts do not expose.",
+  "arms": {
+    "gap_1_and_11_cancel_consumption": {
+      "expectation": "For each SDK, a long generation interrupted after streaming starts makes the local provider stop generating: vllm:num_requests_running returns to 0 within 10 s of the interrupt, and vllm:generation_tokens_total does not grow across two later settle windows. The native logs (Codex rollout token_count, Claude session JSONL usage and ResultMessage usage) will under-report the interrupted request against the provider's prompt and generation token deltas.",
+      "criteria": [
+        "provider metrics sampled before the turn, at interrupt, after settle 1 and after settle 2 (10 s each), with the per-SDK request isolated (no other client on the server)",
+        "consumption stops: generation_tokens_total(settle2) == generation_tokens_total(settle1) and num_requests_running == 0 at settle1",
+        "detector: a control request that is not interrupted must show generation_tokens_total growing by its completion_tokens, so the counter can see consumption",
+        "provider-side prompt and generation deltas recorded next to the SDK-reported usage and the native session-log usage for the same request",
+        "gap 1 stays advanced unless hosted-provider consumption becomes observable; the local provider is a substitute channel, not the hosted accounts",
+        "gap 11 stays advanced: hosted billing and multi-host recovery are not tested; the zombie-worker arm below only strengthens the one-host exactly-once evidence"
+      ]
+    },
+    "gap_11_zombie_worker": {
+      "expectation": "A Temporal worker paused with SIGSTOP mid-activity (a stand-in for a partition or long GC pause) loses its activity to a second worker after the heartbeat timeout; when resumed with SIGCONT, the stale worker's effect write is rejected by the idempotency key and its completion is not accepted by the server. The effect row count stays 1.",
+      "criteria": [
+        "attempt 1 on worker A (paused), attempt 2 on worker B completes the workflow",
+        "after SIGCONT, worker A's effect attempt is recorded as refused (key exists) and the workflow result is from worker B",
+        "effect rows == 1; negative control without the idempotency key writes 2 rows (detector)",
+        "one host only; labelled local_integration"
+      ]
+    },
+    "gap_9_matched_comparison": {
+      "expectation": "One fixed task (vault_lookup custom tool returning a random value, a long-essay turn interrupted mid-stream, then a new-process resume asking for the stored value) runs through both SDKs against the same local model and provider. The Codex SDK registers the tool as a thread dynamicTool; the Claude Agent SDK registers it through create_sdk_mcp_server. Both are scored on the checklist carried over from round 1: structured events typed, custom-tool round trip, mid-turn interrupt status, resume recall in a new process.",
+      "criteria": [
+        "custom-tool round trip: the host-side handler is called with key alpha and the model's final answer contains the handler's value",
+        "interrupt: the SDK reports an interrupted/aborted terminal state and the provider shows the request ended (num_requests_running 0)",
+        "resume: a new OS process resumes the same thread/session id and returns the turn-1 value without calling the tool (a decoy handler value must not appear)",
+        "structured events: every received event is a typed SDK object (Codex: not UnknownNotification; Claude: SDK message classes)",
+        "settled only if both SDKs complete all four items on the same task; model-quality failures of the small local model are recorded as such and leave the gap advanced",
+        "scope stated in the receipt: SDK-level comparison with one open-weight model; hosted gpt/claude models are not part of this arm"
+      ]
+    },
+    "gap_8_openhands_real_model": {
+      "expectation": "The OpenHands SDK (1.49.4, existing venv) runs a local Conversation with a real model through LiteLLM (openai-compatible base_url to the loopback vLLM), and the agent uses the terminal or file-editor tool to create a file with a requested content. If openhands-agent-server installs into a fresh prefix, a second conversation runs through a loopback agent-server process (RemoteWorkspace/remote conversation).",
+      "criteria": [
+        "local conversation: execution status FINISHED, at least one ActionEvent from the model (not TestLLM), the file exists with the requested content, provider request count > 0",
+        "remote arm: conversation created on the loopback agent-server, events returned over its API, the file exists in the server's workspace",
+        "container arm: attempted only if an agent-server image and a docker-compatible runtime are available without touching shared container storage; otherwise named as the remaining blocker",
+        "settled only if LangGraph and Temporal (round 1) plus an OpenHands real-model conversation hold and the remote/container clause is exercised; otherwise advanced with the remainder named"
+      ]
+    },
+    "gap_10_more_native_types": {
+      "expectation": "Against the local provider (no account use), client-driven app-server requests (thread/name/set, thread/archive and unarchive, thread/compact/start, a turn with a plan update and a command) raise the count of natively received documented notification types above round 3's 13. Not every documented type can be triggered on this host (for example login, Windows sandbox and realtime types).",
+      "criteria": [
+        "received documented types listed from a collector draining turn and global queues; every received type typed",
+        "settled only if all 82 documented types are received natively; otherwise advanced with the count"
+      ]
+    },
+    "gap_0": {
+      "expectation": "Not run: the recovery needs 12 submissions on Claude arms with Claude models; a local model cannot stand in for the protocol's arms. Outcome stays advanced.",
+      "criteria": [
+        "no change to comparison-progress-20260922/summary.json in this round"
+      ]
+    }
+  },
+  "stop_rules": [
+    "any single check running past 20 minutes is stopped and recorded as not_settled",
+    "the vLLM server is stopped at the end of round 4 and its GPU memory release is checked with nvidia-smi",
+    "no hosted model call is needed by these arms; if one becomes necessary it is limited to one bounded Codex call (codex exec count classified by argv first)"
+  ],
+  "written_window": {
+    "not_before": "2026-09-23T14:11:57Z",
+    "not_after": "2026-09-23T14:12:27Z"
+  },
+  "round4_review_fix": {
+    "written_at": "2026-09-23T14:55:50Z",
+    "label": "fix-round preregistration, written after the cross-family review of 594de02..b59b175 (codex exec, read-only, gpt-6-astra) and before any fix or rerun; not back-dated",
+    "findings_and_plan": [
+      "1 (major, supported): the container arm ran with --network host and the image's VSCode service bound 0.0.0.0:8001 on the host network for about a minute, breaking the loopback-only rule. Plan: record the deviation; rerun the container arm with podman's pasta network (container ports stay in the container namespace; only 127.0.0.1:28433 is published; the container reaches the model through a pasta -T 28431 forward), OH_ENABLE_VSCODE=false, and a host listener snapshot (ss -ltnp) taken while the container runs. Expectation: the snapshot shows no new non-loopback listener and the conversation finishes with the token file in the container. Gap 8 stays settled only if the rerun passes; otherwise advanced.",
+      "2 (major, supported): the gap-9 typed-event check saw only turn-routed Codex notifications, and the Claude SDK silently drops unknown message types. Plan: tap every notification before routing (Codex: MessageRouter.route_notification) and every raw CLI message before parsing (Claude: message_parser.parse_message) in the session and resume phases; add detectors (an unknown method and a malformed known method must classify as untyped; an unknown Claude message type must be counted as dropped). Rerun 3 session trials and 1 resume per SDK. Gap 9 is settled only if every tapped item is typed (or explicitly a documented type) in all reruns and the detectors fire; otherwise advanced.",
+      "3 (major, supported): 'late completions were rejected by the server' is not observed; the worker log shows worker-side cancellation. Plan: remove the claim; state what the history shows (one ActivityTaskCompleted, result from attempt 4).",
+      "4 (minor): rename the predicate in the receipt (retry on worker B, with the actual attempt number) from the raw data; the raw key name stays as recorded.",
+      "5 (minor): derive checked_at from every contributing run.",
+      "6 (minor): the repeated Codex token_count precedes turn_aborted; fix the wording.",
+      "7 (minor): drop the GPU attribution.",
+      "8 (minor): record the download command with its import."
+    ]
+  },
+  "round4_review_fix2": {
+    "written_at": "2026-09-23T15:45:21Z",
+    "label": "fix-round preregistration, written after the independent Opus review of the round-4 fix round and before any rerun; not back-dated",
+    "findings_and_plan": [
+      "1 (minor, supported): openhands-remote.json (14:30:50-14:31:03Z) came from a working-tree revision of r4_openhands.py that predates the committed one (69fa1bb): the committed script always writes workspace_cat or workspace_cat_error for a non-local run that ends ok, and that output has neither. Plan: disclose this in receipt 8 and the README, keep the output as run 1, and rerun the remote arm once with the committed script (unchanged, git hash-object recorded) against a fresh loopback agent-server 1.49.4 (127.0.0.1:28432) and the same loopback vLLM. Expectation: status ok, RemoteConversation, FINISHED, workspace_cat present with exit_code 0 and stdout_has_token true, proof_file_has_token true on the host path, provider generation delta > 0. If it passes, the rerun becomes the cited remote arm; if not, gap 8 drops to advanced with the failure quoted.",
+      "2 (minor, supported): the stop rule's GPU check was reported only for the first stop; the fix-round pair (5526 MiB before the 14:56Z restart, 5758 MiB after the 15:03:19Z stop) was not reported or evaluated. Plan: report both pairs and state that aggregate readings cannot confirm release. For the rerun stop, record a before/during/after triple of memory.used, `nvidia-smi --query-compute-apps` output (detection method for per-process attribution; on WSL it is expected to list no processes, in which case attribution is recorded as unavailable), and a ps check that no process of this unit's vLLM (the Qwen3-4B snapshot path) remains. Criterion: the rule counts as evaluated for the rerun stop if the unit's vLLM process is gone and memory.used falls back by at least 80% of the during-minus-before rise; otherwise it is recorded as not confirmed with the readings."
+    ],
+    "stop_rules": [
+      "the rerun is stopped after 20 minutes and recorded as not_settled",
+      "no hosted model call; the embedding vLLM on :8231 and every other service are not touched"
+    ]
+  }
+}

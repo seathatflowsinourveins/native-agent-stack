@@ -1,0 +1,60 @@
+{
+  "id": "6-review-workflow-project-settings-deferred",
+  "gap_index": 6,
+  "gap_text_sha256": "461a39fa71fc18e6d5cbb000c31449902d62245278f2ebd7c1cbab8587ff3939",
+  "preregistration": {
+    "written_at": "2026-09-23T01:01:01Z",
+    "expectation": "The `review-changes` workflow is tracked at `examples/claude-native/workflows/review-changes.js` (correcting the superseded receipt's false premise that it does not exist anywhere in this repo). Its `status`/`accepted` computation can be read directly from source to see whether a strict `accepted` status without a fix-and-commit gate is structurally possible, even though actually running it end-to-end under `claude --setting-sources project` needs a three-phase (sonnet/opus/sonnet) native Claude Workflow, which this run cannot dispatch while the shared Claude account is reserved for a peer session's long-horizon comparison.",
+    "criteria": "Settled only if the workflow is run to completion under project-only settings and its terminal status is observed. Deferred, with the exact blocker, if no run can be dispatched.",
+    "timing": "post_hoc fix-round text written at 2026-09-23T01:01:01Z after the source read (00:54:11Z); criteria reworded in the reconciliation pass (2026-09-23T02:21:44Z) to drop the 'advanced on source review' branch, which could not narrow the executed claim. The receipt previously showed 01:20:00Z, which was not a real time."
+  },
+  "commands": [
+    {
+      "cmd": "cd $HOME/code/nas-wt-g2-workers && git ls-tree -r origin/main --name-only | grep -i 'child-usage\\|review-changes\\|workflows/' | head -50 && echo ---- && ls -la examples/claude-native/workflows/ 2>&1",
+      "exit": 0,
+      "started_at": "2026-09-23T00:53:00.632Z",
+      "duration_s": 0.333,
+      "output_excerpt": "examples/claude-native/workflows/review-changes.js is tracked in origin/main",
+      "output_sha256": "b1b583e07e17455cad5112104e2a486e645b73cb8089f0cf34e71581d6fa364a",
+      "raw_output": "raw/gap6-transcript-extract.json#toolu_01WWeW5Utsj7fvvZSxGCrQkZ",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/code/nas-wt-g2-workers && sed -n '1,40p' examples/claude-native/workflows/review-changes.js && echo --- && sed -n '140,180p' examples/claude-native/workflows/review-changes.js",
+      "exit": 0,
+      "started_at": "2026-09-23T00:54:11.738Z",
+      "duration_s": 0.14,
+      "output_excerpt": "meta.phases Inventory (sonnet), Review (opus), Recheck (sonnet); status logic returns 'accepted' when no failed checks, defects, rejected/unresolved claims, evidence issues or gaps",
+      "output_sha256": "a125a151ce54e44758ba1a4079e28f1a5e53c7de797920fa5934d74bcaa82730",
+      "raw_output": "raw/gap6-transcript-extract.json#toolu_01Cj6TkBdrnW4vUhNeWaLTKz",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "claude --setting-sources project ... (native Workflow launch of review-changes.js) -- NOT RUN",
+      "exit": null,
+      "started_at": null,
+      "duration_s": null,
+      "output_excerpt": "not dispatched: a three-phase native Claude Workflow is a Claude multi-agent run, which the unit rules defer while the shared Claude account is reserved for another session's long-horizon comparison (from 2026-09-23 00:33 UTC)",
+      "output_sha256": null,
+      "raw_output": null
+    }
+  ],
+  "results": "Deferred. The tracked source (examples/claude-native/workflows/review-changes.js) can return 'accepted'. That was never in doubt and does not touch the gap. The gap asks whether an executed run under project-only settings returns strict accepted without a fix-and-commit gate. No run was made, so the source reading does not narrow the executed claim, and the earlier 'advanced' outcome is withdrawn. Real blocker: running review-changes.js is a three-phase native Claude Workflow (Sonnet, Opus, Sonnet children). The unit rules defer any Claude multi-agent fan-out while the shared Claude account is reserved, and allow one bounded single call. Isolated alternatives do not remove this blocker. A temp HOME, `unshare` or a loopback-only instance changes host state, not account use, and a Codex substitute would not exercise the Claude review workflow's settings behaviour.",
+  "outcome": "deferred",
+  "evidence_class": "source_review",
+  "limits": "Owner: a session not bound by the Claude-account reservation, or this one after it lifts: run `claude --setting-sources project` with review-changes.js on a small real change and record the terminal status fields. The first-round 'file does not exist' premise was false and is superseded. Privacy sweep 2026-09-23: the transcript extract(s) are retained host-local and not published; the published support is each command's cmd, exit, output_excerpt and output_sha256.",
+  "checked_at": "2026-09-23T00:54:11Z",
+  "reconciliation": "reconciliation 2026-09-23T02:21:44Z (no new checks; claims aligned to the transcripts and files on disk, see README 'Reconciliation'): outcome advanced -> deferred (source reading did not narrow the executed claim); id and filename returned to -deferred; timestamps corrected.",
+  "raw_evidence": [
+    {
+      "file": "raw/gap6-transcript-extract.json",
+      "sha256": "530f91e83ae6c0b940e5a0bb7be1a5b88901f8e8e80faede70434a530c7f0bc4",
+      "bytes": 10877,
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)",
+      "published_support": "each command's cmd, exit, output_excerpt and output_sha256 in this receipt"
+    }
+  ]
+}

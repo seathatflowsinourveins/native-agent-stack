@@ -1,0 +1,415 @@
+{
+  "parent": {
+    "overrides": [],
+    "features": {
+      "hooks": true,
+      "plugin_hooks": true,
+      "apps": null
+    },
+    "mcp_servers_enabled": [],
+    "mcp_servers_disabled": [],
+    "plugins": {
+      "context-mode@context-mode": true
+    },
+    "otel": {
+      "exporter": {
+        "otlp-http": {
+          "endpoint": "http://127.0.0.1:14318/v1/logs",
+          "headers": {},
+          "protocol": "binary",
+          "tls": null
+        }
+      },
+      "metrics_exporter": {
+        "otlp-http": {
+          "endpoint": "http://127.0.0.1:14318/v1/metrics",
+          "headers": {},
+          "protocol": "binary",
+          "tls": null
+        }
+      }
+    },
+    "analytics": {
+      "enabled": true
+    },
+    "mcp_status_names": [
+      "codex_apps",
+      "context-mode"
+    ],
+    "hooks_list": {
+      "data": [
+        {
+          "cwd": "$HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe",
+          "hooks": [
+            {
+              "key": "$HOME/.codex/hooks.json:pre_tool_use:0:0",
+              "eventName": "preToolUse",
+              "handlerType": "command",
+              "command": "$HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event pre-tool-use --agent codex --server-url http://127.0.0.1:49374",
+              "async": false,
+              "matcher": "",
+              "timeoutSec": 600,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/hooks.json",
+              "source": "user",
+              "pluginId": null,
+              "displayOrder": 0,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:2a9b493e71f7e16d4a61d72d728df02fa6b6b8df7601a653c399b36f479d64a8",
+              "trustStatus": "trusted"
+            },
+            {
+              "key": "$HOME/.codex/hooks.json:post_tool_use:0:0",
+              "eventName": "postToolUse",
+              "handlerType": "command",
+              "command": "$HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event post-tool-use --agent codex --server-url http://127.0.0.1:49374",
+              "async": false,
+              "matcher": "",
+              "timeoutSec": 600,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/hooks.json",
+              "source": "user",
+              "pluginId": null,
+              "displayOrder": 1,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:18108baae805cb035c1a90b002291f4ab504364fcab807dd078f8933126e6f9b",
+              "trustStatus": "trusted"
+            },
+            {
+              "key": "$HOME/.codex/hooks.json:pre_compact:0:0",
+              "eventName": "preCompact",
+              "handlerType": "command",
+              "command": "$HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event pre-compact --agent codex --server-url http://127.0.0.1:49374",
+              "async": false,
+              "matcher": "",
+              "timeoutSec": 600,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/hooks.json",
+              "source": "user",
+              "pluginId": null,
+              "displayOrder": 2,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:00dc3791bfd4ae0b46c43cb8ee8a391b6da63e5b7690cebfe1bd59cf8793ad58",
+              "trustStatus": "trusted"
+            },
+            {
+              "key": "$HOME/.codex/hooks.json:session_start:0:0",
+              "eventName": "sessionStart",
+              "handlerType": "command",
+              "command": "$HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event session-start --agent codex --server-url http://127.0.0.1:49374",
+              "async": false,
+              "matcher": "",
+              "timeoutSec": 600,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/hooks.json",
+              "source": "user",
+              "pluginId": null,
+              "displayOrder": 3,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:6994cf4fb1fc4534ee5efb35367f0f85b3bcd5fb3e200b0b3fd73c9d337397cc",
+              "trustStatus": "trusted"
+            },
+            {
+              "key": "$HOME/.codex/hooks.json:session_end:0:0",
+              "eventName": "sessionEnd",
+              "handlerType": "command",
+              "command": "$HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event session-end --agent codex --server-url http://127.0.0.1:49374",
+              "async": false,
+              "matcher": "",
+              "timeoutSec": 1,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/hooks.json",
+              "source": "user",
+              "pluginId": null,
+              "displayOrder": 4,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:9a190d2120d2c9dd8dcb4adfb956379e2bfc9d74435eaea9262b22a31b5649fd",
+              "trustStatus": "trusted"
+            },
+            {
+              "key": "$HOME/.codex/hooks.json:user_prompt_submit:0:0",
+              "eventName": "userPromptSubmit",
+              "handlerType": "command",
+              "command": "$HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event user-prompt-submit --agent codex --server-url http://127.0.0.1:49374",
+              "async": false,
+              "matcher": null,
+              "timeoutSec": 600,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/hooks.json",
+              "source": "user",
+              "pluginId": null,
+              "displayOrder": 5,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:9cd01164b2e560a27f94a0fedcddcd21306857980f4fee2dd248719244b4a061",
+              "trustStatus": "trusted"
+            },
+            {
+              "key": "$HOME/.codex/hooks.json:stop:0:0",
+              "eventName": "stop",
+              "handlerType": "command",
+              "command": "$HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event stop --agent codex --server-url http://127.0.0.1:49374 --capture-assistant",
+              "async": false,
+              "matcher": null,
+              "timeoutSec": 600,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/hooks.json",
+              "source": "user",
+              "pluginId": null,
+              "displayOrder": 6,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:0cfffc0558b708e1d401a870834648362335c69221add66766052d5dd92c2f98",
+              "trustStatus": "trusted"
+            },
+            {
+              "key": "context-mode@context-mode:.codex-plugin/hooks.json:pre_tool_use:0:0",
+              "eventName": "preToolUse",
+              "handlerType": "command",
+              "command": "node \"$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/hooks/codex/pretooluse.mjs\"",
+              "async": false,
+              "matcher": "local_shell|shell|shell_command|exec_command|Bash|Shell|apply_patch|Edit|Write|grep_files|ctx_execute|ctx_execute_file|ctx_batch_execute|ctx_fetch_and_index|ctx_search|ctx_index|mcp__",
+              "timeoutSec": 600,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json",
+              "source": "plugin",
+              "pluginId": "context-mode@context-mode",
+              "displayOrder": 7,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:56da0c4249dc7af048f42ae458fb83931926a8af41ec6fab5ae819ff3a8c83ae",
+              "trustStatus": "trusted"
+            },
+            {
+              "key": "context-mode@context-mode:.codex-plugin/hooks.json:post_tool_use:0:0",
+              "eventName": "postToolUse",
+              "handlerType": "command",
+              "command": "node \"$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/hooks/codex/posttooluse.mjs\"",
+              "async": false,
+              "matcher": null,
+              "timeoutSec": 600,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json",
+              "source": "plugin",
+              "pluginId": "context-mode@context-mode",
+              "displayOrder": 8,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:0d237345f8d46110d36cd0ef08e79b55fa151a07691dee36d492aa6f64bc0efd",
+              "trustStatus": "trusted"
+            },
+            {
+              "key": "context-mode@context-mode:.codex-plugin/hooks.json:pre_compact:0:0",
+              "eventName": "preCompact",
+              "handlerType": "command",
+              "command": "node \"$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/hooks/codex/precompact.mjs\"",
+              "async": false,
+              "matcher": null,
+              "timeoutSec": 600,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json",
+              "source": "plugin",
+              "pluginId": "context-mode@context-mode",
+              "displayOrder": 9,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:ac1f9e5eb71ca262492150381d8f078b897056fc691f9973fc56d7b1b402e648",
+              "trustStatus": "trusted"
+            },
+            {
+              "key": "context-mode@context-mode:.codex-plugin/hooks.json:session_start:0:0",
+              "eventName": "sessionStart",
+              "handlerType": "command",
+              "command": "node \"$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/hooks/codex/sessionstart.mjs\"",
+              "async": false,
+              "matcher": null,
+              "timeoutSec": 600,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json",
+              "source": "plugin",
+              "pluginId": "context-mode@context-mode",
+              "displayOrder": 10,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:a6cc6a322d0931bdd68a5969e523cd71e6eedccab4850e8996c8948311173618",
+              "trustStatus": "trusted"
+            },
+            {
+              "key": "context-mode@context-mode:.codex-plugin/hooks.json:user_prompt_submit:0:0",
+              "eventName": "userPromptSubmit",
+              "handlerType": "command",
+              "command": "node \"$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/hooks/codex/userpromptsubmit.mjs\"",
+              "async": false,
+              "matcher": null,
+              "timeoutSec": 600,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json",
+              "source": "plugin",
+              "pluginId": "context-mode@context-mode",
+              "displayOrder": 11,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:114549c484c131b94782d3424527dd1042d48bc3a8616a11299acdf60b112572",
+              "trustStatus": "trusted"
+            },
+            {
+              "key": "context-mode@context-mode:.codex-plugin/hooks.json:stop:0:0",
+              "eventName": "stop",
+              "handlerType": "command",
+              "command": "node \"$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/hooks/codex/stop.mjs\"",
+              "async": false,
+              "matcher": null,
+              "timeoutSec": 600,
+              "statusMessage": null,
+              "additionalContextLimit": null,
+              "sourcePath": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json",
+              "source": "plugin",
+              "pluginId": "context-mode@context-mode",
+              "displayOrder": 12,
+              "enabled": true,
+              "isManaged": false,
+              "currentHash": "sha256:9205c1763e40c0256ab334e2e96c037c1cdf5b8bfaddba31ed19d93d3388586a",
+              "trustStatus": "trusted"
+            }
+          ],
+          "warnings": [],
+          "errors": []
+        }
+      ]
+    }
+  },
+  "isolated_worker": {
+    "overrides": [
+      "features.hooks=false",
+      "features.plugin_hooks=false",
+      "features.apps=false",
+      "otel.exporter=\"none\"",
+      "otel.metrics_exporter=\"none\"",
+      "analytics.enabled=false",
+      "plugins={\"context-mode@context-mode\"={enabled=false}}"
+    ],
+    "features": {
+      "hooks": false,
+      "plugin_hooks": false,
+      "apps": false
+    },
+    "mcp_servers_enabled": [],
+    "mcp_servers_disabled": [],
+    "plugins": {
+      "context-mode@context-mode": false
+    },
+    "otel": {
+      "exporter": "none",
+      "metrics_exporter": "none"
+    },
+    "analytics": {
+      "enabled": false
+    },
+    "mcp_status_names": [],
+    "hooks_list": {
+      "data": [
+        {
+          "cwd": "$HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe",
+          "hooks": [],
+          "warnings": [],
+          "errors": []
+        }
+      ]
+    }
+  },
+  "diff": {
+    "features": {
+      "parent": {
+        "hooks": true,
+        "plugin_hooks": true,
+        "apps": null
+      },
+      "isolated_worker": {
+        "hooks": false,
+        "plugin_hooks": false,
+        "apps": false
+      }
+    },
+    "plugins": {
+      "parent": {
+        "context-mode@context-mode": true
+      },
+      "isolated_worker": {
+        "context-mode@context-mode": false
+      }
+    },
+    "otel": {
+      "parent": {
+        "exporter": {
+          "otlp-http": {
+            "endpoint": "http://127.0.0.1:14318/v1/logs",
+            "headers": {},
+            "protocol": "binary",
+            "tls": null
+          }
+        },
+        "metrics_exporter": {
+          "otlp-http": {
+            "endpoint": "http://127.0.0.1:14318/v1/metrics",
+            "headers": {},
+            "protocol": "binary",
+            "tls": null
+          }
+        }
+      },
+      "isolated_worker": {
+        "exporter": "none",
+        "metrics_exporter": "none"
+      }
+    },
+    "analytics": {
+      "parent": {
+        "enabled": true
+      },
+      "isolated_worker": {
+        "enabled": false
+      }
+    },
+    "mcp_status_names": {
+      "parent": [
+        "codex_apps",
+        "context-mode"
+      ],
+      "isolated_worker": []
+    }
+  },
+  "status": "ok",
+  "isolation_overrides": [
+    "features.hooks=false",
+    "features.plugin_hooks=false",
+    "features.apps=false",
+    "otel.exporter=\"none\"",
+    "otel.metrics_exporter=\"none\"",
+    "analytics.enabled=false"
+  ],
+  "sdk": "openai-codex",
+  "started_at": 1790133848.7785177,
+  "finished_at": 1790133850.293084,
+  "python_env_keys": [
+    "HOME",
+    "LC_CTYPE",
+    "PATH"
+  ]
+}

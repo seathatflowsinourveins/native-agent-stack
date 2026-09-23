@@ -1,0 +1,36 @@
+{
+ "received_at": "2026-09-23T13:07:02Z",
+ "reviewer": "independent Opus review relayed by the workflow coordinator (fix-round request text); verbatim finding summaries",
+ "findings": [
+  {
+   "n": 1,
+   "severity": "minor",
+   "gap": 7,
+   "finding": "chrishayuk/mcp-cli is selected by the section rule (README line 4527) but has no pinned commit, citations or disposition; the receipt's disposition arm lists only 1mcp, mcp-hub and mcpproxy-go."
+  },
+  {
+   "n": 2,
+   "severity": "minor",
+   "gap": null,
+   "finding": "make_results.py does not verify gap_text_sha256 against g2-units.json, receipt fields or results.json equality; the handoff claim 'all verified by script' has no retained helper."
+  },
+  {
+   "n": 3,
+   "severity": "minor",
+   "gap": 3,
+   "finding": "Host username remains in codebase-memory project slugs ('home-<user>-...') in bridges-matched.json (both), receipt 3 and README; sanitize only replaces the literal home path."
+  },
+  {
+   "n": 4,
+   "severity": "minor",
+   "gap": 5,
+   "finding": "The project-approved Claude arm health-checked agent-lab's ai-memory entry at the live URL 127.0.0.1:49374 with no owned server and no AI_MEMORY_SERVER_URL; the network namespace blocked it (ENETUNREACH). The receipt should say a live-URL connect was attempted and blocked."
+  },
+  {
+   "n": 5,
+   "severity": "minor",
+   "gap": 1,
+   "finding": "Receipt 1 lifecycle dict uses True for 'same outcome on both versions' while receipt 2 uses True for 'passed or auto_recovered'; give per-version outcomes plus an identical flag."
+  }
+ ]
+}

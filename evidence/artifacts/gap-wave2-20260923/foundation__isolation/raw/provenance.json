@@ -1,0 +1,47 @@
+{
+  "written_at": "2026-09-23T02:26:24Z",
+  "redactions": "host home -> $HOME; session scratchpad -> $SCRATCHPAD; UUIDs -> <uuid>; srt per-session proxy tokens and Basic proxy auth -> <redacted>; /Users/<name> in upstream doc text -> /Users/<user>; host username -> <user> (privacy sweep 2026-09-23)",
+  "rtk_note": "Some outputs were condensed by the RTK Bash hook before the agent saw them; the raw record is the agent-visible output. Untransformed logs under /tmp/gapfix and $HOME/.cache/gap-wave2-20260923/isolation were deleted at teardown (original#86, fix#72) and are not recoverable.",
+  "files": {
+    "original": {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "source_transcript": "~/.claude/projects/-home-<user>-code-agent-lab/<session>/subagents/workflows/wf_781062eb-0fd/agent-a0b2c31fa4446dba6.jsonl",
+      "source_transcript_sha256": "b42a1a50bff582851f521b02cf0994902722bc6d38a5dbcb283501f8e936aca8",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    "fix": {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/fix-session-tool-calls.txt",
+      "source_transcript": "~/.claude/projects/-home-<user>-code-agent-lab/<session>/subagents/workflows/wf_781062eb-0fd/agent-ad4b98deed015c5e3.jsonl",
+      "source_transcript_sha256": "755f25849fa36f5092e1179c4e2bb482f832eb1fd750205337567de90c25244f",
+      "sha256": "b1a1bce670082262521365455849b1618b460a9bbd53fdec5d6d0337523d8899",
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    "rtk-a6ffea92b169": {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/rtk-recall-a6ffea92b169.txt",
+      "source": "rtk recall a6ffea92b169 --full",
+      "sha256": "e1c9b1bdbbf020cbbd0c89b26bd98bdaf6813ec17f1748eed32a9d366da72f1a"
+    },
+    "rtk-fdcacf92a602": {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/rtk-recall-fdcacf92a602.txt",
+      "source": "rtk recall fdcacf92a602 --full",
+      "sha256": "88cc8457dc22e6bb2780681cb485e66112844c966d2255a0b72cce89291ed10c"
+    },
+    "fix38-persisted-output.txt": {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/fix38-persisted-output.txt",
+      "source": "$HOME/.claude/projects/-home-<user>-code-agent-lab/<uuid>/tool-results/bt0kvo077.txt",
+      "source_sha256": "9b57f1509757cef9b0fe324d6df50e4c33aa740451c332341d274ce2f549ec37",
+      "sha256": "660b1f6470bad2b0977e2bec07d398ca67159d27e0e642cda026b475b21e9acc",
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    "original63-background-output.txt": {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original63-background-output.txt",
+      "source": "$CLAUDE_TMP/<session>/tasks/bangwxdwg.output",
+      "source_sha256": "01f220ec4d54d850d646cb0596f946b6e25ea4b7284756ed83e534d5afb56533",
+      "sha256": "c21f07e57959ecd8b19c1ab3789074b01ee5468aa5451bff2c90776f29b0c2c4"
+    }
+  }
+}

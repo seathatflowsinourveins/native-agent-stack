@@ -1,0 +1,102 @@
+{
+ "id": "gap-wave2-20260923/us-equities__evaluation-experiments/2-matched-promptfoo-inspect-comparison",
+ "gap_index": 2,
+ "gap_text_sha256": "24b6acc97b1d3449bb11df339c8450c6348d4251d0ba27171877464cc5d4dc59",
+ "next_check": "Use the same two-arm run described under gap 0 on blueprints/native-skill-practice/catalog-cases.json, and retain it as the matched comparison receipt.",
+ "preregistration": {
+  "written_at": "2026-09-23T07:18:31Z",
+  "expectation": "The gap-0 two-arm run on catalog-cases.json is the matched comparison: same 8 cases, same deterministic transform and gate, zero provider calls. Expected: identical scorer outcomes; differences, if any, appear in failure-log fidelity and resume mechanics. No model-quality or selection-win claim is expected to follow, because both arms use the same deterministic baseline.",
+  "criteria": [
+   "Retain a comparison receipt listing, per arm: per-case outcome vector, repeat-to-repeat reproducibility, failure-log fidelity count, resume success, provider calls.",
+   "The receipt states whether the comparison supports keeping inspect-ai selected over promptfoo on these measured properties, or neither.",
+   "Settled only if gap 0's arms all execute."
+  ],
+  "file": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/prereg/2-matched-promptfoo-inspect-comparison.json",
+  "committed_in": "20fbeb6 (2026-09-23T07:18:35Z), before any check ran"
+ },
+ "commands": [
+  "Same run as gap 0 (see receipt 0-promptfoo-inspect-two-arm.json).",
+  "python3 blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/compare_two_arm.py $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run . > $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/comparison.json"
+ ],
+ "results": {
+  "matched_on": "same frozen 8 cases (sha256 7cc28c50...), same exact-text transform, same gate.cjs and three assertions, zero provider calls, concurrency 1",
+  "scorer_reproducibility": {
+   "promptfoo_repeat_identical": true,
+   "inspect_repeat_identical": true,
+   "cross_arm_identical": true,
+   "differing_cases": []
+  },
+  "label_matches": {
+   "promptfoo": 3,
+   "inspect": 3,
+   "cases": 8
+  },
+  "failure_log_fidelity_per_assertion": {
+   "promptfoo": 5,
+   "inspect": 5
+  },
+  "injected_error_in_final_tool_state": {
+   "promptfoo": false,
+   "promptfoo_error_log_file": [
+    "promptfoo-error-2026-09-23_07-26-43-274Z.log"
+   ],
+   "inspect_error_retries": [
+    "RuntimeError('injected transient failure for C3 (first attempt)')"
+   ]
+  },
+  "resume": {
+   "promptfoo": {
+    "evals_before": 1,
+    "evals_after": 1,
+    "same_eval_id": true,
+    "rows_before_resume": 2,
+    "rows_after_resume": 8,
+    "duplicate_test_idx_after": false,
+    "pre_interrupt_rows_preserved": true,
+    "final_outcome_equals_clean": true
+   },
+   "inspect": {
+    "interrupted_log_status": "cancelled",
+    "completed_before": [
+     "C1",
+     "C2",
+     "C3"
+    ],
+    "cancelled_samples": [
+     "C4"
+    ],
+    "resumed_log_status": "success",
+    "samples_after": 8,
+    "completed_samples_reused_not_rerun": true,
+    "final_outcome_equals_clean": true
+   }
+  },
+  "input_fidelity_gate_source_hash_equal_frozen": {
+   "promptfoo": 6,
+   "inspect": 8
+  },
+  "verdict": "Tie on scorer reproducibility (identical 8-case vectors, repeat-stable) and on resume success (both 8/8, pre-interrupt results reused). inspect-ai is ahead on two measured properties: it keeps the retried error inside the final eval log, and it passes the JSON-valued sources byte-exact (8/8 vs 6/8 gate source hashes). This supports keeping inspect-ai selected for the harness properties measured here; it is not a model-quality win."
+ },
+ "outcome": "settled",
+ "outcome_note": "The matched two-arm comparison now exists on the same task and is retained; it measures harness properties, not model quality.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "Harness comparison on a deterministic baseline; the TypeSafe/model arm and any semantic-quality comparison were not run (no provider calls by design).",
+  "Eight cases and one interrupt point per arm; timing is not compared."
+ ],
+ "raw_outputs": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/contract-test.txt",
+   "sha256": "864735072b546fb3be107c2219c7364895803a01aac6885e1e447ea61cd9cee1"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/comparison.json",
+   "sha256": "ba06cc9d57180c6f9cf326e2cb5f85498b0dfbd4e70d70a1dda217b77b6f0aab"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/timeline.txt",
+   "sha256": "d7a347b7fcacb31e4bf36df5a128045f885bea270687143b489d62bfb0cb322d"
+  }
+ ],
+ "checked_at": "2026-09-23T13:51:51Z"
+}

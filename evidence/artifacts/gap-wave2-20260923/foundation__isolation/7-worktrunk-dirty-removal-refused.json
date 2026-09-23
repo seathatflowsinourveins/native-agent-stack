@@ -1,0 +1,53 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-7",
+  "gap_index": 7,
+  "gap_text_sha256": "9969f8e11930109b8198f236ea530e5d67df6ab0efa55fcdfe8b960b2a90b047",
+  "checked_at": "2026-09-23T00:45:42.458Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:53:17.012Z",
+    "expectation": "Attempting `wt remove` on a worktree with uncommitted (modified + untracked) changes at v0.79.0 will refuse with a nonzero exit, and the files will remain byte-identical afterward.",
+    "criteria": "sha256 of the dirty files recorded before and after the refused removal; the removal command's exit code recorded.",
+    "late": true,
+    "late_note": "Written at 2026-09-23T00:53:17.012Z by original#68 (Write of $SCRATCHPAD/write_receipts2.py; receipts written by original#69 at 00:53:20Z), after the first-pass commands it describes had run (original-session calls 2026-09-23T00:45:28.726Z to 2026-09-23T00:45:42.458Z); any fix-round evidence in this receipt came later and has its own fix-round preregistration where one exists. The previously recorded written_at '2026-09-23T01:55:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps."
+  },
+  "commands": [
+    "original#53 [2026-09-23T00:45:28.726Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\nmkdir -p $HOME/.cache/gap-wave2-20260923/isolation/worktrunk\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk\nrm -rf owned-repo\nmkdir owned-repo && cd owned-repo\ngit init -q\ngit config user.email test@example.com\ngit config user.name test\necho \"hello\" > file.txt\ngit add file.txt\ngit commit -qm init\n$WT --version\n$WT list 2>&1\necho \"== create ==\"\n$WT create feat-a 2>&1\necho \"exit=$?\"\n$WT list 2>&1",
+    "original#55 [2026-09-23T00:45:35.040Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo\necho \"== switch --create feat-a ==\"\n$WT -y switch --create feat-a 2>&1\necho \"exit=$?\"\n$WT list 2>&1",
+    "original#56 [2026-09-23T00:45:42.268Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo\nWORKTREE_DIR=../owned-repo.feat-a\necho \"dirty-uncommitted\" > \"$WORKTREE_DIR/dirty.txt\"\necho \"modified\" >> \"$WORKTREE_DIR/file.txt\"\nsha_dirty=$(sha256sum \"$WORKTREE_DIR/dirty.txt\" | cut -d' ' -f1)\nsha_file=$(sha256sum \"$WORKTREE_DIR/file.txt\" | cut -d' ' -f1)\necho \"sha_dirty=$sha_dirty sha_file=$sha_file\"\necho \"== attempt remove dirty worktree ==\"\n$WT -y -C \"$WORKTREE_DIR\" remove 2>&1\necho \"exit=$?\"\nls -la \"$WORKTREE_DIR\" 2>&1\nsha_dirty2=$(sha256sum \"$WORKTREE_DIR/dirty.txt\" 2>&1 | cut -d' ' -f1)\nsha_file2=$(sha256sum \"$WORKTREE_DIR/file.txt\" 2>&1 | cut -d' ' -f1)\necho \"post: sha_dirty2=$sha_dirty2 sha_file2=$sha_file2\"\n[[ \"$sha_dirty\" == \"$sha_dirty2\" && \"$sha_file\" == \"$sha_file2\" ]] && echo \"PRESERVED_BYTE_IDENTICAL=true\" || echo \"PRESERVED_BYTE_IDENTICAL=false\""
+  ],
+  "results": [
+    "wt -y -C ../owned-repo.feat-a remove: '\u2717 Cannot remove worktree: feat-a has uncommitted changes\\n   M file.txt\\n  ?? dirty.txt\\n\u21b3 Commit or stash changes first, or to lose uncommitted changes, run wt remove --force feat-a', exit=1.",
+    "sha256 before: dirty.txt=7c2ba910e63bf44092361aa4c89cf2620010504561ef88d697d0e4b6e1238e28, file.txt=72014b9e284faf1501e212de93165bf3766585d09c059c9f3a1ac70a262feee9",
+    "sha256 after: identical to before for both files (PRESERVED_BYTE_IDENTICAL=true).",
+    "wt --version for this repository session: `wt v0.79.0` (original#53, before the worktree was created)."
+  ],
+  "outcome": "settled",
+  "note": "'Dirty removal was refused without loss' is now an opened, retained receipt with a nonzero refusal (exit=1) and byte-identical sha256 for both the modified tracked file and the untracked file, at wt v0.79.0. This is no longer only a summary sentence. evidence_class is aligned to local_integration (a scripted local repro), consistent with the other Worktrunk CLI fixtures in this wave rather than the stronger 'native_proven' label used only for gap 5's run of Worktrunk's own bundled upstream test suite.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Only modified (M) and untracked (??) states were exercised, not staged-but-uncommitted or conflicted states.",
+    "Gaps 6, 7, 12 and 18 cite one continuous disposable repository session (original#53-#59 in $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo): repository init and `wt --version` (#53), `wt -y switch --create feat-a` (#55), dirty-removal refusal (#56), SIGKILL mid-write (#57), `wt -y step prune` (#58) and `wt -y remove --force feat-a` (#59). The earlier limit saying each gap used a fresh, independent repository was false and is removed. The byte-identity assertion covers the moment after the refusal; the forced removal in original#59 later deleted the worktree on purpose."
+  ],
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:45:28.726Z to 2026-09-23T00:45:42.458Z. The previous value '2026-09-23T00:53:20.715653+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#53",
+        "original#55",
+        "original#56"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Review finding 7: the commands now start with the repository creation and `wt --version` from the same session (original#53, #55), so the v0.79.0 claim is traceable; the false independence limit was replaced with the actual session structure.",
+      "Timestamps corrected; raw_evidence added. Outcome kept settled: nonzero refusal (exit=1) and byte-identical sha256 for both files are in original#56."
+    ]
+  }
+}

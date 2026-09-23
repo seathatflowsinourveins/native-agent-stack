@@ -1,0 +1,8 @@
+syft-venv exit=0 seconds=4
+trivy-rootfs exit=0 seconds=4
+trivy-positive exit=0 seconds=0
+grype-venv exit=0 seconds=2
+osv-venv exit=0 seconds=1
+osv-positive exit=1 seconds=6
+pip-audit-venv-scan exit=0 seconds=2
+pip-audit-positive exit=1 seconds=0

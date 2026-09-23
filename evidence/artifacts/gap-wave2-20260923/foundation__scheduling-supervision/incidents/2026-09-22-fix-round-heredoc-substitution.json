@@ -1,0 +1,78 @@
+{
+ "id": "gap-wave2-20260923-scheduling-supervision-incident-1",
+ "written_at": "2026-09-22T23:26:12-04:00",
+ "status": "unresolved: awaiting a recorded coordinator or user decision (leave or remove the 27 created paths). Fix round 2 completed the prerequisites the review named: the running `dagu server` (pid 366) was shown to use a different store, and every listed path has a birth time.",
+ "severity": "isolation-rule breach (host default Dagu home written; wildcard port bound for about 2 min 15 s; one unintended codex exec process started). Fix round 2 found that the written directory is not the running dagu-equities service's store.",
+ "what_happened": "At 23:22:41-04:00 the unit tried to write preregistrations/fix-round-1.json through an unquoted bash heredoc (python3 - <<EOF). Bash performed command substitution on the backquoted command names inside the preregistration prose before python ran. Five substitutions executed, in order: 'dagu retry --step finalize', 'dagu scheduler', 'ss -Hltnp', 'scheduler.port: 0' and 'codex exec'. The python step then failed with a SyntaxError and wrote nothing; the git commit failed ('pathspec ... did not match any files').",
+ "effects": [
+  "'dagu retry --step finalize' (the PATH dagu, $HOME/.local/share/codex-ecosystem/bin/dagu = Dagu 2.16.6) failed immediately: 'Error: accepts 1 arg(s), received 0'. No effect.",
+  "'dagu scheduler' (PATH dagu, default config) ran as pid 2656058 from 23:22:42 to 23:24:57-04:00 against the host's default Dagu home: DAGs dir $HOME/.config/dagu/dags (5 example DAGs, from `ls`), data dir $HOME/.local/share/dagu/data. A 'dagu server' (pid 366, $HOME/.local/share/codex-ecosystem/tools/dagu-2.16.6/dagu server, started 11:04:18, no arguments) was running; fix round 2 refuted the earlier inference that it uses the same data directory: its environment sets DAGU_HOME=$HOME/.local/share/codex-ecosystem/dagu-equities (see fix_round_2). The scheduler acquired the scheduler lock (no other scheduler held it), started its health server on port 8090 on all interfaces for about 2 min 15 s, ran the zombie detector (45 s interval) and the retry scanner (30 s interval, 24 h failure window), acquired the notifications and incidents monitor locks, and ticked once (checkpoint lastTick 23:24:00). The unit stopped it with SIGTERM at 23:24:57; its log shows an orderly shutdown ('Scheduler stopped' at 23:24:57.355).",
+  "Paths under $HOME/.local/share/dagu/data whose mtime falls in 23:22:40-23:26:00 (complete `find -newermt` list, 28 entries, below its head -40 cap): dag-settings/, notifications/, notifications/{channels,dags,routes,routes/workspaces}/, notifications/monitor-state.json, notifications/monitor-state.json.lock/ and notifications/monitor-state.json.lock.flock, incidents/, incidents/{providers,policies,policies/dags,policies/workspaces,states}/, incidents/monitor-state.json, incidents/monitor-state.json.lock/ and incidents/monitor-state.json.lock.flock, service-registry/ and service-registry/scheduler/ (empty after shutdown), scheduler/ with state.json (all five DAGs lastScheduledTime 0001-01-01), checkpoint.json ({\"lastTick\": \"2026-09-22T23:24:00-04:00\"}), locks/ (empty after shutdown), .dagu_record_locks/, .dagu_record_locks/4b and .dagu_record_locks/47, and the data directory itself.",
+  "Creation versus modification (corrected in reconciliation 1): `stat %w` birth times inside the window were recorded for 11 paths only: dag-settings, notifications/monitor-state.json, incidents/monitor-state.json, scheduler, scheduler/state.json, scheduler/checkpoint.json, scheduler/locks, service-registry, service-registry/scheduler, notifications/monitor-state.json.lock and notifications/monitor-state.json.lock.flock. For the other entries only the mtime is recorded; for a directory that shows an entry was added or removed in the window, not that the directory was created then. No birth time was recorded for the data directory itself; it is presumed to pre-exist as the running server's data directory (inferred, see above). The earlier statement that every listed path had a birth time in the window and was absent before 23:22:42 is therefore established for those 11 paths only.",
+  "No DAG run was created: the complete find list contains no path under a dag-runs tree, and state.json records no scheduled time for any DAG. The same command's `grep schedule` over the DAG files did not run as intended (the host RTK hook replaced it with its usage text), so the five DAGs' schedules were not recorded.",
+  "'ss -Hltnp' printed the host listener table (read-only).",
+  "'scheduler.port: 0' failed: 'scheduler.port:: command not found'.",
+  "'codex exec' (pid 2709199, ps lstart 23:24:56, which is about 1 s earlier than the scheduler's 23:24:57.355 exit that had to precede it; lstart has 1 s resolution) waited with stdin on a harness socket and printed 'Reading prompt from stdin...'. The unit sent SIGTERM at 23:25:10 (corrected from 'about 23:25:00'; transcript call time 03:25:10.225Z) and it had exited 1 s later. It ran about 14 s.",
+  "Codex session files (corrected in reconciliation 1): the check `find $HOME/.codex -newermt 23:24:50 ! -newermt 23:25:30 | head` returned exactly 10 lines, the `head` default, so its list may be truncated. The one rollout file in it was modified at 23:25:15 and is named for 23:21:26 (another session). The earlier statement that no new rollout file was created in that interval is therefore NOT established by the stored output. Whether the process sent any network request is not observable here."
+ ],
+ "not_done": "The unit did not delete or edit the files the accidental scheduler created in $HOME/.local/share/dagu/data. Fix round 2 made read-only observations only. The paths are inert while no scheduler uses the default Dagu home; if one is later started there it will read the 23:24:00 watermark instead of none.",
+ "decision": "removed",
+ "decision_note": "Decided and executed by the coordinator (agent-lab-17) at 2026-09-23T17:11:09Z. A read-only re-run of incident_observe.sh at 17:10Z showed that the default data dir $HOME/.local/share/dagu/data pre-existed with only auth/ and contexts/ (born 2026-09-19 12:20); that the incident created exactly five top-level directories (dag-settings, incidents, notifications, scheduler, service-registry) at 23:22:42-04:00; that nothing under the data dir was modified after 23:26:00; that no log file under $HOME/.local/share/dagu/logs was written in the incident window; and that the only running dagu (pid 366, dagu server) uses DAGU_HOME=$HOME/.local/share/codex-ecosystem/dagu-equities. The five directories (27 archive entries) were archived first to $HOME/.local/state/agent-lab-17/dagu-default-home-incident-backup-20260923T171109Z.tgz (sha256 04abb941851d0fadb7e7948b540dc3cb51919edf1cf92896c43397710c38128f), then removed with `rm -r` on exactly those five paths. Afterwards the data dir lists only auth/ and contexts/, its pre-incident state.",
+ "cause_and_fix": "Cause: shell heredoc without a quoted delimiter used to write prose containing backquotes. Fix: the preregistration and all later evidence files were written with the editor tool or a quoted heredoc; no further unquoted heredoc is used by this unit.",
+ "raw_output": [
+  "raw/incident-1/background-shell-output.txt: the background shell's output (scheduler log, bash errors, Python SyntaxError)",
+  "raw/incident-1/damage-assessment-tool-results.txt: the 12 commands the unit ran from 23:22:42 to 23:25:55 (the heredoc call itself, process discovery, SIGTERM of the scheduler and of codex exec, the find -newermt list, the stat %w birth times, state.json and checkpoint.json, and the Codex rollout mtime check) with their outputs, extracted verbatim from the unit's Claude transcript in reconciliation 1. The outputs passed through the host RTK hook; the `ls -la` of scheduler/ in the stat call was condensed ('... (3 filtered)'), and `rtk recall 07bc69396294 --full` returned only the directory headers, so that listing is incomplete.",
+  "Home path replaced by $HOME, UUID-shaped identifiers by <uuid-N>; raw and committed sha256 in raw/incident-1/MANIFEST.json"
+ ],
+ "written_at_note": "Time of the editor Write call that created this file (transcript tool_use toolu_01JmrrANQbHwha3GwBx8AqCD, 03:26:12Z). It replaces an earlier guess of 23:27:00, which was later than the commit that first added the file (fdaf6f4, 23:26:19-04:00), and an approximation of 23:26:05, which was 7 s earlier than the actual write.",
+ "reconciliation_1": {
+  "edited_at": "2026-09-22T23:42:58-04:00",
+  "changes": "added the stored raw output of the damage-assessment commands; limited the birth-time and absent-before claims to the 11 stat'ed paths; marked the Codex rollout claim as not established (truncated by head); corrected the codex SIGTERM time; qualified the live server's data-directory claim as inferred; added status and decision fields. No command was re-run."
+ },
+ "fix_round_2": {
+  "edited_at": "2026-09-23T08:51:22-04:00",
+  "preregistration": "preregistrations/fix-round-2.json (written 08:49:00-04:00, before the observation at 08:49:14)",
+  "commands": [
+   "bash blueprints/gap-wave2-20260923/foundation__scheduling-supervision/incident_observe.sh > $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-round-2/incident-observe.txt",
+   "find $HOME/.local/share/codex-ecosystem/dagu-equities -newermt '2026-09-22 23:22:40' ! -newermt '2026-09-22 23:26:00' (and the 5 newest mtimes as a detection control)",
+   "systemctl --user list-units --all | grep -i dagu; rg -n -F DAGU_HOME $HOME/.config/systemd/user (read-only)",
+   "find $HOME/.local/share/dagu/data -mindepth 1 | sort (read-only, not preregistered; added to verify the remove option's scope)"
+  ],
+  "observations": {
+   "pid_366_data_dir": "Confirmed different store. pid 366 (started 2026-09-22 11:04:18, cmdline `dagu server`, cwd $HOME) has 3 environment variables; the filtered read printed HOME=$HOME and DAGU_HOME=$HOME/.local/share/codex-ecosystem/dagu-equities (no XDG_* variable). Its only open files in a dagu tree are dagu-equities/data/{incidents,notifications}/monitor-state.json.lock.flock. It listens on 127.0.0.1:18525 only. The user unit dagu-equities.service (loaded, active) starts it with `env -i HOME=%h PATH=/usr/bin:/bin DAGU_HOME=%h/.local/share/codex-ecosystem/dagu-equities`. No other dagu process runs. So the accidental scheduler did not write the running service's store, and the earlier 'live store' wording was wrong.",
+   "equities_store_in_window": "find -newermt over dagu-equities for 23:22:40-23:26:00 returned no path. Detection limit: pid 366 re-touches its two .dagu_lock directories continuously (latest mtime 08:50:17 at observation), so a write in the window to a path that was modified again later would not show; the other paths' newest mtime is 2026-09-22 10:53:19, before the incident. The primary evidence is the DAGU_HOME value and the accidental scheduler's own log line naming $HOME/.local/share/dagu/data.",
+   "default_home_birth_times": "All 28 listed paths now have `stat %w` birth times. The data directory itself was born 2026-09-19 12:20:30 (pre-existing, with only auth/ and contexts/, both born 2026-09-19 12:20:30 and unchanged). The other 27 paths (dag-settings, notifications and its 7 descendants, incidents and its 8 descendants, service-registry and service-registry/scheduler, scheduler and its 6 descendants) were all born between 23:22:42.575 and 23:23:59.997 (checkpoint.json), inside the accidental scheduler's lifetime. So they were all created by it. The only pre-existing entry it changed is the data directory's own mtime (23:22:42.644). $HOME/.config/dagu had no path modified in the window.",
+   "later_activity": "No path under $HOME/.local/share/dagu/data was born or modified after 2026-09-22 23:26:00 (find -newermt, empty); checkpoint.json still reads lastTick 23:24:00.",
+   "current_tree": "A full read-only listing of $HOME/.local/share/dagu/data shows auth/ (with encryption_key), contexts/, and exactly the 27 created paths, nothing else (raw/incident-1/fix-round-2-default-home-tree.txt). The remove option therefore deletes only incident-created paths."
+  },
+  "decision_options": {
+   "leave": "No action. The default home keeps the accidental scheduler state; no running process uses it.",
+   "remove": "Restores the pre-incident contents (auth/ and contexts/ only; the directory mtime stays changed). The five top-level paths contain exactly the 27 created paths: `cd $HOME/.local/share/dagu/data && rm -r -- dag-settings notifications incidents service-registry scheduler`. Before running it, re-run incident_observe.sh to confirm no process has used the default home since."
+  },
+  "raw_output": [
+   "raw/incident-1/fix-round-2-incident-observe.txt",
+   "raw/incident-1/fix-round-2-equities-store-and-helper-revisions.txt",
+   "raw/incident-1/fix-round-2-default-home-tree.txt",
+   "sha256 values in raw/incident-1/MANIFEST.json"
+  ],
+  "credential_handling": "The environ read printed only HOME, XDG_* and DAGU_*HOME/DIR/PATH/CONFIG* variables; the count of variables and of DAGU_* names was printed, no other name or value."
+ },
+ "fix_round_3": {
+  "edited_at": "2026-09-23T10:18:07-04:00",
+  "preregistration": "preregistrations/fix-round-3.json (written 2026-09-23T10:15:57-04:00, before the fix-round-3 observations)",
+  "observation": "Read-only re-run of incident_observe.sh at 2026-09-23T10:16:05-04:00: the default Dagu home still holds auth/, contexts/ and the same five top-level created paths with the same birth times; no path under it was born or modified after 2026-09-22 23:26:00; checkpoint.json still reads lastTick 23:24:00; pid 366 still runs with DAGU_HOME=$HOME/.local/share/codex-ecosystem/dagu-equities. The remove option therefore still covers exactly the incident-created paths.",
+  "raw_output": [
+   "raw/fix3/incident-observe.txt"
+  ],
+  "decision_status": "Still null. The third review confirms the unit may not make this decision. It is handed to the coordinator: record leave or remove here (decision, by whom, when, and for removal the command output) before integrating this branch."
+ },
+ "raw_output_unpublished": [
+  {
+   "file": "raw/incident-1/damage-assessment-tool-results.txt",
+   "sha256": "c53879ff5ad14af30a243a79eaca6d4eb669c25f1e3310172b9f8e8715d5109d",
+   "bytes": 42523,
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  }
+ ]
+}

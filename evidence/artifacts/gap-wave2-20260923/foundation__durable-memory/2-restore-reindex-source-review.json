@@ -1,0 +1,43 @@
+{
+  "id": "2-restore-reindex-source-review",
+  "gap_index": 2,
+  "gap_text_sha256": "1336f772284a02cfc4207d4d4e8e5e0d206bb71987e6f7552ce6b86cbeaa487d",
+  "preregistration": {
+    "written_at": "2026-09-23T01:29:38Z",
+    "late": true,
+    "late_reason": "Written by the fix round at 01:29:38Z, after its source read at 01:22:21Z and after gap 11's incident.",
+    "expectation": "Existing receipts (blueprints/memory-lifecycle-probe/README.md, evidence/artifacts/gap-resolution-20260922/durable-memory/deletion-erasure-probe.json) already document that ai-memory's native restore/reindex enumerate all same-name processes rather than checking only the target data directory, and that this assignment's own isolation rules (never touch a running service, systemd unit, or process enumeration of one) make that check out of scope for a bounded worker without a much heavier process-namespace protocol than this unit's other checks used. This check reviews the existing source text rather than re-running restore/reindex.",
+    "criteria": "Settled only by an executed restore + reindex pass under process-namespace isolation with page/session/observation counts verified against a pre-backup copy. Deferred (not settled or advanced) if that pass is not attempted.",
+    "timestamp_note": "Timestamps reconciled on 2026-09-23T02:30:41Z from the unit workers' session transcripts (tool-call times, listed in raw/INDEX.json). The earlier value 2026-09-23T01:20:00Z was shared by every receipt, fell after the first-pass commit (01:19:05Z) and matched no recorded event."
+  },
+  "commands": [
+    {
+      "cmd": "sed -n '1,60p' blueprints/memory-lifecycle-probe/README.md | sed -n '30,50p'",
+      "exit": 0,
+      "output_excerpt": "ai-memory's native `restore` and `reindex` both enumerate **all** same-name\nprocesses before acting, rather than checking only the selected data directory.\nThose commands were not run because this assignment prohibited inspecting\nactive service state. The process guard was not bypassed. Basic Memory's full\nreindex is not a demonstration of restoring a lost database. These are unequal\nrecovery checks and do not support a comparative recovery winner.\n(These are README lines 40-45; the sed printed lines 30-50 without line numbers.)",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-live-status-before-gap14.txt",
+      "note": "Corrected on reconciliation: the command recorded before was a grep; the transcript shows this sed read, whose output contains the quoted lines 40-45.",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "results": "Not executed. The gap's next_check names the isolation method: `unshare --pid --fork --mount-proc` with its own port. In a private PID namespace with its own /proc, restore/reindex's same-name process guard sees only processes inside the namespace, so it neither inspects nor depends on the host's ai-memory.service. The previous blocker ('the guard enumerates live host processes, which the isolation rules forbid') therefore does not hold. The same fix round ran `unshare -rn` successfully (transcript calls [8], [12], [27]), so `unshare -rn --pid --fork --mount-proc` with a disposable data dir was available but not tried. Corroboration: the peer receipt evidence/artifacts/sota-refresh-20260923/pins-mem/ai-memory.json on origin/main (5dcf451) records restore refusing with 'refusing to restore: 1 other ai-memory process(es) running (pids: [365])' when run without a PID namespace, which is the failure a private PID namespace removes. Outcome: not_settled (weak deferral).",
+  "outcome": "not_settled",
+  "evidence_class": "source_review",
+  "limits": [
+    "No restore or reindex was executed; evidence is the quoted source text only.",
+    "Remaining: in `unshare -rn --pid --fork --mount-proc`, init a disposable data dir, serve it on its own loopback port with AI_MEMORY_SERVER_URL exported, write pages, back up, restore into a fresh dir and reindex, then compare page/session/observation counts and search results with the pre-backup copy.",
+    "The deletion-is-logical half is credited to receipt 11's raw git-history evidence and the prior deletion-erasure-probe.json, not to this receipt."
+  ],
+  "checked_at": "2026-09-23T01:22:21Z",
+  "checked_at_note": "Time of the sed read of blueprints/memory-lifecycle-probe/README.md (fix-round transcript Bash call [7]).",
+  "reconciliation": {
+    "reconciled_at": "2026-09-23T02:30:41Z",
+    "new_checks_run": false,
+    "changes": [
+      "deferred -> not_settled: the named blocker is invalid under the next_check's own PID-namespace method.",
+      "commands[0] corrected to the sed read actually run; raw output committed.",
+      "Real timestamps."
+    ]
+  }
+}

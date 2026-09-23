@@ -1,0 +1,998 @@
+{
+  "id": "gap-wave2-20260923/foundation/agent-sdks/1-cancel-usage-vs-native-logs",
+  "gap_index": 1,
+  "gap_text_sha256": "5a8e3de38acde64a34d36a8161e7fabc08f398ff2ccf34ff906f9e50079c2d91",
+  "preregistration": {
+    "written_at": "2026-09-23T03:24:52Z",
+    "expectation": "Codex arm executable: an SDK turn interrupted mid-stream reports token usage via thread/tokenUsage/updated that equals the rollout token_count total, and the rollout stops growing after turn_aborted. Claude arm uses the single allowed bounded Claude call.",
+    "criteria": [
+      "Codex: interrupted turn completes with status interrupted; SDK-reported last total == rollout last token_count total_token_usage; no token_count after the abort event across two settle windows; rate-limit usedPercent before/after recorded (integer granularity stated)",
+      "Claude: one ClaudeSDKClient query interrupted mid-turn; ResultMessage usage (or its absence) compared against session JSONL assistant usage sums",
+      "settled only if both arms executed and compared; advanced if one arm only"
+    ],
+    "fix_round": {
+      "written_at": "2026-09-23T04:22:00Z",
+      "label": "fix-round preregistration, written after the Codex cross-family review (review findings 3-6); not back-dated",
+      "note": "outcome re-evaluated to advanced: the provider-consumption clause stays open (review finding 1)"
+    }
+  },
+  "commands": [
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 400 $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/codex_probe.py cancel --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/cancel.json --deadline 120 --interrupt-after 30 --settle 30",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 400 $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/codex_probe.py cancel --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/cancel-streaming.json --deadline 120 --interrupt-after 90 --settle 30 --effort low",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 240 $HOME/.cache/gap-wave2-20260923/agent-sdks/claude-sdk/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/claude_probe.py --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-claude --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/claude-interrupt.json",
+    "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/export_raw.py $HOME/.cache/gap-wave2-20260923/agent-sdks/runs evidence/artifacts/gap-wave2-20260923/foundation__agent-sdks/raw"
+  ],
+  "results": {
+    "codex_interrupt_before_output": {
+      "streaming_observed_before_interrupt": false,
+      "method_counts": {
+        "turn/started": 1,
+        "item/started": 3,
+        "item/completed": 2,
+        "turn/completed": 1
+      },
+      "turn_status": "interrupted",
+      "sdk_last_token_usage": null,
+      "rollout_entries_after_two_settle_windows": [
+        {
+          "timestamp": "2026-09-23T03:25:41.093Z",
+          "event": "task_started",
+          "reason": null
+        },
+        {
+          "timestamp": "2026-09-23T03:26:11.096Z",
+          "total": null,
+          "last": null
+        },
+        {
+          "timestamp": "2026-09-23T03:26:11.102Z",
+          "event": "turn_aborted",
+          "reason": "interrupted"
+        }
+      ],
+      "rollout_unchanged_between_settles": true,
+      "rate_limit_primary_used_percent_before_after": [
+        12,
+        12
+      ]
+    },
+    "codex_interrupt_mid_stream": {
+      "streaming_observed_before_interrupt": true,
+      "method_counts": {
+        "turn/started": 1,
+        "item/started": 3,
+        "item/completed": 2,
+        "item/agentMessage/delta": 68,
+        "turn/completed": 1
+      },
+      "turn_status": "interrupted",
+      "sdk_last_token_usage": null,
+      "rollout_entries_after_two_settle_windows": [
+        {
+          "timestamp": "2026-09-23T03:27:22.649Z",
+          "event": "task_started",
+          "reason": null
+        },
+        {
+          "timestamp": "2026-09-23T03:27:29.242Z",
+          "total": null,
+          "last": null
+        },
+        {
+          "timestamp": "2026-09-23T03:27:29.248Z",
+          "event": "turn_aborted",
+          "reason": "interrupted"
+        }
+      ],
+      "rollout_unchanged_between_settles": true,
+      "rate_limit_primary_used_percent_before_after": [
+        12,
+        12
+      ]
+    },
+    "claude_agent_sdk_interrupt_mid_stream": {
+      "init_model": "claude-haiku-4-5-20251001",
+      "cli_version": "2.1.280",
+      "init_mcp_servers": [
+        {
+          "name": "claude.ai Claude Docs",
+          "status": "connected",
+          "source": "claudeai"
+        }
+      ],
+      "streaming_observed_before_interrupt": true,
+      "event_type_counts": {
+        "SystemMessage:init": 1,
+        "SystemMessage:status": 1,
+        "RateLimitEvent": 1,
+        "StreamEvent:message_start": 1,
+        "StreamEvent:content_block_start": 2,
+        "SystemMessage:thinking_tokens": 2,
+        "StreamEvent:content_block_delta": 68,
+        "AssistantMessage": 2,
+        "StreamEvent:content_block_stop": 1,
+        "UserMessage": 1,
+        "ResultMessage": 1
+      },
+      "result": {
+        "subtype": "error_during_execution",
+        "terminal_reason": "aborted_streaming",
+        "usage": {
+          "output_tokens_details": {
+            "thinking_tokens": 0
+          },
+          "input_tokens": 0,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 0,
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "inference_geo": "",
+          "iterations": [],
+          "speed": "standard"
+        },
+        "model_usage": {
+          "claude-haiku-4-5-20251001": {
+            "inputTokens": 921,
+            "outputTokens": 17,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0,
+            "webSearchRequests": 0,
+            "costUSD": 0.001006,
+            "contextWindow": 200000,
+            "maxOutputTokens": 32000,
+            "thinkingTokens": 0,
+            "canonicalModel": "claude-haiku-4-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        },
+        "total_cost_usd": 0.001006
+      },
+      "session_jsonl_final_usage_per_message": [
+        {
+          "timestamp": "2026-09-23T03:29:29.736Z",
+          "message_id": "msg_011CfKfPAhe8EYFzStGd9Dgc",
+          "stop_reason": null,
+          "input_tokens": 3346,
+          "output_tokens": 4,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0
+        }
+      ],
+      "model_usage_reading": "Unexplained, labelled as such. model_usage (921 input / 17 output, costUSD 0.001006) matches no message in the stream or the session JSONL (3346 input / 4 output for the one streamed message). Most likely reading, not confirmed: the CLI made a separate auxiliary Haiku request that completed (the bundled 2.1.280 CLI contains a generateSessionTitle path; num_turns is 2), while the interrupted main message never reached model_usage. If so, the one SDK query produced two provider requests, and model_usage cannot be read as the interrupted turn's usage.",
+      "session_log_unchanged_between_settles": true
+    },
+    "finding": "Both Codex interrupts return a typed turn/completed with status interrupted, but no thread/tokenUsage/updated arrives and the native rollout's only token_count has info null; the 68 streamed deltas are not accounted anywhere local. The Claude ResultMessage (terminal_reason aborted_streaming) reports usage all zeros; its model_usage reports a different small figure; the session JSONL keeps the message_start snapshot (output_tokens 4) although 68 deltas streamed. Integer usedPercent did not move (12 -> 12)."
+  },
+  "raw_outputs": [
+    {
+      "path": "raw/cancel.json",
+      "sha256": "0a86c46e65c188d677846f8d9144090abfb9b3726e65d08ba90b51026b26681c"
+    },
+    {
+      "path": "raw/cancel-streaming.json",
+      "sha256": "b9e107bbff9042291d1f5c0ac3c3c91f09fc17a6b8e5d0a4b4aadebe8e7f8c3f"
+    },
+    {
+      "path": "raw/claude-interrupt.json",
+      "sha256": "edb4fca8670353452d37f6ea0aad066613925e0a0494e7cfd053e9e059d000e4"
+    },
+    {
+      "path": "raw/cancel.rollout-excerpt.jsonl",
+      "sha256": "9662bb2ce7588bcf0cc973915a765288073cd40ec47f0243401eb14d32fe842b"
+    },
+    {
+      "path": "raw/cancel-streaming.rollout-excerpt.jsonl",
+      "sha256": "45ca4c88c3d878a4ca3ab5762dc8636201bf369764441bd6a40264478fc8b24c"
+    },
+    {
+      "path": "raw/claude-interrupt.session-usage-excerpt.jsonl",
+      "sha256": "943d8babedef7233ee3cae4b67961247519e1e48c861a0b71ad280aa0c251269"
+    }
+  ],
+  "outcome": "advanced",
+  "evidence_class": "native_proven",
+  "rule_deviations": [
+    {
+      "rule": "wait while 2 or more real codex exec processes run",
+      "status": "unresolved",
+      "observed": "The first Codex SDK model call (tool-turn.json, 03:24:59Z) started while pgrep counted 3 processes matching 'codex exec'. A substring count can include processes that are not codex exec runs (at 04:37Z a similar substring filter matched two codex-linux-sandbox helpers); the 3 were never classified, so the rule may have been broken for this call. Later calls waited; the fix-round-2 driver classifies by argv (worker-tool-runs.json slot_checks: 1 real codex exec before each call)."
+    }
+  ],
+  "checked_at": "2026-09-23T15:47:16Z",
+  "round_3_observation": {
+    "source": [
+      {
+        "path": "raw/round3/claude-resume.json",
+        "sha256": "b1f013f9ed499b4694e0f2eb3a9325072ff8626fba515b1b89a796d64d1b5884"
+      },
+      {
+        "path": "raw/round3/claude-resume.session-appended-excerpt.jsonl",
+        "sha256": "a57db5c69de3afae72be31637024e9840dac0f75a7fb5e9f3cf9855b4daad8a5"
+      }
+    ],
+    "completed_query_usage": {
+      "input_tokens": 3858,
+      "output_tokens": 221
+    },
+    "completed_query_model_usage": {
+      "inputTokens": 4779,
+      "outputTokens": 238
+    },
+    "difference": {
+      "input": 921,
+      "output": 17
+    },
+    "reading": "On a completed query, model_usage exceeds the message usage by 921 input / 17 output tokens, the same figures as round 1's whole model_usage on the interrupted query. That fits one auxiliary request of about that size per query, and it suggests the interrupted main request's consumption was left out of round 1's model_usage. Two observations, one model: an inference, not a measurement of provider consumption; the gap's consumption clause stays open."
+  },
+  "round_4": {
+    "preregistration": {
+      "file": "preregistration-round4.json",
+      "written_at": null,
+      "written_window": {
+        "not_before": "2026-09-23T14:11:57Z",
+        "not_after": "2026-09-23T14:12:27Z"
+      },
+      "written_at_note": "Written between 14:11:57Z (a date call just before writing) and 14:12:27Z (commit 1ce3105 time); the first draft carried 14:13:00Z, which was later than its own commit and is corrected here in an amended commit. Written before the round-4 model download, before the local vLLM server started and before any round-4 inference.",
+      "expectation": "For each SDK, a long generation interrupted after streaming starts makes the local provider stop generating: vllm:num_requests_running returns to 0 within 10 s of the interrupt, and vllm:generation_tokens_total does not grow across two later settle windows. The native logs (Codex rollout token_count, Claude session JSONL usage and ResultMessage usage) will under-report the interrupted request against the provider's prompt and generation token deltas.",
+      "criteria": [
+        "provider metrics sampled before the turn, at interrupt, after settle 1 and after settle 2 (10 s each), with the per-SDK request isolated (no other client on the server)",
+        "consumption stops: generation_tokens_total(settle2) == generation_tokens_total(settle1) and num_requests_running == 0 at settle1",
+        "detector: a control request that is not interrupted must show generation_tokens_total growing by its completion_tokens, so the counter can see consumption",
+        "provider-side prompt and generation deltas recorded next to the SDK-reported usage and the native session-log usage for the same request",
+        "gap 1 stays advanced unless hosted-provider consumption becomes observable; the local provider is a substitute channel, not the hosted accounts",
+        "gap 11 stays advanced: hosted billing and multi-host recovery are not tested; the zombie-worker arm below only strengthens the one-host exactly-once evidence"
+      ]
+    },
+    "commands": [
+      "ECOSYSTEM_JOB_SECONDS=1200 $HOME/codex-ecosystem/bin/ecosystem-bounded-run env -u HF_TOKEN HF_HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/hf HF_HUB_DISABLE_TELEMETRY=1 $HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/bin/python -c \"from huggingface_hub import snapshot_download; snapshot_download('Qwen/Qwen3-4B-Instruct-2507-FP8', revision='8591804019c8b22094c3b5b4454e0edc05dffc98')\"  # 4.9 GB download from huggingface.co",
+      "ECOSYSTEM_JOB_MEMORY_HIGH=10G ECOSYSTEM_JOB_MEMORY_MAX=14G ECOSYSTEM_JOB_SECONDS=10800 ECOSYSTEM_JOB_TASKS_MAX=1024 $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/serve.sh  # contents in raw/round4/serve.sh (pasta netns, only 127.0.0.1:28431 forwarded); three earlier launches failed or were replaced, logs retained",
+      "kill -TERM <vllm api-server pid inside the pasta namespace>  # stop at 14:37:38Z; nvidia-smi before/after in raw/round4/gpu-before.txt, gpu-after.txt",
+      "(review fix round) the same serve.sh restarted at about 14:56:36Z and stopped the same way at 15:03:19Z; gpu-before-fix.txt, gpu-after-fix.txt",
+      "(second review fix) blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_fix2_remote.sh restarted it at 15:46:08Z; its stop step failed and the api-server was stopped by pid at 15:49:59Z (see receipt 8, round_4.results.provider_stop_rule_gpu)",
+      "$HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_codex.py session --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/codex-home --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-codex --state $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/private/codex-state.json --out $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/codex-session.json  # and -rep2/-rep3 with their own state files",
+      "env -i PATH=/usr/bin:/bin HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/claude-home CLAUDE_CONFIG_DIR=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/claude-home/.claude ANTHROPIC_BASE_URL=http://127.0.0.1:28431 ANTHROPIC_API_KEY=dummy-local ANTHROPIC_DEFAULT_HAIKU_MODEL=qwen3-4b ANTHROPIC_DEFAULT_SONNET_MODEL=qwen3-4b ANTHROPIC_DEFAULT_OPUS_MODEL=qwen3-4b ANTHROPIC_SMALL_FAST_MODEL=qwen3-4b CLAUDE_CODE_MAX_OUTPUT_TOKENS=8192 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 DISABLE_TELEMETRY=1 DISABLE_AUTOUPDATER=1 DISABLE_ERROR_REPORTING=1 $HOME/.cache/gap-wave2-20260923/agent-sdks/claude-sdk/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_claude.py session --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-claude --state $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/private/claude-state.json --out $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/claude-session.json  # and -rep2/-rep3",
+      "(fix round) the same two commands with --tap, state codex-state-fix<i>.json / claude-state-fix<i>.json and outputs codex-session-fix<i>.json / claude-session-fix<i>.json for i = 1, 2, 3"
+    ],
+    "raw_outputs": [
+      {
+        "path": "raw/round4/codex-session.json",
+        "sha256": "c12325246e4a9961e41224dabc4f4992cb1782dede19c3a9317f19f2fdf5510c"
+      },
+      {
+        "path": "raw/round4/codex-session-rep2.json",
+        "sha256": "f65d47e65ed1659b4b76ab6a94c7f536e1947ab707152616e20fd8536788192f"
+      },
+      {
+        "path": "raw/round4/codex-session-rep3.json",
+        "sha256": "fe4f3b101d6bdab16f7a6cbe2716368df2b9890af9f71abadcc1e873a2da2752"
+      },
+      {
+        "path": "raw/round4/codex-session-fix1.json",
+        "sha256": "ef7afbfa18eeb983ace11cb23788724033901ee79ccd176ceeb5f3a199bd0536"
+      },
+      {
+        "path": "raw/round4/codex-session-fix2.json",
+        "sha256": "90e331ca667699cbd37b7305d4a158f6ec5945c00782374fb52af4ecc057c519"
+      },
+      {
+        "path": "raw/round4/codex-session-fix3.json",
+        "sha256": "c310a4b8e36e0c0edf7390f15c4f5e2f3a99ef82ec3e6e5d989583dc3bed3024"
+      },
+      {
+        "path": "raw/round4/claude-session.json",
+        "sha256": "01ee25e5b5ff83c7960b4e27b234f2a9348b7ccdd1a8aa62083086930a0efb7f"
+      },
+      {
+        "path": "raw/round4/claude-session-rep2.json",
+        "sha256": "55f01c937b6c00ee17de4b31dc1e7cab44f07e016efc4d1785bde6480bd8e150"
+      },
+      {
+        "path": "raw/round4/claude-session-rep3.json",
+        "sha256": "454a9c310e1407f1c347b1aa85e428c70adfc15cf3ae331a626f23d249c9b64c"
+      },
+      {
+        "path": "raw/round4/claude-session-fix1.json",
+        "sha256": "9fd3608ac79c4d78c526f63814ac344caadbae4b8cb3b1b734472694deddc156"
+      },
+      {
+        "path": "raw/round4/claude-session-fix2.json",
+        "sha256": "f53995364deb22b0207a18f21be77f2e30bbf0e1d4e91ac54b202f314c8262f3"
+      },
+      {
+        "path": "raw/round4/claude-session-fix3.json",
+        "sha256": "6182042b77db39337ed5f0bbc47e0acf4a7f3cc20191c47740b9ee19031795ee"
+      },
+      {
+        "path": "raw/round4/claude-session.usage-excerpt.jsonl",
+        "sha256": "07287120bb306cb5ef364e8a7e868700cdd64cb88b1dacd4c1852888c1621168"
+      },
+      {
+        "path": "raw/round4/codex-home__config.toml",
+        "sha256": "5d9129ef0c3417b33c06a1880602a00583069119d1dc2b38ae7c79de656d0b58"
+      },
+      {
+        "path": "raw/round4/serve.sh",
+        "sha256": "b471eba6d25174b4f808531c7719488de80637e46c2cfde5435748ef25dbb34d"
+      },
+      {
+        "path": "raw/round4/vllm.log",
+        "sha256": "a615ef60ed6cde49e59e95da37e35132bb81d63d2e4fd55949f8505d86977856"
+      },
+      {
+        "path": "raw/round4/dl.log",
+        "sha256": "29106cdbebcdd1219ff5e54995981c1dcb17cc4db067a7d4a3ca315cf05b99ea"
+      },
+      {
+        "path": "raw/round4/codex-session-attempt1.json",
+        "sha256": "53de963bf987a757e8bb18cbd8b425cfb06f5edea1a7bc766fed22b3dae3beea"
+      }
+    ],
+    "results": {
+      "codex_sdk": [
+        {
+          "file": "codex-session.json",
+          "turn_status": "interrupted",
+          "streaming_observed_before_interrupt": true,
+          "provider_interrupted_request": {
+            "prompt_tokens": 10795.0,
+            "generation_tokens": 127.0,
+            "generation_tokens_at_interrupt_sample": 127.0,
+            "finished_by_reason_delta": {}
+          },
+          "running_right_after_turn_completed": 1.0,
+          "running_at_settle1": 0.0,
+          "settle1_seconds_after_interrupt": 10.04,
+          "generation_settle1_to_settle2": 0.0,
+          "consumption_stopped": true,
+          "sdk_thread_token_usage_total_after_interrupt": {
+            "cacheWriteInputTokens": 0,
+            "cachedInputTokens": 21376,
+            "inputTokens": 21407,
+            "outputTokens": 33,
+            "reasoningOutputTokens": 0,
+            "totalTokens": 21440
+          },
+          "rollout_last_total_after_abort": {
+            "input_tokens": 21407,
+            "cached_input_tokens": 21376,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 33,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 21440
+          },
+          "rollout_abort_event": [
+            {
+              "timestamp": "2026-09-23T14:21:09.084Z",
+              "event": "turn_aborted",
+              "reason": "interrupted"
+            }
+          ],
+          "turn1_provider_vs_rollout": {
+            "provider_prompt": 21407.0,
+            "provider_generation": 33.0,
+            "rollout_total_input": 21407,
+            "rollout_total_output": 33
+          }
+        },
+        {
+          "file": "codex-session-rep2.json",
+          "turn_status": "interrupted",
+          "streaming_observed_before_interrupt": true,
+          "provider_interrupted_request": {
+            "prompt_tokens": 10795.0,
+            "generation_tokens": 157.0,
+            "generation_tokens_at_interrupt_sample": 157.0,
+            "finished_by_reason_delta": {}
+          },
+          "running_right_after_turn_completed": 0.0,
+          "running_at_settle1": 0.0,
+          "settle1_seconds_after_interrupt": 10.03,
+          "generation_settle1_to_settle2": 0.0,
+          "consumption_stopped": true,
+          "sdk_thread_token_usage_total_after_interrupt": {
+            "cacheWriteInputTokens": 0,
+            "cachedInputTokens": 21376,
+            "inputTokens": 21407,
+            "outputTokens": 33,
+            "reasoningOutputTokens": 0,
+            "totalTokens": 21440
+          },
+          "rollout_last_total_after_abort": {
+            "input_tokens": 21407,
+            "cached_input_tokens": 21376,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 33,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 21440
+          },
+          "rollout_abort_event": [
+            {
+              "timestamp": "2026-09-23T14:22:48.940Z",
+              "event": "turn_aborted",
+              "reason": "interrupted"
+            }
+          ],
+          "turn1_provider_vs_rollout": {
+            "provider_prompt": 21407.0,
+            "provider_generation": 33.0,
+            "rollout_total_input": 21407,
+            "rollout_total_output": 33
+          }
+        },
+        {
+          "file": "codex-session-rep3.json",
+          "turn_status": "interrupted",
+          "streaming_observed_before_interrupt": true,
+          "provider_interrupted_request": {
+            "prompt_tokens": 10793.0,
+            "generation_tokens": 132.0,
+            "generation_tokens_at_interrupt_sample": 131.0,
+            "finished_by_reason_delta": {}
+          },
+          "running_right_after_turn_completed": 1.0,
+          "running_at_settle1": 0.0,
+          "settle1_seconds_after_interrupt": 10.03,
+          "generation_settle1_to_settle2": 0.0,
+          "consumption_stopped": true,
+          "sdk_thread_token_usage_total_after_interrupt": {
+            "cacheWriteInputTokens": 0,
+            "cachedInputTokens": 21376,
+            "inputTokens": 21406,
+            "outputTokens": 32,
+            "reasoningOutputTokens": 0,
+            "totalTokens": 21438
+          },
+          "rollout_last_total_after_abort": {
+            "input_tokens": 21406,
+            "cached_input_tokens": 21376,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 32,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 21438
+          },
+          "rollout_abort_event": [
+            {
+              "timestamp": "2026-09-23T14:23:41.906Z",
+              "event": "turn_aborted",
+              "reason": "interrupted"
+            }
+          ],
+          "turn1_provider_vs_rollout": {
+            "provider_prompt": 21406.0,
+            "provider_generation": 32.0,
+            "rollout_total_input": 21406,
+            "rollout_total_output": 32
+          }
+        },
+        {
+          "file": "codex-session-fix1.json",
+          "turn_status": "interrupted",
+          "streaming_observed_before_interrupt": true,
+          "provider_interrupted_request": {
+            "prompt_tokens": 10795.0,
+            "generation_tokens": 121.0,
+            "generation_tokens_at_interrupt_sample": 121.0,
+            "finished_by_reason_delta": {}
+          },
+          "running_right_after_turn_completed": 0.0,
+          "running_at_settle1": 0.0,
+          "settle1_seconds_after_interrupt": 10.03,
+          "generation_settle1_to_settle2": 0.0,
+          "consumption_stopped": true,
+          "sdk_thread_token_usage_total_after_interrupt": {
+            "cacheWriteInputTokens": 0,
+            "cachedInputTokens": 10688,
+            "inputTokens": 21407,
+            "outputTokens": 33,
+            "reasoningOutputTokens": 0,
+            "totalTokens": 21440
+          },
+          "rollout_last_total_after_abort": {
+            "input_tokens": 21407,
+            "cached_input_tokens": 10688,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 33,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 21440
+          },
+          "rollout_abort_event": [
+            {
+              "timestamp": "2026-09-23T14:57:46.947Z",
+              "event": "turn_aborted",
+              "reason": "interrupted"
+            }
+          ],
+          "turn1_provider_vs_rollout": {
+            "provider_prompt": 21407.0,
+            "provider_generation": 33.0,
+            "rollout_total_input": 21407,
+            "rollout_total_output": 33
+          }
+        },
+        {
+          "file": "codex-session-fix2.json",
+          "turn_status": "interrupted",
+          "streaming_observed_before_interrupt": true,
+          "provider_interrupted_request": {
+            "prompt_tokens": 10797.0,
+            "generation_tokens": 139.0,
+            "generation_tokens_at_interrupt_sample": 138.0,
+            "finished_by_reason_delta": {}
+          },
+          "running_right_after_turn_completed": 1.0,
+          "running_at_settle1": 0.0,
+          "settle1_seconds_after_interrupt": 10.02,
+          "generation_settle1_to_settle2": 0.0,
+          "consumption_stopped": true,
+          "sdk_thread_token_usage_total_after_interrupt": {
+            "cacheWriteInputTokens": 0,
+            "cachedInputTokens": 21376,
+            "inputTokens": 21408,
+            "outputTokens": 34,
+            "reasoningOutputTokens": 0,
+            "totalTokens": 21442
+          },
+          "rollout_last_total_after_abort": {
+            "input_tokens": 21408,
+            "cached_input_tokens": 21376,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 34,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 21442
+          },
+          "rollout_abort_event": [
+            {
+              "timestamp": "2026-09-23T14:58:40.103Z",
+              "event": "turn_aborted",
+              "reason": "interrupted"
+            }
+          ],
+          "turn1_provider_vs_rollout": {
+            "provider_prompt": 21408.0,
+            "provider_generation": 34.0,
+            "rollout_total_input": 21408,
+            "rollout_total_output": 34
+          }
+        },
+        {
+          "file": "codex-session-fix3.json",
+          "turn_status": "interrupted",
+          "streaming_observed_before_interrupt": true,
+          "provider_interrupted_request": {
+            "prompt_tokens": 10795.0,
+            "generation_tokens": 99.0,
+            "generation_tokens_at_interrupt_sample": 98.0,
+            "finished_by_reason_delta": {}
+          },
+          "running_right_after_turn_completed": 1.0,
+          "running_at_settle1": 0.0,
+          "settle1_seconds_after_interrupt": 10.04,
+          "generation_settle1_to_settle2": 0.0,
+          "consumption_stopped": true,
+          "sdk_thread_token_usage_total_after_interrupt": {
+            "cacheWriteInputTokens": 0,
+            "cachedInputTokens": 21376,
+            "inputTokens": 21407,
+            "outputTokens": 33,
+            "reasoningOutputTokens": 0,
+            "totalTokens": 21440
+          },
+          "rollout_last_total_after_abort": {
+            "input_tokens": 21407,
+            "cached_input_tokens": 21376,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 33,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 21440
+          },
+          "rollout_abort_event": [
+            {
+              "timestamp": "2026-09-23T14:59:35.008Z",
+              "event": "turn_aborted",
+              "reason": "interrupted"
+            }
+          ],
+          "turn1_provider_vs_rollout": {
+            "provider_prompt": 21407.0,
+            "provider_generation": 33.0,
+            "rollout_total_input": 21407,
+            "rollout_total_output": 33
+          }
+        }
+      ],
+      "claude_agent_sdk": [
+        {
+          "file": "claude-session.json",
+          "terminal_reason": "aborted_streaming",
+          "result_subtype": "error_during_execution",
+          "streaming_observed_before_interrupt": true,
+          "provider_interrupted_request": {
+            "prompt_tokens": 484.0,
+            "generation_tokens": 150.0,
+            "generation_tokens_at_interrupt_sample": 150.0,
+            "finished_by_reason_delta": {}
+          },
+          "running_right_after_result": 1.0,
+          "running_at_settle1": 0.0,
+          "settle1_seconds_after_interrupt": 10.02,
+          "generation_settle1_to_settle2": 0.0,
+          "consumption_stopped": true,
+          "result_usage_input_output": [
+            0,
+            0
+          ],
+          "result_model_usage": {
+            "qwen3-4b": [
+              729,
+              38
+            ]
+          },
+          "turn1_provider_prompt_generation": [
+            729.0,
+            38.0
+          ],
+          "session_jsonl_final_usage_per_message": [
+            {
+              "stop_reason": "tool_use",
+              "input_tokens": 331,
+              "output_tokens": 25
+            },
+            {
+              "stop_reason": "end_turn",
+              "input_tokens": 398,
+              "output_tokens": 13
+            },
+            {
+              "stop_reason": null,
+              "input_tokens": 484,
+              "output_tokens": 0
+            }
+          ],
+          "stream_usage_events": [
+            {
+              "input_tokens": 484,
+              "output_tokens": 0
+            },
+            {
+              "input_tokens": 484,
+              "output_tokens": 0
+            }
+          ]
+        },
+        {
+          "file": "claude-session-rep2.json",
+          "terminal_reason": "aborted_streaming",
+          "result_subtype": "error_during_execution",
+          "streaming_observed_before_interrupt": true,
+          "provider_interrupted_request": {
+            "prompt_tokens": 480.0,
+            "generation_tokens": 133.0,
+            "generation_tokens_at_interrupt_sample": 133.0,
+            "finished_by_reason_delta": {}
+          },
+          "running_right_after_result": 1.0,
+          "running_at_settle1": 0.0,
+          "settle1_seconds_after_interrupt": 10.03,
+          "generation_settle1_to_settle2": 0.0,
+          "consumption_stopped": true,
+          "result_usage_input_output": [
+            0,
+            0
+          ],
+          "result_model_usage": {
+            "qwen3-4b": [
+              727,
+              36
+            ]
+          },
+          "turn1_provider_prompt_generation": [
+            727.0,
+            36.0
+          ],
+          "session_jsonl_final_usage_per_message": [
+            {
+              "stop_reason": "tool_use",
+              "input_tokens": 331,
+              "output_tokens": 25
+            },
+            {
+              "stop_reason": "end_turn",
+              "input_tokens": 396,
+              "output_tokens": 11
+            },
+            {
+              "stop_reason": null,
+              "input_tokens": 480,
+              "output_tokens": 0
+            }
+          ],
+          "stream_usage_events": [
+            {
+              "input_tokens": 480,
+              "output_tokens": 0
+            },
+            {
+              "input_tokens": 480,
+              "output_tokens": 0
+            }
+          ]
+        },
+        {
+          "file": "claude-session-rep3.json",
+          "terminal_reason": "aborted_streaming",
+          "result_subtype": "error_during_execution",
+          "streaming_observed_before_interrupt": true,
+          "provider_interrupted_request": {
+            "prompt_tokens": 488.0,
+            "generation_tokens": 137.0,
+            "generation_tokens_at_interrupt_sample": 136.0,
+            "finished_by_reason_delta": {}
+          },
+          "running_right_after_result": 1.0,
+          "running_at_settle1": 0.0,
+          "settle1_seconds_after_interrupt": 10.03,
+          "generation_settle1_to_settle2": 0.0,
+          "consumption_stopped": true,
+          "result_usage_input_output": [
+            0,
+            0
+          ],
+          "result_model_usage": {
+            "qwen3-4b": [
+              731,
+              40
+            ]
+          },
+          "turn1_provider_prompt_generation": [
+            731.0,
+            40.0
+          ],
+          "session_jsonl_final_usage_per_message": [
+            {
+              "stop_reason": "tool_use",
+              "input_tokens": 331,
+              "output_tokens": 25
+            },
+            {
+              "stop_reason": "end_turn",
+              "input_tokens": 400,
+              "output_tokens": 15
+            },
+            {
+              "stop_reason": null,
+              "input_tokens": 488,
+              "output_tokens": 0
+            }
+          ],
+          "stream_usage_events": [
+            {
+              "input_tokens": 488,
+              "output_tokens": 0
+            },
+            {
+              "input_tokens": 488,
+              "output_tokens": 0
+            }
+          ]
+        },
+        {
+          "file": "claude-session-fix1.json",
+          "terminal_reason": "aborted_streaming",
+          "result_subtype": "error_during_execution",
+          "streaming_observed_before_interrupt": true,
+          "provider_interrupted_request": {
+            "prompt_tokens": 486.0,
+            "generation_tokens": 140.0,
+            "generation_tokens_at_interrupt_sample": 140.0,
+            "finished_by_reason_delta": {}
+          },
+          "running_right_after_result": 1.0,
+          "running_at_settle1": 0.0,
+          "settle1_seconds_after_interrupt": 10.02,
+          "generation_settle1_to_settle2": 0.0,
+          "consumption_stopped": true,
+          "result_usage_input_output": [
+            0,
+            0
+          ],
+          "result_model_usage": {
+            "qwen3-4b": [
+              730,
+              39
+            ]
+          },
+          "turn1_provider_prompt_generation": [
+            730.0,
+            39.0
+          ],
+          "session_jsonl_final_usage_per_message": [
+            {
+              "stop_reason": "tool_use",
+              "input_tokens": 331,
+              "output_tokens": 25
+            },
+            {
+              "stop_reason": "end_turn",
+              "input_tokens": 399,
+              "output_tokens": 14
+            },
+            {
+              "stop_reason": null,
+              "input_tokens": 486,
+              "output_tokens": 0
+            }
+          ],
+          "stream_usage_events": [
+            {
+              "input_tokens": 486,
+              "output_tokens": 0
+            },
+            {
+              "input_tokens": 486,
+              "output_tokens": 0
+            }
+          ]
+        },
+        {
+          "file": "claude-session-fix2.json",
+          "terminal_reason": "aborted_streaming",
+          "result_subtype": "error_during_execution",
+          "streaming_observed_before_interrupt": true,
+          "provider_interrupted_request": {
+            "prompt_tokens": 484.0,
+            "generation_tokens": 98.0,
+            "generation_tokens_at_interrupt_sample": 98.0,
+            "finished_by_reason_delta": {}
+          },
+          "running_right_after_result": 1.0,
+          "running_at_settle1": 0.0,
+          "settle1_seconds_after_interrupt": 10.03,
+          "generation_settle1_to_settle2": 0.0,
+          "consumption_stopped": true,
+          "result_usage_input_output": [
+            0,
+            0
+          ],
+          "result_model_usage": {
+            "qwen3-4b": [
+              729,
+              38
+            ]
+          },
+          "turn1_provider_prompt_generation": [
+            729.0,
+            38.0
+          ],
+          "session_jsonl_final_usage_per_message": [
+            {
+              "stop_reason": "tool_use",
+              "input_tokens": 331,
+              "output_tokens": 25
+            },
+            {
+              "stop_reason": "end_turn",
+              "input_tokens": 398,
+              "output_tokens": 13
+            },
+            {
+              "stop_reason": null,
+              "input_tokens": 484,
+              "output_tokens": 0
+            }
+          ],
+          "stream_usage_events": [
+            {
+              "input_tokens": 484,
+              "output_tokens": 0
+            },
+            {
+              "input_tokens": 484,
+              "output_tokens": 0
+            }
+          ]
+        },
+        {
+          "file": "claude-session-fix3.json",
+          "terminal_reason": "aborted_streaming",
+          "result_subtype": "error_during_execution",
+          "streaming_observed_before_interrupt": true,
+          "provider_interrupted_request": {
+            "prompt_tokens": 486.0,
+            "generation_tokens": 88.0,
+            "generation_tokens_at_interrupt_sample": 88.0,
+            "finished_by_reason_delta": {}
+          },
+          "running_right_after_result": 1.0,
+          "running_at_settle1": 0.0,
+          "settle1_seconds_after_interrupt": 10.04,
+          "generation_settle1_to_settle2": 0.0,
+          "consumption_stopped": true,
+          "result_usage_input_output": [
+            0,
+            0
+          ],
+          "result_model_usage": {
+            "qwen3-4b": [
+              730,
+              39
+            ]
+          },
+          "turn1_provider_prompt_generation": [
+            730.0,
+            39.0
+          ],
+          "session_jsonl_final_usage_per_message": [
+            {
+              "stop_reason": "tool_use",
+              "input_tokens": 331,
+              "output_tokens": 25
+            },
+            {
+              "stop_reason": "end_turn",
+              "input_tokens": 399,
+              "output_tokens": 14
+            },
+            {
+              "stop_reason": null,
+              "input_tokens": 486,
+              "output_tokens": 0
+            }
+          ],
+          "stream_usage_events": [
+            {
+              "input_tokens": 486,
+              "output_tokens": 0
+            },
+            {
+              "input_tokens": 486,
+              "output_tokens": 0
+            }
+          ]
+        }
+      ],
+      "all_consumption_stopped": true,
+      "all_running_zero_at_settle1": true,
+      "detector": {
+        "method": "vLLM Prometheus counters read over /metrics; for every completed (not interrupted) request the counter deltas equal the client-reported usage, so the counters see consumption that the clients also see",
+        "codex_turn1_counter_equals_rollout_total": true,
+        "claude_turn1_counter_equals_model_usage": true,
+        "openhands_counter_equals_sdk_metrics": true,
+        "inline_control_not_retained": "Two direct /v1/chat/completions control requests (120 and 200 tokens) matched the counters exactly (between 14:18:57Z and about 14:20:20Z); their output was printed to the terminal only and is not a retained file, so the retained detector is the completed-request equality above.",
+        "natural_finish_detector": "a request that ends by itself increments request_success_total (stop/length, seen for every completed turn); the interrupted requests added no finished_reason count, so they did not end naturally. vLLM 0.25.0 also did not count them under finished_reason=abort."
+      },
+      "sampling_note": "The sample named after_completed_1s/after_result_1s is taken immediately (about 0.01-0.03 s) after the SDK reported the terminal state; num_requests_running was still 1 there in 10 of 12 runs (the server-side abort lags the client) and 0 at settle1 in 12 of 12. Settle1 falls 10.02-10.04 s after the interrupt request, so the preregistered 'within 10 s' holds only to within that sampling slack. Between the interrupt sample and settle1, 0-1 further tokens were generated.",
+      "reading": "Provider-side consumption of each interrupted request is now measured (Codex SDK: 10793-10797 prompt and 99-157 generated tokens; Claude Agent SDK: 480-488 prompt and 88-150 generated tokens; 6 trials per SDK). No client channel reports the generated tokens: the Codex thread/tokenUsage notification and the rollout's last token_count (written just before turn_aborted) repeat the pre-interrupt total; the Claude ResultMessage usage is 0/0, its model_usage equals the completed turn-1 requests only, and the session JSONL keeps the interrupted message's input count (equal to the provider's prompt count) with output 0. This supports the round-3 inference that model_usage leaves the interrupted request out.",
+      "account_use": "none: the fresh CODEX_HOME has no auth.json (account/read: account null, requiresOpenaiAuth false); Claude ran with a dummy key, temp HOME and CLAUDE_CONFIG_DIR (apiKeySource ANTHROPIC_API_KEY)",
+      "attempt_1": "The first Codex session (14:20Z) failed: the small model refused the essay prompt, so turn 2 ended before the interrupt (JSON-RPC 'no active turn to interrupt'). The prompt was changed to a long listing for both SDKs before any Claude run; the attempt is retained."
+    },
+    "evidence_class": "local_integration",
+    "limits": [
+      "The provider is an open-weight model (Qwen3-4B-Instruct-2507-FP8) on a vLLM server this unit started; neither the hosted OpenAI nor the hosted Anthropic service was involved, so hosted-model behaviour and hosted billing are not shown.",
+      "Provider consumption is a vLLM counter on one host; it does not say how OpenAI or Anthropic bill an aborted stream.",
+      "Six trials per SDK (three first-pass, three tapped fix-round reruns); the Codex prompt carries about 10.8k tokens of Codex system prompt and tools, the Claude CLI about 0.5k with tools=[] and setting_sources=[], so the two SDKs' prompt counts are not comparable."
+    ],
+    "checked_at": "2026-09-23T15:47:16Z"
+  },
+  "pre_round_4_remaining": "A provider-side consumption figure for an interrupted turn in each SDK (usage or billing data finer than integer usedPercent) and an explanation of the Claude model_usage figure; the SDK and native-log comparison itself is done.",
+  "pre_round_4_limits": [
+    "Actual provider consumption on interruption is not observable through any of the three channels, so the gap's consumption clause stays open (outcome re-evaluated from settled to advanced in the fix round after cross-family review).",
+    "codex usedPercent is an integer percentage of a weekly window; it cannot resolve one small turn (detection floor ~1% of the window).",
+    "The Claude arm is one bounded call (haiku alias -> claude-haiku-4-5-20251001), the single call this unit was allowed.",
+    "The Claude arm counts as one SDK query; it may have produced two provider requests (see model_usage_reading), which is disclosed against the one-bounded-call allowance.",
+    "Rule deviation kept open: see rule_deviations."
+  ],
+  "limits": [
+    "Hosted consumption on interruption is still not observable here: subscription sign-in exposes no usage API beyond integer usedPercent, and paid APIs are excluded (round 1).",
+    "Round 4 shows, at a local provider, that the interrupted request's generated tokens reach no SDK or native-log channel in either SDK; the same omission for the hosted services is an inference."
+  ],
+  "remaining": "Hosted-provider consumption for an interrupted turn (OpenAI and Anthropic usage or billing data finer than integer usedPercent). Round 4 measured it at a local provider only; the SDK and native-log comparison is done for both SDKs."
+}

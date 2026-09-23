@@ -1,0 +1,84 @@
+== date
+2026-09-23T08:49:14-04:00
+== ps 366
+    PID    PPID                  STARTED USER     COMMAND
+    366     336 Tue Sep 22 11:04:18 2026 <user>    $HOME/.local/share/codex-ecosystem/tools/dagu-2.16.6/dagu server
+== cmdline 366
+$HOME/.local/share/codex-ecosystem/tools/dagu-2.16.6/dagu server 
+== cwd 366
+$HOME
+== environ 366 (filtered: only HOME, XDG_*, DAGU_*HOME*/DIR*/PATH*/CONFIG*; all other names and values suppressed)
+HOME=$HOME
+DAGU_HOME=$HOME/.local/share/codex-ecosystem/dagu-equities
+== environ 366 variable count, and count of DAGU_* names (names/values not printed)
+3
+1
+== open fds of 366 pointing into dagu trees
+/proc/366/fd/12 -> $HOME/.local/share/codex-ecosystem/dagu-equities/data/incidents/monitor-state.json.lock.flock
+/proc/366/fd/13 -> $HOME/.local/share/codex-ecosystem/dagu-equities/data/notifications/monitor-state.json.lock.flock
+== open fd count
+14
+== maps of 366 mentioning dagu (files only)
+$HOME/.local/share/codex-ecosystem/tools/dagu-2.16.6/dagu
+== listeners of 366
+LISTEN 0      4096        127.0.0.1:18525 0.0.0.0:* users:(("dagu",pid=366,fd=10))            
+== config files
+total 28
+drwxr-x---  3 <user> <user>  4096 Sep 19 12:20 .
+drwxr-xr-x 27 <user> <user>  4096 Sep 23 08:45 ..
+-rw-------  1 <user> <user>   118 Sep 19 12:20 .base-config-created
+-rw-------  1 <user> <user> 11103 Sep 19 12:20 base.yaml
+drwxr-x---  2 <user> <user>  4096 Sep 19 12:20 dags
+-- $HOME/.config/dagu/base.yaml (keys only)
+type:
+overlap_policy:
+log_output:
+hist_retention_days:
+max_clean_up_time_sec:
+max_active_steps:
+max_output_size:
+catchup_window:
+== birth/modify times of the 28 incident paths (%w birth, %y mtime)
+birth=2026-09-19 12:20:30.433692330 -0400 | mtime=2026-09-22 23:22:42.644335893 -0400 | directory | $HOME/.local/share/dagu/data/
+birth=2026-09-22 23:22:42.575995896 -0400 | mtime=2026-09-22 23:22:42.575995896 -0400 | directory | $HOME/.local/share/dagu/data/dag-settings
+birth=2026-09-22 23:22:42.575995896 -0400 | mtime=2026-09-22 23:22:42.674108314 -0400 | directory | $HOME/.local/share/dagu/data/notifications
+birth=2026-09-22 23:22:42.580925582 -0400 | mtime=2026-09-22 23:22:42.580925582 -0400 | directory | $HOME/.local/share/dagu/data/notifications/channels
+birth=2026-09-22 23:22:42.580925582 -0400 | mtime=2026-09-22 23:22:42.580925582 -0400 | directory | $HOME/.local/share/dagu/data/notifications/dags
+birth=2026-09-22 23:22:42.581069485 -0400 | mtime=2026-09-22 23:22:42.581133186 -0400 | directory | $HOME/.local/share/dagu/data/notifications/routes
+birth=2026-09-22 23:22:42.581133186 -0400 | mtime=2026-09-22 23:22:42.581133186 -0400 | directory | $HOME/.local/share/dagu/data/notifications/routes/workspaces
+birth=2026-09-22 23:22:42.665743668 -0400 | mtime=2026-09-22 23:22:42.666021373 -0400 | regular file | $HOME/.local/share/dagu/data/notifications/monitor-state.json
+birth=2026-09-22 23:22:42.659997367 -0400 | mtime=2026-09-22 23:24:57.331860729 -0400 | directory | $HOME/.local/share/dagu/data/notifications/monitor-state.json.lock
+birth=2026-09-22 23:22:42.659997367 -0400 | mtime=2026-09-22 23:22:42.659997367 -0400 | regular empty file | $HOME/.local/share/dagu/data/notifications/monitor-state.json.lock.flock
+birth=2026-09-22 23:22:42.581133186 -0400 | mtime=2026-09-22 23:22:42.679997717 -0400 | directory | $HOME/.local/share/dagu/data/incidents
+birth=2026-09-22 23:22:42.581133186 -0400 | mtime=2026-09-22 23:22:42.581133186 -0400 | directory | $HOME/.local/share/dagu/data/incidents/providers
+birth=2026-09-22 23:22:42.581327689 -0400 | mtime=2026-09-22 23:22:42.581520293 -0400 | directory | $HOME/.local/share/dagu/data/incidents/policies
+birth=2026-09-22 23:22:42.581398691 -0400 | mtime=2026-09-22 23:22:42.581398691 -0400 | directory | $HOME/.local/share/dagu/data/incidents/policies/dags
+birth=2026-09-22 23:22:42.581398691 -0400 | mtime=2026-09-22 23:22:42.581398691 -0400 | directory | $HOME/.local/share/dagu/data/incidents/policies/workspaces
+birth=2026-09-22 23:22:42.581520293 -0400 | mtime=2026-09-22 23:22:42.581520293 -0400 | directory | $HOME/.local/share/dagu/data/incidents/states
+birth=2026-09-22 23:22:42.675357536 -0400 | mtime=2026-09-22 23:22:42.675558140 -0400 | regular file | $HOME/.local/share/dagu/data/incidents/monitor-state.json
+birth=2026-09-22 23:22:42.675148732 -0400 | mtime=2026-09-22 23:24:57.331957031 -0400 | directory | $HOME/.local/share/dagu/data/incidents/monitor-state.json.lock
+birth=2026-09-22 23:22:42.675148732 -0400 | mtime=2026-09-22 23:22:42.675148732 -0400 | regular empty file | $HOME/.local/share/dagu/data/incidents/monitor-state.json.lock.flock
+birth=2026-09-22 23:22:42.581520293 -0400 | mtime=2026-09-22 23:22:42.583060320 -0400 | directory | $HOME/.local/share/dagu/data/service-registry
+birth=2026-09-22 23:22:42.581520293 -0400 | mtime=2026-09-22 23:24:57.353724995 -0400 | directory | $HOME/.local/share/dagu/data/service-registry/scheduler
+birth=2026-09-22 23:22:42.644335893 -0400 | mtime=2026-09-22 23:23:59.996985321 -0400 | directory | $HOME/.local/share/dagu/data/scheduler
+birth=2026-09-22 23:22:42.691997928 -0400 | mtime=2026-09-22 23:22:42.695146983 -0400 | regular file | $HOME/.local/share/dagu/data/scheduler/state.json
+birth=2026-09-22 23:23:59.996985321 -0400 | mtime=2026-09-22 23:24:00.001210992 -0400 | regular file | $HOME/.local/share/dagu/data/scheduler/checkpoint.json
+birth=2026-09-22 23:22:42.644335893 -0400 | mtime=2026-09-22 23:24:57.336058299 -0400 | directory | $HOME/.local/share/dagu/data/scheduler/locks
+birth=2026-09-22 23:22:42.687997858 -0400 | mtime=2026-09-22 23:22:42.703513829 -0400 | directory | $HOME/.local/share/dagu/data/scheduler/.dagu_record_locks
+birth=2026-09-22 23:22:42.687997858 -0400 | mtime=2026-09-22 23:22:42.703513829 -0400 | directory | $HOME/.local/share/dagu/data/scheduler/.dagu_record_locks/4b
+birth=2026-09-22 23:22:42.703513829 -0400 | mtime=2026-09-22 23:24:00.004030739 -0400 | directory | $HOME/.local/share/dagu/data/scheduler/.dagu_record_locks/47
+== top-level of data dir with birth times
+birth=2026-09-19 12:20:30.433692330 -0400 | mtime=2026-09-19 12:20:30.434375154 -0400 | directory | $HOME/.local/share/dagu/data/auth
+birth=2026-09-19 12:20:30.434375154 -0400 | mtime=2026-09-19 12:20:30.434375154 -0400 | directory | $HOME/.local/share/dagu/data/contexts
+birth=2026-09-22 23:22:42.575995896 -0400 | mtime=2026-09-22 23:22:42.575995896 -0400 | directory | $HOME/.local/share/dagu/data/dag-settings
+birth=2026-09-22 23:22:42.581133186 -0400 | mtime=2026-09-22 23:22:42.679997717 -0400 | directory | $HOME/.local/share/dagu/data/incidents
+birth=2026-09-22 23:22:42.575995896 -0400 | mtime=2026-09-22 23:22:42.674108314 -0400 | directory | $HOME/.local/share/dagu/data/notifications
+birth=2026-09-22 23:22:42.644335893 -0400 | mtime=2026-09-22 23:23:59.996985321 -0400 | directory | $HOME/.local/share/dagu/data/scheduler
+birth=2026-09-22 23:22:42.581520293 -0400 | mtime=2026-09-22 23:22:42.583060320 -0400 | directory | $HOME/.local/share/dagu/data/service-registry
+== any path under data dir born or modified since 2026-09-22 23:26:00 (to see later activity by pid 366)
+== current checkpoint.json
+{
+  "lastTick": "2026-09-22T23:24:00-04:00"
+}
+== end
+2026-09-23T08:49:15-04:00

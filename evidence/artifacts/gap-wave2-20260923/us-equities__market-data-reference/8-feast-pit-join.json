@@ -1,0 +1,90 @@
+{
+ "id": "gap-wave2-20260923/us-equities__market-data-reference/8-feast-pit-join",
+ "gap_index": 8,
+ "layer_id": "market-data-reference",
+ "catalog": "us-equities",
+ "gap_text": "News, macro-vintage, point-in-time feature store, stream-ingestion and server-store scope terms have no native evidence among the adopted candidates.",
+ "gap_text_sha256": "1d639116b65566c99f20878720a85fc2b2ae1c2ee7df4b9ed98048ce9728e84f",
+ "next_check": "Install Feast in a new prefix and run a local point-in-time join fixture. Fetch Alpaca news with the paper credentials and retain it as the news native-evidence receipt.",
+ "preregistration": {
+  "written_at": "2026-09-23T04:22:33Z",
+  "expectation": "Feast installs in a new prefix and a local offline-store point-in-time join fixture returns the as-of feature value (never a future value). Alpaca news fetch is deferred (credentials/broker lane owned by sota-workflow-resolution). Macro-vintage, stream-ingestion and server-store terms remain without native evidence.",
+  "criteria": "advanced if the Feast PIT fixture passes with a leakage negative control (a feature row timestamped after the entity event must not be joined); settled only if news, macro-vintage, stream, server-store AND PIT all get native evidence.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration.json",
+  "committed_in": "c6846f1"
+ },
+ "fix_round_preregistration": {
+  "written_at": "2026-09-23T04:41:56Z",
+  "label": "fix-round preregistration, written after the Codex round-1 review and before the fix-round reruns",
+  "expectation": "Join cardinality check (no duplicate or unrequested rows) passes on Feast 0.66.0 and the earlier values are unchanged.",
+  "criteria": "Counter of returned (symbol, ts) keys must be <= entity Counter; a self-test appending a duplicate and an unrequested row must fail the check.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration-fix-round1.json",
+  "committed_in": "0481e46"
+ },
+ "fix_round2_preregistration": null,
+ "fix_round3_preregistration": null,
+ "eol_fix_preregistration": null,
+ "independent_review_round3": null,
+ "independent_review_round2": {
+  "reviewer": "independent Opus review of fe8b66e (findings relayed by the coordinator)",
+  "findings_for_this_gap": "none"
+ },
+ "independent_review": {
+  "reviewer": "codex exec --sandbox read-only --ephemeral (codex-cli 0.155.1); invocation 1 stalled reading stdin and was stopped without output, invocation 2 (stdin from /dev/null) completed, 62,448 tokens",
+  "output": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/review-codex-round1.txt",
+  "findings_for_this_gap": "1 finding (join cardinality: duplicate/unrequested rows accepted) - fixed in round 1 and re-run"
+ },
+ "commands": [
+  "uv venv --python 3.12 $HOME/.cache/gap-wave2-20260923/market-data-reference/feast && uv pip install feast   # via ecosystem-bounded-run; feast 0.66.0, pandas 2.3.3, pyarrow 25.0.1; uv cache 562 MB downloaded in total for this unit",
+  "HOME=$(mktemp -d) $HOME/.cache/gap-wave2-20260923/market-data-reference/feast/bin/python blueprints/gap-wave2-20260923/us-equities__market-data-reference/feast_pit_fixture.py > evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.json   # final run exit 0; attempt 1 exit 1 retained"
+ ],
+ "results": [
+  "Feast 0.66.0 local provider, file offline store, get_historical_features: AAA@2020-02-01 -> 1.0 (oracle 1.0); AAA@2020-05-01 -> 1.15 (restatement with later created_timestamp wins; oracle 1.15); AAA@2020-06-30 -> 1.15 (value published 2020-07-10 NOT joined; future_value_leaked=false)",
+  "CCC (no feature rows) returned with null; BBB (only a row older than the 365-day TTL) is DROPPED from the result: entity_rows_in 5, rows_returned 4",
+  "attempt 1 (without CCC) exited 1 because its TTL check expected a null row for BBB and got none (rows_returned 3 of 4)",
+  "Alpaca news fetch: not run (credentialed provider contact belongs to sota-workflow-resolution)",
+  "Fix round 1 (after Codex review): join cardinality check added (Counter of returned (symbol, ts) keys must not exceed the requested keys): join_cardinality_ok=true; self-tests reject an appended duplicate row and an unrequested ZZZ row (both true). Values unchanged."
+ ],
+ "detection_method": "Every returned row is compared with an independent filter-and-sort oracle; the 2020-07-10 value (1.20) is explicitly searched for as the leakage signal; dropped entity rows are enumerated by comparing input and output keys.",
+ "outcome": "advanced",
+ "evidence_class": "local_integration",
+ "limits": [
+  "Alpaca news native evidence deferred (owner: sota-workflow-resolution; needs paper credentials).",
+  "Macro-vintage, stream-ingestion and server-store scope terms were not exercised (no feature server, no stream source, no ALFRED/vintage data); they remain without native evidence.",
+  "Synthetic 5-row fixture, local file offline store only; Feast's silent drop of stale-only entity rows is a PIT-research hazard (row loss instead of explicit null) and should be handled by a left-join guard if Feast is adopted.",
+  "Feast pulled a ~430 MB venv and was installed only under the cache prefix; no Feast server or port was started."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.json",
+   "sha256": "8e64af64d5c54e4642d8afe0d614f6a57b6407c5fa47207a31a6ad2ee0be221c"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.stderr",
+   "sha256": "d9e853e9d1236d2255db0ff8a30baf5781d0b2e441c33dc5b2fad91dd8054f21"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.attempt1.json",
+   "sha256": "740d4538b8fd64e72707ffbca83bd36ee7f72fca895cbe936b13bf542b050ab9"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.attempt1.stderr",
+   "sha256": "a4bdb48ec007dfd3d2438063dd80a5da88bef4eb43a611968667a4a2abe8fd33"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/install-feast-install.log",
+   "sha256": "429b741aa896a84b34d607f7179e57b44df4f0101b0ffc325190cf7b988b64eb"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.fix1.json",
+   "sha256": "476cfc1a02342f15ebe95ef8dc428a0ad51a5ed7ffc1cc2dc1813bec465d44e2"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.fix1.stderr",
+   "sha256": "d9e853e9d1236d2255db0ff8a30baf5781d0b2e441c33dc5b2fad91dd8054f21"
+  }
+ ],
+ "checked_at": "2026-09-23T04:42:57Z",
+ "checked_at_source": "UTC mtime of the latest raw output the receipt cites (sed path-redaction can postdate the run by seconds)",
+ "host_paths": "host paths are written as $HOME; private Alpaca payloads stay outside the repository"
+}

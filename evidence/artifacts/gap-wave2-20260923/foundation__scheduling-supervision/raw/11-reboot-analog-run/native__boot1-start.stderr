@@ -1,0 +1,9 @@
+time=2026-09-22T22:54:07.826-04:00 level=INFO msg="Executing root dag-run" dag=realboot run-id=realboot-59dd2fcf40df9ebc params=""
+time=2026-09-22T22:54:07.863-04:00 level=INFO msg="DAG run started" dag=realboot run-id=realboot-59dd2fcf40df9ebc worker-id=local attempt-id=fe06cc params=[]
+time=2026-09-22T22:54:07.864-04:00 level=INFO msg="Step started" dag=realboot run-id=realboot-59dd2fcf40df9ebc worker-id=local attempt-id=fe06cc step=checkpoint
+time=2026-09-22T22:54:12.817-04:00 level=INFO msg="Step started" dag=realboot run-id=realboot-59dd2fcf40df9ebc worker-id=local attempt-id=fe06cc step=finalize
+time=2026-09-22T22:54:12.962-04:00 level=INFO msg="Stopping running child processes" stop-mode=graceful signal=terminated allow-override=false max-cleanup-time=5s
+time=2026-09-22T22:54:12.964-04:00 level=INFO msg="All child processes have been terminated"
+time=2026-09-22T22:54:12.970-04:00 level=INFO msg="DAG run finished" dag=realboot run-id=realboot-59dd2fcf40df9ebc worker-id=local attempt-id=fe06cc status=aborted started-at=2026-09-22T22:54:07-04:00 finished-at=2026-09-22T22:54:12-04:00
+time=2026-09-22T22:54:12.979-04:00 level=ERROR msg="Failed to execute dag-run" dag=realboot run-id=realboot-59dd2fcf40df9ebc err="signal: terminated"
+Error: failed to execute the dag-run realboot (dag-run ID: realboot-59dd2fcf40df9ebc): signal: terminated

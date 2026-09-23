@@ -1,0 +1,17 @@
+control-default-rules exit=1 seconds=1
+head commits: 502 head=ba3e7c2b1c660b84844377d2baa8dcab6e37785d
+head-repo-config exit=143 seconds=600
+head commits: 502 head=ba3e7c2b1c660b84844377d2baa8dcab6e37785d
+blobs over 2 MB reachable from HEAD: 163
+head-repo-config-2mb exit=0 seconds=63
+control-default-rules lock busy (75), retry 1
+control-default-rules lock busy (75), retry 2
+control-default-rules lock busy (75), retry 3
+control-default-rules lock busy (75), retry 4
+control-default-rules lock busy (75), retry 5
+control-default-rules lock busy (75), retry 6
+control-default-rules exit=1 seconds=120
+control-repo-config exit=1 seconds=1
+oversized-head-index exit=1 seconds=2
+all-ref commits: 1216
+allrefs-repo-config-2mb exit=1 seconds=68

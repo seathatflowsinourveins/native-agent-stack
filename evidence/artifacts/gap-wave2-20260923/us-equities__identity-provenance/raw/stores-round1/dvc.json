@@ -1,0 +1,218 @@
+{
+  "arm": "dvc",
+  "concurrent_writers": {
+    "appends_each": 10,
+    "no_silent_loss": true,
+    "reported_successful_appends": 20,
+    "rows_expected_from_reported_successes": 100,
+    "rows_found": 100,
+    "rows_lost_after_reported_success": 0,
+    "state": {
+      "detail": {
+        "a": {
+          "batches": 10,
+          "checkout_exit": 0,
+          "stderr": ""
+        },
+        "b": {
+          "batches": 10,
+          "checkout_exit": 0,
+          "stderr": ""
+        }
+      },
+      "git_commits": 20,
+      "readable": true,
+      "rows": 100,
+      "status_after_exit": 0,
+      "status_exit": 0
+    },
+    "stderr_tail": {
+      "a": "",
+      "b": ""
+    },
+    "writer_error_counts": {
+      "a": 0,
+      "b": 0
+    },
+    "writer_error_examples": {
+      "a": [],
+      "b": []
+    },
+    "writers": 2
+  },
+  "correction_retention": {
+    "mechanism": "git checkout <v1 commit> -- snap.dvc && dvc checkout",
+    "v1_row_ids": [
+      "future-member",
+      "original"
+    ],
+    "v1_rows_equal": true
+  },
+  "elapsed_s": 46.26,
+  "fixture_rows": {
+    "observations": [
+      "aeeacfe8f0cfa22b73c71a6b2b7349f05c3bfd031c2ef8f8bbe98784c7ac9ebe",
+      5
+    ],
+    "universe": [
+      "37cb0502779e72b2c0ff66e7dd64932d0b75a43873cde1d46e83a229e67a11c9",
+      2
+    ]
+  },
+  "latency_ms": {
+    "read_median": 459.365,
+    "unit_of_work": "write parquet + dvc add + git commit (CLI subprocesses) / delete + dvc checkout + read",
+    "write_median": 628.433,
+    "write_samples": 5
+  },
+  "lineage": {
+    "commit_timestamp": "2026-09-23T01:14:32-04:00",
+    "input_dataset_name": null,
+    "native_fields_present": [
+      "version_id",
+      "parent_version",
+      "commit_timestamp",
+      "operation",
+      "per_file_content_hash"
+    ],
+    "note": "input dataset names appear only for pipeline stages (dvc.lock deps), not for dvc add; see gap 0/2 run dvc.lock",
+    "operation": "v2",
+    "parent_version": "2d96fdcfdd091473b6ffb53732e0ba96f9fef9e8",
+    "per_file_content_hash": "md5 of the directory manifest in snap.dvc: 6c0c0e7ae3bac776360620fa0943beb9.dir",
+    "version_id": "13ba6b4159bfa9a49765c8cf6809a049776ce144"
+  },
+  "python": "3.13.15",
+  "recovery_after_sigkill": {
+    "all_recovered": true,
+    "detection_method": "after SIGKILL, reopen the store in a fresh process handle; pass only if it reads, holds a whole number of 5-row batches, and the committed count is the writer's last recorded count or one more (a commit that finished before its progress line was written)",
+    "trials": [
+      {
+        "committed_units": 3,
+        "progress_recorded_commits": 3,
+        "state": {
+          "detail": {
+            "a": {
+              "batches": 3,
+              "checkout_exit": 0,
+              "stderr": ""
+            }
+          },
+          "git_commits": 3,
+          "readable": true,
+          "rows": 15,
+          "status_after_exit": 0,
+          "status_exit": 0
+        },
+        "trial": 0,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 3,
+        "progress_recorded_commits": 3,
+        "state": {
+          "detail": {
+            "a": {
+              "batches": 3,
+              "checkout_exit": 0,
+              "stderr": ""
+            }
+          },
+          "git_commits": 3,
+          "readable": true,
+          "rows": 15,
+          "status_after_exit": 0,
+          "status_exit": 0
+        },
+        "trial": 1,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 3,
+        "progress_recorded_commits": 3,
+        "state": {
+          "detail": {
+            "a": {
+              "batches": 3,
+              "checkout_exit": 0,
+              "stderr": ""
+            }
+          },
+          "git_commits": 3,
+          "readable": true,
+          "rows": 15,
+          "status_after_exit": 0,
+          "status_exit": 0
+        },
+        "trial": 2,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 3,
+        "progress_recorded_commits": 3,
+        "state": {
+          "detail": {
+            "a": {
+              "batches": 3,
+              "checkout_exit": 0,
+              "stderr": ""
+            }
+          },
+          "git_commits": 3,
+          "readable": true,
+          "rows": 15,
+          "status_after_exit": 0,
+          "status_exit": 0
+        },
+        "trial": 3,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 3,
+        "progress_recorded_commits": 3,
+        "state": {
+          "detail": {
+            "a": {
+              "batches": 3,
+              "checkout_exit": 0,
+              "stderr": ""
+            }
+          },
+          "git_commits": 3,
+          "readable": true,
+          "rows": 15,
+          "status_after_exit": 0,
+          "status_exit": 0
+        },
+        "trial": 4,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      }
+    ]
+  },
+  "restore": {
+    "observations": true,
+    "universe": true
+  },
+  "restore_after_delete": {
+    "mechanism": "dvc checkout from local cache",
+    "per_file_equal": {
+      "observations.parquet": true,
+      "universe.parquet": true
+    }
+  },
+  "started_utc": "2026-09-23T05:14:30Z",
+  "storage_bytes": {
+    "dvc_cache": 6363,
+    "git_dir": 28960,
+    "workspace_plus_cache": 10882
+  },
+  "versions": {
+    "duckdb": "1.5.5",
+    "dvc": "3.67.1",
+    "pandas": "3.0.6"
+  }
+}

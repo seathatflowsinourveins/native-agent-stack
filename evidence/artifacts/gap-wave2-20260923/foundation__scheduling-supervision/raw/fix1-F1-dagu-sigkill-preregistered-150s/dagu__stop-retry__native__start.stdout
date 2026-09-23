@@ -1,0 +1,16 @@
+Aborted - 2026-09-22T23:27:53-04:00
+
+dag: recovery (0s)
+├─log: $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f1-dagu-prereg-1790134073/dagu/stop-retry/dagu-home/logs/recovery/dag-run_20260923_032753Z_recovery-37b04d106c4b5a53/dag-run_20260922.232753.523.recovery.log
+│
+├─checkpoint (0s) [succeeded]
+│ └─/usr/bin/python3 -B
+│     $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-
+│     f1-dagu-prereg-1790134073/dagu/stop-retry/fixture.py checkpoint
+│     $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-
+│     f1-dagu-prereg-1790134073/dagu/stop-retry
+│ 
+└─finalize [aborted]
+
+Result: Aborted
+

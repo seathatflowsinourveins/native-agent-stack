@@ -1,0 +1,839 @@
+{
+  "decompressed": [
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/fixed/account.csv.gz",
+      "gz_sha256": "a3986d9aa6c3c44ad265816ce854df0a6e33673f457488868dff8b6faa2b156c",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/fixed/account.csv",
+      "sha256": "67bdef4b6fdd5adb206d558f71290f83d184e293facb2cfd6842c08717bd5eb8"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/fixed/fills.csv.gz",
+      "gz_sha256": "872fbc90b1fac3b0933ab59ed01f2af070758253b53f1b736635a6762c057a96",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/fixed/fills.csv",
+      "sha256": "7ef4bd0e1429f3777c1ad3c31f635fce4856cea69bc6a5f4601208810f6a216d"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/fixed/orders.json.gz",
+      "gz_sha256": "56caf06f8da4c0cb9f2c0c6af1aba6798f7e3359c47350382d831f1b7599e2c6",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/fixed/orders.json",
+      "sha256": "2d15e90c7e2d55f87ac04432f35af90881cdb96ea141fca4a5838689fb32eb82"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/per_share/account.csv.gz",
+      "gz_sha256": "4b57f568721df569ba329ae7cfa0f4a1bb4ec8fb91045bcbe751cb85de404fe7",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/per_share/account.csv",
+      "sha256": "88d35601ed81eeb3304aa69d3ce22b42665c6d139b8413f7afb9c0fdc083a53a"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/per_share/fills.csv.gz",
+      "gz_sha256": "034111536c12787ce8bcabd7ac1f7418f6f6e0cbb2671afc698501016b4ac17f",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/per_share/fills.csv",
+      "sha256": "32bac5814cbbbad989356f58d5a0ea28143595fabc571ddc1a4a9158a2be7823"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/per_share/orders.json.gz",
+      "gz_sha256": "56caf06f8da4c0cb9f2c0c6af1aba6798f7e3359c47350382d831f1b7599e2c6",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/per_share/orders.json",
+      "sha256": "2d15e90c7e2d55f87ac04432f35af90881cdb96ea141fca4a5838689fb32eb82"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/fixed/account.csv.gz",
+      "gz_sha256": "926f116f98470b4523f7021f7fe71d330104d7ee54b336f1d2c7d73e98852c7b",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/fixed/account.csv",
+      "sha256": "620c8c0192447b8f3b0343eb0fc54be8b7e70652d76bceb87738d6f28c42afcc"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/fixed/fills.csv.gz",
+      "gz_sha256": "49350a556cd18b8aea1188126dd2e31aa1eaeb4d3ded0f7d4e52db376755078e",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/fixed/fills.csv",
+      "sha256": "0b19a3b3b64b8b7f9f7d0479670762a64b7757bbd1793a836758c73ea4f78a22"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/fixed/orders.json.gz",
+      "gz_sha256": "b26dd72f673be8359c2c0877e9b637d4cf38e778abeadc47bdb88d3d3085d843",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/fixed/orders.json",
+      "sha256": "95f2a69b033b5ac409a3f456c0624dd8cbeb017dac56cd687a1b5e6a002ad23d"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/per_share/account.csv.gz",
+      "gz_sha256": "94077801304815facbf96e2ea9a6746376a0ac85e322300f06cbe20ff0d7e122",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/per_share/account.csv",
+      "sha256": "07c44b3f6da5125d202d415fb6ec112cb973aca1b4aab0b853639251408a53f2"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/per_share/fills.csv.gz",
+      "gz_sha256": "d158964d8c1efb6110c7957b927a912ee7953b846dfd505497f54526451033d4",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/per_share/fills.csv",
+      "sha256": "f911e6419279ced1497c0f8e0663355ad186fa7a081aeabe9d62ac7e289639d0"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/per_share/orders.json.gz",
+      "gz_sha256": "b26dd72f673be8359c2c0877e9b637d4cf38e778abeadc47bdb88d3d3085d843",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/per_share/orders.json",
+      "sha256": "95f2a69b033b5ac409a3f456c0624dd8cbeb017dac56cd687a1b5e6a002ad23d"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/fixed/account.csv.gz",
+      "gz_sha256": "d45f4b3a881b909a5e39ac089307c38baaeb17f0927dfe2e4dd22598f3aef659",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/fixed/account.csv",
+      "sha256": "23466a70306c0977585d4fb5237efb6806dd07b1c3586dcac4a3f2536028d2a6"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/fixed/fills.csv.gz",
+      "gz_sha256": "87837799cc6607dc1e4ff45d7539de4755228150e0a6f49f42b796c49d0e1391",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/fixed/fills.csv",
+      "sha256": "ec92444f2d01ff5e911033c4cf21d5974418e5f8982848ed985a1c3040611ea5"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/fixed/orders.json.gz",
+      "gz_sha256": "f30b527b1db1dbd72554e0f860af512fb195292282c843909ef73d6ac05bcd6d",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/fixed/orders.json",
+      "sha256": "66feb2d4aae2c17ab20547d8db398e93e6db5d3f5462b625caa1e79ded1f29d0"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/per_share/account.csv.gz",
+      "gz_sha256": "ee104f3d01d2d60c094ad607ec4f11101fcc666d7a0ec39b65d9f9ba58d74b41",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/per_share/account.csv",
+      "sha256": "ca30a2ff5ea1bf7b4f1fd8bab000b4adbcfddfc893c6a4e62beac2c782bd2e6f"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/per_share/fills.csv.gz",
+      "gz_sha256": "8f3d6b0be54bd1a960fd0d8d2b5333c4a29d30811b1a7a34f9a0552bbeb2ac2a",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/per_share/fills.csv",
+      "sha256": "837178a11771b5c259e1c70199b9e08d44c9c75b90be20bb1738b7b7bbfa0c7d"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/per_share/orders.json.gz",
+      "gz_sha256": "f30b527b1db1dbd72554e0f860af512fb195292282c843909ef73d6ac05bcd6d",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/per_share/orders.json",
+      "sha256": "66feb2d4aae2c17ab20547d8db398e93e6db5d3f5462b625caa1e79ded1f29d0"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/fixed/account.csv.gz",
+      "gz_sha256": "5087593d5cdace2fdc52b600318bbcc8a7c0d5f480b3ab0e339403bb67882de6",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/fixed/account.csv",
+      "sha256": "edcf6df2325dff8fa719ec53027254c3a7a53bdc39544ed7a562ecdb4ade2ad0"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/fixed/fills.csv.gz",
+      "gz_sha256": "248f2fa58c0bb389c6acb0adc7f1224ddb75ae160ef1fd3ee5adab78ae2cec2e",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/fixed/fills.csv",
+      "sha256": "d446e5999cb5239acba4d52fb0f28ed60f46a924206305d37d79a6379a83b7e7"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/fixed/orders.json.gz",
+      "gz_sha256": "2d272727c608ff1d4f4465cd8cb5c530bb5e33aea3bd5c1e564372429876b263",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/fixed/orders.json",
+      "sha256": "7f2a7962b11e7b20c39c0a96e5fb4127a334ce7625c9c03d2e374bbca0eb907f"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/per_share/account.csv.gz",
+      "gz_sha256": "b29eed351f4486fd54f79859471a71b032a077993691e9bb88255808ee436295",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/per_share/account.csv",
+      "sha256": "f492af6e2e8a76a6aa962e0f3e7ff6e099ca87f56c2ea913a2481da4d8ed5ffc"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/per_share/fills.csv.gz",
+      "gz_sha256": "e3472ef1fcb9a930f91a54bd377aee735a423099d58b2da6229967a2782f2320",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/per_share/fills.csv",
+      "sha256": "6002b85fdca5f60cb710ae3e26bc875b071934a7ce0a1d5dfadc0962cc1d174e"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/per_share/orders.json.gz",
+      "gz_sha256": "2d272727c608ff1d4f4465cd8cb5c530bb5e33aea3bd5c1e564372429876b263",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/per_share/orders.json",
+      "sha256": "7f2a7962b11e7b20c39c0a96e5fb4127a334ce7625c9c03d2e374bbca0eb907f"
+    },
+    {
+      "from": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/candidate-ledger.json.gz",
+      "gz_sha256": "a484bd323b617a758ffec1f266ddc004de3476c3448b2517ff7c2b57656e0894",
+      "to": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/candidate-ledger.json",
+      "sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672"
+    }
+  ],
+  "uuid_redacted": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/fixed/fills.csv",
+      "uuids_replaced": 1560,
+      "sha256_before": "7ef4bd0e1429f3777c1ad3c31f635fce4856cea69bc6a5f4601208810f6a216d",
+      "sha256_after": "0af672b5bb7eafc5de588f4eb825393ed9984ac0fb70223786a1383409e17b62"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/equalweight/per_share/fills.csv",
+      "uuids_replaced": 1560,
+      "sha256_before": "32bac5814cbbbad989356f58d5a0ea28143595fabc571ddc1a4a9158a2be7823",
+      "sha256_after": "8470c6ea67033a3527b86f0c8d5eed5365330b7d8b36ac975e9c22cad58c9d36"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/fixed/fills.csv",
+      "uuids_replaced": 454,
+      "sha256_before": "0b19a3b3b64b8b7f9f7d0479670762a64b7757bbd1793a836758c73ea4f78a22",
+      "sha256_after": "a766cfedee9b8fb69960755b82f64b0299eecfa675f7fe158af2c38dd6150580"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum120/per_share/fills.csv",
+      "uuids_replaced": 454,
+      "sha256_before": "f911e6419279ced1497c0f8e0663355ad186fa7a081aeabe9d62ac7e289639d0",
+      "sha256_after": "4c501aa5668b7b8903233a02ce4904e1cfb62e3c9baee3b6c118927ea66b67fb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/fixed/fills.csv",
+      "uuids_replaced": 412,
+      "sha256_before": "ec92444f2d01ff5e911033c4cf21d5974418e5f8982848ed985a1c3040611ea5",
+      "sha256_after": "adf839cf6cf70359d14395387964cb875505c6216263ae1797077eff06f1e273"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum20/per_share/fills.csv",
+      "uuids_replaced": 412,
+      "sha256_before": "837178a11771b5c259e1c70199b9e08d44c9c75b90be20bb1738b7b7bbfa0c7d",
+      "sha256_after": "12ee3a5d410827180c79ad0b70f8cc41e620bbc12919b093bbb6b0ea5a869394"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/fixed/fills.csv",
+      "uuids_replaced": 424,
+      "sha256_before": "d446e5999cb5239acba4d52fb0f28ed60f46a924206305d37d79a6379a83b7e7",
+      "sha256_after": "2a3e3e8b29cc570c971c28fd75d61ee23d1360352554de87fa06c76ac54e4bc7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run/momentum60/per_share/fills.csv",
+      "uuids_replaced": 424,
+      "sha256_before": "6002b85fdca5f60cb710ae3e26bc875b071934a7ce0a1d5dfadc0962cc1d174e",
+      "sha256_after": "f4041c141e9e01dec6ed5053a7938b4c2dd024bbc59bc0724b51f1d84e99e4ef"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run/hrp_variance/fills.csv",
+      "uuids_replaced": 66,
+      "sha256_before": "e85a2ee7cd5a4e37774fe85922ec5c4ce6dfc2985259cfd6106074a52c735bb3",
+      "sha256_after": "7ea3d7eb8511424d47092b1aa2ab966811c83d4973b0ae4e565256cb6152b24d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run/hrp_variance/positions.csv",
+      "uuids_replaced": 66,
+      "sha256_before": "b87d1f5f962480cc978ce7cbe04895b9be26a91f3b832f9e5069133c0956a8c0",
+      "sha256_after": "4c4c0ad473e07e756b019eaf262fc7d8356df4e443d0c016b6ef9817167916f5"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run/meanrisk_min_variance/fills.csv",
+      "uuids_replaced": 34,
+      "sha256_before": "3089df6fb4208c2a3b99904347f6809e98ce6324a8a1b54c0870966e2e5693c5",
+      "sha256_after": "0a20b921d74e0ba7e4848da8bca067ce7dbb6549ea70c93b5da1c08f4b55ee25"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run/meanrisk_min_variance/positions.csv",
+      "uuids_replaced": 35,
+      "sha256_before": "882c25cb2d2216507da0f2b552e90cf9a2897d7439d6459ffbe71a144328c3d0",
+      "sha256_after": "530b28ec0543c57d7bc1889bf5ade6c5d6ad564ad1df5cf5e5ae86e5dc658cca"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run/hrp_variance/fills.csv",
+      "uuids_replaced": 66,
+      "sha256_before": "db614146c37d48f83399e16da12cf8c2f1de870b04de89da97fa84765a3db21b",
+      "sha256_after": "faba89592902fd38e326c70ae24833b58c88986e67452cf3eb8407ee803409eb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run/hrp_variance/positions.csv",
+      "uuids_replaced": 66,
+      "sha256_before": "71de85b7771b12358630cf572eda6c2adff4e66f139c721534b1dda10ae74803",
+      "sha256_after": "b463849eadb16fc33c7563f16c298a419529f94a97304b6b859079d13427e905"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run/meanrisk_min_variance/fills.csv",
+      "uuids_replaced": 33,
+      "sha256_before": "c31f165d2419b973ad1f4f943aad6e04db3fe4806da88a14fb489f63636c6815",
+      "sha256_after": "72f101398d58d2d9f851b1eb746262a9be67d679281fdff525b837dd8398efc3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run/meanrisk_min_variance/positions.csv",
+      "uuids_replaced": 34,
+      "sha256_before": "af31f1d912f6a2c41d1072a4cf2b235b6df5e80e31f2cba9c89428e552ecbd2c",
+      "sha256_after": "e66d2d01e64314ca3ea1b2efe9faf8128f97554bd6b5a44c835dbfa3c3c95b12"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run/control/fills.csv",
+      "uuids_replaced": 13,
+      "sha256_before": "053071bdb90cb4a2802f04369497b8f76884cb7121203ea69effe5fe20f40f7a",
+      "sha256_after": "e8e710cff67d15037eef6d634b2c45a856ef85dce093257417389dd8ea33b34a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run/control/positions.csv",
+      "uuids_replaced": 13,
+      "sha256_before": "3cf18717becc103a955931379634c824d3624a7e289dc4ad0b9e5c7a4cde8e65",
+      "sha256_after": "583cb828c52fcd687621140a2fe37e05e845cbb70d1862e11678003d69313904"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run/limits/fills.csv",
+      "uuids_replaced": 10,
+      "sha256_before": "4c39e871478bc57d7efe2b538605dd6b8b7e5fc875ba2bc1c3e7b7cc60fad571",
+      "sha256_after": "e3a2d67c974545f4bdf00b979a629ff684d85f3880d33a2a0eb943b19c48d6e2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run/limits/positions.csv",
+      "uuids_replaced": 10,
+      "sha256_before": "6625bfc4f515b5a40009f4746408772bcf1e264cc8db551930947d6bd34fa9ea",
+      "sha256_after": "531a206631949f74f4bc98c177113e3639d3b8c6fbc7a4f98c7676233d77a231"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1/equalweight/fixed/fills.csv",
+      "uuids_replaced": 1560,
+      "sha256_before": "fec0ab49d6212c60c1d477f39c9f7f6702cbc3404e3410c1af28ac6ea937b421",
+      "sha256_after": "0af672b5bb7eafc5de588f4eb825393ed9984ac0fb70223786a1383409e17b62"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1/equalweight/fixed_one_tick_slippage/fills.csv",
+      "uuids_replaced": 1560,
+      "sha256_before": "e7426b79044fab8915292d5d79ef4cd0dcdd375112564a03d3ee1a1d587c43ff",
+      "sha256_after": "3ed525bc7feb5775968345bf85b5be603eebe3c68c178ac6b86d6d230b40980c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1/equalweight/per_share/fills.csv",
+      "uuids_replaced": 1560,
+      "sha256_before": "e15a54d2b2d845d6253ba8779c0a03e80812586b7225e2687cc82908195223e3",
+      "sha256_after": "8470c6ea67033a3527b86f0c8d5eed5365330b7d8b36ac975e9c22cad58c9d36"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1/momentum120/fixed/fills.csv",
+      "uuids_replaced": 454,
+      "sha256_before": "78f97a86950cc2c59ad8d05c88e47dfb784edee85e9ce57ffa5c14cb518e4f8d",
+      "sha256_after": "a766cfedee9b8fb69960755b82f64b0299eecfa675f7fe158af2c38dd6150580"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1/momentum120/fixed_one_tick_slippage/fills.csv",
+      "uuids_replaced": 454,
+      "sha256_before": "6ebca0ef5a99cdd33da0715cc112015ea81193e8fb7848dabfda33cc50ba4942",
+      "sha256_after": "2f3ab16d4325193c29c695481470ee4a2fdb41b910bcbd7990b358a4afe72f06"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1/momentum120/per_share/fills.csv",
+      "uuids_replaced": 454,
+      "sha256_before": "ffd72770c5ceceb74ec58bc9dcebde928ca870b3c150effd6ea04b713faa1543",
+      "sha256_after": "4c501aa5668b7b8903233a02ce4904e1cfb62e3c9baee3b6c118927ea66b67fb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1/momentum20/fixed/fills.csv",
+      "uuids_replaced": 412,
+      "sha256_before": "1d755fbea8eef9bc271cfd729c72e35c883e017b30e26e6e7d5b96d5b1a57da7",
+      "sha256_after": "adf839cf6cf70359d14395387964cb875505c6216263ae1797077eff06f1e273"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1/momentum20/fixed_one_tick_slippage/fills.csv",
+      "uuids_replaced": 412,
+      "sha256_before": "2f3edbe5a842f3476434fd5b89c5dbdcbce76d987cc9ddf6f65696407d31b059",
+      "sha256_after": "eb8e059a980c670f874aeb3c620367ea05cb2fd1cd5ae22596711e8c47d8cd37"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1/momentum20/per_share/fills.csv",
+      "uuids_replaced": 412,
+      "sha256_before": "a95ab34337f7808d2e55ce5ea5d085954d83ffadb4df0e6288aa481c9264a04c",
+      "sha256_after": "12ee3a5d410827180c79ad0b70f8cc41e620bbc12919b093bbb6b0ea5a869394"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1/momentum60/fixed/fills.csv",
+      "uuids_replaced": 424,
+      "sha256_before": "a813ed1503e2dd84c4a8ba61498abbbccf6bad9767dac18c04e6b720a0b94bd5",
+      "sha256_after": "2a3e3e8b29cc570c971c28fd75d61ee23d1360352554de87fa06c76ac54e4bc7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1/momentum60/fixed_one_tick_slippage/fills.csv",
+      "uuids_replaced": 424,
+      "sha256_before": "21b8337e844f76496ef05f0d448489c1dda381e3e67494ac7582867b9c5e8522",
+      "sha256_after": "f2b11449621007192f2ed4641b89203bd5acce07789f2b97b28cdaa44878bb1c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1/momentum60/per_share/fills.csv",
+      "uuids_replaced": 424,
+      "sha256_before": "50c6a343052f6a85c25b3f242faa1260ca20528ed738474586b42265bece6b1c",
+      "sha256_after": "f4041c141e9e01dec6ed5053a7938b4c2dd024bbc59bc0724b51f1d84e99e4ef"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix1/hrp_variance/fills.csv",
+      "uuids_replaced": 66,
+      "sha256_before": "60910b50473b72cac7926929ac3c9f046e81e65434569c2b5511d07cd7c5ff8f",
+      "sha256_after": "faba89592902fd38e326c70ae24833b58c88986e67452cf3eb8407ee803409eb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix1/hrp_variance/positions.csv",
+      "uuids_replaced": 66,
+      "sha256_before": "9c0d11372dcbbca74d10e0ddd87743b7d80ce64d6263fb1261c0990b6f372130",
+      "sha256_after": "b463849eadb16fc33c7563f16c298a419529f94a97304b6b859079d13427e905"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix1/meanrisk_min_variance/fills.csv",
+      "uuids_replaced": 33,
+      "sha256_before": "16923db2811e3ec42261d68674e24923aa6db06e8152c20eb31c23c7384ac629",
+      "sha256_after": "72f101398d58d2d9f851b1eb746262a9be67d679281fdff525b837dd8398efc3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix1/meanrisk_min_variance/positions.csv",
+      "uuids_replaced": 34,
+      "sha256_before": "979cc636fb2745a5408033730b2a6df0b335602cc36607b43783cdc904b5edd4",
+      "sha256_after": "e66d2d01e64314ca3ea1b2efe9faf8128f97554bd6b5a44c835dbfa3c3c95b12"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix1/control/fills.csv",
+      "uuids_replaced": 13,
+      "sha256_before": "79d86608bd0af6e2b7493689ed0115ac1240c9a0e59f37cfac765b2754216880",
+      "sha256_after": "e8e710cff67d15037eef6d634b2c45a856ef85dce093257417389dd8ea33b34a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix1/control/positions.csv",
+      "uuids_replaced": 13,
+      "sha256_before": "08749d2cf647f61f7bfce4652358adfcde13c4477c8df16ef7e1e0fe90fc987e",
+      "sha256_after": "583cb828c52fcd687621140a2fe37e05e845cbb70d1862e11678003d69313904"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix1/limits/fills.csv",
+      "uuids_replaced": 10,
+      "sha256_before": "828911dc2f1d283f4b11f020542752c5d4227dfe09038f89fc6b1cf10a229351",
+      "sha256_after": "e3a2d67c974545f4bdf00b979a629ff684d85f3880d33a2a0eb943b19c48d6e2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix1/limits/positions.csv",
+      "uuids_replaced": 10,
+      "sha256_before": "ed83ed1e8bf1c05fda1b0aecdd61ac7227560cb30d9527a8fd27949cb1a1ed30",
+      "sha256_after": "531a206631949f74f4bc98c177113e3639d3b8c6fbc7a4f98c7676233d77a231"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/equalweight/fixed/fills.csv",
+      "uuids_replaced": 1560,
+      "sha256_before": "86ecc066628a5f5f277adbad440b47216930d83fdb7dfcfc1b58d70363b97eac",
+      "sha256_after": "0af672b5bb7eafc5de588f4eb825393ed9984ac0fb70223786a1383409e17b62"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/equalweight/fixed_one_tick_slippage/fills.csv",
+      "uuids_replaced": 1560,
+      "sha256_before": "081147a81bc89ce9da2ddf154c1d5334e474553dfdc03af354ab3d565d3cf87d",
+      "sha256_after": "3ed525bc7feb5775968345bf85b5be603eebe3c68c178ac6b86d6d230b40980c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/equalweight/per_share/fills.csv",
+      "uuids_replaced": 1560,
+      "sha256_before": "a02d81d16e00f83daee7c4a2ecf79168842e4ebd98fdf1e6bdb7d3c7b86af0dc",
+      "sha256_after": "8470c6ea67033a3527b86f0c8d5eed5365330b7d8b36ac975e9c22cad58c9d36"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum120/fixed/fills.csv",
+      "uuids_replaced": 454,
+      "sha256_before": "ec8feaec8e9ca29f997f7a99edb529a956694b422339ec7a083c2416a5258e95",
+      "sha256_after": "a766cfedee9b8fb69960755b82f64b0299eecfa675f7fe158af2c38dd6150580"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum120/fixed_one_tick_slippage/fills.csv",
+      "uuids_replaced": 454,
+      "sha256_before": "d6b05a9fbb2b48403b544a170061a7ca986d5e6a78fc06bcbe3bf83f3ab8ad37",
+      "sha256_after": "2f3ab16d4325193c29c695481470ee4a2fdb41b910bcbd7990b358a4afe72f06"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum120/per_share/fills.csv",
+      "uuids_replaced": 454,
+      "sha256_before": "11314a550d7693d8b665d2d203f8ff5c484416aadc2c68b95a89be98646415f8",
+      "sha256_after": "4c501aa5668b7b8903233a02ce4904e1cfb62e3c9baee3b6c118927ea66b67fb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum20/fixed/fills.csv",
+      "uuids_replaced": 412,
+      "sha256_before": "c73e12d5c4ba8572590a2f625f0f756a20427a63c061a6fdbb25e915e1be0138",
+      "sha256_after": "adf839cf6cf70359d14395387964cb875505c6216263ae1797077eff06f1e273"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum20/fixed_one_tick_slippage/fills.csv",
+      "uuids_replaced": 412,
+      "sha256_before": "37ae4bc78ba2f719a8809ca30d93e2e634c766ac6630e0fb0e31e4dd0cf85777",
+      "sha256_after": "eb8e059a980c670f874aeb3c620367ea05cb2fd1cd5ae22596711e8c47d8cd37"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum20/per_share/fills.csv",
+      "uuids_replaced": 412,
+      "sha256_before": "ddd0a8575e3870db7727a0cc42c9b508f09545a793eac9f7a84d50782adf6510",
+      "sha256_after": "12ee3a5d410827180c79ad0b70f8cc41e620bbc12919b093bbb6b0ea5a869394"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum60/fixed/fills.csv",
+      "uuids_replaced": 424,
+      "sha256_before": "1a5647770dc5fa8cb60eb8b4446224442dde974527b6450a12fe3038622c66a6",
+      "sha256_after": "2a3e3e8b29cc570c971c28fd75d61ee23d1360352554de87fa06c76ac54e4bc7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum60/fixed_one_tick_slippage/fills.csv",
+      "uuids_replaced": 424,
+      "sha256_before": "e2219dd1e0ecaf29a505ee868d0d195ff9aefd40a0884e7e4a00d1ac6450bdb8",
+      "sha256_after": "f2b11449621007192f2ed4641b89203bd5acce07789f2b97b28cdaa44878bb1c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum60/per_share/fills.csv",
+      "uuids_replaced": 424,
+      "sha256_before": "aebfb286a771f8dfa3c00608fbc9a4d7ba3f8280346fb477ed778b3c969434c8",
+      "sha256_after": "f4041c141e9e01dec6ed5053a7938b4c2dd024bbc59bc0724b51f1d84e99e4ef"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix2/hrp_variance/fills.csv",
+      "uuids_replaced": 66,
+      "sha256_before": "7fdd7749dc8da48004c48573bd43f58f1bef1fc16deae3b8e4c92c14a1febfcf",
+      "sha256_after": "7ea3d7eb8511424d47092b1aa2ab966811c83d4973b0ae4e565256cb6152b24d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix2/hrp_variance/positions.csv",
+      "uuids_replaced": 66,
+      "sha256_before": "7e6377d5538c9b0eba2d21a1475150aa3157c004e08def364f0afc2976100f95",
+      "sha256_after": "4c4c0ad473e07e756b019eaf262fc7d8356df4e443d0c016b6ef9817167916f5"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix2/meanrisk_min_variance/fills.csv",
+      "uuids_replaced": 34,
+      "sha256_before": "91e89053aece77677c3f46de7f818e5831a020f70fb1ca1406e29381638d4935",
+      "sha256_after": "0a20b921d74e0ba7e4848da8bca067ce7dbb6549ea70c93b5da1c08f4b55ee25"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix2/meanrisk_min_variance/positions.csv",
+      "uuids_replaced": 35,
+      "sha256_before": "c245ac0b1b2b1195ef5a4f429ece586a85d3338bfa6029568259e219c6887c0c",
+      "sha256_after": "530b28ec0543c57d7bc1889bf5ade6c5d6ad564ad1df5cf5e5ae86e5dc658cca"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/hrp_variance/fills.csv",
+      "uuids_replaced": 66,
+      "sha256_before": "f46c52842c9405ae9d4e942166e402685cfaeabcbd3140f1c05576cadad71f78",
+      "sha256_after": "faba89592902fd38e326c70ae24833b58c88986e67452cf3eb8407ee803409eb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/hrp_variance/positions.csv",
+      "uuids_replaced": 66,
+      "sha256_before": "8ab57da379165bb7e46c3e4bb1ca5fcc1e85c08bce9b91dcef068b943e3d195d",
+      "sha256_after": "b463849eadb16fc33c7563f16c298a419529f94a97304b6b859079d13427e905"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/meanrisk_min_variance/fills.csv",
+      "uuids_replaced": 33,
+      "sha256_before": "25516f38390620a469171a985a11380b2eb44b820772c76afc975146b6bf2f34",
+      "sha256_after": "72f101398d58d2d9f851b1eb746262a9be67d679281fdff525b837dd8398efc3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/meanrisk_min_variance/positions.csv",
+      "uuids_replaced": 34,
+      "sha256_before": "210079af20c532535c150af9acda45ce27a89b3e752264ecfea45af2c115f3e2",
+      "sha256_after": "e66d2d01e64314ca3ea1b2efe9faf8128f97554bd6b5a44c835dbfa3c3c95b12"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/control/fills.csv",
+      "uuids_replaced": 13,
+      "sha256_before": "99365f1dbb425caa05b7c3815b993b451cead46887a5776c8c117578fb8936d5",
+      "sha256_after": "e8e710cff67d15037eef6d634b2c45a856ef85dce093257417389dd8ea33b34a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/control/positions.csv",
+      "uuids_replaced": 13,
+      "sha256_before": "92a5b2a89a474ca968e2047ea34ad291a3d77fc237bd471453d60b7422f20b1d",
+      "sha256_after": "583cb828c52fcd687621140a2fe37e05e845cbb70d1862e11678003d69313904"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/limits/fills.csv",
+      "uuids_replaced": 10,
+      "sha256_before": "d09ceece5cfd61f70534dcd8e1ab3567d41c6a9c62aff7897d0fbb4621db57f0",
+      "sha256_after": "e3a2d67c974545f4bdf00b979a629ff684d85f3880d33a2a0eb943b19c48d6e2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/limits/positions.csv",
+      "uuids_replaced": 10,
+      "sha256_before": "96f9ad8ffcf2f63673dff894efa453076c971eca7cf5bf69a3e1fece827a7356",
+      "sha256_after": "531a206631949f74f4bc98c177113e3639d3b8c6fbc7a4f98c7676233d77a231"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/hrp_variance/fills.csv",
+      "uuids_replaced": 66,
+      "sha256_before": "8e38f2b38d1c23fde02bc23de7959c3ddcf61dd017c7a082193e7cb871833bff",
+      "sha256_after": "7ea3d7eb8511424d47092b1aa2ab966811c83d4973b0ae4e565256cb6152b24d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/hrp_variance/positions.csv",
+      "uuids_replaced": 66,
+      "sha256_before": "60a23d9c1f04e52900aa8d5cac69031359498add290fd3737b180518ce26b70b",
+      "sha256_after": "4c4c0ad473e07e756b019eaf262fc7d8356df4e443d0c016b6ef9817167916f5"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/meanrisk_min_variance/fills.csv",
+      "uuids_replaced": 34,
+      "sha256_before": "7ff6fc82372d349d6f37f677ae64668ab10b9e4a88d964be7045c7f02e3d6b6f",
+      "sha256_after": "0a20b921d74e0ba7e4848da8bca067ce7dbb6549ea70c93b5da1c08f4b55ee25"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/meanrisk_min_variance/positions.csv",
+      "uuids_replaced": 35,
+      "sha256_before": "fbbc976fb6e6d595905f7396600c6cab8bc3cb08be7180aeb828e9ce3fddca91",
+      "sha256_after": "530b28ec0543c57d7bc1889bf5ade6c5d6ad564ad1df5cf5e5ae86e5dc658cca"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/equalweight/fills.csv",
+      "uuids_replaced": 1560,
+      "sha256_before": "f0822330a92ef33e2714f514b4f3d672f989433d9b132eedf84c3c1921f26798",
+      "sha256_after": "0af672b5bb7eafc5de588f4eb825393ed9984ac0fb70223786a1383409e17b62"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum120/fills.csv",
+      "uuids_replaced": 454,
+      "sha256_before": "54467f71d052e142cb5de971c534f6a040ae7afbc5355c4df6a1f52d283c198c",
+      "sha256_after": "a766cfedee9b8fb69960755b82f64b0299eecfa675f7fe158af2c38dd6150580"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum20/fills.csv",
+      "uuids_replaced": 412,
+      "sha256_before": "2fca394ecac757d26e6ca864167837aa525390faacdb54d6f9548c10259c0cd2",
+      "sha256_after": "adf839cf6cf70359d14395387964cb875505c6216263ae1797077eff06f1e273"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum60/fills.csv",
+      "uuids_replaced": 424,
+      "sha256_before": "d150d94eb71fa955022edce37f4d66d0f92395521c557c31989c3baa1f310035",
+      "sha256_after": "2a3e3e8b29cc570c971c28fd75d61ee23d1360352554de87fa06c76ac54e4bc7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/equalweight/fills.csv",
+      "uuids_replaced": 1560,
+      "sha256_before": "75e6b4ed23bcb69fe26c96b1e68603bf8a36bab90032433e2ce9c955ac6d0c29",
+      "sha256_after": "0af672b5bb7eafc5de588f4eb825393ed9984ac0fb70223786a1383409e17b62"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum120/fills.csv",
+      "uuids_replaced": 454,
+      "sha256_before": "61fd98d298171f9a5f283e0cf543e15f9c6538e9a58257dd1a7b4235ef276916",
+      "sha256_after": "a766cfedee9b8fb69960755b82f64b0299eecfa675f7fe158af2c38dd6150580"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum20/fills.csv",
+      "uuids_replaced": 412,
+      "sha256_before": "5058b163b278fa1632cddd3426c50583854ee5709523743e918c7aadb3cf13cb",
+      "sha256_after": "adf839cf6cf70359d14395387964cb875505c6216263ae1797077eff06f1e273"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum60/fills.csv",
+      "uuids_replaced": 424,
+      "sha256_before": "f6f45d08d5d3627b3d9d3c5952ee938fb928e1a46e357cfa95e0ca42838a4239",
+      "sha256_after": "2a3e3e8b29cc570c971c28fd75d61ee23d1360352554de87fa06c76ac54e4bc7"
+    }
+  ],
+  "lean_parity_redacted": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/compile.command.json",
+      "sha256_before": "c3d2dac6154a6b61b3bc83a9ab6d999c5006f4a87815bcddf9234f426cf2bbb4",
+      "sha256_after": "23785425e4a0d88b8d93afa772183b445990fa865a129c8c442b047d2b33ee34",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/hrp_variance/WeightScheduleParityAlgorithm-summary.json",
+      "sha256_before": "0bdfb81f64fe5679f19052abfe510900487b5927e24fcecfc8a5668c2ef98b7c",
+      "sha256_after": "47977c8da5a355fe47ab8de2f113c28b9e160a913553f64594c57994506e6474",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/hrp_variance/log.txt",
+      "sha256_before": "a5ca39d3554a3c8f7c07b16942e9256303f0d5c76af2cafc21520bc70d76cc7a",
+      "sha256_after": "9dd950c0de8ff83d6e201759254222d20e5638e134161fa1016924ca02450d81",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/meanrisk_min_variance/WeightScheduleParityAlgorithm-summary.json",
+      "sha256_before": "8a44f89440a52b42b180d71ce87cc974c3ada303c3db907484ea943861eefaa0",
+      "sha256_after": "8c2a727b5c2c70754602e6d604e9c8f3dbac4821cc7c5b6d03e676908cedd519",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2/meanrisk_min_variance/log.txt",
+      "sha256_before": "0d4a2364964e0e35e92f23ecc7510c73cdfe611817fb3611f475a1d3d9aba79b",
+      "sha256_after": "e9ece4a56b96210319c0b3194c2902e17fdcc0cf3260411a4577b96fdfa70ee7",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2.hrp_variance.command.json",
+      "sha256_before": "5fa0fb02e5113a2bf6ca7cdf7b1b5934461e9d4917cb9f526f32dc0109da18c1",
+      "sha256_after": "865b4e85609af34ff02c2e1bc637598860439725afd6d4c277c858e148fe5ff6",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2.hrp_variance.stdout.txt",
+      "sha256_before": "2bb31f8b6cdf9871eec97f6e4d01df8de84ac8f74ad28854f9d82db1d931a321",
+      "sha256_after": "97c31fe2579a26b0f1a4f472997c84888340e32cd6ef5c5f8a3541f581b2ce5e",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2.meanrisk_min_variance.command.json",
+      "sha256_before": "ed91b8a9d99594029d9c34936b19c7d0e39a0de10495eb414648d46563f4679b",
+      "sha256_after": "b9bfacedd7f81e56cbaddfee1e1796a369f67d10d7ac4108128d3c223f83af2b",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/control_fee2.meanrisk_min_variance.stdout.txt",
+      "sha256_before": "b50553965af006e0fb2db88c92ede0483f26dd5d8a745059efc40fddd9bb9958",
+      "sha256_after": "34cbdc43004da35bc8d436944078b906fd8dfa234868af4aa55ca2b1f684747d",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/hrp_variance/WeightScheduleParityAlgorithm-summary.json",
+      "sha256_before": "634105ceadb0b8d9298490be01046fbd5e1690086d937895dd0f8120b127e316",
+      "sha256_after": "b8c8f20f047f63cd612f443e82a81c78775c0239feb196504692f3d8a46f43bf",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/hrp_variance/log.txt",
+      "sha256_before": "aa0cf60ba359156fbacf41fa2e5edd3e4cd216a18685a3a54106c67fcfab050d",
+      "sha256_after": "03e401842d84b9ea50881954dcd1b78901c4fa5e03c8214785936a6ec274c27d",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/meanrisk_min_variance/WeightScheduleParityAlgorithm-summary.json",
+      "sha256_before": "074de940f072a4cca00b830a4e17492b6b86d35a11e81dd7d5a66b72ab91991b",
+      "sha256_after": "70b31aedb7d6f52dd367726ac4a9b7e51f93573806b6f8846b47fe15c5057ff7",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends/meanrisk_min_variance/log.txt",
+      "sha256_before": "fb110ac28e3fec16acadf2ae7a35322ab59f8181de293c0dedc40f3b7dc61bf4",
+      "sha256_after": "68284952c0e03f8eca6957a7e2606f870af305a2e2bce0a2e9fdc62626c02787",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends.hrp_variance.command.json",
+      "sha256_before": "0ba77f5eccee71e7c8d66950db574bf2da3e0ec88cf8b7a0d3a55615790f0443",
+      "sha256_after": "142303d98d38930d85cd923ed17743019fa5b3809d8e8a6e1d0efefee25d2ca3",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends.hrp_variance.stdout.txt",
+      "sha256_before": "79736a511c45ddd0ea6a5cad50a428dde0327f43867e15db5b5166cd25b40cf3",
+      "sha256_after": "4a29304569c88f05bc1621d2e30176749fa4af5144b459b78b824e4857219290",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends.meanrisk_min_variance.command.json",
+      "sha256_before": "f8147bb9516d9f7d6369c3f693b1371c80668f39778c1532ccb4de1c5396954d",
+      "sha256_after": "a9337cf29aea533d130ca42f29fbb6a2de127d4e02a35640a12fab68663d1817",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/dividends.meanrisk_min_variance.stdout.txt",
+      "sha256_before": "099e328c9b03672e3c3c8feca0ab2d2b7338303ab179d0f3cef1abc0e334a8dc",
+      "sha256_after": "99e4030d890f88569da1e8e0424742fca09a03e61c0953794f211de8ab5693d2",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/hrp_variance/WeightScheduleParityAlgorithm-summary.json",
+      "sha256_before": "4113a395e169faf1b8f7436b0f5baced77e96f551d90224d6004f54abb58ab5c",
+      "sha256_after": "f6516acf875b46b95b5ec39ca45b9d3b106bb17a8ba894afcbb006504e3bae1a",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/hrp_variance/log.txt",
+      "sha256_before": "2217ebc1dc70abfea93a463d17a62b63db5240be9fd50df86a5ea6c161e01230",
+      "sha256_after": "37894bb47bdb920f26fcb235776ccdc55c6c26e49ba63dfab2af94698d180678",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/meanrisk_min_variance/WeightScheduleParityAlgorithm-summary.json",
+      "sha256_before": "a292d07de44b71ce4cce3664e930dadc7cc2f988b5dc8c33a3cfcdab67e42c9c",
+      "sha256_after": "70a827c1bde5f8557000c8585feeba6a46d83c86c26b41d7d6462293184dd261",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends/meanrisk_min_variance/log.txt",
+      "sha256_before": "5dd043b2e81e79ba2e9a4ced53551827445ae1a33d254f44e7a26f7b19195769",
+      "sha256_after": "dcdc2352ab544cf3db7d0ce3bde26672e005d0c543106182e2a16286a1b15634",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends.hrp_variance.command.json",
+      "sha256_before": "699a9226ae72bc2d5fae6a5f19889854e8b5a70293720fb4a702fae9f6468923",
+      "sha256_after": "9b8ca20e9b3182b878b2b49a3eaa39820c238cbc1111a5c2cbab6d1d96f94141",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends.hrp_variance.stdout.txt",
+      "sha256_before": "4dae21463815320cf2ce90043f36558062a6e7a9e55f695c9bf31d30c57f381a",
+      "sha256_after": "76eb5ac54b3b7525b75746481dfdbb23d1ecc305a81180bebcce2082077de9bf",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends.meanrisk_min_variance.command.json",
+      "sha256_before": "96f3d56d3fa4034efaf66c9ea731362be739bb15b13e2c3126bcda990198b514",
+      "sha256_after": "d5f6b0f8d4ff86acd20c33f8a4d8cdeff0c6597267633718c7aaeb8c1bb353bb",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/14/lean-parity-run/no_dividends.meanrisk_min_variance.stdout.txt",
+      "sha256_before": "65239da5244fcd5dc6bf4838eb231640d2befaa3095d838edd339e968de3d489",
+      "sha256_after": "4a14ed773dcdf10fb3bf7a64c7855b9bf0077a8b53d928274c1b91f55ca1e82e",
+      "replaced": [
+        "host home path -> $HOME",
+        "host name -> HOST-redacted"
+      ]
+    }
+  ]
+}

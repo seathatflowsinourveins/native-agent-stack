@@ -1,0 +1,189 @@
+{
+  "id": "gap-wave2-20260923/us-equities/backtesting-engine/6-comparator-modes-and-review-count",
+  "gap_index": 6,
+  "gap_text_sha256": "3deee2ea0925dbe07d32fe371ca17ee2935a7d492691c125a52fbc5fc191f189",
+  "preregistration": {
+    "written_at": "2026-09-23T06:21:22Z",
+    "expectation": "settled: (a) a fresh bwrap Nautilus replay (run.py) produces its own converted rows; compare.py in --bars mode with those rows and in no-evidence mode (plus --lean-data as the control) reproduces the README table: --bars exit 1 BLOCKED 25 passed / 4 failed complete true; neither: exit 1 FAIL with 4 unattributed and 1 SKIPPED, complete false. (b) the 21-of-24 review claim is committed by retaining the agent-lab task-record excerpt with its commit and sha256 and pointing the README at it.",
+    "criteria": [
+      "settled if both comparator modes other than --lean-data are executed on the real retained data, their verdict files and exit codes are retained, and the review-count claim is either retained in-repo with provenance or dropped",
+      "advanced if only one arm completes",
+      "detection: exit codes and verdict JSON fields (verdict, complete, counts, unattributed_failures) are read from the written files, and the fresh receipt's converted_rows_sha256 is compared to the committed receipt"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration.json (committed in 2b93d4d before any check ran)"
+  },
+  "next_check": "Run the spy-parity acceptance set in each comparator mode other than --lean-data and retain the result. Separately, commit or drop the unretained 21-of-24 review-count claim.",
+  "commands": [
+    "NENV=$HOME/.local/share/codex-ecosystem/tools/nautilus-2.0.0rc5; REPO=$HOME/code/nas-wt-g2-backtesting-engine; C=$HOME/.cache/gap-wave2-20260923/backtesting-engine; LEAN=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30/Data; SP=blueprints/us-equities/engine-nautilus/spy-parity",
+    "bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind $NENV $NENV --ro-bind $REPO /repo --ro-bind $LEAN /data --bind $C/spy-parity-run /out --chdir /repo --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PYTHONDONTWRITEBYTECODE 1 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 $NENV/bin/python -I /repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py --lean-data /data --out /out/native",
+    "python3 $SP/compare.py --receipt $SP/receipt.json --bars $C/spy-parity-run/native/converted-rows.private.json --verdict $C/spy-parity-run/cmp/bars.verdict.json",
+    "python3 $SP/compare.py --receipt $SP/receipt.json --verdict $C/spy-parity-run/cmp/neither.verdict.json",
+    "python3 $SP/compare.py --receipt $SP/receipt.json --lean-data $LEAN --verdict $C/spy-parity-run/cmp/lean-data.verdict.json",
+    "python3 $SP/compare.py --receipt $C/spy-parity-run/native/receipt.json --bars $C/spy-parity-run/native/converted-rows.private.json --verdict $C/spy-parity-run/cmp/bars-fresh-receipt.verdict.json",
+    "sed '0,/\"c\": \"313.0900\"/s//\"c\": \"313.0901\"/' converted-rows.private.json > tampered-rows.json; python3 $SP/compare.py --receipt $SP/receipt.json --bars tampered-rows.json --verdict ...",
+    "git -C $HOME/code/agent-lab show HEAD:docs/tasks/2026-09-22-executed-comparisons.md | sed -n 407,423p",
+    "(fix round 1) python3 -m unittest tests.test_spy_parity -v",
+    "(fix round 1) python3 -m unittest tests.test_nautilus_equity_replay -v",
+    "(fix round 1, per mode) python3 -c \"import json;v=json.load(open(VERDICT));print(v['verdict'],v['complete'],v['failed'],v['blocking_mappings'],v['unattributed_failures'],v['skipped'],v['rejected_attributions'])\""
+  ],
+  "results": {
+    "replay": {
+      "exit_code": 0,
+      "stdout": "{\"case\": \"one_zero\", \"dividend_cash_usd\": \"428.64\", \"fills\": 2, \"native_end_cash_usd\": \"90078.96\", \"processed_bars\": 725, \"two_run_records_equal\": true, ...}",
+      "converted_rows_sha256": "6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc (equals the committed receipt's attribution_evidence value)",
+      "fresh_vs_committed_receipt": "only observed_utc and the raw fills/positions report hashes (generated identities) differ; normalized economic hashes equal"
+    },
+    "modes": {
+      "--bars (fresh rows, committed receipt)": "exit 1, BLOCKED, 25 PASS / 4 FAIL, complete true, unattributed []",
+      "--bars (fresh rows, fresh receipt)": "exit 1, identical verdict bytes",
+      "neither": "exit 1, FAIL, 25 PASS / 4 FAIL / 1 SKIPPED, complete false, 4 unattributed (entry/exit fill price, reconciled and native end cash)",
+      "--lean-data (control)": "exit 1, BLOCKED, identical verdict bytes",
+      "verdict_sha256": {
+        "note": "the two complete modes (--bars, --lean-data) write bytes identical to the committed verdict.json; the incomplete no-evidence verdict differs by design",
+        "--bars": "b7b898a861492348ae864de25551c127a0367e4638ef5dfa65152f233a6b0d10 (= committed verdict.json)",
+        "--lean-data": "b7b898a8...0d10",
+        "neither": "64df3ffa097cc9c162941551f0c490c17253806b765dba7b9cd9d841bfc22cf2"
+      },
+      "negative_control": "--bars with a one-digit tampered close: exit 1, ValueError: converted_rows_sha256_mismatch, no verdict written"
+    },
+    "acceptance_set": {
+      "source": "The review excerpt describes five acceptance commands: two unit suites (92 and 8 tests), the verdict line, the comparator re-derivation and the replay; the verbatim five-command list is not retained, so it is reconstructed from that description.",
+      "test_spy_parity": "Ran 92 tests, OK (exit 0)",
+      "test_nautilus_equity_replay": "Ran 8 tests, OK (exit 0)",
+      "replay": "run.py exit 0 (above)",
+      "verdict_lines": {
+        "--bars": "BLOCKED True 4 ['distributions_and_cash', 'market_on_open_proxy'] [] [] []",
+        "--bars (fresh receipt)": "BLOCKED True 4 ['distributions_and_cash', 'market_on_open_proxy'] [] [] []",
+        "--lean-data": "BLOCKED True 4 ['distributions_and_cash', 'market_on_open_proxy'] [] [] []",
+        "neither": "FAIL False 4 [] ['entry_fill.fill_price_usd#12', 'exit_fill.fill_price_usd#16', 'end_cash.reconciled_end_cash_usd#21', 'native_end_cash.native_end_cash_usd#22'] ['attribution_evidence.converted_bars#30'] []"
+      },
+      "note": "The two unit suites are synthetic fixtures and do not depend on comparator mode, so one run covers every mode; the mode-dependent commands (comparator and verdict line) were run in each mode."
+    },
+    "review_count": "Committed: verbatim excerpt of agent-lab docs/tasks/2026-09-22-executed-comparisons.md lines 407-423 (commit cf714105c3ec1921339343cd3dc949b0893b640e, blob 017df541523f73283239883dfce03bb8d83ffc85) retained as raw/6-agent-lab-parity-final-review-excerpt.md; it records 'Opus verifier: **21/24 claims confirmed, 2 corrected, 1 unverifiable**'. The spy-parity README now points to it and marks review item 5 resolved."
+  },
+  "raw_outputs": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-run.stdout.txt",
+      "sha256": "3ea170eb851c00394d7b61502c1e2fc0b55e84bc36f1055d4970ad691f88eac2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-run.stderr.txt",
+      "sha256": "a5c71c88e2cce1043d6952dede64dd1237f967bba9e6d0146b32cc40686a88aa"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-run.exit.txt",
+      "sha256": "cd3f0147e86ce26162e786bb93075a147e9833c137c62899417e5c2e1be75cf6"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-run.started_at.txt",
+      "sha256": "70c9d95cfe4cc2f7c96d5e22adf51002985b27a7a3b6a9bcd63e2120f5b6428d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-fresh-receipt.json",
+      "sha256": "3593b38dffb2ccb7f078b3ca7dfc74ba1b8713ff0f9c78f49c602a034e4fdbfc"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-bars.verdict.json",
+      "sha256": "b7b898a861492348ae864de25551c127a0367e4638ef5dfa65152f233a6b0d10"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-bars.stdout.txt",
+      "sha256": "75e6c26bd1bad7543f63bed8f0802cce2c08a05b12a0fbe6bfbea2a604bb868f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-bars.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-bars.exit.txt",
+      "sha256": "87886b44d341271d28b85138362dcb27ccbbd7e80701744eb40a430c6107977a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-neither.verdict.json",
+      "sha256": "64df3ffa097cc9c162941551f0c490c17253806b765dba7b9cd9d841bfc22cf2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-neither.stdout.txt",
+      "sha256": "0fde91faa289c442f913a6b678b14d88adb7025381498e0fa009d6898a3f599a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-neither.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-neither.exit.txt",
+      "sha256": "6bef66eb2d03acbd56b404bc3abea19602fd6e8626b8d35fea721f9edccb31a0"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-lean-data.verdict.json",
+      "sha256": "b7b898a861492348ae864de25551c127a0367e4638ef5dfa65152f233a6b0d10"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-lean-data.stdout.txt",
+      "sha256": "75e6c26bd1bad7543f63bed8f0802cce2c08a05b12a0fbe6bfbea2a604bb868f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-lean-data.exit.txt",
+      "sha256": "9a678887925eca60024599fb8ee32a514edb06488ce1325dee9e6a50972162a7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-bars-fresh-receipt.verdict.json",
+      "sha256": "b7b898a861492348ae864de25551c127a0367e4638ef5dfa65152f233a6b0d10"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-bars-fresh-receipt.exit.txt",
+      "sha256": "101924f4d619b779a87168af197d39843b7c7a5d97af87f385abd9cd3236f017"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-bars-tampered.stderr.txt",
+      "sha256": "15df5ef90c3e3d608912d3056f94643099f6d3fda75fe3da6243945d46de05b0"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-bars-tampered.exit.txt",
+      "sha256": "fe820ebdc127556dc6697eb8a7b023af9476d4bf0ceb94346e9cecd875ae6046"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-agent-lab-parity-final-review-excerpt.md",
+      "sha256": "b9549ce95655606b894b10181f0cddf9dbbc52fe307e62fd908467a0e6ff7a98"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-acceptance-test_spy_parity.txt",
+      "sha256": "17fba132f127dc7aeded2da0efd0aa6d16a7457825d35ac31074dede60c6c84e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-acceptance-test_nautilus_equity_replay.txt",
+      "sha256": "7ba0cb60e91738f85a0a312df1f5531b5541ddf861b42175dc9b57b0a1a74233"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-acceptance-exits.txt",
+      "sha256": "bbba1042bbf0d82bd51361363d8390f6c32e182fc7ac9548a7884ba066ef7244"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-acceptance-verdict-lines.txt",
+      "sha256": "81b7f8bde8b4080b29198b3a4fe7489e6598b4cb9748f8654ec25d33df3b6224"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-acceptance-started_at.txt",
+      "sha256": "733f26dcbe91e22a9935c04c0cb93457597344c1e08e5450759128e984dfd793"
+    }
+  ],
+  "outcome": "settled",
+  "evidence_class": "local_integration",
+  "remaining": null,
+  "limits": [
+    "Local integration on bundled LEAN sample data (evidence class HIST in the harness); the BLOCKED verdict itself is unchanged and peer-owned.",
+    "The converted rows and raw native reports stay private in $HOME/.cache/gap-wave2-20260923/backtesting-engine/spy-parity-run; their sha256 values are recorded.",
+    "The review excerpt is a copy of an agent-lab task record; the underlying workflow transcript wf_88f01a45-eeb is not retained here."
+  ],
+  "checked_at": "2026-09-23T07:09:55Z",
+  "fix_round_1": {
+    "preregistration_written_at": "2026-09-23T07:00:03Z",
+    "label": "fix-round 1 preregistration, written after the independent Codex review of c6c7f07/e951e32 and before any fix-round run; the original preregistration.json (2b93d4d) is unchanged",
+    "expectation": "tests.test_spy_parity (92 tests) and tests.test_nautilus_equity_replay (8 tests) pass unchanged; the verdict line (verdict, complete, failed count, blocking_mappings, unattributed, skipped, rejected) reads 'BLOCKED True 4 [distributions_and_cash, market_on_open_proxy] [] [] []' for --bars and --lean-data and 'FAIL False 4 ... 4 unattributed, 1 skipped' for the no-evidence mode.",
+    "criteria": [
+      "settled if both suites pass and the verdict line is recorded for every comparator mode alongside the already retained replay and comparator runs",
+      "advanced if any acceptance command fails or cannot be run"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration-fix1.json (committed in 43a2f90 before the fix-round runs)"
+  }
+}

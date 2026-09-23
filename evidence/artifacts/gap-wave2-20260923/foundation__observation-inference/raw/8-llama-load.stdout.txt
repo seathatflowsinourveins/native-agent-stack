@@ -1,0 +1,4 @@
+{"cold_start_healthy_s": 14.118, "restart_healthy_after_start_s": 5.264, "recovery_kill_to_first_success_s": 10.702, "error": null}
+phase1_concurrent {'requests': 12, 'ok': 12, 'failed': 0, 'success_rate': 1.0, 'wall_s': 130.483, 'errors': []}
+phase2_kill_midload {'requests': 8, 'ok': 0, 'failed': 8, 'success_rate': 0.0, 'wall_s': 8.518, 'errors': ['RemoteDisconnected']}
+phase3_after_restart {'requests': 8, 'ok': 8, 'failed': 0, 'success_rate': 1.0, 'wall_s': 57.67, 'errors': []}

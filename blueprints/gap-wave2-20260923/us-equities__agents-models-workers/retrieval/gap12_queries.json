@@ -1,0 +1,980 @@
+{
+ "description": "Build the gap-12 source-recovery query set with exhaustive, pattern-defined gold.",
+ "corpus_files": [
+  "scripts/adoption_status.py",
+  "scripts/build_ecosystem.py",
+  "scripts/catalog_decisions.py",
+  "scripts/landscape.py",
+  "scripts/native_token_ci.py",
+  "scripts/trading_gates.py",
+  "scripts/validate.py",
+  "scripts/validate_catalogs.py",
+  "scripts/validate_convergence.py",
+  "scripts/validate_foundation.py",
+  "scripts/verify_nautilus_ci.py"
+ ],
+ "corpus_manifest_sha256": "aaa563429399f50a0e2a04390c8f6211ff9abbe78f05a14060e3b35134037a1b",
+ "query_count": 32,
+ "queries": [
+  {
+   "id": "dupkey",
+   "query": "Where does the code load JSON while rejecting duplicate object keys?",
+   "gold_pattern": "object_pairs_hook",
+   "gold_locations": [
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 167
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 83
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 179
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 156
+    },
+    {
+     "file": "scripts/validate_convergence.py",
+     "line": 23
+    }
+   ],
+   "gold_count": 5
+  },
+  {
+   "id": "sha256",
+   "query": "Every place that computes a SHA-256 digest of bytes or text.",
+   "gold_pattern": "hashlib\\.sha256",
+   "gold_locations": [
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 110
+    },
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 703
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 118
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 417
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 32
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 244
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 320
+    },
+    {
+     "file": "scripts/validate_convergence.py",
+     "line": 231
+    },
+    {
+     "file": "scripts/verify_nautilus_ci.py",
+     "line": 31
+    },
+    {
+     "file": "scripts/verify_nautilus_ci.py",
+     "line": 120
+    }
+   ],
+   "gold_count": 10
+  },
+  {
+   "id": "subproc",
+   "query": "Every place that launches an external process or command.",
+   "gold_pattern": "subprocess\\.(run|check_output|Popen|call)\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 134
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 146
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 199
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 205
+    }
+   ],
+   "gold_count": 4
+  },
+  {
+   "id": "envread",
+   "query": "Every place that reads the process environment variables.",
+   "gold_pattern": "os\\.environ|os\\.getenv",
+   "gold_locations": [
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 98
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 120
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 133
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 134
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 197
+    }
+   ],
+   "gold_count": 5
+  },
+  {
+   "id": "urlparse",
+   "query": "Every place that splits a URL into its scheme, host and path components.",
+   "gold_pattern": "urlsplit\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 94
+    },
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 122
+    },
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 137
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 111
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 68
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 490
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 544
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 98
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 112
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 309
+    }
+   ],
+   "gold_count": 10
+  },
+  {
+   "id": "argparse",
+   "query": "Every command-line argument parser that is constructed.",
+   "gold_pattern": "argparse\\.ArgumentParser\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 201
+    },
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 708
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 247
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 589
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 314
+    },
+    {
+     "file": "scripts/trading_gates.py",
+     "line": 180
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 417
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 462
+    },
+    {
+     "file": "scripts/validate_convergence.py",
+     "line": 249
+    },
+    {
+     "file": "scripts/validate_foundation.py",
+     "line": 239
+    },
+    {
+     "file": "scripts/verify_nautilus_ci.py",
+     "line": 126
+    }
+   ],
+   "gold_count": 11
+  },
+  {
+   "id": "recompile",
+   "query": "Every precompiled regular expression pattern.",
+   "gold_pattern": "re\\.compile\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 22
+    },
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 23
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 25
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 27
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 28
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 29
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 30
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 31
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 32
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 33
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 34
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 35
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 36
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 34
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 35
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 36
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 37
+    },
+    {
+     "file": "scripts/verify_nautilus_ci.py",
+     "line": 18
+    }
+   ],
+   "gold_count": 18
+  },
+  {
+   "id": "sysexit",
+   "query": "Every place the program terminates by raising an exit status.",
+   "gold_pattern": "raise SystemExit",
+   "gold_locations": [
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 225
+    },
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 732
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 283
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 603
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 365
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 431
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 476
+    },
+    {
+     "file": "scripts/validate_convergence.py",
+     "line": 275
+    },
+    {
+     "file": "scripts/validate_foundation.py",
+     "line": 258
+    },
+    {
+     "file": "scripts/verify_nautilus_ci.py",
+     "line": 147
+    }
+   ],
+   "gold_count": 10
+  },
+  {
+   "id": "filerel",
+   "query": "Every place that locates the repository relative to the running script file.",
+   "gold_pattern": "Path\\(__file__\\)",
+   "gold_locations": [
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 709
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 248
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 590
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 26
+    },
+    {
+     "file": "scripts/trading_gates.py",
+     "line": 181
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 418
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 463
+    },
+    {
+     "file": "scripts/validate_convergence.py",
+     "line": 16
+    },
+    {
+     "file": "scripts/validate_foundation.py",
+     "line": 26
+    }
+   ],
+   "gold_count": 9
+  },
+  {
+   "id": "writes",
+   "query": "Every place that writes text or bytes to a file on disk.",
+   "gold_pattern": "\\.write_text\\(|\\.write_bytes\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 719
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 271
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 272
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 116
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 117
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 140
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 181
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 218
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 243
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 257
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 277
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 278
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 280
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 299
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 307
+    },
+    {
+     "file": "scripts/verify_nautilus_ci.py",
+     "line": 141
+    }
+   ],
+   "gold_count": 16
+  },
+  {
+   "id": "glob",
+   "query": "Every recursive filesystem pattern walk over files.",
+   "gold_pattern": "\\.glob\\(|\\.rglob\\(|glob\\.glob",
+   "gold_locations": [
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 267
+    },
+    {
+     "file": "scripts/verify_nautilus_ci.py",
+     "line": 140
+    }
+   ],
+   "gold_count": 2
+  },
+  {
+   "id": "htmlesc",
+   "query": "Where is text escaped before being inserted into HTML?",
+   "gold_pattern": "html\\.escape",
+   "gold_locations": [
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 699
+    }
+   ],
+   "gold_count": 1
+  },
+  {
+   "id": "tempdir",
+   "query": "Where is a temporary working directory created?",
+   "gold_pattern": "tempfile\\.",
+   "gold_locations": [
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 320
+    }
+   ],
+   "gold_count": 1
+  },
+  {
+   "id": "exccls",
+   "query": "Every custom exception class declared for validation failures.",
+   "gold_pattern": "^class \\w+\\((ValueError|Exception|RuntimeError|TypeError)\\)",
+   "gold_locations": [
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 35
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 32
+    },
+    {
+     "file": "scripts/trading_gates.py",
+     "line": 37
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 40
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 42
+    }
+   ],
+   "gold_count": 5
+  },
+  {
+   "id": "isodate",
+   "query": "Every place that parses an ISO-8601 date or timestamp string.",
+   "gold_pattern": "fromisoformat|strptime",
+   "gold_locations": [
+    {
+     "file": "scripts/landscape.py",
+     "line": 91
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 206
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 87
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 89
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 282
+    }
+   ],
+   "gold_count": 5
+  },
+  {
+   "id": "urlcheck",
+   "query": "Functions that validate a URL is public HTTPS or a loopback address.",
+   "gold_pattern": "def (https|https_url|public_url|loopback_url)\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 117
+    },
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 132
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 64
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 95
+    }
+   ],
+   "gold_count": 4
+  },
+  {
+   "id": "require",
+   "query": "Small helper functions that raise an error when a condition is false.",
+   "gold_pattern": "def require\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 39
+    },
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 104
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 36
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 46
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 35
+    },
+    {
+     "file": "scripts/trading_gates.py",
+     "line": 41
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 46
+    },
+    {
+     "file": "scripts/verify_nautilus_ci.py",
+     "line": 25
+    }
+   ],
+   "gold_count": 8
+  },
+  {
+   "id": "canonical",
+   "query": "Functions that produce a canonical, deterministic JSON serialization.",
+   "gold_pattern": "def canonical(_json)?\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 113
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 139
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 76
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 168
+    }
+   ],
+   "gold_count": 4
+  },
+  {
+   "id": "gitrev",
+   "query": "Where does the code ask git for the current revision or top-level directory?",
+   "gold_pattern": "rev-parse",
+   "gold_locations": [
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 135
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 230
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 200
+    }
+   ],
+   "gold_count": 3
+  },
+  {
+   "id": "digestdef",
+   "query": "Helper functions that return a hex digest for a file or byte string.",
+   "gold_pattern": "def digest\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 109
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 31
+    },
+    {
+     "file": "scripts/verify_nautilus_ci.py",
+     "line": 30
+    }
+   ],
+   "gold_count": 3
+  },
+  {
+   "id": "png",
+   "query": "Where are PNG image signatures or structures checked?",
+   "gold_pattern": "x89PNG|is_structural_png\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 609
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 53
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 55
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 271
+    }
+   ],
+   "gold_count": 4
+  },
+  {
+   "id": "pdf",
+   "query": "Where is PDF file framing (header and end-of-file marker) checked?",
+   "gold_pattern": "%PDF|%%EOF",
+   "gold_locations": [
+    {
+     "file": "scripts/validate.py",
+     "line": 94
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 96
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 97
+    }
+   ],
+   "gold_count": 3
+  },
+  {
+   "id": "pointer",
+   "query": "Functions that resolve a JSON-pointer-like path inside a document.",
+   "gold_pattern": "def pointer\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 88
+    },
+    {
+     "file": "scripts/trading_gates.py",
+     "line": 46
+    }
+   ],
+   "gold_count": 2
+  },
+  {
+   "id": "uniquejson",
+   "query": "Functions used as JSON object hooks that reject repeated keys.",
+   "gold_pattern": "def unique_json\\(|def _json_without_duplicates\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 44
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 72
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 44
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 122
+    }
+   ],
+   "gold_count": 4
+  },
+  {
+   "id": "loopback",
+   "query": "Where are localhost or 127.0.0.1 hostnames recognised?",
+   "gold_pattern": "127\\.0\\.0\\.1|localhost",
+   "gold_locations": [
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 125
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 71
+    }
+   ],
+   "gold_count": 2
+  },
+  {
+   "id": "dateregex",
+   "query": "Regular expressions that match a calendar date in year-month-day form.",
+   "gold_pattern": "\\\\d\\{4\\}-\\\\d\\{2\\}-\\\\d\\{2\\}",
+   "gold_locations": [
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 36
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 38
+    }
+   ],
+   "gold_count": 2
+  },
+  {
+   "id": "hexregex",
+   "query": "Regular expressions that match a 64-character lowercase hex checksum.",
+   "gold_pattern": "\\[0-9a-f\\]\\{64\\}|\\[a-f0-9\\]\\{64\\}",
+   "gold_locations": [
+    {
+     "file": "scripts/landscape.py",
+     "line": 112
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 453
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 497
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 313
+    }
+   ],
+   "gold_count": 4
+  },
+  {
+   "id": "archive",
+   "query": "Where is a tar archive opened or inspected?",
+   "gold_pattern": "tarfile",
+   "gold_locations": [
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 20
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 47
+    }
+   ],
+   "gold_count": 2
+  },
+  {
+   "id": "printjson",
+   "query": "Every place that prints a JSON result document to standard output.",
+   "gold_pattern": "print\\(json\\.dumps",
+   "gold_locations": [
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 209
+    },
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 726
+    },
+    {
+     "file": "scripts/catalog_decisions.py",
+     "line": 277
+    },
+    {
+     "file": "scripts/landscape.py",
+     "line": 594
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 358
+    },
+    {
+     "file": "scripts/trading_gates.py",
+     "line": 189
+    },
+    {
+     "file": "scripts/trading_gates.py",
+     "line": 192
+    },
+    {
+     "file": "scripts/trading_gates.py",
+     "line": 194
+    },
+    {
+     "file": "scripts/validate.py",
+     "line": 425
+    },
+    {
+     "file": "scripts/validate_catalogs.py",
+     "line": 470
+    },
+    {
+     "file": "scripts/validate_convergence.py",
+     "line": 265
+    },
+    {
+     "file": "scripts/validate_foundation.py",
+     "line": 249
+    },
+    {
+     "file": "scripts/verify_nautilus_ci.py",
+     "line": 142
+    }
+   ],
+   "gold_count": 13
+  },
+  {
+   "id": "which",
+   "query": "Where does the code check whether a command is installed on PATH?",
+   "gold_pattern": "shutil\\.which",
+   "gold_locations": [
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 4
+    },
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 149
+    },
+    {
+     "file": "scripts/adoption_status.py",
+     "line": 152
+    },
+    {
+     "file": "scripts/native_token_ci.py",
+     "line": 331
+    }
+   ],
+   "gold_count": 4
+  },
+  {
+   "id": "csvread",
+   "query": "Where are CSV report rows read?",
+   "gold_pattern": "csv\\.DictReader",
+   "gold_locations": [
+    {
+     "file": "scripts/verify_nautilus_ci.py",
+     "line": 99
+    }
+   ],
+   "gold_count": 1
+  },
+  {
+   "id": "render",
+   "query": "Where is the final HTML page rendered from data?",
+   "gold_pattern": "def render\\(",
+   "gold_locations": [
+    {
+     "file": "scripts/build_ecosystem.py",
+     "line": 691
+    }
+   ],
+   "gold_count": 1
+  }
+ ]
+}

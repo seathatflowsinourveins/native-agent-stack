@@ -1,0 +1,26 @@
+{
+ "equalweight": {
+  "unrounded_estimate": "7157.64",
+  "cent_rounded_estimate": "7156.72",
+  "native_credited": "7156.72",
+  "cent_rounded_equals_native": true
+ },
+ "momentum120": {
+  "unrounded_estimate": "5219.07",
+  "cent_rounded_estimate": "5221.74",
+  "native_credited": "5221.74",
+  "cent_rounded_equals_native": true
+ },
+ "momentum20": {
+  "unrounded_estimate": "5176.01",
+  "cent_rounded_estimate": "5172.13",
+  "native_credited": "5172.13",
+  "cent_rounded_equals_native": true
+ },
+ "momentum60": {
+  "unrounded_estimate": "4858.55",
+  "cent_rounded_estimate": "4852.58",
+  "native_credited": "4852.58",
+  "cent_rounded_equals_native": true
+ }
+}

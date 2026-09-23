@@ -1,0 +1,1 @@
+{"kill_rows_before": 300000, "kill_rows_after_mutation": 300000, "round1_aggregate_check_passes": true, "round2_failing_batches": [5, 6], "batch_5": null, "batch_6": {"rows": 20000, "distinct_ts": 10000, "sum_volume": 10066836}}

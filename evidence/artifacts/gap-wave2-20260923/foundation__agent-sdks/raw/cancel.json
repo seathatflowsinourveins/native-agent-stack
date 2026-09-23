@@ -1,0 +1,121 @@
+{
+  "mode": "cancel",
+  "interrupt_after_seconds": 30.0,
+  "limits_before": {
+    "at": 1790133940.877054,
+    "windows": {
+      "primary": {
+        "usedPercent": 12,
+        "resetsAt": 1790719654,
+        "windowDurationMins": 10080
+      }
+    },
+    "ordinaryUsageAllowed": true
+  },
+  "turn_started_at": 1790133941.0940356,
+  "streaming_observed_before_interrupt": false,
+  "interrupt_requested_at": 1790133971.0957375,
+  "interrupt_response": {},
+  "turn_completed": {
+    "at": 1790133971.1046073,
+    "method": "turn/completed",
+    "typed": true,
+    "turn_status": "interrupted",
+    "turn_error": null
+  },
+  "method_counts": {
+    "turn/started": 1,
+    "item/started": 3,
+    "item/completed": 2,
+    "turn/completed": 1
+  },
+  "untyped_methods": [],
+  "documented_notification_types": 82,
+  "received_types_documented": [
+    "item/completed",
+    "item/started",
+    "turn/completed",
+    "turn/started"
+  ],
+  "received_types_undocumented": [],
+  "documented_types_not_received": 78,
+  "item_types": [
+    "reasoning",
+    "userMessage"
+  ],
+  "tool_items": [],
+  "last_token_usage": null,
+  "events_after_interrupt": 1,
+  "deltas_after_completed": 0,
+  "rollout_after_settle": {
+    "rollout_found": true,
+    "rollout_name": "rollout-2026-09-22T23-25-40-redacted-id:d484115279275540.jsonl",
+    "entries": [
+      {
+        "timestamp": "2026-09-23T03:25:41.093Z",
+        "event": "task_started",
+        "reason": null
+      },
+      {
+        "timestamp": "2026-09-23T03:26:11.096Z",
+        "total": null,
+        "last": null
+      },
+      {
+        "timestamp": "2026-09-23T03:26:11.102Z",
+        "event": "turn_aborted",
+        "reason": "interrupted"
+      }
+    ]
+  },
+  "limits_after": {
+    "at": 1790134001.4992187,
+    "windows": {
+      "primary": {
+        "usedPercent": 12,
+        "resetsAt": 1790719654,
+        "windowDurationMins": 10080
+      }
+    },
+    "ordinaryUsageAllowed": true
+  },
+  "rollout_after_second_settle": {
+    "rollout_found": true,
+    "rollout_name": "rollout-2026-09-22T23-25-40-redacted-id:d484115279275540.jsonl",
+    "entries": [
+      {
+        "timestamp": "2026-09-23T03:25:41.093Z",
+        "event": "task_started",
+        "reason": null
+      },
+      {
+        "timestamp": "2026-09-23T03:26:11.096Z",
+        "total": null,
+        "last": null
+      },
+      {
+        "timestamp": "2026-09-23T03:26:11.102Z",
+        "event": "turn_aborted",
+        "reason": "interrupted"
+      }
+    ]
+  },
+  "status": "ok",
+  "isolation_overrides": [
+    "features.hooks=false",
+    "features.plugin_hooks=false",
+    "features.apps=false",
+    "otel.exporter=\"none\"",
+    "otel.metrics_exporter=\"none\"",
+    "analytics.enabled=false",
+    "plugins={\"context-mode@context-mode\"={enabled=false}}"
+  ],
+  "sdk": "openai-codex",
+  "started_at": 1790133940.0836825,
+  "finished_at": 1790134031.5154774,
+  "python_env_keys": [
+    "HOME",
+    "LC_CTYPE",
+    "PATH"
+  ]
+}

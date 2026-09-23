@@ -1,0 +1,14 @@
+{
+  "source_dir": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/go-setup",
+  "substitution": "host home path -> $HOME; UUID-shaped identifiers -> <uuid-N> (same id, same N)",
+  "files": [
+    {
+      "source": "setup.log",
+      "committed_as": "setup.log",
+      "raw_sha256": "b8c4619de0932455f51341c07bc65cc1b9ecaa87c789678dea1773bfcd6612c5",
+      "committed_sha256": "365d439321775dafa0b94a45c6053f4a64940a7f816efe831375e23c009f4efe",
+      "bytes": 235
+    }
+  ],
+  "uuid_placeholders": 0
+}

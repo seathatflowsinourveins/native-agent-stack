@@ -1,0 +1,37 @@
+{
+  "execution_count": 1,
+  "model": {
+    "codex_gate": {
+      "checked_at": "2026-09-22T23:29:05.959593-04:00",
+      "other_codex_exec_at_release": 0,
+      "pids_at_release": [],
+      "released_by_timeout": false,
+      "rule": "wait while 2 or more real codex exec processes run",
+      "samples": [
+        0
+      ],
+      "waited_s": 0.0
+    },
+    "elapsed_s": 5.9,
+    "event_types": [
+      "thread.started",
+      "turn.started",
+      "item.completed",
+      "turn.completed"
+    ],
+    "exit": 0,
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 11520,
+      "input_tokens": 18728,
+      "output_tokens": 17,
+      "reasoning_output_tokens": 10
+    },
+    "verdict": "PASS"
+  },
+  "validate": {
+    "exit": 0,
+    "stdout_first_line": "{\"components\": 69, \"hashed_files\": 2012, \"profiles\": 4, \"receipts\": 140, \"status\": \"passed\"}",
+    "stdout_first_line_sha256": "941352217aafbe965f2cb9ec5498d6b763d818f9ee6ef61310dde86bfd8e9632"
+  }
+}

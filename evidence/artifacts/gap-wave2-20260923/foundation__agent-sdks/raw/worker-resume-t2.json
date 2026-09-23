@@ -1,0 +1,80 @@
+{
+  "mode": "run",
+  "model_inference_submitted": true,
+  "usage": {
+    "last": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 17408,
+      "inputTokens": 17685,
+      "outputTokens": 14,
+      "reasoningOutputTokens": 0,
+      "totalTokens": 17699
+    },
+    "modelContextWindow": 258400,
+    "total": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 29440,
+      "inputTokens": 35332,
+      "outputTokens": 21,
+      "reasoningOutputTokens": 0,
+      "totalTokens": 35353
+    }
+  },
+  "usage_status": "reported",
+  "sdk_version": "0.155.1",
+  "sandbox": "read-only",
+  "approval_mode": "deny_all",
+  "config_overrides": [
+    "features.hooks=false",
+    "features.plugin_hooks=false",
+    "features.apps=false",
+    "otel.exporter=\"none\"",
+    "otel.metrics_exporter=\"none\"",
+    "analytics.enabled=false",
+    "plugins={\"context-mode@context-mode\"={enabled=false}}"
+  ],
+  "readiness": {
+    "model": "gpt-6-astra",
+    "model_available": true,
+    "ordinary_usage_allowed": true,
+    "windows": {
+      "primary": {
+        "usedPercent": 13,
+        "resetsAt": 1790719654,
+        "windowDurationMins": 10080
+      }
+    },
+    "ready": true
+  },
+  "native_runtime": "codex_python_sdk/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)",
+  "thread_id": "redacted-id:bb1930eaaa81b664",
+  "thread_mode": "resumed",
+  "configured_model": "gpt-6-astra",
+  "configured_provider": "openai",
+  "status": "completed",
+  "final_response": "tk-5763c3da5ea5",
+  "duration_ms": 5438,
+  "items": [
+    {
+      "clientId": null,
+      "content": [
+        {
+          "text": "Without using any tool, what exact token did I ask you to remember earlier in this conversation? Reply with only that token.\n",
+          "text_elements": [],
+          "type": "text"
+        }
+      ],
+      "id": "redacted-id:37ce379fc191018e",
+      "type": "userMessage"
+    },
+    {
+      "delivery": null,
+      "id": "msg_07470492c69d1f2a016ab34807499887d1ad73ad8d441cbf40",
+      "memoryCitation": null,
+      "phase": "final_answer",
+      "questions": null,
+      "text": "tk-5763c3da5ea5",
+      "type": "agentMessage"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "fixture": "momentum_backtest.py",
+  "categories_offered": ["look_ahead", "survivorship", "transaction_costs", "in_sample_selection", "overfitting_multiple_testing", "label_leakage_cv", "data_quality", "risk_metric_error", "position_sizing", "other"],
+  "seeded": [
+    {"id": "D1", "name": "same-bar look-ahead: weights from close[t] applied to the return ending at t (no shift)", "categories": ["look_ahead"], "line_ranges": [[22, 36]]},
+    {"id": "D2", "name": "survivorship: universe is today's index membership applied to history", "categories": ["survivorship"], "line_ranges": [[16, 19], [65, 68]]},
+    {"id": "D3", "name": "no transaction costs, slippage or turnover charge", "categories": ["transaction_costs"], "line_ranges": [[32, 36], [65, 77]]},
+    {"id": "D4", "name": "lookback chosen on the full sample then reported as out-of-sample", "categories": ["in_sample_selection", "overfitting_multiple_testing"], "line_ranges": [[69, 75]]},
+    {"id": "D5", "name": "shuffled KFold on overlapping 20-session forward labels without purge/embargo", "categories": ["label_leakage_cv"], "line_ranges": [[52, 62], [28, 29]]}
+  ],
+  "decoys": "load_prices (8-13), sharpe (39-44), max_drawdown (46-49) are intended correct; findings there count as out-of-range.",
+  "detection_rule": "A seeded defect is detected in a run when at least one finding has a category in the defect's categories and a line inside one of its line_ranges. Findings matching no seeded defect are counted as out_of_range (not necessarily wrong).",
+  "prompt_control": "You are reviewing a Python backtest for methodological defects that would make its reported results misleading. Read the file momentum_backtest.py (line-numbered below). Report every defect you find. Output ONLY a JSON array; each element is {\"line\": <int line number where the defect is most directly located>, \"category\": <one of CATEGORIES>, \"explanation\": <one sentence>}. Do not run any commands.",
+  "prompt_skill_prefix": "Apply the following skill (SKILL.md and its references from tradermonty/claude-trading-skills backtest-expert at commit bc5515644c70abc90fbc20d15c838c47808ca893) to the task after it.\n\n"
+}

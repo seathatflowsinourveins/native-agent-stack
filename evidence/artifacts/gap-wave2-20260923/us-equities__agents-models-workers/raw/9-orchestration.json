@@ -1,0 +1,21 @@
+{
+ "started_at": "2026-09-23T07:35:47Z",
+ "handoffs_before": "No open handoffs for g2amw/g9-composed.",
+ "handoffs_at_kill": "Open handoffs for g2amw/g9-composed (oldest first):\n  just now  from other -> any agent\n    id: <id-1>\n\nCancel one with the MCP tool `memory_handoff_cancel`, passing its id.",
+ "run1": {
+  "returncode": -9,
+  "killed_after_s": 17.68,
+  "receipt_written": false,
+  "stdout": "",
+  "stderr_tail": ""
+ },
+ "orphans_after_kill": "",
+ "handoffs_between_runs": "Open handoffs for g2amw/g9-composed (oldest first):\n  just now  from other -> any agent\n    id: <id-1>\n\nCancel one with the MCP tool `memory_handoff_cancel`, passing its id.",
+ "run2": {
+  "returncode": 0,
+  "stdout": "{\"status\": \"completed\", \"wall_seconds\": 38.53, \"usage_status\": \"reported\"}\n",
+  "stderr_tail": ""
+ },
+ "handoffs_after_run2": "No open handoffs for g2amw/g9-composed.",
+ "finished_at": "2026-09-23T07:36:46Z"
+}

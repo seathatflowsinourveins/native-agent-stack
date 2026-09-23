@@ -1,0 +1,80 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-10",
+  "gap_index": 10,
+  "gap_text_sha256": "ba35be6f6ddf24f3cb5bb901075fea75292042b6764987538782f13d83e02998",
+  "checked_at": "2026-09-23T01:05:30.714Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:53:17.012Z",
+    "late": true,
+    "late_note": "Written at 2026-09-23T00:53:17.012Z by original#68 (Write of $SCRATCHPAD/write_receipts2.py; receipts written by original#69 at 00:53:20Z), after the first-pass commands it describes had run (original-session calls 2026-09-23T00:44:56.111Z to 2026-09-23T00:45:07.990Z); any fix-round evidence in this receipt came later and has its own fix-round preregistration where one exists. The previously recorded written_at '2026-09-23T02:15:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps.",
+    "expectation": "A pinned rootless Podman build might be installable into an isolated prefix without touching system state, allowing the same filesystem/network fixtures to be rerun inside a container for comparison.",
+    "criteria": "Either a working `podman info` under a cache-scoped prefix with no root/system changes, or a documented concrete blocker."
+  },
+  "commands": [
+    "original#48 [2026-09-23T00:44:56.111Z]: which sudo apt apt-get 2>&1\nsudo -n true 2>&1; echo \"sudo_exit=$?\"\ncat /etc/subuid 2>&1 | grep -c \"$(whoami)\" \ncat /etc/subgid 2>&1 | grep -c \"$(whoami)\"",
+    "original#49 [2026-09-23T00:45:07.484Z]: timeout 15 curl -sSI \"https://github.com/containers/podman/releases/latest\" 2>&1 | head -5\ntimeout 15 curl -sS \"https://api.github.com/repos/containers/podman/releases/latest\" 2>&1 | python3 -c \"\nimport json,sys\nd=json.load(sys.stdin)\nprint(d.get('tag_name'))\nfor a in d.get('assets',[]):\n    print(a['name'])\n\" 2>&1 | head -30",
+    "fix#33 [2026-09-23T01:05:06.674Z]: curl -sS \"https://api.github.com/repos/mgoltzsche/podman-static/releases/latest\" 2>&1 | head -40\necho ---subuid---\ncat /etc/subuid 2>&1\ncat /etc/subgid 2>&1\necho ---newuidmap---\nwhich newuidmap newgidmap 2>&1\nls -la /usr/bin/newuidmap /usr/bin/newgidmap 2>&1\ngetcap /usr/bin/newuidmap 2>&1",
+    "fix#34 [2026-09-23T01:05:11.345Z]: curl -sS \"https://api.github.com/repos/mgoltzsche/podman-static/releases/latest\" 2>&1 | python3 -c \"import json,sys; d=json.load(sys.stdin); [print(a['name'], a['size']) for a in d['assets']]\"",
+    "fix#35 [2026-09-23T01:05:15.917Z]: cd /tmp/gapfix && rm -rf podmanstatic && mkdir podmanstatic && cd podmanstatic\ncurl -sSL -o podman-linux-amd64.tar.gz \"https://github.com/mgoltzsche/podman-static/releases/download/v6.1.2/podman-linux-amd64.tar.gz\"\nls -la\ntar tzf podman-linux-amd64.tar.gz | grep -iE \"newuidmap|newgidmap|subuid|bin/\" | head -30",
+    "fix#36 [2026-09-23T01:05:25.891Z]: cd /tmp/gapfix/podmanstatic\nmkdir -p $HOME/.cache/gap-wave2-20260923/isolation/podman\ntar xzf podman-linux-amd64.tar.gz -C $HOME/.cache/gap-wave2-20260923/isolation/podman --strip-components=3 podman-linux-amd64/usr/local/bin 2>&1\nls $HOME/.cache/gap-wave2-20260923/isolation/podman\nexport PATH=$HOME/.cache/gap-wave2-20260923/isolation/podman:$PATH\npodman --version\nmkdir -p $HOME/.cache/gap-wave2-20260923/isolation/podman-home/.local/share/containers\nexport XDG_RUNTIME_DIR=/run/user/$(id -u)\npodman info 2>&1 | head -40",
+    "fix#37 [2026-09-23T01:05:30.224Z]: find $HOME/.cache/gap-wave2-20260923/isolation/podman -maxdepth 3\nexport PATH=$HOME/.cache/gap-wave2-20260923/isolation/podman/bin:$PATH\npodman --version 2>&1\npodman info 2>&1 | head -40"
+  ],
+  "results": [
+    "First pass (original#48, #49): `sudo -n true` exited 0 (passwordless sudo exists); /etc/subuid and /etc/subgid each have one entry for this user; `curl -sSI` against github.com/containers/podman/releases/latest returned an HTML 301 and the API query printed `None`. This check was superseded.",
+    "fix#33, #34: the GitHub REST API for mgoltzsche/podman-static reports tag v6.1.2 with assets `podman-linux-amd64.tar.gz 35104638`, `podman-linux-arm64.tar.gz 31892337` and two .asc signatures; `which newuidmap newgidmap` found neither and /usr/bin/newuidmap does not exist.",
+    "fix#35: the amd64 tarball (35,104,638 bytes, shown as 33.5M) was downloaded. Its listing was filtered with `tar tzf ... | grep -iE \"newuidmap|newgidmap|subuid|bin/\" | head -30`; the pattern has no `conmon` term and only lines containing `bin/` matched, so the retained listing (fixtures/10-tarball-contents.txt) shows usr/local/bin entries only and cannot show whether conmon is in the archive.",
+    "fix#36: `tar xzf ... --strip-components=3 podman-linux-amd64/usr/local/bin` extracted only the usr/local/bin subtree; `podman` was then not found because PATH pointed at the prefix root. fix#37: with .../podman/bin on PATH, `podman version 6.1.2`; `podman info` failed with `Error: could not find a working conmon binary (configured options: [/usr/libexec/podman/conmon /usr/local/libexec/podman/conmon /usr/local/lib/podman/conmon ...]: invalid argument)`.",
+    "The earlier statement that the tarball omits conmon is not supported: the searched paths include /usr/local/lib/podman/conmon, and the archive's usr/local/lib subtree was never listed or extracted."
+  ],
+  "outcome": "not_settled",
+  "note": "Outcome changed from deferred to not_settled. The check ran partway (a static Podman 6.1.2 installed into the isolation cache and `podman --version` worked) and stopped at `podman info`, which found no conmon on its search paths. The deferral reasons given earlier were not established: whether the tarball ships conmon is unknown because only usr/local/bin was listed and extracted, and newuidmap/newgidmap are missing but this host has passwordless sudo, so installing them is limited by this unit's install scope (`$HOME/.cache/gap-wave2-20260923/isolation/` only), not by host capability. Untried isolated routes: list and extract the full archive into the cache prefix and point podman at its helper directory (containers.conf `helper_binaries_dir` / `conmon_path`); check whether rootless podman can run with a single-ID mapping when newuidmap is absent. Only after `podman info` works can the filesystem and network fixtures run in a container.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Network download disclosed: podman-linux-amd64.tar.gz, 35,104,638 bytes, from the v6.1.2 GitHub release; its .asc signature was not verified.",
+    "fixtures/10-tarball-contents.txt is the filtered listing described above, byte-equal to the fix#35 output lines; fixtures/10-podman-info-output.txt is a hand transcription of fix#37 written by fix#60, not a captured file.",
+    "The downloaded archive and extracted files were deleted at teardown (fix#72), so the full listing cannot be produced from disk now."
+  ],
+  "fix_round_preregistration": {
+    "written_at": "2026-09-23T01:35:12.489Z",
+    "expectation": "Independent review found the original blocker claim inaccurate: mgoltzsche/podman-static publishes a single-archive static Linux tarball, and the release check used curl -sSI against an HTML redirect page rather than the actual GitHub releases API. Fetching the real API endpoint and extracting the tarball into the isolation cache dir will show whether a working `podman info` is actually reachable this way, and if not, what the real blocker is.",
+    "criteria": "curl the GitHub REST releases API (not an HTML page) for mgoltzsche/podman-static; download and extract the static tarball into ~/.cache/gap-wave2-20260923/isolation/podman (no system-wide install); run `podman --version` and `podman info` from there and record the exact failure, plus check for the presence of newuidmap/newgidmap and /etc/subuid entries as the documented rootless prerequisites.",
+    "late": true,
+    "label": "fix-round preregistration, written after the fix-round commands it describes",
+    "late_note": "Written at 2026-09-23T01:35:12.489Z by fix#59; fix-round commands ran fix#4-fix#46 (01:01:10Z-01:27:09Z); cargo attempt 2 had finished by fix#54 (01:28:38Z). The previously recorded written_at '2026-09-23T01:40:00+00:00' was a placeholder, not the time this block was written, and it was not written before its sub-check ran."
+  },
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:44:56.111Z to 2026-09-23T01:05:30.714Z. The previous value '2026-09-23T00:53:20.715653+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#48",
+        "original#49"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/fix-session-tool-calls.txt",
+      "sha256": "b1a1bce670082262521365455849b1618b460a9bbd53fdec5d6d0337523d8899",
+      "calls": [
+        "fix#33",
+        "fix#34",
+        "fix#35",
+        "fix#36",
+        "fix#37"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Review finding 9: the conmon blocker rested on a listing filtered to bin/ entries and an extraction limited to usr/local/bin; the claim that the tarball omits conmon is withdrawn.",
+      "Outcome changed deferred -> not_settled, with the real reasons: conmon presence unknown; newuidmap/newgidmap blocked by the unit install scope (passwordless sudo exists), not by host capability; isolated alternatives not tried are named.",
+      "Corrected the command list (the grep pattern had no conmon term) and labelled both retained fixtures. Timestamps corrected; raw_evidence added."
+    ]
+  }
+}

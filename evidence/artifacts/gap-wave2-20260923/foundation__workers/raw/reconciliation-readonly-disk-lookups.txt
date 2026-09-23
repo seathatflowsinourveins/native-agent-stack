@@ -1,0 +1,14 @@
+$ date -u
+2026-09-23T02:19:40Z
+$ sha256sum <recovery-coordinator project>/<recovery-session>/subagents/workflows/wf_07c63de3-bde/journal.jsonl <recovery-coordinator project>/<recovery-session>.jsonl
+f7c29223a9951f45c30beb6a3aea94c4fdefe9260b08f7282b80f541e85fe84d  <recovery-coordinator project>/<recovery-session>/subagents/workflows/wf_07c63de3-bde/journal.jsonl
+175115dea1eddaa2c5c330cdc639304f1b68312b0e57fdb61b25729907d1adf1  <recovery-coordinator project>/<recovery-session>.jsonl
+$ python3 -c (recovery.json raw_artifact_sha256 native_journal, native_main_transcript)
+f7c29223a9951f45c30beb6a3aea94c4fdefe9260b08f7282b80f541e85fe84d
+175115dea1eddaa2c5c330cdc639304f1b68312b0e57fdb61b25729907d1adf1
+$ stat -c '%y %n' $HOME/.cache/gap-wave2-20260923/workers; ls -A $HOME/.cache/gap-wave2-20260923/workers | wc -l
+2026-09-22 21:08:50.982743591 -0400 $HOME/.cache/gap-wave2-20260923/workers
+0
+$ ls -d $HOME/.rustup $HOME/.cargo
+ls: cannot access '$HOME/.rustup': No such file or directory
+ls: cannot access '$HOME/.cargo': No such file or directory

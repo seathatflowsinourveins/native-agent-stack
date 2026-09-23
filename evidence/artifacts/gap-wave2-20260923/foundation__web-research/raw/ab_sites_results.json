@@ -1,0 +1,37 @@
+[
+ {
+  "url": "https://example.com",
+  "success": true,
+  "ms": 441,
+  "stdout": "\u2713 Example Domain\n  https://example.com/",
+  "stderr": "[agent-browser] launched browser"
+ },
+ {
+  "url": "https://en.wikipedia.org/wiki/Special:Random",
+  "success": true,
+  "ms": 1332,
+  "stdout": "\u2713 Scott Porter (rugby league) - Wikipedia\n  https://en.wikipedia.org/wiki/Scott_Porter_(rugby_league)",
+  "stderr": ""
+ },
+ {
+  "url": "https://www.iana.org/domains/reserved",
+  "success": true,
+  "ms": 296,
+  "stdout": "\u2713 IANA-managed Reserved Domains\n  https://www.iana.org/domains/reserved",
+  "stderr": ""
+ },
+ {
+  "url": "https://playwright.dev",
+  "success": true,
+  "ms": 246,
+  "stdout": "\u2713 Playwright\n  https://playwright.dev/",
+  "stderr": ""
+ },
+ {
+  "url": "https://httpstat.us/200",
+  "success": true,
+  "ms": 10421,
+  "stdout": "\u2713 404 Not Found\n  https://httpstat.us/200",
+  "stderr": ""
+ }
+]

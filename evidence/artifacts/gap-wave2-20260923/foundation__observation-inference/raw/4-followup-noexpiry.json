@@ -1,0 +1,50 @@
+{
+  "variant": "noexpiry",
+  "overlay": "exporters:\n  otlphttp/loki:\n    retry_on_failure:\n      max_elapsed_time: 0s\n",
+  "helper_function_sha256": "9bce397536064e7dbfb64447a2ead6aa6f8e296193e871e843255bae792145e2",
+  "started_at": "2026-09-23T03:13:33.773159+00:00",
+  "a_filled": {
+    "written": 32,
+    "in_loki": 32
+  },
+  "a_expiry": {
+    "scanned": 32,
+    "confirmed_known": 32,
+    "deleted": 16,
+    "orphans_removed": 0,
+    "unconfirmed_kept": 0,
+    "oldest_unconfirmed_age_s": null,
+    "free_bytes_before": 0,
+    "free_bytes_after": 0,
+    "dry_run": false
+  },
+  "a_deleted_open_fds_right_after": 16,
+  "a_space_released_after_s": 0.39,
+  "a_samples_first_last": [
+    [
+      0.19,
+      0,
+      16
+    ],
+    [
+      0.39,
+      65536,
+      0
+    ]
+  ],
+  "a_write_after_release": true,
+  "b_loki_stopped_at": "2026-09-23T03:14:03.852668+00:00",
+  "b_written": 8,
+  "b_in_events_file_during_outage": 8,
+  "b_loki_down_s": 334.6,
+  "b_in_loki_after_restore": 8,
+  "b_lost_in_loki": 0,
+  "b_duplicates": {},
+  "b_seconds_to_all": 0.0,
+  "collector_log_signals": {
+    "Exporting failed": 0,
+    "Dropping data": 0,
+    "no more retries left": 0
+  },
+  "stopped_at": "2026-09-23T03:20:06.697018+00:00"
+}

@@ -1,0 +1,78 @@
+{
+  "id": "gap-wave2-20260923/us-equities/security-supply-chain/8",
+  "gap_index": 8,
+  "gap_text": "The requirement text is shared across the agents-operations group (research workers, supervision, telemetry). None of these tools establishes that research workers lack broker execution authority.",
+  "gap_text_sha256": "d51fe676eee194c9219b1971b1a12f24e98db89408669c824e298de243c38dcf",
+  "next_check": "Launch a research worker with its configured environment, assert that no ALPACA_*/IBKR credential variables are present, and show that an Alpaca paper order attempt from it fails.",
+  "preregistration": {
+    "written_at": "2026-09-23T08:13:16Z",
+    "expectation": "The research worker (native_worker.py) does not scrub broker variables itself; it inherits the launcher environment. A documented dedicated-environment launch has no ALPACA_*/IBKR* vars.",
+    "criteria": [
+      "the Alpaca paper order attempt arm requires broker contact/paper-account call, owned by peer session sota-workflow-resolution: deferred",
+      "the environment arm is executed locally with canary (fake) values and a positive control (canary present in parent env must be detected in the worker child when not scrubbed)"
+    ]
+  },
+  "commands": [
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/worker_env_check.sh",
+    "A: equity-worker-sdk python: CodexClient(CodexConfig(codex_bin=<stub that records env names>, env={CODEX_HOME, CONTEXT_MODE_PROJECT_DIR, OTEL_RESOURCE_ATTRIBUTES})).start()  # exactly the env overlay native_worker.py passes",
+    "A1 launcher env + synthetic canaries for APCA_API_KEY_ID APCA_API_SECRET_KEY APCA_API_BASE_URL ALPACA_API_KEY ALPACA_SECRET_KEY TWS_USERNAME TWS_PASSWORD TWS_ACCOUNT IBKR_ACCOUNT_ID; A2 env -i PATH=/usr/bin:/bin HOME=<temp>",
+    "B: CODEX_HOME=<temp empty> codex sandbox -- /bin/sh -c '<list broker var names; count /proc/*/environ containing the canary>'  (default shell_environment_policy); control: same probe unsandboxed",
+    "B2: codex sandbox -c shell_environment_policy.inherit=none -- ...; B3: codex sandbox -c shell_environment_policy.ignore_default_excludes=false -- ..."
+  ],
+  "results": [
+    "A:launcher-with-broker-env exit=0 broker_vars_in_codex_child=[ALPACA_ACCOUNT_PROFILE,ALPACA_API_KEY,ALPACA_PAPER,ALPACA_PAPER_ENDPOINT,ALPACA_SECRET_KEY,APCA_API_BASE_URL,APCA_API_KEY_ID,APCA_API_SECRET_KEY,IBKR_ACCOUNT_ID,TWS_ACCOUNT,TWS_PASSWORD,TWS_USERNAME]",
+    "A:dedicated-research-env exit=0 broker_vars_in_codex_child=[]",
+    "B:codex-sandbox-default-policy exit=0 broker_vars_in_shell=[<same 12 names>] procs_with_canary_in_environ=2",
+    "B:control-unsandboxed broker_vars_in_shell=[<same 12 names>] procs_with_canary_in_environ=1",
+    "B2:codex-sandbox-inherit-none exit=0 broker_vars_in_shell=[] procs_with_canary_in_environ=0",
+    "B3:codex-sandbox-default-excludes-on exit=0 broker_vars_in_shell=[ALPACA_ACCOUNT_PROFILE,ALPACA_PAPER,ALPACA_PAPER_ENDPOINT,APCA_API_BASE_URL,IBKR_ACCOUNT_ID,TWS_ACCOUNT,TWS_PASSWORD,TWS_USERNAME] procs_with_canary_in_environ=2",
+    "ambient_launcher_broker_var_names=[ALPACA_ACCOUNT_PROFILE,ALPACA_API_KEY,ALPACA_PAPER,ALPACA_PAPER_ENDPOINT,ALPACA_SECRET_KEY,APCA_API_BASE_URL,APCA_API_KEY_ID,APCA_API_SECRET_KEY] (names only; values were not read and may be empty)",
+    "codex-cli 0.155.1"
+  ],
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Detection method: per-run random canary values placed in the launcher environment; a variable is reported present when its NAME reaches the child, and /proc/*/environ is searched for the canary VALUE. A1 and the unsandboxed control show the probe detects presence.",
+    "The SDK child was a stub standing in for the codex binary (no model call, no account access); `codex sandbox` exercises the Linux sandbox and shell_environment_policy directly, not a full model-driven turn.",
+    "The Alpaca paper-order attempt arm needs broker contact; it is deferred to peer session sota-workflow-resolution (owner of broker/paper lanes and gate rows).",
+    "Ambient broker variable names were observed in this host's launcher environment; their values were not read, so whether they hold live credentials is unknown.",
+    "native_worker.py was not changed; enforcing a scrubbed environment (env -i launch or shell_environment_policy.inherit=none plus an SDK-side environment allowlist) is a follow-up for the worker owner."
+  ],
+  "checked_at": "2026-09-23T17:01:14Z",
+  "outcome_note": "Environment arm executed with canaries and a positive control: the documented launch from a dedicated research environment (A2) gave the codex child zero broker variables, but the SDK overlays the parent environment and nothing enforces that launch, so an undocumented launch from this host's launcher (A1, which already carries 8 broker-prefixed names) forwarded all broker variables to the codex child, and the default Codex sandbox shell policy forwarded them to tool shells. Only env -i or inherit=none removed them. Remains: the Alpaca paper-order failure arm (deferred, owner sota-workflow-resolution) and enforcing a scrubbed worker environment.",
+  "raw_outputs": [
+    {
+      "path": "raw/worker-env/results.log",
+      "sha256": "c829b1e82ef0b7c5819943380d3be82c46cf1d528231ae4fdc579c0a4318f576"
+    }
+  ],
+  "helper_scripts": [
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/classify_findings.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/collect_raw.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_fix_round.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/grype_sdk.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/inventory_diff.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_install.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_lifecycle.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg_fix_round.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/scanner_comparison.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/syft_binary_coverage.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/verify_signatures.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/worker_env_check.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/write_receipts.py"
+  ],
+  "timeline": {
+    "preregistration_written_at": "2026-09-23T08:13:16Z",
+    "first_pass": "2026-09-23T08:13:24Z..08:27:10Z (same unit, earlier session)",
+    "this_pass": "2026-09-23T16:26Z..2026-09-23T17:01:14Z",
+    "post_preregistration_additions": "all-refs gitleaks scan, oversized-file dir scan, SDK interpreter and IB Gateway scans, B2/B3 sandbox policy arms, and the attestation-lookup positive control were added after preregistration as stronger checks of the same claims",
+    "fix_round": "after the independent Opus review: fix_round_preregistration written 2026-09-23T16:56:53Z (commit d67f77a) before the oversized-blob, merge first-parent and control scans (16:58Z..17:00Z) and the osv/inventory re-analysis"
+  },
+  "deferred_arm": {
+    "arm": "Alpaca paper order attempt from the research worker must fail",
+    "owner": "sota-workflow-resolution",
+    "blocker": "broker contact / paper-account calls belong to the peer session's lanes"
+  }
+}

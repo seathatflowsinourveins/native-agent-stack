@@ -1,0 +1,10 @@
+namespace uid=1000 gid=1000
+app-pg-init exit=0
+app-pg-start exit=0
+app-pg-databases exit=0
+app-migrate exit=0
+app-original exit=0
+app-mutant exit=1
+app-restored exit=0
+app-pg-stop exit=0
+namespace exit=0

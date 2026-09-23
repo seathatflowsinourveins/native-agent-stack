@@ -1,0 +1,16 @@
+{
+ "attestations": [
+  {
+   "repository_id": 212613049,
+   "bundle_url": "<signed-url-removed>",
+   "initiator": "github",
+   "bundle": null
+  },
+  {
+   "repository_id": 212613049,
+   "bundle_url": "<signed-url-removed>",
+   "initiator": "user",
+   "bundle": null
+  }
+ ]
+}

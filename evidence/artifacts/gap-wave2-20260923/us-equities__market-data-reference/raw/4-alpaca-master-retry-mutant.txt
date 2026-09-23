@@ -1,0 +1,10 @@
+0
+    self.assertEqual(len(captures), before + 1, "native retry or redirect added an HTTP attempt")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 4 != 3 : native retry or redirect added an HTTP attempt
+
+----------------------------------------------------------------------
+Ran 1 test in 3.284s
+
+FAILED (failures=1)
+mutant_exit=1

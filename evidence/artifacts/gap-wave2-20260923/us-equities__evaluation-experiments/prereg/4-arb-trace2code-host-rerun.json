@@ -1,0 +1,17 @@
+{
+  "gap_index": 4,
+  "slug": "arb-trace2code-host-rerun",
+  "gap_text_sha256": "e244db74d2c9685bef0e553d67f4351eb31bc8f24d362e4c57d577fa113208f9",
+  "next_check": "Rerun the arb-trace2code c7 evaluation on this host from the same pinned source, and compare the per-sample metrics with the Darwin arm64 receipt.",
+  "preregistration": {
+    "written_at": "2026-09-23T07:18:31Z",
+    "expectation": "Rerunning the unmodified ARB v0.2.1 (commit b487f386) lexical and BM25 evaluators on the pinned v2_trace2code archive (sha256 19b252e8...) with a stdlib-only CPython 3.14.7 on this Linux x86_64 host reproduces the Darwin arm64 per-sample detail files byte-for-byte (native_details_sha256 2eb08ad2... lexical, 3c5e5399... bm25) and the same macro metrics; the 15 pinned upstream tests pass. This closes the host clause only: the task remains file-level code retrieval, not financial-document retrieval, answer quality or trading performance.",
+    "criteria": [
+      "Archive sha256 and member inventory match before extraction (39,295,446-byte download disclosed).",
+      "Upstream schema validation: 101 valid, 0 invalid.",
+      "Per-sample details sha256 and macro metrics compared with blueprints/convergence-practice/arb-trace2code/receipt.json; per-sample gold ranks compared with paired-samples.json.",
+      "Upstream tests: tests/test_corpus_baseline.py pass count compared with 15.",
+      "Outcome at most advanced: the domain-scope clauses of the gap cannot be closed by a host rerun."
+    ]
+  }
+}

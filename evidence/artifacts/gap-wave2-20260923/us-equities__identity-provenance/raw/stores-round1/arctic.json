@@ -1,0 +1,157 @@
+{
+  "arm": "arctic",
+  "concurrent_writers": {
+    "appends_each": 10,
+    "no_silent_loss": false,
+    "reported_successful_appends": 20,
+    "rows_expected_from_reported_successes": 100,
+    "rows_found": 55,
+    "rows_lost_after_reported_success": 45,
+    "state": {
+      "readable": true,
+      "rows": 55,
+      "rows_including_seed": 60,
+      "versions": 12
+    },
+    "stderr_tail": {
+      "a": "",
+      "b": ""
+    },
+    "writer_error_counts": {
+      "a": 0,
+      "b": 0
+    },
+    "writer_error_examples": {
+      "a": [],
+      "b": []
+    },
+    "writers": 2
+  },
+  "correction_retention": {
+    "mechanism": "read(as_of=<v1 version>)",
+    "v1_row_ids": [
+      "future-member",
+      "original"
+    ],
+    "v1_rows_equal": true
+  },
+  "elapsed_s": 4.35,
+  "fixture_rows": {
+    "observations": [
+      "aeeacfe8f0cfa22b73c71a6b2b7349f05c3bfd031c2ef8f8bbe98784c7ac9ebe",
+      5
+    ],
+    "universe": [
+      "37cb0502779e72b2c0ff66e7dd64932d0b75a43873cde1d46e83a229e67a11c9",
+      2
+    ]
+  },
+  "latency_ms": {
+    "read_median": 4.88,
+    "unit_of_work": "new LMDB library + write two symbols / fresh handle + read two symbols",
+    "write_median": 35.912,
+    "write_samples": 5
+  },
+  "lineage": {
+    "commit_timestamp": "2026-09-23 05:15:25.238439172+00:00",
+    "input_dataset_name": "user metadata only: {'input_dataset': 'nanosecond-replay/fixture.json', 'part': 'v1'}",
+    "native_fields_present": [
+      "version_id",
+      "commit_timestamp"
+    ],
+    "note": "version numbers are monotonic per symbol; no parent pointer, operation type or content hash is recorded; metadata is caller-supplied",
+    "operation": null,
+    "parent_version": null,
+    "per_file_content_hash": null,
+    "version_id": 1,
+    "versions_listed": 2
+  },
+  "python": "3.13.15",
+  "recovery_after_sigkill": {
+    "all_recovered": true,
+    "detection_method": "after SIGKILL, reopen the store in a fresh process handle; pass only if it reads, holds a whole number of 5-row batches, and the committed count is the writer's last recorded count or one more (a commit that finished before its progress line was written)",
+    "trials": [
+      {
+        "committed_units": 14,
+        "progress_recorded_commits": 14,
+        "state": {
+          "readable": true,
+          "rows": 70,
+          "rows_including_seed": 75,
+          "versions": 15
+        },
+        "trial": 0,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 16,
+        "progress_recorded_commits": 16,
+        "state": {
+          "readable": true,
+          "rows": 80,
+          "rows_including_seed": 85,
+          "versions": 17
+        },
+        "trial": 1,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 31,
+        "progress_recorded_commits": 31,
+        "state": {
+          "readable": true,
+          "rows": 155,
+          "rows_including_seed": 160,
+          "versions": 32
+        },
+        "trial": 2,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 13,
+        "progress_recorded_commits": 13,
+        "state": {
+          "readable": true,
+          "rows": 65,
+          "rows_including_seed": 70,
+          "versions": 14
+        },
+        "trial": 3,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 9,
+        "progress_recorded_commits": 9,
+        "state": {
+          "readable": true,
+          "rows": 45,
+          "rows_including_seed": 50,
+          "versions": 10
+        },
+        "trial": 4,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      }
+    ]
+  },
+  "restore": {
+    "observations": true,
+    "universe": true
+  },
+  "restore_after_delete": {
+    "mechanism": "row store; parquet files are converted to ArcticDB segments, so source per-file sha256 is not preserved",
+    "per_file_equal": "not_supported"
+  },
+  "started_utc": "2026-09-23T05:15:24Z",
+  "storage_bytes": 225536,
+  "versions": {
+    "arcticdb": "6.26.0",
+    "duckdb": "1.5.5",
+    "pandas": "2.3.3",
+    "pyarrow": "25.0.1"
+  }
+}

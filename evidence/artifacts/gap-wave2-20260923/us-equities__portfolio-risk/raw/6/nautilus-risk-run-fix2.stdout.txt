@@ -1,0 +1,26 @@
+{
+ "criteria": {
+  "a_target_orders_filled_under_limits": true,
+  "b_oversized_denied_with_notional_reason": true,
+  "c_control_fills_oversized": true,
+  "d_burst_order_denied_by_rate": true,
+  "e_positions_and_cash_reconciled_both_arms": true
+ },
+ "limits_denied": [
+  {
+   "client_order_id": "O-20210105-210000-001-000-4",
+   "reason": "NOTIONAL_EXCEEDS_MAX_PER_ORDER: max=45000.00 USD, notional=59784.13 USD"
+  },
+  {
+   "client_order_id": "O-20210106-210000-001-000-9",
+   "reason": "RATE_LIMIT_EXCEEDED"
+  },
+  {
+   "client_order_id": "O-20210106-210000-001-000-10",
+   "reason": "RATE_LIMIT_EXCEEDED"
+  }
+ ],
+ "control_denied": [],
+ "limits_burst_filled": 4,
+ "control_burst_filled": 6
+}

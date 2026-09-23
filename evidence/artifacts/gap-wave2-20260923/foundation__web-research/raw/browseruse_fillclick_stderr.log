@@ -1,0 +1,7 @@
+ERROR    [BrowserSession] [LocalBrowserWatchdog] ⚠️ No local browser binary found, installing browser using playwright subprocess...
+INFO     [BrowserSession] Setting viewport to 2560x1600 with device scale factor 1.0 whereas original device scale factor was 1.0
+INFO     [BrowserSession] ⌨️ Typed "Gap Wave 2 Fix" into element with index 2
+INFO     [BrowserSession] 📢 on_BrowserStopEvent - Calling reset() (force=False, keep_alive=None)
+INFO     [BrowserSession] [SessionManager] Cleared all owned data (targets, sessions, mappings)
+INFO     [BrowserSession] ✅ Browser session reset complete
+INFO     [BrowserSession] ✅ Browser session reset complete

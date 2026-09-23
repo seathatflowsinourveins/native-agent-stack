@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "$HOME/code/nas-wt-g2-portfolio-risk/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_episodes.py", line 259, in <module>
+    main()
+  File "$HOME/code/nas-wt-g2-portfolio-risk/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_episodes.py", line 239, in main
+    cash, pnl, fees, rows = reconcile(case, eps, parsed, log, denied, state, opens)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/code/nas-wt-g2-portfolio-risk/blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_episodes.py", line 159, in reconcile
+    raise ValueError(f"cash transitions differ: native rows {len(native)}, ledger {len(sequence)}, "
+ValueError: cash transitions differ: native rows 413, ledger 412, ending native 1067802.08 ledger 1067802.0494

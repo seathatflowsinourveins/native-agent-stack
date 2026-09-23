@@ -1,0 +1,84 @@
+{
+  "closeEvent": {
+    "eventId": "20",
+    "eventTime": "2026-09-23T03:12:22.996294105Z",
+    "eventType": "EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED",
+    "taskId": "1048678",
+    "workflowExecutionCompletedEventAttributes": {
+      "result": [
+        "completed"
+      ],
+      "workflowTaskCompletedEventId": "19"
+    }
+  },
+  "executionConfig": {
+    "defaultWorkflowTaskTimeout": "10s",
+    "taskQueue": {
+      "kind": "TASK_QUEUE_KIND_NORMAL",
+      "name": "q-39edc4b4"
+    },
+    "workflowExecutionTimeout": "0s",
+    "workflowRunTimeout": "0s"
+  },
+  "result": "completed",
+  "workflowExecutionInfo": {
+    "autoResetPoints": {
+      "points": [
+        {
+          "buildId": "ea2aa83e1185d176917207d081a355e4",
+          "createTime": "2026-09-23T03:12:22.411229861Z",
+          "firstWorkflowTaskCompletedId": "4",
+          "resettable": true,
+          "runId": "<uuid-3>"
+        }
+      ]
+    },
+    "closeTime": "2026-09-23T03:12:22.996294105Z",
+    "execution": {
+      "runId": "<uuid-3>",
+      "workflowId": "recovery-58e61c8abf08"
+    },
+    "executionDuration": "0.585600151s",
+    "executionTime": "2026-09-23T03:12:22.410693954Z",
+    "firstRunId": "<uuid-4>",
+    "historyLength": "20",
+    "historySizeBytes": "2647",
+    "memo": {},
+    "mostRecentWorkerVersionStamp": {
+      "buildId": "ea2aa83e1185d176917207d081a355e4"
+    },
+    "rootExecution": {
+      "runId": "<uuid-3>",
+      "workflowId": "recovery-58e61c8abf08"
+    },
+    "searchAttributes": {
+      "indexedFields": {
+        "BuildIds": {
+          "data": "WyJ1bnZlcnNpb25lZCIsInVudmVyc2lvbmVkOmVhMmFhODNlMTE4NWQxNzY5MTcyMDdkMDgxYTM1NWU0Il0=",
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZExpc3Q="
+          }
+        }
+      }
+    },
+    "startTime": "2026-09-23T03:12:22.410693954Z",
+    "stateTransitionCount": "8",
+    "status": "WORKFLOW_EXECUTION_STATUS_COMPLETED",
+    "taskQueue": "q-39edc4b4",
+    "type": {
+      "name": "Recovery"
+    }
+  },
+  "workflowExtendedInfo": {
+    "lastResetTime": "2026-09-23T03:12:22.410693954Z",
+    "originalStartTime": "2026-09-23T03:12:15.876018218Z",
+    "requestIdInfos": {
+      "<uuid-13>": {
+        "eventId": "1",
+        "eventType": "EVENT_TYPE_WORKFLOW_EXECUTION_STARTED"
+      }
+    },
+    "runExpirationTime": "0001-01-01T00:00:00Z"
+  }
+}

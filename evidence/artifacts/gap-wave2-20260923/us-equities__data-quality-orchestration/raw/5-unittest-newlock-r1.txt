@@ -1,0 +1,8 @@
+test_provisioning_step_present_before_the_unittest_step (tests.test_promotion_gate.WorkflowProvisioningContract.test_provisioning_step_present_before_the_unittest_step) ... ok
+test_provisioning_step_sets_require_hashes_and_the_guard_env_var (tests.test_promotion_gate.WorkflowProvisioningContract.test_provisioning_step_sets_require_hashes_and_the_guard_env_var) ... ok
+test_unittest_step_runs_the_full_suite (tests.test_promotion_gate.WorkflowProvisioningContract.test_unittest_step_runs_the_full_suite) ... ok
+
+----------------------------------------------------------------------
+Ran 25 tests in 13.328s
+
+OK

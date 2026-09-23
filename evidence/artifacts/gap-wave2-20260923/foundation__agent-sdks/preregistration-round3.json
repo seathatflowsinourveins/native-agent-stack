@@ -1,0 +1,91 @@
+{
+  "written_at": "2026-09-23T12:56:16Z",
+  "label": "round 3 preregistration: a re-dispatch of this unit on 2026-09-23 after the two review rounds; written before any round-3 evidence arm and not back-dated. Earlier rounds' preregistrations are unchanged.",
+  "author": "gap-wave-2 agent-sdks unit (round 3)",
+  "isolation_method": "pasta --config-net -T none -U none -t none -u none --no-map-gw (own network namespace with outbound internet and no forwarding to host loopback ports) + unshare --mount --pid --fork --mount-proc + iso_ns.sh (tmpfs over $HOME, /tmp, /mnt, /run/user; binds back only the SDK venv and Python, node, the workers and helper directories read-only, a fresh staging CODEX_HOME at $HOME/.codex, the workspace and an output dir; the native sign-in file is bind-mounted read-only, never copied) + nested user namespace mapped to uid 1000 + env -i with HOME, USER, PATH=/usr/local/bin:/usr/bin:/bin, LANG, TMPDIR. All round-3 Codex rollouts and Context Mode data therefore land in the staging home, not in the live $HOME/.codex.",
+  "preregistrations": {
+    "2": {
+      "expectation": "In the isolated namespace with a fresh CODEX_HOME whose config.toml only turns hooks, plugin hooks, apps, analytics and OTLP off: (a) deterministic controls: outside the namespace `command -v mcporter` resolves, the Context Mode start.mjs exists, $HOME/.codex/AGENTS.md exists and a loopback listener this unit starts answers; inside, none of these is reachable. (b) iso config snapshot: 0 configured MCP servers, empty mcpServerStatus list, 0 hooks, no instruction file in CODEX_HOME; the parent snapshot (native home, config/read, hooks/list and skills/list only, so no host MCP server is started) shows the context-mode plugin and its hooks. (c) One native_worker.py turn (workspace-write, deny_all) with an adversarial prompt that asks the model to find and start host MCP tooling and reach the listener: the turn completes, 0 mcpToolCall items, and every such command fails.",
+      "criteria": [
+        "(a) each control differs outside vs inside; detection: the outside run of the same script is the positive control",
+        "(b) iso vs parent diff recorded from config/read + hooks/list (+ mcpServerStatus/list inside only)",
+        "(c) worker receipt item stream: zero mcpToolCall items; commandExecution items for mcporter / start.mjs / listener fail or report not found; detection: the same collector recorded 5 context-mode calls and the shell bypass in round 1 (c4-t1)",
+        "settled if (a), (b) and (c) all hold; advanced otherwise. The staging home shares the native sign-in read-only (no second account); that is recorded as a limit, not as a failed criterion, because the next_check asks for an isolated CODEX_HOME/config, not a separate account"
+      ]
+    },
+    "10": {
+      "expectation": "(a) codex 0.155.1 `app-server generate-json-schema --experimental` (no inference) lists the same 82 server-notification methods as the SDK's NOTIFICATION_MODELS. (b) Synthetic: for every method, a minimal and a maximal params sample generated from the native schema validate against the native schema (jsonschema) and are typed (not UnknownNotification) by the SDK's CodexClient._coerce_notification, and a MessageRouter delivers them; negative control: dropping a required field yields UnknownNotification. (c) One native turn in the isolated namespace that asks for a dynamic tool call, a plan update, a shell command and a file edit receives more documented types than round 1's 6, every received type typed.",
+      "criteria": [
+        "(a) set equality of native schema methods and SDK registry keys",
+        "(b) count of methods whose samples are native-valid and SDK-typed; negative control flips to UnknownNotification (detector works)",
+        "(c) received documented types listed from a collector that drains both the turn queue and the global queue",
+        "settled only if every documented type is received natively and handled; the synthetic arm alone yields advanced"
+      ]
+    },
+    "12": {
+      "expectation": "The round-1 no-override failure came from the Context Mode most-recent-transcript fallback binding to another session's worktree. In an isolated CODEX_HOME containing the Context Mode plugin (code copied from the installed plugin cache, enabled; hooks off) and a persistent worker thread whose rollout is the only transcript, rerunning the failing c4-t2 prompt with workspace-write and auto_review and without --context-mode-start: ctx_execute_file completes on both workspace files and all six values are extracted.",
+      "criteria": [
+        "no --context-mode-start and no CONTEXT_MODE_PROJECT_DIR reaching the MCP server via config",
+        "mcpToolCall items for context-mode ctx_execute_file complete; extraction values 3943, 3, 0, 23, gpt-6-astra, 0 present",
+        "settled if the turn completes with extraction success without the override; the shared native home's failing path (round 1) stays recorded as a limit"
+      ]
+    },
+    "13": {
+      "expectation": "Claude arm: one bounded query in a new process with ClaudeAgentOptions(resume=<the round-1 interrupted session id>, setting_sources=[], tools=[], max_turns=1, model haiku) and cwd equal to that session's workspace, asking which subject the first message requested, without naming it. The answer names double-entry bookkeeping. This is the single bounded Claude call of this dispatch (round 1 of this unit also made one; both are disclosed).",
+      "criteria": [
+        "the turn-2 prompt does not contain 'bookkeeping' or 'double-entry'",
+        "answer contains 'double-entry' or 'double entry' (case-insensitive); detection: without the resumed context the subject is unguessable, and a failed resume would start an empty session",
+        "ResultMessage session_id equals the resumed id (or the fork is recorded)",
+        "settled if this holds, since the Codex arm (new-process thread/resume) is already shown in round 1"
+      ]
+    },
+    "not_attempted": {
+      "0": "needs 18 recovery submissions including 12 on Claude arms; the Claude account is reserved",
+      "1": "provider consumption is not observable through any available channel (round 1); no new channel exists here",
+      "8": "OpenHands with a real model needs a model endpoint; no container runtime (docker absent); a local CPU model would need a >1 GB download and is not attempted in this round",
+      "9": "Claude arm needs a custom-tool query, an interrupt and a resume on one task (three or more calls)",
+      "11": "provider billing and multi-host recovery are not available on this host",
+      "3,4,6": "already settled"
+    }
+  },
+  "round3_fix": {
+    "written_at": "2026-09-23T13:06:28Z",
+    "label": "round-3 fix preregistration, written after the gap-10 events turn (13:00Z) and a no-inference diagnostic (13:05Z) showed a provider-delivered MCP server; before any rerun; not back-dated",
+    "finding": "A fresh CODEX_HOME downloads the account's remote curated plugins (openai-curated-remote: 9 plugins, about 41 MB per home) on first app-server start. One of them (openai-developers 1.3.0) starts an MCP server named openai-api-key-local-confirmation when a thread starts. mcpServerStatus/list before a thread is empty, so criterion 2(b) as measured pre-thread does not cover it. It is provider-delivered, not host tooling, but it is an MCP server in the worker.",
+    "gap_2": {
+      "expectation": "A new stage 'bare-np' whose config.toml also sets features.plugins=false, features.remote_plugin=false and features.skill_mcp_dependency_install=false downloads no plugin, and after thread/start (no inference) mcpServerStatus/list is empty and no mcpServer/startupStatus/updated notification arrives. The adversarial worker turn is rerun there with the same prompt and the same criteria (c).",
+      "criteria": [
+        "thread-time MCP status empty and zero startupStatus notifications (detection: the same probe named openai-api-key-local-confirmation in the 'bare' stage)",
+        "no plugins directory created under the stage home",
+        "worker turn: 0 mcpToolCall items; host tooling and the unit's loopback listener unreachable",
+        "settled if these hold together with 2(a); otherwise advanced"
+      ]
+    }
+  },
+  "round3_review_fix": {
+    "written_at": "2026-09-23T13:19:31Z",
+    "label": "written after the round-3 cross-family review (one codex exec --sandbox read-only --ephemeral, gpt-6-astra) and before the fixes and the gap-10 synthetic rerun; not back-dated",
+    "findings_and_plan": [
+      "1 (major, supported): build_round3 accepted any outside/inside difference. Plan: require the expected inside values (absent/no/0/unreachable, non-zero node exit, inside run exit 0), the expected outside values, and non-zero exits for every worker command that tries mcporter, start.mjs or the listener; no rerun of model turns.",
+      "2 (major, supported, also affects round 1): the five sanitized .jsonl excerpts are matched by the repository's *.jsonl ignore rule, so they were never committed although receipts and manifests/evidence.json cite them. Plan: force-add them (no .gitignore change).",
+      "3 (minor, supported): schema_dispatch routed only minimal samples and did not show delivery. Plan: register a turn consumer per sample turn id, route both variants, and count notifications actually delivered by next_turn_notification / next_global_notification. Expectation: 164 of 164 delivered. Gap 10 stays advanced.",
+      "4 (minor, supported): README said nothing was written to the live $HOME/.codex, but the parent config snapshot ran app-server against it. Plan: limit the claim to the isolated runs and disclose the parent snapshot."
+    ]
+  },
+  "round3_review2_fix": {
+    "written_at": "2026-09-23T13:30:48Z",
+    "label": "written after the second independent Opus review of round 3 (5 minor findings) and before any fix or probe; not back-dated",
+    "findings_and_plan": [
+      "1 (supported): the README says hooks, apps and OTLP exporters were off in every Codex run; the round-3 parent config snapshot ran the native app-server against the live $HOME/.codex without overrides (6 hooks, OTLP exporters to the local viewer at 127.0.0.1:14318). Plan: correct the README and receipt 2; list which events the 6 hooks run on (from the recorded hooks/list); and measure, without the live viewer and with hooks off, whether the same request sequence (initialize, config/read, hooks/list, skills/list; no thread) exports anything, by redirecting both OTLP endpoints to a loopback listener started and stopped by the probe. Positive control: a temp CODEX_HOME process with the same exporter redirect that also runs thread/start (no inference).",
+      "2 (supported): receipt 13's top-level results.claude_agent_sdk still says 'not run'. Plan: build_round3 replaces it with a pointer to round_3 and keeps the old text under claude_agent_sdk_round_1.",
+      "3 (supported): the gap-2 criterion 'no plugins directory created under the stage home' was never evaluated. Plan: a post-hoc listing of the four round-3 stage homes (dated when taken); criterion holds if bare-np has no plugins/ entry and the bare stage (positive control, which downloaded plugins) has one; also check the worker's own `ls -A ~/.codex` output. Add it to the gap-2 acceptance.",
+      "4 (supported): gap-12 values were checked as substrings. Plan: parse the final response as JSON and compare the six fields by name and value; the outcome is re-derived.",
+      "5 (supported in part): results.json carries only 'settled' for gap 12. Plan: add a settled_scope field to receipt 12 and carry an optional scope into results.json from the receipts (generator change, not a hand edit)."
+    ],
+    "expectations": {
+      "otel_probe": "Unknown before running. If the parent sequence posts nothing to the redirected listener while the positive control posts at least one OTLP request, the README states that the parent snapshot most likely exported nothing (reproduction, not an observation of the original run). If the positive control also posts nothing, detection is not established and the README says so.",
+      "gap_2": "stays settled if the plugins-directory criterion holds; otherwise advanced",
+      "gap_12": "stays settled if all six parsed fields match"
+    }
+  }
+}

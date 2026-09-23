@@ -1,0 +1,97 @@
+{
+  "all_ok": true,
+  "manifest_sha256_used": "a90a4281b1a8850bce542f4a89e957f71cd46e65de96b3de722b6849f59c2544",
+  "quarantine_preserved": true,
+  "refusals": {
+    "bars_parquet_tamper": {
+      "error": "ValueError: artifact_hash_mismatch",
+      "refused": true
+    },
+    "wrong_manifest_sha256": {
+      "error": "ValueError: manifest_hash_mismatch",
+      "refused": true
+    }
+  },
+  "selections": {
+    "after-observation-meta_mapped": {
+      "case_id": "meta_mapped",
+      "count": 3,
+      "cutoff": "2026-09-21T00:00:00Z",
+      "historical_universe_eligible": false,
+      "qualified_count": 3,
+      "quarantined_count": 0,
+      "result": {
+        "case_id": "meta_mapped",
+        "count": 3,
+        "cutoff_ns": "1789948800000000000",
+        "historical_universe_eligible": false,
+        "manifest_sha256": "a90a4281b1a8850bce542f4a89e957f71cd46e65de96b3de722b6849f59c2544",
+        "qualified_count": 3,
+        "quarantined_count": 0,
+        "selected_rows_sha256": "03d2ac9f8f6f9a6769236ae00fd0295dfcfa0238d97528b5c73eda7ea2b54857",
+        "selection_sql_sha256": "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+      },
+      "selection_sql_sha256": "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+    },
+    "after-observation-meta_unmapped": {
+      "case_id": "meta_unmapped",
+      "count": 2,
+      "cutoff": "2026-09-21T00:00:00Z",
+      "historical_universe_eligible": false,
+      "qualified_count": 1,
+      "quarantined_count": 1,
+      "result": {
+        "case_id": "meta_unmapped",
+        "count": 2,
+        "cutoff_ns": "1789948800000000000",
+        "historical_universe_eligible": false,
+        "manifest_sha256": "a90a4281b1a8850bce542f4a89e957f71cd46e65de96b3de722b6849f59c2544",
+        "qualified_count": 1,
+        "quarantined_count": 1,
+        "selected_rows_sha256": "2468777d6499e8854999d4aa026592138d7e36aa696204356bd780443cd3a20e",
+        "selection_sql_sha256": "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+      },
+      "selection_sql_sha256": "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+    },
+    "before-first-observation": {
+      "case_id": "meta_unmapped",
+      "count": 0,
+      "cutoff": "2026-09-20T12:00:00.000000100Z",
+      "historical_universe_eligible": false,
+      "qualified_count": 0,
+      "quarantined_count": 0,
+      "result": {
+        "case_id": "meta_unmapped",
+        "count": 0,
+        "cutoff_ns": "1789905600000000100",
+        "historical_universe_eligible": false,
+        "manifest_sha256": "a90a4281b1a8850bce542f4a89e957f71cd46e65de96b3de722b6849f59c2544",
+        "qualified_count": 0,
+        "quarantined_count": 0,
+        "selected_rows_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "selection_sql_sha256": "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+      },
+      "selection_sql_sha256": "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+    },
+    "historical-2022-meta_unmapped": {
+      "case_id": "meta_unmapped",
+      "count": 0,
+      "cutoff": "2022-06-30T00:00:00Z",
+      "historical_universe_eligible": false,
+      "qualified_count": 0,
+      "quarantined_count": 0,
+      "result": {
+        "case_id": "meta_unmapped",
+        "count": 0,
+        "cutoff_ns": "1656547200000000000",
+        "historical_universe_eligible": false,
+        "manifest_sha256": "a90a4281b1a8850bce542f4a89e957f71cd46e65de96b3de722b6849f59c2544",
+        "qualified_count": 0,
+        "quarantined_count": 0,
+        "selected_rows_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "selection_sql_sha256": "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+      },
+      "selection_sql_sha256": "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477"
+    }
+  }
+}

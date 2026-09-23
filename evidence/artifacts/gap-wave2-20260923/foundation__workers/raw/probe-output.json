@@ -1,0 +1,155 @@
+{
+  "trial_count": 10,
+  "delays_ms": [
+    1,
+    2,
+    3,
+    5,
+    8,
+    12,
+    20,
+    33,
+    55,
+    90
+  ],
+  "trials": [
+    {
+      "delay_ms_requested": 1,
+      "elapsed_s": 0.0028,
+      "killed_process_group": true,
+      "target_state": "target_present",
+      "worktree_list_count": 3,
+      "worktree_list": [
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.crash-target",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.sibling-dirty"
+      ],
+      "sibling_status_porcelain": "?? README.md\n",
+      "sibling_intact": true
+    },
+    {
+      "delay_ms_requested": 2,
+      "elapsed_s": 0.0155,
+      "killed_process_group": true,
+      "target_state": "target_present",
+      "worktree_list_count": 3,
+      "worktree_list": [
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.crash-target",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.sibling-dirty"
+      ],
+      "sibling_status_porcelain": "?? README.md\n",
+      "sibling_intact": true
+    },
+    {
+      "delay_ms_requested": 3,
+      "elapsed_s": 0.0128,
+      "killed_process_group": true,
+      "target_state": "target_present",
+      "worktree_list_count": 3,
+      "worktree_list": [
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.crash-target",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.sibling-dirty"
+      ],
+      "sibling_status_porcelain": "?? README.md\n",
+      "sibling_intact": true
+    },
+    {
+      "delay_ms_requested": 5,
+      "elapsed_s": 0.0409,
+      "killed_process_group": true,
+      "target_state": "target_present",
+      "worktree_list_count": 3,
+      "worktree_list": [
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.crash-target",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.sibling-dirty"
+      ],
+      "sibling_status_porcelain": "?? README.md\n",
+      "sibling_intact": true
+    },
+    {
+      "delay_ms_requested": 8,
+      "elapsed_s": 0.0098,
+      "killed_process_group": true,
+      "target_state": "target_present",
+      "worktree_list_count": 3,
+      "worktree_list": [
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.crash-target",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.sibling-dirty"
+      ],
+      "sibling_status_porcelain": "?? README.md\n",
+      "sibling_intact": true
+    },
+    {
+      "delay_ms_requested": 12,
+      "elapsed_s": 0.0136,
+      "killed_process_group": true,
+      "target_state": "target_present",
+      "worktree_list_count": 3,
+      "worktree_list": [
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.crash-target",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.sibling-dirty"
+      ],
+      "sibling_status_porcelain": "?? README.md\n",
+      "sibling_intact": true
+    },
+    {
+      "delay_ms_requested": 20,
+      "elapsed_s": 0.0216,
+      "killed_process_group": true,
+      "target_state": "target_removed",
+      "worktree_list_count": 2,
+      "worktree_list": [
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.sibling-dirty"
+      ],
+      "sibling_status_porcelain": "?? README.md\n",
+      "sibling_intact": true
+    },
+    {
+      "delay_ms_requested": 33,
+      "elapsed_s": 0.0346,
+      "killed_process_group": true,
+      "target_state": "target_removed",
+      "worktree_list_count": 2,
+      "worktree_list": [
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.sibling-dirty"
+      ],
+      "sibling_status_porcelain": "?? README.md\n",
+      "sibling_intact": true
+    },
+    {
+      "delay_ms_requested": 55,
+      "elapsed_s": 0.0554,
+      "killed_process_group": true,
+      "target_state": "target_removed",
+      "worktree_list_count": 2,
+      "worktree_list": [
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.sibling-dirty"
+      ],
+      "sibling_status_porcelain": "?? README.md\n",
+      "sibling_intact": true
+    },
+    {
+      "delay_ms_requested": 90,
+      "elapsed_s": 0.0904,
+      "killed_process_group": true,
+      "target_state": "target_removed",
+      "worktree_list_count": 2,
+      "worktree_list": [
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo",
+        "$HOME/.cache/gap-wave2-20260923/workers/fix5/wt-repo.sibling-dirty"
+      ],
+      "sibling_status_porcelain": "?? README.md\n",
+      "sibling_intact": true
+    }
+  ],
+  "sibling_final_status": "?? README.md\n",
+  "sibling_survived_all_trials": true
+}

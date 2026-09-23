@@ -1,0 +1,104 @@
+{
+ "id": "gap-wave2-20260923-foundation-mcp-surfaces-8",
+ "gap_index": 8,
+ "gap_text_sha256": "e03a012e712ebc292585632bfbe91a2d678223864c494bf80fe262a26eaa4080",
+ "gap_text": "Inspector's arithmetic execution does not establish complete client plugin behavior, hooks, project-file scope or current Desktop connectivity.",
+ "next_check": "Run Inspector CLI tools/list and one tools/call against configured project servers and record them; check project-file scope by running from inside and outside the project.",
+ "preregistration": {
+  "written_at": "2026-09-23T03:54:03Z",
+  "expectation": "Inspector CLI tools/list and one tools/call succeed against the project-configured servers when given the project config explicitly; Inspector does not auto-load a project .mcp.json from the cwd (it uses --config or its catalog), so from outside the project a relative --config fails and an absolute one works.",
+  "criteria": "advanced at best: Desktop connectivity, client plugin and hook behavior cannot be executed here; tools/list, tools/call and the inside/outside project-file scope arms must all be executed for 'advanced'.",
+  "source": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/preregistrations.json",
+  "addenda": [
+   {
+    "written_at": "2026-09-23T04:24:12Z",
+    "label": "added arm, written after the isolated-fixture runs and before this arm ran",
+    "expectation": "Inside the namespace, before the owned services start, connecting to 49374/16333 is refused (probe that would detect live contact). Then: installed mcporter 0.13.13 with the unmodified $HOME/codex-ecosystem/config/mcporter.json lists context-mode, ai-memory and socraticode and runs ctx_execute_file (agent-lab README.md), memory_status (0 counts = owned store) and codebase_status; the retained ad-hoc jcodemunch --stdio call and the Inspector context-mode arithmetic call (42) pass. Inspector with agent-lab's unmodified .mcp.json lists tools for serena, ai-memory and socraticode from inside the project, calls memory_status and codebase_status, fails without --config (no cwd auto-discovery), fails with a relative --config from outside, and with an absolute --config from outside runs codebase_status against the OUTSIDE cwd (the .mcp.json socraticode entry sets no cwd).",
+    "criteria": "Gap 0: settled only if every retained call passes on the unmodified host config and binaries (context-mode start.mjs from the read-only plugin cache may fail; that is reported, not hidden). Gap 8 remains advanced (no Desktop/plugin/hooks)."
+   },
+   {
+    "written_at": "2026-09-23T04:36:13Z",
+    "label": "FIX ROUND 1, written after the round-1 independent review (raw/review-codex-round1.txt, received 04:35:13Z) and before the fix-round runs",
+    "expectation": "Re-running the bridge matrix, both lifecycle fixtures and the unmodified-config arm inside unshare -rnm with an empty tmpfs mounted over $HOME/.mcporter (the shared daemon's socket path does not exist there) gives the same outcomes. A connect probe to the shared socket path inside the namespace returns ENOENT, while the same probe against the owned daemon socket connects. That owned control shows the probe detects a reachable socket. wong2 interactive listing is executed x3 for all 5 servers and renders at most one page (10 tools). With a lock holder that EXITS ON ITS OWN (sleep with a fixed lifetime, no harness kill), a call made while the lock is held times out after 45 s, a second call while still held also fails, and the first call after the holder exits succeeds with no step taken by the harness or the operator.",
+    "criteria": "Gap 10 and the no-contact claim in the other receipts are settled only by the enforced (tmpfs + netns) runs with the probe and owned control recorded. Gap 12/6: settled only if every wong2 list arm executed (interactive), with incompleteness reported as a result. Gap 9: the startup-timeout conclusion is restated to match what the natural-expiry arm shows."
+   }
+  ]
+ },
+ "checked_at": "2026-09-23T13:09:10Z",
+ "arms": [
+  {
+   "arm": "Inspector CLI tools/list against configured project servers",
+   "status": "executed",
+   "detail": {
+    "inspector-inside-list-serena": 1,
+    "inspector-inside-list-ai-memory": 0,
+    "inspector-inside-list-socraticode": 0
+   }
+  },
+  {
+   "arm": "one tools/call against configured project servers",
+   "status": "executed",
+   "detail": {
+    "inspector-inside-call-memory-status": 0,
+    "inspector-inside-call-codebase-status-cwd": 0
+   }
+  },
+  {
+   "arm": "project-file scope from inside and outside the project",
+   "status": "executed",
+   "detail": {
+    "inspector-inside-no-config": 1,
+    "inspector-outside-relative-config": 1,
+    "inspector-outside-absolute-list": 0,
+    "inspector-outside-absolute-call-codebase-status-cwd": 0
+   }
+  },
+  {
+   "arm": "client plugin behavior, hooks, current Desktop connectivity",
+   "status": "not_executed",
+   "detail": "no Desktop/plugin host here"
+  }
+ ],
+ "commands": [
+  "node $HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js --cli --config .mcp.json --server serena --method tools/list   # cwd $HOME/code/agent-lab",
+  "node $HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js --cli --config .mcp.json --server ai-memory --method tools/list   # cwd $HOME/code/agent-lab",
+  "node $HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js --cli --config .mcp.json --server socraticode --method tools/list   # cwd $HOME/code/agent-lab",
+  "node $HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js --cli --config .mcp.json --server ai-memory --method tools/call --tool-name memory_status --tool-arg workspace=agent-lab --tool-arg project=agent-lab   # cwd $HOME/code/agent-lab",
+  "node $HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js --cli --config .mcp.json --server socraticode --method tools/call --tool-name codebase_status   # cwd $HOME/code/agent-lab",
+  "node $HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js --cli --server socraticode --method tools/list   # cwd $HOME/code/agent-lab",
+  "node $HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js --cli --config .mcp.json --server socraticode --method tools/list   # cwd $HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/outside",
+  "node $HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js --cli --config $HOME/code/agent-lab/.mcp.json --server socraticode --method tools/list   # cwd $HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/outside",
+  "node $HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js --cli --config $HOME/code/agent-lab/.mcp.json --server socraticode --method tools/call --tool-name codebase_status   # cwd $HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/outside"
+ ],
+ "results": [
+  "inspector-inside-list-serena: exit 1: Traceback (most recent call last): File \"$HOME/.local/share/codex-ecosystem/context/serena-c6fbd1c/bin/serena\", line 10, in <module> sys.exit(top_level()) ~~~~~~~~~^^ File \"$HOME/.local/share/codex-ec",
+  "inspector-inside-list-ai-memory: exit 0: { \"tools\": [ { \"name\": \"memory_auto_improve\", \"description\": \"Run manual auto-improvement for one completed session and apply or stage validated wiki edit proposals through the auto-improvement approv",
+  "inspector-inside-list-socraticode: exit 0: { \"tools\": [ { \"name\": \"codebase_index\", \"description\": \"Start indexing a codebase in the background. Returns immediately. Call codebase_status to poll progress until 100%. Do NOT search until indexin",
+  "inspector-inside-call-memory-status: exit 0: { \"content\": [ { \"type\": \"text\", \"text\": \"{\\n \\\"counts\\\": {\\n \\\"pages_latest\\\": 0,\\n \\\"pages_all\\\": 0,\\n \\\"sessions\\\": 0,\\n \\\"observations\\\": 0\\n }\\n}\" } ], \"isError\": false }",
+  "inspector-inside-call-codebase-status-cwd: exit 0: { \"content\": [ { \"type\": \"text\", \"text\": \"No index found for project: $HOME/code/agent-lab\\nRun codebase_index to create one.\\n\\nFile watcher: active (watched by another process)\" } ] }",
+  "inspector-inside-no-config: exit 1: {\"error\":{\"code\":\"error\",\"message\":\"Server 'socraticode' not found. Available servers: \"}}",
+  "inspector-outside-relative-config: exit 1: {\"error\":{\"code\":\"error\",\"message\":\"Error loading configuration: Config file not found: $HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/outside/.mcp.json\",\"cause\":\"Config file not found: $HOME",
+  "inspector-outside-absolute-list: exit 0: { \"tools\": [ { \"name\": \"codebase_index\", \"description\": \"Start indexing a codebase in the background. Returns immediately. Call codebase_status to poll progress until 100%. Do NOT search until indexin",
+  "inspector-outside-absolute-call-codebase-status-cwd: exit 0: { \"content\": [ { \"type\": \"text\", \"text\": \"No index found for project: $HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/ns045115/outside\\nRun codebase_index to create one.\\n\\nFile watcher: inactive\" } ] "
+ ],
+ "outcome": "advanced",
+ "note": "Inspector 2.7.0 with agent-lab's unmodified .mcp.json listed tools for ai-memory and SocratiCode and called memory_status and codebase_status. Serena failed on the read-only ecosystem log dir. Project-file scope is explicit, not cwd-discovered: without --config the server is not found, and a relative --config from outside fails. With an absolute --config from outside, the SocratiCode entry (which sets no cwd) reported the OUTSIDE directory as the project. Remaining: Desktop connectivity, client plugin and hook behavior.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "Servers ran with owned state only (temp HOME/XDG, MCPORTER_DAEMON_DIR under $HOME/.cache/gap-wave2-20260923, owned ai-memory --data-dir and Qdrant storage). Fix round 1 runs are ENFORCED: unshare -rnm with an empty tmpfs over $HOME/.mcporter and a fresh network namespace (enforce.py / ns_exact.py). Inside, an AF_UNIX connect to the shared daemon socket path returned 'FileNotFoundError: No such file or directory' and TCP 49374/16333 returned 'ConnectionRefusedError: Connection refused', while the same AF_UNIX probe against each owned daemon socket returned ['connected'] (owned control, so the probe can detect a reachable socket). Round-1 runs (raw/round1/) set only environment-level isolation; their stat() of the shared daemon (pid, socket inode, metadata mtime) could not detect a client connection, so they are not cited for the no-contact claim.",
+  "/tmp was not isolated; SocratiCode reported another process watching the agent-lab checkout, i.e. it read host watcher state.",
+  "Inside the namespace the configured ports were served by owned empty instances. Fix-round rerun: shared socket path -> FileNotFoundError: No such file or directory, owned daemon socket -> connected."
+ ],
+ "raw_evidence": [
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/ns-exact-config.json",
+   "sha256": "c3b2ac4b5ee45236946750465a8474ea7dccece0f236dbc9f110ee8eb63e9504"
+  }
+ ],
+ "helper_scripts": [
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/ns_exact.py",
+   "sha256": "f7010cfa4fab79e52978d5e4b1540a8798e0d603d98fbb4bde577d7d18fbfb7d"
+  }
+ ]
+}

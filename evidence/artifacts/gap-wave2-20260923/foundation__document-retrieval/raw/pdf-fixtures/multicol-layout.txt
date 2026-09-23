@@ -1,0 +1,5 @@
+LEFTCOL-ALPHA one two three       RIGHTCOL-ECHO thirteen fourteen
+LEFTCOL-BETA four five six        RIGHTCOL-FOXTROT fifteen sixteen
+LEFTCOL-GAMMA seven eight nine    RIGHTCOL-GOLF seventeen eighteen
+LEFTCOL-DELTA ten eleven twelve   RIGHTCOL-HOTEL nineteen twenty
+

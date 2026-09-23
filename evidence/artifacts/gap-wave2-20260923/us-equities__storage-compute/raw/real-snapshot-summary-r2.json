@@ -1,0 +1,319 @@
+{
+  "started_at": "2026-09-23T06:01:26.824677+00:00",
+  "alpaca_snapshots": {
+    "alpaca-sip-20260922": {
+      "receipt": {
+        "kind": "promotion_gate_snapshot_ingest",
+        "evidence_class": "native_market_data_readonly",
+        "fetched_at_utc": "2026-09-22T21:55:59Z",
+        "feed": "sip",
+        "adjustment": "raw",
+        "timeframe": "1Day",
+        "sessions_requested": 20,
+        "symbols": 24,
+        "symbols_missing": [],
+        "row_count": 480,
+        "sessions_range": [
+          "2026-08-25",
+          "2026-09-22"
+        ],
+        "config_sha256": "2b555982034af02b9d0d2e1d20e17d22c1e83f2b0c4d60b61d91307ebec63562",
+        "snapshot_sha256": "914b7d949b3de201c1e64225a5c9d36e1f5c1d370a49371ef09776537c158c82",
+        "snapshot_bytes": 35137,
+        "alpaca_py": "0.44.0"
+      },
+      "receipt_sha256": "8762835a33e7e0c0d9546450aa33c8c0d5e637d3d290130d082872cdfb6342fe",
+      "copy_sha256": "914b7d949b3de201c1e64225a5c9d36e1f5c1d370a49371ef09776537c158c82",
+      "copy_matches_receipt": true,
+      "gate": {
+        "exit": 0,
+        "status": "pass",
+        "row_count": 480,
+        "input_sha256": "914b7d949b3de201c1e64225a5c9d36e1f5c1d370a49371ef09776537c158c82",
+        "input_sha256_matches_file": true,
+        "failed_checks": [],
+        "checks_total": 12,
+        "versions": {
+          "exchange_calendars": "4.13.2",
+          "pandas": "3.0.6",
+          "pandera": "0.33.1",
+          "pyarrow": "25.0.1",
+          "python": "3.13.15"
+        },
+        "gate_result_file": "alpaca-sip-20260922-gate-result.json",
+        "gate_result_sha256": "52099e3cd0b45d5d4b38eb9c590116976a06156ec64a002dcee60d6f753e5d49"
+      },
+      "parquet_duckdb": {
+        "duckdb": "1.5.5",
+        "parquet_sha256": "6bc3038f1f0f370ff87bd5b52fa5f4c6760b5a510fae20edaafc4adc5d39f8e8",
+        "parquet_bytes": 9598,
+        "parquet_mode": "0o444",
+        "parquet_writable_after_chmod": false,
+        "precision_loss_rows": 0,
+        "max_price_decimal_places_in_text": 4,
+        "precision_probe_1_23456_detected": true,
+        "csv_minus_parquet_rows": 0,
+        "parquet_minus_csv_rows": 0,
+        "queries": {
+          "rows": 480,
+          "symbols": 24,
+          "first_session": "2026-08-25",
+          "last_session": "2026-09-22",
+          "sessions_per_symbol_min": 20,
+          "sessions_per_symbol_max": 20,
+          "symbols_with_full_range": 24,
+          "null_cells": 0,
+          "ohlc_inconsistent_rows": 0,
+          "return_aggregate_rows": 24,
+          "return_aggregate_sha256": "55aa99c43fd9837dd9f8c082eb5bfa093f6f622905bb31caa02b559641a46593"
+        }
+      },
+      "detection_control": {
+        "mutations": [
+          "row 1 high set to close - 0.01",
+          "row 2 duplicated"
+        ],
+        "gate": {
+          "exit": 1,
+          "status": "fail",
+          "row_count": 481,
+          "input_sha256": "3a0b4587f0a2dca30add5284e258f7c4928f8f704af47473885522000cd748f2",
+          "input_sha256_matches_file": true,
+          "failed_checks": [
+            "high_ge_max_open_close",
+            "unique_symbol_session"
+          ],
+          "checks_total": 12,
+          "versions": {
+            "exchange_calendars": "4.13.2",
+            "pandas": "3.0.6",
+            "pandera": "0.33.1",
+            "pyarrow": "25.0.1",
+            "python": "3.13.15"
+          },
+          "gate_result_file": "alpaca-sip-20260922-control-gate-result.json",
+          "gate_result_sha256": "f14c5c6a46ed4672f57455a8b650d01284b47e0d96c6b3f5286848e5855a1140"
+        }
+      }
+    },
+    "alpaca-sip-dryrun-20260922": {
+      "receipt": {
+        "kind": "promotion_gate_snapshot_ingest",
+        "evidence_class": "native_market_data_readonly",
+        "fetched_at_utc": "2026-09-23T00:33:24Z",
+        "feed": "sip",
+        "adjustment": "raw",
+        "timeframe": "1Day",
+        "sessions_requested": 20,
+        "symbols": 24,
+        "expected_latest_session": "2026-09-22",
+        "coverage_problems": {},
+        "row_count": 480,
+        "sessions_range": [
+          "2026-08-25",
+          "2026-09-22"
+        ],
+        "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+        "snapshot_sha256": "ffc988e2e850ed3fb5ea9b13bc4443392a329c4c2f5ccd949b574375a2c9b115",
+        "snapshot_bytes": 35137,
+        "alpaca_py": "0.44.0"
+      },
+      "receipt_sha256": "2ad7cc92b286d6027e1435cd156595e8972b9299cf01d0420d1ede8ac740d03b",
+      "copy_sha256": "ffc988e2e850ed3fb5ea9b13bc4443392a329c4c2f5ccd949b574375a2c9b115",
+      "copy_matches_receipt": true,
+      "gate": {
+        "exit": 0,
+        "status": "pass",
+        "row_count": 480,
+        "input_sha256": "ffc988e2e850ed3fb5ea9b13bc4443392a329c4c2f5ccd949b574375a2c9b115",
+        "input_sha256_matches_file": true,
+        "failed_checks": [],
+        "checks_total": 12,
+        "versions": {
+          "exchange_calendars": "4.13.2",
+          "pandas": "3.0.6",
+          "pandera": "0.33.1",
+          "pyarrow": "25.0.1",
+          "python": "3.13.15"
+        },
+        "gate_result_file": "alpaca-sip-dryrun-20260922-gate-result.json",
+        "gate_result_sha256": "8b1d641dcdfc68e4ba1275f497cb0694dd9944e00744aada4c29c324e2a71d8d"
+      },
+      "parquet_duckdb": {
+        "duckdb": "1.5.5",
+        "parquet_sha256": "afb308a708057fccb3ada5789ced533206fedc486dc3c156c57ef43ed5cfac0f",
+        "parquet_bytes": 9634,
+        "parquet_mode": "0o444",
+        "parquet_writable_after_chmod": false,
+        "precision_loss_rows": 0,
+        "max_price_decimal_places_in_text": 4,
+        "precision_probe_1_23456_detected": true,
+        "csv_minus_parquet_rows": 0,
+        "parquet_minus_csv_rows": 0,
+        "queries": {
+          "rows": 480,
+          "symbols": 24,
+          "first_session": "2026-08-25",
+          "last_session": "2026-09-22",
+          "sessions_per_symbol_min": 20,
+          "sessions_per_symbol_max": 20,
+          "symbols_with_full_range": 24,
+          "null_cells": 0,
+          "ohlc_inconsistent_rows": 0,
+          "return_aggregate_rows": 24,
+          "return_aggregate_sha256": "55aa99c43fd9837dd9f8c082eb5bfa093f6f622905bb31caa02b559641a46593"
+        }
+      },
+      "detection_control": {
+        "mutations": [
+          "row 1 high set to close - 0.01",
+          "row 2 duplicated"
+        ],
+        "gate": {
+          "exit": 1,
+          "status": "fail",
+          "row_count": 481,
+          "input_sha256": "21a4a021e3731fb4e6c9ae91dffec898072a593b3cba62a8b155259905e74931",
+          "input_sha256_matches_file": true,
+          "failed_checks": [
+            "high_ge_max_open_close",
+            "unique_symbol_session"
+          ],
+          "checks_total": 12,
+          "versions": {
+            "exchange_calendars": "4.13.2",
+            "pandas": "3.0.6",
+            "pandera": "0.33.1",
+            "pyarrow": "25.0.1",
+            "python": "3.13.15"
+          },
+          "gate_result_file": "alpaca-sip-dryrun-20260922-control-gate-result.json",
+          "gate_result_sha256": "73f4f3edc20c3d93a3ee7183524e73499188be8a1f9d10eac8f0633af2e53dba"
+        }
+      }
+    }
+  },
+  "lean": {
+    "lean-five-252": {
+      "tickers": [
+        "AAPL",
+        "SPY",
+        "IBM",
+        "BAC",
+        "AIG"
+      ],
+      "last_n_sessions": 252,
+      "csv_sha256": "f39e816f9b28af46ddcf6663a445265e67b46f3ab24e6f3dad7caefdd490ae3e",
+      "gate": {
+        "exit": 0,
+        "status": "pass",
+        "row_count": 1260,
+        "input_sha256": "f39e816f9b28af46ddcf6663a445265e67b46f3ab24e6f3dad7caefdd490ae3e",
+        "input_sha256_matches_file": true,
+        "failed_checks": [],
+        "checks_total": 12,
+        "versions": {
+          "exchange_calendars": "4.13.2",
+          "pandas": "3.0.6",
+          "pandera": "0.33.1",
+          "pyarrow": "25.0.1",
+          "python": "3.13.15"
+        },
+        "gate_result_file": "lean-five-252-gate-result.json",
+        "gate_result_sha256": "cff2237f66d30af7dd76a712975ee44c3e6cab61d8f958dd5b06b8b5aca6d261"
+      },
+      "parquet_duckdb": {
+        "duckdb": "1.5.5",
+        "parquet_sha256": "9bd40a6f0755ce80a0c2e67d3511f2b789e4df86ab9c7ecb48f2f355c46e59d8",
+        "parquet_bytes": 21784,
+        "parquet_mode": "0o444",
+        "parquet_writable_after_chmod": false,
+        "precision_loss_rows": 0,
+        "max_price_decimal_places_in_text": 4,
+        "precision_probe_1_23456_detected": true,
+        "csv_minus_parquet_rows": 0,
+        "parquet_minus_csv_rows": 0,
+        "queries": {
+          "rows": 1260,
+          "symbols": 5,
+          "first_session": "2020-04-01",
+          "last_session": "2021-03-31",
+          "sessions_per_symbol_min": 252,
+          "sessions_per_symbol_max": 252,
+          "symbols_with_full_range": 5,
+          "null_cells": 0,
+          "ohlc_inconsistent_rows": 0,
+          "return_aggregate_rows": 5,
+          "return_aggregate_sha256": "a59ec724ec30033fa85a83200f1061aa24ec342cd16ee3697709a2733b746610"
+        }
+      }
+    },
+    "lean-all-full": {
+      "tickers": [
+        "AAA",
+        "AAPL",
+        "AIG",
+        "BAC",
+        "BNO",
+        "EEM",
+        "FB",
+        "GOOG",
+        "GOOGL",
+        "IBM",
+        "IWM",
+        "QQQ",
+        "SPY",
+        "USO",
+        "UW",
+        "WM",
+        "WMI"
+      ],
+      "last_n_sessions": null,
+      "csv_sha256": "589d618c3fe1ccd66d179cfd3fc1b803d9dd26b69da17fdc169ae1ae581b38b9",
+      "gate": {
+        "exit": 0,
+        "status": "pass",
+        "row_count": 70011,
+        "input_sha256": "589d618c3fe1ccd66d179cfd3fc1b803d9dd26b69da17fdc169ae1ae581b38b9",
+        "input_sha256_matches_file": true,
+        "failed_checks": [],
+        "checks_total": 12,
+        "versions": {
+          "exchange_calendars": "4.13.2",
+          "pandas": "3.0.6",
+          "pandera": "0.33.1",
+          "pyarrow": "25.0.1",
+          "python": "3.13.15"
+        },
+        "gate_result_file": "lean-all-full-gate-result.json",
+        "gate_result_sha256": "ed72b7fc09c69af396e48b904bd83c35b73987c8473cd6109aef87910de84e3f"
+      },
+      "parquet_duckdb": {
+        "duckdb": "1.5.5",
+        "parquet_sha256": "cf254a71354a6adfaca3deb4c2eb4e847c0db7fdfec9afc7ac93487e83858006",
+        "parquet_bytes": 1100949,
+        "parquet_mode": "0o444",
+        "parquet_writable_after_chmod": false,
+        "precision_loss_rows": 0,
+        "max_price_decimal_places_in_text": 4,
+        "precision_probe_1_23456_detected": true,
+        "csv_minus_parquet_rows": 0,
+        "parquet_minus_csv_rows": 0,
+        "queries": {
+          "rows": 70011,
+          "symbols": 17,
+          "first_session": "1998-01-02",
+          "last_session": "2021-03-31",
+          "sessions_per_symbol_min": 135,
+          "sessions_per_symbol_max": 5849,
+          "symbols_with_full_range": 7,
+          "null_cells": 0,
+          "ohlc_inconsistent_rows": 0,
+          "return_aggregate_rows": 17,
+          "return_aggregate_sha256": "c4f6bc7daec2567b85f15a2d8ea8b85abbe7fae8b04d1b400d85ae318fcdd306"
+        }
+      }
+    }
+  },
+  "finished_at": "2026-09-23T06:01:32.948884+00:00"
+}

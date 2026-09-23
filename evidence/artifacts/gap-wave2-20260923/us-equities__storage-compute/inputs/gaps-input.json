@@ -1,0 +1,57 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "storage-compute",
+ "crosswalk": "main 92bb279, crosswalk PR #85",
+ "gaps": [
+  {
+   "index": 0,
+   "text": "DuckDB's retained runs cover a bundled LEAN historical simulation (6 order events) and artificial SEC-shaped fixtures. Neither is licensed US-equity market-data ingestion.",
+   "next_check": "Use pinned alpaca-py with the paper credentials to fetch daily IEX bars for about 5 symbols over 1 year, write immutable Parquet, and run the DuckDB catalyst/bars queries plus the Pandera gate on it. Record the feed=iex licence scope in the receipt.",
+   "prior_receipts": [
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/duckdb-regression.json",
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/financial-data-offline-regression.json",
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/sec-edgar-acquisition-deferred.json"
+   ]
+  },
+  {
+   "index": 3,
+   "text": "No throughput, concurrency or multi-writer measurement exists for DuckDB or any server or lake alternative (QuestDB, ClickHouse, Iceberg).",
+   "next_check": "Install pinned QuestDB, ClickHouse and pyiceberg (SQL catalog) in new prefixes. Generate a fixed-seed OHLCV dataset of about 50M rows and measure bulk-load throughput, query latency, and 1/4/8 concurrent writers/readers against DuckDB 1.5.5. Retain raw timings and versions.",
+   "prior_receipts": [
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/duckdb-regression.json",
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/financial-data-offline-regression.json",
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/sec-edgar-acquisition-deferred.json"
+   ]
+  },
+  {
+   "index": 4,
+   "text": "The Pandera promotion gate has retained fail-closed outputs only on synthetic 4-row CSV fixtures, run on 2026-09-22. According to blueprints/us-equities/data/README.md lines 119-124, no production bars/universe ingest produces a real snapshot yet.",
+   "next_check": "Fetch Alpaca IEX daily bars for a small universe, run the existing Pandera promotion gate on that real snapshot, and retain the pass/fail output and the snapshot hash.",
+   "prior_receipts": [
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/duckdb-regression.json",
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/financial-data-offline-regression.json",
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/sec-edgar-acquisition-deferred.json"
+   ]
+  },
+  {
+   "index": 6,
+   "text": "The research-runtime receipt says the paired Astra-to-Claude workflow was not executed (paired_model_workflow_executed false).",
+   "next_check": "Run the research-runtime paired workflow once (Codex gpt-6-astra stage, then a Claude review stage) on a retained research question, and record paired_model_workflow_executed with outputs, model IDs and usage.",
+   "prior_receipts": [
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/duckdb-regression.json",
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/financial-data-offline-regression.json",
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/sec-edgar-acquisition-deferred.json"
+   ]
+  },
+  {
+   "index": 10,
+   "text": "No retained comparison measures representative data volumes, concurrent writers/readers, latency, recovery or operational cost across storage candidates.",
+   "next_check": "Extend the same pinned DuckDB/QuestDB/ClickHouse/Iceberg benchmark with: a fixed-seed representative data volume, concurrent writer/reader latency percentiles, a kill-and-recover test per store, and disk/RAM footprint as the operational-cost proxy. Retain raw results.",
+   "prior_receipts": [
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/duckdb-regression.json",
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/financial-data-offline-regression.json",
+    "evidence/artifacts/gap-resolution-20260922/storage-compute/sec-edgar-acquisition-deferred.json"
+   ]
+  }
+ ]
+}

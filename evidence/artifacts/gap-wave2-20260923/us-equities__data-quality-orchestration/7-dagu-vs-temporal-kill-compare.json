@@ -1,0 +1,345 @@
+{
+  "id": "gap-wave2-20260923-us-equities-data-quality-orchestration-7-dagu-vs-temporal-kill-compare",
+  "gap_index": 7,
+  "gap_text_sha256": "96e62957e39c4a903d728a6af3062b61aad39f24f174b632bd25485aa48bae51",
+  "gap_text": "No measured comparison between orchestrators exists. The winner set rests on single-lane native and local evidence, not on a head-to-head test.",
+  "next_check": "Run the same disposable two-step kill-mid-step DAG under Dagu 2.16.6 and a local Temporal dev server. Compare failure retention, cancel behavior, post-threshold recovery (for Dagu, a retry after the 30 s and 90 s thresholds) and telemetry, recording both arms in one receipt.",
+  "preregistration": {
+    "written_at": "2026-09-23T05:16:19Z",
+    "expectation": "The same two-step workflow (step1: write started marker, sleep 20 s, write finished marker; step2 depends on step1) runs under Dagu 2.16.6 (disposable DAGU_HOME) and Temporal (gap-6 dev server). Expected: Dagu retains failed and aborted statuses and cancels via dagu stop; after SIGKILL of the executing dagu start process group, history stays 'running' and dagu retry is refused at >30 s and >90 s without a scheduler (as sota-refresh saw on 2.17.0); with an isolated dagu scheduler running for about 240 s after the kill, zombie detection may mark the run failed and allow retry (unknown). Temporal recovers the killed worker's activity on a restarted worker after the heartbeat timeout without manual action. Telemetry: Dagu exposes Prometheus metrics from its server; Temporal exposes OTel spans and server metrics.",
+    "criteria": "The comparison is recorded iff both arms run the failure, cancel and kill scenarios and both are captured in one receipt with raw outputs. The outcome is settled only if every arm, including the 30 s and 90 s Dagu retries and a telemetry capture for each engine, is executed; a single-host single-run comparison is labelled as such."
+  },
+  "commands": [
+    "attempt 1 (harness defect, disclosed): timeout 900 python3 $H/dagu_arm.py --dagu $C/bin/dagu-2.16.6/dagu --work $C/w-kill-2166 --scenario kill --port 18671 --sched-port 18672 --tag g2k2166 --step-sleep 20 --scheduler-wait 300 --out $C/raw/7-dagu-kill-2.16.6.json   (renamed afterwards to 7-dagu-kill-2.16.6-attempt1-marker-bug.json)",
+    "attempt 2 (after the fix-round preregistration): timeout 900 python3 $H/dagu_arm.py --dagu $C/bin/dagu-2.16.6/dagu --work $C/w-kill-2166b --scenario kill --port 18673 --sched-port 18674 --tag g2k2166b --step-sleep 20 --scheduler-wait 300 --out $C/raw/7-dagu-kill-2.16.6.json",
+    "(inside dagu_arm.py kill) dagu start --run-id g2k2166b-kill-1 <dag> in its own session; os.killpg(pgid, SIGKILL) about 2 s after step1's started marker appeared (harness clock t=2.3 s); dagu history --format json; dagu ps; dagu retry --run-id g2k2166b-kill-1 g2k2166b-kill at +35 s and +95 s; dagu scheduler --dagu-home <home> started at +95 s, dagu history polled every 15 s; dagu retry after status left running; dagu server + GET /api/v1/metrics",
+    "find <home>/data/dag-runs -name status.jsonl | per-attempt status summary > 7-dagu-kill-attempt-records.txt",
+    "Dagu failure and cancel arms: the 2.16.6 hosting run of gap 3 (dagu_arm.py --scenario hosting, tag g2h2166): step1 'exit 23' -> dependent step; step1 'sleep 60' -> dagu stop",
+    "Temporal arm: timeout 900 bash $H/run_temporal.sh $T $C/tvenv/bin/python3 $C/w-temporal-fr2 17733 17740 (gap 6 fix round 2; round 1 used $C/w-temporal), TwoStep workflow scenarios happy / retry / fail_hard / cancel / kill"
+  ],
+  "results": {
+    "kill_mid_step": {
+      "dagu_2.16.6": {
+        "step1_started_before_kill": true,
+        "kill": "SIGKILL of the dagu start process group about 2 s after step1's started marker appeared (harness clock t=2.3 s; step1 sleeps 20 s)",
+        "status_immediately_after_kill": "running",
+        "dagu_ps_after_kill": "g2k2166b-kill  g2k2166b-kill-1  5f76b3   2026-09-23T05:26:18Z  g2k2166b-kill  yes",
+        "retry_at_35s": {
+          "exit": 1,
+          "stderr": "already running. dag-run ID=g2k2166b-kill-1, socket=/tmp/@dagu_g2k2166b-kill_dc928d.sock",
+          "status_after": "running"
+        },
+        "retry_at_95s": {
+          "exit": 1,
+          "stderr": "already running. ...",
+          "status_after": "running"
+        },
+        "scheduler": {
+          "started_s_after_kill": 95.1,
+          "log": [
+            "01:28:40 Proc entry appears stale ... stale_count=1 threshold=3",
+            "01:29:25 ... stale_count=2",
+            "01:30:10 Confirmed zombie DAG run, updated to failed status ... stale_count=3"
+          ],
+          "status_running_until_s": 215.4,
+          "status_failed_at_poll_s": 230.5
+        },
+        "retry_after_zombie": {
+          "s_after_kill": 250.8,
+          "exit": 0,
+          "status_after": "succeeded",
+          "log": "DAG run finished ... status=succeeded started-at=2026-09-23T01:30:11-04:00 finished-at=2026-09-23T01:30:31-04:00"
+        },
+        "markers": {
+          "step1.finished": [
+            "1790141431"
+          ],
+          "step1.started": [
+            "1790141178",
+            "1790141411"
+          ],
+          "step2.ran": [
+            "1790141431"
+          ]
+        },
+        "step1_reexecuted_from_scratch": true,
+        "attempt_records": "attempt 5f76b3 status 2 (failed) 01:26:18-01:30:10; attempt b421b7 status 4 (succeeded) 01:30:11-01:30:31, same dag-run id"
+      },
+      "temporal_1.9.1_server_1.32.0": {
+        "kill": "SIGKILL of the worker process group 2 s after step1 started (20 s activity, heartbeat every 1 s, heartbeat_timeout 5 s); replacement worker launched 3.1 s after the kill (measured, fix round 2)",
+        "status_immediately_after_kill": "WORKFLOW_EXECUTION_STATUS_RUNNING",
+        "pending_after_kill": [
+          {
+            "activity": "step1",
+            "state": "PENDING_ACTIVITY_STATE_STARTED",
+            "attempt": 1
+          }
+        ],
+        "result": [
+          "step1 done attempt 2",
+          "step2 done"
+        ],
+        "seconds_from_kill_to_completion": 24.8,
+        "history": "ACTIVITY_TASK_STARTED step1 attempt 2 lastFailure \"activity Heartbeat timeout\" -> ACTIVITY_TASK_COMPLETED -> step2 -> WORKFLOW_EXECUTION_COMPLETED",
+        "markers": {
+          "g2-kill.step1.finished": [
+            "1790142150 attempt=2 pid=678083"
+          ],
+          "g2-kill.step1.started": [
+            "1790142123 attempt=1 pid=674921",
+            "1790142130 attempt=2 pid=678083"
+          ],
+          "g2-kill.step2.ran": [
+            "1790142150 pid=678083"
+          ]
+        },
+        "manual_action": "none (only starting a worker)",
+        "kill_at_utc": "2026-09-23T05:42:05Z",
+        "round_1": "completed 24.9 s after the kill (launch delay then reported as a hardcoded 3 s)"
+      }
+    },
+    "failure_retention": {
+      "dagu": "exit-23 step1 -> status failed, CLI exit 1, dependent step aborted; the killed attempt stays on disk as a failed attempt record next to the succeeded retry; history rows kept across a server restart",
+      "temporal": "non-retryable ActivityError -> WORKFLOW_EXECUTION_FAILED with the failure message in history; retryable failure recorded as lastFailure \"injected failure on attempt 1\" on the attempt-2 ACTIVITY_TASK_STARTED; statuses kept across a dev-server restart"
+    },
+    "cancel": {
+      "dagu": "dagu stop -> exit 0, cancelled dagu start exit 0, status aborted",
+      "temporal": "temporal workflow cancel -> exit 0 'Canceled workflow'; history WORKFLOW_EXECUTION_CANCEL_REQUESTED, ACTIVITY_TASK_CANCEL_REQUESTED, WORKFLOW_EXECUTION_CANCELED; step1 finished marker absent"
+    },
+    "telemetry": {
+      "dagu": "Prometheus text at /api/v1/metrics of dagu server: dagu_dag_runs_total{status=\"succeeded\"} 1, dagu_dag_run_duration_seconds_sum{dag=\"g2k2166b-kill\"} 20, dagu_info{version=\"2.16.6\"} 1; no trace/span output (the 2.16.6 DAG and config schemas have no OpenTelemetry key). The killed attempt is not visible as a separate metric series after the retry.",
+      "temporal": "SDK TracingInterceptor spans (32 across 5 traces) plus server Prometheus metrics; in the fix-round-2 scrape workflow_success read 2 although 3 workflows completed (round 1 read 3), so the counter lagged at scrape time. The killed attempt's span was lost; the event history keeps it."
+    },
+    "summary": "On this host, Temporal recovered the killed step automatically in 24.8 s (fix round 2; 24.9 s in round 1) (heartbeat timeout plus retry on a new worker). Dagu 2.16.6 kept the run in running and refused dagu retry at 35 s and 95 s; recovery needed a running dagu scheduler to confirm the zombie (about 230 s after the kill with default 45 s x 3 checks) and then a manual dagu retry, which re-ran step1 from scratch and succeeded. Both engines retained failed and cancelled runs and history across a restart. Temporal exported traces; Dagu exposed Prometheus metrics only."
+  },
+  "outcome": "settled",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Dagu kill arm: one valid run (attempt 2) plus a disclosed defective attempt 1 that showed the same running/refused/zombie-at-about-230-s pattern; Temporal kill arm: two runs (round 1 and fix round 2), 24.9 s and 24.8 s. Times are single-host observations, not distributions.",
+    "The Dagu failure and cancel arms come from the gap-3 hosting run on the same 2.16.6 binary with two-step dependent fixtures (step1 exit 23 -> step2; step1 sleep 60 -> step2), not from the kill DAG file itself; the Temporal arms all used the one TwoStep workflow.",
+    "The two kills are not identical in what they remove: Dagu's dagu start process is both orchestrator and executor for a local run, while Temporal keeps orchestration state in the server and only the worker was killed. That asymmetry is the design difference being compared.",
+    "Dagu thresholds were upstream defaults (lock 30 s, heartbeat stale 90 s, zombie interval 45 s x 3); the scheduler was started 95 s after the kill, so the observed 230 s bound depends on that start time and the 45 s cadence.",
+    "Temporal ran on the dev server (sqlite) with a 5 s heartbeat timeout and an unsandboxed workflow runner; no production cluster.",
+    "Telemetry comparison is capability-level (what each engine emits), not a collector-side join; neither arm was sent to the host observability stack.",
+    "This receipt does not change the layer winner set; that adjudication belongs to the ledger owner."
+  ],
+  "checked_at": "2026-09-23T05:42:35Z",
+  "fixround_preregistration": {
+    "written_at": "2026-09-23T05:26:05Z",
+    "label": "fix round 1, written after attempt 1 and before attempt 2",
+    "reason": "Attempt 1 (tag g2k2166) referenced $MARKS inside the Dagu step, but Dagu 2.16.6 only passes env names listed in env_passthrough, so step markers went to \"/\" and failed with Permission denied. The kill still landed mid-step1 (status running after SIGKILL at t=17 s of a 20 s sleep), but the post-scheduler retry failed because of the harness defect, so it cannot show whether Dagu recovers.",
+    "expectation": "With absolute marker paths: history stays running after SIGKILL; dagu retry refused at >30 s and >90 s (\"already running\"); the isolated scheduler confirms the zombie about 225-235 s after the kill and sets failed (attempt 1 saw this at about 230 s); a dagu retry after that re-executes step1 from scratch and then step2, ending succeeded.",
+    "criteria": "Recovery is recorded as demonstrated iff the post-scheduler retry exits 0, history ends succeeded, and step1.started has two lines (original plus re-execution) with step2.ran present. Otherwise the observed statuses are recorded as they are."
+  },
+  "command_variables": {
+    "C": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration",
+    "H": "<worktree>/blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration",
+    "T": "$C/temporal/temporal (1.9.1)"
+  },
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/7-dagu-kill-2.16.6.json",
+      "original_sha256": "0320ef1cb9511e880b939246da368e9281b419dbf9ecec9377fe2b474da9487f",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/7-dagu-kill-2.16.6.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "3edfc40acc9eed57ae1eb1ddb5c811277ef7aea008507e0b9278f14ea8486c9b",
+      "bytes": 15676
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/7-dagu-kill-2.16.6.stdout.txt",
+      "original_sha256": "5f9a16085d196b5322766054aa6b681149c9b5a96f85b19efe430e5a70a79f13",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/7-dagu-kill-2.16.6.stdout.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "5f9a16085d196b5322766054aa6b681149c9b5a96f85b19efe430e5a70a79f13",
+      "bytes": 4008
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/7-dagu-kill-scheduler.log",
+      "original_sha256": "a6afad089caf0fe66a87fa62f5d22a72d48e77b82f5f24e564ca5a546a6559bb",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/7-dagu-kill-scheduler.log",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "68921539265ad9418c931dc21cd59085c8bbe2a8bae9b7f433944d9151161caf",
+      "bytes": 3491
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/7-dagu-kill-attempt-records.txt",
+      "original_sha256": "162c572c2d46b6f4eb29ce8d707f5a580004f1464c146024eda9b76137745bc2",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/7-dagu-kill-attempt-records.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "162c572c2d46b6f4eb29ce8d707f5a580004f1464c146024eda9b76137745bc2",
+      "bytes": 605
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/7-dagu-kill-2.16.6-attempt1-marker-bug.json",
+      "original_sha256": "5218cc2d137b3516b26e545fa260374d83e39e0eca70b2bb8595b82952e370a7",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/7-dagu-kill-2.16.6-attempt1-marker-bug.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "1a9f44a0ffb2d3da93cf0da51725c409f6f73854e370d925243a252702313faf",
+      "bytes": 15476
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/7-dagu-kill-attempt1-scheduler.log",
+      "original_sha256": "25271ac81221f10cbabe3819a213eadf1628c7059a63875a4c2b85198af1d0e5",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/7-dagu-kill-attempt1-scheduler.log",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "905865fcfc677d88e5ee423ad5705d1bc989c45642405424ad271d6a74f0aaf2",
+      "bytes": 3470
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/3-hosting-2.16.6.json",
+      "original_sha256": "205c7da5da8b7921a2ddbcb4dfd89959721e8afa2166d7dc1a91272979dcbaec",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/3-hosting-2.16.6.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "6b09dec538907436a521d784ad77edb5b0df3446a648c6d4d5439fb7ed55b829",
+      "bytes": 12585
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-drive-fr2.json",
+      "original_sha256": "899652c15edd68e611aa273ff904ea6b6846b8dc03a4749be6d3b53091495b42",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/drive.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "899652c15edd68e611aa273ff904ea6b6846b8dc03a4749be6d3b53091495b42",
+      "bytes": 10496
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-kill.json",
+      "original_sha256": "9af9ad85ccbcf4d862467c018456266773f589e14048d20ee5a2fbf7a8695b56",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/history-g2-kill.json",
+      "uuids_redacted": 7,
+      "base64_payloads_sanitized": 3,
+      "sha256": "08649f131736016b87a2c00dc287372e8ac485b95feaa79882594e75597bef21",
+      "bytes": 11964
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-fail-hard.json",
+      "original_sha256": "9e89de85f3e55d35e3133095c7679bec921651827224f4f6eeea8b28c786e17c",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/history-g2-fail-hard.json",
+      "uuids_redacted": 5,
+      "base64_payloads_sanitized": 2,
+      "sha256": "470c5d7ea2088a8f68579e08441025564abe18e317aad903f9fbf9e3a089a37a",
+      "bytes": 11351
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-cancel.json",
+      "original_sha256": "103bd4b1ea3746e09a1394157968493697654e743d0caca92be457a5aa630322",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/history-g2-cancel.json",
+      "uuids_redacted": 4,
+      "base64_payloads_sanitized": 2,
+      "sha256": "7da6666536126aee3d86b2575f3dad450c1d8858ac635a3e5faa0c394ba633f3",
+      "bytes": 7055
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-retry.json",
+      "original_sha256": "6815da5a637c2d4d034a8025a12df58e0aeaa310f050a92a4cc0f196d53b14be",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/history-g2-retry.json",
+      "uuids_redacted": 7,
+      "base64_payloads_sanitized": 3,
+      "sha256": "ab21ce7d598d0e8f19ecbc2a8e49f8d7a4581cf0aff000f12395b027706ee2ec",
+      "bytes": 13492
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-list-before-restart.json",
+      "original_sha256": "a7f3d8252b115d74abfd7c269e1ca23d24be53305f828aa10a974d03cf958425",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/list-before-restart.json",
+      "uuids_redacted": 10,
+      "base64_payloads_sanitized": 0,
+      "sha256": "5457daffa11708b03e8b3802fc4dc0eb9bb8cef61f538cac55527ee1c904ca5d",
+      "bytes": 4412
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-list-after-restart.json",
+      "original_sha256": "a7f3d8252b115d74abfd7c269e1ca23d24be53305f828aa10a974d03cf958425",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/list-after-restart.json",
+      "uuids_redacted": 10,
+      "base64_payloads_sanitized": 0,
+      "sha256": "5457daffa11708b03e8b3802fc4dc0eb9bb8cef61f538cac55527ee1c904ca5d",
+      "bytes": 4412
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-spans-worker-1.jsonl.txt",
+      "original_sha256": "9329dfbd613ec5008d218e9429338a01d6730266a84154825466e8d572f94197",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/spans-worker-1.jsonl",
+      "uuids_redacted": 23,
+      "base64_payloads_sanitized": 0,
+      "sha256": "98e95cc58a44903b4825fa5cc2fc1b8dbb1d2421db607a5b986b4106b4db0da7",
+      "bytes": 8250
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-spans-worker-2.jsonl.txt",
+      "original_sha256": "8aa8cad4f5173f87d4c01d73715dcf50ab039ce2c05e4074343b0ef005a71221",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/spans-worker-2.jsonl",
+      "uuids_redacted": 4,
+      "base64_payloads_sanitized": 0,
+      "sha256": "c98fec18df19cc018151d710d9ee89353873227848bfafdfa591039fda59394b",
+      "bytes": 1451
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-server-metrics-outcomes-fr2.txt",
+      "original_sha256": "78bab9d6bcfd9d73405fe932b6cabd402db63201dd1870c5c6565c0fa3a97e0f",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/6-temporal-server-metrics-outcomes-fr2.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "78bab9d6bcfd9d73405fe932b6cabd402db63201dd1870c5c6565c0fa3a97e0f",
+      "bytes": 1325
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-r1-drive.json",
+      "original_sha256": "ba3e1645540cf0429b1e20c23fd08b06359643018a4424b6fb83efd9022f334f",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal/drive.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "ba3e1645540cf0429b1e20c23fd08b06359643018a4424b6fb83efd9022f334f",
+      "bytes": 10359
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-first-round-mtimes.txt",
+      "original_sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/0-first-round-mtimes.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce",
+      "bytes": 923
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+      "original_sha256": "765352de082804501782e86a64029211bf1504edbf823d3aba4f8ae77753b7c8",
+      "source": "<ephemeral session scratchpad>/g2dqo-review.md",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "dd0283b76a5c85ea9aff1c3506538b1aa02fc7f221fd12b8f361d9576ca254f4",
+      "bytes": 3926
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "tag": "g2k2166",
+      "outcome": "harness defect: $MARKS was not passed into the Dagu step (no env_passthrough), so markers failed and the post-zombie retry exited 1 with \"cannot create /step1.finished: Permission denied\". It still showed running after SIGKILL, refusal at 35 s and 95 s, and zombie confirmation at about 230 s. Kept as disclosed evidence, not used for the recovery result."
+    },
+    {
+      "attempt": 2,
+      "tag": "g2k2166b",
+      "outcome": "used for the result above"
+    }
+  ],
+  "fixround2_preregistration": {
+    "written_at": "2026-09-23T05:40:45Z",
+    "label": "fix round 2, written after the independent review and before the reruns",
+    "reason": "Independent Codex review (codex exec --sandbox read-only --ephemeral, 2026-09-23) found: base64 Temporal payloads still carried the host home path; *.jsonl raw files were gitignored and so not committed; several provenance claims (checksum verification, archive size, modal version, fresh --require-hashes sync, installed versions) had no retained raw output; raw outputs lacked capture timestamps; and the Temporal harness hardcoded the second-worker launch delay as 3 s.",
+    "expectation": "The Temporal side is re-cited from the gap-6 fix-round rerun (measured launch delay). The Dagu side is unchanged (attempt 2). Expect Temporal to recover the killed step automatically again.",
+    "criteria": "The comparison stays settled only if the rerun Temporal kill scenario again completes without manual action; its measured times replace the first-run numbers."
+  },
+  "review": {
+    "reviewer": "one codex exec --sandbox read-only --ephemeral call (Codex account) with blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration/review_prompt.md; output retained as raw/0-codex-review-r1.md",
+    "raw": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+    "findings_for_this_receipt": "Findings 2 and 7 (span files not committed; hardcoded worker delay) affected the Temporal side. Resolved by the fix-round-2 rerun and *.jsonl.txt naming; the Temporal recovery result reproduced."
+  }
+}

@@ -1,0 +1,18 @@
+{
+ "meanrisk_min_variance": {
+  "fills_matched": 34,
+  "account_transitions_matched": 97,
+  "nonzero_distribution_credits": 30,
+  "dividend_cash_usd": "138948.42",
+  "ending_cash_native": "2207656.15",
+  "native_total_return": "1.20765615"
+ },
+ "hrp_variance": {
+  "fills_matched": 66,
+  "account_transitions_matched": 129,
+  "nonzero_distribution_credits": 63,
+  "dividend_cash_usd": "111669.90",
+  "ending_cash_native": "2451556.98",
+  "native_total_return": "1.45155698"
+ }
+}

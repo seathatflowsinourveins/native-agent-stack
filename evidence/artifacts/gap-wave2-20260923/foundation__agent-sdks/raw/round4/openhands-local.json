@@ -1,0 +1,53 @@
+{
+  "mode": "local",
+  "pid": 90540,
+  "started_at": 1790173788.8770366,
+  "event_types": [
+    "SystemPromptEvent",
+    "MessageEvent",
+    "ActionEvent",
+    "ObservationEvent",
+    "ActionEvent",
+    "ObservationEvent",
+    "ActionEvent",
+    "ObservationEvent"
+  ],
+  "actions": [
+    "FileEditorAction",
+    "TerminalAction",
+    "FinishAction"
+  ],
+  "tool_names": [
+    "file_editor",
+    "terminal",
+    "finish"
+  ],
+  "execution_status": "ConversationExecutionStatus.FINISHED",
+  "sdk_metrics": {
+    "accumulated_token_usage": {
+      "model": "default",
+      "prompt_tokens": 18201,
+      "completion_tokens": 239,
+      "cache_read_tokens": 0,
+      "cache_write_tokens": 0,
+      "reasoning_tokens": 0,
+      "context_window": 0,
+      "per_turn_token": 6307,
+      "response_id": ""
+    },
+    "accumulated_cost": 0.0
+  },
+  "status": "ok",
+  "provider_delta": {
+    "vllm:prompt_tokens_total": 18201.0,
+    "vllm:generation_tokens_total": 239.0,
+    "finished_by_reason": {
+      "stop": 3.0
+    },
+    "seconds": 13.429
+  },
+  "proof_file_exists": true,
+  "proof_file_has_token": true,
+  "token_in_prompt_only": true,
+  "finished_at": 1790173802.3273559
+}

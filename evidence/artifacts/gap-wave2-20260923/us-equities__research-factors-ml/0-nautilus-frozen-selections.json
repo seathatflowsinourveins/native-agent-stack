@@ -1,0 +1,132 @@
+{
+  "id": "gap-wave2-20260923-research-factors-ml-0-nautilus-frozen-selections",
+  "layer_id": "research-factors-ml",
+  "catalog": "us-equities",
+  "gap_index": 0,
+  "gap_text_sha256": "f06338eacf83aaa6f0df20983c7752628ddf91c7e5c25fad68ea44ce434c7ae2",
+  "gap_text": "The skfolio receipt covers a selected ETF sample (SPY, QQQ, IWM), not a point-in-time equity universe. Labels are raw-price, not total-return, and each candidate has only 11 complete reserved episodes. It records no alpha, P&L, fill, dividend or cash reconciliation, and no new LEAN or Nautilus engine execution.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:19:39Z",
+    "written_at_note": "Upper bound: the commit time of the first preregistration commit (4484138). Written between 06:18:35Z and that commit; corrected in the same unpushed commit before any check ran.",
+    "source": "preregistration.json gaps.0",
+    "expectation": "The frozen selections (each development fold's chosen candidate applied to its evaluation episodes, and the reserved-2021Q1 momentum20 selection) execute in a NautilusTrader 2.0.0rc5 BacktestEngine with fills at session opens, a 10 bp/side taker fee, and every cash transition reconciling exactly. Raw-price per-episode price ratios equal evaluate.py gross_price_label. Dividends are handled in two arms: RAW bars with dividends computed independently from LEAN factor files (not credited in engine cash), and ADJ bars (raw price times LEAN price factor, dividend-inclusive).",
+    "criteria": [
+      "Every scheduled order fills once at the arm's session open price; independent fill audit passes for every fill (side, qty, price, commission).",
+      "Every account-report cash transition equals independent Decimal arithmetic; final open orders and positions are zero.",
+      "RAW arm: fill price ratio exit_open/entry_open per episode equals evaluate.py gross_price_label + 1 for the traded asset (exact Decimal).",
+      "Strategy-internal momentum decision recomputed from the close ticks it receives equals the frozen schedule's weights at every decision.",
+      "Dividend amounts reported per ex-date held; ADJ minus RAW ending equity is compared to credited-equivalent dividend income as a consistency check (sign and order of magnitude, not exact, because ADJ reinvests).",
+      "Outcome ceiling: advanced. PIT universe, total-return labels inside evaluate.py, episode count, alpha and in-engine dividend cash crediting (peer-owned dividend SimulationModule) remain outside this check."
+    ],
+    "fix_rounds": [
+      {
+        "written_at": "2026-09-23T06:37:00Z",
+        "label": "fix round 1 (gaps 0 and 10), written after round-1 Nautilus output was seen",
+        "trigger": "Round 1: RAW arms reconciled exactly; both ADJ arms failed the cash-sequence audit ('cash sequence mismatch', 'final cash 89651.82 != independent 89651.9250'; reserved '100814.92 != 100814.9167') and the realized-PnL identity. ADJ prices have 4 decimals, so qty*price has sub-cent notional; the independent arithmetic did not round it.",
+        "diagnosis": "Testing five rounding rules against round-1 development-ADJ reports: per-fill notional rounded to cents with ROUND_HALF_EVEN matched all 276 cash transitions (HALF_UP 163, DOWN/FLOOR 5, CEILING 6). Per-position realized PnL matched round_half_even(qty*(exit-entry)) - fees in 136/138 positions; the 2 others differ by 0.01 at exact half-cent ties (consistent with binary floating-point rounding).",
+        "change": "Audit v2 rounds each fill notional to cents with ROUND_HALF_EVEN before the cash update (declared engine currency-precision convention, fitted on development-ADJ round 1; the reserved-ADJ arm's 20 fills act as a check that was not used for fitting). Realized PnL is checked per position with tolerance 0.01 USD; the sum residual against the cash delta is reported, not asserted. Strategy, schedule, prices and engine configuration are unchanged; round-1 outputs are retained.",
+        "criteria": [
+          "All four arms: every cash transition equals independent arithmetic under the declared rule.",
+          "Per-position realized PnL within 0.01 USD of independent value; report count of exact matches and total residual."
+        ]
+      }
+    ]
+  },
+  "commands": [
+    "$HOME/.local/share/codex-ecosystem/tools/nautilus-2.0.0rc5/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/nautilus_rerun.py --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30 --folds $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-purge/results.json --out $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-nautilus-round1   # round 1, exit 0, audit v1",
+    "$HOME/.local/share/codex-ecosystem/tools/nautilus-2.0.0rc5/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/nautilus_rerun.py --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30 --folds $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-purge/results.json --out $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-nautilus   # round 2 after fix round 1, exit 0, audit v2"
+  ],
+  "results": {
+    "round1_verbatim": "RAW development/reserved reconciled: true. ADJ development problems: ['cash sequence mismatch', 'final cash 89651.82 != independent 89651.9250', 'realized pnl -10348.11 != cash delta -10348.0750']; ADJ reserved: ['cash sequence mismatch', 'final cash 100814.92 != independent 100814.9167', 'realized pnl 814.91 != cash delta 814.9167'].",
+    "round2": [
+      "RAW development: 249 episodes (138 invested, 111 cash), 276 fills, fees 27073.48 USD, ending cash 87359.71 (engine 87359.71), realized-PnL check 138/138 exact, reconciled true, strategy momentum recomputation 249 checked / 0 mismatches, parity fill ratio == evaluate gross_price_label 138/138, dividends entitled but not credited 2542.51 USD over 10 ex-dates, max daily-volume participation 0.0000812.",
+      "ADJ development (dividend-inclusive back-adjusted prices): 276 fills, fees 27407.36, ending cash 89651.82 (engine 89651.82), realized-PnL 136/138 exact, max abs diff 0.01, sum residual 0.07 USD, reconciled true; adjusted-price momentum would differ from the frozen raw decision at 6 of 249 decisions (diagnostic; the frozen schedule was traded).",
+      "RAW reserved 2021Q1 (momentum20): 11 episodes (10 invested), 20 fills, fees 2079.93, ending cash 100808.61, net 808.61, 11/11 decisions match, 10/10 parity exact, dividends entitled 0 (no held position spans a record close).",
+      "ADJ reserved: 20 fills, fees 2080.04, ending cash 100814.92, reconciled true.",
+      "ADJ minus RAW development ending cash = 2292.11 USD vs 2542.51 USD of independently computed RAW-equivalent dividends: same sign and magnitude; not equal because ADJ reinvests through prices and trades different share counts.",
+      "inputs_unchanged true; engine nautilus_trader 2.0.0rc5."
+    ]
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "detection_method": "The audit compares every fill, commission and account-report cash total against independent Decimal arithmetic and fails on any difference. It demonstrably fires: round 1 flagged the ADJ sub-cent notional rounding. RAW parity compares Decimal fill-price ratios to evaluate.label exactly; the strategy recomputes momentum from its own ticks and is compared to the frozen weights.",
+  "remaining": "Selected ETF sample, not a point-in-time universe; evaluate.py labels remain raw-price (total-return labels were not added to evaluate.py); 11 reserved episodes; no alpha claim. The engine does not credit dividend cash: RAW dividends are computed outside the engine and ADJ embeds them in back-adjusted prices that were not tradable historically. In-engine dividend crediting belongs to the peer-owned dividend SimulationModule (sota-workflow-resolution).",
+  "limits": [
+    "Fills are at the session open trade tick with no spread, queue or impact; the synthetic tick size is the whole session volume.",
+    "The Nautilus CASH account and 10 bp per side fee are declared conventions, not a broker fee schedule.",
+    "Dividend amounts come from LEAN factor files (ref_close * (1 - pf_D/pf_next)), not from an independent corporate-action source.",
+    "The ADJ half-even notional rounding rule was fitted on round-1 development-ADJ output; the reserved-ADJ arm (20 fills) was not used for fitting."
+  ],
+  "raw_outputs": [
+    {
+      "path": "raw/nautilus-round1/run-nautilus-round1__summary.json",
+      "committed_sha256": "d8272a08f8578330d02a11685d95fbc57872eeb42da07607edba868a6d1a0729",
+      "original_sha256": "d8272a08f8578330d02a11685d95fbc57872eeb42da07607edba868a6d1a0729",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/nautilus-round1/logs__nautilus-round1.stdout",
+      "committed_sha256": "7228de8a0e760939327d6c6b0ae0ffc330771e5937ed8c57c4751c48415a0f7a",
+      "original_sha256": "7228de8a0e760939327d6c6b0ae0ffc330771e5937ed8c57c4751c48415a0f7a",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/nautilus-round1/run-nautilus-round1__development-ADJ.reports.json",
+      "committed_sha256": "325795407fc2932c9a32c23d76fef10aaee56ef7b84916b9d921b1dfabbbb442",
+      "original_sha256": "f1f1ab5d456eb8971c5b6f87678b4ac3b27410151c6619c6ee26860c999554fd",
+      "uuids_redacted": 687
+    },
+    {
+      "path": "raw/nautilus/run-nautilus__summary.json",
+      "committed_sha256": "1089e537363c9af3f58f664e0ec4c47b1c8b0cedc59b729808b472c33a90662c",
+      "original_sha256": "1089e537363c9af3f58f664e0ec4c47b1c8b0cedc59b729808b472c33a90662c",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/nautilus/logs__nautilus.stdout",
+      "committed_sha256": "364e1b6f508fccdbde2ffb496e45c1e70ed6fd6a4d8f59f0ffe0d5474dce5873",
+      "original_sha256": "364e1b6f508fccdbde2ffb496e45c1e70ed6fd6a4d8f59f0ffe0d5474dce5873",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/nautilus/run-nautilus__development.schedule.json",
+      "committed_sha256": "8cfc589080e5426ba3db35b050d8c3d48d9adb1931687097350ef9a547f8f69a",
+      "original_sha256": "8cfc589080e5426ba3db35b050d8c3d48d9adb1931687097350ef9a547f8f69a",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/nautilus/run-nautilus__reserved.schedule.json",
+      "committed_sha256": "a9f978ae3cf23ef82f9ad1540b2dcb144e1c38a8c39ba2ccfa663a6f71de03e1",
+      "original_sha256": "a9f978ae3cf23ef82f9ad1540b2dcb144e1c38a8c39ba2ccfa663a6f71de03e1",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/nautilus/run-nautilus__development-RAW.reports.json",
+      "committed_sha256": "b7b3631f8dd7f7bc38ab445c5a409eaa079417008b9a6bcb89c95b6341063ee1",
+      "original_sha256": "41e53c88855c9bd8117102b2eab00e4deefb995f1c0d81978a84ce31514ec3cc",
+      "uuids_redacted": 687
+    },
+    {
+      "path": "raw/nautilus/run-nautilus__development-ADJ.reports.json",
+      "committed_sha256": "a0157d406ae45f91cab2e999515d2780e9d106cd641101d3d6abd9c7fd9c984f",
+      "original_sha256": "bcab98572a1cac2e87e609c379fec7c31e814f54f1b65fae8ca67344e2c43048",
+      "uuids_redacted": 687
+    },
+    {
+      "path": "raw/nautilus/run-nautilus__reserved-RAW.reports.json",
+      "committed_sha256": "4887c4cbbb1d6f4ffd9278a61e39fce1673396734fcd19fdbe2b0bbdc7d48fd1",
+      "original_sha256": "d22528f08907e53f2c426ddb924c91458f869a4744d2f271a988bf794ea51909",
+      "uuids_redacted": 47
+    },
+    {
+      "path": "raw/nautilus/run-nautilus__reserved-ADJ.reports.json",
+      "committed_sha256": "f755fa98632dcf4eeb767b9830cfe57419c0eb45bbd5aa5f94d1fb61525a1a00",
+      "original_sha256": "706408b6ee474cb633b82ee4902f46f1890a549e54e4a86216e0a409c69e1001",
+      "uuids_redacted": 47
+    }
+  ],
+  "checked_at": "2026-09-23T07:09:07Z",
+  "checked_at_note": "mtime of the last check output, $CACHE/run-fcmp-merged-r2/results.json. Corrected from 07:15:00Z, which post-dated its own commit 01e6054 (07:11:23Z); correction written 2026-09-23 after 13:37Z.",
+  "base_commit": "41d39b3",
+  "branch": "claude/g2-research-factors-ml-20260923"
+}

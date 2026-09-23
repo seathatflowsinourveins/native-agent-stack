@@ -1,0 +1,9 @@
+{
+  "gap_index": 6,
+  "written_at": "2026-09-23T05:52:16Z",
+  "round": 2,
+  "label": "fix-round (late relative to round 1, written before round 2)",
+  "expectation": "Round 2 verifier additionally reconstructs both prompts with run_worker.native_prompt and requires their sha256 to equal the receipt's astra.prompt_sha256 and claude.prompt_sha256 (the Claude prompt embeds the accepted Astra report). A second negative control edits a finding in a copied Astra report and updates its report hash in the copied receipt, so only the handoff (prompt-hash) check can fail. Expected: real receipt passes; control fails only the Claude prompt-hash check.",
+  "criteria": "covered_elsewhere stands if both prompt hashes reconstruct and the handoff control fails as expected.",
+  "note": "Fix-round preregistration, written after round 1 and the Codex gpt-6-astra read-only review of a0f57fa, before any round-2 command ran."
+}

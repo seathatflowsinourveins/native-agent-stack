@@ -1,0 +1,10 @@
+{
+  "step": "schema",
+  "started_at": "2026-09-23T13:01:27Z",
+  "generate_exit_code": 0,
+  "native_version": "codex-cli 0.155.1",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr_tail": "Traceback (most recent call last):\n  File \"$HOME/code/nas-wt-g2-agent-sdks/blueprints/gap-wave2-20260923/foundation__agent-sdks/schema_dispatch.py\", line 127, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"$HOME/code/nas-wt-g2-agent-sdks/blueprints/gap-wave2-20260923/foundation__agent-sdks/schema_dispatch.py\", line 86, in main\n    s = sample(pschema, root, full)\n  File \"$HOME/code/nas-wt-g2-agent-sdks/blueprints/gap-wave2-20260923/foundation__agent-sdks/schema_dispatch.py\", line 59, in sample\n    return {k: sample(props[k], root, full, depth + 1) for k in keys if k in props}\n               ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/code/nas-wt-g2-agent-sdks/blueprints/gap-wave2-20260923/foundation__agent-sdks/schema_dispatch.py\", line 59, in sample\n    return {k: sample(props[k], root, full, depth + 1) for k in keys if k in props}\n               ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/code/nas-wt-g2-agent-sdks/blueprints/gap-wave2-20260923/foundation__agent-sdks/schema_dispatch.py\", line 33, in sample\n    schema = resolve(schema, root)\n  File \"$HOME/code/nas-wt-g2-agent-sdks/blueprints/gap-wave2-20260923/foundation__agent-sdks/schema_dispatch.py\", line 26, in resolve\n    while \"$ref\" in schema:\n          ^^^^^^^^^^^^^^^^\nTypeError: argument of type 'bool' is not iterable\n",
+  "finished_at": "2026-09-23T13:01:40Z"
+}

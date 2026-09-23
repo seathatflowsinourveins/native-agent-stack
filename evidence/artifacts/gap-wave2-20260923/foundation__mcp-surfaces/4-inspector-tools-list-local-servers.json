@@ -1,0 +1,154 @@
+{
+ "id": "gap-wave2-20260923-foundation-mcp-surfaces-4",
+ "gap_index": 4,
+ "gap_text_sha256": "4fb960f410f79ac075e92a679018dddc6c785a372901f1a56e9cd76b51cf1106",
+ "gap_text": "The Inspector evidence covers only a stdio arithmetic call ('42 computed'). It does not certify the full client plugin, hooks, project-file scope or desktop connection (saturation-audit.json line 4844). Recipe Inspector calls such as tools/list against other servers did not appear in the receipts I opened.",
+ "next_check": "Run `npx @modelcontextprotocol/inspector --cli <server> --method tools/list` against the configured local servers (e.g. ai-memory, jcodemunch) and record the results; Desktop connectivity remains a separate check.",
+ "preregistration": {
+  "written_at": "2026-09-23T03:54:03Z",
+  "expectation": "`mcp-inspector --cli ... --method tools/list` succeeds against the isolated ai-memory HTTP server and jcodemunch stdio server and lists their tools.",
+  "criteria": "The next_check's tools/list arms settle only the 'tools/list against other servers did not appear' clause. The gap text also names full client plugin, hooks, project-file scope and Desktop connection; Desktop and plugin hooks are out of reach here, so the expected outcome is advanced even if both tools/list calls pass.",
+  "source": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/preregistrations.json",
+  "addenda": [
+   {
+    "written_at": "2026-09-23T04:24:12Z",
+    "label": "added arm, written after the isolated-fixture runs and before this arm ran",
+    "expectation": "Inside the namespace, before the owned services start, connecting to 49374/16333 is refused (probe that would detect live contact). Then: installed mcporter 0.13.13 with the unmodified $HOME/codex-ecosystem/config/mcporter.json lists context-mode, ai-memory and socraticode and runs ctx_execute_file (agent-lab README.md), memory_status (0 counts = owned store) and codebase_status; the retained ad-hoc jcodemunch --stdio call and the Inspector context-mode arithmetic call (42) pass. Inspector with agent-lab's unmodified .mcp.json lists tools for serena, ai-memory and socraticode from inside the project, calls memory_status and codebase_status, fails without --config (no cwd auto-discovery), fails with a relative --config from outside, and with an absolute --config from outside runs codebase_status against the OUTSIDE cwd (the .mcp.json socraticode entry sets no cwd).",
+    "criteria": "Gap 0: settled only if every retained call passes on the unmodified host config and binaries (context-mode start.mjs from the read-only plugin cache may fail; that is reported, not hidden). Gap 8 remains advanced (no Desktop/plugin/hooks)."
+   },
+   {
+    "written_at": "2026-09-23T04:36:13Z",
+    "label": "FIX ROUND 1, written after the round-1 independent review (raw/review-codex-round1.txt, received 04:35:13Z) and before the fix-round runs",
+    "expectation": "Re-running the bridge matrix, both lifecycle fixtures and the unmodified-config arm inside unshare -rnm with an empty tmpfs mounted over $HOME/.mcporter (the shared daemon's socket path does not exist there) gives the same outcomes. A connect probe to the shared socket path inside the namespace returns ENOENT, while the same probe against the owned daemon socket connects. That owned control shows the probe detects a reachable socket. wong2 interactive listing is executed x3 for all 5 servers and renders at most one page (10 tools). With a lock holder that EXITS ON ITS OWN (sleep with a fixed lifetime, no harness kill), a call made while the lock is held times out after 45 s, a second call while still held also fails, and the first call after the holder exits succeeds with no step taken by the harness or the operator.",
+    "criteria": "Gap 10 and the no-contact claim in the other receipts are settled only by the enforced (tmpfs + netns) runs with the probe and owned control recorded. Gap 12/6: settled only if every wong2 list arm executed (interactive), with incompleteness reported as a result. Gap 9: the startup-timeout conclusion is restated to match what the natural-expiry arm shows."
+   }
+  ]
+ },
+ "checked_at": "2026-09-23T13:09:10Z",
+ "arms": [
+  {
+   "arm": "Inspector --cli --method tools/list against ai-memory (HTTP) and jcodemunch (stdio)",
+   "status": "executed",
+   "detail": {
+    "ai-memory": {
+     "all_pass": true,
+     "exits": [
+      0,
+      0,
+      0
+     ],
+     "median_ms": 266
+    },
+    "jcodemunch": {
+     "all_pass": true,
+     "exits": [
+      0,
+      0,
+      0
+     ],
+     "median_ms": 816
+    }
+   }
+  },
+  {
+   "arm": "same against the other retained local servers",
+   "status": "executed",
+   "detail": {
+    "context-mode": {
+     "all_pass": true,
+     "exits": [
+      0,
+      0,
+      0
+     ],
+     "median_ms": 377
+    },
+    "socraticode": {
+     "all_pass": true,
+     "exits": [
+      0,
+      0,
+      0
+     ],
+     "median_ms": 457
+    },
+    "codebase-memory": {
+     "all_pass": true,
+     "exits": [
+      0,
+      0,
+      0
+     ],
+     "median_ms": 4418
+    }
+   }
+  },
+  {
+   "arm": "tools/list against agent-lab's configured .mcp.json servers (unmodified file, namespace)",
+   "status": "executed",
+   "detail": {
+    "serena": 1,
+    "ai-memory": 0,
+    "socraticode": 0
+   }
+  },
+  {
+   "arm": "full client plugin, hooks, Desktop connection",
+   "status": "not_executed",
+   "detail": "no Desktop client or plugin-hook host in this environment; next_check marks Desktop as separate"
+  }
+ ],
+ "commands": [
+  "$HOME/.local/share/codex-ecosystem/bin/mcp-inspector --cli --config $HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/bridges-20260923T043746Z/state/mcp.json --server ai-memory --method tools/list",
+  "$HOME/.local/share/codex-ecosystem/bin/mcp-inspector --cli --config $HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/bridges-20260923T043746Z/state/mcp.json --server jcodemunch --method tools/list",
+  "node $HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js --cli --config .mcp.json --server serena --method tools/list   # cwd $HOME/code/agent-lab",
+  "node $HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js --cli --config .mcp.json --server ai-memory --method tools/list   # cwd $HOME/code/agent-lab",
+  "node $HOME/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js --cli --config .mcp.json --server socraticode --method tools/list   # cwd $HOME/code/agent-lab"
+ ],
+ "results": [
+  "fixture tools/list: {'ai-memory': {'all_pass': True, 'exits': [0, 0, 0], 'median_ms': 266}, 'jcodemunch': {'all_pass': True, 'exits': [0, 0, 0], 'median_ms': 816}, 'context-mode': {'all_pass': True, 'exits': [0, 0, 0], 'median_ms': 377}, 'socraticode': {'all_pass': True, 'exits': [0, 0, 0], 'median_ms': 457}, 'codebase-memory': {'all_pass': True, 'exits': [0, 0, 0], 'median_ms': 4418}}",
+  "agent-lab .mcp.json tools/list exits: {'serena': 1, 'ai-memory': 0, 'socraticode': 0}",
+  "serena failure: OSError: [Errno 30] Read-only file system: '$HOME/.local/share/codex-ecosystem/context/serena-home/logs/2026-09-23/mcp_20260923-005120_4036839.txt' {\"error\":{\"code\":\"error\",\"message\":\"Connection closed\"}} (the serena-context wrapper writes logs under $HOME/.local/share/codex-ecosystem/context/serena-home regardless of HOME; read-only in the namespace)",
+  "ai-memory tools/list first tool: { \"tools\": [ { \"name\": \"memory_auto_improve\", \"description\": \"Run manual auto-improvement for one completed session and "
+ ],
+ "outcome": "advanced",
+ "note": "Inspector 2.7.0 tools/list now has receipts against ai-memory (HTTP) and jcodemunch (stdio), plus context-mode, SocratiCode and codebase-memory, all passing 3 of 3. It also passed for agent-lab's configured ai-memory and SocratiCode. Serena failed only because its wrapper writes logs into the read-only ecosystem directory. Remaining: full client plugin, hook behavior and Desktop connectivity. Project-file scope is covered by gap 8.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "Servers ran with owned state only (temp HOME/XDG, MCPORTER_DAEMON_DIR under $HOME/.cache/gap-wave2-20260923, owned ai-memory --data-dir and Qdrant storage). Fix round 1 runs are ENFORCED: unshare -rnm with an empty tmpfs over $HOME/.mcporter and a fresh network namespace (enforce.py / ns_exact.py). Inside, an AF_UNIX connect to the shared daemon socket path returned 'FileNotFoundError: No such file or directory' and TCP 49374/16333 returned 'ConnectionRefusedError: Connection refused', while the same AF_UNIX probe against each owned daemon socket returned ['connected'] (owned control, so the probe can detect a reachable socket). Round-1 runs (raw/round1/) set only environment-level isolation; their stat() of the shared daemon (pid, socket inode, metadata mtime) could not detect a client connection, so they are not cited for the no-contact claim.",
+  "/tmp was not isolated; SocratiCode reported another process watching the agent-lab checkout, i.e. it read host watcher state.",
+  "Serena's tools/list could not complete under the read-only mount; it was not retried with a writable ecosystem dir (that would write shared state)."
+ ],
+ "raw_evidence": [
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/bridges-matched.json",
+   "sha256": "50ee509141f31e7aebe75cd45f08dea288c2dbc85bd7b2da3de6dde54d0e18ff"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/bridges-matched.enforce.json",
+   "sha256": "6088f9c5ab68df745dcf8722243ebf38ac58aa6b9067282467f4caf18fa3c8c6"
+  },
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/ns-exact-config.json",
+   "sha256": "c3b2ac4b5ee45236946750465a8474ea7dccece0f236dbc9f110ee8eb63e9504"
+  }
+ ],
+ "helper_scripts": [
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/iso.py",
+   "sha256": "29677ff5175f71676feb6ea379fdb255f48f1a8fb69d7f3e909ddc66a6b28560"
+  },
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/enforce.py",
+   "sha256": "64ea85756615270fb848351797b680115ba54f91a10405e805716b6983bd0833"
+  },
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/run_bridges.py",
+   "sha256": "5ebad3ba47b27abefb866108fb19685fe8a7474230849e24a6723be3a00d353f"
+  },
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/ns_exact.py",
+   "sha256": "f7010cfa4fab79e52978d5e4b1540a8798e0d603d98fbb4bde577d7d18fbfb7d"
+  }
+ ]
+}
