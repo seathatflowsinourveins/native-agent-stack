@@ -6319,6 +6319,11 @@
       "bytes": 869
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/evidence/alpaca-account-schema-20260923.json",
+      "sha256": "260f393d1acb9268f18b81413f0d2c9082a1762dbc7334adf75a3dc63903ea41",
+      "bytes": 1727
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/exits.py",
       "sha256": "189133e6df99bda201d73d36a15f45ccbfb38979a3319ae6f75d077f5db5b3df",
       "bytes": 7049
@@ -6400,8 +6405,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "7cc57e6305a8d4bb1806532895de82373fbcc27970e8c72460a935111db97201",
-      "bytes": 94565
+      "sha256": "94f7cdfe32aefe0aeb3e92ece16200c858a95dd61e2ce0d9c03c5318ac9e893d",
+      "bytes": 96987
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -6425,7 +6430,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "bdb8363c06ee85107b2461ecc965be60b669f015dc4ac0d31cc32878d51b1bb9",
+      "sha256": "fbe08571a958642ec4b158b2c2a83f9cff1cd1ce118137837184b47c731eca19",
       "bytes": 4661
     },
     {
@@ -6440,8 +6445,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "325f0817abc3607665c7a3d60c896721f9d667622bcf09ab00f9a4efa64f92a2",
-      "bytes": 46451
+      "sha256": "59ffbb35726b0909c9b9db9043f993242e9beb29329c0d851359617244b06934",
+      "bytes": 46491
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -8560,8 +8565,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "2159fdd3be82c5d20e8500a868999d03a4a4dbec397b9d67cac3fe60e65d7eba",
-      "bytes": 179499
+      "sha256": "44e20f2c66969b6281af5c47f585a2871c2e271427a3cab4dfaca9cfc03edf8c",
+      "bytes": 181016
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -8610,8 +8615,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "1e7de47b4c2ef57adf35b13912c7cae42184a61858a28ba0d17030e355c2bdec",
-      "bytes": 73869
+      "sha256": "31c127d82da4690b256c5d483a05fe8af59c2955e08f888412d525c3c3247d32",
+      "bytes": 75364
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9040,7 +9045,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "c4d18d82e9dd132b284dad5846a89491d7c8f122aa062e52548df531d845aac5",
+      "sha256": "a91a6c459f84085ed54e4cfcfe1198b53da01cce1492e52ff9d881e8df2001e8",
       "bytes": 18618
     },
     {
@@ -9325,8 +9330,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "26ac5cb6768a6ce624b3885e1500fb660097bd029930c39a538b833d997d637c",
-      "bytes": 14451
+      "sha256": "8b6c807bd90d7f5bd49d15e926e1a0e307d0fd1c416ddaafbd763fabd70c0cb4",
+      "bytes": 14833
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -13519,6 +13524,11 @@
       "bytes": 11763
     },
     {
+      "path": "evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json",
+      "sha256": "3d5a293615e6ddd3e82e9323e54f8784d46d7adaa94606ec373b81f9426a2a4e",
+      "bytes": 3875
+    },
+    {
       "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--difftastic--use--20260923.json",
       "sha256": "14c16d2fe0aabba2d953c2901b871253017bcd4626856b6a34792be269471f35",
       "bytes": 2116
@@ -14760,8 +14770,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "39aab2396aae673afe1c0d4cd18329da93058da45c65a8f36c8fb95c3f555700",
-      "bytes": 128471
+      "sha256": "e16392b12dc33e9af661c265f6125c39572a3ef526dbd6d88e889faa5d8f4878",
+      "bytes": 131943
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -14775,8 +14785,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "3a31bf896ee00b97ee141a6a5f16cb9b70df194dd38faad2d696060621648178",
-      "bytes": 40517
+      "sha256": "95d606e5aa79b4be25603ce77a8690c4008e59905a0e9bedbae4e73f538f3dd9",
+      "bytes": 41484
     },
     {
       "path": "tests/test_adoption_bootstrap.py",

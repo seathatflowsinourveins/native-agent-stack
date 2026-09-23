@@ -733,6 +733,19 @@ class LeverageNormalizeAccountTests(unittest.TestCase):
         raw.update(overrides)
         return raw
 
+    def test_current_alpaca_schema_normalizes_without_legacy_fields(self):
+        # Alpaca dropped daytrading_buying_power, pattern_day_trader and daytrade_count on 2026-07-06.
+        raw = {"cash": "10000", "equity": "10000", "buying_power": "40000", "status": "ACTIVE", "currency": "USD",
+               "trading_blocked": False, "account_blocked": False, "trade_suspended_by_user": False,
+               "shorting_enabled": True, "multiplier": "4", "regt_buying_power": "20000",
+               "maintenance_margin": "0", "initial_margin": "0"}
+        result = t.normalize_account(raw, include_margin=True)
+        for key in ("multiplier", "regt_buying_power", "maintenance_margin", "initial_margin", "buying_power"):
+            self.assertIn(key, result)
+        for key in ("daytrading_buying_power", "pattern_day_trader", "daytrade_count"):
+            self.assertNotIn(key, result)
+        self.assertNotIn("maintenance_margin", t.normalize_account(raw))
+
     def test_default_returns_exact_pre_change_key_set(self):
         result = t.normalize_account(self.raw_account())
         expected_keys = {"cash", "equity", "buying_power", "status", "currency", "trading_blocked",
