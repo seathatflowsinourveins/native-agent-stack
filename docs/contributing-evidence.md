@@ -166,7 +166,8 @@ machine (`host.second_physical_machine: true`), independently reviewed.
 
    The first command checks your new receipts against the schema rules
    (platform/component identity, id/path coherence, pass/exit coherence,
-   registration, and private-content scanning). The second is this
+   registration, reviewer independence, dates no later than 15 minutes past
+   the validating machine's clock, and private-content scanning). The second is this
    repository's general publication validator; it also re-checks that every
    file you touched is correctly hash-registered. The third confirms step 5's
    `--write` is current and enforces the macOS-acceptance flip rule (Section

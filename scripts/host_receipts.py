@@ -75,6 +75,10 @@ COMMAND_REQUIRED = ["cmd", "exit", "duration_s", "output_sha256", "output_excerp
 REVIEW_REQUIRED = ["kind", "ref", "verdict", "at_utc"]
 
 DEFAULT_TIMEOUT_S = 120
+# How far ahead of the validating machine's clock an observation or review may be dated
+# (clock skew between hosts). A later date would sort as the "latest" receipt or review and
+# could not be superseded, so validate refuses it.
+FUTURE_SKEW_S = 15 * 60
 MAX_EXCERPT_CHARS = 400
 
 
@@ -627,6 +631,14 @@ def cmd_record(args: argparse.Namespace) -> int:
         print(f"error: cannot record a receipt at {relative_path!r}: {error}")
         return 2
 
+    # Check the receipt against the schema before writing anything (for example an overlong
+    # --model), so a failed check never leaves a receipt that validate would reject.
+    shape_errors: list[str] = []
+    validate_receipt_shape(root, receipt, relative_path, shape_errors)
+    if shape_errors:
+        print("error: the receipt would not validate: " + "; ".join(shape_errors))
+        return 2
+
     # Validate (and register) before/around the final write, rolling back the file on any
     # registration failure, so a crash here can never leave a written-but-unregistered
     # receipt behind (the receipt file and manifests/evidence.json stay coherent together).
@@ -709,6 +721,11 @@ def cmd_review(args: argparse.Namespace) -> int:
         "kind": args.kind, "ref": args.ref, "verdict": args.verdict, "at_utc": now,
         "reviewer": identity_record(reviewer, args.model),
     })
+    shape_errors: list[str] = []
+    validate_receipt_shape(root, receipt, relative_path, shape_errors)
+    if shape_errors:
+        print("error: the reviewed receipt would not validate: " + "; ".join(shape_errors))
+        return 2
     path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     register_file(root, relative_path)
     print(relative_path)
@@ -826,6 +843,16 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
         at_utc = review.get("at_utc")
         if isinstance(at_utc, str) and isinstance(observed_at, str) and at_utc < observed_at:
             errors.append(f"{where}: review at_utc {at_utc} precedes observed_at_utc {observed_at}")
+
+    latest_allowed = datetime.fromtimestamp(time.time() + FUTURE_SKEW_S, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    dated = [("observed_at_utc", observed_at)] + [
+        (f"reviews[{index}].at_utc", review.get("at_utc")) for index, review in enumerate(reviews)
+        if isinstance(review, dict)]
+    for field, value in dated:
+        if isinstance(value, str) and ISO_UTC_PATTERN.fullmatch(value) and value > latest_allowed:
+            errors.append(f"{label}.{field}: {value} is later than this machine's clock allows "
+                          f"({latest_allowed}, {FUTURE_SKEW_S // 60} minutes of skew); a future date would stay "
+                          "the latest receipt or review")
 
     catalog_revision = receipt.get("catalog_revision")
     if isinstance(catalog_revision, str) and SHA_PATTERN.fullmatch(catalog_revision):

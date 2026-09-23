@@ -869,6 +869,59 @@ class RecorderRoundTripTests(unittest.TestCase):
             exit_code = self._run([*argv[:-1], "2.0.0rc5 (tag v2.0.0rc5)"])
         self.assertEqual(exit_code, 0, buffer.getvalue())
 
+    def test_overlong_model_is_refused_before_anything_is_written(self):
+        # Codex review of #117: a --model over the schema's 100 characters used to write a receipt
+        # that validate then rejected.
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands", "--model", "m" * 101,
+            ])
+        self.assertEqual(exit_code, 2, buffer.getvalue())
+        self.assertFalse((self.root / "evidence" / "hosts" / "test-host-20260101").exists())
+        evidence = json.loads((self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"))
+        self.assertEqual(evidence["files"], [])
+
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands",
+            ])
+        relative_path = out.getvalue().strip()
+        before = (self.root / relative_path).read_bytes()
+        with contextlib.redirect_stdout(io.StringIO()) as review_out:
+            exit_code = _run_cli(["review", "--root", str(self.root), "--receipt", relative_path, "--kind",
+                                  "independent_session", "--ref", "t", "--verdict", "agree", "--model", "m" * 101],
+                                 identity="test-reviewer")
+        self.assertEqual(exit_code, 2, review_out.getvalue())
+        self.assertEqual((self.root / relative_path).read_bytes(), before)
+
+    def test_validate_refuses_future_dated_observations_and_reviews(self):
+        # Codex review of #117: a future date would stay the "latest" receipt or review.
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands",
+            ])
+        path = self.root / out.getvalue().strip()
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        receipt["reviews"].append({"kind": "independent_session", "ref": "t", "verdict": "agree",
+                                   "at_utc": "2099-01-01T00:00:00Z",
+                                   "reviewer": {"identity_sha256": hr.identity_digest("x")}})
+        errors: list[str] = []
+        hr.validate_receipt_cross_references(self.root, path.parent.name, path, receipt, errors,
+                                             set(), set(), set(), {})
+        self.assertTrue(any("reviews[1].at_utc: 2099-01-01T00:00:00Z is later" in e for e in errors), errors)
+        receipt["observed_at_utc"] = "2099-01-01T00:00:00Z"
+        errors = []
+        hr.validate_receipt_cross_references(self.root, path.parent.name, path, receipt, errors,
+                                             set(), set(), set(), {})
+        self.assertTrue(any("observed_at_utc: 2099-01-01T00:00:00Z is later" in e for e in errors), errors)
+
     def test_review_from_the_recorders_identity_is_refused(self):
         exit_code, output = self._record_then_review(reviewer="test-recorder")
         self.assertEqual(exit_code, 2, output)

@@ -8634,8 +8634,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "ce2d029767a171cb0cada5165d3d18cb7c41ea5a407851500582b7860cfc9f96",
-      "bytes": 17686
+      "sha256": "bee6a10ddbbd42d49eec3f76ae785b3b9da0a108d404ad8824cf284107ddffad",
+      "bytes": 17780
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -14134,8 +14134,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "d65f69896e747aab24c8d637147475f0dbbd4575fec1ac64cef6ab63a6824f30",
-      "bytes": 55897
+      "sha256": "c95b004b8efec6a6295644def8a65f5c7bca1f5e895900a3c494fa91b21d1ca0",
+      "bytes": 57494
     },
     {
       "path": "scripts/landscape.py",
@@ -14474,8 +14474,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "8cf555c5bb3db8ee00b53235efae34946d2374b33578090dbe7f4e72ecec03f3",
-      "bytes": 57475
+      "sha256": "5a11f68bee22d1311375cacf88c68683c66e815f229fc30f2ee3290056905fe1",
+      "bytes": 60927
     },
     {
       "path": "tests/test_job_recovery.py",
