@@ -107,6 +107,60 @@ MANIFEST_CANDIDATE_SOURCE = "sota_manifest_layer_entries"
 # default occur only on selected candidates; decision review_status accepted_within_scope on 105
 # selected against 6 others). Evidence prose (evidence_scope, limitations, next_gap) stays.
 WITHHELD_DECISION_FIELDS = ("selection", "review_status")
+# --withhold-labels also strips popularity and recency signals (2026-09-23 peer audit: the upstream
+# record was copied verbatim, so every judge saw GitHub stars and push/release dates, which rank
+# candidates by attention rather than by the retained evidence). The explicit keys are the ones
+# build_manifest.upstream_record() and the GitHub API emit; any other key naming a count of stars,
+# forks, watchers or downloads, or a timestamp (``*_at``), is stripped the same way.
+POPULARITY_RECENCY_FIELDS = ("stars", "forks", "watchers", "pushed_at", "released_at")
+_POPULARITY_TOKENS = ("star", "fork", "watcher", "subscriber", "download", "popular", "trending")
+# Kept only when the packet's requirement text names them (a requirement about licensing or
+# maintenance status makes them evidence rather than a popularity proxy).
+REQUIREMENT_GATED_FIELDS = {"archived": ("archiv", "maintained", "maintenance"), "license": ("licen",)}
+# The packet copies of upstream metadata: each candidate's and each unclaimed sota component's.
+UPSTREAM_COPIES = ("candidates", "sota_components_not_in_candidates")
+
+
+def is_popularity_or_recency_key(key: str) -> bool:
+    lowered = key.lower()
+    return (lowered in POPULARITY_RECENCY_FIELDS or lowered.endswith("_at")
+            or any(token in lowered for token in _POPULARITY_TOKENS))
+
+
+def requirement_names(field: str, requirement) -> bool:
+    text = requirement.lower() if isinstance(requirement, str) else ""
+    return any(token in text for token in REQUIREMENT_GATED_FIELDS[field])
+
+
+def withhold_popularity(packet: dict) -> dict:
+    """Strip popularity and recency fields (and archived/license unless the requirement names
+    them) from every candidate and sota-component copy in a built packet, and list each stripped
+    field in ``withheld``. The canonical fields are always listed, so a reader can tell the
+    packet was built under this policy even when no copy carried upstream metadata."""
+    requirement = packet.get("requirement")
+    gated = [field for field in REQUIREMENT_GATED_FIELDS if not requirement_names(field, requirement)]
+    # Labels are relative to one copy: "upstream.<key>" inside the upstream record, "<key>" on the copy itself.
+    policy = {f"upstream.{field}" for field in list(POPULARITY_RECENCY_FIELDS) + gated}
+    stripped = {collection: set(policy) for collection in UPSTREAM_COPIES}
+    for collection in UPSTREAM_COPIES:
+        for item in packet.get(collection) or []:
+            if not isinstance(item, dict):
+                continue
+            for key in [key for key in item if key != "upstream" and is_popularity_or_recency_key(key)]:
+                del item[key]
+                stripped[collection].add(key)
+            upstream = item.get("upstream")
+            if isinstance(upstream, dict):
+                for key in [key for key in upstream if is_popularity_or_recency_key(key) or key in gated]:
+                    del upstream[key]
+                    stripped[collection].add(f"upstream.{key}")
+    withheld = list(packet.get("withheld", []))
+    for collection in UPSTREAM_COPIES:
+        for label in sorted(f"{collection}[].{key}" for key in stripped[collection]):
+            if label not in withheld:
+                withheld.append(label)
+    packet["withheld"] = withheld
+    return packet
 
 
 RULE_ITEM_RE = re.compile(r"\n(?=\d+\.\s)")
@@ -423,9 +477,12 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 else None,
             )
             if withhold and layer_candidates is None:
-                # Manifest-mode trading packets already carry no labels; leaving them untouched
-                # keeps their bytes (and every lane return sealed against them) unchanged.
+                # Manifest-mode trading packets already carry no decision labels.
                 packet = withhold_labels(packet)
+            if withhold:
+                # Every packet, manifest-mode trading packets included, loses popularity and
+                # recency signals; the default (no --withhold-labels) build is unchanged.
+                packet = withhold_popularity(packet)
             packets[packet_filename(catalog, row["layer_id"])] = serialize(packet)
     return packets
 
@@ -451,8 +508,10 @@ def parse_args(argv=None):
                              "so packets and verdicts agree on the pins.")
     parser.add_argument("--withhold-labels", action="store_true",
                         help="Drop decision-bearing labels (candidate and SOTA-component review_status, decision "
-                             "selection and review_status) from every ledger-built packet; manifest-built trading "
-                             "packets (--trading-candidates manifest) carry none and stay byte-identical. Off by "
+                             "selection and review_status) from every ledger-built packet, and popularity/recency "
+                             "fields (stars, forks, watchers, pushed_at, released_at, any *_at; archived and "
+                             "license unless the requirement names them) from every candidate and component copy "
+                             "of every packet; each stripped field is listed in the packet's withheld list. Off by "
                              "default so the 2026-09-22 packets reproduce.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
                         help="Candidate source for us-equities packets: the ledger row's group-wide list "

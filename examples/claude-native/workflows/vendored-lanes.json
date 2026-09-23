@@ -1,0 +1,15 @@
+{
+ "files": [
+  {
+   "agentlab_commit": "440da1d0e86ad5108760f46741c8afb4cd4ddd54",
+   "path": "layer-verdict-lane.js",
+   "records_in_its_return": "model {name: 'opus', effort: 'high'} only; tools/sota-convergence/claude_lane.py writes <work-dir>/claude/<catalog>__<layer_id>.json from the workflow result and adds model.family 'anthropic', the resolved model name (--resolved-model, for example claude-opus-5-5 from child-usage.mjs) and provenance {workflow_path, workflow_sha256, agentlab_commit}, refusing workflow bytes that are uncommitted or differ from this SHA256SUMS entry",
+   "sha256": "5cbf6becbc9cc5d15a070afebab322df895242b76f62a85a1aa620960984dd4a",
+   "source_path": ".claude/workflows/layer-verdict-lane.js",
+   "source_repository": "agent-lab",
+   "verified_identical_at_agentlab_commit": "c042ea75e96b66e6ab9abdbf38f4ac4e7e3ca385"
+  }
+ ],
+ "schema_version": 1,
+ "scope": "Workflow files vendored byte for byte from agent-lab so a host holding only this catalog can rerun the layer-verdict Claude lane (2026-09-23 peer audit). tools/sota-convergence/record_verdicts.py accepts a new-wave Claude lane return only when its provenance.workflow_sha256 equals this directory's SHA256SUMS entry for the named workflow. The lane prompt it fills is tools/sota-convergence/lane-prompt.md, already in this catalog."
+}

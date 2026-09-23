@@ -22,7 +22,14 @@ JSON object: ``lane`` is always forced to ``"codex"``; ``packet_sha256`` is
 filled from the packet file's own sha256 when the model did not set it;
 ``model`` is filled from whatever the event stream carried (else falls back
 to ``{"name": "unknown", "effort": <--effort>}``) only when the model's own
-response did not already set a usable ``model.name``. A failing attempt
+response did not already set a usable ``model.name``. Two runner-owned fields
+are always written by this script, never taken from the model (2026-09-23 peer
+audit): ``model.family`` is ``"openai"`` (``codex exec`` is OpenAI's CLI; a
+non-OpenAI model name then fails record_verdicts.py's family pattern), and
+``provenance`` is ``{codex_lane_py_sha256, prompt_sha256}`` -- the sha256 of
+this script file and of the prompt template it filled. The strict schema copy
+passed to ``codex exec`` omits both, since Codex strict output requires every
+listed property. A failing attempt
 (non-zero exit, timeout, missing or unparseable ``out.tmp``) is retried
 exactly once before the layer is recorded as failed and left for the next
 run (resumable). Nothing here validates the full lane-return JSON Schema --
@@ -64,12 +71,19 @@ SCHEMA_MAP_KEYWORDS = frozenset({"properties", "patternProperties", "$defs", "de
 DATA_KEYWORDS = frozenset({"const", "enum", "default", "examples"})
 
 
+def _top_level_lane_schema(schema) -> bool:
+    properties = schema.get("properties") if isinstance(schema, dict) else None
+    return isinstance(properties, dict) and "provenance" in properties and "lane" in properties
+
+
 def strict_output_schema(schema):
     """Return a copy of ``schema`` without keywords Codex strict output rejects."""
     if isinstance(schema, list):
         return [strict_output_schema(value) for value in schema]
     if not isinstance(schema, dict):
         return schema
+    if _top_level_lane_schema(schema):
+        schema = without_runner_owned(json.loads(json.dumps(schema)))
     strict = {}
     for key, value in schema.items():
         if key in STRICT_UNSUPPORTED_KEYWORDS:
@@ -81,6 +95,23 @@ def strict_output_schema(schema):
         else:
             strict[key] = strict_output_schema(value)
     return strict
+
+
+# Written by this runner, never asked of the model: (object path, property).
+RUNNER_OWNED_PROPERTIES = ((), "provenance"), (("model",), "family")
+
+
+def without_runner_owned(schema):
+    """Drop the runner-owned properties (and their ``required`` entries) from a lane schema copy."""
+    for path, name in RUNNER_OWNED_PROPERTIES:
+        node = schema
+        for step in path:
+            node = (node.get("properties") or {}).get(step) if isinstance(node, dict) else None
+        if isinstance(node, dict):
+            (node.get("properties") or {}).pop(name, None)
+            if isinstance(node.get("required"), list):
+                node["required"] = [item for item in node["required"] if item != name]
+    return schema
 
 
 def write_strict_schema(schema_path: Path, codex_dir: Path) -> Path:
@@ -281,8 +312,17 @@ def extract_events_summary(events: list):
     return model_name, usage
 
 
+LANE_FAMILY = "openai"
+
+
+def lane_provenance(prompt_path: Path) -> dict:
+    """What produced a return: this runner file's and the filled prompt template's sha256."""
+    return {"codex_lane_py_sha256": sha256_file(Path(__file__).resolve()),
+            "prompt_sha256": sha256_file(Path(prompt_path))}
+
+
 def finalize_lane_return(data: dict, catalog: str, layer_id: str, packet_sha256: str,
-                          event_model_name, effort: str) -> dict:
+                          event_model_name, effort: str, provenance: dict = None) -> dict:
     data = dict(data)
     data["lane"] = LANE
     if not data.get("packet_sha256"):
@@ -294,6 +334,12 @@ def finalize_lane_return(data: dict, catalog: str, layer_id: str, packet_sha256:
             "name": event_model_name or existing.get("name") or "unknown",
             "effort": existing.get("effort") or effort,
         }
+    else:
+        data["model"] = dict(model_field)
+    # Runner-owned: never trust a self-declared family or provenance.
+    data["model"]["family"] = LANE_FAMILY
+    if provenance is not None:
+        data["provenance"] = dict(provenance)
     return data
 
 
@@ -360,6 +406,7 @@ def main(argv=None) -> int:
 
     events_dir.mkdir(parents=True, exist_ok=True)
     strict_schema_path = write_strict_schema(schema_path, codex_dir)
+    provenance = lane_provenance(prompt_path)
     usage_lock = threading.Lock()
     failures: list = []
 
@@ -413,7 +460,8 @@ def main(argv=None) -> int:
                 tmp_out.unlink(missing_ok=True)
                 continue
 
-            final = finalize_lane_return(data, catalog, layer_id, packet_sha256, last_model_name, args.effort)
+            final = finalize_lane_return(data, catalog, layer_id, packet_sha256, last_model_name, args.effort,
+                                         provenance)
             out_path.write_text(json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
             tmp_out.unlink(missing_ok=True)
             succeeded = True

@@ -4,7 +4,10 @@ No network, no real catalogs -- a minimal fixture root is built per test.
 Modules are loaded by file path (tools/sota-convergence is not a dotted-import
 package name), matching the pattern already used by test_sota_convergence.py.
 """
+import contextlib
+import hashlib
 import importlib.util
+import io
 import json
 import tempfile
 import unittest
@@ -311,6 +314,112 @@ class BuildVerdictsTests(LayerVerdictFixture):
         narrative_heading = text.index("### foundation (per-layer narrative)")
         row_heading = text.index("#### Native clients (native-clients)")
         self.assertLess(narrative_heading, row_heading)
+
+
+class WaveFreezeTests(LayerVerdictFixture):
+    """Per-wave CI (2026-09-23 peer audit): a later wave must not break the default
+    ``--check``. Each wave document is frozen and hash-registered; only the newest wave and
+    the handbook block are regenerated from the current rows."""
+
+    LATER = "20260923"
+
+    def later_manifest(self):
+        self.write(f"catalogs/sota-convergence/manifest-{self.LATER}.json", {
+            "foundation": [{"layer": "native-clients", "title": "Native clients", "components": [
+                {"id": "codex-native-sdk", "pin": "2.0", "upstream": {"latest": "2.0"},
+                 "review_status": "confirmed_default", "pin_behind_upstream": False}]}],
+            "trading": [{"layer": "market-data-reference", "entries": [
+                {"id": "alpaca-py", "pin": "3.0", "upstream": {"latest": "3.0"},
+                 "review_status": "confirmed_default", "pin_behind_upstream": False}]}],
+        })
+
+    def record_later_wave_on_the_foundation_row(self, gap="re-recorded in the later wave"):
+        """What record_verdicts.py --run-id 20260923 --write does to a row: new lanes pointing
+        at the later sealed base and changed verdict fields; the trading row stays on 20260922."""
+        foundation = json.loads((self.root / "catalogs/landscape/foundation.json").read_text())
+        row = foundation["layers"][0]
+        row["open_gaps"] = [gap]
+        row["checked_at"] = "2026-09-23"
+        row["lanes"] = {"claude": {"run_id": f"foundation-native-clients-{self.LATER}", "sealed_sha256": ""},
+                        "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "pending",
+                        "sealed_base": f"evidence/artifacts/layer-verdicts-{self.LATER}"}
+        self.write("catalogs/landscape/foundation.json", foundation)
+
+    def two_waves(self):
+        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        self.first_wave_bytes = self.out_path().read_bytes()
+        self.later_manifest()
+        self.record_later_wave_on_the_foundation_row()
+        self.assertEqual(build_verdicts.main(
+            ["--write", "--root", str(self.root), "--run-id", self.LATER, "--checked-at", "2026-09-23"]), 0)
+
+    def later_out(self):
+        return self.root / f"catalogs/sota-convergence/layer-verdicts-{self.LATER}.json"
+
+    def check(self, *extra):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            code = build_verdicts.main(["--check", "--root", str(self.root), *extra])
+        return code, output.getvalue()
+
+    def test_a_later_wave_leaves_the_default_check_passing(self):
+        self.two_waves()
+        code, output = self.check()
+        self.assertEqual(code, 0, output)
+        # The frozen first wave was not regenerated from the changed rows.
+        self.assertEqual(self.out_path().read_bytes(), self.first_wave_bytes)
+        later = json.loads(self.later_out().read_text(encoding="utf-8"))
+        self.assertEqual(later["id"], f"layer-verdicts-{self.LATER}")
+        self.assertIn("re-recorded in the later wave", self.handbook_text())
+
+    def test_each_wave_is_registered_by_hash(self):
+        self.two_waves()
+        registry = json.loads((self.root / build_verdicts.WAVE_REGISTRY).read_text(encoding="utf-8"))
+        by_run = {wave["run_id"]: wave for wave in registry["waves"]}
+        self.assertEqual(set(by_run), {"20260922", self.LATER})
+        self.assertEqual(by_run["20260922"]["sha256"], hashlib.sha256(self.first_wave_bytes).hexdigest())
+        self.assertEqual(by_run[self.LATER]["sha256"], hashlib.sha256(self.later_out().read_bytes()).hexdigest())
+
+    def test_a_hand_edited_frozen_wave_fails_its_registered_hash(self):
+        self.two_waves()
+        self.out_path().write_bytes(self.first_wave_bytes.replace(b'"schema_version": 1', b'"schema_version":  1'))
+        code, output = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn("registered sha256", output)
+
+    def test_a_row_still_naming_the_frozen_wave_cannot_change(self):
+        self.two_waves()
+        trading = json.loads((self.root / "catalogs/landscape/us-equities.json").read_text())
+        trading["layers"][0]["open_gaps"] = ["edited after the wave was frozen"]
+        self.write("catalogs/landscape/us-equities.json", trading)
+        code, output = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn("us-equities/market-data-reference", output)
+        self.assertIn("20260922", output)
+
+    def test_the_newest_wave_is_regenerated_from_the_current_rows(self):
+        self.two_waves()
+        self.record_later_wave_on_the_foundation_row(gap="a second correction in the same wave")
+        self.assertEqual(self.check()[0], 1)
+        # --write without --run-id rewrites the current (newest) wave only.
+        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        self.assertEqual(self.check()[0], 0)
+        self.assertEqual(self.out_path().read_bytes(), self.first_wave_bytes)
+        self.assertIn("a second correction in the same wave", self.later_out().read_text(encoding="utf-8"))
+
+    def test_an_older_wave_cannot_be_rewritten(self):
+        self.two_waves()
+        with self.assertRaises(SystemExit):
+            build_verdicts.main(["--write", "--root", str(self.root), "--run-id", "20260922"])
+        self.assertEqual(self.out_path().read_bytes(), self.first_wave_bytes)
+
+    def test_rows_of_an_unregistered_wave_fail_the_check(self):
+        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        self.later_manifest()
+        self.record_later_wave_on_the_foundation_row()
+        code, output = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn(self.LATER, output)
 
 
 if __name__ == "__main__":

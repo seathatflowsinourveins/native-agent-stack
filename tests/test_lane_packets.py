@@ -591,11 +591,87 @@ class WithholdLabelsUnitTests(unittest.TestCase):
 
 
 class WithholdWithManifestModeTests(ManifestTradingCandidatesTests):
-    def test_manifest_mode_trading_packets_are_unchanged_by_withholding(self):
-        plain = self.build(trading_candidates="manifest")
-        withheld = self.build(trading_candidates="manifest", withhold=True)
-        self.assertEqual(plain["us-equities__layer-b.json"], withheld["us-equities__layer-b.json"])
-        self.assertNotEqual(plain["foundation__layer-a.json"], withheld["foundation__layer-a.json"])
+    def test_manifest_mode_trading_packets_only_lose_popularity_and_recency_when_withheld(self):
+        # Manifest-mode trading packets carry no decision labels, so --withhold-labels changes
+        # them only by the popularity/recency strip (2026-09-23 peer audit); every other field
+        # stays as the plain build wrote it.
+        plain = json.loads(self.build(trading_candidates="manifest")["us-equities__layer-b.json"])
+        withheld = json.loads(self.build(trading_candidates="manifest", withhold=True)["us-equities__layer-b.json"])
+        for key in set(plain) | set(withheld):
+            if key != "withheld":
+                self.assertEqual(scrub_popularity(plain[key]), withheld[key], key)
+        self.assertEqual(plain["withheld"], withheld["withheld"][:len(plain["withheld"])])
+        self.assertIn("candidates[].upstream.stars", withheld["withheld"])
+        self.assertFalse({key for key in keys_anywhere(withheld) if key in POPULARITY_RECENCY_KEYS})
+        plain_all = self.build(trading_candidates="manifest")
+        withheld_all = self.build(trading_candidates="manifest", withhold=True)
+        self.assertNotEqual(plain_all["foundation__layer-a.json"], withheld_all["foundation__layer-a.json"])
+
+
+# Popularity/recency keys a --withhold-labels packet must never carry (2026-09-23 peer audit:
+# lane_packets copied candidates[].upstream verbatim, so judges saw GitHub stars and push dates).
+POPULARITY_RECENCY_KEYS = ("stars", "forks", "watchers", "pushed_at", "released_at")
+
+
+def keys_anywhere(value):
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield key
+            yield from keys_anywhere(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from keys_anywhere(item)
+
+
+def scrub_popularity(value):
+    """The expected withheld form of a plain packet value: every popularity/recency key and
+    archived/license (no fixture requirement names them) removed at any depth."""
+    if isinstance(value, dict):
+        return {key: scrub_popularity(item) for key, item in value.items()
+                if key not in POPULARITY_RECENCY_KEYS + ("archived", "license")}
+    if isinstance(value, list):
+        return [scrub_popularity(item) for item in value]
+    return value
+
+
+class WithholdPopularityAndRecencyTests(LanePacketsFixture):
+    def test_withheld_packets_carry_no_popularity_or_recency_field(self):
+        plain = self.build()
+        self.assertIn('"stars"', "".join(plain.values()), "the fixture must exercise upstream stars")
+        self.assertIn('"pushed_at"', "".join(plain.values()))
+        # Manifest-mode trading packets are covered by WithholdWithManifestModeTests (they need
+        # the domain catalog cards that fixture adds).
+        for trading_candidates in ("ledger",):
+            packets = self.build(withhold=True, trading_candidates=trading_candidates)
+            for name, text in packets.items():
+                packet = json.loads(text)
+                found = sorted({key for key in keys_anywhere(packet) if key in POPULARITY_RECENCY_KEYS})
+                self.assertEqual(found, [], f"{name} ({trading_candidates}) still carries {found}")
+                for key in ("stars", "pushed_at", "released_at"):
+                    self.assertIn(f"candidates[].upstream.{key}", packet["withheld"], name)
+                    self.assertIn(f"sota_components_not_in_candidates[].upstream.{key}", packet["withheld"], name)
+
+    def test_archived_and_license_are_kept_only_where_the_requirement_names_them(self):
+        packets = self.build(withhold=True)
+        packet = json.loads(packets["foundation__layer-a.json"])
+        uploads = [c["upstream"] for c in packet["candidates"] if c.get("upstream")]
+        self.assertTrue(uploads, "the fixture must match an upstream record")
+        self.assertTrue(all("license" not in u and "archived" not in u for u in uploads))
+        self.assertIn("candidates[].upstream.license", packet["withheld"])
+        ledger = self.read("catalogs/landscape/foundation.json")
+        ledger["layers"][0]["requirement"] = "Use a permissively licensed, non-archived tool."
+        self.write("catalogs/landscape/foundation.json", ledger)
+        packet = json.loads(self.build(withhold=True)["foundation__layer-a.json"])
+        uploads = [c["upstream"] for c in packet["candidates"] if c.get("upstream")]
+        self.assertTrue(all("license" in u and "archived" in u for u in uploads))
+        self.assertNotIn("candidates[].upstream.license", packet["withheld"])
+        self.assertNotIn("stars", json.dumps(uploads))
+
+    def test_default_mode_keeps_upstream_metadata_byte_identical(self):
+        plain = self.build()
+        self.assertEqual(plain, self.build(withhold=False))
+        packet = json.loads(plain["foundation__layer-a.json"])
+        self.assertTrue(any((c.get("upstream") or {}).get("stars") is not None for c in packet["candidates"]))
 
 if __name__ == "__main__":
     unittest.main()

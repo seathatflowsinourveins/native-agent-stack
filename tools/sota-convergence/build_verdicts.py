@@ -14,16 +14,30 @@ runs a lane or claims an execution result -- it only republishes whatever the
 ledger rows and the sota manifest already record, in a fixed deterministic
 shape (``json.dumps(..., sort_keys=True)``).
 
-Modes: ``--check`` (default) recomputes both outputs in memory and exits 1 on
-any difference from what is currently checked in; ``--write`` recomputes and
-writes them.
+Waves (2026-09-23 peer audit). Every dated wave's
+``catalogs/sota-convergence/layer-verdicts-<run-id>.json`` is registered by
+sha256 in ``catalogs/sota-convergence/layer-verdict-waves.json``. A row names
+its wave through ``lanes.sealed_base`` (absent means the 2026-09-22 wave). The
+current wave is the newest run id (lexicographic; dated ``YYYYMMDD`` ids sort
+chronologically) present in the rows or the registry; every older wave is frozen.
+
+Modes: ``--check`` (default) verifies every registered wave document (a) byte
+for byte against its registered sha256 and (b) against the current rows whose
+``lanes.sealed_base`` names that wave, and fails when a row names a wave with
+no registered document. It regenerates only the current wave's document and
+the handbook's generated block from the current rows. ``--check --run-id X``
+verifies wave X alone. ``--write`` regenerates the current wave (or
+``--run-id X`` when X is not older than the current wave), writes the handbook
+block and registers the new sha256; it refuses to rewrite a frozen wave.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -129,6 +143,9 @@ def build_verdict_row(row: dict, sota_components: list) -> dict:
 
 
 DEFAULT_RUN_ID = "20260922"
+WAVE_REGISTRY = "catalogs/sota-convergence/layer-verdict-waves.json"
+SEALED_BASE_PREFIX = "evidence/artifacts/layer-verdicts-"
+DEFAULT_CHECKED_AT = "2026-09-22"
 
 
 def default_manifest(run_id: str) -> str:
@@ -137,6 +154,67 @@ def default_manifest(run_id: str) -> str:
 
 def default_out(run_id: str) -> str:
     return f"catalogs/sota-convergence/layer-verdicts-{run_id}.json"
+
+
+def row_run_id(row: dict) -> str:
+    """The wave a ledger row belongs to: the run id of its ``lanes.sealed_base``, or the
+    2026-09-22 wave when the row carries none (scripts/landscape.py uses the same fallback)."""
+    sealed_base = (row.get("lanes") or {}).get("sealed_base") or SEALED_BASE_PREFIX + DEFAULT_RUN_ID
+    if not isinstance(sealed_base, str) or not sealed_base.startswith(SEALED_BASE_PREFIX):
+        raise SystemExit(f"{row.get('catalog')}/{row.get('layer_id')}: malformed lanes.sealed_base {sealed_base!r}")
+    return validate_run_id(sealed_base[len(SEALED_BASE_PREFIX):])
+
+
+def ledger_rows(root: Path) -> list:
+    """[(catalog, row), ...] in ledger order for both catalogs."""
+    return [(catalog, row) for catalog, relative in LEDGER_FILES.items()
+            for row in load_json(root / relative).get("layers", [])]
+
+
+def load_registry(root: Path) -> dict:
+    """run_id -> {run_id, path, manifest, checked_at, sha256}; empty when no wave is registered yet."""
+    path = root / WAVE_REGISTRY
+    if not path.is_file():
+        return {}
+    document = load_json(path)
+    waves = {}
+    for wave in document.get("waves", []):
+        run_id = validate_run_id(wave["run_id"])
+        if run_id in waves:
+            raise SystemExit(f"{WAVE_REGISTRY}: duplicate wave {run_id}")
+        if not re.fullmatch(r"[a-f0-9]{64}", wave.get("sha256") or ""):
+            raise SystemExit(f"{WAVE_REGISTRY}: wave {run_id} needs a lowercase sha256")
+        waves[run_id] = wave
+    return waves
+
+
+def registry_text(waves: dict) -> str:
+    document = {
+        "schema_version": 1,
+        "generated_by": "tools/sota-convergence/build_verdicts.py",
+        "scope": "One entry per layer-verdict wave document. Every wave older than the newest is frozen: "
+                 "build_verdicts.py --check verifies it byte for byte against this sha256 and against the "
+                 "ledger rows whose lanes.sealed_base names it, and --write refuses to rewrite it.",
+        "waves": [waves[run_id] for run_id in sorted(waves)],
+    }
+    text = json.dumps(document, indent=1, sort_keys=True) + "\n"
+    assert_no_leak(text)
+    return text
+
+
+def default_checked_at(run_id: str) -> str:
+    """A dated run id (YYYYMMDD) names its own checked_at; anything else keeps the 2026-09-22 default."""
+    if re.fullmatch(r"[0-9]{8}", run_id):
+        try:
+            return date(int(run_id[:4]), int(run_id[4:6]), int(run_id[6:])).isoformat()
+        except ValueError:
+            pass
+    return DEFAULT_CHECKED_AT
+
+
+def normalized(value):
+    """The JSON value a serialized document holds for ``value`` (sanitized, key order free)."""
+    return json.loads(json.dumps(sanitize_value(value), sort_keys=True))
 
 
 def build_document(root: Path, checked_at: str, *, run_id: str = DEFAULT_RUN_ID, manifest: str = None) -> dict:
@@ -322,58 +400,140 @@ def parse_args(argv=None):
     parser.add_argument("--root", type=Path, default=HERE.parent.parent)
     parser.add_argument("--write", action="store_true", help="Write the generated outputs.")
     parser.add_argument("--check", action="store_true",
-                         help="Recompute and compare against the checked-in outputs (default).")
-    parser.add_argument("--checked-at", default="2026-09-22")
-    parser.add_argument("--run-id", default=DEFAULT_RUN_ID,
-                        help="Dated wave id joined into the id field, the default --manifest "
+                         help="Verify every registered wave and regenerate the current one (default).")
+    parser.add_argument("--checked-at", default=None,
+                        help="checked_at of a newly written wave (default: the registered value, else the "
+                             "date a YYYYMMDD run id names, else 2026-09-22).")
+    parser.add_argument("--run-id", default=None,
+                        help="Wave to write or check (default: --write the current wave; --check every wave). "
+                             "Joined into the id field, the default --manifest "
                              "(catalogs/sota-convergence/manifest-<run-id>.json) and the default --out "
-                             "(catalogs/sota-convergence/layer-verdicts-<run-id>.json); default reproduces the "
-                             "sealed 2026-09-22 wave byte for byte.")
+                             "(catalogs/sota-convergence/layer-verdicts-<run-id>.json).")
     parser.add_argument("--manifest", type=Path, default=None,
-                        help="Override the dated sota manifest this joins (default derived from --run-id).")
+                        help="Override the dated sota manifest this joins (default: the registered one, else "
+                             "derived from --run-id).")
     parser.add_argument("--out", type=Path, default=None,
-                        help="Override the output layer-verdicts catalog path (default derived from --run-id).")
+                        help="Override the output layer-verdicts catalog path (default: the registered one, "
+                             "else derived from --run-id).")
     return parser.parse_args(argv)
 
 
-def main(argv=None) -> int:
-    args = parse_args(argv)
-    root = args.root.resolve()
-    write_mode = bool(args.write) and not args.check
-    run_id = validate_run_id(args.run_id)
-    manifest = args.manifest.as_posix() if args.manifest else None
+def relative_path(root: Path, value) -> str:
+    if value is None:
+        return None
+    path = Path(value)
+    if path.is_absolute():
+        try:
+            return path.resolve().relative_to(root).as_posix()
+        except ValueError:
+            return path.as_posix()
+    return path.as_posix()
 
-    document = build_document(root, args.checked_at, run_id=run_id, manifest=manifest)
+
+def render_outputs(root: Path, run_id: str, checked_at: str, manifest: str):
+    """(document, json_text, current handbook text, regenerated handbook text) for one wave."""
+    document = build_document(root, checked_at, run_id=run_id, manifest=manifest)
     # Sanitize once and render both outputs from the sanitized copy: the
     # handbook markdown table is built directly from field values (e.g.
     # overturn_when), so it needs the same host-path/secret-marker redaction
     # as the JSON document, not just a leak check on its own text.
     sanitized_document = sanitize_value(document)
     json_text = serialize(sanitized_document)
-    handbook_path = root / "docs/grand-catalog-handbook.md"
-    handbook_text = handbook_path.read_text(encoding="utf-8")
+    handbook_text = (root / "docs/grand-catalog-handbook.md").read_text(encoding="utf-8")
     new_handbook_text = update_handbook(handbook_text, render_handbook_section(sanitized_document))
     assert_no_leak(new_handbook_text)
+    return document, json_text, handbook_text, new_handbook_text
 
-    out_path = root / (args.out.as_posix() if args.out else default_out(run_id))
+
+def check_frozen_rows(root: Path, run_id: str, wave: dict, rows: list, text: str) -> list:
+    """(b): every current row naming ``run_id`` must equal its entry in the wave document."""
+    problems = []
+    try:
+        document = json.loads(text)
+    except ValueError as error:
+        return [f"layer-verdicts wave {run_id} is not valid JSON: {error}"]
+    published = {(catalog, entry.get("layer_id")): entry
+                 for catalog, entries in (document.get("catalogs") or {}).items() for entry in entries}
+    sota_index = sota_layer_index(load_json(root / (wave.get("manifest") or default_manifest(run_id))))
+    for catalog, row in rows:
+        if row_run_id(row) != run_id:
+            continue
+        entry = published.get((catalog, row["layer_id"]))
+        if entry is None:
+            problems.append(f"{catalog}/{row['layer_id']} names wave {run_id} but is absent from {wave['path']}")
+        elif normalized(build_verdict_row(row, sota_index.get(row["layer_id"], []))) != entry:
+            problems.append(f"{catalog}/{row['layer_id']} names wave {run_id} but differs from its frozen "
+                            f"entry in {wave['path']} (re-record it under a new --run-id instead)")
+    return problems
+
+
+def main(argv=None) -> int:
+    args = parse_args(argv)
+    root = args.root.resolve()
+    write_mode = bool(args.write) and not args.check
+    requested = validate_run_id(args.run_id) if args.run_id is not None else None
+    registry = load_registry(root)
+    rows = ledger_rows(root)
+    row_runs = {row_run_id(row) for _, row in rows}
+    known = row_runs | set(registry)
+    current = max(known) if known else DEFAULT_RUN_ID
 
     if write_mode:
+        run_id = requested or current
+        if run_id < current:
+            raise SystemExit(f"layer-verdicts wave {run_id} is frozen (the current wave is {current}); "
+                             "re-record changed rows under a new --run-id instead of rewriting it")
+        wave = dict(registry.get(run_id) or {})
+        manifest = relative_path(root, args.manifest) or wave.get("manifest") or default_manifest(run_id)
+        out = relative_path(root, args.out) or wave.get("path") or default_out(run_id)
+        checked_at = args.checked_at or wave.get("checked_at") or default_checked_at(run_id)
+        document, json_text, _handbook, new_handbook_text = render_outputs(root, run_id, checked_at, manifest)
+        out_path = root / out
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json_text, encoding="utf-8")
-        handbook_path.write_text(new_handbook_text, encoding="utf-8")
-        print(json.dumps({"status": "written", "counts": document["counts"]}))
+        (root / "docs/grand-catalog-handbook.md").write_text(new_handbook_text, encoding="utf-8")
+        registry[run_id] = {"run_id": run_id, "path": out, "manifest": manifest, "checked_at": checked_at,
+                            "sha256": hashlib.sha256(json_text.encode("utf-8")).hexdigest()}
+        registry_path = root / WAVE_REGISTRY
+        registry_path.parent.mkdir(parents=True, exist_ok=True)
+        registry_path.write_text(registry_text(registry), encoding="utf-8")
+        print(json.dumps({"status": "written", "run_id": run_id, "counts": document["counts"]}))
         return 0
 
-    ok = True
-    if not out_path.exists() or out_path.read_text(encoding="utf-8") != json_text:
-        print(f"layer-verdicts JSON differs from the generated output: {out_path}")
-        ok = False
-    if handbook_text != new_handbook_text:
-        print("docs/grand-catalog-handbook.md generated verdicts section differs from the generated output")
-        ok = False
-    if not ok:
+    problems = []
+    waves = [requested] if requested else sorted(known)
+    counts = None
+    for run_id in waves:
+        wave = registry.get(run_id)
+        if wave is None:
+            problems.append(f"layer-verdicts wave {run_id} is named by ledger rows but has no registered "
+                            f"document in {WAVE_REGISTRY} (run build_verdicts.py --write --run-id {run_id})")
+            continue
+        path = root / (relative_path(root, args.out) if args.out and requested else wave["path"])
+        if not path.is_file():
+            problems.append(f"layer-verdicts JSON differs from the generated output: {path} is missing")
+            continue
+        data = path.read_bytes()
+        if hashlib.sha256(data).hexdigest() != wave["sha256"]:
+            problems.append(f"layer-verdicts wave {run_id} ({wave['path']}) differs from its registered sha256")
+        text = data.decode("utf-8")
+        problems.extend(check_frozen_rows(root, run_id, wave, rows, text))
+        if run_id == current:
+            manifest = relative_path(root, args.manifest) or wave.get("manifest") or default_manifest(run_id)
+            checked_at = args.checked_at or wave.get("checked_at") or default_checked_at(run_id)
+            document, json_text, handbook_text, new_handbook_text = render_outputs(root, run_id, checked_at,
+                                                                                   manifest)
+            counts = document["counts"]
+            if text != json_text:
+                problems.append(f"layer-verdicts JSON differs from the generated output: {path}")
+            if handbook_text != new_handbook_text:
+                problems.append("docs/grand-catalog-handbook.md generated verdicts section differs from the "
+                                "generated output")
+    for problem in problems:
+        print(problem)
+    if problems:
         return 1
-    print(json.dumps({"status": "checked", "counts": document["counts"]}))
+    print(json.dumps({"status": "checked", "waves": waves, "current": current, "counts": counts}))
     return 0
 
 
