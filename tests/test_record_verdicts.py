@@ -9,10 +9,12 @@ dependency on the sibling lane_packets.py unit) matching the packet/
 lane-return shapes documented in the PR-5 lane contract.
 """
 import contextlib
+import copy
 import hashlib
 import importlib.util
 import io
 import json
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -94,9 +96,10 @@ def make_packet(catalog, layer_id, candidates):
 def make_candidate(key, layer_id, suffix, *, adopted=True, component_id=None, pin="1.0", recipe_ref=None):
     return {
         "key": key, "name": f"{layer_id} {suffix}", "repository": repo(layer_id, suffix),
+        # The shape of a --withhold-labels packet candidate (a new wave retains and CI re-checks its
+        # packets, which may carry no upstream release, recency or popularity key).
         "adopted": adopted, "evidence_kind": "native_execution", "evidence_refs": [],
-        "component_id": component_id, "pin": pin, "upstream": {"latest": pin},
-        "review_status": "confirmed_default", "pin_behind_upstream": False,
+        "component_id": component_id, "pin": pin, "upstream": {},
         "recipe_ref": recipe_ref, "decisions": [],
     }
 
@@ -205,6 +208,7 @@ FOUNDATION_LAYERS = [
     "wave-rejected-layer", "wave-missing-layer", "wave-unregistered-layer", "wave-registered-layer",
     "wave-basename-layer", "wave-stalevendor-layer", "wave-forgedcodex-layer", "wave-stalecodex-layer",
     "wave-otherpacket-layer", "frozen-wave-layer", "wave-artifact-layer", "wave-mac-layer",
+    "wave-refuted-layer", "wave-failed-layer", "wave-append-layer", "wave-withheld-layer",
 ]
 US_EQUITIES_LAYERS = ["unindexed-alt-layer", "unindexed-pending-layer"]
 
@@ -406,14 +410,45 @@ class CodexAbsentTests(RecordVerdictsFixture):
         catalog = self.write_claude_only(layer_id)
         decision = "docs/decisions/2026-09-23-single-lane.md"
         (self.root / decision).parent.mkdir(parents=True, exist_ok=True)
-        (self.root / decision).write_text(f"# Single-lane decision\n\nRecord {layer_id} from Claude alone.\n",
+        (self.root / decision).write_text(f"# Single-lane decision\n\nsingle-lane-authorization: {catalog}/{layer_id}\n",
                                           encoding="utf-8")
         self.assertEqual(self.run_main(write=True, extra=["--allow-single-lane", decision]), 0)
         row = self.load_row(catalog, layer_id)
         self.assertEqual(row["verdict_status"], "recorded")
         self.assertEqual(row["lanes"]["agreement"], "codex_absent")
         self.assertEqual(row["lanes"]["single_lane_decision"], decision)
+        self.assertEqual(row["lanes"]["single_lane_decision_sha256"],
+                         hashlib.sha256((self.root / decision).read_bytes()).hexdigest())
         build_landscape(self.root)
+        # The record is bound by hash: editing it after it authorized the row fails CI.
+        with (self.root / decision).open("a", encoding="utf-8") as handle:
+            handle.write("Edited later.\n")
+        with self.assertRaisesRegex(ValueError, "single_lane_decision_sha256"):
+            build_landscape(self.root)
+
+    def test_a_record_that_mentions_the_layer_without_an_authorization_line_leaves_it_pending(self):
+        # Review of #122, finding 2: a wave document naming all 32 layers authorized every one of them.
+        layer_id = "single-lane-layer"
+        catalog = self.write_claude_only(layer_id)
+        decision = "docs/decisions/2026-09-23-wave.md"
+        (self.root / decision).parent.mkdir(parents=True, exist_ok=True)
+        (self.root / decision).write_text(f"Re-record every layer, including `{layer_id}` ({catalog}/{layer_id}).\n"
+                                          f"single-lane-authorization: us-equities/{layer_id}\n", encoding="utf-8")
+        self.assertEqual(self.run_main(write=True, extra=["--allow-single-lane", decision]), 0)
+        row = self.load_row(catalog, layer_id)
+        self.assertEqual(row["verdict_status"], "pending_lanes")
+        self.assertNotIn("single_lane_decision", row["lanes"])
+
+    def test_allow_single_lane_outside_docs_decisions_is_refused(self):
+        # Review of #122, finding 2: any dated file (the wave document, a task record) was accepted.
+        catalog = self.write_claude_only("single-lane-layer")
+        for path in ("docs/2026-09-23-wave.md", "docs/tasks/2026-09-23-wave.md"):
+            (self.root / path).parent.mkdir(parents=True, exist_ok=True)
+            (self.root / path).write_text(f"single-lane-authorization: {catalog}/single-lane-layer\n",
+                                          encoding="utf-8")
+            with self.assertRaisesRegex(SystemExit, "must be a decision record under docs/decisions/"):
+                self.run_main(write=True, extra=["--allow-single-lane", path])
+        self.assertEqual(self.load_row(catalog, "single-lane-layer")["verdict_status"], "pending_lanes")
 
     def test_a_decision_record_that_does_not_name_the_layer_leaves_it_pending(self):
         layer_id = "single-lane-unnamed-layer"
@@ -433,7 +468,8 @@ class CodexAbsentTests(RecordVerdictsFixture):
         catalog = self.write_claude_only(layer_id)
         decision = "docs/decisions/2026-09-23-longer-id.md"
         (self.root / decision).parent.mkdir(parents=True, exist_ok=True)
-        (self.root / decision).write_text("Record `agents-single-lane-layer` and single-lane-layers alone.\n",
+        (self.root / decision).write_text("single-lane-authorization: foundation/agents-single-lane-layer\n"
+                                          "single-lane-authorization: foundation/single-lane-layers\n",
                                           encoding="utf-8")
         self.assertEqual(self.run_main(write=True, extra=["--allow-single-lane", decision]), 0)
         row = self.load_row(catalog, layer_id)
@@ -1323,8 +1359,17 @@ def lane_provenance(lane):
 DROP = object()  # an override value that removes the field from the lane return
 
 
+# The refutation summary layer-verdict-lane.js returns for a final both lenses left unrefuted.
+UNREFUTED = {"status": "unrefuted", "final_source": "proposal", "proposal_status": "unrefuted",
+             "revision_status": None,
+             "votes": [{"lens": "evidence", "round": "proposal", "refuted": False, "reason": "Every cited path holds."},
+                       {"lens": "challenger", "round": "proposal", "refuted": False, "reason": "No stronger candidate."}]}
+
+
 def new_wave_lane(lane, catalog, layer_id, digest, winner_keys, alternatives, **overrides):
     fields = {"model": dict(LANE_MODELS[lane]), "provenance": lane_provenance(lane)}
+    if lane == "claude":
+        fields["refutation"] = copy.deepcopy(UNREFUTED)
     fields.update(overrides)
     data = make_lane_return(lane, catalog, layer_id, digest, winner_keys, alternatives, **fields)
     return {key: value for key, value in data.items() if value is not DROP}
@@ -1778,6 +1823,182 @@ class NewWavePlatformStatusTests(NewWaveFixture):
         with self.assertRaises(ValueError):
             record_verdicts.process_row({}, self.root, "foundation", "wave-mac-layer", self.work_dir, "2026-09-23",
                                         None, set(), {}, {}, [], run_date="20260923", status_context=None)
+
+
+class ReviewOf122Tests(NewWaveFixture):
+    """Independent review of catalog #122 (2026-09-23), findings 1, 3, 5, 6 and 7, end to end: the
+    recorder writes the wave and scripts/landscape.py re-checks it."""
+
+    def sealed_base(self):
+        return self.root / NEW_SEALED_BASE
+
+    def sealed_listing(self):
+        return {path.relative_to(self.root).as_posix(): path.read_bytes()
+                for path in sorted(self.sealed_base().rglob("*")) if path.is_file()}
+
+    def ledger_text(self):
+        return (self.root / record_verdicts.LEDGER_FILES["foundation"]).read_text(encoding="utf-8")
+
+    def write_ledger_row(self, layer_id, change):
+        path = self.root / record_verdicts.LEDGER_FILES["foundation"]
+        document = json.loads(path.read_text(encoding="utf-8"))
+        change(next(row for row in document["layers"] if row["layer_id"] == layer_id))
+        path.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+
+    def record_disagreement(self, layer_id="wave-crossfamily-layer"):
+        catalog = self.both_lanes(layer_id, codex_winner="c2")
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, layer_id, cross_family("claude", self.digest))
+        code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 0, output)
+        return catalog
+
+    # Finding 1 -------------------------------------------------------------------------------
+    def test_relabelling_or_swapping_a_recorded_disagreement_fails_ci(self):
+        catalog = self.record_disagreement()
+        row = self.load_row(catalog, "wave-crossfamily-layer")
+        self.assertEqual(row["lanes"]["agreement"], "disagree")
+        build_landscape(self.root)
+        original = self.ledger_text()
+        self.write_ledger_row("wave-crossfamily-layer", lambda row: row["lanes"].update(agreement="same_winner"))
+        with self.assertRaisesRegex(ValueError, "is not what its sealed returns establish"):
+            build_landscape(self.root)
+        (self.root / record_verdicts.LEDGER_FILES["foundation"]).write_text(original, encoding="utf-8")
+
+        def swap(row):
+            winner, alternative = row["winners"][0], row["alternatives"][0]
+            winner.update(component_id="candidate:example-wave-crossfamily-layer-c2",
+                          repository=alternative["repository"])
+            alternative.update(repository=repo("wave-crossfamily-layer", "c1"))
+
+        self.write_ledger_row("wave-crossfamily-layer", swap)
+        with self.assertRaisesRegex(ValueError, "are not the claude lane's sealed winner set"):
+            build_landscape(self.root)
+
+    # Finding 3 -------------------------------------------------------------------------------
+    def test_a_sealed_wave_is_never_rewritten(self):
+        # The review's scenario: re-running without the dissenting return erased the dissent.
+        catalog = self.record_disagreement()
+        before_ledger, before_sealed = self.ledger_text(), self.sealed_listing()
+        (self.work_dir / "codex" / f"{catalog}__wave-crossfamily-layer.json").unlink()
+        with self.assertRaisesRegex(SystemExit, "run-manifest.json already exists"):
+            self.run_wave(adjudications=self.work_dir / "adjudications")
+        self.assertEqual((self.ledger_text(), self.sealed_listing()), (before_ledger, before_sealed))
+        # --append-rows may not name a row the manifest already holds.
+        with self.assertRaisesRegex(SystemExit, "already holds: foundation__wave-crossfamily-layer.json"):
+            self.run_wave(extra=["--append-rows", "foundation/wave-crossfamily-layer"])
+        self.assertEqual((self.ledger_text(), self.sealed_listing()), (before_ledger, before_sealed))
+
+    def test_rows_bind_their_run_manifest_and_adjudication(self):
+        catalog = self.record_disagreement()
+        lanes = self.load_row(catalog, "wave-crossfamily-layer")["lanes"]
+        manifest = self.sealed_base() / "run-manifest.json"
+        adjudication = self.sealed_base() / "adjudication" / f"{lanes['claude']['run_id']}.json"
+        self.assertEqual(lanes["run_manifest_sha256"], hashlib.sha256(manifest.read_bytes()).hexdigest())
+        self.assertEqual(lanes["adjudication_sha256"], hashlib.sha256(adjudication.read_bytes()).hexdigest())
+        adjudication.write_text(adjudication.read_text(encoding="utf-8").replace("retained", "Retained"),
+                                encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "adjudication_sha256 does not match"):
+            build_landscape(self.root)
+
+    def test_append_rows_extends_the_wave_with_absent_rows_only(self):
+        catalog = self.both_lanes("wave-same-layer")
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        first_manifest = json.loads((self.sealed_base() / "run-manifest.json").read_text(encoding="utf-8"))
+        first_sealed = self.sealed_listing()
+        # A later work dir holding only the appended layer's packet and returns.
+        work_temp = tempfile.TemporaryDirectory()
+        self.addCleanup(work_temp.cleanup)
+        self.work_dir = Path(work_temp.name).resolve()
+        self.packets = PacketWriter(self.work_dir)
+        self.both_lanes("wave-append-layer")
+        code, output = self.run_wave(extra=["--append-rows", "foundation/wave-append-layer"])
+        self.assertEqual(code, 0, output)
+        manifest_path = self.sealed_base() / "run-manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        self.assertEqual([entry["layer_id"] for entry in manifest["packets"]], ["wave-append-layer", "wave-same-layer"])
+        held = next(entry for entry in manifest["packets"] if entry["layer_id"] == "wave-same-layer")
+        self.assertEqual(held, first_manifest["packets"][0])
+        for relative, data in first_sealed.items():
+            if not relative.endswith(("run-manifest.json", "packets/SHA256SUMS")):
+                self.assertEqual((self.root / relative).read_bytes(), data, relative)
+        digest = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+        for layer_id in ("wave-same-layer", "wave-append-layer"):
+            self.assertEqual(self.load_row(catalog, layer_id)["lanes"]["run_manifest_sha256"], digest)
+        build_landscape(self.root)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main(write=False, check=True, run_id=NEW_RUN,
+                                           extra=["--append-rows", "foundation/wave-append-layer"]), 0)
+
+    # Finding 5 -------------------------------------------------------------------------------
+    def test_a_claude_return_whose_final_was_refuted_or_unknown_is_rejected(self):
+        refuted = copy.deepcopy(UNREFUTED)
+        refuted.update(status="refuted", final_source=None, proposal_status="refuted")
+        refuted["votes"][1]["refuted"] = True
+        unknown = copy.deepcopy(UNREFUTED)
+        unknown["votes"][0].update(refuted=None, reason="no vote returned")
+        unknown.update(status="unknown", final_source=None, proposal_status="unknown")
+        one_vote_unrefuted = copy.deepcopy(UNREFUTED)
+        one_vote_unrefuted["votes"] = one_vote_unrefuted["votes"][1:]
+        for refutation, fragment in ((DROP, "needs the refutation summary"),
+                                     (refuted, "refutation.status is 'refuted'"),
+                                     (unknown, "refutation.status is 'unknown'"),
+                                     (one_vote_unrefuted, "both lens votes")):
+            with self.subTest(fragment=fragment):
+                catalog = self.both_lanes("wave-refuted-layer", claude={"refutation": refutation})
+                code, output = self.run_wave()
+                self.assertEqual(code, 1, output)
+                self.assertIn("foundation__wave-refuted-layer [claude]", output)
+                self.assertIn(fragment, output)
+                row = self.load_row(catalog, "wave-refuted-layer")
+                self.assertNotEqual(row["verdict_status"], "recorded")
+                shutil.rmtree(self.sealed_base())
+
+    # Finding 6 -------------------------------------------------------------------------------
+    def test_the_wave_retains_the_packets_its_lanes_judged(self):
+        self.both_lanes("wave-same-layer")
+        self.build_packet_pair("foundation", "wave-missing-layer")
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        manifest = json.loads((self.sealed_base() / "run-manifest.json").read_text(encoding="utf-8"))
+        packets = self.work_dir / "packets"
+        self.assertEqual((self.sealed_base() / "packets" / "SHA256SUMS").read_bytes(),
+                         (packets / "SHA256SUMS").read_bytes())
+        self.assertEqual({item["name"] for item in manifest["retained_packets"]},
+                         {"foundation__wave-same-layer.json", "foundation__wave-missing-layer.json"})
+        for item in manifest["retained_packets"]:
+            self.assertEqual((self.sealed_base() / "packets" / item["name"]).read_bytes(),
+                             (packets / item["name"]).read_bytes())
+            self.assertEqual(item["sha256"], hashlib.sha256((packets / item["name"]).read_bytes()).hexdigest())
+        build_landscape(self.root)
+
+    def test_a_packet_carrying_withheld_keys_is_refused_for_a_new_wave(self):
+        c1 = make_candidate("c1", "wave-withheld-layer", "c1")
+        c2 = dict(make_candidate("c2", "wave-withheld-layer", "c2"), upstream={"latest": "2.0", "stars": 9})
+        self.packets.write("foundation", "wave-withheld-layer", make_packet("foundation", "wave-withheld-layer", [c1, c2]))
+        self.packets.flush()
+        with self.assertRaisesRegex(SystemExit, "carries withheld keys .*upstream.latest"):
+            self.run_wave()
+        self.assertFalse(self.sealed_base().exists())
+
+    # Finding 7 -------------------------------------------------------------------------------
+    def test_a_lane_failure_is_recorded_as_failed_with_its_reason(self):
+        catalog = "foundation"
+        c1, c2, digest = self.build_packet_pair(catalog, "wave-failed-layer")
+        write_lane(self.work_dir, "claude", catalog, "wave-failed-layer",
+                   new_wave_lane("claude", catalog, "wave-failed-layer", digest, ["c1"], [make_alternative(c2)]))
+        (self.work_dir / "codex").mkdir(exist_ok=True)
+        (self.work_dir / "codex" / "failures.json").write_text(json.dumps({"lane": "codex", "failures": [
+            {"catalog": catalog, "layer_id": "wave-failed-layer", "reason": "failed after retry: timed out"}]}),
+            encoding="utf-8")
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        entry = next(entry for entry in json.loads((self.sealed_base() / "run-manifest.json").read_text(
+            encoding="utf-8"))["packets"] if entry["layer_id"] == "wave-failed-layer")
+        self.assertEqual(entry["lanes"]["codex"], {"outcome": "failed", "reasons": ["failed after retry: timed out"]})
+        self.assertEqual(entry["lanes"]["claude"]["outcome"], "sealed")
+        build_landscape(self.root)
 
 
 class CheckedAtDefaultTests(NewWaveFixture):

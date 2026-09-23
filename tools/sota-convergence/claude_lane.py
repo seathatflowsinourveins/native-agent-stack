@@ -20,9 +20,17 @@ adding the two runner-owned fields a new-wave Claude return must carry
   ``examples/claude-native/workflows/SHA256SUMS`` entry, so a return always
   names bytes a catalog-only host can rerun.
 
-A layer whose workflow chain produced no ``final`` object, and every ``lost``
-packet, is listed on stdout and gets no file: ``record_verdicts.py`` then records
-that lane as ``missing`` in the run manifest. Stdlib only.
+The workflow's per-layer ``refutation`` summary ({status, final_source,
+proposal_status, revision_status, votes}) is copied into the return as
+``refutation``; ``record_verdicts.py`` rejects a new-wave Claude return without it
+or whose final was not sealed unrefuted by both lens votes (2026-09-23 review of
+catalog #122, finding 5).
+
+A layer whose workflow chain produced no ``final`` object (its proposal or
+revision was refuted, or a vote or the proposal never returned), and every
+``lost`` packet, gets no return file; it is listed on stdout and in
+``<work-dir>/claude/failures.json`` with its reason, which ``record_verdicts.py``
+records as the lane's ``failed`` outcome in the run manifest. Stdlib only.
 """
 from __future__ import annotations
 
@@ -88,7 +96,25 @@ def lane_return(layer: dict, provenance: dict, resolved_model=None) -> dict:
     model["family"] = LANE_FAMILY
     data["model"] = model
     data["provenance"] = dict(provenance)
+    if isinstance(layer.get("refutation"), dict):
+        data["refutation"] = layer["refutation"]
     return data
+
+
+FAILURES_NAME = "failures.json"
+
+
+def failure_reason(layer: dict) -> str:
+    """Why a layer produced no final: its refutation status and the deciding votes' reasons."""
+    refutation = layer.get("refutation") if isinstance(layer.get("refutation"), dict) else {}
+    status = refutation.get("status") or "unknown"
+    if not layer.get("proposal") and "proposal" in layer:
+        return "no final: the proposal never returned (refutation status unknown)"
+    reasons = [f"{vote.get('round')}/{vote.get('lens')}: "
+               + ("refuted" if vote.get("refuted") is True else "no vote" if vote.get("refuted") is None else "unrefuted")
+               + f" ({vote.get('reason')})"
+               for vote in refutation.get("votes") or [] if isinstance(vote, dict) and vote.get("refuted") is not False]
+    return f"no final: refutation status {status}" + (f"; {'; '.join(reasons)}" if reasons else "")
 
 
 def parse_args(argv=None):
@@ -112,15 +138,28 @@ def main(argv=None) -> int:
     result = json.loads(args.result.read_text(encoding="utf-8"))
     out_dir = args.work_dir / "claude"
     out_dir.mkdir(parents=True, exist_ok=True)
-    written, without_final = [], []
+    written, without_final, failures = [], [], []
     for layer in result.get("layers") or []:
         name = f"{layer['catalog']}__{layer['layer_id']}.json"
         if not isinstance(layer.get("final"), dict):
             without_final.append(name)
+            failures.append({"catalog": layer["catalog"], "layer_id": layer["layer_id"],
+                             "reason": failure_reason(layer)})
             continue
         data = lane_return(layer, provenance, args.resolved_model)
         (out_dir / name).write_text(json.dumps(data, indent=1, sort_keys=True) + "\n", encoding="utf-8")
         written.append(name)
+    for lost in result.get("lost") or []:
+        catalog, _, layer_id = str(lost).partition("/")
+        if catalog and layer_id:
+            failures.append({"catalog": catalog, "layer_id": layer_id,
+                             "reason": "lost: the workflow returned no result for this packet"})
+    failures_path = out_dir / FAILURES_NAME
+    if failures:
+        failures_path.write_text(json.dumps({"lane": "claude", "failures": failures}, indent=1, sort_keys=True)
+                                 + "\n", encoding="utf-8")
+    else:
+        failures_path.unlink(missing_ok=True)
     print(json.dumps({"written": len(written), "without_final": without_final,
                       "lost": list(result.get("lost") or []), "provenance": provenance}, sort_keys=True))
     return 0

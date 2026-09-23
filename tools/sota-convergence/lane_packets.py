@@ -60,6 +60,12 @@ from build_manifest import assert_no_leak, github_repo_slug, sanitize_value  # n
 # DISPOSITIONS/WINNER_EVIDENCE_CLASSES are reused (not reimplemented) from
 # scripts/landscape.py, the single owner of these enums.
 from scripts.landscape import DISPOSITIONS, WINNER_EVIDENCE_CLASSES  # noqa: E402
+# The withheld-key policy is shared with scripts/landscape.py, which re-checks every packet a new
+# wave retains (evidence/artifacts/layer-verdicts-<run-id>/packets/) against it in CI.
+from scripts.landscape import (  # noqa: E402
+    COPY_WITHHELD_FIELDS, POPULARITY_RECENCY_FIELDS, POPULARITY_TOKENS, UPSTREAM_RELEASE_FIELDS,
+    is_popularity_or_recency_key,
+)
 from scripts.catalog_decisions import InvalidDecisionIndex, safe_file  # noqa: E402
 
 LEDGER_FILES = {
@@ -112,28 +118,22 @@ WITHHELD_DECISION_FIELDS = ("selection", "review_status")
 # candidates by attention rather than by the retained evidence). The explicit keys are the ones
 # build_manifest.upstream_record() and the GitHub API emit; any other key naming a count of stars,
 # forks, watchers or downloads, or a timestamp (``*_at``), is stripped the same way.
-POPULARITY_RECENCY_FIELDS = ("stars", "forks", "watchers", "pushed_at", "released_at")
 # The latest upstream release is withheld entirely (re-review 2026-09-23): a date-based tag such as
 # inspect_ai's "release/2025-11-28" carries a release date. Withholding it always is the stricter
 # of the two options considered (the other stripped it only when date-shaped) and no packet
 # requirement names releases, versions or maintenance. prerelease describes that same release, and
 # pin_behind_upstream is derived by comparing the pin with it, so both go with it.
-UPSTREAM_RELEASE_FIELDS = ("latest", "prerelease")
 # newcomer marks a candidate as recently discovered, a recency signal of the same kind (final
-# verification, 2026-09-23), so it is withheld with them.
-COPY_RELEASE_FIELDS = ("pin_behind_upstream", "newcomer")
-_POPULARITY_TOKENS = ("star", "fork", "watcher", "subscriber", "download", "popular", "trending")
+# verification, 2026-09-23), so it is withheld with them. The candidate-only note (a newcomer's
+# demonstrated_gap or a keep-but-compare entry's overturn comparison) exists only on non-adopted
+# candidates, so it hints at their status too and is withheld as well (review of #122, finding 9).
+COPY_RELEASE_FIELDS = COPY_WITHHELD_FIELDS
+_POPULARITY_TOKENS = POPULARITY_TOKENS
 # Kept only when the packet's requirement text names them (a requirement about licensing or
 # maintenance status makes them evidence rather than a popularity proxy).
 REQUIREMENT_GATED_FIELDS = {"archived": ("archiv", "maintained", "maintenance"), "license": ("licen",)}
 # The packet copies of upstream metadata: each candidate's and each unclaimed sota component's.
 UPSTREAM_COPIES = ("candidates", "sota_components_not_in_candidates")
-
-
-def is_popularity_or_recency_key(key: str) -> bool:
-    lowered = key.lower()
-    return (lowered in POPULARITY_RECENCY_FIELDS or lowered.endswith("_at")
-            or any(token in lowered for token in _POPULARITY_TOKENS))
 
 
 def requirement_names(field: str, requirement) -> bool:

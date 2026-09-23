@@ -272,6 +272,12 @@ class CodexLaneTests(CodexLaneFixture):
             self.assertIsNone(row["exit_code"])
 
         self.assertFalse(self.out_path("foundation", "native-clients").exists())
+        # Review of catalog #122, finding 7: the failure and its reason reach record_verdicts.py's
+        # run manifest through codex/failures.json instead of a bare "missing".
+        failures_path = self.out_path("foundation", "native-clients").parent / "failures.json"
+        failures = json.loads(failures_path.read_text(encoding="utf-8"))
+        self.assertEqual(failures["failures"], [{"catalog": "foundation", "layer_id": "native-clients",
+                                                 "reason": "failed after retry: timed out"}])
 
     def test_timed_out_attempt_keeps_its_partial_event_stream(self):
         self.write_packet("foundation", "native-clients")
@@ -439,6 +445,9 @@ class StrictSchemaTests(CodexLaneFixture):
         strict = codex_lane.strict_output_schema(json.loads(codex_lane.DEFAULT_SCHEMA.read_text()))
         self.assertNotIn("provenance", strict["properties"])
         self.assertNotIn("family", strict["properties"]["model"]["properties"])
+        # The Claude lane's refutation summary (review of catalog #122, finding 5) is never asked of Codex.
+        self.assertIn("refutation", json.loads(codex_lane.DEFAULT_SCHEMA.read_text())["properties"])
+        self.assertNotIn("refutation", strict["properties"])
         self.assertEqual(set(strict["properties"]), set(strict["required"]))
         self.assertEqual(set(strict["properties"]["model"]["properties"]), set(strict["properties"]["model"]["required"]))
 
