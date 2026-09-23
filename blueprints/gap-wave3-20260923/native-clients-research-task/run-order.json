@@ -1,0 +1,8 @@
+{
+  "frozen_before_any_run": true,
+  "purpose": "Counterbalanced arm order for the N=3-per-client frozen research task (gaps 2 & 8), to avoid the wave-2 skill-arm-ab confound where one arm always ran first (cache-warmth / ordering effects).",
+  "generator": "python3 random.seed(20260923); arms = ['claude']*3 + ['codex']*3; random.shuffle(arms)",
+  "order": ["codex", "claude", "codex", "codex", "claude", "claude"],
+  "run_labels": ["run1_codex", "run2_claude", "run3_codex", "run4_codex", "run5_claude", "run6_claude"],
+  "note": "run index within each label (e.g. codex run1/run3/run4 -> codex_n1/codex_n2/codex_n3 in output filenames) follows this left-to-right order."
+}

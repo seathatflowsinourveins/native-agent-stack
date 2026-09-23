@@ -1,0 +1,30 @@
+{
+  "frozen_before_any_run": true,
+  "id": "native-clients-research-task-rubric",
+  "date": "2026-09-23",
+  "scale": "0-3 blind-judged points, plus 1 mechanical point checked by the harness (not the judge)",
+  "criteria": [
+    {
+      "id": "R1",
+      "points": 1,
+      "description": "Names a specific, real, plausible technique (not vague filler such as 'be efficient' or 'summarize'); a named technique/provider/system is acceptable even if the exact provider attribution cannot be independently re-verified by the judge in this sealed context."
+    },
+    {
+      "id": "R2",
+      "points": 1,
+      "description": "The explanation of the mechanism is technically coherent and internally consistent (does not contradict itself or describe an impossible mechanism)."
+    },
+    {
+      "id": "R3",
+      "points": 1,
+      "description": "Includes at least one concrete quantifiable claim (a percentage, ratio, multiplier, or comparable number) tied to the technique's benefit or tradeoff."
+    },
+    {
+      "id": "R4_mechanical_not_judged",
+      "points": 1,
+      "description": "Response includes a 'TIMESTAMP: <value>' final line with a plausible ISO8601 UTC timestamp close to the run's wall-clock time, indicating a real Bash tool call rather than a fabricated line. Checked mechanically by the harness against the command's own recorded duration/time window, not scored by the blind judge (the judge packet has this line stripped so client identity/timestamp cannot leak arm identity)."
+    }
+  ],
+  "judge_protocol": "One `claude -p` call per output. The judge receives only: the frozen prompt text, the rubric (R1-R3 only; R4 stripped), and the single output's answer text with the TIMESTAMP line and any tool-call/system framing removed. No client name, model name, or arm label is included. Packet order across the batch of judge calls is randomized (not run in the same order the outputs were produced). The judge is asked to return R1, R2, R3 each as 0 or 1 and a one-line justification, as JSON.",
+  "expected_discriminating_signal": "If one client's arm scores materially higher mean R1+R2+R3 across N=3 with non-overlapping or clearly separated spread, that is evidence of a quality difference on this task. If scores are statistically indistinguishable (means within 1 point and overlapping spread), that is a valid null result for this diagnostic task and must be reported as such, not discarded."
+}

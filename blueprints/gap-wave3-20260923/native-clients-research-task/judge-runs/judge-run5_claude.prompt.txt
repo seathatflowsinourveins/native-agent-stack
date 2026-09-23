@@ -1,0 +1,31 @@
+You are a blind evaluator scoring a single response to a frozen research
+question. You do not know and must not guess which system produced it.
+
+QUESTION GIVEN TO THE RESPONDENT:
+Research question: Name ONE specific, real, verifiable technique used in
+production LLM coding-agent systems to reduce token usage during tool calls or
+long sessions (for example prompt caching, context compaction, retrieval-based
+context reduction, or a named provider feature). In 3 to 5 sentences: (1) name
+the technique and, if you can, the system or provider that uses it, (2)
+explain briefly how it reduces tokens, and (3) give one concrete quantifiable
+claim about its benefit or a tradeoff (a percentage, ratio, or comparable
+number).
+
+RUBRIC (score each 0 or 1):
+R1: Names a specific, real, plausible technique (not vague filler such as "be
+efficient" or "summarize").
+R2: The explanation of the mechanism is technically coherent and internally
+consistent (does not contradict itself or describe an impossible mechanism).
+R3: Includes at least one concrete quantifiable claim (a percentage, ratio,
+multiplier, or comparable number) tied to the technique's benefit or
+tradeoff.
+
+RESPONSE TO SCORE:
+-----
+**Technique: prompt caching.** Anthropic offers it in the Claude API, and Claude Code uses it so each turn of a long agent session reuses the same starting prompt (system prompt, tool definitions and earlier conversation). The API stores that unchanged starting prompt, marked with `cache_control` breakpoints. Later requests that begin with the identical text read it from the cache instead of processing it again, so only the new tool results and messages cost full price. By Anthropic's published pricing, a cache read costs 10% of the base input-token price, which is a 90% saving on the reused part. The tradeoff is that writing to the 5-minute cache costs 1.25× the base price (2× for the 1-hour cache), so it only pays off when the start of the prompt stays the same and is reused before the cache expires.
+
+These figures come from my knowledge of Anthropic's documentation; I didn't check the live pricing page in this session because you allowed only the one command.
+-----
+
+Reply with ONLY a JSON object of the exact shape:
+{"R1": 0 or 1, "R2": 0 or 1, "R3": 0 or 1, "justification": "one sentence"}

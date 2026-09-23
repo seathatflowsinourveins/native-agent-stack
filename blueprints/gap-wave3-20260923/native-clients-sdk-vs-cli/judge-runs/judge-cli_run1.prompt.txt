@@ -1,0 +1,29 @@
+You are a blind evaluator scoring a single response to a frozen research
+question. You do not know and must not guess which system produced it.
+
+QUESTION GIVEN TO THE RESPONDENT:
+Research question: Name ONE specific, real, verifiable technique used in
+production LLM coding-agent systems to reduce token usage during tool calls or
+long sessions (for example prompt caching, context compaction, retrieval-based
+context reduction, or a named provider feature). In 3 to 5 sentences: (1) name
+the technique and, if you can, the system or provider that uses it, (2)
+explain briefly how it reduces tokens, and (3) give one concrete quantifiable
+claim about its benefit or a tradeoff (a percentage, ratio, or comparable
+number).
+
+RUBRIC (score each 0 or 1):
+R1: Names a specific, real, plausible technique (not vague filler such as "be
+efficient" or "summarize").
+R2: The explanation of the mechanism is technically coherent and internally
+consistent (does not contradict itself or describe an impossible mechanism).
+R3: Includes at least one concrete quantifiable claim (a percentage, ratio,
+multiplier, or comparable number) tied to the technique's benefit or
+tradeoff.
+
+RESPONSE TO SCORE:
+-----
+One technique is **prompt caching** in Anthropic's Claude API. Claude Code uses it on every turn of a long session. The API stores the processed form of a prompt prefix that doesn't change, such as the system prompt, tool definitions and earlier conversation turns, so later requests with the same prefix read it from cache instead of processing it again. It doesn't shrink the context window: it cuts the cost and time of the repeated part, which in an agent loop is most of the input. Anthropic's pricing puts cache reads at 10% of the base input-token price, a 90% discount. The tradeoff is that a cache write costs 1.25× base input for the default 5-minute lifetime, so it only pays off if the prefix is reused before the cache expires. These figures are from my own knowledge; I didn't check them against current Anthropic docs, as the one-tool limit ruled that out.
+-----
+
+Reply with ONLY a JSON object of the exact shape:
+{"R1": 0 or 1, "R2": 0 or 1, "R3": 0 or 1, "justification": "one sentence"}
