@@ -145,14 +145,14 @@ def compute_drift(published_rows: dict, rebuilt_rows: dict, raw_repositories: di
       regardless of whether either side's ``upstream.latest`` is known --
       a pin bump is real drift even for a repository with no GitHub
       releases or tags at all.
-    - ``unfetched``: ids the fresh manifest has no reliable data for this
-      run -- ``upstream.pushed_at`` is ``None`` (``github_freshness.py``
+    - ``unfetched``: ids the fresh manifest has no reliable upstream data for this
+      run (a pin change on such a row is still reported in ``drifted``, with its
+      fresh upstream fields nulled, because the pin comes from the local catalogs) -- ``upstream.pushed_at`` is ``None`` (``github_freshness.py``
       never fetched that repository this run, e.g. a bounded ``--max-repos``
       run or a full fetch failure) or the raw freshness record shows a
       fetch problem for it (see ``_freshness_record_has_error``, e.g. a
       releases-endpoint error papered over by a tags-endpoint fallback).
-      These are excluded from both ``drifted`` and ``no_release`` since
-      nothing reliable was observed either way.
+      Their upstream comparison is excluded from ``drifted`` and ``no_release``.
     - ``no_release``: ids that *were* reliably fetched this run
       (``pushed_at`` present, no recorded fetch problem) but whose
       ``upstream.latest`` is genuinely ``None`` on both sides -- the
@@ -167,14 +167,25 @@ def compute_drift(published_rows: dict, rebuilt_rows: dict, raw_repositories: di
             continue
         new_upstream = new.get("upstream") or {}
         new_latest = new_upstream.get("latest")
-        if new_upstream.get("pushed_at") is None or _freshness_record_has_error(
+        old_latest = (old.get("upstream") or {}).get("latest")
+        fetch_unreliable = new_upstream.get("pushed_at") is None or _freshness_record_has_error(
             new.get("repository"), raw_repositories,
-        ):
+        )
+        # The pin comes from the local catalogs, not from upstream, so a pin change is
+        # real drift whatever the fetch reliability of this run (Codex verification of
+        # 7a483f7: the original skills-ref 0.1.0 -> 0.1.1 repro without pushed_at).
+        if old.get("pin") != new.get("pin"):
+            drifted.append((component_id, old.get("pin"), new.get("pin"),
+                             old_latest, None if fetch_unreliable else new_latest,
+                             old.get("pin_behind_upstream"),
+                             None if fetch_unreliable else new.get("pin_behind_upstream")))
+            if fetch_unreliable:
+                unfetched.append(component_id)
+            continue
+        if fetch_unreliable:
             unfetched.append(component_id)
             continue
-        old_latest = (old.get("upstream") or {}).get("latest")
-        if (old.get("pin") != new.get("pin") or old_latest != new_latest
-                or old.get("pin_behind_upstream") != new.get("pin_behind_upstream")):
+        if old_latest != new_latest or old.get("pin_behind_upstream") != new.get("pin_behind_upstream"):
             drifted.append((component_id, old.get("pin"), new.get("pin"),
                              old_latest, new_latest,
                              old.get("pin_behind_upstream"), new.get("pin_behind_upstream")))

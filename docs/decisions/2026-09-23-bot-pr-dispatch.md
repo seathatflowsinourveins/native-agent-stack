@@ -369,3 +369,9 @@ test asserting the job-scoped, category-keyed concurrency group. Full
 `python3 -m unittest`, all validators, `zizmor`, `actionlint` and the
 guarded `gitleaks` scans were re-run after this round; exact counts and
 results are in the unit's final report.
+
+## Codex verification of 7a483f7 (2026-09-23): two further corrections
+
+- **A pin change on a row with unreliable upstream data was still hidden.** Codex's original repro (skills-ref 0.1.0 to 0.1.1 with no `pushed_at`) returned `drifted=[]` and `unfetched=['skills-ref']`. The pin comes from the local catalogs, not upstream, so `compute_drift` now reports a pin change as drift for every row. For a row whose fetch was unreliable, the fresh upstream fields are nulled and the row is also listed as unfetched. A regression test reproduces the original input exactly.
+- **Overlapping manual and scheduled proposals could mismatch the PR description.** Run A pushes, then run B observes A's commit and pushes with a successful lease, then A overwrites the PR body with its older report. The PR step now compares the remote branch head with this run's pushed commit, and only the run that is still the head updates the description. A window of seconds remains between that check and `gh pr edit`. Serialising the push and PR update across both triggers would need a single concurrency group, which reintroduces pending-run displacement across categories, because the pinned actionlint rejects `concurrency.queue`. Overturn condition: an actionlint release that accepts `queue`, or an observed mismatched description.
+- **Two pending manual requests can still replace each other** (GitHub's default single pending slot). This is accepted and documented: the later request supersedes the earlier one.

@@ -158,6 +158,20 @@ class ComputeDriftTests(unittest.TestCase):
         self.assertEqual(unfetched, [])
         self.assertEqual(no_release, [])
 
+    def test_codex_original_repro_pin_change_without_fetch_evidence_is_still_drift(self):
+        """Codex verification of 7a483f7: the ORIGINAL skills-ref 0.1.0 -> 0.1.1 repro
+        has no pushed_at. The pin comes from the local catalogs, so the change must be
+        reported as drift even though the upstream fields are unreliable; the row is
+        also listed as unfetched and its fresh upstream fields are nulled."""
+        published = {"skills-ref": self._row("0.1.0", None, pushed_at=None)}
+        rebuilt = {"skills-ref": self._row("0.1.1", None, pushed_at=None)}
+        drifted, unfetched, no_release = fp.compute_drift(published, rebuilt)
+        self.assertEqual([row[0] for row in drifted], ["skills-ref"])
+        self.assertEqual(drifted[0][1:3], ("0.1.0", "0.1.1"))
+        self.assertIsNone(drifted[0][4])
+        self.assertEqual(unfetched, ["skills-ref"])
+        self.assertEqual(no_release, [])
+
     def test_fetched_with_no_release_and_no_change_is_its_own_category(self):
         """A component reliably fetched this run (pushed_at set, no recorded fetch
         problem) but with no GitHub release or tag on either side, and no pin change,
@@ -891,6 +905,15 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertEqual(invocations, [])
         self.assertIn("approval-required", body)
         self.assertIn("https://docs.github.com/en/actions/concepts/security/github_token", body)
+
+    def test_pr_description_update_is_guarded_by_the_branch_head(self):
+        """Codex verification of 7a483f7: overlapping manual and scheduled proposals
+        could leave the PR description describing an older run's evidence. Only the
+        run whose pushed commit is still the branch head may update the PR."""
+        body = self._job_body("propose")
+        self.assertIn('echo "pushed_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"', body)
+        self.assertIn("PUSHED_SHA: ${{ steps.push.outputs.pushed_sha }}", body)
+        self.assertIn('if [ "$current_sha" != "$PUSHED_SHA" ]; then', body)
 
     def test_propose_job_states_the_correct_approval_ui_path(self):
         # N3: approval happens on the PR itself -- the GITHUB_TOKEN page's banner in the

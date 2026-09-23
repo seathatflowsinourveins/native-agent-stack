@@ -282,6 +282,7 @@ jobs:
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -m "Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))"
       - name: Push the evidence branch with the workflow token (never persisted to disk)
+        id: push
         env:
           GITHUB_TOKEN: ${{ github.token }}
           OBSERVED_SHA: ${{ steps.branch.outputs.observed_sha }}
@@ -294,13 +295,25 @@ jobs:
           GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $basic_auth" \
           git push --force-with-lease="automation/catalog-freshness:$OBSERVED_SHA" \
             origin HEAD:refs/heads/automation/catalog-freshness
+          echo "pushed_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Open or update the evidence PR
         id: pr
         env:
           GH_TOKEN: ${{ github.token }}
           RECEIPT_PATH: ${{ steps.build.outputs.receipt_path }}
+          PUSHED_SHA: ${{ steps.push.outputs.pushed_sha }}
         run: |
           set -euo pipefail
+          # A manual and a scheduled propose can overlap (separate concurrency groups).
+          # Only the run whose commit is still the branch head may write the PR
+          # description, so the description always matches the branch's evidence.
+          # A window of seconds remains between this check and `gh pr edit`.
+          current_sha="$(git ls-remote origin refs/heads/automation/catalog-freshness | awk '{print $1}')"
+          if [ "$current_sha" != "$PUSHED_SHA" ]; then
+            echo "automation/catalog-freshness moved to $current_sha after this run pushed $PUSHED_SHA; the newer run owns the PR description, skipping the update."
+            echo "pr_url=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           body_file="$RUNNER_TEMP/freshness/pr-body.md"
           {
             echo "## Catalog freshness: report-only drift evidence"

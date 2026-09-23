@@ -3008,8 +3008,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "23dede6aa2bebf9f6dd3f9f8f926fcef3a042d7c65699e8371aacafc4753f2c1",
-      "bytes": 19031
+      "sha256": "d729934e491dd94236199df45a09c2e7867c86a34b2f012a0330caa7df853008",
+      "bytes": 19910
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
