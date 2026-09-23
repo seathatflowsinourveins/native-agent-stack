@@ -8034,8 +8034,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "516cce6c31a76ffe7d75ea75ee575e5bf3f185be2bb08722b57c4f8b62275d1e",
-      "bytes": 102997
+      "sha256": "de95e0e075204efe5ade37aa11daad625035b3a2747eb89f1c2aec5ab61cdb55",
+      "bytes": 103223
     },
     {
       "path": "docs/evidence.md",
@@ -13019,8 +13019,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "cc8ef0795733e74bcefb802d93c6162299b12eed4eb4a32484e7d3e39a6a69e3",
-      "bytes": 48546
+      "sha256": "91972ba3d96c5275202c8f7629c6e532466f4f923dfe2c3ef1b6103fb6f0aab8",
+      "bytes": 48553
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -13269,8 +13269,8 @@
     },
     {
       "path": "tests/test_claude_repository_evidence.py",
-      "sha256": "36e2b158789e765614e5376565727fd7678b9769c8695c617bed4bc45c2d97d6",
-      "bytes": 10269
+      "sha256": "95b752a950ee8d6310ff5ec3b698bf0b0db7d421d6d227851604f0f2aa08896b",
+      "bytes": 10276
     },
     {
       "path": "tests/test_component_matrix.py",
@@ -13299,8 +13299,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "b5e847263c742924ca96773e4eded4dca9d0255c3245a4209744ec588f8c054f",
-      "bytes": 56250
+      "sha256": "8f77ba93ba4858aafb348f8fda9945f9ea7e85d94f2f4c34e025684f44d6908a",
+      "bytes": 56257
     },
     {
       "path": "tests/test_execution_realism.py",
@@ -13374,8 +13374,8 @@
     },
     {
       "path": "tests/test_lifecycle_capture.py",
-      "sha256": "ab76bdda7d8df777ed5efbf740a0456f18358a3e2cd19603e2e59a80c68757b2",
-      "bytes": 6656
+      "sha256": "266554101a1fe59e709a81003ed472b0f70b2feb4029efdd5e95e4931f1a3d28",
+      "bytes": 6812
     },
     {
       "path": "tests/test_lifecycle_sample.py",

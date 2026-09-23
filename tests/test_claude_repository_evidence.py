@@ -144,7 +144,7 @@ class ClaudeRepositoryEvidenceTests(unittest.TestCase):
         self.assertIn("connect-src 'none'", policy)
         script_src = policy.split("script-src", 1)[1].split(";", 1)[0]
         self.assertNotIn("unsafe", script_src)
-        bodies = [body for attrs, body in re.findall(r"<script([^>]*)>(.*?)</script>", page, re.S) if "application/json" not in attrs]
+        bodies = [body for attrs, body in re.findall(r"<script([^>]*)>(.*?)</script>", page, re.S | re.I) if "application/json" not in attrs]
         self.assertEqual(len(bodies), 1)
         expected = "'sha256-" + base64.b64encode(hashlib.sha256(bodies[0].encode("utf-8")).digest()).decode("ascii") + "'"
         self.assertEqual(script_src.split(), [expected])

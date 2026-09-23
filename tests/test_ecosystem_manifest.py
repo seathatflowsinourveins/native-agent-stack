@@ -228,7 +228,7 @@ process.stdout.write(JSON.stringify({nodes, errors, renderAttempts, navigations}
              ["injected renderer failure"], 1),
         ):
             with self.subTest(label=label):
-                script, = re.findall(r"<script>(.*?)</script>", html_text, re.S)
+                script, = re.findall(r"<script>(.*?)</script>", html_text, re.S | re.I)
                 result = subprocess.run(["node", "-e", harness], input=json.dumps({
                     "script": script, "data": payload}), capture_output=True, text=True, timeout=10)
                 self.assertEqual(result.returncode, 0, result.stderr)
