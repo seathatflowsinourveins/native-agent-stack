@@ -23,12 +23,12 @@
     {
       "client": "ibapi",
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20260923.json",
-      "sha256": "ccd3ace1a4c8df3dc7280b81cfac97bf1bfb199e7056cf5bc35196aa7edd95ed"
+      "sha256": "1e991754850b1ad18b5f8b6caf6510e57c4dc8d3c2ee7eaad6c09d67ac30a008"
     },
     {
       "client": "nautilus",
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/nautilus-readonly-20260923.json",
-      "sha256": "6d1e3e1ae0f13d9610598e285b8fc721b856704cd28f2bd537ba3b5930eb9b64"
+      "sha256": "639aa343318e757056d122c0bbdf31b42d4f6074160b1425e33d1c6ef55e25fb"
     }
   ],
   "observed_summary": {
@@ -52,10 +52,10 @@
       "tradingHoursSample": "20260923:0400-20260923:2000;20260924:040"
     },
     "market_data_type": "REALTIME",
-    "quote_age_s": -0.578,
+    "quote_age_s": 0.618,
     "max_quote_age_s": 900.0,
-    "history_bars_ibapi": 91,
-    "server_minus_local_s": -1.082,
+    "history_bars_ibapi": 92,
+    "server_minus_local_s": -1.016,
     "ibapi_errors": [],
     "nautilus_instrument": {
       "id": "SPY.ARCA",
@@ -64,7 +64,7 @@
       "conId": 756733,
       "primaryExchange": "ARCA",
       "currency": "USD",
-      "elapsed_s": 0.01
+      "elapsed_s": 0.002
     },
     "nautilus_bars": [
       {
@@ -74,7 +74,7 @@
         "count": 5,
         "first": "SPY.ARCA-1-DAY-LAST-EXTERNAL,759.50,761.67,749.60,754.05,37772236,1789603199999999999",
         "last": "SPY.ARCA-1-DAY-LAST-EXTERNAL,774.04,775.14,772.57,773.38,20070509,1790121599999999999",
-        "elapsed_s": 0.11
+        "elapsed_s": 0.114
       },
       {
         "spec": "5-MINUTE-LAST",
@@ -83,7 +83,7 @@
         "count": 390,
         "first": "SPY.ARCA-5-MINUTE-LAST-EXTERNAL,759.50,759.71,759.14,759.21,725714,1789565700000000000",
         "last": "SPY.ARCA-5-MINUTE-LAST-EXTERNAL,774.36,774.36,773.29,773.44,1620113,1790107200000000000",
-        "elapsed_s": 0.266
+        "elapsed_s": 0.133
       }
     ]
   },
@@ -194,12 +194,28 @@
     },
     {
       "utc": "2026-09-23T14:32:49Z",
+      "client": "ibapi_probe.py before the latched non-paper refusal",
+      "status": "passed",
+      "detail": "superseded after the Codex cross-review finding that a later non-paper managedAccounts callback did not stop reads",
+      "file": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T143249Z-ibapi.json",
+      "sha256": "ccd3ace1a4c8df3dc7280b81cfac97bf1bfb199e7056cf5bc35196aa7edd95ed"
+    },
+    {
+      "utc": "2026-09-23T14:32:51Z",
+      "client": "nautilus_probe.py (unchanged since)",
+      "status": "passed",
+      "detail": "paired with the superseded ibapi run",
+      "file": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T143251Z-nautilus.json",
+      "sha256": "6d1e3e1ae0f13d9610598e285b8fc721b856704cd28f2bd537ba3b5930eb9b64"
+    },
+    {
+      "utc": "2026-09-23T14:35:50Z",
       "client": "ibapi_probe.py (this commit)",
       "status": "passed",
       "detail": "published: evidence/ibapi-readonly-20260923.json"
     },
     {
-      "utc": "2026-09-23T14:32:51Z",
+      "utc": "2026-09-23T14:35:52Z",
       "client": "nautilus_probe.py (this commit)",
       "status": "passed",
       "detail": "published: evidence/nautilus-readonly-20260923.json"
@@ -225,9 +241,9 @@
     "Read-only step 1 only; acceptance-plan steps 2-4 (client-id ownership, bounded paper orders, reconnect/restart reconciliation) are not run.",
     "Market-data type depends on the session: DELAYED at 13:16Z (pre-market), none during a competing session at 13:23Z (10197), REALTIME from 14:13Z; a delayed quote never satisfies a case that needs a current real-time feed.",
     "Quote age uses IB's last-trade timestamp and server time, both at one-second resolution.",
-    "The paper-account check comes from the ibapi probe; the Nautilus historical client has no account query of its own.",
+    "The paper-account check comes from the ibapi probe; the Nautilus historical client has no account query of its own, so the Nautilus probe cannot verify account scope on its own connection and relies on an ibapi receipt for the same host and port written at most 300 s earlier.",
     "One session on one host (Windows IB Gateway 10.50 reached from WSL over mirrored networking); not a new-host acceptance.",
     "Account ids are not recorded, not even hashed; balances are not recorded."
   ],
-  "observed_utc": "2026-09-23T14:32:49.971823+00:00"
+  "observed_utc": "2026-09-23T14:35:50.945709+00:00"
 }

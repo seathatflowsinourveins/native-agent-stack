@@ -48,8 +48,9 @@ class Details:
 class FakeProbe(IBAPI.ProbeState):
     """Drives ProbeState callbacks synchronously in place of the ibapi client."""
 
-    def __init__(self, accounts="DU1234567", connected=True, positions=0, finish_positions=True):
+    def __init__(self, accounts="DU1234567", connected=True, positions=0, finish_positions=True, switch_to=None):
         super().__init__()
+        self.switch_to = switch_to
         self.accounts, self.connected, self.n_positions = accounts, connected, positions
         self.finish_positions, self.calls, self.disconnected = finish_positions, [], False
         self.client_version = "fake"
@@ -76,6 +77,8 @@ class FakeProbe(IBAPI.ProbeState):
             if name == "reqCurrentTime":
                 self.currentTime(int(__import__("time").time()))
             elif name == "reqPositions":
+                if self.switch_to:
+                    self.managedAccounts(self.switch_to)
                 for _ in range(self.n_positions):
                     self.position("DU1234567", None, 1, 1.0)
                 if self.finish_positions:
@@ -130,6 +133,7 @@ class AccountScopeAndPrivacy(unittest.TestCase):
 class ErrorRoutingAndVerdict(unittest.TestCase):
     def passing_state(self):
         state = IBAPI.ProbeState()
+        state.managedAccounts("DU1234567")
         state.currentTime(1790169413)
         state.r.update(spy_contract={"conId": 756733}, quote_age_s=12.0)
         state.tickPrice(9003, 1, 772.64, None)
@@ -156,6 +160,7 @@ class ErrorRoutingAndVerdict(unittest.TestCase):
         self.assertEqual(IBAPI.verdict({**state.r, "quote_age_s": -2.5}, ALL_DONE, 900), "incomplete")
         self.assertEqual(IBAPI.verdict({**state.r, "positions": 1}, ALL_DONE, 900), "blocked_existing_state")
         self.assertEqual(IBAPI.verdict({**state.r, "open_orders": 2}, ALL_DONE, 900), "blocked_existing_state")
+        self.assertEqual(IBAPI.verdict({**state.r, "paper_accounts": False}, ALL_DONE, 900), "refused_not_paper_account")
 
     def test_quote_age_uses_the_trade_timestamp_and_server_offset(self):
         state = IBAPI.ProbeState()
@@ -187,6 +192,15 @@ class IbapiMain(unittest.TestCase):
         self.assertEqual((code, receipt["status"]), (3, "refused_not_paper_account"))
         self.assertEqual(probe.calls, [])
         self.assertTrue(probe.disconnected)
+
+    def test_a_later_non_paper_account_callback_stops_all_further_reads(self):
+        probe = FakeProbe(switch_to="U7654321")
+        code, receipt = run_main(probe)
+        self.assertEqual((code, receipt["status"]), (3, "refused_not_paper_account"))
+        self.assertEqual(probe.calls, ["reqCurrentTime", "reqPositions", "cancelPositions"])
+        self.assertTrue(probe.disconnected)
+        probe = FakeProbe(switch_to="DU7654321")
+        self.assertEqual(run_main(probe)[0], 0)
 
     def test_not_connected(self):
         code, receipt = run_main(FakeProbe(connected=False))

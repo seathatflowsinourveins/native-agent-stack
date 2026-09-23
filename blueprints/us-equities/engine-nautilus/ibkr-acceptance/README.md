@@ -17,7 +17,8 @@ neither records account ids or balances.
 
 - `ibapi_probe.py` (official IB API client, `ibapi` 10.45.1): paper-account
   check (every managed account starts with `DU`, else disconnect before any
-  other read), server time, positions and open-order counts, account-summary
+  other read; the refusal is latched and checked before every request, so a
+  later non-paper account callback also stops the run), server time, positions and open-order counts, account-summary
   tag names, SPY contract identity, the market-data type actually granted with
   a snapshot quote and its last-trade time, and two days of 5-minute bars.
   `passed` needs every request to complete, zero existing positions and open

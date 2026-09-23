@@ -7,7 +7,7 @@
   "port": 4002,
   "client_id": 73,
   "deadline_seconds": 90.0,
-  "generated_at": "2026-09-23T14:35:50.945709+00:00",
+  "generated_at": "2026-09-23T14:32:49.971823+00:00",
   "ibapi_version": "10.45.1",
   "status": "passed",
   "evidence_class": "native_paper_readonly",
@@ -18,7 +18,7 @@
   "observed": {
     "account_count": 1,
     "paper_accounts": true,
-    "server_time_epoch": 1790174150,
+    "server_time_epoch": 1790173969,
     "positions": 0,
     "open_orders": 0,
     "summary_tags": [
@@ -39,16 +39,16 @@
     },
     "market_data_type": "REALTIME",
     "spy_quote": {
-      "last_trade_epoch": 1790174150,
-      "last": 769.84,
-      "first_tick_local_epoch": 1790174151.6331112,
-      "bid": 769.83,
-      "ask": 769.84
+      "last_trade_epoch": 1790173970,
+      "last": 769.18,
+      "first_tick_local_epoch": 1790173970.5034857,
+      "bid": 769.17,
+      "ask": 769.18
     },
     "history": {
-      "bars": 92,
+      "bars": 91,
       "first": "1790083800",
-      "last": "1790174100"
+      "last": "1790173800"
     },
     "errors": [],
     "info": [
@@ -68,8 +68,8 @@
         "text": "Sec-def data farm connection is OK:secdefil"
       }
     ],
-    "server_minus_local_s": -1.016,
-    "quote_age_s": 0.618,
+    "server_minus_local_s": -1.082,
+    "quote_age_s": -0.578,
     "max_quote_age_s": 900.0
   },
   "requests_completed": {

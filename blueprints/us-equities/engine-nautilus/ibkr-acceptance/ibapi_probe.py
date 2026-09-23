@@ -68,7 +68,10 @@ class ProbeState:
                   "market_data_type": None, "spy_quote": {}, "history": {"bars": 0}, "errors": [], "info": []}
 
     def managedAccounts(self, accountsList):
-        self.r["account_count"], self.r["paper_accounts"] = account_scope(accountsList)
+        count, paper = account_scope(accountsList)
+        self.r["account_count"] = max(self.r["account_count"], count)
+        # Latched: once any callback reports a non-paper account the probe stays refused.
+        self.r["paper_accounts"] = paper and self.r["paper_accounts"] is not False
         self.done["accounts"].set()
 
     def currentTime(self, t):
@@ -156,6 +159,8 @@ def verdict(r: dict, completed: dict, max_age: float) -> str:
     contract, bars, server time and a quote no older than the plan's limit. IB
     trade and server times have one-second resolution, so an age down to
     ``-QUOTE_AGE_RESOLUTION_S`` counts as current; anything earlier is refused."""
+    if r["paper_accounts"] is not True:
+        return "refused_not_paper_account"
     if not all(completed.get(k) for k in REQUESTS):
         return "incomplete"
     if r["positions"] or r["open_orders"]:
@@ -226,23 +231,33 @@ def main(argv=None, probe_factory=None, contract_factory=None) -> int:
         if not p.isConnected() or not wait("accounts", 10):
             receipt.update(status="not_connected", evidence_class="not_connected")
             return _write(a.receipt, receipt, p)
-        if not p.r["paper_accounts"]:
+        steps = (
+            ("time", 5, p.reqCurrentTime, None),
+            ("positions", 10, p.reqPositions, p.cancelPositions),
+            ("orders", 10, p.reqAllOpenOrders, None),
+            ("summary", 10, lambda: p.reqAccountSummary(9001, "All", SUMMARY_TAGS), lambda: p.cancelAccountSummary(9001)),
+            ("contract", 10, lambda: p.reqContractDetails(9002, contract()), None),
+            # Delayed data is allowed; the callback records the type actually granted.
+            ("mktdata", 15, lambda: (p.reqMarketDataType(3), p.reqMktData(9003, contract(), "", True, False, [])), None),
+            ("history", 20, lambda: p.reqHistoricalData(9004, contract(), "", "2 D", "5 mins", "TRADES", 1, 2, False, []),
+             None),
+        )
+        for key, seconds, request, after in steps:
+            if p.r["paper_accounts"] is not True:  # checked before every request
+                break
+            started = time.time()
+            request()
+            wait(key, seconds)
+            if after:
+                after()
+            if key == "time" and p.r["server_time_epoch"]:
+                # reqCurrentTime has one-second resolution; the midpoint bounds the local side.
+                p.r["server_minus_local_s"] = round(p.r["server_time_epoch"] - (started + time.time()) / 2, 3)
+            if key == "mktdata":
+                p.r["quote_age_s"], p.r["max_quote_age_s"] = quote_age(p.r, time.time()), limit
+        if p.r["paper_accounts"] is not True:
             receipt.update(status="refused_not_paper_account", evidence_class="none")
             return _write(a.receipt, receipt, p)
-        local_before = time.time()
-        p.reqCurrentTime()
-        wait("time", 5)
-        if p.r["server_time_epoch"]:
-            # reqCurrentTime has one-second resolution; the midpoint bounds the local side.
-            p.r["server_minus_local_s"] = round(p.r["server_time_epoch"] - (local_before + time.time()) / 2, 3)
-        p.reqPositions(); wait("positions", 10); p.cancelPositions()
-        p.reqAllOpenOrders(); wait("orders", 10)
-        p.reqAccountSummary(9001, "All", SUMMARY_TAGS); wait("summary", 10); p.cancelAccountSummary(9001)
-        p.reqContractDetails(9002, contract()); wait("contract", 10)
-        p.reqMarketDataType(3)  # delayed allowed; the callback records what is actually granted
-        p.reqMktData(9003, contract(), "", True, False, []); wait("mktdata", 15)
-        p.r["quote_age_s"], p.r["max_quote_age_s"] = quote_age(p.r, time.time()), limit
-        p.reqHistoricalData(9004, contract(), "", "2 D", "5 mins", "TRADES", 1, 2, False, []); wait("history", 20)
         completed = p.completed()
         receipt.update(status=verdict(p.r, completed, limit), evidence_class="native_paper_readonly",
                        existing_state={"positions": p.r["positions"] if completed["positions"] else None,
