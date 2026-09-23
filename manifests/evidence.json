@@ -7988,6 +7988,11 @@
       "bytes": 4241
     },
     {
+      "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
+      "sha256": "cf928a9df8cbcea6950ccd2e4b03679525ce773e479a2f1dba5656491dd5a910",
+      "bytes": 11201
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -13299,8 +13304,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "8f77ba93ba4858aafb348f8fda9945f9ea7e85d94f2f4c34e025684f44d6908a",
-      "bytes": 56257
+      "sha256": "cf68419d2b8874dc15ea5a359d331f7fbb890199d711acf5b3e281f892ebdfeb",
+      "bytes": 58403
     },
     {
       "path": "tests/test_execution_realism.py",

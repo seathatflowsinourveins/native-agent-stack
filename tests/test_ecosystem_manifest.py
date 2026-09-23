@@ -243,6 +243,36 @@ process.stdout.write(JSON.stringify({nodes, errors, renderAttempts, navigations}
                 else:
                     self.assertEqual(observed["errors"], expected_errors)
 
+    @unittest.skipUnless(shutil.which("node"), "safeHref allowlist check needs Node")
+    def test_safe_href_allowlists_http_https_and_rejects_other_schemes(self):
+        """Executes the committed `safeHref` helper (the CodeQL js/xss-through-dom
+        fix for `link()`'s `node.href = ...` assignment) under Node, not a
+        reimplementation, so a regression in the shipped code is caught here."""
+        template = (ROOT / "docs/ecosystem/template.html").read_text()
+        match = re.search(r"const safeHref = .*?;\n", template)
+        self.assertIsNotNone(match, "safeHref helper not found in template.html")
+        # `location` is a browser global the standalone helper relies on for relative
+        # URL resolution; stub it directly since a plain `node -e` context has none.
+        harness = ('const location = {href: "https://catalog.example/page"};\n'
+                   + match.group(0) + r'''
+const probes = ["javascript:alert(1)", "data:text/html,<script>1</script>",
+  "vbscript:msgbox(1)", "https://good.example/x", "http://good.example/y",
+  "//good.example/z", "/relative/path", "file:///etc/passwd", "mailto:x@y.example"];
+process.stdout.write(JSON.stringify(probes.map(safeHref)));
+''')
+        result = subprocess.run(["node", "-e", harness], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        resolved = json.loads(result.stdout)
+        self.assertEqual(resolved[0], "about:blank", "javascript: URI must not pass through")
+        self.assertEqual(resolved[1], "about:blank", "data: URI must not pass through")
+        self.assertEqual(resolved[2], "about:blank", "vbscript: URI must not pass through")
+        self.assertEqual(resolved[3], "https://good.example/x")
+        self.assertEqual(resolved[4], "http://good.example/y")
+        self.assertEqual(resolved[5], "https://good.example/z")
+        self.assertEqual(resolved[6], "https://catalog.example/relative/path")
+        self.assertEqual(resolved[7], "about:blank", "file: URI must not pass through")
+        self.assertEqual(resolved[8], "about:blank", "mailto: URI must not pass through")
+
     def test_useful_execution_requires_a_linked_receipt_and_keeps_limits(self):
         self.evidence["receipts"][0].update(kind="native_cli_e2e", claim="Exact query returned",
                                              limitations=["One historical fixture only"])
