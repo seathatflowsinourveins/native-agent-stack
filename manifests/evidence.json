@@ -7193,6 +7193,11 @@
       "bytes": 504565
     },
     {
+      "path": "catalogs/sota-convergence/manifest-20260923.json",
+      "sha256": "812c913c1e333ba0dca7721832569741f0b9d50618bad4ea4e434c9c031ef6d2",
+      "bytes": 568301
+    },
+    {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
       "sha256": "26f9826b855483587619aa87a6626dd81a12f921fbd7c3a0e330c1c7c204799f",
       "bytes": 1098507
@@ -11979,8 +11984,8 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "sha256": "557605ad4b390785ca9b9927be43fede3c66cc4a74b8f42976cb605ce87b69f2",
-      "bytes": 133084
+      "sha256": "486bfa1d94c7c3d01ff188434a447d12a08b1846f7c2eb4cd1900c09bb26fad3",
+      "bytes": 147840
     },
     {
       "path": "tests/test_spy_parity.py",
@@ -12044,13 +12049,13 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "75dbb3b3414afe3bb152af0bf2e362fea1eec1d042402617403e218a4915775d",
-      "bytes": 61245
+      "sha256": "dd7735c9deb65f5570a4252af8aa4832e1733f35435b4cbfca7a8817672f7d27",
+      "bytes": 63319
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "f3b3dfc83c53e2972ffed67ca7ce7635d828e2179a00e829a7645bf8abcd15aa",
-      "bytes": 74139
+      "sha256": "32bd46ac753d0e736f793013dc1ad748d9657c2a4768d96bd086f74806e17add",
+      "bytes": 87831
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
@@ -13596,6 +13601,11 @@
       "path": "tests/test_adaptive_paper_leverage.py",
       "sha256": "40ddd51e0e8c8393cfdd42b3e91ff4c1a08ec050ef1d61e5d5573e83113ded65",
       "bytes": 17681
+    },
+    {
+      "path": "evidence/artifacts/sota-convergence-review-20260923/manifest-citation-review.json",
+      "sha256": "dbfe159a5dda9e3772405dc410ac761bfdb4c9baa0621ccb5ba9b22c00462890",
+      "bytes": 67506
     }
   ],
   "convergence_records": [

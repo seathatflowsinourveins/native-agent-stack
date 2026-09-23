@@ -2332,5 +2332,215 @@ class RecheckResidualTests(unittest.TestCase):
         self.assertNotIn("exampleuser", build_manifest_mod.sanitize(home_root + "#/p"))
 
 
+
+class CitationReview20260923GeneratorFixTests(unittest.TestCase):
+    """Generator defects from the 2026-09-23 independent citation review
+    (evidence/artifacts/sota-convergence-review-20260923/
+    manifest-citation-review.json, catalog "tooling", generator_defect true)."""
+
+    def _build(self, *, foundation_components=(), trading_entries=(), lanes=(), repositories=None,
+               citation_review=None, trading_layer="layer-t", foundation_layer="layer-f"):
+        foundation_layers = {"checked_at": "2026-01-01", "layers": [{
+            "layer_id": foundation_layer, "title": "F", "components": list(foundation_components)}]}
+        trading_by_layer = {"taxonomy": {trading_layer: ["tag"]},
+                            "layers": {trading_layer: list(trading_entries)}}
+        freshness_doc = {"count": 0, "generated_at": "2026-01-02T00:00:00+00:00",
+                         "repositories": repositories or {}}
+        return build_manifest_mod.build_manifest(
+            checked_at="2026-01-03", manifest_id="test-id", scope="s",
+            foundation_layers=foundation_layers, trading_by_layer=trading_by_layer,
+            freshness_doc=freshness_doc, lanes_doc={"critic": None, "lanes": list(lanes)},
+            reconciliations=[], taxonomy=trading_by_layer["taxonomy"], citation_review=citation_review,
+        )
+
+    @staticmethod
+    def _lane(lane, layer_id, selected, proposals=()):
+        return {"lane": lane, "result": {"calls": {}, "limits": [], "layers": [{
+            "layer_id": layer_id, "selected": list(selected), "alternatives_keep_but_compare": [],
+            "new_candidates": [], "open_gaps": []}]}, "proposals": list(proposals)}
+
+    # Defect 1 (high, two reviewers): the lane-entry-to-card join.
+    def test_card_with_tree_or_release_tag_url_keeps_the_lane_review_of_the_plain_url(self):
+        plain_f = "https://github.com/example/plugin"
+        plain_t = "https://github.com/example/markdown-tool"
+        lanes = [
+            self._lane("foundation", "layer-f", [{
+                "repository": plain_f, "status": "unmaintained_signal", "evidence": ["gh api repos/example/plugin"],
+                "note": "stale", "why_selected": "bridge", "comparison_that_would_overturn": "a replay"}],
+                # The proposal cites the /tree/ alias; the join is by slug on both sides.
+                proposals=[{"layer": "layer-f", "repository": plain_f + "/tree/v1.0.6", "kind": "unmaintained_signal",
+                            "survives": True, "votes": [{"refuted": False}, {"refuted": False}]}]),
+            self._lane("trading", "layer-t", [{
+                "repository": plain_t, "status": "pin_behind_upstream", "evidence": ["receipt"],
+                "note": None, "why_selected": "converter", "comparison_that_would_overturn": "a corpus"}]),
+        ]
+        manifest = self._build(
+            foundation_components=[{"id": "plugin", "repository": plain_f + "/tree/v1.0.6", "version": "1.0.6"}],
+            trading_entries=[{"id": "markdown-tool", "repository": plain_t + "/releases/tag/v0.1.7",
+                              "decision": "default", "version_or_commit": "0.1.7", "layers": ["tag"]}],
+            lanes=lanes)
+        component = manifest["foundation"][0]["components"][0]
+        self.assertEqual(component["review_status"], "unmaintained_signal")
+        self.assertEqual(component["review_lane"], "foundation")
+        self.assertIn("gh api repos/example/plugin", component["evidence"])
+        self.assertEqual(component["why_selected"], "bridge")
+        self.assertEqual(component["comparison_that_would_overturn"], "a replay")
+        entry = manifest["trading"][0]["entries"][0]
+        self.assertEqual(entry["review_status"], "pin_behind_upstream")
+        self.assertEqual(entry["evidence"], ["receipt"])
+        self.assertEqual(entry["why_selected"], "converter")
+        self.assertEqual(entry["comparison_that_would_overturn"], "a corpus")
+
+    def test_the_exact_string_status_index_is_unchanged_for_direct_merge_lanes_callers(self):
+        repo = "https://github.com/example/plugin"
+        status = build_manifest_mod.merge_lanes({"lanes": [self._lane("foundation", "layer-f", [
+            {"repository": repo, "status": "confirmed_default", "evidence": []}])]}, {})[0]
+        self.assertIn(("layer-f", repo), status)
+        index = build_manifest_mod.index_status_by_join_key(status)
+        self.assertIn(("layer-f", "example/plugin"), index)
+
+    def test_lane_groupings_join_alias_urls_and_publish_a_url_the_lane_cited(self):
+        repo = "https://github.com/example/ref"
+        lanes = [self._lane("beyond", "reference-material", [
+            {"repository": repo + "/tree/main", "status": "confirmed_default", "evidence": ["a"]}]),
+                 self._lane("zeta", "reference-material", [
+            {"repository": repo, "status": "confirmed_default", "evidence": ["b"]}])]
+        manifest = self._build(lanes=lanes)
+        selected = manifest["lane_groupings"][0]["selected"]
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]["repository"], repo + "/tree/main")
+        self.assertEqual([o["lane"] for o in selected[0]["other_lane_reviews"]], ["zeta"])
+
+    # Defect 2 (medium + low): checkout paths keep their repository-relative path.
+    def test_checkout_paths_keep_the_repository_relative_path_and_distinct_readmes_stay_distinct(self):
+        checkout = "/home/example/code/catalog-checkout"
+        text = (f"see {checkout}/blueprints/us-equities/broad-universe/README.md and "
+                f"{checkout}/catalogs/us-equities/README.md and "
+                f"{checkout}/manifests/stack.json#/components/3 and /home/example/elsewhere/README.md")
+        cleaned = build_manifest_mod.sanitize(text, checkout_roots=[checkout])
+        self.assertEqual(cleaned, "see blueprints/us-equities/broad-universe/README.md and "
+                                  "catalogs/us-equities/README.md and manifests/stack.json#/components/3 "
+                                  "and <host-path>/README.md")
+        build_manifest_mod.assert_no_leak(cleaned)
+
+    def test_the_checkout_root_itself_becomes_a_token_and_trailing_punctuation_survives(self):
+        checkout = "/home/example/code/catalog-checkout"
+        cleaned = build_manifest_mod.sanitize(f"worktree {checkout}), then {checkout}.", checkout_roots=[checkout])
+        self.assertEqual(cleaned, "worktree <checkout>), then <checkout>.")
+        # A sibling directory sharing the prefix is not inside the checkout.
+        self.assertEqual(build_manifest_mod.sanitize(f"{checkout}-old/x.md", checkout_roots=[checkout]),
+                         "<host-path>/x.md")
+
+    def test_work_dir_precedes_checkout_and_no_roots_keeps_the_previous_redaction(self):
+        work_dir = "/home/example/state/run"
+        self.assertEqual(build_manifest_mod.sanitize(f"{work_dir}/lanes.json", work_dir=work_dir,
+                                                     checkout_roots=["/home/example/state"]),
+                         "<work-dir>/lanes.json")
+        self.assertEqual(build_manifest_mod.sanitize("/home/example/code/c/manifests/stack.json"),
+                         "<host-path>/stack.json")
+
+    def test_cli_defaults_the_checkout_root_to_this_repository(self):
+        args = build_manifest_mod.parse_args(["--lanes", "l.json", "--out", "o.json", "--checked-at", "d",
+                                              "--id", "i"])
+        self.assertIsNone(args.checkout_roots)
+        self.assertEqual(build_manifest_mod.REPO_ROOT, ROOT)
+
+    # Defect 3 (low): a pin that was not compared is never published as false.
+    def test_uncompared_pins_publish_not_compared_instead_of_false(self):
+        repositories = {"https://github.com/example/{}".format(name): {"latest_release": {"tag": "v2.2.1"}}
+                        for name in ("sha-pinned", "dev-pinned", "released")}
+        manifest = self._build(foundation_components=[
+            {"id": "sha-pinned", "repository": "https://github.com/example/sha-pinned", "version": "dd6ee538"},
+            {"id": "dev-pinned", "repository": "https://github.com/example/dev-pinned", "version": "2.0.0.dev0 @ c6fbd1c"},
+            {"id": "released", "repository": "https://github.com/example/released", "version": "2.2.1"},
+            {"id": "off-github", "repository": "https://gitlab.com/example/x", "version": "1.0.0"},
+        ], repositories=repositories)
+        rows = {c["id"]: c for c in manifest["foundation"][0]["components"]}
+        for card_id, reason in (("sha-pinned", "unversioned"), ("dev-pinned", "commit_pinned"),
+                                ("off-github", "non_github_or_os_package")):
+            self.assertIsNone(rows[card_id]["pin_behind_upstream"], card_id)
+            self.assertEqual(rows[card_id]["pin_comparison"], "not_compared", card_id)
+            self.assertEqual(rows[card_id]["pin_comparison_reason"], reason, card_id)
+        self.assertIs(rows["released"]["pin_behind_upstream"], False)
+        self.assertEqual(rows["released"]["pin_comparison"], "compared")
+        self.assertNotIn("pin_comparison_reason", rows["released"])
+        self.assertEqual(manifest["counts"]["pins_not_compared"], 3)
+        self.assertEqual(manifest["counts"]["pins_not_compared_by_reason"],
+                         {"commit_pinned": 1, "non_github_or_os_package": 1, "unversioned": 1})
+
+    # Defect 4 (low): an OS-package pin's review_status never says pin_behind_upstream.
+    def test_distro_package_pin_review_status_is_distro_managed_not_pin_behind_upstream(self):
+        repo = "https://github.com/systemd/systemd"
+        lanes = [self._lane("foundation", "layer-f", [
+            {"repository": repo, "status": "pin_behind_upstream", "evidence": ["v261.3 upstream"]}]),
+                 self._lane("beyond", "layer-f", [
+            {"repository": repo, "status": "pin_behind_upstream", "evidence": ["beyond"]}])]
+        manifest = self._build(
+            foundation_components=[{"id": "systemd", "repository": repo, "version": "255.4-1ubuntu8.17"}],
+            lanes=lanes, repositories={repo: {"latest_release": {"tag": "v261.3"}}})
+        row = manifest["foundation"][0]["components"][0]
+        self.assertIsNone(row["pin_behind_upstream"])
+        self.assertEqual(row["pin_comparison_reason"], "os_package_pin")
+        self.assertEqual(row["review_status"], "distro_managed")
+        self.assertIn("v261.3 upstream", row["evidence"])
+        self.assertTrue(any("published as distro_managed" in item for item in row["evidence"]))
+        self.assertEqual(row["other_lane_reviews"][0]["status"], "distro_managed")
+
+    def test_distro_mapping_keeps_the_unverified_suffix_and_leaves_other_rows_alone(self):
+        self.assertEqual(build_manifest_mod.reconcile_status_with_pin(
+            "pin_behind_upstream_unverified", {"pin_comparison_reason": "os_package_pin"})[0],
+            "distro_managed_unverified")
+        self.assertEqual(build_manifest_mod.reconcile_status_with_pin(
+            "pin_behind_upstream", {"pin_comparison": "compared"}), ("pin_behind_upstream", None))
+        self.assertEqual(build_manifest_mod.reconcile_status_with_pin(
+            "confirmed_default", {"pin_comparison_reason": "os_package_pin"}), ("confirmed_default", None))
+
+    # Defect 5 (low): a non-version tag from the tag listing is flagged, not published as latest.
+    def test_tag_only_non_version_tag_is_flagged_not_published_as_latest(self):
+        repo = "https://github.com/postgres/postgres"
+        upstream = build_manifest_mod.compute_upstream(repo, {repo: {"latest_tag": "release-6-3"}})
+        self.assertIsNone(upstream["latest"])
+        self.assertEqual(upstream["latest_flag"], {"tag": "release-6-3",
+                                                   "reason": "tag_listing_only_not_version_shaped"})
+        manifest = self._build(foundation_components=[{"id": "postgresql", "repository": repo, "version": "18.1"}],
+                               repositories={repo: {"latest_tag": "release-6-3"}})
+        row = manifest["foundation"][0]["components"][0]
+        self.assertIsNone(row["upstream"]["latest"])
+        self.assertEqual(row["pin_comparison"], "not_compared")
+        # A version-shaped tag-only fallback and a release are unchanged.
+        tagged = build_manifest_mod.compute_upstream(repo, {repo: {"latest_tag": "v3.2.0"}})
+        self.assertEqual(tagged["latest"], "v3.2.0")
+        self.assertNotIn("latest_flag", tagged)
+        released = build_manifest_mod.compute_upstream(repo, {repo: {"latest_release": {"tag": "nightly"}}})
+        self.assertEqual(released["latest"], "nightly")
+        self.assertNotIn("latest_flag", released)
+
+    # Review-schema component field: a multi-layer, multi-component finding
+    # attaches to every row it names instead of falling into general.
+    def test_component_field_finding_attaches_to_every_named_row(self):
+        manifest = self._build(
+            foundation_components=[{"id": "alpha", "repository": "https://github.com/example/alpha", "version": "1"},
+                                   {"id": "alpha-extended", "repository": "https://github.com/example/ae", "version": "1"}],
+            trading_entries=[{"id": "data-alpha", "repository": "https://github.com/example/da",
+                              "decision": "default", "version_or_commit": "1", "layers": ["tag"]}],
+            citation_review={"findings": [
+                {"catalog": "foundation", "layer": "layer-f, other-layer", "component": "alpha (plus notes)",
+                 "reviewer": "r", "severity": "low", "claim": "c1", "fix": "f", "evidence": "e"},
+                {"catalog": "trading", "layer": "multiple", "component": "data-alpha, absent-card",
+                 "reviewer": "r", "severity": "low", "claim": "c2", "fix": "f", "evidence": "e"},
+                {"catalog": "trading", "layer": "multiple", "component": "absent-card",
+                 "reviewer": "r", "severity": "low", "claim": "c3", "fix": "f", "evidence": "e"},
+            ]})
+        rows = {c["id"]: c for c in manifest["foundation"][0]["components"]}
+        self.assertEqual([f["claim"] for f in rows["alpha"]["citation_review"]], ["c1"])
+        self.assertEqual(rows["alpha"]["citation_review"][0]["component"], "alpha (plus notes)")
+        self.assertNotIn("citation_review", rows["alpha-extended"])
+        self.assertEqual([f["claim"] for f in manifest["trading"][0]["entries"][0]["citation_review"]], ["c2"])
+        self.assertEqual([f["claim"] for f in manifest["citation_review"]["general"]], ["c3"])
+        self.assertEqual(manifest["counts"]["citation_review"], {
+            "findings_in_artifact": 3, "findings": 3, "out_of_scope": 0,
+            "attached": 2, "rows_flagged": 2, "general": 1})
+
+
 if __name__ == "__main__":
     unittest.main()

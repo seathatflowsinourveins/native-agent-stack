@@ -149,6 +149,37 @@ default reconciliation file. No step here calls a model.
   which also excludes a distro pin that happens not to match the suffix
   pattern. A version merely *annotated* with a commit fingerprint
   (`0.25.0 (<commit>)`) is still compared normally.
+- **Pin comparison state** (2026-09-23 citation review): every
+  foundation/trading row carries `pin_comparison` (`compared` or
+  `not_compared`). A pin the generator could not compare (a non-GitHub
+  repository, an OS-package or `.devN` pin, or a pin/upstream with no
+  parseable version, reason `unversioned`) publishes `pin_behind_upstream:
+  null` and `pin_comparison_reason`, never a definite `false`;
+  `counts.pins_not_compared[_by_reason]` totals them. A lane's
+  `pin_behind_upstream` status on an OS-package pin (systemd) is published as
+  `distro_managed` (the `_unverified` suffix kept), the lane's status noted in
+  the row evidence. A tag-only upstream whose listed tag is not
+  version-shaped (`release-6-3` for the postgres mirror, `show` for kafka) is
+  moved to `upstream.latest_flag` and `upstream.latest` is null: the
+  freshness step reads the first tag in GitHub's name order, not the newest
+  release.
+- **Slug-keyed lane join** (`repo_join_key`, `index_status_by_join_key`):
+  lane entries, their adversarial verdicts and lane_groupings rows join on
+  `(layer, normalized GitHub slug)`, so a card whose repository carries a
+  `/releases/tag/...` or `/tree/...` suffix keeps the lane review of the plain
+  URL (15 lane reviews were dropped by the previous exact-string join in the
+  2026-09-23 draft). `merge_lanes` still returns its exact-string index for
+  direct callers.
+- **Checkout-relative citations** (`--checkout-root`, repeatable, default:
+  the checkout the tool runs from): a cited path inside a checkout of this
+  repository is published repository-relative (`manifests/stack.json`), so
+  same-named files stay distinct; the checkout root itself becomes
+  `<checkout>`. Paths outside it keep the `<work-dir>/` or `<host-path>/`
+  basename redaction.
+- **Component-field citation findings**: a review finding that does not
+  resolve to a single card but carries its own `component` field attaches to
+  every card that field names within the layers its `layer` field names (all
+  layers of its catalog when it names none, e.g. `multiple`).
 - **Slug-normalized freshness lookup** (`github_repo_slug`,
   `compute_upstream`, `repository_known`): a component/entry's `repository`
   field is looked up in the freshness snapshot first by exact URL, then by
