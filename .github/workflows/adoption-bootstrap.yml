@@ -464,6 +464,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # Full history, as in validate.yml: host_receipts.py validate resolves each
+          # receipt's catalog_revision, which a depth-1 clone does not contain.
+          fetch-depth: 0
       - name: Set up the manifest-supported Python line
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
