@@ -893,8 +893,39 @@ class QdrantConfigProvisionTests(unittest.TestCase):
         )
         return subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=30)
 
+    @staticmethod
+    def _parse_two_level_yaml(text):
+        """Parse the flat two-level mapping examples/qdrant.yaml.example uses
+        (top-level keys, two-space-indented scalar children) without PyYAML,
+        which the macos-15 setup-python interpreter does not have -- this
+        provisioning check must still run on macOS itself."""
+        def scalar(raw):
+            raw = raw.strip()
+            if raw in ("null", "~", ""):
+                return None
+            if raw in ("true", "false"):
+                return raw == "true"
+            if raw.lstrip("-").isdigit():
+                return int(raw)
+            if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in "'\"":
+                return raw[1:-1]
+            return raw
+        data, section = {}, None
+        for line in text.splitlines():
+            if not line.strip() or line.lstrip().startswith("#"):
+                continue
+            key, sep, value = line.strip().partition(":")
+            if not sep:
+                raise ValueError(f"unparsable line: {line!r}")
+            if line.startswith("  ") and section is not None:
+                data[section][key] = scalar(value)
+            elif value.strip():
+                data[key], section = scalar(value), None
+            else:
+                data[key], section = {}, key
+        return data
+
     def test_provisions_a_default_config_matching_the_selected_linux_recipe_shape(self):
-        import yaml
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             eco_root = tmp_path / "eco"
@@ -902,7 +933,7 @@ class QdrantConfigProvisionTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             config_path = eco_root / "config" / "qdrant.yaml"
             self.assertTrue(config_path.is_file())
-            data = yaml.safe_load(config_path.read_text())
+            data = self._parse_two_level_yaml(config_path.read_text())
             # Mirrors examples/qdrant.yaml.example exactly: storage under
             # $ECO_ROOT/state (never inside a version-pinned tools/<id>-
             # <version> directory a later bump can replace wholesale),

@@ -14580,8 +14580,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "338e3907e6d5cb3053b7d0b7af82378b0c8a1829dc64bf64ffcacb6e478d544e",
-      "bytes": 158390
+      "sha256": "aeeb644b53e0ab0075ed97596d6a625ed156c26612971b3bdd1ff28cacea40a0",
+      "bytes": 159726
     },
     {
       "path": "tests/test_adoption_contract.py",
