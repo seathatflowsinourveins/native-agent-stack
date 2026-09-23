@@ -1,0 +1,17 @@
+2026-09-23T00:06:00Z versions
+2026-09-23T00:06:00Z snapshots
+exit=0
+2026-09-23T00:06:01Z check --read-data
+exit=0
+2026-09-23T00:06:01Z restore latest
+exit=0
+2026-09-23T00:06:02Z restored dir: restored2~/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/ai-memory-copy
+2026-09-23T00:06:02Z diff pre-backup copy vs fresh restore
+exit=0
+2026-09-23T00:06:03Z baseline dir = copy of the pre-backup copy (server bookkeeping must not touch the original)
+2026-09-23T00:06:04Z servers baseline_pid=3563305 restored_pid=3563306 ready_after=2s
+baseline status exit=0
+baseline search exit=0
+restored status exit=0
+restored search exit=0
+2026-09-23T00:06:04Z servers stopped

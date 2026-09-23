@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "id": "ai-memory-local-scope-reread",
+  "date": "2026-09-22",
+  "layer_ids": ["agents-models-workers", "durable-memory"],
+  "gap_refs": [
+    {"layer_id": "agents-models-workers", "gap_index": 5},
+    {"layer_id": "agents-models-workers", "gap_index": 8}
+  ],
+  "purpose": "In the same disposable ai-memory 2.3.2 instance used for the deletion-erasure probe, record the 2.3.2 scope fields and behaviour relevant to the stale v2.3.1 pin recorded in catalogs/landscape/us-equities.json's agents-models-workers row (open_gaps index 5 and 8: 'ai-memory's pin v2.3.1 is behind upstream v2.4.0' and 'The ai-memory evidence establishes explicit agent-lab scope only for the Claude memory_status call. The Codex memory_status entry records no scope fields.'). Do NOT run the forced auto-improve trial if it would call any LLM provider; check config first and record the decision.",
+  "preregistered": "Expectation before running: the catalog row was written against a mixed pin history (v2.3.1 in the catalog decision text, but the Claude memory receipt actually used ai-memory 2.1.277/2.1.278, and the installed binary today is 2.3.2). [FIX-ROUND CORRECTION, added after independent review: this premise was wrong. 2.1.277/2.1.278 are Claude Code CLIENT versions cited in the same gap text, not ai-memory versions -- see the corrected 'result' field below. The original preregistration text is left unedited above, as the historical record of what was assumed before this check ran; only this bracketed note and the downstream result/verdict_impact/limitations fields were corrected.] Preregistered prediction: (1) `ai-memory --version` will confirm 2.3.2 is what is actually installed (not 2.3.1 or 2.1.x), settling the version-currency part of gap 8 as 'row is stale on the exact version number, though the underlying upstream-lag direction (installed behind latest upstream release) may still hold'. (2) config.toml and CLI output will show 2.3.2 prints an explicit resolved workspace/project ('scope <ws>/<proj>') on every write/delete/search call when a `.ai-memory.toml` marker or explicit --workspace/--project is present, which would be new evidence for the CLI surface (distinct from the MCP memory_status surface gap 5 is actually about) -- so this check can only PARTIALLY settle gap 5, since gap 5 is specifically about MCP tool call scope fields observed from native Codex/Claude clients, which this read-only CLI probe does not invoke. (3) auto_improve config will be checked for an LLM provider before any auto-improve command is considered; if none is configured (expected, since no AI_MEMORY_LLM_PROVIDER/ANTHROPIC/OPENAI env vars are set in this authorized-scope session), the auto-improve trial will be skipped and that decision recorded, not silently omitted.",
+  "commands": [
+    {
+      "cmd": "ai-memory --version",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "ai-memory 2.3.2",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "cat <disposable-1>/config.toml | sed -n '/\\[slots\\]/,/\\[consolidation\\]/p; /\\[routing\\]/,/\\[auth\\]/p'",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "[slots] per_user = false. [routing] mid_session = \"follow-cwd\" (comment: 'follow-cwd (default) Re-resolve every mid-session event from its own cwd ... splitting one session's raw record across two projects' vs 'sticky Keep the session's project wherever the agent wanders ... Recommended when one agent session means one project.'). [auto_scope] mode is commented out (default per_actor): 'keyed by identity + session. Two harnesses, or two operators, keep separate pointers. Falls back to the shared slot for a caller with no coordinate and for installs with no lifecycle hooks.'",
+      "output_sha256": "7dfb03807646acc94395c57f3503cd50525ee8ee74e2ac427bd4373a8f219018"
+    },
+    {
+      "cmd": "cat $HOME/code/agent-lab/.ai-memory.toml",
+      "exit": 0,
+      "duration_s": 0.01,
+      "output_excerpt": "workspace = \"agent-lab\"\nproject = \"agent-lab\"\n[capture]\nignore_paths = [\".env\", ...]\n[briefing]\ninject_on_session_start = false",
+      "output_sha256": "a47ee1291f2412db9dd1b1d527fed5cae76eda19ec262b00a52e560826d8c5ae"
+    },
+    {
+      "cmd": "(cwd=$HOME/code/agent-lab) ai-memory write-page --data-dir <disposable-1> --path scratch/erasure-probe-2.md --body ... --title 'Erasure probe 2'   [no --workspace/--project supplied]",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "ai-memory: scope agent-lab/agent-lab (workspace + project from $HOME/code/agent-lab/.ai-memory.toml)\nwrote scratch/erasure-probe-2.md (page_id=01a0cb56) under agent-lab/agent-lab",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "ai-memory search/delete-page/status --data-dir <disposable-1>  (repeated across the deletion-erasure-probe run)",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "Every one of these commands printed the same resolved-scope line before its own result: 'ai-memory: scope agent-lab/agent-lab (workspace + project from $HOME/code/agent-lab/.ai-memory.toml)' -- scope resolution is echoed on every CLI call, not silent.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "grep -n 'AI_MEMORY_LLM_PROVIDER\\|\\[llm\\]' <disposable-1>/config.toml ; env | grep -i 'AI_MEMORY_LLM\\|ANTHROPIC\\|OPENAI'",
+      "exit": 1,
+      "duration_s": 0.05,
+      "output_excerpt": "no match in config.toml (llm provider line is commented out / absent by default); no AI_MEMORY_LLM_PROVIDER, ANTHROPIC_*, or OPENAI_* variable set in this session's environment",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "grep -n 'providers:' -A2 <serve status output>",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "On the disposable server: 'providers: llm: disabled  embedding: disabled' (status against the isolated 49483 instance, before any embed model finished downloading). On the LIVE server (read-only observation, not touched further): 'providers: llm: codex/gpt-5.6-luna ok ... embedding: local/all-MiniLM-L6-v2 (384d) ok' -- the live install DOES have an LLM provider configured; the disposable one deliberately does not.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "DECISION: auto-improve trial not run.",
+      "exit": 0,
+      "duration_s": 0,
+      "output_excerpt": "Config check confirms the disposable instance has no LLM provider configured (providers.llm = disabled) and the session environment has no AI_MEMORY_LLM_PROVIDER/ANTHROPIC/OPENAI credentials. `ai-memory auto-improve` requires min_observations=8 and an LLM for the actual proposal-generation step (per config.toml's [auto_improve] section and CLI help text); running it against a provider-less instance would either no-op or attempt a network LLM call this task is not authorized to make, so it was skipped rather than run-and-hope. This decision is the deliverable for this part of the check.",
+      "output_sha256": "n/a"
+    }
+  ],
+  "tool_versions": {
+    "ai-memory": "2.3.2"
+  },
+  "installs": [],
+  "result": "FIX-ROUND CORRECTION: the original version of this receipt misread the '2.1.277'/'2.1.278' numbers in gap 8's text as additional ai-memory version citations. They are not. Cross-checked against catalogs/landscape/foundation.json (lines 110, 112, 131, 364, 726, etc., e.g. 'Claude Code 2.1.278 used Fable 5.1') and docs/grand-catalog-handbook.md (evidence/receipts/native-memory.json: 'native Claude 2.1.277 (claude-opus-5[1m])'), 2.1.277/2.1.278 are Claude Code CLIENT versions -- the version of the Claude Code session that made the cited memory_status/memory_read_page calls -- not ai-memory server/binary versions at all. That claim ('the catalog row's version citations are internally inconsistent across three different numbers') is retracted; it was a factual error in the original receipt, now corrected. Version currency, corrected: only ONE ai-memory version discrepancy is actually supported by this check -- gap 8's decision/pin text names ai-memory v2.3.1, while this check's fresh `ai-memory --version` on the installed binary returns 2.3.2. That single discrepancy (2.3.1 named vs. 2.3.2 installed) is real and stands; it is unrelated to, and should not be conflated with, the separate 2.1.277-vs-2.1.278 Claude Code client-version numbers in the same gap text, which describe two different native Claude Code sessions used across two different receipts, not ai-memory itself. Scope fields: on the CLI surface (write-page/search/delete-page/status), 2.3.2 resolves and PRINTS an explicit 'ai-memory: scope <workspace>/<project> (workspace + project from <path>/.ai-memory.toml)' line before every command's own output whenever a `.ai-memory.toml` marker is present in the caller's cwd (observed directly: running from $HOME/code/agent-lab resolved to agent-lab/agent-lab on every call, matching that project's own marker file). This shows the CLI's marker-based auto-detection working and explicit, which is consistent with (does not contradict) this project's own CLAUDE.md guidance for 'session-aware clients'. Auto-scope config default is [auto_scope] mode = per_actor (commented default, not overridden here) and [routing] mid_session = follow-cwd (also default), both read directly from config.toml comments rather than inferred. Auto-improve: config check performed first; no LLM provider was configured on the disposable instance (providers.llm: disabled) and no LLM credentials existed in the session environment, so the auto-improve trial was correctly SKIPPED rather than attempted -- this decision is recorded per the binding instruction, not silently omitted.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "This does not change the durable-memory/agents-models-workers verdicts. FIX-ROUND CORRECTED: it settles exactly one factual detail -- the installed ai-memory binary is 2.3.2, confirming durable-memory gap 4's version text and flagging agents-models-workers gap 8's 'v2.3.1' text as stale relative to what is actually installed today. It does NOT find the catalog row's version citations inconsistent 'across three different numbers': the '2.1.277'/'2.1.278' figures in the same gap text are Claude Code client versions, not ai-memory versions (see corrected result field), so there is no three-way inconsistency to reconcile -- only the single 2.3.1-named-vs-2.3.2-installed gap. This check also adds new CLI-level scope evidence, but gap 5's actual claim is about the MCP memory_status tool surface as invoked by native Codex/Claude clients specifically -- this check exercised the ai-memory CLI directly (write-page/search/status), not an MCP tool call from either native client, so it cannot confirm or refute whether a fresh native Codex memory_status call now includes scope fields. That remains open and would need a live native-client MCP call (out of this read-only, no-LLM-call check's authorized scope) to settle fully."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Only the CLI surface (write-page/search/delete-page/status) was exercised, not the MCP memory_status tool as called by a native Codex or Claude session -- gap 5's exact claim (about MCP call scope fields) is only partially addressed by analogy, not directly settled.",
+    "Auto-improve was deliberately not run at all (config-checked and skipped), so no evidence was gathered about auto-improve's own scope behavior specifically -- only that it was correctly not attempted without a provider.",
+    "FIX-ROUND CORRECTION: the original receipt's claim of 'three different version citations' was a factual error and is retracted -- 2.1.277/2.1.278 in gap 8's text are Claude Code client versions (cross-checked against catalogs/landscape/foundation.json and docs/grand-catalog-handbook.md's cited evidence/receipts/native-memory.json), not ai-memory versions, so they are not part of any ai-memory version inconsistency. The only actual ai-memory version discrepancy this check supports is: catalog gap 8 names v2.3.1, this check's fresh `ai-memory --version` reports 2.3.2 installed. This single discrepancy was not reconciled by editing catalogs/landscape/us-equities.json, per the binding rule against editing that file; this receipt documents it for the coordinator to reconcile.",
+    "Live-server provider info (codex/gpt-5.6-luna) was observed read-only via `status` against the already-running live server as an incidental side effect of diagnosing the --data-dir hijack described in deletion-erasure-probe.json; no call was made to that provider."
+  ],
+  "raw_artifacts": [
+    {"path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/retrieval-memory/ai-memory-disposable-1/config.toml", "sha256": "7dfb03807646acc94395c57f3503cd50525ee8ee74e2ac427bd4373a8f219018"},
+    {"path": "$HOME/code/agent-lab/.ai-memory.toml", "sha256": "a47ee1291f2412db9dd1b1d527fed5cae76eda19ec262b00a52e560826d8c5ae"}
+  ]
+}

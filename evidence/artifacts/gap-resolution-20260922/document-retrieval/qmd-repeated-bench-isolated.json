@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "qmd-repeated-bench-isolated",
+  "date": "2026-09-22",
+  "layer_ids": ["document-retrieval"],
+  "gap_refs": [
+    {"layer_id": "document-retrieval", "gap_index": 1}
+  ],
+  "purpose": "Repeat the September 21 QMD diagnostic (bm25/hybrid/full/vector modes via `qmd bench`) three times warm and three times cold using a DISPOSABLE qmd index (never registered in the live 'native-agent-stack-catalog' index) built from a collection matching the frozen fixture blueprints/us-equities/retrieval-evaluation/fixture.json's 'us-equities-foundation' collection name, and record variance across repeats.",
+  "preregistered": "Expectation before running: the September 21 baseline (evidence/artifacts/foundation-rd-20260921/qmd-comparison.json) reports one ordered run with per-mode average latencies bm25=5ms, vector=172ms, hybrid=10328ms, full=75920ms, and an EARLIER incomplete attempt at the same command that hit `timeout 300` (exit 124) before a second, unbounded attempt succeeded. Preregistered prediction: repeated warm/cold bench invocations on a disposable index, isolated from the live catalog index, would show low variance for bm25/vector (deterministic, non-LLM scoring) and high variance for hybrid/full (which invoke a local llama.cpp generation model for query expansion), plausibly including at least one run that again exceeds a 300s per-mode budget, consistent with the retained 'earlier incomplete attempt' already on file. A result where all 6 runs complete quickly and consistently would refute this and establish hybrid/full as stable enough to re-evaluate the BM25-retain decision on latency grounds alone.",
+  "commands": [
+    {
+      "cmd": "rm -f ~/.cache/qmd/scratch-test.sqlite*  (cleanup of an accidental first probe index name, before building the real one)",
+      "exit": 0,
+      "duration_s": 0.01,
+      "output_excerpt": "(no output)",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "cd $HOME/code/nas-wt-gap-retrieval-memory && qmd --index retrieval-memory-isolated-20260922 collection add blueprints/us-equities --name us-equities-foundation",
+      "exit": 0,
+      "duration_s": 0.34,
+      "output_excerpt": "Creating collection 'us-equities-foundation'... Collection: .../blueprints/us-equities (**/*.md). Indexed: 67 new, 0 updated, 0 unchanged, 0 removed. Collection 'us-equities-foundation' created successfully. Index: $HOME/.cache/qmd/retrieval-memory-isolated-20260922.sqlite",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "ECOSYSTEM_JOB_SECONDS=600 ecosystem-bounded-run qmd --index retrieval-memory-isolated-20260922 embed",
+      "exit": 0,
+      "duration_s": 178.95,
+      "output_excerpt": "Model: embeddinggemma-300M-Q8_0.gguf ... Done! Embedded 279 chunks from 67 documents in 2m 59s",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_HIGH=6G ECOSYSTEM_JOB_MEMORY_MAX=8G ecosystem-bounded-run qmd --index retrieval-memory-isolated-20260922 bench blueprints/us-equities/retrieval-evaluation/fixture.json   [run 1, immediately following embed = the intended 'cold' condition; run backgrounded, monitored, then terminated with SIGTERM after ~8 minutes when it had not progressed past query 1 of 12]",
+      "exit": 143,
+      "duration_s": 497.6,
+      "output_excerpt": "sec-availability / bm25... 4ms\nsec-availability / vector... 1897ms\nsec-availability / hybrid...Structured query expansion failed: DisposedError: Object is disposed\n  at GenerateResponseState.ensureNotAborted (node-llama-cpp/.../LlamaChat.js:1074:19)\n  ... at LlamaCpp.expandQuery (@tobilu/qmd/dist/llm.js:1235:28)\n 303687ms\nsec-availability / full...[terminated here by SIGTERM, no further output]",
+      "output_sha256": "78400b1ad11249cece6cbc085caead97da48a7e915f71b832b7d9eb541589283"
+    }
+  ],
+  "tool_versions": {
+    "qmd": "2.8.3",
+    "embedding_model": "hf_ggml-org_embeddinggemma-300M-Q8_0.gguf (shared, pre-existing local cache, not re-downloaded)"
+  },
+  "installs": [],
+  "result": "FIX-ROUND CORRECTION of the original receipt's numeric and framing errors (identified by independent review); the underlying commands/output are unchanged, only the analysis is corrected. The check as literally specified (3x cold + 3x warm complete 4-mode bench passes) could NOT be completed. Only query 1 of 12 (sec-availability) was reached in run 1 before the job was terminated: bm25=4ms and vector=1897ms. CORRECTED comparison against the September 21 baseline (5ms/172ms respectively): bm25 (4ms) was NOT slower than baseline -- it was marginally faster (0.8x, i.e. no slowdown at all); the original receipt's claim of a 'roughly 1000x' bm25 slowdown was a fabricated/erroneous figure and is retracted. Only vector showed a real slowdown, ~11.0x (1897ms / 172ms). The hybrid mode's query-expansion step then threw an unhandled exception from the underlying node-llama-cpp library ('DisposedError: Object is disposed') after 303687ms (~5.06 minutes) for a SINGLE query, versus the baseline's 10328ms average -- a real and large (~29x) slowdown, distinct from bm25/vector. Bench then moved on to 'full' mode for the same first query; the job was terminated by SIGTERM at duration_s=497.6s total. CORRECTED arithmetic: bm25 (4ms) + vector (1897ms) + hybrid (303687ms) account for 305588ms (305.6s) of the 497.6s total, leaving approximately 192s (~3.2 minutes, NOT '~8 minutes' as the original receipt claimed) during which 'full' mode ran with no output before termination. The original receipt's numbers were internally inconsistent (its own body text said 'a further ~8 minutes' for full mode, which would total roughly 13 minutes together with the ~5-minute hybrid stall, and a separate summary elsewhere said 'terminated via SIGTERM after ~13 minutes' -- neither matches the recorded duration_s=497.6s/~8.3 minutes total); this fix-round version uses duration_s as the source of truth and corrects both. Elapsed CPU time on the node process exceeded 150 minutes across threads during this window, indicating heavy but unproductive parallel work. No second or third 'cold' rebuild, and no 'warm' repeats, were attempted after this outcome, per the binding rule against re-running a check to fish for a different outcome. FIX-ROUND ADDITION: this host-contention framing was also incomplete. The bench run's own working directory (qmd-bench-runs/, created 18:53:56 local) and this same builder's own disposable ai-memory `serve` process (aim-serve-disposable.log, its ~87 MB local-embedding-model fetch running 18:56:37-18:57:30 local, log ending at 18:57:30) both fall squarely inside the bench's 18:53:56-19:02:27 local wall-clock window -- i.e. part of the measured contention was this SAME check's own concurrently-running work (the deletion-erasure-probe check's disposable ai-memory server), not solely other, unrelated concurrent agent sessions on the host as the original receipt implied.",
+  "settles_gap": "no",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "FIX-ROUND CORRECTION: the original receipt's 'supports_incumbent' / 'partially settles' framing overclaimed what a single, non-completing run over a non-frozen, larger corpus (67 files vs. the 18-33-file Sept-19/21 baseline snapshot), on a host under partly self-inflicted contention, can establish. It does NOT settle document-retrieval gap 1 (no valid warm/cold variance comparison was obtained -- 0 of the planned 6 runs completed even one full pass), and it does not by itself support or refute the 'Retain scoped BM25' incumbent decision, since the vector/hybrid latency figures are not comparable to the baseline (different corpus, different host load, and in hybrid's case a crash rather than a valid latency number). What IS newly and validly observed: qmd 2.8.3's hybrid query-expansion path raised an unhandled DisposedError from node-llama-cpp on this run. This was observed EXACTLY ONCE, under contended and partly self-inflicted host conditions (see limitations); it is a genuine anomaly worth flagging upstream but is not established as reproducible, and this receipt does not claim it is. Net: inconclusive for the incumbent verdict; the concrete, defensible finding is narrower -- 'one non-completing run observed a crash in hybrid mode and could not establish latency variance at all.'"
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "This remains a single, real, natively executed command (not a fixture or a documentation read) with retained raw output, hence evidence_class native_proven per the schema's definition ('executed here with retained output'); however, per independent review, native_proven execution of a run that did not complete should not be read as validating the check's intended protocol (3x cold + 3x warm complete passes) -- 0 of 6 planned runs completed, so 'variance across repeats' as literally requested could not be measured at all, and no completion-based claim should be drawn from this evidence_class label.",
+    "The DisposedError was observed exactly once, not established as reproducible. It occurred under measurably contended host conditions, and per this fix round, PART of that contention was this same check's own concurrent work: this builder's own disposable ai-memory `serve` process (for the deletion-erasure-probe check) ran its embedding-model fetch (18:56:37-18:57:30 local) entirely inside the bench's own wall-clock window (18:53:56-19:02:27 local), in addition to whatever other concurrent agent worktree processes were also running (confirmed via `ps aux` at the time). The original receipt attributed contention only to 'other concurrent workers on this machine,' omitting this self-inflicted overlap; both this receipt and any future repeat should avoid running this builder's own disposable services during a latency-sensitive bench window.",
+    "The disposable index was built from the WORKTREE's current blueprints/us-equities tree (67 markdown files matching **/*.md), not the frozen Sept19/Sept21 snapshot (18-33 files) -- consistent with the layer's own already-documented 'no full corpus seal' limitation, and not a new problem introduced here, but worth restating: the corpus indexed is not literally frozen even though the fixture.json query/gold-path file is. Because of this corpus mismatch alone (independent of host load), latency figures from this run are NOT validly comparable to the September 21 baseline's per-query averages; only order-of-magnitude directional statements (e.g. 'hybrid crashed instead of returning a latency number') are defensible.",
+    "A separate, unrelated qmd index named 'gap-retrieval-scratch-20260922' (67 files, collection 'us-equities-foundation', last updated ~14 minutes before this check started) was observed pre-existing in the shared ~/.cache/qmd/ directory, apparently built by a concurrent peer session for a different check; it was inspected read-only (status/collection list only) and was not modified, queried further, or used by this check.",
+    "The disposable index files (~/.cache/qmd/retrieval-memory-isolated-20260922.sqlite*) were left on disk after this check for traceability; they are safely removable (not registered in the live 'native-agent-stack-catalog' index and not referenced by any other check)."
+  ],
+  "raw_artifacts": [
+    {"path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/retrieval-memory/qmd-bench-runs/run1-cold.log", "sha256": "78400b1ad11249cece6cbc085caead97da48a7e915f71b832b7d9eb541589283"}
+  ]
+}
