@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "frozen_at": "2026-09-23T00:00:00Z",
+  "purpose": "Frozen 6-case labeled set for gaps 0/1/7 (instructions-skills), separate from blueprints/native-skill-practice/catalog-cases.json and cases.json, and separate from the 8-case TypeSafe diagnostic. Each case targets one winner skill (ECC search-first, ECC iterative-retrieval, OpenAI gh-fix-ci-adjacent security-best-practices, or TypeSafe). Labels/rubrics below are frozen BEFORE any arm is run.",
+  "cases": [
+    {
+      "id": "C1",
+      "skill": "search-first",
+      "prompt": "I need exponential-backoff retry logic for an HTTP client used in this project. Before writing any custom code, research what already exists for this, then give me your recommendation in 3 sentences. Do not edit any files.",
+      "rubric": {
+        "point_a": "Names at least one existing built-in/library mechanism (e.g. urllib3 Retry, requests HTTPAdapter, tenacity, backoff) rather than only proposing custom code.",
+        "point_b": "Explicitly frames the answer as research-before-build (states what already exists before any implementation suggestion)."
+      },
+      "max_score": 2
+    },
+    {
+      "id": "C2",
+      "skill": "iterative-retrieval",
+      "prompt": "A subagent tasked with summarizing a codebase's error-handling patterns returned an incomplete answer because its first context pull missed several relevant files. In 4-6 sentences, describe how you would fix this by refining retrieval across multiple passes.",
+      "rubric": {
+        "point_a": "Describes at least two distinct retrieval passes/cycles (not a single one-shot fix).",
+        "point_b": "Describes evaluating relevance/gaps after a pass and refining the next query based on that evaluation (not just 'search again')."
+      },
+      "max_score": 2
+    },
+    {
+      "id": "C3",
+      "skill": "security-best-practices",
+      "prompt": "Review this FastAPI route for security issues and name the single most serious one:\n\n@app.get(\"/users\")\ndef get_user(name: str, db: Session = Depends(get_db)):\n    query = f\"SELECT * FROM users WHERE name = '{name}'\"\n    return db.execute(query).fetchall()",
+      "rubric": {
+        "point_a": "Names SQL injection specifically (not just 'input validation' generically).",
+        "point_b": "Recommends parameterized queries / an ORM query builder as the fix, not string sanitization alone."
+      },
+      "max_score": 2
+    },
+    {
+      "id": "C4",
+      "skill": "security-best-practices",
+      "prompt": "Review this Next.js API route for security issues and name the single most serious one:\n\nexport async function GET(req) {\n  const { searchParams } = new URL(req.url);\n  const file = searchParams.get('file');\n  const { stdout } = await exec(`cat /data/reports/${file}`);\n  return Response.json({ output: stdout });\n}",
+      "rubric": {
+        "point_a": "Names command injection specifically (not just 'path traversal' alone, though path traversal may also be mentioned).",
+        "point_b": "Recommends avoiding shell interpolation entirely (allowlist, execFile with array args, or no shell) rather than only escaping the string."
+      },
+      "max_score": 2
+    },
+    {
+      "id": "C5",
+      "skill": "typesafe-ai",
+      "prompt": "Claim: \"The company's Q3 revenue guidance of $50M is supported by the SEC filing.\"\nSource text: \"The filing states the company expects Q3 revenue between $45M and $55M.\"\nIs the claim supported, contradicted, or insufficiently evidenced by the source? Answer with one word, then one sentence of reasoning.",
+      "rubric": {
+        "point_a": "Answers 'supported' (frozen label; $50M lies within the stated $45M-$55M range, a semantic containment judgment, not literal text match).",
+        "point_b": "Reasoning cites the numeric range relationship, not just word overlap."
+      },
+      "max_score": 2,
+      "frozen_label": "supported"
+    },
+    {
+      "id": "C6",
+      "skill": "typesafe-ai",
+      "prompt": "Claim: \"The vendor discontinued support for the legacy API in 2026.\"\nSource text: \"As of 2026 the legacy API no longer receives new support requests from the vendor.\"\nIs the claim supported, contradicted, or insufficiently evidenced by the source? Answer with one word, then one sentence of reasoning.",
+      "rubric": {
+        "point_a": "Answers 'supported' (frozen label; this is a paraphrase with no literal word-match on 'discontinued', requiring semantic equivalence judgment rather than weak literal containment).",
+        "point_b": "Reasoning explicitly notes the paraphrase relationship (not literal wording) between 'discontinued support' and 'no longer receives new support requests'."
+      },
+      "max_score": 2,
+      "frozen_label": "supported"
+    }
+  ],
+  "arms": {
+    "with_skill": "Skill tool allowed (--allowedTools includes Skill); the relevant skill is installed and discoverable.",
+    "without_skill": "Skill tool explicitly disallowed (--disallowedTools Skill); no other change to prompt or model."
+  },
+  "scoring_note": "Scored 0-2 per case per arm by this receipt's author reading the transcript against the frozen rubric above, written before any arm ran. This is single-rater diagnostic scoring, not blinded or independently adjudicated -- recorded as a limitation, not hidden."
+}

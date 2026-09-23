@@ -1,0 +1,10 @@
+diff --git a/fixtures/py_before.py b/fixtures/py_after.py
+index 6e72f55..42ace87 100644
+--- a/fixtures/py_before.py
++++ b/fixtures/py_after.py
+@@ -1,4 +1,4 @@
+ def is_allowed(age, has_permit):
+-    if age > 18:
++    if age >= 18:
+         return True
+     return has_permit

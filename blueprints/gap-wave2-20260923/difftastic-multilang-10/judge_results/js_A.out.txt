@@ -1,0 +1,2 @@
+ANSWER: YES
+EXPLANATION: Lines 7-8 (the `if (isMember)` block) appear only in the right column with no corresponding left-side line numbers, marking them as newly inserted rather than a modification of the unchanged `if (total > 100)` block above.

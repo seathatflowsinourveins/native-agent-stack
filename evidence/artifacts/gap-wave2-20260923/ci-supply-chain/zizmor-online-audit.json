@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "zizmor-online-audit",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["ci-supply-chain"],
+  "gap_refs": [{"layer_id": "ci-supply-chain", "gap_index": 5}],
+  "purpose": "Run zizmor's credential-backed online audits (known-vulnerable-actions, impostor-commit, ref-confusion, ref-version-mismatch) against this repository's real workflows, since existing retained evidence is offline regular-persona analysis only (ci-security README lines 48-52), and confirm the online audits genuinely execute (network activity with the provided token) rather than silently no-op. FIX ROUND CORRECTION (2026-09-23): the original receipt omitted the first (tag-pinned) positive-control run, misattributed the ref-version-mismatch finding from the second run to the tj-actions pin instead of the actions/checkout pin, and drew a supports_incumbent conclusion the two runs together do not establish; this revision discloses both runs, retains both fixtures, and corrects the direction. No check was re-run to obtain a different outcome; the disclosed runs are the ones originally executed.",
+  "preregistered": "If `GH_TOKEN=$(gh auth token) zizmor --persona=auditor .github/workflows` (no --offline, no --no-online-audits) produces a nonempty HTTP cache directory and/or at least one online-only-audit finding on a constructed positive-control fixture, that demonstrates online audits genuinely execute with the supplied credential, settling the connectivity/credential half of gap 5. The findings on the real repository workflows themselves are recorded as-is, whatever they are (zero known-vulnerable-actions findings would be a real negative result supporting current action pinning hygiene, not a failure of this check). Two positive-control fixture variants were preregistered together: a tag-pinned form (tj-actions/changed-files@v45.0.7, the exact tag covered by GHSA-mrrh-fwg8-r2c3) and a SHA-pinned form (the same tag's resolved commit SHA). If known-vulnerable-actions fires on either form, that settles the 'online audits detect a real known-compromised action' half of gap 5 directly. If it fires on neither, that is recorded as a real negative result on this audit for this specific advisory, not retried against a different action/advisory to fish for a hit.",
+  "commands": [
+    {
+      "cmd": "GH_TOKEN=$(gh auth token) zizmor --persona=auditor --no-config --no-ignores --no-progress --format json --cache-dir <scratch>/zizmor-online-cache .github/workflows",
+      "exit": 13,
+      "duration_s": 3.8,
+      "output_excerpt": "29 findings total: anonymous-definition x19 (Informational, Pedantic), concurrency-limits x7 (Low, Pedantic), secrets-outside-env x3 (Medium, Regular); zero known-vulnerable-actions/impostor-commit/ref-confusion findings",
+      "output_sha256": "480f1df2eff516113bc727b46261a8d91b8f70eed44577004cced73916c5554f"
+    },
+    {
+      "cmd": "find <scratch>/zizmor-online-cache -type f | wc -l",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "20 (HTTP cache entries populated by the run above, confirming real network activity occurred during the credentialed run)",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "positive-control fixture, tag-pinned form (blueprints/gap-wave2-20260923/zizmor-online-audit/positive-control-tag-pinned.yml.txt): actions/checkout@v4 and tj-actions/changed-files@v45.0.7, both tag-pinned -- v45.0.7 is a version covered by GHSA-mrrh-fwg8-r2c3, the March 2025 tj-actions/changed-files supply-chain compromise. GH_TOKEN=$(gh auth token) zizmor --persona=auditor --no-config --no-ignores --no-progress --format json --cache-dir <scratch>/zzcache online-audit-positive-control.yml",
+      "exit": 13,
+      "duration_s": 0.6,
+      "output_excerpt": "5 findings: artipacked (Regular), unpinned-uses x2 (Regular, High -- fires on both actions/checkout@v4 and tj-actions/changed-files@v45.0.7 because neither is pinned to a hash), anonymous-definition (Pedantic), concurrency-limits (Pedantic); no known-vulnerable-actions, impostor-commit or ref-confusion finding for this tag-pinned fixture",
+      "output_sha256": "run recorded under <scratch>/online-audit-positive-control.json; this receipt's own raw_artifacts entry below carries its sha256"
+    },
+    {
+      "cmd": "positive-control fixture, SHA-pinned form (blueprints/gap-wave2-20260923/zizmor-online-audit/positive-control-sha-pinned.yml.txt): actions/checkout@8e5e7e5... # v4 (SHA-pinned, tag-comment claims v4) and tj-actions/changed-files@a284dc1814e3fd07f2e34267fc8f81227ed29fb8 # v45.0.7 (the exact commit SHA resolved via gh api for tag v45.0.7, covered by GHSA-mrrh-fwg8-r2c3). GH_TOKEN=$(gh auth token) zizmor --persona=auditor --no-config --no-ignores --no-progress --format json --cache-dir <scratch>/zzcache2 online-audit-positive-control.yml",
+      "exit": 13,
+      "duration_s": 0.6,
+      "output_excerpt": "4 findings: artipacked (Regular), anonymous-definition (Pedantic), ref-version-mismatch (Regular, Medium -- an online-only audit requiring resolving the tag/SHA pairing against the live repository; it fired on the actions/checkout@8e5e7e5... step, annotated 'is pointed to by tag v3.5.2, tag points to commit 11d5960a3267', i.e. it flagged that the checkout SHA is actually the commit behind tag v3.5.2, not v4 as the trailing comment claims -- it did NOT fire on the tj-actions/changed-files step), concurrency-limits (Pedantic); no known-vulnerable-actions finding for either action/SHA pair in this fixture",
+      "output_sha256": "6b4fd82ddb56ef35ebb70703de8cb99d9ecc780ace564d5771946750b212ac3f"
+    }
+  ],
+  "tool_versions": {"zizmor": "1.30.1", "gh": "2.101.0"},
+  "installs": [],
+  "model_calls": [],
+  "result": "Ran zizmor's --persona=auditor scan with a real GH_TOKEN and no --offline/--no-online-audits flag against every published workflow in .github/workflows. 29 findings total, all from persona-gated static audits (anonymous-definition, concurrency-limits, secrets-outside-env) already reachable without a token; zero findings from the three online-credential-only audit idents (known-vulnerable-actions, impostor-commit, ref-confusion) named in the gap's next_check. Two positive-control fixtures pinning tj-actions/changed-files to v45.0.7 (covered by the real March-2025 GHSA-mrrh-fwg8-r2c3 compromise) were built and run the same way, one tag-pinned and one SHA-pinned to the exact compromised-era commit. Neither fixture produced a known-vulnerable-actions, impostor-commit or ref-confusion finding for the tj-actions/changed-files step in either pinning form. The tag-pinned fixture instead produced unpinned-uses on both steps (an offline audit, not evidence online audits ran). The SHA-pinned fixture produced ref-version-mismatch, which is an online-only audit and does prove online audits execute with this credential -- but it fired on the actions/checkout step (whose SHA resolves to tag v3.5.2, not the v4 the workflow's trailing comment claims), not on the tj-actions/changed-files step that is the actual subject of the compromise being tested for. The HTTP cache directory was independently populated with 20 real cache entries during the real-workflow run, corroborating that outbound network calls occur. So: online audits are confirmed to genuinely execute with this credential (via the HTTP cache and via ref-version-mismatch firing on an unrelated, correctly-mismatched pin), but the specific claim under test -- that zizmor's online known-vulnerable-actions audit would catch a workflow pinning to the exact commit behind a known, real, disclosed action compromise -- was tested twice (tag-pinned and SHA-pinned) and it did not fire either time.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "inconclusive",
+    "explanation": "Online audits are proven to genuinely execute against this repository with the existing gh token (HTTP cache activity plus a correctly-triggered ref-version-mismatch finding on an unrelated pin). That part supports the incumbent's 'online credential-backed checks now run' claim. But the specific online-credential-only audit named in the gap text as the target capability -- known-vulnerable-actions -- was tested against a known, real, disclosed action compromise (GHSA-mrrh-fwg8-r2c3) in both a tag-pinned and a SHA-pinned form, and did not fire in either case. That is evidence against, not for, the 'online advisories' half of gap 5's coverage claim. Recorded as inconclusive rather than refutes_incumbent because it is possible zizmor's known-vulnerable-actions matcher requires a different signal (e.g. an advisory keyed to a different SHA range, or a GitHub Advisory Database entry it queries live rather than a static list) that this fixture did not trigger for a reason unrelated to coverage -- that alternative explanation was not ruled out."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "known-vulnerable-actions specifically did not fire on either the tag-pinned or the SHA-pinned positive-control fixture (tj-actions/changed-files at v45.0.7 / its exact compromised-era commit SHA). This was tested twice, with two different pin forms, and neither triggered it; that is stronger evidence of a real coverage gap than a single run would be, though it still does not prove the audit never covers this incident (e.g. it might require a live GitHub Advisory Database lookup keyed in a way this fixture's exact SHA does not match, which was not independently verified).",
+    "This is one dated run against one repository's workflows on one day; it does not establish ongoing/scheduled online-audit coverage (that is a separate CI-configuration question, out of scope here -- validate.yml's zizmor step, per test_workflow_security.py etc., currently runs offline regular-persona only, not online auditor-persona, in CI).",
+    "The ref-version-mismatch finding that proves online audits execute is incidental: it flagged an unrelated tag/SHA mismatch on the actions/checkout step (SHA resolves to v3.5.2 while the trailing comment says v4), not the tj-actions/changed-files compromise the fixture was built to test. It demonstrates online execution, not known-vulnerable-actions coverage.",
+    "The real-workflow scan (.github/workflows) was run twice (zizmor-online-auditor.json and its -v2 rerun); both runs produced byte-identical output (sha256 480f1df2...), so the rerun changes no conclusion, but only the -v2 artifact was originally retained/disclosed."
+  ],
+  "raw_artifacts": [
+    {"path": "<scratch>/zizmor-online-auditor-v2.json", "sha256": "480f1df2eff516113bc727b46261a8d91b8f70eed44577004cced73916c5554f"},
+    {"path": "<scratch>/online-audit-positive-control.json", "sha256": "e72e9a8b8451995eb9848931a323aad64a54b58f9602341fcf9111f63da929f8"},
+    {"path": "<scratch>/online-audit-positive-control2.json", "sha256": "6b4fd82ddb56ef35ebb70703de8cb99d9ecc780ace564d5771946750b212ac3f"}
+  ]
+}

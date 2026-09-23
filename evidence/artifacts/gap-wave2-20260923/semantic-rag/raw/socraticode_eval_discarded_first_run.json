@@ -1,0 +1,1129 @@
+{
+  "baseline": "socraticode_discarded_first_run_incomplete_index",
+  "n_questions": 35,
+  "recall_at_5": 0.4857142857142857,
+  "recall_at_5_hits": 17,
+  "mrr": 0.37857142857142856,
+  "detail": [
+    {
+      "id": "q01",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/ecosystem/e2e-spec-v3.json",
+          "start_line": 361,
+          "end_line": 428
+        },
+        {
+          "path": "tools/ecosystem/e2e_manifest_v3.py",
+          "start_line": 77,
+          "end_line": 86
+        },
+        {
+          "path": "tools/ecosystem/evaluate-native.py",
+          "start_line": 171,
+          "end_line": 195
+        },
+        {
+          "path": "tests/compare/workers-normalisation.test.mjs",
+          "start_line": 44,
+          "end_line": 49
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 30,
+          "end_line": 42
+        }
+      ]
+    },
+    {
+      "id": "q02",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 43,
+          "end_line": 51
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 168,
+          "end_line": 182
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 131,
+          "end_line": 149
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 210,
+          "end_line": 217
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 104,
+          "end_line": 116
+        }
+      ]
+    },
+    {
+      "id": "q03",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 87,
+          "end_line": 97
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 76,
+          "end_line": 86
+        },
+        {
+          "path": "tools/ecosystem/linux-usage-report.cjs",
+          "start_line": 40,
+          "end_line": 65
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 1,
+          "end_line": 8
+        },
+        {
+          "path": "tests/compare/test_run_gap_cases.py",
+          "start_line": 490,
+          "end_line": 520
+        }
+      ]
+    },
+    {
+      "id": "q04",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-normalisation.test.mjs",
+          "start_line": 73,
+          "end_line": 80
+        },
+        {
+          "path": "tests/compare/workers-normalisation.test.mjs",
+          "start_line": 81,
+          "end_line": 89
+        },
+        {
+          "path": "tests/compare/workers-normalisation.test.mjs",
+          "start_line": 90,
+          "end_line": 97
+        },
+        {
+          "path": "tests/compare/workers-normalisation.test.mjs",
+          "start_line": 98,
+          "end_line": 109
+        },
+        {
+          "path": "tests/compare/closure-and-isolation.test.mjs",
+          "start_line": 75,
+          "end_line": 90
+        }
+      ]
+    },
+    {
+      "id": "q05",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 226,
+          "end_line": 233
+        },
+        {
+          "path": "tools/compare/strip-packet.mjs",
+          "start_line": 10,
+          "end_line": 25
+        },
+        {
+          "path": "tests/compare/workers-normalisation.test.mjs",
+          "start_line": 44,
+          "end_line": 49
+        },
+        {
+          "path": "tools/ecosystem/evaluate-native.py",
+          "start_line": 332,
+          "end_line": 355
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 58,
+          "end_line": 77
+        }
+      ]
+    },
+    {
+      "id": "q06",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/ecosystem/e2e-spec-v3.json",
+          "start_line": 2971,
+          "end_line": 2996
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 265,
+          "end_line": 279
+        },
+        {
+          "path": "tools/ecosystem/e2e-spec-v3.json",
+          "start_line": 181,
+          "end_line": 237
+        },
+        {
+          "path": "tools/ecosystem/e2e-spec-v3.json",
+          "start_line": 2940,
+          "end_line": 2980
+        },
+        {
+          "path": "tools/ecosystem/test_e2e_manifest_v3.py",
+          "start_line": 43,
+          "end_line": 50
+        }
+      ]
+    },
+    {
+      "id": "q07",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 243,
+          "end_line": 252
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 221,
+          "end_line": 230
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 253,
+          "end_line": 264
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 1,
+          "end_line": 20
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 231,
+          "end_line": 242
+        }
+      ]
+    },
+    {
+      "id": "q08",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 231,
+          "end_line": 242
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 243,
+          "end_line": 252
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 493,
+          "end_line": 507
+        },
+        {
+          "path": "tools/ecosystem/e2e-convergence.json",
+          "start_line": 130,
+          "end_line": 144
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 221,
+          "end_line": 230
+        }
+      ]
+    },
+    {
+      "id": "q09",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 231,
+          "end_line": 242
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 253,
+          "end_line": 264
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 221,
+          "end_line": 230
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 243,
+          "end_line": 252
+        },
+        {
+          "path": "tools/ecosystem/install-linux-efficiency.py",
+          "start_line": 114,
+          "end_line": 147
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "hit_at_5": true,
+      "rank": 4,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 61,
+          "end_line": 92
+        },
+        {
+          "path": "tools/ecosystem/linux-usage-report.cjs",
+          "start_line": 113,
+          "end_line": 120
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 509,
+          "end_line": 534
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 118,
+          "end_line": 118
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 93,
+          "end_line": 117
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "hit_at_5": true,
+      "rank": 2,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 509,
+          "end_line": 534
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 93,
+          "end_line": 117
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 171,
+          "end_line": 199
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 486,
+          "end_line": 508
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 463,
+          "end_line": 485
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 139,
+          "end_line": 144
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 78,
+          "end_line": 107
+        },
+        {
+          "path": "tools/ecosystem/native-choice-run.cjs",
+          "start_line": 9,
+          "end_line": 37
+        },
+        {
+          "path": "tools/ecosystem/toon-pin.json",
+          "start_line": 1,
+          "end_line": 17
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 1,
+          "end_line": 29
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 258,
+          "end_line": 277
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 278,
+          "end_line": 303
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 243,
+          "end_line": 269
+        },
+        {
+          "path": "tools/ecosystem/install-linux-efficiency.py",
+          "start_line": 77,
+          "end_line": 98
+        },
+        {
+          "path": "tools/ecosystem/install-linux-efficiency.py",
+          "start_line": 175,
+          "end_line": 195
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 420,
+          "end_line": 434
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 192,
+          "end_line": 219
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 41,
+          "end_line": 73
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 171,
+          "end_line": 199
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 535,
+          "end_line": 547
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/ecosystem/linux-usage-report.cjs",
+          "start_line": 113,
+          "end_line": 120
+        },
+        {
+          "path": "tools/ecosystem/linux-usage-report.test.cjs",
+          "start_line": 117,
+          "end_line": 138
+        },
+        {
+          "path": "tools/ecosystem/evaluate-native.py",
+          "start_line": 141,
+          "end_line": 167
+        },
+        {
+          "path": "tests/compare/closure-and-isolation.test.mjs",
+          "start_line": 147,
+          "end_line": 166
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 120,
+          "end_line": 144
+        }
+      ]
+    },
+    {
+      "id": "q16",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/ecosystem/native-choice-run.cjs",
+          "start_line": 171,
+          "end_line": 179
+        },
+        {
+          "path": "tools/compare/closure.mjs",
+          "start_line": 22,
+          "end_line": 42
+        },
+        {
+          "path": "tools/ecosystem/e2e_manifest_v3.py",
+          "start_line": 665,
+          "end_line": 678
+        },
+        {
+          "path": "tools/ecosystem/inspect-codex-hooks.py",
+          "start_line": 47,
+          "end_line": 81
+        },
+        {
+          "path": "tools/ecosystem/e2e-spec-v3.json",
+          "start_line": 91,
+          "end_line": 131
+        }
+      ]
+    },
+    {
+      "id": "q17",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 48,
+          "end_line": 57
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 328,
+          "end_line": 341
+        },
+        {
+          "path": "tools/ecosystem/e2e_manifest_v3.py",
+          "start_line": 665,
+          "end_line": 678
+        },
+        {
+          "path": "tools/ecosystem/e2e-spec-v3.json",
+          "start_line": 91,
+          "end_line": 131
+        },
+        {
+          "path": "tools/compare/closure.mjs",
+          "start_line": 1,
+          "end_line": 21
+        }
+      ]
+    },
+    {
+      "id": "q18",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/ecosystem/evaluate-native.py",
+          "start_line": 295,
+          "end_line": 316
+        },
+        {
+          "path": "tools/ecosystem/native-choice-run.cjs",
+          "start_line": 38,
+          "end_line": 74
+        },
+        {
+          "path": "tools/ecosystem/e2e-convergence.json",
+          "start_line": 108,
+          "end_line": 113
+        },
+        {
+          "path": "tools/ecosystem/e2e-spec-v3.json",
+          "start_line": 132,
+          "end_line": 186
+        },
+        {
+          "path": "tools/ecosystem/native-choice-run.cjs",
+          "start_line": 3,
+          "end_line": 8
+        }
+      ]
+    },
+    {
+      "id": "q19",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 48,
+          "end_line": 57
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 1,
+          "end_line": 8
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 12,
+          "end_line": 24
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 9,
+          "end_line": 11
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 25,
+          "end_line": 37
+        }
+      ]
+    },
+    {
+      "id": "q20",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 12,
+          "end_line": 24
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 9,
+          "end_line": 11
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 1,
+          "end_line": 8
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 48,
+          "end_line": 57
+        },
+        {
+          "path": "tools/compare/retrieval/run-arms.mjs",
+          "start_line": 132,
+          "end_line": 139
+        }
+      ]
+    },
+    {
+      "id": "q21",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 48,
+          "end_line": 57
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 1,
+          "end_line": 8
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 9,
+          "end_line": 11
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 12,
+          "end_line": 24
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 396,
+          "end_line": 419
+        }
+      ]
+    },
+    {
+      "id": "q22",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 8,
+          "end_line": 21
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 22,
+          "end_line": 27
+        },
+        {
+          "path": "tools/compare/workers/run-arms.mjs",
+          "start_line": 262,
+          "end_line": 300
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 124,
+          "end_line": 143
+        },
+        {
+          "path": "tools/compare/workers/run-arms.mjs",
+          "start_line": 540,
+          "end_line": 560
+        }
+      ]
+    },
+    {
+      "id": "q23",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 37,
+          "end_line": 68
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 8,
+          "end_line": 21
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 69,
+          "end_line": 116
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 124,
+          "end_line": 143
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 21,
+          "end_line": 36
+        }
+      ]
+    },
+    {
+      "id": "q24",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 117,
+          "end_line": 128
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 65,
+          "end_line": 70
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 1,
+          "end_line": 13
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 37,
+          "end_line": 68
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 405,
+          "end_line": 408
+        }
+      ]
+    },
+    {
+      "id": "q25",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 21,
+          "end_line": 36
+        },
+        {
+          "path": "tools/ecosystem/e2e-spec-v3.json",
+          "start_line": 91,
+          "end_line": 131
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 14,
+          "end_line": 20
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 8,
+          "end_line": 21
+        },
+        {
+          "path": "tools/ecosystem/e2e-spec-v3.json",
+          "start_line": 47,
+          "end_line": 96
+        }
+      ]
+    },
+    {
+      "id": "q26",
+      "hit_at_5": true,
+      "rank": 2,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 1,
+          "end_line": 29
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 43,
+          "end_line": 57
+        },
+        {
+          "path": "tools/ecosystem/test_toon_artifact.py",
+          "start_line": 118,
+          "end_line": 130
+        },
+        {
+          "path": "tools/compare/semantic/run-arms.mjs",
+          "start_line": 1207,
+          "end_line": 1242
+        },
+        {
+          "path": "tools/ecosystem/test_toon_artifact.py",
+          "start_line": 47,
+          "end_line": 80
+        }
+      ]
+    },
+    {
+      "id": "q27",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 78,
+          "end_line": 107
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 146,
+          "end_line": 159
+        },
+        {
+          "path": "tools/ecosystem/test_toon_artifact.py",
+          "start_line": 118,
+          "end_line": 130
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 108,
+          "end_line": 133
+        },
+        {
+          "path": "tools/compare/memory/arms/hindsight_driver.py",
+          "start_line": 42,
+          "end_line": 52
+        }
+      ]
+    },
+    {
+      "id": "q28",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 78,
+          "end_line": 107
+        },
+        {
+          "path": "tools/ecosystem/test_toon_artifact.py",
+          "start_line": 14,
+          "end_line": 46
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 134,
+          "end_line": 145
+        },
+        {
+          "path": "tools/ecosystem/test_toon_artifact.py",
+          "start_line": 47,
+          "end_line": 80
+        },
+        {
+          "path": "tools/ecosystem/native-choice-run.cjs",
+          "start_line": 90,
+          "end_line": 114
+        }
+      ]
+    },
+    {
+      "id": "q29",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 1,
+          "end_line": 29
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 139,
+          "end_line": 144
+        },
+        {
+          "path": "tools/ecosystem/test_e2e_template.py",
+          "start_line": 28,
+          "end_line": 71
+        },
+        {
+          "path": "tools/ecosystem/test_toon_artifact.py",
+          "start_line": 81,
+          "end_line": 117
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 108,
+          "end_line": 133
+        }
+      ]
+    },
+    {
+      "id": "q30",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 30,
+          "end_line": 42
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 61,
+          "end_line": 68
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 486,
+          "end_line": 508
+        },
+        {
+          "path": "tools/ecosystem/e2e_manifest_v3.py",
+          "start_line": 68,
+          "end_line": 76
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 509,
+          "end_line": 534
+        }
+      ]
+    },
+    {
+      "id": "q31",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 144,
+          "end_line": 154
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 121,
+          "end_line": 145
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 1,
+          "end_line": 14
+        },
+        {
+          "path": "tools/compare/memory/lib/protocol.mjs",
+          "start_line": 83,
+          "end_line": 91
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 28,
+          "end_line": 55
+        }
+      ]
+    },
+    {
+      "id": "q32",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 108,
+          "end_line": 120
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 174,
+          "end_line": 181
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 88,
+          "end_line": 117
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 498,
+          "end_line": 532
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 85,
+          "end_line": 107
+        }
+      ]
+    },
+    {
+      "id": "q33",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 177,
+          "end_line": 184
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 214,
+          "end_line": 220
+        },
+        {
+          "path": "tests/compare/latency-stats.test.mjs",
+          "start_line": 1,
+          "end_line": 43
+        },
+        {
+          "path": "tools/compare/semantic/run-arms.mjs",
+          "start_line": 162,
+          "end_line": 174
+        },
+        {
+          "path": "tools/compare/retrieval/run-arms.mjs",
+          "start_line": 416,
+          "end_line": 419
+        }
+      ]
+    },
+    {
+      "id": "q34",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 146,
+          "end_line": 162
+        },
+        {
+          "path": "tools/compare/retrieval/run-arms.mjs",
+          "start_line": 132,
+          "end_line": 139
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 197,
+          "end_line": 213
+        },
+        {
+          "path": "tools/compare/memory/lib/protocol.mjs",
+          "start_line": 92,
+          "end_line": 97
+        },
+        {
+          "path": "tools/compare/retrieval/run-arms.mjs",
+          "start_line": 995,
+          "end_line": 1037
+        }
+      ]
+    },
+    {
+      "id": "q35",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/ecosystem/e2e-spec-v3.json",
+          "start_line": 91,
+          "end_line": 131
+        },
+        {
+          "path": "tools/compare/models/score.mjs",
+          "start_line": 13,
+          "end_line": 21
+        },
+        {
+          "path": "tools/ecosystem/context-evaluation/run.py",
+          "start_line": 150,
+          "end_line": 171
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 95,
+          "end_line": 101
+        },
+        {
+          "path": "tools/ecosystem/e2e-spec-v3.json",
+          "start_line": 47,
+          "end_line": 96
+        }
+      ]
+    }
+  ]
+}

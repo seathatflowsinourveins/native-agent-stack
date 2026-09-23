@@ -1,0 +1,2 @@
+ANSWER: YES
+EXPLANATION: The diff shows only `+` lines adding a new `if (isMember) { discount += 5; }` block after the existing `if (total > 100)` block, which remains unchanged.

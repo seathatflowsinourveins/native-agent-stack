@@ -1,0 +1,1305 @@
+{
+  "collection": "arm_a_nemotron_incumbent",
+  "n_questions": 35,
+  "recall_at_5": 0.9714285714285714,
+  "recall_at_5_hits": 34,
+  "mrr": 0.8533333333333334,
+  "mean_query_latency_s": 0.03267530713762556,
+  "detail": [
+    {
+      "id": "q01",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.60684127
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.50184286
+        },
+        {
+          "path": "tools/compare/workers/lib/arms.mjs",
+          "start_line": 346,
+          "end_line": 365,
+          "score": 0.41917714
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.4164381
+        },
+        {
+          "path": "tools/compare/semantic/run-arms.mjs",
+          "start_line": 451,
+          "end_line": 470,
+          "score": 0.41615504
+        }
+      ]
+    },
+    {
+      "id": "q02",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 211,
+          "end_line": 230,
+          "score": 0.5125278
+        },
+        {
+          "path": "tools/compare/workers/lib/protocol.mjs",
+          "start_line": 151,
+          "end_line": 170,
+          "score": 0.45353228
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 226,
+          "end_line": 245,
+          "score": 0.4245838
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.41208178
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 151,
+          "end_line": 170,
+          "score": 0.4045783
+        }
+      ]
+    },
+    {
+      "id": "q03",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 436,
+          "end_line": 455,
+          "score": 0.5539081
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.54953974
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 421,
+          "end_line": 440,
+          "score": 0.5478195
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.44697487
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 226,
+          "end_line": 245,
+          "score": 0.41932976
+        }
+      ]
+    },
+    {
+      "id": "q04",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 361,
+          "end_line": 380,
+          "score": 0.5059295
+        },
+        {
+          "path": "tests/compare/workers-normalisation.test.mjs",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.4291619
+        },
+        {
+          "path": "tests/compare/workers-normalisation.test.mjs",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.39794374
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 391,
+          "end_line": 410,
+          "score": 0.35203236
+        },
+        {
+          "path": "tools/compare/workers/run-arms.mjs",
+          "start_line": 676,
+          "end_line": 695,
+          "score": 0.31933933
+        }
+      ]
+    },
+    {
+      "id": "q05",
+      "hit_at_5": true,
+      "rank": 2,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.51166594
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.47087583
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 151,
+          "end_line": 170,
+          "score": 0.42753583
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 226,
+          "end_line": 245,
+          "score": 0.4216828
+        },
+        {
+          "path": "tools/compare/memory/lib/cases.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.40225804
+        }
+      ]
+    },
+    {
+      "id": "q06",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 121,
+          "end_line": 140,
+          "score": 0.65092033
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 256,
+          "end_line": 275,
+          "score": 0.47431263
+        },
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.4000182
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.37937808
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 436,
+          "end_line": 455,
+          "score": 0.36699268
+        }
+      ]
+    },
+    {
+      "id": "q07",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.5921172
+        },
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.57201463
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 226,
+          "end_line": 245,
+          "score": 0.5599956
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 241,
+          "end_line": 260,
+          "score": 0.5349088
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 211,
+          "end_line": 230,
+          "score": 0.50986624
+        }
+      ]
+    },
+    {
+      "id": "q08",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.6104273
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 256,
+          "end_line": 275,
+          "score": 0.43836248
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 241,
+          "end_line": 260,
+          "score": 0.42290962
+        },
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.4205147
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 226,
+          "end_line": 245,
+          "score": 0.3957677
+        }
+      ]
+    },
+    {
+      "id": "q09",
+      "hit_at_5": true,
+      "rank": 2,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.6252138
+        },
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.5763283
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 226,
+          "end_line": 245,
+          "score": 0.54625666
+        },
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.54250383
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 241,
+          "end_line": 260,
+          "score": 0.53847367
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "hit_at_5": true,
+      "rank": 2,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.46174356
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.45771015
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.4302727
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 316,
+          "end_line": 335,
+          "score": 0.4213675
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 451,
+          "end_line": 470,
+          "score": 0.41670656
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.5048889
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 481,
+          "end_line": 500,
+          "score": 0.5042886
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 511,
+          "end_line": 530,
+          "score": 0.44073683
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.43488675
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.40657
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.5208295
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.49017274
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.42046574
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.39335513
+        },
+        {
+          "path": "tools/ecosystem/verify-context-mode.py",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.3886909
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 256,
+          "end_line": 275,
+          "score": 0.71659505
+        },
+        {
+          "path": "tools/ecosystem/install-linux-efficiency.py",
+          "start_line": 181,
+          "end_line": 200,
+          "score": 0.5589133
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 286,
+          "end_line": 305,
+          "score": 0.5438192
+        },
+        {
+          "path": "tools/ecosystem/install-linux-efficiency.py",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.5212977
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 241,
+          "end_line": 260,
+          "score": 0.50797266
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 421,
+          "end_line": 440,
+          "score": 0.5244755
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 406,
+          "end_line": 425,
+          "score": 0.3355835
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 196,
+          "end_line": 215,
+          "score": 0.30177805
+        },
+        {
+          "path": "docs/tasks/2026-09-20-token-lifetime-coverage.md",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.27254307
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 181,
+          "end_line": 200,
+          "score": 0.2619118
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.51895005
+        },
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.435833
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.43184388
+        },
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.4076797
+        },
+        {
+          "path": "tools/compare/models/score2.mjs",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.3363332
+        }
+      ]
+    },
+    {
+      "id": "q16",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.46621862
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.4174517
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.41042304
+        },
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.40601218
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.38624156
+        }
+      ]
+    },
+    {
+      "id": "q17",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.4635555
+        },
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.44675085
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.43832847
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.42537937
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.41381648
+        }
+      ]
+    },
+    {
+      "id": "q18",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.77018046
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 106,
+          "end_line": 121,
+          "score": 0.60604537
+        },
+        {
+          "path": "tools/compare/models/phase1/t2/hidden.test.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.4984391
+        },
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.42602533
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.41896456
+        }
+      ]
+    },
+    {
+      "id": "q19",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.6012606
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.58499587
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.5757638
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.550843
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.52480376
+        }
+      ]
+    },
+    {
+      "id": "q20",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 76,
+          "end_line": 82,
+          "score": 0.7165208
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.6625439
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 436,
+          "end_line": 455,
+          "score": 0.5527854
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.49420926
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 466,
+          "end_line": 485,
+          "score": 0.47631598
+        }
+      ]
+    },
+    {
+      "id": "q21",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.48350114
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.4565112
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.4392898
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.39977103
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.3299712
+        }
+      ]
+    },
+    {
+      "id": "q22",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.57927936
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.5503274
+        },
+        {
+          "path": "tools/compare/workers/lib/arms.mjs",
+          "start_line": 376,
+          "end_line": 395,
+          "score": 0.52831084
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 391,
+          "end_line": 410,
+          "score": 0.5041018
+        },
+        {
+          "path": "tools/compare/workers/run-arms.mjs",
+          "start_line": 286,
+          "end_line": 305,
+          "score": 0.5005517
+        }
+      ]
+    },
+    {
+      "id": "q23",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.5643922
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.50450706
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.49907464
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.49699342
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 121,
+          "end_line": 140,
+          "score": 0.4958385
+        }
+      ]
+    },
+    {
+      "id": "q24",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 121,
+          "end_line": 129,
+          "score": 0.6991408
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.5794127
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.48002425
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.45699948
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.44877914
+        }
+      ]
+    },
+    {
+      "id": "q25",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.5443729
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.34709716
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.30377302
+        },
+        {
+          "path": "tools/compare/data/run-gap-cases.py",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.30296347
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 451,
+          "end_line": 469,
+          "score": 0.29271245
+        }
+      ]
+    },
+    {
+      "id": "q26",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.526636
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.50724924
+        },
+        {
+          "path": "tools/ecosystem/test_toon_artifact.py",
+          "start_line": 121,
+          "end_line": 135,
+          "score": 0.42470652
+        },
+        {
+          "path": "tools/ecosystem/e2e_manifest_v3.py",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.40671727
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.38222185
+        }
+      ]
+    },
+    {
+      "id": "q27",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.41143024
+        },
+        {
+          "path": "tools/ecosystem/test_toon_artifact.py",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.38298243
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.36988038
+        },
+        {
+          "path": "tools/ecosystem/test_toon_artifact.py",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.3454349
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.316372
+        }
+      ]
+    },
+    {
+      "id": "q28",
+      "hit_at_5": true,
+      "rank": 5,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 466,
+          "end_line": 485,
+          "score": 0.48233974
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.45850912
+        },
+        {
+          "path": "tools/ecosystem/test_toon_artifact.py",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.45756075
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.4558701
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.45452598
+        }
+      ]
+    },
+    {
+      "id": "q29",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.45033917
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 121,
+          "end_line": 140,
+          "score": 0.44691992
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.43180132
+        },
+        {
+          "path": "tools/ecosystem/verify-context-mode.py",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.35301518
+        },
+        {
+          "path": "tools/ecosystem/test_toon_artifact.py",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.34105062
+        }
+      ]
+    },
+    {
+      "id": "q30",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.53968906
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.52341396
+        },
+        {
+          "path": "tests/compare/closure-and-isolation.test.mjs",
+          "start_line": 226,
+          "end_line": 239,
+          "score": 0.33962685
+        },
+        {
+          "path": "tools/ecosystem/test_e2e_manifest_v3.py",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.32848167
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 496,
+          "end_line": 515,
+          "score": 0.31284326
+        }
+      ]
+    },
+    {
+      "id": "q31",
+      "hit_at_5": true,
+      "rank": 2,
+      "top5": [
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.6753962
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.57208365
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 241,
+          "end_line": 248,
+          "score": 0.56233686
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 121,
+          "end_line": 140,
+          "score": 0.53537685
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 121,
+          "end_line": 140,
+          "score": 0.515382
+        }
+      ]
+    },
+    {
+      "id": "q32",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.6181536
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.4631954
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.46019804
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.4059118
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 496,
+          "end_line": 515,
+          "score": 0.39442968
+        }
+      ]
+    },
+    {
+      "id": "q33",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.61177814
+        },
+        {
+          "path": "tools/compare/semantic/run-arms.mjs",
+          "start_line": 151,
+          "end_line": 170,
+          "score": 0.5464698
+        },
+        {
+          "path": "tests/compare/latency-stats.test.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.53109235
+        },
+        {
+          "path": "tests/compare/latency-stats.test.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.4919926
+        },
+        {
+          "path": "tools/compare/retrieval/run-arms.mjs",
+          "start_line": 376,
+          "end_line": 395,
+          "score": 0.46340823
+        }
+      ]
+    },
+    {
+      "id": "q34",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.49666524
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 196,
+          "end_line": 215,
+          "score": 0.44819936
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 151,
+          "end_line": 170,
+          "score": 0.4478606
+        },
+        {
+          "path": "tools/compare/memory/arms/ai_memory_driver.py",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.44135565
+        },
+        {
+          "path": "tools/compare/memory/arms/basic_memory_driver.py",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.44133016
+        }
+      ]
+    },
+    {
+      "id": "q35",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": ".claude/workflows/check-syntax.mjs",
+          "start_line": 1,
+          "end_line": 18,
+          "score": 0.6465957
+        },
+        {
+          "path": ".claude/workflows/test-envelope.mjs",
+          "start_line": 451,
+          "end_line": 470,
+          "score": 0.47865462
+        },
+        {
+          "path": ".claude/workflows/test-envelope.mjs",
+          "start_line": 436,
+          "end_line": 455,
+          "score": 0.43695486
+        },
+        {
+          "path": ".claude/workflows/test-envelope.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.4287655
+        },
+        {
+          "path": ".claude/workflows/review-changes.js",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.42217478
+        }
+      ]
+    }
+  ]
+}

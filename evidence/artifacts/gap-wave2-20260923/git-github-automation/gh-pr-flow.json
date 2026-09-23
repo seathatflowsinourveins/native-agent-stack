@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "gh-pr-flow",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["git-github-automation"],
+  "gap_refs": [
+    { "layer_id": "git-github-automation", "gap_index": 1 }
+  ],
+  "purpose": "Run a full gh PR lifecycle (create draft, comment, view --json, close without merge and delete the remote branch) on a real scratch branch of the catalog repository, per gap [1]'s next_check and the unit's authorized scratch/w2-gh-flow-20260923 branch.",
+  "preregistered": "If `gh pr create --draft`, `gh pr comment`, `gh pr view --json` and `gh pr close --delete-branch` all exit 0 against a real docs-only scratch branch/PR on seathatflowsinourveins/native-agent-stack, and the final `gh pr view --json` reports state CLOSED with the comment attached, that gives the first recorded gh PR create/comment/view/close operation result for this catalog (gap [1] says none is recorded) and settles the create/comment/view/close portion of that record. The PR is never merged, matching the binding rule. Gap [1]'s next_check also names `gh pr review --comment`, a distinct review-flow operation from `gh pr comment`'s issue-comment; this check does not exercise `gh pr review` and so cannot by itself fully settle gap [1], which asks for a 'create/review/merge' result -- at most a partial settlement. A nonzero exit on any of the four named commands leaves the corresponding sub-claim (including the all-four-exit-0 criterion) unresolved rather than settled, even if a workaround later achieves the same end state through a different command.",
+  "commands": [
+    { "cmd": "git worktree add -b scratch/w2-gh-flow-20260923 ~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/scratch-pr main (catalog repo)", "exit": 0, "duration_s": 0.3, "output_excerpt": "new worktree created at ~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/scratch-pr on new branch scratch/w2-gh-flow-20260923 from main (4378f0de82bad87c9a8a6517650849f22be0dc77 lineage via origin/main)", "output_sha256": null },
+    { "cmd": "git commit -m 'docs: scratch no-op marker for gh PR-flow acceptance check' (README.md +2 lines)", "exit": 0, "duration_s": 0.1, "output_excerpt": "[scratch/w2-gh-flow-20260923 97051eb] docs: scratch no-op marker for gh PR-flow acceptance check; 1 file changed, 2 insertions(+)", "output_sha256": null },
+    { "cmd": "git push -u origin scratch/w2-gh-flow-20260923", "exit": 0, "duration_s": 1.1, "output_excerpt": "new branch scratch/w2-gh-flow-20260923 -> scratch/w2-gh-flow-20260923; branch set to track origin", "output_sha256": null },
+    { "cmd": "gh pr create --draft --title 'scratch: gh PR-flow acceptance check (gap-wave2-20260923)' --body '...'", "exit": 0, "duration_s": 1.5, "output_excerpt": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/92", "output_sha256": null },
+    { "cmd": "gh pr comment 92 --body 'Acceptance check comment for gap-wave2-20260923 gh-flow gap [1].'", "exit": 0, "duration_s": 0.8, "output_excerpt": "ok commented #92 -> https://github.com/seathatflowsinourveins/native-agent-stack/pull/92#issuecomment-5787870557", "output_sha256": null },
+    { "cmd": "gh pr view 92 --json number,state,isDraft,title,headRefName,baseRefName,url,mergeable,comments", "exit": 0, "duration_s": 0.6, "output_excerpt": "{\"baseRefName\":\"main\",\"headRefName\":\"scratch/w2-gh-flow-20260923\",\"isDraft\":true,\"mergeable\":\"MERGEABLE\",\"number\":92,\"state\":\"OPEN\",\"comments\":[{\"body\":\"Acceptance check comment...\"}]}", "output_sha256": null },
+    { "cmd": "gh pr close 92 --delete-branch --comment 'Closing scratch PR (not merged)...'", "exit": 1, "duration_s": 1.0, "output_excerpt": "STDOUT: 'Closed pull request seathatflowsinourveins/native-agent-stack#92 (...)'  STDERR: 'failed to run git: fatal: main is already used by worktree at ~/code/native-agent-stack-token-practice-review'. The PR close itself (a GitHub API call) succeeded; gh's own follow-on local git checkout-to-main-and-delete-local-branch step failed because this worktree's sibling checkout already has main checked out. The remote branch deletion that --delete-branch also normally performs did NOT happen as a side effect of this failure (verified below).", "output_sha256": null },
+    { "cmd": "gh pr view 92 --json number,state,isDraft,closed", "exit": 0, "duration_s": 0.5, "output_excerpt": "{\"closed\":true,\"isDraft\":true,\"number\":92,\"state\":\"CLOSED\"}", "output_sha256": null },
+    { "cmd": "git ls-remote --heads origin scratch/w2-gh-flow-20260923 (post-close check)", "exit": 0, "duration_s": 0.4, "output_excerpt": "97051eb0328d31fbced8ef399c87819d19290a74\trefs/heads/scratch/w2-gh-flow-20260923 (branch still present -- confirms gh pr close --delete-branch did not delete the remote ref when its local git step failed)", "output_sha256": null },
+    { "cmd": "gh api --method DELETE repos/seathatflowsinourveins/native-agent-stack/git/refs/heads/scratch/w2-gh-flow-20260923", "exit": 0, "duration_s": 0.5, "output_excerpt": "no content (204); remote branch removed", "output_sha256": null },
+    { "cmd": "git ls-remote --heads origin scratch/w2-gh-flow-20260923 (confirm deletion)", "exit": 0, "duration_s": 0.4, "output_excerpt": "(empty output -- remote branch confirmed deleted)", "output_sha256": null },
+    { "cmd": "git worktree remove ~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/scratch-pr --force && git branch -D scratch/w2-gh-flow-20260923", "exit": 0, "duration_s": 0.3, "output_excerpt": "worktree removed; local branch deleted", "output_sha256": null }
+  ],
+  "tool_versions": {
+    "gh": "gh version 2.101.0 (2026-09-15)",
+    "git": "git version 2.43.0"
+  },
+  "installs": [],
+  "model_calls": [],
+  "result": {
+    "status": "partially_settled_with_one_documented_command_failure",
+    "pr_number": 92,
+    "pr_url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/92",
+    "final_pr_state": "CLOSED",
+    "merged": false,
+    "remote_branch_final_state": "deleted (via explicit gh api DELETE after gh pr close --delete-branch's own local-git step failed)",
+    "preregistered_all_four_exit_0_criterion_met": false
+  },
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "gh's PR create/comment/view cycle works end to end against the real GitHub API, and the close-without-merge outcome was ultimately achieved, but not as preregistered: `gh pr close --delete-branch` itself exited 1 (a local-checkout-collision artifact of running from a sibling worktree of the same repository, not a gh CLI or GitHub API defect), and the remote branch deletion it normally performs had to be completed with a separate `gh api DELETE` call instead of the tested command. Separately, gap [1]'s next_check names `gh pr review --comment`, a review-flow operation; only `gh pr comment` (an issue comment) was exercised, so no review/approval flow was tested. Together these mean gap [1] is only partially settled: the create/comment/view/close-with-a-workaround portion is demonstrated, but the preregistered all-four-exit-0 criterion was not met and the review-flow portion of the gap's next_check was not attempted at all. This does not change gh's selection, but it is a real operational caveat worth citing if a future component entry documents --delete-branch, and the review-flow gap remains open."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "gh pr close --delete-branch's remote-branch deletion did not occur automatically when run from a worktree whose sibling checkout has the PR's base branch (main) checked out; a separate gh api DELETE was needed. This is worth noting in any future gh component entry that recommends --delete-branch. Because that command itself exited 1, the receipt's own preregistered all-four-exit-0 criterion was not met, even though the end state (CLOSED PR, deleted remote branch) was reached through a different, unpreregistered command.",
+    "No review/approval flow was exercised: gap [1]'s next_check names `gh pr review --comment`, a distinct operation from the `gh pr comment` issue-comment that was actually run. This receipt does not settle that portion of gap [1].",
+    "Single repository (the operator's own catalog), single PR, no reviewers requested, and no CI checks were allowed to run to completion before close since the PR was closed within seconds of creation.",
+    "PR number 92 and the deleted scratch branch remain visible in the repository's PR history (GitHub does not purge closed-PR records); this is expected and not a residual artifact requiring further cleanup.",
+    "Fix-round correction (2026-09-23): the original receipt's preregistration text referenced the close-command failure it was meant to predict, and its settles_gap value of true did not match either its own (unmet) all-four-exit-0 criterion or the absence of a review-flow check. Both are corrected here without re-running any command; no new command was executed for this correction."
+  ],
+  "raw_artifacts": []
+}

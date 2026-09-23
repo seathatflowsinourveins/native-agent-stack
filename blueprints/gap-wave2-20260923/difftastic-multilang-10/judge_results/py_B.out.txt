@@ -1,0 +1,2 @@
+ANSWER: YES
+EXPLANATION: Line 2 changed from "if age > 18:" to "if age >= 18:", showing the comparison operator changed from '>' to '>='.

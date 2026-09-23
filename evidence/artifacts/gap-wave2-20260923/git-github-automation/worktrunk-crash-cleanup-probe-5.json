@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "worktrunk-crash-cleanup-probe-5",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["git-github-automation"],
+  "gap_refs": [{ "layer_id": "git-github-automation", "gap_index": 5 }],
+  "purpose": "Redesigned crash probe, per gap_index 5's next_check: delay SIGKILL until .git/worktrees/<name> actually appears on disk (rather than the prior wave's immediate-kill-after-Popen design), with an unrelated dirty worktree present throughout, then verify `wt remove`/`git worktree prune` clean only the orphaned target and leave the unrelated worktree's registration and bytes untouched.",
+  "preregistered": "Two trials are run in one execution: T1 kills as soon as the admin directory .git/worktrees/repo.<name> appears (earliest observable partial state); T2 kills as soon as the working-tree file fixture.txt has been checked out into the new worktree (a later partial/complete state). For each trial: if the admin dir is confirmed present immediately after proc.wait() returns (proving the kill landed on real partial state, not a race before anything existed), and by the end of the probe (after git worktree prune, and wt remove for any survivor) the crash target is fully absent from `git worktree list` while the unrelated dirty worktree remains registered with byte-identical fixture.txt and untracked.txt, that settles gap 5's specific complaint (crash cleanup without deleting unrelated/dirty state). If either trial leaves the crash target registered with no working cleanup path succeeding, or if the unrelated worktree's bytes or registration change, that is recorded as a failure, not retried. No prediction is made about WHICH tool (prune vs wt remove) will be needed for which trial; that is determined empirically and recorded honestly (git worktree prune only removes entries whose directory is fully missing, not a partially-checked-out one that still exists on disk).",
+  "commands": [
+    { "cmd": "python3 blueprints/gap-wave2-20260923/worktree-crash-cleanup-5-9/crash_probe.py --base $SCRATCH/crash-probe-5", "exit": 0, "duration_s": null, "output_excerpt": "status=passed; T1 admin_dir persisted immediately after kill=true, self-healed within 50ms before any prune call=true; T2 admin_dir persisted immediately after kill=true, self-healed=false (genuine orphan, fully-checked-out working tree); git worktree prune output empty (nothing prunable -- T1 already self-healed, T2's directory still exists so prune correctly ignores it); wt remove crash-target-2 --foreground --no-hooks --format=json exit 0, branch_outcome=deleted; unrelated-dirty worktree still_registered=true, fixture_sha256 and untracked_sha256 unchanged before/after", "output_sha256": "244a0ea4ea4867952e80089ab71b58a2ad5067584cac49f4464ee19b1ba0006e" },
+    { "cmd": "git -C $SCRATCH/crash-probe-5/repo branch -a (corrective post-hoc verification, NOT a re-run of the preregistered probe; inspects state already left on disk by the command above, added after fix-round finding that the probe never checks branches)", "exit": 0, "duration_s": null, "output_excerpt": "* main\\n  crash-target-1\\n  + unrelated-dirty", "output_sha256": "1989fe0a148481c82f18153acebc2a78c1abb7f1e2709e08950f0ac179d8779b" }
+  ],
+  "tool_versions": { "git": "git version 2.43.0", "wt": "wt v0.79.0" },
+  "installs": [],
+  "model_calls": [],
+  "result": {
+    "status": "passed",
+    "trial1_kill_on_admin_dir_appears": {
+      "kill_landed_at_s": 0.012759,
+      "admin_dir_persisted_immediately_after_kill": true,
+      "self_healed_within_50ms_before_any_cleanup_command": true,
+      "finding": "When killed at the earliest observable partial state (admin dir just registered, no working files yet), the underlying git worktree machinery (most plausibly the `git worktree add` child process invoked by `wt`, which is not itself killed by SIGKILL to its `wt` parent and can complete or self-abort independently) already removed the orphaned admin directory within 50ms, before this probe called `git worktree prune` or `wt remove` itself. CORRECTED (fix round, 2026-09-23): the original text here claimed the registered branch `crash-target-1` was 'also gone', citing git_worktree_list_after_prune as confirmation. That claim is FALSE and is retracted: `git worktree list` (porcelain or otherwise) only enumerates worktree entries, not branches, so it cannot show whether a branch exists. A corrective `git branch -a` run directly against this trial's still-present repo (see commands[], added in the fix round, not a re-run of the probe) shows `crash-target-1` IS still present as a branch with no owning worktree. So while the admin-dir/worktree-registration self-healed within 50ms, the branch that `wt switch --create` had already created for crash-target-1 before the kill was left behind as an orphan: neither `git worktree prune` (which only touches worktree admin entries) nor the probe's `wt remove` calls (which only ran for trial2's target, since trial1 already showed 'already absent after prune' in wt_remove_attempts_for_prune_survivors and so was skipped) ever attempted to delete it. This is crash residue, not clean self-healing, and is a genuine unfavorable finding for crash resilience at this kill point. The exact self-cleanup mechanism for the worktree admin directory itself was also not independently traced (e.g. via strace) and remains reported as an observation, not a verified root cause."
+    },
+    "trial2_kill_on_working_file_checked_out": {
+      "kill_landed_at_s": 0.015657,
+      "admin_dir_persisted_immediately_after_kill": true,
+      "self_healed_within_50ms": false,
+      "git_worktree_prune_result": "no-op (empty output); prune only removes entries whose linked directory is entirely MISSING, and this trial's directory (repo.crash-target-2) still existed with fixture.txt checked out and a valid .git gitlink, so git correctly considered it a valid, non-prunable worktree.",
+      "wt_remove_result": "`wt remove crash-target-2 --foreground --no-hooks --format=json` exited 0 and reported branch_outcome=deleted; this is the actual working cleanup path for a worktree that was killed after its git-level construction finished (or nearly finished) but before the `wt` wrapper process could report success.",
+      "finding": "`git worktree prune` alone is NOT sufficient to clean up every crash scenario: it only helps when the linked directory itself is missing. A worktree killed once its files exist (even if the wrapper never confirmed success) is left as a fully valid, registered worktree that requires `wt remove` (or `git worktree remove`) rather than prune."
+    },
+    "unrelated_dirty_worktree": {
+      "preserved_registration": true,
+      "fixture_sha256_unchanged": true,
+      "untracked_sha256_unchanged": true
+    },
+    "only_target_cleaned": true,
+    "only_target_cleaned_scope_correction": "CORRECTED (fix round, 2026-09-23): 'only_target_cleaned' as computed by crash_probe.py (lines 182-184) means only 'no crash-target worktree registration survives in `git worktree list --porcelain`'. It does NOT mean no crash residue at all: a corrective `git branch -a` (see commands[]) shows the `crash-target-1` branch, created by `wt switch --create` before it was killed in trial 1, is still present with no owning worktree. The probe's own flow never attempts to delete it (trial1's target was already absent from `git worktree list` after prune/self-heal, so wt_remove_attempts_for_prune_survivors records it as 'already absent after prune' and skips any removal call, including any branch cleanup). So crash cleanup left an orphaned branch behind; only the worktree admin-dir/registration was fully cleaned.",
+    "crash_residue": {
+      "orphaned_branch": "crash-target-1",
+      "how_confirmed": "git -C $SCRATCH/crash-probe-5/repo branch -a, run post-hoc against the trial's still-present repo (not a re-run of the probe itself)",
+      "why_the_original_probe_missed_it": "crash_probe.py's crash_targets_cleaned check (lines 182-184) tests only `('worktree ' + path) not in listing_after_wt_remove`, i.e. it parses `git worktree list --porcelain` output, which enumerates worktree entries, never branches. A branch with no owning worktree is invisible to that check by construction."
+    }
+  },
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "Confirms worktrunk's underlying git-worktree admin-dir/registration crash behavior can be recovered cleanly at two different kill points using the appropriate tool for each (git worktree prune for a genuinely missing directory, wt remove for a directory that exists but whose wrapper never confirmed success), and that an unrelated dirty worktree is never touched by either cleanup path. It also surfaces a real, previously undocumented nuance (prune alone is insufficient for late-stage kills) that should be added to any crash-recovery runbook for this tool. However, this only PARTIALLY settles gap 5: a corrective post-hoc check (added in the fix round) found trial 1's crash left an orphaned `crash-target-1` branch behind with no owning worktree, and neither `git worktree prune` nor the probe's `wt remove` calls ever touch it, because the probe's own cleanliness test only inspects worktree registrations, not branches. So crash cleanup is clean for worktree state but leaves branch-level residue; gap 5's complaint about crash cleanup without collateral damage is not fully closed, and this finding does not, on its own, change the layer's keep_but_compare selection of worktrunk since native `git worktree` crash recovery was not comparably probed here for the same branch-residue failure mode."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Only 1 trial per kill point was run (not a statistical distribution of kill timings); the two chosen points (admin-dir-appears, working-file-checked-out) are representative early/late partial states but do not cover every possible interleaving (e.g. mid-checkout of a multi-file commit).",
+    "The root cause of trial 1's self-healing within 50ms was not independently traced (no strace/ptrace was used); it is reported as an observed filesystem-state transition, not a verified mechanism.",
+    "Single-file fixture (fixture.txt only); a larger commit with many files might expose a genuinely partial (some-files-present, some-missing) checkout state that this probe's two kill points did not target.",
+    "No concurrent/parallel crash scenario (only one process was killed at a time); no test of a crash during `wt remove` itself (removal-time crash) is included here.",
+    "CORRECTED (fix round, 2026-09-23): the probe's crash_targets_cleaned/only_target_cleaned checks look only at `git worktree list --porcelain` and cannot detect an orphaned branch left with no owning worktree; a post-hoc `git branch -a` found trial 1's `crash-target-1` branch was never cleaned up. No comparable branch-residue check was run for native `git worktree` (no `wt`-equivalent wrapper exists there), so this is not scored as a tool-vs-tool difference, only as an unresolved crash-recovery gap for worktrunk."
+  ],
+  "raw_artifacts": [
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/worktree-diff/crash-probe-5/receipt.json", "sha256": "244a0ea4ea4867952e80089ab71b58a2ad5067584cac49f4464ee19b1ba0006e" }
+  ]
+}

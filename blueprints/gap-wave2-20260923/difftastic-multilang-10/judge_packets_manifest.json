@@ -1,0 +1,58 @@
+[
+  {
+    "packet_id": "py_A",
+    "language": "python",
+    "label": "A",
+    "actual_tool": "gitdiff",
+    "surfacing_question": "Does the diff clearly show the comparison operator changing from '>' to '>=' on the age check (not merely that the line changed)?"
+  },
+  {
+    "packet_id": "py_B",
+    "language": "python",
+    "label": "B",
+    "actual_tool": "difft",
+    "surfacing_question": "Does the diff clearly show the comparison operator changing from '>' to '>=' on the age check (not merely that the line changed)?"
+  },
+  {
+    "packet_id": "js_A",
+    "language": "javascript",
+    "label": "A",
+    "actual_tool": "difft",
+    "surfacing_question": "Does the diff clearly show a new `if (isMember)` block adding 5 to discount, as an ADDITION rather than a modification of the existing `if (total > 100)` block?"
+  },
+  {
+    "packet_id": "js_B",
+    "language": "javascript",
+    "label": "B",
+    "actual_tool": "gitdiff",
+    "surfacing_question": "Does the diff clearly show a new `if (isMember)` block adding 5 to discount, as an ADDITION rather than a modification of the existing `if (total > 100)` block?"
+  },
+  {
+    "packet_id": "go_A",
+    "language": "go",
+    "label": "A",
+    "actual_tool": "difft",
+    "surfacing_question": "Does the diff clearly show BOTH the return-type signature change (int -> (int, error)) AND the new zero-check guard, not just that 'the function body changed'?"
+  },
+  {
+    "packet_id": "go_B",
+    "language": "go",
+    "label": "B",
+    "actual_tool": "gitdiff",
+    "surfacing_question": "Does the diff clearly show BOTH the return-type signature change (int -> (int, error)) AND the new zero-check guard, not just that 'the function body changed'?"
+  },
+  {
+    "packet_id": "rs_A",
+    "language": "rust",
+    "label": "A",
+    "actual_tool": "gitdiff",
+    "surfacing_question": "Does the diff clearly show a NEW `if value < 0` block being added, distinct from the existing `if value > max` block?"
+  },
+  {
+    "packet_id": "rs_B",
+    "language": "rust",
+    "label": "B",
+    "actual_tool": "difft",
+    "surfacing_question": "Does the diff clearly show a NEW `if value < 0` block being added, distinct from the existing `if value > max` block?"
+  }
+]

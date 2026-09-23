@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "gh-inventory-baseline",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["git-github-automation"],
+  "gap_refs": [
+    { "layer_id": "git-github-automation", "gap_index": 0 },
+    { "layer_id": "git-github-automation", "gap_index": 7 }
+  ],
+  "purpose": "Record a dated gh CLI version, a dated ruleset GET pair (rulesets list and rules/branches/main), and a dated gh attestation verify of a real release asset, as the source material a future manifests/stack.json gh component entry would cite, per gaps [0] and [7]'s next_check.",
+  "preregistered": "If `gh --version`, a dated `gh api repos/seathatflowsinourveins/native-agent-stack/rulesets`, a dated `gh api .../rules/branches/main` and a dated `gh attestation verify` on a downloaded release asset all exit 0 with real (non-empty, well-formed) output, that gives the gh-attributed dated results gap [0] says are missing and the version/ruleset/attestation/PR baseline gap [7] says gh's selection currently lacks a recorded operational basis for; it would not by itself add the manifests/stack.json inventory entry or lifecycle stage (out of this unit's owned paths), so this check can settle the missing-dated-results portion but only partially settle gap [0]/[7], which also ask for the inventory entry itself. A nonzero exit or empty output on any command would leave the corresponding sub-claim unresolved and is recorded as such.",
+  "commands": [
+    { "cmd": "gh --version", "exit": 0, "duration_s": 0.1, "output_excerpt": "gh version 2.101.0 (2026-09-15)\nhttps://github.com/cli/cli/releases/tag/v2.101.0", "output_sha256": null },
+    { "cmd": "gh api repos/seathatflowsinourveins/native-agent-stack/rulesets", "exit": 0, "duration_s": 0.6, "output_excerpt": "[{\"id\":23739774,\"name\":\"Native foundation required checks\",\"target\":\"branch\",\"enforcement\":\"active\",\"updated_at\":\"2026-09-22T11:08:22.608-04:00\"},{\"id\":23829417,\"name\":\"Native foundation tag protection\",\"target\":\"tag\",\"enforcement\":\"active\",\"created_at\":\"2026-09-22T11:08:53.556-04:00\"}]", "output_sha256": "d90daa69c02e0586f1749f8190e7938d16f4963849cc8c83fa34560e5fe46308" },
+    { "cmd": "gh api repos/seathatflowsinourveins/native-agent-stack/rules/branches/main", "exit": 0, "duration_s": 0.5, "output_excerpt": "required_status_checks contexts=[validate,token-report,secret-scan] (integration_id 15368 each); deletion; non_fast_forward; required_linear_history; pull_request rule required_approving_review_count=0, dismiss_stale_reviews_on_push=true, require_code_owner_review=false, require_last_push_approval=false, required_review_thread_resolution=true, allowed_merge_methods=[squash,rebase]", "output_sha256": "154efb2f4eb0fc5e945f9788dda2aca392980c04f6888d63f3426278b7925bea" },
+    { "cmd": "gh release download --repo rhysd/actionlint --pattern '*_linux_amd64.tar.gz' v1.7.12", "exit": 0, "duration_s": 1.2, "output_excerpt": "downloaded actionlint_1.7.12_linux_amd64.tar.gz (2.2M); sha256 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8 (matches the value already recorded in docs/github-automation.md's 2026-09-20 local verification)", "output_sha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8" },
+    { "cmd": "gh attestation verify -R rhysd/actionlint actionlint_1.7.12_linux_amd64.tar.gz --format json", "exit": 0, "duration_s": 2.0, "output_excerpt": "1 attestation returned; bundle mediaType application/vnd.dev.sigstore.bundle.v0.3+json; verificationResult present with signature, verifiedTimestamps, verifiedIdentity, statement. Plain (non-json) invocation also exited 0 with empty stdout/stderr on this host -- the pretty-printed table renderer produced no visible text here even though the underlying verification succeeded, so --format json was used to retain content.", "output_sha256": "5e660380c5da0ac2d93a7d3010712115e64ed8db6784427db4ec33ca19dbad42" }
+  ],
+  "tool_versions": {
+    "gh": "gh version 2.101.0 (2026-09-15)"
+  },
+  "installs": [],
+  "model_calls": [],
+  "result": {
+    "status": "all_commands_exit_0",
+    "ruleset_ids_observed": [23739774, 23829417],
+    "attestation_subject_sha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+  },
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Confirms gh CLI's ruleset and attestation-verify paths function correctly and match the previously documented static claims (same attestation subject hash as the 2026-09-20 record). This is source material for a gh manifests/stack.json entry, not a verdict change: no alternative CLI was compared and no new capability gap was found."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Does not add the manifests/stack.json gh component entry or a lifecycle stage; catalogs/landscape and manifests/stack.json edits are out of this unit's owned paths per the binding rules, so a proposed entry is returned in the coordinating result instead of applied here.",
+    "gh attestation verify's default table-format renderer produced empty stdout despite exit 0 in this shell/host combination; only --format json reliably surfaced content. This is a recorded tool-behavior observation, not a verification failure (the JSON path independently confirms a valid, matching attestation).",
+    "Single release asset (rhysd/actionlint v1.7.12) was verified; this does not generalize to every attested artifact type gh supports."
+  ],
+  "raw_artifacts": [
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/attest-check/out.json", "sha256": "5e660380c5da0ac2d93a7d3010712115e64ed8db6784427db4ec33ca19dbad42" },
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/attest-check/actionlint_1.7.12_linux_amd64.tar.gz", "sha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8" },
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/ruleset-checks/rulesets-20260923.json", "sha256": "d90daa69c02e0586f1749f8190e7938d16f4963849cc8c83fa34560e5fe46308" },
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/ruleset-checks/rules-branches-main-20260923.json", "sha256": "154efb2f4eb0fc5e945f9788dda2aca392980c04f6888d63f3426278b7925bea" }
+  ]
+}

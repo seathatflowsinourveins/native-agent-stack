@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "archive-reproducibility",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["ci-supply-chain"],
+  "gap_refs": [{"layer_id": "ci-supply-chain", "gap_index": 7}],
+  "purpose": "Test 'reproducible changes' end to end by rebuilding the published catalog archive locally, byte for byte, at both the previously-attested commit (d0fe136c, run 35541322881) and the current commit (41d39b3, run 35803145596, see publish-catalog-dispatch-attestation.json in this same directory) and comparing sha256 digests against the attestation subject digest recorded by each hosted run.",
+  "preregistered": "If `git archive --format=tar.gz --prefix=native-agent-stack/` run locally against each commit produces bytes whose sha256 exactly matches that commit's hosted-run archive digest, that settles gap 7 in the supports_incumbent direction: the archive build step is genuinely reproducible on this host, not merely reproducible in principle. Any digest mismatch (e.g. from gzip version/timestamp/ordering nondeterminism) would refute the reproducibility claim and change the verdict the other way, and would need to be recorded as a real finding, not retried to fish for a match. FIX ROUND CORRECTION (2026-09-23): settles_gap=true overclaimed gap 7, which is broader than the archive step (it also covers whether static checks execute a job at all, and whether reproducibility extends past the two attested commits); and the 'independently-versioned git/gzip toolchain' claim was unverified since the runner's git version was never recorded and, per `git help archive`, `git archive --format=tar.gz` uses an internal gzip implementation, not the external gzip binary, since git added that magic-command default -- so the local gzip 1.12 binary's version is not actually load-bearing for this test. This revision corrects settles_gap to partially, drops the unverified toolchain-independence claim, and adds one bounded corrective check (archiving with no external gzip binary on PATH) to directly test git's internal-gzip claim instead of relying on recollection.",
+  "commands": [
+    {
+      "cmd": "git -C ~/code/nas-wt-w2-ci-supply-chain rev-parse d0fe136c218fedff93c93ac674e302ae19b2d924",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "d0fe136c218fedff93c93ac674e302ae19b2d924",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "git -C ~/code/nas-wt-w2-ci-supply-chain archive --format=tar.gz --prefix=native-agent-stack/ --output=<scratch>/rebuild/rebuilt-d0fe136c.tar.gz d0fe136c218fedff93c93ac674e302ae19b2d924 && sha256sum <scratch>/rebuild/rebuilt-d0fe136c.tar.gz",
+      "exit": 0,
+      "duration_s": 0.9,
+      "output_excerpt": "93935ba33efcf578694973ba8e915318536bff2dc5eb2f9223397703dea5f69f  rebuilt-d0fe136c.tar.gz",
+      "output_sha256": "93935ba33efcf578694973ba8e915318536bff2dc5eb2f9223397703dea5f69f"
+    },
+    {
+      "cmd": "gh api repos/seathatflowsinourveins/native-agent-stack/actions/runs/35541322881/artifacts (record the archive artifact's digest field)",
+      "exit": 0,
+      "duration_s": 0.5,
+      "output_excerpt": "native-agent-stack-d0fe136c218fedff93c93ac674e302ae19b2d924.tar.gz sha256:93935ba33efcf578694973ba8e915318536bff2dc5eb2f9223397703dea5f69f",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "git -C ~/code/nas-wt-w2-ci-supply-chain archive --format=tar.gz --prefix=native-agent-stack/ --output=<scratch>/rebuild/rebuilt.tar.gz 41d39b3917feee17ecc6369a5662b6acda7c0983 && sha256sum <scratch>/rebuild/rebuilt.tar.gz",
+      "exit": 0,
+      "duration_s": 0.9,
+      "output_excerpt": "a528186ea3f679fabcf6ac9fb768ce8e8c5c1790cb361c101009c0cc76ecf3c6  rebuilt.tar.gz",
+      "output_sha256": "a528186ea3f679fabcf6ac9fb768ce8e8c5c1790cb361c101009c0cc76ecf3c6"
+    },
+    {
+      "cmd": "FIX ROUND CORRECTION: `git help archive` (checked instead of relying on recollection) plus a direct test -- env -i PATH=<empty-dir-with-no-gzip-binary>:/usr/bin HOME=$HOME git archive --format=tar.gz --prefix=native-agent-stack/ --output=<scratch>/rebuild-no-external-gzip.tar.gz HEAD",
+      "exit": 0,
+      "duration_s": 0.6,
+      "output_excerpt": "`git help archive` states: 'The tar.gz and tgz formats are defined automatically and use the magic command git archive gzip by default, which invokes an internal implementation of gzip.' The direct test confirms this empirically: git archive --format=tar.gz succeeded (exit 0, valid tar.gz produced) even with PATH containing no gzip binary at all, proving this host's git does not shell out to the external gzip 1.12 binary for tar.gz archives.",
+      "output_sha256": "882c93df93c0e0292473ea464a34a57bc429747ca7877bd2cc1c0043e328feab"
+    }
+  ],
+  "tool_versions": {"git": "2.43.0", "gzip": "1.12 (installed on this host but not invoked by `git archive --format=tar.gz`, which uses git's own internal gzip implementation; see FIX ROUND CORRECTION)"},
+  "installs": [],
+  "model_calls": [],
+  "result": "For both commits tested, the locally-rebuilt archive's sha256 matched the hosted-run attestation subject digest exactly, byte for byte: d0fe136c218fedff93c93ac674e302ae19b2d924 rebuilt to 93935ba33efcf578694973ba8e915318536bff2dc5eb2f9223397703dea5f69f (matches run 35541322881's recorded artifact digest exactly), and 41d39b3917feee17ecc6369a5662b6acda7c0983 rebuilt to a528186ea3f679fabcf6ac9fb768ce8e8c5c1790cb361c101009c0cc76ecf3c6 (matches run 35803145596's recorded artifact digest exactly, see publish-catalog-dispatch-attestation.json). Both rebuilds used this host's git 2.43.0. FIX ROUND CORRECTION: the original claim that this used 'an independently-versioned git/gzip toolchain, distinct from the runner's' was unverified (the runner's git version was never recorded) and misleading about the mechanism: `git help archive` documents, and a direct test confirms (git archive --format=tar.gz succeeded with no gzip binary at all on PATH), that `git archive --format=tar.gz` uses git's own internal gzip implementation, not the external gzip 1.12 binary on this host. So the reproducibility demonstrated here is git-version-dependent, not gzip-binary-dependent, and the runner's actual git version (needed to say whether it is the 'same' or 'different' git as this host's 2.43.0) remains unrecorded.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "supports_incumbent",
+    "explanation": "Tests the archive-build-step portion of the previously-unestablished 'reproducible changes' claim by comparing real rebuilt bytes against real hosted-attestation digests, across two independent commits three days apart, and finds byte-for-byte reproducibility both times -- real, decisive, supporting evidence for that specific mechanism. It does not settle gap 7 as a whole: the gap text also covers whether static checks execute a job at all (not addressed here) and reproducibility is demonstrated for exactly two commits, not as a general property of every future commit, so settles_gap is corrected to partially rather than true."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Only the archive build step (git archive --format=tar.gz) was tested for reproducibility, not the SBOM generation step (syft scan), which embeds a generation timestamp and is not expected to be byte-reproducible run to run; the SBOM's own provenance is instead established by its build-provenance attestation (see publish-catalog-dispatch-attestation.json), not by content reproducibility. The gap text's 'static checks execute no job' concern is also not addressed by this check.",
+    "The GitHub-hosted ubuntu-24.04 runner's actual git version was not recorded by either this check or the original publish run, so whether this host's git 2.43.0 matches or differs from the runner's git version is unverified, not merely 'distinct'. Since `git archive --format=tar.gz` uses git's own internal gzip (confirmed via `git help archive` and by successfully archiving with no gzip binary on PATH), the locally-installed gzip 1.12 binary's version is not actually load-bearing for this reproducibility result either way.",
+    "Only two commits were tested (d0fe136c and 41d39b3); this does not prove every future commit will reproduce identically, only that the mechanism is deterministic for the content tested."
+  ],
+  "raw_artifacts": [
+    {"path": "<scratch>/rebuild/rebuilt.tar.gz", "sha256": "a528186ea3f679fabcf6ac9fb768ce8e8c5c1790cb361c101009c0cc76ecf3c6"},
+    {"path": "<scratch>/rebuild/rebuilt-d0fe136c.tar.gz", "sha256": "93935ba33efcf578694973ba8e915318536bff2dc5eb2f9223397703dea5f69f"},
+    {"path": "<scratch>/rebuild-no-external-gzip.tar.gz", "sha256": "882c93df93c0e0292473ea464a34a57bc429747ca7877bd2cc1c0043e328feab"},
+    {"path": "<scratch>/git-help-archive.txt", "sha256": "47de3ecf6b364d9b3fbcf8cdd51a02ddd9db50a384fecabd8bcbd3b4a4170a86"}
+  ]
+}

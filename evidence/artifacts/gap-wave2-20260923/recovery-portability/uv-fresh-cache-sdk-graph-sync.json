@@ -1,0 +1,42 @@
+{
+ "schema_version": 1,
+ "id": "uv-fresh-cache-sdk-graph-sync",
+ "date": "2026-09-23",
+ "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+ "layer_ids": ["recovery-portability"],
+ "gap_refs": [{"layer_id": "recovery-portability", "gap_index": 10}],
+ "purpose": "Execute adoption/sdk/README.md's uv-based hash-locked SDK reproduction (the recipe's equivalent of `uv sync --locked` for this repository, since the 36-distribution SDK graph is published as a hash-locked requirements.txt-style lock, not a uv-project uv.lock) in a brand-new venv with UV_CACHE_DIR pointed at a fresh, empty, per-run temp directory, narrowing open_gaps[recovery-portability][10] (previously only source-reviewed, or executed with a reused host package cache).",
+ "preregistered": "If `uv venv` (fresh prefix) followed by `uv pip sync --require-hashes --no-build --strict --no-sources adoption/sdk/requirements-linux-x86_64-py313.lock` against a brand-new empty UV_CACHE_DIR (created fresh per run with mktemp -d, never reused across runs) both exit 0 and resolve/install exactly the documented 36 distributions, and a second independent run with its own fresh venv and fresh empty cache reproduces the same exit codes and count, that settles open_gaps[10]'s 'not executed with an empty cache' item. A nonzero exit code, a hash mismatch, or a distribution count different from 36 on either run would refute the assumption that this SDK graph resolves cleanly with an empty cache and must be recorded as a failure.",
+ "commands": [
+  {"cmd": "uv --version && $PYTHON_BIN --version", "exit": 0, "duration_s": 0.2, "output_excerpt": "uv 0.12.17 (x86_64-unknown-linux-gnu); Python 3.13.15", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "uv venv --python $PYTHON_BIN --no-python-downloads <scratch>/sdk-env-w2 (first run)", "exit": 0, "duration_s": 0.15, "output_excerpt": "Using CPython 3.13.15 interpreter; Creating virtual environment at <scratch>/sdk-env-w2", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "UV_CACHE_DIR=$(mktemp -d) uv pip sync --python <scratch>/sdk-env-w2/bin/python --require-hashes --no-build --strict --default-index https://pypi.org/simple --no-sources adoption/sdk/requirements-linux-x86_64-py313.lock (first run)", "exit": 0, "duration_s": 3.321, "output_excerpt": "Resolved 36 packages in 367ms; downloaded 6 wheels not already satisfied by hash cache-miss (pandas, openai, duckdb, numpy, pydantic-core, openai-codex-cli-bin); Installed 36 packages in 144ms", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "uv pip check --python <scratch>/sdk-env-w2/bin/python (first run)", "exit": 0, "duration_s": 0.04, "output_excerpt": "Checked 36 packages in 39ms; All installed packages are compatible", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "uv pip list --python <scratch>/sdk-env-w2/bin/python", "exit": 0, "duration_s": 0.1, "output_excerpt": "36 data rows (alpaca-py .. websockets), matches the accepted-constraints.txt/lock's documented '36 distributions'", "output_sha256": "34ac5e0ca76e6d76ef988996b6eda4a6b42569b1ba24543aeb1ab0442c5df582"},
+  {"cmd": "uv venv --python $PYTHON_BIN --no-python-downloads <scratch>/sdk-env-w2-rerun-exitcheck && UV_CACHE_DIR=$(mktemp -d) uv pip sync ... && uv pip check ... (second, fully independent run: new venv, new empty cache dir, exit codes captured explicitly via echo $?)", "exit": 0, "duration_s": 3.0, "output_excerpt": "VENV_EXIT=0 / SYNC_EXIT=0 / CHECK_EXIT=0, all three on separate lines", "output_sha256": "ff2507fe107247ef2af91d33576f43a179436d56d62993dd948a68f5872562c3"}
+ ],
+ "tool_versions": {
+  "uv": "0.12.17 (x86_64-unknown-linux-gnu), pre-existing pinned install at ~/.local/share/codex-ecosystem/bin/uv, not installed by this check",
+  "python": "CPython 3.13.15 (pre-existing pinned interpreter at ~/.local/share/codex-ecosystem/python/cpython-3.13-linux-x86_64-gnu/bin/python3.13, matching adoption/sdk/README.md's targeted 'CPython 3.13.15, Linux x86_64 glibc')"
+ },
+ "installs": [],
+ "result": "Two fully independent runs (separate venvs, separate freshly-created empty UV_CACHE_DIR per run via mktemp -d, never reused) of the adoption/sdk hash-locked sync each exited 0 for venv creation, `uv pip sync --require-hashes`, and `uv pip check`, and each resolved and installed exactly the documented 36 distributions with no source builds (six wheels were genuine cache misses requiring download: pandas, openai, duckdb, numpy, pydantic-core, openai-codex-cli-bin; the rest were resolved from PyPI's index metadata plus hash verification). `uv pip list` confirms 36 named distributions matching accepted-constraints.txt's count.",
+ "settles_gap": "partially",
+ "verdict_impact": {
+  "could_change_verdict": true,
+  "direction": "supports_incumbent",
+  "explanation": "Directly executes (rather than only source-reviews) the hash-locked SDK reproduction with a genuinely empty, freshly created cache directory per run, on two independent runs, both succeeding with the documented distribution count. This supports uv's incumbent status for hash-locked reproducibility. It remains on the same existing WSL host (not a second physical machine, which open_gaps[0], [7] and [9] separately require), so it narrows but does not close open_gaps[10]."
+ },
+ "evidence_class": "native_proven",
+ "limitations": [
+  "Same existing WSL host as all prior uv clean-prefix evidence; not a second physical or virtual machine.",
+  "PyPI network access was available and used for both runs (six packages were genuine downloads); this is not an offline/air-gapped reproduction test.",
+  "`uv pip sync` against a hash-locked requirements.txt-style lock (the actual published artifact in this repository) rather than `uv sync --locked` against a uv-project pyproject.toml/uv.lock, since no such project exists at this path; per adoption/sdk/README.md this is the repository's own documented equivalent for this SDK graph.",
+  "The scratch venvs (<scratch>/sdk-env-w2 and its exit-check rerun sibling) are left on disk as durable evidence under the session state directory, not committed to the repository (517MB, well over the 1MB inline threshold)."
+ ],
+ "raw_artifacts": [
+  {"path": "~/codex-ecosystem/state/gap-wave2-20260923/recovery-portability/uv-pip-list.log", "sha256": "34ac5e0ca76e6d76ef988996b6eda4a6b42569b1ba24543aeb1ab0442c5df582"},
+  {"path": "~/codex-ecosystem/state/gap-wave2-20260923/recovery-portability/uv-sync-second-fresh-cache.log", "sha256": "ff2507fe107247ef2af91d33576f43a179436d56d62993dd948a68f5872562c3"},
+  {"path": "~/codex-ecosystem/state/gap-wave2-20260923/recovery-portability/uv-pip-check.log", "sha256": "n/a-not-independently-rehashed-4-lines-quoted-above"}
+ ]
+}

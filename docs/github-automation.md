@@ -165,24 +165,34 @@ do not transfer a native client's credential store.
 
 ## Publication and practical acceptance
 
-As of this writing, the active [main ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
-requires the always-running `validate` and `token-report` jobs from GitHub Actions
-(app ID 15368). It adds no human approval count, strict up-to-date requirement or
-bypass actor. Native path-filtered and manually dispatched checks are not global
+As of a dated 2026-09-23 GET (see below), the active [main ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
+(id 23739774, updated 2026-09-22T11:08:22-04:00) requires the `validate`,
+`token-report` and `secret-scan` jobs from GitHub Actions (app ID 15368), plus
+`deletion`, `non_fast_forward`, `required_linear_history` and a `pull_request`
+rule (`required_approving_review_count: 0`, `dismiss_stale_reviews_on_push: true`,
+`require_code_owner_review: false`, `require_last_push_approval: false`,
+`required_review_thread_resolution: true`, `allowed_merge_methods: ["squash", "rebase"]`).
+It adds no human approval count or strict up-to-date requirement, and no bypass
+actor. Native path-filtered and manually dispatched checks are not global
 requirements. Require native acceptance separately when its capability changes.
-No merge queue is enabled; add `merge_group` support before adopting one.
+No merge queue is enabled; add `merge_group` support before adopting one. A
+separate [tag ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23829417)
+(id 23829417, created 2026-09-22T11:08:53-04:00) is also active.
 
-The committed [main-ruleset.json](../.github/main-ruleset.json) no longer
-describes this applied state: it has been edited ahead of application to add
-`secret-scan` and the other rules described in "Ruleset upgrade, 2026-09-22"
-below. Until the coordinator applies it, treat `main-ruleset.json` as the
-*reviewed, not-yet-applied* configuration, and the "active ruleset" GET below
-as the ground truth for what GitHub currently enforces.
+The committed [main-ruleset.json](../.github/main-ruleset.json) and
+[tag-ruleset.json](../.github/tag-ruleset.json) now describe this applied
+state, matching the 2026-09-23 dated GET field by field (see "Ruleset
+upgrade, 2026-09-22" below for the full comparison and application record).
+Both were applied on 2026-09-22; there is no pending, not-yet-applied
+configuration as of this writing.
 
 The prior state had no rulesets and returned `Branch not protected` for main.
 After applying the configuration, a separate `GET /repos/OWNER/REPO/rules/branches/main`
-confirmed both required contexts and their expected app. This verifies settings,
-not an experimentally attempted blocked merge. GitHub's [rules REST interface](https://docs.github.com/en/rest/repos/rules)
+confirmed both required contexts and their expected app. A dated re-check on
+2026-09-23 (`gh api repos/seathatflowsinourveins/native-agent-stack/rulesets`
+and `.../rules/branches/main`, both exit 0) reconfirmed the same live state.
+This verifies settings, not an experimentally attempted blocked merge.
+GitHub's [rules REST interface](https://docs.github.com/en/rest/repos/rules)
 and [status-check behavior](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks)
 define these controls.
 

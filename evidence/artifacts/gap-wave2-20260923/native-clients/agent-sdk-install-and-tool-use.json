@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "id": "agent-sdk-install-and-tool-use",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["native-clients"],
+  "gap_refs": [
+    {"layer_id": "native-clients", "gap_index": 7}
+  ],
+  "purpose": "Gap 7: the Claude Agent SDK and OpenAI Agents SDK have no install, account or tool execution evidence. This check installs both SDKs into fresh, isolated uv prefixes and attempts each upstream minimal tool-use example: the Claude Agent SDK through native Claude Code auth (no API key), and the OpenAI Agents SDK only if a local OpenAI-compatible CHAT endpoint exists (per this unit's binding scope, no API keys are authorized). FIX-ROUND CORRECTION: gap 12 (same-task SDK vs native CLI comparison) was originally also cited in gap_refs as 'partially' addressed; it has been dropped from gap_refs below because this check ran a different task on the SDK path (an SDK-internal Bash tool_use example) than the native comparison points it was checked against (`claude -p \"Reply with OK\"` and a post-resume MCP tool call in claude-resume-mcp-toolset.json), so there is no actual same-task comparison here, and the SDK resume/session fields were only confirmed via source review (`dataclasses.fields`), not exercised -- a source review does not settle an execution-comparison gap. This check is retained as gap-7 install/execution evidence only.",
+  "preregistered": "FIX-ROUND NOTE: this text is a same-day, post-hoc-labelled description of the check's intent and expected discriminating signal, not a proven-prior-timestamped prediction -- no separate timestamped preregistration artifact exists for this receipt (the raw output directory holds only run artifacts, and this receipt file itself was first committed after the commands ran). Expectation: `uv pip install claude-agent-sdk` and `uv pip install openai-agents` into two separate new prefixes under ~/.local/share/codex-ecosystem/tools/ should both succeed and report installed versions. A minimal Claude Agent SDK script using `query()`/`ClaudeAgentOptions(allowed_tools=[\"Bash\"])` asking the model to run a Bash command and reply DONE should produce a ResultMessage with is_error=False, result='DONE', and an AssistantMessage tool_use of Bash with the expected stdout -- this exercises native Claude Code auth (no ANTHROPIC_API_KEY set). Before attempting the OpenAI Agents SDK example, checking `curl .../v1/models` on common local ports (8000/8001/11434/1234/8080) and the already-known local vLLM port for a CHAT-capable model (not just embeddings) determines runnability: if only an embedding model is being served and no API key is authorized, the OpenAI Agents SDK example is expected to be NOT RUNNABLE and is recorded as such rather than attempted against a real provider.",
+  "commands": [
+    {
+      "cmd": "uv venv .venv && uv pip install claude-agent-sdk  (in ~/.local/share/codex-ecosystem/tools/claude-agent-sdk-w2)",
+      "exit": 0,
+      "duration_s": 6.0,
+      "output_excerpt": "claude-agent-sdk 0.2.158 installed; deps include mcp 2.2.0, pydantic 2.13.5",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "flock ~/codex-ecosystem/state/gap-wave2-20260923/claude.lock python3 blueprints/gap-wave2-20260923/claude-agent-sdk-minimal.py",
+      "exit": 0,
+      "duration_s": 18.0,
+      "output_excerpt": "AssistantMessage tool_use: Bash(command='echo sdk-tool-ok') -> UserMessage tool_result: 'sdk-tool-ok' -> AssistantMessage text: 'DONE' -> ResultMessage(subtype='success', is_error=False, num_turns=2, result='DONE', model_usage keyed by claude-opus-5-5[1m] and a small claude-haiku-4-5-20251001 subagent-tier call). RateLimitEvent observed mid-run: seven_day utilization 0.89 (allowed_warning).",
+      "output_sha256": "c4b31bb04acb2fab562637f9a107b23d5fb3df5763db67202a91dc0d220d0e06"
+    },
+    {
+      "cmd": "curl -m5 http://127.0.0.1:{8000,8001,11434,1234,8080}/v1/models",
+      "exit": 0,
+      "duration_s": 15.0,
+      "output_excerpt": "all empty/no response",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "ss -ltnp | grep vllm ; curl -m5 http://127.0.0.1:8231/v1/models",
+      "exit": 0,
+      "duration_s": 1.0,
+      "output_excerpt": "{\"object\":\"list\",\"data\":[{\"id\":\"nvidia/Nemotron-3-Embed-1B-BF16\", ...}]} -- an embedding-only model, not chat-capable",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "uv venv .venv && uv pip install openai-agents  (in ~/.local/share/codex-ecosystem/tools/openai-agents-w2)",
+      "exit": 0,
+      "duration_s": 5.0,
+      "output_excerpt": "openai-agents 0.22.3 installed; deps include openai, mcp, pydantic",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "python3 -c \"from claude_agent_sdk import ClaudeAgentOptions; import dataclasses; [print(f.name) for f in dataclasses.fields(ClaudeAgentOptions) if 'resum' in f.name.lower() or 'session' in f.name.lower()]\"",
+      "exit": 0,
+      "duration_s": 0.5,
+      "output_excerpt": "continue_conversation, resume, session_id, fork_session, resume_session_at, resume_drops_turn, session_store, session_store_flush",
+      "output_sha256": "n/a"
+    }
+  ],
+  "tool_versions": {
+    "claude-agent-sdk": "0.2.158",
+    "openai-agents": "0.22.3",
+    "uv": "0.12.17"
+  },
+  "installs": [
+    {"name": "claude-agent-sdk", "version": "0.2.158", "prefix": "~/.local/share/codex-ecosystem/tools/claude-agent-sdk-w2", "source_url": "https://pypi.org/project/claude-agent-sdk/", "sha256": "not recorded (installed via uv pip from PyPI index, no single wheel hash captured for this receipt)"},
+    {"name": "openai-agents", "version": "0.22.3", "prefix": "~/.local/share/codex-ecosystem/tools/openai-agents-w2", "source_url": "https://pypi.org/project/openai-agents/", "sha256": "not recorded (installed via uv pip from PyPI index, no single wheel hash captured for this receipt)"}
+  ],
+  "model_calls": [
+    {"client": "claude-agent-sdk query()", "model": "claude-opus-5-5[1m] (default) plus one claude-haiku-4-5-20251001 subagent-tier call", "effort": "default", "count": 1, "input_tokens": 4, "output_tokens": 86}
+  ],
+  "result": "Claude Agent SDK 0.2.158 installed cleanly into a fresh prefix and its minimal tool-use example ran successfully through native Claude Code auth (no API key set in the environment): the SDK's `query()` call spawned a real Claude Code session (private-id-552a1340cf59a2fa), the model issued a Bash tool_use for 'echo sdk-tool-ok', received the real stdout, and replied 'DONE' with ResultMessage.is_error=False. This directly settles the Claude Agent SDK half of gap 7. OpenAI Agents SDK 0.22.3 also installed cleanly, but no local OpenAI-compatible CHAT endpoint was found: scans of common local ports (8000/8001/11434/1234/8080) returned nothing, and the one locally-running vLLM instance (127.0.0.1:8231) serves only an embedding model (nvidia/Nemotron-3-Embed-1B-BF16), not a chat-completions model. Per this unit's explicit scope (no API keys authorized), the OpenAI Agents SDK tool-use example was correctly NOT attempted and is recorded as not runnable rather than skipped silently. FIX-ROUND CORRECTION: this receipt originally also claimed a 'partial' contribution to gap 12 (same-task SDK vs native comparison). That claim is dropped: the SDK task here (an SDK-internal Bash tool_use example asking for 'DONE') and the native comparison points (`claude -p \"Reply with OK\"`, and a post-resume MCP tool call) are different tasks, not a same-task comparison, and the SDK's resume/session_id/fork_session fields were checked only via source review (`dataclasses.fields(ClaudeAgentOptions)`), never exercised -- a source review does not settle an execution gap. Gap 12 is not addressed by this receipt; it remains open.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Adds first install-and-execution evidence for the Claude Agent SDK (previously none existed), and honest not-runnable evidence for the OpenAI Agents SDK given this unit's no-API-key scope and the absence of a local chat endpoint. Does not establish a ranking or causal comparison between the SDK and native CLI paths, does not exercise SDK-side resume, and does not address gap 12 (see gap_refs correction)."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "OpenAI Agents SDK: install evidence only; no tool-execution evidence, because no local OpenAI-compatible chat endpoint exists on this host and no API keys are authorized for this unit -- explicitly recorded as not runnable per the unit's own scoping, not a silent gap.",
+    "Claude Agent SDK: single trial (N=1), one simple Bash tool call; does not exercise MCP tools, multi-turn conversations, or SDK-side resume/session_id/fork_session (those fields were confirmed to exist via source review only, not exercised).",
+    "This unit stopped further claude -p / SDK model calls after this run partly because a RateLimitEvent surfaced seven-day utilization at 0.89 (allowed_warning) on the shared account, and binding rules require pausing on rate-limit pressure to avoid impacting another session's rate-limit-sensitive long jobs; this is a conservative stopping choice, not a 429.",
+    "FIX-ROUND CORRECTION: gap 12 was dropped from gap_refs (previously cited as 'partial'). This receipt contains no same-task comparison (different tasks were run on the SDK vs. native-CLI sides) and the SDK resume fields were only source-reviewed, not executed; gap 12 remains entirely open and should not be counted as partial progress from this receipt."
+  ],
+  "raw_artifacts": [
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/claude-agent-sdk-run.txt", "sha256": "c4b31bb04acb2fab562637f9a107b23d5fb3df5763db67202a91dc0d220d0e06"}
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "id": "gitleaks-precommit-enforcement-20260923",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": [
+    "secrets-credentials"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "secrets-credentials",
+      "gap_index": 6
+    }
+  ],
+  "purpose": "Gap 6 says gitleaks detects exposure but the evidence does not establish enforcement that keeps sign-ins and credentials out of the checkout -- all prior evidence is detection-mode scans, never a mechanism that actively blocks a commit. This installs a git pre-commit hook (calling the guarded gitleaks launcher, never the underlying binary directly) in a disposable scratch clone and demonstrates it blocks a commit containing a synthetic credential while a clean commit passes.",
+  "preregistered": "[Fix-round caveat: this text was authored in the same working session as the commands below, after related output already existed, not strictly before running them; see PREREGISTRATION-NOTE.md and the matching limitations entry. The underlying commands, exit codes, and output were not re-run or altered.] Expected: in a scratch clone under ~/codex-ecosystem/state/gap-wave2-20260923/secrets-credentials/precommit-clone (never the live worktree, never pushed), a `.git/hooks/pre-commit` script that runs `gitleaks git --pre-commit --staged --config .gitleaks.toml --redact --no-banner` via the guarded launcher on PATH will (a) allow a commit of an inert, non-credential-shaped file to complete normally (exit 0, git creates the commit), and (b) refuse a commit that stages a synthetic, clearly-labeled non-real credential-shaped string (e.g. a generic-api-key-shaped value), with the hook's non-zero exit aborting `git commit` before any commit object is created (staged content remains staged, HEAD unchanged). Both outcomes are recorded verbatim; this establishes local enforcement is possible and demonstrated, not that it is deployed repository-wide (the live worktree's own hooks are unmodified by this check).",
+  "commands": [
+    {
+      "cmd": "git clone --no-hardlinks ~/code/nas-wt-w2-secrets-credentials <scratch>/precommit-clone",
+      "exit": 0,
+      "duration_s": 1.5,
+      "output_excerpt": "local clone at HEAD 3bb8cb3",
+      "output_sha256": "clone-not-hashed"
+    },
+    {
+      "cmd": "cat > .git/hooks/pre-commit <<'HOOK'\\n#!/usr/bin/env bash\\nset -euo pipefail\\nexport PATH=\"~/.local/share/codex-ecosystem/bin:$PATH\"\\ngitleaks git --pre-commit --staged --config .gitleaks.toml --redact --no-banner\\nHOOK\\nchmod +x .git/hooks/pre-commit",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "hook installed, confirmed `which gitleaks` under this PATH resolves to the guarded launcher, not the underlying binary",
+      "output_sha256": "hook-install-not-hashed"
+    },
+    {
+      "cmd": "echo 'clean-fixture-<ts>' > CLEAN_FIXTURE.txt && git add CLEAN_FIXTURE.txt && git commit -m 'clean fixture commit'",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "0 commits scanned. scanned ~25 bytes (25 bytes) in 94ms. no leaks found.\n[claude/wave2-secrets-credentials c1a02ce] clean fixture commit",
+      "output_sha256": "b957614fdff9bfa2c86097da151a8d1e3f1a7ac69c36c8dcda7d2cb65942599d"
+    },
+    {
+      "cmd": "cat > SYNTHETIC_CREDENTIAL.txt (inert, commented-as-synthetic generic-api-key-shaped string) && git add SYNTHETIC_CREDENTIAL.txt && git commit -m 'synthetic credential fixture (should be blocked)'",
+      "exit": 1,
+      "duration_s": 0.1,
+      "output_excerpt": "0 commits scanned. scanned ~158 bytes (158 bytes) in 102ms. leaks found: 1.  -- git commit aborted, no new commit object created",
+      "output_sha256": "9a51c30f8b53ab0094c8a3a7661a87f83cd5b923dfb220c55b3da00deb6cc19f"
+    },
+    {
+      "cmd": "git log --oneline -1 && git status --short  (confirm HEAD unchanged, file still only staged, not committed)",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "HEAD stayed at c1a02ce (clean fixture commit); SYNTHETIC_CREDENTIAL.txt shown as 'A' (staged, not committed)",
+      "output_sha256": "post-block-status-not-hashed"
+    },
+    {
+      "cmd": "git reset HEAD SYNTHETIC_CREDENTIAL.txt && rm -f SYNTHETIC_CREDENTIAL.txt  (cleanup; scratch clone is disposable and never pushed)",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "unstaged and removed",
+      "output_sha256": "cleanup-not-hashed"
+    }
+  ],
+  "tool_versions": {
+    "gitleaks": "8.30.1",
+    "git": "2.43.0"
+  },
+  "installs": [],
+  "model_calls": [],
+  "result": "A git pre-commit hook calling the guarded gitleaks launcher (`gitleaks git --pre-commit --staged --config .gitleaks.toml --redact --no-banner`) was installed in a disposable scratch clone and demonstrated both required outcomes: a clean commit of a non-credential-shaped file completed normally (exit 0, commit c1a02ce created), and a commit staging a synthetic, comment-labeled generic-api-key-shaped string was blocked (hook exit 1 via `leaks found: 1`, `git commit` itself exited non-zero and created no new commit object; HEAD remained at c1a02ce and the staged file was left uncommitted). This is the first demonstrated enforcement mechanism for this gap (all prior evidence was detection-only ad hoc scans); it shows a pre-commit hook using the exact guarded launcher this repository's policy requires CAN and DOES stop a locally-staged synthetic credential from being committed.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "This moves gap 6 from 'no enforcement demonstrated, detection only' to 'enforcement demonstrated in a scratch fixture' -- a real, executed proof that a pre-commit hook blocks a synthetic credential while passing a clean commit. It does not settle the gap: this hook was installed only in a disposable scratch clone, not in the live worktree's or the canonical repository's actual .git/hooks/ (which is untracked by git itself and cannot be distributed via a commit without a hook-installation mechanism such as a Makefile target, a documented `git config core.hooksPath`, or a hosted pre-commit-framework config, none of which this receipt adds). Server-side/CI enforcement (rejecting a push containing a secret, as opposed to a local pre-commit hook a developer could bypass with --no-verify) also remains untested."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Demonstrated only in a disposable scratch clone under ~/codex-ecosystem/state/gap-wave2-20260923/secrets-credentials/precommit-clone, which is never pushed and is separate from both the live catalog worktree and the canonical repository; this receipt does NOT install or modify any hook in the actual worktree, nor propose a repository-wide hooksPath change (out of this unit's owned-paths scope).",
+    "A local pre-commit hook is bypassable by the committer via `git commit --no-verify`; this receipt does not test or claim protection against that bypass, nor does it test server-side (push-time/CI) rejection of a secret, which is a materially stronger enforcement guarantee this receipt does not supply.",
+    "Only one synthetic secret shape (a generic-api-key-shaped string) was tested; the broader gitleaks ruleset's blocking behavior across other credential formats is untested here (matching gap 7's separate, not-actionable text about detecting every format).",
+    "The scratch clone's `git commit` used explicit -c user.email/-c user.name overrides for a disposable test identity; this has no bearing on the enforcement result but is recorded for reproducibility.",
+    "FIX ROUND: this receipt's `preregistered` field was written in the same working session as its results rather than strictly before running the commands; see PREREGISTRATION-NOTE.md in this same directory. The underlying commands, exit codes, and output were not re-run or altered."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/secrets-credentials/gitleaks-runs/gap6-clean-commit.log",
+      "sha256": "b957614fdff9bfa2c86097da151a8d1e3f1a7ac69c36c8dcda7d2cb65942599d"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/secrets-credentials/gitleaks-runs/gap6-blocked-commit.log",
+      "sha256": "9a51c30f8b53ab0094c8a3a7661a87f83cd5b923dfb220c55b3da00deb6cc19f"
+    }
+  ]
+}

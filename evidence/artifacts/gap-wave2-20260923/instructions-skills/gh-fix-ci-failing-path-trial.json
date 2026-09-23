@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "gh-fix-ci-failing-path-trial",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["instructions-skills"],
+  "gap_refs": [
+    {"layer_id": "instructions-skills", "gap_index": 5}
+  ],
+  "purpose": "Gap 5: gh-fix-ci has been run only on the clean-check path (native-practice.json lines 89-124); failing-log extraction, repair quality and native agent activation are unqualified. Create a disposable repository branch/PR with a seeded failing Actions check, invoke gh-fix-ci through a native claude -p session, and record failing-log extraction, the proposed repair, whether the rerun passes, and whether the skill activated natively.",
+  "preregistered": "Before running: a seeded workflow step that unconditionally `exit 1`s should (1) make exactly one CI job ('contracts') fail while sibling jobs pass, (2) be diagnosable by the gh-fix-ci skill's bundled inspect_pr_checks.py or a documented fallback, and (3) the skill's own documented workflow (inspect, summarize, propose a fix plan, stop for approval before implementing) should be followed by a native claude -p session with the Skill tool available and explicitly instructed not to implement or push. If the bundled script mis-locates the failing snippet, that is a real tooling limitation to record, not silently smoothed over. Native activation is settled true only if a Skill tool_use event for gh-fix-ci actually appears in the transcript, not merely if the correct answer is reached by other means.",
+  "commands": [
+    {
+      "cmd": "git clone https://github.com/seathatflowsinourveins/agent-lab.git agent-lab-scratch (private repo, gh-authenticated); git checkout -b scratch/w2-gh-fix-ci-20260923",
+      "exit": 0,
+      "duration_s": 3.0,
+      "output_excerpt": "Cloned into a disposable scratch worktree separate from ~/code/agent-lab, per binding instructions.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "Edit .github/workflows/validate.yml: insert one step 'Seeded failing check ... exit 1' before the first real contract step; git commit; git push -u origin scratch/w2-gh-fix-ci-20260923",
+      "exit": 0,
+      "duration_s": 1.5,
+      "output_excerpt": "commit 518f78a pushed",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "gh workflow run validate.yml --ref scratch/w2-gh-fix-ci-20260923; gh pr create --title '[scratch, do not merge] gh-fix-ci probe gap-wave2-20260923' --base codex/native-expansion --head scratch/w2-gh-fix-ci-20260923",
+      "exit": 0,
+      "duration_s": 2.0,
+      "output_excerpt": "workflow_dispatch run 35813683456 (branch-only, failed as expected); PR #17 created, triggering the pull_request event and run 35813734193",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "gh pr checks 17 --json name,state,bucket (polled until no checks pending)",
+      "exit": 0,
+      "duration_s": 30.0,
+      "output_excerpt": "contracts fail; workflows pass; secret-scan pass; skills pass; Socket Security checks pass -- confirms exactly the one seeded job failed, siblings unaffected.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "flock ~/codex-ecosystem/state/gap-wave2-20260923/claude.lock claude -p \"There is an open PR (#17) ... Use the gh-fix-ci skill to inspect the failing check ... Do NOT implement the fix or push any commit yet ...\" --output-format stream-json --verbose --effort medium --allowedTools 'Bash(gh:*),Read,Glob,Grep,Skill' --disallowedTools Edit,Write,NotebookEdit",
+      "exit": 0,
+      "duration_s": 42.0,
+      "output_excerpt": "The session explicitly invoked the Skill tool ({\"skill\": \"gh-fix-ci\", ...}) before any gh command. It ran gh auth status, gh pr view, the bundled inspect_pr_checks.py (which mis-attributed its log snippet to the passing 'workflows' job), then self-corrected by pulling the contracts job log directly via `gh run view --log-failed` (after `gh api .../jobs/<id>/logs` refused over terminal escape sequences), correctly identified the seeded step and commit 518f78a as the sole cause, noted the real contract steps never ran, and stopped with a numbered fix plan (revert/delete the seeded lines, re-verify locally, push, re-check) asking for approval -- it did not implement or push anything.",
+      "output_sha256": "4ec44cf4cae727fe4d5011689849612e9220b6d881e7b9aea3bb95a668a65b0e"
+    },
+    {
+      "cmd": "gh pr close 17 --comment '...'; git push origin --delete scratch/w2-gh-fix-ci-20260923",
+      "exit": 0,
+      "duration_s": 2.0,
+      "output_excerpt": "PR #17 closed without merge; remote scratch branch deleted, per binding cleanup instruction.",
+      "output_sha256": "n/a"
+    }
+  ],
+  "tool_versions": {"claude": "2.1.280 (claude-opus-5-5[1m])", "gh": "installed CLI, repo+workflow scopes"},
+  "installs": [],
+  "model_calls": [
+    {"client": "claude", "model": "claude-opus-5-5[1m]", "effort": "medium (flag passed)", "count": 1, "input_tokens": 0, "output_tokens": 2559}
+  ],
+  "result": "All three preregistered predictions held. (1) The seeded step failed exactly one job ('contracts') while three sibling jobs and two external app checks passed, confirmed by polling gh pr checks to a stable non-pending state. (2) gh-fix-ci's own bundled inspect_pr_checks.py has a real, newly-observed limitation on this run: it returned a log snippet from the passing 'workflows' job instead of the failing 'contracts' job (a run-wide-log tail heuristic that picked the wrong job); the native session self-corrected via `gh run view --log-failed` after `gh api .../jobs/<id>/logs` was refused for needing `--allow-escape-sequences`. This is a genuine tooling gap in the skill's helper script, not merely an unqualified limitation as before. (3) Native activation is now positively established: the transcript contains an explicit `Skill` tool_use call naming gh-fix-ci as the very first action, before any gh/Bash command -- this settles the previously-unqualified 'client-trigger behavior' question for this run. (4) Repair quality: the proposed fix plan (revert or delete the 4 seeded lines, re-verify locally with check-syntax.mjs plus contract commands, push, re-check gh pr checks) is correct and minimal, and the session correctly stopped short of implementing or pushing, honoring both the skill's own approval-gate workflow and this check's explicit instruction. No rerun-passes verification was performed because implementation was deliberately withheld per the skill's and this check's own gate; that specific sub-claim (post-fix rerun) remains unqualified.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "This substantially advances gap 5: failing-log extraction, native agent activation and proposed-repair quality are now all qualified with a real failing-check trial (previously only the clean-check path existed). It also surfaces a genuine, previously-unknown limitation in the skill's bundled inspect_pr_checks.py (wrong-job snippet attribution) worth flagging upstream. It does not fully close the gap: the skill's approval-gated design means an actual implement-and-rerun-passes cycle was intentionally not exercised in this run, so 'repair quality once implemented' and 'does the rerun actually pass' remain open."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "The fix was proposed but deliberately not implemented or pushed (both the skill's own workflow and this check's instruction require approval before implementation), so no rerun-passes result was produced.",
+    "N=1 trial with one seeded failure type (an unconditional `exit 1` step); this does not qualify gh-fix-ci's behavior on more realistic failure types (flaky tests, dependency resolution failures, timeout, etc).",
+    "The bundled inspect_pr_checks.py's wrong-job-snippet behavior was observed once on this specific job-log-fetch race/heuristic; it was not isolated to a minimal reproduction or reported upstream as part of this check.",
+    "This is a private disposable-scratch repository clone with a workflow_dispatch + PR-triggered CI run on a real hosted GitHub Actions runner (native_proven), but the PR was closed and branch deleted immediately after, so the run history remains only in Actions run logs, not in an open PR."
+  ],
+  "raw_artifacts": [
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/gap5-gh-fix-ci.jsonl", "sha256": "4ec44cf4cae727fe4d5011689849612e9220b6d881e7b9aea3bb95a668a65b0e"}
+  ]
+}

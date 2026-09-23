@@ -1,0 +1,23 @@
+You are reviewing a code diff blind, with no knowledge of which tool produced it.
+
+Below is the ENTIRE output of a diff tool comparing a 'before' and 'after' version of a small python function. Do not assume anything about the code beyond what is shown.
+
+--- DIFF START ---
+diff --git a/fixtures/py_before.py b/fixtures/py_after.py
+index 6e72f55..42ace87 100644
+--- a/fixtures/py_before.py
++++ b/fixtures/py_after.py
+@@ -1,4 +1,4 @@
+ def is_allowed(age, has_permit):
+-    if age > 18:
++    if age >= 18:
+         return True
+     return has_permit
+
+--- DIFF END ---
+
+Question: Does this diff clearly show the following change: Does the diff clearly show the comparison operator changing from '>' to '>=' on the age check (not merely that the line changed)?
+
+Answer with EXACTLY this format, two lines:
+ANSWER: YES or NO
+EXPLANATION: one sentence, based only on the diff text shown above, describing what you can see changed.

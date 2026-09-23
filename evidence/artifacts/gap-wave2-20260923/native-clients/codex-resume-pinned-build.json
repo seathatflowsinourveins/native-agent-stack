@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "codex-resume-pinned-build",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["native-clients"],
+  "gap_refs": [
+    {"layer_id": "native-clients", "gap_index": 0},
+    {"layer_id": "native-clients", "gap_index": 10},
+    {"layer_id": "native-clients", "gap_index": 5}
+  ],
+  "purpose": "Gap 0/10: the prior Codex same-thread resume trial ran on macOS with codex-cli 0.155.0-alpha.9.2, not on the pinned 0.155.1 or on WSL. Gap 5 (codex half): the readiness row for `codex --version`/login-status is a zero-exit check, not a functional turn. This check runs a real first turn on this WSL host with the pinned build, then resumes the same thread and asks the model to recall its own prior message, to distinguish genuine same-thread continuity from a fresh context that merely replies plausibly.",
+  "preregistered": "FIX-ROUND NOTE: this text is a same-day, post-hoc-labelled description of the check's intent and expected discriminating signal, not a proven-prior-timestamped prediction -- no separate timestamped preregistration artifact exists for this receipt (the raw output directory holds only run artifacts, and this receipt file itself was first committed after the commands ran). 'Confirmed 0.155.1 before any call' below reports the ORDER commands were run in (the `codex --version` command is the first entry in the commands array, run before the exec/resume calls), not that this expectation text itself was authored strictly before that command ran. Expectation: `codex --version` on this host already reports the pinned build. A first `codex exec --json \"Reply with OK\"` should return exit 0, a `thread.started` event with a thread_id, and an `item.completed` agent_message of \"OK\" plus a `turn.completed` usage block. `codex exec resume <thread_id> --json \"What was my previous message to you? Reply with just that text.\"` should then return exit 0, the SAME thread_id in its `thread.started` event, and an agent_message that reproduces \"Reply with OK\" (the literal prior turn's user text) rather than a generic or unrelated reply -- that reproduction is the discriminating signal for genuine same-thread continuity versus a stateless restart. This settles gap 0/10 for the pinned build on WSL; it does not extend to every future release. It also supplies the codex half of gap 5's functional (not just zero-exit) row.",
+  "commands": [
+    {
+      "cmd": "codex --version",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "codex-cli 0.155.1",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "flock ~/codex-ecosystem/state/gap-wave2-20260923/codex.lock codex exec --json --color never -C ~/code/nas-wt-w2-native-clients \"Reply with OK\"",
+      "exit": 0,
+      "duration_s": 8.2,
+      "output_excerpt": "{\"type\":\"thread.started\",\"thread_id\":\"private-id-6129b48423e41d19\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"OK\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":21127,\"cached_input_tokens\":12160,\"cache_write_input_tokens\":0,\"output_tokens\":5,\"reasoning_output_tokens\":0}}",
+      "output_sha256": "2c1d923eaa333e488bc3931c2b3e8206235abb362ebcde492352fbdaa2fb7e7e"
+    },
+    {
+      "cmd": "flock ~/codex-ecosystem/state/gap-wave2-20260923/codex.lock codex exec resume <thread_id> --json \"What was my previous message to you? Reply with just that text.\"",
+      "exit": 0,
+      "duration_s": 11.4,
+      "output_excerpt": "{\"type\":\"thread.started\",\"thread_id\":\"private-id-6129b48423e41d19\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"Reply with OK\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":43328,\"cached_input_tokens\":33152,\"cache_write_input_tokens\":0,\"output_tokens\":33,\"reasoning_output_tokens\":19}}",
+      "output_sha256": "a7aad2030c2a05ab8d743ca15f3a36de1dd75e24e87fc322f70f291977f7e3bc"
+    }
+  ],
+  "tool_versions": {
+    "codex-cli": "0.155.1"
+  },
+  "installs": [],
+  "model_calls": [
+    {"client": "codex exec", "model": "codex-default (not overridden)", "effort": "default (not overridden with model_reasoning_effort)", "count": 1, "input_tokens": 21127, "output_tokens": 5},
+    {"client": "codex exec resume", "model": "codex-default (not overridden)", "effort": "default (not overridden with model_reasoning_effort)", "count": 1, "input_tokens": 43328, "output_tokens": 33}
+  ],
+  "result": "On WSL with codex-cli 0.155.1 (the currently pinned build, confirmed by `codex --version` before the trial), a first `codex exec` turn returned exit 0 with thread_id private-id-6129b48423e41d19 and agent_message \"OK\". `codex exec resume <thread_id>` (note: the `resume` subcommand rejects `--color` and `-C`, which the top-level `codex exec` accepts -- two failed exit-2 arg-parsing attempts preceded the working invocation and are not counted as model calls since neither produced a thread.started/turn.started event or consumed a turn) then returned exit 0 with the SAME thread_id and an agent_message reproducing the literal text of the first turn's prompt (\"Reply with OK\"), not a paraphrase or generic reply. This is direct evidence of genuine same-thread state continuity (the model recalled its actual prior input, not just a plausible guess) on the pinned build, on WSL, settling gap 0/10 for this host and this build. It also gives codex a functional (not zero-exit) readiness row for gap 5.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Confirms the previously-claimed same-thread resume behaviour actually holds on the pinned build and on WSL (not just on the earlier alpha build on macOS), closing the specific version/platform gap named in gap 0/10. Does not establish resume across every future Codex release, which gap 10's own text treats as inherently open."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Single trial (N=1), not repeated; does not characterize resume reliability across many turns or a long-running thread.",
+    "Only establishes resume on this exact pinned build (0.155.1) and this host; a future release needs its own trial per gap 10's own text.",
+    "The two failed arg-parsing attempts (`--color`/`-C` unsupported on the `resume` subcommand) were CLI usage errors on this operator's part, not evidence about Codex itself; recorded for completeness since they used the codex binary, but produced no turn and are excluded from model_calls and from the shared-account call budget."
+  ],
+  "raw_artifacts": [
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/codex-exec1.json", "sha256": "2c1d923eaa333e488bc3931c2b3e8206235abb362ebcde492352fbdaa2fb7e7e"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/codex-resume1.json", "sha256": "a7aad2030c2a05ab8d743ca15f3a36de1dd75e24e87fc322f70f291977f7e3bc"}
+  ]
+}

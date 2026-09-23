@@ -2,10 +2,39 @@
 
 import base64
 import hashlib
+from html.parser import HTMLParser
 import json
 from pathlib import Path
 import re
 import unittest
+
+
+class ExecutableScripts(HTMLParser):
+    """Bodies of <script> elements a browser would run (JSON data blocks excluded)."""
+
+    def __init__(self, text):
+        super().__init__(convert_charrefs=False)
+        self.bodies, self.body, self.opened = [], None, 0
+        self.feed(text)
+        self.close()
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "script":
+            self.opened += 1
+            types = [value for name, value in attrs if name == "type"]
+            self.body = None if types[:1] == ["application/json"] else []
+
+    def handle_startendtag(self, tag, attrs):
+        pass  # a browser ignores "/>" on <script>; leaving it uncounted makes the raw-count check fail
+
+    def handle_data(self, data):
+        if self.body is not None:
+            self.body.append(data)
+
+    def handle_endtag(self, tag):
+        if tag == "script" and self.body is not None:
+            self.bodies.append("".join(self.body))
+            self.body = None
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -144,7 +173,9 @@ class ClaudeRepositoryEvidenceTests(unittest.TestCase):
         self.assertIn("connect-src 'none'", policy)
         script_src = policy.split("script-src", 1)[1].split(";", 1)[0]
         self.assertNotIn("unsafe", script_src)
-        bodies = [body for attrs, body in re.findall(r"<script([^>]*)>(.*?)</script>", page, re.S) if "application/json" not in attrs]
+        parsed = ExecutableScripts(page)
+        self.assertEqual(parsed.opened, page.lower().count("<script"))  # no script hidden from the parser
+        bodies = parsed.bodies
         self.assertEqual(len(bodies), 1)
         expected = "'sha256-" + base64.b64encode(hashlib.sha256(bodies[0].encode("utf-8")).digest()).decode("ascii") + "'"
         self.assertEqual(script_src.split(), [expected])

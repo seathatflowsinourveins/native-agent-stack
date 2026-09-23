@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "deviation_id": "first_v2_run_preceded_review",
+  "accepted_by": "sota-workflow-resolution, the gate-owner Claude session for spy-lean-parity and dividend-sim-module, acting under the user's 2026-09-22 instruction to resolve the gated items; not a user signature",
+  "accepted_utc": "2026-09-23T03:55:06+00:00",
+  "reviewed_harness_local_source_sha256": {
+    "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+    "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+    "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+    "run.py": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+    "compare.py": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec"
+  },
+  "statement": "Sealed precondition[0] required independent review before the first v2 run. Six v2 replays (replay-history-v2.json: dev1-dev5, dev9, late-emission-experiment, bwrap-db8bad7, bwrap-8c4d7e7, bwrap-f079f6c) ran before any review and are superseded. The harness at cc4503fb85b488ab9ac56fbb0144c411290eee79 was then independently reviewed (not accepted at f079f6c; accepted at cc4503f with zero unresolved findings). The gate owner accepts that the first replay from this reviewed harness, run after this acceptance with the committed history, may qualify under otherwise unchanged sealed criteria and tolerances. This reading and every earlier replay are disclosed; no retry from cc4503f can qualify."
+}

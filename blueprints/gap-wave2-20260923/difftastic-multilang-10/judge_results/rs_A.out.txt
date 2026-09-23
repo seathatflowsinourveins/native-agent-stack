@@ -1,0 +1,2 @@
+ANSWER: YES
+EXPLANATION: The diff adds three new lines (`if value < 0 { return 0; }`) after the existing `if value > max` block, which remains unchanged above it.

@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "id": "socraticode-token-comparison",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": [
+    "semantic-rag"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "semantic-rag",
+      "gap_index": 6
+    }
+  ],
+  "purpose": "Measure whether making the live SocratiCode MCP server available to a native `claude -p` session changes token usage or answer correctness, on one fixed, frozen-gold-answer code question, matched N=3 with vs N=3 without.",
+  "preregistered": "Freeze the question and gold answer from direct source inspection before any run. If the 'with' arm shows materially lower cache/input token usage than 'without' at equal correctness, that supports a token-saving claim for this layer (supports_incumbent). If usage is statistically indistinguishable and/or the model never actually invokes the SocratiCode tool, that refutes a general token-saving claim for pinpoint fact-lookup questions specifically (refutes_incumbent, scoped) while remaining silent on harder/broader questions this single question does not probe.",
+  "correction_note": "FIX ROUND 2026-09-23: (1) the receipt previously called the MCP config 'read-only' and cited a nonexistent file 'mcporter-socraticode-readonly.json'; the config actually used and committed as a raw artifact, socraticode-mcp.json, is not read-only and names no such filter -- it exposes the full 26-tool SocratiCode surface (including write-capable tools: codebase_index, codebase_remove, codebase_prune, codebase_graph_remove, codebase_context_remove, codebase_watch, etc.) against the LIVE Qdrant instance at 127.0.0.1:16333, under --permission-mode bypassPermissions. No socraticode_* tool was actually invoked in any of the 6 runs (confirmed from summary.json tool_calls), so no write occurred, but the exposure itself was real, undisclosed, and inconsistent with this session's constraint that live shared services are off-limits for writes -- an unfiltered write-capable MCP surface against the live store should not have been used even though it went uninvoked. Corrected and disclosed below; not re-run, since a corrected read-only-filtered rerun was not necessary to establish the (already measured) token-overhead result, which only depended on tool-schema loading, not on which specific tools were exposed. (2) The preregistration mapped 'tool never invoked' directly to refutes_incumbent, but the single frozen question names the exact file and constant, making grep the obvious answer path and making retrieval-tool use close to precluded by the question's own design; what was actually measured is the token overhead of loading an unused tool schema set, not evidence about SocratiCode's retrieval token savings (which is what gap 6 asks about). Direction corrected from refutes_incumbent to inconclusive below. (3) The with-arm/without-arm cache_creation_input_tokens percentage difference is corrected from ~1.9% to ~1.84% (466.7/25412.3).",
+  "commands": [
+    {
+      "cmd": "grep -rn 'COUNTERS' ~/code/agent-lab/CLAUDE.md ~/code/agent-lab/AGENTS.md ~/code/agent-lab/RTK.md  # confound check before freezing the question: verify the gold fact is not already present in the auto-loaded project instructions (an earlier draft question about .claude/settings.json values WAS present verbatim in AGENTS.md and was discarded before any 'without' run)",
+      "exit": 1,
+      "duration_s": 1,
+      "output_excerpt": "no match (grep exit 1 = not found); only the bare filename child-usage.mjs is mentioned in AGENTS.md as an invocation example, never the COUNTERS array contents -- question is clean of that confound",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "flock ~/codex-ecosystem/state/gap-wave2-20260923/claude.lock claude -p \"$(cat question.txt)\" --mcp-config socraticode-mcp.json --strict-mcp-config --permission-mode bypassPermissions --effort low --add-dir ~/code/agent-lab --output-format json   # with_1, with_2, with_3 (via blueprints/.../run_arm.sh with arm=with); 20s sleep after each per shared-account pacing",
+      "exit": 0,
+      "duration_s": 4.63,
+      "output_excerpt": "with_1: result='input_tokens, output_tokens, cache_read_input_tokens, cache_creation_input_tokens' (correct); tool_use=[Bash grep]; cache_creation_input_tokens=25286, cache_read_input_tokens=47939",
+      "output_sha256": "see runs/summary.json"
+    },
+    {
+      "cmd": "flock ~/codex-ecosystem/state/gap-wave2-20260923/claude.lock claude -p \"$(cat question.txt)\" --strict-mcp-config --permission-mode bypassPermissions --effort low --add-dir ~/code/agent-lab --output-format json   # without_1, without_2, without_3 (arm=without, no --mcp-config at all so zero MCP servers under --strict-mcp-config); 20s sleep after each",
+      "exit": 0,
+      "duration_s": 5.22,
+      "output_excerpt": "without_1: result='input_tokens, output_tokens, cache_read_input_tokens, cache_creation_input_tokens' (correct); tool_use=[Bash grep]; cache_creation_input_tokens=24810, cache_read_input_tokens=47505",
+      "output_sha256": "see runs/summary.json"
+    },
+    {
+      "cmd": "python3 -c \"...\" # aggregate the 6 runs' JSON 'result' events, normalize the answer strings, compare to the frozen gold_answer.txt, average token fields per arm",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "6/6 correct; with-arm avg cache_creation_input_tokens=25412.3, avg cache_read_input_tokens=47939.7; without-arm avg cache_creation_input_tokens=24945.7, avg cache_read_input_tokens=47503.7; 0/6 runs in either arm actually invoked a socraticode_* tool -- both arms answered via Bash+grep",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "ccusage claude session --json",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "account-wide aggregate across ALL sessions on this shared account (cacheCreationTokens: 24323063 total, spans firstActivity 2026-09-22 to lastActivity 2026-09-23) -- not scoped to these 6 calls, so it was NOT used for the per-arm comparison; the per-call `usage` object from each claude -p --output-format json response was used instead as the session-scoped source of truth",
+      "output_sha256": "n/a-inline"
+    }
+  ],
+  "tool_versions": {
+    "claude_code": "2.1.280",
+    "model": "claude-opus-5-5[1m] (account default alias resolved by the CLI; not explicitly pinned since the unit only constrains effort, and effort=low was passed explicitly)"
+  },
+  "installs": [],
+  "model_calls": [
+    {
+      "client": "claude -p",
+      "model": "claude-opus-5-5[1m]",
+      "effort": "low",
+      "count": 3,
+      "input_tokens": 12,
+      "output_tokens": 490,
+      "cache_read_input_tokens": 143819,
+      "cache_creation_input_tokens": 76237,
+      "note": "with-SocratiCode arm, 3 runs (with_1..with_3), totals summed from each run's usage object"
+    },
+    {
+      "client": "claude -p",
+      "model": "claude-opus-5-5[1m]",
+      "effort": "low",
+      "count": 3,
+      "input_tokens": 12,
+      "output_tokens": 483,
+      "cache_read_input_tokens": 142511,
+      "cache_creation_input_tokens": 74837,
+      "note": "without-SocratiCode arm, 3 runs (without_1..without_3), totals summed from each run's usage object"
+    }
+  ],
+  "result": "CORRECTED (fix round 2026-09-23; see correction_note). 6/6 total runs answered correctly against the frozen gold answer ('input_tokens, output_tokens, cache_read_input_tokens, cache_creation_input_tokens'), in both arms. In every one of the 6 runs (3 with SocratiCode MCP available via the live, unfiltered, write-capable socraticode-mcp.json config pointed at the live Qdrant on 127.0.0.1:16333 -- NOT a read-only config, see correction_note -- 3 with --strict-mcp-config and no MCP servers at all), the model answered by calling Bash+grep directly on the known file path named in the question -- it never invoked any socraticode_* tool even when available. The only measurable difference between arms was a small, consistent per-call overhead in the 'with' arm from the unused SocratiCode tool-schema definitions being loaded into the system prompt: cache_creation_input_tokens averaged 25412.3 (with) vs 24945.7 (without), a difference of ~467 tokens (~1.84% of the with-arm's cache_creation total, corrected from a previously miscalculated ~1.9%); cache_read_input_tokens averaged 47939.7 (with) vs 47503.7 (without), a difference of ~436 tokens. Both differences are consistent with fixed schema-loading cost (26 unused tool schemas), not retrieval usage, since the tool was never called in any run. Because the single frozen question names the exact file and constant, grep is the obvious answer path for this specific question by design, so this receipt measures the token overhead of an unused, available-but-not-needed tool surface -- it does not measure SocratiCode's retrieval token-saving behavior on a question where retrieval would actually be used, which is what gap 6 is about.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "CORRECTED: the original 'refutes_incumbent' direction rested on mapping 'tool never invoked' straight to a refutation of token-saving, per the preregistration. On review, this question's design (naming the exact file and constant) makes grep close to the only sensible path and largely precludes retrieval-tool use regardless of any token-saving properties SocratiCode might have on a harder, location-unknown question -- so a null result here is close to expected by construction, not a genuine test of the retrieval-savings claim gap 6 asks about. What IS a valid, corrected finding: a real, small, measured fixed overhead (~1.84% of cache_creation tokens) from having 26 unused tool schemas loaded, for this one narrow question type. This is a genuine measured_comparison (matched arms, same model/effort, N=3 each, frozen gold answer) for that narrower overhead claim, but it does not settle the retrieval-savings side of the gap in either direction, so direction is corrected to inconclusive and could_change_verdict to false pending a harder, location-unknown question that would actually exercise SocratiCode's retrieval path."
+  },
+  "evidence_class": "measured_comparison",
+  "limitations": [
+    "UNFILTERED LIVE-STORE EXPOSURE (fix round finding): socraticode-mcp.json exposed all 26 SocratiCode tools, including write-capable ones (codebase_index, codebase_remove, codebase_prune, codebase_graph_remove, codebase_context_remove, codebase_watch, etc.), against the LIVE Qdrant instance at 127.0.0.1:16333 under bypassPermissions, with no read-only tool filter. No socraticode_* tool was actually called in any of the 6 runs (verified from summary.json tool_calls), so no write occurred, but this was not disclosed as 'read-only' correctly in the original receipt and should not have been pointed at the live store unfiltered; a corrected version of this check should use a read-only-filtered config or a disposable Qdrant instance.",
+    "The question's design (naming the exact file and constant) makes grep the obvious answer path, which largely precludes exercising SocratiCode's retrieval behavior; this receipt therefore measures unused-tool-schema overhead, not retrieval token savings, and should not be read as testing the gap's retrieval-savings claim.",
+    "Single fixed question, N=3 per arm; no statistical test (e.g. confidence interval) was computed given the small N and near-identical per-run values -- the ~467-token difference is consistent across all 3 with-runs vs all 3 without-runs but this is descriptive, not a formal significance test.",
+    "The question was deliberately answerable via grep because its file location is named explicitly; this measures the token cost of SocratiCode's availability for a case where the model doesn't need retrieval, not the benefit case where the file location is unknown. A harder, location-unknown question is needed to test the benefit side and was not run here given the 90-minute/12-call budget for this unit.",
+    "Model defaulted to the account's aliased Opus model rather than a pinned model id; --effort low was passed explicitly per the unit's constraint, but model choice itself was not controlled beyond that.",
+    "ccusage's account-wide aggregation could not isolate these 6 calls from concurrent activity on the shared account, so per-call `usage` JSON (a different, session-scoped evidence source) was used instead; this is noted as a deviation from the suggested ccusage-based approach, with the reason recorded.",
+    "Did not test whether forcing tool use (e.g. via a system-prompt instruction to always use codebase_search) would change the picture; this receipt characterizes default model behavior only."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/run_arm.sh",
+      "sha256": "c8a1313ccc17de95c14e7b9aa0ecdd6b6658eef247b8d30bae4b313c38e92946",
+      "published_sha256": "e5618899a85e1e17594d6c3f70297b2080df36762a9e76607d46869288cd67f4",
+      "published_note": "Published copy differs from the run's file: home paths were sanitized to ~/ at publication, and the coordinator then made helper paths expand at run time (review of PR #101). sha256 is the file as run; published_sha256 is the committed file."
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/question.txt",
+      "sha256": "71285bab81baa2aa74ac0f52338df2150c9423e593ae16d24d806f32eb0c5659"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/gold_answer.txt",
+      "sha256": "3d9d10d7638bda52ba706d0b24abdcac49c66d43d51efb002483fa80cda2aa89"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/socraticode-mcp.json",
+      "sha256": "443b25c933f3bd478db67a8a10bcfdef120c5246f2784baa38dbefcd2d8da5ee"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/empty-mcp.json",
+      "sha256": "372a7f8c1e988f58480012e741582e13bb1c9c2b2611432f365ae132f519cfe5"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/summary.json",
+      "sha256": "ee6ffca528054c5e0e9d38fd9d8eba4f2c9aab64fc967940fe4a7a018849bd2c"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_1.stdout",
+      "sha256": "44dec266d0169e7018eed464e81093d6c906c5cc938066376cd16bebe2934332"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_2.stdout",
+      "sha256": "4e0d901180eeedea997f9e2fafb9e2e8555fa74cf5d873c28908a64ca89fb585"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_3.stdout",
+      "sha256": "d3d8c2c78e0887e89b7561c06622d8b7e2a178d103eae9e3fe8c2b7cfa23627c"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/without_1.stdout",
+      "sha256": "3e7670a9b5a3b2b95fe03bcb421ffcafacf50b43648f7cb027350c125f073f37"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/without_2.stdout",
+      "sha256": "33353ac3d5547661a8c8faee2a16a350a60a687c50e3155402c4021a6319c812"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/without_3.stdout",
+      "sha256": "bd40389d38d1d63a41b7c6d6563c4d3a38fd0ee1e73c756b023632de4492a604"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+# Deliberately over-permissioned input for static analysis only. Never run this workflow.
+# This is a negative-control fixture for gap ci-supply-chain[0]: it exists to prove
+# that zizmor's excessive-permissions audit actually fires against real over-broad
+# permissions, rather than relying only on configuration and source review.
+# Kept outside .github/workflows (as a .yml.txt file, matching the existing
+# tests/fixtures/workflow-security/unsafe.yml.txt convention) so it is never
+# picked up by GitHub Actions or by validate.yml's directory-wide zizmor scan.
+name: Negative control - excessive permissions
+on: pull_request
+permissions: write-all
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    # Needless job-level contents: write in addition to the already-excessive
+    # workflow-level write-all -- neither is required by any step below.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - run: echo "no-op"
