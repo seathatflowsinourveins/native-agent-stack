@@ -32,7 +32,7 @@ LINUX_X86_64_ONLY = unittest.skipUnless(
 GITHUB_AUTOMATION_DOC_PATH = ROOT / "docs/github-automation.md"
 
 SHA256_HEX = re.compile(r"[0-9a-f]{64}\Z")
-VALID_KINDS = {"tarball", "npm", "pip", "uv-tool", "native", "system-package"}
+VALID_KINDS = {"tarball", "npm", "pip", "uv-tool", "native"}
 
 
 def load_pins() -> dict:

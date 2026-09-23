@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -3139,13 +3139,13 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "0b9b39b2758fa4cd36765063a1d7ec37786f248e4fce430b4c0cee182100b57d",
-      "bytes": 17324
+      "sha256": "0c15d8a01958a65ce34b916273d0c50397ded6825bc0059b22fd762fe13cc326",
+      "bytes": 17576
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "53000e8113ae88487b15dc33b7e634046e2f79cd548fa9628d6d7668b11f2d7c",
-      "bytes": 57173
+      "sha256": "e44dd25800a5ce6398f4d346bb910e2dd191a4add7cd41ba20cb1fbee1a3e383",
+      "bytes": 57425
     },
     {
       "path": "adoption/bootstrap.md",
@@ -3234,13 +3234,13 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "601f9daffc93a211a462409e2d59c09445041cf423e1cb7babbbf433dfd9e815",
-      "bytes": 11779
+      "sha256": "31a96d867d084d1b399f5d6da71544b04a842cbb016bfe56d41235e7cdca4c8c",
+      "bytes": 11269
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "17e6233186b04835d5275ac92a41ad5f6aa478502687d3f1b5a21acefc5e82d2",
-      "bytes": 17654
+      "sha256": "b393868aee89534bf3986470c11584463116b8748d433da3fb2ac25a067956eb",
+      "bytes": 17677
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -8650,8 +8650,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "31c127d82da4690b256c5d483a05fe8af59c2955e08f888412d525c3c3247d32",
-      "bytes": 75364
+      "sha256": "a9170e7561003ef37b33d85dec97926371c5ea8d8545c4ed565c5032deec1fdb",
+      "bytes": 75466
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9070,8 +9070,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "bd8610993f5a1860397b480385a7a957630f7c8ad9bb95ee102deaf923c0e7c0",
-      "bytes": 19362
+      "sha256": "9f2187980fb7d8619f711d00771e591038d7685fcbbd3230914648e73b1020c0",
+      "bytes": 19528
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -9365,8 +9365,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "8b6c807bd90d7f5bd49d15e926e1a0e307d0fd1c416ddaafbd763fabd70c0cb4",
-      "bytes": 14833
+      "sha256": "bf0afa11ebd1e9b041ab066eed974277b1139595f4f63e941767b74ce0a20d4f",
+      "bytes": 14902
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -14955,8 +14955,8 @@
     },
     {
       "path": "tests/test_effort_default_guard.py",
-      "sha256": "3771c790758f9336b8d9dad79558bd81a14c14e6f12dba45c995ac00a2f01601",
-      "bytes": 7673
+      "sha256": "b8a63c2cca3304c730c96b9185bd9dce580eef97fb8949481fb0f4febf896fb3",
+      "bytes": 10546
     },
     {
       "path": "tests/test_execution_realism.py",
@@ -15030,8 +15030,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "7d52586810a140f909edc6dc2db1a7d5c8d2537c2950eb42c86a017ae158aac9",
-      "bytes": 5786
+      "sha256": "1411cc42cc9057208a9c2983d4d901fa9a4b9296951fd5671f5e20797867c928",
+      "bytes": 8029
     },
     {
       "path": "tests/test_job_recovery.py",

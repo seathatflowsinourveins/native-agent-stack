@@ -19,6 +19,11 @@ ROOT = Path(__file__).resolve().parents[1]
 GUARD_PATH = ROOT / "adoption/hooks/claude/effort-default-guard.py"
 SHA256SUMS_PATH = ROOT / "adoption/hooks/claude/SHA256SUMS"
 HOST_GUARD_PATH = Path.home() / ".claude" / "hooks" / "effort-default-guard.py"
+# The guard reads this fixed managed-settings path; a host that has one would make
+# the behavioral results depend on it, so those tests skip there.
+MANAGED_SETTINGS = Path("/etc/claude-code/managed-settings.json")
+HOST_INDEPENDENT = unittest.skipIf(MANAGED_SETTINGS.exists(),
+                                   f"{MANAGED_SETTINGS} exists; guard results would depend on it")
 
 
 def run_guard(home: Path, event: dict, env_extra: dict | None = None):
@@ -65,6 +70,7 @@ class GuardFileIntegrityTests(unittest.TestCase):
         self.assertIn("effort-default-guard.py", text)
 
 
+@HOST_INDEPENDENT
 class SessionStartWarningTests(unittest.TestCase):
     def test_warns_for_an_unsaved_newer_model(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -136,6 +142,7 @@ class SessionStartWarningTests(unittest.TestCase):
             self.assertEqual(result.stdout.strip(), "")
 
 
+@HOST_INDEPENDENT
 class SessionEndSelfHealTests(unittest.TestCase):
     def test_self_heals_once_when_no_level_was_saved(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -171,6 +178,46 @@ class SessionEndSelfHealTests(unittest.TestCase):
             self.assertEqual(result.stdout.strip(), "")
             saved = json.loads((home / ".claude" / "settings.json").read_text())
             self.assertEqual(saved["modelSettings"]["claude-opus-5-5"]["effortLevel"], "medium")
+
+    def test_heals_only_once(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            write_settings(home, {})
+            transcript = Path(tmp) / "transcript.jsonl"
+            transcript.write_text(transcript_line("claude-opus-5-5", "medium"))
+            event = {"hook_event_name": "SessionEnd", "transcript_path": str(transcript), "cwd": tmp}
+            first = run_guard(home, event)
+            self.assertIn("Saved modelSettings.claude-opus-5-5.effortLevel", json.loads(first.stdout)["systemMessage"])
+            after_first = (home / ".claude" / "settings.json").read_bytes()
+            second = run_guard(home, event)
+            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertEqual(second.stdout.strip(), "")
+            self.assertEqual((home / ".claude" / "settings.json").read_bytes(), after_first)
+
+    def test_respects_an_explicit_lower_session_effort(self):
+        # The model already resolves to xhigh from settings (a legacy model covered by the
+        # user top-level effortLevel), so a medium session was an explicit --effort/`/effort`
+        # choice: no modelSettings entry is written.
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            write_settings(home, {"effortLevel": "xhigh"})
+            transcript = Path(tmp) / "transcript.jsonl"
+            transcript.write_text(transcript_line("claude-sonnet-5", "low"))
+            result = run_guard(home, {"hook_event_name": "SessionEnd", "transcript_path": str(transcript), "cwd": tmp})
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.strip(), "")
+            saved = json.loads((home / ".claude" / "settings.json").read_text())
+            self.assertNotIn("modelSettings", saved)
+
+    def test_respects_an_explicit_lower_effort_under_ultracode(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            write_settings(home, {"ultracode": True})
+            transcript = Path(tmp) / "transcript.jsonl"
+            transcript.write_text(transcript_line("claude-opus-5-5", "low"))
+            result = run_guard(home, {"hook_event_name": "SessionEnd", "transcript_path": str(transcript), "cwd": tmp})
+            self.assertEqual(result.stdout.strip(), "")
+            self.assertNotIn("modelSettings", json.loads((home / ".claude" / "settings.json").read_text()))
 
 
 if __name__ == "__main__":

@@ -188,10 +188,14 @@ GitHub-hosted macOS runner; see
      byte-identical.
    - **MCP servers**: for each entry in
      [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
-     http, `jcodemunch` and `serena` stdio), runs `claude mcp add --scope
-     user`; skipped when `claude mcp get <name>` already reports a matching
-     transport, command/URL, args and env variable names (values are not
-     compared -- the running host owns them).
+     http, `jcodemunch` and `serena` stdio), renders its `${HOME}` and
+     `${ECO_ROOT}` placeholders (`--eco-root`, default `$ECO_INSTALL_ROOT` or
+     `~/.local/share/codex-ecosystem`), then runs `claude mcp add --scope user
+     <name> [-e KEY=VALUE ...] -- <command> [args...]`; skipped when `claude
+     mcp get <name>` already reports a matching transport, command/URL, args
+     and env variable names (values are not compared -- the running host owns
+     them). A same-named server with a different config is reported and left
+     unchanged unless `--replace-mcp` is given.
    Then apply the settings template itself (model, effort, ultracode,
    workflow env, hooks) into the live `~/.claude/settings.json` with
    [`tools/adoption/apply_claude_settings.py`](../tools/adoption/apply_claude_settings.py),
@@ -200,11 +204,14 @@ GitHub-hosted macOS runner; see
    python3 tools/adoption/apply_claude_settings.py --template "$RUN_DIR/rendered/settings.json"
    python3 tools/adoption/apply_claude_settings.py --template "$RUN_DIR/rendered/settings.json" --dry-run
    ```
-   Backs up the current file (`settings.json.bak.<UTC timestamp>`) before
+   Backs up the current file (`settings.json.bak.<UTC timestamp>`, with a
+   counter suffix rather than overwriting an earlier backup) before
    writing, refuses to operate through a symlink, deep-merges (template
-   scalars win; `modelSettings` merges per-model; `hooks` combine per event,
-   de-duplicated by each entry's own `command`; everything else in the live
-   file that the template does not mention is kept), writes atomically and
+   scalars win; nested objects such as `modelSettings`, `env`, `permissions`
+   and `enabledPlugins` merge per key and lists union, so host-only rules
+   are kept; `hooks` combine per event, de-duplicated across the event by
+   each command's shell words; everything else in the live file that the
+   template does not mention is kept), writes atomically and
    preserves the original file's mode bits. Never touches `~/.claude.json`
    or any credential store.
 

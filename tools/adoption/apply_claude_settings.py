@@ -3,10 +3,11 @@
 one host) into a live ~/.claude/settings.json, in place.
 
 Never touches ~/.claude.json or any credential store. Backs up the current
-settings file before writing, refuses to operate through a symlink, merges
-scalars template-wins / modelSettings deep-merged / hooks combined per event
-and de-duplicated by command, writes atomically, and preserves the original
-file's mode bits. Supports --dry-run (prints the would-be result and exits
+settings file (never overwriting an earlier backup) before writing, refuses
+to operate through a symlink, deep-merges nested objects (template scalars
+win; host-only keys, permission rules and plugins are kept), combines hooks
+per event de-duplicated by command, writes atomically, and preserves the
+original file's mode bits. Supports --dry-run (prints the would-be result and exits
 without touching anything).
 """
 
@@ -16,6 +17,7 @@ import argparse
 import copy
 import json
 import os
+import shlex
 import shutil
 import stat
 import sys
@@ -44,44 +46,24 @@ def hook_command(entry: dict) -> str | None:
     return cmd if isinstance(cmd, str) else None
 
 
-def merge_hook_matcher_group(base_group: dict, incoming_group: dict) -> dict:
-    """Merge one {"matcher": ..., "hooks": [...]} entry pair.
-
-    Combines the two `hooks` arrays, de-duplicating by each inner entry's own
-    `command` string (base entries keep their position; a template hook whose
-    command already exists in the base is skipped, never duplicated).
-    """
-    merged = copy.deepcopy(base_group)
-    base_hooks = merged.get("hooks")
-    if not isinstance(base_hooks, list):
-        base_hooks = []
-        merged["hooks"] = base_hooks
-    existing_commands = {hook_command(h) for h in base_hooks if hook_command(h) is not None}
-    for hook in incoming_group.get("hooks", []) if isinstance(incoming_group.get("hooks"), list) else []:
-        cmd = hook_command(hook)
-        if cmd is not None and cmd in existing_commands:
-            continue
-        base_hooks.append(copy.deepcopy(hook))
-        if cmd is not None:
-            existing_commands.add(cmd)
-    return merged
-
-
-def matcher_key(group) -> tuple:
-    """A stable identity for one hook matcher-group entry.
-
-    Distinct groups sharing the same (or absent) matcher are combined into
-    one merged group rather than appended as separate list entries, so a
-    template group and a base group for the same matcher merge their
-    `hooks` arrays instead of duplicating the whole group.
-    """
-    if not isinstance(group, dict):
-        return ("__non_dict__", json.dumps(group, sort_keys=True))
-    return ("matcher", group.get("matcher", ""))
+def command_key(cmd: str) -> str:
+    """Compare commands by their shell words, so quoting differences such as
+    `python3 "/x/guard.py"` vs `python3 /x/guard.py` are one hook."""
+    try:
+        return "\0".join(shlex.split(cmd))
+    except ValueError:
+        return cmd
 
 
 def merge_hooks(base: dict, incoming: dict) -> dict:
-    """Combine hooks per event, de-duplicated by command (never dropped)."""
+    """Combine hooks per event, de-duplicated by command across the event.
+
+    A template hook is skipped when any base group of the same event already
+    runs the same command (by shell words). Remaining template hooks join the
+    first base group with the identical matcher (an absent matcher and "" are
+    kept distinct, so the host's structure is preserved), or form a new group.
+    Base hooks are never dropped or reordered.
+    """
     merged: dict = copy.deepcopy(base) if isinstance(base, dict) else {}
     if not isinstance(incoming, dict):
         return merged
@@ -92,28 +74,50 @@ def merge_hooks(base: dict, incoming: dict) -> dict:
         if not isinstance(base_groups, list):
             merged[event] = copy.deepcopy(incoming_groups)
             continue
-        by_key = {matcher_key(g): i for i, g in enumerate(base_groups)}
+        seen = {command_key(c) for g in base_groups if isinstance(g, dict)
+                for c in map(hook_command, g.get("hooks") or []) if c is not None}
         for incoming_group in incoming_groups:
-            key = matcher_key(incoming_group)
-            if key in by_key and isinstance(incoming_group, dict):
-                idx = by_key[key]
-                base_groups[idx] = merge_hook_matcher_group(base_groups[idx], incoming_group)
-            else:
+            if not isinstance(incoming_group, dict):
                 base_groups.append(copy.deepcopy(incoming_group))
-                by_key[key] = len(base_groups) - 1
+                continue
+            fresh = []
+            for hook in incoming_group.get("hooks") or []:
+                cmd = hook_command(hook)
+                if cmd is not None and command_key(cmd) in seen:
+                    continue
+                fresh.append(copy.deepcopy(hook))
+                if cmd is not None:
+                    seen.add(command_key(cmd))
+            if not fresh:
+                continue
+            has_matcher = "matcher" in incoming_group
+            target = next((g for g in base_groups if isinstance(g, dict)
+                           and ("matcher" in g) == has_matcher
+                           and g.get("matcher") == incoming_group.get("matcher")
+                           and isinstance(g.get("hooks"), list)), None)
+            if target is not None:
+                target["hooks"].extend(fresh)
+            else:
+                group = copy.deepcopy(incoming_group)
+                group["hooks"] = fresh
+                base_groups.append(group)
         merged[event] = base_groups
     return merged
 
 
 def deep_merge_dict(base: dict, incoming: dict) -> dict:
-    """Generic recursive dict merge: template (incoming) scalars win;
-    nested dicts merge deeply; incoming keys not in base are added."""
+    """Recursive merge: nested dicts merge key by key, lists union (base
+    entries first, template entries appended when absent), other template
+    values win; base keys the template does not mention are kept."""
     merged = copy.deepcopy(base) if isinstance(base, dict) else {}
     if not isinstance(incoming, dict):
         return merged
     for key, value in incoming.items():
-        if isinstance(value, dict) and isinstance(merged.get(key), dict):
-            merged[key] = deep_merge_dict(merged[key], value)
+        current = merged.get(key)
+        if isinstance(value, dict) and isinstance(current, dict):
+            merged[key] = deep_merge_dict(current, value)
+        elif isinstance(value, list) and isinstance(current, list):
+            merged[key] = current + [copy.deepcopy(item) for item in value if item not in current]
         else:
             merged[key] = copy.deepcopy(value)
     return merged
@@ -122,32 +126,22 @@ def deep_merge_dict(base: dict, incoming: dict) -> dict:
 def merge_settings(base: dict, template: dict) -> dict:
     """Merge `template` (the rendered adoption template) into `base` (the
     live settings), returning a new dict. Rules:
-      - scalars: template wins (overwrites base)
-      - `modelSettings`: deep-merged (per-model dicts merge key by key)
-      - `hooks`: combined per event, de-duplicated by inner `command`
-      - everything else the template does not mention: kept from base
-      - everything else new in the template: added
+      - `hooks`: combined per event, de-duplicated by command (merge_hooks)
+      - nested objects (modelSettings, env, permissions, statusLine,
+        enabledPlugins, ...): deep-merged, so host-only keys such as extra
+        permission rules, plugins or per-model levels are kept
+      - lists: union, host entries first
+      - scalars: template wins
+      - keys the template does not mention: kept from base
     """
     if not isinstance(base, dict):
         raise ApplyError("live settings file does not contain a JSON object")
     if not isinstance(template, dict):
         raise ApplyError("rendered template does not contain a JSON object")
-
-    merged = copy.deepcopy(base)
-    for key, value in template.items():
-        if key == "hooks":
-            merged["hooks"] = merge_hooks(base.get("hooks"), value)
-        elif key == "modelSettings":
-            merged["modelSettings"] = deep_merge_dict(base.get("modelSettings", {}), value)
-        elif key == "env":
-            # env is a flat map; template keys win, base-only keys are kept.
-            merged_env = dict(base.get("env") or {})
-            merged_env.update(value if isinstance(value, dict) else {})
-            merged["env"] = merged_env
-        else:
-            # Template scalars (including nested non-modelSettings dicts
-            # like permissions, statusLine, enabledPlugins) win outright.
-            merged[key] = copy.deepcopy(value)
+    hooks = template.get("hooks")
+    merged = deep_merge_dict(base, {k: v for k, v in template.items() if k != "hooks"})
+    if hooks is not None:
+        merged["hooks"] = merge_hooks(base.get("hooks"), hooks)
     return merged
 
 
@@ -157,8 +151,28 @@ def refuse_symlink(path: Path) -> None:
 
 
 def backup_path(target: Path) -> Path:
+    """A new, not-yet-existing backup name (UTC timestamp plus a counter when
+    two applies land in the same second)."""
     timestamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
-    return target.with_name(f"{target.name}.bak.{timestamp}")
+    candidate = target.with_name(f"{target.name}.bak.{timestamp}")
+    counter = 1
+    while candidate.exists():
+        candidate = target.with_name(f"{target.name}.bak.{timestamp}.{counter}")
+        counter += 1
+    return candidate
+
+
+def write_backup(target: Path) -> Path:
+    """Copy target to a fresh backup, never overwriting an existing one."""
+    while True:
+        backup = backup_path(target)
+        try:
+            fd = os.open(backup, os.O_WRONLY | os.O_CREAT | os.O_EXCL, stat.S_IMODE(target.stat().st_mode))
+        except FileExistsError:
+            continue
+        with os.fdopen(fd, "wb") as handle, open(target, "rb") as source:
+            shutil.copyfileobj(source, handle)
+        return backup
 
 
 def atomic_write(target: Path, text: str, mode: int) -> None:
@@ -203,8 +217,7 @@ def apply(template_path: Path, target_path: Path, dry_run: bool) -> dict:
     target_path.parent.mkdir(parents=True, exist_ok=True)
     if target_path.is_file():
         refuse_symlink(target_path)  # re-check right before mutating: TOCTOU-narrow
-        backup = backup_path(target_path)
-        shutil.copy2(target_path, backup)
+        backup = write_backup(target_path)
         print(f"Backed up {target_path} -> {backup}", file=sys.stderr)
 
     atomic_write(target_path, rendered, original_mode)

@@ -88,6 +88,47 @@ class MergeSettingsTests(unittest.TestCase):
         merged = acs.merge_settings(base, template)
         self.assertEqual(merged["permissions"]["deny"], ["Agent(codex:codex-rescue)"])
 
+    def test_hook_is_deduplicated_across_groups_of_the_event(self):
+        # The host runs the guard under an unmatched group; the template lists it
+        # under "startup|resume": it must not be added a second time.
+        base = {"hooks": {"SessionEnd": [
+            {"matcher": "", "hooks": [{"type": "command", "command": "memory-hook"}]},
+            {"hooks": [{"type": "command", "command": "python3 /h/.claude/hooks/guard.py 2>/dev/null || true"}]},
+        ]}}
+        template = {"hooks": {"SessionEnd": [
+            {"matcher": "", "hooks": [{"type": "command", "command": "memory-hook"}]},
+            {"hooks": [{"type": "command", "command": 'python3 "/h/.claude/hooks/guard.py" 2>/dev/null || true'}]},
+        ]}}
+        merged = acs.merge_settings(base, template)
+        self.assertEqual(merged["hooks"], base["hooks"])
+
+    def test_absent_and_empty_matchers_keep_their_own_groups(self):
+        base = {"hooks": {"SessionStart": [
+            {"hooks": [{"type": "command", "command": "a"}]},
+            {"matcher": "", "hooks": [{"type": "command", "command": "b"}]},
+        ]}}
+        template = {"hooks": {"SessionStart": [
+            {"hooks": [{"type": "command", "command": "c"}]},
+            {"matcher": "", "hooks": [{"type": "command", "command": "d"}]},
+        ]}}
+        groups = acs.merge_settings(base, template)["hooks"]["SessionStart"]
+        self.assertEqual(len(groups), 2)
+        self.assertNotIn("matcher", groups[0])
+        self.assertEqual([h["command"] for h in groups[0]["hooks"]], ["a", "c"])
+        self.assertEqual([h["command"] for h in groups[1]["hooks"]], ["b", "d"])
+
+    def test_host_only_nested_keys_are_kept(self):
+        base = {"permissions": {"allow": ["Bash(ls)"], "deny": ["X"], "defaultMode": "default"},
+                "enabledPlugins": {"host@plugin": True},
+                "statusLine": {"type": "command", "command": "old", "padding": 1}}
+        template = {"permissions": {"deny": ["X", "Y"], "defaultMode": "bypassPermissions"},
+                    "enabledPlugins": {"tpl@plugin": True},
+                    "statusLine": {"type": "command", "command": "new"}}
+        merged = acs.merge_settings(base, template)
+        self.assertEqual(merged["permissions"], {"allow": ["Bash(ls)"], "deny": ["X", "Y"], "defaultMode": "bypassPermissions"})
+        self.assertEqual(merged["enabledPlugins"], {"host@plugin": True, "tpl@plugin": True})
+        self.assertEqual(merged["statusLine"], {"type": "command", "command": "new", "padding": 1})
+
 
 class ApplyIOTests(unittest.TestCase):
     def _write(self, path: Path, data: dict):
@@ -183,6 +224,20 @@ class ApplyIOTests(unittest.TestCase):
         def __exit__(self, *exc):
             self._ctx.cleanup()
             return False
+
+
+class BackupTests(unittest.TestCase):
+    def test_same_second_backups_never_overwrite(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "settings.json"
+            target.write_text('{"v": 1}')
+            first = acs.write_backup(target)
+            target.write_text('{"v": 2}')
+            second = acs.write_backup(target)
+            self.assertNotEqual(first, second)
+            self.assertEqual(first.read_text(), '{"v": 1}')
+            self.assertEqual(second.read_text(), '{"v": 2}')
 
 
 if __name__ == "__main__":

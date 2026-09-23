@@ -42,7 +42,8 @@
       "kind": "native",
       "url": "https://downloads.claude.ai/claude-code-releases/2.1.280/linux-x64/claude",
       "sha256": "1e08503dbdf3c2cb0d706d32f3408277388d1c76ef108673e8fe42c1b322925b",
-      "install_note": "minimum version; native auto-update on the latest channel. Verified by downloading the linux-x64 binary directly and independently computing its sha256 (2026-09-23), matching both this pin and the 2.1.280 manifest.json's linux-x64 checksum. Superseded the prior npm-wrapper pin (2.1.278, DISABLE_AUTOUPDATER=1) once the native installer became the reference path: fetch the binary, verify its sha256, then run `\"$bin\" install 2.1.280`, matching ~/codex-ecosystem/bin/bootstrap-linux.sh's own claude-code step. The installed binary self-manages ~/.local/share/claude/versions and the ~/.local/bin/claude launcher and auto-updates on the latest channel from there; this pin is a floor, not a ceiling, and no DISABLE_AUTOUPDATER opt-out is set."
+      "install_note": "minimum version; native auto-update on the latest channel. Verified by downloading the linux-x64 binary directly and independently computing its sha256 (2026-09-23), matching both this pin and the 2.1.280 manifest.json's linux-x64 checksum. Superseded the prior npm-wrapper pin (2.1.278, DISABLE_AUTOUPDATER=1) once the native installer became the reference path: fetch the binary, verify its sha256, then run `\"$bin\" install 2.1.280`, matching ~/codex-ecosystem/bin/bootstrap-linux.sh's own claude-code step. The installed binary self-manages ~/.local/share/claude/versions and the ~/.local/bin/claude launcher and auto-updates on the latest channel from there; this pin is a floor, not a ceiling, and no DISABLE_AUTOUPDATER opt-out is set.",
+      "bin": "claude"
     },
     {
       "id": "qmd",
@@ -87,18 +88,18 @@
     {
       "id": "markitdown",
       "version": "0.1.7",
-      "kind": "pip",
+      "kind": "uv-tool",
       "url": "https://files.pythonhosted.org/packages/59/93/e8a4af0c47551beb6383e226e840cbc811a577b8096eb385251b3fcc8f62/markitdown-0.1.7.tar.gz",
       "sha256": "4d1f3c69cd43b82288fdc3653686d759dcf355ee7c681aa6a855aed98a1e4f44",
-      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: this host already has markitdown 0.1.7 installed (confirmed with `markitdown --version`), a catalog winner (Microsoft's Office/PDF/HTML-to-Markdown converter) with no prior pin here. sdist re-downloaded from the URL above and sha256-hashed independently; matches PyPI's own published digest (`https://pypi.org/pypi/markitdown/0.1.7/json` `urls[].digests.sha256`, read 2026-09-23) exactly. `install_pin`'s `*-pip` case runs `pip install --target tools/markitdown-0.1.7 markitdown==0.1.7`, which resolves this exact version from PyPI by version pin (pip has no sha256-gate of its own in that path); this pin's sha256 is recorded as an independent artifact cross-check for evidence and this catalog's own fail-closed null-sha256 refusal, not as a hash pip itself verifies before installing. The actually-installed host copy instead lives under a dedicated `uv-tools/markitdown` virtualenv inside its own `tools/markitdown-0.1.7` prefix (observed via its `bin/markitdown` shebang), a slightly different install mechanism than `install_pip`'s flat `--target`; both resolve the same pinned PyPI version and this pin does not change how the host's existing copy was installed."
+      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: this host already has markitdown 0.1.7 (Microsoft's Office/PDF/HTML-to-Markdown converter), installed as a uv tool: its uv-receipt.toml requires markitdown==0.1.7 with no-build, and its console script's shebang points into the tool's own virtualenv. The artifact at the URL above was re-downloaded and sha256-hashed independently; it matches PyPI's published digest (https://pypi.org/pypi/markitdown/0.1.7/json urls[].digests.sha256, read 2026-09-23). install_pin's *-uv-tool case runs `uv tool install --python 3.13 markitdown==0.1.7` into UV_TOOL_DIR, so the entry point runs in its own environment. uv resolves the pinned version from PyPI and does not check this sha256; it is recorded as an independent artifact cross-check and satisfies this catalog's fail-closed null-sha256 refusal."
     },
     {
       "id": "tavily-cli",
       "version": "0.1.8",
-      "kind": "pip",
+      "kind": "uv-tool",
       "url": "https://files.pythonhosted.org/packages/bc/8a/bb8437105cc2d4794a344b6a4ed84b2fb0002e1973b06d33d7f882c14a76/tavily_cli-0.1.8.tar.gz",
       "sha256": "3b660c961e8bc93309964ccfc6982f3a17dcae15b59cc1e36924ccf4edfdec08",
-      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: `uv tool list` shows tavily-cli 0.1.8 already installed on this host (its `tvly` command). sdist re-downloaded and sha256-hashed independently; matches PyPI's published digest (`https://pypi.org/pypi/tavily-cli/0.1.8/json`, read 2026-09-23) exactly. The host's actual install path is `uv tool install tavily-cli==0.1.8` (a real uv-managed tool environment, `UV_TOOL_DIR`/`UV_TOOL_BIN_DIR`-scoped), not `install_pin`'s `*-pip` case; this pin's kind follows this catalog's existing `install_pip` code path convention (`pip install --target tools/tavily-cli-0.1.8 tavily-cli==0.1.8`) for consistency with markitdown above, and its sha256 is an independent PyPI artifact cross-check rather than a hash either pip or uv verifies itself before installing."
+      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: `uv tool list` shows tavily-cli 0.1.8 already installed on this host (its `tvly` command). The artifact at the URL above was re-downloaded and sha256-hashed independently; it matches PyPI's published digest (https://pypi.org/pypi/tavily-cli/0.1.8/json, read 2026-09-23). install_pin's *-uv-tool case runs `uv tool install --python 3.13 tavily-cli==0.1.8`, the same mechanism as this host's install. uv resolves the pinned version from PyPI and does not check this sha256; it is recorded as an independent artifact cross-check and satisfies this catalog's fail-closed null-sha256 refusal."
     },
     {
       "id": "orx",

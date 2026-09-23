@@ -24,7 +24,7 @@ apply/install tooling (`tools/adoption/apply_claude_settings.py`,
    against `https://downloads.claude.ai/claude-code-releases/2.1.280/manifest.json`
    and, because this host cannot run the binary to prove the manifest's signature, was
    additionally confirmed by independently downloading the darwin-arm64 binary itself
-   and re-hashing it byte-for-byte against the manifest's claim (`387a5c5d...2925b`
+   and re-hashing it byte-for-byte against the manifest's claim (`387a5c5d...055229d`
    — matches). The manifest's own `.sig` sidecar exists but this host has no published
    Anthropic public key or documented verification procedure for it, so the checksum
    is **byte-verified against the served artifact, not signature-verified**; recorded
@@ -66,8 +66,11 @@ apply/install tooling (`tools/adoption/apply_claude_settings.py`,
    match live-host bytes exactly instead (in which case drop the quoting).
 5. **Merge tool deep-merges rather than overwrites.** `tools/adoption/apply_claude_settings.py`
    merges a rendered template into a live `~/.claude/settings.json` (template scalars
-   win; `modelSettings` and `env` merge per key; `hooks` combine per event,
-   de-duplicated by each hook's own `command` string) instead of replacing the file
+   win; every nested object -- `modelSettings`, `env`, `permissions`, `enabledPlugins`,
+   `statusLine` -- merges per key and lists union, so host-only rules and plugins are
+   kept; `hooks` combine per event, de-duplicated across the whole event by each
+   command's shell words, so the template's quoted guard path and a host's unquoted
+   one are one hook; backups never overwrite an earlier backup) instead of replacing the file
    outright, because a live settings file on a real host commonly carries
    host-specific `env`/`modelSettings` entries (this host's own self-healed
    `claude-sonnet-5` entry, for example) that a naive overwrite would destroy.

@@ -296,7 +296,9 @@ install_npm() {
 # run `"$bin" install <version>`, and leave the binary's own auto-update in
 # control from there (no DISABLE_AUTOUPDATER opt-out).
 install_native() {
-  local id="$1" version="$2" url="$3" sha256="$4"
+  # $5 is the command the native installer creates (the pin's `bin`, e.g.
+  # claude-code installs ~/.local/bin/claude); it defaults to the pin id.
+  local id="$1" version="$2" url="$3" sha256="$4" bin_name="${5:-$1}"
   local download="$cache_dir/${id}-${version}-native"
   fetch "$url" "$sha256" "$download"
   chmod 0755 "$download"
@@ -305,9 +307,9 @@ install_native() {
     printf '#!/usr/bin/env bash\n'
     printf '# Native auto-updating launcher (installed by %s install); the ecosystem no longer pins a snapshot.\n' "$id"
     # shellcheck disable=SC2016
-    printf 'exec "$HOME/.local/bin/%s" "$@"\n' "$id"
-  } > "$bin_dir/$id"
-  chmod 0755 "$bin_dir/$id"
+    printf 'exec "$HOME/.local/bin/%s" "$@"\n' "$bin_name"
+  } > "$bin_dir/$bin_name"
+  chmod 0755 "$bin_dir/$bin_name"
 }
 
 install_pip() {
@@ -355,7 +357,7 @@ install_pin() {
     uv-tarball) install_uv "$version" "$url" "$sha256" ;;
     *-tarball) install_single_binary_tarball "$id" "$version" "$url" "$sha256" ;;
     *-npm) install_npm "$id" "$version" "$url" "$sha256" ;;
-    *-native) install_native "$id" "$version" "$url" "$sha256" ;;
+    *-native) install_native "$id" "$version" "$url" "$sha256" "$(jq -r '.bin // .id' <<<"$entry")" ;;
     *-pip) install_pip "$id" "$version" ;;
     *-uv-tool) install_uv_tool "$id" "$version" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
@@ -399,7 +401,7 @@ printf '%s\n' 'Next: sign into Codex, Claude, and GitHub using their native brow
 if [[ "$configure_claude_user_profile" == 1 ]]; then
   command -v python3 >/dev/null || { printf 'python3 is required for --configure-claude-user-profile.\n' >&2; exit 1; }
   printf '\nConfiguring the Claude Code user-scope profile (guard hook, agents, MCP servers)...\n'
-  python3 "$repo_root/tools/adoption/install_claude_profile.py" --claude-bin "$bin_dir/claude"
+  python3 "$repo_root/tools/adoption/install_claude_profile.py" --claude-bin "$bin_dir/claude" --eco-root "$ecosystem_root"
 else
   printf '\nAfter native Claude sign-in, run:\n'
   printf '  python3 %q/tools/adoption/install_claude_profile.py\n' "$repo_root"
