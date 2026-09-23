@@ -14,7 +14,7 @@
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "adaptive 1x broker trial passed 2026-09-23 (main 843dc8f: 300 s, real orders, flat) / leverage rungs pending / account flat",
+      "state": "adaptive 1x broker trial passed 2026-09-23 (main 843dc8f) / leverage rungs pending / account flat",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
     },
     {
@@ -30,7 +30,7 @@
       "kind": "gate",
       "id": "alpaca-paper-operational",
       "title": "Alpaca bounded paper lifecycle",
-      "state": "smoke passed / adaptive 1x broker trial passed 2026-09-23 / native fault behaviour partial (C01, C02 native)",
+      "state": "smoke passed / adaptive 1x broker trial passed 2026-09-23 / native fault behaviour partial (C01 C02 native)",
       "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
     },
     {
