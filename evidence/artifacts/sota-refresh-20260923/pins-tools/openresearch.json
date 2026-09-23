@@ -1,0 +1,72 @@
+{
+  "id": "sota-refresh-20260923-pins-tools-openresearch",
+  "component": "openresearch",
+  "repo": "https://github.com/alphaXiv/OpenResearch",
+  "from_pin": "v0.2.7",
+  "to_version": "v0.2.8",
+  "release_published_at": "2026-09-22T03:20:42Z",
+  "release_resolved_via": "gh api repos/alphaXiv/OpenResearch/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
+  "preregistration": {
+    "written_at": "2026-09-22T20:30:48-04:00",
+    "written_at_note": "Set from the orx_old_discover.txt file mtime (20:30:48.29-04:00); finalized alongside the receipt after the run, not strictly prior.",
+    "expectation": "The v0.2.8 x86_64-unknown-linux-musl asset's sha256 matches its published .sha256 sidecar; --version and the first --help line report v0.2.8 with unchanged wording ('OpenResearch CLI'); the offline `discover --help` subcommand tree (keyword/embedding/openalex/biorxiv) is unchanged since it needs no API key to enumerate. Note: the retained repository receipt (evidence/artifacts/claude-upstream-checks-20260921/results.json id=openresearch) only captured `--version` and the first line of `--help`; it does not include any `discover --help` output, so the discover comparison below is a fresh v0.2.7-vs-v0.2.8 same-session comparison, not a comparison against the retained receipt.",
+    "criteria": "sha256 match; --version/--help exit 0 with unchanged wording besides the version (matched against the retained receipt for these two commands only); `orx discover --help` output, captured freshly from both v0.2.7 and v0.2.8 in this session (hashed, not narrated), is byte-identical aside from any version string -- this is a same-session comparison since no retained discover --help output exists to compare against. Any command that would need a live search key (discover keyword/embedding/openalex/biorxiv actually run, or `login`) is not executed and is recorded as offline-only/blocked, not attempted."
+  },
+  "acceptance_check_ref": "evidence/artifacts/claude-upstream-checks-20260921/results.json component id=openresearch (evidence_class: version-help; pin v0.2.7 commands: --version, `--help` first-line-only)",
+  "commands": [
+    "curl -sL -o orx.tar.xz https://github.com/alphaXiv/OpenResearch/releases/download/v0.2.8/openresearch-cli-x86_64-unknown-linux-musl.tar.xz",
+    "curl -sL -o orx.tar.xz.sha256 https://github.com/alphaXiv/OpenResearch/releases/download/v0.2.8/openresearch-cli-x86_64-unknown-linux-musl.tar.xz.sha256",
+    "sha256sum orx.tar.xz && cat orx.tar.xz.sha256",
+    "tar xJf orx.tar.xz -C extracted",
+    "bash -o pipefail -c 'orx --version; rc=$?; exit $rc'  # retained 0.2.7 binary on PATH",
+    "bash -o pipefail -c '$NEWBIN --version; rc=$?; exit $rc'",
+    "bash -o pipefail -c 'orx --help > orx_old_help.txt 2>&1; rc=$?; sed -n \"1p\" orx_old_help.txt; exit $rc'  # retained 0.2.7 binary on PATH",
+    "bash -o pipefail -c '$NEWBIN --help > orx_new_help.txt 2>&1; rc=$?; sed -n \"1p\" orx_new_help.txt; exit $rc'",
+    "diff orx_old_help.txt orx_new_help.txt",
+    "bash -o pipefail -c 'orx discover --help > orx_old_discover.txt 2>&1; rc=$?; exit $rc'  # retained 0.2.7 binary, fresh same-session capture (no retained discover --help exists to compare against)",
+    "bash -o pipefail -c '$NEWBIN discover --help > orx_new_discover.txt 2>&1; rc=$?; exit $rc'",
+    "sha256sum orx_old_discover.txt orx_new_discover.txt",
+    "diff orx_old_discover.txt orx_new_discover.txt"
+  ],
+  "results": {
+    "sha256_downloaded": "7887889e8d6efd52972a6a72181fe6a8aaee1a432decded0f7d46fdd4ae37d3d",
+    "sha256_published": "7887889e8d6efd52972a6a72181fe6a8aaee1a432decded0f7d46fdd4ae37d3d",
+    "sha256_match": true,
+    "old_0_2_7_version_exit": 0,
+    "old_0_2_7_version": "orx 0.2.7",
+    "new_0_2_8_version_exit": 0,
+    "new_0_2_8_version": "orx 0.2.8",
+    "old_0_2_7_help_exit": 0,
+    "old_0_2_7_help_line1": "OpenResearch CLI",
+    "new_0_2_8_help_exit": 0,
+    "new_0_2_8_help_line1": "OpenResearch CLI",
+    "top_help_full_body_diff": "`diff orx_old_help.txt orx_new_help.txt` reports no differences: the full --help body is byte-identical between 0.2.7 and 0.2.8 (stored as raw/orx_old_help.txt and raw/orx_new_help.txt, same sha256; see raw_help_captures).",
+    "discover_help_old_exit": 0,
+    "discover_help_new_exit": 0,
+    "discover_help_sha256_old": "c89fec1a98c25f17a1478793424c416965e074fb3a235923081caab14e004cf5",
+    "discover_help_sha256_new": "c89fec1a98c25f17a1478793424c416965e074fb3a235923081caab14e004cf5",
+    "discover_help_diff": "`diff orx_old_discover.txt orx_new_discover.txt` reports no differences; sha256 hashes match. This is a same-session v0.2.7-vs-v0.2.8 comparison (no retained receipt captures discover --help output to compare against; the retained receipt only has --version and --help line 1). Both orx_old_discover.txt (v0.2.7, sha256 c89fec1a98c25f17a1478793424c416965e074fb3a235923081caab14e004cf5, mtime 2026-09-22T20:30:48-04:00) and orx_new_discover.txt (v0.2.8, same sha256, mtime 2026-09-22T20:30:48-04:00) are copied (not moved -- the originals remained in the ephemeral session /tmp) into $HOME/.cache/sota-refresh-20260923/pins-tools/openresearch/ and are additionally committed to this repository at evidence/artifacts/sota-refresh-20260923/pins-tools/raw/orx_old_discover.txt and raw/orx_new_discover.txt (cp -p, mtimes preserved). Both sides of the sha256/diff comparison above are independently re-verifiable from a stored file.",
+    "not_run": "discover keyword/embedding/openalex/biorxiv, paper, login, ssh-key, instance, compute -- these need a stored search/compute key or network account state this unit does not hold; recorded as offline-only, not attempted.",
+    "raw_help_captures": {
+      "orx_old_help.txt": {
+        "path": "raw/orx_old_help.txt",
+        "sha256": "009d4649e88a9060951715928c8e1a2588a2759ffe40a843c497ac1bc8845301",
+        "mtime": "2026-09-22T20:30:48.242-04:00"
+      },
+      "orx_new_help.txt": {
+        "path": "raw/orx_new_help.txt",
+        "sha256": "009d4649e88a9060951715928c8e1a2588a2759ffe40a843c497ac1bc8845301",
+        "mtime": "2026-09-22T20:30:48.282-04:00"
+      }
+    }
+  },
+  "verdict": "qualified",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Only offline/no-credential subcommands (--version, --help, discover --help) were exercised; any functional search (discover keyword/embedding/openalex/biorxiv) needs a stored alphaXiv/OpenAlex key or account this unit was not given, so search-functional parity is source_review only (unchanged CLI surface), not native_proven.",
+    "The --version/--help-line-1 comparison matches the retained receipt's evidence class exactly (version-help) and is checked against the actual retained receipt text. The discover --help comparison is NOT checked against a retained receipt (none exists with that output); it is a same-session v0.2.7-vs-v0.2.8 comparison only, hashed and diffed rather than narrated.",
+    "Both orx_old_discover.txt (v0.2.7) and orx_new_discover.txt (v0.2.8) are now stored under the cache prefix and committed to this repository's evidence/artifacts/sota-refresh-20260923/pins-tools/raw/ directory with sha256 and mtime recorded in results.discover_help_diff; the sha256/diff match is independently re-verifiable from these stored files."
+  ],
+  "checked_at": "2026-09-22T20:30:48-04:00",
+  "checked_at_note": "Set from the later of orx_old_discover.txt (20:30:48.286-04:00) and orx_new_discover.txt (20:30:48.298-04:00) file mtimes -- orx_new_discover.txt is the actual last check for this component and both now exist as stored files; a prior version of this note cited only the older capture. The two mtimes round to the same displayed second (20:30:48-04:00)."
+}

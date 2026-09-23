@@ -1,0 +1,22 @@
+diff --git a/tmp/pr81_run_optimizer.py b/tmp/session-scratchpad/skf_run_optimizer.py
+index 72fbf14..e44833b 100644
+--- a/tmp/pr81_run_optimizer.py
++++ b/tmp/session-scratchpad/skf_run_optimizer.py
+@@ -23,7 +23,7 @@ import json
+ from pathlib import Path
+ 
+ HERE = Path(__file__).resolve().parent
+-EVAL_DIR = HERE.parent.parent / "us-equities" / "research-evaluation"
++EVAL_DIR = Path("/tmp/session-scratchpad/skf_eval")
+ 
+ 
+ def load_evaluate_module():
+@@ -50,7 +50,7 @@ def main():
+     from skfolio.optimization import HierarchicalRiskParity, MeanRisk
+     from skfolio.preprocessing import prices_to_returns
+ 
+-    if importlib.metadata.version("skfolio") != "1.2.9":
++    if importlib.metadata.version("skfolio") != "1.3.0":
+         raise ValueError("use the accepted skfolio version")
+ 
+     ev = load_evaluate_module()

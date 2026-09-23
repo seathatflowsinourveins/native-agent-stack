@@ -1,0 +1,37 @@
+OpenResearch CLI
+
+Usage: orx [OPTIONS] [COMMAND]
+
+Commands:
+  login              Log in via the browser and store a token
+  logout             Remove the stored token
+  projects           List projects registered in the local orx store
+  orgs               List organizations available for OpenResearch compute
+  project            Operate on one local project
+  agent              Delegate a task to a second agent session
+  runs               List a project's runs
+  logs               Read a run's terminal log (tail by default)
+  create-experiment  Add an experiment node to a local `orx up` project
+  compute            List the GPU compute catalog
+  instance           Spin up standalone compute in an organization (no experiment)
+  ssh-key            Register this computer's SSH key so the boxes you provision accept it
+  exp                Operate on one local experiment node
+  skill              Print CLI usage for agents, or fetch a skill doc
+  skills             Add reusable skills to the local OpenResearch library
+  templates          Add reusable LaTeX templates to the local OpenResearch library
+  install-skills     Install the OpenResearch skill into local coding agents (Claude Code, Codex, OpenCode, Cursor, Antigravity)
+  discover           Call one paper-retrieval primitive; the caller owns the search loop
+  paper              Fetch a paper: alphaXiv report/full-text, or OpenAlex/bioRxiv metadata. The source is auto-detected from the id (override with `--source`)
+  version            Show the CLI version; `--check` compares it to the latest release
+  update             Update orx to the latest release (installer-script installs only)
+  install-cli        Link the macOS app's `orx` onto your PATH (macOS app installs only)
+  delete             Permanently delete the local database, CLI executable, or both
+  serve              Loopback HTTP/SSE daemon over the local run store (jobs sibling of `opencode serve`); the api tunnels to it on agent boxes
+  supervise          Supervise one local run: tail backend logs, persist status, and honor local cancel intent. Spawned detached by `exp run`
+  up                 Start the local autoresearch dashboard on 127.0.0.1: embedded UI, JSON/SSE API over the local store, and the opencode agent proxy
+  telemetry          Turn anonymous usage analytics on or off, or show current status
+
+Options:
+      --no-telemetry  Disable anonymous usage analytics for this run. To disable it persistently, run `orx telemetry off`
+  -h, --help          Print help
+  -V, --version       Print version

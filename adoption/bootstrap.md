@@ -6,15 +6,31 @@ entry or component it uses instead of repeating its command. Read
 native verification tiers; this page only sequences the steps for a machine
 that has never run this stack.
 
-**Step 0, before anything below: get the catalog at its pinned commit.**
+**Step 0, before anything below: get the catalog at its attested release tag.**
 ```sh
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack
-git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['baseline_commit'])")"
+git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 ```
-This checks out `adoption/manifest.json` `source.baseline_commit`, the same
-field `scripts/adoption_status.py` compares the working tree's revision
-against (`baseline_matches` / `baseline_differs` in its `git` result block).
+This checks out `adoption/manifest.json` `source.release_tag`
+(`v2026.09.22.1`, or a later tag) at `source.release_commit`
+(`bdd04ca50eb781f8366c955f481479b7a7f57cbd`), published with SLSA build
+provenance by `.github/workflows/publish-catalog.yml`. Do **not** check out
+`source.baseline_commit`: that field records the parent publication
+immediately *before* this `adoption/` directory (and `tools/adoption/`) were
+added, so every step below it on this page would fail with a missing file
+(Codex cross-family review finding, `codex-review-72`); `baseline_commit`
+remains meaningful only as the comparison point `scripts/adoption_status.py`
+uses for its `baseline_matches`/`baseline_differs` `git` result, not as a
+checkout target.
+
+If downloading the release archive from an Actions run instead of
+`git clone` (e.g. no local git), verify its attested provenance before use:
+```sh
+gh attestation verify native-agent-stack-<release_commit>.tar.gz \
+  --repo seathatflowsinourveins/native-agent-stack \
+  --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml
+```
 
 Read the platform page for the chosen
 [`platform_profiles`](manifest.json) entry before starting:
