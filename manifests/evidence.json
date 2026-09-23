@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -6405,8 +6405,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "9f1bb40524892900a1742cebc02b8dab3c7e0935848f7f8565a277fd75bc1e93",
-      "bytes": 96892
+      "sha256": "94f7cdfe32aefe0aeb3e92ece16200c858a95dd61e2ce0d9c03c5318ac9e893d",
+      "bytes": 96987
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -6430,7 +6430,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "646fe7c424e12924a0b444178af28f12866cd4a468f9fe0b9215c7e34b2a2c09",
+      "sha256": "fbe08571a958642ec4b158b2c2a83f9cff1cd1ce118137837184b47c731eca19",
       "bytes": 4661
     },
     {
@@ -14760,8 +14760,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "c7a3f40a0547673a6494790baebeab8736a48cfa73b8a31b6f221a80911798d1",
-      "bytes": 131140
+      "sha256": "e16392b12dc33e9af661c265f6125c39572a3ef526dbd6d88e889faa5d8f4878",
+      "bytes": 131943
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",

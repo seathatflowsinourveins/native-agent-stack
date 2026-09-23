@@ -511,17 +511,17 @@ def intraday_buying_power(account):
     bounded by ``multiplier * (equity - maintenance_margin)`` whenever those fields are
     present, so a stale or prior-close figure can never admit more than current equity
     supports."""
-    if account.get("daytrading_buying_power") is not None:
-        return str(account["daytrading_buying_power"]), "daytrading_buying_power"
-    if account.get("buying_power") is None:
+    field = "daytrading_buying_power" if account.get("daytrading_buying_power") is not None else "buying_power"
+    if account.get(field) is None or any(account.get(k) is None for k in ("multiplier", "equity")):
         return None
-    value = Decimal(str(account["buying_power"]))
-    if all(account.get(k) is not None for k in ("multiplier", "equity", "maintenance_margin")):
-        bound = Decimal(str(account["multiplier"])) * max(
-            Decimal(str(account["equity"])) - Decimal(str(account["maintenance_margin"])), Decimal(0))
-        if bound < value:
-            return str(bound), "multiplier*(equity-maintenance_margin)"
-    return str(value), "buying_power"
+    if account.get("maintenance_margin") is None and field == "buying_power":
+        return None  # the current-schema figure is only trusted with its equity bound: fail closed
+    value = Decimal(str(account[field]))
+    margin = Decimal(str(account.get("maintenance_margin") or 0))
+    bound = Decimal(str(account["multiplier"])) * max(Decimal(str(account["equity"])) - margin, Decimal(0))
+    if bound < value:
+        return str(bound), "multiplier*(equity-maintenance_margin)"
+    return str(value), field
 
 
 def _check_margin_entitlement(account, config, lev, session_policy):
