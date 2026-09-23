@@ -12469,13 +12469,13 @@
     },
     {
       "path": "catalogs/landscape/gap-resolution-20260922.json",
-      "bytes": 414216,
-      "sha256": "62673d9af869fd345b5b6066722b0cf7eda239fd7a1da65c0460aebd0808cf72"
+      "bytes": 414571,
+      "sha256": "45c9f3a0d38f4a8bad7d0f59bbc31ff87f6631135273b8a2f731388e993c6555"
     },
     {
       "path": "docs/gap-resolution-20260922.md",
-      "bytes": 16408,
-      "sha256": "1ff44dc5c7c02751819032bdf45643a5dd862b1a951e1f0c5d204645f93611cf"
+      "bytes": 16438,
+      "sha256": "f8c93e1889a46ef7800cb2cbd78168da21dfe77dcce2ef965316c0eb5ce8e6d5"
     },
     {
       "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/headroom-live-store-cleanup.json",

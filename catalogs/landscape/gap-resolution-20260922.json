@@ -2631,11 +2631,11 @@
      "blocker": "Testing whether the Codex-side MCP call can be made to record explicit workspace/project scope fields (per the ai-memory MCP server's own session-aware vs static-client guidance) requires exercising it from inside a real native Codex session, which is blocked by the same Codex usage-limit window as gaps 2-3.",
      "evidence": "native_agent_stack open_gaps[5] catalogs/landscape/us-equities.json line 4070; ai-memory MCP server instructions text (this session's MCP server instructions block) distinguishing session-aware vs static clients for workspace/project scoping; ai-memory 2.3.2 config template at ~/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/crates/ai-memory-cli/templates/config.default.toml line 246 ('currently active project' pointer keying)",
      "critic_correction": null,
-     "status": "advanced",
+     "status": "not_settled",
      "receipts": [
       "evidence/artifacts/gap-resolution-20260922/agents-models-workers/ai-memory-local-scope-reread.json"
      ],
-     "coordinator_note": null
+     "coordinator_note": "Codex follow-up review of PR #81: the receipt ran only the ai-memory CLI and states it cannot confirm or refute the native clients' MCP memory_status scope, which is the gap."
     },
     {
      "index": 6,
@@ -3811,11 +3811,11 @@
      "blocker": "No blocker to re-running the repo's own 214-test local suite and the 12 focused boundary tests exactly as recorded (offline, using cached wheels); running skfolio's actual upstream pytest suite would additionally require cloning skfolio's source repo, which is a network fetch this task disallows, so only the local-suite half is closable today.",
      "evidence": "receipt.json lines 1560-1589 record commands `python3 -m unittest discover -s tests -p test_research_evaluation.py -q` (12 passed) and `$SDK_PYTHON -m unittest discover -s tests -q` (214 passed, 0 skipped); `python3 -m py_compile tests/test_research_evaluation.py tests/test_broad_universe_evaluate.py` succeeded on this host today (COMPILE_OK), confirming the test files are present and syntactically runnable.",
      "critic_correction": null,
-     "status": "advanced",
+     "status": "not_settled",
      "receipts": [
       "evidence/artifacts/gap-resolution-20260922/research-factors-ml/repo-local-full-test-rerun.json"
      ],
-     "coordinator_note": null
+     "coordinator_note": "Codex follow-up review of PR #81: the gap is the absence of upstream skfolio tests; the receipt reran only the repository-local suite and states the upstream suite was not run."
     },
     {
      "index": 4,
@@ -5078,12 +5078,12 @@
   }
  ],
  "counts": {
-  "codex_limited/advanced": 1,
+  "codex_limited/not_settled": 1,
   "codex_limited/open": 42,
   "documentation_fix/advanced": 1,
   "documentation_fix/open": 33,
-  "executable_now/advanced": 22,
-  "executable_now/not_settled": 10,
+  "executable_now/advanced": 21,
+  "executable_now/not_settled": 11,
   "executable_now/open": 45,
   "executable_now/settled": 5,
   "manifest_gap/advanced": 1,

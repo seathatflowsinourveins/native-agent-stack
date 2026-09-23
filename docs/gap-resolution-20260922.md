@@ -15,8 +15,8 @@ This page summarizes the machine-readable ledger [`catalogs/landscape/gap-resolu
 | Status | Gaps |
 | --- | ---: |
 | settled | 5 |
-| advanced | 26 |
-| not_settled | 14 |
+| advanced | 24 |
+| not_settled | 16 |
 | open | 270 |
 
 | Category (why a gap is open or what it needs) | Gaps |
@@ -33,12 +33,12 @@ This page summarizes the machine-readable ledger [`catalogs/landscape/gap-resolu
 | needs_user_login | 3 |
 | time_gated | 2 |
 
-13 gaps carry a coordinator note from the two reviews of this PR (the ledger field `coordinator_note`):
+15 gaps carry a coordinator note from the reviews of this PR (Opus, Codex and a Codex follow-up) (the ledger field `coordinator_note`):
 
 - Two vLLM gaps were recategorised because no new hardware was needed.
 - The gitleaks attestation gap is `not_settled`: the recheck showed it is still true.
 - Promotion-gate gap 4 is `advanced`, because it is settled for this host only.
-- Eight gaps moved to `not_settled`. Some of their receipts name several gaps but carry one `settles_gap` value. Others only reran the incumbent or synthetic suite, or explicitly disclaim the gap.
+- Ten gaps moved to `not_settled`. Some of their receipts name several gaps but carry one `settles_gap` value. Others only reran the incumbent or synthetic suite, or explicitly disclaim the gap.
 - One summary was corrected to match its source text.
 
 ## Per layer
@@ -65,7 +65,7 @@ This page summarizes the machine-readable ledger [`catalogs/landscape/gap-resolu
 | foundation | token-efficiency | 10 | 0 | 3 | 0 | 7 |
 | foundation | web-research | 10 | 0 | 0 | 0 | 10 |
 | foundation | workers | 11 | 0 | 2 | 1 | 8 |
-| us-equities | agents-models-workers | 12 | 0 | 2 | 1 | 9 |
+| us-equities | agents-models-workers | 12 | 0 | 1 | 2 | 9 |
 | us-equities | backtesting-engine | 12 | 0 | 0 | 0 | 12 |
 | us-equities | data-quality-orchestration | 9 | 1 | 2 | 0 | 6 |
 | us-equities | evaluation-experiments | 9 | 0 | 1 | 1 | 7 |
@@ -74,7 +74,7 @@ This page summarizes the machine-readable ledger [`catalogs/landscape/gap-resolu
 | us-equities | market-data-reference | 12 | 0 | 1 | 1 | 10 |
 | us-equities | observability-hosting | 12 | 0 | 0 | 0 | 12 |
 | us-equities | portfolio-risk | 9 | 1 | 0 | 0 | 8 |
-| us-equities | research-factors-ml | 11 | 0 | 2 | 1 | 8 |
+| us-equities | research-factors-ml | 11 | 0 | 1 | 2 | 8 |
 | us-equities | security-supply-chain | 8 | 0 | 0 | 0 | 8 |
 | us-equities | storage-compute | 8 | 0 | 0 | 3 | 5 |
 
