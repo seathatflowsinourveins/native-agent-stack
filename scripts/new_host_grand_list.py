@@ -105,7 +105,10 @@ def pinned_tools() -> dict:
     for platform, rel in PIN_FILES.items():
         tools = [tool for tool in load(rel).get("tools", []) if isinstance(tool, dict)]
         out[platform] = {"ids": {tool.get("id") for tool in tools},
-                         "repos": {repo_key(tool.get("url")) for tool in tools if "github.com/" in str(tool.get("url"))}}
+                         "repos": {repo_key(tool.get("url")) for tool in tools if "github.com/" in str(tool.get("url"))},
+                         "versions": {tool.get("id"): tool.get("version") for tool in tools},
+                         "repo_versions": {repo_key(tool.get("url")): tool.get("version") for tool in tools
+                                           if "github.com/" in str(tool.get("url"))}}
     return out
 
 
@@ -113,10 +116,19 @@ def adoption_id(component_id: str) -> str:
     return ADOPTION_IDS.get(component_id, strip_candidate(component_id))
 
 
-def is_pinned(component_id: str, repository, pins_for_platform: dict) -> bool:
+def bootstrap_pin(component_id: str, repository, pins_for_platform: dict):
+    """The version the platform's bootstrap installs for this component, or None when it installs none."""
     bare = adoption_id(component_id)
-    names = PIN_ALIASES.get(bare, {bare})
-    return bool(names & pins_for_platform["ids"]) or (bool(repository) and repo_key(repository) in pins_for_platform["repos"])
+    for name in sorted(PIN_ALIASES.get(bare, {bare})):
+        if name in pins_for_platform["ids"]:
+            return pins_for_platform["versions"].get(name) or "pinned"
+    if repository and repo_key(repository) in pins_for_platform["repos"]:
+        return pins_for_platform["repo_versions"].get(repo_key(repository)) or "pinned"
+    return None
+
+
+def is_pinned(component_id: str, repository, pins_for_platform: dict) -> bool:
+    return bootstrap_pin(component_id, repository, pins_for_platform) is not None
 
 
 def ledger_decisions() -> dict:
@@ -155,6 +167,7 @@ def build() -> dict:
                 platforms[platform] = {
                     "e2e_state": state.get("e2e_state"),
                     "bootstrap_pinned": is_pinned(cid, winner.get("repository"), pins[platform]),
+                    "bootstrap_version": bootstrap_pin(cid, winner.get("repository"), pins[platform]),
                 }
             winners.append({
                 "component_id": cid,
@@ -202,7 +215,7 @@ def build() -> dict:
         "winners": len(winners_all),
         "winner_count_unit": "layer-winner pairs (a component that wins several layers counts once per layer)",
         "distinct_components": len({adoption_id(w["component_id"]) for w in winners_all}),
-        "pins_behind_upstream": sorted({w["component_id"] for w in winners_all if w["pin_behind_upstream"] is True}),
+        "pins_behind_upstream": sorted({adoption_id(w["component_id"]) for w in winners_all if w["pin_behind_upstream"] is True}),
         "not_joined_to_manifest": sorted({w["component_id"] for w in winners_all if not w["manifest_joined"]}),
         "e2e_accepted": {p: sum(1 for w in winners_all if w["platforms"][p]["e2e_state"] == "accepted") for p in PLATFORMS},
         "bootstrap_pinned": {p: sorted({w["component_id"] for w in winners_all if w["platforms"][p]["bootstrap_pinned"]}) for p in PLATFORMS},
@@ -300,11 +313,13 @@ def render_md(data: dict) -> str:
                 cells = []
                 for p in PLATFORMS:
                     st = w["platforms"][p]
-                    cells.append(md_cell(st["e2e_state"]) + (", pinned" if st["bootstrap_pinned"] else ""))
+                    cells.append(md_cell(st["e2e_state"]) + (f", bootstrap {st['bootstrap_version']}" if st["bootstrap_pinned"] else ""))
                 gaps = md_cell(layer["open_executable_now_gaps"]) if i == 0 else ""
                 lines.append(f"| {head} | `{w['component_id']}` | {pin} | {md_cell(w['evidence_class'])} | {cells[0]} | {cells[1]} | "
                              f"{md_cell(', '.join(w['install_profiles']))} | {gaps} |")
-    lines += ["", "\"pinned\" means the platform's bootstrap installs the tool from a pinned, checksummed artifact. "
+    lines += ["", "\"bootstrap X\" means the platform's bootstrap installs version X from a pinned, checksummed artifact; "
+              "it can differ from the ledger pin in the Pin column (the ledger records what a verdict was measured on, the "
+              "bootstrap what a new host installs). "
               "An E2E state of `accepted` is scoped to the recorded host; a new host proves its own.",
               "", "## How to update this page", "",
               "Generated, not hand-edited. After any change to the component evidence matrix (host receipts, "

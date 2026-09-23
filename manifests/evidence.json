@@ -7524,8 +7524,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "45b4d440e0ac10921a59ae55d5e24338048cc07d8f06f391d5cfe6930e7f596b",
-      "bytes": 66065
+      "sha256": "822fa078142d43b08f64020808df5d5027986d5913bd223e15ba9b52ba3fe1d3",
+      "bytes": 71540
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -8214,13 +8214,18 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "5ec5dfbed18881662c35c3b63399273fe042f60c9479edc6666873131023e5b5",
-      "bytes": 13002
+      "sha256": "156de59bca9d4df1bd977fbf3fdc04c1eddf08c45576540b56d2f66bbc32fae6",
+      "bytes": 13372
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
       "sha256": "da5dd61a96155dd73c9c1e2166ff9977e68231dfc0b0200aea5f0f845fb33499",
       "bytes": 15978
+    },
+    {
+      "path": "docs/next-host-stages.md",
+      "sha256": "4804b33e8516384ea8aa3c44b1f69e631410f147ae69ae6a64074eec4c5c0b5a",
+      "bytes": 5304
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -9309,8 +9314,8 @@
     },
     {
       "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
-      "sha256": "cd9556bc60f2e4ce534cfd9fb00feb1b2fd694dc092f76fe177fe346f1d3d5fc",
-      "bytes": 6596
+      "sha256": "8b59148cd489ecada14f2b52ae1730bd7f20ffb857ed2d58109e5ae4a5ac86b2",
+      "bytes": 6598
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",

@@ -62,7 +62,7 @@
    "change": "256 GB system RAM.",
    "verdict": "not_needed_now",
    "trigger": "Selecting a 150B-class mixture-of-experts model served partly from system RAM, after a measured throughput run shows it is usable. No such model is selected; runtime support for candidates such as MiMo-V2.6-Flash (159B) is unverified here.",
-   "evidence": "RAM on the measured host has 24-26 GB free under full load; the workstation projection already reaches the 'headroom' tier at 100 GB."
+   "evidence": "RAM on the measured host has 24-26 GiB free under full load; the workstation projection already reaches the 'headroom' tier at 100 GB."
   },
   {
    "id": "laptop-ram",
@@ -70,7 +70,7 @@
    "target": "this host",
    "change": "More RAM for the 48 GB WSL laptop.",
    "verdict": "not_needed",
-   "evidence": "24-26 GB available and memory pressure under 1 with five to eight sessions and a wave running."
+   "evidence": "24-26 GiB available and memory pressure under 1 with five to eight sessions and a wave running."
   },
   {
    "id": "disk",
