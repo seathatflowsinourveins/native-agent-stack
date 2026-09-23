@@ -1,0 +1,192 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "docs/dashboard-gap-resolution.md",
+    "docs/token-native-saturation.md"
+   ],
+   "key": "c1",
+   "name": "AgentsView",
+   "repository": "https://github.com/kenn-io/agentsview",
+   "why_not_default": "Native archive refresh retained 17 selected session identities, but observation is a scoped snapshot requiring explicit refresh; continuous service telemetry and automatic archive discovery are not established."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "synthetic",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c2",
+   "name": "otel-tui",
+   "repository": "https://github.com/ymtdzzz/otel-tui",
+   "why_not_default": "The bounded-history-and-traces decision records a synthetic loopback terminal trace. It does not establish production trace completeness or reconciled native usage."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c3",
+   "name": "Claude HUD",
+   "repository": "https://github.com/jarrodwatts/claude-hud",
+   "why_not_default": "Recorded native terminal observations establish rendered model, project, context and usage fields. This client-specific display does not provide cross-client service observation, and every statistic and billing reconciliation remain unqualified."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c4",
+   "name": "OpenLIT",
+   "repository": "https://github.com/openlit/openlit",
+   "why_not_default": "No installation, hook invocation or telemetry delivery was executed. Its additional transcript instrumentation requires privacy and counter reconciliation and could duplicate collection."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "docs/dashboard-gap-resolution.md",
+    "catalogs/foundation/decisions.json",
+    "observability/receipt.json"
+   ],
+   "key": "c6",
+   "name": "ntfy",
+   "repository": "https://github.com/binwiederhier/ntfy",
+   "why_not_default": "Local firing/resolved feed delivery passed, but notification delivery complements collection and accounting. Corrected formatting has renderer replay evidence without a subsequent production webhook observation."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "catalogs/us-equities/agents-operations.json",
+    "observability/receipt.json"
+   ],
+   "key": "c7",
+   "name": "Alertmanager",
+   "repository": "https://github.com/prometheus/alertmanager",
+   "why_not_default": "The native local alert route was exercised using a deliberately unavailable loopback fixture. Routing complements the selected observation pipeline; external paging and unattended remediation were not accepted."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c10",
+   "name": "SGLang",
+   "repository": "https://github.com/sgl-project/sglang",
+   "why_not_default": "Serving commands are prospective. No matched task execution, target-hardware compatibility or measured prefix-cache benefit establishes a better optional route."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-gpu-patch-20260920.json",
+    "blueprints/convergence-practice/gpu-inference/experiment.json"
+   ],
+   "key": "c11",
+   "name": "llama.cpp optional local inference",
+   "repository": "https://github.com/ggml-org/llama.cpp",
+   "why_not_default": "One pinned partial-offload repair passed independent review and 12 original tests, but generation took 179.191 seconds near its 180-second cap. There is no matched baseline model trial, representative workload qualification or recovery acceptance supporting a default inference route."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "docs/native-telemetry-resolution.md",
+    "observability/receipt.json",
+    "observability/backends/receipt.json"
+   ],
+   "key": "c12",
+   "name": "Loki",
+   "repository": "https://github.com/grafana/loki",
+   "why_not_default": "Native sanitized-log ingestion and receipt queries are established, with bounded restart evidence. It remains a useful supporting sink, but does not replace metrics reconciliation or rendered observation; removed payloads cannot be reconstructed and no trace database was accepted."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c13",
+   "name": "Phoenix",
+   "repository": "https://github.com/Arize-ai/phoenix",
+   "why_not_default": "Although marked adopted in the packet, retained evidence is source review: launch is prospective, no application was instrumented and no judge-model calls ran. Trace capture privacy and actual integration remain unqualified."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "observation-inference",
+ "limits": [
+  "This verdict reviews retained public evidence; no new native client, backend, browser or GPU execution was performed.",
+  "Private returned-output archives and screenshots were not inspected; their observations are available through sanitized retained records.",
+  "Upstream metadata was treated as packet context and was not independently refreshed."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "Privacy acceptance covers tested fields and trusted instrumentation. Its direct canary was synthetic; arbitrary-content DLP is not established.",
+  "The native SDK turn histogram remained absent. Imported completed-receipt summaries are a separate accounting path, not fresh model execution.",
+  "Process startup events, missing historical attribution and cache-category semantics prevent exact whole-account billing or causal lifetime savings claims.",
+  "Traces are disabled. Phoenix and OpenLIT lack executed trace-quality and privacy comparisons against the current pipeline.",
+  "Single-host restart checks do not establish reboot persistence, high availability, full-disk recovery or extended-outage delivery.",
+  "Optional inference is qualified only for the recorded llama.cpp repair trial; broader workloads, concurrency and host portability remain open."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Retained Collector Contrib, Prometheus and Grafana pipeline using native client results as the usage oracle.",
+   "One isolated candidate replacement using the same native task and privacy probes, without simultaneous duplicate capture.",
+   "For optional inference, the pinned llama.cpp repair route versus one candidate route on the same frozen task and original oracle."
+  ],
+  "fixture_paths": [
+   "fixtures/observability-check.json",
+   "tests/test_observability.py",
+   "blueprints/convergence-practice/gpu-inference/experiment.json"
+  ],
+  "metric": "Require correct fixture output, agreement with native usage categories, preserved writer identity and unknown usage, absence of tested forbidden content, no duplicate counting, and observed delivery/recovery. Compare actual latency and resource use. Optional inference must pass the frozen original oracle and resource/deadline contract. Local test success alone cannot promote a candidate."
+ },
+ "overturn_when": "Change the verdict when an executed comparison using fixtures/observability-check.json and the identity/unknown-usage contracts in tests/test_observability.py shows a candidate closes a concrete observation gap while preserving privacy, usage fidelity and recovery without duplicate capture. Promote an optional inference route only after an executed comparison against blueprints/convergence-practice/gpu-inference/experiment.json demonstrates task correctness and acceptable measured latency/resources.",
+ "packet_sha256": "be95e26e136f99966d539f159045bac43c5f1dcad35914dc71d395db1ee487df",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__observation-inference.json",
+  "<host-path>/SKILL.md",
+  "<host-path>/RTK.md",
+  "catalogs/foundation/decisions.json",
+  "catalogs/us-equities/agents-operations.json",
+  "docs/dashboard-gap-resolution.md",
+  "docs/dashboard-rendered-acceptance.md",
+  "docs/foundation-closure-20260921.md",
+  "docs/native-telemetry-resolution.md",
+  "docs/token-native-saturation.md",
+  "evidence/receipts/native-gpu-patch-20260920.json",
+  "observability/receipt.json",
+  "observability/backends/receipt.json",
+  "tests/test_observability.py",
+  "tests/test_observability_backends_alerts.py",
+  "fixtures/observability-check.json",
+  "blueprints/convergence-practice/gpu-inference/experiment.json"
+ ],
+ "why_selected": "Select Collector Contrib, Prometheus and Grafana as complementary collection, metrics and presentation components. observability/receipt.json records actual native Codex/Claude task execution, collected usage, loopback service queries and rendered observation; its privacy check is explicitly a synthetic canary through native exporters. docs/native-telemetry-resolution.md records a later real Claude task whose four usage categories matched Prometheus and appeared in Grafana. docs/dashboard-rendered-acceptance.md records rendered panels checked against native commands and APIs, with project-local panels identified as integration work. These observations best support the required single privacy-filtered local pipeline. Supporting log/alert components remain conditional, and optional inference retains its separate workload gate.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "observability/receipt.json",
+  "docs/native-telemetry-resolution.md",
+  "docs/dashboard-rendered-acceptance.md",
+  "docs/dashboard-gap-resolution.md",
+  "catalogs/us-equities/agents-operations.json"
+ ],
+ "winner_keys": [
+  "c8",
+  "c9",
+  "c5"
+ ]
+}

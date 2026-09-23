@@ -1,0 +1,292 @@
+{
+ "candidates": [
+  {
+   "adopted": true,
+   "component_id": "systemd",
+   "decisions": [
+    {
+     "capability": "Resume the same native child and reconcile a local effect after interruption",
+     "evidence_scope": "One native inherited-tool child completed cancellation, same-child continuation, abrupt parent-runtime failure, automatic systemd descendant cleanup and same-parent/same-child finalization with an unchanged checkpoint and one local effect.",
+     "id": "native-child-interruption-recovery",
+     "limitations": [
+      "One synthetic local task on this WSL host; not general worker reliability or an OS sandbox.",
+      "Not host/user-manager crash, independent-host recovery, remote provider cancellation, cessation of billing or distributed exactly-once effects.",
+      "Restricted Bash-only role incompatibility and every original failure remain retained; only this inherited role is accepted.",
+      "The successful run did not request ls, so the exact rewrite permission diagnosis is deterministic evidence rather than an exercised native approval success.",
+      "Native usage views overlap; initial SIGKILL has no terminal record. Complete parent/child/retry usage, billing and savings remain unknown."
+     ],
+     "next_gap": "Reuse the accepted same-host fixture while inputs match; qualify changed application effects or an independent host only when that scope is required."
+    },
+    {
+     "capability": "Resume one scheduled native workflow after an orderly owned guest reboot",
+     "evidence_scope": "A signed disposable Ubuntu guest automatically resumed the same native Dagu run after an orderly kernel reboot, preserved its checkpoint and produced one local effect. A dedicated read-only serial observer and independent journal review confirmed completion before postboot SSH; owned cleanup passed.",
+     "id": "owned-guest-scheduled-reboot",
+     "limitations": [
+      "One orderly disposable guest reboot with a synthetic workload; not a physical PC, power loss, production disaster recovery, provider recovery or broker acceptance.",
+      "The unchanged official Dagu retry tests are a selected upstream subset. The project planner, its original 12-test oracle and the guest experiment are local synthetic integration coverage.",
+      "Source, disk and process continuity cover this owned guest only; no distributed exactly-once or arbitrary external side-effect guarantee.",
+      "Public text projections replace owned home prefixes and synthetic UUIDs and normalize CRLF. Original artifact/stream hashes and explicit projection rules are retained; projected bytes are not labelled raw-byte-identical.",
+      "The full auth-free guest archive contains three hidden bookkeeping files omitted by loose-file artifact upload. Independent inspection used the intact archive.",
+      "Both prior failed attempts remain failures; retrospective successful workload records did not override their missing acceptance evidence.",
+      "No model was called and no provider or lifetime token-saving measurement was made."
+     ],
+     "next_gap": "Qualify the actual deployment and application effects when adopting beyond this orderly synthetic guest boundary."
+    },
+    {
+     "capability": "Terminate an owned local process tree at its deadline",
+     "evidence_scope": "The Linux user manager terminated a TERM-ignoring parent and descendants, retained timeout failure, and accepted a separate fresh run. A separate upstream user-service fixture also contained a TERM-ignoring setsid descendant after MainPID crash. The earlier combined restricted-role trial remains refused; the native-child-interruption-recovery decision separately records the later accepted inherited-role result.",
+     "id": "owned-process-deadlines",
+     "limitations": [
+      "Local process termination does not prove remote provider cancellation, spending caps or exactly-once effects."
+     ],
+     "next_gap": "The separate native-child-interruption-recovery decision covers one local cancellation/crash fixture; reconcile external effects before any provider or application relaunch."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "docs/foundation-convergence-20260921.md"
+   ],
+   "key": "c1",
+   "name": "systemd",
+   "pin": "255.4-1ubuntu8.17",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/worker-supervision/README.md",
+   "repository": "https://github.com/systemd/systemd",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v262",
+    "license": "GPL-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-22",
+    "renamed_to": null,
+    "stars": 16713
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c2",
+   "name": "Prefect",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/agents-operations.json",
+   "repository": "https://github.com/PrefectHQ/prefect",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "dagu",
+   "decisions": [
+    {
+     "capability": "Retry unfinished workflow steps while preserving a checkpoint",
+     "evidence_scope": "Native cancellation/retry retained one checkpoint on Mac and WSL; separate SSH-client termination left the same job running to completion. Selected unchanged official Dagu retry tests passed on fresh hosted runners. The additional owned-guest-scheduled-reboot decision qualifies the later orderly reboot without overriding retained failed attempts.",
+     "id": "checkpointed-workflow-resume",
+     "limitations": [
+      "Controlled transport interruption is not a real network outage or host reboot.",
+      "This does not establish remote model cancellation or distributed exactly-once effects."
+     ],
+     "next_gap": "Reuse the separate accepted orderly guest reboot scope; qualify changed deployment boundaries and application effects independently."
+    },
+    {
+     "capability": "Resume one scheduled native workflow after an orderly owned guest reboot",
+     "evidence_scope": "A signed disposable Ubuntu guest automatically resumed the same native Dagu run after an orderly kernel reboot, preserved its checkpoint and produced one local effect. A dedicated read-only serial observer and independent journal review confirmed completion before postboot SSH; owned cleanup passed.",
+     "id": "owned-guest-scheduled-reboot",
+     "limitations": [
+      "One orderly disposable guest reboot with a synthetic workload; not a physical PC, power loss, production disaster recovery, provider recovery or broker acceptance.",
+      "The unchanged official Dagu retry tests are a selected upstream subset. The project planner, its original 12-test oracle and the guest experiment are local synthetic integration coverage.",
+      "Source, disk and process continuity cover this owned guest only; no distributed exactly-once or arbitrary external side-effect guarantee.",
+      "Public text projections replace owned home prefixes and synthetic UUIDs and normalize CRLF. Original artifact/stream hashes and explicit projection rules are retained; projected bytes are not labelled raw-byte-identical.",
+      "The full auth-free guest archive contains three hidden bookkeeping files omitted by loose-file artifact upload. Independent inspection used the intact archive.",
+      "Both prior failed attempts remain failures; retrospective successful workload records did not override their missing acceptance evidence.",
+      "No model was called and no provider or lifetime token-saving measurement was made."
+     ],
+     "next_gap": "Qualify the actual deployment and application effects when adopting beyond this orderly synthetic guest boundary."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/foundation-convergence-20260921.md",
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c3",
+   "name": "Dagu",
+   "pin": "2.16.6",
+   "pin_behind_upstream": true,
+   "recipe_ref": "blueprints/us-equities/hosting/README.md",
+   "repository": "https://github.com/dagucloud/dagu",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v2.17.0",
+    "license": "GPL-3.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 4058
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c4",
+   "name": "Dagster",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/agents-operations.json",
+   "repository": "https://github.com/dagster-io/dagster",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c5",
+   "name": "Restate",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/hosting-source-review.json",
+   "repository": "https://github.com/restatedev/restate",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json",
+    "docs/foundation-rd-readiness.md"
+   ],
+   "key": "c6",
+   "name": "Temporal",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/hosting-source-review.json",
+   "repository": "https://github.com/temporalio/temporal",
+   "review_status": null,
+   "upstream": null
+  }
+ ],
+ "catalog": "foundation",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "Real jobs require host-loss survival, days-long waits or durable cross-host effects, and one challenger passes the declared effect/retry/recovery cases with acceptable operational burden.",
+ "group": null,
+ "layer_id": "scheduling-supervision",
+ "limitations": [
+  "The selected guest reboot is not a physical-PC reboot and does not qualify every schedule or daemon policy.",
+  "Local process cancellation does not prove provider billing cessation, external exactly-once effects or durable cross-host orchestration."
+ ],
+ "requirement": "Run selected local workflows with visible history, bounded process trees, cancellation and recoverable effects appropriate to the actual workload.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [
+  {
+   "id": "beads",
+   "pin": "1.3.0",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/gastownhall/beads",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v1.3.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-15",
+    "renamed_to": null,
+    "stars": 27362
+   }
+  },
+  {
+   "id": "claude-code",
+   "pin": "2.1.278",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/anthropics/claude-code",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v2.1.278",
+    "license": null,
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-19",
+    "renamed_to": null,
+    "stars": 147597
+   }
+  },
+  {
+   "id": "codex",
+   "pin": "0.155.1",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/openai/codex",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "rust-v0.155.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-18",
+    "renamed_to": null,
+    "stars": 125923
+   }
+  }
+ ],
+ "title": "Scheduling and supervision",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].review_status",
+  "candidates[].decisions[].selection",
+  "candidates[].decisions[].review_status",
+  "sota_components_not_in_candidates[].review_status"
+ ]
+}

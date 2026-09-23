@@ -1,0 +1,35 @@
+name: Dependency review (warn-only)
+
+# Warn-only PR dependency review, not added to required status checks (see
+# docs/decisions/2026-09-22-actions-hardening.md). It needs the repository's
+# dependency graph enabled. Like every ubuntu job that is not byte-pinned by
+# retained evidence, it starts with harden-runner in audit mode
+# (tests/test_workflow_hardening.py).
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Review dependency changes (report-only; never blocks the PR)
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          warn-only: true

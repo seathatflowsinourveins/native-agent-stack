@@ -1,0 +1,130 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "docs/github-automation.md",
+    "docs/catalog-provenance.md"
+   ],
+   "key": "c1",
+   "name": "actionlint",
+   "repository": "https://github.com/rhysd/actionlint",
+   "why_not_default": "Native execution detected an invalid workflow expression and passed after correction. Valuable complementary syntax checking, but it does not supply runtime inventory or publication attribution; zizmor more directly covers workflow security within the three-winner limit."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c2",
+   "name": "Trivy",
+   "repository": "https://github.com/aquasecurity/trivy",
+   "why_not_default": "Although marked adopted in the packet, its retained source review defers execution pending SBOM and vulnerability-database freshness policy. No executed Trivy comparison establishes coverage or actionable findings."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/automation.json",
+    "docs/github-automation.md"
+   ],
+   "key": "c5",
+   "name": "Dependabot",
+   "repository": "https://github.com/dependabot/dependabot-core",
+   "why_not_default": "Initial hosted scans succeeded and opened two major-update proposals whose unreviewed hashes blocked integration. This supports update maintenance, but weekly timing and nonempty minor/patch grouping remain unobserved, and it does not establish inventory or artifact provenance."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "docs/foundation-closure-20260921.md",
+    "docs/github-automation.md"
+   ],
+   "key": "c6",
+   "name": "gitleaks",
+   "repository": "https://github.com/gitleaks/gitleaks",
+   "why_not_default": "Retained native controls support scoped secret detection. The newer hosted history scan timed out; subsequent coverage excludes large generated HTML, and the documentation retains an unresolved finding on a sibling branch. Secret detection complements the selected three but cannot replace inventory, workflow-permission analysis or publication attribution."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+    "docs/github-automation.md"
+   ],
+   "key": "c8",
+   "name": "Grype",
+   "repository": "https://github.com/anchore/grype",
+   "why_not_default": "Newer retained execution exceeds the packet's source-review classification: scans of 21 installed runtime packages and two declared adapter pins returned zero matches against the recorded database. This adds bounded vulnerability matching, not replacement coverage for the selected capabilities; positive detection, actionable remediation and a blocking threshold remain unestablished. It remains non-adopted under the packet's eligibility rule."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "ci-supply-chain",
+ "limits": [
+  "This verdict reviews retained evidence; no native scan, hosted workflow, artifact download or comparison was rerun.",
+  "Private raw SBOMs and their underlying runtime directories were not inspected; inventory conclusions rely on sanitized retained receipts.",
+  "Live GitHub enforcement and artifact availability were not verified. Historical publication acceptance does not qualify the newer tag-triggered and SBOM-attestation changes.",
+  "Documentation contains differing historical and prospective automation states; claims are restricted to explicitly recorded executions and revisions."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "The three winners cover complementary requirements; no executed comparison establishes that this combination is globally superior to every alternative.",
+  "Syft's installed-package inventory excludes external interpreters, host libraries and complete vendored-native-library discovery; its release signature was not verified.",
+  "zizmor acceptance covers offline regular-persona analysis. The unsafe fixture is inert synthetic input, and successful analysis does not execute workflows.",
+  "Publication provenance establishes origin and byte integrity for the named historical commit, not reproducible builds, catalog correctness or current publication behavior.",
+  "Complete dependency locking and ongoing update ownership are not established across every runtime; Dependabot's scheduled timing and grouped-update behavior remain unobserved.",
+  "The Grype scan establishes a dated zero-match result, not vulnerability absence, positive-detection sensitivity or remediation quality."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Incumbent: zizmor workflow-security checks, Syft installed-runtime inventory and GitHub Actions attest publication verification.",
+   "Challenger: a candidate substitution or addition evaluated against the same workflow controls, installed-package metadata and publication identity/tamper checks; compare Trivy and Grype on identical SBOM bytes with recorded database provenance."
+  ],
+  "fixture_paths": [
+   "tests/test_workflow_security.py",
+   "blueprints/convergence-practice/ci-security/README.md",
+   "blueprints/us-equities/supply-chain/README.md"
+  ],
+  "metric": "Require successful clean controls and unsafe-input rejection with no skipped native tests, exact installed-package name/version agreement, valid original and rejected altered publication artifacts, and any claimed additional vulnerability coverage supported by reproducible findings and reviewed fix applicability."
+ },
+ "overturn_when": "Reconsider if python3 -m unittest -v tests.test_workflow_security fails a clean or unsafe control without skips, or replay of the native inventory procedure in blueprints/us-equities/supply-chain/README.md exposes an installed-package omission. Replace a winner only after an executed alternative comparison closes that demonstrated gap while retaining the other required capabilities; vulnerability additions require identical SBOM inputs and recorded database provenance.",
+ "packet_sha256": "0eb5019163f4e6eca4fa177575807adca6cd00c6c447c164f48550555537b284",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__ci-supply-chain.json",
+  "<host-path>/SKILL.md",
+  "catalogs/foundation/automation.json",
+  "docs/github-automation.md",
+  "catalogs/us-equities/hosting-source-review.json",
+  "catalogs/foundation/decisions.json",
+  "docs/catalog-provenance.md",
+  "docs/foundation-closure-20260921.md",
+  "blueprints/convergence-practice/ci-security/README.md",
+  "blueprints/us-equities/supply-chain/README.md",
+  "blueprints/us-equities/supply-chain/receipt.json",
+  "evidence/receipts/native-linux-zizmor-20260920.json",
+  "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+  "tests/test_workflow_security.py"
+ ],
+ "why_selected": "Select Syft, GitHub Actions attest and zizmor as the strongest complementary coverage within the three-candidate limit. Native Syft execution in blueprints/us-equities/supply-chain/receipt.json matched all 36 installed distributions and agreed across Syft/CycloneDX package identities. Native zizmor execution in evidence/receipts/native-linux-zizmor-20260920.json accepted the published workflows and rejected an inert synthetic unsafe fixture with three diagnostics; both acceptance tests passed without skips. Hosted publication recorded in catalogs/foundation/automation.json and docs/catalog-provenance.md established independent download digest equality and original/altered/original verification outcomes of 0/1/0 for the named commit. Project-local SHA pins, scoped publication permissions and attributed required checks support these tools; their configuration is not itself additional upstream acceptance.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "blueprints/us-equities/supply-chain/receipt.json",
+  "evidence/receipts/native-linux-zizmor-20260920.json",
+  "catalogs/foundation/automation.json",
+  "docs/catalog-provenance.md"
+ ],
+ "winner_keys": [
+  "c3",
+  "c4",
+  "c7"
+ ]
+}

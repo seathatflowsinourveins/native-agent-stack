@@ -161,6 +161,21 @@ def write_lane(work_dir: Path, lane: str, catalog: str, layer_id: str, data: dic
     (lane_dir / f"{catalog}__{layer_id}.json").write_text(json.dumps(data, indent=1), encoding="utf-8")
 
 
+def counterbalanced(winner_lane, why="The retained receipt decides it.", evidence_refs=("receipt.json",),
+                    picks=None):
+    """An adjudication record with one judgment per presentation order. ``picks`` maps
+    Claude's position (A or B) to the lane that judgment chose; by default both orders
+    chose ``winner_lane``."""
+    picks = picks or {"A": winner_lane, "B": winner_lane}
+    judgments = []
+    for claude_position, lane in picks.items():
+        codex_position = "B" if claude_position == "A" else "A"
+        judgments.append({"claude_position": claude_position,
+                          "preferred_position": claude_position if lane == "claude" else codex_position,
+                          "preferred_lane": lane, "refuting_votes": 0})
+    return {"winner_lane": winner_lane, "why": why, "evidence_refs": list(evidence_refs), "judgments": judgments}
+
+
 def write_adjudication(adjudications_dir: Path, catalog: str, layer_id: str, data: dict):
     adjudications_dir.mkdir(parents=True, exist_ok=True)
     (adjudications_dir / f"{catalog}__{layer_id}.json").write_text(json.dumps(data, indent=1), encoding="utf-8")
@@ -181,6 +196,9 @@ FOUNDATION_LAYERS = [
     "citation-layer", "review-adjudicated-layer", "review-badadj-layer", "review-sealed-layer",
     "review-packet-layer", "review-nosum-layer", "review-leak-layer", "review-sources-layer",
     "review-explorer-layer", "verify-noalt-layer", "verify-adjleak-layer", "verify-winalt-layer",
+    "disagree-split-layer", "disagree-one-order-layer", "disagree-no-judgments-layer",
+    "disagree-split-claimed-layer", "disagree-refuted-layer", "disagree-contradiction-layer",
+    "disagree-missing-winner-layer", "disagree-bool-votes-layer", "disagree-judgments-object-layer",
 ]
 US_EQUITIES_LAYERS = ["unindexed-alt-layer", "unindexed-pending-layer"]
 
@@ -398,9 +416,8 @@ class DisagreeTests(RecordVerdictsFixture):
                                                   c1_component="adjudicated-component")
         self.write_disagreeing_lanes(catalog, layer_id, digest, c1, c2)
         adjudications_dir = self.work_dir / "adjudications"
-        write_adjudication(adjudications_dir, catalog, layer_id, {
-            "winner_lane": "claude", "why": "Claude's evidence was stronger on native execution.",
-            "evidence_refs": ["receipt.json"]})
+        write_adjudication(adjudications_dir, catalog, layer_id, counterbalanced(
+            "claude", why="Claude's evidence was stronger on native execution."))
 
         self.assertEqual(self.run_main(write=True, adjudications=adjudications_dir), 0)
         row = self.load_row(catalog, layer_id)
@@ -416,6 +433,85 @@ class DisagreeTests(RecordVerdictsFixture):
         self.assertEqual(adjudication_data["winner_lane"], "claude")
         self.assertIn(f"{record_verdicts.SEALED_BASE}/adjudication/{run_id}.json", gap)
         build_landscape(self.root)
+
+    def test_split_counterbalanced_adjudication_is_sealed_and_stays_pending(self):
+        catalog, layer_id = "foundation", "disagree-split-layer"
+        c1, c2, digest = self.build_packet_pair(catalog, layer_id)
+        self.write_disagreeing_lanes(catalog, layer_id, digest, c1, c2)
+        adjudications_dir = self.work_dir / "adjudications"
+        # Each order chose whichever return was shown as A: a position effect, not evidence.
+        write_adjudication(adjudications_dir, catalog, layer_id, counterbalanced(
+            None, why="Every judgment followed the presentation order.",
+            picks={"A": "claude", "B": "codex"}))
+
+        self.assertEqual(self.run_main(write=True, adjudications=adjudications_dir), 0)
+        row = self.load_row(catalog, layer_id)
+        self.assertEqual(row["verdict_status"], "pending_lanes")
+        self.assertEqual(row["winners"], [])
+        gap = next(gap for gap in row["open_gaps"] if gap.startswith("lanes disagreed"))
+        self.assertIn("did not agree (claude 1, codex 1, 0 refuted", gap)
+        self.assertNotIn("adjudication pending", gap)
+        run_id = row["lanes"]["claude"]["run_id"]
+        sealed = self.root / record_verdicts.SEALED_BASE / "adjudication" / f"{run_id}.json"
+        self.assertTrue(sealed.is_file())
+        self.assertIsNone(json.loads(sealed.read_text(encoding="utf-8"))["winner_lane"])
+        self.assertIn(f"{record_verdicts.SEALED_BASE}/adjudication/{run_id}.json", gap)
+        self.assertEqual(self.run_main(write=False, adjudications=adjudications_dir), 0)
+        build_landscape(self.root)
+
+    def assert_adjudication_rejected(self, layer_id, data, reason_fragment):
+        catalog = "foundation"
+        c1, c2, digest = self.build_packet_pair(catalog, layer_id)
+        self.write_disagreeing_lanes(catalog, layer_id, digest, c1, c2)
+        adjudications_dir = self.work_dir / "adjudications"
+        write_adjudication(adjudications_dir, catalog, layer_id, data)
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.assertEqual(self.run_main(write=True, adjudications=adjudications_dir), 1)
+        self.assertIn(f"{catalog}__{layer_id} [adjudication]", output.getvalue())
+        self.assertIn(reason_fragment, output.getvalue())
+        row = self.load_row(catalog, layer_id)
+        self.assertEqual(row["verdict_status"], "pending_lanes")
+        self.assertEqual(row["winners"], [])
+
+    def test_adjudication_from_one_presentation_order_is_rejected(self):
+        data = counterbalanced("claude")
+        data["judgments"] = [data["judgments"][0]]
+        self.assert_adjudication_rejected("disagree-one-order-layer", data, "both presentation orders")
+
+    def test_adjudication_without_judgments_is_rejected(self):
+        data = counterbalanced("claude")
+        del data["judgments"]
+        self.assert_adjudication_rejected("disagree-no-judgments-layer", data, "both presentation orders")
+
+    def test_winner_lane_over_a_split_is_rejected(self):
+        data = counterbalanced("claude", picks={"A": "claude", "B": "codex"})
+        self.assert_adjudication_rejected("disagree-split-claimed-layer", data, "must equal the lane")
+
+    def test_winner_lane_over_a_refuted_judgment_is_rejected(self):
+        data = counterbalanced("claude")
+        data["judgments"][1]["refuting_votes"] = 1
+        self.assert_adjudication_rejected("disagree-refuted-layer", data, "must equal the lane")
+
+    def test_split_without_an_explicit_null_winner_lane_is_rejected(self):
+        data = counterbalanced(None, picks={"A": "claude", "B": "codex"})
+        del data["winner_lane"]
+        self.assert_adjudication_rejected("disagree-missing-winner-layer", data, "winner_lane claude|codex|null")
+
+    def test_boolean_refuting_votes_is_rejected(self):
+        data = counterbalanced("claude")
+        data["judgments"][0]["refuting_votes"] = False
+        self.assert_adjudication_rejected("disagree-bool-votes-layer", data, "nonnegative integer refuting_votes")
+
+    def test_judgments_that_are_not_a_list_are_rejected(self):
+        data = counterbalanced("claude")
+        data["judgments"] = {"A": data["judgments"][0]}
+        self.assert_adjudication_rejected("disagree-judgments-object-layer", data, "both presentation orders")
+
+    def test_judgment_lane_contradicting_its_positions_is_rejected(self):
+        data = counterbalanced("claude")
+        data["judgments"][0]["preferred_position"] = "B"
+        self.assert_adjudication_rejected("disagree-contradiction-layer", data, "contradicts")
 
 
 class RejectedLaneTests(RecordVerdictsFixture):
@@ -826,7 +922,7 @@ class ReviewFindingTests(RecordVerdictsFixture):
         adjudications = self.work_dir / "adjudications"
         adjudications.mkdir()
         (adjudications / f"foundation__{layer_id}.json").write_text(json.dumps(
-            {"winner_lane": "claude", "why": "Claude cites the executed receipt.", "evidence_refs": ["receipt.json"]}),
+            counterbalanced("claude", why="Claude cites the executed receipt.")),
             encoding="utf-8")
         self.assertEqual(self.run_main(write=True, adjudications=adjudications), 0)
         row = self.load_row("foundation", layer_id)
@@ -947,7 +1043,7 @@ class VerificationFindingTests(RecordVerdictsFixture):
         adjudications = self.work_dir / "adjudications"
         adjudications.mkdir()
         (adjudications / f"foundation__{layer_id}.json").write_text(json.dumps(
-            {"winner_lane": "claude", "why": "The APCA broker receipt decides it.", "evidence_refs": []}),
+            counterbalanced("claude", why="The APCA broker receipt decides it.", evidence_refs=())),
             encoding="utf-8")
         output = io.StringIO()
         with contextlib.redirect_stdout(output):

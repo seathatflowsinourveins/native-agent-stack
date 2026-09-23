@@ -1,0 +1,103 @@
+{
+ "alternatives": [
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c1",
+   "name": "OpenHands SDK",
+   "repository": "https://github.com/openhands/software-agent-sdk",
+   "why_not_default": "Retained review identifies remote/container workers as its application, but records no executed SDK comparison or qualified remote-worker result."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c3",
+   "name": "Claude Agent SDK",
+   "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+   "why_not_default": "The review identifies programmatic Claude control but explicitly says the SDK was not newly installed or qualified. Native Claude CLI success does not establish SDK settings, tools or cancellation behavior."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c2",
+   "name": "LangGraph",
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "why_not_default": "Explicit graph checkpoints are a conditional application need; retained evidence contains no executed comparison demonstrating an advantage for this worker requirement."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c5",
+   "name": "Temporal",
+   "repository": "https://github.com/temporalio/temporal",
+   "why_not_default": "Durable cross-host replay adds a service and distinct recovery semantics. Neither that need nor an executed advantage over the accepted worker is established."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "agent-sdks",
+ "limits": [
+  "Reviewed retained files only; no fresh SDK execution, provider call or upstream verification was performed.",
+  "Alternative SDK evidence is limited to the retained source review and metadata.",
+  "Historical execution does not establish acceptance on this host or arbitrary SDK versions."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "No matched execution compares the candidate SDKs on structured events, custom tools or session control.",
+  "The Codex receipt demonstrates a bounded programmatic worker with existing MCP tools; it does not establish arbitrary custom-tool registration or complete event handling.",
+  "SDK cancellation, provider billing cessation, distributed recovery and exactly-once effects remain unqualified.",
+  "The recorded file-tool scope failure and subsequent approval-blocked override remain unresolved acceptance boundaries.",
+  "CLI session-resume evidence does not independently qualify SDK resume behavior."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Accepted Codex worker using blueprints/us-equities/workers/native_worker.py",
+   "A candidate SDK implementing the same bounded task and explicitly required event, tool or session-control behavior"
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/workers/native_worker.py",
+   "blueprints/us-equities/workers/README.md",
+   "blueprints/us-equities/workers/receipt.json"
+  ],
+  "metric": "Exact task-result correctness, required SDK behavior, effective settings and permission fidelity, failure recovery, elapsed time and complete reported usage; retain failures and unknown usage."
+ },
+ "overturn_when": "Execute the native replay documented in blueprints/us-equities/workers/README.md using blueprints/us-equities/workers/native_worker.py, then a matched candidate SDK trial. Change the verdict if the candidate satisfies a concrete required event, custom-tool or session-control behavior that Codex fails, while preserving task correctness and permission boundaries. Alternative comparison adapters are not established by the retained evidence.",
+ "packet_sha256": "0535214c13287c263717eb2fc05e10a7628e267ccd7820c06f6cc276c2e3a762",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/SKILL.md",
+  "<host-path>/foundation__agent-sdks.json",
+  "docs/foundation-closure-20260921.md",
+  "catalogs/foundation/decisions.json",
+  "blueprints/us-equities/workers/README.md",
+  "blueprints/us-equities/workers/native_worker.py",
+  "blueprints/us-equities/workers/receipt.json"
+ ],
+ "why_selected": "Select c4 within its demonstrated programmatic-worker scope. blueprints/us-equities/workers/receipt.json retains native SDK execution that completed a bounded source-extraction task through Context Mode tools, while preserving a failed file-tool call. The inspected integration in blueprints/us-equities/workers/native_worker.py starts a thread, reads configured model/provider state and submits a turn. docs/foundation-closure-20260921.md retains this working integration while identifying the other SDKs as unqualified or conditional. This establishes an executed SDK baseline, not comparative superiority across all SDK features.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "docs/foundation-closure-20260921.md",
+  "catalogs/foundation/decisions.json",
+  "blueprints/us-equities/workers/native_worker.py",
+  "blueprints/us-equities/workers/receipt.json"
+ ],
+ "winner_keys": [
+  "c4"
+ ]
+}

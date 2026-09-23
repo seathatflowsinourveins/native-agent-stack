@@ -1,0 +1,131 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md"
+   ],
+   "key": "c1",
+   "name": "Podman / Quadlet",
+   "repository": "https://github.com/podman-container-tools/podman",
+   "why_not_default": "Retained review establishes no native workload comparison. Filesystem/network enforcement, volume behavior, cleanup and host compatibility remain unmeasured. Rootless and systemd capabilities are documented in the [Quadlet reference](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html), but documentation does not qualify this workload."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md"
+   ],
+   "key": "c3",
+   "name": "Docker Engine / Moby",
+   "repository": "https://github.com/moby/moby",
+   "why_not_default": "No retained matched execution establishes better isolation, reproduction or recovery for the selected tasks. [Rootless documentation](https://docs.docker.com/engine/security/rootless/) describes user-namespace operation and prerequisites; it supplies no local acceptance."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "blueprints/convergence-practice/container-storage/README.md"
+   ],
+   "key": "c4",
+   "name": "Apple Container",
+   "repository": "https://github.com/apple/container",
+   "why_not_default": "Native Mac execution retained a PostgreSQL row across stop/start and cleaned up owned resources. That storage check does not establish the required filesystem/network policy. The Documents bind mount stalled, and crash/reboot recovery remains unqualified."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c7",
+   "name": "E2B",
+   "repository": "https://github.com/e2b-dev/E2B",
+   "why_not_default": "The retained workflow is prospective: no sandbox was created or tested. Managed lifecycle and a separate VM boundary lack workload-specific enforcement, recovery and cleanup acceptance."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c2",
+   "name": "gVisor",
+   "repository": "https://github.com/google/gvisor",
+   "why_not_default": "Retained source review identifies an OCI application-kernel option, but no runsc workload/platform execution or matched isolation comparison establishes superiority for these bounded native tasks."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "isolation",
+ "limits": [
+  "This verdict reviews historical retained evidence; no native isolation or lifecycle trial was executed in this session.",
+  "The pinned Moby README could not be retrieved through either its GitHub URL or raw-content fallback. Its local retained review and Docker rootless documentation were readable.",
+  "Private raw artifacts behind sanitized receipts were not inspected.",
+  "Upstream documentation reads establish source-review context, not acceptance of the packet's current versions on this host."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "Worktrees do not isolate permissions, accounts, global configuration or shared services; crash cleanup preserving dirty and unrelated state remains unproven.",
+  "Sandbox acceptance covers selected filesystem operations and Linux/WSL IPv4 loopback HTTP proxy policy. TLS, SOCKS, DNS rebinding, IPv6, remote hosts, resource limits and general escape resistance remain unqualified.",
+  "The HTTP fixture initially failed because proxy readiness raced client startup; acceptance used bounded connection-refused retries.",
+  "Overlapping read/write exclusions allowed an ephemeral write without changing the host; direct write denial was established only by the separate protected-write fixture.",
+  "Ordinary native clients and Dagu processes are not automatically wrapped in sandbox-runtime.",
+  "No retained matched comparison establishes that an OCI or managed VM alternative better satisfies this layer.",
+  "Historical Worktrunk lifecycle evidence does not independently establish identical behavior at the packet's newer pin."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Worktrunk owned create/select/list/remove lifecycle, including preservation of dirty and unrelated state.",
+   "sandbox-runtime permitted/protected filesystem operations and allowed, explicit-deny and default-deny HTTP requests with independent server observation.",
+   "A task-required OCI or VM alternative executing equivalent boundary, workload, lifecycle and cleanup checks on the target host."
+  ],
+  "fixture_paths": [
+   "blueprints/token-native-focus/saturation-audit.json",
+   "blueprints/convergence-practice/container-storage/README.md"
+  ],
+  "metric": "Preserved edits and unrelated resources; permitted operations succeed; protected host paths remain unchanged; denied requests never reach the fixture server; required workload completes and owned resources clean up. Compare actual executions, not receipt replay or metadata."
+ },
+ "overturn_when": "Re-execute the Worktrunk and sandbox-runtime acceptance scopes recorded in blueprints/token-native-focus/saturation-audit.json on the required host and version. Change the affected selection if it loses dirty work, changes a protected host path, or delivers a denied request. Promote an alternative only after a matched execution passes those scopes and a concrete additional task requirement; for container persistence, include the native stop/start and cleanup check in blueprints/convergence-practice/container-storage/README.md. These paths define retained scopes and a storage recipe, not an already executed cross-runtime comparison.",
+ "packet_sha256": "e2816a751383f7b6680833ac587cf2263a14441687afcdd7fbc384f4602fab49",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__isolation.json",
+  "<host-path>/SKILL.md",
+  "catalogs/landscape/hosting-practice.json",
+  "docs/hosting-container-practice.md",
+  "catalogs/foundation/decisions.json",
+  "docs/token-native-saturation.md",
+  "catalogs/us-equities/hosting-source-review.json",
+  "catalogs/us-equities/agents-operations.json",
+  "evidence/receipts/token-native-retained-functional-20260920.json",
+  "evidence/receipts/runtime-tools.json",
+  "evidence/receipts/native-sandbox-network-20260920.json",
+  "blueprints/convergence-practice/container-storage/README.md",
+  "blueprints/token-native-focus/saturation-audit.json",
+  "https://github.com/podman-container-tools/podman/blob/04f3aa430e6df81bea059978bc5bafbc846ba3e7/README.md",
+  "https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html",
+  "https://docs.docker.com/engine/security/rootless/"
+ ],
+ "why_selected": "Select Worktrunk for separate editing state and activate sandbox-runtime only when the task requires enforced restrictions. docs/token-native-saturation.md and evidence/receipts/token-native-retained-functional-20260920.json record native Worktrunk create/select/list/remove in a disposable repository with hooks disabled; catalogs/foundation/decisions.json also records dirty-removal refusal without loss. evidence/receipts/runtime-tools.json records native allowed writes, denied reads and separately denied protected writes. evidence/receipts/native-sandbox-network-20260920.json records native sandbox execution against a local HTTP fixture: the allowed request reached the server, while explicit-deny and default-deny requests did not. These are bounded native results using local fixtures, not a general security certification or a measured victory over container runtimes.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "docs/token-native-saturation.md",
+  "catalogs/foundation/decisions.json",
+  "evidence/receipts/token-native-retained-functional-20260920.json",
+  "evidence/receipts/runtime-tools.json",
+  "evidence/receipts/native-sandbox-network-20260920.json"
+ ],
+ "winner_keys": [
+  "c5",
+  "c6"
+ ]
+}

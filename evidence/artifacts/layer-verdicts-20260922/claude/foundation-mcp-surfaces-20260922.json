@@ -1,16 +1,15 @@
 {
  "alternatives": [
   {
-   "disposition": "unqualified",
+   "disposition": "out_of_scope",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "catalogs/foundation/decisions.json",
-    "recipes/README.md"
+    "catalogs/foundation/decisions.json"
    ],
    "key": "c2",
    "name": "Awesome MCP servers registry",
    "repository": "https://github.com/punkpeye/awesome-mcp-servers",
-   "why_not_default": "It is a discovery list, not a bridge, inspector or configuration tool, and it is not adopted. The catalog keeps registries in scope only as discovery input (decisions.json line 2873: 'treat unexamined registries as discovery input only'). It records this one as an 'unexamined source' whose listing 'does not establish adoption' (lines 2883-2885). The requirement also rules out adopting an unexamined registry entry. The only evidence ref is recipes/README.md, and it reviews no registry entry against a concrete MCP surface gap. The refuter's grep for awesome-mcp|punkpeye|registry matched only npm and context-hub registry lines, not an MCP server registry entry. The disposition is changed from out_of_scope to unqualified because the catalog's activation text keeps registries in scope as discovery input."
+   "why_not_default": "This is a discovery list of servers. It is not a bridge, inspector or configuration tool, so it cannot do the bridge or inspect work the requirement asks for. The requirement also excludes adopting an unexamined registry entry. The only support for this disposition is the project decision record: catalogs/foundation/decisions.json line 2873 and lines 2883-2885 say registries are discovery input only, that this registry is an unexamined source, and that a listing there does not establish adoption. The packet's evidence_ref for c2, recipes/README.md, never mentions this registry, so I dropped it as support. The evidence_class source_review means a review of that project decision record, not of the registry. No registry entry was reviewed or executed. The registry is untested, which is not the same as failed."
   }
  ],
  "catalog": "foundation",
@@ -18,60 +17,65 @@
  "lane": "claude",
  "layer_id": "mcp-surfaces",
  "limits": [
-  "I ran no commands and re-executed nothing. Every native-execution claim comes from the retained receipts, not from anything seen in this review.",
-  "I did not open scripts/validate_catalogs.py or manifests/evidence.json. The validator is cited only through observability/restart-receipt.json line 200.",
-  "I did not read the token-practice-coverage-20260920 evidence body behind mcp-surface-policy, or evidence/receipts/claude-repository-evidence-20260921.json, which the saturation audit lists for mcp-inspector.",
-  "I confirmed only that the examples/*mcp* configuration files exist; I did not read their contents.",
-  "For the mcporter lifecycle block at saturation-audit.json lines 4990-5049, I inferred that it belongs to mcporter from the refuter's line citations and from its restart-receipt.json evidence refs. I did not read the component_id header above line 4990.",
-  "Provider judgment versus my own review: the packet withheld the provider's current_choice, decision, rationale and dispositions, so no provider judgment was retained or checked. The candidate decisions and review_status fields were treated as data and checked against decisions.json. The refuter findings were treated as claims and verified against the cited lines; the major tools/list and recovery finding was confirmed and fixed. No TypeSafe inference results were supplied and no service calls were made.",
-  "The model name and effort are the fixed values the task required. The client reports the actual runtime model as claude-opus-5-5[1m]. The skill path is <host-path>/SKILL.md."
+  "I could not run commands, so I re-executed none of the mcporter or Inspector operations. Every execution claim is retained receipt data that I read, not something I observed now.",
+  "Skill path: <host-path>/typesafe-ai (the base directory the client gave). I did not open the project copy at .agents/skills/typesafe-ai/SKILL.md. No TypeSafe inference results were supplied, and I made no service calls. The disposition is my own source review; I retained no provider judgment. The refuters' findings were treated as data, and each was checked against the original files before I accepted it.",
+  "The model the client exposes is Opus 5.5 (claude-opus-5-5[1m]). The packet's fixed model field is recorded as opus/high.",
+  "Corrections from the refuters, verified against the original files. (1) The mcporter daemon recovery is dated 2026-09-19 (restart-receipt.json line 5), not 2026-09-20. Only the Inspector receipt is a retrospective 2026-09-20 publication. (2) The four mcporter retained_operation_ids are only listed in saturation-audit.json lines 4986-4991. The earlier 'list/call' label for them had no source and was removed. (3) recipes/README.md was removed as support for c2. (4) The mcporter call receipts in current-session-observation-20260920.json were added.",
+  "catalogs/foundation/decisions.json contains the selection and review_status fields that the packet withholds. I read them only as recorded project claims. The verdict rests on the receipt contents.",
+  "I did not open evidence/receipts/component-history.json, token-practice-coverage-20260920.json, claude-upstream-checks-20260921.json, claude-repository-evidence-20260921.json, adoption-macos-hosted-smoke-20260922.json or adoption/lifecycle.md. Their contents are unverified.",
+  "The public receipts bind to private raw captures by hash (manifests/evidence.json line 1698; current-session-observation-20260920.json lines 1251-1276). I could not inspect the raw operation output.",
+  "I read no upstream repository sources or release notes for mcporter v0.14.0 or Inspector 2.7.0. Upstream metadata comes only from the packet."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "mcporter is pinned at 0.13.13 while upstream is at v0.14.0, released 2026-09-22 (packet c3.upstream). The newer version is not qualified.",
-  "The Inspector version 2.7.0 comes only from the saturation audit (line 4834) and the recipe pin (recipes/README.md line 91). The retained operation receipt (token-native-retained-functional-20260920.json lines 84-106) names the component 'mcp-inspector' but records no version. The audit says current_host_recertified_by_this_audit is false (line 4838).",
-  "No retained receipt records an Inspector tools/list call. tools/list appears only as a documented command (recipes/README.md lines 91 and 153-160).",
-  "The Inspector evidence covers only launching the pinned npm Context Mode CLI for arithmetic. It does not certify the full client plugin, hooks, project-file scope or current desktop connection (receipt line 18). The receipt is a later write-up of September 20 evidence that was not rerun, and its raw captures are private, bound only by hashes (lines 15-16).",
-  "The saturation audit leaves mcporter's persistence, restart, cleanup and recovery stages not_established (lines 5023-5042). The only recovery evidence is restart-receipt.json bridge_recovery. It shows automatic_recovery false and failed first attempts (line 181).",
-  "The catalog's next gap is still open: qualify changed process roots and scoped registration recovery without disturbing unrelated consumers. The mcporter daemon is shared, so removing one registration is not an uninstall or an all-client cleanup.",
-  "The configure-and-policy part (mcp-surface-policy) is source review only; decisions.json line 2882 says no new execution was run. The configuration artifacts exist but no config-application receipt was reviewed. examples/claude-mcp.json.example, examples/codex-mcp.toml.example and examples/mcporter.json.example were found by glob, and the native CLI registration is at recipes/README.md lines 140-151.",
-  "No executed comparison exists between bridge or inspector alternatives, and no registry entry has been reviewed against a concrete gap."
+  "The retained native runs are from 2026-09-19 (mcporter daemon recovery, restart-receipt.json line 5) and 2026-09-20 (mcporter bridge calls in current-session-observation-20260920.json; Inspector call in token-native-retained-functional-20260920.json, a retrospective publication). None was repeated. saturation-audit.json lines 4838 and 4943 show current_host_recertified_by_this_audit false for both components.",
+  "mcporter is pinned at 0.13.13 while upstream is v0.14.0 (packet pin_behind_upstream true). v0.14.0 is untested, which does not mean it failed.",
+  "saturation-audit.json lines 5023-5042 give not_established for mcporter's persistence, restart, cleanup and recovery lifecycle stages. The bridge recovery in restart-receipt.json was manual (automatic_recovery false). The shared daemon is not an owned disposable service.",
+  "The mcporter retained_operation_ids (fresh-static-graph, fresh-static-callees, fresh-memory-status, fresh-socraticode-status) appear only as IDs in saturation-audit.json. No public receipt I read defines their commands or results.",
+  "The Inspector evidence covers only a stdio arithmetic call ('42 computed'). It does not certify the full client plugin, hooks, project-file scope or desktop connection (saturation-audit.json line 4844). Recipe Inspector calls such as tools/list against other servers did not appear in the receipts I opened.",
+  "The requirement's configure-without-registry-adoption part (mcp-surface-policy) rests on source review only. No new execution was run for this taxonomy layer.",
+  "No measured comparison against other MCP bridges or inspectors was found. The selection rests on retained native execution alone, not on a head-to-head comparison.",
+  "No registry entry from punkpeye/awesome-mcp-servers was reviewed against a concrete MCP surface gap."
  ],
  "overturn_protocol": {
   "arms": [
-   "c3 mcporter 0.13.13 (current pin, rerun)",
-   "mcporter v0.14.0 (upstream latest per packet)",
-   "c1 MCP Inspector 2.7.0 (current pin, rerun)",
-   "any registry-sourced replacement server, bridge or inspector reviewed against a concrete MCP surface gap"
+   "mcporter 0.13.13 + mcp-inspector 2.7.0 (current pins)",
+   "mcporter v0.14.0 (latest upstream) + mcp-inspector 2.7.0",
+   "candidate server/bridge from a reviewed registry entry against the same operations"
   ],
   "fixture_paths": [
    "blueprints/token-native-focus/saturation-audit.json"
   ],
-  "metric": "Every arm, incumbents included, is re-executed on the same host. Bridge arms pass or fail on: the daemon starts, the discovered tool count is at least 1 and recorded, and a tool execute call returns the expected output (acceptance modelled on observability/restart-receipt.json lines 165-179). Inspector arms pass or fail on: a direct stdio tool call exits 0 and returns the expected computed result (acceptance modelled on evidence/receipts/token-native-retained-functional-20260920.json lines 84-106). tools/list and automatic recovery are recorded as optional extra observations, not pass criteria, because no incumbent receipt shows them accepted. `python3 scripts/validate_catalogs.py` must exit 0."
+  "metric": "Pass/fail per operation on the current host. For the mcporter bridge: exit code 0 and the expected returned fields for the recorded `mcporter ... call` commands; daemon start plus tool discovery count plus execute stdout for recovery. For the Inspector stdio tool call: exit code 0 and the expected computed result. The four mcporter retained_operation_ids appear in the fixture only as IDs. Their commands and checks must be recovered from the private raw captures or re-specified before they can be scored."
  },
- "overturn_when": "Change the verdict only after an executed same-host comparison in which a challenger passes the use-stage acceptance that the incumbents are actually recorded as passing, and an incumbent fails it or is weaker. Challengers include mcporter v0.14.0 (the upstream latest per the packet) or a registry-sourced bridge or inspector reviewed against a concrete MCP surface gap. blueprints/token-native-focus/saturation-audit.json names the stage map (mcp-inspector use at lines 4898-4903, mcporter use at lines 5016-5021). The acceptance content comes from the receipts those stages cite. For the bridge, observability/restart-receipt.json lines 165-179 require a daemon start, discovered tools, and an execute call returning the expected output. For the inspector, token-native-retained-functional-20260920.json lines 84-106 require a direct upstream stdio tool call with exit 0 and the expected computed result (\"42 computed\"). The audit does not record tools/list or mcporter recovery as accepted stages, so neither is required of challengers. The saturation audit says Inspector 2.7.0 was not recertified on the current host (line 4838), and the Inspector receipt was not rerun (receipt line 15). The incumbents mcporter 0.13.13 and Inspector 2.7.0 must therefore be rerun under the same metric in the same comparison. Their retained receipts alone do not count. `python3 scripts/validate_catalogs.py` must still pass; observability/restart-receipt.json line 200 records it as the catalog validator. A retained failure of either incumbent on this rerun would also overturn the verdict.",
- "packet_sha256": "86d612a4f050637754ae607b95056f355d732e8f6c2026402cc755d932c22062",
+ "overturn_when": "The verdict changes if a current-host re-run of the retained operations fails. The retained operations are the ones listed in blueprints/token-native-focus/saturation-audit.json:\n- mcporter use-stage evidence: observability/restart-receipt.json, the bridge recovery (lines 5016-5021).\n- mcporter retained_operation_ids: fresh-static-graph, fresh-static-callees, fresh-memory-status and fresh-socraticode-status (lines 4986-4991).\n- Inspector: fresh-inspector-context-call (line 4872).\n- The mcporter call commands recorded in evidence/receipts/current-session-observation-20260920.json lines 71-85 and 336-361.\n\nThat file lists operation IDs only. It defines no commands or checks for the four mcporter IDs. The re-run must therefore be rebuilt from the receipts' recorded commands and checks, not from the fixture alone.\n\nThree further checks would also change the verdict:\n- A replacement bridge or inspector passes the same operations with equal or better checks.\n- mcporter v0.14.0 fails the bridge call or the daemon-recovery checks that 0.13.13 passed.\n- A concrete MCP surface gap that neither tool can serve is closed by a reviewed registry entry that passes the same bridge and inspection acceptance.",
+ "packet_sha256": "e3bd8deb88d369dfb96a2d04774cfc5cebf44697ac4e315b9a11e98d1a2e884f",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/foundation__mcp-surfaces.json (full)",
-  "catalogs/foundation/decisions.json (lines 1835-1914 native-mcp-adapters from the earlier round; lines 2868-2887 mcp-surface-policy re-read this round)",
-  "recipes/README.md (lines 86-167 re-read; earlier grep for mcp/MCP)",
-  "observability/restart-receipt.json (lines 160-204)",
-  "evidence/receipts/token-native-retained-functional-20260920.json (lines 10-109)",
-  "blueprints/token-native-focus/saturation-audit.json (lines 4825-4914 mcp-inspector; lines 4990-5049 mcporter lifecycle stages)",
-  "<host-path>/examples (glob *mcp*: existence only, contents not opened)",
-  "<host-path>/SKILL.md (skill body preloaded in context via the skill invocation; not separately re-read)"
+  "<host-path>/SKILL.md (skill body preloaded in context via command; not separately opened)",
+  "catalogs/foundation/decisions.json (lines 1835-1909, 2858-2927; prior round)",
+  "manifests/evidence.json (lines 700-749, 1680-1739; prior round)",
+  "recipes/README.md (grep for MCP/registry lines incl. 27, 97-98, 146-217, 489-510; prior round)",
+  "blueprints/token-native-focus/saturation-audit.json (lines 4828-5067, re-read this round)",
+  "observability/restart-receipt.json (lines 1-190, re-read this round)",
+  "evidence/receipts/token-native-retained-functional-20260920.json (lines 9-18 via grep, 80-104; prior round)",
+  "evidence/receipts/current-session-observation-20260920.json (full, read this round)",
+  "tests/test_adoption_bootstrap_macos.py (grep only: lines 461, 467 are a pin-drop refusal test, not a use check; not used as evidence)"
  ],
- "why_selected": "The two adopted candidates do different jobs, so both win: mcporter (c3) is the bridge and MCP Inspector (c1) is the direct stdio inspector and caller. The observations come from retained native-execution receipts, not from anything run in this review. mcporter: observability/restart-receipt.json lines 165-179 (bridge_recovery, version 0.13.13) record the upstream start printing \"Single-user daemon started.\", 11 tools discovered, and the execute call printing \"bridge-recovered\". automatic_recovery was false, and line 181 keeps the failed first attempts (stale daemon metadata refused, and a deliberate start that timed out after 45 seconds). MCP Inspector: evidence/receipts/token-native-retained-functional-20260920.json lines 84-106 (fresh-inspector-context-call, kind upstream_cli) record the Inspector invoking native Context Mode with exit_code 0, and the checks \"expected process exit\" and \"42 computed\" both passed. That receipt is a later write-up of September 20 evidence and was not rerun (line 15). It covers arithmetic only (line 18) and records no tools/list operation. blueprints/token-native-focus/saturation-audit.json marks the \"use\" stage accepted_within_scope for both: mcp-inspector at lines 4898-4903 and mcporter at lines 5016-5021. The same audit leaves mcporter's persistence, restart, cleanup and recovery stages not_established (lines 5023-5042). catalogs/foundation/decisions.json line 1851 has native-mcp-adapters accepted_within_scope. recipes/README.md lines 91-92 and 153-160 only document the Inspector tools/list command and say to follow it with a selected tool call. That is a documented procedure, not an observed run. The configure-and-policy part of the requirement rests on source review only: decisions.json lines 2872-2882 put mcp-surface-policy at review_status source_review with \"no new execution was run\". Configuration itself is documented through the native client paths, meaning the example merges or `codex mcp add` / `claude mcp add` (recipes/README.md lines 140-151), not through c1 or c3. Both winners stay conditional, as the catalog records.",
+ "why_selected": "mcporter (c3) and MCP Inspector (c1) cover different parts of the requirement. mcporter bridges MCP servers. The Inspector inspects servers and calls their tools. The two do not overlap, so both are selected. Everything below is my own source review of retained receipts. I re-ran nothing.\n\nc3 (mcporter): observability/restart-receipt.json is dated 2026-09-19. Its checked_at is 2026-09-19T15:41:40.084709+00:00 at line 5, and it is kind native_cli_e2e at line 4. The bridge_recovery block at lines 165-179 records mcporter 0.13.13 printing \"Single-user daemon started.\", discovered_tools 11, native_execute_stdout \"bridge-recovered\" and automatic_recovery false. The receipt keeps its failures at line 181: the initial bridge call refused stale daemon metadata, and a deliberate start timed out after 45 seconds.\n\nevidence/receipts/current-session-observation-20260920.json (kind native_cli_e2e) adds two bridge calls on 2026-09-20:\n- Lines 71-85: `mcporter --config $MCPORTER_CONFIG call context-mode.ctx_execute_file ...` ran with state executed and exit_code 0 at 2026-09-20T14:19:03.815Z. The same project-file read through the directly loaded MCP connection had failed with failed_project_root_scope (lines 56-69). That shows the bridge reaching a server surface the loaded client could not.\n- Lines 336-361: `mcporter call --stdio jcodemunch-mcp ...` also returned exit_code 0.\n\nc1 (MCP Inspector): evidence/receipts/token-native-retained-functional-20260920.json is recorded 2026-09-20T04:11:34.336Z and described as a retrospective publication of retained September 20 evidence. Its lines 84-104 (fresh-inspector-context-call) record an upstream_cli run with exit_code 0 and passed true. The checks \"expected process exit\" and \"42 computed\" both passed.\n\nLinkage: catalogs/foundation/decisions.json lines 1841-1889 (native-mcp-adapters) ties both components to this layer. blueprints/token-native-focus/saturation-audit.json gives use-stage status accepted_within_scope for the Inspector (lines 4898-4904) and for mcporter (lines 5016-5021). mcporter's use stage cites only restart-receipt.json.\n\nConfiguration without adopting an unexamined registry entry rests on source review only. That covers the recipes/README.md commands and the mcp-surface-policy decision (decisions.json lines 2864-2908). The policy treats registries as discovery input only, and its evidence_scope says \"no new execution was run to freeze this taxonomy layer\". saturation-audit.json lines 4838 and 4943 give current_host_recertified_by_this_audit false for both components.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
   "observability/restart-receipt.json",
+  "evidence/receipts/current-session-observation-20260920.json",
   "evidence/receipts/token-native-retained-functional-20260920.json",
+  "catalogs/foundation/decisions.json",
+  "manifests/evidence.json",
   "blueprints/token-native-focus/saturation-audit.json",
-  "catalogs/foundation/decisions.json"
+  "recipes/README.md"
  ],
  "winner_keys": [
   "c3",

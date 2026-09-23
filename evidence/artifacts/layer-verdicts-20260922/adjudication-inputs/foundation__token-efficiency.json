@@ -1,0 +1,492 @@
+{
+ "catalog": "foundation",
+ "layer_id": "token-efficiency",
+ "repository_root": "the repository root given in the task",
+ "return_A": {
+  "winner_keys": [
+   "c4",
+   "c5",
+   "c1"
+  ],
+  "winner_names": [
+   [
+    "RTK",
+    "rtk"
+   ],
+   [
+    "Headroom",
+    "headroom"
+   ],
+   [
+    "ccusage",
+    "ccusage"
+   ]
+  ],
+  "why_selected": "The requirement has two parts: supply useful context with recoverable originals, and measure artifact reductions separately from provider usage. Three candidates cover it. (1) RTK (c4) formats supported command output. Evidence: docs/token-practice.md lines 105-107 record one retained RTK Git log artifact pair, measured with o200k_base, of 537 -> 178 tokens at a fixed six-commit input. catalogs/foundation/decisions.json lines 1472-1502 (clean-token-tool-ci) records that local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks on local fixtures. docs/full-stack-convergence.md lines 132-137 says that run was a hosted clean install of RTK, QMD, Repomix and TOON on local fixtures. docs/token-native-saturation.md line 109 lists RTK as core with an accepted use stage only. docs/token-practice.md lines 191-193 says native Claude's Bash rewrite is configured. (2) Headroom (c5) is the only adopted candidate whose decision is specifically compression with exact-source recovery. catalogs/foundation/decisions.json lines 1195-1223 records that owned synthetic MCP compression/retrieval and isolated install/restart/uninstall passed. docs/token-native-saturation.md lines 3-8 says Headroom restored identical original content after restart, and line 82 lists accepted install, use, persistence, restart, cleanup and recovery stages with 11 retained pairs. docs/token-practice.md lines 215-217 and 233-234 retain both reductions and growth cases: 2,732 vs 5,105 tokens, or 18,777 when the full original is also fetched; 19,714 vs 36,625; and 191 vs 26,529 on a guarded log fixture. (3) ccusage (c1) covers the provider-usage half. catalogs/foundation/decisions.json lines 1309-1336 (native-usage-reading) records offline native usage parsing and scoped current-session observations with retained outputs, and keeps provider consumption, estimated savings, billing and cache subsets separate. docs/token-practice.md lines 291-296 confirms offline ccusage parsing within its stated gate. docs/full-stack-convergence.md lines 124-128 records the 20.0.24 upgrade with captured upstream test subsets. How the evidence was observed: RTK by native CLI execution on fixtures plus one artifact pair; Headroom by synthetic owned fixtures with isolated lifecycle; ccusage by offline local parsing. None of it is a matched provider-savings measurement. This is my own source review. The packet withheld the provider selections. When I opened decisions.json, every one of these decisions reads \"selection\": \"conditional\", and I did not use that as authority.",
+  "winner_evidence_class": "synthetic",
+  "winner_evidence_refs": [
+   "docs/token-practice.md",
+   "catalogs/foundation/decisions.json",
+   "docs/token-native-saturation.md",
+   "docs/full-stack-convergence.md"
+  ],
+  "alternatives": [
+   {
+    "disposition": "measured_tradeoff",
+    "evidence_class": "measured_comparison",
+    "evidence_refs": [
+     "docs/token-practice.md",
+     "docs/token-native-saturation.md",
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c3",
+    "name": "Context Mode",
+    "repository": "https://github.com/mksglu/context-mode",
+    "why_not_default": "The paired native evidence points in both directions. docs/token-practice.md lines 83-92 records one fixed-order pair per client: Codex went 135,217 -> 119,998 (11.26% lower) and Claude went 292,561 -> 368,121 (25.83% higher). Cache warmth and plugin availability were uncontrolled, so the pairs do not isolate a causal effect. docs/token-practice.md lines 317-321 records a later Claude selective pilot that made zero Context Mode calls and was 2.42% higher in aggregate; that is not a Context Mode treatment. Its ctx_stats counters mix session and retained-history scopes, which makes them hard to measure separately (lines 155 and 168-179). It is core and passed a use/restart task (docs/token-native-saturation.md lines 18 and 73), so it stays usable when an explicit filter lane is cheaper than a direct read, but it has not been shown to reduce Claude usage."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "local_integration",
+    "evidence_refs": [
+     "docs/token-practice.md",
+     "catalogs/foundation/decisions.json",
+     "catalogs/us-equities/foundation-memory.json",
+     "docs/full-stack-convergence.md"
+    ],
+    "key": "c7",
+    "name": "Repomix",
+    "repository": "https://github.com/yamadashy/repomix",
+    "why_not_default": "The measured reduction comes from lossy structure. docs/token-practice.md line 112 records its outline at 3,697 -> 663 tokens against a complete pack. catalogs/foundation/decisions.json lines 1281-1284 says structural compression omits implementation details and that originals are still required for edits and correctness. It is suited to bounded selected-file handoffs, not general recoverable context supply. Its native acceptance is the use stage only (docs/token-native-saturation.md line 107) plus the CI fixture run. Version identity is also inconsistent: catalogs/us-equities/foundation-memory.json lines 302-329 records v1.18.0 installed, while the packet pin is 1.18.1. docs/full-stack-convergence.md lines 124-128 records the 1.18.1 upgrade separately."
+   },
+   {
+    "disposition": "measured_tradeoff",
+    "evidence_class": "measured_comparison",
+    "evidence_refs": [
+     "docs/token-practice.md",
+     "docs/full-stack-convergence.md"
+    ],
+    "key": "c6",
+    "name": "TOON",
+    "repository": "https://github.com/toon-format/toon",
+    "why_not_default": "Not adopted. One component artifact shrank 1,664 -> 1,307 tokens (docs/token-practice.md line 108). The exact o200k_base full-catalog comparison went the other way: 59,792 compact-JSON tokens became 66,815 TOON tokens, 7,023 more, while the native tokenx heuristic claimed a reduction (lines 131-138). The guard kept compact JSON. It is a per-artifact representation choice, not a better default."
+   },
+   {
+    "disposition": "overlap",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "key": "c2",
+    "name": "Claude Token Efficient",
+    "repository": "https://github.com/drona23/claude-token-efficient",
+    "why_not_default": "Not adopted and reviewed at source level only. catalogs/us-equities/star-audit.json lines 4506-4524 records review_depth readme_license_overview with decision overlaps_established. It is a short instruction file for response verbosity. It adds recurring instruction tokens and has only upstream benchmarks. No installation or model inference was performed. It does not address recoverable originals or separate usage measurement."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "A repeated, counterbalanced native comparison on a frozen task, with the complete provider usage of every attempt counted, would change this verdict under any of three outcomes. First, Context Mode or Repomix matches correctness while reducing Claude provider usage relative to RTK plus a direct read. Second, the Headroom guard loses a required fact or fails exact original recovery on a retained pair in blueprints/token-native-focus/saturation-audit.json. Third, `python3 -m unittest tests/test_native_token_ci.py` or the RTK fidelity/recovery fixture checks it guards stop passing.",
+  "open_gaps": [
+   "No matched baseline exists for the current native tasks. Exact whole-PC or lifetime provider savings for any winner are unmeasured (docs/full-stack-convergence.md lines 37 and 147-150).",
+   "Headroom's recovery evidence comes from owned synthetic fixtures. Automatic interception of agent traffic is not configured, and its native ledger returned zero calls, so its native-use benefit in real sessions is not established.",
+   "The RTK foundation gateway/lite previews failed required semantic checks. CLI acceptance does not repair them (catalogs/foundation/decisions.json line 1166).",
+   "ccusage has an accepted use stage only. Missing attempt and child coverage blocks any whole-workflow efficiency claim (catalogs/foundation/decisions.json line 1336).",
+   "The Context Mode paired results are one fixed-order pair per client with uncontrolled cache state. A causal effect in either direction is not established.",
+   "The Headroom pin 0.37.0 is behind upstream v0.38.0, and 0.38.0 has not been qualified.",
+   "Artifact reduction rows must not be summed. Several share sources, and the ten artifact pairs are not provider usage."
+  ]
+ },
+ "return_B": {
+  "winner_keys": [
+   "c3",
+   "c5",
+   "c1"
+  ],
+  "winner_names": [
+   [
+    "Context Mode",
+    "context-mode"
+   ],
+   [
+    "Headroom",
+    "headroom"
+   ],
+   [
+    "ccusage",
+    "ccusage"
+   ]
+  ],
+  "why_selected": "Select c3 for explicit context processing, c5 for guarded recoverable compression, and c1 for separate usage accounting. In evidence/artifacts/full-stack-convergence-20260921/native-client-results.json, retained native execution returned Context Mode file extraction identifying the actual absence of application checks. In evidence/receipts/native-token-clean-prefix-20260920.json, native Headroom calls recovered identical original content before and after restart; the complete compression response measured 2,732 tokens against a 5,105-token compact original. The project-local guard's synthetic fixtures in evidence/receipts/token-native-retained-functional-20260920.json retained the original when ANSI-byte fidelity failed. In evidence/receipts/token-practice-gap-followup-20260920.json, native ccusage offline parsing returned combined usage and its overlapping Codex subset with explicit non-addition rules. These complementary capabilities satisfy the requirement conditionally; they do not establish universal compression benefits or causal provider savings. The set's conservative evidence class reflects the synthetic qualification of guarded fidelity.",
+  "winner_evidence_class": "synthetic",
+  "winner_evidence_refs": [
+   "evidence/artifacts/full-stack-convergence-20260921/native-client-results.json",
+   "evidence/receipts/native-token-clean-prefix-20260920.json",
+   "evidence/receipts/token-native-retained-functional-20260920.json",
+   "evidence/receipts/token-practice-gap-followup-20260920.json",
+   "docs/token-practice.md",
+   "catalogs/foundation/decisions.json"
+  ],
+  "alternatives": [
+   {
+    "disposition": "measured_tradeoff",
+    "evidence_class": "measured_comparison",
+    "evidence_refs": [
+     "docs/token-practice.md",
+     "catalogs/foundation/decisions.json",
+     "docs/full-stack-convergence.md"
+    ],
+    "key": "c4",
+    "name": "RTK",
+    "repository": "https://github.com/rtk-ai/rtk",
+    "why_not_default": "Useful for selected command output: the retained Git-log artifact shrank from 537 to 178 tokens and native client calls succeeded. However, gateway RTK/lite previews failed required semantic checks. Its shared history estimates do not establish provider savings or general fidelity."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "measured_comparison",
+    "evidence_refs": [
+     "catalogs/us-equities/foundation-memory.json",
+     "docs/full-stack-convergence.md",
+     "docs/token-practice.md"
+    ],
+    "key": "c7",
+    "name": "Repomix",
+    "repository": "https://github.com/yamadashy/repomix",
+    "why_not_default": "Selected-file packing passed native checks, and a retained outline reduced 3,697 tokens to 663. That outline omits implementation details; correctness still requires original source. Prefer it for bounded handoffs rather than general context processing and usage accounting."
+   },
+   {
+    "disposition": "measured_tradeoff",
+    "evidence_class": "measured_comparison",
+    "evidence_refs": [
+     "docs/token-practice.md",
+     "docs/full-stack-convergence.md"
+    ],
+    "key": "c6",
+    "name": "TOON",
+    "repository": "https://github.com/toon-format/toon",
+    "why_not_default": "Strict decoding passed and one components artifact became smaller, but exact full-catalog counting increased from 59,792 compact-JSON tokens to 66,815 TOON tokens. Selection must follow artifact-specific counts; the native heuristic predicted the opposite result."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "key": "c2",
+    "name": "Claude Token Efficient",
+    "repository": "https://github.com/drona23/claude-token-efficient",
+    "why_not_default": "The retained review inspected README/license material for concise-response instructions. It performed no native acceptance or model comparison and establishes neither recoverable context processing nor scoped provider accounting."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Reopen the selection after an executed comparison on fixtures/records.json and fixtures/example.sh shows another arm preserves every required fact and exact original recovery while reducing complete provider consumption or latency. Include full-source requests and rejected transformations; fixture-only token reductions cannot establish general provider savings.",
+  "open_gaps": [
+   "No inspected comparison establishes complete causal provider savings, including coordination, failed attempts, children and recovery.",
+   "The older paired trials had uncontrolled cache conditions; the later selective-policy pilot made zero Context Mode calls and therefore did not measure its causal effect.",
+   "Headroom compression plus full recovery cost 18,777 retained response tokens versus a 5,105-token compact original. Workloads requiring complete originals should bypass that transformation.",
+   "Synthetic guard fixtures and isolated native recovery do not establish semantic completeness for arbitrary production output or automatic interception of native client traffic.",
+   "Native counters, exact artifact counts, provider consumption and billing remain separate quantities; their overlapping totals cannot be added."
+  ]
+ },
+ "packet": {
+  "title": "Context and usage efficiency",
+  "requirement": "Supply useful task context with recoverable originals and measure artifact reductions separately from provider usage.",
+  "limitations": [
+   "The current native tasks have no matched baseline; counters, bytes avoided, artifact token counts and provider usage must not be summed.",
+   "TOON expands the full catalog relative to compact JSON; guarded compression must return originals on rejection. Exact whole-PC lifetime savings are unmeasured."
+  ],
+  "candidates": [
+   {
+    "adopted": true,
+    "component_id": "ccusage",
+    "decisions": [
+     {
+      "capability": "Read native provider usage without mixing counter scopes",
+      "evidence_scope": "Offline native usage parsing and scoped current-session observations have retained outputs.",
+      "id": "native-usage-reading",
+      "limitations": [
+       "Provider consumption, estimated savings, billing and cache subsets are distinct.",
+       "Repeated cumulative snapshots cannot be summed as additional usage."
+      ],
+      "next_gap": "Resolve missing attempt/child coverage before any whole-workflow efficiency claim."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "docs/full-stack-convergence.md",
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c1",
+    "name": "ccusage",
+    "pin": "20.0.24",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/native-upgrades-20260921.md",
+    "repository": "https://github.com/ccusage/ccusage",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v20.0.24",
+     "license": "NOASSERTION",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-21",
+     "renamed_to": null,
+     "stars": 18686
+    }
+   },
+   {
+    "adopted": false,
+    "component_id": null,
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "key": "c2",
+    "name": "Claude Token Efficient",
+    "pin": null,
+    "pin_behind_upstream": null,
+    "recipe_ref": "catalogs/us-equities/star-audit.json",
+    "repository": "https://github.com/drona23/claude-token-efficient",
+    "review_status": null,
+    "upstream": null
+   },
+   {
+    "adopted": true,
+    "component_id": "context-mode",
+    "decisions": [
+     {
+      "capability": "Resolve persistent native command and MCP environments",
+      "evidence_scope": "Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
+      "id": "native-process-defaults",
+      "limitations": [
+       "Configuration presence does not prove an already-running task hot-reloaded it.",
+       "The Linux/WSL and Desktop process/configuration boundaries remain distinct."
+      ],
+      "next_gap": "Collect the specific new-host or changed-session activation evidence; do not copy account stores."
+     },
+     {
+      "capability": "Process large tool output while preserving useful source facts",
+      "evidence_scope": "Selected explicit native calls and exact artifact checks passed; paired trials retain both a Codex reduction and a Claude increase. The later six-attempt selective-policy pilot passed its fixture checks but made zero Context Mode calls.",
+      "id": "selected-context-processing",
+      "limitations": [
+       "Cache conditions were uncontrolled and enclosing workflow usage was incomplete.",
+       "The foundation gateway RTK/lite previews failed required semantic checks; general CLI acceptance does not repair those failures.",
+       "The selective-policy pilot's +2.42% aggregate token difference is not a causal Context Mode measurement; its rejected first attempt remains retained."
+      ],
+      "next_gap": "Measure only a concrete changed workload, with correctness and complete attempt accounting."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "docs/token-native-saturation.md",
+     "docs/full-stack-convergence.md"
+    ],
+    "key": "c3",
+    "name": "Context Mode",
+    "pin": "1.0.169",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/mksglu/context-mode",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v1.0.169",
+     "license": "NOASSERTION",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-06-29",
+     "renamed_to": null,
+     "stars": 23936
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "rtk",
+    "decisions": [
+     {
+      "capability": "Reproduce native context-tool commands in a clean CI environment",
+      "evidence_scope": "Local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks; retained artifact/source hashes matched.",
+      "id": "clean-token-tool-ci",
+      "limitations": [
+       "CI acceptance covers these four tool fixtures, not live providers, GPU execution or a full new-PC stack."
+      ],
+      "next_gap": "Extend a specific missing native-tool CI behavior only with its own useful fixture."
+     },
+     {
+      "capability": "Resolve persistent native command and MCP environments",
+      "evidence_scope": "Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
+      "id": "native-process-defaults",
+      "limitations": [
+       "Configuration presence does not prove an already-running task hot-reloaded it.",
+       "The Linux/WSL and Desktop process/configuration boundaries remain distinct."
+      ],
+      "next_gap": "Collect the specific new-host or changed-session activation evidence; do not copy account stores."
+     },
+     {
+      "capability": "Process large tool output while preserving useful source facts",
+      "evidence_scope": "Selected explicit native calls and exact artifact checks passed; paired trials retain both a Codex reduction and a Claude increase. The later six-attempt selective-policy pilot passed its fixture checks but made zero Context Mode calls.",
+      "id": "selected-context-processing",
+      "limitations": [
+       "Cache conditions were uncontrolled and enclosing workflow usage was incomplete.",
+       "The foundation gateway RTK/lite previews failed required semantic checks; general CLI acceptance does not repair those failures.",
+       "The selective-policy pilot's +2.42% aggregate token difference is not a causal Context Mode measurement; its rejected first attempt remains retained."
+      ],
+      "next_gap": "Measure only a concrete changed workload, with correctness and complete attempt accounting."
+     }
+    ],
+    "evidence_kind": "mixed",
+    "evidence_refs": [
+     "docs/full-stack-convergence.md",
+     "docs/token-native-saturation.md"
+    ],
+    "key": "c4",
+    "name": "RTK",
+    "pin": "0.49.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/rtk-ai/rtk",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v0.49.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-21",
+     "released_at": "2026-09-11",
+     "renamed_to": null,
+     "stars": 81419
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "headroom",
+    "decisions": [
+     {
+      "capability": "Compress selected artifacts with exact-source recovery",
+      "evidence_scope": "Owned synthetic MCP compression/retrieval and isolated install/restart/uninstall passed; retained guard comparisons preserve counterexamples.",
+      "id": "guarded-recoverable-compression",
+      "limitations": [
+       "Automatic interception of all agent traffic is not configured.",
+       "Capped native counters and exact artifact comparisons do not establish lifetime causal provider savings."
+      ],
+      "next_gap": "Reject a candidate representation that loses required facts or costs more than the adequate baseline."
+     }
+    ],
+    "evidence_kind": "mixed",
+    "evidence_refs": [
+     "docs/token-native-saturation.md",
+     "docs/full-stack-convergence.md"
+    ],
+    "key": "c5",
+    "name": "Headroom",
+    "pin": "0.37.0",
+    "pin_behind_upstream": true,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/headroomlabs-ai/headroom",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v0.38.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-21",
+     "renamed_to": null,
+     "stars": 73473
+    }
+   },
+   {
+    "adopted": false,
+    "component_id": "toon",
+    "decisions": [
+     {
+      "capability": "Reproduce native context-tool commands in a clean CI environment",
+      "evidence_scope": "Local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks; retained artifact/source hashes matched.",
+      "id": "clean-token-tool-ci",
+      "limitations": [
+       "CI acceptance covers these four tool fixtures, not live providers, GPU execution or a full new-PC stack."
+      ],
+      "next_gap": "Extend a specific missing native-tool CI behavior only with its own useful fixture."
+     },
+     {
+      "capability": "Pack selected files or encode structured data only when useful",
+      "evidence_scope": "Selected-file packing and TOON roundtrip passed; exact full-catalog tokens increased under TOON and compact JSON was retained.",
+      "id": "selected-file-representations",
+      "limitations": [
+       "Structural compression omits implementation details; originals remain required for edits and correctness.",
+       "A smaller heuristic estimate is not an exact token reduction."
+      ],
+      "next_gap": "Recount a changed artifact only when representation choice matters."
+     }
+    ],
+    "evidence_kind": "measured_comparison",
+    "evidence_refs": [
+     "docs/full-stack-convergence.md",
+     "docs/token-practice.md"
+    ],
+    "key": "c6",
+    "name": "TOON",
+    "pin": "4.1.1",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/toon-format/toon",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v4.1.1",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-09-03",
+     "released_at": "2026-08-05",
+     "renamed_to": null,
+     "stars": 25409
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "repomix",
+    "decisions": [
+     {
+      "capability": "Reproduce native context-tool commands in a clean CI environment",
+      "evidence_scope": "Local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks; retained artifact/source hashes matched.",
+      "id": "clean-token-tool-ci",
+      "limitations": [
+       "CI acceptance covers these four tool fixtures, not live providers, GPU execution or a full new-PC stack."
+      ],
+      "next_gap": "Extend a specific missing native-tool CI behavior only with its own useful fixture."
+     },
+     {
+      "capability": "Pack selected files or encode structured data only when useful",
+      "evidence_scope": "Selected-file packing and TOON roundtrip passed; exact full-catalog tokens increased under TOON and compact JSON was retained.",
+      "id": "selected-file-representations",
+      "limitations": [
+       "Structural compression omits implementation details; originals remain required for edits and correctness.",
+       "A smaller heuristic estimate is not an exact token reduction."
+      ],
+      "next_gap": "Recount a changed artifact only when representation choice matters."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "docs/full-stack-convergence.md",
+     "catalogs/us-equities/foundation-memory.json"
+    ],
+    "key": "c7",
+    "name": "Repomix",
+    "pin": "1.18.1",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/native-upgrades-20260921.md",
+    "repository": "https://github.com/yamadashy/repomix",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v1.18.1",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-09-21",
+     "released_at": "2026-09-21",
+     "renamed_to": null,
+     "stars": 28461
+    }
+   }
+  ]
+ }
+}

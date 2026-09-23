@@ -1,0 +1,122 @@
+{
+ "alternatives": [
+  {
+   "disposition": "measured_tradeoff",
+   "evidence_class": "measured_comparison",
+   "evidence_refs": [
+    "docs/token-practice.md",
+    "catalogs/foundation/decisions.json",
+    "docs/full-stack-convergence.md"
+   ],
+   "key": "c4",
+   "name": "RTK",
+   "repository": "https://github.com/rtk-ai/rtk",
+   "why_not_default": "Useful for selected command output: the retained Git-log artifact shrank from 537 to 178 tokens and native client calls succeeded. However, gateway RTK/lite previews failed required semantic checks. Its shared history estimates do not establish provider savings or general fidelity."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "measured_comparison",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json",
+    "docs/full-stack-convergence.md",
+    "docs/token-practice.md"
+   ],
+   "key": "c7",
+   "name": "Repomix",
+   "repository": "https://github.com/yamadashy/repomix",
+   "why_not_default": "Selected-file packing passed native checks, and a retained outline reduced 3,697 tokens to 663. That outline omits implementation details; correctness still requires original source. Prefer it for bounded handoffs rather than general context processing and usage accounting."
+  },
+  {
+   "disposition": "measured_tradeoff",
+   "evidence_class": "measured_comparison",
+   "evidence_refs": [
+    "docs/token-practice.md",
+    "docs/full-stack-convergence.md"
+   ],
+   "key": "c6",
+   "name": "TOON",
+   "repository": "https://github.com/toon-format/toon",
+   "why_not_default": "Strict decoding passed and one components artifact became smaller, but exact full-catalog counting increased from 59,792 compact-JSON tokens to 66,815 TOON tokens. Selection must follow artifact-specific counts; the native heuristic predicted the opposite result."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c2",
+   "name": "Claude Token Efficient",
+   "repository": "https://github.com/drona23/claude-token-efficient",
+   "why_not_default": "The retained review inspected README/license material for concise-response instructions. It performed no native acceptance or model comparison and establishes neither recoverable context processing nor scoped provider accounting."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "token-efficiency",
+ "limits": [
+  "This verdict reviews retained evidence; no new native model trial, installation, recovery run or token recount was executed.",
+  "Private original streams and artifact pairs were unavailable for independent reproduction; published hashes and sanitized receipts do not replace those bytes.",
+  "Upstream freshness was taken from the packet, not independently verified. Headroom 0.38.0 behavior is unqualified by the inspected 0.37.0 evidence."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "No inspected comparison establishes complete causal provider savings, including coordination, failed attempts, children and recovery.",
+  "The older paired trials had uncontrolled cache conditions; the later selective-policy pilot made zero Context Mode calls and therefore did not measure its causal effect.",
+  "Headroom compression plus full recovery cost 18,777 retained response tokens versus a 5,105-token compact original. Workloads requiring complete originals should bypass that transformation.",
+  "Synthetic guard fixtures and isolated native recovery do not establish semantic completeness for arbitrary production output or automatic interception of native client traffic.",
+  "Native counters, exact artifact counts, provider consumption and billing remain separate quantities; their overlapping totals cannot be added."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Direct original or focused native read, with compact JSON where adequate.",
+   "Explicit Context Mode extraction, with original-source access and separate native provider accounting.",
+   "Guarded Headroom compression, including rejection fallback and demanded original recovery.",
+   "Task-appropriate RTK, Repomix or TOON representation, using the same required information and accounting boundary."
+  ],
+  "fixture_paths": [
+   "fixtures/records.json",
+   "fixtures/example.sh"
+  ],
+  "metric": "Require exact records and types, correct script behavior, and byte-identical original recovery. Compare complete serialized artifact tokens separately from repeated native task usage and latency; include setup, retries, failures and recovery, and control or report cache conditions."
+ },
+ "overturn_when": "Reopen the selection after an executed comparison on fixtures/records.json and fixtures/example.sh shows another arm preserves every required fact and exact original recovery while reducing complete provider consumption or latency. Include full-source requests and rejected transformations; fixture-only token reductions cannot establish general provider savings.",
+ "packet_sha256": "0e2850eebbe21f18b6e75f09a78d504720930e0e1f1c78359059c1196816c2d7",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__token-efficiency.json",
+  "<host-path>/SKILL.md",
+  "docs/full-stack-convergence.md",
+  "docs/token-native-saturation.md",
+  "catalogs/foundation/decisions.json",
+  "catalogs/us-equities/foundation-memory.json",
+  "docs/token-practice.md",
+  "evidence/receipts/native-token-clean-prefix-20260920.json",
+  "evidence/receipts/token-native-retained-functional-20260920.json",
+  "evidence/receipts/token-practice-gap-followup-20260920.json",
+  "evidence/artifacts/full-stack-convergence-20260921/native-client-results.json",
+  "tests/test_native_token_ci.py",
+  "fixtures/records.json",
+  "fixtures/example.sh",
+  "catalogs/us-equities/star-audit.json",
+  "evidence/receipts/claude-selective-context-pilot-20260921.json"
+ ],
+ "why_selected": "Select c3 for explicit context processing, c5 for guarded recoverable compression, and c1 for separate usage accounting. In evidence/artifacts/full-stack-convergence-20260921/native-client-results.json, retained native execution returned Context Mode file extraction identifying the actual absence of application checks. In evidence/receipts/native-token-clean-prefix-20260920.json, native Headroom calls recovered identical original content before and after restart; the complete compression response measured 2,732 tokens against a 5,105-token compact original. The project-local guard's synthetic fixtures in evidence/receipts/token-native-retained-functional-20260920.json retained the original when ANSI-byte fidelity failed. In evidence/receipts/token-practice-gap-followup-20260920.json, native ccusage offline parsing returned combined usage and its overlapping Codex subset with explicit non-addition rules. These complementary capabilities satisfy the requirement conditionally; they do not establish universal compression benefits or causal provider savings. The set's conservative evidence class reflects the synthetic qualification of guarded fidelity.",
+ "winner_evidence_class": "synthetic",
+ "winner_evidence_refs": [
+  "evidence/artifacts/full-stack-convergence-20260921/native-client-results.json",
+  "evidence/receipts/native-token-clean-prefix-20260920.json",
+  "evidence/receipts/token-native-retained-functional-20260920.json",
+  "evidence/receipts/token-practice-gap-followup-20260920.json",
+  "docs/token-practice.md",
+  "catalogs/foundation/decisions.json"
+ ],
+ "winner_keys": [
+  "c3",
+  "c5",
+  "c1"
+ ]
+}
