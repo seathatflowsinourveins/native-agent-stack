@@ -3149,8 +3149,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "a4d772f2572c0725815f56052eb808e52d1423ea918db1754a715d6d840ac797",
-      "bytes": 12910
+      "sha256": "795403e602aa2f0638790629e5d10b10377e4a004bb3afe3be2f7c94de2fe4be",
+      "bytes": 16600
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3244,13 +3244,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "1d7cfdc6cdc6157c3727c0f386e8acaad7046b099d0dbccf8827e76203c4c4ca",
-      "bytes": 5929
+      "sha256": "c26ba0ed11ba0ebcade4ba0f86183244b9e04375c2e1a6820dd39ca6eaf3c620",
+      "bytes": 6206
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "ba2c02333308f6c142f61de986e515307988ef670cb0b2928e2acbc771a3db14",
-      "bytes": 39768
+      "sha256": "920ba6279fee6ac61a59385e52b9c95df90d952c891267c1b02a281ace3ad3d8",
+      "bytes": 40322
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -14825,8 +14825,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "db7670bd987511cd3ae52747a5886c99e16858fba064fd716add1e643d7e0028",
-      "bytes": 22810
+      "sha256": "0ac6c9f42ead197e4e576dfba4170b591a46bc870e9270083b181dd5b5fe9013",
+      "bytes": 22820
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",

@@ -261,7 +261,9 @@ install 2.1.280`, exactly mirroring `adoption/pins-linux-x86_64.json`'s own
 existing claude-code step. There is no more nested platform package, no
 `install.cjs` postinstall to defer, and no `postinstall_binary_check`; the
 native binary manages its own version directory and launcher and keeps
-auto-updating on the latest channel afterward.
+auto-updating on the latest channel afterward. Both claude-code pins
+(this page's and `adoption/pins-linux-x86_64.json`'s) changed after `v2026.09.23`;
+at that tag they are npm pins.
 
 `llama-server` is a profile `required_command`, so llama.cpp is pinned rather
 than left to `brew install llama.cpp`. The macOS asset holds every executable

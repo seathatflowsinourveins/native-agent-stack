@@ -214,6 +214,10 @@ GitHub-hosted macOS runner; see
    template does not mention is kept), writes atomically and
    preserves the original file's mode bits. Never touches `~/.claude.json`
    or any credential store.
+   The profile installer, the apply tool and their assets
+   (`adoption/hooks/claude/`, `adoption/agents/claude/`,
+   `adoption/mcp/claude-user.json`) were added after `v2026.09.23`; at that
+   tag, merge the rendered settings by hand.
 
 5. **Services.** Start only the selected profile's services using the native
    process-lifecycle guide in [`adoption/lifecycle.md`](lifecycle.md#native-client-integration-and-process-lifecycle):

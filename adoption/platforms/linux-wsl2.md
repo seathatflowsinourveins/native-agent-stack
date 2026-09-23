@@ -78,6 +78,10 @@ itself evidence the WSL UVA gap closed.
 
 1. Follow [`adoption/bootstrap.md`](../bootstrap.md) steps 1–3 (prerequisites,
    `bootstrap-linux.sh --profile <id>`, native sign-in).
+   `adoption/bootstrap-linux.sh` and its pins changed after `v2026.09.23`
+   (native `claude-code` pin, uv-tool `markitdown`/`tavily-cli`,
+   `--configure-claude-user-profile`); at `v2026.09.23` the script installs
+   the npm `claude-code` 2.1.278 pin and has no profile step.
 2. Recreate the SDK only for the `research-runtime` profile using
    [`adoption/sdk/README.md`](../sdk/README.md)'s transitive lock; retain the
    same exact-match and uncached-reinstall checks as
