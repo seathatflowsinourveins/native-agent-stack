@@ -653,8 +653,8 @@ Measured on the 2026-09-23 tree (round-2 review, rebuilt with
 `lane_packets.py --root . --out <dir> --manifest catalogs/sota-convergence/manifest-20260923.json
 --trading-candidates manifest --withhold-labels --registered-receipts`):
 - 93 of 286 candidates carry at least one receipt.
-- Candidate entries by `matched_by`: `component_id` 1097, `alias` 34, `repository` 0.
-- The alias entries: `data-edgartools` 14, `data-duckdb` 13, `nautilustrader` 6 and `data-exchange-calendars` 1.
+- Candidate entries by `matched_by`: `component_id` 1028, `alias` 32, `repository` 0, after label-bearing receipts are left out.
+- The alias entries: `data-edgartools` 14, `data-duckdb` 11, `nautilustrader` 6 and `data-exchange-calendars` 1.
 - `nautilus-ibkr-adapter`, `codex-native-sdk` and the trading `foundation-*` ids (for example
   `foundation-ai-memory`) get no receipt by repository, because each shares its slug with another manifest id.
 
@@ -1546,6 +1546,12 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   and the packet's `withheld` list says so. Examples are `native-session-defaults-20260920` and
   `adoption/receipt.json`.
 - **Schema:** `lane-return.schema.json` includes `provenance.agent_sha256`.
+- **Prompt and evidence binding:** adjudication provenance hashes the prompt actually used, including a
+  `codex --prompt` override, and `repo_tree_sha256`, a digest of every file in the evidence export.
+  A resumed Codex judgment must match the run's provenance, and a layer is assembled only when every
+  counted judgment carries the same provenance.
+- **Symlinks:** `blind_checkout --export` removes any symlink that is absolute or resolves outside the
+  export, and reports it.
 
 **Limits:**
 - Writing style can still reveal a lane.

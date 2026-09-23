@@ -97,7 +97,7 @@ class AdjudicateFixture(unittest.TestCase):
              "evidence_refs": [str(self.repo / "evidence/receipt.json")]},
             {"refuted": refuted, "reason": "The cited receipt exists and shows the run.", "evidence_refs": []},
             input_sha256=adjudicate.sha256_file(input_path) if input_path.is_file() else None,
-            provenance=adjudicate.adjudication_provenance())
+            provenance=adjudicate.adjudication_provenance(repo=self.repo))
         adjudicate.write_json(self.work / "adjudication-judgments" / lane / f"{NAME}.{order}.json", record)
 
     def assemble(self):
@@ -301,8 +301,9 @@ class AssembleTests(AdjudicateFixture):
                     "refute_schema_sha256": TOOL_DIR / "adjudication-refute.schema.json",
                     "workflow_sha256": TOOL_DIR / "adjudication-lane.js",
                     "adjudicator_role_sha256": adjudicate.VENDORED_ADJUDICATOR}
-        self.assertEqual(record["provenance"], {key: hashlib.sha256(path.read_bytes()).hexdigest()
-                                                for key, path in expected.items()})
+        self.assertEqual(record["provenance"], {**{key: hashlib.sha256(path.read_bytes()).hexdigest()
+                                                   for key, path in expected.items()},
+                                                "repo_tree_sha256": adjudicate.tree_sha256(self.repo)})
         self.assertEqual(self.assert_valid(record)["winner_lane"], "codex")
 
     def test_a_judgment_whose_model_misses_its_family_pattern_does_not_count(self):
@@ -689,6 +690,32 @@ class ThirdRereviewOf145Tests(AdjudicateFixture):
         adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
         records = json.loads((self.work / "adjudication-judgments" / "claude" / "leaks.json").read_text())["leaks"]
         self.assertEqual([record["input_sha256"] for record in records], [snapshot[f"{NAME}.AB"]])
+
+
+class FourthRereviewOf145Tests(AdjudicateFixture):
+    """Codex re-review of #145 (fourth round): judgments bind to the prompt used and the evidence tree."""
+
+    def test_provenance_names_the_prompt_used_and_the_evidence_tree(self):
+        custom = self.base / "custom-prompt.md"
+        custom.write_text(adjudicate.PROMPT_PATH.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        default = adjudicate.adjudication_provenance(repo=self.repo)
+        self.assertNotEqual(adjudicate.adjudication_provenance(custom, self.repo)["prompt_sha256"],
+                            default["prompt_sha256"])
+        (self.repo / "new-receipt.json").write_text("{}", encoding="utf-8")
+        self.assertNotEqual(adjudicate.adjudication_provenance(repo=self.repo)["repo_tree_sha256"],
+                            default["repo_tree_sha256"])
+
+    def test_judgments_against_another_evidence_tree_do_not_assemble_together(self):
+        self.inputs()
+        for order in adjudicate.ORDERS:
+            self.judgment("claude", order, "codex")
+        (self.repo / "new-receipt.json").write_text("{}", encoding="utf-8")
+        for order in adjudicate.ORDERS:
+            self.judgment("codex", order, "codex")
+        code, err, record = self.assemble()
+        self.assertEqual(code, 1)
+        self.assertIsNone(record)
+        self.assertIn("different provenance", err)
 
 
 class InputScrubTests(AdjudicateFixture):

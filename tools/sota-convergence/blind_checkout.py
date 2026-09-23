@@ -440,6 +440,20 @@ def export_tree(dest: Path, export: Path) -> dict:
         return skipped
 
     shutil.copytree(dest, export, symlinks=True, ignore=ignore)
+    # A symlink that is absolute or resolves outside the export would let a lane read the original checkout
+    # or host files, past both label stripping and instruction replacement (Codex review of #145): removed.
+    removed_links: list = []
+    export_root = export.resolve()
+    for directory, dirs, files in os.walk(export, followlinks=False):
+        for name in sorted(dirs + files):
+            path = Path(directory) / name
+            if not path.is_symlink():
+                continue
+            target = os.readlink(path)
+            resolved = (path.parent / target).resolve()
+            if os.path.isabs(target) or not (resolved == export_root or export_root in resolved.parents):
+                path.unlink()
+                removed_links.append(path.relative_to(export).as_posix())
     replaced: list = []
     # os.walk without followlinks: a symlinked directory in the tree may point outside the export, and
     # nothing outside the export is ever written.
@@ -455,7 +469,8 @@ def export_tree(dest: Path, export: Path) -> dict:
         if not (export / name).exists():
             (export / name).write_text(EXPORT_INSTRUCTION_STUB, encoding="utf-8")
             replaced.append(name)
-    return {"replaced_instruction_files": sorted(replaced), "removed_instruction_dirs": sorted(removed_dirs)}
+    return {"replaced_instruction_files": sorted(replaced), "removed_instruction_dirs": sorted(removed_dirs),
+            "removed_escaping_symlinks": sorted(removed_links)}
 
 
 def parse_args(argv=None):
@@ -489,7 +504,8 @@ def main(argv=None) -> int:
                        "hmac_key_path": str(key_path),
                        "export": str(export) if export is not None else None,
                        "export_instruction_files_replaced": sanitized["replaced_instruction_files"] if sanitized else None,
-                       "export_instruction_dirs_removed": sanitized["removed_instruction_dirs"] if sanitized else None},
+                       "export_instruction_dirs_removed": sanitized["removed_instruction_dirs"] if sanitized else None,
+                       "export_escaping_symlinks_removed": sanitized["removed_escaping_symlinks"] if sanitized else None},
                       sort_keys=True))
     return 0
 

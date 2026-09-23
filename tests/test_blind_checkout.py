@@ -11,6 +11,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import os
 import shutil
 import subprocess
 import tempfile
@@ -440,9 +441,31 @@ class ExportTests(BlindCheckoutFixture):
         self.addCleanup(self.remove_worktree)
         result = blind_checkout.export_tree(self.dest, export)
         self.assertEqual(result, {"replaced_instruction_files": ["AGENTS.md", "CLAUDE.md"],
-                                  "removed_instruction_dirs": []})
+                                  "removed_instruction_dirs": [], "removed_escaping_symlinks": []})
         self.assertEqual((export / "AGENTS.md").read_text(encoding="utf-8"), blind_checkout.EXPORT_INSTRUCTION_STUB)
         self.assertFalse((self.dest / "AGENTS.md").exists())
+
+
+class ExportSymlinkTests(BlindCheckoutFixture):
+    """Codex review of #145: a symlink escaping the export is removed; one inside it is kept."""
+
+    def test_escaping_symlinks_are_removed_and_inner_ones_kept(self):
+        (self.source / "docs").mkdir(exist_ok=True)
+        (self.source / "docs" / "inner.md").write_text("inner\n", encoding="utf-8")
+        os.symlink("inner.md", self.source / "docs" / "inner-link.md")
+        os.symlink("/etc/hostname", self.source / "docs" / "absolute-link")
+        os.symlink("../../../outside", self.source / "docs" / "escaping-link")
+        git(["add", "-A"], self.source)
+        git(["commit", "-q", "-m", "links"], self.source)
+        export = self.dest.parent / "export"
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",
+                                                  "--dest", str(self.dest), "--export", str(export)]), 0)
+        self.addCleanup(lambda: git(["worktree", "remove", "--force", str(self.dest)], self.source))
+        self.assertTrue((export / "docs" / "inner-link.md").is_symlink())
+        self.assertFalse(os.path.lexists(export / "docs" / "absolute-link"))
+        self.assertFalse(os.path.lexists(export / "docs" / "escaping-link"))
+        self.assertIn("docs/absolute-link", out.getvalue())
 
 
 if __name__ == "__main__":

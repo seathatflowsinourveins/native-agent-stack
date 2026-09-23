@@ -583,6 +583,8 @@ def run_codex(args) -> int:
     leaked_inputs = recorded_leaks(work_dir)
     items = pending_items(index, layers)
     out_dir = work_dir / JUDGMENTS_DIR / "codex"
+    # The code, prompt and evidence tree this run judges with, captured at launch (Codex review of #145).
+    run_provenance = adjudication_provenance(args.prompt, repo)
     pending, failures = [], []
     for name, order, input_path, packet_sha256 in items:
         out_path = out_dir / f"{name}.{order}.json"
@@ -592,10 +594,11 @@ def run_codex(args) -> int:
             continue
         try:
             existing = load_json(out_path)
-            # Resume skips only a judgment made with the configured model.
-            # ... and at the configured effort: a changed --effort reruns it (Codex review of #145).
+            # Resume skips only a judgment made with the configured model and effort, under this run's
+            # provenance: the same code, prompt, schemas, role and evidence tree (Codex review of #145).
             if (usable_judgment(existing, "openai", order, packet_sha256) is None
-                    and existing.get("model") == args.model and existing.get("effort") == args.effort):
+                    and existing.get("model") == args.model and existing.get("effort") == args.effort
+                    and existing.get("provenance") == run_provenance):
                 continue
         except (OSError, ValueError, AttributeError):
             pass
@@ -611,8 +614,6 @@ def run_codex(args) -> int:
         schemas[label].write_text(json.dumps(codex_lane.strict_output_schema(load_json(source)), indent=1,
                                              sort_keys=True) + "\n", encoding="utf-8")
     leaks, lock = [], threading.Lock()
-    # The code and prompt this run judges with, captured at launch (Codex review of #145), not at assembly.
-    run_provenance = adjudication_provenance()
 
     def process(item):
         name, order, input_path, packet_sha256, out_path = item
@@ -760,7 +761,7 @@ def claude_args(work_dir: Path, repo: Path, prompt_path: Path = PROMPT_PATH, lay
     # The input content each item is judged on; claude-collect binds every judgment to it.
     write_json(Path(work_dir).resolve() / JUDGMENTS_DIR / "claude" / CLAUDE_ARGS_SNAPSHOT,
                {"inputs": {f"{item['name']}.{item['order']}": sha256_file(Path(item["path"])) for item in items},
-                "provenance": adjudication_provenance()})
+                "provenance": adjudication_provenance(prompt_path, repo)})
     return {"repo": str(repo), "prompt": prompt_path.read_text(encoding="utf-8"), "items": items, "leaked": leaked}
 
 
@@ -919,12 +920,29 @@ VENDORED_ADJUDICATOR = HERE.parents[1] / "examples" / "claude-native" / "agents"
 DEFAULT_ADJUDICATOR_FILE = Path.home() / ".claude" / "agents" / f"{ADJUDICATOR_ROLE}.md"
 
 
-def adjudication_provenance() -> dict:
-    """What produced a record: this script, the prompt, both judgment schemas, the Claude family's workflow and
-    the vendored blind-adjudicator role it runs as (claude-args refuses an installed role other than this)."""
-    return {"adjudicate_py_sha256": sha256_file(Path(__file__).resolve()), "prompt_sha256": sha256_file(PROMPT_PATH),
-            "judge_schema_sha256": sha256_file(JUDGE_SCHEMA), "refute_schema_sha256": sha256_file(REFUTE_SCHEMA),
-            "workflow_sha256": sha256_file(WORKFLOW_PATH), "adjudicator_role_sha256": sha256_file(VENDORED_ADJUDICATOR)}
+def tree_sha256(repo: Path) -> str:
+    """A digest of the evidence repository's content: every regular file's relative path and sha256, sorted.
+    The packet names evidence paths, not their bytes, so a judgment is bound to the tree it read."""
+    digest = hashlib.sha256()
+    repo = Path(repo)
+    for path in sorted(p for p in repo.rglob("*") if p.is_file() and not p.is_symlink()):
+        digest.update(f"{path.relative_to(repo).as_posix()}\0{sha256_file(path)}\n".encode("utf-8"))
+    return digest.hexdigest()
+
+
+def adjudication_provenance(prompt_path: Path = PROMPT_PATH, repo: Path = None) -> dict:
+    """What produced a judgment: this script, the prompt actually used, both judgment schemas, the Claude
+    family's workflow, the vendored blind-adjudicator role it runs as (claude-args refuses an installed role
+    other than this), and the evidence tree it judged against (Codex review of #145). Both families' counted
+    judgments must carry the same provenance for a layer to be assembled."""
+    provenance = {"adjudicate_py_sha256": sha256_file(Path(__file__).resolve()),
+                  "prompt_sha256": sha256_file(Path(prompt_path)),
+                  "judge_schema_sha256": sha256_file(JUDGE_SCHEMA), "refute_schema_sha256": sha256_file(REFUTE_SCHEMA),
+                  "workflow_sha256": sha256_file(WORKFLOW_PATH),
+                  "adjudicator_role_sha256": sha256_file(VENDORED_ADJUDICATOR)}
+    if repo is not None:
+        provenance["repo_tree_sha256"] = tree_sha256(Path(repo))
+    return provenance
 
 
 def adjudicator_role_issue(agent_file: Path):
