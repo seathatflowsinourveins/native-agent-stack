@@ -6485,8 +6485,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/README.md",
-      "sha256": "902270835aac857ea73c40f77df23540b4b77c2bd2de48a6cbc683972636deba",
-      "bytes": 3199
+      "sha256": "1c45dd78a2a7465e78ea09db3cbae0dd60c297175e30991d72ab20d1eff08e0b",
+      "bytes": 3940
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/config-post-liquid-9967f44d.json",
@@ -6740,8 +6740,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923j-regular-no-signals/README.md",
-      "sha256": "26fc06519604ae0b665aa19adfea9ac07932ace2b1238d3eef3a6ca85011c58e",
-      "bytes": 2450
+      "sha256": "0e64fd2537a67d075c514879ee83b5419a348f76d2f98f53a7ae9c6aea7898ae",
+      "bytes": 2958
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923j-regular-no-signals/config-sip-77244c39.json",
@@ -8955,8 +8955,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "43ac6e7e7d6072ab3946faf46c04a39056c22311ddbefd695be486ffe334a5ce",
-      "bytes": 34598
+      "sha256": "93ac155e72a5602de53b329c64c2a9529355fd37bb3be32c024643d7ef31489e",
+      "bytes": 34698
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
