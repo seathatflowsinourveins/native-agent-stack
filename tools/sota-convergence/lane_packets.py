@@ -426,30 +426,55 @@ def build_packet(row: dict, *, catalog: str, sota_components: list, recipe_map: 
     return packet
 
 
-def registered_receipts_by_component(root: Path) -> dict:
-    """component_id -> [{id, kind, path}] from manifests/evidence.json ``receipts`` (the registered receipt
-    list that scripts/platform_status.py and component_matrix.py read), sorted by path. A packet otherwise
-    carries only the ledger's evidence_refs, so a lane cannot see, cite or judge a registered native receipt
-    the ledger row never named (2026-09-23 re-record)."""
-    index: dict = {}
+STACK_MANIFEST_PATH = "manifests/stack.json"
+
+
+def registered_receipts_index(root: Path) -> tuple:
+    """(by component id, by repository slug) -> [{id, kind, path}] from manifests/evidence.json ``receipts``
+    (the registered receipt list that scripts/platform_status.py and component_matrix.py read). A receipt names
+    components in the manifests/stack.json id space, which differs from the sota manifest's for some components
+    (``nautilus-trader`` there, ``nautilustrader`` here; ``duckdb``/``data-duckdb``), so each receipt is also
+    keyed by its components' repository slug. A packet otherwise carries only the ledger's evidence_refs, so a
+    lane cannot see, cite or judge a registered native receipt the ledger row never named (2026-09-23
+    re-record)."""
+    repositories = {component["id"]: component.get("repository")
+                    for component in load_json(root / STACK_MANIFEST_PATH).get("components") or []}
+    by_id: dict = {}
+    by_repository: dict = {}
     for receipt in load_json(root / EVIDENCE_MANIFEST_PATH).get("receipts") or []:
         entry = {"id": receipt["id"], "kind": receipt["kind"], "path": receipt["path"]}
         for component_id in receipt.get("component_ids") or []:
-            index.setdefault(component_id, []).append(entry)
-    return {component_id: sorted(entries, key=lambda item: item["path"]) for component_id, entries in index.items()}
+            by_id.setdefault(component_id, []).append(entry)
+            slug = github_repo_slug(repositories.get(component_id) or "")
+            if slug:
+                by_repository.setdefault(slug, []).append(entry)
+    return by_id, by_repository
 
 
-REGISTERED_RECEIPTS_NOTE = ("registered_receipts lists, for each candidate and component, the receipts "
-                            "manifests/evidence.json registers for its component id. They are evidence to open "
-                            "and judge like evidence_refs: a receipt's kind and content, not its presence, "
-                            "decide the evidence class.")
+REGISTERED_RECEIPTS_NOTE = ("registered_receipts lists the receipts manifests/evidence.json registers for a "
+                            "candidate's component (matched by component id or repository). A receipt may name "
+                            "several components, and its kind is the registrant's label, not a checked evidence "
+                            "class: open it and judge what it actually ran for this component, as for "
+                            "evidence_refs.")
 
 
-def attach_registered_receipts(packet: dict, index: dict) -> dict:
+def receipts_for(item: dict, component_id, index: tuple, withhold: bool) -> list:
+    by_id, by_repository = index
+    found = {entry["path"]: entry for entry in by_id.get(component_id, [])} if component_id else {}
+    slug = github_repo_slug(item.get("repository") or "")
+    if slug:
+        found.update({entry["path"]: entry for entry in by_repository.get(slug, [])})
+    entries = sorted(found.values(), key=lambda entry: entry["path"])
+    # Receipt ids such as "native-session-defaults-20260920" can name the incumbent's role; under
+    # --withhold-labels only kind and path (enough to open the receipt) are given.
+    return [{"kind": entry["kind"], "path": entry["path"]} if withhold else dict(entry) for entry in entries]
+
+
+def attach_registered_receipts(packet: dict, index: tuple, withhold: bool = False) -> dict:
     for item in packet.get("candidates") or []:
-        item["registered_receipts"] = list(index.get(item.get("component_id"), []))
+        item["registered_receipts"] = receipts_for(item, item.get("component_id"), index, withhold)
     for item in packet.get("sota_components_not_in_candidates") or []:
-        item["registered_receipts"] = list(index.get(item.get("id"), []))
+        item["registered_receipts"] = receipts_for(item, item.get("id"), index, withhold)
     packet["registered_receipts_note"] = REGISTERED_RECEIPTS_NOTE
     return packet
 
@@ -501,7 +526,7 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
     manifest_mode = trading_candidates == "manifest"
     cards = trading_cards_by_id(root) if manifest_mode else {}
     trading_layers = {layer["layer"]: layer for layer in sota_doc.get("trading", [])}
-    receipts_index = registered_receipts_by_component(root) if registered_receipts else None
+    receipts_index = registered_receipts_index(root) if registered_receipts else None
 
     packets = {}
     for catalog in catalogs:
@@ -529,7 +554,7 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 # recency signals; the default (no --withhold-labels) build is unchanged.
                 packet = withhold_popularity(packet)
             if receipts_index is not None:
-                packet = attach_registered_receipts(packet, receipts_index)
+                packet = attach_registered_receipts(packet, receipts_index, withhold)
             packets[packet_filename(catalog, row["layer_id"])] = serialize(packet)
     return packets
 
@@ -563,9 +588,10 @@ def parse_args(argv=None):
                              "of every packet; each stripped field is listed in the packet's withheld list. Off by "
                              "default so the 2026-09-22 packets reproduce.")
     parser.add_argument("--registered-receipts", action="store_true",
-                        help="Attach to every candidate and component its receipts registered in "
-                             "manifests/evidence.json (id, kind, path), so a lane can open and cite them. Off "
-                             "by default so the 2026-09-22 packets reproduce.")
+                        help="Attach to every candidate and component the receipts registered in "
+                             "manifests/evidence.json for it, matched by component id or repository (kind and "
+                             "path; id too unless --withhold-labels), so a lane can open and cite them. Off by "
+                             "default: the default build path is unchanged.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
                         help="Candidate source for us-equities packets: the ledger row's group-wide list "
                              "(default; reproduces the 2026-09-22 packets) or the sota manifest's own entries "

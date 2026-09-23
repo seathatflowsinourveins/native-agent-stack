@@ -813,26 +813,40 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
 
 
 class RegisteredReceiptsTests(LanePacketsFixture):
-    """2026-09-23 re-record: --registered-receipts attaches each component's registered receipts, so a
-    lane can open and cite a native receipt its ledger row never named."""
+    """2026-09-23 re-record: --registered-receipts attaches each component's registered receipts, matched by
+    component id or by repository, so a lane can open and cite a native receipt its ledger row never named."""
 
-    def receipts(self, *entries):
+    def receipts(self, *entries, stack=()):
         self.write("manifests/evidence.json", {"schema_version": 1, "files": [], "convergence_records": [],
                                                "receipts": [dict(entry, claim="c", limitations=[]) for entry in entries]})
+        self.write("manifests/stack.json", {"components": [{"id": cid, "repository": repo} for cid, repo in stack]})
+
+    def first_candidate(self, catalog="foundation", layer="layer-a", packets=None):
+        packet = self.packet(catalog, layer, packets)
+        return packet, next(c for c in packet["candidates"] if c.get("component_id") and c.get("repository"))
 
     def test_candidates_carry_their_registered_receipts_sorted_by_path(self):
-        packet = self.packet("foundation", "layer-a")
-        component = next(c["component_id"] for c in packet["candidates"] if c.get("component_id"))
+        _packet, candidate = self.first_candidate()
+        component = candidate["component_id"]
         self.receipts({"id": "r2", "kind": "native_cli_e2e", "component_ids": [component], "path": "evidence/receipts/b.json"},
                       {"id": "r1", "kind": "host_e2e", "component_ids": [component, "other"], "path": "evidence/receipts/a.json"},
                       {"id": "r3", "kind": "native_cli_e2e", "component_ids": ["unrelated"], "path": "evidence/receipts/c.json"})
-        packet = self.packet("foundation", "layer-a", self.build(registered_receipts=True))
-        candidate = next(c for c in packet["candidates"] if c.get("component_id") == component)
+        packet, candidate = self.first_candidate(packets=self.build(registered_receipts=True))
         self.assertEqual(candidate["registered_receipts"], [
             {"id": "r1", "kind": "host_e2e", "path": "evidence/receipts/a.json"},
             {"id": "r2", "kind": "native_cli_e2e", "path": "evidence/receipts/b.json"}])
         self.assertTrue(all("registered_receipts" in c for c in packet["candidates"]))
-        self.assertIn("registered_receipts lists", packet["registered_receipts_note"])
+        self.assertIn("kind is the registrant's label", packet["registered_receipts_note"])
+
+    def test_a_receipt_in_the_stack_id_space_matches_by_repository(self):
+        # manifests/stack.json names nautilus-trader where the sota manifest says nautilustrader.
+        _packet, candidate = self.first_candidate()
+        self.receipts({"id": "r9", "kind": "native_cli_e2e", "component_ids": ["stack-only-id"], "path": "evidence/receipts/z.json"},
+                      stack=[("stack-only-id", candidate["repository"].replace("https://github.com/", "https://github.com/").rstrip("/")
+                                       .rsplit("/", 2)[0] + "/" + "/".join(part.title() for part in
+                                       candidate["repository"].rstrip("/").rsplit("/", 2)[1:]) + ".git")])
+        _packet, candidate = self.first_candidate(packets=self.build(registered_receipts=True))
+        self.assertEqual([r["path"] for r in candidate["registered_receipts"]], ["evidence/receipts/z.json"])
 
     def test_default_build_is_unchanged(self):
         self.receipts({"id": "r1", "kind": "host_e2e", "component_ids": ["anything"], "path": "evidence/receipts/a.json"})
@@ -840,13 +854,17 @@ class RegisteredReceiptsTests(LanePacketsFixture):
         for text in self.build().values():
             self.assertNotIn("registered_receipts", text)
 
-    def test_withheld_packets_keep_the_receipts(self):
-        packet = self.packet("foundation", "layer-a")
-        component = next(c["component_id"] for c in packet["candidates"] if c.get("component_id"))
-        self.receipts({"id": "r1", "kind": "host_e2e", "component_ids": [component], "path": "evidence/receipts/a.json"})
-        packet = self.packet("foundation", "layer-a", self.build(registered_receipts=True, withhold=True))
-        candidate = next(c for c in packet["candidates"] if c.get("component_id") == component)
-        self.assertEqual([r["id"] for r in candidate["registered_receipts"]], ["r1"])
+    def test_withheld_packets_keep_kind_and_path_but_not_the_receipt_id(self):
+        _packet, candidate = self.first_candidate()
+        self.receipts({"id": "native-session-defaults-20260920", "kind": "host_e2e",
+                       "component_ids": [candidate["component_id"]], "path": "evidence/receipts/a.json"})
+        packets = self.build(registered_receipts=True, withhold=True)
+        packet, candidate = self.first_candidate(packets=packets)
+        self.assertEqual(candidate["registered_receipts"], [{"kind": "host_e2e", "path": "evidence/receipts/a.json"}])
+        self.assertNotIn("native-session-defaults", "".join(packets.values()))
+        withheld_packet_keys = importlib.import_module("scripts.landscape").withheld_packet_keys
+        for text in packets.values():
+            self.assertEqual(withheld_packet_keys(json.loads(text)), [])
 
 
 if __name__ == "__main__":

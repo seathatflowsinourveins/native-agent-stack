@@ -624,13 +624,20 @@ the packets alone does not blind a lane; see the handbook's label-exposure limit
 **Registered receipts** (`--registered-receipts`, 2026-09-23 re-record). A packet's `evidence_refs` come from
 the ledger row, so a lane could not see a native receipt the row never named. Under Linux, `platform_status`
 accepts a `native_proven` or `measured_comparison` winner only when it cites a registered `evidence/` file.
-With the flag, every candidate and `sota_components_not_in_candidates` entry carries `registered_receipts`:
-the `{id, kind, path}` of each `manifests/evidence.json` receipt whose `component_ids` names it, sorted by
-path. A packet-level `registered_receipts_note` tells the lane that a receipt's kind and content, not its
-presence, decide the evidence class.
 
-On the 2026-09-23 tree with `manifest-20260923`, 88 of 286 candidates carry at least one receipt. The flag is
-off by default, so the 2026-09-22 packets reproduce.
+With the flag, every candidate and `sota_components_not_in_candidates` entry carries `registered_receipts`: the
+`manifests/evidence.json` receipts that name its component, sorted by path.
+- **Matching:** by component id, or by repository through the receipt's `manifests/stack.json` components.
+  The two id spaces differ for some components: `nautilus-trader` and `nautilustrader`, and `duckdb` and
+  `data-duckdb`.
+- **Fields:** each entry gives `kind` and `path`. Under `--withhold-labels` the receipt `id` is dropped,
+  because ids such as `native-session-defaults-20260920` can name the incumbent's role.
+- **Remaining limit:** paths and receipt contents are not stripped, and a receipt describing an adoption
+  still says so.
+
+A packet-level `registered_receipts_note` says a receipt may name several components and that its `kind` is
+the registrant's label. The lane must open the receipt and judge what it ran for this component. The flag
+is off by default, and the default build path is unchanged.
 
 **Popularity and recency are withheld too** (2026-09-23 peer audit: 132
 foundation-packet objects still carried GitHub `stars` and `pushed_at` through
