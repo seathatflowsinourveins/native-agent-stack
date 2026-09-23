@@ -8,6 +8,17 @@
 # variable is used instead).
 set -Eeuo pipefail
 
+# Round 3k (coordinator, WSL-host CPU-load flakiness fix): exported purely
+# for offline fault-injection tests. A shim that must signal THIS script's
+# own top-level process reads this instead of $PPID -- $PPID is correct
+# today for every foreign command this script calls directly (none of
+# them run inside a $(...) or a pipeline, so $PPID already equals $$ at
+# each call site), but that is not an invariant future edits are
+# guaranteed to preserve; bootout_and_wait's own subshell-vs-plain-call
+# comment below records exactly how that assumption broke once already.
+# No production code path reads this variable.
+export ADOPTION_SCRIPT_PID="$$"
+
 usage() {
   printf '%s\n' \
     'Usage: bash launchd-agents.sh render|lint|install|status|remove [options]' \

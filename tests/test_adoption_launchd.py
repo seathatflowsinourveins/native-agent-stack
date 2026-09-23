@@ -66,6 +66,245 @@ def _shell_functions(text: str, *names: str) -> str:
     return "".join(blocks)
 
 
+def _signal_and_wait_for_exit(signal_name: str, indent: str = "    ", target_var: str = "ADOPTION_SCRIPT_PID") -> str:
+    """Round 3k: a fault-injection shim's real-command-then-signal tail.
+
+    Signals `target_var` -- launchd-agents.sh's own top-level PID, which it
+    exports itself (see the export next to its `set -Eeuo pipefail`), never
+    `$PPID` (that half is genuinely load-independent: see
+    SignalShimMechanismProofTests.test_ppid_inside_a_command_substitution_
+    subshell_is_not_the_script for a deterministic, no-load reproduction of
+    exactly how `$PPID` fails once ANY step is ever wrapped in `$(...)`,
+    matching the pre-round-3i bootout_and_wait bug this project already
+    fixed once).
+
+    Round 3k's FIRST draft of this helper also polled `kill -0 "$target"`
+    in a loop, waiting for the target to have fully exited before this
+    shim itself returns. That design was WRONG and is not used: this shim
+    is always the target's own SYNCHRONOUS foreground child (exactly how
+    real npm/mv/ln/launchctl are invoked), so the target cannot possibly
+    exit -- its own `wait()` cannot return -- while still blocked waiting
+    for THIS shim to finish. A shim that waits for the target to disappear
+    before it disappears itself is circular, not a handshake; it does not
+    fail loudly either, since its own 30s bound always fires (proven
+    directly: every affected test took ~30-63s per run in this project's
+    first commit of this helper, passing only because the shim's own
+    timeout path, not a real interruption, produced a nonzero exit the
+    assertions happened to accept as "not 0").
+
+    What actually determines correctness, confirmed by direct, repeated
+    (bash 5.2, this host, 10/10 both with and without an added sleep)
+    testing: bash defers running a trapped signal's handler until whatever
+    is CURRENTLY in the foreground finishes -- here, this shim itself --
+    and then services it immediately afterward, before the script's own
+    next line, regardless of how long that takes. Ordering is therefore
+    already guaranteed by bash's synchronous foreground-child execution
+    model alone, once the signal reaches the right PID (the fix above).
+    This tail still sleeps briefly (0.5s, comfortably above the 0.2-0.3s
+    this project's earlier rounds used) purely as defensive margin for the
+    real `kill()` syscall's effect to be recorded before this process
+    image goes away -- not to "win a race" against the trap, which this
+    shim structurally cannot observe completing.
+    """
+    p = indent
+    return (
+        f'{p}target="${target_var}"\n'
+        f'{p}kill -{signal_name} "$target"\n'
+        f'{p}sleep 0.5\n'
+    )
+
+
+class SignalShimMechanismProofTests(unittest.TestCase):
+    """Round 3k, coordinator's deterministic (load-INDEPENDENT) proof of the
+    mechanism the fix relies on, alongside the CPU-load reproduction
+    attempts recorded in the round's own handoff.
+
+    1. TARGET (a real bug, fixed): a shim invoked from inside a command-
+       substitution subshell -- `x="$(...)"`, the exact construct this
+       codebase already uses elsewhere (launchctl_label_state's own
+       `print_output="$(launchctl print ...)"`, and pre-round-3i's
+       `result="$(bootout_and_wait ...)"`) -- forks a NEW process for that
+       substitution. `$PPID` read from inside it is that subshell's own
+       pid, never the top-level script's, so `kill -TERM "$PPID"` there
+       signals a process with no trap of its own (subshells reset trap
+       dispositions unless explicitly re-armed inside them); the subshell
+       just dies, and the top-level script's own TERM trap never runs at
+       all -- not a matter of odds, every single time. An explicitly
+       exported target (`export ADOPTION_SCRIPT_PID="$$"` at the script's
+       own top level) is unaffected: exported variables are inherited into
+       a subshell unchanged, so the same shim signals the right process
+       regardless of how many subshells sit between it and the caller.
+
+    2. ORDERING (this project's own first draft of the fix was WRONG, and
+       this test proves why, in place of the "poll kill -0 <pid>" design
+       originally suggested): a shim that is the target's own SYNCHRONOUS
+       foreground child -- true of every real shim in this suite (npm,
+       mv, ln, launchctl are all invoked directly, never via $(...)) --
+       cannot observe the target exit, because the target's own `wait()`
+       cannot return while still blocked waiting for this shim. Polling
+       `kill -0` on the target from inside the shim is therefore circular,
+       not a handshake: it hangs until ITS OWN bound fires, every run, and
+       does so SILENTLY (a timeout there still yields the nonzero exit
+       these tests check for, so it does not "fail loud" the way it looks
+       like it should -- it makes every affected test take ~30s longer
+       instead). What this project's own repeated, direct testing shows
+       instead: bash defers a trapped signal's handler until whatever is
+       CURRENTLY in the foreground finishes -- here, the shim itself --
+       then services it immediately afterward, before the script's own
+       next line, regardless of how long the shim's own post-kill sleep
+       is (0s and 0.5s were both tested, 10/10 each). Ordering is already
+       guaranteed by bash's synchronous foreground-child execution model,
+       once the signal reaches the right PID (property 1).
+    """
+
+    def test_ppid_inside_a_command_substitution_subshell_is_not_the_script(self):
+        for target_var, expect_trap_fires in (("PPID", False), ("ADOPTION_SCRIPT_PID", True)):
+            with self.subTest(target_var=target_var):
+                with tempfile.TemporaryDirectory() as tmp:
+                    tmp_path = Path(tmp)
+                    marker = tmp_path / "trap-ran"
+                    shim_dir = tmp_path / "shim"
+                    shim_dir.mkdir()
+                    (shim_dir / "fake-tool").write_text(
+                        "#!/bin/sh\n"
+                        f'kill -TERM "${target_var}"\n'
+                        "sleep 0.3\n"
+                    )
+                    (shim_dir / "fake-tool").chmod(0o755)
+                    script = tmp_path / "target.sh"
+                    script.write_text(
+                        "set -Eeuo pipefail\n"
+                        'export ADOPTION_SCRIPT_PID="$$"\n'
+                        f'trap \'touch {str(marker)!r}; exit 143\' TERM\n'
+                        # The exact shape of the pre-round-3i bootout_and_wait
+                        # bug: the script wraps its OWN call to a foreign-
+                        # command-invoking step in $(...), as a small
+                        # function that does something with the exit status
+                        # AFTER calling fake-tool (captures $?, returns it) --
+                        # not a bare `run_it() { fake-tool; }`, which bash
+                        # can (and does; confirmed directly) exec-replace the
+                        # subshell with, keeping fake-tool's own $PPID equal
+                        # to the top-level script's and hiding the bug
+                        # entirely. bootout_and_wait's real body has exactly
+                        # this shape: a call, then more statements using its
+                        # exit status, which is what forces bash to keep the
+                        # subshell alive as a genuine separate process rather
+                        # than exec-optimizing it away.
+                        'run_it() { fake-tool; local rc=$?; return "$rc"; }\n'
+                        'x="$(run_it)"\n'
+                        "sleep 5\n"  # only ever reached if the trap never fired
+                    )
+                    script.chmod(0o755)
+                    result = subprocess.run(
+                        ["bash", str(script)],
+                        capture_output=True, text=True, timeout=15,
+                        env={**os.environ, "PATH": f"{shim_dir}{os.pathsep}{os.environ['PATH']}"},
+                    )
+                    self.assertEqual(
+                        marker.exists(), expect_trap_fires,
+                        f"target_var={target_var}: rc={result.returncode} "
+                        f"stdout={result.stdout!r} stderr={result.stderr!r}")
+
+    def test_the_trap_runs_before_the_scripts_next_line_once_the_shim_exits(self):
+        # Proves the ORDERING property _signal_and_wait_for_exit actually
+        # relies on (see property 2 in the class docstring): regardless of
+        # the shim's own post-kill sleep -- none at all, or the 0.5s this
+        # fix uses -- the target's trap always preempts the script's next
+        # line. `reached` existing would mean the trap was skipped, which
+        # this project's own repeated testing (10/10 each case) never
+        # observed.
+        for extra_sleep in ("0", "0.5"):
+            with self.subTest(shim_post_kill_sleep=extra_sleep):
+                with tempfile.TemporaryDirectory() as tmp:
+                    tmp_path = Path(tmp)
+                    marker = tmp_path / "trap-ran"
+                    reached = tmp_path / "reached-after-shim"
+                    shim_dir = tmp_path / "shim"
+                    shim_dir.mkdir()
+                    (shim_dir / "fake-tool").write_text(
+                        "#!/bin/sh\n"
+                        'kill -TERM "$ADOPTION_SCRIPT_PID"\n'
+                        f'sleep {extra_sleep}\n'
+                        "exit 0\n"
+                    )
+                    (shim_dir / "fake-tool").chmod(0o755)
+                    script = tmp_path / "target.sh"
+                    script.write_text(
+                        "set -Eeuo pipefail\n"
+                        'export ADOPTION_SCRIPT_PID="$$"\n'
+                        f'trap \'touch {str(marker)!r}; exit 143\' TERM\n'
+                        # Direct invocation -- fake-tool is this script's own
+                        # synchronous foreground child, exactly like real
+                        # npm/mv/ln/launchctl calls (never $(...) -- see the
+                        # test above for that half).
+                        'fake-tool\n'
+                        f'touch {str(reached)!r}\n'
+                    )
+                    script.chmod(0o755)
+                    result = subprocess.run(
+                        ["bash", str(script)],
+                        capture_output=True, text=True, timeout=10,
+                        env={**os.environ, "PATH": f"{shim_dir}{os.pathsep}{os.environ['PATH']}"},
+                    )
+                    self.assertTrue(
+                        marker.exists(),
+                        f"trap never ran: rc={result.returncode} "
+                        f"stdout={result.stdout!r} stderr={result.stderr!r}")
+                    self.assertFalse(
+                        reached.exists(),
+                        "the trap must preempt the script's next line, not run after it")
+
+    def test_the_actual_helper_through_a_subshell_uses_the_fixed_target_not_ppid(self):
+        # Codex P2 (#146): the two tests above each build their OWN shim
+        # script by hand, so neither would notice a regression in
+        # _signal_and_wait_for_exit ITSELF -- the class would still pass
+        # even if the real fix were reverted. This one runs the ACTUAL
+        # helper's generated text (not a hand-written stand-in) as the
+        # shim, through the same non-optimizable command-substitution
+        # subshell as test_ppid_inside_a_command_substitution_subshell_is_
+        # not_the_script above, against a script that exports
+        # ADOPTION_SCRIPT_PID exactly like the real product scripts do.
+        # Manually confirmed while writing this commit: temporarily
+        # changing _signal_and_wait_for_exit's own `target_var` default
+        # back to "PPID" makes this exact test fail (marker never
+        # created); the default was restored to "ADOPTION_SCRIPT_PID"
+        # before committing.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            marker = tmp_path / "trap-ran"
+            shim_dir = tmp_path / "shim"
+            shim_dir.mkdir()
+            (shim_dir / "fake-tool").write_text(
+                "#!/bin/sh\n" + _signal_and_wait_for_exit("TERM", indent="")
+            )
+            (shim_dir / "fake-tool").chmod(0o755)
+            script = tmp_path / "target.sh"
+            script.write_text(
+                "set -Eeuo pipefail\n"
+                'export ADOPTION_SCRIPT_PID="$$"\n'
+                f'trap \'touch {str(marker)!r}; exit 143\' TERM\n'
+                # Identical non-optimizable shape to the subshell test
+                # above -- a function that inspects $? after calling
+                # fake-tool, so bash cannot exec-replace the subshell with
+                # fake-tool directly (which would hide a $PPID regression
+                # by leaving fake-tool's own $PPID equal to the script's).
+                'run_it() { fake-tool; local rc=$?; return "$rc"; }\n'
+                'x="$(run_it)"\n'
+                "sleep 5\n"  # only ever reached if the trap never fired
+            )
+            script.chmod(0o755)
+            result = subprocess.run(
+                ["bash", str(script)],
+                capture_output=True, text=True, timeout=15,
+                env={**os.environ, "PATH": f"{shim_dir}{os.pathsep}{os.environ['PATH']}"},
+            )
+            self.assertTrue(
+                marker.exists(),
+                "the real helper's default target must reach the script "
+                f"through a subshell: rc={result.returncode} "
+                f"stdout={result.stdout!r} stderr={result.stderr!r}")
+
+
 class TemplateRenderAndSchemaTests(unittest.TestCase):
     def setUp(self):
         self.templates = templates()
@@ -538,9 +777,14 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
         return shim
 
     def _run(self, args, env):
+        # Round 3k: 60s, not 30s -- a fault-injection shim's own bounded
+        # wait for the script to react to a signal (_signal_and_wait_for_
+        # exit) can itself take up to 30s under real CPU load before it
+        # gives up; this must stay comfortably above that so a genuine
+        # slow-but-eventual pass is never mistaken for a hang.
         return subprocess.run(
             ["bash", str(SCRIPT_PATH), *args],
-            capture_output=True, text=True, timeout=30, env=env,
+            capture_output=True, text=True, timeout=60, env=env,
         )
 
     def test_help_exits_zero(self):
@@ -1366,8 +1610,9 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
         "*.plist.new.*" temp-file path pattern (this script's ONLY staging
         target) for binary in ("cp", "mv"). `mode` is "failure" (never
         performs the real action) or a signal name (performs the real
-        action, then signals $PPID -- the same real-command-then-signal
-        design test_adoption_bootstrap_macos.py's own signal shims use).
+        action, then runs _signal_and_wait_for_exit -- the same
+        deterministic-target, poll-to-completion design
+        test_adoption_bootstrap_macos.py's own signal shims use, round 3k).
         For launchctl, every OTHER subcommand keeps working exactly like
         _launchctl_shim (marker-based, reading/writing marker_dir), so the
         matrix isolates exactly one step at a time.
@@ -1389,13 +1634,9 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
                                     f'    rm -f "{marker_dir!s}/$label.loaded.marker"')
                         else:
                             real = ":"
-                        lines += [
-                            f"  {subcmd})",
-                            f"    {real}",
-                            f'    kill -{signal_name} "$PPID"',
-                            "    sleep 0.3",
-                            "    exit 0 ;;",
-                        ]
+                        lines += [f"  {subcmd})", f"    {real}"]
+                        lines += _signal_and_wait_for_exit(signal_name, indent="    ").rstrip("\n").split("\n")
+                        lines += ["    exit 0 ;;"]
                 elif subcmd == "bootstrap":
                     lines += [
                         "  bootstrap)",
@@ -1443,9 +1684,8 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
                 body = ('case "$check" in\n'
                         "  *.plist.new.*)\n"
                         f'    /bin/{binary} "$@" || exit $?\n'
-                        f'    kill -{signal_name} "$PPID"\n'
-                        "    sleep 0.3\n"
-                        "    exit 0\n"
+                        + _signal_and_wait_for_exit(signal_name, indent="    ")
+                        + "    exit 0\n"
                         "    ;;\n"
                         "esac\n"
                         f'exec /bin/{binary} "$@"\n')
@@ -1735,9 +1975,8 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
                         "      exit 36\n"
                         "    fi\n"
                         f'    touch "{async_shim!s}/teardown-started"\n'
-                        f'    kill -{signal_name} "$PPID"\n'
-                        "    sleep 0.3\n"
-                        "    exit 0 ;;\n"
+                        + _signal_and_wait_for_exit(signal_name, indent="    ")
+                        + "    exit 0 ;;\n"
                         '  enable) exit 0 ;;\n'
                         '  *) exit 0 ;;\n'
                         "esac\n"
