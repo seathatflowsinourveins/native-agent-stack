@@ -1,0 +1,44 @@
+diff --git a/home/example/code/nas-wt-w2-pins-runtime/blueprints/convergence-practice/job-recovery/run.py b/tmp/session-scratchpad/job-recovery-2170/run.py
+index ebc0e3d..5de177e 100644
+--- a/home/example/code/nas-wt-w2-pins-runtime/blueprints/convergence-practice/job-recovery/run.py
++++ b/tmp/session-scratchpad/job-recovery-2170/run.py
+@@ -18,7 +18,7 @@ import uuid
+ import fixture
+ 
+ HERE = Path(__file__).resolve().parent
+-ROOT = HERE.parents[2]
++ROOT = Path("/home/example/code/nas-wt-w2-pins-runtime")
+ 
+ 
+ def process_table():
+@@ -87,7 +87,9 @@ def run(dagu, work):
+     base = [str(dagu), "--context", "local", "--dagu-home", str(home), "--config", str(config)]
+     frozen = {"frozen_at_utc": datetime.now(timezone.utc).isoformat(),
+               "repository_inputs": {str(path.relative_to(ROOT)): fixture.digest(path) for path in
+-                                    [HERE / "plan.json", HERE / "run.py", HERE / "fixture.py",
++                                    [ROOT / "blueprints/convergence-practice/job-recovery/plan.json",
++                                     ROOT / "blueprints/convergence-practice/job-recovery/run.py",
++                                     ROOT / "blueprints/convergence-practice/job-recovery/fixture.py",
+                                      ROOT / "blueprints/convergence-practice/native-worker/accepted/planner.py",
+                                      ROOT / "blueprints/convergence-practice/native-worker/seed/test_planner.py"]},
+               "private_inputs": {path.name: fixture.digest(path) for path in
+@@ -118,8 +120,8 @@ def run(dagu, work):
+         return stdout
+ 
+     version = call("version", [str(dagu), "version"]).strip()
+-    if "2.16.6" not in version.split():
+-        raise ValueError("This frozen fixture requires Dagu 2.16.6")
++    if "2.17.0" not in version.split():
++        raise ValueError("This frozen fixture requires Dagu 2.17.0")
+     call("validate", base + ["validate", str(workflow)])
+     owned = {}
+     process = None
+@@ -152,7 +154,7 @@ def run(dagu, work):
+         if any(fixture.digest(ROOT / path) != sha for path, sha in frozen["repository_inputs"].items()):
+             raise ValueError("Frozen repository input changed during execution")
+         result = {"status": "passed", "platform": platform.system() + " " + platform.release(),
+-                  "architecture": platform.machine(), "dagu_version": "2.16.6", "python_version": platform.python_version(),
++                  "architecture": platform.machine(), "dagu_version": "2.17.0", "python_version": platform.python_version(),
+                   "completed_at_utc": datetime.now(timezone.utc).isoformat(), "command_exit_codes": codes,
+                   "before_retry_status": stopped["status"], "after_retry_status": succeeded["status"],
+                   "same_native_run_id": stopped["dagRunId"] == succeeded["dagRunId"],
