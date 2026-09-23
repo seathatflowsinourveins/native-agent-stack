@@ -59,20 +59,23 @@ than assumed. Observed: self-test status 0 (portable 0, unportable 6); serena 22
 socraticode 26, strict ok. It establishes protocol conformance of the configured servers, not their
 behaviour.
 
-## Follow-ups (each gated as stated)
+## Follow-ups (status 2026-09-23)
 
-1. Ecosystem configuration: link `dagu` 2.16.6 into the ecosystem bin or record the deliberate
-   omission; unblocks every scheduling and durability comparison.
-2. Viability probes that need no account, consent or paid key run as a separate follow-up on the
-   WSL2 host: `awslabs/cli-agent-orchestrator` and the TypeScript Agent SDK on the native Claude
-   login (the latter settles the SDK's C1 `api_key_required` label), and the
-   `untrivial-ai/agent-orchestrator` headless backend from its checksummed release.
-3. Gated on a user decision: `anthropics/claude-code-action` needs a scratch repository and a
-   repository secret; `trailofbits/coop` needs `/dev/kvm` group membership; `snyk/agent-scan` needs a
-   separate Snyk token; `swe-agent/mini-swe-agent` needs a model endpoint (the host's local endpoint
-   serves an embedding model only).
+1. Done: `dagu` 2.16.6 is linked on the ecosystem PATH.
+2. Done: the viability probes below (TypeScript Agent SDK, `awslabs/cli-agent-orchestrator`,
+   `untrivial-ai/agent-orchestrator`).
+3. Executed: the user-gated rows (`anthropics/claude-code-action`, `trailofbits/coop`,
+   `snyk/agent-scan`, a local model endpoint for `swe-agent/mini-swe-agent`) and the follow-ups their
+   probes opened; see "Gated items executed" below. Still open: the Snyk-connected agent-scan arm
+   (public-tier daily limit, one timed retry), coop persistence after a WSL restart (armed), the
+   claude-code-action routine arm (needs a GitHub connection on the Claude account) and any macOS
+   execution.
 4. Layer owners: fold the `agent-sdks`, `workers`, `isolation` and `mcp-surfaces` rows into the
-   landscape ledger's alternatives and `overturn_when` fields after PR-5, with the named comparisons.
+   landscape ledger's alternatives and `overturn_when` fields, with the named comparisons. The
+   executed evidence contradicts two blockers in `catalogs/landscape/gap-resolution-20260922.json`:
+   the `agent-sdks` gap that says a Claude Agent SDK run needs a paid Anthropic API (the Python SDK
+   ran on the native login), and the `isolation` gaps that say sandbox-runtime is not present (srt
+   0.0.77 is installed on the host's ecosystem PATH and was exercised).
 
 ## Limits
 
@@ -103,3 +106,18 @@ the host login still reports valid. Removed from the user home after verificatio
 two session transcripts, their cache logs and session-env directories. Remaining: one project entry for
 a probe path in the Claude Code user config, ai-memory hook rows naming the two probe sessions, a stale
 tmux socket with no server, and the Codex credential rewrite (not reversible).
+
+## Gated items executed (2026-09-23)
+
+The gated rows and their follow-ups ran on the WSL2 host, each preregistered with a sha256 lock (with
+the post-hoc exceptions listed in the artifact) and checked by an independent evidence reviewer
+against raw logs; the ledger's `gated_items` block and
+Markdown section summarise them, and
+`evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json` carries the sanitised
+results with the reviewer corrections that change meaning. No disposition changes. Execution note: workflow stages treat
+authorization text in their prompts as script output, so after two workflow rounds whose executors
+stopped or declined, the gated runs went to ordinary background workers dispatched from the
+coordinator's conversation, and workflows stayed for review. Host effects recorded there: kvm group
+membership and restored device groups for coop, a scheduled one-shot Snyk retry, a one-shot
+post-restart coop check, the Codex lane's port of this catalog's runner fixes into its host copies,
+and removal of probe residue attributed to the runs.
