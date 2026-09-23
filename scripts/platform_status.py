@@ -38,7 +38,6 @@ authenticate the claimant. See ``docs/contributing-evidence.md``.
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import NamedTuple
@@ -54,7 +53,6 @@ STATUS_RANK = {"untested": 0, "not_established": 0, "conditional": 1, "accepted"
 QUALIFYING_STAGES = frozenset({"install", "use"})
 NATIVE_CLASSES = frozenset({"native_proven", "measured_comparison"})
 CONDITIONAL_CLASSES = frozenset({"local_integration", "synthetic"})
-HEX_PREFIX_MIN = 7
 
 
 class PlatformStatus(NamedTuple):
@@ -79,22 +77,9 @@ def load_context(root: Path) -> StatusContext:
     )
 
 
+# One definition, shared with the recorder's --component-version check.
 normalize_pin = host_receipts.normalize_pin
-
-
-def pin_matches(recorded, pin) -> bool:
-    """True when a receipt's recorded component version is the winner's current pin: equal
-    after ``normalize_pin``, or both a single hex commit id where one abbreviates the other
-    (at least 7 characters). A pin without a digit ('unpinned') never binds."""
-    left, right = normalize_pin(recorded), normalize_pin(pin)
-    if not left or not right:
-        return False
-    if left == right:
-        return True
-    hexy = re.compile(r"[0-9a-f]+")
-    shorter, longer = sorted((left, right), key=len)
-    return (len(shorter) >= HEX_PREFIX_MIN and hexy.fullmatch(left) is not None
-            and hexy.fullmatch(right) is not None and longer.startswith(shorter))
+pin_matches = host_receipts.pin_matches
 
 
 def registered_evidence_refs(winner: dict, registered_paths) -> tuple[str, ...]:
@@ -123,7 +108,9 @@ def platform_status(platform_id: str, winner: dict, context: StatusContext) -> P
     native_stage = [entry for entry in bound
                     if entry.get("evidence_class") == "native_proven" and entry.get("stage") in QUALIFYING_STAGES]
     latest_per_host_stage: dict[tuple, tuple] = {}
-    for entry in native_stage:
+    # Only pass and fail decide; a later partial or not_runnable receipt neither clears a fail nor
+    # withdraws a pass.
+    for entry in (item for item in native_stage if item.get("result") in ("pass", "fail")):
         key = (entry.get("host_id"), entry.get("stage"))
         # On an equal timestamp a fail sorts after a pass, so the tie blocks.
         rank = (entry.get("observed_at_utc") or "", entry.get("result") == "fail", entry.get("path") or "")

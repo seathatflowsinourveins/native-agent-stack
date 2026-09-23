@@ -8634,8 +8634,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "2a3bc9d17e467cb6aa6a8b66682e8831eea09e63560ce899e77fe1b87c58f077",
-      "bytes": 16479
+      "sha256": "ce2d029767a171cb0cada5165d3d18cb7c41ea5a407851500582b7860cfc9f96",
+      "bytes": 17686
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -14134,8 +14134,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "5fe40a38820e6e751a0afbe64732b30e3e4f0357098213d79cdbc73cbc3df6d2",
-      "bytes": 53865
+      "sha256": "d65f69896e747aab24c8d637147475f0dbbd4575fec1ac64cef6ab63a6824f30",
+      "bytes": 55897
     },
     {
       "path": "scripts/landscape.py",
@@ -14149,8 +14149,8 @@
     },
     {
       "path": "scripts/platform_status.py",
-      "sha256": "396ccd67961e05d8bbd64ac0767d208e43847ac5051b054bae3076eb75e98de3",
-      "bytes": 9878
+      "sha256": "8a12682cdbbcfca02db5512110ad21f9e1fecbd9468bad9cfc4cb85f13123c34",
+      "bytes": 9434
     },
     {
       "path": "scripts/recount-tokens.cjs",
@@ -14474,8 +14474,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "fc3ffe1b1d6f6779e181b0a07c073625582192921e2178a794f304f6cd83f816",
-      "bytes": 55113
+      "sha256": "8cf555c5bb3db8ee00b53235efae34946d2374b33578090dbe7f4e72ecec03f3",
+      "bytes": 57475
     },
     {
       "path": "tests/test_job_recovery.py",
@@ -14579,8 +14579,8 @@
     },
     {
       "path": "tests/test_platform_status.py",
-      "sha256": "87ae10ad22f3eac6e3aed529128823768ccec3700f2e589c105d815bfee2a12f",
-      "bytes": 15042
+      "sha256": "efea1b7d21275f595ad492043d3ff5cc76f360b9f6be1f735c960b878543dbf4",
+      "bytes": 15658
     },
     {
       "path": "tests/test_point_in_time.py",

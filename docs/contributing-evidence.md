@@ -108,7 +108,10 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    the landscape winner pin when every layer that selects the component
    agrees on it, else the `manifests/stack.json` version. Pass
    `--component-version` when neither applies or the host ran something else;
-   a version without a digit (such as `unpinned`) is refused. A receipt only
+   a version without a digit (such as `unpinned`) is refused, and so is one
+   that matches none of the component's current winner pins (it would never
+   count), unless you pass `--allow-unbound-version`. Multi-part pins such
+   as `2.0.0rc5 (tag ...)` must be given as written. A receipt only
    counts toward a winner's status while that version equals the winner's
    current pin in full, so a pin bump retires older receipts until someone
    re-records. The
@@ -196,7 +199,21 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    `needs_changes` vetoes the receipt however many others agree; a reviewer
    withdraws a dissent by appending a newer review. A dissent that fails
    those checks (no reviewer, the recorder's own identity, or dated before
-   the observation) still vetoes and cannot be withdrawn. This step re-registers
+   the observation) still vetoes and cannot be withdrawn. Only the identity
+   that dissented can withdraw it; a Claude session's dissent can be
+   withdrawn only by that same session, and no other review, a maintainer's
+   `human` review included, overrides it. Once that session is gone, the
+   supported path is to address the dissent and record a fresh receipt,
+   which starts with no reviews. A subagent or tool launched from the
+   recording session inherits its session id and is refused as the recorder.
+   An independent review therefore runs in a separate session, a Codex
+   session or a person's shell. A process that has no
+   `$CLAUDE_CODE_SESSION_ID` passes `--identity` (for example
+   `env -u CLAUDE_CODE_SESSION_ID python3 scripts/host_receipts.py review
+   ... --identity <token>`). That identity is self-declared, so use it only
+   for a reviewer that really is separate. `review` refuses to run when this
+   host's clock is behind the receipt's `observed_at_utc`, because the review
+   would be dated before the observation. This step re-registers
    the file's hash after the review is appended; rerun step 5's
    `component_matrix.py --write` afterward, since a new review can change the
    matrix's receipt counts and derived status.

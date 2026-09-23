@@ -135,6 +135,26 @@ def normalize_pin(value) -> str | None:
     return text if re.search(r"[0-9]", text) else None
 
 
+HEX_PREFIX_MIN = 7
+FULL_COMMIT_LENGTHS = {40, 64}
+
+
+def pin_matches(recorded, pin) -> bool:
+    """True when a recorded component version is ``pin``: equal after ``normalize_pin``, or
+    an abbreviation (at least 7 hex characters) of a full 40- or 64-character commit id. A
+    value without a digit ('unpinned') never binds."""
+    left, right = normalize_pin(recorded), normalize_pin(pin)
+    if not left or not right:
+        return False
+    if left == right:
+        return True
+    shorter, longer = sorted((left, right), key=len)
+    hexy = re.compile(r"[0-9a-f]+")
+    return (len(longer) in FULL_COMMIT_LENGTHS and len(shorter) >= HEX_PREFIX_MIN
+            and hexy.fullmatch(longer) is not None and hexy.fullmatch(shorter) is not None
+            and longer.startswith(shorter))
+
+
 def identity_record(digest: str, model: str | None) -> dict:
     record = {"identity_sha256": digest}
     if model and model.strip():
@@ -348,10 +368,8 @@ def landscape_component_ids(root: Path) -> set[str]:
     return ids
 
 
-def catalog_component_version(root: Path, component_id: str) -> str | None:
-    """The version a receipt binds to by default: the landscape winner pin when every layer
-    that selects the component agrees on it (the pin scripts/platform_status.py binds to),
-    else the manifests/stack.json version."""
+def winner_pins(root: Path, component_id: str) -> set[str]:
+    """Every landscape winner pin recorded for ``component_id`` (one per selecting layer)."""
     pins: set[str] = set()
     landscape_dir = root / "catalogs" / "landscape"
     for path in sorted(landscape_dir.glob("*.json")) if landscape_dir.is_dir() else []:
@@ -364,6 +382,14 @@ def catalog_component_version(root: Path, component_id: str) -> str | None:
                 if isinstance(winner, dict) and winner.get("component_id") == component_id \
                         and isinstance(winner.get("pin"), str) and winner["pin"].strip():
                     pins.add(winner["pin"].strip())
+    return pins
+
+
+def catalog_component_version(root: Path, component_id: str) -> str | None:
+    """The version a receipt binds to by default: the landscape winner pin when every layer
+    that selects the component agrees on it (the pin scripts/platform_status.py binds to),
+    else the manifests/stack.json version."""
+    pins = winner_pins(root, component_id)
     if len(pins) == 1:
         return pins.pop()
     if pins:
@@ -514,6 +540,12 @@ def cmd_record(args: argparse.Namespace) -> int:
         print(f"error: no usable version for component {args.component_id!r} ({component_version!r}: its landscape "
               "pins disagree, it has none, or it has no digit such as 'unpinned'); pass --component-version with "
               "the version this host ran")
+        return 2
+    pins = winner_pins(root, args.component_id)
+    if pins and not any(pin_matches(component_version, pin) for pin in pins) and not args.allow_unbound_version:
+        print(f"error: version {component_version!r} matches no current winner pin of {args.component_id!r} "
+              f"({', '.join(sorted(pins))}), so the receipt would never count toward a status; pass the pin as "
+              "written, or --allow-unbound-version to record it anyway")
         return 2
 
     commands_to_run: list[str] = []
@@ -667,8 +699,14 @@ def cmd_review(args: argparse.Namespace) -> int:
             print(f"error: --kind {args.kind} review from the recorder's own identity; an independent review must "
                   "come from a different session, lane or person")
             return 2
+    now = utc_now()
+    observed_at = receipt.get("observed_at_utc")
+    if isinstance(observed_at, str) and now < observed_at:
+        print(f"error: this host's clock ({now}) is behind the receipt's observed_at_utc ({observed_at}); a review "
+              "dated before the observation is refused by validate, so fix the clock and rerun")
+        return 2
     receipt.setdefault("reviews", []).append({
-        "kind": args.kind, "ref": args.ref, "verdict": args.verdict, "at_utc": utc_now(),
+        "kind": args.kind, "ref": args.ref, "verdict": args.verdict, "at_utc": now,
         "reviewer": identity_record(reviewer, args.model),
     })
     path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
@@ -1084,7 +1122,9 @@ def build_parser() -> argparse.ArgumentParser:
                                help=f"Recorder identity (stored hashed); defaults to ${IDENTITY_ENV}, else required")
     record_parser.add_argument("--model", default=None, help="Model or runtime that ran the recording (optional)")
     record_parser.add_argument("--component-version", default=None,
-                               help="Version this host ran; defaults to the stack version or the landscape pin")
+                               help="Version this host ran; defaults to the landscape pin or the stack version")
+    record_parser.add_argument("--allow-unbound-version", action="store_true",
+                               help="Record a --component-version that matches no current winner pin (never counts)")
     record_parser.set_defaults(func=cmd_record)
 
     review_parser = subparsers.add_parser("review", help="Append an independent review to an existing receipt")

@@ -136,6 +136,9 @@ class PlatformStatusTests(unittest.TestCase):
         self.assertFalse(ps.pin_matches("unpinned", "unpinned"))
         self.assertFalse(ps.pin_matches(None, "1.0.0"))
         self.assertFalse(ps.pin_matches("1.2", "1.2.9"))
+        # Re-review: an all-digit date is not a commit abbreviation of a longer number.
+        self.assertFalse(ps.pin_matches("2026092", "20260921"))
+        self.assertFalse(ps.pin_matches("985ef30", "985ef30ad3ac"))
 
     def test_multi_part_pins_must_match_in_full(self):
         # Review of #117 finding 2: only the first token used to be compared, so any
@@ -168,6 +171,12 @@ class PlatformStatusTests(unittest.TestCase):
         # Review of #117 finding 5: a fail supersedes whatever its review state.
         self.r.receipt(host="mac-a", observed_at="2026-09-23T01:00:00Z")
         self.r.receipt(result="fail", host="mac-a", reviewer=None, observed_at="2026-09-23T02:00:00Z")
+        self.assertEqual(self.r.status().status, "conditional")
+
+    def test_a_later_partial_or_not_runnable_does_not_clear_a_fail(self):
+        self.r.receipt(host="mac-b", observed_at="2026-09-23T00:30:00Z")
+        self.r.receipt(result="fail", host="mac-a", observed_at="2026-09-23T01:00:00Z")
+        self.r.receipt(result="not_runnable", host="mac-a", observed_at="2026-09-23T02:00:00Z")
         self.assertEqual(self.r.status().status, "conditional")
 
     def test_a_use_fail_is_not_hidden_by_a_later_install_pass(self):

@@ -832,6 +832,43 @@ class RecorderRoundTripTests(unittest.TestCase):
             {"winners": [{"component_id": "widget", "pin": "v1.0.0"}]}]}), encoding="utf-8")
         self.assertEqual(hr.catalog_component_version(self.root, "widget"), "v1.0.0")
 
+    def test_review_refuses_when_the_clock_is_behind_the_observation(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands",
+            ])
+        relative_path = buffer.getvalue().strip()
+        review_buffer = io.StringIO()
+        with mock.patch.object(hr, "utc_now", return_value="2000-01-01T00:00:00Z"), \
+                contextlib.redirect_stdout(review_buffer):
+            exit_code = _run_cli(["review", "--root", str(self.root), "--receipt", relative_path,
+                                  "--kind", "independent_session", "--ref", "t", "--verdict", "disagree"],
+                                 identity="test-reviewer")
+        self.assertEqual(exit_code, 2, review_buffer.getvalue())
+        self.assertIn("clock", review_buffer.getvalue())
+        receipt = json.loads((self.root / relative_path).read_text(encoding="utf-8"))
+        self.assertEqual(len(receipt["reviews"]), 1)
+
+    def test_record_refuses_a_version_that_matches_no_winner_pin(self):
+        (self.root / "catalogs" / "landscape" / "foundation.json").write_text(json.dumps({"layers": [
+            {"winners": [{"component_id": "widget", "pin": "2.0.0rc5 (tag v2.0.0rc5)"}]}]}), encoding="utf-8")
+        argv = ["record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands", "--component-version", "2.0.0rc5"]
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            self.assertEqual(self._run(argv), 2, buffer.getvalue())
+        self.assertIn("--allow-unbound-version", buffer.getvalue())
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self._run([*argv, "--allow-unbound-version"]), 0)
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run([*argv[:-1], "2.0.0rc5 (tag v2.0.0rc5)"])
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+
     def test_review_from_the_recorders_identity_is_refused(self):
         exit_code, output = self._record_then_review(reviewer="test-recorder")
         self.assertEqual(exit_code, 2, output)
