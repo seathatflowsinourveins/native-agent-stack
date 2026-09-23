@@ -40,34 +40,80 @@
 #     keys that look like a relative path (contain "." or "/", or are one of a small
 #     set of known extension-less filenames) so a credential-shaped key such as
 #     "api_key" or "token" is never matched by this allowlist even inside those files.
-#   - Git commit/tree ids referenced in two dated review narratives (pin/commit/tree/
-#     source_pin/@ context words only), restricted to those two exact files.
+#   - Git commit/tree ids referenced in two dated review narratives: no longer
+#     handled by an in-config allowlist (see the note below the codex-review-64
+#     paragraph); the reviewed real lines are exempted individually via exact
+#     fingerprint in the root .gitleaksignore file instead.
 #   - Opaque Alpaca pagination cursors ("next_page_token") in one retained
-#     historical-bars receipt, restricted to that exact file and to the cursor's own
-#     base64-with-padding value shape (regexTarget = "secret"), not the whole line,
-#     so any other credential on the same line is still detected.
+#     historical-bars receipt, restricted to that exact file, keyed on the literal
+#     "next_page_token" field, and anchored to the whole line.
 #   - sha256sum-style "<64-hex>  <filename>" lines inside a JSON string array in two
 #     sealed comparison-protocol files, restricted to those two exact files.
-# After this config, `gitleaks git . --config .gitleaks.toml --max-target-megabytes 2`
-# restricted to this branch's own ancestry (--log-opts="HEAD") scanned 376 commits
-# (~756 MB) and produced 0 findings (re-measured 2026-09-22, this fix round;
-# `git merge-base --is-ancestor` confirms every commit scanned this way is an
-# ancestor of this branch's HEAD). The same command with default log-opts (which
-# walks all refs reachable in this shared, concurrently used repository, not just
-# this branch) scanned 542 commits and produced exactly 1 residual finding:
-# tests/test_lane_packets.py on commit 34fc51b, confirmed NOT an ancestor of this
-# branch (`git merge-base --is-ancestor 34fc51b HEAD` fails) and not a path this
-# unit owns or created - a synthetic fixture on a different, concurrently active
-# sibling branch (PR-5, "packets unit"). `gitleaks dir .` (working tree only)
-# produced 0 findings. The default-log-opts commit count and the sibling-branch
-# finding are NOT stable invariants: this is a shared repository with other
-# active branches, so a rerun on a different day can see a different count or a
-# different (or zero) number of out-of-ancestry findings; only the HEAD-scoped
-# 0-findings result is this unit's own acceptance evidence. This means the
-# published acceptance command (default log-opts, no --log-opts restriction)
-# does not currently reach 0 findings by itself; reaching 0 requires either
-# `--log-opts="HEAD"` or the sibling branch merging/rebasing its own fix. This
-# is flagged for a coordinator decision, not resolved by this unit.
+#
+# 2026-09-22, Codex cross-family review fix round (codex-review-64): every
+# `regexTarget = "line"` regex below is now anchored to the WHOLE line
+# (`^\s*...,?\s*$`), not just a substring match anywhere on it. An unanchored
+# `regexTarget = "line"` allowlist exempts the ENTIRE line once its pattern matches
+# anywhere on it -- so a line holding both an allowed digest ("sha256": "<64-hex>")
+# AND an unrelated secret ("api_key": "<64-hex>") on the same physical line was
+# exempted for both, not just the digest. The `next_page_token` cursor exemption
+# was also changed from `regexTarget = "secret"` (matching only the value's
+# base64-with-padding shape, anywhere, under no key constraint beyond the path) to
+# a keyed, line-anchored `regexTarget = "line"` regex requiring the literal
+# `"next_page_token"` field name, so an unrelated `api_key` value of the same shape
+# is not incidentally exempted. Regression coverage for both fixes is in
+# tests/test_gitleaks_config.py.
+#
+# 2026-09-22, the prose-narrative commit-id allowlist that previously lived
+# here (an in-config regex under generic-api-key/sourcegraph-access-token,
+# restricted to the two blind-catalog-convergence review files) was removed
+# after four review rounds (the Opus evidence review of this branch, not
+# codex-review-72; a blind Codex cross-family review of PR #83; a blind
+# Opus/Codex evidence review of that fix; and a final blind Codex review,
+# codex-review-83b) each found it leaky in a new way that RE2 (gitleaks'
+# regex engine, which has no lookaround or backreferences) cannot close with
+# a regex fix alone -- most recently, its context-word separator could
+# itself absorb leading hex characters, and a non-hex-shaped secret sharing
+# the same JSON string as a real commit reference remained exempted in full
+# regardless of how the marker/hex grammar was tightened. The two review
+# files' real narrative lines are now exempted individually by exact
+# `commit:path:rule:line` fingerprint in the root .gitleaksignore file
+# (gitleaks' own mechanism for known historical false positives, read from
+# that file by default); a later commit changing a matching line gets a new
+# fingerprint and is still detected. See .gitleaksignore's header comment for
+# the full rationale, the generation commands, and the rule that fingerprints
+# are added only for reviewed false positives, never for real secrets.
+#
+# After this config (and the root .gitleaksignore, which gitleaks reads by
+# default), `gitleaks git . --config .gitleaks.toml --max-target-megabytes 2`
+# restricted to this branch's own ancestry (--log-opts="HEAD") scanned 409
+# commits (~1.03 GB) and produced 0 findings (re-measured 2026-09-22,
+# codex-review-83b fix round, after replacing the prose-narrative regex
+# allowlist with .gitleaksignore fingerprints; `git merge-base --is-ancestor`
+# confirms every commit scanned this way is an ancestor of this branch's HEAD).
+# Before adding .gitleaksignore, the same command against a scratch copy of
+# this config with both narrative-allowlist blocks simply removed (no
+# replacement) produced 15 findings / 14 unique fingerprints, all in the two
+# review-narrative files the removed allowlist covered; `gitleaks dir .`
+# against that same scratch config produced 0 findings, confirming the
+# allowlist removal did not surface any finding outside those two files
+# before .gitleaksignore was added to re-suppress them individually. The
+# default-log-opts (all-refs) count and any out-of-ancestry sibling-branch
+# finding reported by an earlier revision of this comment were NOT re-measured
+# in this fix round: this is a shared repository with other active branches,
+# so a rerun on a different day can see a different count; only the
+# HEAD-scoped 0-findings result above is this unit's own acceptance evidence,
+# and reaching 0 on the default (all-refs) command may still require either
+# `--log-opts="HEAD"` or another branch's own fix -- unchanged from before,
+# and still a coordinator decision, not resolved by this unit.
+#
+# Before the whole-line-anchoring fix above, the same `--log-opts="HEAD"` command
+# (anchored to a single line only, pre-fix) additionally flagged two corpus_files
+# entries in protocol-C.json and protocol.sealed.json (lines 98-99 each) because
+# the underlying generic-api-key rule's own match for those array entries spans
+# TWO adjacent lines; the corpus_files allowlist regex was widened (see its own
+# comment above) to match one-or-more consecutive corpus_files-shaped lines, which
+# resolved both without reverting to an unanchored match.
 #
 # `--exit-code 0` tells gitleaks to always return process exit code 0, findings
 # or not (it does NOT mean "0 findings required"); pass/fail must be read from
@@ -131,7 +177,7 @@ paths = [
 ]
 regexTarget = "line"
 regexes = [
-  '''"(?:after_neutral_key_manifest_sha256|archive_sha256|arms_json_sha256|artifact_archive_sha256|artifact_sha256|base_commit|before_neutral_key_manifest_sha256|binary_sha256_before|binary_sha256|cases_sealed_sha256|checkpoint_sha256|claim_sha256|commit|completed_sha256|config_sha256|content_sha256|corporate_actions_ledger|corpus_sha256sums|coverage_manifest|coverage_probes|dagu_archive_sha256|dagu|daily_parquet|dataset_ledger|derived_sha256|disk-token|disk_token|downloaded_receipt_sha256|entitlement_probe|evaluate_sha256|evaluated_at_commit|evaluation_events|expected_symbol_sha256|frozen_commit|head_sha|image_sha256|input_sha256|installed_binary_sha256|interpreter_sha256|ledger_sha256|machine_id_sha256|manifest_sha256|openapi_sha256|payload_iso_sha256|plan_sha256|preparation_receipt_sha256|private_original_sha256|python_sha256|qemu_binary_sha256|raw_sha256|recovered_sha256|refetch_check|response_sha256|result_sha256|retained_sha256|rtk_archive_sha256|runner_sha256|scan_private|seal_sha256|seed_sha256|sha256|source_head_pin|source_revision|source_sha256|stderr_raw_sha256|stderr_sha256|stdout_raw_sha256|stdout_sha256|symbols_sha256|ubuntu_keyring_sha256|uv_executable_sha256|workflow_sha256)":\s*"(?:[0-9a-f]{40}|[0-9a-f]{64})"''',
+  '''^\s*"(?:after_neutral_key_manifest_sha256|archive_sha256|arms_json_sha256|artifact_archive_sha256|artifact_sha256|base_commit|before_neutral_key_manifest_sha256|binary_sha256_before|binary_sha256|cases_sealed_sha256|checkpoint_sha256|claim_sha256|commit|completed_sha256|config_sha256|content_sha256|corporate_actions_ledger|corpus_sha256sums|coverage_manifest|coverage_probes|dagu_archive_sha256|dagu|daily_parquet|dataset_ledger|derived_sha256|disk-token|disk_token|downloaded_receipt_sha256|entitlement_probe|evaluate_sha256|evaluated_at_commit|evaluation_events|expected_symbol_sha256|frozen_commit|head_sha|image_sha256|input_sha256|installed_binary_sha256|interpreter_sha256|ledger_sha256|machine_id_sha256|manifest_sha256|openapi_sha256|payload_iso_sha256|plan_sha256|preparation_receipt_sha256|private_original_sha256|python_sha256|qemu_binary_sha256|raw_sha256|recovered_sha256|refetch_check|response_sha256|result_sha256|retained_sha256|rtk_archive_sha256|runner_sha256|scan_private|seal_sha256|seed_sha256|sha256|source_head_pin|source_revision|source_sha256|stderr_raw_sha256|stderr_sha256|stdout_raw_sha256|stdout_sha256|symbols_sha256|ubuntu_keyring_sha256|uv_executable_sha256|workflow_sha256)":\s*"(?:[0-9a-f]{40}|[0-9a-f]{64})",?\s*$''',
 ]
 
 # Content digests under filename-shaped JSON keys (whole-file or whole-subtree
@@ -162,40 +208,41 @@ paths = [
 ]
 regexTarget = "line"
 regexes = [
-  '''"(?:[A-Za-z0-9_$][A-Za-z0-9_\-./$]*[./][A-Za-z0-9_\-.$]*|\.[A-Za-z0-9_\-./$]+|Dockerfile|LICENSE|Makefile|SHA256SUMS)":\s*"(?:[0-9a-f]{40}|[0-9a-f]{64})"''',
+  '''^\s*"(?:[A-Za-z0-9_$][A-Za-z0-9_\-./$]*[./][A-Za-z0-9_\-.$]*|\.[A-Za-z0-9_\-./$]+|Dockerfile|LICENSE|Makefile|SHA256SUMS)":\s*"(?:[0-9a-f]{40}|[0-9a-f]{64})",?\s*$''',
 ]
 
-# 40-hex git commit/tree ids referenced in dated review-narrative prose (not JSON
-# key:value pairs), restricted to the two review files that hold them and to lines
-# where a pin/commit/tree/source context word or an "@version" separator sits
-# immediately before the hex id.
+# Opaque Alpaca pagination cursor retained in one historical-bars receipt. Anchored
+# to the WHOLE line and keyed on the literal "next_page_token" field name (not just
+# the cursor's base64-with-padding shape): an earlier revision used
+# `regexTarget = "secret"` matching only that shape, which would also exempt an
+# unrelated `api_key`/token value of the same shape anywhere in this path, even on
+# a different key. This form requires the exact `"next_page_token": "<value>"` line
+# with nothing else on it, so any other credential-shaped value sharing this line
+# (or this base64 shape under a different key) is still detected.
 [[rules.allowlists]]
-description = "Git commit/tree ids referenced in blind-catalog-convergence review narrative"
-condition = "AND"
-paths = [
-  '''^evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review\.json$''',
-  '''^evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger\.json$''',
-]
-regexTarget = "line"
-regexes = [
-  '''(?i)(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b''',
-]
-
-# Opaque Alpaca pagination cursor retained in one historical-bars receipt. Scoped to
-# the cursor's own base64-with-padding value shape (regexTarget = "secret"), not the
-# whole line, so any other credential-shaped value on the same line is still
-# detected (e.g. a ghp_-prefixed token, which this shape never matches).
-[[rules.allowlists]]
-description = "Opaque market-data pagination cursor retained in one historical receipt"
+description = "next_page_token cursor, keyed and line-anchored"
 condition = "AND"
 paths = ['''^blueprints/us-equities/broad-universe/receipt\.json$''']
-regexTarget = "secret"
+regexTarget = "line"
 regexes = [
-  '''^[A-Za-z0-9+/]{16,}={1,2}$''',
+  '''^\s*"next_page_token":\s*"[A-Za-z0-9+/]{16,}={1,2}"\s*,?\s*$''',
 ]
 
 # sha256sum-style "<64-hex>  <filename>" lines inside a JSON string array, restricted
 # to the two sealed-protocol files that record them.
+#
+# The base generic-api-key rule's own match for these array entries can span TWO
+# adjacent array-entry lines at once (its separator context tolerates the newline
+# between one entry's trailing comma and the next entry's opening quote), so the
+# text gitleaks evaluates this `regexTarget = "line"` allowlist against can itself
+# be that two-line span, not always a single physical line (re-measured 2026-09-22,
+# codex-review-64 fix round: `gitleaks git . --log-opts=HEAD` flagged exactly this
+# shape at protocol-C.json:98-99 and protocol.sealed.json:98-99 once the allowlist
+# below was anchored to a single line only). The regex is therefore anchored to ONE
+# OR MORE consecutive lines that are EACH individually shaped exactly like a
+# corpus_files entry, with nothing else on any of them -- still rejecting a line
+# that mixes a real entry with any unrelated key/value pair, since `[^"]+` cannot
+# cross the double-quote that would introduce one.
 [[rules.allowlists]]
 description = "sha256sum-style corpus_files entries in sealed comparison protocols"
 condition = "AND"
@@ -205,7 +252,7 @@ paths = [
 ]
 regexTarget = "line"
 regexes = [
-  '''"[0-9a-f]{64}\s{2}[^"]+"''',
+  '''^(?:\s*"[0-9a-f]{64}\s{2}[^"]+",?\s*\n?)+$''',
 ]
 
 [[rules]]
@@ -245,18 +292,5 @@ paths = [
 ]
 regexTarget = "line"
 regexes = [
-  '''"(?:after_neutral_key_manifest_sha256|archive_sha256|arms_json_sha256|artifact_archive_sha256|artifact_sha256|base_commit|before_neutral_key_manifest_sha256|binary_sha256_before|binary_sha256|cases_sealed_sha256|checkpoint_sha256|claim_sha256|commit|completed_sha256|config_sha256|content_sha256|corporate_actions_ledger|corpus_sha256sums|coverage_manifest|coverage_probes|dagu_archive_sha256|dagu|daily_parquet|dataset_ledger|derived_sha256|disk-token|disk_token|downloaded_receipt_sha256|entitlement_probe|evaluate_sha256|evaluated_at_commit|evaluation_events|expected_symbol_sha256|frozen_commit|head_sha|image_sha256|input_sha256|installed_binary_sha256|interpreter_sha256|ledger_sha256|machine_id_sha256|manifest_sha256|openapi_sha256|payload_iso_sha256|plan_sha256|preparation_receipt_sha256|private_original_sha256|python_sha256|qemu_binary_sha256|raw_sha256|recovered_sha256|refetch_check|response_sha256|result_sha256|retained_sha256|rtk_archive_sha256|runner_sha256|scan_private|seal_sha256|seed_sha256|sha256|source_head_pin|source_revision|source_sha256|stderr_raw_sha256|stderr_sha256|stdout_raw_sha256|stdout_sha256|symbols_sha256|ubuntu_keyring_sha256|uv_executable_sha256|workflow_sha256)":\s*"(?:[0-9a-f]{40}|[0-9a-f]{64})"''',
-]
-
-# Same prose-narrative allowlist as generic-api-key above.
-[[rules.allowlists]]
-description = "Git commit/tree ids referenced in blind-catalog-convergence review narrative"
-condition = "AND"
-paths = [
-  '''^evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review\.json$''',
-  '''^evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger\.json$''',
-]
-regexTarget = "line"
-regexes = [
-  '''(?i)(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b''',
+  '''^\s*"(?:after_neutral_key_manifest_sha256|archive_sha256|arms_json_sha256|artifact_archive_sha256|artifact_sha256|base_commit|before_neutral_key_manifest_sha256|binary_sha256_before|binary_sha256|cases_sealed_sha256|checkpoint_sha256|claim_sha256|commit|completed_sha256|config_sha256|content_sha256|corporate_actions_ledger|corpus_sha256sums|coverage_manifest|coverage_probes|dagu_archive_sha256|dagu|daily_parquet|dataset_ledger|derived_sha256|disk-token|disk_token|downloaded_receipt_sha256|entitlement_probe|evaluate_sha256|evaluated_at_commit|evaluation_events|expected_symbol_sha256|frozen_commit|head_sha|image_sha256|input_sha256|installed_binary_sha256|interpreter_sha256|ledger_sha256|machine_id_sha256|manifest_sha256|openapi_sha256|payload_iso_sha256|plan_sha256|preparation_receipt_sha256|private_original_sha256|python_sha256|qemu_binary_sha256|raw_sha256|recovered_sha256|refetch_check|response_sha256|result_sha256|retained_sha256|rtk_archive_sha256|runner_sha256|scan_private|seal_sha256|seed_sha256|sha256|source_head_pin|source_revision|source_sha256|stderr_raw_sha256|stderr_sha256|stdout_raw_sha256|stdout_sha256|symbols_sha256|ubuntu_keyring_sha256|uv_executable_sha256|workflow_sha256)":\s*"(?:[0-9a-f]{40}|[0-9a-f]{64})",?\s*$''',
 ]

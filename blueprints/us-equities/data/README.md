@@ -62,7 +62,36 @@ calendar; `open`/`high`/`low`/`close` all `> 0`; `high >= max(open, close)`;
 integral and `>= 0` (`volume_integral_non_negative`), validated on the RAW
 column BEFORE any lossy numeric coercion -- a raw value like `-0.5` would
 otherwise be silently truncated to `0` by a later `astype('int64')` and pass
-a post-coercion `>= 0` check. It writes `gate-result.json`:
+a post-coercion `>= 0` check.
+
+A recognized pandera failure is reported under its named check even when
+pandera did not attach a row index to that failure case (e.g. the
+`valid_trading_session` check calling `calendar.is_session()`, which raises
+rather than returning `False` for an unparseable date, produces a
+`failure_cases` row with `index: null`) -- `_summarize()` counts every
+recorded failure case for a check regardless of index availability and
+records `"row index unavailable"` in the check's `detail` when no index was
+available for it, rather than silently reporting the check as "pass" (Codex
+cross-family review finding, `codex-review-64`).
+
+`volume_integral_non_negative` Decimal-parses the RAW `volume` cell's exact
+source text with `decimal.Decimal` (rejecting non-finite values, negative
+values including a `-0`/`-0.0` produced by a negative literal, any non-zero
+fractional part, and values above int64 max) rather than converting through
+`float`/`pd.to_numeric` first: a float round-trip is itself lossy for values
+like `-1e-400` (underflows to `-0.0`, which then reads as non-negative and
+integral) or `9007199254740992.5` (loses its fractional part once past
+float64's ~15-17 significant digits), both of which silently passed the
+gate's earlier float-based check (Codex cross-family review finding,
+`codex-review-64`). The `.csv` loader reads every column with `dtype=str` so
+`volume`'s exact source text survives to that Decimal parse; an integer
+already read as int64 (a whole-number CSV cell, or a Parquet int64 column) is
+exact either way and goes through `Decimal(int(...))`, never a float. A
+Parquet `volume` column stores a typed float/int at write time, so this
+exactness guarantee is CSV-only -- a lossy Parquet float `volume` cell falls
+back to `Decimal(repr(value))`, a best-effort check on whatever precision the
+Parquet writer already kept, not the source-text guarantee CSV gets. It
+writes `gate-result.json`:
 `{status: "pass"|"fail", input_sha256, row_count, checks: [{name, status,
 detail}], versions, checked_at}`. Any exception -- schema failure or an
 unreadable/malformed input, a missing dependency, an unknown calendar code --
@@ -86,10 +115,23 @@ Parquet is binary):
 * `fractional-negative-volume.csv` has one row with raw `volume=-0.5`; it
   fails only `volume_integral_non_negative` (Codex cross-family review
   finding, PR-4 follow-up).
+* `null-index-session.csv` has one row with `session=not-a-date`, whose
+  `valid_trading_session` pandera failure case carries `index: null`
+  (`calendar.is_session()` raises rather than returning `False`); it fails
+  only `valid_trading_session`, with `"row index unavailable"` in that
+  check's detail (Codex cross-family review finding `codex-review-64`).
+* `lossy-volume-conversion.csv` has raw `volume` values `-1e-400` and
+  `9007199254740992.5`, both of which a float-based check silently passed;
+  it fails only `volume_integral_non_negative` for both rows (Codex
+  cross-family review finding `codex-review-64`).
 
 Each fixture's retained gate output lives alongside it
 (`fixtures/<name>-gate-result.json`). `tests/test_promotion_gate.py` reruns
-every fixture through the isolated venv.
+every fixture through the isolated venv; `tests/test_promotion_gate_codex_review.py`
+additionally covers the `null-index-session.csv` and
+`lossy-volume-conversion.csv` regressions plus pure-stdlib unit tests for
+`_summarize()`'s index-unavailable path and `_volume_cell_fails()`'s Decimal
+parsing.
 
 The gate runs in its own environment so the paper runtime
 (`../adaptive-paper/runner.py`) never imports pandera/pandas/
