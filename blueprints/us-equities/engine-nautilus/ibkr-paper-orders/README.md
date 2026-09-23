@@ -257,3 +257,17 @@ trading outside regular hours:
 These runs cover acceptance-plan section 5: step 1 (in the pre-check), and from step 3 submit/acknowledge, cancel,
 fill and flat. They do not cover reconnect with an open order, restart reconciliation, or the step 4 kill-switch
 exercise. 1.231.0 is not the pinned 2.0.0rc5 destination.
+
+## After hours (`plan-post.json`)
+
+`run --plan plan-post.json` is the same bounded procedure for the 16:00-20:00
+America/New_York session. The plan (revision 4, frozen before its first run) keeps
+revision 3's bounds, cases, timeouts, data and stop rules and changes only the
+session: every order carries `outsideRth` (NautilusTrader 1.231.0's
+`IBOrderTags(outsideRth=True)`, which its IB execution client turns into the IB order
+field), today's window comes from the contract's `tradingHours` instead of
+`liquidHours` (missing or unparseable still refuses the run), and the data client's
+`use_regular_trading_hours` is off. `plan.json` is unchanged and still refuses a run
+outside 09:30-16:00; only these two predeclared plans can be selected. After-hours
+liquidity is thinner: the same quote-age limit and marketable offset apply, so a stale
+or wide quote leaves the run incomplete instead of paying up.

@@ -29,6 +29,9 @@ from zoneinfo import ZoneInfo
 
 HERE = Path(__file__).resolve().parent
 PLAN_PATH = HERE / "plan.json"
+# Predeclared plans only: the regular-session plan and its after-hours variant.
+PLAN_NAMES = ("plan.json", "plan-post.json")
+SESSIONS = {("09:30", "16:00"): "regular", ("16:00", "20:00"): "after_hours"}
 HARNESS_PATH = Path(__file__).resolve()
 # The gate's flip receipt; this harness never writes there.
 GATE_RECEIPT = HERE.parent / "ibkr-acceptance" / "receipt.json"
@@ -158,7 +161,15 @@ def validate_plan(plan: dict) -> list[str]:
              "max_cancel_attempts_per_order must be 2..5")
         s = plan["session"]
         need(s["timezone"] == "America/New_York", "session timezone must be America/New_York")
-        need(s["open"] == "09:30" and s["close"] == "16:00", "session must be 09:30-16:00")
+        kind = SESSIONS.get((s["open"], s["close"]))
+        need(kind is not None, "session must be 09:30-16:00 (regular) or 16:00-20:00 (after hours)")
+        # IB rejects or holds an order outside regular hours unless it carries outsideRth.
+        need(s.get("outside_rth", False) is (kind == "after_hours"),
+             "outside_rth must be true exactly for the after-hours session")
+        need(s.get("contract_hours_field", "liquidHours") == ("tradingHours" if kind == "after_hours" else "liquidHours"),
+             "the after-hours session reads the contract's tradingHours; the regular session its liquidHours")
+        need(kind != "after_hours" or s.get("use_contract_liquid_hours") is True,
+             "the after-hours session must check today's contract hours")
         need(s["close_buffer_minutes"] >= 10, "close_buffer_minutes must be >= 10")
         d = plan["data"]
         need(0 < d["quote_max_age_seconds"] <= 10, "quote_max_age_seconds must be in (0, 10]")
@@ -428,6 +439,7 @@ class CheckState:
                   "spy_position": False, "open_orders": 0, "open_order_statuses": [], "contract": None,
                   "errors": [], "info": []}
         self._liquid_hours = ""
+        self._trading_hours = ""
         self._time_zone_id = ""
 
     def managedAccounts(self, accountsList):
@@ -468,6 +480,7 @@ class CheckState:
     def contractDetails(self, reqId, d):
         c = d.contract
         self._liquid_hours = d.liquidHours or ""
+        self._trading_hours = getattr(d, "tradingHours", "") or ""
         self._time_zone_id = d.timeZoneId or ""
         self.r["contract"] = {"secType": c.secType, "currency": c.currency, "exchange": c.exchange,
                               "primaryExchange": c.primaryExchange, "minTick": d.minTick,
@@ -565,9 +578,10 @@ def run_check(plan: dict, port: int, *, with_session: bool, client_factory=None,
         required = tuple(k for k, *_ in [("accounts",)] + steps)
         status = check_verdict(p.r, p.completed(), required=required)
         result.update(status=status, observed=p.r, requests_completed=p.completed())
-        if with_session and p._liquid_hours:
+        if with_session and (p._liquid_hours or p._trading_hours):
             # Kept whole (IB lists about a month of days); never written to a receipt.
             result["liquid_hours"] = p._liquid_hours
+            result["trading_hours"] = p._trading_hours
             result["time_zone_id"] = p._time_zone_id
         return result, (p.single_account() if status == "passed" else None)
     finally:
@@ -742,6 +756,7 @@ def build_strategy_class():
     from nautilus_trader.model.identifiers import ClientOrderId, InstrumentId
     from nautilus_trader.model.objects import Price
     from nautilus_trader.trading.strategy import Strategy
+    from nautilus_trader.adapters.interactive_brokers.common import IBOrderTags
 
     TERMINAL_EVENTS = (OrderCanceled, OrderRejected, OrderDenied, OrderExpired)
 
@@ -839,20 +854,28 @@ def build_strategy_class():
                 self._try_step()
 
         # ---------------------------------------------------------- order creation (the only factory calls)
+        def _order_tags(self):
+            """IB order fields for every order: outsideRth exactly when the plan is the
+            after-hours session (the execution client parses IBOrderTags:<json>)."""
+            return [IBOrderTags(outsideRth=True).value] if self.ctx.plan["session"].get("outside_rth") else None
+
         def _new_c1_order(self, price, qty):
             return self.order_factory.limit(
                 instrument_id=self._iid, order_side=OrderSide.BUY, quantity=qty, price=price,
-                time_in_force=TimeInForce.DAY, client_order_id=ClientOrderId(self.ctx.client_order_id("C1")))
+                time_in_force=TimeInForce.DAY, client_order_id=ClientOrderId(self.ctx.client_order_id("C1")),
+                tags=self._order_tags())
 
         def _new_c3_order(self, price, qty):
             return self.order_factory.limit(
                 instrument_id=self._iid, order_side=OrderSide.BUY, quantity=qty, price=price,
-                time_in_force=TimeInForce.DAY, client_order_id=ClientOrderId(self.ctx.client_order_id("C3")))
+                time_in_force=TimeInForce.DAY, client_order_id=ClientOrderId(self.ctx.client_order_id("C3")),
+                tags=self._order_tags())
 
         def _new_flatten_order(self, price, qty, suffix):
             return self.order_factory.limit(
                 instrument_id=self._iid, order_side=OrderSide.SELL, quantity=qty, price=price,
-                time_in_force=TimeInForce.DAY, client_order_id=ClientOrderId(self.ctx.client_order_id(suffix)))
+                time_in_force=TimeInForce.DAY, client_order_id=ClientOrderId(self.ctx.client_order_id(suffix)),
+                tags=self._order_tags())
 
         def _submit(self, case, suffix, side, price_dec, qty_int):
             """Check spacing, reserve budget, create the order with its case's builder, then submit."""
@@ -1300,7 +1323,8 @@ def build_node_config(plan: dict, account_id: str, port: int, log_level: str = "
                                              primaryExchange=inst["primary_exchange"], currency=inst["currency"])]),
     )
     data_cfg = InteractiveBrokersDataClientConfig(
-        ibg_host=plan["host"], ibg_port=port, ibg_client_id=node_id, use_regular_trading_hours=True,
+        ibg_host=plan["host"], ibg_port=port, ibg_client_id=node_id,
+        use_regular_trading_hours=not plan["session"].get("outside_rth", False),
         market_data_type=IBMarketDataTypeEnum.REALTIME, instrument_provider=provider,
         connection_timeout=t["node_start_seconds"], request_timeout_secs=t["per_step_seconds"])
     exec_cfg = InteractiveBrokersExecClientConfig(
@@ -1585,7 +1609,7 @@ def flat_proof(plan: dict, port: int, check_fn, sleep_fn, overall_end: float) ->
 def _sanitized_check(result: dict | None) -> dict | None:
     if result is None:
         return None
-    return {k: v for k, v in result.items() if k != "liquid_hours"}
+    return {k: v for k, v in result.items() if k not in ("liquid_hours", "trading_hours")}
 
 
 def cmd_check(a, check_fn=run_check) -> int:
@@ -1617,7 +1641,8 @@ def cmd_run(a, check_fn=run_check, node_fn=run_node, now_fn=None, sleep_fn=time.
     if is_gate_receipt(a.receipt):
         print(json.dumps({"status": "refused_gate_receipt_path", "exit_code": 3}))
         return 3
-    receipt = base_receipt()
+    plan_path = HERE / getattr(a, "plan", "plan.json")
+    receipt = base_receipt(plan_path)
     receipt.update(port=a.port, status=None)
     account = None
     ctx = None
@@ -1627,7 +1652,7 @@ def cmd_run(a, check_fn=run_check, node_fn=run_node, now_fn=None, sleep_fn=time.
     flat = {"status": "not_attempted", "positions": None, "open_orders": None, "attempts": []}
     try:
         try:
-            plan = load_plan()
+            plan = load_plan(plan_path)
             errors = validate_plan(plan)
             if errors:
                 receipt.update(status="refused_plan_invalid", plan_errors=errors)
@@ -1656,10 +1681,14 @@ def cmd_run(a, check_fn=run_check, node_fn=run_node, now_fn=None, sleep_fn=time.
             sessions = None
             if plan["session"].get("use_contract_liquid_hours"):
                 # Fail closed: without today's contract hours a holiday or early close is invisible.
+                # The after-hours plan reads tradingHours (04:00-20:00 segments), the regular
+                # plan liquidHours; both use the same IB segment format.
+                field = plan["session"].get("contract_hours_field", "liquidHours")
+                hours = pre.get("trading_hours" if field == "tradingHours" else "liquid_hours") or ""
                 tz_name = pre.get("time_zone_id") or plan["session"]["timezone"]
                 local_day = now.astimezone(ZoneInfo(plan["session"]["timezone"])).date()
-                sessions = parse_liquid_hours(pre.get("liquid_hours") or "", tz_name, local_day)
-                receipt["session_check"].update(liquid_hours_present=bool(pre.get("liquid_hours")),
+                sessions = parse_liquid_hours(hours, tz_name, local_day)
+                receipt["session_check"].update(contract_hours_field=field, liquid_hours_present=bool(hours),
                                                 liquid_hours_parsed=sessions is not None)
                 if sessions is None:
                     receipt["session_check"]["with_liquid_hours"] = "today_missing_or_unparseable"
@@ -1734,6 +1763,8 @@ def main(argv=None, **hooks) -> int:
     r = sub.add_parser("run", help="bounded paper order run")
     r.add_argument("--port", type=int, default=4002)
     r.add_argument("--receipt", required=True)
+    r.add_argument("--plan", choices=PLAN_NAMES, default="plan.json",
+                   help="predeclared plan next to this file: plan.json (09:30-16:00) or plan-post.json (16:00-20:00, outsideRth)")
     r.add_argument("--log-level", default="WARNING", help="Nautilus console log level (console output is not redacted)")
     a = ap.parse_args(argv)
     install_signal_handlers()

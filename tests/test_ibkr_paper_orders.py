@@ -48,6 +48,37 @@ def ny(y, mo, d, h, mi, s=0):
 WEDNESDAY_10AM = ny(2026, 9, 23, 10, 0)
 
 
+class AfterHoursPlan(unittest.TestCase):
+    def test_post_plan_is_the_regular_plan_with_only_the_session_changed(self):
+        post, rth = RUN.load_plan(RUN.HERE / "plan-post.json"), RUN.load_plan(RUN.HERE / "plan.json")
+        self.assertEqual(RUN.validate_plan(post), [])
+        self.assertEqual((post["session"]["open"], post["session"]["close"], post["session"]["outside_rth"]),
+                         ("16:00", "20:00", True))
+        for key in set(rth) - {"session", "revision", "revision_note"}:
+            self.assertEqual(post[key], rth[key], key)
+
+    def test_session_and_outside_rth_must_agree(self):
+        post, rth = RUN.load_plan(RUN.HERE / "plan-post.json"), RUN.load_plan(RUN.HERE / "plan.json")
+        cases = [(post, {"outside_rth": False}), (rth, {"outside_rth": True}),
+                 (post, {"contract_hours_field": "liquidHours"}), (rth, {"contract_hours_field": "tradingHours"}),
+                 (post, {"use_contract_liquid_hours": False}), (post, {"open": "16:00", "close": "21:00"})]
+        for plan, change in cases:
+            with self.subTest(change=change):
+                bad = copy.deepcopy(plan)
+                bad["session"].update(change)
+                self.assertNotEqual(RUN.validate_plan(bad), [])
+
+    def test_only_predeclared_plans_are_selectable(self):
+        with self.assertRaises(SystemExit):
+            RUN.main(["run", "--receipt", "/dev/null", "--plan", "../plan.json"])
+
+    def test_every_order_builder_passes_the_plan_order_tags(self):
+        source = (RUN.HERE / "run.py").read_text()
+        builders = re.findall(r"def _new_\w+_order\(self[^)]*\):\n(?:.*\n){1,4}?.*tags=self\._order_tags\(\)\)", source)
+        self.assertEqual(len(builders), 3)
+        self.assertEqual(source.count("order_factory.limit("), 3)
+
+
 class PlanValidation(unittest.TestCase):
     def test_frozen_plan_is_valid(self):
         self.assertEqual(RUN.validate_plan(PLAN), [])
@@ -268,8 +299,9 @@ class FakeChecks:
     """Scripted run_check replacement: first call is the pre-run check, later calls the flat proof.
     A post entry that is an exception instance is raised instead of returning a result."""
 
-    def __init__(self, pre, post=("passed",), liquid_hours=TODAY_HOURS):
+    def __init__(self, pre, post=("passed",), liquid_hours=TODAY_HOURS, trading_hours=None):
         self.pre, self.post, self.calls, self.liquid_hours = pre, list(post), [], liquid_hours
+        self.trading_hours = trading_hours
 
     def __call__(self, plan, port, *, with_session, deadline_s=None):
         self.calls.append(with_session)
@@ -278,6 +310,8 @@ class FakeChecks:
             result = _check_result(status)
             if self.liquid_hours is not None:
                 result.update(liquid_hours=self.liquid_hours, time_zone_id="US/Eastern")
+            if self.trading_hours is not None:
+                result.update(trading_hours=self.trading_hours, time_zone_id="US/Eastern")
             return result, (FAKE_ACCOUNT if status == "passed" else None)
         status = self.post.pop(0) if self.post else "passed"
         if isinstance(status, BaseException):
@@ -287,7 +321,7 @@ class FakeChecks:
 
 
 class RunRefusals(unittest.TestCase):
-    def _run(self, port=4002, checks=None, now=WEDNESDAY_10AM, node_fn=None, receipt=None):
+    def _run(self, port=4002, checks=None, now=WEDNESDAY_10AM, node_fn=None, receipt=None, plan="plan.json"):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         path = receipt or str(Path(tmp.name) / "r.json")
@@ -299,10 +333,31 @@ class RunRefusals(unittest.TestCase):
             if node_fn:
                 node_fn(ctx)
 
-        args = SimpleNamespace(port=port, receipt=path, log_level="WARNING")
+        args = SimpleNamespace(port=port, receipt=path, log_level="WARNING", plan=plan)
         code = RUN.cmd_run(args, check_fn=checks, node_fn=fake_node, now_fn=lambda: now, sleep_fn=lambda s: None)
         text = Path(path).read_text() if Path(path).exists() else None
         return code, (json.loads(text) if text else None), text, checks, nodes
+
+    def test_after_hours_plan_reads_trading_hours_and_enters_the_node(self):
+        trading = "20260923:0400-20260923:2000;20260924:0400-20260924:2000"
+        code, r, text, checks, nodes = self._run(now=ny(2026, 9, 23, 19, 0), plan="plan-post.json",
+                                                 checks=FakeChecks("passed", trading_hours=trading))
+        self.assertEqual(nodes, [FAKE_ACCOUNT])
+        self.assertEqual(r["session_check"]["contract_hours_field"], "tradingHours")
+        self.assertEqual(r["session_check"]["with_liquid_hours"], "inside_window")
+        self.assertEqual(r["plan_sha256"], RUN.sha256_file(RUN.HERE / "plan-post.json"))
+        self.assertNotIn("0400-20260923", text)  # contract hours are never written to the receipt
+
+    def test_after_hours_plan_refused_without_todays_trading_hours(self):
+        code, r, _, _, nodes = self._run(now=ny(2026, 9, 23, 19, 0), plan="plan-post.json",
+                                         checks=FakeChecks("passed", trading_hours=""))
+        self.assertEqual((code, r["status"], nodes), (3, "refused_liquid_hours_unavailable", []))
+
+    def test_regular_plan_still_refused_after_hours_and_post_plan_before_16(self):
+        code, r, _, checks, _ = self._run(now=ny(2026, 9, 23, 19, 0))
+        self.assertEqual((code, r["status"], checks.calls), (3, "refused_outside_rth", []))
+        code, r, _, checks, _ = self._run(now=WEDNESDAY_10AM, plan="plan-post.json")
+        self.assertEqual((code, r["status"], checks.calls), (3, "refused_outside_rth", []))
 
     def test_non_paper_port_refused_before_connecting(self):
         code, r, _, checks, nodes = self._run(port=4001)
@@ -810,9 +865,22 @@ class NautilusBacktestFlow(unittest.TestCase):
         try:
             eng.run()
             self.statuses = {o.client_order_id.value: o.status_string() for o in strategy.cache.orders()}
+            self.order_tags = {o.client_order_id.value: o.tags for o in strategy.cache.orders()}
         finally:
             eng.dispose()
         return ctx, stops
+
+    def test_after_hours_plan_tags_every_order_outside_rth(self):
+        self.simulate(plan=RUN.load_plan(RUN.HERE / "plan-post.json"))
+        self.assertTrue(self.order_tags)
+        for cid, tags in self.order_tags.items():
+            with self.subTest(cid=cid):
+                self.assertEqual(len(tags), 1)
+                self.assertTrue(tags[0].startswith("IBOrderTags:"))
+                self.assertIs(json.loads(tags[0].removeprefix("IBOrderTags:"))["outsideRth"], True)
+        self.simulate()
+        self.assertTrue(self.order_tags)
+        self.assertTrue(all(not tags for tags in self.order_tags.values()))
 
     def _submit_times(self, ctx):
         orders = [o for c in RUN.CASE_IDS for o in ctx.cases[c]["orders"]] + ctx.cleanup_orders
