@@ -32,6 +32,20 @@ class TierValueTests(unittest.TestCase):
         self.assertEqual(g.tier_value(12), 12)
         self.assertIsNone(g.tier_value(None))
 
+    def test_trailing_parenthetical_note_containing_equals_is_dropped(self):
+        # catalog PR #125's wsl-workstation-128gb-projected workflow_concurrency_cap:
+        # a second '=' inside a trailing explanatory note previously made rsplit("=", 1)
+        # return "60)" (the tail of the note) instead of the actual result "16".
+        self.assertEqual(
+            g.tier_value("min(16, 60 - 2) = 16 (nproc inside WSL is the .wslconfig processors=60)"),
+            "16")
+
+    def test_multiple_equals_with_no_trailing_note_still_takes_the_last(self):
+        # Unchanged behavior: a string with several '=' but no trailing "(...)" note takes
+        # the result after the *last* one, as it always has.
+        self.assertEqual(
+            g.tier_value("max(6, round(99*0.25,1)=24.8), min(24.8, 32) = 24.8"), "24.8")
+
 
 class RepoKeyTests(unittest.TestCase):
     def test_release_and_tree_urls_share_a_key(self):

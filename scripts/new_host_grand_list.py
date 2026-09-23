@@ -295,14 +295,31 @@ def build() -> dict:
 
 def tier_value(value):
     """Reduce a labelled-projection arithmetic string to its result, e.g.
-    'vram_gb=24 >= 20 -> large-32b-q4' -> 'large-32b-q4'; 'min(16, 32 - 2) = 16' -> '16'."""
+    'vram_gb=24 >= 20 -> large-32b-q4' -> 'large-32b-q4'; 'min(16, 32 - 2) = 16' -> '16';
+    'min(16, 60 - 2) = 16 (nproc inside WSL is the .wslconfig processors=60)' -> '16' (a
+    trailing parenthetical explanatory note, itself possibly containing '=', is dropped
+    first; catalog PR #125 finding). A string with no trailing note still takes the result
+    after the *last* '=' (for example 'max(6, round(...)=24.8), min(24.8, 32) = 24.8' ->
+    '24.8'), unchanged from before."""
     if not isinstance(value, str):
         return value
     if "->" in value:
         return value.rsplit("->", 1)[1].strip()
-    if "=" in value:
-        return value.rsplit("=", 1)[1].strip()
-    return value
+    core = value
+    if core.rstrip().endswith(")"):
+        core = core.rstrip()
+        depth = 0
+        for index in range(len(core) - 1, -1, -1):
+            if core[index] == ")":
+                depth += 1
+            elif core[index] == "(":
+                depth -= 1
+                if depth == 0:
+                    core = core[:index].rstrip()
+                    break
+    if "=" in core:
+        return core.rsplit("=", 1)[1].strip()
+    return core
 
 
 def md_cell(value) -> str:
