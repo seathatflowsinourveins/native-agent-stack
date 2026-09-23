@@ -44,7 +44,7 @@ jobs:
           python3 scripts/validate_catalogs.py 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
           python3 scripts/validate_foundation.py --root . --json 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
           python3 scripts/validate_convergence.py --all-recorded --root . --json 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
-          python3 scripts/build_ecosystem.py --check 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
+          python3 scripts/build_ecosystem.py --check | tee "$PUBLICATION_DIR/explorer-check.json" | tee -a "$PUBLICATION_DIR/validation.log"
       - name: Archive only the validated Git commit
         shell: bash
         run: |
@@ -56,6 +56,36 @@ jobs:
           cd "$PUBLICATION_DIR"
           sha256sum "$(basename "$archive")" | tee archive.sha256
           stat --format='archive_bytes=%s' "$archive" | tee -a source.log
+      - name: Build the public explorer
+        shell: bash
+        run: |
+          set -euo pipefail
+          # docs/ecosystem/index.html is generated, not committed (see
+          # docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md);
+          # rebuild it from this validated commit and publish it as its own
+          # attested artifact alongside the source archive.
+          python3 scripts/build_ecosystem.py --write
+          # Publish only the bytes --check verified: the rebuild must match its output_sha256.
+          checked="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["output_sha256"])' "$PUBLICATION_DIR/explorer-check.json")"
+          built="$(sha256sum docs/ecosystem/index.html | awk '{print $1}')"
+          printf 'checked_explorer_sha256=%s\nbuilt_explorer_sha256=%s\n' "$checked" "$built" | tee "$PUBLICATION_DIR/explorer-build.log"
+          test "$built" = "$checked"
+          explorer="$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.explorer.html"
+          cp docs/ecosystem/index.html "$explorer"
+          cd "$PUBLICATION_DIR"
+          sha256sum "$(basename "$explorer")" | tee -a archive.sha256
+      - name: Scan the built explorer for private content before attesting it
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The build step above regenerates docs/ecosystem/index.html fresh
+          # every run and it is gitignored (see
+          # docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md),
+          # so "Validate the catalog and recorded evidence" above never saw
+          # this exact file: scan_publication() only walks git-tracked/listed
+          # paths. Scan the actual artifact that gets uploaded and attested.
+          explorer="$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.explorer.html"
+          python3 scripts/validate.py --scan-file "$explorer" 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
       - name: Fetch and SHA-checked-verify syft
         shell: bash
         run: |
@@ -194,6 +224,32 @@ jobs:
           expected="$(sha256sum "$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.spdx.json" | awk '{print $1}')"
           printf 'expected_sbom_sha256=%s\nuploaded_sbom_sha256=%s\n' \
             "$expected" "$UPLOADED_DIGEST" | tee "$PUBLICATION_DIR/sbom-upload.log"
+          test "$UPLOADED_DIGEST" = "$expected"
+      - name: Attest the public explorer
+        id: attest-explorer
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.explorer.html
+          push-to-registry: false
+          create-storage-record: false
+      - name: Upload the public explorer next to the archive
+        id: explorer-upload
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: native-agent-stack-${{ github.sha }}-explorer
+          path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.explorer.html
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+      - name: Match the uploaded explorer digest to the attested file
+        env:
+          UPLOADED_DIGEST: ${{ steps.explorer-upload.outputs.artifact-digest }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="$(sha256sum "$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.explorer.html" | awk '{print $1}')"
+          printf 'expected_explorer_sha256=%s\nuploaded_explorer_sha256=%s\n' \
+            "$expected" "$UPLOADED_DIGEST" | tee "$PUBLICATION_DIR/explorer-upload.log"
           test "$UPLOADED_DIGEST" = "$expected"
       - name: Preserve publication success or failure evidence
         if: always()
