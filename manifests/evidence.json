@@ -13489,18 +13489,18 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json",
-      "sha256": "8e751148ee88a4bb40e6634c6e1b2a36a998c6c78be0fa01f3cee1dd38a5f3b8",
-      "bytes": 28724
+      "sha256": "c1bd4b8acee7e7f21a800bf745f793fc6c1e8970390c68143dd1c9e12f4042ba",
+      "bytes": 41106
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json",
-      "sha256": "788f64636619faba667805ee5c00c9003826de658c4c20dc0759239adf69b19b",
-      "bytes": 28827
+      "sha256": "c51db9c8084fd7284233e520c56ad60da6e4f263639e0157b4dbbda734b17f4f",
+      "bytes": 34869
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json",
-      "sha256": "8409f4ce5426d888e2769cec491ba08169406f11fec17022a3022b27e8c7ee79",
-      "bytes": 4358
+      "sha256": "6f14792485c02e586bd9ca06c1a19fa597f292a355a64afd33e5e36114637f5b",
+      "bytes": 5038
     }
   ],
   "convergence_records": [

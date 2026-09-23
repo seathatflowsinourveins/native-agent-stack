@@ -31,6 +31,12 @@
      "isolation": "documented bwrap two-run replay (loopback only, cleared environment)",
      "outcome": "published as receipt-v2.json at 9d55cb4 with verdict-v2.json PASS (93 checks); the 2026-09-23 independent review found that verdict unqualified because precondition 0 was unmet",
      "receipt_sha256": ["8e751148ee88a4bb40e6634c6e1b2a36a998c6c78be0fa01f3cee1dd38a5f3b8"],
-     "reviewed_before_run": false, "status": "superseded by the next run from the review-fix harness"}
+     "reviewed_before_run": false, "status": "superseded by the next run from the review-fix harness"},
+    {"id": "bwrap-f079f6c", "observed_utc": ["2026-09-23T03:10:54.832732+00:00"],
+     "harness": "commit f079f6cf41db50fd266f9a429ee6b7a58e6f05c7 (review-fix harness)",
+     "isolation": "documented bwrap two-run replay (loopback only, cleared environment, read-only harness and data mounts)",
+     "outcome": "published as receipt-v2.json with verdict-v2.json FAIL: 96/96 execution checks pass, precondition_review fails because no retained review preceded the run",
+     "receipt_sha256": ["c1bd4b8acee7e7f21a800bf745f793fc6c1e8970390c68143dd1c9e12f4042ba"],
+     "reviewed_before_run": false, "status": "published; to be superseded by the first run from a reviewed harness"}
   ]
 }

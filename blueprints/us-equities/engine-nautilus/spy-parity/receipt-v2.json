@@ -232,7 +232,8 @@
     "resets": 0,
     "source": "distribution_module.py",
     "source_sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
-    "venue_module_count": 1
+    "venue_module_count": 1,
+    "venue_module_count_source": "length of the modules list passed to add_venue (harness configuration); the pinned engine exposes no accessor for a venue's modules"
   },
   "dividend_cash_usd": "428.64",
   "engine": {
@@ -320,7 +321,7 @@
   "gate": "G-a",
   "harness_commit": {
     "source": "declared by the operator on the command line; the isolated run cannot read Git, so local_source_sha256 is the binding record",
-    "value": "8c4d7e777f285bbbbc9a4eecc2a47e745a407b24"
+    "value": "f079f6cf41db50fd266f9a429ee6b7a58e6f05c7"
   },
   "id": "spy-parity-one-zero-v2",
   "inputs": {
@@ -389,7 +390,7 @@
       "--out",
       "/out/native",
       "--harness-commit",
-      "8c4d7e777f285bbbbc9a4eecc2a47e745a407b24"
+      "f079f6cf41db50fd266f9a429ee6b7a58e6f05c7"
     ],
     "cwd": "/repo",
     "environment_names": [
@@ -405,22 +406,28 @@
         1,
         "lo"
       ]
-    ]
+    ],
+    "read_only": {
+      "data_root": true,
+      "harness_source": true
+    }
   },
   "latch_events": [],
   "limitations": [
     "The market-on-open proxy equals LEAN's MarketOnOpenFill only inside the manifest's faithfulness_domain (open differs from the decision close by at least one tick, the quantity fits the open tick and the fill does not overdraw the CASH account); compare.py checks each event.",
     "The DistributionModule posts cash only; bar prices stay raw-normalized. Payable dates, withholding and short-position debits are outside one_zero.",
-    "Bundled sample bytes are not an entitled, point-in-time or market-wide dataset."
+    "Bundled sample bytes are not an entitled, point-in-time or market-wide dataset.",
+    "The unchanged v1 sizing rule sizes from the strategy's own fill-driven cash, which leaves out engine-posted distribution cash: the exit intent records decision_equity 90767.52 where LEAN's portfolio value includes the 428.64 distribution (91196.16). one_zero is unaffected (exit target 0; the entry precedes any distribution); a case that sizes after an ex-date would be under-sized.",
+    "Each OCO leg's harness submission fields are the strategy's own record; compare.py judges the native OCO structure from engine_at_accept and engine_final, the order as the engine's cache serializes it at OrderAccepted and at run end."
   ],
   "local_source_sha256": {
-    "compare.py": "e88546a0fd9e8592113f6b393d66ea5d9760401138bac7b7957f40b3c64c952e",
+    "compare.py": "598bffafe5ae875fb97a95d2a5234bf713ccbac6d3e33b01e94d1eb1f656e74b",
     "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
     "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
-    "fixture_strategy.py": "cb6830320e8aace88b370bc1c4aac53c95c825ee539861756d4f79e83037c4ee",
+    "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
     "mapping-manifest-v2.json": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
     "mapping-manifest.json": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
-    "run.py": "9e70b39545aaebee39f091247fe0a402b5c8075c3b1634eec8b1d488c7478cee",
+    "run.py": "b2c0cf6e704779053babb6e62ed5ace0c16ea00df79a54d34ec8f04cc499aac4",
     "tolerances.json": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a"
   },
   "mapping_manifest": {
@@ -508,7 +515,7 @@
     }
   ],
   "native_end_cash_usd": "90734.08",
-  "observed_utc": "2026-09-23T02:53:40.574318+00:00",
+  "observed_utc": "2026-09-23T03:10:54.832732+00:00",
   "oco_pairs": [
     {
       "decision_session": "2019-12-31",
@@ -516,6 +523,40 @@
         {
           "client_order_id": "O-1-STOP",
           "contingency_type": "OCO",
+          "engine_at_accept": {
+            "client_order_id": "O-1-STOP",
+            "contingency_type": "OCO",
+            "filled_qty": "0",
+            "is_reduce_only": false,
+            "linked_order_ids": [
+              "O-1-MIT"
+            ],
+            "order_list_id": "OL-1",
+            "quantity": "304",
+            "side": "BUY",
+            "status": "ACCEPTED",
+            "time_in_force": "GTC",
+            "trigger_price": "321.8601",
+            "trigger_type": "DEFAULT",
+            "type": "STOP_MARKET"
+          },
+          "engine_final": {
+            "client_order_id": "O-1-STOP",
+            "contingency_type": "OCO",
+            "filled_qty": "304",
+            "is_reduce_only": false,
+            "linked_order_ids": [
+              "O-1-MIT"
+            ],
+            "order_list_id": "OL-1",
+            "quantity": "304",
+            "side": "BUY",
+            "status": "FILLED",
+            "time_in_force": "GTC",
+            "trigger_price": "321.8601",
+            "trigger_type": "DEFAULT",
+            "type": "STOP_MARKET"
+          },
           "expected_trigger_price": "321.8601",
           "linked_order_ids": [
             "O-1-MIT"
@@ -532,6 +573,40 @@
         {
           "client_order_id": "O-1-MIT",
           "contingency_type": "OCO",
+          "engine_at_accept": {
+            "client_order_id": "O-1-MIT",
+            "contingency_type": "OCO",
+            "filled_qty": "0",
+            "is_reduce_only": false,
+            "linked_order_ids": [
+              "O-1-STOP"
+            ],
+            "order_list_id": "OL-1",
+            "quantity": "304",
+            "side": "BUY",
+            "status": "ACCEPTED",
+            "time_in_force": "GTC",
+            "trigger_price": "321.8599",
+            "trigger_type": "DEFAULT",
+            "type": "MARKET_IF_TOUCHED"
+          },
+          "engine_final": {
+            "client_order_id": "O-1-MIT",
+            "contingency_type": "OCO",
+            "filled_qty": "0",
+            "is_reduce_only": false,
+            "linked_order_ids": [
+              "O-1-STOP"
+            ],
+            "order_list_id": "OL-1",
+            "quantity": "304",
+            "side": "BUY",
+            "status": "CANCELED",
+            "time_in_force": "GTC",
+            "trigger_price": "321.8599",
+            "trigger_type": "DEFAULT",
+            "type": "MARKET_IF_TOUCHED"
+          },
           "expected_trigger_price": "321.8599",
           "linked_order_ids": [
             "O-1-STOP"
@@ -558,6 +633,40 @@
         {
           "client_order_id": "O-2-STOP",
           "contingency_type": "OCO",
+          "engine_at_accept": {
+            "client_order_id": "O-2-STOP",
+            "contingency_type": "OCO",
+            "filled_qty": "0",
+            "is_reduce_only": false,
+            "linked_order_ids": [
+              "O-2-MIT"
+            ],
+            "order_list_id": "OL-2",
+            "quantity": "304",
+            "side": "SELL",
+            "status": "ACCEPTED",
+            "time_in_force": "GTC",
+            "trigger_price": "293.2099",
+            "trigger_type": "DEFAULT",
+            "type": "STOP_MARKET"
+          },
+          "engine_final": {
+            "client_order_id": "O-2-STOP",
+            "contingency_type": "OCO",
+            "filled_qty": "304",
+            "is_reduce_only": false,
+            "linked_order_ids": [
+              "O-2-MIT"
+            ],
+            "order_list_id": "OL-2",
+            "quantity": "304",
+            "side": "SELL",
+            "status": "FILLED",
+            "time_in_force": "GTC",
+            "trigger_price": "293.2099",
+            "trigger_type": "DEFAULT",
+            "type": "STOP_MARKET"
+          },
           "expected_trigger_price": "293.2099",
           "linked_order_ids": [
             "O-2-MIT"
@@ -574,6 +683,40 @@
         {
           "client_order_id": "O-2-MIT",
           "contingency_type": "OCO",
+          "engine_at_accept": {
+            "client_order_id": "O-2-MIT",
+            "contingency_type": "OCO",
+            "filled_qty": "0",
+            "is_reduce_only": false,
+            "linked_order_ids": [
+              "O-2-STOP"
+            ],
+            "order_list_id": "OL-2",
+            "quantity": "304",
+            "side": "SELL",
+            "status": "ACCEPTED",
+            "time_in_force": "GTC",
+            "trigger_price": "293.2101",
+            "trigger_type": "DEFAULT",
+            "type": "MARKET_IF_TOUCHED"
+          },
+          "engine_final": {
+            "client_order_id": "O-2-MIT",
+            "contingency_type": "OCO",
+            "filled_qty": "0",
+            "is_reduce_only": false,
+            "linked_order_ids": [
+              "O-2-STOP"
+            ],
+            "order_list_id": "OL-2",
+            "quantity": "304",
+            "side": "SELL",
+            "status": "CANCELED",
+            "time_in_force": "GTC",
+            "trigger_price": "293.2101",
+            "trigger_type": "DEFAULT",
+            "type": "MARKET_IF_TOUCHED"
+          },
           "expected_trigger_price": "293.2101",
           "linked_order_ids": [
             "O-2-STOP"
@@ -731,6 +874,92 @@
       "ts_event_ns": 1588255200000000000
     }
   ],
+  "preconditions": {
+    "prior_v2_replays": {
+      "path": "replay-history-v2.json",
+      "replays": [
+        {
+          "harness": "uncommitted working tree whose harness files hash as at db8bad7 (run.py 8fc9f4272e0a..., fixture_strategy.py cb6830320e8a..., distribution_module.py eefee070b0db..., compare.py e88546a0fd9e...)",
+          "id": "dev1-dev5",
+          "isolation": "none: host process with the host network namespace and inherited environment (not the documented bwrap replay)",
+          "observed_utc": [
+            "2026-09-23T02:48:29.014822+00:00",
+            "2026-09-23T02:48:29.660935+00:00",
+            "2026-09-23T02:48:30.271356+00:00",
+            "2026-09-23T02:48:30.869954+00:00",
+            "2026-09-23T02:48:31.471769+00:00"
+          ],
+          "outcome": "five two-run replays; each: fills +304 @ 323.5800 and -304 @ 291.6900, distributions 0.00 and 428.64 engine-posted, native end cash 90734.08, zero ERROR lines, two runs equal after UUID normalization",
+          "receipt_sha256": [
+            "34996806d39515c86f35ff4fcac110db2b3f8fe8bc4a4e175d4cbafb63c834eb",
+            "03d8004bb0049d3fde48a44a98d235824cafc6ec619b25c6310ecbca47d08b2c",
+            "2f793c5f1c29ee72bacfd13cc8e163666c6ee8f1094dfc8f84c29837be6c96ad",
+            "5a3d3adf1cf1bd9c0f59a54fe3b7315e9ce01f5dcebe92c673c83ddba0ac49a5",
+            "36463c0daebd26db283c95695ffb047ff90df340288150fb2cdd49997bbc9ca8"
+          ],
+          "reviewed_before_run": false,
+          "status": "superseded development run"
+        },
+        {
+          "harness": "same harness files as dev1-dev5",
+          "id": "dev9",
+          "isolation": "none: host process (not the documented bwrap replay)",
+          "observed_utc": [
+            "2026-09-23T02:51:30.035940+00:00"
+          ],
+          "outcome": "same fills, distributions, native end cash 90734.08 and determinism as dev1-dev5",
+          "receipt_sha256": [
+            "23aab3194964e56fde186e0d58b1f39694968e44d6cce4f749bd622e7d257463"
+          ],
+          "reviewed_before_run": false,
+          "status": "superseded development run"
+        },
+        {
+          "harness": "the dev9 harness driven by a scratch script that monkeypatched build_strategy to register no ex-date alerts, so the module could only see each ex-date late",
+          "id": "late-emission-experiment",
+          "isolation": "none: host process, one engine run",
+          "observed_utc": [
+            "2026-09-23T02:51:40Z (output file times)"
+          ],
+          "outcome": "refused by the runner after engine.run() (no summary.json written); the native account report shows no distribution posted (end total 90305.44 = 90734.08 - 428.64); account report sha256 c89bfbbc1713a58eb6d7b1fc07183129111c51caec593a9e03d0dae6115855a1 (reports.private.json)",
+          "receipt_sha256": [],
+          "reviewed_before_run": false,
+          "status": "experiment on a modified harness; not a replay of the committed harness"
+        },
+        {
+          "harness": "commit db8bad7ce24c6e22b295b717b10558816467d66a",
+          "id": "bwrap-db8bad7",
+          "isolation": "documented bwrap two-run replay (loopback only, cleared environment)",
+          "observed_utc": [
+            "2026-09-23T02:52:41.011275+00:00"
+          ],
+          "outcome": "same fills, distributions, native end cash 90734.08 and determinism as the development runs; compare.py PASS under the harness of that commit",
+          "receipt_sha256": [
+            "4dd2d1fb126b7a93ceb02a5ba1126ff77a75c853e628ba91082e2b44bac8ad7d"
+          ],
+          "reviewed_before_run": false,
+          "status": "superseded by bwrap-8c4d7e7 before publication"
+        },
+        {
+          "harness": "commit 8c4d7e777f285bbbbc9a4eecc2a47e745a407b24",
+          "id": "bwrap-8c4d7e7",
+          "isolation": "documented bwrap two-run replay (loopback only, cleared environment)",
+          "observed_utc": [
+            "2026-09-23T02:53:40.574318+00:00"
+          ],
+          "outcome": "published as receipt-v2.json at 9d55cb4 with verdict-v2.json PASS (93 checks); the 2026-09-23 independent review found that verdict unqualified because precondition 0 was unmet",
+          "receipt_sha256": [
+            "8e751148ee88a4bb40e6634c6e1b2a36a998c6c78be0fa01f3cee1dd38a5f3b8"
+          ],
+          "reviewed_before_run": false,
+          "status": "superseded by the next run from the review-fix harness"
+        }
+      ],
+      "sha256": "8409f4ce5426d888e2769cec491ba08169406f11fec17022a3022b27e8c7ee79"
+    },
+    "review": null,
+    "review_note": "None means no retained independent review preceded this run."
+  },
   "preregistered_mappings": [
     "decision_visibility",
     "distributions_and_cash",
@@ -742,10 +971,16 @@
   },
   "preregistration_deviations": [
     {
-      "deviation": "The replay ran before any independent review of the harness changes. The review is owned by the peer session that owns the gate rows; no review record exists in this receipt.",
-      "effect": "The comparison result stands as measured, but the precondition is unmet until that review is retained; a PASS here does not by itself move any mapping or gate.",
+      "deviation": "No independent review preceded any replay in preconditions.prior_v2_replays. compare.py evaluates this precondition as a check: unless preconditions.review names a retained review record whose sha256 still matches at comparison time, whose reviewed harness file hashes equal this run's local_source_sha256, whose completion precedes started_utc and which leaves no finding unresolved, the check fails and, under the sealed verdict rule, so does the comparison.",
+      "effect": "A run without a qualifying review record is published with verdict FAIL and preregistration_qualifying false even when every execution check passes; it moves no mapping and no gate.",
       "id": "review_before_first_run",
       "sealed_text": "acceptance_criteria.preconditions[0]: the harness changes are implemented and independently reviewed before the first v2 run; the review record is retained."
+    },
+    {
+      "deviation": "Read literally, no run can meet this any more: the first v2 replays on the frozen data ran before any review (preconditions.prior_v2_replays). compare.py evaluates the reading the 2026-09-23 independent review proposed: the qualifying run is the first run from a harness whose exact files were reviewed before that run, with every earlier replay published as superseded.",
+      "effect": "Whether that reading satisfies the preregistration is for the gate owner; if it does not, v2 cannot pass and a new dated preregistration is required.",
+      "id": "first_v2_run_preceded_review",
+      "sealed_text": "acceptance_criteria.preconditions[0]: '... before the first v2 run'."
     },
     {
       "deviation": "Both fields stay as sealed because the manifest must not be edited; they no longer describe the tree once this receipt exists.",
@@ -760,7 +995,19 @@
       "sealed_text": "distributions_and_cash.mechanism_rules.timing: a late emission is a module error that aborts the run."
     },
     {
-      "deviation": "The v2 results are published as receipt-v2.json and verdict-v2.json; the v1 receipt.json and verdict.json are kept unchanged.",
+      "deviation": "The pinned engine exposes no accessor for a venue's modules. venue_module_count is the length of the modules list the runner passed to add_venue (harness configuration, labelled as such). compare.py adds the engine-observed check that every reported AccountState after the initial one sits at a DistributionModule emission instant with exactly the emitted delta.",
+      "effect": "A second cash-posting module would surface as an unexplained reported AccountState; a second module that posts nothing would not be detected.",
+      "id": "venue_module_count_not_engine_observable",
+      "sealed_text": "acceptance_criteria.distributions_and_cash[0]: the venue has exactly one module, a DistributionModule instance."
+    },
+    {
+      "deviation": "compare.py --bars has no data root, so it cannot re-hash the frozen inputs; it reports that precondition check SKIPPED, which leaves the comparison incomplete. The v2 verdict is published from --lean-data, which re-hashes them.",
+      "effect": "--bars can no longer produce a v2 PASS; the README mode table describes v1.",
+      "id": "bars_mode_cannot_rehash_inputs",
+      "sealed_text": "acceptance_criteria.preconditions[1]: the five frozen inputs hash-match at run and at comparison time."
+    },
+    {
+      "deviation": "The v2 results are published as receipt-v2.json and verdict-v2.json, and the replay list as replay-history-v2.json; the v1 receipt.json and verdict.json are kept unchanged.",
       "effect": "The gate row reading verdict.json is untouched by this run.",
       "id": "v2_output_paths",
       "sealed_text": "Neither README.md nor mapping-manifest-v2.json names paths for the v2 receipt and verdict; the manifest keeps v1 bound to verdict.json."
@@ -778,7 +1025,7 @@
       "sealed_text": "acceptance_criteria.market_on_open_proxy[4]: no ERROR-level engine log line in either run."
     },
     {
-      "deviation": "The documented bwrap command gains --harness-commit, because the isolated run cannot read Git; local_source_sha256 remains the binding record.",
+      "deviation": "The documented bwrap command gains --harness-commit, because the isolated run cannot read Git, and --review-record when a retained review record exists; local_source_sha256 remains the binding record.",
       "effect": "None on execution.",
       "id": "operator_declared_commit",
       "sealed_text": "README.md replay command."
@@ -799,7 +1046,7 @@
         },
         "negative_cash_lines": 0
       },
-      "engine_log_sha256": "6f185eb5465122b297918f0fcdbdfbe55d0a6003c099d272eb4ebdd1525ee37e",
+      "engine_log_sha256": "5710f9b11f3968c57e264cb050029c8b5d9516f44726d8a636ee22c444a7ec50",
       "fees_usd": "0.00",
       "final_quantity": "0",
       "final_state_checked": true,
@@ -807,17 +1054,17 @@
       "latch_events": [],
       "native_account_events": 11,
       "native_end_cash_usd": "90734.08",
-      "normalized_economic_sha256": "50ec18ec8eae12857e53968b53fdcc34bad1d1e4d6df81651008db30fbd60b36",
+      "normalized_economic_sha256": "c9678337e9cc6a6b53410f1c63a220c0f51311907caf7998f5c5a5755638ab8a",
       "open_orders": 0,
       "open_positions": 0,
       "pending_intent": null,
       "processed_bars": 725,
       "raw_report_sha256": {
         "account": "7ad013a2e2d4e04ecd7b21f64fd332f32447a144180503de84dcc68033917b80",
-        "fills": "f83274ff65565cd0c0e589f3745126779bc1c4fa3c8018b4bafdd618ebd76d71",
-        "positions": "e00de8e693d62c0476b17fecfb9a2371c118472a8aac7386acfefeb75beef691"
+        "fills": "2c9edfff9ea517a585f01fb87ceba4fc1cd6a67bdb98807870ea2f253edc726b",
+        "positions": "a36814a09c502ea8c987d76d1887fe08a321a61157024c053beec4f7be2111ea"
       },
-      "raw_reports_json_sha256": "0a2a77383f0fe3d91101613ff8dda5760ee071d0b1725dc713385989b8347c43",
+      "raw_reports_json_sha256": "ce1d2dcd751e82c4045c7701ac08eac2ac79c26236e3554cbac4a29654a37c77",
       "reconciled_end_cash_usd": "90734.0800",
       "run_integrity_checked": true,
       "strategy_callback_errors": []
@@ -835,7 +1082,7 @@
         },
         "negative_cash_lines": 0
       },
-      "engine_log_sha256": "152a081fb07c72da76bbce9094866e4fc1c6abf6306a9274a08ede28aa0a6a6d",
+      "engine_log_sha256": "3afc8dfce5e72f0e13218d70807c0395609db00a95414a7a37a4753d4df69e40",
       "fees_usd": "0.00",
       "final_quantity": "0",
       "final_state_checked": true,
@@ -843,23 +1090,24 @@
       "latch_events": [],
       "native_account_events": 11,
       "native_end_cash_usd": "90734.08",
-      "normalized_economic_sha256": "50ec18ec8eae12857e53968b53fdcc34bad1d1e4d6df81651008db30fbd60b36",
+      "normalized_economic_sha256": "c9678337e9cc6a6b53410f1c63a220c0f51311907caf7998f5c5a5755638ab8a",
       "open_orders": 0,
       "open_positions": 0,
       "pending_intent": null,
       "processed_bars": 725,
       "raw_report_sha256": {
         "account": "7ad013a2e2d4e04ecd7b21f64fd332f32447a144180503de84dcc68033917b80",
-        "fills": "aa793016bf4a6439b7f2b4b4309e1aa7222c403be1f6556824560790f1753682",
-        "positions": "f651dc19060e3bc4ad8e28af6e3b4c3affa9677936ca30df41b89a6ed66b6fa5"
+        "fills": "4eaddc85c9d9b047c66825f8deb654a7bd27348f7458c066404d9f4a97488e1b",
+        "positions": "fcd8ed375bb2112692c80ea4feb9a96b321ef6fe4a16702d91070b0d72397996"
       },
-      "raw_reports_json_sha256": "ca04897d39709c3aee55973895bf2c4fcaa9c49cff0ff499ee09851e68761bc6",
+      "raw_reports_json_sha256": "62cee0bf0baa973023e7bc30566bc0050ee9fd8401c5fd6b41a28198e9d622ff",
       "reconciled_end_cash_usd": "90734.0800",
       "run_integrity_checked": true,
       "strategy_callback_errors": []
     }
   ],
   "schema_version": 2,
+  "started_utc": "2026-09-23T03:10:54.138012+00:00",
   "superseded_manifest": {
     "carried_rows": [
       "instrument_identity",
