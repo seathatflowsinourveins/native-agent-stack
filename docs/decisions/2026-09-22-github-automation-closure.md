@@ -871,6 +871,34 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     residual now also names `sota_components` of a newly registered wave, above. The
     name-alignment test is unchanged: it asserts #124's pinned literals unconditionally, and the
     comparison with `scripts/landscape.py` skips with its reason until #124 defines the names.
+- **Measured (fifth review, 2026-09-23).** `tests/test_verdict_review_gate.py` has 139
+  synthetic-fixture tests (127 before). Three positive controls were rebased so their evidence or
+  receipt is at the base, since they had added it in the same comparison. Run against the pre-fix
+  gate (7eadf1e6), all nine new negative controls fail. They are five `platform_status` cases
+  (a late citation, evidence added with the row, rewritten, or unregistered at the base, and a
+  same-PR receipt), three SOTA manifest cases and the merge-base git failure. The positive
+  controls pass on both gates.
+
+  Real-checkout mutations ran in a scratch detached worktree of b316f3f9, which was then
+  removed. It held a committed decision record and the constructed sealed 20260923 wave for four
+  real foundation layers, whose `workers` claude return cites `evidence/scratch-new.json`, absent
+  when the row was recorded. Results of the gate's own rules (`evaluate`, validators off), new
+  gate against the 7eadf1e6 gate:
+  - the late citation's file added and registered, copied into `workers`' `evidence_refs`, with
+    linux `accepted`: the new gate fails, deriving `conditional`; the old gate passes it;
+  - the same with the file already at the base: passes on the new gate;
+  - a schema-valid `shellcheck` install receipt at the sealed pin 0.10.0 added with
+    `quality-evaluation` linux raised to `conditional`: the new gate fails, deriving
+    `not_established`; the old gate passes it. With the receipt at the base, the raise passes;
+  - `manifest-20260923.json` (registered by the wave) edited: the new gate fails; the old gate
+    passes it;
+  - G2 re-run: the single-lane record edited in the same comparison, and the wave judged against
+    the commit before the record landed, both fail on both gates;
+  - control, an `open_gaps` edit: passes on both.
+
+  As in the fourth round, the CLI exits 1 on every run, the control included. The cause is that
+  `scripts/landscape.py` and `build_verdicts.py --check` reject the constructed wave. Only the
+  gate's own violation list is evidence here.
 - **Accepted residual: sealed lane returns are self-attested (fifth review, 2026-09-23).** The
   gate checks consistency, not provenance. A sealed lane return must match the row's
   `sealed_sha256` and be registered in the head's `manifests/evidence.json`, which the PR can
