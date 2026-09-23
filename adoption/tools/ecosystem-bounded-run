@@ -64,7 +64,15 @@ read -r have_memory < "/sys/fs/cgroup$cgroup/memory.max" || refuse "memory.max i
 read -r have_tasks < "/sys/fs/cgroup$cgroup/pids.max" || refuse "pids.max is not enforced for $unit"
 [ "$have_memory" = "$memory" ] || refuse "memory.max is $have_memory, not $memory"
 [ "$have_tasks" = "$tasks" ] || refuse "pids.max is $have_tasks, not $tasks"
-command -v -- "$1" >/dev/null 2>&1 || refuse "command not found: $1"
+# exec only runs files, so look the name up the way exec does: a path must be an
+# executable file; a bare name must be an executable file in a PATH directory
+# (a shell builtin such as cd with no file would otherwise fail after the start).
+case $1 in
+  */*) [ -f "$1" ] && [ -x "$1" ] || refuse "command not found: $1" ;;
+  *) found=; old_ifs=$IFS; IFS=:
+     for dir in $PATH; do [ -f "${dir:-.}/$1" ] && [ -x "${dir:-.}/$1" ] && { found=1; break; }; done
+     IFS=$old_ifs; [ -n "$found" ] || refuse "command not found: $1" ;;
+esac
 : > "$marker" || refuse "cannot record the start"
 exec "$@"
 '

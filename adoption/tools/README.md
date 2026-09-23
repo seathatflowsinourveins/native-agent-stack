@@ -24,7 +24,7 @@ the VM and take the whole session down; the scope kills the job instead.
 - `ecosystem-bounded-run` was byte-for-byte identical to its source at copy
   time. On 2026-09-22 a cross-family review fix changed this repository's copy
   (see "Divergence in `ecosystem-bounded-run`" below), so it now hashes to
-  `f6c0cfa42b377b2f383f763c2342fe25b585131c9ba3e287788f5f617b044004`; the
+  `67f1df1e6fa89057e1e1e4dd699741637ef8627436e4cf4b6b411321a881decb`; the
   `7680fe11…` value above identifies the unmodified source only.
 - `gitleaks-guarded` differs from its source on two lines only (see below), so
   the copy in this repository hashes to
@@ -65,6 +65,8 @@ the same fix;** until it does, the two files are expected to differ.
 The limit defaults, exit codes 64/78, the `/usr/bin` tool paths and the signal
 handling (129/130/143 after a native scope stop) are unchanged. The marker
 directory is removed on every exit path.
+
+- The command lookup mirrors `exec`: a path must be an executable file, and a bare name must be an executable file in a `PATH` directory. A shell builtin with no file (for example `cd`) is refused with 78 before the start marker instead of failing with 127 after it (second cross-family review round, 2026-09-22).
 
 ## Install on a new Linux/WSL2 host
 

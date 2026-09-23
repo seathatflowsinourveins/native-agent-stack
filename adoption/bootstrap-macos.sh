@@ -206,9 +206,11 @@ ecosystem_root="$(cd -- "$ecosystem_root" >/dev/null 2>&1 && pwd -P)"
 # "$HOME/../<home>" or a symlink to HOME must not put bin/, tools/ and
 # downloads/ straight into the shared home directory.
 home_canonical="$(cd -- "$HOME" >/dev/null 2>&1 && pwd -P)" || home_canonical="$HOME"
-[[ "$ecosystem_root" != / && "$ecosystem_root" != "$home_canonical" ]] || {
+# -ef compares device and inode, so a differently-cased spelling of HOME on a
+# case-insensitive APFS volume is refused as well.
+if [[ "$ecosystem_root" == / || "$ecosystem_root" == "$home_canonical" || "$ecosystem_root" -ef "$HOME" || "$ecosystem_root" -ef / ]]; then
   printf 'ECO_INSTALL_ROOT must name a dedicated absolute directory (it resolves to %s).\n' "$ecosystem_root" >&2; exit 1
-}
+fi
 bin_dir="$ecosystem_root/bin"
 cache_dir="$ecosystem_root/downloads"
 mkdir -p "$bin_dir" "$cache_dir" "$ecosystem_root/tools"

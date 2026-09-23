@@ -162,6 +162,12 @@ ecosystem_root="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
 }
 mkdir -p "$ecosystem_root"
 ecosystem_root="$(realpath "$ecosystem_root")"
+# Compared again after canonicalization, before any child is created: "$HOME/.",
+# "$HOME/../<home>" or a symlink to HOME must not put bin/, tools/ and
+# downloads/ straight into the shared home directory (-ef compares inodes).
+if [[ "$ecosystem_root" == / || "$ecosystem_root" -ef "$HOME" || "$ecosystem_root" -ef / ]]; then
+  printf 'ECO_INSTALL_ROOT must name a dedicated absolute directory (it resolves to %s).\n' "$ecosystem_root" >&2; exit 1
+fi
 bin_dir="$ecosystem_root/bin"
 cache_dir="$ecosystem_root/downloads"
 mkdir -p "$bin_dir" "$cache_dir" "$ecosystem_root/tools"

@@ -3098,13 +3098,13 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "384858498777de6ab634164eb69d7b23146383eaf4182676e4e00bf31eaf9a67",
-      "bytes": 14458
+      "sha256": "5a7310884ab3d805202b207cf9e1e30a98991ed807e135700ae747c546c8dd45",
+      "bytes": 14909
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "a730416954690978c51682898c01e498be0722b2a85b4c2bf3d37f2103525c01",
-      "bytes": 20192
+      "sha256": "6352627d2289c25040d04463e913c16d0939d664435d33791e5b9aa35b16a141",
+      "bytes": 20386
     },
     {
       "path": "adoption/bootstrap.md",
@@ -3233,13 +3233,13 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "baa7298f7520e5e47cc3816dd3d30b7fc65c74ec7e5e10c1c36dc2bc59fb86f5",
-      "bytes": 16285
+      "sha256": "d0b8fb0a4a5f33808b595d3724dbc1ff8284b91d3c17ade1c832ce5dd25e9733",
+      "bytes": 16600
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
-      "sha256": "f6c0cfa42b377b2f383f763c2342fe25b585131c9ba3e287788f5f617b044004",
-      "bytes": 5235
+      "sha256": "67f1df1e6fa89057e1e1e4dd699741637ef8627436e4cf4b6b411321a881decb",
+      "bytes": 5701
     },
     {
       "path": "adoption/tools/gitleaks-guarded",
@@ -11504,8 +11504,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "e42089d0ea4d0f48e92a3e9386869f6afcb1c8987817af1eb7187cf658d16a25",
-      "bytes": 20197
+      "sha256": "9dda4e75569c4e3c2d063594e66f25f221c3919fb0dc342287c8ad67fa3490d5",
+      "bytes": 21911
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
@@ -11519,8 +11519,8 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "147b889e4bdedf071490e6ea5ecd36056ddc17c843d91ea9fbfda6bee0291926",
-      "bytes": 30053
+      "sha256": "37da8d86fbbb775217fe696a1aef58cd250cdb13e821b1aeb4ab20dc42d0668b",
+      "bytes": 30814
     },
     {
       "path": "tests/test_adoption_status.py",

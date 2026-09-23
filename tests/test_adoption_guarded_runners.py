@@ -588,6 +588,20 @@ class BoundedRunSetupRefusalTests(unittest.TestCase):
         self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
         self.assertIn("was not started", result.stderr)
 
+    def test_builtin_without_an_executable_file_is_refused_with_78(self):
+        # `cd` is a shell builtin with no file on PATH; exec cannot run it, so the
+        # runner must refuse before the start marker rather than return 127.
+        result = _run([str(BOUNDED_RUN), "cd", "/"])
+        self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
+        self.assertIn("command not found: cd", result.stderr)
+
+    def test_builtin_name_with_an_executable_file_still_runs(self):
+        result = _run([str(BOUNDED_RUN), "true"])
+        if CONTAINMENT_AVAILABLE:
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        else:
+            self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
+
     @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
     def test_non_default_and_unaligned_limits_are_verified_and_run(self):
         # 1000001K is not a whole number of pages; the kernel stores
