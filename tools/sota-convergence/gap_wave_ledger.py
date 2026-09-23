@@ -1,10 +1,12 @@
 """Ledger of a gap-evidence wave keyed to the gap crosswalk (offline, deterministic).
 
 Reads the crosswalk at catalogs/landscape/gap-crosswalk-92bb279.json and the wave's receipts
-under evidence/artifacts/<wave>/<layer_id>/*.json (directories without "__"; another session's
-wave uses <catalog>__<layer_id>), and writes a ledger plus a summary page:
+under evidence/artifacts/<wave>/<layer_id>/*.json (default) or <wave>/<catalog>__<layer_id>/*.json
+(--dir-style catalog__layer, where gap_refs may omit layer_id; results.json is skipped), and writes
+a ledger plus a summary page:
 
   python3 tools/sota-convergence/gap_wave_ledger.py --wave gap-wave2-20260923 --owner gap-resolution [--check]
+  python3 tools/sota-convergence/gap_wave_ledger.py --wave gap-wave2-20260923 --owner agent-lab-17 --dir-style catalog__layer
 
 Status per crosswalk gap: settled / advanced / not_settled from the receipts' settles_gap
 (true / partially / false), or from a receipt's per_gap_settles entry ("<layer>:<index>") when it
@@ -33,15 +35,39 @@ def settle_key(value):
     return key
 
 
-def load_receipts(root, wave):
+def _receipt_dirs(base, dir_style):
+    """(directory, default layer_id) pairs. "layer": <layer_id>/ (no "__"); "catalog__layer":
+    <catalog>__<layer_id>/, where gap_refs entries may omit layer_id."""
+    for directory in sorted(p for p in base.iterdir() if p.is_dir()):
+        if dir_style == "layer" and "__" not in directory.name:
+            yield directory, directory.name
+        elif dir_style == "catalog__layer" and "__" in directory.name:
+            yield directory, directory.name.split("__", 1)[1]
+
+
+def _refs(data, default_layer, path):
+    refs = []
+    for g in data["gap_refs"]:
+        if isinstance(g, dict) and "gap_index" in g:
+            refs.append((g.get("layer_id", default_layer), int(g["gap_index"])))
+        elif isinstance(g, int):
+            refs.append((default_layer, g))
+        else:
+            raise SystemExit(f"{path}: unrecognised gap_refs entry {g!r}")
+    return refs
+
+
+def load_receipts(root, wave, dir_style="layer"):
     base = root / "evidence/artifacts" / wave
     out = []
-    for directory in sorted(p for p in base.iterdir() if p.is_dir() and "__" not in p.name):
+    for directory, default_layer in _receipt_dirs(base, dir_style):
         for path in sorted(directory.glob("*.json")):
+            if path.name == "results.json":
+                continue  # a per-layer index, not a receipt
             data = json.loads(path.read_text(encoding="utf-8"))
             if not isinstance(data, dict) or "gap_refs" not in data:
                 continue
-            refs = [(g["layer_id"], g["gap_index"]) for g in data["gap_refs"]]
+            refs = _refs(data, default_layer, path)
             per_gap = {k: settle_key(v) for k, v in (data.get("per_gap_settles") or {}).items()}
             for key in per_gap:
                 if key not in {f"{l}:{i}" for l, i in refs}:
@@ -59,9 +85,9 @@ def load_receipts(root, wave):
     return out
 
 
-def build(root, wave, owner):
+def build(root, wave, owner, dir_style="layer"):
     crosswalk = json.loads((root / CROSSWALK).read_text(encoding="utf-8"))
-    receipts = load_receipts(root, wave)
+    receipts = load_receipts(root, wave, dir_style)
     rev = crosswalk["source_revision"]
     for r in receipts:
         if not rev.startswith(str(r["source_revision"])[:7]):
@@ -135,9 +161,11 @@ def main(argv=None):
     ap.add_argument("--wave", required=True)
     ap.add_argument("--owner", required=True)
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--dir-style", choices=("layer", "catalog__layer"), default="layer",
+                    help="receipt directory layout: <layer_id>/ (default) or <catalog>__<layer_id>/")
     args = ap.parse_args(argv)
     root = args.root.resolve()
-    doc = build(root, args.wave, args.owner)
+    doc = build(root, args.wave, args.owner, args.dir_style)
     text = json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
     page = render(doc)
     out, md = root / f"catalogs/landscape/{doc['id']}.json", root / f"docs/{doc['id']}.md"

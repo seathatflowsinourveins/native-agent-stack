@@ -57,6 +57,24 @@ class GapWaveLedgerTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             self.tool.settle_key("maybe")
 
+    def test_catalog_layer_dir_style_reads_prefixed_dirs_and_defaults_the_layer(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp) / "evidence/artifacts/wave-x"
+            (base / "foundation__native-clients").mkdir(parents=True)
+            (base / "native-clients").mkdir()
+            receipt = {"id": "r1", "source_revision": "92bb279", "gap_refs": [{"gap_index": 2}, 5],
+                       "settles_gap": "partially", "verdict_impact": {"direction": "inconclusive"}}
+            (base / "foundation__native-clients/r1.json").write_text(json.dumps(receipt))
+            (base / "foundation__native-clients/results.json").write_text(json.dumps({"gap_refs": "not a receipt"}))
+            (base / "native-clients/r2.json").write_text(json.dumps({**receipt, "id": "r2",
+                                                                      "gap_refs": [{"layer_id": "native-clients", "gap_index": 0}]}))
+            prefixed = self.tool.load_receipts(Path(tmp), "wave-x", "catalog__layer")
+            self.assertEqual([r["id"] for r in prefixed], ["r1"])
+            self.assertEqual(prefixed[0]["gap_refs"], [["native-clients", 2], ["native-clients", 5]])
+            plain = self.tool.load_receipts(Path(tmp), "wave-x", "layer")
+            self.assertEqual([r["id"] for r in plain], ["r2"])
+
     def test_every_receipt_names_the_crosswalk_revision(self):
         for receipt in self.doc["receipts"]:
             self.assertTrue(self.doc["source_revision"].startswith(receipt["source_revision"][:7]), receipt["path"])
