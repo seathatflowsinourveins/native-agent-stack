@@ -203,6 +203,17 @@ class PublishReleaseTests(unittest.TestCase):
         self.assertIn(".isImmutable == true", job)
 
 
+class SupplyChainGateTests(unittest.TestCase):
+    text = (WORKFLOWS / "supply-chain.yml").read_text(encoding="utf-8")
+
+    def test_grype_policy_changes_trigger_the_gate_on_push_and_pull_request(self):
+        self.assertIn("--config .grype.yaml --fail-on high", self.text)
+        trigger = "\n" + self.text.split("\non:\n", 1)[1].split("\n\n", 1)[0]
+        for event in ("push", "pull_request"):
+            block = trigger.split(f"\n  {event}:\n", 1)[1].split("\n  schedule:", 1)[0].split("\n  pull_request:", 1)[0]
+            self.assertIn("- '.grype.yaml'", block, event)
+
+
 class PinningTests(unittest.TestCase):
     def test_every_third_party_action_is_pinned_by_full_sha(self):
         unpinned = []

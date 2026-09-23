@@ -2978,8 +2978,8 @@
     },
     {
       "path": ".github/main-ruleset.json",
-      "sha256": "999c87b51df21d95a21c344fcd77e220841686b8ee5dd0dd9d8932bac4f874a8",
-      "bytes": 1598
+      "sha256": "0023f78bb23fc41dfd486b1acbc87656aabfc9280592d7259afa2f6dce8bbaaf",
+      "bytes": 1561
     },
     {
       "path": ".github/pull_request_template.md",
@@ -3043,8 +3043,8 @@
     },
     {
       "path": ".github/workflows/supply-chain.yml",
-      "sha256": "0e92b36df9c05a50101fa6ac60580c1a3a8180647bb1ec9032daf4a43895ec86",
-      "bytes": 7367
+      "sha256": "a752c1be5c7e73642085b3fd91f3e97c4b42167dbe5b3452b2bd1191652e9c24",
+      "bytes": 7411
     },
     {
       "path": ".github/workflows/token-report.yml",
@@ -7909,8 +7909,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "8ce61a603d68f71fd2d5765270a95a83f3b8c8299962a7affa092d4e8a2e5e8a",
-      "bytes": 30114
+      "sha256": "9c21fca2741bc803a67a6640c29819d6bde0f27b8d879fab6990291ebb480299",
+      "bytes": 30436
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -7959,8 +7959,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "796b2d765dc002738ea2e26dff6cfd75e9836dcbc338508cefadaa44cf480ded",
-      "bytes": 469323
+      "sha256": "1db003ec3c8ff1bde160191e9225bfbdcf744a512bb3e3ee1368453f8b2ddf76",
+      "bytes": 469452
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -8024,8 +8024,8 @@
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
-      "sha256": "074b2ae46fe3c2259325ff2d8a88042de29ea0d5bad5feedcf11fb30343aec2c",
-      "bytes": 609450
+      "sha256": "d42ae32cfe50891f6bf31e6778b33784abdee2615d3d455f2b1eb3f5dca936e2",
+      "bytes": 609579
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260922.json",
@@ -8479,8 +8479,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "a90e984568bb011277d78c9df198ce451f94294a983d11a894f8b729bec191c9",
-      "bytes": 19538
+      "sha256": "4e9a41c7cf675def24a70a392a20dfc4c86e79cea5fab56df5028f90c3b1a102",
+      "bytes": 21062
     },
     {
       "path": "docs/direct-results.md",
@@ -8584,13 +8584,13 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "6a4958e5756df714222fb54dca1d4fe9cd626634d8a84dd3290e15f49d6272d1",
-      "bytes": 60372
+      "sha256": "88b2d519904c2a2fb9480769d244cf92efffe1e2b9f2ab98390257a6f77368cf",
+      "bytes": 61193
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "b7b1eaeeac0d754fb574ee3e346ee11e46015a5583c8cc2322cb711253b49504",
-      "bytes": 424100
+      "sha256": "1ce012986e4a127b32679fe4c6eb57bbb7863fe5b66fe590ecff1ba38b40cc37",
+      "bytes": 424229
     },
     {
       "path": "docs/harness-defaults.md",

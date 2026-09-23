@@ -44,7 +44,7 @@
       "osv-scanner"
     ],
     "target_ruleset_file": ".github/main-ruleset.json",
-    "target_ruleset_status": "Committed target, applied by the coordinator after this change merges: adds dependency-review and osv-scanner, strict up-to-date checks, required signatures, a CodeQL code_scanning rule (security alerts high_or_higher, alerts errors) and squash-only merges. required_checks above is the live state read on 2026-09-22.",
+    "target_ruleset_status": "Committed target, applied by the coordinator after this change merges: adds dependency-review and osv-scanner, strict up-to-date checks, a CodeQL code_scanning rule (security alerts high_or_higher, alerts errors) and squash-only merges. required_signatures is not in the target (keep-but-compare): on 2026-09-23 it blocked agent-lab PRs #19/#20 with unsigned branch commits despite GitHub-signed squash merges. required_checks above is the live state read on 2026-09-22.",
     "tag_rulesets": {
       "23829417": {
         "file": ".github/tag-ruleset.json",
@@ -380,7 +380,8 @@
     "Native research improvement over the declared baseline",
     "Future publication artifacts after the named qualified commit",
     "First hosted runs of security-scan.yml (PR, push, schedule), the Scorecard SARIF upload and publish-catalog.yml's release job on a v* tag",
-    "Application of the target main ruleset (coordinator, after merge) and a PR blocked by its code_scanning rule"
+    "Application of the target main ruleset (coordinator, after merge) and a PR blocked by its code_scanning rule",
+    "required_signatures: add only after every writer signs commits (registered signing key, commit.gpgsign=true) and one signed PR is observed merging under the rule"
   ],
   "rollback": "Revert the setup action pins, compatibility workflow and matching reviewed hashes through a PR if qualification regresses. Disable only the manual publisher to stop issuance; preserve historical attestations. Revert Dependabot config to stop future update proposals. Keep required integrity checks and the single research owner intact. Remove security-scan.yml or drop dependency-review/osv-scanner from the ruleset to stop those gates; revert .grype.yaml/--fail-on to return sbom-vuln to report-only; delete the release job to stop release creation (published immutable releases stay).",
   "closure_record": "docs/decisions/2026-09-22-github-automation-closure.md",

@@ -188,9 +188,10 @@ closure, 2026-09-22"). A separate [tag ruleset](https://github.com/seathatflowsi
 
 The committed [main-ruleset.json](../.github/main-ruleset.json) is the reviewed
 *target*, not this applied state: it adds `dependency-review` and `osv-scanner`
-to the required checks, turns on the strict up-to-date policy, and adds
-`required_signatures`, a CodeQL `code_scanning` rule and squash-only merges
-(see "Automation closure, 2026-09-22" below). The coordinator applies it after
+to the required checks, turns on the strict up-to-date policy, and adds a
+CodeQL `code_scanning` rule and squash-only merges (see "Automation closure,
+2026-09-22" below). It does not add `required_signatures`: a measured run
+blocked PRs whose branch commits are unsigned, even with signed squash merges. The coordinator applies it after
 the change that adds `security-scan.yml` merges; until then the GET above is
 the ground truth. [tag-ruleset.json](../.github/tag-ruleset.json) (ruleset
 23829417) and [tag-creation-ruleset.json](../.github/tag-creation-ruleset.json)
@@ -269,14 +270,16 @@ remain the execution evidence.
 
 ## Scheduled report-only lanes, 2026-09-22
 
-Three lanes run on a schedule and never gate a merge: `catalog-freshness.yml`
+Three lanes run on a schedule and are not required checks: `catalog-freshness.yml`
 (Mondays 06:17 UTC, plus manual dispatch with a `max_repos` bound), the
 `sbom-vuln` job in `supply-chain.yml` (weekly, plus push/PR when its own paths
 change) and `adoption-bootstrap.yml` (weekly Monday 06:47 UTC, plus push/PR
 when `adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`
 change; described in full further below). None of these three appear in
 `main-ruleset.json`'s required status checks; a required check must run on
-every PR, and a report-only scheduled lane does not.
+every PR, and a scheduled lane does not. Update 2026-09-22: `sbom-vuln` is no
+longer report-only; it fails its own job on a High or Critical grype match
+(see "Secret and supply-chain scanning"), but it is still not a required check.
 
 `catalog-freshness.yml` reuses `tools/sota-convergence/extract_layers.py` and
 `github_freshness.py` unchanged, then rebuilds a manifest with
@@ -351,8 +354,9 @@ version, not a floating "latest" reference; `sbom-vuln` itself never compares
 its pinned grype binary against upstream, it only runs the pinned binary to
 scan the SBOMs it generates. `catalog-freshness.yml`'s fixed-tool table
 covers grype's pin drift against upstream instead (see "Recorded decisions"
-below), so nothing about grype's report-only vulnerability-scanning role
-exempts its own version pin from freshness tracking.
+below), so nothing about grype's vulnerability-scanning role (a
+`--fail-on high` gate since 2026-09-22) exempts its own version pin from
+freshness tracking.
 
 Receipts land as workflow artifacts only: `secret-scan-<run_id>` (30-day
 retention) and `supply-chain-<run_id>` (90-day retention, matching the SBOM's
@@ -443,8 +447,8 @@ tarballs with no manifest Dependabot understands at all. The new
 `catalog-freshness.yml` drift table covers all five (actionlint, gitleaks,
 syft, zizmor, grype) plus `nautilus_trader` against each tool's latest
 upstream release (see "Secret and supply-chain scanning" above for why
-grype's own pin is fixed like the others despite `sbom-vuln`'s scanning role
-being report-only), so the gap is covered by a different, already-built lane
+grype's own pin is fixed like the others whatever `sbom-vuln`'s gating
+role), so the gap is covered by a different, already-built lane
 rather than by Dependabot.
 Precondition to revisit: rename `.github/requirements-ci.lock` to a
 Dependabot-discoverable name (e.g. `requirements-ci.txt` with a
@@ -615,10 +619,14 @@ user); do not raise its limits to retry a failed scan.
 
 ## Report-only Actions hardening, 2026-09-22
 
-Three GitHub Actions security lanes were adopted, each report-only (none is a
+Three GitHub Actions security lanes were adopted, each report-only (none was a
 required check) and recorded in
 [`docs/decisions/2026-09-22-actions-hardening.md`](decisions/2026-09-22-actions-hardening.md)
-with the exact evidence, alternatives and overturn condition.
+with the exact evidence, alternatives and overturn condition. Update
+2026-09-22: dependency review stopped being report-only. It now fails on high
+advisories and is a required check in the target `main-ruleset.json` (see
+"Automation closure, 2026-09-22"); Scorecard and harden-runner still gate
+nothing.
 
 **`scorecard.yml` (OpenSSF Scorecard).** Runs `ossf/scorecard-action` pinned
 to the full commit SHA of `v2.4.4`
@@ -626,12 +634,12 @@ to the full commit SHA of `v2.4.4`
 annotated tag with `gh api repos/ossf/scorecard-action/git/tags/<sha>`) on a
 weekly schedule, `workflow_dispatch`, and push to `main`. `publish_results`
 is `false` -- results are never published to the public `api.scorecard.dev`
-dataset or badge -- and the job requests only `contents: read`; it does not
-use GitHub Advanced Security or `security-events: write`. The SARIF report is
-retained as a workflow artifact (`scorecard-results-<run_id>`, 5-day
-retention). Since 2026-09-22 it is also uploaded to code scanning with
-`github/codeql-action/upload-sarif` v4.38.1; only the `analysis` job holds
-`security-events: write`.
+dataset or badge. The workflow's top-level permission is `contents: read`;
+since 2026-09-22 the `analysis` job alone also holds `security-events: write`,
+which it uses only to upload the SARIF report to code scanning with
+`github/codeql-action/upload-sarif` v4.38.1 (free for this public repository,
+no GitHub Advanced Security purchase). The SARIF report is also retained as a
+workflow artifact (`scorecard-results-<run_id>`, 5-day retention).
 
 **`harden-runner` (step-security).** `step-security/harden-runner`, pinned to
 the full commit SHA of its latest release `v2.21.1`
@@ -919,12 +927,15 @@ holds the evidence, alternatives and overturn comparison for each item.
   `supply-chain.yml`'s grype scan fails at `--fail-on high` with the reviewed
   `.grype.yaml`; Scorecard SARIF goes to code scanning.
 - **Target main ruleset.** `.github/main-ruleset.json` adds `dependency-review`
-  and `osv-scanner`, `strict_required_status_checks_policy: true`,
-  `required_signatures` (the last 10 `main` commits are GitHub-signed squash
-  merges), a `code_scanning` rule for CodeQL (`security_alerts_threshold:
+  and `osv-scanner`, `strict_required_status_checks_policy: true`, a
+  `code_scanning` rule for CodeQL (`security_alerts_threshold:
   high_or_higher`, `alerts_threshold: errors`) and `allowed_merge_methods:
   ["squash"]`. The coordinator applies it with the PUT above after this change
-  merges.
+  merges. `required_signatures` is left out (keep-but-compare): on agent-lab
+  (2026-09-23) it blocked PRs #19 and #20, whose branch commits were unsigned,
+  although GitHub signs the squash merge; removing only that rule unblocked
+  them. Add it after every writer signs commits and one signed PR merges
+  under it.
 - **Releases.** `publish-catalog.yml`'s tag-only `release` job (see
   "Publication on tags") creates an immutable release with the attested
   archive and SBOM attached at creation.

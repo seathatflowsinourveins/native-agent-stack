@@ -29,7 +29,7 @@ changelog dates are given where they exist.
 
 | Setting | Before | After |
 | --- | --- | --- |
-| CodeQL default setup | `not-configured` | `configured`; languages `actions`, `csharp`, `javascript`, `javascript-typescript`, `python`, `typescript`; `default` suite; weekly schedule; setup run 35815088202 (success, `168a3a8`) |
+| CodeQL default setup | `not-configured` | `configured`; languages `actions`, `csharp`, `javascript`, `javascript-typescript`, `python`, `typescript`; `default` suite; weekly schedule (`GET .../code-scanning/default-setup` at 2026-09-23T04:24:29Z, `updated_at` 2026-09-23T03:39:52Z; the GET right after configuration still showed `languages: []`, `schedule: null`); setup run 35815088202 (success, `168a3a8`) |
 | Dependabot security updates | `disabled` | `enabled` |
 | Actions `sha_pinning_required` | `false` | `true` |
 | Merge methods | merge, squash, rebase; no auto-merge; branches kept | squash only; `allow_auto_merge: true`; `delete_branch_on_merge: true` |
@@ -52,9 +52,11 @@ changelog dates are given where they exist.
   `PinningTests`), so the enforcement changes no workflow.
 - **Alternatives.** Keep the settings off. Keep merge commits and rebase.
 - **Decision.** Keep the applied settings. Squash-only merging matches the
-  existing `required_linear_history`. The last 10 `main` commits are all
-  GitHub-signed squash merges (`verification.verified: true`, committer
-  `GitHub`), so the target `required_signatures` rule adds no new merge step.
+  existing `required_linear_history`. The target ruleset does **not** add
+  `required_signatures` (keep-but-compare, section 10): the last 10 `main`
+  commits are GitHub-signed squash merges (`verification.verified: true`,
+  committer `GitHub`), but a measured run showed that this does not satisfy
+  the rule for unsigned branch commits.
 - **Overturn.** A required workflow that cannot be SHA-pinned; a merge that
   needs a merge commit; a release that needs mutable assets.
 
@@ -207,7 +209,9 @@ noisy alerts that nobody triages for 30 days.
 - **Decision.** `--fail-on high` with a reviewed `.grype.yaml`. **Ignores: none**
   (every match is below the gate). Re-review by 2026-12-21. The scan now runs
   `grype db update` and `db status` before the gated scan, so the status file
-  exists when the gate fails.
+  exists when the gate fails. `.grype.yaml` is in the workflow's `push` and
+  `pull_request` path filters (asserted by `tests/test_workflow_hardening.py`
+  `SupplyChainGateTests`), so a PR that changes an ignore rule runs the gate.
 - **Alternatives.** Stay report-only. Gate at medium, which would fail today
   on the seeded pip that no runtime uses.
 - **Overturn.** A High that is unreachable in this venv. Add a scoped
@@ -269,12 +273,26 @@ noisy alerts that nobody triages for 30 days.
   rules, including the server defaults `required_reviewers: []` and
   `require_extra_approval_for_unattributed_changes: true`. It adds
   `dependency-review` and `osv-scanner` (integration 15368), sets
-  `strict_required_status_checks_policy: true`, and adds `required_signatures`,
-  `code_scanning` (CodeQL, `high_or_higher`, `errors`) and
-  `allowed_merge_methods: ["squash"]`. The coordinator applies it after merge
+  `strict_required_status_checks_policy: true`, and adds `code_scanning`
+  (CodeQL, `high_or_higher`, `errors`) and `allowed_merge_methods:
+  ["squash"]`. The coordinator applies it after merge
   ([available rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets)).
 - **Overturn.** The `code_scanning` rule blocks a PR that introduces no alert,
   or strict checks stall auto-merge repeatedly.
+- **`required_signatures`: not in the target (keep-but-compare, 2026-09-23).**
+  An earlier draft of this change added it because every `main` commit is a
+  GitHub-signed squash merge. The coordinator measured the rule on agent-lab
+  (2026-09-23T04:00Z): PRs #19 and #20, each with one unsigned branch commit,
+  green checks and 0 unresolved threads, were `BLOCKED` under ruleset 23859430
+  with `required_signatures`; removing only that rule made both `CLEAN` within
+  8 s. A GitHub-signed squash merge therefore does not satisfy the rule for
+  unsigned branch commits. This change's own commits are unsigned, and no
+  writer worktree sets `commit.gpgsign` or `gpg.format`, so applying the rule
+  would block every agent-authored PR. **Alternatives:** apply it now (blocks
+  every current writer); apply it after every writer signs (a registered SSH
+  signing key plus `commit.gpgsign=true` in each worktree). **Overturn:** add
+  the rule once a signed-commit workflow is set up for every writer and one
+  signed PR is observed to merge under it.
 
 ## 11. Recorded non-adoptions and verdicts
 

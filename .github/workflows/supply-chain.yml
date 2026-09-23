@@ -11,11 +11,13 @@ on:
       - '.github/workflows/supply-chain.yml'
       - 'blueprints/us-equities/supply-chain/**'
       - '.github/workflows/native-foundation-e2e.yml'
+      - '.grype.yaml'
   pull_request:
     paths:
       - '.github/workflows/supply-chain.yml'
       - 'blueprints/us-equities/supply-chain/**'
       - '.github/workflows/native-foundation-e2e.yml'
+      - '.grype.yaml'
   schedule:
     - cron: '29 7 * * 1'
   workflow_dispatch:
