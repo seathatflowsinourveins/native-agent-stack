@@ -24,7 +24,8 @@ from safety import Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerpr
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
                      must_end_flat, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
-from transport import AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, preflight
+from transport import (AlpacaPaperTransport, CALLBACK_REASON_CODES, DATA_FEEDS,
+                       TransportError, RejectedSubmission, preflight)
 
 SOURCE = Path(__file__).resolve().parent
 LAST_OUTPUT = None
@@ -747,6 +748,11 @@ def _decision_transport_health(port):
     if isinstance(failure, dict):
         result["callback_failure"] = {key: _diagnostic_code(failure.get(key))
                                       for key in ("stage", "exception_type")}
+        if isinstance(failure.get("reason_code"), str) and failure["reason_code"] in CALLBACK_REASON_CODES:
+            result["callback_failure"]["reason_code"] = failure["reason_code"]
+        symbol = failure.get("symbol")
+        if isinstance(symbol, str) and symbol in getattr(port, "symbols", ()):
+            result["callback_failure"]["symbol"] = symbol
     return result
 
 
@@ -790,6 +796,9 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     reconciliation = None
     decision_exit = None
     shutdown_failure = None
+    finalization_failure = None
+    pre_shutdown_health = None
+    execution_stage = "decision_loop"
 
     def record_exit(reason, detail=None):
         nonlocal decision_exit
@@ -919,21 +928,41 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
         controller.stop = True
         # Native lifecycle has to settle before a read-only final comparison.
         if not controller.ledger.unresolved() and not strategy.pending:
+            execution_stage = "final_snapshot"
             snap = await port.snapshot()
+            execution_stage = "final_reconciliation"
             reconciliation = reconcile(controller.ledger, snap, baseline_cash)
+    except (Exception, asyncio.CancelledError) as exc:
+        if decision_exit is None:
+            record_exit("execution_failure", type(exc).__name__)
+        finalization_failure = {"stage": execution_stage, "exception_type": _diagnostic_code(type(exc).__name__)}
     finally:
         strategy.enabled = False
         controller.stop = True
-        session.stop()
+        # A quote/callback failure can arrive while the final snapshot awaits
+        # I/O. Inspect the same serious-gap predicate BEFORE intentional native
+        # shutdown mutates transport health; stale-only behavior is unchanged.
+        pre_shutdown_health = _decision_transport_health(port)
+        health = getattr(port, "health", {})
+        if (finalization_failure is None
+                and any("stale" not in str(reason) for reason in health.get("reasons", []))):
+            finalization_failure = {"stage": "final_transport_health", "reason_code": "transport_gap"}
+        try:
+            session.stop()
+        except Exception as exc:
+            shutdown_failure = {"stage": "native_stop", "exception_type": _diagnostic_code(type(exc).__name__)}
         try:
             await asyncio.wait_for(task, 20)
         except (asyncio.TimeoutError, asyncio.CancelledError) as exc:
-            shutdown_failure = {"stage": "native_task_shutdown", "exception_type": _diagnostic_code(type(exc).__name__)}
+            shutdown_failure = shutdown_failure or {"stage": "native_task_shutdown", "exception_type": _diagnostic_code(type(exc).__name__)}
             task.cancel()
             await asyncio.gather(task, return_exceptions=True)
         except Exception as exc:
-            shutdown_failure = {"stage": "native_task_shutdown", "exception_type": _diagnostic_code(type(exc).__name__)}
-        await port.stop()
+            shutdown_failure = shutdown_failure or {"stage": "native_task_shutdown", "exception_type": _diagnostic_code(type(exc).__name__)}
+        try:
+            await port.stop()
+        except (Exception, asyncio.CancelledError) as exc:
+            shutdown_failure = shutdown_failure or {"stage": "transport_shutdown", "exception_type": _diagnostic_code(type(exc).__name__)}
     state = asdict(controller.ledger.accounting())
     is_flat = not controller.ledger.positions() and not controller.ledger.unresolved()
     outcome = {"engine": "NautilusTrader LiveNode 2.0.0rc5", "native_quotes": strategy.received_quotes,
@@ -946,6 +975,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                                  "overnight_holds": session_policy["overnight_holds"]},
               "boundary_receipts": boundary_receipts,
               "decision_exit": decision_exit, "shutdown_failure": shutdown_failure,
+              "finalization_failure": finalization_failure, "pre_shutdown_health": pre_shutdown_health,
               "elapsed_seconds": time.monotonic() - started}
     outcome["status"] = _run_native_status(reconciliation, session.errors, strategy.native_fills,
                                            outcome, session_policy, time.time())
@@ -984,7 +1014,8 @@ def _run_native_status(reconciliation, session_errors, native_fills, outcome, se
     real outcome.
     """
     decision = outcome.get("decision_exit")
-    if (outcome.get("shutdown_failure") or (outcome.get("accounting") or {}).get("halted_reason")
+    if (outcome.get("shutdown_failure") or outcome.get("finalization_failure")
+            or (outcome.get("accounting") or {}).get("halted_reason")
             or (decision is not None and (decision.get("reason") not in _NORMAL_DECISION_EXITS
                 or (decision.get("reason") == "duration_completed" and decision.get("duration_completed") is not True)))):
         return "needs_attention"
@@ -1326,7 +1357,7 @@ def main():
                                                config, metadata["baseline_cash"], account_fingerprint=fingerprint)
                 except Exception as exc:
                     outcome = {"status": "needs_attention", "flat": False, "native_fill_events": 0,
-                               "error_type": type(exc).__name__}
+                               "error_type": _diagnostic_code(type(exc).__name__)}
                 if ledger.positions() or ledger.unresolved():
                     controller.stop = True
                     # This CLI invocation cannot yet tell whether it is the

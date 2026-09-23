@@ -28,10 +28,16 @@ TERMINAL = {"filled", "canceled", "expired", "rejected", "replaced"}
 SYMBOL = re.compile(r"[A-Z][A-Z0-9.\-]{0,14}\Z")
 CLIENT_ID = re.compile(r"[A-Za-z0-9_\-]{1,48}\Z")
 UUID = re.compile(r"[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\Z")
+CALLBACK_REASON_CODES = frozenset({"crossed_quote", "invalid_decimal", "decimal_precision",
+                                   "invalid_timestamp", "negative_size", "unknown_symbol", "callback_exception"})
 
 
 class TransportError(RuntimeError):
     """Sanitized transport failure; never includes provider response bodies."""
+
+    def __init__(self, *args, reason_code="callback_exception"):
+        super().__init__(*args)
+        self.reason_code = reason_code if isinstance(reason_code, str) and reason_code in CALLBACK_REASON_CODES else "callback_exception"
 
 
 class AmbiguousSubmission(TransportError):
@@ -74,11 +80,11 @@ def decimal_string(value, *, positive=False):
     try:
         number = Decimal(str(value))
     except (InvalidOperation, ValueError):
-        raise TransportError("invalid decimal") from None
+        raise TransportError("invalid decimal", reason_code="invalid_decimal") from None
     if not number.is_finite() or (positive and number <= 0):
-        raise TransportError("invalid decimal")
+        raise TransportError("invalid decimal", reason_code="invalid_decimal")
     if number.adjusted() > 18 or number.as_tuple().exponent < -18:
-        raise TransportError("decimal precision out of bounds")
+        raise TransportError("decimal precision out of bounds", reason_code="decimal_precision")
     fixed = format(number, "f")
     return fixed.rstrip("0").rstrip(".") if "." in fixed else fixed
 
@@ -90,15 +96,19 @@ def timestamp_ns(value):
         return int(value.to_unix_nano())
     if isinstance(value, datetime):
         if value.tzinfo is None:
-            raise TransportError("timestamp lacks timezone")
+            raise TransportError("timestamp lacks timezone", reason_code="invalid_timestamp")
         return int(value.timestamp()) * 1_000_000_000 + value.microsecond * 1000
     if isinstance(value, str):
         match = re.fullmatch(r"(.+?)(?:\.(\d{1,9}))?(Z|[+-]\d\d:\d\d)", value)
         if not match:
-            raise TransportError("invalid timestamp")
-        base = datetime.fromisoformat(match[1] + match[3].replace("Z", "+00:00"))
+            raise TransportError("invalid timestamp", reason_code="invalid_timestamp")
+        try:
+            base = datetime.fromisoformat(match[1] + match[3].replace("Z", "+00:00"))
+        except ValueError as exc:
+            exc.reason_code = "invalid_timestamp"
+            raise
         return int(base.timestamp()) * 1_000_000_000 + int((match[2] or "").ljust(9, "0"))
-    raise TransportError("unsupported timestamp")
+    raise TransportError("unsupported timestamp", reason_code="invalid_timestamp")
 
 
 def normalize_order(raw):
@@ -135,9 +145,12 @@ def normalize_quote(raw, symbol=None):
               "ask_size": decimal_string(raw.get("as", raw.get("ask_size", 0))),
               "ts_ns": timestamp_ns(raw.get("t", raw.get("timestamp"))),
               "halted": bool(raw.get("halted")) or bool(QUOTE_HALT_CONDITION_CODES & set(conditions))}
-    if (Decimal(result["bid"]) > Decimal(result["ask"]) or result["ts_ns"] <= 0
-            or min(Decimal(result["bid_size"]), Decimal(result["ask_size"])) < 0):
-        raise TransportError("invalid quote")
+    if Decimal(result["bid"]) > Decimal(result["ask"]):
+        raise TransportError("invalid quote", reason_code="crossed_quote")
+    if result["ts_ns"] <= 0:
+        raise TransportError("invalid quote", reason_code="invalid_timestamp")
+    if min(Decimal(result["bid_size"]), Decimal(result["ask_size"])) < 0:
+        raise TransportError("invalid quote", reason_code="negative_size")
     return result
 
 
@@ -625,7 +638,7 @@ class AlpacaPaperTransport:
                 if kind == "quote":
                     quote = normalize_quote(raw)
                     if quote["symbol"] not in self.symbols:
-                        raise TransportError("unexpected quote symbol")
+                        raise TransportError("unexpected quote symbol", reason_code="unknown_symbol")
                     age = (time.time_ns() - quote["ts_ns"]) / 1e9
                     if not -0.25 <= age <= self.quote_timeout:
                         if quote["symbol"] in self.required_quote_symbols:
@@ -653,7 +666,12 @@ class AlpacaPaperTransport:
                 name = name if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,79}", name) else "Exception"
                 with self._state_lock:
                     if self._callback_failure is None:
-                        self._callback_failure = {"stage": stage, "exception_type": name}
+                        code = getattr(exc, "reason_code", None)
+                        self._callback_failure = {"stage": stage, "exception_type": name,
+                                                  "reason_code": code if isinstance(code, str) and code in CALLBACK_REASON_CODES else "callback_exception"}
+                        symbol = (raw.get("S") or raw.get("symbol")) if kind == "quote" and isinstance(raw, dict) else None
+                        if isinstance(symbol, str) and symbol in self.symbols:
+                            self._callback_failure["symbol"] = symbol
                 self.freeze_health("callback_failure")
 
     async def _watchdog(self):

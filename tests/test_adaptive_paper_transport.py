@@ -285,12 +285,75 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
                         detail = self.port.health.get("callback_failure")
                         self.assertIsNotNone(detail)
                         self.assertEqual(detail["stage"], stage)
-                        self.assertEqual(set(detail), {"stage", "exception_type"})
+                        self.assertTrue({"stage", "exception_type", "reason_code"}.issubset(detail))
+                        self.assertLessEqual(set(detail), {"stage", "exception_type", "reason_code", "symbol"})
                         self.assertRegex(detail["exception_type"], r"^[A-Za-z_][A-Za-z0-9_]{0,79}$")
                         self.assertNotIn("private", json.dumps(self.port.health))
                     finally:
                         consumer.cancel()
                         await asyncio.gather(consumer, return_exceptions=True)
+
+    async def test_quote_validation_reports_machine_code_and_only_configured_symbol(self):
+        cases = [({"bp": "101"}, "crossed_quote", "QQQ"),
+                 ({"bp": "private malformed value"}, "invalid_decimal", "QQQ"),
+                 ({"bs": "-1"}, "negative_size", "QQQ"),
+                 ({"t": None}, "invalid_timestamp", "QQQ"),
+                 ({"t": 123}, "invalid_timestamp", "QQQ"),
+                 ({"t": "2026-99-23T10:00:00Z"}, "invalid_timestamp", "QQQ"),
+                 ({"S": "private-unconfigured-symbol"}, "unknown_symbol", None)]
+        for changes, code, symbol in cases:
+            with self.subTest(code=code, changes=tuple(changes)):
+                port = t.AlpacaPaperTransport("fixture-key", "fixture-secret", ["SPY", "QQQ"],
+                                             before_request=lambda *_: None,
+                                             before_submit=lambda *_: None, sink_observation=lambda *_: None)
+                port._on_quote = AsyncMock()
+                raw = {"S": "QQQ", "bp": "100", "ap": "100.01", "bs": 1, "as": 1,
+                       "t": t.datetime.now().astimezone(), **changes}
+                port._enqueue("quote", raw)
+                consumer = asyncio.create_task(port._consume_events())
+                try:
+                    for _ in range(100):
+                        if port.health["frozen"]:
+                            break
+                        await asyncio.sleep(.001)
+                    self.assertIn("callback_failure", port.health["reasons"])
+                    detail = port.health["callback_failure"]
+                    self.assertEqual(detail["stage"], "quote_normalization")
+                    self.assertEqual(detail["exception_type"],
+                                     "ValueError" if changes.get("t") == "2026-99-23T10:00:00Z" else "TransportError")
+                    self.assertEqual(detail.get("reason_code"), code)
+                    self.assertEqual(detail.get("symbol"), symbol)
+                    self.assertNotIn("private", json.dumps(detail))
+                    port._on_quote.assert_not_called()
+                    self.assertEqual(port._quote_values, {})
+                finally:
+                    consumer.cancel()
+                    await asyncio.gather(consumer, return_exceptions=True)
+                    await port.stop()
+
+    async def test_unhashable_exception_reason_cannot_break_callback_freeze(self):
+        async def reject(_):
+            exc = ValueError("private error message")
+            exc.reason_code = ["private provider payload"]
+            raise exc
+
+        self.port._on_quote = reject
+        self.port._enqueue("quote", {"S": "SPY", "bp": "100", "ap": "100.01",
+                                     "t": t.datetime.now().astimezone()})
+        consumer = asyncio.create_task(self.port._consume_events())
+        try:
+            for _ in range(100):
+                if self.port.health["frozen"] or consumer.done():
+                    break
+                await asyncio.sleep(.001)
+            self.assertFalse(consumer.done())
+            self.assertIn("callback_failure", self.port.health["reasons"])
+            self.assertEqual(self.port.health["callback_failure"]["reason_code"], "callback_exception")
+            self.assertNotIn("private", json.dumps(self.port.health))
+            self.assertEqual(t.TransportError("safe", reason_code=[]).reason_code, "callback_exception")
+        finally:
+            consumer.cancel()
+            await asyncio.gather(consumer, return_exceptions=True)
 
     async def test_metadata_journaled_not_sent_and_replay_has_one_post(self):
         calls = []

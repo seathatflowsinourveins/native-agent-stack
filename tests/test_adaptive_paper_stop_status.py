@@ -88,6 +88,19 @@ class StopLifecycle(unittest.TestCase):
                 async def stop(self):
                     await super().stop()
                     self.health["reasons"] = ["shutdown_marker"]
+                    if mode == "port_stop_failure":
+                        raise RuntimeError("private transport shutdown details")
+
+                async def snapshot(self):
+                    snapshot = await super().snapshot()
+                    if controller.stop:
+                        if mode == "final_snapshot_failure":
+                            raise RuntimeError("private broker response")
+                        if mode == "final_reconcile_failure":
+                            snapshot["account"]["cash"] = "99999"
+                        if mode in ("late_transport_gap", "late_stale"):
+                            self.health["reasons"] = ["callback_failure" if mode == "late_transport_gap" else "quote_stale"]
+                    return snapshot
 
             port = Port(controller, policy.symbols)
             controller.port = port
@@ -95,6 +108,9 @@ class StopLifecycle(unittest.TestCase):
             stopped = asyncio.Event()
 
             async def task_end():
+                if mode.startswith(("final_", "late_")) or mode == "port_stop_failure":
+                    await stopped.wait()
+                    return
                 if mode.startswith("shutdown_"):
                     await stopped.wait()
                     if mode == "shutdown_cancelled":
@@ -109,6 +125,9 @@ class StopLifecycle(unittest.TestCase):
             session = SimpleNamespace(run_async=task_end, stop=stopped.set,
                                       reconciliation=None, errors=[])
             with patch.object(runner, "DEFAULT_STOP", Path(root) / "STOP"):
+                if mode.startswith(("final_", "late_")) or mode == "port_stop_failure":
+                    with patch.object(native_adapter, "build_node", return_value=session):
+                        return asyncio.run(runner.run_native(controller, policy, assets, "fixture", config, "100000"))
                 if mode.startswith("shutdown_"):
                     original_wait = asyncio.wait_for
                     async def bounded_wait(task, timeout):
@@ -166,3 +185,38 @@ class StopLifecycle(unittest.TestCase):
                 self.assertTrue(outcome["decision_exit"]["duration_completed"])
                 self.assertEqual(outcome["shutdown_failure"],
                                  {"stage": "native_task_shutdown", "exception_type": kind})
+
+    def test_final_snapshot_and_reconcile_failure_retain_the_decision(self):
+        for mode, stage, kind in (("final_snapshot_failure", "final_snapshot", "RuntimeError"),
+                                  ("final_reconcile_failure", "final_reconciliation", "SafetyError")):
+            with self.subTest(mode=mode):
+                outcome = self.run_fixture(mode)
+                self.assertEqual(outcome["status"], "needs_attention")
+                self.assertEqual(outcome["decision_exit"]["reason"], "duration_completed")
+                self.assertTrue(outcome["decision_exit"]["duration_completed"])
+                self.assertEqual(outcome["finalization_failure"]["stage"], stage)
+                self.assertEqual(outcome["finalization_failure"]["exception_type"], kind)
+                self.assertNotIn("private", str(outcome))
+                self.assertIsNone(outcome["reconciliation"])
+
+    def test_port_stop_failure_retains_pre_shutdown_health(self):
+        outcome = self.run_fixture("port_stop_failure")
+        self.assertEqual(outcome["status"], "needs_attention")
+        self.assertEqual(outcome["decision_exit"]["reason"], "duration_completed")
+        self.assertNotIn("shutdown_marker", str(outcome["pre_shutdown_health"]))
+        self.assertEqual(outcome["shutdown_failure"],
+                         {"stage": "transport_shutdown", "exception_type": "RuntimeError"})
+        self.assertNotIn("private", str(outcome))
+
+    def test_late_transport_gap_is_seen_before_intentional_shutdown(self):
+        outcome = self.run_fixture("late_transport_gap")
+        self.assertEqual(outcome["status"], "needs_attention")
+        self.assertEqual(outcome["decision_exit"]["reason"], "duration_completed")
+        self.assertEqual(outcome["finalization_failure"]["stage"], "final_transport_health")
+        self.assertEqual(outcome["pre_shutdown_health"]["reasons"], ["callback_failure"])
+
+    def test_late_stale_health_keeps_existing_exit_semantics(self):
+        outcome = self.run_fixture("late_stale")
+        self.assertEqual(outcome["status"], "completed_no_signals")
+        self.assertEqual(outcome["pre_shutdown_health"]["reasons"], ["quote_stale"])
+        self.assertIsNone(outcome["finalization_failure"])
