@@ -85,10 +85,15 @@ on another account/provider. The [subsequent native observations](../evidence/ar
 retain fresh-session settings/role discovery and returned usage separately from
 the interrupted cross-client attempt; they are not another PC's acceptance.
 
-Use this profile for substantial parallel work. Routine work stays at ordinary
-effort. Native Ultracode can increase tokens and elapsed time; it is not a general
-token-saving switch. In a `-p` run, load this opted-in settings file or pass
-`--effort ultracode`; the word in a prompt does not enable the feature.
+Since 2026-09-23 this profile is the default main loop for every session, not
+only for substantial parallel work
+([decision record](../docs/decisions/2026-09-23-max-effort-default.md)).
+Ultracode orchestrates workflows only for substantive tasks, and the sizing rule
+above keeps conversational and mechanical turns solo; a lower effort remains a
+per-session `/effort` choice. Native Ultracode can increase tokens and elapsed
+time; it is not a general token-saving switch. In a `-p` run, load this
+opted-in settings file or pass `--effort ultracode`; the word in a prompt does
+not enable the feature.
 [Persistent settings](https://code.claude.com/docs/en/settings-reference#ultracode),
 [native model configuration](https://code.claude.com/docs/en/model-config),
 [workflow behavior](https://code.claude.com/docs/en/workflows).
@@ -103,14 +108,28 @@ Fable 5.1 is the escalation path when a task specifically needs the prior
 coordinator's demonstrated multi-agent-graph behavior (below) rather than the
 new default.
 
+**2026-09-23, later: every child role runs at `max` effort.** The coordinator
+stays Opus 5.5 at Ultracode (`xhigh` plus dynamic workflow orchestration).
+Every child keeps its task-matched model and requests `max`: Sonnet for scouts
+and builders, Opus for reviewers and judges. Each child row's Qualification
+below predates this change and was recorded at the earlier task-matched
+efforts (Sonnet/medium, Opus/high). No run has compared `max` with those
+efforts on the same tasks yet, so the effort choice stays keep-but-compare
+until the sweep named in the
+[decision record](../docs/decisions/2026-09-23-max-effort-default.md) runs.
+The [section below](#child-effort-max-under-an-ultracode-coordinator) has
+the measured constraints and the per-stage rule.
+
 | Role | Starting choice | Qualification |
 | --- | --- | --- |
-| Requirements, decomposition, integration and hard judgments | Opus 5.5, Ultracode for substantial graphs; escalate to Fable 5.1 for a task needing its previously demonstrated graph-coordination behavior | Coordinator observed as Opus 5.5/xhigh on this host as of 2026-09-23; Fable 5.1/xhigh's own multi-agent-graph coordination (Sonnet 5 and Opus 5 workers) remains the escalation's own qualification below |
-| Exact extraction, inventories, running acceptance commands | `source-scout` (Sonnet, medium; four built-in tools, no project instructions) | First prompt 8,048 tokens versus 42,396 for the default child on one identical task; ran the inventory stage of eight native reviews and the readers of two readiness audits (one deployed, one in the scratch adoption); the recheck stage exists since the eighth review and ran there and in the three scratch-adoption reviews |
-| Implementation from a clear contract | `isolated-builder` (Sonnet, medium, own worktree, named MCP tools behind ToolSearch) | One real task: a manifest probe implemented, checked and committed from its own worktree (first prompt 17,864) |
-| Independent review from source and recorded evidence | `evidence-reviewer` (Opus, high; read-only named MCP tools behind ToolSearch, no Bash/Edit/Write) | Eight native review runs; first prompt 12,164 for the deferred shape versus 42,220 with bare server grants |
-| Cheap exact extraction | Haiku | Not routed: on one byte-identical packet the Opus verifier scored Sonnet 14/14 lane rows and Haiku 9/14 with a quote attributed to a file that does not contain it; overturn only after a repeat trial with no unanchored citation on two distinct packets |
-| Independent cross-family review | Existing official Codex companion | Reuse its separately recorded native acceptance; this trial did not run Codex inside a Workflow graph |
+| Requirements, decomposition, integration and hard judgments | Opus 5.5 at Ultracode (`xhigh` plus dynamic workflow orchestration), the default for every session; escalate to Fable 5.1 for a task needing its previously demonstrated graph-coordination behavior | Coordinator observed as Opus 5.5/xhigh on this host as of 2026-09-23; Fable 5.1/xhigh's own multi-agent-graph coordination (Sonnet 5 and Opus 5 workers) remains the escalation's own qualification below |
+| Exact extraction, inventories, running acceptance commands | `source-scout` (Sonnet, max; four built-in tools, no project instructions) | First prompt 8,048 tokens versus 42,396 for the default child on one identical task; ran the inventory stage of eight native reviews and the readers of two readiness audits (one deployed, one in the scratch adoption); the recheck stage exists since the eighth review and ran there and in the three scratch-adoption reviews |
+| Implementation from a clear contract | `isolated-builder` (Sonnet, max, own worktree, named MCP tools behind ToolSearch) | One real task: a manifest probe implemented, checked and committed from its own worktree (first prompt 17,864) |
+| Independent review from source and recorded evidence | `evidence-reviewer` (Opus, max; read-only named MCP tools behind ToolSearch, no Bash/Edit/Write) | Eight native review runs; first prompt 12,164 for the deferred shape versus 42,220 with bare server grants |
+| Review of supplied semantic (TypeSafe) judgments against original source | `semantic-evidence-reviewer` (Opus, max; Read, Glob and Grep, `typesafe-ai` skill preloaded) | One probe, `wf_20a5e69a-84d`, measured the skill preload (first prompt 15,059 tokens; [convergence record](../docs/harness-rules-convergence-20260922.md)); it proposes in the vendored [layer-verdict lane](../examples/claude-native/workflows/layer-verdict-lane.js); no quality comparison with another reviewer is recorded |
+| Judging or refuting one sealed comparison packet | `blind-judge` (Opus, max; Read only, no project instructions) | Its frontmatter was checked against the agent contract in the [convergence record](../docs/harness-rules-convergence-20260922.md); its body was not reviewed there, and this catalog records no dated run of the role |
+| Cheap exact extraction | Haiku | Not routed: on one byte-identical packet the Opus verifier scored Sonnet 14/14 lane rows and Haiku 9/14 with a quote attributed to a file that does not contain it; overturn only after a repeat trial with no unanchored citation on two distinct packets. Haiku 4.5 takes no effort level, so `max` does not apply to it |
+| Independent cross-family review | Existing official Codex companion | Reuse its separately recorded native acceptance; this trial did not run Codex inside a Workflow graph. Its reasoning effort follows the Codex configuration, not this table |
 
 These are starting choices, not a universal quality ranking. Set worker model
 and effort explicitly. Inspect native child metadata and returned model identity;
@@ -141,6 +160,14 @@ static contract suite, a mutation harness and receipt bindings driven by a sibli
 `contract.config.json`). `review-changes` re-runs every acceptance command with a
 second worker and compares both runs in code. Record each run's children with
 `node .claude/workflows/child-usage.mjs --latest`.
+These examples are dated evidence: their agents, stages and contract suite
+keep the efforts they were qualified at (Sonnet/medium, Opus/high). When
+adopting them after 2026-09-23, raise each stage and agent effort to `max`
+under the per-stage rule below, and update the suite to match: the `ROUTING`
+table in `test-envelope.mjs` (which already accepts `max`) and the effort text
+that cases in `test-contract-mutations.mjs` search for; the shipped
+[`adoption/agents/claude/`](../adoption/agents/claude/) definitions already
+declare it.
 Adopt selected files into a project's existing `.claude/` directories without
 overwriting its instructions, accounts or permissions. A saved script is a
 supported native extension, not an upstream-authored acceptance policy.
@@ -162,10 +189,77 @@ Save a useful script from that view into the selected project's `.claude/workflo
 or the user's workflow directory, then `/reload-skills` when needed. Do not
 publish live host paths or save a one-off audit as a universal project workflow.
 
+### Child effort: `max` under an Ultracode coordinator
+
+Measured on 2026-09-23 with Claude Code 2.1.281 in headless probes, each started
+in a fresh directory; the probes left the user settings file unchanged. The
+[decision record](../docs/decisions/2026-09-23-max-effort-default.md) lists each
+probe and its result.
+
+- **`max` disables Ultracode orchestration.** Ultracode sends `xhigh` to the
+  model and additionally has Claude orchestrate dynamic workflows; any other
+  resolved effort, `max` included, leaves orchestration inactive. Sessions
+  started with `--effort max` or `CLAUDE_CODE_EFFORT_LEVEL=max` ran at `max`
+  and had no Ultracode system reminder, so one session cannot have both.
+- **`max` cannot be persisted.** `effortLevel: "max"` and
+  `modelSettings.<model>.effortLevel: "max"` were silently dropped from
+  `--settings` and from a project `.claude/settings.json`, with or without
+  `ultracode: true` beside them: the session stayed at `xhigh`, with no
+  warning. The installed schema accepts only `low`, `medium`, `high` and
+  `xhigh` in both keys, and the official docs say `max` "isn't accepted as a
+  level in either key" and otherwise applies to the current session only.
+- **`CLAUDE_CODE_EFFORT_LEVEL` overrides every child's effort.** With it set
+  to `max`, a default Agent child, a `source-scout` whose frontmatter then said
+  `sonnet`/`medium` and a workflow stage that passed `effort: 'high'` all ran
+  at `max`. Do not set it: besides disabling Ultracode, it erases every
+  per-agent and per-stage effort.
+
+Under the default Ultracode coordinator (`xhigh`, orchestration active), a
+workflow stage that passed `effort: 'max'` ran at `max`, an Agent whose
+frontmatter says `effort: max` ran at `max`, and a stage without `effort`
+inherited `xhigh`. The installed binary has no default-effort key for
+subagents or workflow stages (`CLAUDE_CODE_SUBAGENT_MODEL` sets only the
+model), so name the effort wherever a child is defined:
+
+- every project agent declares `effort: max` in its frontmatter beside its
+  task-matched `model` (the shipped [agent definitions](../adoption/agents/claude/)
+  do);
+- every saved workflow stage and every ad-hoc `agent()` call in a workflow
+  script passes `effort: 'max'` together with an explicit `model`, because a
+  stage without `effort` inherits the coordinator's `xhigh`;
+- a single non-orchestrated session at `max` stays available on request with
+  `claude --effort max` or `/effort max`; either turns Ultracode off for that
+  session.
+
+The docs list `max` for Opus 5.5, Fable 5.1 and Sonnet 5 (the probes observed
+it on Opus 5.5 and Sonnet 5); a model without it falls back to its highest
+supported level, and Haiku 4.5 takes no effort level. The
+official docs warn that `max` "may show diminishing returns and is prone to
+overthinking" and advise testing before adopting it broadly. Children are
+expected to spend more output tokens, and no sweep has measured that cost or a
+quality gain yet (`autoContinueAtUsageLimit` stays on in the settings template).
+
+## GitHub and cloud sessions
+
+No GitHub Actions workflow in this catalog invokes Claude. For a future one
+built on `anthropics/claude-code-action` (its `action.yml` read at
+`8cf3482550831fb35a4fc3fbf7ca139cf8028b4c`, 2026-09-23): the action has no
+`effort`, `ultracode` or `model` input. Request Ultracode through
+`claude_args: '--effort ultracode'` or the `settings` input
+`'{"ultracode": true}'`, and never put `--effort max` in `claude_args` beside
+Ultracode: an explicit `max` wins and turns orchestration off. This
+repository's committed [`.claude/settings.json`](../.claude/settings.json) is
+the settings example above, byte for byte. Per the official
+[cloud-session settings](https://code.claude.com/docs/en/settings#settings-in-cloud-sessions)
+docs, a cloud session on this one repository reads it, while a session with
+several repositories reads only its `enabledPlugins` and
+`extraKnownMarketplaces` keys. Neither the action nor a cloud session was run;
+this section rests on the documentation and the action's source.
+
 ## Native sessions, result return and messaging
 
 ```sh
-claude --bg --name scoped-worker --model sonnet --effort medium "Bounded task"
+claude --bg --name scoped-worker --model sonnet --effort max "Bounded task"
 claude agents --json --all --cwd "$PWD"
 claude logs WORKER_ID
 claude attach WORKER_ID

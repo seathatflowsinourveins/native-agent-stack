@@ -184,8 +184,27 @@ their previous selection; Claude supports `/effort` for the current session.
 Do not interrupt active work to reload a default. [Codex worker settings](https://learn.chatgpt.com/docs/agent-configuration/subagents)
 and [Claude subagent frontmatter](https://code.claude.com/docs/en/sub-agents)
 can override effort/model inheritance, so do not claim all workers run at the
-coordinator's maximum. The short global instruction example makes task-based
+coordinator's effort. The short global instruction example makes task-based
 acceptance, original-source verification and independent review persistent.
+
+**2026-09-23: Claude children run at `max`; the coordinator stays at
+Ultracode.** Re-measured on Claude Code 2.1.281: `max` in `effortLevel` or
+`modelSettings.<model>.effortLevel` is still silently dropped (the session
+stays at `xhigh`), and a session started with `--effort max` or
+`CLAUDE_CODE_EFFORT_LEVEL=max` ran at `max` with Ultracode orchestration off;
+`/effort max` likewise replaces the `ultracode` entry of the same menu. The
+environment variable also overrides every child's frontmatter and workflow-stage
+effort, so keep it unset. The shipped [agent definitions](../adoption/agents/claude/)
+therefore declare `effort: max` beside their task-matched models (Sonnet for
+`source-scout` and `isolated-builder`; Opus for `evidence-reviewer`,
+`semantic-evidence-reviewer` and `blind-judge`), and workflow stages pass
+`effort: 'max'` explicitly, since a stage without it inherits the
+coordinator's `xhigh`. Verify each child's resolved effort in its transcript
+rather than inferring it from a definition. The
+[Ultracode recipe](claude-native-ultracode.md#child-effort-max-under-an-ultracode-coordinator)
+has the per-stage rule and the
+[decision record](../docs/decisions/2026-09-23-max-effort-default.md) has the
+probes, alternatives and overturn conditions.
 
 The [settings receipt](../evidence/receipts/native-quality-defaults-20260920.json)
 records supported values, effective configuration and preservation checks. More

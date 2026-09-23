@@ -115,3 +115,11 @@ apply/install tooling (`tools/adoption/apply_claude_settings.py`,
   the trust boundary `bootstrap-linux.sh`'s fixed system-package list already
   relies on), and poppler is not even installed on this host to describe. Left as
   a documented gap rather than a speculative mechanism.
+
+## Later decisions
+
+- [`max` effort for every Claude child, Ultracode for the main loop](2026-09-23-max-effort-default.md)
+  (2026-09-23): the shipped `adoption/agents/claude/` definitions now declare
+  `effort: max` beside their task-matched models, and this repository commits a
+  project `.claude/settings.json` that turns Ultracode on. Decision 3's coordinator
+  (Opus 5.5 at `xhigh`) is unchanged.

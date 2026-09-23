@@ -28641,8 +28641,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "1333f3519a190e73b5bfadd37808164ccefebabe88617f2107f1b47c73a912e5",
-      "bytes": 14403
+      "sha256": "fa8ff1b5d35b8af7dfc8fd5e4c4bfd4617c21bbd665d67dd283fe2e7edd28024",
+      "bytes": 21050
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
