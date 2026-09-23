@@ -13111,6 +13111,101 @@
       "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/mteb.json",
       "sha256": "d3ff2011dafc09060ca4dd15abc4cf6469a77f9eedfb27d255eb2aaa0208cc47",
       "bytes": 4375
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/README.md",
+      "sha256": "3135ca53779d7a91765e1396052c641b65a3b241ce2462f938e1125716ccad52",
+      "bytes": 19449
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/opensandbox.json",
+      "sha256": "c8e1e63617f2b8bede9e83726f7e3a8cdf05ea7322345dae618750ca8ccda74b",
+      "bytes": 12727
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/langgraph.json",
+      "sha256": "06565faf2510fa688880d13621ee66381afc611759a1f210db996c1b83ed8b72",
+      "bytes": 8311
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/openresearch.json",
+      "sha256": "86229c561be482bc99fe7b65099cb4c16a451b361d82b14fedeea4aaa1a59213",
+      "bytes": 7712
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/mcporter.json",
+      "sha256": "4a169ece1806fef3791dabd1beb2e75a504c44156b470fddcb761e3c34dec368",
+      "bytes": 6846
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/agentsview.json",
+      "sha256": "57389f254e79420fd1df0d13bc461a3a832e9c1ac7c18457d84d261bc7e25a7d",
+      "bytes": 6685
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/langgraph-smoke-test/out_1.2.11.txt",
+      "sha256": "690dce58adc41574ac3735d894891a0d2ea832bb5c2c6692ebb3399669a6fbba",
+      "bytes": 378
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/langgraph-smoke-test/out_1.2.12.txt",
+      "sha256": "5125183a0bbebe954be3ec87606460c7d155eb93ed1e7dd6e67d1c71dc8605b7",
+      "bytes": 400
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/langgraph-smoke-test/smoke_test.py",
+      "sha256": "94ffdf4c915fe0b724a35404ca5678a09c6c29a0a5a4f063d9fa0814c6bc3240",
+      "bytes": 4553
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/orx_old_help.txt",
+      "sha256": "009d4649e88a9060951715928c8e1a2588a2759ffe40a843c497ac1bc8845301",
+      "bytes": 2564
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/mp_new_help.txt",
+      "sha256": "1746701a12d9a2bd1d11d6cf396afbde1571236276e8c2ef6cfdfbefde406856",
+      "bytes": 2642
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/orx_old_discover.txt",
+      "sha256": "c89fec1a98c25f17a1478793424c416965e074fb3a235923081caab14e004cf5",
+      "bytes": 586
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/av_new_help.txt",
+      "sha256": "c2c7d42049d5097c8615765add6b9590cebc280cd6e42a7de6a3f5d1c5847e5e",
+      "bytes": 9973
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/mp_old_help.txt",
+      "sha256": "1746701a12d9a2bd1d11d6cf396afbde1571236276e8c2ef6cfdfbefde406856",
+      "bytes": 2642
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/mp_old_list_rerun.txt",
+      "sha256": "252298224a773476cbb4f358a5fc0dd951d037f362183cc66440305f02abf39a",
+      "bytes": 324
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/mp_new_list.txt",
+      "sha256": "ca11ef8243dbe7cc83224d5adcd6803d8410eab60431fbe803c721238be66031",
+      "bytes": 323
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/orx_new_discover.txt",
+      "sha256": "c89fec1a98c25f17a1478793424c416965e074fb3a235923081caab14e004cf5",
+      "bytes": 586
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/av_old_help.txt",
+      "sha256": "34e1ece9fd92f99d355eaba761796140fc7f0e672bc764600078448033561380",
+      "bytes": 9173
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/orx_new_help.txt",
+      "sha256": "009d4649e88a9060951715928c8e1a2588a2759ffe40a843c497ac1bc8845301",
+      "bytes": 2564
     }
   ],
   "convergence_records": [
