@@ -64,8 +64,9 @@ class AdjudicateFixture(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.base = Path(temporary.name).resolve()
         self.work = self.base / "work"
-        self.repo = self.base / "repo"
-        self.repo.mkdir()
+        # blind-adjudicator refuses a repository root with fewer than four path components.
+        self.repo = self.base / "hosts" / "blind" / "repo"
+        self.repo.mkdir(parents=True)
         for sub in ("packets", "claude", "codex"):
             (self.work / sub).mkdir(parents=True)
         packet_path = self.work / "packets" / f"{NAME}.json"
@@ -78,8 +79,11 @@ class AdjudicateFixture(unittest.TestCase):
         path = self.work / lane / f"{name}.json"
         path.write_text(json.dumps(lane_return(lane, winner, sha or self.sha, **extra)), encoding="utf-8")
 
-    def inputs(self):
-        return quiet(adjudicate.main, ["inputs", "--work-dir", str(self.work)])
+    def inputs(self, *roots):
+        argv = ["inputs", "--work-dir", str(self.work)]
+        for root in roots or (self.repo,):
+            argv += ["--lane-repo-root", str(root)]
+        return quiet(adjudicate.main, argv)
 
     def judgment(self, lane, order, preferred_lane, refuted=False, model=None):
         family = adjudicate.FAMILIES[lane]
@@ -130,7 +134,7 @@ class InputsTests(AdjudicateFixture):
     def test_evidence_path_lists_are_reduced_to_sorted_bare_paths(self):
         """Round-2 review: Claude sources_read entries carried notes ("path (lines 60-104, prior round)")
         while Codex entries were bare paths, so the notes told the judge which lane wrote A."""
-        claude_repo = self.base / "claude-export"
+        claude_repo = self.base / "hosts" / "claude" / "export"
         self.write_return(
             "claude", "c1", refutation={"status": "unrefuted"},
             sources_read=["evidence/receipt.json (lines 60-104, prior round)", f"{claude_repo}/docs/a.md#setup",
@@ -142,8 +146,7 @@ class InputsTests(AdjudicateFixture):
         self.write_return("codex", "c2", sources_read=["docs/b.md", "docs/a.md#setup", "evidence/receipt.json"],
                           alternatives=[{"key": "c1", "evidence_refs": ["docs/b.md"]}],
                           challenger_preferred={"key": "c1", "evidence_refs": ["tests/x.py"]})
-        code, _err = quiet(adjudicate.main, ["inputs", "--work-dir", str(self.work),
-                                             "--lane-repo-root", str(claude_repo)])
+        code, _err = self.inputs(claude_repo, self.repo)
         self.assertEqual(code, 0)
         ab = json.loads((self.work / "adjudication-inputs" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
         claude_side, codex_side = ab["A"], ab["B"]
@@ -425,7 +428,8 @@ class LeakTests(AdjudicateFixture):
         judge, refuter = adjudicate.split_prompt(adjudicate.PROMPT_PATH.read_text(encoding="utf-8"))
         input_path = self.work / "adjudication-inputs" / f"{NAME}.AB.json"
         for template in (judge, refuter):
-            text = adjudicate.fill(template, input_path, self.repo, {"preferred": "A"})
+            packet = adjudicate.packet_paths(adjudicate.load_index(self.work))[NAME]
+            text = adjudicate.fill(template, input_path, self.repo, {"preferred": "A"}, packet)
             self.assertIn(f"Input file: {input_path}\n", text)
             self.assertIn(f"Packet file: {self.work / 'packets' / (NAME + '.json')}\n", text)
             self.assertIn(f"Repository root: {self.repo}\n", text)
@@ -459,17 +463,136 @@ class LeakTests(AdjudicateFixture):
         self.assertEqual([(e["order"], e["stage"], e["family"]) for e in leaks["leaks"]],
                          [("AB", "judge", "anthropic"), ("BA", "refuter", "anthropic")])
         self.assertEqual(set(leaks["leaks"][0]["inputs"]), {"AB", "BA"})
+        self.assertEqual(leaks["leaks"][0]["input"], f"{NAME}.AB.json")
+        self.assertEqual(leaks["leaks"][0]["input_sha256"], hashlib.sha256(
+            (self.work / "adjudication-inputs" / f"{NAME}.AB.json").read_bytes()).hexdigest())
         for order in adjudicate.ORDERS:
             self.judgment("codex", order, "codex")
         code, err, record = self.assemble()
-        self.assertEqual(code, 0)
-        self.assertIsNone(record["winner_lane"])
-        self.assertEqual(record["missing_families"], ["anthropic"])
-        self.assertEqual(len(record["judgments"]), 2, "leak refusals never count")
-        self.assertIn("anthropic AB: leak", err)
+        self.assertEqual(code, 1)
+        self.assertIsNone(record, "no judgment of a leaked input counts, so no adjudication record is written")
+        self.assertIn("leak recorded for the input", err)
         assembled = json.loads((self.work / "adjudication-leaks.json").read_text(encoding="utf-8"))
         self.assertEqual(len(assembled["leaks"]), 2)
         self.assertEqual(assembled["leaks"][0]["inputs"]["AB"], str(self.work / "adjudication-inputs" / f"{NAME}.AB.json"))
+        self.assertEqual(assembled["split_layers"][0]["leaked_inputs"], [f"{NAME}.AB.json", f"{NAME}.BA.json"])
+        self.assertIn("split: a leak is recorded", assembled["split_layers"][0]["reason"])
+
+    def claude_result(self, leak_orders=()):
+        items = []
+        for order in adjudicate.ORDERS:
+            item = {"name": NAME, "order": order, "packet_sha256": self.sha,
+                    "judge": {"preferred": "A" if order == "AB" else "B", "why": WHY, "evidence_refs": []},
+                    "refuter": {"refuted": False, "reason": "holds", "evidence_refs": []}}
+            if order in leak_orders:
+                item.update(judge=None, refuter=None, leak={"stage": "judge", "text": "gpt-6"})
+            items.append(item)
+        return {"items": items}
+
+    def test_a_claude_leak_is_sticky_until_the_input_changes(self):
+        """Round-2 review (adjudication round 3): a second claude-collect overwrote the leaked judgment with a
+        counted one."""
+        self.assertEqual(adjudicate.collect_claude(self.work, self.claude_result(("AB",)), "claude-opus-5-5"),
+                         [(f"{NAME}.AB", "leak")])
+        self.assertEqual(adjudicate.claude_args(self.work, self.repo)["leaked"], [f"{NAME}.AB"])
+        self.assertEqual([i["order"] for i in adjudicate.claude_args(self.work, self.repo)["items"]], ["BA"])
+        # The workflow is rerun anyway and returns a clean judgment for the leaked input.
+        self.assertEqual(adjudicate.collect_claude(self.work, self.claude_result(), "claude-opus-5-5"),
+                         [(f"{NAME}.AB", "leak")])
+        data = json.loads((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        self.assertEqual((data["failure"], data["judge"]), ("leak", None))
+        records = json.loads((self.work / "adjudication-judgments" / "claude" / "leaks.json").read_text(encoding="utf-8"))
+        self.assertEqual(len(records["leaks"]), 1, "the leak record survives the second run")
+        for order in adjudicate.ORDERS:
+            self.judgment("codex", order, "claude")
+        # Even a judgment file edited to look clean does not count while the leak is recorded.
+        self.judgment("claude", "AB", "claude")
+        code, _err, record = self.assemble()
+        self.assertEqual(code, 1)
+        self.assertIsNone(record)
+        # Rebuilding the input with different content clears it.
+        self.write_return("codex", "c2", why_selected="c2 has evidence in evidence/receipt.json and docs/b.md")
+        self.inputs()
+        self.assertEqual(adjudicate.claude_args(self.work, self.repo)["leaked"], [])
+
+
+class InputScrubTests(AdjudicateFixture):
+    """Round-2 review (adjudication round 3): every real input tripped the leak rule, because inputs carried
+    the packet's absolute path and left absolute paths outside the lane roots."""
+
+    def input_body(self, order="AB"):
+        return json.loads((self.work / "adjudication-inputs" / f"{NAME}.{order}.json").read_text(encoding="utf-8"))
+
+    def test_inputs_carry_no_packet_path_and_no_host_path(self):
+        packet = self.work / "packets" / f"{NAME}.json"
+        self.write_return("claude", "c1", refutation={"status": "unrefuted"},
+                          sources_read=[str(packet), f"{self.repo}/evidence/receipt.json (lines 1-9)"],
+                          why_selected=f"c1: see {self.repo}/docs/a.md, /home/example/code/agent-lab/docs/tasks/t.md "
+                                       "and <host-path>/SKILL.md (https://github.com/example/one).")
+        self.write_return("codex", "c2", sources_read=["evidence/receipt.json", f"{packet}"],
+                          limits=["could not read ~/notes/verdicts.md or $HOME/.codex/AGENTS.md"])
+        code, err = self.inputs()
+        self.assertEqual(code, 0, err)
+        body = self.input_body()
+        self.assertEqual(set(body), {"layer", "packet_sha256", "A", "B"})
+        self.assertEqual(body["A"]["sources_read"], ["PACKET", "evidence/receipt.json"])
+        self.assertEqual(body["A"]["why_selected"], "c1: see docs/a.md, <outside-path>/t.md and "
+                                                    "<outside-path>/SKILL.md (https://github.com/example/one).")
+        self.assertEqual(body["B"]["limits"], ["could not read <outside-path>/verdicts.md or <outside-path>/AGENTS.md"])
+        self.assertEqual(adjudicate.unscrubbed_paths(body), [])
+        self.assertNotIn(str(self.base), json.dumps(body))
+        index = adjudicate.load_index(self.work)
+        self.assertEqual(adjudicate.packet_paths(index)[NAME], str(packet))
+        self.assertEqual(adjudicate.claude_args(self.work, self.repo)["items"][0]["packet_path"], str(packet))
+
+    def test_lane_repo_root_is_required(self):
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as raised:
+            adjudicate.main(["inputs", "--work-dir", str(self.work)])
+        self.assertEqual(raised.exception.code, 2)
+
+    def test_inputs_refuse_to_write_a_layer_whose_host_path_survives_scrubbing(self):
+        self.inputs()
+        self.assertTrue((self.work / "adjudication-inputs" / f"{NAME}.AB.json").is_file())
+        self.write_return("codex", "c2", limits=["see ~example/private/verdicts.md"])
+        code, err = self.inputs()
+        self.assertEqual(code, 1)
+        self.assertIn("host paths remain after scrubbing: ~example/private/verdicts.md", err)
+        self.assertFalse((self.work / "adjudication-inputs" / f"{NAME}.AB.json").exists(), "the stale input is removed")
+        index = adjudicate.load_index(self.work)
+        self.assertEqual(index["skipped"][0]["unscrubbed"], ["~example/private/verdicts.md"])
+        self.assertEqual(adjudicate.pending_items(index), [])
+
+
+class RootDepthTests(AdjudicateFixture):
+    """Round-2 review (adjudication round 3): blind-adjudicator refuses shallow repository roots, so the Claude
+    family alone would refuse while the Codex family judged."""
+
+    def test_root_issue_matches_the_blind_adjudicator_rule(self):
+        for bad in ("/", "/home", "/tmp", "/home/example", "/Users/example", "/root", "/tmp/a/b", "/srv/x/y",
+                    "/a/../b/c/d", "/a/b/c/$HOME", "relative/a/b/c", str(Path.home())):
+            self.assertIsNotNone(adjudicate.root_issue(bad), bad)
+        for good in ("/tmp/a/b/c", "/home/example/code/export", str(self.repo)):
+            self.assertIsNone(adjudicate.root_issue(good), good)
+
+    def test_every_entry_point_refuses_a_shallow_root_with_exit_2(self):
+        shallow = self.base / "export"
+        shallow.mkdir()
+        code, err = self.inputs(shallow)
+        self.assertEqual(code, 2)
+        self.assertIn("path components", err)
+        self.inputs()
+        code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(shallow)])
+        self.assertEqual(code, 2)
+        self.assertIn("blind-adjudicator refuses", err)
+        code, err = quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", "/home",
+                                            "--model", "gpt-6-astra"])
+        self.assertEqual(code, 2)
+        self.assertIn("/home", err)
+
+    def test_a_work_dir_inside_the_repository_root_is_refused(self):
+        # blind-adjudicator refuses an input or packet file inside the repository root.
+        self.assertIsNotNone(adjudicate.refuse_work_dir_inside(self.repo / "work", self.repo))
+        self.assertIsNone(adjudicate.refuse_work_dir_inside(self.work, self.repo))
 
 
 @unittest.skipUnless(os.access(FAKE_BIN / "codex", os.X_OK), "fake codex fixture is not executable")
@@ -497,7 +620,7 @@ class CodexLeakTests(AdjudicateFixture):
         self.assertEqual(code, 1)
         calls = [json.loads(line) for line in self.argv_log.read_text(encoding="utf-8").splitlines()]
         self.assertEqual(len(calls), 2, "one judge call per order: no retry and no refuter after a leak")
-        self.assertIn("Packet file: ", calls[0][-1])
+        self.assertIn(f"Packet file: {self.work / 'packets' / (NAME + '.json')}\n", calls[0][-1])
         for order in adjudicate.ORDERS:
             data = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.{order}.json")
                               .read_text(encoding="utf-8"))
@@ -507,6 +630,31 @@ class CodexLeakTests(AdjudicateFixture):
         leaks = json.loads((self.work / "adjudication-judgments" / "codex" / "leaks.json").read_text(encoding="utf-8"))
         self.assertEqual([(e["family"], e["order"]) for e in leaks["leaks"]], [("openai", "AB"), ("openai", "BA")])
         self.assertIn("LEAK openai", err)
+
+    def test_a_codex_leak_is_sticky_until_inputs_rebuild_the_file(self):
+        """Round-2 review (adjudication round 3): a rerun erased the leak and counted the new judgment."""
+        self.return_file.write_text(json.dumps({"preferred": "A", "why": "leak", "evidence_refs": [], "leak": True,
+                                                "leak_text": "gpt-6"}), encoding="utf-8")
+        self.run_codex()
+        self.return_file.write_text(json.dumps({"preferred": "B", "why": WHY, "evidence_refs": [], "leak": False,
+                                                "leak_text": "", "refuted": False, "reason": "holds"}),
+                                    encoding="utf-8")
+        code, err = self.run_codex()
+        self.assertEqual(code, 1)
+        self.assertEqual(len(self.argv_log.read_text(encoding="utf-8").splitlines()), 2, "a leaked input is not rerun")
+        self.assertIn("leak recorded for this input", err)
+        for order in adjudicate.ORDERS:
+            self.judgment("claude", order, "codex")
+        code, _err, record = self.assemble()
+        self.assertEqual((code, record), (1, None))
+        split = json.loads((self.work / "adjudication-leaks.json").read_text(encoding="utf-8"))["split_layers"]
+        self.assertEqual([entry["layer"] for entry in split], [NAME])
+        # A rebuilt input with different content is judged again.
+        self.write_return("claude", "c1", refutation={"status": "unrefuted"}, why_selected="c1 is native: evidence/receipt.json")
+        self.inputs()
+        code, err = self.run_codex()
+        self.assertEqual(code, 0, err)
+        self.assertEqual(len(self.argv_log.read_text(encoding="utf-8").splitlines()), 6)
 
     def test_a_codex_refuter_leak_drops_the_judgment(self):
         judge = {"preferred": "B", "why": WHY, "evidence_refs": ["evidence/receipt.json"]}

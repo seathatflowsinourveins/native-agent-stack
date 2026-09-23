@@ -1437,6 +1437,21 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   is absolute under a `--lane-repo-root`. In the 2026-09-22 sealed returns, 263 of 423 Claude `sources_read`
   entries carried notes such as "path (lines 60-104, prior round)", while all 558 Codex entries were bare
   paths, so the notes alone showed which lane wrote A.
+  - **Host paths (adjudication round 3).** The blind-adjudicator role and `adjudication-prompt.md` count an
+    absolute host path outside the repository root as a leak, and both lanes record such paths (the packet's
+    absolute path in `sources_read`, for one). So every string in both returns, prose included, is scrubbed:
+    - a path under `<work-dir>/packets/` becomes `PACKET`;
+    - a path under a `--lane-repo-root` becomes repository-relative;
+    - any other absolute path, `~` or `$HOME` path, or `<host-path>` placeholder becomes
+      `<outside-path>/<basename>`.
+
+    http(s) URLs are left alone. `--lane-repo-root` is required and repeatable.
+  - **No packet path in an input.** An input is `{layer, packet_sha256, A, B}`. The judge's labelled
+    `Packet file:` line carries the packet path, which `claude-args` and `codex` take from `index.json`.
+  - **Refusal on a surviving path.** If an absolute path, a `~` path, `$HOME` or `${HOME}`, or a `<host-path>`
+    placeholder still remains after scrubbing, `inputs` writes no input for that layer and removes a stale
+    one. It lists the offenders in `index.json` `skipped[].unscrubbed` and exits 1, so a known leak is never
+    sent to a judge.
 - **`codex`:** runs one judge and one refuter per input through `codex exec` with `codex_lane.ISOLATION_ARGS`
   (no user config, hooks or web search) and the strict schemas `adjudication-judge.schema.json` and
   `adjudication-refute.schema.json`. It refuses a repository under any `.git`, retries once, resumes, and
@@ -1450,7 +1465,7 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
 - **Prompt and leak check (both families, round-2 review):**
   - Every judge and refuter task starts with three labelled lines: `Input file: <path>`, `Packet file: <path>`
     and `Repository root: <path>`. `adjudication-prompt.md` refers only to them and treats any other path as
-    data. `claude-args` gives each item its `packet_path`.
+    data. `claude-args` gives each item its `packet_path` from `index.json`.
   - The judge and the refuter first check their input for reviewer identity: a lane, model, provenance or
     refutation key; a model name such as gpt-, o3, opus, sonnet, haiku or claude-opus; wording that
     attributes a return; or a host path outside the repository root. A candidate that shares a vendor name
@@ -1460,9 +1475,28 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     every property.
   - `adjudicate.py` records a leak as a missing judgment with failure `leak`, never as a judgment or a vote.
     A Codex leak is not retried, and a judge leak skips the refuter.
-  - Each leak is listed, with both of the layer's input files, in `leaks.json`: `codex` and `claude-collect`
-    write it under `adjudication-judgments/<family>/`, and `assemble` writes
-    `<work-dir>/adjudication-leaks.json`. It is not written into `--out`, which `record_verdicts.py` reads.
+  - **Leaks are sticky per input content (adjudication round 3).** `codex` and `claude-collect` append each
+    leak to `adjudication-judgments/<family>/leaks.json` and never overwrite or remove a record. A record is
+    keyed by the input file name and that input's sha256, and lists both of the layer's input files. While
+    an input's current sha256 has a leak record from either family:
+    - `usable_judgment` returns `leak` for any judgment of it, whatever the judgment file says;
+    - `codex` does not rerun it;
+    - `claude-args` leaves it out (listed under `leaked`);
+    - `claude-collect` records any returned judgment for it as `leak`.
+
+    It clears only when `inputs` rebuilds the file and its sha256 changes.
+  - **Leaked layers get no record.** `assemble` drops every judgment of a leaked input from both families.
+    The remaining judgments cannot cover both presentation orders, which `judge_adjudication` requires, so
+    no record is written. The layer is reported as a split, with its reason, in
+    `<work-dir>/adjudication-leaks.json` (`split_layers`, next to every leak record of both families), and
+    `assemble` exits 1. Without an adjudication record, a disagreeing row stays `pending_lanes`. The report is
+    not written into `--out`, which `record_verdicts.py` reads.
+- **Repository-root rule (adjudication round 3).** `blind-adjudicator` refuses a repository root that is
+  `/`, `/home`, a home directory (`/home/<name>`, `/Users/<name>`, `/root` or the current user's), `/tmp`, a
+  path with fewer than four components, or a path with a `.` or `..` segment, `~`, `$` or a wildcard. It also
+  refuses an input or packet file inside the root. `inputs` (each `--lane-repo-root`), `claude-args` and
+  `codex` (`--repo`) apply the same rule first and exit 2 with the reason, so the Claude family never refuses
+  alone while the Codex family judges. `claude-args` and `codex` also refuse a work dir inside `--repo`.
 - **`assemble`:** writes one record per layer. `claude_position` follows the order, `refuting_votes` is 1 when
   the refuter refuted, and `judge` is `{model, family}`. `stripped_packet_sha256` is the layer's sealed lane
   packet. Each record is validated with `judge_adjudication` before it is written. A missing family gives a

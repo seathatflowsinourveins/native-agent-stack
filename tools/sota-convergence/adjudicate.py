@@ -23,8 +23,11 @@ families, each in both presentation orders, and every judgment is attacked by on
 A winner needs unanimous, unrefuted judgments from both families, each covering both orders; anything
 else is a split (winner_lane null). A judge or refuter that finds reviewer identity in its input answers
 ``leak: true`` with the text (adjudication-prompt.md): that judgment is missing with failure "leak", never
-counted, and the layer's inputs are listed in a ``leaks.json`` (codex, claude-collect) and
-``<work-dir>/adjudication-leaks.json`` (assemble). A judgment counts only when both its judge and its refuter returned
+counted. Leak records accumulate per family in ``adjudication-judgments/<family>/leaks.json``, keyed by input
+file name and input sha256; an input with a recorded leak stays leaked (not rerun, never counted) until
+``inputs`` rebuilds it with different content, and ``assemble`` reports its layer as a split in
+``<work-dir>/adjudication-leaks.json``. Inputs carry no host path (``scrub_strings``) and no packet path, and
+every repository root must pass ``root_issue``, the blind-adjudicator rule. A judgment counts only when both its judge and its refuter returned
 a valid object: a lost refuter is never read as "unrefuted". Stdlib only.
 """
 from __future__ import annotations
@@ -128,12 +131,160 @@ def bare_paths(value, repo_roots=()):
     return value
 
 
-def scrub_pair(claude_return: dict, codex_return: dict, repo_roots=()):
-    """(scrubbed claude, scrubbed codex): only SCRUB_KEEP keys present in both returns, with every evidence-path
-    list reduced to sorted bare paths (``bare_paths``)."""
+# Host paths in any string of a return (round-2 review, adjudication round 3). The blind-adjudicator role and
+# adjudication-prompt.md treat an absolute host path outside the repository root as a leak, and both lanes
+# record such paths (the packet's absolute path in sources_read, for one), so every string is scrubbed:
+# a path under <work-dir>/packets/ becomes PACKET, a path under a lane repository root becomes relative, and
+# any other absolute path, ~ or $HOME path, or <host-path> placeholder becomes <outside-path>/<basename>.
+# http(s) URLs are left alone.
+_PATH_CHARS = r"[^\s'\"|;&<>()`,]"
+_PATH_START = r"(?:^|(?<=[\s'\"(=:\[{,]))"
+URL = re.compile(r"https?://\S+")
+ABSOLUTE_TEXT_PATH = re.compile(_PATH_START + r"/+[A-Za-z0-9_.]" + _PATH_CHARS + "*")
+HOME_TEXT_PATH = re.compile(r"(?:~|\$HOME\b|\$\{HOME\})(?:/" + _PATH_CHARS + r"*)?(?![\w])")
+HOST_PLACEHOLDER = re.compile(r"<host-path>(?:/" + _PATH_CHARS + "*)?")
+OUTSIDE = "<outside-path>"
+PACKET_TOKEN = "PACKET"
+# What must never remain in an input after scrubbing (checked by ``unscrubbed_paths``): an absolute path, a
+# ~ path (~/x or ~user/x), $HOME or ${HOME}, or a <host-path> placeholder.
+RESIDUAL_PATTERNS = (
+    re.compile(_PATH_START + r"/+[A-Za-z0-9_.]" + _PATH_CHARS + "*"),
+    re.compile(r"(?<![\w])~[\w.-]*/" + _PATH_CHARS + "*"),
+    re.compile(r"\$HOME\b|\$\{HOME\}"),
+    re.compile(r"<host-path>"),
+)
+
+
+def _outside(path: str) -> str:
+    core, hash_mark, fragment = path.partition("#")
+    base = core.rstrip("/").rsplit("/", 1)[-1] if "/" in core.rstrip("/") else ""
+    return (f"{OUTSIDE}/{base}" if base and not base.startswith(("~", "$")) else OUTSIDE) + hash_mark + fragment
+
+
+def map_host_path(path: str, packets_dir: str, repo_roots=()) -> str:
+    """One absolute path: PACKET under ``packets_dir``, repository-relative under a lane root, else
+    ``<outside-path>/<basename>`` (a ``#fragment`` is kept)."""
+    core = "/" + path.lstrip("/")
+    packets = str(packets_dir).rstrip("/")
+    if core == packets or core.startswith(packets + "/"):
+        return PACKET_TOKEN
+    for root in repo_roots:
+        prefix = str(root).rstrip("/")
+        if core == prefix:
+            return "."
+        if core.startswith(prefix + "/"):
+            return core[len(prefix) + 1:]
+    return _outside(core)
+
+
+def scrub_text(text: str, packets_dir: str, repo_roots=()) -> str:
+    """Every host path in ``text`` (prose included) mapped by ``map_host_path``; http(s) URLs untouched."""
+    pieces, last = [], 0
+    for url in URL.finditer(text):
+        pieces.append(_scrub_segment(text[last:url.start()], packets_dir, repo_roots))
+        pieces.append(url.group(0))
+        last = url.end()
+    pieces.append(_scrub_segment(text[last:], packets_dir, repo_roots))
+    return "".join(pieces)
+
+
+def _split_tail(token: str):
+    core = token.rstrip(".,;:")
+    return core, token[len(core):]
+
+
+def _scrub_segment(text: str, packets_dir: str, repo_roots) -> str:
+    def absolute(match):
+        core, tail = _split_tail(match.group(0))
+        return map_host_path(core, packets_dir, repo_roots) + tail
+
+    def outside(match):
+        core, tail = _split_tail(match.group(0))
+        return _outside(core) + tail
+
+    text = HOST_PLACEHOLDER.sub(outside, text)
+    text = HOME_TEXT_PATH.sub(outside, text)
+    return ABSOLUTE_TEXT_PATH.sub(absolute, text)
+
+
+def scrub_strings(value, packets_dir: str, repo_roots=()):
+    """``value`` with ``scrub_text`` applied to every string at any depth (keys are schema names and stay)."""
+    if isinstance(value, dict):
+        return {key: scrub_strings(item, packets_dir, repo_roots) for key, item in value.items()}
+    if isinstance(value, list):
+        return [scrub_strings(item, packets_dir, repo_roots) for item in value]
+    return scrub_text(value, packets_dir, repo_roots) if isinstance(value, str) else value
+
+
+def unscrubbed_paths(value) -> list:
+    """Every string fragment in ``value`` that still looks like a host path after scrubbing, sorted."""
+    found = set()
+    if isinstance(value, dict):
+        for item in value.values():
+            found.update(unscrubbed_paths(item))
+    elif isinstance(value, list):
+        for item in value:
+            found.update(unscrubbed_paths(item))
+    elif isinstance(value, str):
+        text = URL.sub(" ", value)
+        for pattern in RESIDUAL_PATTERNS:
+            found.update(match.group(0) for match in pattern.finditer(text))
+    return sorted(found)
+
+
+def scrub_pair(claude_return: dict, codex_return: dict, repo_roots=(), packets_dir: str = None):
+    """(scrubbed claude, scrubbed codex): only SCRUB_KEEP keys present in both returns; every string has its
+    host paths mapped (``scrub_strings``), then every evidence-path list is reduced to sorted bare paths
+    (``bare_paths``)."""
     shared = [key for key in SCRUB_KEEP if key in claude_return and key in codex_return]
-    return (bare_paths({key: claude_return[key] for key in shared}, repo_roots),
-            bare_paths({key: codex_return[key] for key in shared}, repo_roots))
+    packets = packets_dir or "/nonexistent-packets-dir"
+    return tuple(bare_paths(scrub_strings({key: data[key] for key in shared}, packets, repo_roots), repo_roots)
+                 for data in (claude_return, codex_return))
+
+
+# The repository roots the blind-adjudicator role refuses (agent-lab PR #40): enforced here first, so the Claude
+# family never refuses alone while the Codex family judges (round-2 review, adjudication round 3).
+MIN_ROOT_COMPONENTS = 4
+REFUSED_ROOTS = ("/", "/home", "/tmp", "/Users", "/root")
+
+
+def root_issue(path) -> str:
+    """None when ``path`` is a repository root blind-adjudicator accepts, else why not: it must be absolute with
+    no ``.``/``..`` segment, ``~``, ``$`` or wildcard, and not ``/``, ``/home``, ``/tmp``, a home directory
+    (``/home/<name>``, ``/Users/<name>``, ``/root`` or this user's home) or a path of fewer than four
+    components."""
+    text = str(path)
+    parts = [part for part in text.split("/") if part]
+    if not text.startswith("/"):
+        return f"{text!r} is not an absolute path"
+    if any(part in (".", "..") for part in parts) or any(char in text for char in "~$*?["):
+        return f"{text!r} has a '.', '..', '~', '$' or wildcard segment"
+    home = str(Path.home()).rstrip("/")
+    if (text.rstrip("/") or "/") in REFUSED_ROOTS or text.rstrip("/") == home or (
+            len(parts) == 2 and parts[0] in ("home", "Users")):
+        return f"{text!r} is /, /home, /tmp or a home directory"
+    if len(parts) < MIN_ROOT_COMPONENTS:
+        return f"{text!r} has {len(parts)} path components; a repository root needs at least {MIN_ROOT_COMPONENTS}"
+    return None
+
+
+def refuse_roots(label: str, roots) -> str:
+    """The exit-2 message for the first refused root, or None."""
+    for root in roots:
+        issue = root_issue(root)
+        if issue:
+            return (f"adjudicate: {label} {issue}; blind-adjudicator refuses such a repository root, so neither "
+                    "family would judge it -- use a blind export at least four directories deep")
+    return None
+
+
+def refuse_work_dir_inside(work_dir: Path, repo: Path) -> str:
+    """blind-adjudicator refuses an input or packet file inside the repository root."""
+    work, root = str(Path(work_dir).resolve()), str(Path(repo).resolve()).rstrip("/")
+    if work == root or work.startswith(root + "/"):
+        return (f"adjudicate: the work dir {work} is inside the repository root {root}; blind-adjudicator refuses an "
+                "input or packet file inside the repository root")
+    return None
 
 
 def identity_mentions(scrubbed: dict) -> list:
@@ -146,10 +297,14 @@ def components_list(components) -> list:
 
 def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
     """Write the counterbalanced input files and index.json; return the index. ``repo_roots`` are the
-    checkouts the lanes were given (their absolute evidence paths become repository-relative)."""
+    checkouts the lanes were given (their absolute evidence paths become repository-relative). An input is
+    ``{layer, packet_sha256, A, B}``: the packet path is not in it (the judge's labelled ``Packet file:`` line
+    carries it, from index.json). A layer whose scrubbed returns still hold a host path is listed in
+    ``skipped`` with the offenders and gets no input file."""
     work_dir = Path(work_dir).resolve()
     out_dir = work_dir / INPUTS_DIR
-    index = {"schema_version": 1, "layers": [], "skipped": []}
+    packets_dir = str((work_dir / "packets").resolve())
+    index = {"schema_version": 2, "layers": [], "skipped": []}
     for packet_path in sorted((work_dir / "packets").glob("*.json")):
         name = packet_path.stem
         if "__" not in name or (layers and name.split("__", 1)[1] not in layers and name not in layers):
@@ -194,16 +349,24 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
             index["layers"].append(entry)
             continue
         entry["agreement"] = "disagree"
-        claude_scrubbed, codex_scrubbed = scrub_pair(returns["claude"], returns["codex"], repo_roots)
+        claude_scrubbed, codex_scrubbed = scrub_pair(returns["claude"], returns["codex"], repo_roots, packets_dir)
+        offenders = unscrubbed_paths([name, claude_scrubbed, codex_scrubbed])
+        if offenders:
+            # Never send a known leak to a judge: no input file for this layer, and a stale one is removed.
+            for order in ORDERS:
+                (out_dir / f"{name}.{order}.json").unlink(missing_ok=True)
+            index["skipped"].append({"layer": name, "reason": "host paths remain after scrubbing: "
+                                                                + ", ".join(offenders), "unscrubbed": offenders})
+            continue
         entry["identity_mentions"] = sorted(set(identity_mentions(claude_scrubbed))
                                             | set(identity_mentions(codex_scrubbed)))
-        entry["inputs"] = {}
+        entry["inputs"], entry["input_sha256"] = {}, {}
         for order in ORDERS:
             a, b = (claude_scrubbed, codex_scrubbed) if order == "AB" else (codex_scrubbed, claude_scrubbed)
             input_path = out_dir / f"{name}.{order}.json"
-            write_json(input_path, {"layer": name, "packet_path": str(packet_path), "packet_sha256": packet_sha256,
-                                    "A": a, "B": b})
+            write_json(input_path, {"layer": name, "packet_sha256": packet_sha256, "A": a, "B": b})
             entry["inputs"][order] = str(input_path)
+            entry["input_sha256"][order] = sha256_file(input_path)
         index["layers"].append(entry)
     write_json(out_dir / "index.json", index)
     return index
@@ -216,13 +379,9 @@ def load_index(work_dir: Path) -> dict:
     return load_json(path)
 
 
-def packet_path_of(input_path) -> str:
-    """The packet path an input file names (written by ``build_inputs``), or "" when it cannot be read."""
-    try:
-        value = load_json(input_path).get("packet_path")
-    except (OSError, ValueError, AttributeError):
-        return ""
-    return value if isinstance(value, str) else ""
+def packet_paths(index: dict) -> dict:
+    """layer name -> the packet path index.json records for it (inputs no longer carry it)."""
+    return {entry["layer"]: entry.get("packet_path") or "" for entry in index.get("layers") or []}
 
 
 def pending_items(index: dict, layers=None) -> list:
@@ -292,12 +451,15 @@ def model_issue(model, family):
     return model_family_issue({"family": family, "name": model}, family, "model")
 
 
-def usable_judgment(data, family, order, packet_sha256):
+def usable_judgment(data, family, order, packet_sha256, leaked_inputs=None):
     """None when the judgment file counts, else the reason it does not. A judgment whose model does not
     match its family's pattern (for example "unknown") does not count, so a resumed run reruns it rather
-    than leaving a record judge_adjudication will reject."""
+    than leaving a record judge_adjudication will reject. ``leaked_inputs`` (``recorded_leaks``) makes a
+    judgment of an input whose current content has a recorded leak, by either family, count as "leak"."""
     if not isinstance(data, dict):
         return "not a JSON object"
+    if leaked_inputs and input_key(data.get("input_path")) in leaked_inputs:
+        return LEAK
     if data.get("family") != family or data.get("order") != order:
         return "family or order does not match its file name"
     issue = model_issue(data.get("model"), family)
@@ -321,11 +483,10 @@ def split_prompt(text: str):
     return judge.strip() + "\n", refuter.strip() + "\n"
 
 
-def fill(template: str, input_path, repo, judgment=None, packet_path=None) -> str:
+def fill(template: str, input_path, repo, judgment=None, packet_path="") -> str:
     """Fill the three labelled lines' placeholders ({INPUT_PATH}, {PACKET_PATH}, {REPO_ROOT}) and {JUDGMENT}.
-    ``packet_path`` defaults to the one the input file names."""
-    packet = packet_path if packet_path is not None else packet_path_of(input_path)
-    text = (template.replace("{INPUT_PATH}", str(input_path)).replace("{PACKET_PATH}", str(packet))
+    ``packet_path`` comes from index.json (``packet_paths``)."""
+    text = (template.replace("{INPUT_PATH}", str(input_path)).replace("{PACKET_PATH}", str(packet_path))
             .replace("{REPO_ROOT}", str(repo)))
     return text.replace("{JUDGMENT}", json.dumps(judgment, sort_keys=True)) if judgment is not None else text
 
@@ -384,17 +545,24 @@ def run_codex(args) -> int:
         print(f"adjudicate: --model {args.model!r} does not match the openai pattern "
               f"{FAMILY_MODEL_PATTERNS['openai'].pattern}", file=sys.stderr)
         return 2
-    refusal = refuse_git_repo(repo)
+    refusal = refuse_roots("--repo", [repo]) or refuse_git_repo(repo) or refuse_work_dir_inside(work_dir, repo)
     if refusal:
         print(refusal, file=sys.stderr)
         return 2
     judge_template, refute_template = split_prompt(args.prompt.read_text(encoding="utf-8"))
     layers = {item.strip() for item in args.layers.split(",") if item.strip()} if args.layers else None
-    items = pending_items(load_index(work_dir), layers)
+    index = load_index(work_dir)
+    packets = packet_paths(index)
+    leaked_inputs = recorded_leaks(work_dir)
+    items = pending_items(index, layers)
     out_dir = work_dir / JUDGMENTS_DIR / "codex"
-    pending = []
+    pending, failures = [], []
     for name, order, input_path, packet_sha256 in items:
         out_path = out_dir / f"{name}.{order}.json"
+        if input_key(input_path) in leaked_inputs:
+            # Sticky: an input with a recorded leak is not rerun until `inputs` rebuilds it.
+            failures.append((f"{name}.{order}", "leak recorded for this input; rebuild it with `inputs`"))
+            continue
         try:
             existing = load_json(out_path)
             # Resume skips only a judgment made with the configured model.
@@ -414,7 +582,7 @@ def run_codex(args) -> int:
         schemas[label] = out_dir / f"adjudication-{label}.codex-strict.schema.json"
         schemas[label].write_text(json.dumps(codex_lane.strict_output_schema(load_json(source)), indent=1,
                                              sort_keys=True) + "\n", encoding="utf-8")
-    failures, leaks, lock = [], [], threading.Lock()
+    leaks, lock = [], threading.Lock()
 
     def process(item):
         name, order, input_path, packet_sha256, out_path = item
@@ -422,7 +590,7 @@ def run_codex(args) -> int:
         leak = None
         judge, judge_model, judge_codes, failure, judge_leak = run_codex_call(
             repo, schemas["judge"], out_dir / f"{stem}.judge.out.tmp", args.effort,
-            fill(judge_template, input_path, repo), args.model, args.timeout,
+            fill(judge_template, input_path, repo, packet_path=packets.get(name, "")), args.model, args.timeout,
             events_dir / f"{stem}.judge.jsonl", valid_judge)
         refuter, refute_model, refute_codes = None, None, []
         if judge_leak is not None:
@@ -430,7 +598,7 @@ def run_codex(args) -> int:
         elif judge is not None:
             refuter, refute_model, refute_codes, failure, refute_leak = run_codex_call(
                 repo, schemas["refute"], out_dir / f"{stem}.refute.out.tmp", args.effort,
-                fill(refute_template, input_path, repo, judge), args.model, args.timeout,
+                fill(refute_template, input_path, repo, judge, packets.get(name, "")), args.model, args.timeout,
                 events_dir / f"{stem}.refute.jsonl", valid_refuter)
             if refute_leak is not None:
                 leak = {"stage": "refuter", "text": refute_leak}
@@ -440,7 +608,7 @@ def run_codex(args) -> int:
         if leak:
             failure = LEAK
             with lock:
-                leaks.append((name, order, {**leak, "family": "openai"}))
+                leaks.append((name, order, input_path, {**leak, "family": "openai"}))
         # The configured --model first, as codex_lane.py records it; the event stream only reports.
         model = args.model or judge_model or "unknown"
         write_json(out_path, judgment_record(
@@ -468,7 +636,7 @@ def run_codex(args) -> int:
     if flagged:
         print(f"adjudicate: blind audit flags {len(flagged)} call(s) for review: {', '.join(flagged)}",
               file=sys.stderr)
-    write_leaks(out_dir / LEAKS_NAME, load_index(work_dir), leaks)
+    record_leaks(out_dir / LEAKS_NAME, index, leaks)
     for stem, failure in sorted(failures):
         print(f"adjudicate: codex {stem}: {failure}", file=sys.stderr)
     return 1 if failures else 0
@@ -477,31 +645,79 @@ def run_codex(args) -> int:
 # ---------------------------------------------------------------- leaks
 
 LEAKS_NAME = "leaks.json"
+_LEAKS_LOCK = threading.Lock()
 
 
-def write_leaks(path: Path, index: dict, leaks) -> list:
-    """Write ``{"schema_version", "leaks": [...]}`` to ``path``: one entry per leaked judgment (layer, order,
-    family, stage, text) with both of the layer's input files, since the leaking text sits in the layer's
-    inputs, not in one order. Returns the entries; an empty list is written too, so a rerun clears old ones."""
+def input_key(input_path):
+    """(input file name, sha256 of its current bytes), or None when it cannot be read."""
+    try:
+        return (Path(input_path).name, sha256_file(input_path))
+    except (OSError, TypeError):
+        return None
+
+
+def load_leak_records(path: Path) -> list:
+    try:
+        records = load_json(path).get("leaks")
+    except (OSError, ValueError, AttributeError):
+        return []
+    return [record for record in records or [] if isinstance(record, dict)]
+
+
+def record_leaks(path: Path, index: dict, leaks) -> list:
+    """Append leak records to ``path`` (a family's ``leaks.json``); existing records are never removed or
+    rewritten. Each record is keyed by the input file name and the input's sha256 when the leak was reported,
+    and lists both of the layer's input files, since the leaking text sits in the layer's returns. Returns the
+    new records."""
     inputs = {entry["layer"]: entry.get("inputs") or {} for entry in index.get("layers") or []}
-    entries = [{"layer": name, "order": order, "family": leak.get("family"), "stage": leak.get("stage"),
-                "text": leak.get("text"), "inputs": inputs.get(name, {})}
-               for name, order, leak in sorted(leaks, key=lambda item: (item[0], item[1], str(item[2].get("family"))))]
-    write_json(path, {"schema_version": 1, "leaks": entries})
-    for entry in entries:
-        print(f"adjudicate: LEAK {entry['family']} {entry['layer']}.{entry['order']} {entry['stage']}: "
-              f"{entry['text']}", file=sys.stderr)
-    return entries
+    with _LEAKS_LOCK:
+        records = load_leak_records(path)
+        seen = {(r.get("input"), r.get("input_sha256"), r.get("family"), r.get("stage")) for r in records}
+        added = []
+        for name, order, input_path, leak in sorted(leaks, key=lambda item: (item[0], item[1])):
+            key = input_key(input_path) or (Path(str(input_path)).name, None)
+            record = {"input": key[0], "input_sha256": key[1], "layer": name, "order": order,
+                      "family": leak.get("family"), "stage": leak.get("stage"), "text": leak.get("text"),
+                      "inputs": inputs.get(name, {})}
+            if (record["input"], record["input_sha256"], record["family"], record["stage"]) in seen:
+                continue
+            seen.add((record["input"], record["input_sha256"], record["family"], record["stage"]))
+            records.append(record)
+            added.append(record)
+        write_json(path, {"schema_version": 2, "leaks": records})
+    for record in added:
+        print(f"adjudicate: LEAK {record['family']} {record['layer']}.{record['order']} {record['stage']}: "
+              f"{record['text']}", file=sys.stderr)
+    return added
+
+
+def leak_record_paths(work_dir: Path) -> list:
+    return [Path(work_dir) / JUDGMENTS_DIR / lane / LEAKS_NAME for lane in FAMILIES]
+
+
+def recorded_leaks(work_dir: Path) -> set:
+    """{(input file name, input sha256)} with a recorded leak from either family. An input stays leaked until
+    ``inputs`` rebuilds it and its sha256 changes."""
+    return {(record.get("input"), record.get("input_sha256"))
+            for path in leak_record_paths(work_dir) for record in load_leak_records(path)}
 
 
 # ---------------------------------------------------------------- claude
 
 def claude_args(work_dir: Path, repo: Path, prompt_path: Path = PROMPT_PATH, layers=None) -> dict:
-    """The adjudication-lane.js args for every disagreeing layer."""
-    items = pending_items(load_index(work_dir), layers)
-    return {"repo": str(repo), "prompt": prompt_path.read_text(encoding="utf-8"),
-            "items": [{"name": name, "order": order, "path": path, "packet_path": packet_path_of(path),
-                       "packet_sha256": sha} for name, order, path, sha in items]}
+    """The adjudication-lane.js args for every disagreeing layer. The packet path comes from index.json. An
+    input with a recorded leak (``recorded_leaks``) is left out and listed under ``leaked`` until ``inputs``
+    rebuilds it."""
+    index = load_index(work_dir)
+    packets, leaked_inputs = packet_paths(index), recorded_leaks(work_dir)
+    items, leaked = [], []
+    for name, order, path, sha in pending_items(index, layers):
+        if input_key(path) in leaked_inputs:
+            leaked.append(f"{name}.{order}")
+            continue
+        items.append({"name": name, "order": order, "path": path, "packet_path": packets.get(name, ""),
+                      "packet_sha256": sha})
+    return {"repo": str(repo), "prompt": prompt_path.read_text(encoding="utf-8"), "items": items, "leaked": leaked}
 
 
 def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
@@ -519,8 +735,16 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
     repo = repo or (result.get("repo") if isinstance(result, dict) else None)
     missing, leaks = [], []
     index = load_index(work_dir)
+    leaked_inputs = recorded_leaks(work_dir)
     for name, order, input_path, packet_sha256 in pending_items(index):
         item = returned.get((name, order)) or {}
+        if input_key(input_path) in leaked_inputs:
+            # Sticky: a judgment of an input with a recorded leak never counts, whatever the workflow returned.
+            write_json(work_dir / JUDGMENTS_DIR / "claude" / f"{name}.{order}.json", judgment_record(
+                "anthropic", name, order, input_path, packet_sha256, model, repo, None, None, LEAK,
+                leak={"stage": "recorded", "text": "a leak is recorded for this input's current content"}))
+            missing.append((f"{name}.{order}", LEAK))
+            continue
         judge, refuter = valid_judge(item.get("judge")), valid_refuter(item.get("refuter"))
         leak = item.get("leak") if isinstance(item.get("leak"), dict) else None
         if leak is None:
@@ -531,7 +755,7 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
         if leak is not None:
             leak = {"stage": leak.get("stage"), "text": leak.get("text")}
             judge, refuter = None, None
-            leaks.append((name, order, {**leak, "family": "anthropic"}))
+            leaks.append((name, order, input_path, {**leak, "family": "anthropic"}))
         if leak is not None:
             failure = LEAK
         elif not item:
@@ -549,7 +773,7 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
             leak=leak))
         if failure:
             missing.append((f"{name}.{order}", failure))
-    write_leaks(work_dir / JUDGMENTS_DIR / "claude" / LEAKS_NAME, index, leaks)
+    record_leaks(work_dir / JUDGMENTS_DIR / "claude" / LEAKS_NAME, index, leaks)
     return missing
 
 
@@ -561,22 +785,25 @@ def relative_ref(ref: str, repo) -> str:
     return ref
 
 
-def assemble_layer(work_dir: Path, entry: dict):
-    """(record, notes) for one disagreeing layer; notes name every judgment that does not count."""
+def assemble_layer(work_dir: Path, entry: dict, leaked_inputs=frozenset()):
+    """(record, notes, leaked input names) for one disagreeing layer; notes name every judgment that does not
+    count. Every judgment of an input whose current content has a recorded leak (either family) is dropped."""
     name, packet_sha256 = entry["layer"], entry["packet_sha256"]
-    judgments, whys, refs, notes, leaks = [], [], set(), [], []
+    judgments, whys, refs, notes = [], [], set(), []
+    leaked_orders = [order for order in ORDERS
+                     if input_key((entry.get("inputs") or {}).get(order)) in leaked_inputs]
     for lane, family in FAMILIES.items():
         for order in ORDERS:
+            if order in leaked_orders:
+                notes.append(f"{family} {order}: leak recorded for the input; every judgment of it is dropped")
+                continue
             path = work_dir / JUDGMENTS_DIR / lane / f"{name}.{order}.json"
             try:
                 data = load_json(path)
             except (OSError, ValueError):
                 notes.append(f"{family} {order}: no judgment file")
                 continue
-            reason = usable_judgment(data, family, order, packet_sha256)
-            if reason == LEAK:
-                leak = data.get("leak") if isinstance(data.get("leak"), dict) else {}
-                leaks.append((name, order, {"family": family, "stage": leak.get("stage"), "text": leak.get("text")}))
+            reason = usable_judgment(data, family, order, packet_sha256, leaked_inputs)
             if reason:
                 notes.append(f"{family} {order}: {reason}")
                 continue
@@ -607,11 +834,15 @@ def assemble_layer(work_dir: Path, entry: dict):
         head = f"split: {refuted} judgment(s) refuted"
     else:
         head = "split: the judgments chose different lanes"
+    if leaked_orders:
+        winner = None
+        head = (f"split: a leak is recorded for input(s) {', '.join(f'{name}.{order}.json' for order in leaked_orders)}"
+                f"; no judgment of a leaked input counts")
     record = {"winner_lane": winner, "why": head + ". " + " | ".join(whys) if whys else head,
               "evidence_refs": sorted(refs), "judgments": judgments}
     if missing:
         record["missing_families"] = missing
-    return record, notes, leaks
+    return record, notes, [f"{name}.{order}.json" for order in leaked_orders]
 
 
 def adjudication_provenance() -> dict:
@@ -624,19 +855,25 @@ def adjudication_provenance() -> dict:
 def assemble(work_dir: Path, out_dir: Path, layers=None):
     """Write every valid record; return (written names, issues)."""
     work_dir, out_dir = Path(work_dir).resolve(), Path(out_dir)
-    written, issues, leaks = [], [], []
+    written, issues, split_layers = [], [], []
     provenance = adjudication_provenance()
     index = load_index(work_dir)
+    leaked_inputs = recorded_leaks(work_dir)
     for entry in index.get("layers") or []:
         if entry.get("agreement") != "disagree":
             continue
         name = entry["layer"]
         if layers and name not in layers and name.split("__", 1)[1] not in layers:
             continue
-        record, notes, layer_leaks = assemble_layer(work_dir, entry)
-        leaks.extend(layer_leaks)
+        record, notes, leaked = assemble_layer(work_dir, entry, leaked_inputs)
         for note in notes:
             print(f"adjudicate: {name}: {note}", file=sys.stderr)
+        if leaked:
+            # A dropped order leaves judgments that cannot cover both presentation orders, which
+            # judge_adjudication rejects; the layer is a split and gets no record (it stays pending_lanes).
+            split_layers.append({"layer": name, "leaked_inputs": leaked, "reason": record["why"]})
+            issues.append((name, record["why"]))
+            continue
         issue, _result = judge_adjudication(record, grandfathered=False, packet_sha256=entry["packet_sha256"])
         if issue:
             issues.append((name, issue))
@@ -644,8 +881,13 @@ def assemble(work_dir: Path, out_dir: Path, layers=None):
         # judge_adjudication and record_verdicts.load_adjudication ignore extra top-level keys.
         write_json(out_dir / f"{name}.json", {**record, "provenance": provenance})
         written.append(name)
-    # Next to the adjudication-inputs, not in --out, which record_verdicts.py --adjudications reads.
-    write_leaks(work_dir / f"adjudication-{LEAKS_NAME}", index, leaks)
+    # A report next to the adjudication-inputs, not in --out, which record_verdicts.py --adjudications reads:
+    # every leak record of both families plus the layers they split. The per-family leaks.json files are the
+    # records; this report is rebuilt from them on every run.
+    write_json(work_dir / f"adjudication-{LEAKS_NAME}", {
+        "schema_version": 2,
+        "leaks": [record for path in leak_record_paths(work_dir) for record in load_leak_records(path)],
+        "split_layers": split_layers})
     return written, issues
 
 
@@ -657,9 +899,10 @@ def parse_args(argv=None):
     inputs = sub.add_parser("inputs", help="Write the AB/BA input files for every disagreeing layer.")
     inputs.add_argument("--work-dir", required=True, type=Path)
     inputs.add_argument("--layers", default=None)
-    inputs.add_argument("--lane-repo-root", action="append", default=[], type=Path,
-                        help="A checkout a lane was given as its repository root (repeatable): absolute evidence "
-                             "paths under it become repository-relative in the inputs.")
+    inputs.add_argument("--lane-repo-root", action="append", required=True, type=Path,
+                        help="Required, repeatable: a checkout a lane was given as its repository root. Host paths "
+                             "under it become repository-relative in the inputs; any other host path becomes "
+                             "<outside-path>/<basename>, and one under <work-dir>/packets/ becomes PACKET.")
     codex = sub.add_parser("codex", help="Run the Codex judge and refuter for every input file.")
     codex.add_argument("--work-dir", required=True, type=Path)
     codex.add_argument("--repo", required=True, type=Path)
@@ -694,8 +937,12 @@ def layer_set(text):
 def main(argv=None) -> int:
     args = parse_args(argv)
     if args.command == "inputs":
-        index = build_inputs(args.work_dir, layer_set(args.layers),
-                             [str(root.resolve()) for root in args.lane_repo_root])
+        roots = [str(root.resolve()) for root in args.lane_repo_root]
+        refusal = refuse_roots("--lane-repo-root", roots)
+        if refusal:
+            print(refusal, file=sys.stderr)
+            return 2
+        index = build_inputs(args.work_dir, layer_set(args.layers), roots)
         for skipped in index["skipped"]:
             print(f"adjudicate: skipped {skipped['layer']}: {skipped['reason']}", file=sys.stderr)
         disagree = [entry["layer"] for entry in index["layers"] if entry["agreement"] == "disagree"]
@@ -705,7 +952,15 @@ def main(argv=None) -> int:
     if args.command == "codex":
         return run_codex(args)
     if args.command == "claude-args":
-        print(json.dumps(claude_args(args.work_dir, args.repo.resolve(), layers=layer_set(args.layers)), indent=1))
+        repo = args.repo.resolve()
+        refusal = refuse_roots("--repo", [repo]) or refuse_work_dir_inside(args.work_dir, repo)
+        if refusal:
+            print(refusal, file=sys.stderr)
+            return 2
+        result = claude_args(args.work_dir, repo, layers=layer_set(args.layers))
+        for stem in result["leaked"]:
+            print(f"adjudicate: {stem}: left out, a leak is recorded for this input", file=sys.stderr)
+        print(json.dumps(result, indent=1))
         return 0
     if args.command == "claude-collect":
         try:

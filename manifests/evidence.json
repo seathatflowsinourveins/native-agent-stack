@@ -28200,8 +28200,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "19ad3ef2b8ae00c2a166a5deff7146990dce1e5b934712f6b27148884994cff2",
-      "bytes": 100753
+      "sha256": "59a9ff2cd87a60d89df9f9432479022dcfa2c060db9bbe4381d56939cea0a865",
+      "bytes": 103637
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
