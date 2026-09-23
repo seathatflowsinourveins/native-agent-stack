@@ -5923,6 +5923,11 @@
       "bytes": 236
     },
     {
+      "path": "blueprints/gap-wave3-20260923/container-build-start-resource-vs-native/Containerfile.app",
+      "sha256": "a6d7e672bd13eb34282a719f24bd2c93a9a30ac87dff05be2c06beee4d0c38a2",
+      "bytes": 612
+    },
+    {
       "path": "blueprints/gap-wave3-20260923/forced-skill-ab/cases.json",
       "sha256": "b40d720fc5831deae3035829eaeab7e59f22c8744a1bb521c6d4011ce5a579a0",
       "bytes": 9193
@@ -8163,6 +8168,11 @@
       "sha256": "45c9f3a0d38f4a8bad7d0f59bbc31ff87f6631135273b8a2f731388e993c6555"
     },
     {
+      "path": "catalogs/landscape/gap-wave2-20260923+gap-wave3-20260923--gap-resolution.json",
+      "sha256": "6b01959e259fdc2d84fd8d69f0f2f274f5730e0a9defbb2821f78493ba7d68dd",
+      "bytes": 75111
+    },
+    {
       "path": "catalogs/landscape/gap-wave2-20260923--gap-resolution.json",
       "sha256": "c7c9e05bdacc5263d370333fd4679ee9c7599f16445c7c75a07dffaf9291b801",
       "bytes": 69876
@@ -8761,6 +8771,11 @@
       "path": "docs/gap-resolution-20260922.md",
       "bytes": 16438,
       "sha256": "f8c93e1889a46ef7800cb2cbd78168da21dfe77dcce2ef965316c0eb5ce8e6d5"
+    },
+    {
+      "path": "docs/gap-wave2-20260923+gap-wave3-20260923--gap-resolution.md",
+      "sha256": "bd9b90496d427dc1181ca17373b1d7a1a1fd77f7a887eef8f8c947446e5d78ce",
+      "bytes": 13940
     },
     {
       "path": "docs/gap-wave2-20260923--gap-resolution.md",
@@ -10301,6 +10316,16 @@
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/watcher-kill-restart-recovery.json",
       "sha256": "1702356a6e2ee2db38b4bf38daa8a7caf14df71efb802635153616a8d7e2e120",
       "bytes": 19163
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-build-start-resource-vs-native.json",
+      "sha256": "64b2f0dca71129522931e5a089c9835887168f39a93899db7fb1fe8d0e7c5fcd",
+      "bytes": 18309
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-recovery-isolation-cpu-mem-vs-native.json",
+      "sha256": "cc5594ad3fea355fb5913d8f30fb263747d273ce0fcc5d500ba69b0edcb9c6d2",
+      "bytes": 15515
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/forced-skill-arm-ab.json",
@@ -14404,8 +14429,8 @@
     },
     {
       "path": "tests/test_gap_wave_ledger.py",
-      "sha256": "63f6ef113311cf13f1ec442f3c8bf1b44008942760ded5791fe34becf7d1b650",
-      "bytes": 9753
+      "sha256": "7857d26cddfa114483dff44b8813afbd937de044fa2a28c3c71cda8b1cac0db3",
+      "bytes": 9965
     },
     {
       "path": "tests/test_gitleaks_config.py",
@@ -14736,21 +14761,6 @@
       "path": "tools/token-report/token_manifest.py",
       "sha256": "7b1c0511e9a56f587392309330e447bb190e5c819950892997a44065f2714e33",
       "bytes": 50793
-    },
-    {
-      "path": "blueprints/gap-wave3-20260923/container-build-start-resource-vs-native/Containerfile.app",
-      "sha256": "a6d7e672bd13eb34282a719f24bd2c93a9a30ac87dff05be2c06beee4d0c38a2",
-      "bytes": 612
-    },
-    {
-      "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-build-start-resource-vs-native.json",
-      "sha256": "04a11387c3f7e6624cd27264d3ff3b62f460d6b8b16255bc94478b567365eebe",
-      "bytes": 15828
-    },
-    {
-      "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-recovery-isolation-cpu-mem-vs-native.json",
-      "sha256": "863513c5fbe67c3efee86fd47d02106ffb46ae0169147d6dac0fad3bcef1e585",
-      "bytes": 12866
     }
   ],
   "convergence_records": [

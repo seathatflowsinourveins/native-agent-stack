@@ -28,6 +28,8 @@ class GapWaveLedgerTests(unittest.TestCase):
     def test_ledger_is_up_to_date(self):
         self.assertEqual(self.tool.main(["--root", str(ROOT), "--wave", "gap-wave2-20260923",
                                          "--owner", "gap-resolution", "--check"]), 0)
+        self.assertEqual(self.tool.main(["--root", str(ROOT), "--wave", "gap-wave2-20260923",
+                                         "--wave", "gap-wave3-20260923", "--owner", "gap-resolution", "--check"]), 0)
 
     def test_status_is_the_best_credit_and_multi_gap_receipts_never_settle(self):
         receipts = {r["path"]: r for r in self.doc["receipts"]}

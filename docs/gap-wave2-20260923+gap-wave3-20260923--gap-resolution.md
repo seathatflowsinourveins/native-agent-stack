@@ -9,11 +9,11 @@ Rule: status is the best credit over the receipts naming the gap; settles_gap tr
 | Status | Gaps |
 | --- | ---: |
 | settled | 10 |
-| advanced | 57 |
-| not_settled | 2 |
+| advanced | 59 |
+| not_settled | 0 |
 | not_run | 0 |
 
-Receipts: 58; native model calls recorded: 101.
+Receipts: 60; native model calls recorded: 101.
 
 ## Per gap
 
@@ -60,10 +60,10 @@ Receipts: 58; native model calls recorded: 101.
 | ci-supply-chain | 13 | settled | [grype-known-cve-fixture](../evidence/artifacts/gap-wave2-20260923/ci-supply-chain/grype-known-cve-fixture.json) |
 | hosting-services | 0 | advanced | [backup-restore-app-rebuild](../evidence/artifacts/gap-wave2-20260923/hosting-services/backup-restore-app-rebuild.json) |
 | hosting-services | 2 | advanced | [migration-up-down-up-data-survival](../evidence/artifacts/gap-wave2-20260923/hosting-services/migration-up-down-up-data-survival.json) |
-| hosting-services | 3 | not_settled | [podman-rootless-feasibility-and-native-comparison](../evidence/artifacts/gap-wave2-20260923/hosting-services/podman-rootless-feasibility-and-native-comparison.json) |
+| hosting-services | 3 | advanced | [podman-rootless-feasibility-and-native-comparison](../evidence/artifacts/gap-wave2-20260923/hosting-services/podman-rootless-feasibility-and-native-comparison.json), [container-build-start-resource-vs-native](../evidence/artifacts/gap-wave3-20260923/hosting-services/container-build-start-resource-vs-native.json), [container-recovery-isolation-cpu-mem-vs-native](../evidence/artifacts/gap-wave3-20260923/hosting-services/container-recovery-isolation-cpu-mem-vs-native.json) |
 | hosting-services | 4 | settled | [systemd-run-supervision-kill-restart](../evidence/artifacts/gap-wave2-20260923/hosting-services/systemd-run-supervision-kill-restart.json) |
 | hosting-services | 9 | advanced | [hardened-postgres-tls-scram](../evidence/artifacts/gap-wave2-20260923/hosting-services/hardened-postgres-tls-scram.json) |
-| hosting-services | 10 | not_settled | [podman-rootless-feasibility-and-native-comparison](../evidence/artifacts/gap-wave2-20260923/hosting-services/podman-rootless-feasibility-and-native-comparison.json) |
+| hosting-services | 10 | advanced | [podman-rootless-feasibility-and-native-comparison](../evidence/artifacts/gap-wave2-20260923/hosting-services/podman-rootless-feasibility-and-native-comparison.json), [container-build-start-resource-vs-native](../evidence/artifacts/gap-wave3-20260923/hosting-services/container-build-start-resource-vs-native.json), [container-recovery-isolation-cpu-mem-vs-native](../evidence/artifacts/gap-wave3-20260923/hosting-services/container-recovery-isolation-cpu-mem-vs-native.json) |
 | recovery-portability | 1 | advanced | [clean-prefix-context-mode-ai-memory-mcporter](../evidence/artifacts/gap-wave2-20260923/recovery-portability/clean-prefix-context-mode-ai-memory-mcporter.json) |
 | recovery-portability | 6 | advanced | [restic-mtime-sparse-uid-extension](../evidence/artifacts/gap-wave2-20260923/recovery-portability/restic-mtime-sparse-uid-extension.json) |
 | recovery-portability | 8 | advanced | [restic-vs-litestream-uv-vs-mise](../evidence/artifacts/gap-wave2-20260923/recovery-portability/restic-vs-litestream-uv-vs-mise.json) |

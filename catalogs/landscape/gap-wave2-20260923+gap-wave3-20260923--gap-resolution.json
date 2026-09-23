@@ -11,8 +11,7 @@
  "crosswalk_sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8",
  "rule": "status is the best credit over the receipts naming the gap; settles_gap true/partially/false credit settled/advanced/not_settled, but a receipt naming several gaps credits each at most advanced; not_run means no receipt names the gap. No verdict changes here.",
  "counts": {
-  "advanced": 57,
-  "not_settled": 2,
+  "advanced": 59,
   "settled": 10
  },
  "layers": [
@@ -556,11 +555,19 @@
      "index": 3,
      "text": "No container lane (Docker/Compose, Podman/Quadlet, Dev Containers) has been run against this workload, so native versus container is unmeasured (docs/hosting-container-practice.md lines 5-6).",
      "next_check": "Install pinned Podman (or Docker Engine) and run the same application and PostgreSQL workload in containers with the unchanged acceptance script. Record build and start time, pass/fail and resource use against the native run.",
-     "status": "not_settled",
+     "status": "advanced",
      "receipts": [
       {
        "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/podman-rootless-feasibility-and-native-comparison.json",
        "credit": "not_settled"
+      },
+      {
+       "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-build-start-resource-vs-native.json",
+       "credit": "advanced"
+      },
+      {
+       "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-recovery-isolation-cpu-mem-vs-native.json",
+       "credit": "advanced"
       }
      ]
     },
@@ -592,11 +599,19 @@
      "index": 10,
      "text": "No matched native-versus-container application comparison establishes deployment, recovery, isolation or operating-cost superiority.",
      "next_check": "Run the identical acceptance, backup/restore and kill-recovery scripts natively and under Podman/Compose. Compare pass rates, recovery time, isolation boundaries and CPU/memory.",
-     "status": "not_settled",
+     "status": "advanced",
      "receipts": [
       {
        "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/podman-rootless-feasibility-and-native-comparison.json",
        "credit": "not_settled"
+      },
+      {
+       "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-build-start-resource-vs-native.json",
+       "credit": "advanced"
+      },
+      {
+       "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-recovery-isolation-cpu-mem-vs-native.json",
+       "credit": "advanced"
       }
      ]
     }
@@ -1764,6 +1779,52 @@
    "settles_gap": "partially",
    "direction": "inconclusive",
    "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-build-start-resource-vs-native.json",
+   "id": "container-build-start-resource-vs-native",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "hosting-services",
+     3
+    ],
+    [
+     "hosting-services",
+     10
+    ]
+   ],
+   "settles_gap": "partially",
+   "per_gap_settles": {
+    "hosting-services:3": "partially",
+    "hosting-services:10": "partially"
+   },
+   "direction": "supports_incumbent",
+   "evidence_class": "local_integration",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-recovery-isolation-cpu-mem-vs-native.json",
+   "id": "container-recovery-isolation-cpu-mem-vs-native",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "hosting-services",
+     3
+    ],
+    [
+     "hosting-services",
+     10
+    ]
+   ],
+   "settles_gap": "partially",
+   "per_gap_settles": {
+    "hosting-services:3": "partially",
+    "hosting-services:10": "partially"
+   },
+   "direction": "supports_incumbent",
+   "evidence_class": "local_integration",
    "model_calls": 0
   },
   {
