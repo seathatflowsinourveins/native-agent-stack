@@ -135,7 +135,7 @@ def bare_paths(value, repo_roots=()):
 # adjudication-prompt.md treat an absolute host path outside the repository root as a leak, and both lanes
 # record such paths (the packet's absolute path in sources_read, for one), so every string is scrubbed:
 # a path under <work-dir>/packets/ becomes PACKET, a path under a lane repository root becomes relative, and
-# any other absolute path, ~ or $HOME path, or <host-path> placeholder becomes <outside-path>/<basename>.
+# any other absolute path, ~ or $HOME path, or <host-path> placeholder becomes the bare <outside-path>.
 # http(s) URLs are left alone.
 _PATH_CHARS = r"[^\s'\"|;&<>()`,]"
 _PATH_START = r"(?:^|(?<=[\s'\"(=:\[{,]))"
@@ -156,14 +156,14 @@ RESIDUAL_PATTERNS = (
 
 
 def _outside(path: str) -> str:
-    core, hash_mark, fragment = path.partition("#")
-    base = core.rstrip("/").rsplit("/", 1)[-1] if "/" in core.rstrip("/") else ""
-    return (f"{OUTSIDE}/{base}" if base and not base.startswith(("~", "$")) else OUTSIDE) + hash_mark + fragment
+    # The bare token only: a kept basename can name a lane (a worktree folder such as "nas-wt-codex-blind",
+    # or a file only one lane's client reads, such as RTK.md) -- independent review of round 2.
+    return OUTSIDE
 
 
 def map_host_path(path: str, packets_dir: str, repo_roots=()) -> str:
     """One absolute path: PACKET under ``packets_dir``, repository-relative under a lane root, else
-    ``<outside-path>/<basename>`` (a ``#fragment`` is kept)."""
+    the bare ``<outside-path>``."""
     core = "/" + path.lstrip("/")
     packets = str(packets_dir).rstrip("/")
     if core == packets or core.startswith(packets + "/"):
@@ -902,7 +902,7 @@ def parse_args(argv=None):
     inputs.add_argument("--lane-repo-root", action="append", required=True, type=Path,
                         help="Required, repeatable: a checkout a lane was given as its repository root. Host paths "
                              "under it become repository-relative in the inputs; any other host path becomes "
-                             "<outside-path>/<basename>, and one under <work-dir>/packets/ becomes PACKET.")
+                             "the bare <outside-path>, and one under <work-dir>/packets/ becomes PACKET.")
     codex = sub.add_parser("codex", help="Run the Codex judge and refuter for every input file.")
     codex.add_argument("--work-dir", required=True, type=Path)
     codex.add_argument("--repo", required=True, type=Path)

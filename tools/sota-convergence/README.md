@@ -1443,7 +1443,7 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     - a path under `<work-dir>/packets/` becomes `PACKET`;
     - a path under a `--lane-repo-root` becomes repository-relative;
     - any other absolute path, `~` or `$HOME` path, or `<host-path>` placeholder becomes
-      `<outside-path>/<basename>`.
+      the bare `<outside-path>`: a kept basename could name a lane (a worktree folder, or a file only one lane's client reads).
 
     http(s) URLs are left alone. `--lane-repo-root` is required and repeatable.
   - **No packet path in an input.** An input is `{layer, packet_sha256, A, B}`. The judge's labelled

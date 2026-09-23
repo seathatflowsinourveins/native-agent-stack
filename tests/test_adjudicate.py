@@ -536,9 +536,9 @@ class InputScrubTests(AdjudicateFixture):
         body = self.input_body()
         self.assertEqual(set(body), {"layer", "packet_sha256", "A", "B"})
         self.assertEqual(body["A"]["sources_read"], ["PACKET", "evidence/receipt.json"])
-        self.assertEqual(body["A"]["why_selected"], "c1: see docs/a.md, <outside-path>/t.md and "
-                                                    "<outside-path>/SKILL.md (https://github.com/example/one).")
-        self.assertEqual(body["B"]["limits"], ["could not read <outside-path>/verdicts.md or <outside-path>/AGENTS.md"])
+        self.assertEqual(body["A"]["why_selected"], "c1: see docs/a.md, <outside-path> and "
+                                                    "<outside-path> (https://github.com/example/one).")
+        self.assertEqual(body["B"]["limits"], ["could not read <outside-path> or <outside-path>"])
         self.assertEqual(adjudicate.unscrubbed_paths(body), [])
         self.assertNotIn(str(self.base), json.dumps(body))
         index = adjudicate.load_index(self.work)
