@@ -96,6 +96,122 @@ class FreshnessTests(unittest.TestCase):
         self.assertEqual(code, 0, err.getvalue())
 
 
+class BuildHostsTests(unittest.TestCase):
+    """A native_proven hosts[] entry whose .json evidence file is missing must fail loudly
+    (exit 1 via SystemExit), not silently give null tiers; every host's own `measured` block
+    must carry through unchanged."""
+
+    def test_missing_native_proven_json_evidence_raises(self):
+        hw = {"hosts": [{
+            "id": "widget-20260101", "label": "widget", "evidence_class": "native_proven",
+            "evidence": "evidence/artifacts/hw-profiles/does-not-exist-xyz/profile.json",
+        }]}
+        with self.assertRaises(SystemExit) as ctx:
+            g.build_hosts(hw)
+        self.assertIn("does not exist", str(ctx.exception))
+
+    def test_native_proven_prose_evidence_does_not_require_a_file(self):
+        # Mirrors the shipped github-macos-15-arm64-runner entry: native_proven with a prose
+        # citation (not a .json report path) is not held to the file-exists check.
+        hw = {"hosts": [{
+            "id": "github-macos-15-arm64-runner", "label": "runner", "evidence_class": "native_proven",
+            "evidence": "GitHub Actions run 1 (some workflow): a citation, not a file path.",
+        }]}
+        hosts = g.build_hosts(hw)
+        self.assertIsNone(hosts[0]["measured_tiers"])
+
+    def test_measured_block_is_carried_through_including_nested_mlx_smoke(self):
+        hw = {"hosts": [{
+            "id": "github-macos-15-arm64-runner", "label": "runner", "evidence_class": "native_proven",
+            "evidence": "a citation, not a file", "measured": {
+                "cpu_brand": "Apple M1 (Virtual)", "cores": 3, "unified_memory_gb": 7.0,
+                "mlx_smoke": {"model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+                             "revision": "a5339a4131f135d0fdc6a5c8b5bbed2753bbe0f3",
+                             "tokens_per_second": 146.57, "generation_tokens": 32},
+            },
+        }]}
+        hosts = g.build_hosts(hw)
+        self.assertEqual(hosts[0]["measured"]["cores"], 3)
+        self.assertEqual(hosts[0]["measured"]["mlx_smoke"]["tokens_per_second"], 146.57)
+
+    def test_labelled_projection_host_has_no_measured_block(self):
+        hw = {"hosts": [{"id": "wsl-projected", "label": "x", "evidence_class": "labelled_projection"}]}
+        hosts = g.build_hosts(hw)
+        self.assertIsNone(hosts[0]["measured"])
+
+
+class MeasuredCellTests(unittest.TestCase):
+    def test_none_measured_returns_none(self):
+        self.assertIsNone(g.measured_cell(None))
+        self.assertIsNone(g.measured_cell({}))
+
+    def test_plain_fields_render(self):
+        cell = g.measured_cell({"cpu_brand": "Apple M1", "cores": 3})
+        self.assertIn("cpu_brand=Apple M1", cell)
+        self.assertIn("cores=3", cell)
+
+    def test_mlx_smoke_renders_compactly(self):
+        cell = g.measured_cell({"mlx_smoke": {
+            "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+            "revision": "a5339a4131f135d0fdc6a5c8b5bbed2753bbe0f3",
+            "tokens_per_second": 146.57, "generation_tokens": 32,
+        }})
+        self.assertIn("mlx-community/Qwen2.5-0.5B-Instruct-4bit@a5339a4", cell)
+        self.assertIn("146.57 tok/s", cell)
+        self.assertIn("32 tokens", cell)
+
+
+class QualifiedModelsRenderTests(unittest.TestCase):
+    """render_md() takes a plain dict, so the new section can be tested without touching the
+    real repository tree."""
+
+    def _minimal_data(self, qualified_models):
+        return {
+            "summary": {
+                "layers": {"foundation": 0, "us-equities": 0}, "winners": 0, "distinct_components": 0,
+                "pins_behind_upstream": [], "e2e_accepted": {p: 0 for p in g.PLATFORMS},
+                "needs_host": {p: 0 for p in g.PLATFORMS}, "not_joined_to_manifest": [],
+            },
+            "setup_order": [], "hosts": [], "layers": [], "qualified_models": qualified_models,
+        }
+
+    def test_empty_section_renders_a_placeholder_row(self):
+        md = g.render_md(self._minimal_data([]))
+        self.assertIn("## Qualified local models", md)
+        self.assertIn("| — | — | — | — | — | — | — | — |", md)
+
+    def test_populated_section_renders_every_field(self):
+        qm = {
+            "catalog": "foundation", "layer_id": "layer-a", "component_id": "vllm", "platform": "linux-wsl2-x86_64",
+            "model_id": "Qwen/Qwen3-8B-AWQ", "revision": "abc123", "runtime": "vllm", "runtime_version": "0.9.0",
+            "bars": "20/20 tool calls", "result": "pass", "host_id": "widget-20260101",
+            "receipt_path": "evidence/hosts/widget-20260101/receipt.json",
+        }
+        md = g.render_md(self._minimal_data([qm]))
+        self.assertIn("Qwen/Qwen3-8B-AWQ", md)
+        self.assertIn("abc123", md)
+        self.assertIn("vllm", md)
+        self.assertIn("0.9.0", md)
+        self.assertIn("widget-20260101", md)
+        self.assertIn("pass", md)
+        self.assertIn("evidence/hosts/widget-20260101/receipt.json", md)
+
+    def test_it_never_claims_acceptance(self):
+        md = g.render_md(self._minimal_data([]))
+        section = md.split("## Qualified local models", 1)[1].split("## ", 1)[0]
+        self.assertIn("never", section)
+        self.assertIn("flip rule", section)
+
+
+class RealRepoQualifiedModelsShapeTests(unittest.TestCase):
+    """The real join's qualified_models list is well formed (empty is fine; the fixture-level
+    behavior is covered above)."""
+
+    def test_qualified_models_key_is_a_list(self):
+        data = g.build()
+        self.assertIsInstance(data["qualified_models"], list)
+
+
 if __name__ == "__main__":
     unittest.main()
 
