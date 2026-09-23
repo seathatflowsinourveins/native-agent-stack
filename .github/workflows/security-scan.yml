@@ -4,9 +4,9 @@ name: Dependency and workflow security scan
 # .github/osv-scanner-lockfiles.json (tests/test_osv_lockfile_coverage.py fails
 # when a tracked one is missing; its "excluded" list names deliberately vulnerable
 # test fixtures, each with a reason) and fails on any vulnerability not ignored in
-# .github/osv-scanner.toml; its pull_request run becomes a required check once the target ruleset
-# (.github/main-ruleset.json) is applied after merge. On push,
-# schedule and dispatch it also uploads SARIF to code scanning, and
+# .github/osv-scanner.toml; its pull_request run is a required check (branch ruleset
+# 23739774). The scan jobs hold only a read token: on push, schedule and dispatch
+# osv-sarif-upload and zizmor-sarif-upload, which run no installed tool, upload the SARIF.
 # zizmor-online adds zizmor's online audits as SARIF (validate.yml keeps the
 # offline zizmor PR gate). See docs/decisions/2026-09-22-github-automation-closure.md.
 
@@ -30,8 +30,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
-      contents: read
-      security-events: write # upload the OSV-Scanner SARIF on push/schedule/dispatch; this job only
+      contents: read # the scanner gets only a read token; osv-sarif-upload holds the write scope
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -82,8 +81,41 @@ jobs:
             fi
           fi
           exit "$status"
-      - name: Upload OSV-Scanner SARIF to code scanning
+      - name: Keep the OSV-Scanner SARIF for the upload job
+        # !cancelled(): a findings exit fails the scan step, and its SARIF must still reach
+        # code scanning; a scanner error leaves no SARIF, so this step then fails too.
         if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: osv-scanner-sarif-${{ github.run_id }}
+          path: ${{ runner.temp }}/osv-scanner/osv-scanner.sarif
+          if-no-files-found: error
+          retention-days: 1
+
+  osv-sarif-upload:
+    needs: osv-scanner
+    # Runs after a findings failure of osv-scanner too (!cancelled()); never on pull_request.
+    if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      security-events: write # upload only: this job runs no installed tool and no shell step
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download the OSV-Scanner SARIF
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: osv-scanner-sarif-${{ github.run_id }}
+          path: ${{ runner.temp }}/osv-scanner
+      - name: Upload OSV-Scanner SARIF to code scanning
         uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
         with:
           sarif_file: ${{ runner.temp }}/osv-scanner/osv-scanner.sarif

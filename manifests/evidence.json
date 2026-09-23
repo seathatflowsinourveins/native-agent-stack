@@ -2988,8 +2988,8 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "f2b393a87510eb6143a082b6ad19123f539eebc579c05f0fad0301d99328fb3c",
-      "bytes": 1762
+      "sha256": "a42818ebdf0eceb6167453cbce129e8b1653a4dca2cf8a54b20440aa053c2e77",
+      "bytes": 1616
     },
     {
       "path": ".github/main-ruleset.json",
@@ -8154,8 +8154,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "68decc71b9d393077e5e070c6cb65c4ab0f2b445992c9f06d1331238c2ea6fcb",
-      "bytes": 469338
+      "sha256": "c2ee606f29d43519e407f34f7c1f8aa81329f4649dee4215f7b99c941036eb77",
+      "bytes": 468999
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -8224,8 +8224,8 @@
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
-      "sha256": "01bc18e70d61e2d6a392c4d722a134ca575406974aa2d09ecc2804166e3e0016",
-      "bytes": 608911
+      "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de",
+      "bytes": 609126
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260922.json",
@@ -8679,8 +8679,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "0e8778bf4c9bda11259a7bd0f9556ecc6f18dff35edbd04bb43c692756ff9f6a",
-      "bytes": 40632
+      "sha256": "61eeba713e1cd0d2c119a2ad1f4d7aaba1db909dbb3f6ea23974e8456fc12d03",
+      "bytes": 41114
     },
     {
       "path": "docs/direct-results.md",
@@ -8794,8 +8794,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "e4ea0b6e6e0e1096fce33695f354c4e53265faa3939502215d17672577ce6f30",
-      "bytes": 425021
+      "sha256": "e7aa905f082b1cdd43897b8f7651061bba4e8d9beff9e093db0a0b6bdf9d468e",
+      "bytes": 425236
     },
     {
       "path": "docs/harness-defaults.md",
@@ -9119,7 +9119,7 @@
     },
     {
       "path": "evidence/artifacts/blind-comparison-20260923/README.md",
-      "sha256": "7dbc89575c3405f1c277cbd8dad430fe71c90e4c7d17f20dd951094c168945e3",
+      "sha256": "a0ba0e2e59f91d19903376b73ad4ecefa9946006a26a2ac3cd8c6dcb98113a87",
       "bytes": 1590
     },
     {
@@ -9134,8 +9134,8 @@
     },
     {
       "path": "evidence/artifacts/blind-comparison-20260923/judgments-cmp-a-20260923.redacted.json",
-      "sha256": "c04116e7879e83767caccc34201c72f3f4a99786877ed1ba52539708fcf9b7b7",
-      "bytes": 8398
+      "sha256": "cbf106603380b661755964724366a8225adfa8127b8ade98a9de27839377e886",
+      "bytes": 8480
     },
     {
       "path": "evidence/artifacts/blind-comparison-20260923/packet-cmp-a-20260923.json",

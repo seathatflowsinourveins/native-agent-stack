@@ -170,45 +170,38 @@ locally with `GH_TOKEN` set and no `--offline`, using
   enforced by the unit test.
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
-  check. Off PRs, the same scan writes SARIF, uploaded by
-  `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
-  (v4.38.1, annotated tag `c23de5a8…` dereferenced) with category
-  `osv-scanner`. This job has never been the only holder of
-  `security-events: write`: the same founding commit (`a9e5180`) gave
-  `zizmor-online` that permission too, and after section 4's 2026-09-23
-  token split the second holder is `zizmor-sarif-upload` instead. Verified
-  with `git show <c>:.github/workflows/security-scan.yml | grep -c
-  'security-events: write'`, which returns 2 at `a9e5180`, `e4737e5`,
-  `da000f8`, `ad72b16` and `4e4aab0`. Two jobs in `security-scan.yml` hold
-  `security-events: write` today. CodeQL Action
-  v3 is deprecated in December 2026
+  check. Off PRs, the same scan writes SARIF, which the job keeps as a 1-day
+  artifact; the separate `osv-sarif-upload` job (`needs: osv-scanner`,
+  `!cancelled()` so a findings failure still uploads) downloads it and uploads
+  it with `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
+  (v4.38.1, annotated tag `c23de5a8…` dereferenced), category `osv-scanner`.
+  CodeQL Action v3 is deprecated in December 2026
   ([changelog](https://github.blog/changelog/2025-10-28-upcoming-deprecation-of-codeql-action-v3/)).
+- **Write scope (2026-09-23 split).** Until this change the `osv-scanner` job
+  itself held `security-events: write`, so the token that can dismiss the
+  CodeQL alerts gated by the `code_scanning` rule was present in the job that
+  runs the curl-installed OSV-Scanner binary on every event, PRs included
+  (job-level permissions apply whether or not the upload step runs). It was
+  never the only holder: `git show <c>:.github/workflows/security-scan.yml |
+  grep -c 'security-events: write'` returns 2 at `a9e5180`, `e4737e5`,
+  `da000f8`, `ad72b16` and `4e4aab0` (`zizmor-online`, later
+  `zizmor-sarif-upload`, held it too). Now both scan jobs are `contents: read`,
+  and the two upload jobs hold the write scope and run no shell step or
+  installed tool (`tests/test_workflow_hardening.py`
+  `test_the_write_token_never_reaches_an_installed_tool`). The split adds no
+  scan: the job already ran `osv-scanner scan source` twice off PRs (the
+  table run for the exit status, then `--format sarif`).
 - **Alternatives.** Dependency review only (sees only a PR's changes). grype
-  over every lock (it needs SBOMs per ecosystem). A separate upload job fed by
-  the scan job's SARIF artifact, matching section 4's `zizmor-sarif-upload`
-  pattern (**rejected, keep-but-compare**). The rejection is not that it would
-  scan twice: `osv-scanner scan source` already runs twice on non-PR events
-  in the current job (once for the exit-code table, once with `--format
-  sarif`), and the table run's `status` already carries the findings exit
-  code, so a split job would need no extra scan -- it would just download the
-  first job's SARIF, the same as zizmor. The real trade-off is that today's
-  in-job design gives the `osv-scanner` job's `security-events: write`
-  permission to the job that also runs the curl-installed, checksum-verified
-  OSV-Scanner binary and parses every tracked lockfile, on every event
-  including PRs (job-level `permissions:` apply regardless of whether the
-  upload step's `if:` runs, the same risk section 4 named for zizmor before
-  splitting it). No measured incident or finding tied that write scope to the
-  installed binary here, and the OSV binary's provenance is checksum-verified
-  against a value pinned in this same workflow (unlike zizmor, which was
-  additionally installed with `--require-hashes` from a lockfile but audits
-  untrusted third-party workflow YAML as its primary function), so the design
-  is kept without a positive incident to justify the split.
-- **Overturn.** A split matching `zizmor-sarif-upload` removes the risk at no
-  scan cost, so keeping the in-job design needs a reason beyond inertia; or
-  OSV-Scanner fixes its version ordering, so resolved results
-  match a pip resolution of the same manifest (then drop `--no-resolve`). Or
-  30 days of PR runs produce only findings that another required check also
-  reports.
+  over every lock (it needs SBOMs per ecosystem). Keep the upload step inside
+  the scan job (rejected on 2026-09-23: it leaves the write-scoped token in the
+  job that runs the installed binary, which the zizmor split in section 4
+  already rejected for the same reason, and splitting costs no extra scan).
+- **Decision.** Scan in a read-only job; upload from a tool-free job.
+- **Overturn.** GitHub adds step-scoped permissions, so the upload step alone
+  can hold the write scope; or OSV-Scanner fixes its version ordering, so
+  resolved results match a pip resolution of the same manifest (then drop
+  `--no-resolve`); or 30 days of PR runs produce only findings that another
+  required check also reports.
 
 ## 4. `security-scan.yml`: zizmor online
 
@@ -263,19 +256,24 @@ locally with `GH_TOKEN` set and no `--offline`, using
   5-day workflow artifact and, in the same job, through
   `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
   (v4.38.1). The upload step and its job-scoped `security-events: write` were
-  added on `main` in commit `4970ba0` (PR #108, 2026-09-22), matching
-  `ossf/scorecard-action`'s own documented example workflow at the same
-  pinned SHA (`2d1146689b8cda280b9bc96326124645441f03bc`, its README's
-  `results_file`/`results_format` step feeding a local SARIF file that the
-  caller uploads itself with `github/codeql-action/upload-sarif`; the action
-  does not upload to code scanning on its own). Observed, not just
-  configured: the first push run on `4970ba0` succeeded with "Scorecard,
-  with its SARIF uploaded" (post-merge section below), and dispatch run
-  35824151483 (post-merge Scorecard-after table, same section) shows the
-  code-scanning-derived score deltas that only follow a successful upload.
-  `analysis` is the
-  only job in the workflow, and it is the only one with `security-events:
-  write` (`tests/test_workflow_hardening.py` `ScorecardTests`).
+  added on `main` in commit `4970ba0` (PR #108), matching the example workflow
+  in `ossf/scorecard-action`'s README at the pinned SHA
+  `2d1146689b8cda280b9bc96326124645441f03bc`: the action writes the local
+  SARIF file named by `results_file`, and the caller uploads it with
+  `github/codeql-action/upload-sarif`; the action does not upload to code
+  scanning itself. Observed upload: `gh api
+  repos/seathatflowsinourveins/native-agent-stack/code-scanning/analyses` lists
+  Scorecard analyses for commit `4970ba0` in the categories
+  `supply-chain/branch-protection` (1 result), `supply-chain/local` (5) and
+  `supply-chain/online-scm` (3), read 2026-09-23. `analysis` is the only job in
+  the workflow and the only one with `security-events: write`
+  (`tests/test_workflow_hardening.py` `ScorecardTests`). Unlike the two
+  security-scan uploads, it is not split: `ossf/scorecard-action` itself takes
+  `repo_token` (default `github.token`) in that job, as its upstream layout
+  prescribes; a split would need the action to run in a read-only job, which
+  its README does not document. **Keep-but-compare:** measured comparison is a
+  dispatch run with the action in a `contents: read` job plus a separate upload
+  job; if it produces the same analyses, split it.
 - **Alternatives.** Set `publish_results: true` (rejected: publishes to the
   public `api.scorecard.dev` dataset and badge, which this unit's scope
   keeps off). Keep the artifact only, with no code-scanning upload (rejected:
@@ -374,6 +372,14 @@ locally with `GH_TOKEN` set and no `--offline`, using
   a fixture).
 - **Overturn.** A Dependabot pip or uv PR passes the recompile-and-diff check on
   a real lock.
+
+- **Stale lane text, recorded here only.** The lane-sourced Dependabot
+  alternative in `catalogs/landscape/foundation.json` (rendered into
+  `catalogs/sota-convergence/layer-verdicts-20260922.json` and the handbook's
+  generated verdict block) still says Dependabot owns only GitHub Actions
+  references. Since the 2026-09-23 fixture entry that is no longer exact. Sealed
+  lane outputs are not edited by hand; the next recorded lane run for that layer
+  replaces the text, and this bullet is the correction until then.
 
 ## 9. Tag-only immutable release
 

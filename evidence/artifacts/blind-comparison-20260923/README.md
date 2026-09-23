@@ -13,7 +13,7 @@ files are deliberately not copied here.
 | `PREREGISTRATION.md` | `6ef62ccf8c72c2f7405ea6af872693efb0f2af6b3f55307b248444f0e257749b` |
 | `battery_catalog.py` | `84c2ae1c0f7aa5eb21e9b16c501fcdc6217fdbd08b2a8360b60e94922fe96145` |
 | `closure-cmp-a-20260923.json` | `0c5ce0ce49aa9a2dc6d718e74f21518bd00c3b31bb309f33f3a72e35c42a2fcf` |
-| `judgments-cmp-a-20260923.redacted.json` | `c04116e7879e83767caccc34201c72f3f4a99786877ed1ba52539708fcf9b7b7` |
+| `judgments-cmp-a-20260923.redacted.json` | `cbf106603380b661755964724366a8225adfa8127b8ade98a9de27839377e886` |
 | `packet-cmp-a-20260923.json` | `43a48b2ef0f3b86c55bd65ddca48aebe91c51ff0e84367ddfc8a61a6f195a91f` |
 | `protocol-cmp-a.json` | `804349c9de90426727afcbf32a7899c588db55efe6cdc59f0be0bae8e8a5b246` |
 | `spec-catalog.md` | `7d70f7a6e36b6ef252946317c7e8b3a3b7e0906a17cae9f2bbb4bf69469f259b` |

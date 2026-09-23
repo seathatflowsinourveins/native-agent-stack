@@ -179,21 +179,22 @@ class SecurityScanTests(unittest.TestCase):
 
     def test_write_scope_is_job_local_and_limited_to_security_events(self):
         self.assertEqual(scopes(self.text.split("\njobs:\n", 1)[0]), [{"contents": "read"}])
-        expected = {"osv-scanner": [{"contents": "read", "security-events": "write"}],
+        expected = {"osv-scanner": [{"contents": "read"}],
+                    "osv-sarif-upload": [{"contents": "read", "security-events": "write"}],
                     "zizmor-online": [{"contents": "read"}],
                     "zizmor-sarif-upload": [{"contents": "read", "security-events": "write"}]}
         self.assertEqual({job_id: scopes(job) for job_id, job in jobs(self.text).items()}, expected)
         self.assertNotRegex(self.text, r"(?m)permissions:[ \t]*[^\s#]", "no inline read-all/write-all form")
 
-    def test_the_zizmor_write_token_never_reaches_an_installed_tool(self):
-        tool = jobs(self.text)["zizmor-online"]
-        upload = jobs(self.text)["zizmor-sarif-upload"]
-        self.assertIn("GH_TOKEN: ${{ github.token }}", tool)
-        self.assertIn("needs: zizmor-online", upload)
-        self.assertNotRegex(upload, r"(?m)^\s+(- )?run:", "the write-scope job runs no shell step")
-        actions = re.findall(r"uses: ([\w.-]+/[\w./-]+)@", upload)
-        self.assertEqual(actions, ["step-security/harden-runner", "actions/checkout",
-                                   "actions/download-artifact", "github/codeql-action/upload-sarif"])
+    def test_the_write_token_never_reaches_an_installed_tool(self):
+        self.assertIn("GH_TOKEN: ${{ github.token }}", jobs(self.text)["zizmor-online"])
+        for tool_job, upload_job in (("osv-scanner", "osv-sarif-upload"), ("zizmor-online", "zizmor-sarif-upload")):
+            upload = jobs(self.text)[upload_job]
+            self.assertIn(f"needs: {tool_job}", upload, upload_job)
+            self.assertNotRegex(upload, r"(?m)^\s+(- )?run:", f"{upload_job} (write scope) runs no shell step")
+            actions = re.findall(r"uses: ([\w.-]+/[\w./-]+)@", upload)
+            self.assertEqual(actions, ["step-security/harden-runner", "actions/checkout",
+                                       "actions/download-artifact", "github/codeql-action/upload-sarif"], upload_job)
 
     def test_osv_scanner_fails_on_findings_and_uploads_sarif_off_pull_requests(self):
         job = jobs(self.text)["osv-scanner"]
@@ -202,8 +203,11 @@ class SecurityScanTests(unittest.TestCase):
         self.assertIn("set +e -u -o pipefail", job)
         self.assertIn('exit "$status"', job)
         self.assertNotIn("continue-on-error", job)
-        upload = job.split("Upload OSV-Scanner SARIF", 1)[1]
-        self.assertIn("github.event_name != 'pull_request'", upload.split("\n", 2)[1])
+        keep = step_block(job, "Keep the OSV-Scanner SARIF for the upload job")
+        self.assertIn("github.event_name != 'pull_request'", block_if(keep))
+        self.assertIn("if-no-files-found: error", keep)
+        upload = jobs(self.text)["osv-sarif-upload"]
+        self.assertIn("github.event_name != 'pull_request'", block_if(upload))
         self.assertIn(UPLOAD_SARIF, upload)
         self.assertIn("category: osv-scanner", upload)
 
@@ -230,13 +234,15 @@ class SecurityScanTests(unittest.TestCase):
         # cancelled run should skip it. block_if() searches the whole step block
         # rather than a fixed line offset, so this still catches a missing/weakened
         # guard even if `uses:` were reordered ahead of `if:`.
+        # The artifact step and the downstream upload job both need it.
         osv_job = jobs(self.text)["osv-scanner"]
-        osv_upload_step = step_block(osv_job, "Upload OSV-Scanner SARIF")
-        osv_upload_if = block_if(osv_upload_step)
-        self.assertIsNotNone(osv_upload_if, "the OSV SARIF upload step must have its own if: guard")
-        self.assertRegex(osv_upload_if, r"!\s*cancelled\(\)|always\(\)",
-                          "the OSV SARIF upload step's if: must keep !cancelled() or always() "
-                          "so a findings exit (the scan step failing) does not skip the upload")
+        for label, block in (("OSV SARIF artifact step", step_block(osv_job, "Keep the OSV-Scanner SARIF for the upload job")),
+                             ("osv-sarif-upload job", jobs(self.text)["osv-sarif-upload"])):
+            guard = block_if(block)
+            self.assertIsNotNone(guard, f"the {label} must have its own if: guard")
+            self.assertRegex(guard, r"!\s*cancelled\(\)|always\(\)",
+                              f"the {label}'s if: must keep !cancelled() or always() so a findings "
+                              "exit (the scan step failing) does not skip the upload")
 
         # (b) The zizmor analyzer step must not have continue-on-error: true, and the
         # artifact-upload step must have no if: that would let it (and, downstream,
@@ -248,9 +254,10 @@ class SecurityScanTests(unittest.TestCase):
                           "the zizmor analyzer step must not continue past a crash "
                           "(continue-on-error would let a partial/empty SARIF reach the upload)")
         keep_step = step_block(zizmor_online, "Keep the zizmor SARIF for the upload job")
-        self.assertNotRegex(keep_step, r"(?m)^\s*if:.*\b(always|cancelled|failure)\s*\(\)",
-                             "the artifact-upload step must not force a run after the analyzer "
-                             "step failed; its default (skip-on-failure) behavior is required")
+        keep_if = block_if(keep_step)  # resolves folded/literal block-scalar if: too
+        self.assertFalse(keep_if and re.search(r"\b(always|cancelled|failure)\s*\(\)", keep_if),
+                         "the artifact-upload step must not force a run after the analyzer "
+                         "step failed; its default (skip-on-failure) behavior is required")
 
         # (c) The zizmor-sarif-upload job's own if: must not force it to run after a
         # cancelled or failed zizmor-online run either (it only skips on pull_request).
