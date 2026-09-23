@@ -549,8 +549,12 @@ class AlpacaPaperTransport:
                 raise TransportError("streams are not ready for reconciliation acknowledgement")
             if "queue_overflow" in self._reasons or "callback_failure" in self._reasons:
                 raise TransportError("event loss requires a new transport and durable recovery")
+            # Pending order-update timers survive a routine acknowledgement; they are
+            # cleared only when the orders stream actually dropped, since only then can
+            # those stream events never arrive (the REST snapshot then stands in for them).
+            if any(str(reason).startswith("orders_") for reason in self._reasons):
+                self._pending_stream.clear()
             self._reasons.clear()
-            self._pending_stream.clear()
 
     def _order_events_pending(self):
         """True while an order event is still queued. Queued quotes do not block a

@@ -132,6 +132,41 @@ class IntegratedRunner(unittest.TestCase):
                                                         "by_symbol": {"SPY": 3}})
             ledger.close()
 
+    def test_gap_arising_during_the_periodic_snapshot_stops_instead_of_thawing(self):
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=3, cleanup_seconds=2, order_timeout_seconds=1)
+
+        class GapDuringSnapshot(SimulatedPort):
+            marks = snapshots = 0
+
+            async def snapshot(self):
+                snap = await super().snapshot()
+                GapDuringSnapshot.snapshots += 1
+                if GapDuringSnapshot.snapshots == 2:  # the first periodic one; the first is the startup snapshot
+                    self.health["reasons"] = ["orders_disconnected"]  # arrives while the snapshot awaits
+                return snap
+
+            def mark_reconciled(self):
+                GapDuringSnapshot.marks += 1
+
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA"), max_positions=4, warmup_samples=4,
+                                  warmup_seconds=.06, sample_seconds=.02, rebalance_seconds=.02,
+                                  min_hold_seconds=.05, max_hold_seconds=.4, cooldown_seconds=.05)
+            port = GapDuringSnapshot(controller, policy.symbols, price=lambda symbol, tick: Decimal("100"))
+            port.health.update(fresh_quotes=True, reasons=[])
+            controller.port = port
+            with patch.object(runner_module, "RECONCILE_EVERY_SECONDS", 0.2):
+                asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                       "fixture", config, "100000"))
+            self.assertGreaterEqual(GapDuringSnapshot.snapshots, 2)  # the periodic branch ran
+            self.assertEqual(GapDuringSnapshot.marks, 0)
+            self.assertTrue(controller.stop)
+            ledger.close()
+
     def test_default_policy_run_native_never_calls_session_at_and_survives_2028(self):
         """S3 regression: last_session_kind used to be computed
         unconditionally, before the try block, on every paper run --

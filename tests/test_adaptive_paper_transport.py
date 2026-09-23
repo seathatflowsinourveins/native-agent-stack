@@ -503,6 +503,16 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
                 await self._drain()
                 self.assertIn("callback_failure", self.port.health["reasons"])
 
+    async def test_routine_acknowledgement_keeps_pending_order_update_timers(self):
+        self.port._pending_stream["trial-1"] = time.monotonic()
+        self.port.freeze_health("quote_stale")
+        self.port.mark_reconciled()
+        self.assertIn("trial-1", self.port._pending_stream)
+        self.assertEqual(self.port.health["reasons"], [])
+        self.port.freeze_health("orders_disconnected")
+        self.port.mark_reconciled()
+        self.assertNotIn("trial-1", self.port._pending_stream)
+
     async def test_queued_quotes_do_not_block_reconciliation_but_order_events_do(self):
         self.port._enqueue("quote", self._stream_quote())
         self.port._enqueue("quote", self._stream_quote())
