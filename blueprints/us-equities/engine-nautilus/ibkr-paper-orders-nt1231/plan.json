@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "plan_id": "ibkr-paper-orders-nt1231-20260923",
+  "frozen_at_utc": "2026-09-23T15:05:00Z",
+  "purpose": "Steps 2-4 of blueprints/us-equities/engine-nautilus/acceptance-plan.md section 5 (IBKR paper) on the NautilusTrader 1.231.0 Python Interactive Brokers adapter (official ibapi), the latest release not blocked by nautilus_trader#4983 or rust-ibapi#764. Frozen before the first order; any deviation is recorded in the receipt.",
+  "authorization": "Standing user authorization for paper E2E and paper orders (agent-lab AGENTS.md). No live account, live port or paid data.",
+  "runtime": {
+    "nautilus_trader": "1.231.0",
+    "nautilus-ibapi": "10.45.1",
+    "python": "3.12",
+    "lock": "requirements.lock (uv pip compile --generate-hashes; installed with uv pip sync --require-hashes)"
+  },
+  "endpoint": {
+    "host": "127.0.0.1",
+    "port": 4002,
+    "allowed_ports": [4002, 7497],
+    "application": "IB Gateway 10.50 (Windows, signed in to paper by the user; reached from WSL over mirrored networking)",
+    "account_rule": "every managed account starts with DU (paper); anything else stops the run before any other request",
+    "client_ids": {"ibapi_precheck_postcheck": 81, "node_data": 81, "node_exec": 82},
+    "client_id_rule": "81 and 82 are used only by this plan and never concurrently with each other's other role; 73 and 76 belong to another session and are never used"
+  },
+  "instrument": {"id": "SPY.ARCA", "symbology": "IB_SIMPLIFIED", "sec_type": "STK", "currency": "USD"},
+  "data_mode": {
+    "market_data_type": "DELAYED (ibapi reqMarketDataType 3; node DELAYED_FROZEN)",
+    "max_reference_quote_age_s": 900,
+    "use": "Only to price the resting limit orders 10% below the reference; no case needs a real-time feed, and market orders fill at the paper simulator's price."
+  },
+  "bounds": {
+    "max_orders_submitted_to_broker": 6,
+    "quantity_per_order": 1,
+    "max_abs_position_shares": 1,
+    "max_notional_per_order_usd": 1000,
+    "max_loss_usd_including_commissions": 5,
+    "order_submit_rate": "1/00:00:01 (Nautilus LiveRiskEngineConfig.max_order_submit_rate)",
+    "timeouts_s": {"accept": 30, "fill": 60, "cancel": 30, "deny": 5, "connect": 90, "reconciliation": 30},
+    "observation_window_s": 1200,
+    "resting_limit_price_rule": "floor(reference_price * 0.90, 0.01), time in force DAY"
+  },
+  "start_conditions": [
+    "IB Gateway reachable at 127.0.0.1:4002 and every managed account starts with DU",
+    "zero positions and zero open orders in every managed account (flat start); otherwise exit 4 and submit nothing",
+    "a SPY reference price no older than max_reference_quote_age_s"
+  ],
+  "cases": [
+    {"id": "C1", "name": "submit, acknowledge, cancel", "steps": "LIMIT BUY 1 SPY at the resting price, DAY -> ACCEPTED -> cancel -> CANCELED"},
+    {"id": "C2", "name": "fill and flatten", "steps": "MARKET BUY 1 -> FILLED; MARKET SELL 1 -> FILLED; net position 0"},
+    {"id": "C5", "name": "kill switch", "steps": "Nautilus risk engine trading state HALTED -> MARKET BUY 1 -> OrderDenied with no broker submission -> state ACTIVE"},
+    {"id": "C3", "name": "reconnect with an open order", "steps": "run 1: LIMIT BUY 1 at the resting price -> ACCEPTED, node stopped with the order left open; run 2: new process with reconciliation -> the same venue order id is open in the cache -> cancel -> CANCELED"},
+    {"id": "C4", "name": "restart reconciliation", "steps": "run 2 startup reconciliation reports net SPY position 0 and exactly the C3 order open, matching the broker"}
+  ],
+  "end_disposition": "Cancel every open order this plan created; flatten any SPY position with a MARKET order (counted toward the order cap; if the cap is reached, stop and report blocked); postcheck must show zero positions and zero open orders.",
+  "reconciliation_rule": "Every journal fill matches one IB execution (execId) for client id 82 with equal side, quantity and price, and one commission report; order ids map client_order_id -> IB order id/permId. Money in USD, rounded to cents; commissions are taken from IB commission reports. A missing commission or an unresolved id makes the result blocked, not passed.",
+  "kill_switch_and_alert": "Kill switch: C5, plus the abort path (any reject, unexpected fill, bound breach or timeout cancels all orders, flattens and stops). Alerts: the adaptive-paper metrics exporter and Prometheus rules are not wired to this arm, so alerting is not exercised here and is reported as not exercised.",
+  "pass_rule": "Every case observed as declared, zero duplicate submissions, zero unexplained position/open-order/cash differences at postcheck, no bound breach, all fills matched with commissions. Anything else is fail or blocked, recorded as observed.",
+  "privacy": "No account id, balance or hash of either is published; raw node logs stay in host-only state; published journals replace account ids with DU<redacted>."
+}
