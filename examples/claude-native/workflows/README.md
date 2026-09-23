@@ -82,6 +82,16 @@ contract suite covers every file in `agents/`.
   workflow child because it must re-run commands with Bash. Omitted, unexecuted,
   missing or unverifiable evidence cannot complete the audit; a complete audit can
   conclude that the project is not ready.
+- `layer-verdict-lane`: this catalog's own Claude lane of the layer-verdict
+  convergence, vendored byte-identical under `SHA256SUMS`. After
+  `tools/sota-convergence/lane_packets.py` writes the packets, pass `repo`,
+  `packets` (`{catalog, layer_id, path, sha256}`) and the lane `prompt`; per
+  packet a `semantic-evidence-reviewer` proposes the winner set, two
+  `evidence-reviewer` lenses try to refute it and one revision round follows a
+  refutation. It writes nothing; `tools/sota-convergence/record_verdicts.py`
+  applies the rules (see `docs/decisions/2026-09-23-verdict-integrity.md`). It
+  needs the project-local `semantic-evidence-reviewer` agent, so a project
+  that does not record layer verdicts can leave it out.
 
 Both workflows retain native model/schema errors and missing results. Claims and
 returned source summaries remain model judgments; deterministic coverage checks

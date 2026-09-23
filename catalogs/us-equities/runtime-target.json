@@ -11,7 +11,7 @@
     "max_total_requests_per_minute": 200,
     "max_submission_requests_per_minute": 180,
     "native_synthetic_capacity": "180 fills / 90 roundtrips in60.4282seconds;178.7246submissions/minute;flat;zero broker connections",
-    "broker_status": "New adaptive trial not started: regular session closed; prior one-SPY broker receipt retained",
+    "broker_status": "Adaptive 1x broker trial passed 2026-09-23 on main 843dc8f (adaptive-paper/receipt.json broker_readiness passed; trials/20260923g-main-passed: 300.5 s, 5 real paper orders, 4 native fills, reconciled flat); earlier one-SPY broker receipt retained",
     "market_research": "Bounded50-provider-news-item and24-IEX-snapshot collection observed; partial news coverage; no execution eligibility",
     "selection": "Reuse selected native engine and official SDK; no replacement justified by repository recency",
     "overturning_comparison": "A maintained alternative must demonstrate better operational acceptance and cost-adjusted out-of-sample strategy results on the same frozen data/risk contract"

@@ -26,10 +26,12 @@ PR #117 (`scripts/platform_status.py`, merged at `9432720`); this record only ma
    (strip only a date-shaped `latest`, or withhold it entirely) this is the stricter, and no packet
    requirement names releases, versions or maintenance. Default packets are byte-identical.
 3. **No single-family winner.** A `codex_absent` layer stays `pending_lanes` unless
-   `--allow-single-lane PATH` names a dated decision record that names the layer; the path is stored
-   as `lanes.single_lane_decision` and `landscape.py` rejects a recorded `codex_absent` row without it.
-   The record must name the layer id as a whole token (`workers` is not named by
-   `agents-models-workers`).
+   `--allow-single-lane PATH` names a dated decision record under `docs/decisions/` carrying the
+   exact line `single-lane-authorization: <catalog>/<layer_id>` for that layer (review of #122: a
+   record that merely named the layer id, such as a wave document naming all 32 layers, authorized
+   every one of them). The path and the record's sha256 are stored as `lanes.single_lane_decision`
+   and `lanes.single_lane_decision_sha256`, and `landscape.py` rejects a recorded `codex_absent` row
+   whose record is missing, elsewhere, lacks the line or changed since.
 4. **Lane identity and two-family adjudication.** Lane returns declare `model.family` (claude lane
    `anthropic`, name `claude-*|opus|sonnet|fable|haiku`; codex lane `openai`, name `gpt-*|codex`), and
    the two families differ. `codex_lane.py` writes the Codex `model` itself from its own observation
@@ -69,6 +71,93 @@ PR #117 (`scripts/platform_status.py`, merged at `9432720`); this record only ma
    matched, not its basename), and the Codex pair this checkout's `codex_lane.py` and
    `lane-prompt.md` hashes; `landscape.py` re-checks every sealed new-wave return against the
    registry in CI, and a unit test keeps the registry covering the current bytes.
+
+## Review of #122 (2026-09-23)
+
+An independent review of the merged #122 (head `2f19193`) found five defects to fix before the
+32-row re-record; this branch (base `97a56e2`) fixes them, each with a regression test that fails
+on the base (`tests/test_landscape.py`, `tests/test_record_verdicts.py` `ReviewOf122Tests` and
+`CodexAbsentTests`, `tests/test_claude_lane.py`, `tests/test_codex_lane.py`,
+`tests/test_lane_packets.py`):
+
+8. **The row is what its sealed wave establishes (finding 1).** `landscape.py` recomputes a
+   new-wave row's `agreement` from both sealed returns' `winner_keys`, resolved to component ids
+   through the retained packet each return names, and requires a recorded row's winners to equal
+   the chosen lane's set (`same_winner`/`codex_absent`: claude; `disagree`: the adjudication's
+   `winner_lane`); an unrecorded new-wave row has no winners.
+9. **Hash-bound, append-only sealed waves (finding 3).** `--write` refuses once a new wave's
+   `run-manifest.json` exists unless `--append-rows` names only rows absent from it, and never
+   overwrites a sealed file with other bytes. Rows store `lanes.run_manifest_sha256` and, when an
+   adjudication was sealed for them, `lanes.adjudication_sha256`; `landscape.py` verifies both and
+   rejects any file under a new wave's sealed folder that no row and not the run manifest references.
+10. **Claude refutation (finding 5).** The lane (agent-lab `6aab001`, merged on codex/native-expansion as `e6953e5` via agent-lab #33, vendored sha256 `2eb9c10d…`,
+    registered in `lane-provenance.json`) seals a final only when both lens votes on it returned
+    unrefuted and returns a per-layer `refutation` summary; `claude_lane.py` copies it into the
+    return, the lane-return schema gains it (`codex_lane.py` drops it from the Codex strict copy), and
+    `record_verdicts.py` and `landscape.py` reject a Claude return whose summary shows a refuted or
+    unknown final or lacks a lens vote.
+11. **Retained packets (finding 6).** A new wave's `--write` copies its packets and `SHA256SUMS` into
+    `<sealed_base>/packets/`, listed in the manifest's `retained_packets`, and refuses a packet with a
+    withheld key; `landscape.py` re-checks each retained packet's hash and withheld keys (the policy
+    `lane_packets.py` now imports from it), requires each row's packet there, and so binds every
+    judgment's `stripped_packet_sha256` to a retained packet.
+12. **Failed lanes (finding 7).** `claude_lane.py` and `codex_lane.py` list each layer they ran but
+    could not return, with its reason, in `<work-dir>/<lane>/failures.json`; the run manifest records
+    that lane as `failed` with the reason instead of a bare `missing`.
+
+**Packet labels kept and withheld (finding 9).** `--withhold-labels` packets keep each candidate's
+`adopted` marker. It correlates with the withheld incumbent disposition (every current default is
+adopted), but the lane contract needs it: a winner set is 1-3 adopted candidates and every adopted
+non-winner must appear in `alternatives` (`lane-prompt.md` rules 2-3, `record_verdicts.py`
+`validate_lane_return`), so removing it would remove the rule that keeps an unqualified candidate
+out of the winner set. The trade-off is kept deliberately; a lane still sees the evidence of every
+candidate. The candidate-only `note` (a newcomer's `demonstrated_gap` or a keep-but-compare entry's
+overturn comparison) exists only on non-adopted candidates and only hints at their status, so it is
+now withheld with `newcomer` and listed as `candidates[].note`; no packet requirement or prompt rule
+reads it.
+
+**Review of the fix round (2026-09-23, head `fcee72b`).** An independent review found one medium
+and two low defects; each is fixed with a regression test that fails on `fcee72b`
+(`tests/test_lane_packets.py` `RecursiveWithheldKeyTests`, `tests/test_landscape.py`
+`test_retained_packets_are_checked_at_every_depth`, `test_a_sealed_adjudication_is_bound_by_the_run_manifest`
+and `test_a_layer_verdicts_folder_no_row_can_name_is_rejected`, `tests/test_record_verdicts.py`
+`ReviewOf122Tests` `test_a_packet_carrying_a_disposition_label_or_a_nested_withheld_key_is_refused` and
+`test_the_run_manifest_lists_each_sealed_adjudication`):
+
+- *Withheld keys at any depth (medium).* `withheld_packet_keys` checked only the positions
+  `withhold_popularity` strips, so a nested release date, `evidence.stars`, a top-level `newcomers`
+  list, a non-null `review_status` or a `decisions[].selection` passed CI and `--write`. The check now
+  walks the whole packet. At any depth it rejects a popularity/recency key, `pin_behind_upstream`,
+  `newcomer`, `note`, and any key naming the latest version, a release or a newcomer. On a
+  candidate or component copy it also rejects `selection`, `disposition`, `rationale`,
+  `current_choice` and a non-null `review_status`. At the top level it rejects `current_choice`,
+  `decision` and `rationale`. It also requires every always-listed policy label in `withheld[]`,
+  which confirms the packet was built with `--withhold-labels`. The only exemptions are
+  `archived`/`license` when the requirement names them and the packet's own `checked_at`.
+  `lane_packets.withhold_popularity` strips with the same predicate at any depth.
+  The review also exposed one leak in real packets: `upstream.latest_flag`, whose tag-listing
+  fallback can be date-shaped (`release/2025-11-28` in the 2026-09-23 manifest's packets). It is now
+  withheld and listed. The default (2026-09-22) build is byte-identical.
+- *Adjudication bound by the manifest (low).* The run manifest entry of a row with a sealed
+  adjudication (recorded or split) carries `adjudication: {outcome: sealed, sha256}`. `landscape.py`
+  requires it to equal the row's `lanes.adjudication_sha256` and re-hashes the file against it. A
+  rewrite therefore has to change the manifest and every row's `run_manifest_sha256`, the same as a
+  sealed return.
+- *Stray wave folders (low).* A `layer-verdicts-<id>` folder whose id is not alphanumeric is now
+  rejected instead of skipped.
+- *Kept deliberately: a proposal after a failed revision.* The lane (agent-lab `6aab001`, merged as `e6953e5`) still seals
+  a never-refuted proposal when the revision ran only for a major finding and that revision is then
+  refuted or comes back unknown. The lens prompts define such a major finding as not refuting the
+  winner (for example a stronger non-adopted candidate missing from `challenger_preferred`). Both
+  lenses returned unrefuted on the proposal, and the sealed Claude return records `revision_status`, so the
+  unresolved major finding is visible. Discarding the proposal would turn a failed attempt to add
+  detail into no verdict. Overturn: a re-record in which a sealed proposal with a refuted revision
+  is shown wrong by its retained evidence.
+
+**Left for a later PR:** finding 4 (a CI step comparing `layer-verdict-waves.json` with the base
+branch so a single PR cannot rewrite an older wave's document, registry hash and rows together) and
+finding 8 (the Claude lane's model name taken from the workflow's `result["model"]` and bound to a
+child-usage receipt hash instead of `--resolved-model` free text).
 
 ## Grandfathered wave
 
