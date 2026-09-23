@@ -46,7 +46,20 @@ component/entry id via ``--os-package-ids``, default ``["systemd"]``) and
 than silently counted as "behind" or "not behind" -- see ``classify_pin``. A
 version merely *annotated* with a commit fingerprint (e.g.
 ``0.25.0 (702f4814...)``) is still compared normally: the fingerprint
-documents provenance, it does not make the release incomparable.
+documents provenance, it does not make the release incomparable. A row whose
+pin was not compared (any exclusion above, or ``unversioned``) publishes
+``pin_behind_upstream: null`` with ``pin_comparison: "not_compared"`` and a
+``pin_comparison_reason``, never a definite false; a lane's
+``pin_behind_upstream`` status on an OS-package pin is published as
+``distro_managed`` (see ``reconcile_status_with_pin``). A tag-only upstream
+whose tag is not version-shaped is flagged under ``upstream.latest_flag``
+instead of being published as ``upstream.latest``.
+
+Lane entries join cards on ``(layer, repo_join_key(repository))`` -- the
+normalized GitHub slug -- so a ``/releases/tag/...`` or ``/tree/...`` card URL
+keeps the lane review of the plain URL. A cited path inside the catalog
+checkout (``--checkout-root``, default: this repository) is published
+repository-relative; only paths outside it are redacted.
 
 Disposition rule: a lane proposes a label; two adversarial refuters try to
 break the proposal. A surviving ``not_adopted`` stays not adopted --
@@ -61,6 +74,9 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+# The catalog repository checkout this tool runs from: the default
+# --checkout-root, whose paths are published repository-relative.
+REPO_ROOT = HERE.parents[1]
 
 GITHUB_RE = re.compile(r"^https?://github\.com/")
 # Capturing form used to derive a normalized owner/repo slug (see
@@ -144,6 +160,18 @@ def github_repo_slug(url: str):
     return f"{owner}/{repo}".lower()
 
 
+def repo_join_key(repository):
+    """Join key for a repository string: its normalized GitHub slug when it
+    is a GitHub URL, else the string itself. Every lane-entry-to-card join
+    (the status index, a selected item's verdict lookup, the per-layer
+    repository-share count) uses this, so a card whose repository is a
+    ``/releases/tag/...`` or ``/tree/...`` alias still meets the lane entry
+    that cited the plain repository URL (2026-09-23 citation review, the two
+    high tooling findings: 15 lane reviews were silently dropped by an
+    exact-string join)."""
+    return github_repo_slug(repository) or repository
+
+
 def _repositories_by_slug(repositories: dict) -> dict:
     """slug -> freshness record, built from each record's own ``slug`` field
     when present (set by github_freshness.py) and otherwise derived from the
@@ -170,6 +198,9 @@ def repository_known(repository, repositories: dict) -> bool:
     return bool(slug and slug in _repositories_by_slug(repositories))
 
 
+LATEST_TAG_NOT_A_RELEASE = "tag_listing_only_not_version_shaped"
+
+
 def compute_upstream(repository, repositories: dict) -> dict:
     repositories = repositories or {}
     record = repositories.get(repository)
@@ -179,8 +210,18 @@ def compute_upstream(repository, repositories: dict) -> dict:
             record = _repositories_by_slug(repositories).get(slug)
     record = record or {}
     release = record.get("latest_release") or {}
-    return {
-        "latest": release.get("tag") or record.get("latest_tag"),
+    latest = release.get("tag") or record.get("latest_tag")
+    flagged_tag = None
+    if not release.get("tag") and latest and parse_version(latest) is None:
+        # No release channel, and the tag-listing fallback is not
+        # version-shaped: github_freshness.py reads repos/{slug}/tags?per_page=1,
+        # which returns the first tag in the API's name order, not the newest
+        # release (postgres/postgres yields "release-6-3", a historical sort
+        # artifact; 2026-09-23 citation review). Flag it instead of
+        # publishing it as upstream.latest.
+        flagged_tag, latest = latest, None
+    upstream = {
+        "latest": latest,
         "released_at": (release.get("published_at") or "")[:10] or None,
         "prerelease": release.get("prerelease"),
         "pushed_at": (record.get("pushed_at") or "")[:10] or None,
@@ -189,6 +230,9 @@ def compute_upstream(repository, repositories: dict) -> dict:
         "archived": record.get("archived"),
         "renamed_to": record.get("renamed_to"),
     }
+    if flagged_tag is not None:
+        upstream["latest_flag"] = {"tag": flagged_tag, "reason": LATEST_TAG_NOT_A_RELEASE}
+    return upstream
 
 
 # ---------------------------------------------------------------------------
@@ -365,7 +409,14 @@ def _path_basename(path_part: str) -> str:
     return segments[-1] if segments else path_part
 
 
-def _host_path_sub(work_dir: str | None):
+# Trailing prose punctuation the host-path patterns' ``[^\s"']+`` class
+# swallows after a bare directory (e.g. "worktree <checkout-dir>),"); it is
+# split off only to recognise the checkout root itself, then re-appended.
+_TRAILING_PROSE_PUNCTUATION = ".,;:)]}"
+CHECKOUT_ROOT_TOKEN = "<checkout>"
+
+
+def _host_path_sub(work_dir: str | None, checkout_roots=()):
     """Return a ``re.sub`` replacement callable that redacts the directory
     portion of a matched host path but keeps its basename and any trailing
     ``#/json/pointer`` verbatim -- ``<work-dir>/basename[#pointer]`` when the
@@ -373,30 +424,53 @@ def _host_path_sub(work_dir: str | None):
     the individually-provided foundation/trading/freshness paths), else the
     generic ``<host-path>/basename[#pointer]``. /tmp session-scratch paths
     and bare session UUIDs are redacted separately, in full, by
-    ``sanitize`` -- unaffected by this (see its docstring)."""
+    ``sanitize`` -- unaffected by this (see its docstring).
+
+    A match inside one of ``checkout_roots`` (a checkout of this catalog
+    repository) instead keeps its full repository-relative path
+    (``manifests/stack.json``, ``blueprints/us-equities/broad-universe/README.md``),
+    since only the checkout location, not the in-repository path, is
+    private: a basename alone collapsed distinct same-named files (two
+    different ``README.md`` citations) into one unresolvable token
+    (2026-09-23 citation review). The checkout root itself becomes
+    ``<checkout>``. The work dir takes precedence when both contain a path."""
     normalized_work_dir = work_dir.replace("\\", "/").rstrip("/") if work_dir else None
+    normalized_roots = sorted(
+        {root.replace("\\", "/").rstrip("/") for root in (checkout_roots or ()) if root},
+        key=len, reverse=True,
+    )
 
     def _replace(match: re.Match) -> str:
         full = match.group(0)
         path_part, has_pointer, pointer = full.partition("#")
+        suffix = f"#{pointer}" if has_pointer else ""
         normalized_path = path_part.replace("\\", "/")
         segments = [segment for segment in normalized_path.split("/") if segment]
         # A home-directory root ("/home/<user>", "/Users/<user>") has no file
         # basename worth keeping: its last segment IS the username, which the
         # redaction exists to remove, so it collapses to the bare token.
         if len(segments) <= 2 and segments[:1] in (["home"], ["Users"]):
-            return "<host-path>" + (f"#{pointer}" if has_pointer else "")
+            return "<host-path>" + suffix
+        in_work_dir = bool(normalized_work_dir) and (
+            normalized_path == normalized_work_dir or normalized_path.startswith(normalized_work_dir + "/"))
+        if not in_work_dir:
+            for root in normalized_roots:
+                if normalized_path.startswith(root + "/"):
+                    relative = normalized_path[len(root) + 1:]
+                    if relative.strip("/"):
+                        return relative + suffix
+                    return CHECKOUT_ROOT_TOKEN + suffix
+                stripped = normalized_path.rstrip(_TRAILING_PROSE_PUNCTUATION)
+                if stripped == root:
+                    return CHECKOUT_ROOT_TOKEN + normalized_path[len(stripped):] + suffix
         basename = _path_basename(path_part)
-        token = "<host-path>"
-        if normalized_work_dir:
-            if normalized_path == normalized_work_dir or normalized_path.startswith(normalized_work_dir + "/"):
-                token = "<work-dir>"
-        return f"{token}/{basename}" + (f"#{pointer}" if has_pointer else "")
+        token = "<work-dir>" if in_work_dir else "<host-path>"
+        return f"{token}/{basename}" + suffix
 
     return _replace
 
 
-def sanitize(text: str, work_dir: str | None = None) -> str:
+def sanitize(text: str, work_dir: str | None = None, checkout_roots=()) -> str:
     """Redact host-path fragments from ``text``.
 
     A ``/tmp`` session-scratch path (a UUID, ``claude-<uid>`` or
@@ -409,16 +483,19 @@ def sanitize(text: str, work_dir: str | None = None) -> str:
     basename and any ``#/json/pointer`` suffix via ``_host_path_sub``, using
     ``<work-dir>`` when ``work_dir`` is given and the path falls inside it.
     A bare session UUID left over outside any path (e.g. quoted directly in
-    lane prose) is scrubbed last, to a distinct ``<session-id>`` token."""
+    lane prose) is scrubbed last, to a distinct ``<session-id>`` token.
+    A path inside one of ``checkout_roots`` keeps its repository-relative
+    path instead (see ``_host_path_sub``); the default ``()`` keeps the
+    previous behaviour for callers that pass none."""
     text = TMP_SESSION_PATH_RE.sub("<host-path>", text)
-    replace = _host_path_sub(work_dir)
+    replace = _host_path_sub(work_dir, checkout_roots)
     for pattern in HOST_PATH_PATTERNS:
         text = pattern.sub(replace, text)
     text = SESSION_UUID_RE.sub("<session-id>", text)
     return text
 
 
-def sanitize_value(value, work_dir: str | None = None):
+def sanitize_value(value, work_dir: str | None = None, checkout_roots=()):
     """Recursively redact host paths from decoded values -- dict/list/str --
     walking the Python object *before* it is JSON-serialized. Applying
     ``sanitize`` to the already-serialized JSON text instead (the previous
@@ -431,11 +508,12 @@ def sanitize_value(value, work_dir: str | None = None):
     would not catch. Sanitizing the raw Python string first means there are
     no JSON escape sequences to misread."""
     if isinstance(value, str):
-        return sanitize(value, work_dir=work_dir)
+        return sanitize(value, work_dir=work_dir, checkout_roots=checkout_roots)
     if isinstance(value, dict):
-        return {key: sanitize_value(item, work_dir=work_dir) for key, item in value.items()}
+        return {key: sanitize_value(item, work_dir=work_dir, checkout_roots=checkout_roots)
+                for key, item in value.items()}
     if isinstance(value, list):
-        return [sanitize_value(item, work_dir=work_dir) for item in value]
+        return [sanitize_value(item, work_dir=work_dir, checkout_roots=checkout_roots) for item in value]
     return value
 
 
@@ -547,20 +625,28 @@ def merge_lanes(lanes_doc: dict, repositories: dict):
         # layer-specific verdict of its own, the first verdict applies
         # there too (sorted by layer id, so a rerun is deterministic even if
         # more than one other layer happens to carry a verdict).
-        verdicts_exact = {(p["layer"], p["repository"], p["kind"]): p for p in proposals}
+        # Verdicts are joined to selected items and candidates on
+        # repo_join_key (normalized slug), not the exact URL string, so a
+        # proposal citing the plain URL still meets a selected item or
+        # candidate citing a release/tree alias of it, and vice versa.
+        verdicts_exact = {(p["layer"], repo_join_key(p["repository"]), p["kind"]): p for p in proposals}
         verdicts_by_repo_kind = defaultdict(list)
         for p in proposals:
-            verdicts_by_repo_kind[(p["repository"], p["kind"])].append((p["layer"], p))
+            verdicts_by_repo_kind[(repo_join_key(p["repository"]), p["kind"])].append((p["layer"], p))
         for layer in result.get("layers", []):
             layer_id = layer["layer_id"]
             for selected in layer.get("selected", []):
                 repository = selected["repository"]
+                # The returned status index stays keyed by the exact
+                # (layer, repository) string for direct callers;
+                # build_manifest() re-indexes it by repo_join_key
+                # (index_status_by_join_key) before joining it to cards.
                 key = (layer_id, repository)
                 status_orig = selected["status"]
-                verdict = verdicts_exact.get((layer_id, repository, status_orig))
+                verdict = verdicts_exact.get((layer_id, repo_join_key(repository), status_orig))
                 shared_from = None
                 if verdict is None:
-                    shared = sorted(verdicts_by_repo_kind.get((repository, status_orig), []),
+                    shared = sorted(verdicts_by_repo_kind.get((repo_join_key(repository), status_orig), []),
                                      key=lambda pair: pair[0])
                     if shared:
                         shared_from, verdict = shared[0]
@@ -604,6 +690,10 @@ def merge_lanes(lanes_doc: dict, repositories: dict):
                         evidence.append(f"verdict shared from layer {shared_from}")
                 entry = {
                     "lane": lane_name,
+                    # The exact repository string this lane cited, kept so a
+                    # lane_groupings row joined on repo_join_key still
+                    # publishes a URL the lane actually wrote.
+                    "repository": repository,
                     # G4: the lane's own card identity, when it set one --
                     # distinguishes two components/entries that share one
                     # repository in one layer (e.g. an execution-broker
@@ -635,7 +725,7 @@ def merge_lanes(lanes_doc: dict, repositories: dict):
             for alt in layer.get("alternatives_keep_but_compare", []):
                 alts[layer_id].append({**alt, "lane": lane_name})
             for candidate in layer.get("new_candidates", []):
-                verdict = verdicts_exact.get((layer_id, candidate["repository"], "new_candidate"))
+                verdict = verdicts_exact.get((layer_id, repo_join_key(candidate["repository"]), "new_candidate"))
                 survives = verdict["survives"] if verdict else None
                 upstream_now = (compute_upstream(candidate["repository"], repositories)
                                  if repository_known(candidate["repository"], repositories)
@@ -862,8 +952,70 @@ def foundation_decision_selection_map(foundation_layers: dict) -> dict:
     return selection_map
 
 
+def index_status_by_join_key(status: dict) -> dict:
+    """Re-index merge_lanes' exact-string ``status[(layer, repository)]`` by
+    ``(layer, repo_join_key(repository))``, concatenating the entries of
+    every exact key that normalizes to the same slug (in the status dict's
+    own insertion order, so the result is deterministic for a fixed
+    lanes.json). This is the index every lane-entry-to-card and
+    lane_groupings join reads; an exact-string join silently dropped the lane
+    review of any card whose repository carried a /releases/tag/ or /tree/
+    suffix while the lane cited the plain URL."""
+    index = {}
+    for (layer_id, repository), bucket in status.items():
+        joined = index.setdefault((layer_id, repo_join_key(repository)), {"entries": []})
+        joined["entries"].extend(bucket["entries"])
+    return index
+
+
 def _repository_share_counts(cards) -> Counter:
-    return Counter(card["repository"] for card in cards)
+    return Counter(repo_join_key(card["repository"]) for card in cards)
+
+
+# Pin-comparison states published on every foundation/trading row. A pin the
+# generator could not compare (classify_pin reason commit_pinned,
+# os_package_pin, non_github_or_os_package or unversioned) is published as
+# pin_behind_upstream=None with pin_comparison="not_compared" and the reason,
+# never as a definite False (2026-09-23 citation review, tooling finding on
+# ECC/claude-code-templates).
+PIN_COMPARED = "compared"
+PIN_NOT_COMPARED = "not_compared"
+
+
+def pin_comparison_fields(classification: dict) -> dict:
+    """``pin_behind_upstream``/``pin_comparison``[/``pin_comparison_reason``]
+    for a row, from a ``classify_pin`` result."""
+    if classification["excluded"] or classification["reason"] is not None:
+        return {"pin_behind_upstream": None, "pin_comparison": PIN_NOT_COMPARED,
+                "pin_comparison_reason": classification["reason"]}
+    return {"pin_behind_upstream": classification["behind"], "pin_comparison": PIN_COMPARED}
+
+
+# A lane's pin_behind_upstream status on a row whose pin is an
+# OS-distribution package (classify_pin reason os_package_pin) compares a
+# distro package string with an upstream release tag -- the category error
+# the pin rule already excludes. Publishing it as review_status next to a
+# not_compared pin contradicts the row's own pin state (2026-09-23 citation
+# review, systemd finding), so it is published as DISTRO_MANAGED_STATUS
+# instead, the lane's original status kept in the row's evidence.
+DISTRO_MANAGED_STATUS = "distro_managed"
+PIN_BEHIND_STATUSES = ("pin_behind_upstream", "pin_behind_upstream_unverified")
+
+
+def reconcile_status_with_pin(status_value, pin_fields: dict):
+    """Return ``(status, note)``: ``status`` never contradicts the row's own
+    pin state; ``note`` (or None) records a remapping in the row evidence."""
+    if (pin_fields.get("pin_comparison_reason") == "os_package_pin"
+            and status_value in PIN_BEHIND_STATUSES):
+        mapped = DISTRO_MANAGED_STATUS + status_value[len("pin_behind_upstream"):]
+        return mapped, (f"lane status {status_value} published as {mapped}: an OS-distribution "
+                        "package pin is not compared with upstream release tags")
+    return status_value, None
+
+
+def _classification_of(baseline_row: dict) -> dict:
+    return {"behind": baseline_row["behind"], "excluded": baseline_row["excluded"],
+            "reason": baseline_row["exclusion_reason"]}
 
 
 def _build_card_row(card, *, layer_id, status, row_kind, repo_counts, selection=None, decision=None,
@@ -872,8 +1024,14 @@ def _build_card_row(card, *, layer_id, status, row_kind, repo_counts, selection=
     this card's lane entries (G4), pick the row's own entry by G1 precedence
     (``select_row_review``), resolve a refuted-to-confirmed marker (G2)
     against this card's own baseline class, and preserve every other lane's
-    entry verbatim under ``other_lane_reviews``."""
-    bucket = status.get((layer_id, card["repository"]))
+    entry verbatim under ``other_lane_reviews``.
+
+    ``status`` is the join index from ``index_status_by_join_key``, looked up
+    on ``(layer_id, repo_join_key(card["repository"]))``; a caller passing
+    merge_lanes' exact-string index directly still matches on the exact
+    ``(layer_id, card["repository"])`` key as before."""
+    bucket = (status.get((layer_id, repo_join_key(card["repository"])))
+              or status.get((layer_id, card["repository"])))
     entries = bucket["entries"] if bucket else []
     matched, by_repository_only = match_lane_entries(entries, card_id=card["id"])
     row = dict(base_fields)
@@ -901,18 +1059,27 @@ def _build_card_row(card, *, layer_id, status, row_kind, repo_counts, selection=
     ]
     evidence = list(chosen["evidence"])
     if by_repository_only:
-        sharing = repo_counts[card["repository"]]
+        sharing = repo_counts.get(repo_join_key(card["repository"]), repo_counts.get(card["repository"], 0))
         if sharing > 1:
             evidence.append(f"lane entry matched by repository only; {sharing} cards share it")
-    row["review_status"] = resolve_refuted_marker(chosen["status"], row_kind=row_kind,
-                                                    selection=selection, decision=decision)
+    review_status, pin_note = reconcile_status_with_pin(
+        resolve_refuted_marker(chosen["status"], row_kind=row_kind, selection=selection, decision=decision),
+        base_fields)
+    if pin_note:
+        evidence.append(pin_note)
+    row["review_status"] = review_status
     row["review_note"] = chosen["note"]
     row["evidence"] = evidence
     row["review_lane"] = chosen["lane"]
     if others:
-        row["other_lane_reviews"] = [
-            other_lane_review(o, row_kind=row_kind, selection=selection, decision=decision) for o in others
-        ]
+        other_reviews = []
+        for other in others:
+            review = other_lane_review(other, row_kind=row_kind, selection=selection, decision=decision)
+            review["status"], other_pin_note = reconcile_status_with_pin(review["status"], base_fields)
+            if other_pin_note:
+                review["evidence"] = list(review["evidence"]) + [other_pin_note]
+            other_reviews.append(review)
+        row["other_lane_reviews"] = other_reviews
     for field in ROW_LANE_FIELDS:
         if field in chosen["lane_item"]:
             row[field] = chosen["lane_item"][field]
@@ -930,6 +1097,31 @@ def _build_card_row(card, *, layer_id, status, row_kind, repo_counts, selection=
 def _id_named_in(id_lower: str, haystack: str) -> bool:
     pattern = r"(?<![\w-])" + re.escape(id_lower) + r"(?![\w-])"
     return re.search(pattern, haystack) is not None
+
+
+def _component_field_targets(finding: dict, rows: list) -> list:
+    """Rows named by a finding's own ``component`` field (review schema
+    ``manifest-citation-review/1``, 2026-09-23): used only when the
+    single-card resolution in ``apply_citation_review`` finds no unique
+    card. A finding may name several layers ("a, b", "a; b",
+    "multiple (a, b/x)") and several components ("x, y (layer)"); it
+    attaches to every card whose id is named, as a hyphen-delimited whole
+    segment (``_id_named_in``), in ``component``, within every row whose
+    layer id is named the same way in ``layer`` -- or within every row of
+    the finding's catalog when ``layer`` names none (e.g. "multiple").
+    Returns ``[(layer_row, card), ...]`` in manifest order; empty when the
+    finding has no ``component`` field or names no card."""
+    component_text = str(finding.get("component") or "").lower()
+    if not component_text:
+        return []
+    layer_text = str(finding.get("layer") or "").lower()
+    named_rows = [r for r in rows if _id_named_in(str(r["layer"]).lower(), layer_text)]
+    targets = []
+    for layer_row in named_rows or rows:
+        for card in layer_row.get("components", layer_row.get("entries", [])):
+            if card.get("id") and _id_named_in(str(card["id"]).lower(), component_text):
+                targets.append((layer_row, card))
+    return targets
 
 
 def apply_citation_review(manifest: dict, citation_review_doc) -> None:
@@ -957,7 +1149,10 @@ def apply_citation_review(manifest: dict, citation_review_doc) -> None:
     ``_id_named_in`` boundary protection, in that same text (a plain
     substring check here has the identical collision, e.g.
     ``example/alpha`` inside ``example/alpha-extended``). A finding that
-    resolves to zero or more than one card is not silently dropped: it is
+    resolves to zero or more than one card this way, but carries its own
+    ``component`` field, is attached to every card that field names in the
+    layers its ``layer`` field names (``_component_field_targets``). A
+    finding that still resolves to no card is not silently dropped: it is
     appended, unchanged, to ``manifest["citation_review"]["general"]``
     instead."""
     manifest["citation_review"] = {"general": []}
@@ -997,19 +1192,26 @@ def apply_citation_review(manifest: dict, citation_review_doc) -> None:
                 ]
                 if len(slug_matches) == 1:
                     card = slug_matches[0]
-        if card is None:
+        targets = [(layer_row, card)] if card is not None else _component_field_targets(finding, rows)
+        if not targets:
             general.append(dict(finding))
             continue
-        card.setdefault("citation_review", []).append({
-            "reviewer": finding.get("reviewer"), "severity": finding.get("severity"),
-            "claim": finding.get("claim"), "fix": finding.get("fix"),
-            # G6 asymmetry fix: carry the exact citation locators too (this
-            # review round exists to preserve them) -- without these, a
-            # row-attached finding was not traceable back to its cited
-            # line the way a citation_review.general entry already was.
-            "file": finding.get("file"), "line": finding.get("line"), "evidence": finding.get("evidence"),
-        })
-        rows_flagged.add((finding["catalog"], layer_row["layer"], card.get("id")))
+        for target_row, target_card in targets:
+            overlay = {
+                "reviewer": finding.get("reviewer"), "severity": finding.get("severity"),
+                "claim": finding.get("claim"), "fix": finding.get("fix"),
+                # G6 asymmetry fix: carry the exact citation locators too (this
+                # review round exists to preserve them) -- without these, a
+                # row-attached finding was not traceable back to its cited
+                # line the way a citation_review.general entry already was.
+                "file": finding.get("file"), "line": finding.get("line"), "evidence": finding.get("evidence"),
+            }
+            if "component" in finding:
+                # The finding's own component list, so a finding attached to
+                # several rows still shows every row it named.
+                overlay["component"] = finding.get("component")
+            target_card.setdefault("citation_review", []).append(overlay)
+            rows_flagged.add((finding["catalog"], target_row["layer"], target_card.get("id")))
         attached += 1
     for rows in (manifest["foundation"], manifest["trading"]):
         for row in rows:
@@ -1029,7 +1231,8 @@ def apply_citation_review(manifest: dict, citation_review_doc) -> None:
         "out_of_scope": len(findings) - len(considered),
         # attached (total findings actually attached to a row) can exceed
         # rows_flagged (distinct rows touched) whenever more than one
-        # finding names the same row -- both are needed so
+        # finding names the same row, and can be lower than it when one
+        # finding's component field names several rows -- both are needed so
         # findings == attached + general is checkable from the manifest
         # alone, without walking every card's citation_review[].
         "attached": attached,
@@ -1045,6 +1248,9 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
     baseline_foundation = build_baseline_foundation(foundation_layers, repositories, os_package_ids=os_package_ids)
     baseline_trading = build_baseline_trading(trading_by_layer, repositories, os_package_ids=os_package_ids)
     status, notes, alts, cands, gaps, calls, limits = merge_lanes(lanes_doc, repositories)
+    # Every lane-entry join below reads this slug-keyed index, never the
+    # exact-string status keys (see index_status_by_join_key).
+    status = index_status_by_join_key(status)
     foundation_selection = foundation_decision_selection_map(foundation_layers)
 
     # Fall back to deriving retained_from_prior_runs from count - fetched_this_run
@@ -1090,7 +1296,7 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
         for component in row["components"]:
             base_fields = {
                 "id": component["id"], "repository": component["repository"], "pin": component["pin"],
-                "upstream": component["upstream"], "pin_behind_upstream": component["behind"],
+                "upstream": component["upstream"], **pin_comparison_fields(_classification_of(component)),
             }
             selection = foundation_selection.get((layer_id, component["id"]))
             components.append(_build_card_row(
@@ -1112,7 +1318,7 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
         for entry in row["entries"]:
             base_fields = {
                 "id": entry["id"], "repository": entry["repository"], "decision": entry["decision"],
-                "pin": entry["pin"], "upstream": entry["upstream"], "pin_behind_upstream": entry["behind"],
+                "pin": entry["pin"], "upstream": entry["upstream"], **pin_comparison_fields(_classification_of(entry)),
             }
             if "evidence_level" in entry:
                 base_fields["evidence_level"] = entry["evidence_level"]
@@ -1144,13 +1350,19 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
     # every distinct catalog_id an entry set (None included) at a given
     # (layer, repository) becomes its own selected[] row here -- the same
     # G4 card-disambiguation principle, applied without a baseline.
+    # ``status`` is the repo_join_key index, so entries citing a release/tree
+    # alias and the plain URL of one repository form one group; the group's
+    # sort key is the lexically first repository string a lane cited, and
+    # the published repository is the chosen entry's own citation (both are
+    # that single string whenever every lane cited the same URL).
     status_by_layer = defaultdict(list)
-    for (status_layer_id, repository), bucket in status.items():
+    for (status_layer_id, _join_key), bucket in status.items():
         by_catalog_id = defaultdict(list)
         for entry in bucket["entries"]:
             by_catalog_id[entry["catalog_id"]].append(entry)
         for catalog_id, entries in by_catalog_id.items():
-            status_by_layer[status_layer_id].append((repository, catalog_id, entries))
+            first_repository = min(entry["repository"] for entry in entries)
+            status_by_layer[status_layer_id].append((first_repository, catalog_id, entries))
 
     lane_grouping_layer_ids = sorted(
         (set(cands) | set(gaps) | set(alts) | set(status_by_layer)) - known_layers
@@ -1159,13 +1371,13 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
         selected = []
         lane_names = set()
         groups = sorted(status_by_layer.get(layer_id, []), key=lambda g: (g[0], g[1] or ""))
-        for repository, catalog_id, entries in groups:
+        for _first_repository, catalog_id, entries in groups:
             # No foundation/trading owning lane applies to a lane's own
             # grouping (G1 rule (b) is moot here); ties fall straight to
             # rule (c), the lexical lane name.
             chosen, others = select_row_review(entries, owning_lane=None)
             selected_row = {
-                "repository": repository,
+                "repository": chosen["repository"],
                 "status": resolve_refuted_marker(chosen["status"], row_kind="lane_groupings"),
                 "evidence": chosen["evidence"], "note": chosen["note"],
                 "review_lane": chosen["lane"],
@@ -1247,6 +1459,18 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
                              "an -Nubuntu/-Ndeb/+debN pin suffix, or by id via --os-package-ids, "
                              "e.g. systemd even though its own repository is on GitHub) are excluded "
                              "from the pin-vs-upstream comparison rather than counted either way",
+        "pins_not_compared": sum(
+            1 for row in all_rows for component in all_components(row)
+            if component["pin_comparison"] == PIN_NOT_COMPARED
+        ),
+        "pins_not_compared_by_reason": dict(sorted(Counter(
+            component["pin_comparison_reason"] for row in all_rows for component in all_components(row)
+            if component["pin_comparison"] == PIN_NOT_COMPARED
+        ).items())),
+        "pins_not_compared_note": "rows whose pin the generator could not compare with upstream "
+                                  "(the exclusions above, plus a pin or upstream latest with no "
+                                  "parseable version, reason unversioned) carry pin_behind_upstream "
+                                  "null and pin_comparison not_compared, never a definite false",
         "candidates_by_disposition": dict(Counter(
             candidate["disposition"] for row in all_rows for candidate in row["candidates"]
         )),
@@ -1289,6 +1513,11 @@ def parse_args(argv=None):
                               "file, line, claim, evidence, fix}, ...]}); overlaid onto the "
                               "matching foundation/trading rows at manifest['citation_review'] "
                               "(G6) -- data only, never edits a row's own fields.")
+    parser.add_argument("--checkout-root", dest="checkout_roots", type=Path, action="append", default=None,
+                         help="A checkout of this catalog repository that lane citations point into; a cited "
+                              "path under it is published repository-relative (e.g. manifests/stack.json) "
+                              "rather than redacted to <host-path>/<basename>. Repeatable. Default: the "
+                              "checkout this tool runs from.")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--checked-at", required=True)
     parser.add_argument("--id", dest="manifest_id", required=True)
@@ -1348,7 +1577,9 @@ def main(argv=None) -> int:
     # docstring for why sanitizing the serialized text instead can produce
     # invalid JSON), then prove the serialized result is valid JSON before
     # the leak check and the write.
-    text = json.dumps(sanitize_value(manifest, work_dir=work_dir_for_sanitize), indent=1)
+    checkout_roots = [str(root.resolve()) for root in (args.checkout_roots or [REPO_ROOT])]
+    text = json.dumps(sanitize_value(manifest, work_dir=work_dir_for_sanitize, checkout_roots=checkout_roots),
+                      indent=1)
     json.loads(text)
     assert_no_leak(text)
     args.out.parent.mkdir(parents=True, exist_ok=True)
