@@ -104,8 +104,12 @@
       "sha256": "243d7174ab90d3cac7667a6af74bb2062c9f0fc3275aa2b447b25afa870f3c07"
     },
     {
+      "path": "scripts/path_safety.py",
+      "sha256": "228edf3968176c04c557078c59502b2d90141e000e1acf2917e87cc67316e703"
+    },
+    {
       "path": "tests/test_offhost_app_state.py",
-      "sha256": "25e8f0fb241e6348f03e974babd1592249486660f3f7b17aee9a50b3ec9e70bd"
+      "sha256": "b00b8335a3e6bf902442f0a3b4319611a5433dd85063c104c606c43c917e5cdc"
     }
   ]
 }
