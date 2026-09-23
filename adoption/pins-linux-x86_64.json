@@ -38,11 +38,11 @@
     },
     {
       "id": "claude-code",
-      "version": "2.1.278",
-      "kind": "npm",
-      "url": "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.1.278.tgz",
-      "sha256": "08c6dfcf3dafcfd30e09b2926c596e274f0fa20844a5801ada7f1c8e6227157e",
-      "install_note": "npm registry tarball for @anthropic-ai/claude-code@2.1.278 (27538 bytes); npm dist.integrity sha512-mfNRqC0GaEXqmP97NiwJBeYBmRuqe2VzgLUreUUaEhyJxJWx2Z6ClW1tBOncGNNXdhj6EY4LPvUIWP+oq311CA== matches a fresh openssl sha512/base64 digest. `npm install --global --prefix tools/claude-2.1.278 @anthropic-ai/claude-code@2.1.278`. Wrapper should export DISABLE_AUTOUPDATER=1, matching the agent-lab devcontainer script's pinned-version intent."
+      "version": "2.1.280",
+      "kind": "native",
+      "url": "https://downloads.claude.ai/claude-code-releases/2.1.280/linux-x64/claude",
+      "sha256": "1e08503dbdf3c2cb0d706d32f3408277388d1c76ef108673e8fe42c1b322925b",
+      "install_note": "minimum version; native auto-update on the latest channel. Verified by downloading the linux-x64 binary directly and independently computing its sha256 (2026-09-23), matching both this pin and the 2.1.280 manifest.json's linux-x64 checksum. Superseded the prior npm-wrapper pin (2.1.278, DISABLE_AUTOUPDATER=1) once the native installer became the reference path: fetch the binary, verify its sha256, then run `\"$bin\" install 2.1.280`, matching ~/codex-ecosystem/bin/bootstrap-linux.sh's own claude-code step. The installed binary self-manages ~/.local/share/claude/versions and the ~/.local/bin/claude launcher and auto-updates on the latest channel from there; this pin is a floor, not a ceiling, and no DISABLE_AUTOUPDATER opt-out is set."
     },
     {
       "id": "qmd",
@@ -83,6 +83,38 @@
       "url": "https://registry.npmjs.org/context-mode/-/context-mode-1.0.169.tgz",
       "sha256": "09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
       "install_note": "npm dist.integrity sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ== matched. recipes/README.md flags that the npm context-mode@1.0.169 release is a DIFFERENT source revision from the native plugin pin (git 6f0cc6841c687e754059f36714a11233fda1a02b installed via `codex plugin marketplace add` / `claude plugin marketplace add`) and is not a substitute for full plugin evidence. This pin installs the npm CLI package only (`npm install --global --prefix tools/context-mode-1.0.169 context-mode@1.0.169`) so the script can place an executable on PATH; it does NOT install or replace the client-native plugin, and does not by itself establish the plugin-level acceptance recorded elsewhere in the catalog."
+    },
+    {
+      "id": "markitdown",
+      "version": "0.1.7",
+      "kind": "pip",
+      "url": "https://files.pythonhosted.org/packages/59/93/e8a4af0c47551beb6383e226e840cbc811a577b8096eb385251b3fcc8f62/markitdown-0.1.7.tar.gz",
+      "sha256": "4d1f3c69cd43b82288fdc3653686d759dcf355ee7c681aa6a855aed98a1e4f44",
+      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: this host already has markitdown 0.1.7 installed (confirmed with `markitdown --version`), a catalog winner (Microsoft's Office/PDF/HTML-to-Markdown converter) with no prior pin here. sdist re-downloaded from the URL above and sha256-hashed independently; matches PyPI's own published digest (`https://pypi.org/pypi/markitdown/0.1.7/json` `urls[].digests.sha256`, read 2026-09-23) exactly. `install_pin`'s `*-pip` case runs `pip install --target tools/markitdown-0.1.7 markitdown==0.1.7`, which resolves this exact version from PyPI by version pin (pip has no sha256-gate of its own in that path); this pin's sha256 is recorded as an independent artifact cross-check for evidence and this catalog's own fail-closed null-sha256 refusal, not as a hash pip itself verifies before installing. The actually-installed host copy instead lives under a dedicated `uv-tools/markitdown` virtualenv inside its own `tools/markitdown-0.1.7` prefix (observed via its `bin/markitdown` shebang), a slightly different install mechanism than `install_pip`'s flat `--target`; both resolve the same pinned PyPI version and this pin does not change how the host's existing copy was installed."
+    },
+    {
+      "id": "tavily-cli",
+      "version": "0.1.8",
+      "kind": "pip",
+      "url": "https://files.pythonhosted.org/packages/bc/8a/bb8437105cc2d4794a344b6a4ed84b2fb0002e1973b06d33d7f882c14a76/tavily_cli-0.1.8.tar.gz",
+      "sha256": "3b660c961e8bc93309964ccfc6982f3a17dcae15b59cc1e36924ccf4edfdec08",
+      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: `uv tool list` shows tavily-cli 0.1.8 already installed on this host (its `tvly` command). sdist re-downloaded and sha256-hashed independently; matches PyPI's published digest (`https://pypi.org/pypi/tavily-cli/0.1.8/json`, read 2026-09-23) exactly. The host's actual install path is `uv tool install tavily-cli==0.1.8` (a real uv-managed tool environment, `UV_TOOL_DIR`/`UV_TOOL_BIN_DIR`-scoped), not `install_pin`'s `*-pip` case; this pin's kind follows this catalog's existing `install_pip` code path convention (`pip install --target tools/tavily-cli-0.1.8 tavily-cli==0.1.8`) for consistency with markitdown above, and its sha256 is an independent PyPI artifact cross-check rather than a hash either pip or uv verifies itself before installing."
+    },
+    {
+      "id": "orx",
+      "version": "0.2.7",
+      "kind": "tarball",
+      "url": "https://github.com/alphaXiv/OpenResearch/releases/download/v0.2.7/openresearch-cli-x86_64-unknown-linux-musl.tar.xz",
+      "sha256": "c0f8c7488cc3ff028e6757ee54957911f754ea3cd80e239e12f7a47a88884d63",
+      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: this host already has OpenResearch's `orx` CLI 0.2.7 installed (confirmed with `orx --version`; alphaXiv/OpenResearch, the local-first research-agent workspace). Archive re-downloaded and sha256-hashed independently; matches the release's own `openresearch-cli-x86_64-unknown-linux-musl.tar.xz.sha256` sidecar (`gh api repos/alphaXiv/OpenResearch/releases/tags/v0.2.7`, read 2026-09-23) exactly. `tar -tJf` lists exactly one top-level directory containing `orx`, `README.md` and `LICENSE`, matching `install_single_binary_tarball`'s convention of finding a single file literally named `orx` in the extracted tree."
+    },
+    {
+      "id": "agent-browser",
+      "version": "0.38.1",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/agent-browser/-/agent-browser-0.38.1.tgz",
+      "sha256": "89a7df4761ff335e4dd5367e4cf04cecb9ba4e2cc130a0220f798d188414dc6c",
+      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: this host already has agent-browser 0.38.1 installed (confirmed with `agent-browser --version`). npm registry tarball re-downloaded independently; npm dist.integrity sha512-k58FCz0yUOCANoNkMiqJe+H2y6r6sUZazqXsWF+MYq1iRC42PjtLcBoag6SSTOD/FRQppvPDvE5HDYEhclvnhw== matches a fresh openssl sha512/base64 digest of the same download exactly. `npm install --global --prefix tools/agent-browser-0.38.1 agent-browser@0.38.1`. The host's actual installed copy places its own platform binary at `node_modules/agent-browser/bin/agent-browser-linux-x64`, resolved by the package's own postinstall/bin dispatch; `install_npm`'s existing generic `bin/*` symlink loop covers this the same way it covers every other npm-kind pin here."
     }
   ]
 }

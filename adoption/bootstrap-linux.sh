@@ -8,6 +8,7 @@ usage() {
   printf '%s\n' \
     'Usage: bash bootstrap-linux.sh --profile <id> [--skip-system-packages]' \
     '                                [--allow-unpinned <id,id,...>]' \
+    '                                [--configure-claude-user-profile]' \
     '' \
     'Installs the tools pinned in adoption/pins-linux-x86_64.json for the' \
     "given profile's component_ids (from adoption/manifest.json) under" \
@@ -29,6 +30,7 @@ repo_root="$(cd -- "$script_dir/.." >/dev/null 2>&1 && pwd -P)"
 profile_id=""
 skip_system=0
 allow_unpinned_ids=()
+configure_claude_user_profile=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --profile)
@@ -42,6 +44,17 @@ while [[ $# -gt 0 ]]; do
       ;;
     --skip-system-packages)
       skip_system=1
+      shift
+      ;;
+    --configure-claude-user-profile)
+      # Opt-in, run only after this script prints the native-sign-in
+      # reminder below: installs adoption/hooks/claude/effort-default-guard.py
+      # (sha256-checked), adoption/agents/claude/*.md, and the user-scope MCP
+      # servers in adoption/mcp/claude-user.json via `claude mcp add --scope
+      # user` (tools/adoption/install_claude_profile.py; idempotent, and
+      # requires a signed-in `claude` for the MCP step to do anything but a
+      # skip). See adoption/bootstrap.md.
+      configure_claude_user_profile=1
       shift
       ;;
     --allow-unpinned)
@@ -275,6 +288,28 @@ install_npm() {
   [[ "$linked" == 1 ]] || printf 'Note: %s (%s) published no bin/ executable; installed for its library only.\n' "$id" "$package" >&2
 }
 
+# Native self-installing binary (e.g. claude-code 2.1.280+): download,
+# verify sha256, then hand off to the binary's own installer, which manages
+# its own version directory and launcher and keeps auto-update working.
+# Mirrors ~/codex-ecosystem/bin/bootstrap-linux.sh (round 2026-09-22,
+# lines 158-171): fetch the exact per-version download, chmod it executable,
+# run `"$bin" install <version>`, and leave the binary's own auto-update in
+# control from there (no DISABLE_AUTOUPDATER opt-out).
+install_native() {
+  local id="$1" version="$2" url="$3" sha256="$4"
+  local download="$cache_dir/${id}-${version}-native"
+  fetch "$url" "$sha256" "$download"
+  chmod 0755 "$download"
+  "$download" install "$version"
+  {
+    printf '#!/usr/bin/env bash\n'
+    printf '# Native auto-updating launcher (installed by %s install); the ecosystem no longer pins a snapshot.\n' "$id"
+    # shellcheck disable=SC2016
+    printf 'exec "$HOME/.local/bin/%s" "$@"\n' "$id"
+  } > "$bin_dir/$id"
+  chmod 0755 "$bin_dir/$id"
+}
+
 install_pip() {
   local id="$1" version="$2"
   command -v pip3 >/dev/null || command -v pip >/dev/null || {
@@ -320,6 +355,7 @@ install_pin() {
     uv-tarball) install_uv "$version" "$url" "$sha256" ;;
     *-tarball) install_single_binary_tarball "$id" "$version" "$url" "$sha256" ;;
     *-npm) install_npm "$id" "$version" "$url" "$sha256" ;;
+    *-native) install_native "$id" "$version" "$url" "$sha256" ;;
     *-pip) install_pip "$id" "$version" ;;
     *-uv-tool) install_uv_tool "$id" "$version" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
@@ -359,3 +395,13 @@ printf '\nInstallation finished. Add %q to PATH to use it in this shell.\n' "$bi
 printf '%s\n' 'Next: sign into Codex, Claude, and GitHub using their native browser login flows.' \
   'Validate the actual sandbox with Codex /permissions and Claude /sandbox before unattended work.' \
   'No model request, project migration, shell-profile change, or account sign-in was performed.'
+
+if [[ "$configure_claude_user_profile" == 1 ]]; then
+  command -v python3 >/dev/null || { printf 'python3 is required for --configure-claude-user-profile.\n' >&2; exit 1; }
+  printf '\nConfiguring the Claude Code user-scope profile (guard hook, agents, MCP servers)...\n'
+  python3 "$repo_root/tools/adoption/install_claude_profile.py" --claude-bin "$bin_dir/claude"
+else
+  printf '\nAfter native Claude sign-in, run:\n'
+  printf '  python3 %q/tools/adoption/install_claude_profile.py\n' "$repo_root"
+  printf 'to install the guard hook, agents and user-scope MCP servers (or re-run this script with --configure-claude-user-profile).\n'
+fi

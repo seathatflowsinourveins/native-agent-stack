@@ -3139,13 +3139,13 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "5a7310884ab3d805202b207cf9e1e30a98991ed807e135700ae747c546c8dd45",
-      "bytes": 14909
+      "sha256": "0b9b39b2758fa4cd36765063a1d7ec37786f248e4fce430b4c0cee182100b57d",
+      "bytes": 17324
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "257f6756f5bec1e8eaf7bfec0fa0c93f96f2b1c347dee04534f2d3eab96ccfc0",
-      "bytes": 54524
+      "sha256": "53000e8113ae88487b15dc33b7e634046e2f79cd548fa9628d6d7668b11f2d7c",
+      "bytes": 57173
     },
     {
       "path": "adoption/bootstrap.md",
@@ -3234,13 +3234,13 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "3607fc8278cd32c89f706e8dfb452c1d369b14162184cfa41e03db70f3b07593",
-      "bytes": 6757
+      "sha256": "601f9daffc93a211a462409e2d59c09445041cf423e1cb7babbbf433dfd9e815",
+      "bytes": 11779
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "c5f6d5bb506a53c575f24d6b358a12fb8705cfa6609d3b88a8c6003769169287",
-      "bytes": 19197
+      "sha256": "17e6233186b04835d5275ac92a41ad5f6aa478502687d3f1b5a21acefc5e82d2",
+      "bytes": 17654
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -3289,8 +3289,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "27a407a56b49a51baba04040de5ca9516fdc985ff07694635aadd11ffac61ba2",
-      "bytes": 5508
+      "sha256": "a85d53f83852b289a1dafd1767b863bd22f4d6f24a15b4bbbf0588e665b44b55",
+      "bytes": 6480
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -9070,8 +9070,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "73414dff430d441288ac7440cb8d8bfc7e0fbfc4bc0be805b2a171f61b6f49b7",
-      "bytes": 8089
+      "sha256": "bd8610993f5a1860397b480385a7a957630f7c8ad9bb95ee102deaf923c0e7c0",
+      "bytes": 19362
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -14145,8 +14145,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "53e1ddd5b917928547ccadb2793e36ebec3f4b3ea8164d8555d873eb72510e97",
-      "bytes": 4513
+      "sha256": "b4f083809afa233db0cd7bcc7e94f30d921de85cbc9a7d08a9b9d061a8b5bf9f",
+      "bytes": 5055
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
@@ -14620,13 +14620,13 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "34d95772ef91ec33963ef92ea7bb9adc79fd34a7cdbfa533fd54dd6a04fefbcb",
-      "bytes": 15034
+      "sha256": "b494154dddde7c415711c03b4ed4d44e5fde95f0a02d1b1349f65b5859095856",
+      "bytes": 16440
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "954d8d9e4d5fbb30316ad511d0701d1978c1fa13629aa7111e104ae4552e130f",
-      "bytes": 13670
+      "sha256": "1333f3519a190e73b5bfadd37808164ccefebabe88617f2107f1b47c73a912e5",
+      "bytes": 14403
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
@@ -14830,8 +14830,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "aeeb644b53e0ab0075ed97596d6a625ed156c26612971b3bdd1ff28cacea40a0",
-      "bytes": 159726
+      "sha256": "747420333a546becb4504a993bcda06bc514a82dae0183f78c6029bcee7c6f2b",
+      "bytes": 161914
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -14954,6 +14954,11 @@
       "bytes": 58693
     },
     {
+      "path": "tests/test_effort_default_guard.py",
+      "sha256": "3771c790758f9336b8d9dad79558bd81a14c14e6f12dba45c995ac00a2f01601",
+      "bytes": 7673
+    },
+    {
       "path": "tests/test_execution_realism.py",
       "sha256": "556bcaecd191d5ec52674b882905f3d7d1a147e3614b6a0a65c1dd9d7327129f",
       "bytes": 3691
@@ -15022,6 +15027,11 @@
       "path": "tests/test_ibkr_acceptance.py",
       "sha256": "2c0f09c5fd86a0125e775fdcd5363a6d25a8f2ff521802a3c6b489b9b21492e7",
       "bytes": 15483
+    },
+    {
+      "path": "tests/test_install_claude_profile.py",
+      "sha256": "7d52586810a140f909edc6dc2db1a7d5c8d2537c2950eb42c86a017ae158aac9",
+      "bytes": 5786
     },
     {
       "path": "tests/test_job_recovery.py",

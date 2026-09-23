@@ -73,9 +73,11 @@ GitHub-hosted macOS runner; see
    drafted, not accepted.
 
 2. **Run the platform bootstrap script.** `adoption/bootstrap-linux.sh --profile <id>
-   [--skip-system-packages] [--allow-unpinned <id,id,...>]` on Linux/WSL2, or
+   [--skip-system-packages] [--allow-unpinned <id,id,...>]
+   [--configure-claude-user-profile]` on Linux/WSL2, or
    `adoption/bootstrap-macos.sh --profile <id> [--skip-system-packages]
-   [--allow-unpinned <id,id,...>] [--plan]` on macOS (`ECO_INSTALL_ROOT` env,
+   [--allow-unpinned <id,id,...>] [--plan] [--configure-claude-user-profile]`
+   on macOS (`ECO_INSTALL_ROOT` env,
    default `$HOME/.local/share/codex-ecosystem`; writes
    `$ECO_INSTALL_ROOT/installed-versions.txt`; both scripts exit 2 usage,
    1 guard/refusal, 0 success, 3 when a selected component has no pin and was
@@ -161,6 +163,50 @@ GitHub-hosted macOS runner; see
    do not apply; `adoption/manifest.json` `policy.historical_acceptance_transfers:
    false` means none of that state should be read as re-qualifying the new
    host's own acceptance evidence.
+
+4a. **Claude user-scope profile.** After step 3's native `claude` sign-in
+   (this step is a no-op, not a failure, without it -- the MCP registration
+   sub-step below needs a working `claude` binary), install this catalog's
+   Claude Code user-scope assets with
+   [`tools/adoption/install_claude_profile.py`](../tools/adoption/install_claude_profile.py):
+   ```sh
+   python3 tools/adoption/install_claude_profile.py            # guard + agents + MCP servers
+   python3 tools/adoption/install_claude_profile.py --dry-run   # report only, write/register nothing
+   python3 tools/adoption/install_claude_profile.py --only mcp  # just the MCP step
+   ```
+   Both platform bootstrap scripts also accept
+   `--configure-claude-user-profile` to run this automatically as their own
+   last step (still only meaningful after sign-in; run it manually
+   afterward otherwise, exactly as the script's own closing message says).
+   Three idempotent sub-steps, each safe to re-run:
+   - **guard hook**: copies [`adoption/hooks/claude/effort-default-guard.py`](hooks/claude/effort-default-guard.py)
+     to `~/.claude/hooks/effort-default-guard.py`, refusing to install unless
+     its sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS);
+     skipped if the installed copy already matches.
+   - **agents**: copies the five [`adoption/agents/claude/*.md`](agents/claude/)
+     files verbatim to `~/.claude/agents/`; skipped per-file when already
+     byte-identical.
+   - **MCP servers**: for each entry in
+     [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
+     http, `jcodemunch` and `serena` stdio), runs `claude mcp add --scope
+     user`; skipped when `claude mcp get <name>` already reports a matching
+     transport, command/URL, args and env variable names (values are not
+     compared -- the running host owns them).
+   Then apply the settings template itself (model, effort, ultracode,
+   workflow env, hooks) into the live `~/.claude/settings.json` with
+   [`tools/adoption/apply_claude_settings.py`](../tools/adoption/apply_claude_settings.py),
+   after rendering it for this host with step 4's `render_config.py --out`:
+   ```sh
+   python3 tools/adoption/apply_claude_settings.py --template "$RUN_DIR/rendered/settings.json"
+   python3 tools/adoption/apply_claude_settings.py --template "$RUN_DIR/rendered/settings.json" --dry-run
+   ```
+   Backs up the current file (`settings.json.bak.<UTC timestamp>`) before
+   writing, refuses to operate through a symlink, deep-merges (template
+   scalars win; `modelSettings` merges per-model; `hooks` combine per event,
+   de-duplicated by each entry's own `command`; everything else in the live
+   file that the template does not mention is kept), writes atomically and
+   preserves the original file's mode bits. Never touches `~/.claude.json`
+   or any credential store.
 
 5. **Services.** Start only the selected profile's services using the native
    process-lifecycle guide in [`adoption/lifecycle.md`](lifecycle.md#native-client-integration-and-process-lifecycle):

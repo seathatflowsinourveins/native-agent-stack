@@ -52,7 +52,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `candidate:actions-attest` | unpinned | native_proven | accepted | untested | — |  |
 | Code navigation | retain | `serena` | 2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | native_proven | accepted | untested | — | 2 / 5 |
 | Documents and ingestion | keep_but_compare | `qmd` | 2.8.3 | local_integration | conditional, bootstrap 2.8.3 | untested | foundation-cpu | 5 / 7 |
-|  |  | `markitdown` | 0.1.7 (behind v0.1.8) | local_integration | conditional | untested | — |  |
+|  |  | `markitdown` | 0.1.7 (behind v0.1.8) | local_integration | conditional, bootstrap 0.1.7 | untested | — |  |
 |  |  | `poppler` | 26.09.0 | local_integration | conditional | untested | — |  |
 | Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.4.0) | native_proven | accepted, bootstrap 2.3.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation | 9 / 13 |
 | Git practice and GitHub automation | retain | `worktrunk` | 0.79.0 | source_review | not_established | untested | — | 11 / 12 |
@@ -68,7 +68,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `sandbox-runtime` | 0.0.77 | native_proven | accepted | untested | — |  |
 | MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | accepted, bootstrap 0.13.13 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation | 12 / 14 |
 |  |  | `mcp-inspector` | 2.7.0 | native_proven | accepted | untested | — |  |
-| Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.278 | untested, bootstrap 2.1.278 | foundation-cpu, research-runtime, macos-arm64-foundation | 9 / 14 |
+| Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.280 | untested, bootstrap 2.1.280 | foundation-cpu, research-runtime, macos-arm64-foundation | 9 / 14 |
 |  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | accepted, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation |  |
 | Observation and optional inference | keep_but_compare | `opentelemetry-collector-contrib` | 0.161.0 | synthetic | conditional | untested | observability | 8 / 11 |
 |  |  | `prometheus` | 3.14.0 | synthetic | conditional | untested | observability |  |
@@ -86,10 +86,10 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Context and usage efficiency | keep_but_compare | `rtk` | 0.49.0 | synthetic | conditional, bootstrap 0.49.0 | untested | foundation-cpu | 4 / 6 |
 |  |  | `headroom` | 0.37.0 (behind v0.38.0) | synthetic | conditional | untested | — |  |
 |  |  | `ccusage` | 20.0.24 | synthetic | conditional | untested | — |  |
-| Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional | untested | — | 7 / 9 |
-|  |  | `agent-browser` | 0.38.1 | local_integration | conditional | untested | — |  |
-|  |  | `openresearch` | 0.2.7 (behind v0.2.9) | local_integration | conditional | untested | — |  |
-| Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.278 | untested, bootstrap 2.1.278 | foundation-cpu, research-runtime, macos-arm64-foundation | 7 / 8 |
+| Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional, bootstrap 0.1.8 | untested | — | 7 / 9 |
+|  |  | `agent-browser` | 0.38.1 | local_integration | conditional, bootstrap 0.38.1 | untested | — |  |
+|  |  | `openresearch` | 0.2.7 (behind v0.2.9) | local_integration | conditional, bootstrap 0.2.7 | untested | — |  |
+| Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.280 | untested, bootstrap 2.1.280 | foundation-cpu, research-runtime, macos-arm64-foundation | 7 / 8 |
 |  |  | `worktrunk` | 0.79.0 | local_integration | conditional | untested | — |  |
 
 ## Trading layers (north star)
