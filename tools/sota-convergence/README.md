@@ -1559,6 +1559,15 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   order suppresses both.
 - **Git-backed roots:** `claude-args` also refuses a repository under any `.git`, as `codex` does.
 - **HTML delimiters:** `>` delimits a path, as backticks do.
+- **Edited inputs:** `claude-args` and `codex` refuse an input whose bytes differ from the sha256 `inputs`
+  indexed.
+- **URL bounds:** URLs end at markup and quote characters, so a host path right after a link is still
+  scrubbed.
+- **Leak hashes:** a leak records both orders' hashes as sampled before the judgment.
+- **Record prose:** the judges' prose and evidence refs are scrubbed before a record is written, and a
+  surviving host path refuses the layer.
+- **Role installation:** both blind roles are in `adoption/agents/claude/`, so
+  `tools/adoption/install_claude_profile.py --only agents` installs them in `~/.claude/agents/`.
 - **Run directory:** `claude-args --run-dir`, which defaults to `--repo`, also checks a project-level
   `blind-adjudicator.md` in the directory the workflow runs from.
 - **`--agent-file`:** pass the `blind-lane-reviewer` file the lane loaded. That is the user-level copy when

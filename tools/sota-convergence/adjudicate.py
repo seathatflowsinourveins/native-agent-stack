@@ -141,7 +141,7 @@ def bare_paths(value, repo_roots=()):
 # http(s) URLs are left alone.
 _PATH_CHARS = r"[^\s'\"|;&<>()`,]"
 _PATH_START = r"(?:^|(?<=[\s'\"(=:\[{,`>]))"
-URL = re.compile(r"https?://\S+")
+URL = re.compile(r"https?://[^\s<>\"'`)\]]+")
 ABSOLUTE_TEXT_PATH = re.compile(_PATH_START + r"/+[A-Za-z0-9_.]" + _PATH_CHARS + "*")
 HOME_TEXT_PATH = re.compile(r"(?:~|\$HOME\b|\$\{HOME\})(?:/" + _PATH_CHARS + r"*)?(?![\w])")
 HOST_PLACEHOLDER = re.compile(r"<host-path>(?:/" + _PATH_CHARS + "*)?")
@@ -404,6 +404,35 @@ def packet_paths(index: dict) -> dict:
     return {entry["layer"]: entry.get("packet_path") or "" for entry in index.get("layers") or []}
 
 
+def inputs_changed(index: dict, stems) -> list:
+    """Stems ("<layer>.<order>") whose input file no longer has the sha256 `inputs` indexed (Codex review of
+    #145): an edited input is not what scrub_pair produced and must not be judged."""
+    indexed = {f"{entry['layer']}.{order}": (path, (entry.get("input_sha256") or {}).get(order))
+               for entry in index.get("layers") or [] for order, path in (entry.get("inputs") or {}).items()}
+    changed = []
+    for stem in stems:
+        path, sha = indexed.get(stem, (None, None))
+        if not path or not Path(path).is_file() or sha is None or sha256_file(Path(path)) != sha:
+            changed.append(stem)
+    return changed
+
+
+def layer_inputs_of(index: dict, name: str) -> dict:
+    for entry in index.get("layers") or []:
+        if entry.get("layer") == name:
+            return entry.get("inputs") or {}
+    return {}
+
+
+def layer_input_hashes(index: dict, name: str) -> dict:
+    """{input file name: current sha256} for both orders of one layer, sampled together."""
+    for entry in index.get("layers") or []:
+        if entry.get("layer") == name:
+            return {Path(path).name: (sha256_file(Path(path)) if Path(path).is_file() else None)
+                    for path in (entry.get("inputs") or {}).values()}
+    return {}
+
+
 def pending_items(index: dict, layers=None) -> list:
     """[(name, order, input_path, packet_sha256)] for every disagreeing layer."""
     items = []
@@ -597,6 +626,9 @@ def run_codex(args) -> int:
                              "packet_sha256": packet_sha256}]):
             failures.append((f"{name}.{order}", "the packet changed after `inputs`; rerun inputs"))
             continue
+        if inputs_changed(index, [f"{name}.{order}"]):
+            failures.append((f"{name}.{order}", "the input changed after `inputs` built it; rerun inputs"))
+            continue
         try:
             existing = load_json(out_path)
             # Resume skips only a judgment made with the configured model and effort, under this run's
@@ -625,6 +657,8 @@ def run_codex(args) -> int:
         stem = f"{name}.{order}"
         leak = None
         judged_sha256 = sha256_file(Path(input_path))
+        # Both orders' content before the call: a leak suppresses both, bound to what was judged.
+        both_sha256 = layer_input_hashes(index, name)
         judge, judge_model, judge_codes, failure, judge_leak = run_codex_call(
             repo, schemas["judge"], out_dir / f"{stem}.judge.out.tmp", args.effort,
             fill(judge_template, input_path, repo, packet_path=packets.get(name, "")), args.model, args.timeout,
@@ -645,7 +679,8 @@ def run_codex(args) -> int:
         if leak:
             failure = LEAK
             with lock:
-                leaks.append((name, order, input_path, {**leak, "family": "openai", "input_sha256": judged_sha256}))
+                leaks.append((name, order, input_path, {**leak, "family": "openai", "input_sha256": judged_sha256,
+                                                        "inputs_sha256": both_sha256}))
         # The configured --model first, as codex_lane.py records it; the event stream only reports.
         model = args.model or judge_model or "unknown"
         write_json(out_path, judgment_record(
@@ -720,10 +755,15 @@ def record_leaks(path: Path, index: dict, leaks) -> list:
             # Both orders hold the same two returns, so a leak in one is a leak in both (Codex review of
             # #145): the other order's content at leak time is recorded too, and recorded_leaks marks both.
             layer_inputs = inputs.get(name, {})
-            both = {other: (judged if other == order else (sha256_file(Path(path)) if Path(path).is_file() else None))
-                    for other, path in layer_inputs.items()}
+            if isinstance(leak.get("inputs_sha256"), dict):
+                # The caller sampled both orders before the judgment (Codex review of #145).
+                both_by_name = dict(leak["inputs_sha256"])
+            else:
+                both_by_name = {Path(path).name: (judged if other == order else
+                                                  (sha256_file(Path(path)) if Path(path).is_file() else None))
+                                for other, path in layer_inputs.items()}
             record = {"input": key[0], "input_sha256": judged, "layer": name, "order": order,
-                      "inputs_sha256": {Path(layer_inputs[other]).name: sha for other, sha in both.items()},
+                      "inputs_sha256": both_by_name,
                       "family": leak.get("family"), "stage": leak.get("stage"), "text": leak.get("text"),
                       "inputs": inputs.get(name, {})}
             if (record["input"], record["input_sha256"], record["family"], record["stage"]) in seen:
@@ -778,6 +818,9 @@ def claude_args(work_dir: Path, repo: Path, prompt_path: Path = PROMPT_PATH, lay
     changed = packets_changed(items)
     if changed:
         raise ValueError("adjudicate: packets changed after `inputs` (rerun inputs): " + ", ".join(changed))
+    edited = inputs_changed(index, [f"{item['name']}.{item['order']}" for item in items])
+    if edited:
+        raise ValueError("adjudicate: inputs changed after `inputs` built them (rerun inputs): " + ", ".join(edited))
     # The input content each item is judged on and the provenance it runs under; claude-collect binds every
     # judgment to this snapshot through the snapshot_id the workflow echoes back.
     snapshot = {"inputs": {f"{item['name']}.{item['order']}": sha256_file(Path(item["path"])) for item in items},
@@ -854,8 +897,10 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
             if not input_changed:
                 # A leak reported on an input rebuilt since the snapshot is about the old content: discarded,
                 # so it cannot mark the rebuilt input as leaked.
+                both = {Path(entry_path).name: snapshot.get(f"{name}.{other}")
+                        for other, entry_path in (layer_inputs_of(index, name) or {}).items()}
                 leaks.append((name, order, input_path, {**leak, "family": "anthropic",
-                                                        "input_sha256": judged_sha256}))
+                                                        "input_sha256": judged_sha256, "inputs_sha256": both}))
         if leak is not None:
             failure = LEAK
         elif not item:
@@ -892,7 +937,7 @@ def assemble_layer(work_dir: Path, entry: dict, leaked_inputs=frozenset()):
     """(record, notes, leaked input names) for one disagreeing layer; notes name every judgment that does not
     count. Every judgment of an input whose current content has a recorded leak (either family) is dropped."""
     name, packet_sha256 = entry["layer"], entry["packet_sha256"]
-    judgments, whys, refs, notes, provenances = [], [], set(), [], []
+    judgments, whys, refs, notes, provenances, repos = [], [], set(), [], [], set()
     leaked_orders = [order for order in ORDERS
                      if input_key((entry.get("inputs") or {}).get(order)) in leaked_inputs]
     for lane, family in FAMILIES.items():
@@ -912,6 +957,8 @@ def assemble_layer(work_dir: Path, entry: dict, leaked_inputs=frozenset()):
                 continue
             judge, refuter = data["judge"], data["refuter"]
             provenances.append(data.get("provenance"))
+            if isinstance(data.get("repo"), str):
+                repos.add(data["repo"])
             claude_position = CLAUDE_POSITION[order]
             preferred = judge["preferred"]
             judgments.append({
@@ -944,6 +991,7 @@ def assemble_layer(work_dir: Path, entry: dict, leaked_inputs=frozenset()):
                 f"; no judgment of a leaked input counts")
     record = {"winner_lane": winner, "why": head + ". " + " | ".join(whys) if whys else head,
               "evidence_refs": sorted(refs), "judgments": judgments}
+    record["_repos"] = sorted(repos)
     # Every counted judgment must have run under one recorded provenance; assemble stamps it on the record.
     distinct = {json.dumps(item, sort_keys=True) for item in provenances}
     record["_provenance"] = (json.loads(next(iter(distinct))) if len(distinct) == 1 and provenances
@@ -1033,6 +1081,16 @@ def assemble(work_dir: Path, out_dir: Path, layers=None):
             (out_dir / f"{name}.json").unlink(missing_ok=True)
             continue
         provenance, provenance_issue = record.pop("_provenance"), record.pop("_provenance_issue")
+        repos = record.pop("_repos")
+        # The judges' prose can repeat host paths (the labelled input, packet or repository paths); the record is
+        # published, so every string is scrubbed like an input and a surviving host path refuses the layer
+        # (Codex review of #145).
+        record["why"] = scrub_text(record["why"], str(work_dir / "packets"), repos)
+        record["evidence_refs"] = sorted({scrub_text(ref, str(work_dir / "packets"), repos)
+                                          for ref in record["evidence_refs"]})
+        leftover = unscrubbed_paths({"why": record["why"], "evidence_refs": record["evidence_refs"]})
+        if leftover and not provenance_issue:
+            provenance_issue = "host paths remain in the judges' prose after scrubbing: " + ", ".join(leftover)
         issue, _result = judge_adjudication(record, grandfathered=False, packet_sha256=entry["packet_sha256"])
         issue = issue or provenance_issue
         if issue:

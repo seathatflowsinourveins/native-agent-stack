@@ -27945,8 +27945,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "b01a05e900adecedb804d9a96903d0c3a3534a86e43a4390c215e8a791eb0f14",
-      "bytes": 13050
+      "sha256": "17e2e19d101956dfb2f1bcb4502e900877e33d5ba1045d99dbebc1295d8a6245",
+      "bytes": 13255
     },
     {
       "path": "tests/test_job_recovery.py",
@@ -28200,8 +28200,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "dcb1707e83158c4178684af17edec97b54e03c8548c566d4d6bdd8f9fa1758fd",
-      "bytes": 108574
+      "sha256": "ee8b4880c3f132e4575b233c064341ec2cce23ca3c3f8d0610ef4f57fd9e8580",
+      "bytes": 109212
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

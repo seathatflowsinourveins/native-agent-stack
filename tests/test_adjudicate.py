@@ -785,6 +785,38 @@ class SixthRereviewOf145Tests(AdjudicateFixture):
         self.assertIn(".git", err)
 
 
+class SeventhRereviewOf145Tests(AdjudicateFixture):
+    """Codex re-review of #145 (seventh round)."""
+
+    def setUp(self):
+        super().setUp()
+        self.inputs()
+
+    def test_an_input_edited_after_inputs_is_refused(self):
+        ab = self.work / "adjudication-inputs" / f"{NAME}.AB.json"
+        ab.write_text(ab.read_text(encoding="utf-8").replace("}", " }", 1), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "inputs changed after"):
+            adjudicate.claude_args(self.work, self.repo)
+
+    def test_a_url_does_not_swallow_an_adjacent_host_path(self):
+        text = '<a href="https://example.com/x">x</a>/home/example/private.json'
+        self.assertNotIn("/home/example/private.json", adjudicate.scrub_text(text, str(self.work / "packets"), ()))
+        self.assertTrue(adjudicate.unscrubbed_paths({"why": 'https://example.com/x">/opt/lane/private.json'}))
+
+    def test_record_prose_is_scrubbed_before_it_is_written(self):
+        for lane in ("claude", "codex"):
+            for order in adjudicate.ORDERS:
+                self.judgment(lane, order, "codex")
+        path = self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        data["judge"]["why"] = data["judge"]["why"] + f" Checked {self.repo}/evidence/receipt.json directly."
+        path.write_text(json.dumps(data), encoding="utf-8")
+        code, _err, record = self.assemble()
+        self.assertEqual(code, 0)
+        self.assertNotIn(str(self.repo), record["why"])
+        self.assertIn("evidence/receipt.json", record["why"])
+
+
 class InputScrubTests(AdjudicateFixture):
     """Round-2 review (adjudication round 3): every real input tripped the leak rule, because inputs carried
     the packet's absolute path and left absolute paths outside the lane roots."""

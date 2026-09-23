@@ -88,6 +88,13 @@ class LaneProvenanceRegistryTests(unittest.TestCase):
                     if field.endswith("sha256") and field in entry:
                         self.assertRegex(entry[field], r"^[a-f0-9]{64}$")
 
+    def test_the_blind_roles_are_in_the_maintained_adoption_source(self):
+        # Codex review of #145: tools/adoption/install_claude_profile.py installs adoption/agents/claude/*.md,
+        # so a fresh host gets exactly the vendored blind roles.
+        for role in ("blind-lane-reviewer", "blind-adjudicator"):
+            self.assertEqual((ROOT / "adoption/agents/claude" / f"{role}.md").read_bytes(),
+                             (ROOT / "examples/claude-native/agents" / f"{role}.md").read_bytes(), role)
+
     def test_the_vendored_lane_role_is_registered(self):
         agent = hashlib.sha256((ROOT / "examples/claude-native/agents/blind-lane-reviewer.md").read_bytes()).hexdigest()
         self.assertIn(agent, [entry.get("agent_sha256") for entry in self.registry()["claude"]])
