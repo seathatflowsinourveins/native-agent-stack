@@ -671,8 +671,9 @@ class AlpacaPaperTransport:
         if ts_ns == previous_ns and self._quarantine_handler is not None and not crossed:
             # An equal-time conflict is recoverable only if every other native
             # constraint is valid. Check even tombstoned/duplicate candidates:
-            # invalid capacity, fractional sizes, and halts remain fatal.
-            if quote["halted"]:
+            # invalid capacity, fractional sizes, and halted conflicts remain
+            # fatal. An identical stored halted quote keeps baseline behavior.
+            if quote["halted"] and quote != self._quote_values.get(symbol):
                 raise TransportError("halted quote cannot qualify as a timestamp conflict")
             self._quarantine_validator(quote)
         if ts_ns < previous_ns:

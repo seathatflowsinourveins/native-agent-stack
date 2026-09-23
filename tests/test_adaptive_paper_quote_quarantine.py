@@ -266,6 +266,20 @@ class Quarantine(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("AAPL", self.port._quote_values)
         self.assertTrue(self.port.health["frozen"])
 
+    async def test_identical_halted_quote_duplicate_keeps_baseline_without_bypassing_validation(self):
+        halted = raw(self.ns + 1, halted=True)
+        await self.push(halted)
+        self.assertTrue(self.port._quote_values["AAPL"]["halted"])
+        self.assertFalse(self.port.health["frozen"])
+        tick_count = len(self.ticks)
+        with patch.object(self.port, "_quarantine_validator", wraps=quote_components) as validate:
+            self.assertIsNone(self.port._stream_quote(halted))
+            await self.push(halted)
+        self.assertEqual(validate.call_count, 2)
+        self.assertEqual(len(self.ticks), tick_count)
+        self.assertFalse(self.port.health["frozen"])
+        self.assertEqual(self.port.health["quote_quarantine"]["invalidated"], 0)
+
     async def test_equal_timestamp_valid_conflict_quarantines_until_strictly_newer(self):
         history = list(self.policy.history["AAPL"])
         await self.push(raw(self.ns, bp="100.001"))
@@ -376,6 +390,49 @@ class Quarantine(unittest.IsolatedAsyncioTestCase):
                                         "side": "buy", "qty": "1", "limit_price": "100.01"})
         wire.assert_not_called()
         self.assertEqual(self.ledger.intents()[0].status, "not_sent")
+
+    async def test_benchmark_conflict_after_post_preserves_owned_order_and_blocks_dependent_entries(self):
+        from test_adaptive_paper_transport import response, order
+        intent = {"client_order_id": "benchmark-after-wire", "symbol": "AAPL", "side": "buy",
+                  "qty": "1", "limit_price": "100.01"}
+        accepted = order(client_order_id=intent["client_order_id"], symbol="AAPL", limit_price="100.01")
+        wired, release = threading.Event(), threading.Event()
+        def request(*args, **kwargs):
+            wired.set()
+            if not release.wait(2):
+                raise AssertionError("test did not release HTTP boundary")
+            return response(accepted)
+        with patch.object(self.port._client._session._session, "request", side_effect=request) as wire:
+            submit = asyncio.create_task(self.port.submit(intent))
+            try:
+                for _ in range(100):
+                    if wired.is_set():
+                        break
+                    await asyncio.sleep(.005)
+                self.assertTrue(wired.is_set())
+                await self.push(raw(self.ns, "SPY", bs="101"))
+                self.assertFalse(self.port.ready)
+                self.assertFalse(self.port.health["frozen"])
+                self.assertFalse(self.controller.stop)
+                self.assertTrue(self.ledger.intents()[0].submit_attempted)
+                with self.assertRaisesRegex(NativeOrderRejected, "admissions_not_ready"):
+                    self.controller.before_submit(dict(intent, client_order_id="dependent-blocked"))
+            finally:
+                release.set()
+            result = await submit
+            self.assertEqual(result["status"], "new")
+            self.assertEqual(len(self.ledger.unresolved()), 1)
+            filled = dict(accepted, status="filled", filled_qty="1", filled_avg_price="100.01")
+            with patch.object(self.port._client, "get_order_by_client_id", return_value=filled):
+                reconciled = await self.port.submit(intent)  # existing ID is lookup-only
+            self.assertEqual(reconciled["status"], "filled")
+            self.assertEqual(wire.call_count, 1)
+        self.assertEqual(self.ledger.positions()["AAPL"].qty, Decimal(1))
+        self.assertEqual(self.ledger.unresolved(), [])
+        self.assertFalse(self.port.ready)
+        await self.push(raw(self.ns + 1, "SPY"))
+        self.assertTrue(self.port.ready)
+        self.assertFalse(self.port.health["frozen"])
 
     async def test_equal_timestamp_compound_invalidity_remains_fatal_even_after_tombstone(self):
         for active in (False, True):
