@@ -68,7 +68,7 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/verify.py",
-      "sha256": "0fc7e39fb112a1d7c8aae1de68957f0e5a67e3fc78f54080672e0b81a1c9df79"
+      "sha256": "a3363192e027e7521fda0e03e5a0a2acc9f149abee304d57d6460166bdeae260"
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/run.py",
@@ -84,7 +84,7 @@
     },
     {
       "path": "tests/test_offhost_restore.py",
-      "sha256": "fd2d27a7cc03077d6f68b5118db557c2f896014ee0b535647049d2f2eceb7e6e"
+      "sha256": "baa44d515cf65db2da9fee8fd50f2d969eba12af14880c6d5bc6b4eab0956a4c"
     },
     {
       "path": ".github/workflows/native-offhost-restore.yml",
