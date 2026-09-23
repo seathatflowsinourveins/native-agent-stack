@@ -25,7 +25,7 @@ if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 from sessions import DEFAULT_SESSION_POLICY, order_extended_hours_flag, reconciliation_receipt
 
-from nautilus_trader.common import Environment, LogLevel
+from nautilus_trader.common import Environment, FileWriterConfig, LogLevel
 from nautilus_trader.config import DataClientConfig, ExecutionClientConfig, LiveNodeConfig
 from nautilus_trader.config import LiveExecutionEngineConfig, LiveRiskEngineConfig, LoggerConfig
 from nautilus_trader.live import LiveNode
@@ -447,8 +447,20 @@ class AlpacaExecutionClient(ExecutionClient):
         return out
 
 
+def logger_config(log_directory=None):
+    """Errors on stdout, as before. With ``log_directory``, NautilusTrader's own file
+    writer also records INFO and above as JSON lines there (upstream FileWriterConfig,
+    file_format "json"), the native live record of the engine's order and fill events."""
+    if log_directory is None:
+        return LoggerConfig(stdout_level=LogLevel.ERROR)
+    Path(log_directory).mkdir(parents=True, exist_ok=True, mode=0o700)
+    return LoggerConfig(stdout_level=LogLevel.ERROR, fileout_level=LogLevel.INFO,
+                        file_config=FileWriterConfig(directory=str(log_directory), file_format="json"))
+
+
 def build_node(port, symbols, strategies, *, account_id="ALPACA-PAPER", trader_id="ADAPTIVE-001",
-               max_order_submit_rate="180/00:01:00", account_type=AccountType.CASH, session_policy=None):
+               max_order_submit_rate="180/00:01:00", account_type=AccountType.CASH, session_policy=None,
+               log_directory=None):
     if importlib.metadata.version("nautilus_trader") != "2.0.0rc5":
         raise ValueError("unqualified_native_version")
     if not account_id.startswith("ALPACA-"):
@@ -468,7 +480,7 @@ def build_node(port, symbols, strategies, *, account_id="ALPACA-PAPER", trader_i
 
     config = LiveNodeConfig(environment=Environment.SANDBOX, trader_id=TraderId(trader_id),
         load_state=False, save_state=False, shutdown_on_error=True,
-        logging=LoggerConfig(stdout_level=LogLevel.ERROR), timeout_connection_secs=10,
+        logging=logger_config(log_directory), timeout_connection_secs=10,
         timeout_reconciliation_secs=10, timeout_portfolio_secs=10, timeout_disconnection_secs=10,
         delay_post_stop_secs=0.2, timeout_shutdown_secs=10,
         risk_engine=LiveRiskEngineConfig(bypass=False, max_order_submit_rate=max_order_submit_rate,

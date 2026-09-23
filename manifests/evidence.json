@@ -6339,6 +6339,11 @@
       "bytes": 15418
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/live_manifest.py",
+      "sha256": "ca34cb59b4ff8f3a9dc763a0937a351ecab815d16164c75c319e3880a57585bd",
+      "bytes": 16245
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/market_research.py",
       "sha256": "692f0f16f56709204002d587d2e4da8045f0ffe8249294055cf36b51e29abe68",
       "bytes": 22176
@@ -6370,8 +6375,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
-      "sha256": "d88408adb268b9283adb6538c20f2cb21ac9b923a827178bfc48bea2f2889bfe",
-      "bytes": 24326
+      "sha256": "3e9cf2d93980b0f59b781dc3771f176c4e90d6af921b61c1022017cf85e64e0f",
+      "bytes": 25014
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
@@ -6405,8 +6410,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "94f7cdfe32aefe0aeb3e92ece16200c858a95dd61e2ce0d9c03c5318ac9e893d",
-      "bytes": 96987
+      "sha256": "03427aa9bf65c2d0863ae147fd1daa135dc1f7379bafcd82aa2ba3b1c19de73a",
+      "bytes": 99013
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -6430,8 +6435,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "a3d84da6cdc757d74cf8e22c08a3feb7bb7b035850a6cd74e7f5f478814c8d35",
-      "bytes": 4767
+      "sha256": "5a604257379a8cc02750345ac72f1a6ad37258359ba8e76a565ec89ac9ac3c6a",
+      "bytes": 5011
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -27697,6 +27702,11 @@
       "path": "tests/test_adaptive_paper_leverage.py",
       "sha256": "40ddd51e0e8c8393cfdd42b3e91ff4c1a08ec050ef1d61e5d5573e83113ded65",
       "bytes": 17681
+    },
+    {
+      "path": "tests/test_adaptive_paper_live_manifest.py",
+      "sha256": "4596f301ac44effefee5b787c5e3627a9cd38f8ff0cf436ef778b7378a0667c2",
+      "bytes": 10501
     },
     {
       "path": "tests/test_adaptive_paper_metrics.py",
