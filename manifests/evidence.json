@@ -7634,8 +7634,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "1cdf575b8bfc29ab48a889d302a6f652077d160d828df257ca29a76d867a85f0",
-      "bytes": 12926000
+      "sha256": "77cb3d3b79818a583ef0437b13e8bd82139dfe55094bc2d9060b9d52a65636a1",
+      "bytes": 12926572
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7714,8 +7714,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "f5cc7d311fa7300ff15d8e18edf7ba48900e3cdd26ce4d405a88b35c1d10787a",
-      "bytes": 8547
+      "sha256": "261856a70c35569bfb917383fa69de47a8dfbfb4c4aa14b923187e8fd10ea19a",
+      "bytes": 9115
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
