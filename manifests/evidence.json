@@ -6485,8 +6485,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/README.md",
-      "sha256": "1c45dd78a2a7465e78ea09db3cbae0dd60c297175e30991d72ab20d1eff08e0b",
-      "bytes": 3940
+      "sha256": "ca7fdd9c1891ed058f9fb6ae11834b050927cbd47a65e8b7d8f230a3696b2b8f",
+      "bytes": 4513
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/config-post-liquid-9967f44d.json",
@@ -6512,6 +6512,16 @@
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/paper-output.json",
       "sha256": "e902f278dcc8182a9508018f616821064939d649b63d0b59d6fddecea662142d",
       "bytes": 7722
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/quote-cadence-20260923T232026Z.json",
+      "sha256": "1a7876363013cb7fb0f0d1bd747cc26e1ac60620b4d72870dff2c29352272299",
+      "bytes": 20657
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/quote_cadence_sample.py",
+      "sha256": "291e35b7c90f9fee8c8ddb180713559916cf18181782ad714ad946a7a3e58682",
+      "bytes": 3553
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/scheduled-trial.log",
@@ -8955,8 +8965,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "93ac155e72a5602de53b329c64c2a9529355fd37bb3be32c024643d7ef31489e",
-      "bytes": 34698
+      "sha256": "71916af69236ac23e99b921d39da3427a188b86c9f7500fbb982fe8b6cfde4e8",
+      "bytes": 34772
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -27525,8 +27535,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "e492c6f40ad527c6b1a2991996083e2a2362e55a4d50be83c2b7a0881720b7b6",
-      "bytes": 10505
+      "sha256": "9891a15026b14f9722b34e10192feb8f8e35b1f2a41c45ac2276c959f09d40ad",
+      "bytes": 10888
     },
     {
       "path": "observability/native-data/README.md",

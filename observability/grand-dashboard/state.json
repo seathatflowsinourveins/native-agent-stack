@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-23T17:20:00Z",
+  "recorded_at_utc": "2026-09-23T23:25:00Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -14,7 +14,7 @@
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "adaptive 1x broker trial passed 2026-09-23 (main 843dc8f) / leverage rungs pending / account flat",
+      "state": "adaptive 1x broker trial passed 2026-09-23 (main 843dc8f) / regular session only / leverage rungs pending / account flat",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
     },
     {
@@ -39,6 +39,13 @@
       "title": "Alpaca observed Trading API rate",
       "state": "observed200REST/min / adaptive submits180 plus management reserve / actual throughput pending",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "alpaca-paper-extended-hours",
+      "title": "Alpaca extended-hours paper session",
+      "state": "not qualified 2026-09-23 / 10.9 s run 0 orders flat / 4 benchmarks fresh together in 3 of 8 snapshots",
+      "evidence_ref": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/README.md"
     },
     {
       "kind": "gate",

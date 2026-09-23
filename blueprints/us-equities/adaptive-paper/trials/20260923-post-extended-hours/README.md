@@ -12,8 +12,8 @@ Config: `config-post-liquid-9967f44d.json` (sha256 `9967f44d5ec2…`). Its `note
 - `sessions.extended_hours` is true, with `regular_session_only` false and `extended_hours_enabled` true;
 - the universe is QQQ, META, SPY and NVDA, with QQQ as the only regime benchmark.
 
-The universe was narrowed because of the after-hours SIP quotes sampled read-only at about 18:50 ET: 8 samples 2.5 s apart,
-24 configured symbols, 3 s limit.
+The universe was narrowed from a read-only after-hours SIP sample taken at about 18:50 ET (8 snapshots 2.5 s apart,
+24 symbols, 3 s limit). That sample was not retained, so its figures are unverifiable here:
 
 | Symbol | Samples no older than 3 s | Median age | Max age | Median spread |
 |---|---|---|---|---|
@@ -24,8 +24,13 @@ The universe was narrowed because of the after-hours SIP quotes sampled read-onl
 | IWM | 2/8 | 6.8 s | 16.0 s | 1.8 bps |
 | DIA | 2/8 | 7.9 s | 15.5 s | 2.1 bps |
 
-Of the other 18 symbols, none met the limit in more than 2 of 8 samples, and ten were never fresh. Their median ages
-ranged from 6.5 s (CRWD) to 363 s (PG).
+A retained re-sample at 19:20 ET used the same method, `quote_cadence_sample.py` (market data only; no account,
+order or position call), and is in `quote-cadence-20260923T232026Z.json`, taken against the durable ledger's 24-symbol
+config `77244c39`. Cadence had changed by then:
+- QQQ 8/8 fresh, META 6/8, NVDA 5/8, IWM 5/8, SPY 4/8, DIA 4/8.
+- 8 of 24 symbols were never fresh.
+- The four benchmarks were fresh at the same time in only 3 of 8 snapshots. Preflight requires exactly that
+  (`benchmark_quotes_not_ready`).
 
 This trial used its own state root, because the durable ledger refuses any config change
 (`next_trial_config_differs_from_frozen_limits`). It filled nothing, so the durable ledger still reconciles with the
@@ -45,12 +50,13 @@ Result (`paper-output.json`):
   reason nor whether the strategy had started, so the cause is inferred, not measured. The `trading stream websocket
   error` on line 5 is the shutdown close seen in earlier trials.
 
-Finding: the engine, as built, trades only in the regular session.
+Finding. This rests on the code and the retained sample; the run's own stop cause is inferred.
 - `RiskLimits` caps `quote_max_age_seconds` at 3 s.
-- The alpaca-py data timeout equals that quote age.
-- Preflight requires every benchmark quote to be no older than it.
+- Preflight requires every benchmark quote to be no older than that.
+- The alpaca-py data timeout is set equal to it.
+- After hours, the standard four-benchmark basket was fresh at the same time in 3 of 8 retained snapshots.
+- This narrowed run stopped after 10.9 s, with a data-timeout reconnect logged.
 
-After hours, those assumptions fail on real quote cadence. Trading pre-market or after hours needs a session-aware
-liquidity design: a per-session quote age, data timeout and benchmark basket, with its own preregistered limits, tests
-and independent review, which in turn needs a limits decision. It is not a configuration flag. Until then, the
-extended-hours path is not qualified on paper.
+So as built and configured, the engine does not qualify for the after-hours session on paper. Which change would fix
+that is an open design question: a per-session quote age, data timeout, benchmark basket or something else. It needs a
+preregistered limits decision, tests and independent review. This run does not establish the remedy.
