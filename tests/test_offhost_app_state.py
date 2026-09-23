@@ -118,9 +118,21 @@ class EvidenceGuards(unittest.TestCase):
         self.assertEqual((self.root / 'reports/failed.stdout').read_text(), 'retained failure\n')
 
     def test_command_timeout_retains_output_and_stops_owned_group(self):
+        # The child must reliably print before the timeout fires -- it previously
+        # raced a full /usr/bin/python3 interpreter's fork/exec + bootstrap against
+        # a 0.1s timeout, which macOS (documented slower, more heavily virtualized
+        # process creation, especially on GitHub-hosted runners) sometimes lost,
+        # yielding an empty stdout that looked like a process-group/kill bug but
+        # was a startup-latency race. /bin/sh -c 'printf ...' has no interpreter
+        # to bootstrap and no stdio buffering to flush (printf writes directly),
+        # so the 0.1s budget is spent almost entirely on the kernel's own
+        # fork/exec, making this deterministic rather than merely less likely to
+        # flake; the timeout is also raised slightly for headroom, not "a longer
+        # sleep" (the child's own sleep, which is what the timeout must interrupt,
+        # is unchanged).
         trial = app.Trial(self.root, 'test')
         with self.assertRaises(RuntimeError):
-            trial.call('timed', ['/usr/bin/python3', '-c', 'import time; print("before timeout", flush=True); time.sleep(3)'], timeout=.1)
+            trial.call('timed', ['/bin/sh', '-c', 'printf "before timeout\\n"; sleep 3'], timeout=.5)
         record = app.load(self.root / 'reports/test.json')['commands'][0]
         self.assertTrue(record['timed_out']); self.assertTrue(record['owned_process_group_signals_sent'])
         self.assertIn('before timeout', (self.root / 'reports/timed.stdout').read_text())

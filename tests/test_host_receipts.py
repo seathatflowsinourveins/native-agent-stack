@@ -1223,6 +1223,11 @@ class QualifiedModelRecordTests(unittest.TestCase):
                 "record", "--root", str(self.root),
                 "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64",
+                # host.os/architecture are auto-detected unless overridden; pin them
+                # to match linux-wsl2-x86_64 so test_qualified_model_flag_is_recorded_
+                # and_validates' cmd_validate() cross-check is host-independent (see
+                # test_record_writes_a_valid_registered_receipt for the same fix).
+                "--os", "linux", "--architecture", "x86_64",
                 "--component-id", "widget",
                 "--stage", "use",
                 "--evidence-class", "synthetic",
