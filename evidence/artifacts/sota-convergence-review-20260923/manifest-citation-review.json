@@ -1,7 +1,7 @@
 {
  "schema": "manifest-citation-review/1",
  "subject": "draft catalogs/sota-convergence/manifest-20260923.json built by tools/sota-convergence/build_manifest.py from the private review-lane record of workflow wf_4069d065-fd4 over catalog main 168a3a8",
- "method": "three independent evidence-reviewer children (Opus 5.5/high, Read/Grep only, no network) in workflow wf_75979946-4da over every foundation/trading component row carrying why_selected or comparison_that_would_overturn (foundation layers 1-10, 11-20, trading 12); citations opened, pins compared to manifests/stack.json and the trading cards, overturn statements checked for a concrete fixture/command/metric, execution claims checked for a receipt path, statuses checked against the lane record and github-freshness.json",
+ "method": "three independent evidence-reviewer children (Opus 5.5/high, Read/Grep only, no network) in workflow wf_75979946-4da over every foundation/trading component row carrying why_selected or comparison_that_would_overturn (foundation layers 1-10, 11-20, trading 12); citations opened, pins compared to manifests/stack.json and the trading cards, overturn statements checked for a concrete fixture/command/metric, execution claims checked for a receipt path, statuses checked against the lane record and github-freshness.json; supplementary: a peer session's citation check of the 20 critic.uncited_claims (agent-lab-e7, wf_cbaf6a8b-129)",
  "checked_at": "2026-09-23",
  "reviewers": {
   "foundationA": {
@@ -18,6 +18,12 @@
    "checked_rows": 43,
    "findings": 15,
    "verdict": "fix_required"
+  },
+  "critic-citations": {
+   "checked_rows": 20,
+   "findings": 11,
+   "verdict": "fix_required",
+   "source": "peer session agent-lab-e7 workflow wf_cbaf6a8b-129 over manifest-20260923 critic.uncited_claims 0-19 (citations.json sha256 c889879e03d1576d...)"
   }
  },
  "checked_rows": {
@@ -160,6 +166,16 @@
    "(a) catalogs/us-equities/README.md line 103 'QuantStats is a proposed reporting layer' and line 147 (vLLM 0.29 WSL failure) are verbatim.",
    "(d) receipts that exist: evidence/receipts/exchange-calendars-native-check-20260922.json, pit-availability.json, native-nautilus-v2-20260920.json, nautilus-equity-replay-20260921.json, spy-parity/verdict.json and mapping-manifest-v2.json, supply-chain/scan-nautilus-rc5-20260922/receipt.json (status passed_scoped_scan_zero_findings), catalyst-experiment and research-evaluation receipts (both reference skfolio), hosting/receipt.json and research-runtime/receipt.json (both reference dagu), alpaca-paper-e2e-20260921.json, observability/backends/broker-path-rules-receipt.json.",
    "(c) concrete overturns: data-alpaca-py, data-edgartools, data-exchange-calendars, data-databento, data-dvc, data-duckdb, data-pandera, lean, nautilustrader, adaptive-paper-alpaca-adapter, data-alpaca-py (execution-broker), lean-alpaca, nautilus-ibkr-adapter, quantstats, inspect-ai, vllm, gitleaks, syft, grype, skfolio. Missing future receipts (data-research-databento-arm-b.json, ibkr-acceptance/receipt.json, adaptive-paper/native-faults/receipt.json) are named as preregistered overturn targets, so their absence is correct."
+  ],
+  "critic-citations": [
+   "uncited_claims[0] supported: catalogs/foundation/decisions.json:2181-2205 (decision id \"local-generation-trial\", evidence_ids: [\"native-gpu-patch-20260920\"], source_paths: [\"blueprints/convergence-practice/gpu-inference/README.md\"])",
+   "uncited_claims[2] supported: catalogs/sota-convergence/manifest-20260923.json:953,959-962 (upstream.license \"NOASSERTION\"; review_note: \"License NOASSERTION in both catalog freshness and GitHub metadata.\"; evidence: \"github-freshness.json repositories['https://github.com/max-sixty/worktrunk'] v0.79.0 = pin\")",
+   "uncited_claims[5] supported: `rg -c \"dated note\" <work-dir>/foundation-layers.json` -> 0 matches; components at lines 814-820 (context-hub) and 822-828 (markitdown) have no note/evidence field",
+   "uncited_claims[7] supported: docs/foundation-closure-20260921.md:21-22 (ECC `2b6e8397`, Shan `bde3f031`) vs <work-dir>/foundation-layers.json:196 (ECC version dd6ee538aee0f548d4a6b520118f875431fd749e) and :260 (Shan version 15969ed2471a177d938c889255d2f23f07e4742a)",
+   "uncited_claims[8] supported: <work-dir>/lanes.json:4554 is the only occurrence of EpicSaber/delisted-stocks-list, CarterYancey/radarash-dataset, supermodo/us-markets-timemachine, with no `evidence` array or gh api/URL attached",
+   "uncited_claims[9] supported: <work-dir>/lanes.json:4349 is the sole occurrence of marketcalls/openalgo, hugodemenez/multi-broker-algorithm, uberdeveloper/omspy, with no evidence field, gh api command, or URL",
+   "uncited_claims[12] supported: catalogs/sota-convergence/manifest-20260923.json:7904 (version deltas for data-sktime/dexter/foundation-docling, \"none receipt-used\", no file cited) and :9510 (codex-acp/pageindex/repomix/langgraph deltas, no file cited)",
+   "uncited_claims[13] supported: catalogs/sota-convergence/manifest-20260923.json:10338 (\"The two extra cards appear to be the runtime-target reconciliation cards (nautilus-ibkr-adapter, adaptive-paper-alpaca-adapter); this is inferred, not verified.\")"
   ]
  },
  "limits": {
@@ -186,6 +202,10 @@
    "Gate line citations such as 'line 154 (pit-news-filings note)' point at the gate's id line, while the note text sits about 14 lines lower in the same block. I treated this as an acceptable block anchor, not a defect.",
    "The upstream/freshness and lanes comparisons were run by script over the full files. Receipt existence was checked with shell test -e. I did not independently re-derive the verdicts inside the sota-refresh-20260923 or gap-resolution-20260922 receipts; I only read their recorded verdict, evidence_class and limits fields.",
    "The manifest's other sections (reconciliations, critic, citation_review, which is empty) were not audited. One observation outside scope: reconciliations[0].note says the card 'still records ... nautilustrader=alternative at 1.231.0', but engines-strategies.json at 168a3a8 records nautilustrader default 2.0.0rc5."
+  ],
+  "critic-citations": [
+   "item 14 not returned by the reviewer",
+   "claims map to layers from their text prefix; findings without a component attach at layer level or stay general"
   ]
  },
  "disposition": "Generator defects (catalog 'tooling', generator_defect=true) are fixed in build_manifest.py and the manifest is rebuilt from the private lane record; every other finding is published as a per-row citation_review overlay on the manifest, never as a hand edit of generated text.",
@@ -593,6 +613,105 @@
    "evidence": "Manifest line 7663 row foundation-serena, pin 'v1.7.0', review_status confirmed_default. manifests/stack.json line 869: \"version\": \"2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143\". foundation-memory.json installed_version is also '2.0.0.dev0 @ c6fbd1c...'.",
    "fix": "Take the pin from stack.json and apply the builder's .devN non-comparable rule (DEV_PIN_RE) so the row is not reported as current against v1.7.0.",
    "reviewer": "trading"
+  },
+  {
+   "catalog": "foundation",
+   "layer": "mcp-surfaces",
+   "severity": "medium",
+   "claim": "critic.uncited_claims[1] contradicted: Foundation mcp-surfaces: 'mcp-inspector has no license recorded in the catalog or GitHub metadata' has no file path or command.",
+   "evidence": "manifests/stack.json:594 (\"license\": \"MIT\" under id \"mcp-inspector\")",
+   "fix": "A license IS recorded (MIT) in nas-wt-critic's own stack manifest, and the same manifest-20260923.json:5458 citation_review flags this exact contradiction (\"But manifests/stack.json:594 records 'license': 'MIT'\"); note manifest-20260923.json:1423 separately records upstream GitHub license as null with its own evidence line.",
+   "reviewer": "critic-citations"
+  },
+  {
+   "catalog": "foundation",
+   "layer": "semantic-rag",
+   "severity": "low",
+   "claim": "critic.uncited_claims[3] unsupported: Foundation semantic-rag: 'no re-index plan is recorded' for vLLM is an absence claim with no search command or file scope.",
+   "evidence": "rg -n -i \"re-?index.*plan",
+   "fix": "plan.*re-?index\"  <work-dir> → 12 hits, all restatements of the same claim or unrelated (SocratiCode watcher reindex), none documenting any vLLM re-index plan | No file in either tree records a re-index plan for the vLLM/embedding pin move; the absence appears real but no source names it via search command or scope, matching the critic's original complaint.",
+   "reviewer": "critic-citations"
+  },
+  {
+   "catalog": "foundation",
+   "layer": "code-navigation",
+   "severity": "low",
+   "claim": "critic.uncited_claims[4] unsupported: Foundation code-navigation: 'Serena dev pin rationale ... is not recorded in the catalog files read' names no files and no search.",
+   "evidence": "rg -c -i \"dev pin rationale",
+   "fix": "why.*dev commit|dev0.*rationale\"  → 1 hit (only the claim itself, catalogs/sota-convergence/manifest-20260923.json:1608) | Checked catalogs/foundation/decisions.json:576-600, recipes/README.md:107, docs/new-host-grand-list.md:44, blueprints/token-native-focus/saturation-audit.json:7602-7616 — all name the pinned dev commit c6fbd1c5 and note it's ahead of v1.7.0, but none states why the dev commit was chosen over the release; no rationale source exists in either tree.",
+   "reviewer": "critic-citations"
+  },
+  {
+   "catalog": "foundation",
+   "layer": "token-efficiency",
+   "severity": "medium",
+   "claim": "critic.uncited_claims[6] contradicted: Foundation token-efficiency: 'Five-plus docs still link the pre-rename chopratejas/headroom identity' cites only one example (closure L61) and gives no rg command.",
+   "evidence": "`cd  && rg -c 'chopratejas/headroom' -g '*.md'` -> 8 files (docs/foundation-closure-20260921.md, docs/token-session-handbook.md, docs/foundation-stack.md, docs/token-efficiency-stack.md, docs/landscape-freshness-notes.md, docs/stack.md, catalogs/sota-convergence/README.md, evidence/artifacts/foundation-closure-20260921/claude-review.md)",
+   "fix": "Critic said \"only one example... no rg command,\" but the target manifest itself already records this exact rg command at <work-dir>/lanes.json:3235 (\"rg -c 'chopratejas/headroom' -g '*.md' in nas-wt-conv-20260923 -> 8 files\"), and a fresh run against nas-wt-critic reproduces 8 matching files, confirming \"five-plus docs.\"",
+   "reviewer": "critic-citations"
+  },
+  {
+   "catalog": "trading",
+   "layer": "storage-compute",
+   "severity": "medium",
+   "claim": "critic.uncited_claims[10] contradicted: Trading storage-compute and data-quality-orchestration: 'No conditional in this layer is used by a receipt' gives no rg command.",
+   "evidence": "blueprints/us-equities/research-runtime/receipt.json:6-9 (component_ids includes \"dagu\"); dagu decision=conditional in <work-dir>/trading-by-layer.json layers[\"data-quality-orchestration\"]",
+   "fix": "The claim covers storage-compute (true, no conditional receipt-used there) and data-quality-orchestration jointly, but dagu is a conditional decision there and is used by this receipt plus wsl-transport-recovery/receipt.json and receipt-attempt-1.json, so the joint claim is false.",
+   "reviewer": "critic-citations"
+  },
+  {
+   "catalog": "trading",
+   "layer": "backtesting-engine",
+   "severity": "medium",
+   "claim": "critic.uncited_claims[11] contradicted: Trading backtesting-engine: 'SimulationModule + SimulatedExchange.adjust_account exist at rc5' gives no file line within exchange.rs or modules/mod.rs.",
+   "evidence": "<work-dir>/manifest-20260923.draft.json:6663 and :6671 (\"crates/backtest/src/exchange.rs line 661 defines `pub fn adjust_account`... exchange.rs line 1674\"); same text at lanes.json:4204,4212",
+   "fix": "exchange.rs does carry cited line numbers (661, 1674) for adjust_account; only modules/mod.rs's SimulationModule trait is given without a line number, so \"gives no file line within exchange.rs\" is false (partially true only for modules/mod.rs).",
+   "reviewer": "critic-citations"
+  },
+  {
+   "catalog": "foundation",
+   "layer": "",
+   "severity": "medium",
+   "claim": "critic.uncited_claims[15] contradicted: Beyond quality-evaluation: 'The native /security-review and security-best-practices skills already cover security review' has no citation.",
+   "evidence": "docs/native-skill-practice-20260921.md:13",
+   "fix": "Doc says security-best-practices coverage is unqualified (\"security findings and false-positive control remain unqualified\"), contradicting manifest's unqualified \"already cover security review\" claim (manifest-20260923.json:3370).",
+   "reviewer": "critic-citations"
+  },
+  {
+   "catalog": "foundation",
+   "layer": "",
+   "severity": "low",
+   "claim": "critic.uncited_claims[16] unsupported: Beyond recovery-portability: casey/just, 'Project scripts and the Dagu workflows already act as task runners', has no citation.",
+   "evidence": "rg -n \"Project scripts and the Dagu workflows already act as task runners",
+   "fix": "task runner\"  -g '*.json' -g '*.md' → only self-referencing hit in manifest-20260923.json:4575/10241 and unrelated \"task runner\" role strings for `just`/`mise` in star-audit.json:912; no source ties Dagu to replacing `just` as a task runner. foundation.json's recovery-portability layer entry (catalogs/landscape/foundation.json, layer_id recovery-portability) cites only uv/Restic/mise, never Dagu-as-task-runner.",
+   "reviewer": "critic-citations"
+  },
+  {
+   "catalog": "foundation",
+   "layer": "",
+   "severity": "low",
+   "claim": "critic.uncited_claims[17] mixed: Beyond backtesting-engine: ai-trader 'Taiwanese commission and 95% cash allocation' and pybroker 'without IBKR/Alpaca execution receipts' have no file or line.",
+   "evidence": "catalogs/us-equities/star-audit.md:78 (also star-audit.json:867)",
+   "fix": "ai-trader Taiwanese-commission/95%-cash part contradicted as uncited (star-audit.md:78 states it); pybroker IBKR/Alpaca receipts part unsupported",
+   "reviewer": "critic-citations"
+  },
+  {
+   "catalog": "foundation",
+   "layer": "",
+   "severity": "low",
+   "claim": "critic.uncited_claims[18] unsupported: Beyond research-factors-ml: JerBouma/FinanceToolkit 'fundamentals ratios overlap edgartools' has no citation.",
+   "evidence": "rg -n \"FinanceToolkit\"  (all hits) and <work-dir>/trading-by-layer.json data-edgartools entry",
+   "fix": "manifest-20260923.json:7755-7759 cites only GitHub metadata for the \"fundamentals ratios overlap edgartools\" claim; edgartools' own role text (trading-by-layer.json, id data-edgartools) never mentions ratio computation, so no file/line supports the overlap assertion.",
+   "reviewer": "critic-citations"
+  },
+  {
+   "catalog": "foundation",
+   "layer": "",
+   "severity": "medium",
+   "claim": "critic.uncited_claims[19] contradicted: Beyond scheduling-supervision: 'The star audit records that restic scheduling is absent' gives no star-audit.md line.",
+   "evidence": "catalogs/us-equities/star-audit.md:98",
+   "fix": "star-audit.md:98 reads \"...absent scheduling, off-host recovery and application-consistent live-database restores remain limitations,\" directly recording restic scheduling as absent — a real star-audit.md line, contradicting the critic's claim that none exists.",
+   "reviewer": "critic-citations"
   }
  ]
 }

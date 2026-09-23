@@ -8034,8 +8034,8 @@
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260923.json",
-      "sha256": "812c913c1e333ba0dca7721832569741f0b9d50618bad4ea4e434c9c031ef6d2",
-      "bytes": 568301
+      "sha256": "18931a86fcb701aa012dc93f5bdae771b70fc319002269d37d66a6842816164b",
+      "bytes": 716008
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -12409,8 +12409,8 @@
     },
     {
       "path": "evidence/artifacts/sota-convergence-review-20260923/manifest-citation-review.json",
-      "sha256": "dbfe159a5dda9e3772405dc410ac761bfdb4c9baa0621ccb5ba9b22c00462890",
-      "bytes": 67506
+      "sha256": "ace5719e1db321555501577ad4400c1707f3e77e873bf91208434d2e1f574a96",
+      "bytes": 78349
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/README.md",
