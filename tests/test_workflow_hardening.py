@@ -636,5 +636,70 @@ class PinningTests(unittest.TestCase):
         self.assertEqual(unpinned, [])
 
 
+
+SHELL_BREAK = {"|", "||", "&&", ";", ">", ">>", "2>&1", "&>", "2>", "<"}
+QUIET_FLAGS = {"-v", "-q", "-b", "-f", "-c", "--verbose", "--quiet", "--buffer", "--failfast", "--catch", "--locals"}
+
+
+def unittest_invocations(job_text):
+    """The argument lists of every ``python3 -m unittest`` command in a job's text."""
+    found = []
+    for match in re.finditer(r"python3? -m unittest\b([^\n]*)", job_text):
+        args = []
+        for token in match.group(1).split():
+            if token in SHELL_BREAK or token.startswith((">", "2>", "|")):
+                break
+            args.append(token)
+        found.append(args)
+    return found
+
+
+def runs_whole_suite(args):
+    """True for the whole project suite: no module or pattern arguments, or ``discover``
+    without ``-p`` over the default or ``tests`` start directory."""
+    rest = [a for a in args if a not in QUIET_FLAGS]
+    if not rest:
+        return True
+    if rest[0] != "discover" or any(a in ("-p", "--pattern") for a in rest):
+        return False
+    start = next((rest[i + 1] for i, a in enumerate(rest[:-1]) if a in ("-s", "--start-directory")), ".")
+    return start.rstrip("/") in (".", "tests")
+
+
+def checkout_steps(job_text):
+    return [m.group(0) for m in re.finditer(r"(?ms)^      - [^\n]*\n(?:(?!^      - ).*\n?)*", job_text)
+            if "actions/checkout@" in m.group(0)]
+
+
+class WholeSuiteJobsCheckOutFullHistory(unittest.TestCase):
+    """tests/test_release_pin_contents.py resolves the pinned release commit and tag, which a
+    depth-1 clone of a main that has moved past the release does not contain (catalog-freshness
+    run 35931645459), so every job that runs the whole project suite must fetch full history."""
+
+    def test_whole_suite_jobs_set_fetch_depth_zero(self):
+        suite_jobs = []
+        for path in sorted(WORKFLOWS.glob("*.yml")):
+            for job_id, job_text in jobs(path.read_text(encoding="utf-8")).items():
+                if any(runs_whole_suite(args) for args in unittest_invocations(job_text)):
+                    suite_jobs.append(f"{path.name}:{job_id}")
+                    checkouts = checkout_steps(job_text)
+                    with self.subTest(job=f"{path.name}:{job_id}"):
+                        self.assertTrue(checkouts, "runs the suite without a checkout step")
+                        for step in checkouts:
+                            self.assertRegex(step, r"(?m)^\s+fetch-depth:\s*0\s*(#.*)?$")
+        self.assertIn("catalog-freshness.yml:freshness", suite_jobs)
+        self.assertIn("validate.yml:validate", suite_jobs)
+
+    def test_whole_suite_classification(self):
+        cases = {(): True, ("-v",): True, ("discover",): True, ("discover", "-s", "tests"): True,
+                 ("tests.test_x", "-v"): False, ("discover", "-s", "tools/token-report", "-p", "t.py", "-q"): False,
+                 ("discover", "-s", "tools/token-report"): False, ("discover", "-p", "test_a*.py"): False}
+        for args, whole in cases.items():
+            with self.subTest(args=args):
+                self.assertIs(runs_whole_suite(list(args)), whole)
+        self.assertEqual(unittest_invocations("run: python3 -m unittest 2>&1 | tee log\n"), [[]])
+        self.assertEqual(unittest_invocations("run: python3 -m unittest -v >full.log 2>&1\n"), [["-v"]])
+
+
 if __name__ == "__main__":
     unittest.main()

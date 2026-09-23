@@ -3044,8 +3044,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "0854b72fc1e91f0bf1feb2ced04044b49cdf09998c87d23afc16028fc5afbd21",
-      "bytes": 19983
+      "sha256": "473e24d15ca8c2d991ad25667251d18632514386cfd03c6fbf05f549aa81375a",
+      "bytes": 20376
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -28160,8 +28160,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "13928d7689e1796be5ef78c5d897700db0d4f2837fb171849253dc3374a2619b",
-      "bytes": 38080
+      "sha256": "45d653a42656437beabbd96d549468e13687d110c094228ff6848aa675b49fa4",
+      "bytes": 41369
     },
     {
       "path": "tests/test_workflow_security.py",
