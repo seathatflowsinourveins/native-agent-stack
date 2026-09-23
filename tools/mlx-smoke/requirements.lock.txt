@@ -801,9 +801,9 @@ tqdm==4.70.1 \
     # via
     #   huggingface-hub
     #   transformers
-transformers==5.0.0rc1 \
-    --hash=sha256:1fdde557b96ef8ea277c45b8e0d558f1e167fe28a98593f4c4aec0277e335821 \
-    --hash=sha256:8b9604700769872cab4280dbcde201f557e93f72ee5a85c4592275ab4f15d330
+transformers==5.10.1 \
+    --hash=sha256:31112d1dcdfcf9934242acbba891f44e2279ff74b9b8ba4595640e0e04195a3a \
+    --hash=sha256:ccb919ea1b77338b44d0d45d23f7472081906b1bb6ed8e5f5cf4d692d1da03d4
     # via mlx-lm
 typer==0.27.2 \
     --hash=sha256:269b7eb9d3c202ca84b4bc9618cb04ebb43d3d4d1e567e4c768607232c05f945 \
