@@ -248,8 +248,10 @@ ISOLATION_ARGS = ("--ignore-user-config", "-c", "features.hooks=false", "-c", "f
 AUDIT_NAME = "blind-audit.json"
 # CLIs that reach memory stores, code indexes, session history, git history or the network.
 AUDIT_TOOLS = ("git", "ai-memory", "agentsview", "mcporter", "qmd", "socraticode", "jcodemunch", "serena",
-               "curl", "wget")
-ABSOLUTE_PATH = re.compile(r"(?<![\w.~-])(/[^\s'\"|;&<>()`]+)")
+               "sqlite3", "curl", "wget")
+ABSOLUTE_PATH = re.compile(r"(?<![\w.~}-])(/[^\s'\"|;&<>()`]+)")
+HOME_PATH = re.compile(r"(?:~|\$HOME|\$\{HOME\})(?:/[^\s'\"|;&<>()`]*)?")
+PARENT_PATH = re.compile(r"(?:^|[\s'\"=:])((?:[^\s'\"|;&<>()`]*/)?\.\.(?:/[^\s'\"|;&<>()`]*)?)")
 SYSTEM_PREFIXES = ("/bin/", "/usr/", "/dev/null")
 
 
@@ -280,6 +282,8 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
                        for path in ABSOLUTE_PATH.findall(command)
                        if not path.startswith(SYSTEM_PREFIXES)
                        and not any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots)]
+            reasons += [f"home-relative path: {path}" for path in HOME_PATH.findall(command)]
+            reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
             words = set(re.findall(r"[A-Za-z][\w.-]*", command))
             reasons += [f"runs {tool}" for tool in AUDIT_TOOLS if tool in words]
             if reasons:
@@ -450,10 +454,12 @@ def main(argv=None) -> int:
         print(f"codex_lane: output schema not found: {schema_path}", file=sys.stderr)
         return 2
     template = prompt_path.read_text(encoding="utf-8")
-    if (repo / ".git").exists() and not args.allow_git_history:
-        print(f"codex_lane: {repo} has .git, whose history recovers every label blind_checkout.py strips; "
-              "run the lane on a blind_checkout.py --export copy, or pass --allow-git-history outside a blind wave",
-              file=sys.stderr)
+    git_dirs = [str(path) for path in (repo, *repo.parents) if (path / ".git").exists()]
+    if git_dirs and not args.allow_git_history:
+        # git walks up from a subdirectory, so an export inside any repository still reaches history.
+        print(f"codex_lane: {git_dirs[0]} has .git, whose history a child can read from {repo}; run the lane on a "
+              "blind_checkout.py --export copy placed outside every repository, or pass --allow-git-history "
+              "outside a blind wave", file=sys.stderr)
         return 2
 
     layers_filter = None

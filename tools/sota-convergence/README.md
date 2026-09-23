@@ -1208,13 +1208,21 @@ What remains and how it is handled:
 - **Shell reads:** `--sandbox read-only` still lets a child read any host path and run CLIs such as
   ai-memory from `PATH`. Rule 1 of `lane-prompt.md` forbids it, and so does the Claude lane's blind rule.
 - **Global instructions:** a probe child quoted `$CODEX_HOME/AGENTS.md`, so that file still loads.
-- **Git history:** `codex_lane.py` refuses a `--repo` that contains `.git` unless `--allow-git-history`
-  is passed. Run the lanes on a `blind_checkout.py --export` copy.
+- **Git history:** `codex_lane.py` refuses a `--repo` when it or any parent directory has `.git`, because git
+  walks up from a subdirectory. Pass `--allow-git-history` only outside a blind wave. Run the lanes on a
+  `blind_checkout.py --export` copy placed outside every repository.
 - **Blind audit:** after each run, `codex_lane.py` writes `<work-dir>/codex/blind-audit.json`, a
   report-only reading of each child's events. It counts web searches and MCP tool calls, and flags
-  commands that name an absolute path outside the repository and the packets directory or that run
-  git, ai-memory, agentsview, mcporter, qmd, socraticode, jcodemunch, serena, curl or wget. A flag is
-  evidence for the coordinator to review and disclose, not a verdict.
+  commands that do any of the following:
+  - name an absolute path outside the repository and the packets directory;
+  - use a `~`, `$HOME` or `${HOME}` path;
+  - climb out with `..`;
+  - run git, ai-memory, agentsview, mcporter, qmd, socraticode, jcodemunch, serena, sqlite3, curl or wget.
+
+  A flag is evidence for the coordinator to review and disclose, not a verdict.
+- **Claude lane:** it has no equivalent audit in these tools. Its agents run Read, Glob and Grep only, but
+  those have no path limit. A wave's coordinator audits the file paths in the lane's agent transcripts and
+  discloses the result.
 
 `--prompt` and `--schema` override the default `lane-prompt.md` /
 `lane-return.schema.json` paths (both otherwise resolved next to
