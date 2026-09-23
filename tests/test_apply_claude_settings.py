@@ -240,5 +240,27 @@ class BackupTests(unittest.TestCase):
             self.assertEqual(second.read_text(), '{"v": 2}')
 
 
+class RobustnessTests(unittest.TestCase):
+    def test_malformed_hook_groups_do_not_crash(self):
+        base = {"hooks": {"Stop": [{"matcher": "", "hooks": 5}, "not-a-group"]}}
+        template = {"hooks": {"Stop": [{"matcher": "", "hooks": [{"type": "command", "command": "x"}]}]}}
+        merged = acs.merge_settings(base, template)
+        commands = [h["command"] for g in merged["hooks"]["Stop"] if isinstance(g, dict)
+                    for h in (g["hooks"] if isinstance(g["hooks"], list) else [])]
+        self.assertEqual(commands, ["x"])
+
+    def test_dangling_symlink_backup_name_is_skipped(self):
+        import tempfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "settings.json"
+            target.write_text("{}")
+            with mock.patch.object(acs.time, "strftime", return_value="20260923T000000Z"):
+                (Path(tmp) / "settings.json.bak.20260923T000000Z").symlink_to(Path(tmp) / "missing")
+                backup = acs.write_backup(target)
+            self.assertEqual(backup.name, "settings.json.bak.20260923T000000Z.1")
+            self.assertEqual(backup.read_text(), "{}")
+
+
 if __name__ == "__main__":
     unittest.main()

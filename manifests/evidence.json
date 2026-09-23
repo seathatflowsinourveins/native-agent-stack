@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -3139,13 +3139,13 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "0c15d8a01958a65ce34b916273d0c50397ded6825bc0059b22fd762fe13cc326",
-      "bytes": 17576
+      "sha256": "814ae27fe514025181bc285231550a3e95bd95d15dbeb69e03c8f4839d16744e",
+      "bytes": 18050
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "e44dd25800a5ce6398f4d346bb910e2dd191a4add7cd41ba20cb1fbee1a3e383",
-      "bytes": 57425
+      "sha256": "a7ca6319798be7532a47d60570548b5ee89f1a28a63b49918105f009a720dc47",
+      "bytes": 57899
     },
     {
       "path": "adoption/bootstrap.md",
@@ -14825,8 +14825,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "0ac6c9f42ead197e4e576dfba4170b591a46bc870e9270083b181dd5b5fe9013",
-      "bytes": 22820
+      "sha256": "c1a74467b813530f08be6ae0fa22625cd4918c91e3e2672b91f46c7be0d226d6",
+      "bytes": 26131
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
@@ -15030,8 +15030,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "1411cc42cc9057208a9c2983d4d901fa9a4b9296951fd5671f5e20797867c928",
-      "bytes": 8029
+      "sha256": "9ee9add18e11d6e4c1a0485301e0949eae9f9bf4c3933d2b2b75bd2ce8824176",
+      "bytes": 11828
     },
     {
       "path": "tests/test_job_recovery.py",

@@ -7,6 +7,7 @@ binary itself is never invoked here; MCP idempotency is tested against
 placeholder rendering and `claude mcp add` argument order are tested as data.
 """
 
+import io
 import json
 import sys
 import tempfile
@@ -152,6 +153,72 @@ class McpRenderAndCommandTests(unittest.TestCase):
             results = icp.install_mcp_servers("claude", False, Path("/h"), Path("/e"))
         self.assertEqual(results, ["differs", "differs", "differs"])
         self.assertEqual(calls, [])
+
+
+class McpGetOutputTests(unittest.TestCase):
+    # Recorded from `claude mcp get` (claude 2.1.280, 2026-09-23) with the home path replaced.
+    SERENA = (
+        "serena:\n  Scope: User config (available in all your projects)\n  Status: \u2714 Connected\n"
+        "  Type: stdio\n  Command: /home/example/.local/share/codex-ecosystem/bin/serena-context\n"
+        "  Args: start-mcp-server --transport stdio --project-from-cwd --context claude-code "
+        "--enable-web-dashboard true --open-web-dashboard false --enable-gui-log-window false\n"
+        "  Environment:\n\nTo remove this server, run: claude mcp remove serena -s user\n"
+    )
+    JCODEMUNCH = (
+        "jcodemunch:\n  Scope: User config (available in all your projects)\n  Status: \u2714 Connected\n"
+        "  Type: stdio\n  Command: /home/example/.local/share/codex-ecosystem/bin/jcodemunch-mcp\n  Args:\n"
+        "  Environment:\n    CODE_INDEX_PATH=/home/example/.code-index\n    JCODEMUNCH_SHARE_SAVINGS=0\n"
+        "\nTo remove this server, run: claude mcp remove jcodemunch -s user\n"
+    )
+    AI_MEMORY = (
+        "ai-memory:\n  Scope: User config (available in all your projects)\n  Status: \u2714 Connected\n"
+        "  Type: http\n  URL: http://127.0.0.1:49374/mcp\n\nTo remove this server, run: claude mcp remove ai-memory -s user\n"
+    )
+
+    def rendered(self):
+        return icp.render_servers(json.loads(icp.MCP_TEMPLATE.read_text()),
+                                  Path("/home/example"), Path("/home/example/.local/share/codex-ecosystem"))
+
+    def matches(self, text, spec):
+        kind = spec.get("type", "stdio")
+        return icp.existing_config_matches(text, kind, spec["url"] if kind == "http" else spec["command"],
+                                           spec.get("args", []), spec.get("env", {}))
+
+    def test_recorded_outputs_match_the_rendered_template(self):
+        servers = self.rendered()
+        self.assertTrue(self.matches(self.SERENA, servers["serena"]))
+        self.assertTrue(self.matches(self.JCODEMUNCH, servers["jcodemunch"]))
+        self.assertTrue(self.matches(self.AI_MEMORY, servers["ai-memory"]))
+
+    def test_reordered_or_extra_args_do_not_match(self):
+        spec = dict(self.rendered()["serena"])
+        reordered = self.SERENA.replace("--transport stdio --project-from-cwd", "--project-from-cwd --transport stdio")
+        extra = self.SERENA.replace("--enable-gui-log-window false", "--enable-gui-log-window false --verbose")
+        self.assertFalse(self.matches(reordered, spec))
+        self.assertFalse(self.matches(extra, spec))
+
+    def test_get_runs_outside_any_project(self):
+        seen = {}
+
+        def fake_run(cmd, **kwargs):
+            seen["cwd"] = kwargs.get("cwd")
+            return mock.Mock(returncode=1, stdout="")
+        with mock.patch.object(icp.subprocess, "run", side_effect=fake_run):
+            self.assertIsNone(icp.claude_mcp_get("claude", "serena"))
+        self.assertIsNotNone(seen["cwd"])
+        self.assertNotEqual(Path(seen["cwd"]).resolve(), Path.cwd().resolve())
+
+    def test_dry_run_with_replace_shows_the_remove(self):
+        with mock.patch.object(icp, "claude_mcp_get", return_value="x:\n  Type: stdio\n  Command: /other\n"), \
+             mock.patch("sys.stdout", new_callable=io.StringIO) as out:
+            icp.install_mcp_servers("claude", True, Path("/home/example"), Path("/e"), replace=True)
+        self.assertIn("mcp remove serena -s user", out.getvalue())
+
+    def test_default_eco_root_follows_home(self):
+        with mock.patch.dict(icp.os.environ, {}, clear=False):
+            icp.os.environ.pop("ECO_INSTALL_ROOT", None)
+            self.assertEqual(icp.default_eco_root(Path("/home/example")),
+                             Path("/home/example/.local/share/codex-ecosystem"))
 
 
 if __name__ == "__main__":

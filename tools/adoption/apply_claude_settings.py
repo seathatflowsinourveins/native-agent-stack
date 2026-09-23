@@ -46,6 +46,12 @@ def hook_command(entry: dict) -> str | None:
     return cmd if isinstance(cmd, str) else None
 
 
+def hook_list(group: dict) -> list:
+    """A matcher group's `hooks` array, or [] when it is missing or malformed."""
+    hooks = group.get("hooks")
+    return hooks if isinstance(hooks, list) else []
+
+
 def command_key(cmd: str) -> str:
     """Compare commands by their shell words, so quoting differences such as
     `python3 "/x/guard.py"` vs `python3 /x/guard.py` are one hook."""
@@ -75,13 +81,13 @@ def merge_hooks(base: dict, incoming: dict) -> dict:
             merged[event] = copy.deepcopy(incoming_groups)
             continue
         seen = {command_key(c) for g in base_groups if isinstance(g, dict)
-                for c in map(hook_command, g.get("hooks") or []) if c is not None}
+                for c in map(hook_command, hook_list(g)) if c is not None}
         for incoming_group in incoming_groups:
             if not isinstance(incoming_group, dict):
                 base_groups.append(copy.deepcopy(incoming_group))
                 continue
             fresh = []
-            for hook in incoming_group.get("hooks") or []:
+            for hook in hook_list(incoming_group):
                 cmd = hook_command(hook)
                 if cmd is not None and command_key(cmd) in seen:
                     continue
@@ -156,7 +162,7 @@ def backup_path(target: Path) -> Path:
     timestamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
     candidate = target.with_name(f"{target.name}.bak.{timestamp}")
     counter = 1
-    while candidate.exists():
+    while os.path.lexists(candidate):
         candidate = target.with_name(f"{target.name}.bak.{timestamp}.{counter}")
         counter += 1
     return candidate

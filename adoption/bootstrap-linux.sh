@@ -303,6 +303,14 @@ install_native() {
   fetch "$url" "$sha256" "$download"
   chmod 0755 "$download"
   "$download" install "$version"
+  # When bin_dir is the installer's own ~/.local/bin, its launcher (a symlink
+  # into ~/.local/share/claude/versions) already provides the command; writing
+  # ours there would replace it with a script that execs itself.
+  if [[ "$(cd "$bin_dir" && pwd -P)" == "$(cd "$HOME/.local/bin" 2>/dev/null && pwd -P)" ]]; then
+    return 0
+  fi
+  # Remove first so the redirect never writes through an existing symlink.
+  rm -f "$bin_dir/$bin_name"
   {
     printf '#!/usr/bin/env bash\n'
     printf '# Native auto-updating launcher (installed by %s install); the ecosystem no longer pins a snapshot.\n' "$id"
@@ -404,6 +412,6 @@ if [[ "$configure_claude_user_profile" == 1 ]]; then
   python3 "$repo_root/tools/adoption/install_claude_profile.py" --claude-bin "$bin_dir/claude" --eco-root "$ecosystem_root"
 else
   printf '\nAfter native Claude sign-in, run:\n'
-  printf '  python3 %q/tools/adoption/install_claude_profile.py\n' "$repo_root"
+  printf '  python3 %q/tools/adoption/install_claude_profile.py --eco-root %q\n' "$repo_root" "$ecosystem_root"
   printf 'to install the guard hook, agents and user-scope MCP servers (or re-run this script with --configure-claude-user-profile).\n'
 fi

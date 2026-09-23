@@ -29,6 +29,7 @@ import shutil
 import string
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -103,35 +104,56 @@ def install_agents(home: Path, dry_run: bool) -> list[str]:
 
 
 def claude_mcp_get(claude_bin: str, name: str) -> str | None:
-    result = subprocess.run([claude_bin, "mcp", "get", name], capture_output=True, text=True, timeout=30, check=False)
+    """`claude mcp get <name>` run from an empty temporary directory, so no
+    project (.mcp.json) or local (per-path) entry can shadow the user-scope one."""
+    with tempfile.TemporaryDirectory() as neutral:
+        result = subprocess.run([claude_bin, "mcp", "get", name], capture_output=True, text=True,
+                                timeout=30, check=False, cwd=neutral)
     if result.returncode != 0:
         return None
     return result.stdout
 
 
+def parse_mcp_get(text: str) -> dict:
+    """Fields of `claude mcp get` output (claude 2.1.280): `  Type: stdio`,
+    `  Command: ...`, `  Args: a b c`, `  URL: ...`, and an `  Environment:`
+    block of `    KEY=VALUE` lines."""
+    fields: dict = {"env": {}}
+    in_env = False
+    for line in text.splitlines():
+        if in_env and line.startswith("    ") and "=" in line:
+            key, _, value = line.strip().partition("=")
+            fields["env"][key] = value
+            continue
+        in_env = False
+        stripped = line.strip()
+        if stripped == "Environment:":
+            in_env = True
+            continue
+        key, sep, value = stripped.partition(":")
+        if sep and line.startswith("  ") and key in ("Scope", "Type", "Command", "Args", "URL"):
+            fields[key.lower()] = value.strip()
+    return fields
+
+
 def existing_config_matches(existing_text: str, server_type: str, command_or_url: str, args: list[str], env: dict) -> bool:
-    """Best-effort match against `claude mcp get`'s text output: same
-    transport type, same command/URL, same args, and every expected env
+    """Exact match against `claude mcp get`'s fields: same transport, the same
+    command or URL, the same argument list in order, and every expected env
     NAME present (values are not asserted; the running host owns them)."""
-    if server_type == "http":
-        return command_or_url in existing_text and "Type: http" in existing_text
-    if "Type: stdio" not in existing_text:
+    fields = parse_mcp_get(existing_text)
+    if fields.get("type") != server_type:
         return False
-    if command_or_url not in existing_text:
-        return False
-    for arg in args:
-        if arg and arg not in existing_text:
-            return False
-    for key in env:
-        if key not in existing_text:
-            return False
-    return True
+    if server_type != "stdio":
+        return fields.get("url") == command_or_url
+    return (fields.get("command") == command_or_url
+            and fields.get("args", "") == " ".join(args)
+            and all(key in fields["env"] for key in env))
 
 
-def default_eco_root() -> Path:
+def default_eco_root(home: Path) -> Path:
     """The ecosystem prefix the bootstraps install into (their ECO_INSTALL_ROOT)."""
     env_root = os.environ.get("ECO_INSTALL_ROOT")
-    return Path(env_root) if env_root else Path.home() / ".local" / "share" / "codex-ecosystem"
+    return Path(env_root) if env_root else home / ".local" / "share" / "codex-ecosystem"
 
 
 def render_servers(data: dict, home: Path, eco_root: Path) -> dict:
@@ -189,13 +211,15 @@ def install_mcp_servers(claude_bin: str, dry_run: bool, home: Path, eco_root: Pa
             results.append("differs")
             continue
         cmd = mcp_add_command(claude_bin, name, spec)
+        remove = [claude_bin, "mcp", "remove", name, "-s", "user"] if existing is not None else None
         if dry_run:
+            if remove:
+                print(f"mcp: would run: {shlex.join(remove)}")
             print(f"mcp: would run: {shlex.join(cmd)}")
             results.append("planned")
             continue
-        if existing is not None:
-            subprocess.run([claude_bin, "mcp", "remove", name, "-s", "user"],
-                           capture_output=True, text=True, timeout=30, check=False)
+        if remove:
+            subprocess.run(remove, capture_output=True, text=True, timeout=30, check=False)
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=60, check=False)
         if result.returncode != 0:
             raise InstallError(f"mcp: failed to register {name}: {result.stderr.strip()}")
@@ -209,7 +233,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--home", default=str(Path.home()), help="Target $HOME (default: current user's)")
     parser.add_argument("--claude-bin", default="claude", help="claude executable to use for MCP registration")
     parser.add_argument("--eco-root", default=None,
-                         help="Ecosystem prefix for ${ECO_ROOT} (default: $ECO_INSTALL_ROOT or ~/.local/share/codex-ecosystem)")
+                         help="Ecosystem prefix for ${ECO_ROOT} (default: $ECO_INSTALL_ROOT or <home>/.local/share/codex-ecosystem)")
     parser.add_argument("--replace-mcp", action="store_true",
                          help="Re-register a same-named MCP server whose existing config differs (default: leave it)")
     parser.add_argument("--only", choices=["guard", "agents", "mcp"], action="append",
@@ -229,7 +253,7 @@ def main(argv: list[str] | None = None) -> int:
         if "agents" in steps:
             install_agents(home, args.dry_run)
         if "mcp" in steps:
-            eco_root = Path(args.eco_root) if args.eco_root else default_eco_root()
+            eco_root = Path(args.eco_root) if args.eco_root else default_eco_root(home)
             install_mcp_servers(args.claude_bin, args.dry_run, home, eco_root, args.replace_mcp)
     except InstallError as error:
         print(f"install failed: {error}", file=sys.stderr)
