@@ -6319,6 +6319,11 @@
       "bytes": 869
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/evidence/alpaca-account-schema-20260923.json",
+      "sha256": "260f393d1acb9268f18b81413f0d2c9082a1762dbc7334adf75a3dc63903ea41",
+      "bytes": 1727
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/exits.py",
       "sha256": "189133e6df99bda201d73d36a15f45ccbfb38979a3319ae6f75d077f5db5b3df",
       "bytes": 7049
@@ -6400,8 +6405,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "7cc57e6305a8d4bb1806532895de82373fbcc27970e8c72460a935111db97201",
-      "bytes": 94565
+      "sha256": "94f7cdfe32aefe0aeb3e92ece16200c858a95dd61e2ce0d9c03c5318ac9e893d",
+      "bytes": 96987
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -6425,7 +6430,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "bdb8363c06ee85107b2461ecc965be60b669f015dc4ac0d31cc32878d51b1bb9",
+      "sha256": "fbe08571a958642ec4b158b2c2a83f9cff1cd1ce118137837184b47c731eca19",
       "bytes": 4661
     },
     {
@@ -6440,8 +6445,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "325f0817abc3607665c7a3d60c896721f9d667622bcf09ab00f9a4efa64f92a2",
-      "bytes": 46451
+      "sha256": "59ffbb35726b0909c9b9db9043f993242e9beb29329c0d851359617244b06934",
+      "bytes": 46491
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -14760,8 +14765,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "39aab2396aae673afe1c0d4cd18329da93058da45c65a8f36c8fb95c3f555700",
-      "bytes": 128471
+      "sha256": "e16392b12dc33e9af661c265f6125c39572a3ef526dbd6d88e889faa5d8f4878",
+      "bytes": 131943
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -14775,8 +14780,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "3a31bf896ee00b97ee141a6a5f16cb9b70df194dd38faad2d696060621648178",
-      "bytes": 40517
+      "sha256": "95d606e5aa79b4be25603ce77a8690c4008e59905a0e9bedbae4e73f538f3dd9",
+      "bytes": 41484
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
